@@ -83,9 +83,8 @@ pipeline
                                         }
 
                                         if (build_ok) {
-
-                                            try{
-                                                dir("${env.ISISROOT}") {
+                                            dir("${env.ISISROOT}") {
+                                                try  {
                                                     env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                                         sh """
                                                             source activate isis
@@ -96,7 +95,7 @@ pipeline
                                                             export ISISROOT=${env.ISISROOT}
                                                             export ISIS3TESTDATA="/isisData/testData"
                                                             export ISIS3DATA="/isisData/data"
-                                                            export PATH=`pwd`/../install/bin:$PATH
+                                                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                                                             automos -HELP
                                                             catlab -HELP
@@ -104,93 +103,92 @@ pipeline
 
                                                             ctest -R _unit_ -j4 -VV
                                                         """
-
                                                 }
-                                            }
-                                            catch(e) {
-                                                build_ok = false
-                                                echo e.toString()
-                                            }
+                                                catch(e) {
+                                                    build_ok = false
+                                                    echo e.toString()
+                                                }
 
-                                            try{
-                                                env.STAGE_STATUS = "Running app tests on ${env.OS}"
-                                                sh """
-                                                    source activate isis
-                                                    echo $ISIS3TESTDATA
-                                                    echo $ISIS3DATA
-                                                    echo $PATH
+                                                try{
+                                                    env.STAGE_STATUS = "Running app tests on ${env.OS}"
+                                                    sh """
+                                                        source activate isis
+                                                        echo $ISIS3TESTDATA
+                                                        echo $ISIS3DATA
+                                                        echo $PATH
 
-                                                    # environment variables
-                                                    export ISISROOT=${env.ISISROOT}
-                                                    export ISIS3TESTDATA="/isisData/testData"
-                                                    export ISIS3DATA='/isisData/data'
-                                                    export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                                        # environment variables
+                                                        export ISISROOT=${env.ISISROOT}
+                                                        export ISIS3TESTDATA="/isisData/testData"
+                                                        export ISIS3DATA='/isisData/data'
+                                                        export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
-                                                    catlab -HELP
-                                                    tabledump -HELP
+                                                        catlab -HELP
+                                                        tabledump -HELP
 
-                                                    ctest -R _app_ -j4 -VV
-                                                    source deactivate
+                                                        ctest -R _app_ -j4 -VV
+                                                        source deactivate
 
-                                                """
-                                            }
-                                            catch(e) {
-                                                build_ok = false
-                                                errors.add(env.STAGE_STATUS)
-                                                println e.toString()
-                                            }
+                                                    """
+                                                }
+                                                catch(e) {
+                                                    build_ok = false
+                                                    errors.add(env.STAGE_STATUS)
+                                                    println e.toString()
+                                                }
 
-                                            try{
-                                                env.STAGE_STATUS = "Running module tests on ${env.OS}"
-                                                sh """
-                                                    source activate isis
-                                                    echo $ISIS3TESTDATA
-                                                    echo $ISIS3DATA
-                                                    echo $PATH
+                                                try{
+                                                    env.STAGE_STATUS = "Running module tests on ${env.OS}"
+                                                    sh """
+                                                        source activate isis
+                                                        echo $ISIS3TESTDATA
+                                                        echo $ISIS3DATA
+                                                        echo $PATH
 
-                                                    # environment variables
-                                                    export ISISROOT=${env.ISISROOT}
-                                                    export ISIS3TESTDATA="/isisData/testData"
-                                                    export ISIS3DATA='/isisData/data'
-                                                    export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                                        # environment variables
+                                                        export ISISROOT=${env.ISISROOT}
+                                                        export ISIS3TESTDATA="/isisData/testData"
+                                                        export ISIS3DATA='/isisData/data'
+                                                        export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
-                                                    catlab -HELP
-                                                    tabledump -HELP
+                                                        catlab -HELP
+                                                        tabledump -HELP
 
-                                                    ctest -R _module_ -j4 -VV
-                                                    source deactivate
+                                                        ctest -R _module_ -j4 -VV
+                                                        source deactivate
 
-                                                """
-                                            }
-                                            catch(e) {
-                                                build_ok = false
-                                                errors.add(env.STAGE_STATUS)
-                                                println e.toString()
-                                            }
+                                                    """
+                                                }
+                                                catch(e) {
+                                                    build_ok = false
+                                                    errors.add(env.STAGE_STATUS)
+                                                    println e.toString()
+                                                }
 
-                                            try{
-                                                env.STAGE_STATUS = "Running gtests on ${env.OS}"
-                                                sh """
-                                                    source activate isis
-                                                    echo $ISIS3TESTDATA
-                                                    echo $ISIS3DATA
-                                                    echo $PATH
+                                                try{
+                                                    env.STAGE_STATUS = "Running gtests on ${env.OS}"
+                                                    sh """
+                                                        source activate isis
+                                                        echo $ISIS3TESTDATA
+                                                        echo $ISIS3DATA
+                                                        echo $PATH
 
-                                                    # environment variables
-                                                    export ISISROOT=${env.ISISROOT}
-                                                    export ISIS3TESTDATA="/isisData/testData"
-                                                    export ISIS3DATA='/isisData/data'
-                                                    export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                                        # environment variables
+                                                        export ISISROOT=${env.ISISROOT}
+                                                        export ISIS3TESTDATA="/isisData/testData"
+                                                        export ISIS3DATA='/isisData/data'
+                                                        export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
-                                                    ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
-                                                    source deactivate
+                                                        ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
+                                                        source deactivate
 
-                                                """
-                                            }
-                                            catch(e) {
-                                                build_ok = false
-                                                errors.add(env.STAGE_STATUS)
-                                                println e.toString()
+                                                    """
+                                                }
+                                                catch(e) {
+                                                    build_ok = false
+                                                    errors.add(env.STAGE_STATUS)
+                                                    println e.toString()
+                                                }
                                             }
                                         }
 
