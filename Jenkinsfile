@@ -3,6 +3,7 @@
 pipeline
 {
     agent any
+    
     stages {
         stage ("CI") {
             steps {
