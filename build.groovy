@@ -120,7 +120,6 @@ node("${env.OS.toLowerCase()}") {
                                     tabledump -HELP
 
                                     ctest -R _unit_ -j4 -VV
-                                    source deactivate
                                 """
 
                         }
@@ -130,6 +129,7 @@ node("${env.OS.toLowerCase()}") {
                     build_ok = false
                     echo e.toString()
                 }
+                sh 'source deactivate'
 
                 try{
                     stage("AppTests") {
@@ -150,8 +150,6 @@ node("${env.OS.toLowerCase()}") {
                             tabledump -HELP
 
                             ctest -R _app_ -j4 -VV
-                            source deactivate
-
                         """
                     }
                 }
@@ -160,6 +158,7 @@ node("${env.OS.toLowerCase()}") {
                     errors.add(env.STAGE_STATUS)
                     println e.toString()
                 }
+                sh 'source deactivate'
 
                 try{
                     stage("ModuleTests") {
@@ -180,8 +179,6 @@ node("${env.OS.toLowerCase()}") {
                             tabledump -HELP
 
                             ctest -R _module_ -j4 -VV
-                            source deactivate
-
                         """
                     }
                 }
@@ -190,6 +187,7 @@ node("${env.OS.toLowerCase()}") {
                     errors.add(env.STAGE_STATUS)
                     println e.toString()
                 }
+                sh 'source deactivate'
 
                 try{
                     stage("GTests") {
@@ -207,8 +205,6 @@ node("${env.OS.toLowerCase()}") {
                             export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
-                            source deactivate
-
                         """
                     }
                 }
@@ -217,6 +213,7 @@ node("${env.OS.toLowerCase()}") {
                     errors.add(env.STAGE_STATUS)
                     println e.toString()
                 }
+                sh 'source deactivate'
             }
         }
 
@@ -231,5 +228,13 @@ node("${env.OS.toLowerCase()}") {
             }
             setGitHubBuildStatus(comment)
         }
+    }
+
+    stage("Clean Up") {
+      env.STAGE_STATUS = "Removing conda environment"
+      sh '''
+          source deactivate
+          conda env remove --name isis
+      '''
     }
 }
