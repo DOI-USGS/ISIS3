@@ -8,7 +8,7 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    def groovy_utilities = load "${pwd()}/script.groovy"
+                    def groovy_utilities = load "${pwd()}/groovy_utilities.groovy"
 
                     def isisDataPath = '/isisData/data'
 
