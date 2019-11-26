@@ -4,14 +4,14 @@ channels:
   - defaults
 
 dependencies:
-  - ale>=0.3.2
+  - ale=0.5.0
   - boost=1.68.0
   - armadillo
   - blas
   - bullet
   - bz2file
   - bzip2
-  - cmake >=3.10
+  - cmake >=3.15
   - cspice
   - curl
   - doxygen
@@ -41,7 +41,7 @@ dependencies:
   - conda-forge/label/gcc7::nn
   - opencv>=3.0.0,<=4.0.0
   - openssl
-  - pcl
+  - pcl=1.9.1
   - protobuf=3.9.1
   - qhull
   - qt=5.9.6
