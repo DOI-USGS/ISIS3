@@ -38,6 +38,7 @@ dependencies:
   - mesalib
   - mysql
   - mysql-connector-c
+  - ninja
   - nanoflann=1.2.2
   - nlohmann_json
   - nn=1.86.0=h470a237_1003
