@@ -5,6 +5,7 @@ channels:
 
 dependencies:
   - ale>=0.3.2
+  - boost=1.68.0
   - armadillo
   - blas
   - bullet
