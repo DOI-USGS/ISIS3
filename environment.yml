@@ -42,7 +42,7 @@ dependencies:
   - conda-forge/label/gcc7::nn
   - opencv>=3.0.0,<=4.0.0
   - openssl
-  - pcl=1.9.1
+  - pcl=1.8.1
   - protobuf=3.9.1
   - qhull
   - qt=5.9.6
