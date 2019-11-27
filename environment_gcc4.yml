@@ -6,7 +6,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale=0.6.4
+  - ale=0.5.0=py37h41a55b7_1
   - boost=1.68.0
   - armadillo
   - blas
