@@ -6,7 +6,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale>=0.6.0
+  - ale=0.6.4=py37hdea6d71_0
   - boost=1.68.0
   - armadillo
   - blas
@@ -44,7 +44,7 @@ dependencies:
   - nn=1.86.0=h470a237_1003
   - opencv>=3.0.0,<=4.0.0
   - openssl
-  - pcl
+  - pcl=1.8.1
   - protobuf=3.5.2
   - qhull
   - qt=5.9.6
