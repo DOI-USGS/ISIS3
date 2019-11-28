@@ -4,6 +4,7 @@ channels:
   - defaults
 
 dependencies:
+  - libcxx
   - cxx-compiler
   - ale=0.6.4
   - boost=1.68.0
