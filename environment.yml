@@ -7,7 +7,7 @@ dependencies:
   - ale>=0.3.2
   - armadillo
   - blas
-  - bullet
+  - bullet==1.68
   - bz2file
   - bzip2
   - cmake >=3.10
