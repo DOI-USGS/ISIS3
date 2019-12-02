@@ -425,6 +425,11 @@ EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
+# Install the header files
+install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+file(GLOB ISIS_INCLUDE_FILES ${CMAKE_BINARY_DIR}/inc/*)
+install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.
 file(GLOB existingPlugins "${CMAKE_BINARY_DIR}/plugins/*.plugin")
