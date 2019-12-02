@@ -81,12 +81,20 @@ parser.add_argument(
     default=os.environ["CONDA_PREFIX"] + "/testData",
     help="ISIS3 Test Data Directory, default: %(default)s",
 )
+
+parser.add_argument(
+    "-a",
+    "--ale-dir",
+    default=os.environ["CONDA_PREFIX"] + "/aleData",
+    help="ISIS3 Ale Data Directory, default: %(default)s",
+)
 args = parser.parse_args()
 
 
 # Create the data directories:
 mkdir(args.data_dir)
 mkdir(args.test_dir)
+mkdir(args.ale_dir)
 
 # Create the conda activation and deactivation directories:
 activate_dir = os.environ["CONDA_PREFIX"] + "/etc/conda/activate.d"
@@ -109,8 +117,9 @@ with open(activate_vars_sh, mode="w") as a:
 export ISISROOT={}
 export ISIS3DATA={}
 export ISIS3TESTDATA={}
+export ALESPICEROOT={}
 """.format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir
+        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
     )
     a.write(script)
 print("Wrote " + activate_vars_sh)
@@ -120,6 +129,7 @@ with open(deactivate_vars_sh, mode="w") as d:
 unset ISISROOT
 unset ISIS3DATA
 unset ISIS3TESTDATA
+unset ALESPICEROOT
 """
     d.write(script)
 print("Wrote " + deactivate_vars_sh)
@@ -130,10 +140,11 @@ with open(activate_vars_csh, mode="w") as a:
 setenv ISISROOT {}
 setenv ISIS3DATA {}
 setenv ISIS3TESTDATA {}
+setenv ALESPICEROOT {}
 
 source $CONDA_PREFIX/scripts/tabCompletion.csh
 """.format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir
+        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
     )
     a.write(script)
 print("Wrote " + activate_vars_csh)
@@ -143,6 +154,7 @@ with open(deactivate_vars_csh, mode="w") as d:
 unsetenv ISISROOT
 unsetenv ISIS3DATA
 unsetenv ISIS3TESTDATA
+unsetenv ALESPICEROOT
 """
     d.write(script)
 print("Wrote " + deactivate_vars_csh)
@@ -153,8 +165,9 @@ with open(activate_vars_fish, mode="w") as a:
 set -gx ISISROOT {}
 set -gx ISIS3DATA {}
 set -gx ISIS3TESTDATA {}
+set -gx ALESPICEROOT {}
 """.format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir
+        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
     )
     a.write(script)
 print("Wrote " + activate_vars_fish)
@@ -164,6 +177,7 @@ with open(deactivate_vars_fish, mode="w") as d:
 set -e ISISROOT
 set -e ISIS3DATA
 set -e ISIS3TESTDATA
+set -e ALESPICEROOT
 """
     d.write(script)
 print("Wrote " + deactivate_vars_fish)
