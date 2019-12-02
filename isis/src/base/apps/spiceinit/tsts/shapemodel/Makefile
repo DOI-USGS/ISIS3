@@ -9,13 +9,13 @@ commands:
 # Test with IsisPreferences set for Embree
 	cp $(INPUT)/st_2458542208_v.cub $(OUTPUT)/ > /dev/null;
 	$(APPNAME) from=$(OUTPUT)/st_2458542208_v.cub shape=user \
-	model=$(ISIS3DATA)/hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds \
+	model='$$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_64q.bds' \
 	-pref=$(INPUT)/IsisPreferences_embree > /dev/null;
 	catlab from=$(OUTPUT)/st_2458542208_v.cub to=$(OUTPUT)/label_embree.pvl > /dev/null;
 
 # Test with IsisPreferences set for Bullet
 	$(APPNAME) from=$(OUTPUT)/st_2458542208_v.cub shape=user \
-	model=$(ISIS3DATA)/hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds \
+	model='$$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_64q.bds' \
 	-pref=$(INPUT)/IsisPreferences_bullet > /dev/null; 
 	catlab from=$(OUTPUT)/st_2458542208_v.cub to=$(OUTPUT)/label_bullet.pvl > /dev/null;
 

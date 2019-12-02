@@ -5,6 +5,7 @@ channels:
 
 dependencies:
   - ale>=0.3.2
+  - boost=1.68.0
   - armadillo
   - blas
   - boost-cpp<=1.67
@@ -38,6 +39,7 @@ dependencies:
   - mysql-connector-c
   - nanoflann
   - nlohmann_json
+  - ninja==1.7.2
   - conda-forge/label/gcc7::nn
   - opencv>=3.0.0,<=4.0.0
   - openssl

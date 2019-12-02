@@ -2,10 +2,18 @@
 
 [![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
+[![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 
 ## Table of Contents
 
+* [FAQ](README.md##FAQ)
 * [Installation](README.md##Installation)
+* [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
+* [ISIS Data Area](README.md##The ISIS Data Area)
+* [Installing Older Versions of ISIS](README.md##Installing older versions of ISIS)
+
+## FAQ
+We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
 
 ## Installation
 
@@ -31,10 +39,10 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
         #Activate the environment
         #Depending on your version of Anaconda use one of the following:
-        
+
         #Anaconda 3.4 and up:
         conda activate isis3
-        
+
         #Prior to Anaconda 3.4:
         source activate isis3
 
@@ -78,7 +86,7 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
 
-        More information about the ISIS3DATA environment variable and the ISIS3 Data Area can be found [here]("#The-ISIS3-Data-Area"). Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with one of the following commands:
+    More information about the ISIS3DATA environment variable and the ISIS3 Data Area can be found [here]("#The-ISIS3-Data-Area"). Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with one of the following commands:
 
         for Anaconda 3.4 and up - conda activate isis3
         prior to Anaconda 3.4 - source activate isis3
@@ -122,7 +130,7 @@ To build and compile ISIS3 requires following the instructions listed below, whi
 -   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
 
-## The ISIS3 Data Area
+## The ISIS Data Area
 
 ### Ancillary Data
 

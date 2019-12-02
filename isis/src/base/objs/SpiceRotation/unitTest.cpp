@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <cmath>
 
+#include <nlohmann/json.hpp>
+
 #include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
@@ -13,6 +15,7 @@
 extern int bodeul_(integer *body, doublereal *et, doublereal *ra,
                    doublereal *dec, doublereal *w, doublereal *lamda);
 
+using json = nlohmann::json;
 using namespace std;
 using namespace Isis;
 
@@ -36,7 +39,7 @@ int main(int argc, char *argv[]) {
   QString mocbc(dir + "moc.bc");
   QString mocbsp(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
-  QString pck("/usgs/cpkgs/isis3/data/base/kernels/pck/pck00009.tpc");
+  QString pck(dir + "../../kernels/pck/pck00009.tpc");
   QString cgFK(dir + "ROS_V29.TF");
   QString cgCK(dir + "CATT_DV_145_02_______00216.BC");
   //QString mocadd(dir+"mocAddendum.ti");
@@ -609,10 +612,104 @@ int main(int argc, char *argv[]) {
   cout << "     " << cgCJ[3] << " " << cgCJ[4] << " " << cgCJ[5] << endl;
   cout << "     " << cgCJ[6] << " " << cgCJ[7] << " " << cgCJ[8] << endl;
 
+  // Test loading cache from ALE ISD with only time dependent quaternions
+  cout << endl << endl << "Testing loading cache from ALE ISD with only time dependent quaternions ..." << endl;
+  SpiceRotation aleQuatRot(-94031);
+  // Test Rotations are 'xyz' euler angle rotations:
+  // [0, 0, 0],
+  // [-90, 0, 0],
+  // [-90, 180, 0],
+  // [-90, 180, 90]
+  json aleQuatIsd = {{"CkTableStartTime"    , 0.0},
+                     {"CkTableEndTime"      , 3.0},
+                     {"CkTableOriginalSize" , 4},
+                     {"EphemerisTimes"      , {0.0, 1.0, 2.0, 3.0}},
+                     {"TimeDependentFrames" , {-94031, 10014, 1}},
+                     {"Quaternions"         , {{0.0, 0.0, 0.0, 1.0},
+                                               {-1.0 / sqrt(2), 0.0, 0.0, 1.0 / sqrt(2)},
+                                               {0.0, 1.0 / sqrt(2), 1.0 / sqrt(2), 0.0},
+                                               {-0.5, -0.5, 0.5, 0.5}}}};
+  aleQuatRot.LoadCache(aleQuatIsd);
+  cout << "Frame type = " << aleQuatRot.getFrameType() << endl;
+  cout << "Is cached? " << (aleQuatRot.IsCached() ? "Yes" : "No") << endl;
+  cout << "Has AV? " << (aleQuatRot.HasAngularVelocity() ? "Yes" : "No") << endl;
+  vector<int> timeDepChain = aleQuatRot.TimeFrameChain();
+  cout << "Time dependent frame chain = { ";
+  for (int i = 0; i < timeDepChain.size(); i++) {
+    if (i > 0) {
+      cout << ", ";
+    }
+    cout << timeDepChain[i];
+  }
+  cout << " }" << endl;
+  vector<int> constChain = aleQuatRot.ConstantFrameChain();
+  cout << "Time dependent frame chain = { ";
+  for (int i = 0; i < constChain.size(); i++) {
+    if (i > 0) {
+      cout << ", ";
+    }
+    cout << constChain[i];
+  }
+  cout << " }" << endl;
+  for (int t = 0; t <= 3; t++) {
+    aleQuatRot.SetEphemerisTime(t);
+    vector<double> CJ = aleQuatRot.Matrix();
+    cout << "Time = " << aleQuatRot.EphemerisTime() << endl;
+    cout << "CJ(" << t << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
+    cout << "        " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
+    cout << "        " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
+  }
+
+  // Test loading cache from ALE ISD with time dependent quaternions and AV
+  cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and AV ..." << endl;
+  SpiceRotation aleQuatAVRot(-94031);
+  json aleQuatAVIsd(aleQuatIsd);
+  aleQuatAVIsd["AngularVelocity"] = {{-Isis::PI / 2, 0.0, 0.0},
+                                     {0.0, Isis::PI, 0.0},
+                                     {0.0, 0.0, Isis::PI / 2},
+                                     {0.0, 0.0, Isis::PI / 2}};
+  aleQuatAVRot.LoadCache(aleQuatAVIsd);
+  cout << "Has AV? " << (aleQuatAVRot.HasAngularVelocity() ? "Yes" : "No") << endl;
+
+  // Test loading cache from ALE ISD with time dependent quaternions and constant rotation
+  cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and constant rotation ..." << endl;
+  SpiceRotation aleQuatConstRot(-94031);
+  json aleQuatConstIsd(aleQuatIsd);
+  aleQuatConstIsd["TimeDependentFrames"] = {-94030, 10014, 1};
+  aleQuatConstIsd["ConstantFrames"] = {-94031, -94030};
+  aleQuatConstIsd["ConstantRotation"] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
+  aleQuatConstRot.LoadCache(aleQuatConstIsd);
+  timeDepChain = aleQuatConstRot.TimeFrameChain();
+  cout << "Time dependent frame chain = { ";
+  for (int i = 0; i < timeDepChain.size(); i++) {
+    if (i > 0) {
+      cout << ", ";
+    }
+    cout << timeDepChain[i];
+  }
+  cout << " }" << endl;
+  constChain = aleQuatConstRot.ConstantFrameChain();
+  cout << "Time dependent frame chain = { ";
+  for (int i = 0; i < constChain.size(); i++) {
+    if (i > 0) {
+      cout << ", ";
+    }
+    cout << constChain[i];
+  }
+  cout << " }" << endl;
+  for (int t = 0; t <= 3; t++) {
+    aleQuatConstRot.SetEphemerisTime(t);
+    vector<double> CJ = aleQuatConstRot.Matrix();
+    cout << "Time = " << aleQuatConstRot.EphemerisTime() << endl;
+    cout << "CJ(" << t << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
+    cout << "        " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
+    cout << "        " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
+  }
 
   //Test exceptions
   cout << endl << endl << "Testing exceptions..." << endl;
   SpiceRotation testRot(-94031); // MGS_MOC
+
 
   // SpiceRotation(frameCode, targetCode)
   //     "Cannot find [key] in text kernels
@@ -769,6 +866,17 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     testRot.ComputeAv();
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
+  // LoadCache(json)
+  //     "SpiceRotation::LoadCache(json) only support Spice source
+  try {
+    cout << endl;
+    json errorTestIsd = {"Invalid"};
+    linrot.LoadCache(errorTestIsd);
   }
   catch (IException &e) {
     e.print();

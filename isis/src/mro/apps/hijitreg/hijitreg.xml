@@ -555,7 +555,7 @@
           </brief>
           <description>
              This file will contain the ControlNet created in the hijitreg application.  The data
-             will be in Pvl format.  This option is required if the subsequent transformations of
+             will be in binary control net format (use cnetbin2pvl later to convert to PVL, if needed).  This option is required if the subsequent transformations of
              the FROM files is desired.  hijitreg is specifically designed to apply a 1-D
              transform that shifts each line in the line and sample direction as indicated in
              the control net.

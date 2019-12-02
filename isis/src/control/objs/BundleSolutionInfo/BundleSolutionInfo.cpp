@@ -290,8 +290,8 @@ namespace Isis {
   void BundleSolutionInfo::setOutputControl(Control *outputControl) {
     m_outputControl = outputControl;
   }
-    
-  
+
+
   /**
    * Sets m_outputControlName
    *
@@ -300,8 +300,8 @@ namespace Isis {
   void BundleSolutionInfo::setOutputControlName(QString name) {
     m_outputControlName = name;
   }
-  
-  
+
+
   /**
    * Returns m_outputControlName
    *
@@ -586,7 +586,7 @@ namespace Isis {
     fpOut << buf;
     sprintf(buf,"\n                       Output File Prefix: %s",
                 m_settings->outputFilePrefix().toStdString().c_str() );
-    fpOut <<buf;   
+    fpOut <<buf;
 
     sprintf(buf, "\n                       Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
@@ -784,7 +784,7 @@ namespace Isis {
       case SurfacePoint::Latitudinal:
         coord1Str = "LATITUDE";
         coord2Str = "LONGITUDE";
-        coord3Str = "RADIUS";  
+        coord3Str = "RADIUS";
         break;
       case SurfacePoint::Rectangular:
         coord1Str = "       X";
@@ -1042,16 +1042,39 @@ namespace Isis {
       }
     }
 
+    // Loop over the observations to find the longest file path/name in the
+    // bunch
+    int filePadding = 0;
+
+    for (int i = 0; i < numObservations; i++) {
+
+      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+
+      for (int j = 0; j < numImagesInObservation; j++) {
+        BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+
+        if (bundleImage->fileName().length() > filePadding) {
+          filePadding = bundleImage->fileName().length();
+        }
+      }
+    }
+
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMeasures\t\t\t\t\t\t\t\tRMS(pixels)\n");
-    fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t******************************  "
-                "**************************************************\n");
+
+    // Pad each element in the table with the space for the longest image
+    // path/name then padd it the length of the element + 1
+    QString header("Measures                            RMS(pixels)");
+    // This is padded by an extra 11 to move it center to the table
+    sprintf(buf,"%*s\n", header.length() + 11 + filePadding, header.toLatin1().data());
     fpOut << buf;
 
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|Accepted\t\t|\t\tTotal|\t|Samples\t\t|\t\t"
-                "Lines\t\t|\t\tTotal|\n");
+    QString dividers("***************************   *******************************************");
+    sprintf(buf,"%*s\n", dividers.length() + 1 + filePadding, dividers.toLatin1().data());
+    fpOut << buf;
+
+    QString fields("|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
+    sprintf(buf,"%*s\n", fields.length() + 1 + filePadding, fields.toLatin1().data());
     fpOut << buf;
 
     int numMeasures;
@@ -1086,13 +1109,17 @@ namespace Isis {
 
         numUsed = numMeasures - numRejectedMeasures;
 
-        sprintf(buf,"%-*s\t\t\t\t\t",45,bundleImage->fileName().toLatin1().data());
+        QString filename = bundleImage->fileName();
+        QStringList List;
+        List = filename.split("/");
+
+        sprintf(buf,"%-*s" ,filePadding + 1, bundleImage->fileName().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf,"%*d\t\t\t%*d\t\t\t",5,numUsed,5,numMeasures);
+        sprintf(buf, " %12d %12d     ", numUsed, numMeasures);
         fpOut << buf;
 
-        sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf \n",
+        sprintf(buf,"%13.4lf %13.4lf %13.4lf \n",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
         fpOut << buf;
@@ -1100,11 +1127,11 @@ namespace Isis {
       }
     }
 
-    sprintf(buf,"\nTotal RMS:");
+    // Do something similar to above but left justify the string and add a 33
+    // character buffer
+    sprintf(buf,"%*s", -(filePadding + 33), "\nTotal RMS:");
     fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-    fpOut << buf;
-    sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf\n",
+    sprintf(buf,"%13.4lf %13.4lf %13.4lf\n",
     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
     fpOut << buf;
 
@@ -1276,15 +1303,12 @@ namespace Isis {
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf,"Image         Initial                     Total                  "
-                    "Final                                      Accuracy\n");
+        sprintf(buf,"Image           Initial                 Total                  Final                                      Accuracy\n");
         fpOut << buf;
-        sprintf(buf,"Parameter         Value                       Correction"
-                    "             Value                      Initial           "
-                    "Final           Units\n");
+        sprintf(buf,"Parameter       Value                   Correction             Value                      Initial           Final           Units\n");
         fpOut << buf;
 
-        sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+        sprintf(buf,"                                                                                          "
                     "***************************************\n");
         fpOut << buf;
 
@@ -1509,7 +1533,7 @@ namespace Isis {
                 numMeasures, numRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat,
                 dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
-      else 
+      else
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf\n",
                 bundlecontrolpoint->id().toLatin1().data(), strStatus.toLatin1().data(),
@@ -1674,21 +1698,21 @@ namespace Isis {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
                              .arg(m_csvSavedImagesFilename).arg(newFile),
-                           _FILEINFO_);        
+                           _FILEINFO_);
         }
         newFile = newPath + "/" + FileName(m_csvSavedPointsFilename).name();
         if (!QFile::copy(m_csvSavedPointsFilename, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
                              .arg(m_csvSavedPointsFilename).arg(newFile),
-                           _FILEINFO_);        
+                           _FILEINFO_);
         }
         newFile = newPath + "/" + FileName(m_csvSavedResidualsFilename).name();
         if (!QFile::copy(m_csvSavedResidualsFilename, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
                              .arg(m_csvSavedResidualsFilename).arg(newFile),
-                           _FILEINFO_);        
+                           _FILEINFO_);
         }
       }
 
@@ -1871,7 +1895,7 @@ namespace Isis {
         projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "imagesCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = 
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename =
         projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "pointsCSV") {

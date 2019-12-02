@@ -34,6 +34,7 @@
 #include <sstream>
 
 using namespace std;
+using json = nlohmann::json;
 namespace Isis {
 
   //! Creates a blank PvlObject.
@@ -59,24 +60,24 @@ namespace Isis {
   }
 
 
- 
+
   /**
-   * Creates a PvlObject with a specified name converted 
+   * Creates a PvlObject with a specified name converted
    * from a json object.
    *
-   * TODO: Needs to be more robust, right now exists in order to 
-   * convert an Ale ISD NaifKeywords group over to an ISIS 
-   * compatible version. 
+   * TODO: Needs to be more robust, right now exists in order to
+   * convert an Ale ISD NaifKeywords group over to an ISIS
+   * compatible version.
    *
    * @param name The name of the PvlObject.
    * @param json Json object to convert to PVL
-   */    
-  PvlObject::PvlObject(const QString &name, const json &jsonobj) : 
+   */
+  PvlObject::PvlObject(const QString &name, const json &jsonobj) :
     PvlContainer("Object", name) {
 
     for(auto it = jsonobj.begin(); it != jsonobj.end(); it++) {
         PvlKeyword keyword;
-        if (it.value().is_array()) { 
+        if (it.value().is_array()) {
           keyword.setName(QString::fromStdString(it.key()));
           for(auto ar = it.value().begin(); ar!=it.value().end();ar++) {
             keyword += QString::number(ar->get<double>());
@@ -84,7 +85,7 @@ namespace Isis {
         }
         else if(it.value().is_number()) {
           keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString::number(it->get<double>())); 
+          keyword.setValue(QString::number(it->get<double>()));
         }
         else if(it.value().is_boolean()) {
           keyword.setName(QString::fromStdString(it.key()));
