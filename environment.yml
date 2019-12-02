@@ -7,7 +7,8 @@ dependencies:
   - ale>=0.3.2
   - armadillo
   - blas
-  - bullet==1.68
+  - boost-cpp<=1.67
+  - bullet==2.86.1
   - bz2file
   - bzip2
   - cmake >=3.10
