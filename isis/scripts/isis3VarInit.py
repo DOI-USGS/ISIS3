@@ -90,7 +90,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-
 # Create the data directories:
 mkdir(args.data_dir)
 mkdir(args.test_dir)
@@ -104,80 +103,69 @@ mkdir(activate_dir)
 mkdir(deactivate_dir)
 
 # Write the files that manage the ISIS3 environments:
-activate_vars_sh = activate_dir + "/env_vars.sh"
-deactivate_vars_sh = deactivate_dir + "/env_vars.sh"
-activate_vars_csh = activate_dir + "/env_vars.csh"
-deactivate_vars_csh = deactivate_dir + "/env_vars.csh"
-activate_vars_fish = activate_dir + "/env_vars.fish"
-deactivate_vars_fish = deactivate_dir + "/env_vars.fish"
+# Three coralated lists for zsh, csh, and fish shell
 
-# bash/zsh
-with open(activate_vars_sh, mode="w") as a:
-    script = """#!/bin/sh
-export ISISROOT={}
-export ISIS3DATA={}
-export ISIS3TESTDATA={}
-export ALESPICEROOT={}
-""".format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
-    )
-    a.write(script)
-print("Wrote " + activate_vars_sh)
+# Associated file
+activate_deactivate_files = ["/env_vars.sh", "/env_vars.csh", "/env_vars.fish"]
 
-with open(deactivate_vars_sh, mode="w") as d:
-    script = """#!/bin/sh
-unset ISISROOT
-unset ISIS3DATA
-unset ISIS3TESTDATA
-unset ALESPICEROOT
-"""
-    d.write(script)
-print("Wrote " + deactivate_vars_sh)
+# Activation script
+activate_scripts = ["""
+                    #!/bin/sh
+                    export ISISROOT={}
+                    export ISIS3DATA={}
+                    export ISIS3TESTDATA={}
+                    export ALESPICEROOT={}
+                    """,
+                    """
+                    #!/bin/csh
+                    setenv ISISROOT {}
+                    setenv ISIS3DATA {}
+                    setenv ISIS3TESTDATA {}
+                    setenv ALESPICEROOT {}
 
-# csh
-with open(activate_vars_csh, mode="w") as a:
-    script = """#!/bin/csh
-setenv ISISROOT {}
-setenv ISIS3DATA {}
-setenv ISIS3TESTDATA {}
-setenv ALESPICEROOT {}
+                    source $CONDA_PREFIX/scripts/tabCompletion.csh
+                    """,
+                    """
+                    #!/usr/bin/env fish
+                    set -gx ISISROOT {}
+                    set -gx ISIS3DATA {}
+                    set -gx ISIS3TESTDATA {}
+                    set -gx ALESPICEROOT {}
+                    """]
 
-source $CONDA_PREFIX/scripts/tabCompletion.csh
-""".format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
-    )
-    a.write(script)
-print("Wrote " + activate_vars_csh)
+# Deactivation script
+deactivate_scripts = ["""
+                      #!/bin/sh
+                      unset ISISROOT
+                      unset ISIS3DATA
+                      unset ISIS3TESTDATA
+                      unset ALESPICEROOT
+                      """,
+                      """
+                      #!/bin/sh
+                      unsetenv ISISROOT
+                      unsetenv ISIS3DATA
+                      unsetenv ISIS3TESTDATA
+                      unsetenv ALESPICEROOT
+                      """,
+                      """
+                      #!/bin/sh
+                      set -e ISISROOT
+                      set -e ISIS3DATA
+                      set -e ISIS3TESTDATA
+                      set -e ALESPICEROOT
+                      """]
 
-with open(deactivate_vars_csh, mode="w") as d:
-    script = """#!/bin/sh
-unsetenv ISISROOT
-unsetenv ISIS3DATA
-unsetenv ISIS3TESTDATA
-unsetenv ALESPICEROOT
-"""
-    d.write(script)
-print("Wrote " + deactivate_vars_csh)
+# Loop over the files and create the correct script associated with
+# said file
+for i, file in enumerate(activate_deactivate_files):
+    with open(activate_dir + file, mode="w") as a:
+        script = activate_scripts[i].format(
+            os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
+        )
+        a.write(script)
+    print("Wrote " + activate_dir + file)
 
-# fish
-with open(activate_vars_fish, mode="w") as a:
-    script = """#!/usr/bin/env fish
-set -gx ISISROOT {}
-set -gx ISIS3DATA {}
-set -gx ISIS3TESTDATA {}
-set -gx ALESPICEROOT {}
-""".format(
-        os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
-    )
-    a.write(script)
-print("Wrote " + activate_vars_fish)
-
-with open(deactivate_vars_fish, mode="w") as d:
-    script = """#!/bin/sh
-set -e ISISROOT
-set -e ISIS3DATA
-set -e ISIS3TESTDATA
-set -e ALESPICEROOT
-"""
-    d.write(script)
-print("Wrote " + deactivate_vars_fish)
+    with open(deactivate_dir + file, mode="w") as d:
+        d.write(deactivate_scripts[i])
+    print("Wrote " + deactivate_dir + file)
