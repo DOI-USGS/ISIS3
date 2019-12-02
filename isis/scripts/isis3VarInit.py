@@ -94,6 +94,14 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+parser.add_argument(
+    "-a",
+    "--ale-dir",
+    default=os.environ["CONDA_PREFIX"] + "/aleData",
+    help="ISIS3 Ale Data Directory, default: %(default)s",
+)
+args = parser.parse_args()
+
 # Create the data directories:
 mkdir(args.data_dir)
 mkdir(args.test_dir)
