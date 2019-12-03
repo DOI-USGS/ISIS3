@@ -48,6 +48,10 @@ import sys
 #       Date:    2019-08-09
 #       Description: Added support for fish shell.
 #
+#       Author:  Adam Paquette
+#       Date:    2019-12-02
+#       Description: Added ALESPICEROOT environment variable for ISIS 4.
+#
 ##########################################################################################################
 
 # There are still a lot of Python 2 installations out there, and if people don't have
@@ -110,14 +114,14 @@ activate_deactivate_files = ["/env_vars.sh", "/env_vars.csh", "/env_vars.fish"]
 
 # Activation script
 activate_scripts = ["""
-                    #!/bin/sh
+                    #!/usr/bin/env sh
                     export ISISROOT={}
                     export ISIS3DATA={}
                     export ISIS3TESTDATA={}
                     export ALESPICEROOT={}
                     """,
                     """
-                    #!/bin/csh
+                    #!/usr/bin/env csh
                     setenv ISISROOT {}
                     setenv ISIS3DATA {}
                     setenv ISIS3TESTDATA {}
@@ -135,21 +139,21 @@ activate_scripts = ["""
 
 # Deactivation script
 deactivate_scripts = ["""
-                      #!/bin/sh
+                      #!/usr/bin/env sh
                       unset ISISROOT
                       unset ISIS3DATA
                       unset ISIS3TESTDATA
                       unset ALESPICEROOT
                       """,
                       """
-                      #!/bin/sh
+                      #!/usr/bin/env csh
                       unsetenv ISISROOT
                       unsetenv ISIS3DATA
                       unsetenv ISIS3TESTDATA
                       unsetenv ALESPICEROOT
                       """,
                       """
-                      #!/bin/sh
+                      #!/usr/bin/env fish
                       set -e ISISROOT
                       set -e ISIS3DATA
                       set -e ISIS3TESTDATA
