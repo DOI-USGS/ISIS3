@@ -46,10 +46,7 @@ pipeline
                             node(lower_label) {
                                 stage ("${label}") {
 
-                                    env.STAGE_STATUS = "Checking out ISIS"
-                                    checkout scm
-                                    isisEnv.add("ISISROOT=${pwd()}/build")
-                                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+                                    groovy_utilities.checkoutIsis(isisEnv, cmakeFlags)
 
                                     env.STAGE_STATUS = "Creating conda environment"
                                     sh '''
