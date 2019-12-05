@@ -224,7 +224,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     // Load necessary kernels (IAK for Cassini, mainly)
     _kernels.Load("CK,FK,SCLK,LSK,IAK");
 
-    QStringList loaded = _kernels.getLoadedList();
+    _kernels.getLoadedList();
 
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
@@ -261,10 +261,6 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
     _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
-
-//    _kernels.UnLoad("FK,SCLK,LSK,IAK,SPK");
-//    loaded = _kernels.getLoadedList();
-//    cout << "\nKernels after unloading...\n" << loaded.join("\n");
 
   } catch ( IException &ie  ) {
     ostringstream mess;
