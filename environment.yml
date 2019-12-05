@@ -1,6 +1,6 @@
 channels:
-  - conda-forge
   - usgs-astrogeology
+  - conda-forge
   - defaults
 
 dependencies:
