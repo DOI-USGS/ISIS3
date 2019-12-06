@@ -68,6 +68,7 @@ node("${env.OS.toLowerCase()}") {
             # Use the conda cache running on the Jenkins host
             conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
             conda config --set always_yes True
+            conda config --set ssl_verify false 
             conda create -n isis python=3
         '''
 
