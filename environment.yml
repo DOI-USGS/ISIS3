@@ -1,17 +1,17 @@
 channels:
-  - conda-forge
   - usgs-astrogeology
+  - conda-forge
   - defaults
 
 dependencies:
-  - ale>=0.3.2
+  - ale=0.6.4
   - boost=1.68.0
   - armadillo
   - blas
   - bullet
   - bz2file
   - bzip2
-  - cmake >=3.10
+  - cmake >=3.15
   - cspice
   - curl
   - doxygen
