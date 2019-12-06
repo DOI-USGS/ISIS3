@@ -56,6 +56,7 @@ def setGitHubBuildStatus(status) {
 node("${env.OS.toLowerCase()}") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
+        git config --global http.sslVerify false
         checkout scm
         isisEnv.add("ISISROOT=${pwd()}/build")
         cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
