@@ -442,6 +442,14 @@ namespace Isis {
         p_cache.push_back(CJ);
     }
 
+    if (isdRot["AngularVelocity"].size() != 0) {
+      for (auto it = isdRot["AngularVelocity"].begin(); it != isdRot["AngularVelocity"].end(); it++) {
+          std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+          p_cacheAv.push_back(av);
+      }
+      p_hasAngularVelocity = true;
+    }
+
     bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
 
     if (hasConstantFrames) {
