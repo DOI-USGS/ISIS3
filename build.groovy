@@ -56,6 +56,7 @@ def setGitHubBuildStatus(status) {
 node("${env.OS.toLowerCase()}") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
+        sh 'git config --global http.sslVerify false'
         checkout scm
         isisEnv.add("ISISROOT=${pwd()}/build")
         cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
@@ -67,6 +68,7 @@ node("${env.OS.toLowerCase()}") {
             # Use the conda cache running on the Jenkins host
             conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
             conda config --set always_yes True
+            conda config --set ssl_verify false 
             conda create -n isis python=3
         '''
 
