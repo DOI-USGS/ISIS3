@@ -171,7 +171,14 @@ namespace Isis {
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
-      try { 
+      try {
+        // At this time ALE does not compute pointing for the nadir option in spiceinit
+        // If NADIR is turned on fail here so ISIS can create nadir pointing
+        if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
+          QString msg = "Falling back to ISIS generation of nadir pointing";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+
         // try using ALE
         std::ostringstream kernel_pvl;
         kernel_pvl << kernels;
@@ -223,6 +230,7 @@ namespace Isis {
           load(kernels["Extra"], noTables);
         }
       }
+
      
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
