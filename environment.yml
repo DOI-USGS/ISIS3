@@ -4,7 +4,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale>=0.6.5
+  - ale >=0.6.5
   - boost=1.68.0
   - armadillo
   - blas
@@ -51,7 +51,7 @@ dependencies:
   - suitesparse
   - superlu
   - tnt
-  - x264
+  - x264=20131218
   - xalan-c
   - xerces-c
   - xorg-kbproto
