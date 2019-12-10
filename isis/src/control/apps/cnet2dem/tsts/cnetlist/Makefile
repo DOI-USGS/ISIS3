@@ -2,6 +2,7 @@
 # Tests CNETLIST, TO, MAP, ALGORITHM
 
 Equi065S355ED10_dem.cub.TOLERANCE = 0.00000001
+
 APPNAME = cnet2dem
 
 include $(ISISROOT)/make/isismake.tsts
