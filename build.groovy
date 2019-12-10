@@ -90,7 +90,6 @@ node("${env.OS.toLowerCase()}") {
                         echo `pwd`
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
-                        python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
                     """
                 }
             }
