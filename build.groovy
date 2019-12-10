@@ -55,7 +55,7 @@ def setGitHubBuildStatus(status) {
 
 node("${env.OS.toLowerCase()}") {
     stage ("Check environment") {
-        sh 'ls ${kakaduIncDir} -R'
+        sh 'ls /isisData/kakadu -R'
     }
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
