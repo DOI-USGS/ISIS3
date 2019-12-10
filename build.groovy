@@ -88,6 +88,7 @@ node("${env.OS.toLowerCase()}") {
                         source activate isis
                         echo `ls ../`
                         echo `pwd`
+                        conda list
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
                         python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
