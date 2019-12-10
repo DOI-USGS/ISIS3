@@ -54,6 +54,9 @@ def setGitHubBuildStatus(status) {
 }
 
 node("${env.OS.toLowerCase()}") {
+    stage ("Check environment") {
+        sh 'ls ${kakaduIncDir} -R'
+    }
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         sh 'git config --global http.sslVerify false'
