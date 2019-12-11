@@ -93,7 +93,7 @@ In this step, we will upload the build(s) that we just created into the Anaconda
 
 This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes.
 
-***Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc). ***
+**Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc).**
 
 ### Part A: Update the Local Server
 * Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers.
@@ -108,35 +108,16 @@ This step covers how to update the data on the rysnc servers. This is where our 
 
 ## Step 6: Create Internal Builds/Installs for Astro
 
-This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. This will need to be done once for Linux, and once for Mac.
+This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. These commands must be run as isis3mgr for permission purposes.
 
-* Ensure that you have the proper build of conda set-up. 
-    * For Linux: ```source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh```.
-    * For MacOS: ```source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh```.
+### Part A: Shared Anaconda Installs
+* You will need to install the new version of ISIS into the two shared Anaconda installs on the ASC campus.
+    * For Linux: `/usgs/cpkgs/anaconda3_linux`
+    * For MacOS: `/usgs/cpkgs/anaconda3_macOS
 
-* Run the following commands to set up the environment:
-```
-   conda deactivate 
-
-   conda create -n isis<isis version> python=3.6
-
-   conda activate isis<isis version>
-
-   conda config --env --add channels conda-forge
-
-   conda config --env --add channels usgs-astrogeology
-```
-* Install the isis release
-    * For Public Releases: `conda install -c usgs-astrogeology isis3`.
-    * For Release Candidates: `conda install -c usgs-astrogeology/label/RC isis3`.
-    * For Custom Builds: `conda install -c usgs-astrogeology/label/<custom-label> isis3` using the custom label that you used to upload to Anaconda in [Step 4](#step-4-upload-the-build-to-anaconda-cloud).
-
-* Set up the environment variables using `python $CONDA_PREFIX/scripts/isis3VarInit.py -d /usgs/cpkgs/isis3/data -t /usgs/cpkgs/isis3/testData`.
-
-
-Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
-
-***Don't forget to go back and do the other OS!***
+### Part B: Installing ISIS
+* Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install the latest version of ISIS into a new environment called `isisX.Y.Z`.
+* Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
 
 ## Step 7: Update Documentation
 
