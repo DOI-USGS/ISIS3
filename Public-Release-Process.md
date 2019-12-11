@@ -113,10 +113,13 @@ This step covers creating the builds and the installation environments of ISIS f
 ### Part A: Shared Anaconda Installs
 * You will need to install the new version of ISIS into the two shared Anaconda installs on the ASC campus.
     * For Linux: `/usgs/cpkgs/anaconda3_linux`
-    * For MacOS: `/usgs/cpkgs/anaconda3_macOS
+    * For MacOS: `/usgs/cpkgs/anaconda3_macOS`
 
 ### Part B: Installing ISIS
-* Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install the latest version of ISIS into a new environment called `isisX.Y.Z`.
+* Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install the latest version of ISIS into a new environment.
+    * For a standard release, the environment should be named `isisX.Y.Z`.
+    * For a release candidate, the environment should be named `isisX.Y.Z-RC#`.
+    * For a custom build, the environment should be named `isisX.Y.Z-<custom-label>`.
 * Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
 
 ## Step 7: Update Documentation
