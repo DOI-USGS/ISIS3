@@ -124,23 +124,62 @@ This step covers creating the builds and the installation environments of ISIS f
 
 ## Step 7: Update Documentation
 
-***This step only need-be done with official public releases***
+**This step is only done for standard releases.**
 
-This step will update the ISIS documentation on our external web site for our users worldwide. Be sure that this is the current version of ISIS to be released.
+This step will update the ISIS documentation on our [website](https://isis.astrogeology.usgs.gov/UserDocs/) for our users worldwide. These commands must be run as isis3mgr for permission purposes.
 
-* As isis3mgr, setisis to the build directory in one of the clones you were working with earlier
+### Part A: Build the documentation
+
+* setisis to the build directory from [Step 2 Part A](#Part_A:_Setup_Repository).
 * Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code.
-* cd into the isis/src/docsys directory that is at the same level as your build/ directory and run the command ```make wwwdoc```.
 
-You may run into permission issues if isis3mgr does not own these files (you were not isis3mgr when you originally pulled this version of the repo). Additionally, you may be asked to provide credentials if you run the ```make wwwdoc``` command as anyone other than isis3mgr.
+### Part B: Upload the documentation
+* In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc```.
 
 ## Step 8: Communicate Availability of Build
 
-You will now need to communicate with both the internal as well as the external users about a new version being available. (Feel free to use past announcements as a template.)
+This step will will communicate that a new version of ISIS is available.
 
-For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. Also inform users that the isis3 symlink will be updated a week after the public release. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
+### Part A: External Announcement
+* Create a new topic under the [ISIS Release Notes](https://astrodiscuss.usgs.gov/c/ISIS/isis-release-notes) category on [astrodiscuss](https://astrodiscuss.usgs.gov/).
+* Fill in the following template for the release notes post:
+```
+## How to install or update to <X.Y.Z>
 
-The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. To create the changelog look at the commit history for the branch since the last release. The changelog and release announcement are targeted at users; so, changes targeted at developers should not be included. Two examples of changes that do not need to be included in the changelog are minor modifications to the build system and developer documentation updates.
+Installation instructions of ISIS3 can be found in the README on our [github page ](https://github.com/USGS-Astrogeology/ISIS3).
+
+If you already have a version of ISIS 3.6.0 or later installed in an anaconda environment, you can update to <X.Y.Z> by activating your existing isis conda environment and running `conda update isis3` .
+
+### How to get access to <X.Y.Z> at the ASC
+
+The new process proposed in the internal [RFC](https://astrodiscuss.usgs.gov/t/internal-rfc-distribution-of-isis3-at-asc/52/26) is now in full effect. Please review the process of using anaconda environments to activate isis [here](https://astrodiscuss.usgs.gov/t/using-the-asc-conda-environment-for-isisx-y-z/106).
+
+Once a version of conda is active, run the command: `conda activate isis<X.Y.Z>` to use this newest version of ISIS.
+
+## Changes for <X.Y.Z>
+
+* <Changes>
+* <Go>
+* <Here>
+
+## Notes
+
+The following operating systems are supported for this release:
+
+Fedora 28
+Ubuntu 18.04
+CentOS 7.0
+macOS High Sierra 10.13
+(Other Linux/macOS variants may be able to run this release, but are not officially supported.)
+
+If you find a problem with this release, please create an issue on our [github issues page](https://github.com/USGS-Astrogeology/ISIS3/issues/new/choose/)
+```
+* To create the change log look at the commits on the dev branch since the last release.
+    * This list is intended for users, so commits that only modify tests, CI, Github files (READMEs, issue templates, etc.), and/or build files should be excluded.
+
+### Part B: Internal Announcement
+* Send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability.
+    * Your e-mail can simply be a link to the external announcement.
 
 ## Problems
 If you test the conda environment you created for the ISIS build, i.e., isis3.7.1, on prog26 as isis3mgr and get the following warning:
