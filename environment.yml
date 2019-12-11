@@ -4,7 +4,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale >=0.6.5
+  - ale >=0.7.1
   - boost=1.68.0
   - armadillo
   - blas
