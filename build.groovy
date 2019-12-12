@@ -66,7 +66,7 @@ node("${env.OS.toLowerCase()}") {
         env.STAGE_STATUS = "Creating conda environment"
         sh '''
             # Use the conda cache running on the Jenkins host
-            conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
+            # conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
             conda config --set always_yes True
             conda config --set ssl_verify false 
             conda create -n isis python=3
@@ -88,9 +88,9 @@ node("${env.OS.toLowerCase()}") {
                         source activate isis
                         echo `ls ../`
                         echo `pwd`
+                        conda list
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
-                        python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
                     """
                 }
             }
