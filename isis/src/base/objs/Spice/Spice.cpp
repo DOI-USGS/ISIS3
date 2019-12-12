@@ -1054,7 +1054,7 @@ namespace Isis {
   QVariant Spice::readValue(QString key, SpiceValueType type, int index) {
     QVariant result;
 
-    if (m_usingNaif and !m_usingAle) {
+    if (m_usingNaif && !m_usingAle) {
       NaifStatus::CheckErrors();
 
       // This is the success status of the naif call
