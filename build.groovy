@@ -70,7 +70,6 @@ node("${env.OS.toLowerCase()}") {
             conda config --set always_yes True
             conda config --set ssl_verify false 
             conda create -n isis python=3
-            conda search -c conda-forge ale
         '''
 
         if (env.OS.toLowerCase() == "centos") {
