@@ -15,7 +15,7 @@ def isisEnv = [
 ]
 
 def cmakeFlags = [
-    "-DJP2KFLAG=ON",
+    "-DJP2KFLAG=OFF",
     "-DKAKADU_INCLUDE_DIR=${kakaduIncDir}",
     "-Dpybindings=OFF",
     "-DCMAKE_BUILD_TYPE=RELEASE"
