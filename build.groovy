@@ -72,7 +72,11 @@ node("${env.OS.toLowerCase()}") {
             conda create -n isis python=3
         '''
 
-        sh 'conda env update -n isis -f environment.yml --prune'
+        if (env.OS.toLowerCase() == "centos") {
+            sh 'conda env update -n isis -f environment_gcc4.yml --prune'
+        } else {
+            sh 'conda env update -n isis -f environment.yml --prune'
+        }
     }
 
     withEnv(isisEnv) {
