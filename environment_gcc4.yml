@@ -1,6 +1,8 @@
 channels:
-  - conda-forge
+  - jessemapel
   - usgs-astrogeology
+  - conda-forge
+  - probcomp
   - defaults
 
 dependencies:
