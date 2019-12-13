@@ -6,7 +6,7 @@ channels:
 dependencies:
   - libcxx
   - cxx-compiler
-  - ale=0.6.4
+  - ale=0.7.2
   - boost=1.68.0
   - armadillo
   - blas
