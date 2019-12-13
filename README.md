@@ -9,8 +9,8 @@
 * [FAQ](README.md##FAQ)
 * [Installation](README.md##Installation)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
-* [ISIS Data Area](README.md##The ISIS Data Area)
-* [Installing Older Versions of ISIS](README.md##Installing older versions of ISIS)
+* [ISIS Data Area](README.md##The-ISIS-Data-Area)
+* [Installing Older Versions of ISIS](README.md##Installing-older-versions-of-ISIS)
 
 ## FAQ
 We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
