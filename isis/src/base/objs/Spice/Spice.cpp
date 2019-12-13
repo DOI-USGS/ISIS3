@@ -1353,25 +1353,78 @@ namespace Isis {
       *m_solarLongitude = Longitude();
       return;
     }
-    
-    double et = m_bodyRotation->EphemerisTime();  
-    m_bodyRotation->SetEphemerisTime(et);
-    m_sunPosition->SetEphemerisTime(et);
 
-    std::vector<double> bodyRotMat = m_bodyRotation->Matrix(); 
-    std::vector<double> sunPos = m_sunPosition->Coordinate();      
-    std::vector<double> sunVel = m_sunPosition->Velocity();
-    double sunAv[3];
+    if (m_usingAle){
+      double og_time = m_bodyRotation->EphemerisTime();  
+      m_bodyRotation->SetEphemerisTime(et.Et());
+      m_sunPosition->SetEphemerisTime(et.Et());
 
-    ucrss_c(&sunPos[0], &sunVel[0], sunAv);
-    
-    double npole[3];
-    for (int i = 0; i < 3; i++) {
-      npole[i] = bodyRotMat[6+i];
+      std::vector<double> bodyRotMat = m_bodyRotation->Matrix(); 
+      std::vector<double> sunPos = m_sunPosition->Coordinate();      
+      std::vector<double> sunVel = m_sunPosition->Velocity();
+      double sunAv[3];
+
+      ucrss_c(&sunPos[0], &sunVel[0], sunAv);
+      
+      double npole[3];
+      for (int i = 0; i < 3; i++) {
+        npole[i] = bodyRotMat[6+i];
+      }
+      
+      double x[3], y[3], z[3];
+      vequ_c(sunAv, z);
+      ucrss_c(npole, z, x);
+      ucrss_c(z, x, y);
+
+      double trans[3][3];
+      for (int i = 0; i < 3; i++) {
+        trans[0][i] = x[i];
+        trans[1][i] = y[i];
+        trans[2][i] = z[i];
+      }
+
+      double pos[3];
+      mxv_c(trans, &sunPos[0], pos);
+
+      double radius, ls, lat;
+      reclat_c(pos, &radius, &ls, &lat);
+      
+      *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
+      
+      NaifStatus::CheckErrors();
+      m_bodyRotation->SetEphemerisTime(og_time);
+      m_sunPosition->SetEphemerisTime(og_time);
+      return;
     }
+
+    if (m_bodyRotation->IsCached()) return; 
     
+    double tipm[3][3], npole[3];
+    char frameName[32];
+    SpiceInt frameCode;
+    SpiceBoolean found;
+
+    cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
+
+    if (found) {
+      pxform_c("J2000", frameName, et.Et(), tipm);
+    }
+    else {
+      tipbod_c("J2000", *m_spkBodyCode, et.Et(), tipm);
+    }
+
+    for (int i = 0; i < 3; i++) {
+      npole[i] = tipm[2][i];
+    }
+
+    double state[6], lt;
+    spkez_c(*m_spkBodyCode, et.Et(), "J2000", "NONE", 10, state, &lt);
+
+    double uavel[3];
+    ucrss_c(state, &state[3], uavel);
+
     double x[3], y[3], z[3];
-    vequ_c(sunAv, z);
+    vequ_c(uavel, z);
     ucrss_c(npole, z, x);
     ucrss_c(z, x, y);
 
@@ -1382,16 +1435,18 @@ namespace Isis {
       trans[2][i] = z[i];
     }
 
+    spkez_c(10, et.Et(), "J2000", "LT+S", *m_spkBodyCode, state, &lt);
+
     double pos[3];
-    mxv_c(trans, &sunPos[0], pos);
+    mxv_c(trans, state, pos);
 
     double radius, ls, lat;
     reclat_c(pos, &radius, &ls, &lat);
-    
+
     *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
-    
+
     NaifStatus::CheckErrors();
-    return; 
+
   }
 
 
