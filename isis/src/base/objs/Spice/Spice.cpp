@@ -195,7 +195,7 @@ namespace Isis {
         if ( kernels.hasKeyword("SpacecraftClock")) {
           load(kernels["SpacecraftClock"], noTables);
         }
-        m_usingAle = true;
+        m_usingAle = true; 
       } 
       catch(...) {
         // Backup to stadnard ISIS implementation
@@ -1297,8 +1297,8 @@ namespace Isis {
 
     SpiceDouble uuB[3], dist;
     unorm_c(m_uB, uuB, &dist);
-
     std::vector<Distance> radii = target()->radii();
+    
     SpiceDouble a = radii[0].kilometers();
     SpiceDouble b = radii[1].kilometers();
     SpiceDouble c = radii[2].kilometers();
@@ -1312,10 +1312,10 @@ namespace Isis {
 
     SpiceDouble mylon, mylat;
     reclat_c(subB, &a, &mylon, &mylat);
+
     lat = mylat * 180.0 / PI;
     lon = mylon * 180.0 / PI;
     if (lon < 0.0) lon += 360.0;
-
     NaifStatus::CheckErrors();
   }
 
@@ -1354,8 +1354,51 @@ namespace Isis {
       return;
     }
 
-    if (m_bodyRotation->IsCached()) return;
+    if (m_usingAle){
+      double og_time = m_bodyRotation->EphemerisTime();  
+      m_bodyRotation->SetEphemerisTime(et.Et());
+      m_sunPosition->SetEphemerisTime(et.Et());
 
+      std::vector<double> bodyRotMat = m_bodyRotation->Matrix(); 
+      std::vector<double> sunPos = m_sunPosition->Coordinate();      
+      std::vector<double> sunVel = m_sunPosition->Velocity();
+      double sunAv[3];
+
+      ucrss_c(&sunPos[0], &sunVel[0], sunAv);
+      
+      double npole[3];
+      for (int i = 0; i < 3; i++) {
+        npole[i] = bodyRotMat[6+i];
+      }
+      
+      double x[3], y[3], z[3];
+      vequ_c(sunAv, z);
+      ucrss_c(npole, z, x);
+      ucrss_c(z, x, y);
+
+      double trans[3][3];
+      for (int i = 0; i < 3; i++) {
+        trans[0][i] = x[i];
+        trans[1][i] = y[i];
+        trans[2][i] = z[i];
+      }
+
+      double pos[3];
+      mxv_c(trans, &sunPos[0], pos);
+
+      double radius, ls, lat;
+      reclat_c(pos, &radius, &ls, &lat);
+      
+      *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
+      
+      NaifStatus::CheckErrors();
+      m_bodyRotation->SetEphemerisTime(og_time);
+      m_sunPosition->SetEphemerisTime(og_time);
+      return;
+    }
+
+    if (m_bodyRotation->IsCached()) return; 
+    
     double tipm[3][3], npole[3];
     char frameName[32];
     SpiceInt frameCode;
@@ -1403,6 +1446,7 @@ namespace Isis {
     *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
 
     NaifStatus::CheckErrors();
+
   }
 
 
