@@ -77,6 +77,10 @@ node("${env.OS.toLowerCase()}") {
         } else {
             sh 'conda env update -n isis -f environment.yml --prune'
         }
+        sh '''
+            which frmdiff
+            frmdiff -h
+        '''
     }
 
     withEnv(isisEnv) {
