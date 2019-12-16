@@ -80,6 +80,7 @@ node("${env.OS.toLowerCase()}") {
         sh '''
             which frmdiff
             frmdiff -h
+            exit 1
         '''
     }
 
