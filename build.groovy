@@ -78,9 +78,9 @@ node("${env.OS.toLowerCase()}") {
             sh 'conda env update -n isis -f environment.yml --prune'
         }
         sh '''
+            ls -l $CONDA_PREFIX/bin/f*
             which frmdiff
             frmdiff -h
-            ls -l $CONDA_PREFIX/bin/f*
         '''
         sh 'exit 1'
     }
