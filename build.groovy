@@ -77,12 +77,6 @@ node("${env.OS.toLowerCase()}") {
         } else {
             sh 'conda env update -n isis -f environment.yml --prune'
         }
-        sh '''
-            ls -l $CONDA_PREFIX/bin/f*
-            which frmdiff
-            frmdiff -h
-        '''
-        sh 'exit 1'
     }
 
     withEnv(isisEnv) {
@@ -90,8 +84,14 @@ node("${env.OS.toLowerCase()}") {
             try {
                 stage ("Build") {
                     env.STAGE_STATUS = "Building ISIS on ${env.OS}"
-                    sh """
+                    sh '''
                         source activate isis
+                        ls -l $CONDA_PREFIX/bin/f*
+                        which frmdiff
+                        frmdiff -h
+                    '''
+                    sh 'exit 1'
+                    sh """
                         echo `ls ../`
                         echo `pwd`
                         conda list
