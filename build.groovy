@@ -80,8 +80,9 @@ node("${env.OS.toLowerCase()}") {
         sh '''
             which frmdiff
             frmdiff -h
-            exit 1
+            ls -l $CONDA_PREFIX/bin/f*
         '''
+        sh 'exit 1'
     }
 
     withEnv(isisEnv) {
