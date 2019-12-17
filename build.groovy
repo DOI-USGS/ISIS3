@@ -81,7 +81,6 @@ node("${env.OS.toLowerCase()}") {
             export PATH="${condaPath}/bin:${env.PATH}"
             echo $PATH
             which conda
-            conda search -c conda-forge ale  
             conda config --set always_yes True
             conda config --set ssl_verify false 
             conda create -n isis python=3
