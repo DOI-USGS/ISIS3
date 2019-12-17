@@ -73,7 +73,7 @@ node("${env.OS.toLowerCase()}") {
         } 
         
         println(condaPath)
-        isisEnv.add("PATH=${pwd()}/install/bin:$condaPath/bin:${env.PATH}")
+        isisEnv.add("PATH=${pwd()}/install/bin:$condaPath/envs/isis/bin:$condaPath/bin:${env.PATH}")
          
         sh """
             # Use the conda cache running on the Jenkins host
