@@ -126,9 +126,7 @@ node("${env.OS.toLowerCase()}") {
                         dir("${env.ISISROOT}") {
                             env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
-                                    echo $ISIS3TESTDATA
-                                    echo $ISIS3DATA
-                                    echo $PATH
+                                    source activate ${condaPath}/envs/isis
                                     ctest -R _unit_ -j4 -VV
                                 """
 
@@ -145,8 +143,7 @@ node("${env.OS.toLowerCase()}") {
                     stage("AppTests") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
                         sh """
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
+                            source activate ${condaPath}/envs/isis
                             echo $PATH
                             ctest -R _app_ -j4 -VV
                         """
@@ -163,9 +160,7 @@ node("${env.OS.toLowerCase()}") {
                     stage("ModuleTests") {
                         env.STAGE_STATUS = "Running module tests on ${env.OS}"
                         sh """
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
-                            echo $PATH
+                            source activate ${condaPath}/envs/isis 
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -181,9 +176,7 @@ node("${env.OS.toLowerCase()}") {
                     stage("GTests") {
                         env.STAGE_STATUS = "Running gtests on ${env.OS}"
                         sh """
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
-                            echo $PATH
+                            source activate ${condaPath}/envs/isis
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
