@@ -129,7 +129,6 @@ node("${env.OS.toLowerCase()}") {
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
                                     echo $PATH
-                                    which ctest
                                     ctest -R _unit_ -j4 -VV
                                 """
 
@@ -149,7 +148,6 @@ node("${env.OS.toLowerCase()}") {
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
                             echo $PATH
-                            which ctest
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -168,7 +166,6 @@ node("${env.OS.toLowerCase()}") {
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
                             echo $PATH
-                            which ctest
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -187,7 +184,6 @@ node("${env.OS.toLowerCase()}") {
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
                             echo $PATH
-                            which ctest
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
