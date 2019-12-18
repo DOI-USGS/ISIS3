@@ -71,32 +71,32 @@ node("${env.OS.toLowerCase()}") {
         } else {
           condaPath = "/home/jenkins/.conda/"
         } 
-        
-        println(condaPath)
+ 
         isisEnv.add("PATH=${pwd()}/install/bin:$condaPath/envs/isis/bin:$condaPath/bin:${env.PATH}")
-         
-        sh """
-            # Use the conda cache running on the Jenkins host
-            # conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
-            export PATH="${condaPath}/bin:${env.PATH}"
-            echo $PATH
-            which conda
-            conda config --set always_yes True
-            conda config --set ssl_verify false 
-            conda create -n isis python=3
-        """
-          
         
-        if (env.OS.toLowerCase() == "centos") {
-            sh 'conda env update -n isis -f environment_gcc4.yml --prune'
-        } else {
+        withEnv(isisEnv) {
+
+          println("Complete Environment:")
+          sh 'printenv'
+          println("Anaconda Path: " + condaPath)
+          
           sh """
-            export PATH="${condaPath}/bin:${env.PATH}"
-            which conda
-            conda env update -n isis -f environment.yml --prune
+              # Use the conda cache running on the Jenkins host
+              # conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
+              which conda
+              conda config --set always_yes True
+              conda config --set ssl_verify false 
+              conda create -n isis python=3
           """
-        }
-    }  
+           
+          
+          if (env.OS.toLowerCase() == "centos") {
+              sh 'conda env update -n isis -f environment_gcc4.yml --prune'
+          } else {
+            sh "conda env update -n isis -f environment.yml --prune"
+          }
+       } 
+    } 
 
     withEnv(isisEnv) {
         dir("${env.ISISROOT}") {
