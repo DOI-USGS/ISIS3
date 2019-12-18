@@ -209,7 +209,6 @@ void IsisMain() {
         // Failed to instantiate a camera, try furnishing kernels directly 
         try {
 
-          throw IException(e, IException::User, "whoops", _FILEINFO_);
           double etStart = startTime.Et();
           // Get the distance between the Moon and the Sun at the given time in
           // Astronomical Units (AU)
