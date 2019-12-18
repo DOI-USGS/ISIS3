@@ -98,6 +98,7 @@ class BundleObservationSolveSettings {
                                      Project *project,
                                      XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
+      BundleObservationSolveSettings(const PvlGroup &scParameterGroup);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
       void initialize();

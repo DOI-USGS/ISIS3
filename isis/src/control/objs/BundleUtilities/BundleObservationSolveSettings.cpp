@@ -47,38 +47,157 @@ namespace Isis {
   }
 
 
-#if 0
-  /**
-   * Construct this BundleSettings object from XML.
-   *
-   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(
-                                                             FileName xmlFile,
-                                                             Project *project,
-                                                             XmlStackedHandlerReader *xmlReader) {
-
+  BundleObservationSolveSettings::BundleObservationSolveSettings(const PvlGroup &scParameterGroup) {
     initialize();
-    QString xmlPath = xmlFile.expanded();
-    QFile qXmlFile(xmlPath);
-    if (!qXmlFile.open(QFile::ReadOnly) ) {
-      throw IException(IException::Io,
-                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
-                       _FILEINFO_);
+
+      // group name must be instrument id
+    m_instrumentId = (QString)scParameterGroup.nameKeyword();
+
+    // If CKDEGREE is not specified, then a default of 2 is used
+    if (scParameterGroup.hasKeyword("CKDEGREE")) {
+      m_ckDegree = (int)(scParameterGroup.findKeyword("CKDEGREE"));
     }
 
-    QXmlInputSource xmlInputSource(&qXmlFile);
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    bool success = xmlReader->parse(xmlInputSource);
-    if (!success) {
-      throw IException(IException::Unknown,
-                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                        _FILEINFO_);
+    // If CKSOLVEDEGREE is not specified, then a default of 2 is used -------jwb----- why ??? why not match camsolve option ???
+    if (scParameterGroup.hasKeyword("CKSOLVEDEGREE")) {
+      m_ckSolveDegree = (int) (scParameterGroup.findKeyword("CKSOLVEDEGREE"));
+    }
+
+    // do we solve for No pointing, ANGLES only, ANGLES+ANGULAR VELOCITY, ANGLES+ANGULAR VELOCITY+
+    // ANGULAR ACCELERATION, or a higher order polynomial
+    QString csolve = "NONE";
+    csolve = (QString)scParameterGroup.findKeyword("CAMSOLVE");
+    csolve = csolve.toUpper();
+    if (csolve == "NONE") {
+      m_instrumentPointingSolveOption = NoPointingFactors;
+      m_numberCamAngleCoefSolved = 0;
+    }
+    else if (csolve == "ANGLES") {
+      m_instrumentPointingSolveOption = AnglesOnly;
+      m_numberCamAngleCoefSolved = 1;
+    }
+    else if (csolve == "VELOCITIES") {
+      m_instrumentPointingSolveOption = AnglesVelocity;
+      m_numberCamAngleCoefSolved = 2;
+    }
+    else if (csolve == "ACCELERATIONS") {
+      m_instrumentPointingSolveOption = AnglesVelocityAcceleration;
+      m_numberCamAngleCoefSolved = 3;
+    }
+    else if (csolve == "ALL"){
+      m_instrumentPointingSolveOption = AllPointingCoefficients;
+      m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
+    }
+
+    m_anglesAprioriSigma.clear();
+
+    // If OVEREXISTING is not specified, then a default of NO is used
+    if (scParameterGroup.hasKeyword("OVEREXISTING")) {
+      QString parval = (QString)scParameterGroup.findKeyword("OVEREXISTING");
+      parval = parval.toUpper();
+      if (parval == "TRUE" || parval == "YES") {
+        m_solvePointingPolynomialOverExisting = true;
+        m_pointingInterpolationType = SpiceRotation::PolyFunctionOverSpice;
+      }
+      else if (parval == "FALSE" || parval == "NO") {
+        m_solvePointingPolynomialOverExisting = false;
+        m_pointingInterpolationType = SpiceRotation::PolyFunction;
+      }
+      else {
+        QString msg = "The OVEREXISTING parameter must be set to TRUE or FALSE; YES or NO";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // If SPKDEGREE is not specified, then a default of 2 is used
+    if (scParameterGroup.hasKeyword("SPKDEGREE"))
+      m_spkDegree = (int)(scParameterGroup.findKeyword("SPKDEGREE"));
+
+    // If SPKSOLVEDEGREE is not specified, then a default of 2 is used
+    if (scParameterGroup.hasKeyword("SPKSOLVEDEGREE"))
+      m_spkSolveDegree = (int)(scParameterGroup.findKeyword("SPKSOLVEDEGREE"));
+
+    // do we solve for No position, POSITION only, POSITION+VELOCITY, POSITION+VELOCITY+
+    // ACCELERATION, or a higher order polynomial
+    QString ssolve = "NONE";
+    ssolve = (QString)scParameterGroup.findKeyword("SPSOLVE");
+    ssolve = ssolve.toUpper();
+    if (ssolve == "NONE") {
+      m_instrumentPositionSolveOption = NoPositionFactors;
+      m_numberCamPosCoefSolved = 0;
+    }
+    else if (ssolve == "POSITION") {
+      m_instrumentPositionSolveOption = PositionOnly;
+      m_numberCamPosCoefSolved = 1;
+    }
+    else if (ssolve == "VELOCITIES") {
+      m_instrumentPositionSolveOption = PositionVelocity;
+      m_numberCamPosCoefSolved = 2;
+    }
+    else if (ssolve == "ACCELERATIONS") {
+      m_instrumentPositionSolveOption = PositionVelocityAcceleration;
+      m_numberCamPosCoefSolved = 3;
+    }
+    else if (csolve == "ALL"){
+      m_instrumentPositionSolveOption = AllPositionCoefficients;
+      m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
+    }
+
+    m_positionAprioriSigma.clear();
+
+    // If TWIST is not specified, then a default of YES is used
+    if (scParameterGroup.hasKeyword("TWIST")) {
+      QString parval = (QString)scParameterGroup.findKeyword("TWIST");
+      parval = parval.toUpper();
+      if (parval == "TRUE" || parval == "YES") { // is this necessary ??? i think pvl and toString can handle it...
+        m_solveTwist = true;
+      }
+      else if (parval == "FALSE" || parval == "NO") {
+        m_solveTwist = false;
+      }
+      else {
+        QString msg = "The TWIST parameter must be set to TRUE or FALSE; YES or NO";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+    // If OVERHERMITE is not specified, then a default of NO is used
+    if (scParameterGroup.hasKeyword("OVERHERMITE")) {
+     QString parval = (QString)scParameterGroup.findKeyword("OVERHERMITE");
+     parval = parval.toUpper();
+     if (parval == "TRUE" || parval == "YES") {
+       m_solvePositionOverHermiteSpline = true;
+       m_positionInterpolationType = SpicePosition::PolyFunctionOverHermiteConstant;
+     }
+     else if (parval == "FALSE" || parval == "NO") {
+       m_solvePositionOverHermiteSpline = false;
+       m_positionInterpolationType = SpicePosition::PolyFunction;
+     }
+     else {
+       QString msg = "The OVERHERMITE parameter must be set to TRUE or FALSE; YES or NO";
+       throw IException(IException::User, msg, _FILEINFO_);
+     }
+    }
+
+    if (csolve != "NONE") {
+     if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA"))
+       m_anglesAprioriSigma.append((double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA")));
+     if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA"))
+       m_anglesAprioriSigma.append(
+           (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")));
+     if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA"))
+       m_anglesAprioriSigma.append(
+           (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")));
+    }
+
+    if (ssolve != "NONE") {
+     if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA"))
+       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA")));
+     if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA"))
+       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA")));
+     if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA"))
+       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA")));
     }
   }
-#endif
 
 
 //  BundleObservationSolveSettings::BundleObservationSolveSettings(const BundleObservationSolveSettings &other)
@@ -435,7 +554,7 @@ namespace Isis {
     }
 
     if (additionalPointingSigmas) {
-      for (int i=0;i < additionalPointingSigmas->count();i++) {         
+      for (int i=0;i < additionalPointingSigmas->count();i++) {
           m_anglesAprioriSigma.append(additionalPointingSigmas->value(i));
       }
     }

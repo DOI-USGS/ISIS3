@@ -6,61 +6,61 @@
 
   <description>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3, 
-      level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment 
-      simultaneously defines the selected image geometry information (camera pointing, spacecraft 
-      position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce 
+      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3,
+      level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
+      simultaneously defines the selected image geometry information (camera pointing, spacecraft
+      position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
       boundary mismatches in mosaics of the images.
     </p>
     <p>
-      This functionality is demonstrated below in a zoomed-in area of a mosaic of a 
-      pair of overlapping Messenger images.  In the before jigsaw mosaic on the left 
-      (uncontrolled), the features on the edges of the images do not match.  In the after 
-      jigsaw mosaic on the right (controlled), the crater edges meet correctly and the 
+      This functionality is demonstrated below in a zoomed-in area of a mosaic of a
+      pair of overlapping Messenger images.  In the before jigsaw mosaic on the left
+      (uncontrolled), the features on the edges of the images do not match.  In the after
+      jigsaw mosaic on the right (controlled), the crater edges meet correctly and the
       seam between the two images is no longer visible.
-    </p>  
+    </p>
 
     <img src='assets/images/mdis2_Uncontrolled.png' alt='Before jigsaw (uncontrolled)' width='306' height='259' />
     <img src='assets/images/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
 
     <p>
-      The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that 
-      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to 
+      The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that
+      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to
       run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
-      net</def>, the name of an output <def>control net</def>, and the adjustment parameters.  
+      net</def>, the name of an output <def>control net</def>, and the adjustment parameters.
       <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
       points in the network and their final state after the adjustment.  The initial states of
       the points are tagged as <def>a priori</def> in the <def>control net</def>, and their final
       states are tagged as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
-      associated with the <def>control point</def>s in the net are not changed.  <def>SPICE</def> 
-      in the <def>cube</def> labels is updated at the end of the adjustment only 
+      associated with the <def>control point</def>s in the net are not changed.  <def>SPICE</def>
+      in the <def>cube</def> labels is updated at the end of the adjustment only
       if the bundle converges and the <b>UPDATE</b> parameter is selected.
     </p>
 
     <p>
-      Optional output files can be selected to provide more information for analyzing the 
-      results.  <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment.  
+      Optional output files can be selected to provide more information for analyzing the
+      results.  <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment.
       It lists the user input parameters selected and tables of statistics for both the
       images and the points.   The image statistics can also be written to a separate
       <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
       option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
-      coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
+      coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals
       in both millimeters and pixels.
     </p>
 
     <p>
-      The functional model for the bundle adjustment is the <i>collinearity 
+      The functional model for the bundle adjustment is the <i>collinearity
       condition</i>.  It stipulates that the camera perspective center, a ground
-      point, and its associated image point measurement be collinear.  The diagram 
+      point, and its associated image point measurement be collinear.  The diagram
       below demonstrates the collinear condition in a <i>bundle adjustment</i>.
-      The vectors formed by connecting each object space point (target surface x,y,z) 
-      and its corresponding image space points (<def>sample</def>,<def>line</def>) form 
+      The vectors formed by connecting each object space point (target surface x,y,z)
+      and its corresponding image space points (<def>sample</def>,<def>line</def>) form
       a <i>bundle</i> of light rays.
     </p>
     <img src='assets/images/BundleAdjustment_KarlKraus.png' alt='Before jigsaw (uncontrolled)' width='498' height='355' />
     <p>
-     Kraus, Karl., 1993. Photogrammetry Vol. I., Fundamentals and Standard 
-     Processes, Der. Dümmler Verlag, Bonn, Germany, ISBN 3-427-78684-6, 397 
+     Kraus, Karl., 1993. Photogrammetry Vol. I., Fundamentals and Standard
+     Processes, Der. Dümmler Verlag, Bonn, Germany, ISBN 3-427-78684-6, 397
      pages.
     </p>
 
@@ -116,7 +116,7 @@
     </change>
     <change name="Tracie Sucharski" date="2009-04-08">
       Added date to the Jigged comment in the spice tables.
-    </change> 
+    </change>
     <change name="Tracie Sucharski" date="2009-04-22">
       If updating pointing, delete the CameraStatistics table from labels.
     </change>
@@ -141,9 +141,9 @@
     </change>
     <change name="Debbie A. Cook, Ken Edmundson, and Orrin Thomas" date="2011-10-03">
       Added images showing before and after to demonstrate the
-      program.  Added Krause's collinearity diagram and 
+      program.  Added Krause's collinearity diagram and
       a brief explanation on the output options.  Also added
-      a lien for example(s) to be added later. 
+      a lien for example(s) to be added later.
     </change>
     <change name="Debbie A. Cook" date="2011-10-06">
       Corrected previous history entry and added references to glossary.  Also
@@ -163,7 +163,7 @@
     </change>
     <change name="Debbie A. Cook" date="2011-11-04">
       Added minimums to parameters, corrected SOLVEDEGREE description, and
-      added to the camsolve option descriptions in response to Mantis 
+      added to the camsolve option descriptions in response to Mantis
       issue #514.
     </change>
     <change name="Ken Edmundson" date="2011-12-20">
@@ -192,7 +192,7 @@
       Added a connection to allow jigsaw to surface exceptions from BundleAdjust.  Fixes #2302
     </change>
     <change name="Jeannie Backer" date="2016-08-18">
-      Removed the user parameter called METHOD (i.e. the method used for solving the bundle matrix). 
+      Removed the user parameter called METHOD (i.e. the method used for solving the bundle matrix).
       This solve method is no longer user-selected. The program will now use what was called the SPARSE option
       for the METHOD parameter (i.e. solve with CholMod sparse decomposition). This method should give
       the same results as the other options and should run faster. So the other options were no longer needed.
@@ -222,7 +222,7 @@
       in addition to the other output files such as bundleout.txt.  Fixes #4314.
     </change>
     <change name="Ian Humphrey" date="2016-10-13">
-      Implemented HELDLIST functionality for non-overlapping held images. Any control points that 
+      Implemented HELDLIST functionality for non-overlapping held images. Any control points that
       intersect the held images are fixed, and a priori surface points for these control points are
       set to the held images' measures' surface points. Disabled USEPVL/SC_PARAMETERS. Fixes #4293.
     </change>
@@ -236,7 +236,7 @@
       be the pointing's (rotation's) center angles. The bundleout_images.csv file will also have
       these defaults provided. Fixes #4464.
     </change>
-    <change name="Makayla Shepherd" date="2016-10-26"> 
+    <change name="Makayla Shepherd" date="2016-10-26">
       Removed the underscores from the new parameters IMAGESCSV and TBPARAMETERS.
     </change>
     <change name="Ian Humphrey" date="2016-11-16">
@@ -263,14 +263,14 @@
       References #501.
     </change>
     <change name="Debbie A. Cook" date="2018-06-04">
-      (BundleXYZ modified on 2017-09-17) Fixed a problem in the 
+      (BundleXYZ modified on 2017-09-17) Fixed a problem in the
       xml that was causing the input parameters to be omitted from
       the history.  References #501.
     </change>
     <change name="Debbie A. Cook" date="2018-06-04">
-      (BundleXYZ modified on 2018-03-18) Fixed a problem in the xml 
-      that excluded entry of values for latitudinal point sigmas when the 
-      coordinate type for reports was set to Rectangular and vice versa.  
+      (BundleXYZ modified on 2018-03-18) Fixed a problem in the xml
+      that excluded entry of values for latitudinal point sigmas when the
+      coordinate type for reports was set to Rectangular and vice versa.
       References #501.
     </change>
     <change name="Tyler Wilson" date="2019-05-17">
@@ -286,7 +286,7 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          List of cubes in the input control network 
+          List of cubes in the input control network
         </brief>
         <description>
           This file contains a list of all <def>cube</def>s in the <def>control network</def>
@@ -323,8 +323,8 @@
           Input control network
         </brief>
         <description>
-          This file is a <def>control network</def> generated from programs such as 
-          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s 
+          This file is a <def>control network</def> generated from programs such as
+          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s
           and associated measures.
         </description>
         <filter>
@@ -347,54 +347,24 @@
         </filter>
       </parameter>
 
- <!-- Turning off USEPVL and SC_PARAMETERS for now. Since we are now using observation numbers
-      to obtain the BundleObservationSolveSettings for a BundleObservation (instead of inst. id),
-      this would require using a PVL that contains names of lists of images to group by.
-      E.g. Group = "listA." would create a BundleObservationSolveSettings object that is associated
-      with the images' observation numbers. Group = "listB.lis" would create another BOSS object
-      that is associated with listB's images' observation numbers. Use of these lists could
-      introduce unintended behaviors if not properly verified (e.g. would need to make sure the
-      lists are sublists of the FROMLIST, that these sublists are all mutually exclusive ...).
-      <parameter name="USEPVL">
-        <type>boolean</type>
-        <default><item>false</item></default>
-        <brief>
-          Enter Camera/Spacecraft parameters using a PVL file
-        </brief>
-        <description>
-          This option indicates that the Camera and Spacecraft parameters are to be
-          obtained from the PVL file specified by SC_PARAMETERS. All of the following
-          parameters must be entered through the PVL file if this option is chosen:
-          HELDLIST, CKDEGREE, CKSOLVEDEGREE, CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE,
-          SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE, SPACECRAFT_POSITION_SIGMA,
-          SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA, CAMERA_ANGLES_SIGMA,
-          CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA. An example
-          template is located at $base/templates/jigsaw/SC_Parameters.pvl.
-        </description>
+      <parameter name="SCCONFIG">
         <exclusions>
-          <item>HELDLIST</item>
           <item>CKDEGREE</item>
           <item>CKSOLVEDEGREE</item>
           <item>CAMSOLVE</item>
-          <item>TWIST</item>
           <item>OVEREXISTING</item>
           <item>SPKDEGREE</item>
           <item>SPKSOLVEDEGREE</item>
           <item>SPSOLVE</item>
+          <!-- <item>TWIST</item> -->
           <item>OVERHERMITE</item>
-          <item>SPACECRAFT_POSITION_SIGMA</item>
-          <item>SPACECRAFT_VELOCITY_SIGMA</item>
-          <item>SPACECRAFT_ACCELERATION_SIGMA</item>
           <item>CAMERA_ANGLES_SIGMA</item>
           <item>CAMERA_ANGULAR_VELOCITY_SIGMA</item>
           <item>CAMERA_ANGULAR_ACCELERATION_SIGMA</item>
+          <item>SPACECRAFT_POSITION_SIGMA</item>
+          <item>SPACECRAFT_VELOCITY_SIGMA</item>
+          <item>SPACECRAFT_ACCELERATION_SIGMA</item>
         </exclusions>
-        <inclusions>
-          <item>SC_PARAMETERS</item>
-        </inclusions>
-      </parameter>
-
-      <parameter name="SC_PARAMETERS">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -418,7 +388,7 @@
         <filter>
           *.pvl
         </filter>
-      </parameter>-->
+      </parameter>
     </group>
 
     <group name="Solve Options">
@@ -426,13 +396,13 @@
         <brief> Keep instances of the same observation in different cube files the same</brief>
         <description>
           This option will solve for <def>SPICE</def> on all cubes with a matching
-          observation number as though they were a single observation.  For 
-          most missions, the default observation number is equivalent to the 
-          <def>serial number</def> of the <def>cube</def>, and a single <def>cube</def> 
-          is an observation.  However, for the Lunar Orbiter mission, an image has a defined 
+          observation number as though they were a single observation.  For
+          most missions, the default observation number is equivalent to the
+          <def>serial number</def> of the <def>cube</def>, and a single <def>cube</def>
+          is an observation.  However, for the Lunar Orbiter mission, an image has a defined
           observation number that is a substring of its <def>serial number</def>.  This
           feature allows the three subframes of a Lunar Orbiter High
-          Resolution frame to be treated as a single observation when this 
+          Resolution frame to be treated as a single observation when this
           option is used; otherwise, each subframe is adjusted independently.
         </description>
         <type>boolean</type>
@@ -458,13 +428,13 @@
           </item>
         </inclusions>
       </parameter>
-      
+
       <parameter name="UPDATE">
         <brief> Update cube label</brief>
         <description>
-          When this option is selected, the application will update the labels  
-          of the individual <def>cube</def>s in the FROMLIST with the final values 
-          from the solution if the adjustment converges.  The results are written 
+          When this option is selected, the application will update the labels
+          of the individual <def>cube</def>s in the FROMLIST with the final values
+          from the solution if the adjustment converges.  The results are written
           to the <def>SPICE</def> blobs attached to the cube, overwriting the previous
           values.  If this option is not selected, the <def>cube</def> files are not
           changed.  All other output files are still created.
@@ -478,7 +448,7 @@
       <parameter name="OUTLIER_REJECTION">
       <brief> Auto-rejection of outliers</brief>
       <description>
-        Select this option to perform automatic outlier detection and rejection. 
+        Select this option to perform automatic outlier detection and rejection.
       </description>
       <type>boolean</type>
       <default>
@@ -571,7 +541,7 @@
 
       <parameter name="MAX_MODEL1_C_QUANTILE">
         <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
-        <description> 
+        <description>
           The tweaking constant has different meanings depending on the model being used:
             Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
             Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
@@ -634,7 +604,7 @@
 
       <parameter name="MAX_MODEL2_C_QUANTILE">
         <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
-        <description> 
+        <description>
           The tweaking constant has different meanings depending on the model being used:
             Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
             Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
@@ -694,7 +664,7 @@
 
       <parameter name="MAX_MODEL3_C_QUANTILE">
         <brief>Quantile of the |residual| distribution used to set the tweaking constant of the maximum likelihood estimation model</brief>
-        <description> 
+        <description>
           The tweaking constant has different meanings depending on the model being used:
             Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recommended quantile: 0.5
             Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recommended quantile: 0.7
@@ -750,8 +720,8 @@
           Degree of polynomial fit to original camera angles
         </brief>
         <description>
-          The degree of the polynomial fit to the original camera angles 
-          and used to generate <def>a priori</def> camera angles for the first 
+          The degree of the polynomial fit to the original camera angles
+          and used to generate <def>a priori</def> camera angles for the first
           iteration.
         </description>
       </parameter>
@@ -765,8 +735,8 @@
           The degree of the polynomial being fit to in the bundle adjustment
         </brief>
         <description>
-          The degree of the polynomial being fit to in the bundle adjust 
-          solution.  This polynomial can be different from the one used to 
+          The degree of the polynomial being fit to in the bundle adjust
+          solution.  This polynomial can be different from the one used to
           generate the <def>a priori</def> camera angles used in the first
           iteration. In the case of an instrument with a jitter problem, a
           higher degree polynomial fit to each of the camera angles might
@@ -781,14 +751,14 @@
           <item>ANGLES</item>
         </default>
         <description>
-          This parameter is used to specify which, if any, camera 
+          This parameter is used to specify which, if any, camera
           pointing parameters to include in the adjustment.
         </description>
         <list>
           <option value="NONE">
             <brief> Don't solve for any camera pointing factors</brief>
             <description>
-              If this option is selected, no camera pointing parameters  
+              If this option is selected, no camera pointing parameters
               will be adjusted.
             </description>
           <exclusions>
@@ -804,11 +774,11 @@
               Solve for camera angles: right ascension, declination and optionally twist
             </brief>
             <description>
-              Camera angles in each <def>cube</def> will be adjusted in the solution, 
+              Camera angles in each <def>cube</def> will be adjusted in the solution,
               but not angular velocities or accelerations. Solving for the first two
               camera angles translates images in sample and line.  Adding the third
               angle to the solution (TWIST option) allows for rotation corrections.
-              Adjustments are not applied unless the solution converges and UPDATE is 
+              Adjustments are not applied unless the solution converges and UPDATE is
               selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
             </description>
             <exclusions>
@@ -821,7 +791,7 @@
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
               Camera angles and their angular velocities will be adjusted in the
-              solution.  Solving for angles and velocities is equivalent to using 
+              solution.  Solving for angles and velocities is equivalent to using
               CKSOLVEDEGREE=1.
             </description>
             <exclusions>
@@ -833,8 +803,8 @@
           <option value="ACCELERATIONS">
             <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
-              Camera angles, their angular velocities, and accelerations will be 
-              adjusted in the solution.  Solving for angles, angular velocities, and 
+              Camera angles, their angular velocities, and accelerations will be
+              adjusted in the solution.  Solving for angles, angular velocities, and
               accelerations is equivalent to using CKSOLVEDEGREE=2.
             </description>
             <exclusions>
@@ -857,7 +827,7 @@
       <parameter name="TWIST">
         <brief> Solve for twist</brief>
         <description>
-          If this option is selected, the twist angle will be adjusted in the 
+          If this option is selected, the twist angle will be adjusted in the
           bundle adjustment solution.
         </description>
         <type>boolean</type>
@@ -926,7 +896,7 @@
           <item>NONE</item>
         </default>
         <description>
-          This parameter is used to specify which, if any, spacecraft 
+          This parameter is used to specify which, if any, spacecraft
           position parameters to include in the adjustment.
         </description>
         <list>
@@ -945,7 +915,7 @@
           <option value="POSITIONS">
             <brief>Solve for the spacecraft positions</brief>
             <description>
-              Spacecraft positions will be adjusted in the solution, but 
+              Spacecraft positions will be adjusted in the solution, but
               not the velocity or the acceleration.
             </description>
             <exclusions>
@@ -957,7 +927,7 @@
           <option value="VELOCITIES">
             <brief>Solve for the spacecraft positions and velocities</brief>
             <description>
-              Spacecraft positions will be adjusted in the solution, as 
+              Spacecraft positions will be adjusted in the solution, as
               well as the velocities of the spacecraft at each instance.
             </description>
             <exclusions>
@@ -969,8 +939,8 @@
           <option value="ACCELERATIONS">
             <brief>Solve for the spacecraft positions, velocities, and accelerations</brief>
             <description>
-              Spacecraft positions will be adjusted in the solution, as well 
-              as the velocities and accelerations of the spacecraft at each 
+              Spacecraft positions will be adjusted in the solution, as well
+              as the velocities and accelerations of the spacecraft at each
               instance.
             </description>
             <exclusions>
@@ -993,13 +963,13 @@
         <brief> Fit polynomial over the existing Hermite spline</brief>
         <description>
           This option will fit a polynomial over the existing Hermite cubic
-          spline used to interpolate the coordinates of the spacecraft 
+          spline used to interpolate the coordinates of the spacecraft
           position. The spline is held constant in the adjustment, and the
           initial value for the each of the coefficients in the polynomials
-          is 0. 
+          is 0.
 
           When this option is used, the current positions are used as a priori
-          in the adjustment.  
+          in the adjustment.
         </description>
         <type>boolean</type>
         <default>
@@ -1052,7 +1022,7 @@
         </default>
         <description>
           This parameter indicates which coordinate type will be used to present
-          the control points in the bundle adjustment and bundle output.  
+          the control points in the bundle adjustment and bundle output.
         </description>
         <list>
           <option value="LATITUDINAL">
@@ -1060,7 +1030,7 @@
             <description>
               If this option is selected all control points will be adjusted, corrected,
               and reported in planetocentric latitudinal coordinates (latitude,
-              longitude, and radius).  
+              longitude, and radius).
             </description>
           <exclusions>
             <item>POINT_X_SIGMA</item>
@@ -1073,7 +1043,7 @@
             <brief> Coordinates will be body-fixed rectangular</brief>
             <description>
               If this option is selected all control points will be adjusted, corrected,
-              and reported in body-fixed rectangular coordinates (X, Y, and Z).  
+              and reported in body-fixed rectangular coordinates (X, Y, and Z).
             </description>
             <exclusions>
               <item>POINT_LATITUDE_SIGMA</item>
@@ -1091,7 +1061,7 @@
         </default>
         <description>
           This parameter indicates which coordinate type will be used to present
-          the control points in the bundle adjustment and bundle output.  
+          the control points in the bundle adjustment and bundle output.
         </description>
         <list>
           <option value="LATITUDINAL">
@@ -1099,7 +1069,7 @@
             <description>
               If this option is selected all control points will be adjusted, corrected,
               and reported in planetocentric latitudinal coordinates (latitude,
-              longitude, and radius).  
+              longitude, and radius).
             </description>
           </option>
 
@@ -1107,19 +1077,19 @@
             <brief> Coordinates will be body-fixed rectangular</brief>
             <description>
               If this option is selected all control points will be adjusted, corrected,
-              and reported in body-fixed rectangular coordinates (X, Y, and Z).  
+              and reported in body-fixed rectangular coordinates (X, Y, and Z).
             </description>
           </option>
         </list>
        </parameter>
     </group>
-    
+
       <group name="Parameter Uncertainties">
         <parameter name="POINT_LATITUDE_SIGMA">
           <brief> Global latitude uncertainty for all points (meters)
           </brief>
-          <description> 
-            This optional value will be used as the global latitude 
+          <description>
+            This optional value will be used as the global latitude
             uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
@@ -1130,9 +1100,9 @@
         <parameter name="POINT_LONGITUDE_SIGMA">
           <brief> Global longitude uncertainty for all points (meters)
           </brief>
-          <description> 
-            This optional value will be used as the global longitude 
-            uncertainty for all points. Units are meters. 
+          <description>
+            This optional value will be used as the global longitude
+            uncertainty for all points. Units are meters.
           </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
@@ -1142,8 +1112,8 @@
         <parameter name="POINT_RADIUS_SIGMA">
           <brief> Global radius uncertainty for all points (meters)
           </brief>
-          <description> 
-            This value will be used as the global radius uncertainty for 
+          <description>
+            This value will be used as the global radius uncertainty for
             all points.  Units are meters.
           </description>
           <type>double</type>
@@ -1159,8 +1129,8 @@
         <parameter name="POINT_X_SIGMA">
           <brief> Global body-fixed X uncertainty for all points (meters)
           </brief>
-          <description> 
-            This optional value will be used as the global  
+          <description>
+            This optional value will be used as the global
             uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
@@ -1171,8 +1141,8 @@
         <parameter name="POINT_Y_SIGMA">
           <brief> Global body-fixed X uncertainty for all points (meters)
           </brief>
-          <description> 
-            This optional value will be used as the global  
+          <description>
+            This optional value will be used as the global
             uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
@@ -1183,22 +1153,22 @@
         <parameter name="POINT_Z_SIGMA">
           <brief> Global body-fixed X uncertainty for all points (meters)
           </brief>
-          <description> 
-            This optional value will be used as the global  
+          <description>
+            This optional value will be used as the global
             uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
-        
+
         <parameter name="SPACECRAFT_POSITION_SIGMA">
           <brief> Global uncertainty for spacecraft coordinates (meters)
           </brief>
-          <description> 
-            This value will be used as the global uncertainty for spacecraft 
+          <description>
+            This value will be used as the global uncertainty for spacecraft
             coordinates.  Units are meters.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
@@ -1207,58 +1177,58 @@
         <parameter name="SPACECRAFT_VELOCITY_SIGMA">
           <brief> Global uncertainty for spacecraft velocity (meters/second)
           </brief>
-          <description> 
-            This value will be used as the global uncertainty for spacecraft 
+          <description>
+            This value will be used as the global uncertainty for spacecraft
             velocity.  Units are meters/second.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="SPACECRAFT_ACCELERATION_SIGMA">
-          <brief> Global uncertainty for spacecraft acceleration 
+          <brief> Global uncertainty for spacecraft acceleration
             (meters/second/second)</brief>
-          <description> 
-            This value will be used as the global uncertainty for 
+          <description>
+            This value will be used as the global uncertainty for
             spacecraft acceleration.  Units are meters/second/second.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGLES_SIGMA">
-          <brief> global uncertainty for camera angles 
+          <brief> global uncertainty for camera angles
             (decimal degrees)</brief>
-          <description> 
-            This value will be used as the global uncertainty for camera 
+          <description>
+            This value will be used as the global uncertainty for camera
             angles.  Units are decimal degrees.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_VELOCITY_SIGMA">
-          <brief> Global uncertainty for camera angular velocity 
+          <brief> Global uncertainty for camera angular velocity
             (decimal degrees/second)</brief>
-          <description> 
-            This value will be used as the global uncertainty for camera 
+          <description>
+            This value will be used as the global uncertainty for camera
             angular velocity.  Units are decimal degrees/second.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_ACCELERATION_SIGMA">
-          <brief> Global uncertainty for camera angular acceleration 
+          <brief> Global uncertainty for camera angular acceleration
             (decimal degrees/second/second)</brief>
-          <description> 
-            This value will be used as the global uncertainty for camera 
+          <description>
+            This value will be used as the global uncertainty for camera
             angular acceleration.  Units are decimal degrees/second/second.
-          </description> 
+          </description>
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
@@ -1272,7 +1242,7 @@
          <internalDefault>none</internalDefault>
          <brief>Output file prefix</brief>
          <description>
-           File prefix to prepend for the generated output files. Any prefix that is not a 
+           File prefix to prepend for the generated output files. Any prefix that is not a
 	   file path will have an underscore placed between the prefix and file name.
          </description>
         </parameter>
@@ -1280,7 +1250,7 @@
         <parameter name="BUNDLEOUT_TXT">
           <brief> Standard bundle output file - bundleout.txt
           </brief>
-          <description> 
+          <description>
             Selection of this parameter flags generation of the standard
             bundle output file
           </description>
@@ -1306,7 +1276,7 @@
         <parameter name="OUTPUT_CSV">
           <brief> Outputs point and image data (body-fixed) to csv file - bundleout_points.csv
           </brief>
-          <description> 
+          <description>
             Selection of this parameter flags output of point and image data
             (in body-fixed coordinates) to csv file.
           </description>
@@ -1318,8 +1288,8 @@
 
         <parameter name="RESIDUALS_CSV">
           <brief> Outputs image coordinate residuals to csv file - residuals.csv</brief>
-          <description> 
-            Selection of this parameter flags output of image coordinate 
+          <description>
+            Selection of this parameter flags output of image coordinate
             residuals to a csv file
           </description>
           <type>boolean</type>
@@ -1332,7 +1302,7 @@
     </groups>
 
     <liens>
-      <item>Add items to glossary, example(s) and tips on how to analyze the 
+      <item>Add items to glossary, example(s) and tips on how to analyze the
             results.
       </item>
     </liens>
