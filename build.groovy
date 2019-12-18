@@ -1,22 +1,16 @@
 // vim: ft=groovy
 
-def isisDataPath = '/isisData/data'
-
-def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
-
-def isisTestDataPath = "/isisData/testData"
-
-def kakaduIncDir = "/isisData/kakadu"
+def condaPath = ""
 
 def isisEnv = [
-    "ISIS3DATA=${isisDataPath}",
-    "ISIS3TESTDATA=${isisTestDataPath}",
-    "ISIS3MGRSCRIPTS=${isisMgrScripts}"
+    "ISIS3DATA=/isisData/data",
+    "ISIS3TESTDATA=/isisData/testData",
+    "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
 ]
 
 def cmakeFlags = [
     "-DJP2KFLAG=ON",
-    "-DKAKADU_INCLUDE_DIR=${kakaduIncDir}",
+    "-DKAKADU_INCLUDE_DIR=/isisData/kakadu",
     "-Dpybindings=OFF",
     "-DCMAKE_BUILD_TYPE=RELEASE"
 ]
@@ -32,6 +26,7 @@ def getRepoUrl() {
 def getCommitSha() {
     return sh(script: "git rev-parse HEAD", returnStdout: true).trim()
 }
+
 
 def setGitHubBuildStatus(status) {
     def repoUrl = getRepoUrl()
@@ -63,21 +58,45 @@ node("${env.OS.toLowerCase()}") {
     }
 
     stage("Create environment") {
+        
         env.STAGE_STATUS = "Creating conda environment"
-        sh '''
-            # Use the conda cache running on the Jenkins host
-            # conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
-            conda config --set always_yes True
-            conda config --set ssl_verify false 
-            conda create -n isis python=3
-        '''
+        
+        if (env.OS.toLowerCase() == "mac") {
+          condaPath = "/tmp/" + sh(script: '{ date "+%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
 
-        if (env.OS.toLowerCase() == "centos") {
-            sh 'conda env update -n isis -f environment_gcc4.yml --prune'
+          sh """
+            curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+            bash miniconda.sh -b -p ${condaPath}
+            """
         } else {
-            sh 'conda env update -n isis -f environment.yml --prune'
-        }
-    }
+          condaPath = "/home/jenkins/.conda/"
+        } 
+ 
+        isisEnv.add("PATH=${pwd()}/install/bin:$condaPath/envs/isis/bin:$condaPath/bin:${env.PATH}")
+        
+        withEnv(isisEnv) {
+
+          println("Complete Environment:")
+          sh 'printenv'
+          println("Anaconda Path: " + condaPath)
+          
+          sh """
+              # Use the conda cache running on the Jenkins host
+              # conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
+              which conda
+              conda config --set always_yes True
+              conda config --set ssl_verify false 
+              conda create -n isis python=3
+          """
+           
+          
+          if (env.OS.toLowerCase() == "centos") {
+              sh 'conda env update -n isis -f environment_gcc4.yml --prune'
+          } else {
+            sh "conda env update -n isis -f environment.yml --prune"
+          }
+       } 
+    } 
 
     withEnv(isisEnv) {
         dir("${env.ISISROOT}") {
@@ -85,7 +104,7 @@ node("${env.OS.toLowerCase()}") {
                 stage ("Build") {
                     env.STAGE_STATUS = "Building ISIS on ${env.OS}"
                     sh """
-                        source activate isis
+                        source activate ${condaPath}/envs/isis
                         echo `ls ../`
                         echo `pwd`
                         conda list
@@ -107,20 +126,7 @@ node("${env.OS.toLowerCase()}") {
                         dir("${env.ISISROOT}") {
                             env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
-                                    source activate isis
-                                    echo $ISIS3TESTDATA
-                                    echo $ISIS3DATA
-
-                                    # environment variables
-                                    export ISISROOT=${env.ISISROOT}
-                                    export ISIS3TESTDATA="/isisData/testData"
-                                    export ISIS3DATA="/isisData/data"
-                                    export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-
-                                    automos -HELP
-                                    catlab -HELP
-                                    tabledump -HELP
-
+                                    source activate ${condaPath}/envs/isis
                                     ctest -R _unit_ -j4 -VV
                                 """
 
@@ -137,20 +143,8 @@ node("${env.OS.toLowerCase()}") {
                     stage("AppTests") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
                         sh """
-                            source activate isis
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
+                            source activate ${condaPath}/envs/isis
                             echo $PATH
-
-                            # environment variables
-                            export ISISROOT=${env.ISISROOT}
-                            export ISIS3TESTDATA="/isisData/testData"
-                            export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-
-                            catlab -HELP
-                            tabledump -HELP
-
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -166,20 +160,7 @@ node("${env.OS.toLowerCase()}") {
                     stage("ModuleTests") {
                         env.STAGE_STATUS = "Running module tests on ${env.OS}"
                         sh """
-                            source activate isis
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
-                            echo $PATH
-
-                            # environment variables
-                            export ISISROOT=${env.ISISROOT}
-                            export ISIS3TESTDATA="/isisData/testData"
-                            export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-
-                            catlab -HELP
-                            tabledump -HELP
-
+                            source activate ${condaPath}/envs/isis 
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -195,17 +176,7 @@ node("${env.OS.toLowerCase()}") {
                     stage("GTests") {
                         env.STAGE_STATUS = "Running gtests on ${env.OS}"
                         sh """
-                            source activate isis
-                            echo $ISIS3TESTDATA
-                            echo $ISIS3DATA
-                            echo $PATH
-
-                            # environment variables
-                            export ISISROOT=${env.ISISROOT}
-                            export ISIS3TESTDATA="/isisData/testData"
-                            export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-
+                            source activate ${condaPath}/envs/isis
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
@@ -234,9 +205,5 @@ node("${env.OS.toLowerCase()}") {
 
     stage("Clean Up") {
       env.STAGE_STATUS = "Removing conda environment"
-      sh '''
-          source deactivate
-          conda env remove --name isis
-      '''
     }
 }
