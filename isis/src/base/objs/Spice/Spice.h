@@ -306,6 +306,8 @@ namespace Isis {
       void instrumentBodyFixedPosition(double p[3]) const;
       void sunPosition(double p[3]) const;
       double targetCenterDistance() const;
+      double sunToBodyDist() const;
+      
       Longitude solarLongitude();
       void instrumentBodyFixedVelocity(double v[3]) const;
       iTime time() const;

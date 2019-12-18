@@ -1338,6 +1338,17 @@ namespace Isis {
   QString Spice::targetName() const {
     return m_target->name();
   }
+  
+  
+  double Spice::sunToBodyDist() const {
+    std::vector<double> sunPosition = m_sunPosition->Coordinate();
+    std::vector<double> moonRotation = m_bodyRotation->Matrix();
+        
+    double sunPosFromTarget[3];
+    mxv_c(&moonRotation[0], &sunPosition[0], sunPosFromTarget);
+        
+    return vnorm_c(sunPosFromTarget);  
+  }
 
 
   /**
@@ -1354,7 +1365,7 @@ namespace Isis {
       return;
     }
 
-    if (m_usingAle){
+    if (m_usingAle) {
       double og_time = m_bodyRotation->EphemerisTime();  
       m_bodyRotation->SetEphemerisTime(et.Et());
       m_sunPosition->SetEphemerisTime(et.Et());
