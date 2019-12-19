@@ -351,8 +351,7 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
       QString snInstId = cubeSNs.spacecraftInstrumentId(snIndex);
       bool found = false;
       for (auto bossIt = observationSolveSettingsList.begin(); bossIt != observationSolveSettingsList.end(); bossIt++) {
-        if (bossIt->instrumentId() == snInstId)
-        {
+        if (bossIt->instrumentId() == snInstId) {
           bossIt->addObservationNumber(cubeSNs.observationNumber(snIndex));
           found = true;
         }
@@ -475,21 +474,18 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
         heldSettings.addObservationNumber(cubeSNs.observationNumber(sn));
         QString snInstId = cubeSNs.spacecraftInstrumentId(sn);
         //for each held serial number, locate corresponding BOSS in BOSSlist, remove.
-        for (int bossIndex = 0; bossIndex < observationSolveSettingsList.size(); bossIndex++) {
-          BundleObservationSolveSettings boss = observationSolveSettingsList.at(bossIndex);
-          if (boss.instrumentId() == snInstId)
-          {
-            boss.removeObservationNumber(cubeSNs.observationNumber(sn));
+        for (auto bossIt = observationSolveSettingsList.begin(); bossIt != observationSolveSettingsList.end(); bossIt++) {
+          if (bossIt->instrumentId() == snInstId) {
+            bossIt->removeObservationNumber(cubeSNs.observationNumber(sn));
           }
         }
-
       }
     }
     // Add the held observation solve settings to the list of solve settings
     // for the BundleAdjust
     observationSolveSettingsList.append(heldSettings);
   }
-  
+
   //************************************************************************************************
   return observationSolveSettingsList;
 }
