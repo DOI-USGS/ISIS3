@@ -174,7 +174,7 @@ namespace Isis {
      }
     }
 
-    if (m_instrumentPointingSolveOption) {
+    if (m_instrumentPointingSolveOption != NoPointingFactors) {
       if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA")) {
         m_anglesAprioriSigma.append((double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA")));
       }
@@ -195,9 +195,15 @@ namespace Isis {
       else {
         m_anglesAprioriSigma.append(Isis::Null);
       }
+      if (scParameterGroup.hasKeyword("ADDITIONAL_CAMERA_POINTING_SIGMAS")) {
+        PvlKeyword additionalSigmas = scParameterGroup.findKeyword("ADDITIONAL_CAMERA_POINTING_SIGMAS");
+        for (int i = 0; i < additionalSigmas.size(); i++ ) {
+          m_anglesAprioriSigma.append(toDouble(additionalSigmas[i]));
+        }
+      }
     }
 
-    if (m_instrumentPositionSolveOption) {
+    if (m_instrumentPositionSolveOption != NoPositionFactors) {
       if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA")) {
         m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA")));
       }
