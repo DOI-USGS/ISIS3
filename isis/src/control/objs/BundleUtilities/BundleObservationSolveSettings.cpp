@@ -89,8 +89,6 @@ namespace Isis {
       m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
     }
 
-    m_anglesAprioriSigma.clear();
-
     // If OVEREXISTING is not specified, then a default of NO is used
     if (scParameterGroup.hasKeyword("OVEREXISTING")) {
       QString parval = (QString)scParameterGroup.findKeyword("OVEREXISTING");
@@ -143,8 +141,6 @@ namespace Isis {
       m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
     }
 
-    m_positionAprioriSigma.clear();
-
     // If TWIST is not specified, then a default of YES is used
     if (scParameterGroup.hasKeyword("TWIST")) {
       QString parval = (QString)scParameterGroup.findKeyword("TWIST");
@@ -178,24 +174,54 @@ namespace Isis {
      }
     }
 
-    if (csolve != "NONE") {
-     if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA"))
-       m_anglesAprioriSigma.append((double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA")));
-     if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA"))
-       m_anglesAprioriSigma.append(
+    if (m_instrumentPointingSolveOption) {
+      if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA")) {
+        m_anglesAprioriSigma.append((double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA")));
+      }
+      else {
+        m_anglesAprioriSigma.append(Isis::Null);
+      }
+      if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")){
+        m_anglesAprioriSigma.append(
            (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")));
-     if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA"))
-       m_anglesAprioriSigma.append(
+      }
+      else {
+        m_anglesAprioriSigma.append(Isis::Null);
+      }
+      if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")){
+        m_anglesAprioriSigma.append(
            (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")));
+      }
+      else {
+        m_anglesAprioriSigma.append(Isis::Null);
+      }
     }
 
-    if (ssolve != "NONE") {
-     if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA"))
-       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA")));
-     if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA"))
-       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA")));
-     if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA"))
-       m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA")));
+    if (m_instrumentPositionSolveOption) {
+      if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA")) {
+        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA")));
+      }
+      else {
+        m_positionAprioriSigma.append(Isis::Null);
+      }
+      if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA")){
+        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA")));
+      }
+      else {
+        m_positionAprioriSigma.append(Isis::Null);
+      }
+      if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA")) {
+        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA")));
+      }
+      else {
+        m_positionAprioriSigma.append(Isis::Null);
+      }
+      if (scParameterGroup.hasKeyword("ADDITIONAL_SPACECRAFT_POSITION_SIGMAS")) {
+        PvlKeyword additionalSigmas = scParameterGroup.findKeyword("ADDITIONAL_SPACECRAFT_POSITION_SIGMAS");
+        for (int i = 0; i < additionalSigmas.size(); i++ ) {
+          m_positionAprioriSigma.append(toDouble(additionalSigmas[i]));
+        }
+      }
     }
   }
 
