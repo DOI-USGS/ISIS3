@@ -277,6 +277,12 @@
       Cleaned up the bundleout.txt file and added new information in the header.
       Fixes #3267.
     </change>
+    <change name="Aaron Giroux" date="2019-12-19">
+      Added SCCONFIG parameter which allows users to pass in a pvl file with different
+      settings for different instrumentIDs. Added logic into the observationSolveSettings
+      function to construct BundleObservationSolveSettings objects based off of the settings
+      in the pvl file.
+    </change>
   </history>
 
   <groups>

@@ -82,7 +82,9 @@ namespace Isis {
    *                           additional apriori sigma values in setInstrumentPositionSettings/
    *                           setInstrumentPointingSettings beyond position/velocity/acceleration.
    *                           References #497.
-   *
+   *   @history 2019-12-19 Aaron Giroux - Added new constructor to construct a BOSS from
+   *                           a PVLGroup.
+   *                           References #3369.
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
