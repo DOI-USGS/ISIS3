@@ -93,8 +93,8 @@ namespace Isis {
       //  Create a polygon from the pixel vertices.  This polygon may have spikes or other
       //  problems such as multiple polygons.  Despike, then make sure we have a single polygon.
       //  Do not rasterize pixel if despiking fails or there are multiple polygons.
-      geos::geom::Polygon *spikedPixelPoly = Isis::globalFactory.createPolygon(
-          globalFactory.createLinearRing(pts), NULL);
+      geos::geom::Polygon *spikedPixelPoly = Isis::globalFactory->createPolygon(
+          globalFactory->createLinearRing(pts), NULL);
 
       const geos::geom::Polygon *projectedInputPixelPoly;
 
@@ -144,7 +144,7 @@ namespace Isis {
 
           if (m_useCenter) {
             geos::geom::Coordinate c(x, y);
-            geos::geom::Point *p = Isis::globalFactory.createPoint(c);
+            geos::geom::Point *p = Isis::globalFactory->createPoint(c);
             contains = preparedPoly->contains(p);
             delete p;
           }
@@ -156,8 +156,8 @@ namespace Isis {
             tpts->add(geos::geom::Coordinate(x - 0.5, y + 0.5));
             tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
 
-            geos::geom::Polygon *outPixelFootPrint = Isis::globalFactory.createPolygon(
-                                      globalFactory.createLinearRing(tpts), NULL);
+            geos::geom::Polygon *outPixelFootPrint = Isis::globalFactory->createPolygon(
+                                      globalFactory->createLinearRing(tpts), NULL);
             contains = preparedPoly->intersects(outPixelFootPrint);
             delete outPixelFootPrint;
           }
@@ -329,8 +329,8 @@ namespace Isis {
     imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->sampleCount(), 0.0));
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
 
-    m_imagePoly = Isis::globalFactory.createPolygon(
-                    globalFactory.createLinearRing(imagePts), NULL);
+    m_imagePoly = Isis::globalFactory->createPolygon(
+                    globalFactory->createLinearRing(imagePts), NULL);
 
     m_average = new Brick(*this->OutputCubes[0], 1, 1, nbands);
     m_count = new Brick(*this->OutputCubes[1], 1, 1, nbands);

@@ -1,3 +1,4 @@
+  
 channels:
   - usgs-astrogeology
   - conda-forge
@@ -17,7 +18,7 @@ dependencies:
   - doxygen
   - eigen
   - embree
-  - geos=3.5.1
+  - geos>=3.6.0,<3.7.0
   - geotiff
   - gmm
   - gmp
@@ -40,7 +41,7 @@ dependencies:
   - nlohmann_json
   - ninja==1.7.2
   - conda-forge/label/gcc7::nn
-  - opencv>=3.0.0,<=4.0.0
+  - opencv
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
