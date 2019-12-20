@@ -90,7 +90,6 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-
     init(lab, !hasTables);
   }
 
@@ -119,7 +118,7 @@ namespace Isis {
    */
   void Spice::init(Pvl &lab, bool noTables) {
     NaifStatus::CheckErrors();
-
+    
     // Initialize members
     m_solarLongitude = new Longitude;
     m_et = NULL;
@@ -152,7 +151,6 @@ namespace Isis {
     m_naifKeywords = new PvlObject("NaifKeywords");
 
     // m_sky = false;
-
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -205,7 +203,7 @@ namespace Isis {
       if (kernels.hasKeyword("Extra")) {
         load(kernels["Extra"], noTables);
       }
-
+      
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
       // that are defined in kernels and not just body codes build into spicelib
@@ -341,7 +339,7 @@ namespace Isis {
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
     // Check to see if we have nadir pointing that needs to be computed &
-    // See if we have table blobs to load
+    // See if we have table blobs to load 
     if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
       Table t("SunPosition", lab.fileName(), lab);
       m_sunPosition->LoadCache(t);
@@ -396,8 +394,7 @@ namespace Isis {
     }
 
     NaifStatus::CheckErrors();
-  }
-
+  } 
 
   /**
    * Loads/furnishes NAIF kernel(s)
@@ -1299,6 +1296,17 @@ namespace Isis {
     */
   QString Spice::targetName() const {
     return m_target->name();
+  }
+  
+  
+  double Spice::sunToBodyDist() const {
+    std::vector<double> sunPosition = m_sunPosition->Coordinate();
+    std::vector<double> bodyRotation = m_bodyRotation->Matrix();
+    
+    double sunPosFromTarget[3];
+    mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
+        
+    return vnorm_c(sunPosFromTarget);  
   }
 
 
