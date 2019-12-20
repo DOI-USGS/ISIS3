@@ -106,12 +106,9 @@ namespace Isis {
     double width = 0.0;
     bool changed = false;
 
+    // Too few pairs to do a saw tooth with
     if(newStretch.Pairs() < 3) {
-      // Disable all interpretation of linear stretches
-      interpretted.CopyPairs(calculateNewStretch());
-      offset = p_offsetEdit->text().toDouble();
-      width = p_widthEdit->text().toDouble();
-      changed = true;
+      return;
     }
     else {
       // find an offset... should be the second or third point
