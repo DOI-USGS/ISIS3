@@ -92,7 +92,14 @@ namespace Isis {
   Spice::Spice(Cube &cube, bool noTables) {  
     init(*cube.label(), noTables);
   }
-  
+ 
+
+  /**
+   * Constructs a Spice Object
+   *
+   * @param lab Isis Cube Pvl Lavel
+   * @param isd ALE Json ISD
+   */
   Spice::Spice(Pvl &lab, json isd) {
     init(lab, true, isd);
   }
@@ -1345,10 +1352,6 @@ namespace Isis {
     std::vector<double> sunPosition = m_sunPosition->Coordinate();
     std::vector<double> bodyRotation = m_bodyRotation->Matrix();
     
-    for(size_t i = 0; i < bodyRotation.size(); i++) {
-      std::cout << bodyRotation[i] << std::endl;
-    } 
-
     double sunPosFromTarget[3];
     mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
         
