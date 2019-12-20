@@ -80,7 +80,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    init(cube, !hasTables);
+    init(lab, !hasTables);
   }
 
   /**
@@ -90,7 +90,18 @@ namespace Isis {
    * @param noTables Indicates the use of tables.
    */
   Spice::Spice(Cube &cube, bool noTables) {  
-    init(cube, noTables);
+    init(*cube.label(), noTables);
+  }
+ 
+
+  /**
+   * Constructs a Spice Object
+   *
+   * @param lab Isis Cube Pvl Lavel
+   * @param isd ALE Json ISD
+   */
+  Spice::Spice(Pvl &lab, json isd) {
+    init(lab, true, isd);
   }
 
   /**
@@ -106,9 +117,9 @@ namespace Isis {
    * @internal
    *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
    */
-  void Spice::init(Cube &cube, bool noTables) {
+  void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
-
+    
     // Initialize members
     m_solarLongitude = new Longitude;
     m_et = NULL;
@@ -142,8 +153,6 @@ namespace Isis {
 
     // m_sky = false;
     
-    Pvl &lab = *cube.label();
-   
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -166,7 +175,6 @@ namespace Isis {
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
     m_usingAle = false; 
 
-    json isd; 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
@@ -178,15 +186,18 @@ namespace Isis {
           QString msg = "Falling back to ISIS generation of nadir pointing";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
+        
+        if (isd == NULL){
+          // try using ALE
+          std::ostringstream kernel_pvl;
+          kernel_pvl << kernels;
 
-        // try using ALE
-        std::ostringstream kernel_pvl;
-        kernel_pvl << kernels;
+          json props;
+          props["kernels"] = kernel_pvl.str();
 
-        json props;
-        props["kernels"] = kernel_pvl.str();
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
+        }
 
-        isd = ale::load(cube.fileName().toStdString(), props.dump(), "isis");
         json aleNaifKeywords = isd["NaifKeywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
         
@@ -230,7 +241,6 @@ namespace Isis {
           load(kernels["Extra"], noTables);
         }
       }
-
      
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
@@ -367,7 +377,7 @@ namespace Isis {
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
     // Check to see if we have nadir pointing that needs to be computed &
-    // See if we have table blobs to load
+    // See if we have table blobs to load 
     if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
       Table t("SunPosition", lab.fileName(), lab);
       m_sunPosition->LoadCache(t);
@@ -387,7 +397,6 @@ namespace Isis {
       m_bodyRotation->LoadCache(isd["BodyRotation"]);
       solarLongitude();
     }
-
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
     //  SpacecraftPosition.  The old keywords were in existance before the
@@ -433,8 +442,7 @@ namespace Isis {
     }
     
     NaifStatus::CheckErrors();
-  }
-
+  } 
 
   /**
    * Loads/furnishes NAIF kernel(s)
@@ -1338,6 +1346,17 @@ namespace Isis {
   QString Spice::targetName() const {
     return m_target->name();
   }
+  
+  
+  double Spice::sunToBodyDist() const {
+    std::vector<double> sunPosition = m_sunPosition->Coordinate();
+    std::vector<double> bodyRotation = m_bodyRotation->Matrix();
+    
+    double sunPosFromTarget[3];
+    mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
+        
+    return vnorm_c(sunPosFromTarget);  
+  }
 
 
   /**
@@ -1354,7 +1373,7 @@ namespace Isis {
       return;
     }
 
-    if (m_usingAle){
+    if (m_usingAle) {
       double og_time = m_bodyRotation->EphemerisTime();  
       m_bodyRotation->SetEphemerisTime(et.Et());
       m_sunPosition->SetEphemerisTime(et.Et());
