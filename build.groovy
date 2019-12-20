@@ -62,7 +62,7 @@ node("${env.OS.toLowerCase()}") {
         env.STAGE_STATUS = "Creating conda environment"
         
         if (env.OS.toLowerCase() == "mac") {
-          condaPath = "/tmp/" + sh(script: '{ date "+%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
+          condaPath = "/tmp/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
 
           sh """
             curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
