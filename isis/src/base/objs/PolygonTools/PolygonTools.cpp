@@ -49,12 +49,6 @@
 using namespace std;
 namespace Isis {
 
-
-  PolygonTools::PolygonTools() {
-    globalFactory = geos::geom::GeometryFactory::create(); 
-  }
-
-
   /**
    * This method will return a geos::geom::MultiPolygon which contains the X/Y
    * coordinates of the LonLat polygon. The Lat/Lon polygon must

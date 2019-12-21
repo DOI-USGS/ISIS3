@@ -86,14 +86,13 @@ node("${env.OS.toLowerCase()}") {
               conda config --set always_yes True
               conda config --set ssl_verify false 
               conda update -n base -c defaults conda
-              conda create -n isis python=3
           """
            
           
           if (env.OS.toLowerCase() == "centos") {
               sh 'conda env update -n isis -f environment_gcc4.yml --prune'
           } else {
-            sh "conda env update -n isis -f environment.yml --prune"
+            sh "conda env create -n isis -f environment.yml"
           }
        } 
     } 
