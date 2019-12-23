@@ -61,6 +61,7 @@ namespace Isis {
     p_photoPhaseCurveList.clear();
   }
 
+
   /**
     * Set the empirical Lunar Lambert function phase angle list.  This is the list
     * of phase angles that Lunar Lambert L values and phase curve list values will
@@ -86,6 +87,40 @@ namespace Isis {
     }
   }
 
+
+  /**
+    * Set the empirical Lunar Lambert function phase angle list.  This is the list
+    * of phase angles that Lunar Lambert L values and phase curve list values will
+    * be provided for. A spline curve will be used to interpolate L values and
+    * phase curve values that exist between the given phase angles. The values
+    * in the phase angle list are limited to values that are >=0 and <=180.
+    *
+    * @param phaselist  PvlKeyword containing phase angles to interpolate
+    */
+  void LunarLambertEmpirical::SetPhotoPhaseList(PvlKeyword phaseList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (phaseList.size() == 1) {
+      SetPhotoPhaseList(QString(phaseList));
+      return;
+    }
+
+    double phaseAngle;
+    p_photoPhaseList.clear();
+
+    for (int i=0; i< phaseList.size(); i++) {
+      phaseAngle = phaseList[i].toDouble();
+
+      if (phaseAngle < 0.0 || phaseAngle > 180.0) {
+        QString msg = "Invalid value of empirical Lunar Lambert phase angle list value [" +
+                          toString(phaseAngle) + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      p_photoPhaseList.push_back(phaseAngle);
+    }
+  }
+
+
   /**
     * Set the empirical Lunar Lambert function L exponent list.  This is used to
     * govern the limb-darkening in the Lunar Lambert photometric function.  Values
@@ -107,6 +142,32 @@ namespace Isis {
     }
   }
 
+
+  /**
+    * Set the empirical Lunar Lambert function L exponent list.  This is used to
+    * govern the limb-darkening in the Lunar Lambert photometric function.  Values
+    * of the Lunar Lambert exponent generally fall in the range from 0.0
+    * (Lambert function) to 1.0 (Lommel-Seeliger or "lunar" function). There are
+    * no limits on the value of this parameter, but values far outside the 0 to 1
+    * range will not be very useful.
+    *
+    * @param llist  PvkKeyword containing List of Lunar Lambert function exponents to interpolate
+    */
+  void LunarLambertEmpirical::SetPhotoLList(PvlKeyword lstrList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (lstrList.size() == 1) {
+      SetPhotoLList(QString(lstrList));
+      return;
+    }
+
+    p_photoLList.clear();
+    for (int i=0; i<lstrList.size(); i++) {
+      p_photoLList.push_back(lstrList[i].toDouble());
+    }
+  }
+
+
   /**
     * Set the empirical Lunar Lambert function phase curve list.  This list provides
     * the brightness values that correspond to the limb-darkening values in the
@@ -124,6 +185,30 @@ namespace Isis {
       p_photoPhaseCurveList.push_back(phasecurve);
     }
   }
+
+
+  /**
+    * Set the empirical Lunar Lambert function phase curve list.  This list provides
+    * the brightness values that correspond to the limb-darkening values in the
+    * empirical Lunar Lambert photometric function.
+    *
+    * @param phasecurvelist  PvlKeyword containing list of brightness values corresponding 
+    * to Lunar Lambert function exponents
+    */
+  void LunarLambertEmpirical::SetPhotoPhaseCurveList(PvlKeyword photocurvestrList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (photocurvestrList.size() == 1) {
+      SetPhotoPhaseCurveList(QString(photocurvestrList));
+      return;
+    }
+
+    p_photoPhaseCurveList.clear();
+    for (int i=0; i<photocurvestrList.size(); i++) {
+      p_photoPhaseCurveList.push_back(photocurvestrList[i].toDouble());
+    }
+  }
+
 
   double LunarLambertEmpirical::PhotoModelAlgorithm(double phase, double incidence,
                                        double emission) {
