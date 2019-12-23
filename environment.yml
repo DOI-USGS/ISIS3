@@ -1,14 +1,14 @@
 channels:
-  - conda-forge/label/gcc7
-  - conda-forge
   - usgs-astrogeology
+  - conda-forge
+  - defaults
 
 dependencies:
   - ale >=0.7.1
   - boost=1.68.0
   - armadillo
   - blas
-  - bullet
+  - bullet=2.86.1=0
   - bz2file
   - bzip2
   - cmake >=3.15
@@ -17,7 +17,7 @@ dependencies:
   - doxygen
   - eigen
   - embree
-  - geos>=3.6.0,<3.7.0
+  - geos>=3.7,<3.8
   - geotiff
   - gmm
   - gmp
@@ -29,7 +29,7 @@ dependencies:
   - kakadu==1
   - krb5
   - libpng>=1.6.34
-  - libprotobuf
+  - libprotobuf=3.9.1
   - libtiff
   - libxml2
   - make
@@ -40,10 +40,10 @@ dependencies:
   - nlohmann_json
   - ninja==1.7.2
   - conda-forge/label/gcc7::nn
-  - opencv=3.4.1=py36_blas_openblas_200
+  - opencv>=3.0.0,<=4.0.0
   - openssl>=1.0.0,<1.1.0
   - pcl
-  - protobuf
+  - protobuf=3.9.1
   - qhull
   - qt=5.9.6
   - qwt=6.1.3

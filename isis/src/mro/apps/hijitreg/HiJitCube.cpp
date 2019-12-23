@@ -42,7 +42,7 @@ using std::ostringstream;
 namespace Isis {
 
 
-  static  geos::geom::GeometryFactory::unique_ptr geosFactory = geos::geom::GeometryFactory::create();
+  static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
   bool HiJitCube::naifLoaded = false;
   int npSamp0[] = {0, 1971, 3964, 5963, 7970, 7971, 7971, 9975, 9976, 9976, 11981, 13986, 15984, 17982};
   int npSamps[] = {2021, 2043, 2048, 2052, 2055, 2053, 2053, 2053, 2054, 2055, 2051, 2049, 2043, 2018};

@@ -394,7 +394,7 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
   bool firstFlag=false;
   bool ignorMeas;
   QList<ControlMeasure *> cubeMeasures = net.GetMeasuresInCube(serialNum);
-  static  geos::geom::GeometryFactory::unique_ptr geosFactory = geos::geom::GeometryFactory::create();
+  static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
   for (i=0;i<cubeMeasures.size();i++) {
     if (cubeMeasures[i]->IsIgnored()) continue;  //skip ignored measures

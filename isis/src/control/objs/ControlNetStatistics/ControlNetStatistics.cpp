@@ -210,7 +210,7 @@ namespace Isis {
    * @author Sharmila Prasad (11/1/2011)
    */
   void ControlNetStatistics::GenerateImageStats() {
-    geos::geom::GeometryFactory::unique_ptr geosFactory = geos::geom::GeometryFactory::create();
+    geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
 
     CubeManager cubeMgr;
     cubeMgr.SetNumOpenCubes(50);

@@ -62,8 +62,9 @@ namespace Isis {
 
   class UniversalGroundMap;
   class TProjection;
-
-  static geos::geom::GeometryFactory::unique_ptr globalFactory = geos::geom::GeometryFactory::create();
+  
+  
+  static geos::geom::GeometryFactory::Ptr globalFactory = geos::geom::GeometryFactory::create();
 
   /**
    * @brief Provides various tools to work with geos multipolygons

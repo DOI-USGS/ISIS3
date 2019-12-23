@@ -92,7 +92,10 @@ node("${env.OS.toLowerCase()}") {
           if (env.OS.toLowerCase() == "centos") {
               sh 'conda env update -n isis -f environment_gcc4.yml --prune'
           } else {
-            sh "conda env create -n isis -f environment.yml"
+            sh """
+                conda config --show channels
+                conda env create -n isis -f environment.yml
+            """
           }
        } 
     } 

@@ -136,7 +136,7 @@ int main() {
   pts->add(geos::geom::Coordinate(25.0, 28.0));
   pts->add(geos::geom::Coordinate(23.0, 22.0));
   vector<geos::geom::Geometry *> polys;
-  geos::geom::GeometryFactory::unique_ptr gf = geos::geom::GeometryFactory::create();
+  geos::geom::GeometryFactory::Ptr gf = geos::geom::GeometryFactory::create();
   polys.push_back(gf->createPolygon(gf->createLinearRing(pts), NULL));
   geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(polys);
 

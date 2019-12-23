@@ -548,7 +548,7 @@ void writeOutput(SerialNumberList num2cube, QString filename,
 double getControlFitness(ControlNet &cnet, QString sn, double tolerance, Cube * cube) {
   double controlFitness = 0;
 
-  static  geos::geom::GeometryFactory::unique_ptr geosFactory = geos::geom::GeometryFactory::create();
+  static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
   QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(sn);
 
