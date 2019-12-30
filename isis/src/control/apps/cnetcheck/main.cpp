@@ -548,7 +548,7 @@ void writeOutput(SerialNumberList num2cube, QString filename,
 double getControlFitness(ControlNet &cnet, QString sn, double tolerance, Cube * cube) {
   double controlFitness = 0;
 
-  static  geos::geom::GeometryFactory geosFactory;
+  static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
   QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(sn);
 
@@ -561,8 +561,8 @@ double getControlFitness(ControlNet &cnet, QString sn, double tolerance, Cube * 
   if (pts->size() >= 4) {
 
     // Calculate the convex hull
-    geos::geom::Geometry * convexHull = geosFactory.createPolygon(
-        geosFactory.createLinearRing(pts), 0)->convexHull();
+    geos::geom::Geometry * convexHull = geosFactory->createPolygon(
+        geosFactory->createLinearRing(pts), 0)->convexHull();
 
     // Calculate the area of the convex hull
     double convexArea = convexHull->getArea();

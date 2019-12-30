@@ -394,7 +394,7 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
   bool firstFlag=false;
   bool ignorMeas;
   QList<ControlMeasure *> cubeMeasures = net.GetMeasuresInCube(serialNum);
-  static  geos::geom::GeometryFactory geosFactory;
+  static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
   for (i=0;i<cubeMeasures.size();i++) {
     if (cubeMeasures[i]->IsIgnored()) continue;  //skip ignored measures
@@ -422,8 +422,8 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
                                   cubeMeasures[firstIndex]->GetLine()));
   if (pts->size() >= 4) {
     // Calculate the convex hull
-    geos::geom::Geometry * convexHull = geosFactory.createPolygon(
-        geosFactory.createLinearRing(pts), 0)->convexHull();
+    geos::geom::Geometry * convexHull = geosFactory->createPolygon(
+        geosFactory->createLinearRing(pts), 0)->convexHull();
     // Calculate the area of the convex hull
     area = convexHull->getArea();
   }
