@@ -106,7 +106,7 @@ node("${env.OS.toLowerCase()}") {
                 stage ("Build") {
                     env.STAGE_STATUS = "Building ISIS on ${env.OS}"
                     sh """
-                        source activate ${condaPath}/envs/isis
+                        conda activate ${condaPath}/envs/isis
                         echo `ls ../`
                         echo `pwd`
                         conda list
