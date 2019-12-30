@@ -230,7 +230,7 @@ namespace Isis {
     for (int i = 0; i < vertices.size(); i++) {
       points->add(geos::geom::Coordinate(vertices[i].x(), vertices[i].y()));
     }
-    QScopedPointer<geos::geom::LineString> pointString(Isis::globalFactory.createLineString(
+    QScopedPointer<geos::geom::LineString> pointString(Isis::globalFactory->createLineString(
                                                                            points.take()));
 
     //Compute a convex hull for the line string
@@ -269,8 +269,8 @@ namespace Isis {
       pts->add(geos::geom::Coordinate(vertices[i].y(), vertices[i].x()));
     }
     pts->add(geos::geom::Coordinate(vertices[0].y(), vertices[0].x()));
-    QScopedPointer<geos::geom::Polygon> originalPoly(Isis::globalFactory.createPolygon(
-                                                       globalFactory.createLinearRing(pts.take()),
+    QScopedPointer<geos::geom::Polygon> originalPoly(Isis::globalFactory->createPolygon(
+                                                       globalFactory->createLinearRing(pts.take()),
                                                        NULL));
 
     // Split the polygon

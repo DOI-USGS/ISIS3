@@ -227,7 +227,7 @@ void IsisMain() {
       cam->SetImage(cm->GetSample(), cm->GetLine());
 
 
-      points.push_back(Isis::globalFactory.createPoint(geos::geom::Coordinate(
+      points.push_back(Isis::globalFactory->createPoint(geos::geom::Coordinate(
                          cam->UniversalLongitude(), cam->UniversalLatitude())));
 
       delete cam;
@@ -322,7 +322,7 @@ void IsisMain() {
       // Convert the X/Y points back to Lat/Lon points
       for (unsigned int pt = 0; pt < points.size(); pt ++) {
         if (proj->SetCoordinate(points[pt]->getX(), points[pt]->getY())) {
-          seed.push_back(Isis::globalFactory.createPoint(
+          seed.push_back(Isis::globalFactory->createPoint(
                            geos::geom::Coordinate(proj->UniversalLongitude(),
                                                   proj->UniversalLatitude())));
         }
@@ -336,7 +336,7 @@ void IsisMain() {
       // Convert the Sample/Line points back to Lat/Lon points
       for (unsigned int pt = 0; pt < points.size(); pt ++) {
         if (ugmap->SetImage(points[pt]->getX(), points[pt]->getY())) {
-          seed.push_back(Isis::globalFactory.createPoint(
+          seed.push_back(Isis::globalFactory->createPoint(
                            geos::geom::Coordinate(ugmap->UniversalLongitude(),
                                                   ugmap->UniversalLatitude())));
         }
