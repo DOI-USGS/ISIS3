@@ -45,7 +45,6 @@ pipeline {
               "-DCMAKE_BUILD_TYPE=RELEASE"
           ]
 
-          def build_ok = true
           def errors = []
           def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
           def builders = [:] 
@@ -59,6 +58,7 @@ pipeline {
             builders[lower_label] = {
               node(lower_label) {
               
+              def build_ok = true
               def condaPath = ""
               def isisEnv = [
                 "ISIS3DATA=/isisData/data",
