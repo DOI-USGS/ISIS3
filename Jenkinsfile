@@ -37,12 +37,7 @@ pipeline {
       steps { 
         script {
           def groovy_utilities = load "${pwd()}/groovy_utilities.groovy" 
-          def isisEnv = [
-              "ISIS3DATA=/isisData/data",
-              "ISIS3TESTDATA=/isisData/testData",
-              "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
-          ]
-
+      
           def cmakeFlags = [
               "-DJP2KFLAG=ON",
               "-DKAKADU_INCLUDE_DIR=/isisData/kakadu",
@@ -65,6 +60,11 @@ pipeline {
               node(lower_label) {
               
               def condaPath = ""
+              def isisEnv = [
+                "ISIS3DATA=/isisData/data",
+                "ISIS3TESTDATA=/isisData/testData",
+                "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
+              ]
               stage (label) {
                   sh 'git config --global http.sslVerify false'
                   checkout scm
