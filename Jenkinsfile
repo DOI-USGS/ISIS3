@@ -36,14 +36,7 @@ pipeline {
     stage("CI") {
       steps { 
         script {
-          def groovy_utilities = load "${pwd()}/groovy_utilities.groovy" 
-      
-          def cmakeFlags = [
-              "-DJP2KFLAG=ON",
-              "-DKAKADU_INCLUDE_DIR=/isisData/kakadu",
-              "-Dpybindings=OFF",
-              "-DCMAKE_BUILD_TYPE=RELEASE"
-          ]
+          def groovy_utilities = load "${pwd()}/groovy_utilities.groovy"  
 
           def errors = []
           def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
@@ -65,6 +58,14 @@ pipeline {
                 "ISIS3TESTDATA=/isisData/testData",
                 "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
               ]
+
+              def cmakeFlags = [
+                  "-DJP2KFLAG=ON",
+                  "-DKAKADU_INCLUDE_DIR=/isisData/kakadu",
+                  "-Dpybindings=OFF",
+                  "-DCMAKE_BUILD_TYPE=RELEASE"
+              ]
+
               stage (label) {
                   sh 'git config --global http.sslVerify false'
                   checkout scm
@@ -101,8 +102,8 @@ pipeline {
                         sh "conda env create --prefix ${condaPath}/envs/isis -f environment_gcc4.yml"
                     } else {
                       sh """
-                          conda config --show channels
-                          conda env create --prefix ${condaPath}/envs/isis -f environment.yml
+                        conda config --show channels
+                        conda env create --prefix ${condaPath}/envs/isis -f environment.yml
                       """
                     }
                     dir("${env.ISISROOT}") {
@@ -135,6 +136,7 @@ pipeline {
                             }
                             catch(e) {
                                 build_ok = false
+                                errors.add(env.STAGE_STATUS)
                                 echo e.toString()
                             }
                             sh 'source deactivate'
@@ -194,10 +196,6 @@ pipeline {
                           }
                           setGitHubBuildStatus(comment)
                       }
-                  }
-
-                  stage("Clean Up") {
-                    env.STAGE_STATUS = "Removing conda environment"
                   }
                 }
               }
