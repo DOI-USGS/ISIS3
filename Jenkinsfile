@@ -96,7 +96,7 @@ pipeline {
                         # Use the conda cache running on the Jenkins host
                         conda config --set always_yes True
                         conda config --set ssl_verify false
-                        conda create --prefix ${condaPath}/envs/isis python=3
+                        conda create -c conda-forge --prefix ${condaPath}/envs/isis python=3
                     """
                     
                     if (lower_label == "centos") {
