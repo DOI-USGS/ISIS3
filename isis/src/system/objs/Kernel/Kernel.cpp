@@ -69,6 +69,7 @@ namespace Isis {
    */
   Kernel::Type Kernel::typeEnum(const QString &type) {
     QString strng = type.simplified().trimmed().toUpper();
+    if (strng == "UNKNOWN") return Unknown;
     if (strng == "PREDICTED") return Predicted;
     if (strng == "NADIR") return Nadir;
     if (strng == "RECONSTRUCTED") return Reconstructed;
