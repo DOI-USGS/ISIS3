@@ -27,10 +27,10 @@
 using namespace std;
 namespace Isis {
   /**
-   * Constructs a Kernel object with "Unknown" Type
+   * Constructs a Kernel object with "None" Type
    */
   Kernel::Kernel() {
-    m_kernelType = (Type)0;
+    m_kernelType = None;
     m_kernels.clear();
   }
 
@@ -69,7 +69,7 @@ namespace Isis {
    */
   Kernel::Type Kernel::typeEnum(const QString &type) {
     QString strng = type.simplified().trimmed().toUpper();
-    if (strng == "UNKNOWN") return Unknown;
+    if (strng == "NONE") return None;
     if (strng == "PREDICTED") return Predicted;
     if (strng == "NADIR") return Nadir;
     if (strng == "RECONSTRUCTED") return Reconstructed;
@@ -81,6 +81,7 @@ namespace Isis {
   /**
    * Converts the given Type to a character as follows
    * <ul>
+   *   <li> 0 = None</li>
    *   <li> 1 = Predicted</li>
    *   <li> 2 = Nadir</li>
    *   <li> 4 = Reconstructed</li>
@@ -92,6 +93,7 @@ namespace Isis {
    *            passed in Kernel::Type.
    */
   const char *Kernel::typeEnum(const Type &type) {
+    if (type == None) return "None";
     if (type == Predicted) return "Predicted";
     if (type == Nadir) return "Nadir";
     if (type == Reconstructed) return "Reconstructed";

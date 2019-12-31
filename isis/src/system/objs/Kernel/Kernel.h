@@ -52,7 +52,7 @@ namespace Isis {
        * Enumeration for type of kernel
        */
       enum Type {
-        Unknown = 0,       /**< Unknown kernel type*/
+        None = 0,       /**< No kernel type*/
         Predicted = 1,     /**< Predicted Kernels are based on predicted location
                                 of the spacecraft*/
         Nadir = 2,         /**< Nadir Kernels mimic spacecraft pointing*/
