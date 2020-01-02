@@ -4,8 +4,10 @@
 #include <QString>
 #include <QStringList>
 
+#include "FileName.h"
 #include "KernelDb.h"
 #include "Pvl.h"
+#include "PvlGroup.h"
 #include "TestUtilities.h"
 
 #include "gmock/gmock.h"
@@ -262,7 +264,8 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
 }
 
 TEST_F(TestKernelDb, TwoCks) {
-  cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
+  PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
+  instGroup.findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
   std::stringstream dbStr;
   dbStr << dbPvl;
   KernelDb db(dbStr, Kernel::Predicted|Kernel::Nadir|Kernel::Reconstructed|Kernel::Smithed);
@@ -275,4 +278,34 @@ TEST_F(TestKernelDb, TwoCks) {
   ASSERT_EQ(cks.size(), 2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest2.1");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[1], "$base/ckTest2.2");
+}
+
+TEST_F(TestKernelDb, MroHirise) {
+  PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
+  instGroup.findKeyword("StartTime") = "2008 JAN 12 00:00:00.0";
+  instGroup.findKeyword("StopTime") = "2008 JAN 12 00:00:00.0";
+  instGroup.findKeyword("SpacecraftName") = "MarsReconnaissanceOrbiter";
+  instGroup.findKeyword("InstrumentId") = "HiRISE";
+  std::stringstream dbStr;
+  dbStr << dbPvl;
+  KernelDb db(dbStr, Kernel::Reconstructed);
+
+  QList<FileName> dbFiles = kdb.kernelDbFiles();
+  ASSERT_EQ(dbFiles.size(), 10);
+
+  QStringList tspks = db.targetPosition(cubeLabel).kernels();
+  ASSERT_EQ(tspks.size(), 1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, tspks[0], "$base/kernels/spk/de430.bsp");
+
+  QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
+  ASSERT_EQ(cklist.size(), 1);
+  ASSERT_EQ(cklist[0].size(), 4);
+  Kernel cKernels(cklist[0].top());
+  QStringList cks = cKernels.kernels();
+  ASSERT_EQ(cks.size(), 1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$mro/kernels/ck/mro_sc_psp_080108_080114.bc");
+
+  QStringList spks = db.spacecraftPosition(cubeLabel).kernels();
+  ASSERT_EQ(spks.size(), 1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, spks[0], "$mro/kernels/spk/mro_psp6_ssd_mro110c.bsp");
 }
