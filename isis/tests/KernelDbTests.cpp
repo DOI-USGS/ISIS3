@@ -308,3 +308,26 @@ TEST_F(TestKernelDb, MroHirise) {
   ASSERT_EQ(spks.size(), 1);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, spks[0], "$mro/kernels/spk/mro_psp6_ssd_mro110c.bsp");
 }
+
+TEST_F(TestKernelDb, MroCrism) {
+  PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
+  instGroup.findKeyword("StartTime") = "2008 JAN 12 00:00:00.0";
+  instGroup.findKeyword("StopTime") = "2008 JAN 12 00:00:00.0";
+  instGroup.findKeyword("SpacecraftName") = "MarsReconnaissanceOrbiter";
+  instGroup.findKeyword("InstrumentId") = "CRISM";
+  std::stringstream dbStr;
+  dbStr << dbPvl;
+  KernelDb db(dbStr, Kernel::Reconstructed);
+
+  QList<FileName> dbFiles = kdb.kernelDbFiles();
+  ASSERT_EQ(dbFiles.size(), 11);
+
+  QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
+  ASSERT_EQ(cklist.size(), 1);
+  ASSERT_EQ(cklist[0].size(), 4);
+  Kernel cKernels(cklist[0].top());
+  QStringList cks = cKernels.kernels();
+  ASSERT_EQ(cks.size(), 2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$mro/kernels/ck/mro_sc_psp_080108_080114.bc");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$mro/kernels/ck/mro_crm_psp_080101_080131.bc");
+}
