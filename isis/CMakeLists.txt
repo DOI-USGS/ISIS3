@@ -170,7 +170,8 @@ set(thirdPartyCppFlags -Wall
 
  # Append CPP flags set in the third party lib file to the string set in this file.
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
- set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+
+ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR} -Wno-cpp" )
 
 
 # Flag to fix numeric literals problem with boost on linux
