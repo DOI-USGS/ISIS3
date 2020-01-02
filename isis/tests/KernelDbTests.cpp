@@ -225,19 +225,13 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, tspks[0], "$base/spkTest1");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, tspks[1], "$base/spkTest2");
 
-  try {
-    QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
-    ASSERT_EQ(cklist.size(), 1);
-    ASSERT_EQ(cklist[0].size(), 1);
-    Kernel cKernels(cklist[0].top());
-    QStringList cks = cKernels.kernels();
-    ASSERT_EQ(cks.size(), 1);
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest1");
-  }
-  catch (IException &e) {
-    std::cerr << e.toString();
-    EXPECT_TRUE(false);
-  }
+  QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
+  ASSERT_EQ(cklist.size(), 1);
+  ASSERT_EQ(cklist[0].size(), 1);
+  Kernel cKernels(cklist[0].top());
+  QStringList cks = cKernels.kernels();
+  ASSERT_EQ(cks.size(), 1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest1");
 
   QStringList iks = db.instrument(cubeLabel).kernels();
   ASSERT_EQ(iks.size(), 2);
@@ -265,4 +259,20 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
   ASSERT_EQ(dems.size(), 2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, dems[0], "$base/demTest1");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, dems[1], "$base/demTest2");
+}
+
+TEST_F(TestKernelDb, TwoCks) {
+  dbPvl.findObject("IsisCube").findGroup("Instrument").findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
+  std::stringstream dbStr;
+  dbStr << dbPvl;
+  KernelDb db(dbStr, Kernel::Predicted|Kernel::Nadir|Kernel::Reconstructed|Kernel::Smithed);
+
+  QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
+  ASSERT_EQ(cklist.size(), 1);
+  ASSERT_EQ(cklist[0].size(), 1);
+  Kernel cKernels(cklist[0].top());
+  QStringList cks = cKernels.kernels();
+  ASSERT_EQ(cks.size(), 2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest2.1");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest2.2");
 }
