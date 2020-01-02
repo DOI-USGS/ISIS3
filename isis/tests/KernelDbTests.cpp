@@ -286,11 +286,10 @@ TEST_F(TestKernelDb, MroHirise) {
   instGroup.findKeyword("StopTime") = "2008 JAN 12 00:00:00.0";
   instGroup.findKeyword("SpacecraftName") = "MarsReconnaissanceOrbiter";
   instGroup.findKeyword("InstrumentId") = "HiRISE";
-  std::stringstream dbStr;
-  dbStr << dbPvl;
-  KernelDb db(dbStr, Kernel::Reconstructed);
+  KernelDb db(Kernel::Reconstructed);
 
-  QList<FileName> dbFiles = kdb.kernelDbFiles();
+  db.loadSystemDb("Mro", cubeLabel);
+  QList<FileName> dbFiles = db.kernelDbFiles();
   ASSERT_EQ(dbFiles.size(), 10);
 
   QStringList tspks = db.targetPosition(cubeLabel).kernels();
@@ -299,7 +298,7 @@ TEST_F(TestKernelDb, MroHirise) {
 
   QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
   ASSERT_EQ(cklist.size(), 1);
-  ASSERT_EQ(cklist[0].size(), 4);
+  ASSERT_EQ(cklist[0].size(), 1);
   Kernel cKernels(cklist[0].top());
   QStringList cks = cKernels.kernels();
   ASSERT_EQ(cks.size(), 1);
