@@ -42,7 +42,7 @@ class TestKernelDb : public ::testing::Test {
         End_Object
 
         Group = Instrument
-          InstrumentName = IdealSpacecraft
+          SpacecraftName = IdealSpacecraft
           InstrumentId   = IdealCamera
           StartTime      = "2005 JUN 15 12:00:00.000 TDB"
           StopTime       = "2005 DEC 15 12:00:00.000 TDB"
@@ -227,7 +227,7 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
 
   QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
   ASSERT_EQ(cklist.size(), 1);
-  ASSERT_EQ(cklist[0].size(), 1);
+  ASSERT_EQ(cklist[0].size(), 4);
   Kernel cKernels(cklist[0].top());
   QStringList cks = cKernels.kernels();
   ASSERT_EQ(cks.size(), 1);
@@ -262,17 +262,17 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
 }
 
 TEST_F(TestKernelDb, TwoCks) {
-  dbPvl.findObject("IsisCube").findGroup("Instrument").findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
+  cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
   std::stringstream dbStr;
   dbStr << dbPvl;
   KernelDb db(dbStr, Kernel::Predicted|Kernel::Nadir|Kernel::Reconstructed|Kernel::Smithed);
 
   QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
   ASSERT_EQ(cklist.size(), 1);
-  ASSERT_EQ(cklist[0].size(), 1);
+  ASSERT_EQ(cklist[0].size(), 5);
   Kernel cKernels(cklist[0].top());
   QStringList cks = cKernels.kernels();
   ASSERT_EQ(cks.size(), 2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest2.1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[0], "$base/ckTest2.2");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[1], "$base/ckTest2.2");
 }
