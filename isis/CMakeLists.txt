@@ -163,13 +163,14 @@ set(thirdPartyCppFlags -Wall
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
-		       -Wno-strict-overflow
+		               -Wno-strict-overflow
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
  # Append CPP flags set in the third party lib file to the string set in this file.
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
 
