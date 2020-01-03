@@ -392,7 +392,7 @@ comparefiles: FORCE
 	      fi;                                                                  \
 	                                                                           \
 	      $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$$FILE $(OUTPUT)/$$FILE      \
-	          $$DIFFFILE >& /dev/null;                                         \
+	          $$DIFFFILE > /dev/null;                                          \
 	                                                                           \
 	      RETVAL=$$?;                                                          \
 	      if [ $$RETVAL != 0 ]; then                                           \

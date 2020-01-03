@@ -75,14 +75,14 @@ pipeline {
                   env.STAGE_STATUS = "Creating conda environment"
                   
                   if (lower_label == "mac") {
-                    condaPath = "/tmp/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
+                    condaPath = "/tmp/macbuilds/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
                     
                     sh """
+                      mkdir -p /tmp/macbuilds/
                       curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
                       bash miniconda.sh -b -p ${condaPath}
                       """
                   } else {
-                    condaPrefix = "/home/jenkins/.conda/envs/isis/"
                     condaPath = "/home/jenkins/.conda/"
                   } 
            
@@ -146,6 +146,7 @@ pipeline {
                                 env.STAGE_STATUS = "Running app tests on ${label}"
                                 sh """
                                     source activate ${condaPath}/envs/isis
+                                    export PATH="${condaPath}bin/:$PATH"
                                     echo $PATH
                                     ctest -R _app_ -j4 -VV
                                 """
@@ -184,6 +185,10 @@ pipeline {
                             }
                             sh 'source deactivate'
                         }
+                      }
+                      
+                      if (lower_label == "mac") {
+                        sh "rm -rf ${condaPath}"
                       }
 
                       if(build_ok) {
