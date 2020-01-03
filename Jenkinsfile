@@ -145,7 +145,7 @@ pipeline {
                                 env.STAGE_STATUS = "Running app tests on ${label}"
                                 sh """
                                     source activate ${condaPath}/envs/isis
-                                    export PATH="${condaPath}/envs/isis/bin/:$PATH"
+                                    export PATH="${condaPath}bin/:$PATH"
                                     echo $PATH
                                     ctest -R _app_ -j4 -VV
                                 """
