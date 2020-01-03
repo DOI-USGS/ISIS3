@@ -115,7 +115,7 @@ pipeline {
                                   echo `pwd`
                                   conda list
                                   cmake -GNinja ${cmakeFlags.join(' ')} ../isis
-                                  ninja -j4 install
+                                  ninja -j4
                               """
                         }
                         catch(e) {
