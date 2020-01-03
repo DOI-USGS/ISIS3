@@ -96,7 +96,7 @@ namespace Isis {
    *
    * @return Type flag that contains all Types in a and all Types in b.
    */
-  inline Kernel::Type operator|(Kernel::Type a, Kernel::Type b) {
+  Kernel::Type operator|(Kernel::Type a, Kernel::Type b) {
       return static_cast<Kernel::Type>(static_cast<int>(a) | static_cast<int>(b));
   }
 };
