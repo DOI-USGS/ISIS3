@@ -163,8 +163,8 @@ set(thirdPartyCppFlags -Wall
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
-                       -Wno-cpp
-		       -Wno-strict-overflow
+                       -DUSE_UNSTABLE_GEOS_CPP_API=1
+		               -Wno-strict-overflow
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
