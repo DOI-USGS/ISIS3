@@ -27,7 +27,7 @@
 using namespace std;
 namespace Isis {
   /**
-   * Constructs a Kernel object with "None" Type
+   * Constructs a Kernel object with "Unknown" Type
    */
   Kernel::Kernel() {
     m_kernelType = static_cast<Type>(0);
