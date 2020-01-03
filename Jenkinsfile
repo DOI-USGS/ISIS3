@@ -75,9 +75,10 @@ pipeline {
                   env.STAGE_STATUS = "Creating conda environment"
                   
                   if (lower_label == "mac") {
-                    condaPath = "/tmp/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
+                    condaPath = "/tmp/macbuilds/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true) 
                     
                     sh """
+                      mkdir -p /tmp/macbuilds/
                       curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
                       bash miniconda.sh -b -p ${condaPath}
                       """
@@ -115,7 +116,7 @@ pipeline {
                                   echo `pwd`
                                   conda list
                                   cmake -GNinja ${cmakeFlags.join(' ')} ../isis
-                                  ninja -j4
+                                  ninja -j4 install
                               """
                         }
                         catch(e) {
@@ -184,6 +185,10 @@ pipeline {
                             }
                             sh 'source deactivate'
                         }
+                      }
+                      
+                      if (lower_label == "mac") {
+                        sh "rm -rf ${condaPath}"
                       }
 
                       if(build_ok) {
