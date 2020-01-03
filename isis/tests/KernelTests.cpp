@@ -11,7 +11,7 @@ using namespace Isis;
 TEST(KernelTests, DefaultConstructor) {
   Kernel defaultKernel;
   EXPECT_EQ(defaultKernel.kernels(), QStringList());
-  EXPECT_EQ(defaultKernel.type(), Kernel::None);
+  EXPECT_EQ(defaultKernel.type(), static_cast<Kernel::Type>(0));
 }
 
 TEST(KernelTests, Constructor) {
@@ -50,37 +50,26 @@ TEST(KernelTests, Indices) {
 
 TEST(KernelTests, Comparison) {
   QStringList kernelList;
-  Kernel none(Kernel::None, kernelList);
   Kernel predict(Kernel::Predicted, kernelList);
   Kernel nadir(Kernel::Nadir, kernelList);
   Kernel reconstructed(Kernel::Reconstructed, kernelList);
   Kernel smithed(Kernel::Smithed, kernelList);
 
-  EXPECT_FALSE(none < none);
-  EXPECT_TRUE( none < predict);
-  EXPECT_TRUE( none < nadir);
-  EXPECT_TRUE( none < reconstructed);
-  EXPECT_TRUE( none < smithed);
-
-  EXPECT_FALSE(predict < none);
   EXPECT_FALSE(predict < predict);
   EXPECT_TRUE( predict < nadir);
   EXPECT_TRUE( predict < reconstructed);
   EXPECT_TRUE( predict < smithed);
 
-  EXPECT_FALSE(nadir < none);
   EXPECT_FALSE(nadir < predict);
   EXPECT_FALSE(nadir < nadir);
   EXPECT_TRUE( nadir < reconstructed);
   EXPECT_TRUE( nadir < smithed);
 
-  EXPECT_FALSE(reconstructed < none);
   EXPECT_FALSE(reconstructed < predict);
   EXPECT_FALSE(reconstructed < nadir);
   EXPECT_FALSE(reconstructed < reconstructed);
   EXPECT_TRUE( reconstructed < smithed);
 
-  EXPECT_FALSE(smithed < none);
   EXPECT_FALSE(smithed < predict);
   EXPECT_FALSE(smithed < nadir);
   EXPECT_FALSE(smithed < reconstructed);
@@ -88,7 +77,6 @@ TEST(KernelTests, Comparison) {
 }
 
 TEST(KernelTests, TypeStrings) {
-  EXPECT_EQ(Kernel::typeEnum(Kernel::typeEnum(Kernel::None)), Kernel::None);
   EXPECT_EQ(Kernel::typeEnum(Kernel::typeEnum(Kernel::Predicted)), Kernel::Predicted);
   EXPECT_EQ(Kernel::typeEnum(Kernel::typeEnum(Kernel::Nadir)), Kernel::Nadir);
   EXPECT_EQ(Kernel::typeEnum(Kernel::typeEnum(Kernel::Reconstructed)), Kernel::Reconstructed);
