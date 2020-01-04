@@ -30,7 +30,7 @@ namespace Isis {
    * Constructs a Kernel object with "Unknown" Type
    */
   Kernel::Kernel() {
-    m_kernelType = (Type)0;
+    m_kernelType = static_cast<Type>(0);
     m_kernels.clear();
   }
 
@@ -74,7 +74,7 @@ namespace Isis {
     if (strng == "RECONSTRUCTED") return Reconstructed;
     if (strng == "SMITHED") return Smithed;
 
-    return (Type)0;
+    return static_cast<Kernel::Type>(0);
   };
 
   /**

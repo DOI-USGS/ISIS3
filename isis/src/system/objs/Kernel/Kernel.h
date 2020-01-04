@@ -87,5 +87,17 @@ namespace Isis {
       QStringList m_kernels; //!< List of kernel file names
       Type m_kernelType;     //!< Enumeration value indicating the kernel type
   };
+
+  /**
+   * Logical operator for combining Type flags.
+   *
+   * @param a The first Type flag.
+   * @param b The second Type flag.
+   *
+   * @return Type flag that contains all Types in a and all Types in b.
+   */
+  Kernel::Type operator|(Kernel::Type a, Kernel::Type b) {
+      return static_cast<Kernel::Type>(static_cast<int>(a) | static_cast<int>(b));
+  }
 };
 #endif
