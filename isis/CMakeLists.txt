@@ -5,7 +5,7 @@
 
 # Specify the required version of CMake.  If your machine does not
 #  have this, it should be easy to build from https://cmake.org/download/
-#cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
