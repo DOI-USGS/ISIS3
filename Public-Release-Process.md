@@ -21,7 +21,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
 ### Part C: Update recipe/meta.yaml
 * Update the version variable to the version of ISIS you are building.
-    * If you are building a standard release, use the same version number as in [Part B].(#Part_B:_Update_isis/CMakeLists.txt)
+    * If you are building a standard release, use the same version number as in [Part B](#Part_B:_Update_isis/CMakeLists.txt).
     * If you are building a release candidate, include "_RCx". 
         * For the first ISIS3.6.1 release candidate, it would be: "3.6.1_RC1".
     * If you are creating a custom build, include a unique tag. 
