@@ -1297,17 +1297,6 @@ namespace Isis {
   QString Spice::targetName() const {
     return m_target->name();
   }
-  
-  
-  double Spice::sunToBodyDist() const {
-    std::vector<double> sunPosition = m_sunPosition->Coordinate();
-    std::vector<double> bodyRotation = m_bodyRotation->Matrix();
-    
-    double sunPosFromTarget[3];
-    mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
-        
-    return vnorm_c(sunPosFromTarget);  
-  }
 
 
   /**
