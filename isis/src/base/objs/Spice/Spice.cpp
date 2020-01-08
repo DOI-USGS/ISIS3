@@ -1299,6 +1299,17 @@ namespace Isis {
   }
 
 
+  double Spice::sunToBodyDist() const {
+    std::vector<double> sunPosition = m_sunPosition->Coordinate();
+    std::vector<double> bodyRotation = m_bodyRotation->Matrix();
+
+    double sunPosFromTarget[3];
+    mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
+
+    return vnorm_c(sunPosFromTarget);  
+  }
+
+
   /**
    * Computes the solar longitude for the given ephemeris time.  If the target
    * is sky, the longitude is set to -999.0.
