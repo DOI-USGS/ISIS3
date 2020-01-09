@@ -76,7 +76,7 @@ requirements:
   - mysql-connector-c==6.1.6
   - nanoflann==1.2.2
   - ninja==1.7.2
-  - nn
+  - conda-forge/label/gcc7::nn
   - openblas==0.2.19
   - opencv
   - openssl==1.0.2n
