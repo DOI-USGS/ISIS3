@@ -14,7 +14,7 @@ Vars   = 2
 9
 -3
 3
----- 2nd order ----
+--------
 Name   = NthOrderPolynomial
 Ncoefs = 6
 Vars   = 2

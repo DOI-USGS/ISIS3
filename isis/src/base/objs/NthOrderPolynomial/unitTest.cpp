@@ -40,7 +40,7 @@ int main() {
   }
 
   NthOrderPolynomial c(6);
-  cout << "---- 2nd order ----" << endl;
+  cout << "--------" << endl;
   cout << "Name   = " << c.Name() << endl;
   cout << "Ncoefs = " << c.Coefficients() << endl;
   cout << "Vars   = " << c.Variables() << endl;
