@@ -240,9 +240,6 @@ void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, Origin
 
     if (ui.WasEntered("CHECKLINEREADOUT")) {
       // Process the checkline image to an ISIS3 cube and write the checkline tables
-
-      // A separate checkline cube may not be necessary if in the future, an EISBlob is attached
-      // to the main EIS Cube. 
       ProcessImport p2;
       translateCoreInfo(checklineXmlFileName, p2);
       if (checklineXmlFileName.removeExtension()
@@ -287,16 +284,6 @@ void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, Origin
       // Write out original label before closing the checkline cube
       checklineCube->write(checklineXmlLabel);
       p2.EndProcess();
-
-      // The EISBlob object has not been implemented correctly! If this is fixed in the future,
-      // the following may be useful: 
-      // 
-      // FileName checkCube(ui.GetFileName("TO2"));
-      // 
-      // //Write the checkline cube as a Blob object to the Pvl label of the primary cube
-      // EISBlob blob("ChecklineCube",checkCube);
-      // outputCube->write(blob);
-
     }
     // Since the checkline cube is not worth anything without the associated
     // times, require that the line times for the checkline cube be provided.
