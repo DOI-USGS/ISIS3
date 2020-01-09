@@ -29,7 +29,7 @@ In this step, we will prepare the local repository to build from as well as upda
 * Ensure the build_number is set to 0.
   * The build number should be incremented for each build produced at the **same version** of source code and should always begin at 0 for each release version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
- * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
+ * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. First, update `nn` in the `build` section only to: `conda-forge/label/gcc7::nn`.  Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
 
 ### Part D: Create a Pull Request
 * Make a pull request with your local changes into the repository.
