@@ -8,6 +8,7 @@
 #include <QString>
 
 #include "IException.h"
+#include "PvlGroup.h"
 
 namespace Isis {
 
@@ -28,6 +29,12 @@ namespace Isis {
         const char* string2_expr,
         QString string1,
         QString string2);
+
+  ::testing::AssertionResult AssertPvlGroupEqual(
+      const char* group1_expr,
+      const char* group2_expr,
+      PvlGroup group1,
+      PvlGroup group2);
 }
 
 #endif
