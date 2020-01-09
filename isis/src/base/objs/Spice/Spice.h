@@ -297,7 +297,6 @@ namespace Isis {
       Spice(Pvl &cubeLabel);
       Spice(Cube &cube);
       Spice(Cube &cube, bool noTables);
-      Spice(Pvl &lab, nlohmann::json);
 
       // destructor
       virtual ~Spice();

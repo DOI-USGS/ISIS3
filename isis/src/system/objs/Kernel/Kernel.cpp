@@ -30,7 +30,7 @@ namespace Isis {
    * Constructs a Kernel object with "Unknown" Type
    */
   Kernel::Kernel() {
-    m_kernelType = (Type)0;
+    m_kernelType = static_cast<Type>(0);
     m_kernels.clear();
   }
 
@@ -74,7 +74,7 @@ namespace Isis {
     if (strng == "RECONSTRUCTED") return Reconstructed;
     if (strng == "SMITHED") return Smithed;
 
-    return (Type)0;
+    return static_cast<Kernel::Type>(0);
   };
 
   /**
@@ -180,5 +180,18 @@ namespace Isis {
    */
   bool Kernel::operator<(const Kernel &other) const {
     return (this->m_kernelType < other.m_kernelType);
+  }
+
+
+  /**
+   * Logical operator for combining Type flags.
+   *
+   * @param a The first Type flag.
+   * @param b The second Type flag.
+   *
+   * @return Type flag that contains all Types in a and all Types in b.
+   */
+  Kernel::Type operator|(Kernel::Type a, Kernel::Type b) {
+      return static_cast<Kernel::Type>(static_cast<int>(a) | static_cast<int>(b));
   }
 } //end namespace isis
