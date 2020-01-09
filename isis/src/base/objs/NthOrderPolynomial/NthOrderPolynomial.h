@@ -33,12 +33,6 @@ namespace Isis {
    *
    * This is a derived class from the BasisFunction class which creates an nth order polynomial.
    *  
-   * The parabolic function has the following form:
-   *
-   * @f[
-   *   x = A + B*y + C*y**2
-   * @f]
-   *
    * @ingroup Math
    *
    * @author  2018-01-01 Unknown
