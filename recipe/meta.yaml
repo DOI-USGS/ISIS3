@@ -79,7 +79,7 @@ requirements:
   - nlohmann_json
   - ninja==1.7.2
   - nn
-  - opencv>=3.0.0,<=4.0.0
+  - opencv=3.2.0
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
@@ -109,7 +109,6 @@ requirements:
   - bzip2
   - cspice
   - curl
-  - doxygen
   - eigen
   - embree
   - geos>=3.7,<3.8
@@ -133,7 +132,7 @@ requirements:
   - nanoflann
   - nlohmann_json
   - conda-forge/label/gcc7::nn
-  - opencv>=3.0.0,<=4.0.0
+  - opencv=3.2.0
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
