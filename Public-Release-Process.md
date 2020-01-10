@@ -34,7 +34,7 @@ In this step, we will prepare the local repository to build from as well as upda
 ### Part D: Create a Pull Request
 * Make a pull request with your local changes into the repository.
 
-### Part E: Create a Release Branch, If Necessary
+### Part E: Create a Release Branch
 Once the PR has been reviewed and merged:
 If this is a Release Candidate release, or if there is not already a branch for the release for some other reason, you will need to create a branch for this release. Branches are made for each minor (i.e. 3.x or 4.x) version of ISIS, and each release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on the associated branch. 
 
