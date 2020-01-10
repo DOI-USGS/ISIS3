@@ -40,10 +40,8 @@ Once the PR into `dev` been reviewed and merged:
 * If there is already a version branch (ex: 3.10) for this release, after the change from Part B-C is PR'd into `dev`, cherry-pick it into the version branch for your release, and then make a pull request with this change into the version branch. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
 
 * If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each then specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on that version branch.
-
-** To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
-
-** Next, create a branch with the appropriate name for the release version in the format `<major version>.<minor verson>`, by running for example: `git branch -b 3.10`. After creation, this branch can be pushed directly to upstream. (`git push upstream 3.10`.)
+   * To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
+   * Next, create a branch with the appropriate name for the release version in the format `<major version>.<minor verson>`, by running for example: `git branch -b 3.10`. After creation, this branch can be pushed directly to upstream. (`git push upstream 3.10`.)
 
 ### Part F: Make Github Release
 * Draft a new github release. 
