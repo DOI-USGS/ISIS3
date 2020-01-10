@@ -32,12 +32,12 @@ In this step, we will prepare the local repository to build from as well as upda
  * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Then, update `nn` in the `build` section only to: `conda-forge/label/gcc7::nn`.  Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
 
 ### Part D: Create a Pull Request
-* Make a pull request with your local changes into the `dev` branch of the repository. If there is already a version branch (ex: 3.10) for this release, after the change is PR'd into `dev`, cherry-pick it into the version branch for your release. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
+* Make a pull request with your local changes into the `dev` branch of the repository. If there is already a version branch (ex: 3.10) for this release, after the change is PR'd into `dev`, cherry-pick it into the version branch for your release, and make a pull request with this change, as well. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
 
 ### Part E: Create a Release Version Branch
 Once the PR has been reviewed and merged:
 
-If this is a Release Candidate release, or if there is not already a branch for this version for some other reason, you will need to create a branch for this release. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on the associated version branch.
+If this is the first Release Candidate for a version, or if there is not already a branch for this version for any other reason, you will need to create a branch for this release. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each then specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on that version branch.
 
 To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
 
