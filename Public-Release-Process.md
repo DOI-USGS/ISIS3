@@ -85,13 +85,10 @@ Anaconda leverages caching in many places which can cause issues. If you are get
 * Run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
-* If the build was successful you will see "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output. Note the location of compressed .tar.bz2 file containing your build.
-  * If you missed the location in the command print out, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build.
-* Back up the build by copying the .tar.bz2 to:
-  * /work/projects/conda-bld/osx-64/ for Mac OS 10.13. 
-  * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS.
 
 ## Step 4: Upload the Build to Anaconda Cloud
+* If the build was successful you will see "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output. Note the location of compressed .tar.bz2 file containing your build.
+  * If you missed the location in the command print out, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build.
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. Uploading the .tar.bz2 file requires one command, however, non-standard builds (release candidates or custom builds), must be uploaded with a label. 
 
@@ -99,8 +96,12 @@ In this step, we will upload the build(s) that we just created into the Anaconda
 * For an Release Candidate, use the command ```anaconda upload -u usgs-astrogeology -l RC <path-to-the-.tar.bz2-file>```.
 * For a custom build, specify a custom label and use the command ```anaconda upload -u usgs-astrogeology -l <custom-label> <path-to-the-.tar.bz2-file>```.
    * For example, when generating a custom build for the CaSSIS team, we would use the "cassis" label and the command ```anaconda upload -u usgs-astrogeology -l cassis <path-to-the-.tar.bz2-file>```.
+## Step 5: Back up the Build 
+Back up the build by copying the .tar.bz2 to:
+  * /work/projects/conda-bld/osx-64/ for Mac OS 10.13. 
+  * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS.
 
-## Step 5: Update Data and TestData Areas on rsync Servers
+## Step 6: Update Data and TestData Areas on rsync Servers
 
 This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes.
 
@@ -117,7 +118,7 @@ This step covers how to update the data on the rysnc servers. This is where our 
 
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
-## Step 6: Create Internal Builds/Installs for Astro
+## Step 7: Create Internal Builds/Installs for Astro
 
 This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. These commands must be run as isis3mgr for permission purposes.
 
@@ -133,7 +134,7 @@ This step covers creating the builds and the installation environments of ISIS f
     * For a custom build, the environment should be named `isisX.Y.Z-<custom-label>`.
 * Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
 
-## Step 7: Update Documentation
+## Step 8: Update Documentation
 
 **This step is only done for standard releases.**
 
@@ -147,7 +148,7 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 ### Part B: Upload the documentation
 * In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc```.
 
-## Step 8: Communicate Availability of Build
+## Step 9: Communicate Availability of Build
 
 This step will will communicate that a new version of ISIS is available.
 
