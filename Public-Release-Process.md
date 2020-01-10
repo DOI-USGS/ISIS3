@@ -34,8 +34,15 @@ In this step, we will prepare the local repository to build from as well as upda
 ### Part D: Create a Pull Request
 * Make a pull request with your local changes into the repository.
 
-### Part E: Make Github Release
+### Part E: Create a Release Branch, If Necessary
 Once the PR has been reviewed and merged:
+If this is a Release Candidate release, or if there is not already a branch for the release for some other reason, you will need to create a branch for this release. Branches are made for each minor (i.e. 3.x or 4.x) version of ISIS, and each release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on the associated branch. 
+
+To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
+
+Next, create a branch with the appropriate name in the format `<major version>.<minor verson>`, by running for example: `git branch -b 3.10`. After creation, this branch can be pushed directly to upstream. (`git push upstream 3.10`.
+
+### Part F: Make Github Release
 * Draft a new github release. 
   * Tag the release. 
       * The release "Tag version" must be the \<version\> from the meta.yaml file you modified in [Part C](#Part_C:_Update_recipe/meta.yaml).
@@ -70,8 +77,9 @@ Anaconda leverages caching in many places which can cause issues. If you are get
 
 ### Part C: Run the Build
 * Go to the root of the repository you set up in [Step 2 Part A](#Part_A:_Setup_Repository). Make sure it is up to date.
-    * Switch to the dev branch ```git checkout dev```
-    * Ensure you are at the head of the dev branch ```git pull upstream dev```
+    * Switch to the release branch you created earlier in [Step 2 Part E](### Part E: Create a Release Branch)
+ ```git checkout <release branch>```
+    * Ensure you are at the head of the release branch ```git pull upstream <release branch>```
 * Run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
