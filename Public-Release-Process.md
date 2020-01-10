@@ -87,10 +87,10 @@ Anaconda leverages caching in many places which can cause issues. If you are get
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
 
 ## Step 4: Upload the Build to Anaconda Cloud
-* If the build was successful you will see "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output. Note the location of compressed .tar.bz2 file containing your build.
-  * If you missed the location in the command print out, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build.
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. Uploading the .tar.bz2 file requires one command, however, non-standard builds (release candidates or custom builds), must be uploaded with a label. 
+
+* If you missed the location in the build command print out, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build.
 
 * For a standard release, use the command ```anaconda upload -u usgs-astrogeology <path-to-the-.tar.bz2-file>```.
 * For an Release Candidate, use the command ```anaconda upload -u usgs-astrogeology -l RC <path-to-the-.tar.bz2-file>```.
