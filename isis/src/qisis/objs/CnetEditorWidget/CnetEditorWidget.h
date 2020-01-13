@@ -108,8 +108,17 @@ namespace Isis {
    *                              setLatLonRadiusCoordinateDisplay() or setXYZCoordinateDisplay()
    *                              SLOT. These slots in turn emit the coordinateDisplayTypeChanged()
    *                              SIGNAL which is connected to the m_pointTableModel member SLOT
-   *                              resetColumnHeaders(). This has to be called prior to updated the
+   *                              resetColumnHeaders(). This has to be called prior to updating the
    *                              point table display.
+   *   @history 2019-11-22 Ken Edmundson - Modifications to support display/edit of control point
+   *                           coordinates/sigmas in either Lat, Lon, Radius or XYZ in the
+   *                           CreateActions() method.
+   *                           1) Fixed text error for QString configureSortToolTipText.
+   *                           2) Added dedicated icons for Lat, Lon, Radius and X,Y,Z menu and
+   *                              toolbar items.
+   *                           3) Made Lat, Lon, Radius display the default checked item.
+   *                           4) Added Lat, Lon, Radius and X,Y,Z coordinate display items to
+   *                              toolbar.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT

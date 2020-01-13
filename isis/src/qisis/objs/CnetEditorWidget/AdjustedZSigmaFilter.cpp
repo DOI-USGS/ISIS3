@@ -51,10 +51,10 @@ namespace Isis {
   QString AdjustedZSigmaFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
     if (getMinForSuccess() == 1)
-      description += "point that has an adjusted surface point radius sigma "
+      description += "point that has an adjusted surface point Z sigma "
           "which is ";
     else
-      description += "points that have adjusted surface point radius sigmas "
+      description += "points that have adjusted surface point Z sigmas "
           "which are ";
 
     description += descriptionSuffix();
@@ -63,7 +63,7 @@ namespace Isis {
 
 
   QString AdjustedZSigmaFilter::getPointDescription() const {
-    return "have adjusted surface point radius sigmas which are " +
+    return "have adjusted surface point Z sigmas which are " +
         descriptionSuffix();
   }
 }

@@ -51,10 +51,10 @@ namespace Isis {
   QString AdjustedYFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
     if (getMinForSuccess() == 1)
-      description += "point that has an adjusted surface point longitude "
+      description += "point that has an adjusted surface point Y "
           "which is ";
     else
-      description += "points that have adjusted surface point longitudes "
+      description += "points that have adjusted surface point Ys "
           "which are ";
 
     description += descriptionSuffix();
@@ -63,7 +63,7 @@ namespace Isis {
 
 
   QString AdjustedYFilter::getPointDescription() const {
-    return "have adjusted surface point longitudes which are " +
+    return "have adjusted surface point Ys which are " +
         descriptionSuffix();
   }
 }

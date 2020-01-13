@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "AprioriXFilter.h"
+#include "APrioriXFilter.h"
 
 #include <QPair>
 #include <QString>
@@ -11,58 +11,58 @@
 
 
 namespace Isis {
-  AprioriXFilter::AprioriXFilter(
+  APrioriXFilter::APrioriXFilter(
         AbstractFilter::FilterEffectivenessFlag flag,
         int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  AprioriXFilter::AprioriXFilter(const AprioriXFilter &other)
+  APrioriXFilter::APrioriXFilter(const APrioriXFilter &other)
         : AbstractNumberFilter(other) {
   }
 
 
-  AprioriXFilter::~AprioriXFilter() {
+  APrioriXFilter::~APrioriXFilter() {
   }
 
 
-  bool AprioriXFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+  bool APrioriXFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
     return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
-  bool AprioriXFilter::evaluate(const ControlPoint *point) const {
+  bool APrioriXFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
           point->GetAprioriSurfacePoint().GetX().kilometers());
   }
 
 
-  bool AprioriXFilter::evaluate(const ControlMeasure *measure) const {
+  bool APrioriXFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 
 
-  AbstractFilter *AprioriXFilter::clone() const {
-    return new AprioriXFilter(*this);
+  AbstractFilter *APrioriXFilter::clone() const {
+    return new APrioriXFilter(*this);
   }
 
 
-  QString AprioriXFilter::getImageDescription() const {
+  QString APrioriXFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
     if (getMinForSuccess() == 1)
       description += "point that has an <i>a priori</i> surface point "
-          "latitude which is ";
+          "X which is ";
     else
       description += "points that have <i>a priori</i> surface point "
-          "latitudes which are ";
+          "Xs which are ";
 
     description += descriptionSuffix();
     return description;
   }
 
 
-  QString AprioriXFilter::getPointDescription() const {
-    return "have <i>a priori</i> surface point latitudes which are " +
+  QString APrioriXFilter::getPointDescription() const {
+    return "have <i>a priori</i> surface point Xs which are " +
         descriptionSuffix();
   }
 }

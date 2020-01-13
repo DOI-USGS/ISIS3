@@ -1,5 +1,5 @@
-#ifndef AprioriZSigmaFilter_H
-#define AprioriZSigmaFilter_H
+#ifndef APrioriZSigmaFilter_H
+#define APrioriZSigmaFilter_H
 
 #include "AbstractNumberFilter.h"
 
@@ -24,15 +24,17 @@ namespace Isis {
    * @internal
    *   @history 2019-07-26 Ken Edmundson - Original version based off of the
    *                           APrioriRadiusSigmaFilter class.
+   *   @history 2019-11-22 Ken Edmundson - Minor text corrections to returned QString in
+   *                           getImageDescription() and getPointDescription() methods.
    */
-  class AprioriZSigmaFilter : public AbstractNumberFilter {
+  class APrioriZSigmaFilter : public AbstractNumberFilter {
       Q_OBJECT
 
     public:
-      AprioriZSigmaFilter(AbstractFilter::FilterEffectivenessFlag flag,
+      APrioriZSigmaFilter(AbstractFilter::FilterEffectivenessFlag flag,
             int minimumForSuccess = -1);
-      AprioriZSigmaFilter(const AprioriZSigmaFilter &other);
-      virtual ~AprioriZSigmaFilter();
+      APrioriZSigmaFilter(const APrioriZSigmaFilter &other);
+      virtual ~APrioriZSigmaFilter();
 
       bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;

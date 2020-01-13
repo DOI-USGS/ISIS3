@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "AprioriXSigmaFilter.h"
+#include "APrioriXSigmaFilter.h"
 
 #include <QPair>
 #include <QString>
@@ -11,59 +11,59 @@
 
 
 namespace Isis {
-  AprioriXSigmaFilter::AprioriXSigmaFilter(
+  APrioriXSigmaFilter::APrioriXSigmaFilter(
         AbstractFilter::FilterEffectivenessFlag flag,
         int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  AprioriXSigmaFilter::AprioriXSigmaFilter(const AprioriXSigmaFilter &other)
+  APrioriXSigmaFilter::APrioriXSigmaFilter(const APrioriXSigmaFilter &other)
         : AbstractNumberFilter(other) {
   }
 
 
-  AprioriXSigmaFilter::~AprioriXSigmaFilter() {
+  APrioriXSigmaFilter::~APrioriXSigmaFilter() {
   }
 
 
-  bool AprioriXSigmaFilter::evaluate(
+  bool APrioriXSigmaFilter::evaluate(
         const QPair<QString, ControlNet *> *imageAndNet) const {
     return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
-  bool AprioriXSigmaFilter::evaluate(const ControlPoint *point) const {
+  bool APrioriXSigmaFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
           point->GetAprioriSurfacePoint().GetXSigma().meters());
   }
 
 
-  bool AprioriXSigmaFilter::evaluate(const ControlMeasure *measure) const {
+  bool APrioriXSigmaFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 
 
-  AbstractFilter *AprioriXSigmaFilter::clone() const {
-    return new AprioriXSigmaFilter(*this);
+  AbstractFilter *APrioriXSigmaFilter::clone() const {
+    return new APrioriXSigmaFilter(*this);
   }
 
 
-  QString AprioriXSigmaFilter::getImageDescription() const {
+  QString APrioriXSigmaFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
     if (getMinForSuccess() == 1)
       description += "point that has an <i>a priori</i> surface point "
-          "latitude sigma which is ";
+          "X sigma which is ";
     else
       description += "points that have <i>a priori</i> surface point "
-          "latitude sigmas which are ";
+          "X sigmas which are ";
 
     description += descriptionSuffix();
     return description;
   }
 
 
-  QString AprioriXSigmaFilter::getPointDescription() const {
-    return "have <i>a priori</i> surface point latitude sigmas which are " +
+  QString APrioriXSigmaFilter::getPointDescription() const {
+    return "have <i>a priori</i> surface point X sigmas which are " +
           descriptionSuffix();
   }
 }

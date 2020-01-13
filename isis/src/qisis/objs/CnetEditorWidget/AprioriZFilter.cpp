@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "AprioriZFilter.h"
+#include "APrioriZFilter.h"
 
 #include <QPair>
 #include <QString>
@@ -11,58 +11,58 @@
 
 
 namespace Isis {
-  AprioriZFilter::AprioriZFilter(
+  APrioriZFilter::APrioriZFilter(
         AbstractFilter::FilterEffectivenessFlag flag,
         int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  AprioriZFilter::AprioriZFilter(const AprioriZFilter &other)
+  APrioriZFilter::APrioriZFilter(const APrioriZFilter &other)
         : AbstractNumberFilter(other) {
   }
 
 
-  AprioriZFilter::~AprioriZFilter() {
+  APrioriZFilter::~APrioriZFilter() {
   }
 
 
-  bool AprioriZFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+  bool APrioriZFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
     return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
-  bool AprioriZFilter::evaluate(const ControlPoint *point) const {
+  bool APrioriZFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
           point->GetAprioriSurfacePoint().GetZ().kilometers());
   }
 
 
-  bool AprioriZFilter::evaluate(const ControlMeasure *measure) const {
+  bool APrioriZFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 
 
-  AbstractFilter *AprioriZFilter::clone() const {
-    return new AprioriZFilter(*this);
+  AbstractFilter *APrioriZFilter::clone() const {
+    return new APrioriZFilter(*this);
   }
 
 
-  QString AprioriZFilter::getImageDescription() const {
+  QString APrioriZFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
     if (getMinForSuccess() == 1)
       description += "point that has an <i>a priori</i> surface point "
-          "radius which is ";
+          "Z which is ";
     else
       description += "points that have <i>a priori</i> surface point "
-          "radii which are ";
+          "Zs which are ";
 
     description += descriptionSuffix();
     return description;
   }
 
 
-  QString AprioriZFilter::getPointDescription() const {
-    return "have <i>a priori</i> surface point radii which are " +
+  QString APrioriZFilter::getPointDescription() const {
+    return "have <i>a priori</i> surface point Zs which are " +
         descriptionSuffix();
   }
 }

@@ -325,7 +325,7 @@ namespace Isis {
     QAction *configureSortAct = new QAction(QIcon(
         FileName("$ISISROOT/appdata/images/icons/sort.png").expanded()),
         tr("&Sorting Options..."), this);
-    QString configureSortToolTipText = tr("Configure table sorting opti ons");
+    QString configureSortToolTipText = tr("Configure table sorting options");
     configureSortAct->setToolTip(configureSortToolTipText);
     configureSortAct->setStatusTip(configureSortToolTipText);
     configureSortAct->setWhatsThis(tr("<html>Click here to configure options "
@@ -339,9 +339,10 @@ namespace Isis {
     
     // 2019-07-08 Ken Edmundson: added option to choose display coordinates in either lat, lon,
     // radius or XYZ
-    QAction *xyzDisplayAct = new QAction(QIcon(FileName("$base/icons/ice.png").expanded()),
+    QAction *xyzDisplayAct = new QAction(QIcon(FileName("$base/icons/xyzIcon.png").expanded()),
         tr("&X,Y,Z"), this);
     xyzDisplayAct->setCheckable(true);
+    xyzDisplayAct->setChecked(false);
     QString configureXYZDisplayToolTipText = tr("X,Y,Z Coordinate Display");
     xyzDisplayAct->setToolTip(configureXYZDisplayToolTipText);
     xyzDisplayAct->setStatusTip(configureXYZDisplayToolTipText);
@@ -355,8 +356,9 @@ namespace Isis {
     coordDisplayGroup->addAction(xyzDisplayAct);
     m_menuActions->insert(xyzDisplayAct, xyzDisplayLocation);
 
-    QAction *latLonRadiusDisplayAct = new QAction(QIcon(FileName("$base/icons/ice.png").expanded()),
-        tr("&Lat,Lon,Radius"), this);
+    QAction *latLonRadiusDisplayAct
+        = new QAction(QIcon(FileName("$base/icons/latlonIcon.png").expanded()),
+          tr("&Lat,Lon,Radius"), this);
     latLonRadiusDisplayAct->setCheckable(true);
     latLonRadiusDisplayAct->setChecked(true);
     QString configureLatLonRadiusDisplayToolTipText = tr("Lat,Lon,Radius Coordinate Display");
@@ -379,6 +381,8 @@ namespace Isis {
     QList< QAction * > tbActionList;
     tbActionList.append(freezeTablesAct);
     tbActionList.append(configureSortAct);
+    tbActionList.append(latLonRadiusDisplayAct);
+    tbActionList.append(xyzDisplayAct);
     m_toolBarActions->insert("settingsToolBar", tbActionList);
   }
 

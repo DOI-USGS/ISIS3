@@ -25,6 +25,16 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2019-11-22 Ken Edmundson - Modifications for coordinate display in either Lat, Lon,
+   *                         Radius, or XYZ...
+   *                           1) Changed header file names in #includes for APrioriXFilter.h,
+   *                              APrioriXSigmaFilter.h, APrioriYFilter.h, APrioriYSigmaFilter.h,
+   *                              APrioriZFilter.h, APrioriZSigmaFilter.h as class names changed
+   *                              to be consistant with the equivalent Lat, Lon, & Radius filters.
+   *                           2) Modified the createSelector() and changeFilter() methods so that
+   *                              all Lat, Lon, Radius and X,Y,Z filters are available in the drop-
+   *                              down filter menu. Also added additional separators in the drop-
+   *                              down menu for clarity.
    */
   class ImagePointFilterSelector : public AbstractFilterSelector {
       Q_OBJECT

@@ -24,6 +24,8 @@ namespace Isis {
    * @internal
    *   @history 2019-07-26 Ken Edmundson - Original version based off of the
    *                           AdjustedRadiusSigmaFilter class.
+   *   @history 2019-11-22 Ken Edmundson - Minor text corrections to returned QString in
+   *                           getImageDescription() and getPointDescription() methods.
    */
   class AdjustedZSigmaFilter : public AbstractNumberFilter {
       Q_OBJECT
