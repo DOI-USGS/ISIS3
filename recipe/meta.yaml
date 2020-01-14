@@ -46,6 +46,7 @@ requirements:
   build:
   - armadillo==8.200.0
   - blas==1.1
+  - boost==1.67
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
@@ -106,6 +107,7 @@ requirements:
   run:
   - armadillo==8.200.0
   - blas==1.1
+  - boost==1.67
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
