@@ -1,0 +1,53 @@
+# Test Data for ISIS software
+## Introduction
+The process described here is centered around the data necessary for the ISIS software unit tests and regression tests. 
+
+### Unit Tests
+The unit tests are desinged to test a single C++ class. When other classes are used inside a unit test it it important to accept any results as valid. The idea is to focus on testing a single class and allow other tests to test other classes.
+
+### Application Regression Tests
+Applicaton tests are specific to one ISIS program. They should test all of the functionality of the application.
+
+### Catagory Regression Tests
+Catagory tests are designed to test multiple applications. Example: ingest, spice, calibration, projection, archive
+
+
+## Setting Up an ISIS Development Environment
+In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests. Follow these steps to get a working ISIS development environment.
+
+1) Get the ISIS source code (https://github.com/USGS-Astrogeology/ISIS3)
+1) Build an [Anaconda](https://www.anaconda.com/download/) environment for the third party libraries, exicutables, and headine files
+1) Compile the ISIS library and link the exicutables (link)
+1) Download the ISIS data files (link)
+
+## Downloading Test Data
+ISIS unit and regression tests require the data and test data directories to be available and their respective environment variables (ISISDATA, ISIS3TESTDATA) be set. This allows the tests to read files from these areas and compare results to known truth data.
+
+### Downloading the ISIS Test Data Files
+The ISIS tests data is curently distributed using rsync servers. NOTE: Work is underway to put the test data under full version control in a Git repository.
+
+From a terminal window set your current working directoy to where you want the test data to be downloaded to, and use the rsync command to copy it to your computer.
+
+```
+# Note: Be extreamly careful using the suggested --delete option with the rsync command below. 
+# If the destination directory is not correct this command can delete all files at that location.
+cd /where/you/want/to/locate/the/test/data
+rsync -azv --partial --delete isisdist.astrogeology.usgs.gov::isis3testData .
+```
+When the rsync command is finished, there should be a single directory called "isis" that contains about 80GB. The directory structure below this "isis" directory is identical to the ISIS source code directory structure. 
+
+The environment variable "ISIS3TESTDATA" needs to be be set to point to this "isis" directory. Note: Each of the examples below ends with an "isis" directory.
+
+Bash and other sh based shells:
+```
+export ISIS3TESTDATA=/path/to/the/test/data/for/isis
+```
+tcsh or other csh based shells:
+setenv ISIS3TESTDATA /path/to/the/test/data/for/isis
+
+
+## Where to go now
+* Running tests (link)
+* Writing Unit Tests (link)
+* Writing Application and Category Tests (link)
+* Contributing New/Modified Test Data (link)
