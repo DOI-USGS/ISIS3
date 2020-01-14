@@ -76,13 +76,13 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
     If you would like to work with our latest ISIS version 3 Release Candidate, rather than updating
     to ISIS 4, instead run:
 
-	conda install -c usgs-astrogeology -c usgs-astrogeology/label/RC isis=3.10.0
+	    conda install -c usgs-astrogeology -c usgs-astrogeology/label/RC isis=3.10.0
 
 
 7.  Finally, setup the environment variables:
 
         #Execute the ISIS3 variable initialization script with default arguments.
-        #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
+        #This script prepares default values for:  $ISISROOT, $ISIS3DATA, $ISIS3TESTDATA
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
 
