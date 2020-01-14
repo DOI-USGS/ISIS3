@@ -46,7 +46,7 @@ requirements:
   build:
   - ale >=0.7.1
   - boost=1.68.0
-  - armadillo
+  - armadillo==8.200.0
   - blas
   - bullet=2.86.1=0
   - bz2file
@@ -102,7 +102,7 @@ requirements:
   run:
   - ale >=0.7.1
   - boost=1.68.0
-  - armadillo
+  - armadillo==8.200.0
   - blas
   - bullet=2.86.1=0
   - bz2file
