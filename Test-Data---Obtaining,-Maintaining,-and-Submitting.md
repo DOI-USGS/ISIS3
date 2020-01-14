@@ -1,25 +1,13 @@
 # Test Data for ISIS software
 ## Introduction
-Test data for ISIS is centered around the input and output data necessary for the ISIS software unit tests and regression tests (applications and module).
+Test data for ISIS is centered around the input and output data necessary for the ISIS software unit tests and regression (applications and module) tests.
 
-Unit tests are designed to test a single class from the ISIS library (e.g., Historgram, ProcessByLine, VoyagerCamera). Unit tests use two frameworks, the newer gtest and the older in house make based tests. Test data for gtest based tests is usually embedded inside the test file located in $ISISROOT/isis/tests. Input test data for the make based tests can be embedded in the unittest.cpp, located in the source code directory for the class, or an external file located in the ISIS3DATA or ISIS3TESTDATA areas. Output test data for the make based tests is always located in the source code directory for the class.
+Unit tests are designed to test a single class from the ISIS library (e.g., Historgram, ProcessByLine, VoyagerCamera). When other classes are used inside a unit test it it important to accept any results as valid and not test the other class. Unit tests use two frameworks, the newer gtest and the older in house make based tests. Test data for gtest based tests is usually embedded inside the test file located in $ISISROOT/isis/tests. Input test data for the make based tests can be embedded in the unittest.cpp, located in the source code directory for the class, or an external file located in the ISIS3DATA or ISIS3TESTDATA areas. Output test data for the make based tests is always located in the source code directory for the class.
 
-Application and module tests are regression tests designed to test all of the functionality of a single ISIS application or a series of ISIS applications respectively. 
-
- This includes input files required for unit tests such as images used to test ingestion applications (e.g. pds2isis, lrocnac2isis, fit2isis), control networks, ISIS cubes for testing processing and export applications (e.g., fx, lowpass, cam2map, hiedrgen), 
-
-### Unit Tests
-The unit tests are desinged to test a single C++ class. When other classes are used inside a unit test it it important to accept any results as valid. The idea is to focus on testing a single class and allow other tests to test other classes.
-
-### Application Regression Tests
-Applicaton tests are specific to one ISIS program. They should test all of the functionality of the application.
-
-### Catagory Regression Tests
-Catagory tests are designed to test multiple applications. Example: ingest, spice, calibration, projection, archive
-
+Application and module tests are regression tests designed to test all of the functionality of a single ISIS application (e.g., fx, lowpass, cam2map) or a series of ISIS applications (e.g., vims2isis->spiceinit->cam2map) respectively. Regression tests have both input and truth data stored in the ISIS3TESTSDATA area. Input and truth data files can be ISIS cubes, control networks, plain text, Parameter Value Language (PVL), Planetary Data System images (PDS3, PDS4), or comma separated value.
 
 ## Setting Up an ISIS Development Environment
-In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests. Follow these steps to get a working ISIS development environment.
+In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests or test data. Follow these steps to get a working ISIS development environment with all of the data.
 
 1) Get the ISIS source code (https://github.com/USGS-Astrogeology/ISIS3)
 1) Build an [Anaconda](https://www.anaconda.com/download/) environment for the third party libraries, exicutables, and headine files
