@@ -12,7 +12,7 @@ In order to run existing tests and develop new tests a full development environm
 1) Build the ISIS library and applications (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
 1) Download the ISIS data files see the [Full ISIS3 Data Download](https://gith**ub.com/USGS-Astrogeology/ISIS3). **NOTE: Be careful where you put the ISISDATA area. It is several hundred GB and growing.**
 
-### Downloading Test Data
+#### Downloading Test Data
 ISIS unit and regression tests require the data and test data directories to be available and their respective environment variables (ISISDATA, ISIS3TESTDATA) be set. This allows the tests to read files from these areas and compare results to known truth data. The ISIS tests data is currently distributed using rsync servers, but work is underway to put the test data under full version control in a Git repository. To download all of the test data, use a terminal window, set your current working directory to where you want the test data to be stored, and use the rsync command below to copy it to your computer:
 
 **Note: Be extremely careful using the suggested --delete argument with the rsync command below. If the destination directory exists and contains files not on the rsync server it will delete all files at that location and replace them the test data.**
