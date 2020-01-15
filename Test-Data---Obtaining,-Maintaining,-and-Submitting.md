@@ -34,11 +34,12 @@ setenv ISIS3TESTDATA /path/to/the/test/data/for/isis
 ```
 
 ## Contributing New and Modified Tests Data
-The source code for the unit and regression tests is located with the ISIS source code repository on Github, but the data used by the tests is currently internal to USGS. Is it made available through the read-only rsync servers. Use the following command to download the current version of of the test data:
+The source code for the unit and regression tests is located with the ISIS source code repository on Github, but the data used by the tests is currently internal to USGS. Is it made available through the read-only rsync servers. Use the following command to download the current version of the test data:
+
 **NOTE: Be very careful using the --delete argument below. If there are existing files in the destination folder that are not in the test data download they will be deleted.**
-'''
+```
 rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3testData .
-'''
+```
 
 Efforts are underway to make all of the test data available in a publicly accessible revision control system. Once the new system is in place, test data will be handled in a similar way as the ISIS source code \(i.e., using pull requests) 
 
