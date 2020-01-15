@@ -29,9 +29,11 @@ Bash and other sh based shells:
 export ISIS3TESTDATA=/path/to/the/test/data/for/isis
 ```
 tcsh or other csh based shells:
+```
 setenv ISIS3TESTDATA /path/to/the/test/data/for/isis
+```
 
-# Contributing New and Modified Tests Data
+## Contributing New and Modified Tests Data
 The source code for the unit and regression tests is located with the ISIS source code repository on Github, but the data used by the tests is currently internal to USGS. Is it made available through the read-only rsync servers. Use the following command to download the current version of of the test data:
 **NOTE: Be very careful using the --delete argument below. If there are existing files in the destination folder that are not in the test data download they will be deleted.**
 '''
