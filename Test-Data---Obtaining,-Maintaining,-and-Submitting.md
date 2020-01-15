@@ -40,3 +40,13 @@ setenv ISIS3TESTDATA /path/to/the/test/data/for/isis
 * Writing Unit Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
 * Writing Application and Module Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
 * Contributing New/Modified Test Data (link)
+
+
+
+# Contributing New and Modified Tests Data
+The source code for the unit and regresion tests is located with ISIS source code, but the data used by the tests is currently internal to USGS. Is it made availible through the read-only rsync servers (link).
+
+Efforts are underway to make all of the test data available in a publicly accessable revision system. Once the new system is in place, test data will be handled in a similar way as the ISIS source code \(i.e., using pull requests) 
+
+If you are writing or modifying ISIS library classes or applications it is required they be well tested. This may include modifications to existing test data and/or new test data. Once a GitHub pull request has been created for ISIS source code changes the data needs to be made available to USGS personel through a web or ftp link. If this is not an option for you, please contact the USGS through the dissucssion forum (link) and we can make other arrangements.
+
