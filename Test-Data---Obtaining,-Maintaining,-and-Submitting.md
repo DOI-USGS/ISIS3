@@ -4,7 +4,7 @@ Unit tests are designed to test a single class from the ISIS library (e.g., Hist
 
 Application and module tests are regression tests designed to test all of the functionality of a single ISIS application (e.g., fx, lowpass, cam2map) or a series of ISIS applications (e.g., vims2isis->spiceinit->cam2map) respectively. Regression tests have both input and truth data stored in the ISIS3TESTSDATA area. Input and truth data files can be ISIS cubes, control networks, plain text, Parameter Value Language (PVL), Planetary Data System images (PDS3, PDS4), or comma separated value (CSV) files.
 
-## Setting Up an ISIS Development Environment
+### Setting Up an ISIS Development Environment
 In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests or test data or the source code for the tests. Follow these steps to get a working ISIS development environment with all of the data.
 
 1) Fork the ISIS source code repository (https://github.com/USGS-Astrogeology/ISIS3)
