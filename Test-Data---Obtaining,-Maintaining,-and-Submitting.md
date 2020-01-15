@@ -9,26 +9,21 @@ Application and module tests are regression tests designed to test all of the fu
 ## Setting Up an ISIS Development Environment
 In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests or test data. Follow these steps to get a working ISIS development environment with all of the data.
 
-1) Get the ISIS source code (https://github.com/USGS-Astrogeology/ISIS3)
-1) Build an [Anaconda](https://www.anaconda.com/download/) environment for the third party libraries, exicutables, and headine files
-1) Compile the ISIS library and link the exicutables (link)
-1) Download the ISIS data files (link)
+1) Fork the ISIS source code repository (https://github.com/USGS-Astrogeology/ISIS3)
+1) Get the ISIS source code on your local machine by cloning your fork
+1) Build the ISIS library and applications (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
+1) Download the ISIS data files see the [Full ISIS3 Data Download](https://github.com/USGS-Astrogeology/ISIS3). Be careful where you put the ISISDATA area. It is several hundred GB and growing.
 
 ## Downloading Test Data
-ISIS unit and regression tests require the data and test data directories to be available and their respective environment variables (ISISDATA, ISIS3TESTDATA) be set. This allows the tests to read files from these areas and compare results to known truth data.
-
-### Downloading the ISIS Test Data Files
-The ISIS tests data is curently distributed using rsync servers. NOTE: Work is underway to put the test data under full version control in a Git repository.
-
-From a terminal window set your current working directoy to where you want the test data to be downloaded to, and use the rsync command to copy it to your computer.
+ISIS unit and regression tests require the data and test data directories to be available and their respective environment variables (ISISDATA, ISIS3TESTDATA) be set. This allows the tests to read files from these areas and compare results to known truth data. The ISIS tests data is currently distributed using rsync servers. NOTE: Work is underway to put the test data under full version control in a Git repository. From a terminal window set your current working directory to where you want the test data to be downloaded to, and use the rsync command below to copy it to your computer.
 
 ```
-# Note: Be extreamly careful using the suggested --delete option with the rsync command below. 
+# Note: Be extremely careful using the suggested --delete option with the rsync command below. 
 # If the destination directory is not correct this command can delete all files at that location.
 cd /where/you/want/to/locate/the/test/data
 rsync -azv --partial --delete isisdist.astrogeology.usgs.gov::isis3testData .
 ```
-When the rsync command is finished, there should be a single directory called "isis" that contains about 80GB. The directory structure below this "isis" directory is identical to the ISIS source code directory structure. 
+When the rsync command is finished, there should be a single directory called "isis" containing about 80GB. The directory structure below this "isis" directory is identical to the ISIS source code directory structure. 
 
 The environment variable "ISIS3TESTDATA" needs to be be set to point to this "isis" directory. Note: Each of the examples below ends with an "isis" directory.
 
@@ -41,7 +36,7 @@ setenv ISIS3TESTDATA /path/to/the/test/data/for/isis
 
 
 ## Where to go now
-* Running tests (link)
-* Writing Unit Tests (link)
-* Writing Application and Category Tests (link)
+* Running tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
+* Writing Unit Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
+* Writing Application and Module Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
 * Contributing New/Modified Test Data (link)
