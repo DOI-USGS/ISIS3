@@ -202,7 +202,32 @@ If you find a problem with this release, please create an issue on our [github i
 * To create the change log look at the commits on the dev branch since the last release.
     * This list is intended for users, so commits that only modify tests, CI, Github files (READMEs, issue templates, etc.), and/or build files should be excluded.
 
+* For a Release Candidate, add the following note: 
+
+```
+Notes
+There are some important considerations to keep in mind when using this release candidate:
+
+Do not use this version for production work. A stable isisX.XX.XX release will be uploaded after a month.
+The ISIS3 online documentation will not be updated until the stable release is announced.
+```
+
 ### Part B: Internal Announcement
+
+ * Create a new topic under the [ASC Internal](https://astrodiscuss.usgs.gov/c/asc-internal) category on [astrodiscuss](https://astrodiscuss.usgs.gov/).
+
+Use the previous template, but with the following additional information about how to use the build internally: 
+
+```
+## How to get access to ISIS X.XX.XX at the ASC 
+
+The new process proposed in the internal [RFC](https://astrodiscuss.usgs.gov/t/internal-rfc-distribution-of-isis3-at-asc/52/26) is now in full effect. Please review the process of using anaconda environments to activate ISIS [here](https://astrodiscuss.usgs.gov/t/using-the-asc-conda-environment-for-isisx-y-z/106). 
+
+With conda installed, run the following commands: 
+
+    conda activate isisX.XX.X
+```
+
 * Send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability.
     * Your e-mail can simply be a link to the external announcement.
 
