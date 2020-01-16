@@ -66,7 +66,7 @@ The built documentation will be available in the `docs` directory below the curr
 
 
 ## Previewing the Built Documentation
-To view your documentation, open the index.html file immediately under the docs directory ($ISISROOT/docs/index.html) using a web browser and use the web browser to navigate to the modified file. It is possible to do this by:
+To view your documentation, open the `index.html` file immediately under the docs directory (`$ISISROOT/docs/index.html`) using a web browser and use the web browser to navigate to the modified file. It is possible to do this by:
 
 * running either of the following in a terminal: `google-chrome index.html` or `firefox index.html`
 * copy-and-pasting the full file path to `index.html` (for example: `/home/username/dev/ISIS3/isis-build/docs/index.html`) into the address bar of a web browser.
