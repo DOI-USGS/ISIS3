@@ -11,6 +11,7 @@
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [Public Release Process](https://github.com/USGS-Astrogeology/ISIS3/wiki/Public-Release-Process)
 * [Continuous Integration](https://github.com/USGS-Astrogeology/ISIS3/wiki/Internal-CI---Jenkins)
+* [Updating Application Documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Contributing-Application-Documentation)
 
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
