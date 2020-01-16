@@ -9,7 +9,7 @@ Since the ISIS documentation is located within the source code, the first step i
  
 # Making Your Documentation Change
 
-Documentation for each ISIS application is located in the same directory as the source code for the application itself and is named `name_of_application.xml` For example, to update the documentation for voy2isis, go to isis/src/voyager/apps/voy2isis in your ISIS repo clone and begin editing voy2isis.xml. To make your documentation change, open the xml file in the text editor of your choice, and edit the text to make your update. Most documentation changes will be made in the `<description>` section of the XML file, which creates the "Description" section on the built html documentation.
+Documentation for each ISIS application is located in the same directory as the source code for the application itself and is named `name_of_application.xml` For example, to update the documentation for voy2isis, go to `ISIS3/isis/src/voyager/apps/voy2isis` in your ISIS repo clone and begin editing `voy2isis.xml`. To make your documentation change, open the xml file in the text editor of your choice, and edit the text to make your update. Most documentation changes will be made in the `<description>` section of the XML file, which creates the "Description" section on the built html documentation.
 
 # How to Preview Your Change
 
