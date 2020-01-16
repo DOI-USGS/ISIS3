@@ -1,4 +1,3 @@
-# Contributing Application Documentation Changes
 This document describes how to contribute changes to the ISIS Application Documentation, which is available online for the most recent ISIS release at: https://isis.astrogeology.usgs.gov/Application/index.html
 
 # Getting Started
