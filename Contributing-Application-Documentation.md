@@ -21,7 +21,8 @@ a new ISIS build.
 
 ### Creating a New ISIS build: 
 
-Building ISIS requires that the anaconda environment you created in [Anaconda and ISIS3 Dependencies] be activated. 
+Building ISIS requires that the anaconda environment you created in [Anaconda and ISIS3 Dependencies](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#anaconda-and-isis3-dependencies) be activated.
+
 Activate your anaconda environment with:
 
 `conda activate <environment-name>`
