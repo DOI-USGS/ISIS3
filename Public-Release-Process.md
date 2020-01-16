@@ -207,8 +207,8 @@ If you find a problem with this release, please create an issue on our [github i
 ```
 There are some important considerations to keep in mind when using this release candidate:
 
-Do not use this version for production work. A stable isisX.XX.XX release will be uploaded after a month.
-The ISIS3 online documentation will not be updated until the stable release is announced.
+* Do not use this version for production work. A stable isisX.XX.XX release will be uploaded after a month.
+* The ISIS3 online documentation will not be updated until the stable release is announced.
 ```
 
 ### Part B: Internal Announcement
