@@ -202,10 +202,9 @@ If you find a problem with this release, please create an issue on our [github i
 * To create the change log look at the commits on the dev branch since the last release.
     * This list is intended for users, so commits that only modify tests, CI, Github files (READMEs, issue templates, etc.), and/or build files should be excluded.
 
-* For a Release Candidate, add the following note: 
+* For a Release Candidate, add the following under "Notes": 
 
 ```
-Notes
 There are some important considerations to keep in mind when using this release candidate:
 
 Do not use this version for production work. A stable isisX.XX.XX release will be uploaded after a month.
