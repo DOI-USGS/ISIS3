@@ -5,11 +5,11 @@ Documentation for ISIS applications is located within the ISIS source code and w
 
 For many documentation contributions, very little understanding of XML is required. Changes in existing wording or additional information can be added where appropriate in the current documentation without needing to change any of the XML. 
 
-Since the ISIS documentation is located within the source code, the first step is to create a local copy of the ISIS source code to work with. To do the necessary initial setup, see [Getting Started with Github](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github) and [Anaconda and ISIS3 Dependencies](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github). 
+Since the ISIS documentation is located within the source code, the first step is to create a local copy of the ISIS source code to work with. To do the necessary initial setup, first complete the steps in [Getting Started with Github](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github), then move on to [Anaconda and ISIS3 Dependencies](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github). 
  
 # Making Your Documentation Change
 
-Documentation for each ISIS application is located in the same directory as the source code for the application itself and is named `name_of_application.xml` For example, to update the documentation for voy2isis, go to `ISIS3/isis/src/voyager/apps/voy2isis` in your ISIS repo clone and begin editing `voy2isis.xml`. To make your documentation change, open the xml file in the text editor of your choice, and edit the text to make your update. Most documentation changes will be made in the `<description>` section of the XML file, which creates the "Description" section on the built html documentation.
+Documentation for each ISIS application is located in the same directory as the source code for the application itself and is named `name_of_application.xml` For example, to update the documentation for voy2isis, go to `ISIS3/isis/src/voyager/apps/voy2isis` in your clone and begin editing `voy2isis.xml`. To make your documentation change, open the xml file in the text editor of your choice, and edit the text to make your update. Most documentation changes will be made in the `<description>` section of the XML file, which creates the "Description" section on the built html documentation.
 
 # How to Preview Your Change
 
@@ -80,7 +80,3 @@ To contribute your documentation changes to ISIS, please put in a pull request c
 # Additional Information About User Documentation in ISIS
 For a comprehensive overview of ISIS documentation, see the following:
 https://isis.astrogeology.usgs.gov/documents/HowToGeneralDocumentation/index.html
-
-# Updating or Adding New Application Examples to User Documentation
-Examples of each ISIS application's use are provided as part of the user documentation. If you would like to modify an existing example or add an additional example to application documentation, please see the instructions at: 
-https://isis.astrogeology.usgs.gov/documents/HowToApplicationExamples/index.html
