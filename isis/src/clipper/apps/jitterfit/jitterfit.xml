@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="jitterfit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Registers lines from a normal image with lines from the check image.
+  </brief>
+  <description>
+    <p>
+      This program co-regsisters lines in the main cube (FROM) with the corrisponding line in
+      the checkline cube (FROM2).
+      The sensor line used to collect the checkline is used to center the registration around
+      the same area in the main cube.
+    </p>
+    <p>
+      The main input cube (FROM) is expected to be a cube from a rolling shutter instrument.
+      The checkline cube (FROM2) is expected to contain lines of data read from the same rolling shutter
+      instrument, but read at different times than the coorsponding line in the main cube. The check 
+      cube must also have an associated table containing the sensor line number and time the line was read. 
+      The algorithum co-registers these individual checklines to the main cube and calculates an offset
+      in the line and sample directions. It then fits an Nth order polynomial through the offsets and time to
+      characterize the jitter. The coefficients are then written to the cube labels so the rolling shutter
+      camera model can adjust the look direction of each pixel in the model's detector map.
+    </p>
+  </description>
+
+  <groups>
+    <group name="Registration">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube containing an image that need jitter correction.
+        </brief>
+        <description>
+          This input cube is the cube that needs to be de-jittered. The algorithms jitterfit uses
+          are designed for a rolling shutter instrument with an accompanying check line cube
+          file (see main description). This cube file must be writable. Coefficients to adjust
+          the jitter will be written to the cube labels for use by the rolling shutter cammera model.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube containing the check lines.
+        </brief>
+        <description>
+          This input cube is the check line cube. It contains a set of lines that were 
+          repetedly read from the sensor array intersperesed with the readout of the main
+          image data.
+          EXPAND
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="DEFFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The Auto Registration template
+        </brief>
+        <description>
+          The parameter template to use for the Autoregistration process. The default template
+          calls the Maximum Correlation pattern matching algorithm with predefined parameter values.
+          There are other templates available in the system autoreg/template directory.  Also, the user
+          can use the 'autoregtemplate' application to create a new template file.
+
+          Example minimal autoregistration definition file:
+          <pre>
+             Object = AutoRegistration
+               Group = Algorithm
+                 Name = MaximumCorrelation
+                 Tolerance = 0.7
+                 SubPixelAccuracy = True
+               EndGroup
+ 
+               Group = PatternChip
+                 Samples = 1391
+                 Lines = 1 
+
+               EndGroup
+ 
+               Group = SearchChip
+                 Samples = 1399
+                 Lines = 7
+               EndGroup
+
+               Group = SurfaceModel
+                 WindowSize = 7
+               EndGroup
+             EndObject
+          </pre>
+
+        </description>
+
+        <filter>
+          *.def
+        </filter>
+      </parameter>
+      
+      <parameter name="SCALE">
+        <type>double</type>
+        <default><item>4.0</item></default>
+        <brief>
+          The scale of the image.
+        </brief>
+        <description>
+          This is the scale of the image. Only use this parameter if you have enlarged the main cube.
+          This will allow the program to access the correct normal cube line number based on the 
+          un-enlarged checktable values.
+          Example: For a 4x enlargement set this value to 4.0.
+          ADD WHY
+        </description>
+      </parameter>
+      
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file where the registration results will be written.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+      <parameter name="TO2">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file where the registration statistics will be written.
+        </brief>
+        <description>
+          SOMETHING 
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Fitting">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          The tolerance that determines which points will be excluded based on the goodness of fit 
+          of the registration.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <default><item>.7</item></default>
+        <minimum inclusive="yes">0.0</minimum>
+        
+      </parameter>
+      <parameter name="DEGREE">
+        <type>integer</type>
+        <brief>
+          The order of polynomial to solve for.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <default><item>3</item></default>
+        <minimum inclusive="yes">1</minimum>
+        
+      </parameter>
+      <parameter name="MAXTIME">
+        <type>double</type>
+        <brief>
+          The time, in seconds, that the last line was taken. The minimum is .0026 seconds it takes for 
+          a 2250 line image to be taken plus the time it takes to take 60 checklines.
+        </brief>
+        <description>
+          SOMETHING
+          WHAT IS THIS USED FOR
+        </description>
+        <default><item>0.0027114285714286</item></default>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+      
+      <parameter name="COEFFICIENTTO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file that holds the coefficients.
+        </brief>
+        <description>
+          SOMETHING
+          FORMAT
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+      <parameter name="RESIDUALTO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file that holds the residuals.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+    </group>
+  </groups>
+
+</application>
