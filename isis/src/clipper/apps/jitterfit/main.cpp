@@ -200,7 +200,7 @@ void IsisMain() {
   if (ui.WasEntered("RESIDUALTO")) {
     ofstream outputResidualFile;
     QString residualTo(FileName(ui.GetFileName("RESIDUALTO")).expanded());
-    outputResidualFile.open(residualTo.toLatin1().data());  
+    outputResidualFile.open(residualTo.toLatin1().data());
 
     outputResidualFile << "# Registered Line, Solved Line, Registered Line Residual, "
                           "Registered Sample, Solved Sample, Sample Residual, Time Taken" << endl;
