@@ -368,11 +368,12 @@ namespace Isis {
        * This enum defines the types of cameras supported in this class
        */
       enum CameraType {
-        Framing,    //!< Framing Camera
-        PushFrame,  //!< Push Frame Camera
-        LineScan,   //!< Line Scan Camera
-        Radar,      //!< Radar Camera
-        Point       //!< Point Camera
+        Framing,        //!< Framing Camera
+        PushFrame,      //!< Push Frame Camera
+        LineScan,       //!< Line Scan Camera
+        Radar,          //!< Radar Camera
+        Point,          //!< Point Camera
+        RollingShutter, //!< RollingShutter
       };
 
       /**
