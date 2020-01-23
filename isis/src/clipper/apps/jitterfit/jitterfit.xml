@@ -2,26 +2,78 @@
 
 <application name="jitterfit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Registers lines from a normal image with lines from the check image.
+    Characterize jitter for rolling shutter images.
   </brief>
   <description>
     <p>
-      This program co-regsisters lines in the main cube (FROM) with the corrisponding line in
-      the checkline cube (FROM2).
-      The sensor line used to collect the checkline is used to center the registration around
-      the same area in the main cube.
+      This program calculates a two sets of polynomial coefficients that characterize the jitter in an
+      image acquired by a rolling shutter instrument. One polynomial for the line direction and on
+      for the sample direction. The ISIS camera model for the instrument can
+      then use the coefficients to adjust for the time dependent jitter.
     </p>
     <p>
-      The main input cube (FROM) is expected to be a cube from a rolling shutter instrument.
-      The checkline cube (FROM2) is expected to contain lines of data read from the same rolling shutter
-      instrument, but read at different times than the coorsponding line in the main cube. The check 
-      cube must also have an associated table containing the sensor line number and time the line was read. 
-      The algorithum co-registers these individual checklines to the main cube and calculates an offset
-      in the line and sample directions. It then fits an Nth order polynomial through the offsets and time to
-      characterize the jitter. The coefficients are then written to the cube labels so the rolling shutter
-      camera model can adjust the look direction of each pixel in the model's detector map.
+      The coefficients are
+      calculated by coregistering lines in the cube with each line in the check line cube, where each
+      check line was acquired durring the readout of the main cube using the
+      same detector, but at a different time. The registration produces sample and line offsets
+      which are fed into a least squares solution to determin the coeficients of an Nth degree
+      polynomial in time. The coefficients are written to the cube label for use by the ISIS camera model.
+    </p>
+    <p>
+      The main cube (FROM) is expected to be a full frame image collected by a rolling shutter sensor.
+      The cube must have two attached tables: 1) A table with a record for each line in the cube where
+      the first column contains the sensor line number used to collect the corresponding image line,
+      and the second column contains the associated exposure time (normalized -1 to 1). 2) A table
+      with one record for each check line where the first column is the sensor line number used to
+      collect the corresponding check line and the second column contains the time the line was
+      exposed normalized using the same minimum and maximum as the main image times were
+    </p>
+    <p>
+      The checkline cube is expected to have individual lines (possibly repeated) from the same sensor as the
+      main cube. The checklines must be read during the readout of the main image sequence. 
+    </p>
+      An example line readout order for a 100 line sensor with 3 check lines read 3 times each
+      could be (readout time for a line = line exposure number * exposure duration):
+    <pre>
+      Type   Line    Exp# 
+             Number       
+                          
+      --------------------
+      Main   1-10    1-10 
+      Check  75      11   
+      Main   11-20   12-21
+      Check  50      22   
+      Main   21-30   23-32
+      Check  25      33   
+      Main   31-40   34-43
+      Check  75      44   
+      Main   41-50   45-54
+      Check  50      55   
+      Main   51-60   56-65
+      Check  25      66   
+      Main   61-70   67-76
+      Check  75      77   
+      Main   71-80   78-87
+      Check  50      88   
+      Main   81-90   89-98
+      Check  25      99   
+      Main   91-100  100-109
+    </pre>
+    <p>
+      In this example the 9 check lines cause the last line of the array to be readout
+      (9 * exposure duration) later than it would have without the check line readouts.
     </p>
   </description>
+
+  <category>
+    <missionItem>Europa Clipper</missionItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2020-01-20">
+      Original version
+    </change>
+  </history>
 
   <groups>
     <group name="Registration">
@@ -29,10 +81,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube containing an image that need jitter correction.
+          Input cube to be jitter corrected.
         </brief>
         <description>
-          This input cube is the cube that needs to be de-jittered. The algorithms jitterfit uses
+          This input cube is the cube that needs to be de-jittered. The algorithms used
           are designed for a rolling shutter instrument with an accompanying check line cube
           file (see main description). This cube file must be writable. Coefficients to adjust
           the jitter will be written to the cube labels for use by the rolling shutter cammera model.
@@ -52,7 +104,7 @@
           This input cube is the check line cube. It contains a set of lines that were 
           repetedly read from the sensor array intersperesed with the readout of the main
           image data.
-          EXPAND
+          ...EXPAND...
         </description>
         <filter>
           *.cub
@@ -115,7 +167,7 @@
           This will allow the program to access the correct normal cube line number based on the 
           un-enlarged checktable values.
           Example: For a 4x enlargement set this value to 4.0.
-          ADD WHY
+          ...ADD WHY...
         </description>
       </parameter>
       
@@ -142,7 +194,8 @@
           Output file where the registration statistics will be written.
         </brief>
         <description>
-          SOMETHING 
+          This file will contain the statistics gathered during the registration process. The
+          format is PVL and is identical to the statistics for all auto registration applictions.
         </description>
         <filter>
           *.csv
@@ -197,8 +250,8 @@
           Output file that holds the coefficients.
         </brief>
         <description>
-          SOMETHING
-          FORMAT
+          A comma separated value file of the line and sample coefficients. One line of line, sample for each 
+          degree.
         </description>
         <filter>
           *.csv
@@ -210,10 +263,11 @@
         <fileMode>output</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          Output file that holds the residuals.
+          Output file that holds the solution residuals.
         </brief>
         <description>
-          SOMETHING
+          A comma separated value file of the residual information from the least squares solution. The columns are:
+          Registered Line, Solved Line, Registered Line Residual, Registered Sample, Solved Sample, Sample Residual, Time Taken
         </description>
         <filter>
           *.csv
