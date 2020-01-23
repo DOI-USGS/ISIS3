@@ -6,14 +6,14 @@
   </brief>
   <description>
     <p>
-      This program calculates a two sets of polynomial coefficients that characterize the jitter in an
-      image acquired by a rolling shutter instrument. One polynomial for the line direction and on
+      This program calculates two sets of polynomial coefficients that characterize the jitter in an
+      image acquired by a rolling shutter instrument. One polynomial for the line direction and one
       for the sample direction. The ISIS camera model for the instrument can
       then use the coefficients to adjust for the time dependent jitter.
     </p>
     <p>
       The coefficients are
-      calculated by coregistering lines in the cube with each line in the check line cube, where each
+      calculated by coregistering lines in the main cube with each line in the check line cube, where each
       check line was acquired durring the readout of the main cube using the
       same detector, but at a different time. The registration produces sample and line offsets
       which are fed into a least squares solution to determin the coeficients of an Nth degree
@@ -26,7 +26,8 @@
       and the second column contains the associated exposure time (normalized -1 to 1). 2) A table
       with one record for each check line where the first column is the sensor line number used to
       collect the corresponding check line and the second column contains the time the line was
-      exposed normalized using the same minimum and maximum as the main image times were
+      exposed normalized using the same minimum and maximum as the main image times were. Tables that
+      meet these requirements are currently attacted to the cube during ingestion to ISIS (i.e., eis2isis).
     </p>
     <p>
       The checkline cube is expected to have individual lines (possibly repeated) from the same sensor as the
@@ -63,6 +64,12 @@
       In this example the 9 check lines cause the last line of the array to be readout
       (9 * exposure duration) later than it would have without the check line readouts.
     </p>
+    <p>
+      This program was designed around work for the Europa Clipper Europa Imaging System Narrow
+      Angel Camera by Randy Kirk. Since the program relies on the check lines and their 
+      spatial and temporal relationship to the main lines, the program will not work with
+      other instruments unless they provide similar data.
+    </p>
   </description>
 
   <category>
@@ -87,7 +94,7 @@
           This input cube is the cube that needs to be de-jittered. The algorithms used
           are designed for a rolling shutter instrument with an accompanying check line cube
           file (see main description). This cube file must be writable. Coefficients to adjust
-          the jitter will be written to the cube labels for use by the rolling shutter cammera model.
+          the jitter will be written to the cube labels for use by the rolling shutter camera model.
         </description>
         <filter>
           *.cub
@@ -102,7 +109,7 @@
         </brief>
         <description>
           This input cube is the check line cube. It contains a set of lines that were 
-          repetedly read from the sensor array intersperesed with the readout of the main
+          repeatedly read from the sensor array interspersed with the readout of the main
           image data.
           ...EXPAND...
         </description>
@@ -118,12 +125,12 @@
           The Auto Registration template
         </brief>
         <description>
-          The parameter template to use for the Autoregistration process. The default template
+          The parameter template to use for the auto registration process. The default template
           calls the Maximum Correlation pattern matching algorithm with predefined parameter values.
           There are other templates available in the system autoreg/template directory.  Also, the user
           can use the 'autoregtemplate' application to create a new template file.
 
-          Example minimal autoregistration definition file:
+          Example minimal auto registration definition file:
           <pre>
              Object = AutoRegistration
                Group = Algorithm
@@ -165,9 +172,9 @@
         <description>
           This is the scale of the image. Only use this parameter if you have enlarged the main cube.
           This will allow the program to access the correct normal cube line number based on the 
-          un-enlarged checktable values.
+          un-enlarged check table values.
           Example: For a 4x enlargement set this value to 4.0.
-          ...ADD WHY...
+          ...ADD - WHY we would do this...
         </description>
       </parameter>
       
@@ -195,7 +202,7 @@
         </brief>
         <description>
           This file will contain the statistics gathered during the registration process. The
-          format is PVL and is identical to the statistics for all auto registration applictions.
+          format is PVL and is identical to the statistics for all auto registration applications.
         </description>
         <filter>
           *.csv
@@ -233,7 +240,7 @@
         <type>double</type>
         <brief>
           The time, in seconds, that the last line was taken. The minimum is .0026 seconds it takes for 
-          a 2250 line image to be taken plus the time it takes to take 60 checklines.
+          a 2250 line image to be taken plus the time it takes to take 60 check lines.
         </brief>
         <description>
           SOMETHING
