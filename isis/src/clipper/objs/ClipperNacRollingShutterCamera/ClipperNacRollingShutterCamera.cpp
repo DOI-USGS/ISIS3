@@ -70,24 +70,30 @@ namespace Isis {
     // Grab the coefficients for the polynomial that fit the jitter and the normal readout times of
     // the lines of the image
     
-    PvlKeyword sampleCoefficients = inst.findKeyword("JitterSampleCoefficients");
-    std::vector<double> sampleCoeffs;
-    for (int i = 0; i < sampleCoefficients.size(); i++) {
-      sampleCoeffs.push_back(sampleCoefficients[i].toDouble());
-    }
-    
-    PvlKeyword lineCoefficients = inst.findKeyword("JitterLineCoefficients");
-    std::vector<double> lineCoeffs;
-    for (int i = 0; i < lineCoefficients.size(); i++) {
-      lineCoeffs.push_back(lineCoefficients[i].toDouble());
-    }
-    
-    Table normalizedReadoutTimes("Normalized Main Readout Line Times", lab.fileName(), lab);
+    // The two keywords and table below are _all_ required for remove/addJitter in the 
+    // RollingShutterCameraDetectorMap to work. If any are missing, just leave the below arrays
+    //  unitialized, and add/removeJitter will default to 0. 
 
-    std::vector<double> readoutTimes;
-    for (int i = 0; i < normalizedReadoutTimes.Records(); i++) {
-      TableRecord record = normalizedReadoutTimes[i];
-      readoutTimes.push_back((double) record["time"]);
+    std::vector<double> sampleCoeffs, lineCoeffs, readoutTimes;
+
+    if ( (inst.hasKeyword("JitterSampleCoefficients") && inst.hasKeyword("JitterLineCoefficients") )
+        && cube.hasTable("Normalized Main Readout Line Times")) {
+      PvlKeyword sampleCoefficients = inst.findKeyword("JitterSampleCoefficients"); 
+      for (int i = 0; i < sampleCoefficients.size(); i++) {
+        sampleCoeffs.push_back(sampleCoefficients[i].toDouble());
+      }
+      
+      PvlKeyword lineCoefficients = inst.findKeyword("JitterLineCoefficients");
+      for (int i = 0; i < lineCoefficients.size(); i++) {
+        lineCoeffs.push_back(lineCoefficients[i].toDouble());
+      }
+      
+      Table normalizedReadoutTimes("Normalized Main Readout Line Times", lab.fileName(), lab); 
+      
+      for (int i = 0; i < normalizedReadoutTimes.Records(); i++) {
+        TableRecord record = normalizedReadoutTimes[i];
+        readoutTimes.push_back((double) record["time"]);
+      }
     }
 
     // Set up camera detector map with the coefficients and readout times
