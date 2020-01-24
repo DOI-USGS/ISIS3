@@ -66,7 +66,7 @@ void IsisMain() {
                   "delta sample, goodness of fit, registration success " << endl;
   }
 
-  // ???? Question: Why use a file name here? Can't Table read from an open Cube?
+  // ???? Question: Why use a file name here? Can't Table/blob read from an open Cube?
   Table mainReadouts(QString("Normalized Main Readout Line Times"), jitterCube.fileName());
   Table checklineReadouts(QString("Normalized Checkline Readout Line Times"), checkCube.fileName());
   
@@ -200,7 +200,7 @@ void IsisMain() {
   if (ui.WasEntered("RESIDUALTO")) {
     ofstream outputResidualFile;
     QString residualTo(FileName(ui.GetFileName("RESIDUALTO")).expanded());
-    outputResidualFile.open(residualTo.toLatin1().data());  
+    outputResidualFile.open(residualTo.toLatin1().data());
 
     outputResidualFile << "# Registered Line, Solved Line, Registered Line Residual, "
                           "Registered Sample, Solved Sample, Sample Residual, Time Taken" << endl;
