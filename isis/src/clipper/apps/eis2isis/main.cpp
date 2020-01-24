@@ -65,7 +65,6 @@ void IsisMain() {
     
     // The ClipperNacRollingShutterCamera requires extra information for instantiating a camera.
     if (outputLabel->findKeyword("InstrumentId", PvlObject::Traverse)[0] == "EIS-NAC-RS") {
-      
       modifyNacRollingShutterLabel(outputCube, xmlFileName, xmlLabel);
     }
     
@@ -83,9 +82,25 @@ void IsisMain() {
       startTime->setValue(startTimeString);
     }
 
+    PvlKeyword *instrumentName = &outputLabel->findGroup("Instrument", Pvl::Traverse)["InstrumentId"];
+    QString instrumentNameString = instrumentName[0];
+
     PvlGroup kerns("Kernels");
-    kerns += PvlKeyword("NaifFrameCode", toString(-159011));
-    outputCube->putGroup(kerns);
+    if (instrumentNameString == "EIS-NAC-RS") {
+      // This ID will need to be updated. It is temporarily used for testing but is NOT the actual
+      // NAC ID.
+      kerns += PvlKeyword("NaifFrameCode", toString(-159011));
+    }
+    else if (instrumentNameString == "EIS-WAC-FC") {
+      kerns += PvlKeyword("NaifFrameCode", toString(-159104));
+    }
+    else {
+      QString msg = "Input file [" + xmlFileName.expanded() + "] has an invalid " +
+                 "InstrumentId.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+
+    outputCube->putGroup(kerns); 
   
     p.EndProcess();
   }
