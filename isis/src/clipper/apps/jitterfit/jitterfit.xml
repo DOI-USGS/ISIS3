@@ -176,7 +176,7 @@
           This is the scale of the image. Only use this parameter if you have enlarged the main cube.
           This will allow the program to access the correct normal cube line number based on the 
           un-enlarged check table values.
-          Enlarging the main image by 4x is used to assist the registration from becomeing pixel locked
+          Enlarging the main image by 4x is used to assist the registration from becoming pixel locked
           (i.e., registering on the whole pixel value instead of a sub-pixel)
           Example: For a 4x enlargement set this value to 4.0.
         </description>
