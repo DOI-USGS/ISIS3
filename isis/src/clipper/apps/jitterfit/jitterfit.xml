@@ -21,17 +21,20 @@
     </p>
     <p>
       The main cube (FROM) is expected to be a full frame image collected by a rolling shutter sensor.
-      The cube must have two attached tables: 1) A table with a record for each line in the cube where
+      The cube must have a table named &quot;Normalized Main Readout Line Times&quot; containing
+      records for each line in the cube where
       the first column contains the sensor line number used to collect the corresponding image line,
-      and the second column contains the associated exposure time (normalized -1 to 1). 2) A table
-      with one record for each check line where the first column is the sensor line number used to
-      collect the corresponding check line and the second column contains the time the line was
-      exposed normalized using the same minimum and maximum as the main image times were. Tables that
-      meet these requirements are currently attacted to the cube during ingestion to ISIS (i.e., eis2isis).
+      and the second column contains the associated exposure time (normalized -1 to 1). A table that
+      meet these requirements is attacted to the cube during ingestion to ISIS (i.e., eis2isis).
     </p>
     <p>
       The checkline cube is expected to have individual lines (possibly repeated) from the same sensor as the
-      main cube. The checklines must be read during the readout of the main image sequence. 
+      main cube. The checklines must be read during the readout of the main image sequence. A table
+      named &quot;Normalized Main Readout Line Times&quot; containing records for each check line
+      where the first column is the sensor line number used to
+      collect the corresponding check line and the second column contains the normalized time the line was
+      exposed. The same minimum and maximum must be used to normalize these times as was used for
+      the main image times.  
     </p>
       An example line readout order for a 100 line sensor with 3 check lines read 3 times each
       could be (readout time for a line = line exposure number * exposure duration):
@@ -173,8 +176,9 @@
           This is the scale of the image. Only use this parameter if you have enlarged the main cube.
           This will allow the program to access the correct normal cube line number based on the 
           un-enlarged check table values.
+          Enlarging the main image by 4x is used to assist the registration from becomeing pixel locked
+          (i.e., registering on the whole pixel value instead of a sub-pixel)
           Example: For a 4x enlargement set this value to 4.0.
-          ...ADD - WHY we would do this...
         </description>
       </parameter>
       
@@ -186,7 +190,7 @@
           Output file where the registration results will be written.
         </brief>
         <description>
-          SOMETHING
+          The resigstration results from the bundle adjustment will be written to this file.
         </description>
         <filter>
           *.csv
@@ -218,7 +222,8 @@
           of the registration.
         </brief>
         <description>
-          SOMETHING
+          This tolerance is used by the auto registration to determine which registrations are valid and
+          which are invalid. See the auto registration documentation for more information. 
         </description>
         <default><item>.7</item></default>
         <minimum inclusive="yes">0.0</minimum>
