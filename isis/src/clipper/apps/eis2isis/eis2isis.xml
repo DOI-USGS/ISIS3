@@ -47,6 +47,7 @@
  </change>
   <change name="Kristin Berry" date="2020-01-08">
      Updates to documentation to add detail and bring it up to date with the current version of the software, prior to checkin to dev. 
+     Move NAC-only keywords into a NAC-only group.
  </change>
   </history>
 
@@ -66,10 +67,10 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          An EIS NAC main image file to be converted to an ISIS cube
+          An EIS main image file to be converted to an ISIS cube
         </brief>
         <description>
-          Use this parameter to select the filename of the xml label for a a Clipper EIS NAC <em>main image</em>
+          Use this parameter to select the filename of the xml label for a a Clipper EIS <em>main image</em>
           file to be converted to a cube. This is expected to be a PDS4 formatted file. The associated image must 
 	  have the same name as the label and end in ".dat." 
         </description>
@@ -78,22 +79,40 @@
         </filter>
       </parameter>
 
-      <parameter name="FROM2">
-        <type>filename</type>
-        <fileMode>input</fileMode>
-        <internalDefault>None</internalDefault>
+    <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
         <brief>
-          An EIS NAC checkline image file to be converted to an ISIS cube
+          Output ISIS cube file for the main image
         </brief>
         <description>
-          Use this parameter to select the filename of the xml label for a Clipper EIS NAC <em>checkline image</em>
-          file to be converted to a cube. This is expceted to be a PDS4 formatted file.  The associated image must 
-	  have the same name as the label and end in ".dat." 
+          The output cube file that will contain the EIS NAC <em>main image</em> in ISIS format.
         </description>
         <filter>
-          *.xml
+          *.cub
         </filter>
       </parameter>
+
+    </group>
+
+    <group name="NAC Only"> 
+
+	<parameter name="FROM2">
+	  <type>filename</type>
+	  <fileMode>input</fileMode>
+	  <internalDefault>None</internalDefault>
+	  <brief>
+	    An EIS NAC checkline image file to be converted to an ISIS cube
+	  </brief>
+	  <description>
+	    Use this parameter to select the filename of the xml label for a Clipper EIS NAC <em>checkline image</em>
+	    file to be converted to a cube. This is expceted to be a PDS4 formatted file.  The associated image must 
+	    have the same name as the label and end in ".dat." 
+	  </description>
+	  <filter>
+	    *.xml
+	  </filter>
+	</parameter>
 
       <parameter name="MAINREADOUT">
         <type>filename</type>
@@ -110,7 +129,7 @@
           *.csv
         </filter>
       </parameter>
-      
+
       <parameter name="CHECKLINEREADOUT">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -128,26 +147,13 @@
         </filter>
       </parameter>
 
-      <parameter name="TO">
-        <type>cube</type>
-        <fileMode>output</fileMode>
-        <brief>
-          Output ISIS cube file for the main image
-        </brief>
-        <description>
-          The output cube file that will contain the EIS NAC <em>main image</em> in ISIS format.
-        </description>
-        <filter>
-          *.cub
-        </filter>
-      </parameter>
-
+    </group>
       <parameter name="TO2">
         <type>cube</type>
         <fileMode>output</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          Output ISIS cube file for the checkline image
+          Output ISIS cube file for the checkline image 
         </brief>
         <description>
           The output cube file that will contain the EIS NAC <em>checkline image</em> ISIS format.
@@ -156,8 +162,6 @@
           *.cub
         </filter>
       </parameter>
-
-    </group>
-  </groups>
+   </groups>
 
 </application>

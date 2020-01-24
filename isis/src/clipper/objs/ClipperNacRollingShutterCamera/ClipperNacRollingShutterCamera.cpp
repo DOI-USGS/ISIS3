@@ -61,8 +61,8 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Set up start time and exposure duration
-    QString startTime = inst["SpacecraftClockCount"];
-    iTime etStart = getClockTime(startTime);
+    QString startTime = inst["StartTime"];
+    iTime etStart(startTime); 
 
     // Use to calculate center time when exposure duration is available
     // double exposureDuration = ((double) inst["ExposureDuration"]);
@@ -109,7 +109,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(etStart); // Consider changing to center in future. 
+    setTime(etStart.Et()); // Consider changing to center in future. 
     LoadCache();
     NaifStatus::CheckErrors();
   }
