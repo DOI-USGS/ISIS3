@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="jitterfit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Characterize jitter for rolling shutter images.
+  </brief>
+  <description>
+    <p>
+      This program calculates two sets of polynomial coefficients that characterize the jitter in an
+      image acquired by a rolling shutter instrument. One polynomial for the line direction and one
+      for the sample direction. The ISIS camera model for the instrument can
+      then use the coefficients to adjust for the time dependent jitter.
+    </p>
+    <p>
+      The coefficients are
+      calculated by coregistering lines in the main cube with each line in the check line cube, where each
+      check line was acquired durring the readout of the main cube using the
+      same detector, but at a different time. The registration produces sample and line offsets
+      which are fed into a least squares solution to determin the coeficients of an Nth degree
+      polynomial in time. The coefficients are written to the cube label for use by the ISIS camera model.
+    </p>
+    <p>
+      The main cube (FROM) is expected to be a full frame image collected by a rolling shutter sensor.
+      The cube must have two attached tables: 1) A table with a record for each line in the cube where
+      the first column contains the sensor line number used to collect the corresponding image line,
+      and the second column contains the associated exposure time (normalized -1 to 1). 2) A table
+      with one record for each check line where the first column is the sensor line number used to
+      collect the corresponding check line and the second column contains the time the line was
+      exposed normalized using the same minimum and maximum as the main image times were. Tables that
+      meet these requirements are currently attacted to the cube during ingestion to ISIS (i.e., eis2isis).
+    </p>
+    <p>
+      The checkline cube is expected to have individual lines (possibly repeated) from the same sensor as the
+      main cube. The checklines must be read during the readout of the main image sequence. 
+    </p>
+      An example line readout order for a 100 line sensor with 3 check lines read 3 times each
+      could be (readout time for a line = line exposure number * exposure duration):
+    <pre>
+      Type   Line    Exp# 
+             Number       
+                          
+      --------------------
+      Main   1-10    1-10 
+      Check  75      11   
+      Main   11-20   12-21
+      Check  50      22   
+      Main   21-30   23-32
+      Check  25      33   
+      Main   31-40   34-43
+      Check  75      44   
+      Main   41-50   45-54
+      Check  50      55   
+      Main   51-60   56-65
+      Check  25      66   
+      Main   61-70   67-76
+      Check  75      77   
+      Main   71-80   78-87
+      Check  50      88   
+      Main   81-90   89-98
+      Check  25      99   
+      Main   91-100  100-109
+    </pre>
+    <p>
+      In this example the 9 check lines cause the last line of the array to be readout
+      (9 * exposure duration) later than it would have without the check line readouts.
+    </p>
+    <p>
+      This program was designed around work for the Europa Clipper Europa Imaging System Narrow
+      Angel Camera by Randy Kirk. Since the program relies on the check lines and their 
+      spatial and temporal relationship to the main lines, the program will not work with
+      other instruments unless they provide similar data.
+    </p>
+  </description>
+
+  <category>
+    <missionItem>Europa Clipper</missionItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2020-01-20">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Registration">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be jitter corrected.
+        </brief>
+        <description>
+          This input cube is the cube that needs to be de-jittered. The algorithms used
+          are designed for a rolling shutter instrument with an accompanying check line cube
+          file (see main description). This cube file must be writable. Coefficients to adjust
+          the jitter will be written to the cube labels for use by the rolling shutter camera model.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube containing the check lines.
+        </brief>
+        <description>
+          This input cube is the check line cube. It contains a set of lines that were 
+          repeatedly read from the sensor array interspersed with the readout of the main
+          image data.
+          ...EXPAND...
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="DEFFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The Auto Registration template
+        </brief>
+        <description>
+          The parameter template to use for the auto registration process. The default template
+          calls the Maximum Correlation pattern matching algorithm with predefined parameter values.
+          There are other templates available in the system autoreg/template directory.  Also, the user
+          can use the 'autoregtemplate' application to create a new template file.
+
+          Example minimal auto registration definition file:
+          <pre>
+             Object = AutoRegistration
+               Group = Algorithm
+                 Name = MaximumCorrelation
+                 Tolerance = 0.7
+                 SubPixelAccuracy = True
+               EndGroup
+ 
+               Group = PatternChip
+                 Samples = 1391
+                 Lines = 1 
+
+               EndGroup
+ 
+               Group = SearchChip
+                 Samples = 1399
+                 Lines = 7
+               EndGroup
+
+               Group = SurfaceModel
+                 WindowSize = 7
+               EndGroup
+             EndObject
+          </pre>
+
+        </description>
+
+        <filter>
+          *.def
+        </filter>
+      </parameter>
+      
+      <parameter name="SCALE">
+        <type>double</type>
+        <default><item>4.0</item></default>
+        <brief>
+          The scale of the image.
+        </brief>
+        <description>
+          This is the scale of the image. Only use this parameter if you have enlarged the main cube.
+          This will allow the program to access the correct normal cube line number based on the 
+          un-enlarged check table values.
+          Example: For a 4x enlargement set this value to 4.0.
+          ...ADD - WHY we would do this...
+        </description>
+      </parameter>
+      
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file where the registration results will be written.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+      <parameter name="TO2">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file where the registration statistics will be written.
+        </brief>
+        <description>
+          This file will contain the statistics gathered during the registration process. The
+          format is PVL and is identical to the statistics for all auto registration applications.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Fitting">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          The tolerance that determines which points will be excluded based on the goodness of fit 
+          of the registration.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <default><item>.7</item></default>
+        <minimum inclusive="yes">0.0</minimum>
+        
+      </parameter>
+      <parameter name="DEGREE">
+        <type>integer</type>
+        <brief>
+          The order of polynomial to solve for.
+        </brief>
+        <description>
+          SOMETHING
+        </description>
+        <default><item>3</item></default>
+        <minimum inclusive="yes">1</minimum>
+        
+      </parameter>
+      <parameter name="MAXTIME">
+        <type>double</type>
+        <brief>
+          The time, in seconds, that the last line was taken. The minimum is .0026 seconds it takes for 
+          a 2250 line image to be taken plus the time it takes to take 60 check lines.
+        </brief>
+        <description>
+          SOMETHING
+          WHAT IS THIS USED FOR
+        </description>
+        <default><item>0.0027114285714286</item></default>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+      
+      <parameter name="COEFFICIENTTO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file that holds the coefficients.
+        </brief>
+        <description>
+          A comma separated value file of the line and sample coefficients. One line of line, sample for each 
+          degree.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+      <parameter name="RESIDUALTO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file that holds the solution residuals.
+        </brief>
+        <description>
+          A comma separated value file of the residual information from the least squares solution. The columns are:
+          Registered Line, Solved Line, Registered Line Residual, Registered Sample, Solved Sample, Sample Residual, Time Taken
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+      
+    </group>
+  </groups>
+
+</application>
