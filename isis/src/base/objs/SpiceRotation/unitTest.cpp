@@ -635,7 +635,7 @@ int main(int argc, char *argv[]) {
   cout << "Has AV? " << (aleQuatRot.HasAngularVelocity() ? "Yes" : "No") << endl;
   vector<int> timeDepChain = aleQuatRot.TimeFrameChain();
   cout << "Time dependent frame chain = { ";
-  for (int i = 0; i < timeDepChain.size(); i++) {
+  for (unsigned int i = 0; i < timeDepChain.size(); i++) {
     if (i > 0) {
       cout << ", ";
     }
