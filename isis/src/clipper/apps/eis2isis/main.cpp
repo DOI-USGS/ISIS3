@@ -72,6 +72,21 @@ void IsisMain() {
     // Write out original label before closing the cube
     outputCube->write(xmlLabel);
 
+    // Pvl output label
+    outputLabel = outputCube->label();
+
+    // Remove trailing "Z" from StartTime for ISIS label
+    PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
+    QString startTimeString = startTime[0];
+    if (startTimeString.endsWith("Z", Qt::CaseInsensitive)) {
+      startTimeString.chop(1);
+      startTime->setValue(startTimeString);
+    }
+
+    PvlGroup kerns("Kernels");
+    kerns += PvlKeyword("NaifFrameCode", toString(-159011));
+    outputCube->putGroup(kerns);
+  
     p.EndProcess();
   }
   catch (IException &e) {
