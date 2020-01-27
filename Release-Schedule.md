@@ -9,8 +9,6 @@ At the start of Month 1, a Release Candidate (RC1) is created from the `dev` bra
 
 During Month 1 through Month 3, we continue with new feature development for RC2. At the start of Month 4, we repeat the same release candidate and release process as described above.
 
-> **NOTE**: We are currently transitioning to this release cadence and plan to release again May 1, 2019. After that release, we will fully adopt the above schedule.
-
 ### Feature Freeze
 When a Release Candidate is branched from the `dev` branch, a feature freeze is put into effect. Any feature additions that occur after a release candidate has been branched will be included in a future RC (and release). In other words, features added prior to the creation of a RC will be included in the next release. The only instances where this may not hold true is if significant, previously unidentified issues are identified during the testing of a RC that are associated with a new feature addition. In that case, we would back out the feature and recreate the RC.
 
