@@ -1,0 +1,5 @@
+Group = Clipper/EIS-WAC-FC
+  Version = 1
+  Library = ClipperWacFcCamera
+  Routine = ClipperWacFcCameraPlugin
+EndGroup
