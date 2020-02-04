@@ -272,35 +272,70 @@ TEST(BundleObservationSolveSettings, SaveSettings){
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     instrumentId.nodeValue(), boss.instrumentId());
 
+// begin testing instrument pointing options save
   QDomElement instrumentPointingOptions = root.firstChildElement("instrumentPointingOptions");
   ASSERT_FALSE(instrumentPointingOptions.isNull());
 
   QDomNamedNodeMap pointingOptionsAtts = instrumentPointingOptions.attributes();
   QString pointingSolveOption =
     BundleObservationSolveSettings::instrumentPointingSolveOptionToString(boss.instrumentPointingSolveOption());
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, pointingOptionsAtts.namedItem(
     "solveOption").nodeValue(), pointingSolveOption);
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("numberCoefSolved").nodeValue(),
     toString(boss.numberCameraAngleCoefficientsSolved()));
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("degree").nodeValue(), toString(boss.ckDegree()));
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveDegree").nodeValue(),
     toString(boss.ckSolveDegree()));
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveTwist").nodeValue(),
     toString(boss.solveTwist()));
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveOverExisting").nodeValue(),
     toString(boss.solvePolyOverPointing()));
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("interpolationType").nodeValue(), "3");
 
   QDomElement aprioiPointingSigmas = instrumentPointingOptions.firstChildElement(
-    "instrumentPointingOptions");
+    "aprioriPointingSigmas");
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
-    aprioiPointingSigmas.namedItem("sigma").nodeValue(), "");
+    aprioiPointingSigmas.namedItem("sigma").nodeValue(), "N/A");
+
+// begin testing instrument position options save
+  QDomElement instrumentPositionOptions = root.firstChildElement("instrumentPositionOptions");
+  ASSERT_FALSE(instrumentPointingOptions.isNull());
+
+  QDomNamedNodeMap positionOptionsAtts = instrumentPositionOptions.attributes();
+  QString positionSolveOption =
+    BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+    boss.instrumentPositionSolveOption());
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, positionOptionsAtts.namedItem(
+    "solveOption").nodeValue(), positionSolveOption);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("numberCoefSolved").nodeValue(),
+    toString(boss.numberCameraPositionCoefficientsSolved()));
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("degree").nodeValue(),
+    toString(boss.spkDegree()));
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("degree").nodeValue(),
+    toString(boss.spkDegree()));
+
+
 
     //needs to check instrument position options
 
