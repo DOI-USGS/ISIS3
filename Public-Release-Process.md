@@ -72,11 +72,12 @@ Anaconda leverages caching in many places which can cause issues. If you are get
 * Activate the base environment: ```conda activate```.
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your base environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda-verify --help```, respectively.
-    * If any of these packages are not in your base environment, they can be installed using the following commands: 
+    * If any of these packages are not in your base environment, they can be installed using the following 
+commands:
 `conda install anaconda-client`
 `conda install -c anaconda conda-build` 
 `conda install -c anaconda conda-verify`
-
+    * If running ```anaconda login``` resulted in an error message similar to ```[ERROR] API server not found. Please check your API url configuration``` run the following command and try again: ```anaconda config --set ssl_verify False``` 
 ### Part C: Run the Build
 * Go to the root of the repository you set up in [Step 2 Part A](#Part_A:_Setup_Repository). Make sure it is up to date.
     * Switch to the appropriate version branch
