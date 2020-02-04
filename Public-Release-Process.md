@@ -32,7 +32,7 @@ In this step, we will prepare the local repository to build from as well as upda
  * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Then, update `nn` in the `build` section only to: `conda-forge/label/gcc7::nn`.  Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
 
 ### Part D: Create a Pull Request
-* Make a pull request with your local changes into the `dev` branch of the repository.
+* Make a pull request with your local changes into the `dev` or version branch of the repository.
 
 ### Part E: Create or update a Version Branch
 Once the PR into `dev` been reviewed and merged:
