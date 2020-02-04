@@ -388,7 +388,7 @@ namespace Isis {
     if (!multiPolygon->isValid() || 
         (multiPolygon->getArea() < 1.0e-10 && !multiPolygon->isEmpty())) {
       delete multiPolygon;
-      multiPolygon = Isis::globalFactory.createMultiPolygon();
+      multiPolygon = Isis::globalFactory->createMultiPolygon();
     }
 
     if (position > p_lonLatOverlaps.size()) {
@@ -547,7 +547,7 @@ namespace Isis {
     p.SetMaximumSteps(p_lonLatOverlaps.size() - 1);
     p.CheckStatus();
 
-    geos::geom::MultiPolygon *emptyPolygon = Isis::globalFactory.createMultiPolygon();
+    geos::geom::MultiPolygon *emptyPolygon = Isis::globalFactory->createMultiPolygon();
 
     // Compare each polygon with all of the others
     for (int outside = 0; outside < p_lonLatOverlaps.size() - 1; ++outside) {
@@ -763,7 +763,7 @@ namespace Isis {
             }
 
             if (!SetPolygon(tmpGeom, outside)) {
-              if (SetPolygon(Isis::globalFactory.createMultiPolygon(), outside))
+              if (SetPolygon(Isis::globalFactory->createMultiPolygon(), outside))
                 foundOverlap = true;
             }
 

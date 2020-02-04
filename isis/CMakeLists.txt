@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.9.1")
+set(VERSION            "4.0.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
@@ -41,7 +41,7 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
 string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
-set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
+set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
@@ -163,13 +163,15 @@ set(thirdPartyCppFlags -Wall
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
-		       -Wno-strict-overflow
+                       -DUSE_UNSTABLE_GEOS_CPP_API=1
+		               -Wno-strict-overflow
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
  # Append CPP flags set in the third party lib file to the string set in this file.
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
 

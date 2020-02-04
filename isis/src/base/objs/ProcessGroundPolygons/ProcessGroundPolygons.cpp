@@ -54,8 +54,8 @@ namespace Isis {
       }
       pts->add(geos::geom::Coordinate(lon[0], lat[0]));
 
-      geos::geom::Polygon *crossingPoly = Isis::globalFactory.createPolygon(
-          globalFactory.createLinearRing(pts), NULL);
+      geos::geom::Polygon *crossingPoly = Isis::globalFactory->createPolygon(
+          globalFactory->createLinearRing(pts), NULL);
 
       geos::geom::MultiPolygon *splitPoly = NULL;
       try {

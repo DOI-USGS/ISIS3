@@ -1,0 +1,6 @@
+Group = Clipper/EIS-NAC-RS
+  Version = 1
+  Library = ClipperNacRollingShutterCamera
+  Routine = ClipperNacRollingShutterCameraPlugin
+EndGroup
+

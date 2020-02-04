@@ -8,7 +8,7 @@ dependencies:
   - boost=1.68.0
   - armadillo
   - blas
-  - bullet
+  - bullet=2.86.1=0
   - bz2file
   - bzip2
   - cmake >=3.15
@@ -17,7 +17,7 @@ dependencies:
   - doxygen
   - eigen
   - embree
-  - geos=3.5.1
+  - geos>=3.7,<3.8
   - geotiff
   - gmm
   - gmp

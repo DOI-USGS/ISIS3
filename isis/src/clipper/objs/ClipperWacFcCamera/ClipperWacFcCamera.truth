@@ -1,0 +1,31 @@
+Unit Test for ClipperWacFcCamera...
+Testing with test image...
+FileName:  "simulated_clipper_eis_wac_rolling_shutter.cub"
+CK Frame:  -159104
+
+Kernel IDs: 
+CK Frame ID =  -159011
+CK Reference ID =  1
+SPK Target ID =  -159
+SPK Reference ID =  1
+
+Focal Length =  150.401990000000012
+
+For upper left corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For upper right corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For lower left corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For lower right corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For center pixel position ...
+ERROR

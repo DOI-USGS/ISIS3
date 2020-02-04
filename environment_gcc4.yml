@@ -1,12 +1,12 @@
 channels:
-  - conda-forge
+  - jessemapel
   - usgs-astrogeology
+  - conda-forge
+  - probcomp
   - defaults
 
 dependencies:
-  - libcxx
-  - cxx-compiler
-  - ale=0.6.4
+  - ale=0.7.2
   - boost=1.68.0
   - armadillo
   - blas
@@ -19,7 +19,7 @@ dependencies:
   - doxygen
   - eigen
   - embree
-  - geos=3.5.1
+  - geos=3.7.1
   - geotiff
   - gmm
   - gmp
@@ -31,7 +31,7 @@ dependencies:
   - kakadu==1
   - krb5
   - libpng>=1.6.34
-  - libprotobuf=3.9.1
+  - libprotobuf=3.5.2
   - libtiff
   - libxml2
   - make
@@ -44,8 +44,8 @@ dependencies:
   - conda-forge/label/gcc7::nn
   - opencv>=3.0.0,<=4.0.0
   - openssl
-  - pcl
-  - protobuf=3.9.1
+  - pcl=1.8.1
+  - protobuf=3.5.2
   - qhull
   - qt=5.9.6
   - qwt=6.1.3
@@ -53,7 +53,7 @@ dependencies:
   - suitesparse
   - superlu
   - tnt
-  - x264
+  - x264=20131218
   - xalan-c
   - xerces-c
   - xorg-kbproto
