@@ -10,7 +10,7 @@ In this step, we check the currently failing tests. This is currently a judgemen
 In this step, we will prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
 ### Part A: Setup Repository
-* Create a fresh branch off of the dev branch (e.g.: `git checkout -b 3.9.1prep upstream/dev`).
+* Create a fresh branch off of the appropriate version branch (e.g.: `git checkout -b 3.9.1prep upstream/3.9`).
 
 ### Part B: Update isis/CMakeLists.txt
 * Update the VERSION variable to the latest version number. NOTE: Do not add the _RC#
