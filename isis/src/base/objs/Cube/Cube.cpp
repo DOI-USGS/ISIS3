@@ -50,6 +50,7 @@
 #include "SpecialPixel.h"
 #include "Statistics.h"
 #include "TProjection.h"
+#include "Longitude.h"
 
 using namespace std;
 
@@ -1168,6 +1169,72 @@ namespace Isis {
       m_camera = CameraFactory::Create(*this);
     }
     return m_camera;
+  }
+
+  
+  void Cube::attachSpiceFromIsd(nlohmann::json isd) {
+    PvlKeyword lkKeyword("LeapSecond");
+    PvlKeyword pckKeyword("TargetAttitudeShape");
+    PvlKeyword targetSpkKeyword("TargetPosition");
+    PvlKeyword ckKeyword("InstrumentPointing");
+    PvlKeyword ikKeyword("Instrument");
+    PvlKeyword sclkKeyword("SpacecraftClock");
+    PvlKeyword spkKeyword("InstrumentPosition");
+    PvlKeyword iakKeyword("InstrumentAddendum");
+    PvlKeyword demKeyword("ShapeModel");
+    PvlKeyword exkKeyword("Extra");  
+    
+    Spice spice(*this->label(), isd); 
+    std::cout << "done" << std::endl; 
+    Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
+    ckTable.Label() += PvlKeyword("Kernels");
+
+    for (int i = 0; i < ckKeyword.size(); i++)
+      ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
+
+    this->write(ckTable);
+
+    Table spkTable = spice.instrumentPosition()->Cache("InstrumentPosition");
+    spkTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < spkKeyword.size(); i++)
+      spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
+
+    this->write(spkTable);
+
+    Table bodyTable = spice.bodyRotation()->Cache("BodyRotation");
+    bodyTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    for (int i = 0; i < pckKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
+
+    bodyTable.Label() += PvlKeyword("SolarLongitude",
+        toString(spice.solarLongitude().degrees()));
+    this->write(bodyTable);
+
+    Table sunTable = spice.sunPosition()->Cache("SunPosition");
+    sunTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    this->write(sunTable);
+    
+    PvlGroup currentKernels = this->group("Kernels");
+
+    Pvl *label = this->label();
+    int i = 0;
+    while (i < label->objects()) {
+      PvlObject currObj = label->object(i);
+      if (currObj.isNamed("NaifKeywords")) {
+        label->deleteObject(i);
+      }
+      else {
+        i ++;
+      }
+    }
+
+    *(this->label()) += spice.getStoredNaifKeywords();
   }
 
 
