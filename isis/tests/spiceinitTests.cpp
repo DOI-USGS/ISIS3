@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include <QTemporaryFile>
-
 #include "spiceinit.h"
 
 #include "Cube.h"
@@ -11,43 +9,15 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "TestUtilities.h"
+#include "FileName.h"
 
 #include "gmock/gmock.h"
 
 using namespace Isis;
 
-class spiceinitTestCube : public ::testing::Test {
-  protected:
-    Cube testCube;
-    QTemporaryFile tempFile;
+QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
-  void SetUp() override {
-    tempFile.open();
-    testCube.setPixelType(UnsignedByte);
-  }
-
-  void TearDown() override {
-    if (testCube.isOpen()) {
-      testCube.close();
-    }
-  }
-
-  void createCube(Pvl &label) {
-    PvlObject cubeLabel = label.findObject("IsisCube");
-    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-    testCube.setDimensions(dimensions["Samples"],
-                          dimensions["Lines"],
-                          dimensions["Bands"]);
-    testCube.create(tempFile.fileName());
-
-    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
-      testCube.putGroup(*grpIt);
-    }
-  }
-};
-
-
-TEST_F(spiceinitTestCube, PredictAndReconCK) {
+TEST_F(TestCube, spiceinit_predict_and_recon_ck) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -108,12 +78,8 @@ TEST_F(spiceinitTestCube, PredictAndReconCK) {
   labelStrm >> label;
 
   createCube(label);
-
-  spiceinitOptions options;
-  options.ckrecon = true;
-  options.cksmithed = true;
-  options.attach = false;
-
+  QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"}; 
+  UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
@@ -128,7 +94,7 @@ TEST_F(spiceinitTestCube, PredictAndReconCK) {
 }
 
 
-TEST_F(spiceinitTestCube, CkConfigFile) {
+TEST_F(TestCube, spiceinit_ck_config_file) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -198,8 +164,10 @@ TEST_F(spiceinitTestCube, CkConfigFile) {
   labelStrm >> label;
 
   createCube(label);
-
-  spiceinit(&testCube);
+  
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
@@ -212,7 +180,7 @@ TEST_F(spiceinitTestCube, CkConfigFile) {
 }
 
 
-TEST_F(spiceinitTestCube, Default) {
+TEST_F(TestCube, spiceinit_default) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -305,8 +273,10 @@ TEST_F(spiceinitTestCube, Default) {
   labelStrm >> label;
 
   createCube(label);
-
-  spiceinit(&testCube);
+  
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
 
@@ -324,7 +294,7 @@ TEST_F(spiceinitTestCube, Default) {
   EXPECT_TRUE(kernels.hasKeyword("InstrumentPointingQuality"));
   EXPECT_TRUE(kernels.hasKeyword("CameraVersion"));
 
-  spiceinit(&testCube);
+  spiceinit(&testCube, options);
 
   PvlGroup secondKernels = testCube.group("Kernels");
 
@@ -332,7 +302,7 @@ TEST_F(spiceinitTestCube, Default) {
 }
 
 
-TEST_F(spiceinitTestCube, Nadir) {
+TEST_F(TestCube, spiceinit_nadir) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -403,16 +373,13 @@ TEST_F(spiceinitTestCube, Nadir) {
 
   Pvl label;
   labelStrm >> label;
-
   createCube(label);
-
-  spiceinitOptions options;
-  options.cknadir = true;
-  options.attach = false;
-  options.tspk.push_back("$base/kernels/spk/de405.bsp");
-
+  
+  QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
+  UserInterface options(APP_XML, args);
+  
   spiceinit(&testCube, options);
-
+  
   PvlGroup kernels = testCube.group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
@@ -421,7 +388,7 @@ TEST_F(spiceinitTestCube, Nadir) {
 }
 
 
-TEST_F(spiceinitTestCube, Padding) {
+TEST_F(TestCube, spiceinit_padding) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -503,14 +470,11 @@ TEST_F(spiceinitTestCube, Padding) {
 
   createCube(label);
 
-  spiceinitOptions options;
-  options.startpad = 1.1;
-  options.endpad = 0.5;
-  options.attach = false;
-  options.fk.push_back("$cassini/kernels/fk/cas_v40_usgs.tf");
-
+  QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
+  UserInterface options(APP_XML, args);
+   
   spiceinit(&testCube, options);
-
+  
   PvlGroup kernels = testCube.group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("StartPadding"));
