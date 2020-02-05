@@ -6,12 +6,10 @@
 #include <string>
 
 #include <QString>
-#include <QTemporaryFile>
 
 #include "IException.h"
 #include "PvlGroup.h"
 
-#include "Cube.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 
@@ -40,16 +38,6 @@ namespace Isis {
       const char* group2_expr,
       PvlGroup group1,
       PvlGroup group2);
-
-  class TestCube : public ::testing::Test {
-      protected:
-        Cube testCube;
-        QTemporaryFile tempFile;
-        
-        void SetUp() override; 
-        void TearDown() override;
-        void createCube(Pvl &label);
-   };
 
 }
 

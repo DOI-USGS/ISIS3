@@ -11,6 +11,8 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 
+#include "Fixtures.h"
+
 #include "gmock/gmock.h"
 
 using namespace Isis;
