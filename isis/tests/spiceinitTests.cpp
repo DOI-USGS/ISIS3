@@ -19,7 +19,7 @@ using namespace Isis;
 
 QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
-TEST_F(TestCube, spiceinit_predict_and_recon_ck) {
+TEST_F(TestCube, TestSpiceinitPredictAndReconCk) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -96,7 +96,7 @@ TEST_F(TestCube, spiceinit_predict_and_recon_ck) {
 }
 
 
-TEST_F(TestCube, spiceinit_ck_config_file) {
+TEST_F(TestCube, TestSpiceinitCkConfigFile) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -182,7 +182,7 @@ TEST_F(TestCube, spiceinit_ck_config_file) {
 }
 
 
-TEST_F(TestCube, spiceinit_default) {
+TEST_F(TestCube, TestSpiceinitDefault) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -304,7 +304,7 @@ TEST_F(TestCube, spiceinit_default) {
 }
 
 
-TEST_F(TestCube, spiceinit_nadir) {
+TEST_F(TestCube, TestSpiceinitNadir) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -390,7 +390,7 @@ TEST_F(TestCube, spiceinit_nadir) {
 }
 
 
-TEST_F(TestCube, spiceinit_padding) {
+TEST_F(TestCube, TestSpiceinitPadding) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
