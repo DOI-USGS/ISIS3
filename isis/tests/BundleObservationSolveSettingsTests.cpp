@@ -309,7 +309,7 @@ TEST(BundleObservationSolveSettings, SaveSettings){
     "aprioriPointingSigmas");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
-    aprioiPointingSigmas.namedItem("sigma").nodeValue(), "N/A");
+    aprioiPointingSigmas.namedItem("sigma").nodeValue(), "");
 
 // begin testing instrument position options save
   QDomElement instrumentPositionOptions = root.firstChildElement("instrumentPositionOptions");
@@ -335,10 +335,22 @@ TEST(BundleObservationSolveSettings, SaveSettings){
     positionOptionsAtts.namedItem("degree").nodeValue(),
     toString(boss.spkDegree()));
 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("solveDegree").nodeValue(),
+    toString(boss.spkSolveDegree()));
 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("solveOverHermiteSpline").nodeValue(),
+    toString(boss.solvePositionOverHermite()));
 
-    //needs to check instrument position options
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    positionOptionsAtts.namedItem("interpolationType").nodeValue(), "3");
 
+  QDomElement aprioriPositionSigmas = instrumentPositionOptions.firstChildElement(
+    "aprioriPositionSigmas");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual,
+    aprioriPositionSigmas.namedItem("sigma").nodeValue(), "");
 }
 
 TEST_P(PointingSolveOptionStrings, StringToOption) {
