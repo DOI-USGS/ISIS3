@@ -21,14 +21,25 @@ namespace Isis {
    * the ISIS3 stats application.
    *
    * @param ui The User Interface to parse the parameters from
-   */
+   */ 
   void stats(UserInterface &ui) {
-
     Cube *inputCube = new Cube();
+    
     CubeAttributeInput inAtt(ui.GetAsString("FROM"));
     inputCube->setVirtualBands(inAtt.bands());
+    
     inputCube->open(ui.GetFileName("FROM"));
-
+    stats(inputCube, ui);
+  }
+  
+  /**
+   * Compute the stats for an ISIS cube. This is the programmatic interface to
+   * the ISIS3 stats application.
+   *
+   * @param inputCube input Cube to compute stats for
+   * @param ui The User Interface to parse the parameters from
+   */
+  void stats(Cube *inputCube, UserInterface &ui) {
     double validMin = Isis::ValidMinimum;
     double validMax = Isis::ValidMaximum;
 

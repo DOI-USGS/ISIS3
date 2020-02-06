@@ -119,8 +119,8 @@ namespace Isis {
    */
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
-    
     // Initialize members
+    
     m_solarLongitude = new Longitude;
     m_et = NULL;
     m_kernels = new QVector<QString>;
@@ -150,7 +150,6 @@ namespace Isis {
     m_bodyFrameCode = new SpiceInt;
 
     m_naifKeywords = new PvlObject("NaifKeywords");
-
     // m_sky = false;
     
     // Get the kernel group and load main kernels
@@ -197,10 +196,10 @@ namespace Isis {
 
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
         }
-
+        
         json aleNaifKeywords = isd["NaifKeywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
-        
+
         // Still need to load clock kernels for now 
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
@@ -361,7 +360,7 @@ namespace Isis {
       m_bodyRotation = new SpiceRotation(frameCode);
       *m_bodyFrameCode = frameCode;
     }
-
+    
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
 
     //  Set up for observer/target and light time correction to between s/c 
@@ -375,10 +374,16 @@ namespace Isis {
                                                   ltState, targetRadius);
 
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
+    
 
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load 
-    if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
+    if (m_usingAle) {
+      m_sunPosition->LoadCache(isd["SunPosition"]);
+      m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      solarLongitude();
+    }
+    else if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
       Table t("SunPosition", lab.fileName(), lab);
       m_sunPosition->LoadCache(t);
 
@@ -392,17 +397,13 @@ namespace Isis {
         solarLongitude();
       }
     }
-    else if (m_usingAle) {
-      m_sunPosition->LoadCache(isd["SunPosition"]);
-      m_bodyRotation->LoadCache(isd["BodyRotation"]);
-      solarLongitude();
-    }
+    
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
     //  SpacecraftPosition.  The old keywords were in existance before the
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
-
+    
     if (kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
@@ -419,27 +420,29 @@ namespace Isis {
 
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
+    else if (m_usingAle) {
+     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+    }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
-    else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
-    }
+    
 
     if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
     }
-
-    if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
+    
+    if (m_usingAle) {
+      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+    }
+    else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-    else if (m_usingAle) {
-      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
-    }
+    
     
     NaifStatus::CheckErrors();
   } 

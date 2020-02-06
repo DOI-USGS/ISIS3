@@ -21,6 +21,7 @@ void IsisMain() {
     }
     throw;
   }
+
   for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
     Application::Log(*grpIt);
   }

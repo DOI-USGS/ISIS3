@@ -68,16 +68,12 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
 6.  The environment is now ready to download ISIS3 and its dependencies:
 
-        conda install -c usgs-astrogeology isis3
+        conda install -c usgs-astrogeology isis
 
-    If you would like to work with our latest ISIS version 4 Release Candidate instead run:
-
-        conda install -c usgs-astrogeology -c usgs-astrogeology/label/RC isis
-
-    If you would like to work with our latest ISIS version 3 Release Candidate, rather than updating
+    If you would like to work with our latest ISIS version 3, rather than updating
     to ISIS 4, instead run:
 
-	    conda install -c usgs-astrogeology -c usgs-astrogeology/label/RC isis=3.10.0
+	    conda install -c usgs-astrogeology isis=3.10.0
 
 
 7.  Finally, setup the environment variables:
