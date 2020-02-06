@@ -1,4 +1,5 @@
-#include <iostream>
+spiceinit(&t#include <iostream>
+#include <QTemporaryFile>
 
 #include "spiceinit.h"
 
@@ -19,7 +20,7 @@ using namespace Isis;
 
 QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
-TEST_F(TestCube, TestSpiceinitPredictAndReconCk) {
+TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -79,12 +80,16 @@ TEST_F(TestCube, TestSpiceinitPredictAndReconCk) {
   Pvl label;
   labelStrm >> label;
 
-  createCube(label);
-  QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"}; 
+
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
+  QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"};
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube.group("Kernels");
+  PvlGroup kernels = testCube->group("Kernels");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 3);
@@ -96,7 +101,7 @@ TEST_F(TestCube, TestSpiceinitPredictAndReconCk) {
 }
 
 
-TEST_F(TestCube, TestSpiceinitCkConfigFile) {
+TEST(Spiceinit, TestSpiceinitCkConfigFile) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -165,13 +170,15 @@ TEST_F(TestCube, TestSpiceinitCkConfigFile) {
   Pvl label;
   labelStrm >> label;
 
-  createCube(label);
-  
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
   QVector<QString> args(0);
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube.group("Kernels");
+  PvlGroup kernels = testCube->group("Kernels");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 4);
@@ -182,7 +189,7 @@ TEST_F(TestCube, TestSpiceinitCkConfigFile) {
 }
 
 
-TEST_F(TestCube, TestSpiceinitDefault) {
+TEST(Spiceinit, TestSpiceinitDefault) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -274,13 +281,15 @@ TEST_F(TestCube, TestSpiceinitDefault) {
   Pvl label;
   labelStrm >> label;
 
-  createCube(label);
-  
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
   QVector<QString> args(0);
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube.group("Kernels");
+  PvlGroup kernels = testCube->group("Kernels");
 
   EXPECT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   EXPECT_TRUE(kernels.hasKeyword("LeapSecond"));
@@ -298,13 +307,13 @@ TEST_F(TestCube, TestSpiceinitDefault) {
 
   spiceinit(&testCube, options);
 
-  PvlGroup secondKernels = testCube.group("Kernels");
+  PvlGroup secondKernels = testCube->group("Kernels");
 
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, secondKernels, kernels);
 }
 
 
-TEST_F(TestCube, TestSpiceinitNadir) {
+TEST(Spiceinit, TestSpiceinitNadir) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -375,14 +384,17 @@ TEST_F(TestCube, TestSpiceinitNadir) {
 
   Pvl label;
   labelStrm >> label;
-  createCube(label);
-  
+
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
   QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
   UserInterface options(APP_XML, args);
-  
+
   spiceinit(&testCube, options);
-  
-  PvlGroup kernels = testCube.group("Kernels");
+
+  PvlGroup kernels = testCube->group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   ASSERT_EQ(kernels["InstrumentPointing"].size(), 1);
@@ -390,7 +402,7 @@ TEST_F(TestCube, TestSpiceinitNadir) {
 }
 
 
-TEST_F(TestCube, TestSpiceinitPadding) {
+TEST(Spiceinit, TestSpiceinitPadding) {
 
   std::istringstream labelStrm(R"(
     Object = IsisCube
@@ -470,14 +482,16 @@ TEST_F(TestCube, TestSpiceinitPadding) {
   Pvl label;
   labelStrm >> label;
 
-  createCube(label);
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
   UserInterface options(APP_XML, args);
-   
+
   spiceinit(&testCube, options);
-  
-  PvlGroup kernels = testCube.group("Kernels");
+
+  PvlGroup kernels = testCube->group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("StartPadding"));
   ASSERT_EQ(kernels["StartPadding"].size(), 1);

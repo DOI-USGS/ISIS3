@@ -73,6 +73,54 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
+  void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
+    PvlObject cubeLabel = label.findObject("IsisCube");
+    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    close();
+
+    setDimensions(dimensions["Samples"],
+                          dimensions["Lines"],
+                          dimensions["Bands"]);
+
+    create(fileName.expanded());
+
+    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
+      putGroup(*grpIt);
+    }
+
+    close();
+    open(fileName.toString(), access);
+  }
+
+  void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
+    fromLabel(fileName, label, access);
+    attachSpiceFromIsd(isd);
+
+    close();
+    open(fileName.toString(), access);
+  }
+
+  void Cube::TestCube(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
+    // construct();
+    // open(fileName.toString(), access);
+    PvlObject cubeLabel = label.findObject("IsisCube");
+    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    close();
+
+    setDimensions(dimensions["Samples"],
+                          dimensions["Lines"],
+                          dimensions["Bands"]);
+
+    create(fileName.expanded());
+
+    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
+      putGroup(*grpIt);
+    }
+    attachSpiceFromIsd(isd);
+
+
+  }
+
 
   //! Destroys the Cube object.
   Cube::~Cube() {
@@ -1171,7 +1219,7 @@ namespace Isis {
     return m_camera;
   }
 
-  
+
   void Cube::attachSpiceFromIsd(nlohmann::json isd) {
     PvlKeyword lkKeyword("LeapSecond");
     PvlKeyword pckKeyword("TargetAttitudeShape");
@@ -1182,9 +1230,9 @@ namespace Isis {
     PvlKeyword spkKeyword("InstrumentPosition");
     PvlKeyword iakKeyword("InstrumentAddendum");
     PvlKeyword demKeyword("ShapeModel");
-    PvlKeyword exkKeyword("Extra");  
-    
-    Spice spice(*this->label(), isd); 
+    PvlKeyword exkKeyword("Extra");
+
+    Spice spice(*this->label(), isd);
     Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
     ckTable.Label() += PvlKeyword("Kernels");
 
@@ -1218,7 +1266,7 @@ namespace Isis {
       sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
     this->write(sunTable);
-    
+
     PvlGroup currentKernels = this->group("Kernels");
 
     Pvl *label = this->label();

@@ -17,17 +17,21 @@
 #include "Pvl.h"
 #include "PvlObject.h"
 
+using json = nlohmann::json;
+
 namespace Isis {
 
    class TestCube : public ::testing::Test {
       protected:
-        Cube testCube;
+        Cube *testCube;
         QTemporaryFile tempFile;
-        
-        void SetUp() override; 
+        Pvl label;
+        json testIsd;
+
+        void SetUp() override;
         void TearDown() override;
-        void createCube(Pvl &label);
-        void createCube(Pvl &label, nlohmann::json &isd); 
+        // void createCube(Pvl &label);
+        // void createCube(Pvl &label, nlohmann::json &isd);
    };
 
 }
