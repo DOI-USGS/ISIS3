@@ -1185,7 +1185,6 @@ namespace Isis {
     PvlKeyword exkKeyword("Extra");  
     
     Spice spice(*this->label(), isd); 
-    std::cout << "done" << std::endl; 
     Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
     ckTable.Label() += PvlKeyword("Kernels");
 
