@@ -38,6 +38,41 @@
 
 using namespace std;
 namespace Isis {
+ /**
+   * Constructs an UserInterface object.
+   *
+   * @param xmlfile Name of the Isis application xml file to open.
+   *
+   * @param argc Number of arguments on the command line.  Must be pass by
+   *             reference!!
+   *
+   * @param argv[] Array of arguments
+   */
+  UserInterface::UserInterface(const QString &xmlfile, QVector<QString> &args) : IsisAml::IsisAml(xmlfile) {
+    p_interactive = false;
+    p_info = false;
+    p_infoFileName = "";
+    p_gui = NULL;
+    p_errList = "";
+    p_saveFile = "";
+    p_abortOnError = true;
+    p_parentId = 0;
+
+    // Make sure the user has a .Isis and .Isis/history directory
+    try {
+      FileName setup = "$HOME/.Isis/history";
+      // cannot completely test this if in unit test
+      if ( !setup.fileExists() ) {
+        setup.dir().mkpath(".");
+      }
+    }
+    catch (IException &) {
+    }
+
+    // Parse the user input
+    loadCommandLine(args);
+  }
+
 
   /**
    * Constructs an UserInterface object.
@@ -285,7 +320,6 @@ namespace Isis {
     }
     catch (IException &) {
     }
-
   }
 
 
@@ -355,6 +389,38 @@ namespace Isis {
   }
 
 
+
+/**
+   * This is used to load the command line into p_cmdline and the Aml object
+   * using information contained in argc and argv.
+   *
+   * @param args QVector of arguments 
+   *
+   * @throws Isis::IException::User - Invalid value for reserve parameter
+   * @throws Isis::IException::User - Invalid command line
+   * @throws Isis::IException::User - -BATCHLIST cannot be used with -GUI, -SAVE,
+   *                                  -RESTORE, or -LAST
+   * @throws Isis::IException::User - -ERRLIST and -ONERROR=continue cannot be used without
+   *                                  -BATCHLIST
+   */
+  void UserInterface::loadCommandLine(QVector<QString> &args, bool ignoreAppName) {
+    char **c_args;
+    
+    if (ignoreAppName) {
+      args.prepend("someapp");
+    }
+
+    c_args = (char**)malloc(sizeof(char*)*args.size());
+    
+    for (size_t i = 0; i < args.size(); i++) {
+      c_args[i] = (char*)malloc(sizeof(char)*args[i].size());
+      strcpy(c_args[i], args[i].toLatin1().data());
+    }
+
+    loadCommandLine(args.size(), c_args);
+  }  
+    
+    
   /**
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
@@ -418,7 +484,6 @@ namespace Isis {
       vector<QString> paramValue;
 
       getNextParameter(currArgument, paramName, paramValue);
-
       // we now have a name,value pair
       if (paramName[0] == '-') {
         paramName = paramName.toUpper();
@@ -538,7 +603,6 @@ namespace Isis {
               }
             }
           }
-          std::cout << commandline << std::endl;
           return;
         }
 
@@ -1142,7 +1206,6 @@ namespace Isis {
     int matchOption = -1;
     // determine if the reserved parameter on cmdline is shortened (e.g. -h for -HELP)
     for (int option = 0; option < (int)reservedParams.size(); option++) {
-
       // If our option starts with the parameter name so far, this is it
       if ( reservedParams[option].startsWith(unresolvedParam) ) {
         if (matchOption >= 0) {

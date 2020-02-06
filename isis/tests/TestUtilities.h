@@ -10,6 +10,9 @@
 #include "IException.h"
 #include "PvlGroup.h"
 
+#include "Pvl.h"
+#include "PvlObject.h"
+
 namespace Isis {
 
   ::testing::AssertionResult AssertIExceptionMessage(
@@ -35,6 +38,7 @@ namespace Isis {
       const char* group2_expr,
       PvlGroup group1,
       PvlGroup group2);
+
 }
 
 #endif
