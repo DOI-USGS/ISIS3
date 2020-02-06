@@ -35,7 +35,14 @@ namespace Isis {
                   Kernel exk);
 
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName);
+  
 
+  /**
+   * Spiceinit a cube in an Application
+   *
+   * @param ui The Application UI
+   * @param(out) log The Pvl that attempted kernel sets will be logged to
+   */
   void spiceinit(UserInterface &ui, Pvl *log) { 
     // Open the input cube
     Process p;
@@ -45,7 +52,15 @@ namespace Isis {
     spiceinit(icube, ui, log);
     p.EndProcess();
   }
-  
+ 
+
+  /**
+   * Spiceinit a Cube
+   *
+   * @param cube The Cube to spiceinit
+   * @param options The options for how the cube should be spiceinit'd
+   * @param(out) log The Pvl that attempted kernel sets will be logged to
+   */
   void spiceinit(Cube *icube, UserInterface &ui, Pvl *log) {
     // Open the input cube
     Process p;
@@ -272,10 +287,29 @@ namespace Isis {
     }
   }
 
-  /** 
-    * This fuction now also adds any ShapeModel information specified in a
-    * preferences file to the Kernels group.
-   */  
+  /**
+   * Attempt to create a camera model from a set of kernels.
+   *
+   * @param(in/out) icube The Cube to create the camera from. If attach is true
+   *                      in the options, then the SPICE data will be written
+   *                      to the Cube's file.
+   * @param p The process object that the Cube belongs to
+   * @param options The spiceinit options
+   * @param(out) log The Application log
+   * @param lk The leap second kernels
+   * @param pck The planetary constant kernels
+   * @param targetspk The target state kernels
+   * @param ck The camera kernels
+   * @param fk The frame kernels
+   * @param ik The instrument kernels
+   * @param sclk The spacecraft clock kernels
+   * @param spk The spacecraft state kernels
+   * @param iak The instrument addendum kernels
+   * @param dem The digital elevation model
+   * @param exk The extra kernels
+   *
+   * @return If a camera model was successfully created
+   */
   bool tryKernels(Cube *icube, Process &p, UserInterface &ui, Pvl *log,
                   Kernel lk, Kernel pck,
                   Kernel targetSpk, Kernel ck,
@@ -555,6 +589,16 @@ namespace Isis {
     return true;
   }
 
+
+  /**
+   * spiceinit a Cube via the spice web service
+   *
+   * @param icube The Cube to spiceinit
+   * @param labels The Cube label
+   * @param missionName The NAIF name of the mission the Cube is from
+   * @param options The spiceinit options
+   * @param log The Application log
+   */
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName) {
     QString instrumentId =
         labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
