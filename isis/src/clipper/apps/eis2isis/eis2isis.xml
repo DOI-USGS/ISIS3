@@ -147,7 +147,7 @@
         </filter>
       </parameter>
 
-    </group>
+
       <parameter name="TO2">
         <type>cube</type>
         <fileMode>output</fileMode>
@@ -162,6 +162,7 @@
           *.cub
         </filter>
       </parameter>
+    </group>
    </groups>
 
 </application>
