@@ -28,6 +28,8 @@
 // This is needed for the QVariant macro
 #include <QMetaType>
 
+#include <nlohmann/json.hpp>
+
 #include "Endian.h"
 #include "PixelType.h"
 
@@ -239,7 +241,9 @@ namespace Isis {
       bool isReadOnly() const;
       bool isReadWrite() const;
       bool labelsAttached() const;
-
+      
+      void attachSpiceFromIsd(nlohmann::json Isd);
+      
       void close(bool remove = false);
       Cube *copy(FileName newFile, const CubeAttributeOutput &newFileAttributes);
       void create(const QString &cfile);

@@ -13,6 +13,9 @@
 #include "SubArea.h"
 #include "UserInterface.h"
 
-extern Isis::PvlGroup crop(Isis::UserInterface &ui);
+namespace Isis {
+  extern PvlGroup crop(Cube* cube, UserInterface &ui);
+  extern PvlGroup crop(UserInterface &ui);
+}
 
 #endif
