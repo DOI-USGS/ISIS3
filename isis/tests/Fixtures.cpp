@@ -2,7 +2,7 @@
 
 namespace Isis {
 
-  void TestCube::SetUp() {
+  void IdealTestCube::SetUp() {
     std::istringstream labelStrm(R"(
         Object = IsisCube
           Object = Core
@@ -187,53 +187,20 @@ namespace Isis {
       ]
     }
   })");
-    // tempFile.open();
-    // testCube->setPixelType(UnsignedByte);
+
     // call constructor
-    testCube = new Cube();
-    std::cout << "exited constructor" << std::endl;
+    testCube Cube;
+    
+    testCube.fromIsd(tempFile.fileName() + ".cub", label, testIsd, "rw");
 
-    testCube->TestCube(tempFile.fileName() + ".cub", label, testIsd, "rw");
-
-    // close cube
-    testCube->close();
-    testCube->open(tempFile.fileName() + ".cub");
-    std::cout << "cube closed" << std::endl;
-
+    // reopen to write out new data 
+    testCube.reopen("rw");
   }
 
-  void TestCube::TearDown() {
+  void TestIdealCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
     }
   }
-
-  // void TestCube::createCube(Pvl &label) {
-  //   PvlObject cubeLabel = label.findObject("IsisCube");
-  //   PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-  //   testCube.setDimensions(dimensions["Samples"],
-  //                         dimensions["Lines"],
-  //                         dimensions["Bands"]);
-  //   testCube.create(tempFile.fileName());
-  //
-  //   for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
-  //     testCube.putGroup(*grpIt);
-  //   }
-  // }
-  //
-  // void TestCube::createCube(Pvl &label, nlohmann::json &isd) {
-  //   PvlObject cubeLabel = label.findObject("IsisCube");
-  //   PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-  //   testCube.setDimensions(dimensions["Samples"],
-  //                         dimensions["Lines"],
-  //                         dimensions["Bands"]);
-  //
-  //   testCube.create(tempFile.fileName());
-  //
-  //   for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
-  //     testCube.putGroup(*grpIt);
-  //   }    testCube.attachSpiceFromIsd(isd);
-  //
-  // }
 
 }

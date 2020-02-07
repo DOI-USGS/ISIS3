@@ -173,7 +173,7 @@ namespace Isis {
     public:
       Cube();
       Cube(const FileName &fileName, QString access = "r");
-      void TestCube(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access);
+      
       virtual ~Cube();
 
       /**

@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 using namespace Isis;
 
-TEST(Cube, TestCubeAttachSpiceFromIsd) {
+TEST(TestCubeAttachSpiceFromIsd) {
   std::istringstream labelStrm(R"(
     Object = IsisCube
       Object = Core

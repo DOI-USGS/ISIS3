@@ -100,27 +100,6 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
-  void Cube::TestCube(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
-    // construct();
-    // open(fileName.toString(), access);
-    PvlObject cubeLabel = label.findObject("IsisCube");
-    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-    close();
-
-    setDimensions(dimensions["Samples"],
-                          dimensions["Lines"],
-                          dimensions["Bands"]);
-
-    create(fileName.expanded());
-
-    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
-      putGroup(*grpIt);
-    }
-    attachSpiceFromIsd(isd);
-
-
-  }
-
 
   //! Destroys the Cube object.
   Cube::~Cube() {
