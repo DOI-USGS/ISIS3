@@ -30,8 +30,6 @@ namespace Isis {
 
         void SetUp() override;
         void TearDown() override;
-        // void createCube(Pvl &label);
-        // void createCube(Pvl &label, nlohmann::json &isd);
    };
 
 }
