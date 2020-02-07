@@ -1,4 +1,4 @@
-spiceinit(&t#include <iostream>
+#include <iostream>
 #include <QTemporaryFile>
 
 #include "spiceinit.h"
@@ -80,7 +80,6 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   Pvl label;
   labelStrm >> label;
 
-
   QTemporaryFile tempFile;
   Cube testCube;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
@@ -89,7 +88,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube->group("Kernels");
+  PvlGroup kernels = testCube.group("Kernels");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 3);
@@ -178,7 +177,7 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube->group("Kernels");
+  PvlGroup kernels = testCube.group("Kernels");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 4);
@@ -289,7 +288,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube->group("Kernels");
+  PvlGroup kernels = testCube.group("Kernels");
 
   EXPECT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   EXPECT_TRUE(kernels.hasKeyword("LeapSecond"));
@@ -307,7 +306,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
 
   spiceinit(&testCube, options);
 
-  PvlGroup secondKernels = testCube->group("Kernels");
+  PvlGroup secondKernels = testCube.group("Kernels");
 
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, secondKernels, kernels);
 }
@@ -394,7 +393,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
 
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube->group("Kernels");
+  PvlGroup kernels = testCube.group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   ASSERT_EQ(kernels["InstrumentPointing"].size(), 1);
@@ -491,7 +490,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
 
   spiceinit(&testCube, options);
 
-  PvlGroup kernels = testCube->group("Kernels");
+  PvlGroup kernels = testCube.group("Kernels");
 
   ASSERT_TRUE(kernels.hasKeyword("StartPadding"));
   ASSERT_EQ(kernels["StartPadding"].size(), 1);
