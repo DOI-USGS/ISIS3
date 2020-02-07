@@ -44,7 +44,7 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-  - ale >=0.7.1
+  - ale==0.7.1
   - boost=1.68.0
   - armadillo==8.200.0
   - blas
@@ -100,7 +100,7 @@ requirements:
   - zlib
 
   run:
-  - ale >=0.7.1
+  - ale==0.7.1
   - boost=1.68.0
   - armadillo==8.200.0
   - blas
