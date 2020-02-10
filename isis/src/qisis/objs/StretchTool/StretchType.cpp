@@ -59,6 +59,10 @@ namespace Isis {
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
+    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube!");
+    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
+    p_mainLayout->addWidget(saveToCubeButton, 4, 0);
+
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     sizePolicy.setHeightForWidth(true);
     p_graph->setSizePolicy(sizePolicy);
@@ -172,6 +176,10 @@ namespace Isis {
     stream << stretch.Text() << endl;
 
     outfile.close();
+  }
+
+  void StretchType::emitTest() {
+    emit saveToCube(); 
   }
 
 

@@ -21,7 +21,10 @@ namespace Isis {
     p_bluStretch = NULL;
     p_enabled = false;
 
+    setWindowTitle("Advanced Stretch Tool");
+
     QHBoxLayout *layout = new QHBoxLayout();
+    
     setLayout(layout);
   }
 

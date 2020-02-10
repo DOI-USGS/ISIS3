@@ -41,8 +41,13 @@ namespace Isis {
     signals:
       //! Emitted when a new stretch is available
       void stretchChanged();
+      void saveToCube(); 
+
+  protected slots: 
+    void saveMe(); 
 
     protected:
+
 
     private:
       QStackedWidget *p_stretchTypeStack; //!< StretchType's

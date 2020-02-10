@@ -51,6 +51,8 @@ namespace Isis {
             this, SLOT(advancedStretchChanged()));
     connect(m_advancedStretch, SIGNAL(visibilityChanged()),
             this, SLOT(updateTool()));
+    connect(m_advancedStretch, SIGNAL(saveToCube()),
+            this, SLOT(saveMe()));
 
     QPushButton *hiddenButton = new QPushButton();
     hiddenButton->setVisible(false);
@@ -368,6 +370,29 @@ namespace Isis {
                                             bluStretch, bluHist);
       }
     }
+  }
+
+
+  void StretchTool::saveMe() {
+    QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
+
+//    MdiCubeViewport *cvp = cubeViewport();
+//    Cube* icube = cvp->cube();
+
+    //  If cube readonly print error
+//    if (icube->isReadOnly()) {
+//      QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
+//      return;
+//    }
+
+
+//    QMessageBox::information((QWidget *) parent(), "Worked" , "vp->cube()->Lines()"); 
+    
+//    Stretch stretch = getStretch();
+
+    //Add the pairs to the file
+//    stream << stretch.Text() << endl;
+
   }
 
   /**

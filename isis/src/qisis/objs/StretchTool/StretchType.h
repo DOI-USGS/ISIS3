@@ -72,11 +72,13 @@ namespace Isis {
 
     signals:
       //! Emitted when a new Stretch object is available
+      void saveToCube();
       void stretchChanged();
-
 
     private slots:
       void savePairs();
+      void emitTest(); 
+
   };
 };
 

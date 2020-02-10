@@ -5,8 +5,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QMessageBox>
 
 #include "Stretch.h"
+#include "StretchTool.h"
 #include "IString.h"
 #include "IException.h"
 #include "StretchType.h"
@@ -48,6 +50,7 @@ namespace Isis {
     LinearStretchType *linear = new LinearStretchType(hist, curStretch,
         name, color);
     connect(linear, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
+    connect(linear, SIGNAL(saveToCube()), this, SLOT(saveMe()));
     p_stretchTypeStack->addWidget(linear);
 
     SawtoothStretchType *sawtooth = new SawtoothStretchType(hist, curStretch,
@@ -72,6 +75,10 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
   }
 
+  void AdvancedStretch::saveMe() {
+    Cube* icube = ((StretchTool*)parentWidget())->cubeViewport()->cube(); 
+    QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read here Only");
+  }
 
   /**
    * Destructor
