@@ -472,7 +472,7 @@ namespace Isis {
     double dr = ( 1.0 + (p_k1 * r2) + (p_k2 * r4) + (p_k3 * r6) ) /
                 ( 1.0 + (p_k4 * r2) + (p_k5 * r4) + (p_k6 * r6) );
 
-    // Tangential contributions
+    // Decentering contributions
     double dt_x = ( 2.0 * p_p1 * xp * yp ) + ( ( p_p2 * r2 ) + ( p_p2 * 2.0 * xp * xp ) );
     double dt_y = ( ( ( p_p1 * r2 ) + ( p_p1 * 2.0 * yp * yp ) ) + ( 2.0 * p_p2 * xp * yp ) );
 
