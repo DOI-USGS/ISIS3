@@ -175,7 +175,7 @@ pipeline {
                                 env.STAGE_STATUS = "Running gtests on ${label}"
                                 sh """
                                     source activate ${condaPath}/envs/isis
-                                    ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
+                                    ctest -R "." -E "(_app_|_unit_|_module_)" -j1 -VV
                                 """
                             }
                             catch(e) {

@@ -73,6 +73,15 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
+  /**
+   * Initialize Cube data from a PVL label.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label to use when initializing cube 
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
     PvlObject cubeLabel = label.findObject("IsisCube");
     PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
@@ -92,6 +101,16 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label to use when initializing cube 
+   * @param isd Ale compatible ISD to be used for initing spice data
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
   void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
     fromLabel(fileName, label, access);
     attachSpiceFromIsd(isd);

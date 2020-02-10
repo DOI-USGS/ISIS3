@@ -82,6 +82,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
   QTemporaryFile tempFile;
   Cube testCube;
+std::cout << tempFile.fileName() << std::endl;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"};
@@ -171,6 +172,7 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
 
   QTemporaryFile tempFile;
   Cube testCube;
+std::cout << tempFile.fileName() << std::endl;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
@@ -282,6 +284,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
 
   QTemporaryFile tempFile;
   Cube testCube;
+std::cout << tempFile.fileName() << std::endl;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
@@ -386,6 +389,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
 
   QTemporaryFile tempFile;
   Cube testCube;
+std::cout << tempFile.fileName() << std::endl;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
@@ -483,6 +487,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
 
   QTemporaryFile tempFile;
   Cube testCube;
+  std::cout << tempFile.fileName() << std::endl;
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
