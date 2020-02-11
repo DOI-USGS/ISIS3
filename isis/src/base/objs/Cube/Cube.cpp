@@ -107,7 +107,6 @@ namespace Isis {
    * @param fileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
    * @param label PVL label to use when initializing cube 
-   * @param isd Ale compatible ISD to be used for initing spice data
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
    */
@@ -118,7 +117,20 @@ namespace Isis {
     close();
     open(fileName.toString(), access);
   }
-
+  
+  void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
+    std::ifstream isdStream(isdFile.expanded().toStdString());
+    std::ifstream labelStream(labelFile.expanded().toStdString());
+    
+    Pvl label;
+    nlohmann::json isd;
+    
+    isdStream >> isd;
+    labelStream >> label;
+    
+    fromIsd(fileName, label, isd, access);
+    reopen("rw");  
+  }
 
   //! Destroys the Cube object.
   Cube::~Cube() {
