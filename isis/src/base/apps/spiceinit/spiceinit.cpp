@@ -35,7 +35,6 @@ namespace Isis {
                   Kernel exk);
 
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName);
-  
 
   /**
    * Spiceinit a cube in an Application
