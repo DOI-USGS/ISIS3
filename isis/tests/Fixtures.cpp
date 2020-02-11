@@ -187,12 +187,11 @@ namespace Isis {
     })");
 
     // call constructor
-    Cube testCube;
-    
-    testCube.fromIsd(tempFile.fileName() + ".cub", label, testIsd, "rw");
+    testCube = new Cube();
+    testCube->fromIsd(tempFile.fileName() + ".cub", label, testIsd, "rw");
 
-    // reopen to write out new data 
-    testCube.reopen("rw");
+    // reopen to write out new data
+    testCube->reopen("rw");
   }
 
   void TestCube::TearDown() {

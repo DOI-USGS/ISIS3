@@ -28,6 +28,11 @@ namespace Isis{
   void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints, Pvl *log);
 
   void campt(UserInterface &ui, Pvl *log) {
+    Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
+    campt(cube, ui, log);
+  }
+
+  void campt(Cube *cube, UserInterface &ui, Pvl *log) {
     // Setup our input cube
     CameraPointInfo campt;
 
@@ -37,7 +42,7 @@ namespace Isis{
     else
         campt.SetCSVOutput(true);
 
-    campt.SetCube( ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString() );
+    campt.SetCube(cube->fileName());
 
     // Grab the provided points (coordinates)
     QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));
