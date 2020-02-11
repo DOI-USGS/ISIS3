@@ -10,9 +10,7 @@ using namespace Isis;
 
 QString CAMPT_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
 
-
 TEST_F(TestCube, BadColumnError) {
-
   // set up bad coordinates file
   std::ofstream of;
   QTemporaryFile badList;
@@ -24,11 +22,11 @@ TEST_F(TestCube, BadColumnError) {
   // configure UserInterface arguments
   QVector<QString> args = {"to=output.pvl", "coordlist=" + badList.fileName(),
                            "coordtype=image"};
-  UserInterface options1(CAMPT_XML, args);
+  UserInterface options(CAMPT_XML, args);
   Pvl appLog;
 
   try {
-    campt(testCube, options1, &appLog);
+    campt(testCube, options, &appLog);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
@@ -45,11 +43,11 @@ TEST_F(TestCube, BadColumnError) {
 TEST_F(TestCube, FlatFileError) {
   // configure UserInterface arguments for flat file error
   QVector<QString> args = {"format=flat"};
-  UserInterface options3(CAMPT_XML, args);
+  UserInterface options(CAMPT_XML, args);
   Pvl appLog;
 
   try {
-    campt(testCube, options3, &appLog);
+    campt(testCube, options, &appLog);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
