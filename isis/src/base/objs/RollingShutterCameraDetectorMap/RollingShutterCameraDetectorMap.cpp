@@ -141,7 +141,7 @@ namespace Isis {
     double currentLine = line;
 
     int iterations = 0;
-    int maxIterations = 20;
+    int maxIterations = 50;
 
     p_detectorSample = sample;
     p_detectorLine   = line;

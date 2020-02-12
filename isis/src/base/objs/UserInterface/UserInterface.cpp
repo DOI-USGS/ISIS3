@@ -603,6 +603,8 @@ namespace Isis {
               }
             }
           }
+
+          cout << commandline << endl;
           return;
         }
 
