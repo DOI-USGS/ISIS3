@@ -106,7 +106,7 @@ namespace Isis {
    *
    * @param fileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
-   * @param label PVL label object reprenting the new Cube label  
+   * @param label PVL label object representing the new Cube label  
    * @param isd JSON object containing Ale compatible ISD
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
