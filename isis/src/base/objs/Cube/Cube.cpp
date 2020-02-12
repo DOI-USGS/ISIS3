@@ -106,7 +106,8 @@ namespace Isis {
    *
    * @param fileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
-   * @param label PVL label to use when initializing cube 
+   * @param label PVL label object to use  
+   * @param isd JSON object containing Ale compatible ISD
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
    */
@@ -118,6 +119,16 @@ namespace Isis {
     open(fileName.toString(), access);
   }
   
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param labelFile Path to PVL label  
+   * @param isdPath Path to Ale compatible ISD
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
   void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
     std::ifstream isdStream(isdFile.expanded().toStdString());
     std::ifstream labelStream(labelFile.expanded().toStdString());

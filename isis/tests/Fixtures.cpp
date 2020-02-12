@@ -10,9 +10,6 @@ namespace Isis {
     cubeLabel >> label;
 
     testCube->fromIsd(tempFile.fileName() + ".cub", label, isd, "rw");
-
-    // reopen to write out new data 
-    testCube->reopen("rw");
   }
 
 
