@@ -1,0 +1,164 @@
+#include <iostream>
+#include <QTemporaryDir>
+
+#include "cnetcheck.h"
+
+#include "Cube.h"
+#include "CubeAttribute.h"
+#include "PixelType.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "TestUtilities.h"
+#include "FileName.h"
+#include "ControlNet.h"
+#include "SerialNumber.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+
+#include "Fixtures.h"
+#include "gmock/gmock.h"
+
+using namespace Isis;
+
+static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetcheck.xml").expanded();
+
+TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckCamera) {
+  QTemporaryDir prefix; 
+  ASSERT_TRUE(prefix.isValid());
+
+  QVector<QString> args = {"fromlist="+cubeListTempPath.fileName(), "prefix="+prefix.path()+"/", "nocube=false", "lowcoverage=false"};
+  UserInterface options(APP_XML, args);
+  
+  QString cube1Serial = SerialNumber::Compose(*cube1->label());
+  QString cube2Serial = SerialNumber::Compose(*cube2->label());
+  
+  // Add measure guarenteed to fail computing lat/lon
+  ControlMeasure *m1 = new ControlMeasure();
+  m1->SetAprioriLine(481);
+  m1->SetAprioriSample(481);
+  m1->SetCamera(cube1->camera());
+  m1->SetCubeSerialNumber(cube1Serial);
+ 
+  ControlMeasure *m2 = new ControlMeasure();
+  m2->SetAprioriLine(999);
+  m2->SetAprioriSample(999);
+  m2->SetCamera(cube2->camera());
+  m2->SetCubeSerialNumber(cube2Serial);
+  
+  ControlPoint *newPoint = new ControlPoint(); 
+  newPoint->Add(m1);
+  newPoint->Add(m2);
+  
+  network->AddPoint(newPoint);
+  
+  Pvl log;
+  QString results = cnetcheck(*network, *cubeList, options, &log);
+    
+  std::ifstream f(prefix.path().toStdString() + "/NoLatLon.txt");
+  std::string ret((std::istreambuf_iterator<char>(f)),
+                 std::istreambuf_iterator<char>()); 
+  
+  EXPECT_THAT(ret, testing::HasSubstr(cube1Serial.toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube2Serial.toStdString()));
+
+  EXPECT_THAT(ret, testing::HasSubstr(cube1->fileName().toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube2->fileName().toStdString()));
+  
+  PvlGroup pvlResults = log.findGroup("Results");
+  EXPECT_TRUE((int)pvlResults.findKeyword("Islands") == 1);
+  EXPECT_TRUE((int)pvlResults.findKeyword("NoLatLonCubes") == 2);
+  EXPECT_FALSE(pvlResults.hasKeyword("SingleCube"));
+}
+
+
+TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
+  // remove all controlpoints from test network
+  QList<ControlPoint*> cpoints = network->GetPoints();
+
+  for (size_t i = 0; i<cpoints.size(); i++) {
+    network->DeletePoint(cpoints[i]);
+  }
+
+  QTemporaryDir prefix; 
+  ASSERT_TRUE(prefix.isValid());
+
+  QVector<QString> args = {"fromlist="+cubeListTempPath.fileName(), "prefix="+prefix.path()+"/", "delimit=comma", "lowcoverage=false", "cnet=test"};
+  UserInterface options(APP_XML, args);
+   
+  Pvl log;
+  cnetcheck(*network, *cubeList, options, &log);
+   
+  std::ifstream f(prefix.path().toStdString() + "/NoControl.txt");
+  std::string ret((std::istreambuf_iterator<char>(f)),
+                 std::istreambuf_iterator<char>());  
+
+  EXPECT_THAT(ret, testing::HasSubstr(cube1->fileName().toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube2->fileName().toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube3->fileName().toStdString()));
+  
+  PvlGroup pvlResults = log.findGroup("Results");
+  EXPECT_EQ((int)pvlResults.findKeyword("Islands"), 0);
+  EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 3);
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
+  
+  // Add measure with fake serials not in the cubelist
+  ControlMeasure *m1 = new ControlMeasure();
+  m1->SetAprioriLine(481);
+  m1->SetAprioriSample(481);
+  m1->SetCamera(cube1->camera());
+  m1->SetCubeSerialNumber("thisIsFakeLol");
+
+  ControlMeasure *m2 = new ControlMeasure();
+  m2->SetAprioriLine(481);
+  m2->SetAprioriSample(481);
+  m2->SetCamera(cube1->camera());
+  m2->SetCubeSerialNumber("thisIsFakeLol2");
+
+  ControlPoint *newPoint = new ControlPoint(); 
+  newPoint->Add(m1);
+  newPoint->Add(m2);
+  
+  network->AddPoint(newPoint);
+
+  // append cube not in network
+  FileName c("data/defaultImage/defaultCube.pvl");
+  cubeList->append(c.expanded());
+
+  QTemporaryDir prefix; 
+  ASSERT_TRUE(prefix.isValid());
+
+  QVector<QString> args = {"fromlist="+cubeListTempPath.fileName(), "prefix="+prefix.path()+"/", "tolerance=0.95"};
+  UserInterface options(APP_XML, args);
+  
+  Pvl log;
+  cnetcheck(*network, *cubeList, options, &log);
+  
+  PvlGroup pvlResults = log.findGroup("Results");
+  
+  std::ifstream f(prefix.path().toStdString() + "/SingleCube.txt");
+  std::string singlecube((std::istreambuf_iterator<char>(f)),
+                 std::istreambuf_iterator<char>());  
+  EXPECT_THAT(singlecube, testing::HasSubstr("thisIsFakeLol"));
+  EXPECT_THAT(singlecube, testing::HasSubstr("thisIsFakeLol2"));
+ 
+  std::ifstream f2(prefix.path().toStdString() + "/LowCoverage.txt");
+  std::string lowcov((std::istreambuf_iterator<char>(f2)),
+                 std::istreambuf_iterator<char>());  
+
+  EXPECT_THAT(lowcov, testing::HasSubstr(cube1->fileName().toStdString()));
+  EXPECT_THAT(lowcov, testing::HasSubstr(cube2->fileName().toStdString()));
+  EXPECT_THAT(lowcov, testing::HasSubstr(cube3->fileName().toStdString()));
+
+  EXPECT_EQ((int)pvlResults.findKeyword("Islands"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("SingleCube"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("NoCube"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 1);
+  EXPECT_EQ((int)pvlResults.findKeyword("LowCoverage"), 3);
+}
+
+
+
+
