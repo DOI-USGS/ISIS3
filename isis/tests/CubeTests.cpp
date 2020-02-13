@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 using namespace Isis;
 
-TEST_F(TestCube, TestCubeAttachSpiceFromIsd) {
+TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
   std::istringstream labelStrm(R"(
     Object = IsisCube
       Object = Core
@@ -204,11 +204,13 @@ TEST_F(TestCube, TestCubeAttachSpiceFromIsd) {
       ]
     }
   })");
-  
+
   Pvl label;
   labelStrm >> label;
-  
-  createCube(label, isd);
+
+  QTemporaryFile tempFile;
+  Cube testCube;
+  testCube.fromIsd(tempFile.fileName() + ".cub", label, isd, "rw");
 
   PvlGroup kernels = testCube.group("Kernels");
 
@@ -227,6 +229,6 @@ TEST_F(TestCube, TestCubeAttachSpiceFromIsd) {
   EXPECT_TRUE(kernels.hasKeyword("CameraVersion"));
 
   Camera *cam = testCube.camera();
-  
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Visual Imaging Subsystem Camera B");
 }
