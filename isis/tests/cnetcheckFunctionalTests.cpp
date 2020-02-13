@@ -103,18 +103,15 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
-  
-  // Add measure with fake serials not in the cubelist
+  // Add measures with fake serials not in the cubelist
   ControlMeasure *m1 = new ControlMeasure();
   m1->SetAprioriLine(481);
   m1->SetAprioriSample(481);
-  m1->SetCamera(cube1->camera());
   m1->SetCubeSerialNumber("thisIsFakeLol");
 
   ControlMeasure *m2 = new ControlMeasure();
   m2->SetAprioriLine(481);
   m2->SetAprioriSample(481);
-  m2->SetCamera(cube1->camera());
   m2->SetCubeSerialNumber("thisIsFakeLol2");
 
   ControlPoint *newPoint = new ControlPoint(); 
