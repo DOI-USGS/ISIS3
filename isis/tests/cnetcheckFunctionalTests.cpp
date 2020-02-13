@@ -102,6 +102,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
   EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 3);
 }
 
+
 TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
   // Add measures with fake serials not in the cubelist
   ControlMeasure *m1 = new ControlMeasure();
@@ -155,7 +156,4 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
   EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 1);
   EXPECT_EQ((int)pvlResults.findKeyword("LowCoverage"), 3);
 }
-
-
-
 
