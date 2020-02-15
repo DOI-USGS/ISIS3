@@ -83,6 +83,9 @@ class PvlObject;
  *
  * @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
  *                          were signaled. References #2248.
+ *
+ * @history 2019-12-05 Adam Paquette - Changed how kernels are loaded so CkSpiceSegment
+ *                          no longer needs to use the Spice class.
  */
 class CkSpiceSegment {
   public:

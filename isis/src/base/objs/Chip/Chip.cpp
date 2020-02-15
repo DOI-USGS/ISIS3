@@ -981,7 +981,7 @@ namespace Isis {
             interp.Interpolate(CubeSample(), CubeLine(), port.DoubleBuffer());
         }
         else {
-          geos::geom::Point *pnt = globalFactory.createPoint(
+          geos::geom::Point *pnt = globalFactory->createPoint(
                                      geos::geom::Coordinate(CubeSample(), CubeLine()));
           if (pnt->within(m_clipPolygon)) {
             port.SetPosition(CubeSample(), CubeLine(), band);

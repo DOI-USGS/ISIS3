@@ -21,9 +21,9 @@ commands:
 	fk='$$lro/kernels/fk/lro_frames_2014049_v01.tf' \
 	iak='$$lro/kernels/iak/lro_instrumentAddendum_v04.ti' \
 	shape=user \
-	model='$$base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub' > /dev/null;
+	model='$$base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub' >/dev/null 2>&1;
 
-	spiceinit from=$(OUTPUT)/M136241759RE.cub
+	spiceinit from=$(OUTPUT)/M136241759RE.cub \
 	ls='$$base/kernels/lsk/naif0012.tls' \
 	pck='($$base/kernels/pck/pck00009.tpc,$$lro/kernels/pck/moon_080317.tf,$$lro/kernels/pck/moon_assoc_me.tf)' \
 	tspk='($$lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,$$lro/kernels/tspk/de421.bsp)' \
@@ -33,35 +33,22 @@ commands:
 	fk='$$lro/kernels/fk/lro_frames_2014049_v01.tf' \
 	iak='$$lro/kernels/iak/lro_instrumentAddendum_v04.ti' \
 	shape=user \
-	model='$$base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub' > /dev/null;
+	model='$$base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub' >/dev/null 2>&1;
 
 	$(APPNAME) FROMLIST=$(OUTPUT)/files.lis TO=$(OUTPUT)/lroc.bc > /dev/null;
 	$(RM) $(OUTPUT)/files.lis
+	frmdiff -t basic -k $(INPUT)/naif0012.tls $(INPUT)/lro_clkcor_2019331_v00.tsc $(INPUT)/lro_frames_2014049_v01.tf -s 1 $(OUTPUT)/lroc.bc $(INPUT)/lroc.bc > $(OUTPUT)/diff_output.txt
+	echo "Group=Tolerance" >> $(OUTPUT)/tolerance.pvl
+	echo -n "  Max=" >> $(OUTPUT)/tolerance.pvl
+	egrep -o "[-+]*[0-9]*\.[0-9]*E[-+][0-9]*" $(OUTPUT)/diff_output.txt | head -n 1 >> $(OUTPUT)/tolerance.pvl
+	echo -n "  Average=" >> $(OUTPUT)/tolerance.pvl
+	egrep -o "[-+]*[0-9]*\.[0-9]*E[-+][0-9]*" $(OUTPUT)/diff_output.txt | tail -n 1 >> $(OUTPUT)/tolerance.pvl
+	echo "End_Group" >> $(OUTPUT)/tolerance.pvl
+	echo "End" >> $(OUTPUT)/tolerance.pvl
 
-	#  Only use 12 digits in the output of tabledump due to precision issues
-	# do for each cube
-	getkey from=$(OUTPUT)/M136241759RE.cub objnam=isiscube grpname=Kernels keyword=InstrumentPointing keyindex=2 > $(OUTPUT)/extra.ck;
-	spiceinit from=$(OUTPUT)/M136241759RE.cub ck=$(OUTPUT)/lroc.bc \
-          extra=`cat $(OUTPUT)/extra.ck` > /dev/null;
-	tabledump from=$(OUTPUT)/M136241759RE.cub to=$(OUTPUT)/M136241759RE.dat \
-	  name=InstrumentPointing > /dev/null;
-	cat $(OUTPUT)/M136241759RE.dat \
-	  | sed 's/\([0-9][0-9]*\.[0-9]\{12\}\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/M136241759RE.txt;
-
-	getkey from=$(OUTPUT)/M103189611LE.cub objnam=isiscube grpname=Kernels keyword=InstrumentPointing keyindex=2 > $(OUTPUT)/extra.ck;
-	spiceinit from=$(OUTPUT)/M103189611LE.cub ck=$(OUTPUT)/lroc.bc \
-          extra=`cat $(OUTPUT)/extra.ck` > /dev/null;
-	tabledump from=$(OUTPUT)/M103189611LE.cub to=$(OUTPUT)/M103189611LE.dat \
-	  name=InstrumentPointing > /dev/null;
-	cat $(OUTPUT)/M103189611LE.dat \
-	  | sed 's/\([0-9][0-9]*\.[0-9]\{12\}\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/M103189611LE.txt;
-
-	$(RM) $(OUTPUT)/M103189611LE.dat;
 	$(RM) $(OUTPUT)/M103189611LE.cub;
-	$(RM) $(OUTPUT)/M136241759RE.dat;
 	$(RM) $(OUTPUT)/M136241759RE.cub;
+	$(RM) $(OUTPUT)/diff_output.txt;
 	$(RM) $(OUTPUT)/lroc.bc;
 	$(RM) $(OUTPUT)/extra.ck;
 

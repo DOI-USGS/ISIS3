@@ -33,14 +33,14 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.9.0")
+set(VERSION            "4.0.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2019-08-26")
+string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
 set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
@@ -163,13 +163,15 @@ set(thirdPartyCppFlags -Wall
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
-		       -Wno-strict-overflow
+                       -DUSE_UNSTABLE_GEOS_CPP_API=1
+		               -Wno-strict-overflow
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
  # Append CPP flags set in the third party lib file to the string set in this file.
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
 
@@ -193,7 +195,7 @@ endif()
 if(APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og")
 endif()
 
 # Paths to required executables
@@ -258,6 +260,8 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
+find_package(ale               REQUIRED)
+find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -265,16 +269,17 @@ find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
 find_package(GMM       5.0     REQUIRED)
+SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
-find_package(PCL       1.8     REQUIRED)
+find_package(PCL               REQUIRED)
 find_package(Protobuf  2.6.1   REQUIRED)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
-find_package(TIFF      4.0.5   REQUIRED)
+find_package(TIFF      4.0.0   REQUIRED)
 find_package(TNT       126     REQUIRED)
 find_package(XercesC   3.1.2   REQUIRED)
 find_package(X11       6       REQUIRED)
@@ -425,6 +430,11 @@ EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
+# Install the header files
+install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+file(GLOB ISIS_INCLUDE_FILES ${CMAKE_BINARY_DIR}/inc/*)
+install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.
 file(GLOB existingPlugins "${CMAKE_BINARY_DIR}/plugins/*.plugin")
@@ -442,6 +452,9 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
+
+# Create the version file
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/version)
 
 # Set up install of the templates folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/templates DESTINATION .)
@@ -487,13 +500,12 @@ add_custom_target(clean_source COMMAND rm -rf "${CMAKE_BINARY_DIR}/*" "${CMAKE_I
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/IsisPreferences   ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/scripts           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.txt    ${CMAKE_BINARY_DIR})
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/version           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BINARY_DIR})
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.txt  DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 
 # Trigger all post-install behavior.

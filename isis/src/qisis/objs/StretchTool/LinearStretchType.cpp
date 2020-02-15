@@ -120,6 +120,12 @@ namespace Isis {
         inMax += p_cubeHist->BinSize();
       }
 
+      // Handles case where the histogram bin size=0
+      if (inMin == inMax) {
+        inMin -= 1.0;
+        inMax += 1.0;
+      }
+
       interpretted.AddPair(inMin, 0);
       interpretted.AddPair(inMax, 255);
     }

@@ -50,6 +50,7 @@
 #include "SpecialPixel.h"
 #include "Statistics.h"
 #include "TProjection.h"
+#include "Longitude.h"
 
 using namespace std;
 
@@ -72,6 +73,75 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
+  /**
+   * Initialize Cube data from a PVL label.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label object representing the new Cube label
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
+    PvlObject cubeLabel = label.findObject("IsisCube");
+    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    close();
+
+    setDimensions(dimensions["Samples"],
+                          dimensions["Lines"],
+                          dimensions["Bands"]);
+
+    create(fileName.expanded());
+
+    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
+      putGroup(*grpIt);
+    }
+
+    close();
+    open(fileName.toString(), access);
+  }
+
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label object representing the new Cube label  
+   * @param isd JSON object containing Ale compatible ISD
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
+    fromLabel(fileName, label, access);
+    attachSpiceFromIsd(isd);
+
+    close();
+    open(fileName.toString(), access);
+  }
+  
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param labelFile Path to PVL label representing the new Cube label
+   * @param isdPath Path to Ale compatible ISD
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
+    std::ifstream isdStream(isdFile.expanded().toStdString());
+    std::ifstream labelStream(labelFile.expanded().toStdString());
+    
+    Pvl label;
+    nlohmann::json isd;
+    
+    isdStream >> isd;
+    labelStream >> label;
+    
+    fromIsd(fileName, label, isd, access);
+    reopen("rw");  
+  }
 
   //! Destroys the Cube object.
   Cube::~Cube() {
@@ -1168,6 +1238,71 @@ namespace Isis {
       m_camera = CameraFactory::Create(*this);
     }
     return m_camera;
+  }
+
+
+  void Cube::attachSpiceFromIsd(nlohmann::json isd) {
+    PvlKeyword lkKeyword("LeapSecond");
+    PvlKeyword pckKeyword("TargetAttitudeShape");
+    PvlKeyword targetSpkKeyword("TargetPosition");
+    PvlKeyword ckKeyword("InstrumentPointing");
+    PvlKeyword ikKeyword("Instrument");
+    PvlKeyword sclkKeyword("SpacecraftClock");
+    PvlKeyword spkKeyword("InstrumentPosition");
+    PvlKeyword iakKeyword("InstrumentAddendum");
+    PvlKeyword demKeyword("ShapeModel");
+    PvlKeyword exkKeyword("Extra");
+
+    Spice spice(*this->label(), isd);
+    Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
+    ckTable.Label() += PvlKeyword("Kernels");
+
+    for (int i = 0; i < ckKeyword.size(); i++)
+      ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
+
+    this->write(ckTable);
+
+    Table spkTable = spice.instrumentPosition()->Cache("InstrumentPosition");
+    spkTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < spkKeyword.size(); i++)
+      spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
+
+    this->write(spkTable);
+
+    Table bodyTable = spice.bodyRotation()->Cache("BodyRotation");
+    bodyTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    for (int i = 0; i < pckKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
+
+    bodyTable.Label() += PvlKeyword("SolarLongitude",
+        toString(spice.solarLongitude().degrees()));
+    this->write(bodyTable);
+
+    Table sunTable = spice.sunPosition()->Cache("SunPosition");
+    sunTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    this->write(sunTable);
+
+    PvlGroup currentKernels = this->group("Kernels");
+
+    Pvl *label = this->label();
+    int i = 0;
+    while (i < label->objects()) {
+      PvlObject currObj = label->object(i);
+      if (currObj.isNamed("NaifKeywords")) {
+        label->deleteObject(i);
+      }
+      else {
+        i ++;
+      }
+    }
+
+    *(this->label()) += spice.getStoredNaifKeywords();
   }
 
 

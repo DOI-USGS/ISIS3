@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
+ *   http://www.usgs.gov/privacy.html.
  */
 
 #include <QtGlobal>
@@ -35,13 +35,13 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Initialize the singleton factory pointer 
+   * Initialize the singleton factory pointer
    */
   EmbreeTargetManager *EmbreeTargetManager::m_maker = 0;
 
 
   /**
-   * This constructor will initialize the EmbreeTargetManager object to default 
+   * This constructor will initialize the EmbreeTargetManager object to default
    * values. The default maximum number of shape models held in memory is 10
    */
   EmbreeTargetManager::EmbreeTargetManager()
@@ -66,7 +66,7 @@ namespace Isis {
   /**
    * @brief Exit termination routine
    *
-   * This (static) method ensure this object is destroyed when Qt exits.  
+   * This (static) method ensure this object is destroyed when Qt exits.
    *
    * Note that it is error to add this to the system _atexit() routine because
    * this object utilizes Qt classes.  At the time the atexit call stack is
@@ -82,13 +82,13 @@ namespace Isis {
 
 
   /**
-   * @brief Retrieve reference to Singleton instance of this object 
-   *  
-   * The only access provided for Singleton instance of this object. All method 
-   * access is made through the pointer returned by this method. The object is 
-   * created upon the first call to this method. The object is deleted when Qt 
-   * shuts down. 
-   * 
+   * @brief Retrieve reference to Singleton instance of this object
+   *
+   * The only access provided for Singleton instance of this object. All method
+   * access is made through the pointer returned by this method. The object is
+   * created upon the first call to this method. The object is deleted when Qt
+   * shuts down.
+   *
    * @return @b EmbreeTargetManager* Pointer to Singleton instance of this object.
    */
   EmbreeTargetManager *EmbreeTargetManager::getInstance() {
@@ -101,11 +101,11 @@ namespace Isis {
 
   /**
    * Helper function that takes a file path and returns the full file path.
-   * 
+   *
    * @param filePath The file path to expand.
-   * 
+   *
    * @return @b QString The full file path.
-   * 
+   *
    * @see FileName::Expanded()
    */
   QString EmbreeTargetManager::fullFilePath(const QString &filePath) const {
@@ -120,27 +120,27 @@ namespace Isis {
    * EmbreeTargetShape then a pointer to that is returned. If the shape file
    * has not been loaded yet, then it is loaded and a pointer to the
    * EmbreeTargetShape is returned.
-   * 
+   *
    * In both cases, ownership of the pointer
    * is not passed. Use EmbreeTargetManager::free to notify the
    * EmbreeTargetManager that the pointer is no longer in use.
-   * 
+   *
    * The EmbreeTargetShapes take a large amount of time to create and memory to
    * store, so the manager limits the number that can be opened at one time. If
    * the limit is reached and a new one is requested, an error is thrown. Use
    * EmbreeTargetManager::setMaxCacheSize to change the maximum number of
    * EmbreeTargetShapes.
-   * 
+   *
    * @param shapeFile The path to the file to create an EmbreeTargetShape from
-   * 
+   *
    * @return @b EmbreeTargetShape* A pointer to the loaded target shape. The
    *                               manager still owns the object so it should
    *                               not be deleted. Use EmbreeTargetManager::free
    *                               to notify the manager that it is no longer
    *                               in use.
-   * 
+   *
    * @see EmbreeTargetManager::free
-   * 
+   *
    * @throws IException::Programmer
    */
   EmbreeTargetShape *EmbreeTargetManager::create(const QString &shapeFile) {
@@ -158,7 +158,7 @@ namespace Isis {
 
     // First check how many already exist
     if ( m_targeCache.size() >= maxCacheSize() ) {
-      QString msg = "Failed creating EmbreeTargetShape for [" + fullPath
+      QString msg = "Failed creating EmbreeTargetShape for [" + shapeFile
                     + "] Too many EmbreeTargetShapes are already open.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -177,14 +177,14 @@ namespace Isis {
    * method will decrease the internal reference count for the target shape.
    * Then if there are not more references. the EmbreeTargetShape is destroyed
    * to free up memory.
-   * 
+   *
    * @param shapeFile The path to the file used to create the EmbreeTargetShape.
    *                  This should be the same as the parameter used with
    *                  EmbreeTargetManager::create to get a pointer to the
    *                  EmbreeTargetShape.
-   * 
+   *
    * @see EmbreeTargetManager::free
-   * 
+   *
    * @throws IException::Programmer
    */
   void EmbreeTargetManager::free(const QString &shapeFile) {
@@ -216,12 +216,12 @@ namespace Isis {
    * EmbreeTargetShapeContainer destructor does not delete the
    * EmbreeTargetShape, so this should be used to free delete anything from the
    * cache.
-   * 
+   *
    * @param shapeFile The path to the shape file used to create the
    *                  EmbreeTargetShape that will be removed.
-   * 
+   *
    * @see EmbreeTargetManager::free
-   * 
+   *
    * @throws IException::Programmer
    */
   void EmbreeTargetManager::removeTargetShape(const QString &shapeFile) {
@@ -244,7 +244,7 @@ namespace Isis {
 
   /**
    * Return the number of currently stored EmbreeTargetShapes.
-   * 
+   *
    * @return @b int The number of currently stored EmbreeTargetShapes.
    */
   int EmbreeTargetManager::currentCacheSize() const {
@@ -254,7 +254,7 @@ namespace Isis {
 
   /**
    * Return the maximum number of stored EmbreeTargetShapes.
-   * 
+   *
    * @return @b int The maximum number of stored EmbreeTargetShapes.
    */
   int EmbreeTargetManager::maxCacheSize() const {
@@ -267,7 +267,7 @@ namespace Isis {
    * retroactively. If there are more stored EmbreeTargetShapes than the new
    * maximum, then they will remain and new EmbreeTargetShapes cannot be
    * created until the number currently open goes below the maximum.
-   * 
+   *
    * @param numShapes The new maximum number of stored EmbreeTargetShapes.
    */
   void EmbreeTargetManager::setMaxCacheSize(const int &numShapes) {
@@ -277,7 +277,7 @@ namespace Isis {
 
   /**
    * Check if there is an already created EmbreeTargetShape for a file.
-   * 
+   *
    * @param shapeFile The path to the file to check for
    */
   bool EmbreeTargetManager::inCache(const QString &shapeFile) const{

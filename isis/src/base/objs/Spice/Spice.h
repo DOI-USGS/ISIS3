@@ -294,9 +294,9 @@ namespace Isis {
   class Spice {
     public:
       // constructors
-      Spice(Pvl &cubeLabel);
       Spice(Cube &cube);
       Spice(Cube &cube, bool noTables);
+      Spice(Pvl &lab, nlohmann::json);
 
       // destructor
       virtual ~Spice();
@@ -307,6 +307,8 @@ namespace Isis {
       void instrumentBodyFixedPosition(double p[3]) const;
       void sunPosition(double p[3]) const;
       double targetCenterDistance() const;
+      double sunToBodyDist() const;
+      
       Longitude solarLongitude();
       void instrumentBodyFixedVelocity(double v[3]) const;
       iTime time() const;
@@ -335,7 +337,8 @@ namespace Isis {
       SpicePosition *instrumentPosition() const;
       SpiceRotation *bodyRotation() const;
       SpiceRotation *instrumentRotation() const;
-
+      
+      bool isUsingAle();
       bool hasKernels(Pvl &lab);
       bool isTimeSet(); 
 
@@ -392,8 +395,8 @@ namespace Isis {
       // Don't allow copies
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
-
-      void init(Pvl &lab, bool noTables);
+  
+      void init(Pvl &pvl, bool noTables, nlohmann::json isd = NULL);
 
       void load(PvlKeyword &key, bool notab);
       void computeSolarLongitude(iTime et);
@@ -436,6 +439,9 @@ namespace Isis {
 
       bool m_usingNaif; /**< Indicates whether we are reading values from the 
                              NaifKeywords PvlObject in cube*/
+
+      bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned 
+                            from ALE */
   };
 }
 

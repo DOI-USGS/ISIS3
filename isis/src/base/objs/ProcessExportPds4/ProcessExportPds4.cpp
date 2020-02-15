@@ -996,7 +996,11 @@ namespace Isis {
           specialConstantElement.appendChild(lowRepresentationSatElement); 
           break; }
 
-        case None: break;
+        case None:
+          break;
+
+        default:
+          break;
       }
 
 
