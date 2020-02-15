@@ -33,6 +33,9 @@ using namespace Isis;
 
 namespace Isis {
 
+  void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures,
+                                 QList <ControlMeasure *> *measToIgnor=NULL);
+
   void cnetwinnow(UserInterface &ui) {
     //build a histogram from the control net
     Progress progress;
