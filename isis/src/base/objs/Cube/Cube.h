@@ -238,6 +238,8 @@ namespace Isis {
       };
 
       void fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access);
+      void fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access);
+
       void fromLabel(const FileName &fileName, Pvl &label, QString access);
 
       bool isOpen() const;

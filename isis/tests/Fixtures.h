@@ -16,22 +16,45 @@
 #include "Cube.h"
 #include "Pvl.h"
 #include "PvlObject.h"
+#include "ControlNet.h"
+#include "FileList.h"
 
 using json = nlohmann::json;
 
 namespace Isis {
 
-   class TestCube : public ::testing::Test {
+   class DefaultCube : public ::testing::Test {
       protected:
         Cube *testCube;
         QTemporaryFile tempFile;
+
         Pvl label;
-        json testIsd;
+        json isd;
 
         void SetUp() override;
         void TearDown() override;
    };
 
+
+   class ThreeImageNetwork : public ::testing::Test {
+      protected:
+        
+        ControlNet *network; 
+
+        Cube *cube1;
+        Cube *cube2;
+        Cube *cube3;
+        
+        FileList *cubeList; 
+
+        QTemporaryFile cubeTempPath1;
+        QTemporaryFile cubeTempPath2;
+        QTemporaryFile cubeTempPath3;
+        QTemporaryFile cubeListTempPath; 
+
+        void SetUp() override;
+        void TearDown() override;
+   };
 }
 
 #endif
