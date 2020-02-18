@@ -63,7 +63,7 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
   }
 }
 
-TEST_F(DefaultCube, FunctionalTestCamptDefault) {
+TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   QVector<QString> args = {};
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -143,7 +143,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefault) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
   QVector<QString> args = {"sample=25.0", "line=25.0"};
-  UserInterface options(CAMPT_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -155,7 +155,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetS) {
   QVector<QString> args = {"sample=25.0"};
-  UserInterface options(CAMPT_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -167,7 +167,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetS) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetL) {
   QVector<QString> args = {"line=25.0"};
-  UserInterface options(CAMPT_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -179,7 +179,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetL) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetGround) {
   QVector<QString> args = {"type=ground", "latitude=10.181441241544", "longitude=255.89292858176"};
-  UserInterface options(CAMPT_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -196,7 +196,7 @@ TEST_F(DefaultCube, FunctionalTestCamptFlat) {
   flatFile.open();
 
   QVector<QString> args = {"format=flat", "to=" + flatFile.fileName(), "append=false"};
-  UserInterface options(CAMPT_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
