@@ -2,8 +2,9 @@
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`. For example, the tests for the Cube class should be in `CubeTests.cpp`.
 1. Add `#include <gtest/gtest.h>` to the file.
 1. Write your test cases.
+1. Delete old tests
 
-Note: If your tests require the use of ISIS' Null value, you will need to include SpecialPixel.h
+Note: If your tests require the use of ISIS's Null value, you will need to include SpecialPixel.h
 
 # General Testing Tips
 
@@ -48,11 +49,11 @@ INSTANTIATE_TEST_CASE_P(
 will ensure that the tests start with `BundleSettings`.
 
 # Test names
-We use gtest as our unit testing framework, but use ctest to actually run the tests. ctest will generate a test name from each test case defined in your unit test. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
+We use gtest as our unit testing framework, but use ctest to actually run the tests. The test name can be defined in the test definition. The naming convention for gtests is `UnitTest<Object><test case>` for unit tests and `FunctionalTest<app name><test case>` for app tests each in upper camel case. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
 
 To run the gtests for a specific class, use `ctest -R ClassName`
 
-To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`
+To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`. Not that this command simply excludes old Makefile based tests that contain the substrings `_app_` and `_unit_` in their respective names. 
 
 ## Basic tests
 `TEST(Foo, Bar)` will produce the test `Foo.Bar`.
@@ -86,11 +87,11 @@ This is a first step towards several places:
 
 ## Creating a basic callable function
 
-For the rest of this document we will use `appname` as the name of the application that is being worked on. Simple example at https://github.com/USGS-Astrogeology/ISIS3/tree/dev/isis/src/base/apps/crop 
+For the rest of this document, we will use `appname` as the name of the application that is being worked on. Simple example at https://github.com/USGS-Astrogeology/ISIS3/tree/dev/isis/src/base/apps/crop 
 
 1. In the `appname` folder create two new files, `appname.cpp` and `appname.h`. These files are where the application logic will live.
 1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`. If the application has a `from` cube, add a second function with the input cube `void appname(Cube incube, UserInterface &ui)`. 
-1. Copy the contents of `IsisMain` in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. Rewrite `void appname(UserInterface &ui)` to unpack the "from" cube into `void appname(Cube incube, UserInterface &ui)` (if the app doesn't take an input cube, simple copy the contents into` void appname(Cube incube, UserInterface &ui)`)
+1. Copy the contents of `IsisMain` in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. Rewrite `void appname(UserInterface &ui)` to unpack the "from" cube into `void appname(Cube incube, UserInterface &ui)` (if the app doesn't take an input cube, simple copy the contents into` void appname(Cube incube, UserInterface &ui)`). Similar if input is some other data structure (e.g. a ControlNet object or FileList object, add them as part of the input parameters, see spiceinit and cnetcheck tests for examples). 
 1. Copy any helper functions or global variables from `main.cpp` into `appname.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols, forward declare any helper function in `appname.cpp` and do not define them in `appname.h`. 
 1. Put all of the required includes in `appname.cpp` and `appname.h`.
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
@@ -147,10 +148,8 @@ Once the `appname` function is defined, the `appname(UserInterface &ui)` functio
 
 Most ISIS3 applications were designed to read their inputs from files and then output their results to the command line and/or files. Unfortunately, gtest is very poorly setup to test against files and the command line. To work around this, it is necessary to remove as much file and command line output from the new `appname` functions as possible. Here are some examples of how outputs can be separated from the application logic:
 
-1. Anything that would be logged to the terminal should be simply returned. This way, it can be programmatically validated in gtest. This in fact already needs to be done because of [issues](#if-your-application-uses-applicationlog) with `Application::Log()`.
-1. Anything that writes to a text file should be moved into a new function. Then, instead of passing a filename and opening that file in the function, pass an `ostream` pointer. This way, in the `appname(UserInterface &ui)` function, the file can be opened and an `ofstream` object can be passed in, but for testing a `ostringstream` object can be passed.
+1. Anything that would be logged to the terminal should be simply returned via the log pointer. This way, it can be programmatically validated in gtest. This in fact already needs to be done because of [issues](#if-your-application-uses-applicationlog) with `Application::Log()`.
 1. No input filenames should be passed as arguments. All files required by the program should be opened and converted into in-memory objects and then passed to the function. This will help eliminate the need for test data files in many applications. **Make sure that for Cubes the appropriate CubeAttributeInput and CubeAttributeOutput values are set!**
-1. Any complex objects needed by the function should be passed in as pointers. This allows for them to be mocked using [gmock](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md). This helps eliminate the need for test data files and better isolates the test. If the input object is broken somehow, a mock object will still operate for this test and instead of getting two failures, only the actually broken object's test will fail.
 
 ### Process, helper functions, and global variables
 Many ISIS3 applications make sure of the Process class and its sub-classes. While these classes make file I/O easier, they also tightly couple it to the application logic! Some of them can take objects like cubes instead of filenames, but not all of them. They may need to be refactored to use objects instead of filenames. For now, where-ever possible use objects, but it is acceptable to use filenames if an object cannot be used.
