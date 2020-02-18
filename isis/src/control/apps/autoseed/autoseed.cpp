@@ -478,13 +478,17 @@ namespace Isis {
     PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");
     pluginInfo.addKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
     pluginInfo.addKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
-    Application::Log(pluginInfo);
+    if (log) {
+      log->addGroup(pluginInfo);
+    }
 
     // inform user of any unused (invalid) keywords found in the def file
     if (unusedDefKeywords.keywords() != 0) {
       PvlGroup unusedKeywords(unusedDefKeywords);
       unusedKeywords.setName("InvalidKeyordsFoundInDefFile");
-      Application::Log(unusedKeywords);
+      if (log) {
+        log->addGroup(unusedKeywords);
+      }
     }
 
     // calc # of points and measures for results group in print.prt
@@ -505,8 +509,9 @@ namespace Isis {
     resultsGrp.addKeyword(msCountKeyword);
     resultsGrp.addKeyword(cpIgnoredCountKeyword);
     resultsGrp.addKeyword(cmIgnoredCountKeyword);
-
-    Application::Log(resultsGrp);
+    if (log) {
+      log->addGroup(resultsGrp);
+    }
 
     if (seedDomain == XY) {
       delete proj;

@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FileList.h"
 #include "ImageOverlapSet.h"
+#include "Pvl.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 
@@ -81,6 +82,9 @@ namespace Isis {
 
     PvlGroup results("Results");
     results += PvlKeyword("ErrorCount", toString((BigInt)overlaps.Errors().size()));
-    Application::Log(results);
+
+    if (log) {
+      log->addGroup(results);
+    }
   }
 }

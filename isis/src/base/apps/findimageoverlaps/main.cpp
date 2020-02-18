@@ -9,6 +9,19 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  Pvl appLog;
+  
+  try {
+    findimageoverlaps(ui, &appLog);
+  }
+  catch (...) {
+    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+      Application::Log(*grpIt);
+    }
+    throw;
+  }
 
-  findimageoverlaps(ui);
+  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+    Application::Log(*grpIt);
+  }
 }
