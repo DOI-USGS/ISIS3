@@ -65,7 +65,10 @@ namespace Isis {
   QString g_delimiter;
 
   /**
+   * check control network validity 
    *
+   * @param ui UserInterface object containing parameters 
+   * @param(out) log The Pvl that outlier results logged to check 
    */
   QString cnetcheck(UserInterface &ui, Pvl *log) {
    ControlNet innet(ui.GetFileName("CNET"));
@@ -75,7 +78,12 @@ namespace Isis {
   }
 
   /**
+   * check control network validity 
    *
+   * @param innet input control network 
+   * @param inlist input file list 
+   * @param ui UserInterface object containing parameters 
+   * @param(out) log The Pvl that outlier results logged to
    */
   QString cnetcheck(ControlNet &innet, FileList &inlist, UserInterface &ui, Pvl *log) {
     Progress progress;
