@@ -63,9 +63,7 @@ QString buildRow(SerialNumberList &serials, QString sn, set<QString> &cps);
 QString buildRow(SerialNumberList &serials, QString sn, double value);
 void outputRow(ofstream &outStream, QString rowText);
 
-
 QString g_delimiter;
-
 
 // Main program
 void IsisMain() {
