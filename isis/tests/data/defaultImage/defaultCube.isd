@@ -1,83 +1,146 @@
-{"CameraVersion": 2,
-   "NaifKeywords": {
-        "BODY_CODE" : 499,
-        "BODY499_RADII" : [3396.19, 3396.19, 3376.2],
-        "BODY_FRAME_CODE" : 10014,
-        "CLOCK_ET_-27999_33322515_COMPUTED" : "d5b9203a4d24c5c1",
-        "INS-27002_TRANSX" : [0.0, 0.011764705882353, 0.0],
-        "INS-27002_TRANSY" : [0.0, 0.0, 0.01176470588235],
-        "INS-27002_ITRANSS" : [0.0, 85.0, 0.0],
-        "INS-27002_ITRANSL" : [0.0, 0.0, 85.0]
+ {
+  "CameraVersion": 1,
+  "NaifKeywords": {
+    "BODY_CODE": 499,
+    "BODY499_RADII": [
+      3396.19,
+      3396.19,
+      3376.2
+    ],
+    "BODY_FRAME_CODE": 10014,
+    "CLOCK_ET_-27999_33322515_COMPUTED": "d5b9203a4d24c5c1",
+    "INS-27002_TRANSX": [
+      0.0,
+      0.011764705882353,
+      0.0
+    ],
+    "INS-27002_TRANSY": [
+      0.0,
+      0.0,
+      0.011764705882353
+    ],
+    "INS-27002_ITRANSS": [
+      0.0,
+      85.0,
+      0.0
+    ],
+    "INS-27002_ITRANSL": [
+      0.0,
+      0.0,
+      85.0
+    ]
   },
-"InstrumentPointing": {
-  "TimeDependentFrames": [-85600, -85000, 1],
-  "CkTableStartTime": 100,
-  "CkTableEndTime": 100.1,
-  "CkTableOriginalSize": 2,
-  "EphemerisTimes": [
-    100,
-    100.1
-  ],
-  "Quaternions": [
-    [0.0, -0.660435174378928, 0, 0.750883067090392],
-    [0.0, -0.660435174378928, 0, 0.750883067090392]
-  ],
-  "AngularVelocity": [
-    [0, 0, 0],
-    [0, 0, 0]
-  ],
-  "ConstantFrames": [-85600],
-  "ConstantRotation": [1, 0, 0, 0, 1, 0, 0, 0, 1]
-},
-"BodyRotation": {
-  "TimeDependentFrames": [31006, 1],
-  "CkTableStartTime": 100,
-  "CkTableEndTime": 100.1,
-  "CkTableOriginalSize": 2,
-  "EphemerisTimes": [
-    100,
-    100.1
-  ],
-  "Quaternions": [
-    [ 0, 0.8509035, 0, 0.525322 ],
-    [ 0, 0.8509035, 0, 0.525322 ]
-  ],
-  "AngularVelocity": [
-    [0, 0, 0],
-    [0, 0, 0]
-  ],
-  "ConstantFrames": [31001, 31007, 31006],
-  "ConstantRotation": [-0.4480736,  0,  0.8939967, 0,  1,  0, -0.8939967,  0, -0.4480736]
-},
-"InstrumentPosition": {
-  "SpkTableStartTime": 100,
-  "SpkTableEndTime": 100.1,
-  "SpkTableOriginalSize": 2,
-  "EphemerisTimes": [
-    100,
-    100.1
-  ],
-  "Positions": [
-    [1000, 0, 0],
-    [1000, 0, 0]
-  ],
-  "Velocities": [
-    [0, 0, 0],
-    [0, 0, 0]
-  ]
-},
-"SunPosition": {
-  "SpkTableStartTime": 100,
-  "SpkTableEndTime": 100.1,
-  "SpkTableOriginalSize": 2,
-  "EphemerisTimes": [
-    100,
-    100.1
-  ],
-  "Positions": [
-    [0, 20, 0]
-  ],
-  "Velocities": [
-    [10,10,10]
-  ]
+  "InstrumentPointing": {
+    "TimeDependentFrames": [
+      -27000,
+      1
+    ],
+    "CkTableStartTime": -709401200.2611448,
+    "CkTableEndTime": -709401200.2611448,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      -709401200.2611448
+    ],
+    "Quaternions": [
+      [
+        0.31520810249542935,
+        -0.9166503199522611,
+        -0.1584333983076251,
+        -0.18786937311160073
+      ]
+    ],
+    "AngularVelocity": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "ConstantFrames": [
+      -27002,
+      -27000
+    ],
+    "ConstantRotation": [
+      -0.0003979349968896706,
+      0.9999292841798486,
+      -0.011885633652183106,
+      -0.9999997648597387,
+      -0.00040454501685083244,
+      -0.0005537362156469968,
+      -0.000558505331602465,
+      0.011885410506372852,
+      0.9999292100388355
+    ]
+  },
+  "BodyRotation": {
+    "TimeDependentFrames": [
+      10014,
+      1
+    ],
+    "CkTableStartTime": -709401200.2611448,
+    "CkTableEndTime": -709401200.2611448,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      -709401200.2611448
+    ],
+    "Quaternions": [
+      [
+        0.53600001724021,
+        0.07306205657296709,
+        -0.3096271483964462,
+        0.7819827021000583
+      ]
+    ],
+    "AngularVelocity": [
+      [
+        3.1626696613081345e-05,
+        -2.8772751199032417e-05,
+        5.0812583480214036e-05
+      ]
+    ]
+  },
+  "InstrumentPosition": {
+    "SpkTableStartTime": -709401200.2611448,
+    "SpkTableEndTime": -709401200.2611448,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      -709401200.2611448
+    ],
+    "Positions": [
+      [
+        -2314.3697349186045,
+        1641.5929356131498,
+        3043.112681407324
+      ]
+    ],
+    "Velocities": [
+      [
+        -4.130724817121533,
+        -0.7713952678774164,
+        -0.8993971780228228
+      ]
+    ]
+  },
+  "SunPosition": {
+    "SpkTableStartTime": -709401200.2611448,
+    "SpkTableEndTime": -709401200.2611448,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      -709401200.2611448
+    ],
+    "Positions": [
+      [
+        -199122331.6742814,
+        -67302869.13807923,
+        -25474695.77623297
+      ]
+    ],
+    "Velocities": [
+      [
+        7.293383953631856,
+        -22.524325637284665,
+        -10.52853149380628
+      ]
+    ]
+  }
 }
