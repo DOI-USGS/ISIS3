@@ -8,6 +8,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "ImageOverlapSet.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -31,15 +32,15 @@ TEST_F(ThreeImageNetwork, FunctionalAutoseedDefault) {
 
   QVector<QString> footprintArgs = {};
   UserInterface footprintUi(FOOTPRINT_XML, footprintArgs);
+  footprintinit(cube1, footprintUi);
+  cube1->reopen();
+  footprintinit(cube2, footprintUi);
+  cube2->reopen();
+  footprintinit(cube3, footprintUi);
+  cube3->reopen();
 
-  Cube cube1(cubeTempPath1.fileName(), "rw");
-  footprintinit(&cube1, footprintUi);
-
-  Cube cube2(cubeTempPath2.fileName(), "rw");
-  footprintinit(&cube2, footprintUi);
-
-  Cube cube3(cubeTempPath3.fileName(), "rw");
-  footprintinit(&cube3, footprintUi);
+  cubeList->removeLast();
+  cubeList->write(cubeListTempPath.fileName());
 
   QTemporaryFile overlapList;
   overlapList.open();
@@ -71,11 +72,19 @@ TEST_F(ThreeImageNetwork, FunctionalAutoseedDefault) {
                                     "deffile="+defFile,
                                     "overlaplist="+overlapList.fileName(),
                                     "networkid=1",
-                                    "pointid=????",
+                                    "pointid=??",
                                     "description=autoseed test network"};
   UserInterface autoseedUi(AUTOSEED_XML, autoseedArgs);
-  autoseed(autoseedUi, log);
 
+  autoseed(autoseedUi, log);
   ControlNet onet(outnet);
+  ASSERT_EQ(onet.GetNumPoints(), 18);
+
+  cubeList->append(cube3->fileName());
+  cubeList->write(cubeListTempPath.fileName());
+  findimageoverlaps(overlapUi);
+
+  autoseed(autoseedUi, log);
+  onet = ControlNet(outnet);
   ASSERT_EQ(onet.GetNumPoints(), 26);
 }

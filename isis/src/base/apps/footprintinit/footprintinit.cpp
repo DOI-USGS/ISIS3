@@ -39,8 +39,6 @@ namespace Isis {
       }
       testXY = false;
     }
-    std::cout << "CHECKED SPICEINIT" << '\n';
-    return;
 
     Progress prog;
     prog.SetMaximumSteps(1);
@@ -155,7 +153,6 @@ namespace Isis {
     p.SetInputCube(cube);
     p.WriteHistory(*cube);
 
-    cube->close();
     prog.CheckStatus();
   }
 }

@@ -18,14 +18,12 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
 
 TEST_F(DefaultCube, FunctionalFootprintinitDefault) {
-  // QTemporaryDir prefix;
-  // ASSERT_TRUE(prefix.isValid());
-  //
-  // QVector<QString> footprintArgs = {};
-  // UserInterface footprintUi(APP_XML, footprintArgs);
-  //
-  // std::cout << tempFile.fileName() << '\n';
-  //
-  // footprintinit(testCube, footprintUi);
-  // std::cout << cube.label()->findKeyword("IsisCore") << '\n';
+  QTemporaryDir prefix;
+  ASSERT_TRUE(prefix.isValid());
+
+  QVector<QString> footprintArgs = {};
+  UserInterface footprintUi(APP_XML, footprintArgs);
+
+  footprintinit(testCube, footprintUi);
+  ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 }
