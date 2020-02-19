@@ -4,7 +4,7 @@ namespace Isis {
 
 
   void DefaultCube::SetUp() {
-    tempFile.setFileTemplate(testTempDir.path() + "/XXXXXX.cub");
+    tempFile.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
 
     // Open the file to generate its filename
     tempFile.open();
@@ -27,10 +27,10 @@ namespace Isis {
 
 
   void ThreeImageNetwork::SetUp() {
-    cubeTempPath1.setFileTemplate(testTempDir.path() + "/XXXXXX.cub");
-    cubeTempPath2.setFileTemplate(testTempDir.path() + "/XXXXXX.cub");
-    cubeTempPath3.setFileTemplate(testTempDir.path() + "/XXXXXX.cub");
-    cubeListTempPath.setFileTemplate(testTempDir.path() + "/XXXXXX.lis");
+    cubeTempPath1.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
+    cubeTempPath2.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
+    cubeTempPath3.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
+    cubeListTempPath.setFileTemplate(tempDir.path() + "/XXXXXX.lis");
 
     // Open the files to generate their filenames
     cubeTempPath1.open();

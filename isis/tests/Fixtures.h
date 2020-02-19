@@ -24,41 +24,44 @@ using json = nlohmann::json;
 
 namespace Isis {
 
-  static QTemporaryDir testTempDir;
+  class TempTestingFiles : public ::testing::Test {
+    protected:
+      QTemporaryDir tempDir;
+  };
 
 
-   class DefaultCube : public ::testing::Test {
-      protected:
-        Cube *testCube;
-        QTemporaryFile tempFile;
+  class DefaultCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+      QTemporaryFile tempFile;
 
-        Pvl label;
-        json isd;
+      Pvl label;
+      json isd;
 
-        void SetUp() override;
-        void TearDown() override;
-   };
+      void SetUp() override;
+      void TearDown() override;
+  };
 
 
-   class ThreeImageNetwork : public ::testing::Test {
-      protected:
+  class ThreeImageNetwork : public TempTestingFiles {
+    protected:
 
-        ControlNet *network;
+      ControlNet *network;
 
-        Cube *cube1;
-        Cube *cube2;
-        Cube *cube3;
+      Cube *cube1;
+      Cube *cube2;
+      Cube *cube3;
 
-        FileList *cubeList;
+      FileList *cubeList;
 
-        QTemporaryFile cubeTempPath1;
-        QTemporaryFile cubeTempPath2;
-        QTemporaryFile cubeTempPath3;
-        QTemporaryFile cubeListTempPath;
+      QTemporaryFile cubeTempPath1;
+      QTemporaryFile cubeTempPath2;
+      QTemporaryFile cubeTempPath3;
+      QTemporaryFile cubeListTempPath;
 
-        void SetUp() override;
-        void TearDown() override;
-   };
+      void SetUp() override;
+      void TearDown() override;
+  };
 }
 
 #endif
