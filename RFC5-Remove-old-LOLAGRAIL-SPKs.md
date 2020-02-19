@@ -12,9 +12,9 @@ only the newest gravity model SPKs (i.e., LRO*GRGM900C*.BSP)
 The most recent LOLA/GRAIL SPK files use an improved gravity model, GRGM900C, instead of the older gravity model GRGM660. Also, all new LOLA/GRAIL SPK files are being delivered using the new model and not the old model. 
 
 We propose to remove the older files to:
-*Reduce the amount of data in the ISIS data area
-*Reduce possible confusion caused by having two sets of LOLA/GRAIL SPK files with different gravity models
-*Any new processing should most likely use the most accurate SPK for LRO spacecraft position
+* Reduce the amount of data in the ISIS data area
+* Reduce possible confusion caused by having two sets of LOLA/GRAIL SPK files with different gravity models
+* Any new processing should most likely use the most accurate SPK for LRO spacecraft position
 
 # Proposed Solution / Explanation
 Remove all LRO SPK SPICE files that use the GRGM660 gravity model, and remove them from the "SMITHED" quality designation in the kernel.????.db file.
