@@ -8,15 +8,18 @@
 #include "SerialNumberList.h"
 
 using namespace std;
-using namespace Isis;
 
 namespace Isis {
 
   void findimageoverlaps(UserInterface &ui, Pvl *log) {
-    SerialNumberList serialNumbers(true);
-
     FileList images(ui.GetFileName("FROMLIST"));
+
+    findimageoverlaps(images, ui, log);
+  }
+
+  void findimageoverlaps(FileList &images, UserInterface &ui, Pvl *log) {
     // list of sns/filenames sorted by serial number
+    SerialNumberList serialNumbers(true);
 
     vector< pair<QString, QString> > sortedList;
 
