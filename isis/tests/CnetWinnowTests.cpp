@@ -19,7 +19,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded();
 
-TEST_F(ThreeImageNetwork, FunctionalCnetwinnowDefault) {
+TEST_F(ThreeImageNetwork, FunctionalTestCnetwinnowDefault) {
   QTemporaryDir prefix;
   ASSERT_TRUE(prefix.isValid());
 
