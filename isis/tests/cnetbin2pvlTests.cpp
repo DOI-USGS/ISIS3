@@ -28,14 +28,14 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetbin2pvlDefault) {
                            "to="+pvlOut};
   UserInterface ui(APP_XML, args);
 
-
   Progress progress;
   cnetbin2pvl(*network, progress, ui);
 
   Pvl pvl;
-  try{
+  try {
     pvl.read(cnetFilePath);
-  } catch (IException &e){
+  }
+  catch (IException &e) {
     FAIL() << "Unable to read PVL file" << std::endl;
   }
 }
