@@ -5,10 +5,10 @@ namespace Isis {
   void DefaultCube::SetUp() {
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
-    
     isdFile >> isd;
     cubeLabel >> label;
 
+    testCube = new Cube();
     testCube->fromIsd(tempFile.fileName() + ".cub", label, isd, "rw");
   }
 
