@@ -53,7 +53,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckCamera) {
   network->AddPoint(newPoint);
   
   Pvl log;
-  QString results = cnetcheck(*network, *cubeList, options, &log);
+  cnetcheck(*network, *cubeList, options, &log);
     
   std::ifstream f(prefix.path().toStdString() + "/NoLatLon.txt");
   std::string ret((std::istreambuf_iterator<char>(f)),
