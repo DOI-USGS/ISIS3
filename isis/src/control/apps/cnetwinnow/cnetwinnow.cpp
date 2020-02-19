@@ -36,20 +36,43 @@ namespace Isis {
   void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures,
                                  QList <ControlMeasure *> *measToIgnor=NULL);
 
-  void cnetwinnow(UserInterface &ui) {
-    //build a histogram from the control net
-    Progress progress;
-
+  /**
+    * Default method for CNET winnow that takes a UI object from the
+    * application, parses the necessary UI elements and winnows points within
+    * the network.
+    *
+    *
+    * @param ui UserInterface object generated using the cnetwinnow.xml file
+    *
+    */
+  void cnetwinnow(UserInterface &ui, Progress *progress) {
     //read the ControlNet
-    ControlNet net(ui.GetFileName("CNET"), &progress);
+    ControlNet net(ui.GetFileName("CNET"), progress);
+    //read the file list
+    SerialNumberList serialNumList(ui.GetFileName("FROMLIST"), true, progress);
 
-    cnetwinnow(net, progress, ui);
+    cnetwinnow(net, serialNumList, ui, progress);
   }
 
-  void cnetwinnow(ControlNet &net, Progress &progress, UserInterface &ui) {
-    //read the file list
-    SerialNumberList serialNumList(ui.GetFileName("FROMLIST"), true, &progress);
-
+  /**
+    * Given some control network and criteria passed in through the UI, remove
+    * points within the network whose residuals (often generated through jigsaw)
+    * do not match the given set of criteria
+    *
+    *
+    * @param net A control network object containing points with residuals
+    *
+    * @param serialNumList A SerialNumberList object that holds the serial
+    *        numbers for all cubes within the network often generated from
+    *        a filelist
+    *
+    * @param progress A progress object for the UI to get progress reports
+    *                 through
+    *
+    * @param ui UserInterface object generated using the cnetwinnow.xml file
+    *
+    */
+  void cnetwinnow(ControlNet &net, SerialNumberList &serialNumList, UserInterface &ui, Progress *progress) {
     //check to make sure all the serial numbers in the net have an associated file name
     QList<QString> cubeSerials = net.GetCubeSerials();
     bool serFlag=true;
@@ -233,9 +256,11 @@ namespace Isis {
 
 
     //now work through the list from the end to the begining setting measures to ignor if we are able
-    progress.SetText("Winnowing points");
-    progress.SetMaximumSteps((int)suspectMeasures.size() + 1);
-    progress.CheckStatus();
+    if (progress) {
+      progress->SetText("Winnowing points");
+      progress->SetMaximumSteps((int)suspectMeasures.size() + 1);
+      progress->CheckStatus();
+    }
     for (int i = suspectMeasures.size() - 1; i > -1; i--) {
       //if the measure to be ignored is one of the last two active measures of a point then both of
        //the measures and the point must be ignored together so we need the flexibility to test
@@ -377,7 +402,7 @@ namespace Isis {
         if (measGroup.size() >1)
           measGroup[0]->Parent()->SetIgnored(true);
       }
-      progress.CheckStatus();
+      if (progress) progress->CheckStatus();
     }
 
     //close the report file

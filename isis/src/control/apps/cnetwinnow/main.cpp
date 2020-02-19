@@ -4,7 +4,7 @@
 
 #include "Application.h"
 #include "UserInterface.h"
-
+#include "Progress.h"
 
 using namespace std;
 using namespace Isis;
@@ -12,6 +12,8 @@ using namespace Isis;
 void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  //build a histogram from the control net
+  Progress progress;
 
-  cnetwinnow(ui);
+  cnetwinnow(ui, &progress);
 }

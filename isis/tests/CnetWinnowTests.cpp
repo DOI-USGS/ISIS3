@@ -19,12 +19,12 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded();
 
-TEST_F(ThreeImageNetwork, CnetwinnowFunctionalDefault) {
+TEST_F(ThreeImageNetwork, FunctionalCnetwinnowDefault) {
   QTemporaryDir prefix;
   ASSERT_TRUE(prefix.isValid());
 
-  QVector<QString> args = {"fromlist="+cubeListTempPath.fileName(),
-                           "onet="+prefix.path()+"/winnowedNetwork.net",
+  QString onetPath = prefix.path()+"/winnowedNetwork.net";
+  QVector<QString> args = {"onet="+onetPath,
                            "file_prefix=winnow"};
   UserInterface ui(APP_XML, args);
 
@@ -34,24 +34,27 @@ TEST_F(ThreeImageNetwork, CnetwinnowFunctionalDefault) {
   ASSERT_EQ(initialMeasureCount, 41);
   ASSERT_EQ(initialPointCount, 16);
 
-  int count = 0;
-
   QList <ControlPoint*> pointList = network->GetPoints();
 
   QList <ControlMeasure*> measures;
-  for (ControlPoint *point : pointList) {
-    measures = point->getMeasures();
+  for (int count = 0; count < pointList.size(); count++) {
+    measures = pointList[count]->getMeasures();
     for (ControlMeasure *measure: measures) {
       measure->SetResidual(count, count);
     }
-    count++;
   }
 
-  Progress progress;
-  cnetwinnow(*network, progress, ui);
+  SerialNumberList serialNumList(cubeListTempPath.fileName(), true);
+  cnetwinnow(*network, serialNumList, ui);
 
   int postWinnowMeasureCount = network->GetNumValidMeasures();
   int postWinnowPointCount = network->GetNumValidPoints();
+  ASSERT_EQ(postWinnowMeasureCount, 31);
+  ASSERT_EQ(postWinnowPointCount, 13);
+
+  ControlNet onet(onetPath);
+  postWinnowMeasureCount = onet.GetNumValidMeasures();
+  postWinnowPointCount = onet.GetNumValidPoints();
   ASSERT_EQ(postWinnowMeasureCount, 31);
   ASSERT_EQ(postWinnowPointCount, 13);
 }
