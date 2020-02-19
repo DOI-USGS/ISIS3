@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QTemporaryFile>
+#include <QTemporaryDir>
 
 #include <nlohmann/json.hpp>
 
@@ -23,6 +24,9 @@ using json = nlohmann::json;
 
 namespace Isis {
 
+  static QTemporaryDir testTempDir;
+
+
    class DefaultCube : public ::testing::Test {
       protected:
         Cube *testCube;
@@ -38,19 +42,19 @@ namespace Isis {
 
    class ThreeImageNetwork : public ::testing::Test {
       protected:
-        
-        ControlNet *network; 
+
+        ControlNet *network;
 
         Cube *cube1;
         Cube *cube2;
         Cube *cube3;
-        
-        FileList *cubeList; 
+
+        FileList *cubeList;
 
         QTemporaryFile cubeTempPath1;
         QTemporaryFile cubeTempPath2;
         QTemporaryFile cubeTempPath3;
-        QTemporaryFile cubeListTempPath; 
+        QTemporaryFile cubeListTempPath;
 
         void SetUp() override;
         void TearDown() override;
