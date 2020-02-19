@@ -13,7 +13,7 @@ enum SeedDomain {
 namespace Isis {
   extern void autoseed(UserInterface &ui,
                        Pvl *log = nullptr);
-  extern void autoseed(UserInterface &ui, ControlNet *precnet = nullptr, Pvl *log=nullptr);
+  extern void autoseed(UserInterface &ui, SerialNumberList &serialNumbers, ControlNet *precnet = nullptr, Pvl *log=nullptr);
 }
 
 #endif

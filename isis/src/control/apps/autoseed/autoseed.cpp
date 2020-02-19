@@ -35,22 +35,21 @@
 #include "UserInterface.h"
 
 using namespace std;
-using namespace Isis;
 
 namespace Isis {
 
   void autoseed(UserInterface &ui, Pvl *log) {
+    SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
 
     if (ui.WasEntered("CNET")) {
       ControlNet precnet(ui.GetFileName("CNET"));
-      autoseed(ui, &precnet, log);
+      autoseed(ui, serialNumbers, &precnet, log);
+      return;
     }
-    autoseed(ui, nullptr, log);
+    autoseed(ui, serialNumbers, nullptr, log);
   }
 
-  void autoseed(UserInterface &ui, ControlNet *precnet, Pvl *log) {
-    SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
-
+  void autoseed(UserInterface &ui, SerialNumberList &serialNumbers, ControlNet *precnet, Pvl *log) {
     // Get the AutoSeed PVL internalized
     Pvl seedDef(ui.GetFileName("DEFFILE"));
 
