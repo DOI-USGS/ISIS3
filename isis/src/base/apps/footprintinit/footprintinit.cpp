@@ -13,7 +13,6 @@
 
 
 using namespace std;
-using namespace Isis;
 
 namespace Isis {
 
