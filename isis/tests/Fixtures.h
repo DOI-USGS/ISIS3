@@ -27,6 +27,8 @@ namespace Isis {
   class TempTestingFiles : public ::testing::Test {
     protected:
       QTemporaryDir tempDir;
+
+      void SetUp() override;
   };
 
 

@@ -2,8 +2,14 @@
 
 namespace Isis {
 
+  void TempTestingFiles::SetUp() {
+    ASSERT_TRUE(tempDir.isValid());
+  }
+
 
   void DefaultCube::SetUp() {
+    TempTestingFiles::SetUp();
+
     tempFile.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
 
     // Open the file to generate its filename
@@ -27,6 +33,8 @@ namespace Isis {
 
 
   void ThreeImageNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
     cubeTempPath1.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
     cubeTempPath2.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
     cubeTempPath3.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
