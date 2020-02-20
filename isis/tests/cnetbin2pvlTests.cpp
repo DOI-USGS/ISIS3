@@ -19,7 +19,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetbin2pvlDefault) {
 
   QString pvlOut = prefix.path()+"/cnetbin2pvlNetwork.pvl";
 
-  QVector<QString> args = { "to="+pvlOut};
+  QVector<QString> args = {"to="+pvlOut};
   UserInterface ui(APP_XML, args);
 
   Progress progress;
