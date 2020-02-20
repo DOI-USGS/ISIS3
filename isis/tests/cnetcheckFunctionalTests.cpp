@@ -72,7 +72,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
   // remove all controlpoints from test network
   QList<ControlPoint*> cpoints = network->GetPoints();
 
-  for (size_t i = 0; i<cpoints.size(); i++) {
+  for (int i = 0; i<cpoints.size(); i++) {
     network->DeletePoint(cpoints[i]);
   }
 
