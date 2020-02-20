@@ -12,6 +12,17 @@ namespace Isis{
   void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile);
   void (ControlNetFilter::*GetPtr2Filter(const QString sFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter);
 
+    /**
+    * Default method for cnetstats that takes a UI object from the
+    * application, parses the necessary UI elements and prints stats
+    * on the control network.
+    *
+    *
+    * @param ui UserInterface object generated using the cnetstats.xml file.
+    *
+    * @param progress A progress object for the UI to get progress reports
+    *                 through.
+    */
   void cnetstats(UserInterface &ui, Pvl *log) {
     ControlNet innet(ui.GetFileName("CNET"));
     QString inlist(ui.GetFileName("FROMLIST"));
@@ -19,6 +30,21 @@ namespace Isis{
     cnetstats(innet, inlist, ui, log);
   }
 
+  /**
+    * Given some control network and criteria passed in through the UI, 
+    * return some stats on the control network and its images.
+    *
+    * @param net A control network object.
+    *
+    * @param serialNumFile A QString of the name of the file containing the serial
+    *        numbers for all cubes within the network often generated from
+    *        a filelist.
+    *
+    * @param ui UserInterface object generated using the cnetwinnow.xml file.
+    *
+    * @param log A pvl object used to store log information.
+    *
+    */
   void cnetstats(ControlNet &innet, QString &serialNumFile, UserInterface &ui, Pvl *log) {
     try {
       // Get the DefFile
