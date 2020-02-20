@@ -18,7 +18,7 @@
 
 using namespace Isis;
 
-QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
 TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
