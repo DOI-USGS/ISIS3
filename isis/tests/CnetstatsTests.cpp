@@ -192,8 +192,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   while(!stream.atEnd()) {
     QString line = stream.readLine();
     QStringList values = line.split(",");
-    std::cout<< line << std::endl;
-
+    
     ASSERT_DOUBLE_EQ(values.size(), 13);
     lineNumber++;
   }
@@ -201,7 +200,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   ASSERT_DOUBLE_EQ(lineNumber, 15);
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
+TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsInvalidDefFile) {
   // Setup def file
   QTemporaryFile defFile("XXXXXX.def");
   ASSERT_TRUE(defFile.open());
@@ -228,74 +227,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
-    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
-  }
-  catch(...) {
-    FAIL() << "Expected error message: \"" << message.toStdString() << "\"";
-  }
-}
-
-TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsNoFlatFile) {
-  // Setup def file
-  QTemporaryFile defFile("XXXXXX.def");
-  ASSERT_TRUE(defFile.open());
-
-  std::ofstream ofstream;
-  ofstream.open(defFile.fileName().toStdString());
-  ofstream << "Object = Filters\n\tGroup = Point_NumMeasures\n\t\tLessThan = 2\n\tEndGroup\nEndObject";
-  ofstream.close();
-
-  // Setup output flat file
-  QTemporaryFile flatFile;
-  ASSERT_TRUE(flatFile.open());
-
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName()};
-  UserInterface options(APP_XML, args);
-  Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
-
-  QString message = "Invalid Deffile";
-  try {
-    cnetstats(*network, serialNumList, options, &log);
-    FAIL() << "Expected an exception to be thrown";
-  }
-  catch(Isis::IException &e) {
-    std::cout<<e<<std::endl;
-    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
-  }
-  catch(...) {
-    FAIL() << "Expected error message: \"" << message.toStdString() << "\"";
-  }
-}
-
-TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsNoDefFile) {
-  // Setup def file
-  QTemporaryFile defFile("XXXXXX.def");
-  ASSERT_TRUE(defFile.open());
-
-  std::ofstream ofstream;
-  ofstream.open(defFile.fileName().toStdString());
-  ofstream << "Object = Filters\n\tGroup = Point_NumMeasures\n\t\tLessThan = 2\n\tEndGroup\nEndObject";
-  ofstream.close();
-
-  // Setup output flat file
-  QTemporaryFile flatFile;
-  ASSERT_TRUE(flatFile.open());
-
-  QVector<QString> args = {"filter=yes", 
-                           "flatfile=" + flatFile.fileName()};
-  UserInterface options(APP_XML, args);
-  Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
-
-  QString message = "Invalid Deffile";
-  try {
-    cnetstats(*network, serialNumList, options, &log);
-    FAIL() << "Expected an exception to be thrown";
-  }
-  catch(Isis::IException &e) {
-    std::cout<<e<<std::endl;
     EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
   catch(...) {

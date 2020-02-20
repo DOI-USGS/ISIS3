@@ -1,7 +1,6 @@
-#include "cnetstats.h"
-
 #include "IsisDebug.h"
 
+#include "cnetstats.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
 #include "IException.h"
