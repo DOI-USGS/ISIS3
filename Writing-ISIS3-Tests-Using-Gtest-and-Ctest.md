@@ -49,7 +49,7 @@ INSTANTIATE_TEST_CASE_P(
 will ensure that the tests start with `BundleSettings`.
 
 # Test names
-We use gtest as our unit testing framework, but use ctest to actually run the tests. The test name can be defined in the test definition. The naming convention for gtests is `UnitTest<Object><test case>` for unit tests and `FunctionalTest<app name><test case>` for app tests each in upper camel case. Source files should follow a similar pattern of UnitTest<Object>.cpp and FunctionalTest<app>.cpp. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
+We use gtest as our unit testing framework, but use ctest to actually run the tests. The test name can be defined in the test definition. The naming convention for gtests is `UnitTest<Object><test case>` for unit tests and `FunctionalTest<app name><test case>` for app tests each in upper camel case. Source files should follow a similar pattern of `UnitTest<Object>.cpp` and `FunctionalTest<app>.cpp`. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
 
 To run the gtests for a specific class, use `ctest -R ClassName`
 
