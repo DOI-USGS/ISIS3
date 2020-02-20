@@ -1,9 +1,10 @@
 #include "cnetstats.h"
 
+#include "IsisDebug.h"
+
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
 #include "IException.h"
-#include "IsisDebug.h"
 #include "PvlGroup.h"
 #include "Progress.h"
 
@@ -34,21 +35,18 @@ namespace Isis{
         for (int i=0; i<pvlDefFile.objects(); i++) {
           PvlObject pvlObj = pvlDefFile.object(i);
           for (int j=0; j<pvlObj.groups(); j++) {
-            // Application::Log(pvlObj.group(j));
             log->addGroup(pvlObj.group(j));
           }
         }
 
         // Verify DefFile comparing with the Template
         Pvl pvlTemplate("$ISIS3DATA/base/templates/cnetstats/cnetstats.def");
-        //Pvl pvlTemplate("/home/sprasad/isis3/isis/src/control/apps/cnetstats/cnetstats.def");
         Pvl pvlResults;
         pvlTemplate.validatePvl(pvlDefFile, pvlResults);
         if(pvlResults.objects() != 0 || pvlResults.groups() != 0 || pvlResults.keywords() != 0){
           for (int i=0; i<pvlResults.objects(); i++) {
             PvlObject pvlObj = pvlResults.object(i);
             for (int j=0; j<pvlObj.groups(); j++) {
-              // Application::Log(pvlObj.group(j));
               log->addGroup(pvlObj.group(j));
             }
           }
@@ -79,7 +77,6 @@ namespace Isis{
       // Log the summary of the input Control Network
       PvlGroup statsGrp;
       cNetFilter.GenerateControlNetStats(statsGrp);
-      // Application::Log(statsGrp);
       log->addGroup(statsGrp);
 
       // Run Filters using Deffile
