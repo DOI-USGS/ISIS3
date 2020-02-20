@@ -8,5 +8,6 @@ using namespace Isis;
 void IsisMain() {
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  cnetbin2pvl(ui);
+  Progress progress;
+  cnetbin2pvl(ui, &progress);
 }

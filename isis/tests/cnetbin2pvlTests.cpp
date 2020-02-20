@@ -18,22 +18,16 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetbin2pvlDefault) {
   ASSERT_TRUE(prefix.isValid());
 
   QString pvlOut = prefix.path()+"/cnetbin2pvlNetwork.pvl";
-  QString cnetFilePath = prefix.path()+"/cnetbin2pvl_network.net";
-  FILE* cnetFile;
-  cnetFile = fopen(cnetFilePath.toStdString().c_str(), "wb");
-  fwrite(network, sizeof(char), sizeof(*network), cnetFile);
-  fclose(cnetFile);
 
-  QVector<QString> args = {"from="+cnetFilePath,
-                           "to="+pvlOut};
+  QVector<QString> args = { "to="+pvlOut};
   UserInterface ui(APP_XML, args);
 
   Progress progress;
-  cnetbin2pvl(*network, progress, ui);
+  cnetbin2pvl(*network, ui, &progress);
 
   Pvl pvl;
   try {
-    pvl.read(cnetFilePath);
+    pvl.read(pvlOut);
   }
   catch (IException &e) {
     FAIL() << "Unable to read PVL file" << std::endl;

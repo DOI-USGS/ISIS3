@@ -6,8 +6,8 @@
 #include "Progress.h"
 
 namespace Isis {
-  extern void cnetbin2pvl(UserInterface &ui);
-  extern void cnetbin2pvl(ControlNet &net, Progress &progress, UserInterface &ui);
+  extern void cnetbin2pvl(UserInterface &ui, Progress *progress=0);
+  extern void cnetbin2pvl(ControlNet &net, UserInterface &ui, Progress *progress=0);
 }
 
 #endif

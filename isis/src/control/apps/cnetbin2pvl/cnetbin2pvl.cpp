@@ -4,20 +4,18 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis{
-  void cnetbin2pvl(UserInterface &ui) {
-    // Build a histogram from the control net
-    Progress progress;
+  void cnetbin2pvl(UserInterface &ui, Progress *progress) {
     ControlNet cnet;
-    cnet.ReadControl(ui.GetFileName("FROM"), &progress);
+    cnet.ReadControl(ui.GetFileName("FROM"), progress);
 
-    cnetbin2pvl(cnet, progress, ui);
+    cnetbin2pvl(cnet, ui, progress);
   }
 
-  void cnetbin2pvl(ControlNet &cnet, Progress &progress, UserInterface &ui) {
-    progress.SetText("Writing Control Network...");
-    progress.SetMaximumSteps(1);
-    progress.CheckStatus();
+  void cnetbin2pvl(ControlNet &cnet, UserInterface &ui, Progress *progress) {
+    progress->SetText("Writing Control Network...");
+    progress->SetMaximumSteps(1);
+    progress->CheckStatus();
     cnet.Write(ui.GetFileName("TO"), true);
-    progress.CheckStatus();
+    progress->CheckStatus();
   }
 }
