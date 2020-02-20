@@ -17,7 +17,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
 TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   // set up bad coordinates file
   std::ofstream of;
-  of.open(tempDir.path()+"/badList.lis");
+  of.open(tempDir.path().toStdString()+"/badList.lis");
   of << "1, 10,\n10,100,500\n100";
   of.close();
 
@@ -219,7 +219,7 @@ TEST_F(DefaultCube, FunctionalTestCamptFlat) {
 
 TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
   std::ofstream of;
-  of.open(tempDir.path()+"/coords.txt");
+  of.open(tempDir.path().toStdString()+"/coords.txt");
   of << "1, 10\n10, 100\n 100, 10000";
   of.close();
 

@@ -16,7 +16,7 @@ namespace Isis {
     cubeLabel >> label;
 
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/default.cub"), label, isd, "rw");
+    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
   }
 
 
