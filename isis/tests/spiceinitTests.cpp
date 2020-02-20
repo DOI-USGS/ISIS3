@@ -18,7 +18,7 @@
 
 using namespace Isis;
 
-QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
 TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
@@ -83,7 +83,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   QTemporaryFile tempFile;
   tempFile.open();
   Cube testCube;
-  
+
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"};
@@ -174,7 +174,7 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   QTemporaryFile tempFile;
   tempFile.open();
   Cube testCube;
-  
+
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
@@ -287,7 +287,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
   QTemporaryFile tempFile;
   tempFile.open();
   Cube testCube;
-  
+
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
@@ -393,7 +393,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
   QTemporaryFile tempFile;
   tempFile.open();
   Cube testCube;
-  
+
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
@@ -492,7 +492,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   QTemporaryFile tempFile;
   tempFile.open();
   Cube testCube;
-  
+
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
