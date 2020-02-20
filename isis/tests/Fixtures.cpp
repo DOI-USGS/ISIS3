@@ -10,18 +10,13 @@ namespace Isis {
   void DefaultCube::SetUp() {
     TempTestingFiles::SetUp();
 
-    tempFile.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
-
-    // Open the file to generate its filename
-    tempFile.open();
-
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     isdFile >> isd;
     cubeLabel >> label;
 
     testCube = new Cube();
-    testCube->fromIsd(tempFile.fileName(), label, isd, "rw");
+    testCube->fromIsd(tempDir.path() + "/default.cub"), label, isd, "rw");
   }
 
 
@@ -29,22 +24,12 @@ namespace Isis {
     if (testCube->isOpen()) {
       testCube->close();
     }
+    delete testCube;
   }
 
 
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
-
-    cubeTempPath1.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
-    cubeTempPath2.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
-    cubeTempPath3.setFileTemplate(tempDir.path() + "/XXXXXX.cub");
-    cubeListTempPath.setFileTemplate(tempDir.path() + "/XXXXXX.lis");
-
-    // Open the files to generate their filenames
-    cubeTempPath1.open();
-    cubeTempPath2.open();
-    cubeTempPath3.open();
-    cubeListTempPath.open();
 
     FileName labelPath1("data/threeImageNetwork/cube1.pvl");
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
@@ -55,20 +40,21 @@ namespace Isis {
     FileName isdPath3("data/threeImageNetwork/cube3.isd");
 
     cube1 = new Cube();
-    cube1->fromIsd(cubeTempPath1.fileName(), labelPath1, isdPath1, "rw");
+    cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, isdPath1, "rw");
 
     cube2 = new Cube();
-    cube2->fromIsd(cubeTempPath2.fileName(), labelPath2, isdPath2, "rw");
+    cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, isdPath2, "rw");
 
     cube3 = new Cube();
-    cube3->fromIsd(cubeTempPath3.fileName(), labelPath3, isdPath3, "rw");
+    cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, isdPath3, "rw");
 
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
     cubeList->append(cube2->fileName());
     cubeList->append(cube3->fileName());
 
-    cubeList->write(cubeListTempPath.fileName());
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
 
     network = new ControlNet();
     network->ReadControl("data/threeImageNetwork/controlnetwork.net");

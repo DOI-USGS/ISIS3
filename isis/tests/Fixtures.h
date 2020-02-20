@@ -6,7 +6,6 @@
 #include <string>
 
 #include <QString>
-#include <QTemporaryFile>
 #include <QTemporaryDir>
 
 #include <nlohmann/json.hpp>
@@ -35,7 +34,6 @@ namespace Isis {
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
-      QTemporaryFile tempFile;
 
       Pvl label;
       json isd;
@@ -55,11 +53,7 @@ namespace Isis {
       Cube *cube3;
 
       FileList *cubeList;
-
-      QTemporaryFile cubeTempPath1;
-      QTemporaryFile cubeTempPath2;
-      QTemporaryFile cubeTempPath3;
-      QTemporaryFile cubeListTempPath;
+      QString cubeListFile;
 
       void SetUp() override;
       void TearDown() override;
