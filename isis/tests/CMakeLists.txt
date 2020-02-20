@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 add_dependencies(isis3 isis3)
 
 file(GLOB test_source "${CMAKE_SOURCE_DIR}/tests/*.cpp")
-file(GLOB isis_libs "${CMAKE_BINARY_DIR}/lib/lib*.so")
+file(GLOB isis_libs "${CMAKE_BINARY_DIR}/lib/lib*")
 
 # Link runISISTests with what we want to test and the GTest and pthread library
 add_executable(runISISTests
