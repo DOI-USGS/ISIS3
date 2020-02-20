@@ -3,7 +3,6 @@
 #include "cnetstats.h"
 
 #include "Application.h"
-#include "Pvl.h"
 
 using namespace std;
 using namespace Isis;

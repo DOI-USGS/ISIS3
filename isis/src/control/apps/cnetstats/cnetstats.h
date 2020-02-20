@@ -1,7 +1,7 @@
 #ifndef cnetstats_h
 #define cnetstats_h
 
-#include "cnetstats.h"
+#include <QString>
 
 #include "ControlNet.h"
 #include "Pvl.h"

@@ -1,11 +1,9 @@
 #include "cnetstats.h"
 
-#include "IsisDebug.h"
-#include "IException.h"
-#include "Pvl.h"
-#include "ControlNet.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
+#include "IException.h"
+#include "IsisDebug.h"
 #include "PvlGroup.h"
 #include "Progress.h"
 
