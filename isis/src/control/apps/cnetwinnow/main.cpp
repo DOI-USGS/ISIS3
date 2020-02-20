@@ -12,7 +12,6 @@ using namespace Isis;
 void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
-  //build a histogram from the control net
   Progress progress;
 
   cnetwinnow(ui, &progress);

@@ -44,6 +44,8 @@ namespace Isis {
     *
     * @param ui UserInterface object generated using the cnetwinnow.xml file
     *
+    * @param progress A progress object for the UI to get progress reports
+    *                 through
     */
   void cnetwinnow(UserInterface &ui, Progress *progress) {
     //read the ControlNet
@@ -87,7 +89,7 @@ namespace Isis {
         return;
       }
     }
-      //build a Histogram of the residual Magnitudes from the ControlNet
+    //build a Histogram of the residual Magnitudes from the ControlNet
     Histogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
 
       //make sure there was some residual data in the control network
