@@ -40,20 +40,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   footprintinit(cube3, footprintUi);
   cube3->reopen();
 
-  cubeList->removeLast();
-  cubeList->write(cubeListTempPath.fileName());
-
-  QTemporaryFile overlapList;
-  overlapList.open();
-  QVector<QString> overlapArgs = {"fromlist="+cubeListTempPath.fileName(),
-                                  "overlaplist="+overlapList.fileName()};
-  UserInterface overlapUi(OVERLAP_XML, overlapArgs);
-  findimageoverlaps(overlapUi);
-
   Pvl *log = NULL;
   QString defFile = prefix.path()+"/gridPixels.pvl";
-  QString outnet1 = prefix.path()+"/seeded.net";
-  QString outnet2 = prefix.path()+"/reseeded.net";
+  QString outnet = prefix.path()+"/seeded.net";
 
   PvlObject autoseedObject("AutoSeed");
   PvlGroup autoseedGroup("PolygonSeederAlgorithm");
@@ -70,30 +59,17 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   autoseedDef.write(defFile);
 
   QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
-                                    "onet="+outnet1,
+                                    "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist="+overlapList.fileName(),
+                                    "overlaplist=/home/acpaquette/overlaps.lis",
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
   UserInterface autoseedUi(AUTOSEED_XML, autoseedArgs);
 
   autoseed(autoseedUi, log);
-  ControlNet onet(outnet1);
-  ASSERT_EQ(onet.GetNumPoints(), 18);
-
-  cubeList->append(cube3->fileName());
-  cubeList->write(cubeListTempPath.fileName());
-  findimageoverlaps(overlapUi);
-
-  autoseedArgs.remove(0);
-  autoseedArgs.replace(1, "onet="+outnet2);
-  autoseedUi = UserInterface(AUTOSEED_XML, autoseedArgs);
-  SerialNumberList serialNumbers(cubeListTempPath.fileName());
-
-  autoseed(autoseedUi, serialNumbers, &onet, log);
-  onet = ControlNet(outnet2);
-  ASSERT_EQ(onet.GetNumPoints(), 7);
+  ControlNet onet(outnet);
+  ASSERT_EQ(onet.GetNumPoints(), 26);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {

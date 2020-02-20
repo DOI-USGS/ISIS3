@@ -28,7 +28,9 @@ namespace Isis {
     FileName isdPath1("data/threeImageNetwork/cube1.isd");
     FileName isdPath2("data/threeImageNetwork/cube2.isd");
     FileName isdPath3("data/threeImageNetwork/cube3.isd");
-    
+
+    imageOverlapFile = new FileName("data/threeImageNetwork/overlap.lis");
+
     cube1 = new Cube();
     cubeTempPath1.open();
     cube1->fromIsd(cubeTempPath1.fileName() + ".cub", labelPath1, isdPath1, "rw");
@@ -48,11 +50,11 @@ namespace Isis {
 
     cubeListTempPath.open();
     cubeList->write(cubeListTempPath.fileName());
-    
+
     network = new ControlNet();
     network->ReadControl("data/threeImageNetwork/controlnetwork.net");
   }
-  
+
 
   void ThreeImageNetwork::TearDown() {
     delete cube1;

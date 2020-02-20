@@ -18,6 +18,7 @@
 #include "PvlObject.h"
 #include "ControlNet.h"
 #include "FileList.h"
+#include "FileName.h"
 
 using json = nlohmann::json;
 
@@ -38,19 +39,20 @@ namespace Isis {
 
    class ThreeImageNetwork : public ::testing::Test {
       protected:
-        
-        ControlNet *network; 
+
+        ControlNet *network;
 
         Cube *cube1;
         Cube *cube2;
         Cube *cube3;
-        
-        FileList *cubeList; 
+
+        FileList *cubeList;
 
         QTemporaryFile cubeTempPath1;
         QTemporaryFile cubeTempPath2;
         QTemporaryFile cubeTempPath3;
-        QTemporaryFile cubeListTempPath; 
+        QTemporaryFile cubeListTempPath;
+        FileName *imageOverlapFile;
 
         void SetUp() override;
         void TearDown() override;
