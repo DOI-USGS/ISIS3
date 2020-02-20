@@ -61,7 +61,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
                                     "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist=/home/acpaquette/overlaps.lis",
+                                    "overlaplist="+imageOverlapFile->original(),
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
