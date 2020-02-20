@@ -20,6 +20,12 @@ namespace Isis {
   void writeFlat(ofstream &os, const Statistics *s);
   string valueToString(const double &value);
 
+  /**
+   * Outputs camera statistics for a cube specified in ui parameters.
+   * 
+   * @param ui UserInterface object containing camstats parameters
+   * @param(out) log the Pvl that camstat results log to
+   */
   void camstats(UserInterface &ui, Pvl *log) {
     Process p;
 
