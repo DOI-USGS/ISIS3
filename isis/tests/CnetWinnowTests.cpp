@@ -1,5 +1,4 @@
 #include <iostream>
-#include <QTemporaryDir>
 
 #include "cnetwinnow.h"
 
@@ -20,10 +19,7 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetwinnowDefault) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString onetPath = prefix.path()+"/winnowedNetwork.net";
+  QString onetPath = tempDir.path()+"/winnowedNetwork.net";
   QVector<QString> args = {"onet="+onetPath,
                            "file_prefix=winnow"};
   UserInterface ui(APP_XML, args);
@@ -44,7 +40,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetwinnowDefault) {
     }
   }
 
-  SerialNumberList serialNumList(cubeListTempPath.fileName(), true);
+  SerialNumberList serialNumList(cubeListFile, true);
   cnetwinnow(*network, serialNumList, ui);
 
   int postWinnowMeasureCount = network->GetNumValidMeasures();
