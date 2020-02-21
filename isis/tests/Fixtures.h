@@ -52,7 +52,8 @@ namespace Isis {
         QTemporaryFile cubeTempPath2;
         QTemporaryFile cubeTempPath3;
         QTemporaryFile cubeListTempPath;
-        FileName *imageOverlapFile;
+        FileName *threeImageOverlapFile;
+        FileName *twoImageOverlapFile;
 
         void SetUp() override;
         void TearDown() override;

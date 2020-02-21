@@ -1,15 +1,24 @@
 #include <iostream>
 #include <QTemporaryFile>
 #include <QTemporaryDir>
+#include <QVector>
+
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Point.h>
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
 
 #include "autoseed.h"
 #include "findimageoverlaps.h"
 #include "footprintinit.h"
 
+#include "Camera.h"
+#include "CameraFactory.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "ImageOverlapSet.h"
+#include "SerialNumber.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -23,22 +32,11 @@
 
 using namespace Isis;
 
-static QString FOOTPRINT_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
-static QString OVERLAP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
-static QString AUTOSEED_XML = FileName("$ISISROOT/bin/xml/autoseed.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/autoseed.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   QTemporaryDir prefix;
   ASSERT_TRUE(prefix.isValid());
-
-  QVector<QString> footprintArgs = {};
-  UserInterface footprintUi(FOOTPRINT_XML, footprintArgs);
-  footprintinit(cube1, footprintUi);
-  cube1->reopen();
-  footprintinit(cube2, footprintUi);
-  cube2->reopen();
-  footprintinit(cube3, footprintUi);
-  cube3->reopen();
 
   Pvl *log = NULL;
   QString defFile = prefix.path()+"/gridPixels.pvl";
@@ -61,36 +59,72 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
                                     "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist="+imageOverlapFile->original(),
+                                    "overlaplist="+threeImageOverlapFile->original(),
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
-  UserInterface autoseedUi(AUTOSEED_XML, autoseedArgs);
+  UserInterface autoseedUi(APP_XML, autoseedArgs);
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet);
   ASSERT_EQ(onet.GetNumPoints(), 26);
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
+TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   QTemporaryDir prefix;
   ASSERT_TRUE(prefix.isValid());
 
-  QVector<QString> footprintArgs = {};
-  UserInterface footprintUi(FOOTPRINT_XML, footprintArgs);
-  footprintinit(cube1, footprintUi);
-  cube1->reopen();
-  footprintinit(cube2, footprintUi);
-  cube2->reopen();
-  footprintinit(cube3, footprintUi);
-  cube3->reopen();
+  Pvl *log = NULL;
+  QString defFile = prefix.path()+"/gridPixels.pvl";
+  QString outnet1 = prefix.path()+"/seeded_two_file.net";
+  QString outnet2 = prefix.path()+"/seeded_three_file.net";
 
-  QTemporaryFile overlapList;
-  overlapList.open();
-  QVector<QString> overlapArgs = {"fromlist="+cubeListTempPath.fileName(),
-                                  "overlaplist="+overlapList.fileName()};
-  UserInterface overlapUi(OVERLAP_XML, overlapArgs);
-  findimageoverlaps(overlapUi);
+  PvlObject autoseedObject("AutoSeed");
+  PvlGroup autoseedGroup("PolygonSeederAlgorithm");
+  autoseedGroup.addKeyword(PvlKeyword("Name", "Grid"));
+  autoseedGroup.addKeyword(PvlKeyword("MinimumThickness", "0.0"));
+  autoseedGroup.addKeyword(PvlKeyword("MinimumArea", "1000"));
+  autoseedGroup.addKeyword(PvlKeyword("XSpacing", "24000"));
+  autoseedGroup.addKeyword(PvlKeyword("YSpacing", "24000"));
+  autoseedGroup.addKeyword(PvlKeyword("PixelsFromEdge", "20.0"));
+  autoseedObject.addGroup(autoseedGroup);
+
+  Pvl autoseedDef;
+  autoseedDef.addObject(autoseedObject);
+  autoseedDef.write(defFile);
+
+  cubeList->removeLast();
+  cubeList->write(cubeListTempPath.fileName());
+
+  QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
+                                    "onet="+outnet1,
+                                    "deffile="+defFile,
+                                    "overlaplist="+twoImageOverlapFile->original(),
+                                    "networkid=1",
+                                    "pointid=??",
+                                    "description=autoseed test network"};
+  UserInterface autoseedUi(APP_XML, autoseedArgs);
+
+  autoseed(autoseedUi, log);
+  ControlNet onet(outnet1);
+  ASSERT_EQ(onet.GetNumPoints(), 18);
+
+  cubeList->append(cube3->fileName());
+  cubeList->write(cubeListTempPath.fileName());
+  SerialNumberList serialNumList(cubeListTempPath.fileName());
+
+  autoseedArgs.removeAt(0);
+  autoseedArgs.replace(1, "onet="+outnet2);
+  autoseedArgs.replace(3, "overlaplist="+threeImageOverlapFile->original());
+  autoseedUi = UserInterface(APP_XML, autoseedArgs);
+  autoseed(autoseedUi, serialNumList, &onet, log);
+  onet = ControlNet(outnet2);
+  ASSERT_EQ(onet.GetNumPoints(), 7);
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
+  QTemporaryDir prefix;
+  ASSERT_TRUE(prefix.isValid());
 
   Pvl *log = NULL;
   QString defFile = prefix.path()+"/pixelGrid.pvl";
@@ -99,11 +133,11 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
                                     "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist="+overlapList.fileName(),
+                                    "overlaplist="+threeImageOverlapFile->original(),
                                     "networkid=1",
                                     "pointid=???",
                                     "description=autoseed test network"};
-  UserInterface autoseedUi(AUTOSEED_XML, autoseedArgs);
+  UserInterface autoseedUi(APP_XML, autoseedArgs);
 
   // Grid DN
   PvlObject autoseedObject("AutoSeed");

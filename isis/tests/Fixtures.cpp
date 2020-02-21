@@ -29,7 +29,8 @@ namespace Isis {
     FileName isdPath2("data/threeImageNetwork/cube2.isd");
     FileName isdPath3("data/threeImageNetwork/cube3.isd");
 
-    imageOverlapFile = new FileName("data/threeImageNetwork/overlaps.lis");
+    threeImageOverlapFile = new FileName("data/threeImageNetwork/threeImageOverlaps.lis");
+    twoImageOverlapFile = new FileName("data/threeImageNetwork/twoImageOverlaps.lis");
 
     cube1 = new Cube();
     cubeTempPath1.open();
