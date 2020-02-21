@@ -1,4 +1,3 @@
-#include <QTemporaryDir>
 #include <iostream>
 
 #include "Pvl.h"
@@ -14,10 +13,7 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetbin2pvl.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetbin2pvlDefault) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString pvlOut = prefix.path()+"/cnetbin2pvlNetwork.pvl";
+  QString pvlOut = tempDir.path()+"/cnetbin2pvlNetwork.pvl";
 
   QVector<QString> args = {"to="+pvlOut};
   UserInterface ui(APP_XML, args);
