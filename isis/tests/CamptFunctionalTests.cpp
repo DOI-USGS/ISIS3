@@ -7,6 +7,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "SpecialPixel.h"
 
 #include "gmock/gmock.h"
 
@@ -125,7 +126,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( (double) groundPoint.findKeyword("EphemerisTime"), -709401200.26114, 1e-8);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("UTC"), "1977-07-09T20:05:51.5549999");
   EXPECT_NEAR( (double) groundPoint.findKeyword("LocalSolarTime"), 7.7862975330952, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("SolarLongitude"), 294.73518830595, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 1e-8);
 
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionBodyFixed")[0]),  0.43850176257802, 1e-8);
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionBodyFixed")[1]),  0.88365594846443, 1e-8);

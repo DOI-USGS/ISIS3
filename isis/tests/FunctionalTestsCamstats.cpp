@@ -1,5 +1,6 @@
 #include <QTextStream>
 #include <QStringList>
+#include <QTemporaryFile>
 
 #include "camstats.h"
 #include "Fixtures.h"
@@ -122,13 +123,14 @@ TEST_F(DefaultCube, FunctionalTestCamstatsAttach) {
 
   camstats(testCube, options, &appLog);
 
-  testCube->open(testCube->fileName(), "r");
+  testCube->open(tempDir.path()+"/default.cub", "r");
   EXPECT_TRUE(testCube->hasTable("CameraStatistics"));
 }
 
 TEST_F(DefaultCube, FunctionalTestCamstatsFlat) {
   QTemporaryFile flatFile;
   flatFile.open();
+  
   QVector<QString> args = {"to=" + flatFile.fileName(), "format=flat", "linc=100", "sinc=100"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
