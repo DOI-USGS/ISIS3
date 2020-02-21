@@ -202,6 +202,7 @@ namespace Isis {
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
 
+      void SetAttributes(CubeAttributeOutput &att);
       void SetPixelType(const Isis::PixelType type);
       /**
        * Returns the pixel type
