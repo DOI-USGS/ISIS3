@@ -1,10 +1,13 @@
-#include <QTemporaryFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QFile>
 
 #include "campt.h"
 #include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "SpecialPixel.h"
 
 #include "gmock/gmock.h"
 
@@ -15,14 +18,13 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
 TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   // set up bad coordinates file
   std::ofstream of;
-  QTemporaryFile badList;
-  ASSERT_TRUE(badList.open());
-  of.open(badList.fileName().toStdString());
+  of.open(tempDir.path().toStdString()+"/badList.lis");
   of << "1, 10,\n10,100,500\n100";
   of.close();
 
   // configure UserInterface arguments
-  QVector<QString> args = {"to=output.pvl", "coordlist=" + badList.fileName(),
+  QVector<QString> args = {"to=" + tempDir.path()+"/output.pvl",
+                           "coordlist=" + tempDir.path()+"/badList.lis",
                            "coordtype=image"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -115,6 +117,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( (double) groundPoint.findKeyword("SubSolarLatitude"), -22.740326163641, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("SubSolarLongitude"), 319.09846558533, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("SubSolarGroundAzimuth"), 118.87356333938, 1e-8);
+
   EXPECT_NEAR( (double) groundPoint.findKeyword("Phase"), 80.528381932125, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("Incidence"), 70.127983116628, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("Emission"), 12.133564327344, 1e-8);
@@ -123,7 +126,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( (double) groundPoint.findKeyword("EphemerisTime"), -709401200.26114, 1e-8);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("UTC"), "1977-07-09T20:05:51.5549999");
   EXPECT_NEAR( (double) groundPoint.findKeyword("LocalSolarTime"), 7.7862975330952, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("SolarLongitude"), 294.73518830595, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 1e-8);
 
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionBodyFixed")[0]),  0.43850176257802, 1e-8);
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionBodyFixed")[1]),  0.88365594846443, 1e-8);
@@ -136,4 +139,124 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionCamera")[0]), -1.27447324380581e-04, 1e-8);
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionCamera")[1]),  2.5816511718707e-05, 1e-8);
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("LookDirectionCamera")[2]),  0.99999999154535, 1e-8);
+}
+
+TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
+  QVector<QString> args = {"sample=25.0", "line=25.0"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 25.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 25.0);
+}
+
+TEST_F(DefaultCube, FunctionalTestCamptSetS) {
+  QVector<QString> args = {"sample=25.0"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 25.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 528.0);
+}
+
+TEST_F(DefaultCube, FunctionalTestCamptSetL) {
+  QVector<QString> args = {"line=25.0"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 602.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 25.0);
+}
+
+TEST_F(DefaultCube, FunctionalTestCamptSetGround) {
+  QVector<QString> args = {"type=ground", "latitude=10.181441241544", "longitude=255.89292858176"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  EXPECT_NEAR( (double) groundPoint.findKeyword("Sample"), 602.0, 1e-4);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("Line"), 528.0, 1e-4);
+}
+
+
+TEST_F(DefaultCube, FunctionalTestCamptFlat) {
+  QFile flatFile(tempDir.path()+"/testOut.txt");
+  QVector<QString> args = {"format=flat",
+                           "to="+flatFile.fileName(),
+                           "append=false"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+
+  int lineNumber = 0;
+  QTextStream flatStream(&flatFile);
+  while(!flatStream.atEnd()) {
+    QString line = flatStream.readLine();
+    QStringList fields = line.split(",");
+
+    if(lineNumber == 0) {
+      EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(1), "Sample");
+      EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(2), "Line");
+    }
+    else if(lineNumber == 1) {
+      EXPECT_DOUBLE_EQ(fields.value(1).toDouble(), 602.0);
+      EXPECT_DOUBLE_EQ(fields.value(2).toDouble(), 528.0);
+    }
+    lineNumber++;
+  }
+}
+
+TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
+  std::ofstream of;
+  of.open(tempDir.path().toStdString()+"/coords.txt");
+  of << "1, 10\n10, 100\n 100, 10000";
+  of.close();
+
+  QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt",
+                           "append=false",
+                           "coordtype=image"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.group(0);
+
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 1.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 10.0);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
+
+  groundPoint = appLog.group(1);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 10.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 100.0);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
+
+  groundPoint = appLog.group(2);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 100.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 10000.0);
+  QString ErrorMsg = "Requested position does not project in camera model; no surface intersection";
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), ErrorMsg);
+}
+
+
+TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
+  QVector<QString> args = {"sample=-1", "line=-1", "allowoutside=true"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), -1.0);
+  EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);
 }

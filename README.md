@@ -7,11 +7,21 @@
 
 ## Table of Contents
 
+* [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
 * [Installation](README.md#Installation)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
+
+## Requests for Comment
+The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](astrodiscuss.usgs.gov).
+
+Current open RFCs:
+  * [Migration of ISIS Data to Git](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC4---Migration-of-ISIS-Data-to-Git)
+  * [Removal of LOLAGRAIL SPKs from the data area](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC5-Remove-old-LOLAGRAIL-SPKs)
+  
+  We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software.
 
 ## FAQ
 We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
