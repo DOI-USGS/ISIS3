@@ -1,4 +1,3 @@
-#include <QTemporaryDir>
 #include <iostream>
 
 #include "cnetpvl2bin.h"
@@ -13,10 +12,7 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetpvl2bin.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetpvl2binDefault) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString binOut = prefix.path()+"/cnetbin2Network.net";
+  QString binOut = tempDir.path()+"/cnetbin2Network.net";
 
   QVector<QString> args = {"to="+binOut};
   UserInterface ui(APP_XML, args);
