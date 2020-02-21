@@ -1,6 +1,6 @@
-#include <QTemporaryFile>
 #include <QTextStream>
 #include <QStringList>
+#include <QFile>
 
 #include "campt.h"
 #include "Fixtures.h"
@@ -17,14 +17,13 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
 TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   // set up bad coordinates file
   std::ofstream of;
-  QTemporaryFile badList;
-  ASSERT_TRUE(badList.open());
-  of.open(badList.fileName().toStdString());
+  of.open(tempDir.path().toStdString()+"/badList.lis");
   of << "1, 10,\n10,100,500\n100";
   of.close();
 
   // configure UserInterface arguments
-  QVector<QString> args = {"to=output.pvl", "coordlist=" + badList.fileName(),
+  QVector<QString> args = {"to=" + tempDir.path()+"/output.pvl",
+                           "coordlist=" + tempDir.path()+"/badList.lis",
                            "coordtype=image"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -191,11 +190,10 @@ TEST_F(DefaultCube, FunctionalTestCamptSetGround) {
 
 
 TEST_F(DefaultCube, FunctionalTestCamptFlat) {
-  // Setup output file
-  QTemporaryFile flatFile;
-  flatFile.open();
-
-  QVector<QString> args = {"format=flat", "to=" + flatFile.fileName(), "append=false"};
+  QFile flatFile(tempDir.path()+"/testOut.txt");
+  QVector<QString> args = {"format=flat",
+                           "to="+flatFile.fileName(),
+                           "append=false"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
@@ -221,14 +219,13 @@ TEST_F(DefaultCube, FunctionalTestCamptFlat) {
 
 TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
   std::ofstream of;
-  QTemporaryFile badPointList;
-  ASSERT_TRUE(badPointList.open());
-  of.open(badPointList.fileName().toStdString());
+  of.open(tempDir.path().toStdString()+"/coords.txt");
   of << "1, 10\n10, 100\n 100, 10000";
   of.close();
 
-  QVector<QString> args = {"coordlist=" + badPointList.fileName(),
-    "append=false", "coordtype=image"};
+  QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt",
+                           "append=false",
+                           "coordtype=image"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
