@@ -63,10 +63,6 @@ TEST(leisa2isisTest, leisa2isisTestDefault) {
 
   // BandBin Group
   // Check size, first, 2 middle, and last values? Enough?
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  PvlKeyword TEMP = bandbin["Center"];
-  std::cout << TEMP << std::endl; 
-
   ASSERT_EQ(bandbin["Center"].size(), 256);
   ASSERT_EQ(bandbin["Width"].size(), 256);
   ASSERT_EQ(bandbin["OriginalBand"].size(), 256);
