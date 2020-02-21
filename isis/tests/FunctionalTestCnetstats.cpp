@@ -18,7 +18,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsDefault) {
   QVector<QString> args = {};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+
+  QString serialNumList = tempDir.path()+"/cubes.lis";
 
   cnetstats(*network, serialNumList, options, &log);
 
@@ -75,7 +76,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsImageStats) {
   QVector<QString> args = {"create_image_stats=yes", "image_stats_file=" + statsFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+  QString serialNumList = tempDir.path()+"/cubes.lis";
 
   cnetstats(*network, serialNumList, options, &log);
 
@@ -96,7 +97,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointStats) {
   QVector<QString> args = {"create_point_stats=yes", "point_stats_file=" + statsFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+  QString serialNumList = tempDir.path() + "/cubes.lis";
 
   cnetstats(*network, serialNumList, options, &log);
 
@@ -138,7 +139,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+  QString serialNumList = tempDir.path()+"/cubes.lis";
 
   cnetstats(*network, serialNumList, options, &log);
 
@@ -182,7 +183,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+  QString serialNumList = tempDir.path()+"/cubes.lis";
 
   cnetstats(*network, serialNumList, options, &log);
 
@@ -219,7 +220,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsInvalidDefFile) {
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
-  QString serialNumList = cubeListTempPath.fileName();
+  QString serialNumList = tempDir.path() + "/cubes.lis";
 
   QString message = "Invalid Deffile";
   try {

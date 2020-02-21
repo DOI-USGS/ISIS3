@@ -1376,7 +1376,7 @@ namespace Isis {
       return;
     }
 
-    if (m_usingAle || !m_usingNaif) {
+    if (m_usingAle) {
       double og_time = m_bodyRotation->EphemerisTime();  
       m_bodyRotation->SetEphemerisTime(et.Et());
       m_sunPosition->SetEphemerisTime(et.Et());
