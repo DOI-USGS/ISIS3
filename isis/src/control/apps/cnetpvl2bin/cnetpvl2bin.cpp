@@ -4,6 +4,16 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis{
+  /**
+    * Default method for cnetpvl2bin that takes a UI object from the
+    * application, parses the necessary UI elements, and writes the control
+    * network to a binary file.
+    *
+    * @param ui UserInterface file generated using the cnetpvl2bin file.
+    *
+    * @param progress A Progress object through which the UI can access progress
+    *                 reports.
+    */
   void cnetpvl2bin(UserInterface &ui, Progress *progress) {
     ControlNet cnet;
     cnet.ReadControl(ui.GetFileName("FROM"), progress);
@@ -21,8 +31,7 @@ namespace Isis{
     *
     * @param progress A Progress object through which the UI can access progress
     *                 reports.
-
-  */
+    */
   void cnetpvl2bin(ControlNet &cnet, UserInterface &ui, Progress *progress) {
 
     progress->SetText("Writing Control Network...");
