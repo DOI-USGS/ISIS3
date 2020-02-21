@@ -2,14 +2,21 @@
 
 namespace Isis {
 
+  void TempTestingFiles::SetUp() {
+    ASSERT_TRUE(tempDir.isValid());
+  }
+
+
   void DefaultCube::SetUp() {
+    TempTestingFiles::SetUp();
+
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     isdFile >> isd;
     cubeLabel >> label;
 
     testCube = new Cube();
-    testCube->fromIsd(tempFile.fileName() + ".cub", label, isd, "rw");
+    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
   }
 
 
@@ -17,10 +24,13 @@ namespace Isis {
     if (testCube->isOpen()) {
       testCube->close();
     }
+    delete testCube;
   }
 
 
   void ThreeImageNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
     FileName labelPath1("data/threeImageNetwork/cube1.pvl");
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
     FileName labelPath3("data/threeImageNetwork/cube3.pvl");
@@ -33,24 +43,21 @@ namespace Isis {
     twoImageOverlapFile = new FileName("data/threeImageNetwork/twoImageOverlaps.lis");
 
     cube1 = new Cube();
-    cubeTempPath1.open();
-    cube1->fromIsd(cubeTempPath1.fileName() + ".cub", labelPath1, isdPath1, "rw");
+    cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, isdPath1, "rw");
 
     cube2 = new Cube();
-    cubeTempPath2.open();
-    cube2->fromIsd(cubeTempPath2.fileName() + ".cub", labelPath2, isdPath2, "rw");
+    cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, isdPath2, "rw");
 
     cube3 = new Cube();
-    cubeTempPath3.open();
-    cube3->fromIsd(cubeTempPath3.fileName() + ".cub", labelPath3, isdPath3, "rw");
+    cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, isdPath3, "rw");
 
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
     cubeList->append(cube2->fileName());
     cubeList->append(cube3->fileName());
 
-    cubeListTempPath.open();
-    cubeList->write(cubeListTempPath.fileName());
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
 
     network = new ControlNet();
     network->ReadControl("data/threeImageNetwork/controlnetwork.net");

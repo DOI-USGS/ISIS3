@@ -6,7 +6,7 @@
 #include <string>
 
 #include <QString>
-#include <QTemporaryFile>
+#include <QTemporaryDir>
 
 #include <nlohmann/json.hpp>
 
@@ -24,40 +24,44 @@ using json = nlohmann::json;
 
 namespace Isis {
 
-   class DefaultCube : public ::testing::Test {
-      protected:
-        Cube *testCube;
-        QTemporaryFile tempFile;
+  class TempTestingFiles : public ::testing::Test {
+    protected:
+      QTemporaryDir tempDir;
 
-        Pvl label;
-        json isd;
-
-        void SetUp() override;
-        void TearDown() override;
-   };
+      void SetUp() override;
+  };
 
 
-   class ThreeImageNetwork : public ::testing::Test {
-      protected:
+  class DefaultCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
 
-        ControlNet *network;
+      Pvl label;
+      json isd;
 
-        Cube *cube1;
-        Cube *cube2;
-        Cube *cube3;
+      void SetUp() override;
+      void TearDown() override;
+  };
 
-        FileList *cubeList;
 
-        QTemporaryFile cubeTempPath1;
-        QTemporaryFile cubeTempPath2;
-        QTemporaryFile cubeTempPath3;
-        QTemporaryFile cubeListTempPath;
-        FileName *threeImageOverlapFile;
-        FileName *twoImageOverlapFile;
+  class ThreeImageNetwork : public TempTestingFiles {
+    protected:
 
-        void SetUp() override;
-        void TearDown() override;
-   };
+      ControlNet *network;
+
+      Cube *cube1;
+      Cube *cube2;
+      Cube *cube3;
+
+      FileName *threeImageOverlapFile;
+      FileName *twoImageOverlapFile;
+
+      FileList *cubeList;
+      QString cubeListFile;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
 }
 
 #endif
