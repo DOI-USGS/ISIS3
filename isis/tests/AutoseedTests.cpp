@@ -35,12 +35,9 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/autoseed.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
   Pvl *log = NULL;
-  QString defFile = prefix.path()+"/gridPixels.pvl";
-  QString outnet = prefix.path()+"/seeded.net";
+  QString defFile = tempDir.path()+"/gridPixels.pvl";
+  QString outnet = tempDir.path()+"/seeded.net";
 
   PvlObject autoseedObject("AutoSeed");
   PvlGroup autoseedGroup("PolygonSeederAlgorithm");
@@ -56,7 +53,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   autoseedDef.addObject(autoseedObject);
   autoseedDef.write(defFile);
 
-  QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
+  QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet,
                                     "deffile="+defFile,
                                     "overlaplist="+threeImageOverlapFile->original(),
@@ -71,13 +68,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
   Pvl *log = NULL;
-  QString defFile = prefix.path()+"/gridPixels.pvl";
-  QString outnet1 = prefix.path()+"/seeded_two_file.net";
-  QString outnet2 = prefix.path()+"/seeded_three_file.net";
+  QString defFile = tempDir.path()+"/gridPixels.pvl";
+  QString outnet1 = tempDir.path()+"/seeded_two_file.net";
+  QString outnet2 = tempDir.path()+"/seeded_three_file.net";
 
   PvlObject autoseedObject("AutoSeed");
   PvlGroup autoseedGroup("PolygonSeederAlgorithm");
@@ -94,9 +88,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   autoseedDef.write(defFile);
 
   cubeList->removeLast();
-  cubeList->write(cubeListTempPath.fileName());
+  cubeList->write(cubeListFile);
 
-  QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
+  QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet1,
                                     "deffile="+defFile,
                                     "overlaplist="+twoImageOverlapFile->original(),
@@ -110,8 +104,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   ASSERT_EQ(onet.GetNumPoints(), 18);
 
   cubeList->append(cube3->fileName());
-  cubeList->write(cubeListTempPath.fileName());
-  SerialNumberList serialNumList(cubeListTempPath.fileName());
+  cubeList->write(cubeListFile);
+  SerialNumberList serialNumList(cubeListFile);
 
   autoseedArgs.removeAt(0);
   autoseedArgs.replace(1, "onet="+outnet2);
@@ -123,14 +117,11 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
   Pvl *log = NULL;
-  QString defFile = prefix.path()+"/pixelGrid.pvl";
-  QString outnet = prefix.path()+"/new.net";
+  QString defFile = tempDir.path()+"/pixelGrid.pvl";
+  QString outnet = tempDir.path()+"/new.net";
 
-  QVector<QString> autoseedArgs = {"fromlist="+cubeListTempPath.fileName(),
+  QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet,
                                     "deffile="+defFile,
                                     "overlaplist="+threeImageOverlapFile->original(),
