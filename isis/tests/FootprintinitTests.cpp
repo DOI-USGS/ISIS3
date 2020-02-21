@@ -17,10 +17,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
 
-TEST_F(DefaultCube, FunctionalFootprintinitDefault) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
+TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   QVector<QString> footprintArgs = {};
   UserInterface footprintUi(APP_XML, footprintArgs);
 
