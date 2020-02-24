@@ -23,7 +23,7 @@
 using namespace std;
 
 namespace Isis {
-  
+
   /**
    * Create FindImageOverlaps object.
    *
@@ -34,7 +34,7 @@ namespace Isis {
    * @see automaticRegistration.doc
    */
   ImageOverlapSet::ImageOverlapSet(bool continueOnError) {
-    
+
     p_continueAfterError = continueOnError;
     p_writtenSoFar = 0;
     p_calculatedSoFar = -1;
@@ -50,7 +50,7 @@ namespace Isis {
    * will be deleted as well.
    */
   ImageOverlapSet::~ImageOverlapSet() {
-    
+
     for (int i = 0; i < Size(); i++) {
       if (p_lonLatOverlaps[i]) delete p_lonLatOverlaps[i];
     }
@@ -69,7 +69,7 @@ namespace Isis {
    * @param sns The serial number list to use when finding overlaps
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &sns) {
-    
+
     // Create an ImageOverlap for each image boundary
     for (int i = 0; i < sns.size(); i++) {
       // Open the cube
@@ -121,11 +121,11 @@ namespace Isis {
           continue;
         }
       }
-      
+
       p_lonLatOverlapsMutex.lock();
       p_lonLatOverlaps.push_back(CreateNewOverlap(sns.serialNumber(i), mp));
       p_lonLatOverlapsMutex.unlock();
-      
+
       if (mp) {
         delete mp;
         mp = NULL;
@@ -168,7 +168,7 @@ namespace Isis {
    * @param outputFile The output ImageOverlapSet file
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
-    
+
     // Do a common sense programmer check, this should be empty before we start
     if (!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on " \
@@ -186,17 +186,17 @@ namespace Isis {
 
     FindImageOverlaps(boundaries);
 
-    // While our exit condition is not true, call WriteImageOverlaps with the filename. 
+    // While our exit condition is not true, call WriteImageOverlaps with the filename.
     // The WriteImageOverlaps call will block if it is waiting on calculations.
     while (p_calculatedSoFar != p_lonLatOverlaps.size()) {
       WriteImageOverlaps(outputFile);
     }
-    
+
     // flush the output if we're still not done writing
     if (p_calculatedSoFar != p_writtenSoFar)
       WriteImageOverlaps(outputFile);
 
-    // Wait for the calculation thread to actually exit, 
+    // Wait for the calculation thread to actually exit,
     // this has more than likely already occurred.
     wait();
 
@@ -212,7 +212,7 @@ namespace Isis {
   /** This is a strict pthread implementation of this class' multi-threading!
    *
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
-  
+
     // Do a common sense programmer check, this should be empty before we start
     if (!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on an ImageOverlapSet " \
@@ -256,7 +256,7 @@ namespace Isis {
       WriteImageOverlaps(outputFile);
     }
 
-    // Wait for the calculation thread to actually exit, 
+    // Wait for the calculation thread to actually exit,
     //   this has more than likely already occurred.
     void *result;
     pthread_join(calculateThread, &result);
@@ -319,14 +319,14 @@ namespace Isis {
     FindAllOverlaps();
   }
 
-  
+
   /**
    * Create polygons of overlap from the file specified.
    *
    * @param filename The file to read the image overlaps from
    */
   void ImageOverlapSet::ReadImageOverlaps(const QString &filename) {
-    
+
     QString file = FileName(filename).expanded();
 
     try {
@@ -379,13 +379,13 @@ namespace Isis {
                                    int position,
                                    ImageOverlap *sncopy,
                                    bool insert) {
-        
+
     bool success = false;
     geos::geom::MultiPolygon *multiPolygon = PolygonTools::MakeMultiPolygon(poly);
     delete poly;
     poly = NULL;
-    
-    if (!multiPolygon->isValid() || 
+
+    if (!multiPolygon->isValid() ||
         (multiPolygon->getArea() < 1.0e-10 && !multiPolygon->isEmpty())) {
       delete multiPolygon;
       multiPolygon = Isis::globalFactory->createMultiPolygon();
@@ -394,7 +394,7 @@ namespace Isis {
     if (position > p_lonLatOverlaps.size()) {
       position = p_lonLatOverlaps.size();
     }
-    
+
     try {
       if (!multiPolygon->isEmpty()) {
         geos::geom::MultiPolygon *despiked = PolygonTools::Despike(multiPolygon);
@@ -405,7 +405,7 @@ namespace Isis {
     catch (IException &) {
     }
 
-    if (multiPolygon->isValid() && 
+    if (multiPolygon->isValid() &&
         (multiPolygon->isEmpty() || multiPolygon->getArea() > 1.0e-14)) {
       if (!insert) {
         p_lonLatOverlaps.at(position)->SetPolygon(multiPolygon);
@@ -430,10 +430,10 @@ namespace Isis {
         p_lonLatOverlaps.insert(p_lonLatOverlaps.begin() + position, imageOverlap);
         p_lonLatOverlapsMutex.unlock();
       }
-      
+
       success = true;
     }
-    
+
     return success;
   }
 
@@ -444,19 +444,19 @@ namespace Isis {
    * @param filename The file to write the image overlaps to
    */
   void ImageOverlapSet::WriteImageOverlaps(const QString &filename) {
-            
+
     QString file = FileName(filename).expanded();
     bool failed = false;
     bool noOverlaps = false;
-    
+
     if (p_threadedCalculate) {
       p_calculatePolygonMutex.lock();
     }
-    
-    try {
-      // Let's get an ostream pointed at our file
-      std::ofstream outStream;
 
+    // Let's get an ostream pointed at our file
+    std::ofstream outStream;
+
+    try {
       QByteArray fileArray = file.toLatin1();
       if (p_writtenSoFar == 0) {
         outStream.open(fileArray.constData(), fstream::out | fstream::trunc | fstream::binary);
@@ -464,28 +464,26 @@ namespace Isis {
       else {
         outStream.open(fileArray.constData(), fstream::out | fstream::app | fstream::binary);
       }
-      
+
       failed |= outStream.fail();
 
-      static bool overlapWritten = false;
       for (int overlap = p_writtenSoFar; !failed && overlap <= p_calculatedSoFar; overlap++) {
         // Let's not try anything during a possible reallocate
         p_lonLatOverlapsMutex.lock();
-        
+
         if (p_lonLatOverlaps.size() == 0) {
           noOverlaps = true;
         }
         else {
           if (overlap < p_lonLatOverlaps.size() && p_lonLatOverlaps[overlap]) {
-                   
+
             if (!p_lonLatOverlaps[overlap]->Polygon()->isEmpty()) {
-                        
-              if (overlapWritten) {
+
+              if (p_writtenSoFar) {
                 outStream << std::endl;
               }
 
               p_lonLatOverlaps[overlap]->Write(outStream);
-              overlapWritten = true;
             }
 
             delete p_lonLatOverlaps[overlap];
@@ -495,7 +493,7 @@ namespace Isis {
         }
         p_lonLatOverlapsMutex.unlock();
       }
-            
+
       failed |= outStream.fail();
       outStream.close();
 
@@ -504,7 +502,8 @@ namespace Isis {
     catch (...) {
       failed = true;
     }
-    
+    outStream.close();
+
     /**
      * Don't wait for an unlock from FindImageOverlaps(...) if we're done
      * calculating.
@@ -538,7 +537,7 @@ namespace Isis {
    *               current known ImageOverlap objects or NULL
    */
   void ImageOverlapSet::FindAllOverlaps(SerialNumberList *snlist) {
-    
+
     bool foundOverlap = false;
     if (p_lonLatOverlaps.size() <= 1) return;
 
@@ -565,7 +564,7 @@ namespace Isis {
       // below it
       for (int inside = outside + 1; inside < p_lonLatOverlaps.size(); ++inside) {
         try {
-          if (p_lonLatOverlaps.at(outside)->HasAnySameSerialNumber(*p_lonLatOverlaps.at(inside))) 
+          if (p_lonLatOverlaps.at(outside)->HasAnySameSerialNumber(*p_lonLatOverlaps.at(inside)))
             continue;
 
           // We know these are valid because they were filtered early on
@@ -588,7 +587,7 @@ namespace Isis {
             p_lonLatOverlapsMutex.lock();
             p_lonLatOverlaps.erase(p_lonLatOverlaps.begin() + inside);
             p_lonLatOverlapsMutex.unlock();
-            inside --;      
+            inside --;
             continue;
           }
 
@@ -605,10 +604,10 @@ namespace Isis {
             //   that we simply can't calculate.
             double outsideArea = poly1->getArea();
             double insideArea = poly2->getArea();
-            double areaRatio = std::min(outsideArea, insideArea) / 
+            double areaRatio = std::min(outsideArea, insideArea) /
                                std::max(outsideArea, insideArea);
 
-            // If one of the polygons is < 1% the area of the other, 
+            // If one of the polygons is < 1% the area of the other,
             //   then only throw out the small one to
             //   try to minimize the impact of this failure.
             if (areaRatio < 0.1) {
@@ -702,7 +701,7 @@ namespace Isis {
               tmpGeom = PolygonTools::Difference(poly2, poly1);
             }
             catch (IException &e) {
-              HandleError(e, snlist, "Differencing overlap polygons failed." 
+              HandleError(e, snlist, "Differencing overlap polygons failed."
                                      "The first polygon will be removed.", inside, outside);
 
               // Delete outside polygon directly and reset outside loop
@@ -724,7 +723,7 @@ namespace Isis {
               tmpGeom = PolygonTools::Difference(poly1, poly2);
             }
             catch (IException &e) {
-              HandleError(e, snlist, "Differencing overlap polygons failed." 
+              HandleError(e, snlist, "Differencing overlap polygons failed."
                                      "The second polygon will be removed.", inside, outside);
 
               // Delete inside polygon directly and process next inside
@@ -749,7 +748,7 @@ namespace Isis {
               tmpGeom = NULL;
             }
 
-            // If we failed to subtract overlap, try to subtract poly2 from poly1 
+            // If we failed to subtract overlap, try to subtract poly2 from poly1
             // and set poly1 to the result
             try {
               if (tmpGeom == NULL) {
@@ -798,14 +797,14 @@ namespace Isis {
 
     p_calculatedSoFar = p_lonLatOverlaps.size();
     delete emptyPolygon;
-    
+
     // Do not write empty overlap files
     if (foundOverlap == false) {
       p_lonLatOverlapsMutex.lock();
       p_lonLatOverlaps.clear();
       p_lonLatOverlapsMutex.unlock();
     }
-    
+
     // unblock the writing process
     // Check first if the the thread is still locked
     // to avoid undefined behavior
@@ -823,7 +822,7 @@ namespace Isis {
    * @param from  The object to copy the serial numbers from
    */
   void ImageOverlapSet::AddSerialNumbers(ImageOverlap *to, ImageOverlap *from) {
-    
+
     for (int i = 0; i < from->Size(); i++) {
       QString s = (*from)[i];
       to->Add(s);
@@ -852,11 +851,11 @@ namespace Isis {
    * overlaps exist.
    *
    * @param serialNumber The serial number to be search for in all existing ImageOverlaps
-   * 
+   *
    * @return List of related ImageOverlap objects, ownership is retained by ImageOverlapSet*
    */
   std::vector<ImageOverlap *> ImageOverlapSet::operator[](QString serialNumber) {
-    
+
     vector<ImageOverlap *> matches;
 
     // Look at all the ImageOverlaps we have and return the ones that
@@ -872,7 +871,7 @@ namespace Isis {
     return matches;
   }
 
-  
+
   /**
    * If a problem occurred when searching for image overlaps,
    * this method will handle it.
@@ -883,11 +882,11 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(IException &e, 
-                                    SerialNumberList *snlist, 
-                                    QString msg, 
+  void ImageOverlapSet::HandleError(IException &e,
+                                    SerialNumberList *snlist,
+                                    QString msg,
                                     int overlap1, int overlap2) {
-    
+
     PvlGroup err("ImageOverlapError");
 
     if (overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -913,7 +912,7 @@ namespace Isis {
       err += polygon;
     }
 
-    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && 
+    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() &&
         overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("FileNames");
@@ -948,7 +947,7 @@ namespace Isis {
     if (!p_continueAfterError) throw;
   }
 
-  
+
   /**
    * If a problem occurred when searching for image overlaps,
    * this method will handle it.
@@ -959,11 +958,11 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, 
-                                    SerialNumberList *snlist, 
-                                    QString msg, 
+  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc,
+                                    SerialNumberList *snlist,
+                                    QString msg,
                                     int overlap1, int overlap2) {
-    
+
     PvlGroup err("ImageOverlapError");
 
     if (overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -985,7 +984,7 @@ namespace Isis {
       }
     }
 
-    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && 
+    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() &&
         overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("FileNames");
@@ -1030,10 +1029,10 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(SerialNumberList *snlist, 
-                                    QString msg, 
+  void ImageOverlapSet::HandleError(SerialNumberList *snlist,
+                                    QString msg,
                                     int overlap1, int overlap2) {
-    
+
     PvlGroup err("ImageOverlapError");
 
     if (overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -1055,7 +1054,7 @@ namespace Isis {
       }
     }
 
-    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && 
+    if (overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() &&
         overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("FileNames");
@@ -1091,7 +1090,7 @@ namespace Isis {
    * footprintinit, prior to calculating overlaps.
    */
   void ImageOverlapSet::DespikeLonLatOverlaps() {
-    
+
     for (int i = 0; i < Size(); i++) {
       try {
         p_lonLatOverlaps[i]->SetPolygon(PolygonTools::Despike(p_lonLatOverlaps[i]->Polygon()));
