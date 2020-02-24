@@ -69,13 +69,13 @@ TEST(leisa2isisTest, leisa2isisTestDefault) {
   ASSERT_EQ(bandbin["OriginalBand"].size(), 256);
 
   ASSERT_DOUBLE_EQ(bandbin["Center"][0].toDouble(), 2.4892);
-  ASSERT_DOUBLE_EQ(bandbin["Center"][64].toDouble(), 0);
-  ASSERT_DOUBLE_EQ(bandbin["Center"][128].toDouble(), 0);
+  ASSERT_DOUBLE_EQ(bandbin["Center"][64].toDouble(), 1.9784);
+  ASSERT_DOUBLE_EQ(bandbin["Center"][128].toDouble(), 1.572);
   ASSERT_DOUBLE_EQ(bandbin["Center"][255].toDouble(), 2.0898);
 
   ASSERT_DOUBLE_EQ(bandbin["Width"][0].toDouble(), 0.011228);
-  ASSERT_DOUBLE_EQ(bandbin["Width"][64].toDouble(), 0);
-  ASSERT_DOUBLE_EQ(bandbin["Width"][128].toDouble(), 0);
+  ASSERT_DOUBLE_EQ(bandbin["Width"][64].toDouble(), 0.008924);
+  ASSERT_DOUBLE_EQ(bandbin["Width"][128].toDouble(), 0.007091);
   ASSERT_DOUBLE_EQ(bandbin["Width"][255].toDouble(), 0.004915);
 
   ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][0].toDouble(), 1);
