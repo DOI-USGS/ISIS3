@@ -68,6 +68,12 @@ pipeline {
 
               stage (label) {
                   sh 'git config --global http.sslVerify false'
+                  if (lower_label == "mac") {
+                      sh """
+                        git config --global http.sslCAInfo /etc/ssl/cert.pem
+                        git config --global http.postBuffer 524288000
+                      """
+                  }
                   checkout scm
                   isisEnv.add("ISISROOT=${pwd()}/build")
                   cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
