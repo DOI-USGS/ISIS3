@@ -1201,19 +1201,15 @@ namespace Isis {
 
 
   /**
-   * Create the output file. Note that all the appropiate calls to at least
-   * SetDimensions and SetPixelType should be made prior to calling this method.
-   *
+   * Given a CubeAttributeOutput object, set min/max to propagate if 
+   * propagating min/max attributes was requested and set the pixel 
+   * type to propagate if pixel type propagation was requested.  
+   * 
    * @param parameter The parameter name that holds the output file name.
-   *
-   * @return @b Isis::Cube Output cube.
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
    */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
-    CubeAttributeOutput &att =
-      Application::GetUserInterface().GetOutputAttribute(parameter);
-
+  void ProcessImport::SetAttributes(CubeAttributeOutput &att) {
     if (att.propagateMinimumMaximum()) {
       double min, max;
       if ((p_pixelType == Isis::Double) ||
@@ -1263,6 +1259,24 @@ namespace Isis {
         att.setPixelType(p_pixelType);
       }
     }
+  }
+
+
+  /**
+   * Create the output file. Note that all the appropiate calls to at least
+   * SetDimensions and SetPixelType should be made prior to calling this method.
+   *
+   * @param parameter The parameter name that holds the output file name.
+   *
+   * @return @b Isis::Cube Output cube.
+   *
+   * @throws Isis::iException::Message "Unsupported pixel type."
+   */
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
+    CubeAttributeOutput &att =
+      Application::GetUserInterface().GetOutputAttribute(parameter);
+
+    SetAttributes(att);
 
     return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
@@ -1283,6 +1297,7 @@ namespace Isis {
    */
   Isis::Cube *ProcessImport::SetOutputCube(const QString &fname,
       Isis::CubeAttributeOutput &att) {
+    SetAttributes(att);
     return Isis::Process::SetOutputCube(fname, att, p_ns, p_nl, p_nb);
   }
 
