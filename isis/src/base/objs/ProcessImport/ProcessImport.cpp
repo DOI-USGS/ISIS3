@@ -1297,6 +1297,7 @@ namespace Isis {
    */
   Isis::Cube *ProcessImport::SetOutputCube(const QString &fname,
       Isis::CubeAttributeOutput &att) {
+    SetAttributes(att);
     return Isis::Process::SetOutputCube(fname, att, p_ns, p_nl, p_nb);
   }
 

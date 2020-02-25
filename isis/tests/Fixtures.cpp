@@ -65,12 +65,11 @@ namespace Isis {
 
 
   void ThreeImageNetwork::TearDown() {
+    delete cubeList;
+    delete network;
+  
     delete cube1;
     delete cube2;
     delete cube3;
-
-    delete cubeList;
-    delete network;
-
   }
 }
