@@ -258,4 +258,14 @@ namespace Isis {
   Stretch LinearStretchType::getStretch() {
     return *p_stretch;
   }
+
+  // work out the flow in a minute
+  QString LinearStretchType::getStretchType() {
+    return "LinearStretch";
+  }
+
+  // work out the flow in a minute
+//  QString LinearStretchType::getName() {
+//    return "UserSetName";
+//  }
 }

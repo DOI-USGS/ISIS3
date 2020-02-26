@@ -11,6 +11,7 @@
 #include <QString>
 #include <QTableWidget>
 #include <QTextStream>
+#include <QInputDialog>
 
 #include "Stretch.h"
 #include "Histogram.h"
@@ -35,6 +36,7 @@ namespace Isis {
     p_cubeHist = NULL;
     p_graph = NULL;
     p_mainLayout = NULL;
+    p_name = "no name"; 
 
     p_cubeHist = new Histogram(hist);
 
@@ -61,6 +63,7 @@ namespace Isis {
 
     QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube!");
     connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
+//    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(promptName()));
     p_mainLayout->addWidget(saveToCubeButton, 4, 0);
 
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -178,8 +181,19 @@ namespace Isis {
     outfile.close();
   }
 
-  void StretchType::emitTest() {
-    emit saveToCube(); 
+
+  void StretchType::promptName() {
+//  bool ok;
+//  QString text = QInputDialog::getText(this, tr("Save Stretch"),
+//                                       tr("Name of Stretch Pair:"), QLineEdit::Normal,
+//                                       "stretch", &ok);
+//  if (ok && !text.isEmpty()) {
+//    p_name = text;
+//  }
+
+    // warn if a stretch of the same name already exists and that it will be over-written 
+    QString nothing("nothing");
+//    emit saveToCube(); 
   }
 
 

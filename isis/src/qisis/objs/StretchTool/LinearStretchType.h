@@ -34,8 +34,8 @@ namespace Isis {
       ~LinearStretchType();
 
       virtual Stretch getStretch();
+      virtual QString getStretchType(); 
       virtual void setStretch(Stretch);
-
 
     private slots:
       void startSliderMoved(int);

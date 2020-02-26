@@ -50,7 +50,8 @@ namespace Isis {
     LinearStretchType *linear = new LinearStretchType(hist, curStretch,
         name, color);
     connect(linear, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
-    connect(linear, SIGNAL(saveToCube()), this, SLOT(saveMe()));
+//    connect(linear, SIGNAL(saveToCube()), this, SLOT(saveMe()));
+   connect(linear, SIGNAL(saveToCube()), this, SIGNAL(saveToCube()));
     p_stretchTypeStack->addWidget(linear);
 
     SawtoothStretchType *sawtooth = new SawtoothStretchType(hist, curStretch,
@@ -75,10 +76,10 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
   }
 
-  void AdvancedStretch::saveMe() {
-    Cube* icube = ((StretchTool*)parentWidget())->cubeViewport()->cube(); 
-    QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read here Only");
-  }
+//  void AdvancedStretch::saveMe() {
+//    Cube* icube = ((StretchTool*)parentWidget())->cubeViewport()->cube(); 
+//    QMessageBox::information((QWidget *)parent(), "Error", "advanced stretch");
+//  }
 
   /**
    * Destructor
@@ -96,6 +97,14 @@ namespace Isis {
     return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretch();
   }
 
+  // This seems like a bad idea?  (if keep, can eliminate at the StretchType level? In theory???? 
+  QString AdvancedStretch::getStretchType() {
+    return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretchType();
+  }
+
+  QString AdvancedStretch::getName() {
+    return ((StretchType *)p_stretchTypeStack->currentWidget())->getName();
+  }
 
   /**
    * This is called when the user creates a stretch outside of the

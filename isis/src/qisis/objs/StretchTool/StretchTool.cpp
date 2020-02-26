@@ -13,9 +13,11 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QValidator>
+#include <QInputDialog>
 
 #include "AdvancedStretchDialog.h"
 #include "Brick.h"
+#include "Blob.h"
 #include "CubeViewport.h"
 #include "Histogram.h"
 #include "IException.h"
@@ -372,27 +374,73 @@ namespace Isis {
     }
   }
 
-
+// HERE
   void StretchTool::saveMe() {
-    QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
+    MdiCubeViewport *cvp = cubeViewport();
+    Cube* icube = cvp->cube();
+    //Pvl* lab = icube->label();
 
-//    MdiCubeViewport *cvp = cubeViewport();
-//    Cube* icube = cvp->cube();
+    // iterate over relevant PVL objects to make sure not taken
+    // PvlObjectIterator object = lab->   ->findObject("LinearStretch"); 
+
+    //PvlObject object = lab->findObject("LinearStretch"); 
+//    PvlKeyword currentName = object.findKeyword("Name"); 
+
+    // can I get a list of objects and search by name??? 
+
+/*    QStringList namelist; 
+
+    PvlObject::PvlObjectIterator objIter;
+    PvlGroup fpgrp;
+    for (objIter=lab->beginObject(); objIter<=lab->endObject(); objIter++) {
+      if (objIter->name() == "Stretch") {
+        PvlKeyword tempKeyword = objIter->findKeyword("Name");
+//        QString tempName = tempKeyword[0];
+//        namelist.append(tempName); 
+      }
+    }
+
+    
+    bool ok;
+    QString name; 
+    QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
+                                         tr("Name of Stretch Pair:"), QLineEdit::Normal,
+                                         "temp", &ok);
+    if (ok && !text.isEmpty()) {
+//      && !lab->hasObject(text)) {
+      name = text;
+      }
+      else {
+      QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
+                                         tr("Name of Stretch Pair not already selected:"), QLineEdit::Normal,
+                                        text, &ok);
+      }*/
+
+    Stretch stretch = m_advancedStretch->getGrayStretch();
+    QString stretchType = m_advancedStretch->getStretchType(); 
+    QString name = "foxtail_fern";
 
     //  If cube readonly print error
-//    if (icube->isReadOnly()) {
-//      QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
-//      return;
-//    }
+    if (icube->isReadOnly()) {
+      //  ReOpen cube as read/write
+      //  If cube readonly print error
+      try {
+        cvp->cube()->reopen("rw");
+      }
+      catch(IException &) {
+        cvp->cube()->reopen("r");
+        QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write to save stretch");
+        return;
+      }
+    }
 
+    // how to get name and stretchtype from AdvancedStretchTool? 
+    Blob blob(name, stretchType); 
+//              stretch.Text()); <-- contents
+    icube->write(blob);
 
-//    QMessageBox::information((QWidget *) parent(), "Worked" , "vp->cube()->Lines()"); 
-    
-//    Stretch stretch = getStretch();
-
-    //Add the pairs to the file
-//    stream << stretch.Text() << endl;
-
+    // Don't leave open rw -- not optimal. 
+    cvp->cube()->reopen("r");
   }
 
   /**

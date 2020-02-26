@@ -50,6 +50,8 @@ namespace Isis {
       bool isRgbMode() const;
 
       Stretch getGrayStretch();
+      QString getStretchType(); 
+      QString getName(); 
       Stretch getRedStretch();
       Stretch getGrnStretch();
       Stretch getBluStretch();
@@ -77,6 +79,7 @@ namespace Isis {
       void stretchChanged();
       //! Emitted when this dialog is shown or hidden
       void visibilityChanged();
+      void saveToCube(); 
 
     public slots:
       void updateStretch(CubeViewport *);

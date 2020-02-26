@@ -37,16 +37,18 @@ namespace Isis {
       Stretch getStretch();
       void setStretch(Stretch newStretch);
       void setHistogram(const Histogram &newHist);
+      QString getStretchType();
+      QString getName();
 
     signals:
       //! Emitted when a new stretch is available
       void stretchChanged();
-      void saveToCube(); 
+      void saveToCube();
 
-  protected slots: 
-    void saveMe(); 
+//  protected slots: 
+//    void saveMe(); 
 
-    protected:
+//    protected:
 
 
     private:

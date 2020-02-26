@@ -72,6 +72,7 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
     connect(p_bluStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
+    // add signal for RGB
   }
 
   /**
@@ -127,6 +128,8 @@ namespace Isis {
 
     connect(p_grayStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
+    connect(p_grayStretch, SIGNAL(saveToCube()),
+            this, SIGNAL(saveToCube()));
   }
 
 
@@ -216,7 +219,7 @@ namespace Isis {
 
 
   /**
-   * This calls setHistogram on the gray advanced stretche. This
+   * This calls setHistogram on the gray advanced stretches. This
    * should be called every time the visible area changes.
    *
    * @param grayHist Histogram of visible area on gray band
@@ -275,6 +278,15 @@ namespace Isis {
     }
   }
 
+
+  // also bad idea?  /// THIS IS OF TYPE AdvancedStretch, so ... something. need to draw out. 
+  QString AdvancedStretchDialog::getStretchType() {
+    return p_grayStretch->getStretchType();
+  }
+
+  QString AdvancedStretchDialog::getName() {
+    return p_grayStretch->getName();
+  }
 
   /**
    * This returns the advanced stretch's stretch for red.
