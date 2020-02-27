@@ -801,7 +801,12 @@ namespace Isis {
     configDialog->setAttribute(Qt::WA_DeleteOnClose);
     configDialog->show();
   }
-
+  
+  /*
+   * Updates lat/lon ranges when a new projection file is loaded. Also 
+   * forces the lat/lon extent source to Map resetting user options in the grid tool dialog. 
+   * 
+   */
   void MosaicGridTool::onProjectionChanged() {
     TProjection * tproj = (TProjection *)getWidget()->getProjection();
     
