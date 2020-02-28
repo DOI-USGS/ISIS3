@@ -454,7 +454,8 @@ namespace Isis {
       if (!cubeDeleted) {
         QMessageBox msgBox;
         msgBox.setText("Stretch Could Not Be Deleted!");
-        msgBox.setInformativeText("A stretch with name: \"" + toDelete + "\" Could not be found, so there was nothing to delete from the Cube.");
+        msgBox.setInformativeText("A stretch with name: \"" + toDelete + 
+            "\" Could not be found, so there was nothing to delete from the Cube.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);
       }
@@ -497,7 +498,8 @@ namespace Isis {
       if (namelist.contains(text)) {
         QMessageBox msgBox;
         msgBox.setText("Stretch Name Already Exists!");
-        msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
+        msgBox.setInformativeText("A stretch pair with name: \"" + text + 
+            "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setDefaultButton(QMessageBox::Cancel);
