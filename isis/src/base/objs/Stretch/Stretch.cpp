@@ -47,9 +47,16 @@ namespace Isis {
     p_minimum = p_lrs;
     p_maximum = p_hrs;
     p_pairs = 0;
-    p_type = "none";
+    p_type = "None";
   }
 
+
+  /**
+   * Constructs a Stretch object with default mapping of special pixel values to
+   * themselves and a provided name. 
+   *  
+   * @param name Name to use for Stretch 
+   */
   Stretch::Stretch(QString name) : Blob(name, "Stretch") {
     p_null = Isis::NULL8;
     p_lis = Isis::LOW_INSTR_SAT8;
@@ -59,8 +66,9 @@ namespace Isis {
     p_minimum = p_lrs;
     p_maximum = p_hrs;
     p_pairs = 0;
-    p_type = "none";
+    p_type = "None";
   }
+
 
   /**
    * Adds a stretch pair to the list of pairs. Note that all input pairs must be
@@ -424,7 +432,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Read saved Stretch data from a Cube into this object. 
+   *  
+   * This is called by Blob::Read() and is the actual data reading function 
+   * ultimately called when running something like cube->read(stretch);  
+   * 
+   * @param is input stream containing the saved Stretch information
+   */
   void Stretch::ReadData(std::istream &is) {
+    // Set the Stretch Type
+     p_type = p_blobPvl["StretchType"][0];
+
+     // Read in the Stretch Pairs
      streampos sbyte = p_startByte - 1;
      is.seekg(sbyte, std::ios::beg);
      if (!is.good()) {
@@ -438,9 +458,10 @@ namespace Isis {
 
      is.read(buf, p_nbytes);
 
-     string temp(buf);
-     QString tempFriend = QString::fromStdString(temp);
-     Parse(tempFriend);
+     // Read buffer data into a QString so we can call Parse()
+     string stringFromBuffer(buf);
+     QString qStringFromBuffer = QString::fromStdString(stringfromBuffer);
+     Parse(qStringFromBuffer);
 
      delete [] buf;
 
@@ -449,45 +470,36 @@ namespace Isis {
                     p_blobName + "]";
        throw IException(IException::Io, msg, _FILEINFO_);
      }
-
-     p_type = p_blobPvl["StretchType"][0];
    }
 
+
+  /**
+   * Get the Type of Stretch. This is only used by the AdvancedStretchTool.
+   * 
+   * @return QString Type of Stretch. 
+   */
   QString Stretch::getType(){
     return p_type;
   }
 
-//  void Stretch::ReadInit() {
-//    p_nbytes = Text().toStdString().size();
-//  }
 
-  //!  Initializes for writing polygon to cube blob
+  /**
+   *  Initializes for writing stretch to cube blob
+   */
   void Stretch::WriteInit() {
-/*    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-    // Check to see p_polygons is valid data
-    if (!p_polygons) {
-      string msg = "Cannot write a NULL polygon!";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    p_polyStr = wkt->write(p_polygons);
-    p_nbytes = p_polyStr.size();
-
-    delete wkt;*/
     p_nbytes = Text().toStdString().size(); 
   }
 
 
+  /**
+   * Writes the stretch information to a cube. 
+   *  
+   * This is called by Blob::write() and is ultimately the function 
+   * called when running something like cube->write(stretch);  
+   *  
+   * @param os output stream to write the stretch data to.
+   */
   void Stretch::WriteData(std::fstream &os) {
- //   std::string temp(
-//    QString temp("Legolas Greenleaf, long under tree...");
-//    os.write(Text().toStdString().c_str(), Text().toStdString().size());
-  //  qDebug() << temp;
-  //  qDebug() << temp.toStdString().size(); 
-    
-  //  QByteArray fred = temp.toUtf8(); 
-//    os.write(temp.toStdString().c_str(), temp.size());
-//    os.write(fred.data(), fred.size());
     os.write(Text().toStdString().c_str(), p_nbytes);
   }
 
