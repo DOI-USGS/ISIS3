@@ -73,6 +73,8 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("BinaryStretch"); 
+
     setLayout(p_mainLayout);
     setStretch(calculateNewStretch());
   }
@@ -373,9 +375,5 @@ namespace Isis {
     }
 
     return newStretch;
-  }
-
-  QString BinaryStretchType::getStretchType() {
-    return "BinaryStretch";
   }
 }

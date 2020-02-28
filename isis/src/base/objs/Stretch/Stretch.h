@@ -183,6 +183,8 @@ namespace Isis {
       };
 
       QString getType(); 
+      void setType(QString type); 
+
       double Input(const int index) const;
       double Output(const int index) const;
 

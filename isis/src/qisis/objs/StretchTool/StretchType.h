@@ -45,8 +45,6 @@ namespace Isis {
       virtual ~StretchType();
 
       virtual Stretch getStretch();
-      virtual QString getStretchType() { return "unknown";}; // change to pure virutal 
-      virtual QString getName() { return p_name;}; // change to pure virutal??
 
       /**
        * Children must re-implement this to update their stretch pairs and GUI

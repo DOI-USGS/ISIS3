@@ -459,8 +459,8 @@ namespace Isis {
      is.read(buf, p_nbytes);
 
      // Read buffer data into a QString so we can call Parse()
-     string stringFromBuffer(buf);
-     QString qStringFromBuffer = QString::fromStdString(stringfromBuffer);
+     std::string stringFromBuffer(buf);
+     QString qStringFromBuffer = QString::fromStdString(stringFromBuffer);
      Parse(qStringFromBuffer);
 
      delete [] buf;
@@ -480,6 +480,17 @@ namespace Isis {
    */
   QString Stretch::getType(){
     return p_type;
+  }
+
+
+  /**
+   * Set the Type of Stretch. This is only used by the AdvancedStretchTool.
+   *  
+   * @param stretchType The type of stretch.  
+   */
+  void Stretch::setType(QString stretchType){
+    // check to see if valid input
+    p_type = stretchType;
   }
 
 

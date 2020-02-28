@@ -541,7 +541,7 @@ namespace Isis {
     QString stretchType = m_advancedStretch->getStretchType(); 
 
     stretch.Label()["Name"] = text;
-    stretch.Label() += PvlKeyword("StretchType", stretchType);
+    stretch.Label() += PvlKeyword("StretchType", stretch.getType());
 
     icube->write(stretch);
 

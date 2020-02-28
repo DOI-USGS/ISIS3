@@ -71,6 +71,8 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("SawtoothStretch"); 
+
     setLayout(p_mainLayout);
 
     p_widthEdit->setText(QString::number(
@@ -307,10 +309,6 @@ namespace Isis {
   Stretch SawtoothStretchType::calculateNewStretch() {
     return calculateNewStretch(p_offsetEdit->text().toDouble(),
                                p_widthEdit->text().toDouble());
-  }
-
-  QString SawtoothStretchType::getStretchType() {
-    return "SawtoothStretch";
   }
 }
 

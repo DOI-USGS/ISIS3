@@ -38,7 +38,6 @@ namespace Isis {
       ~SawtoothStretchType();
 
       virtual void setStretch(Stretch);
-      QString getStretchType(); 
 
     private slots:
       void offsetSliderMoved(int);

@@ -61,19 +61,17 @@ namespace Isis {
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
-    QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch From Cube");
-    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
-//    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(promptName()));
-    p_mainLayout->addWidget(loadStretchButton, 6, 0);
-
-    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube!");
+    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube...");
     connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
-//    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(promptName()));
     p_mainLayout->addWidget(saveToCubeButton, 4, 0);
 
-    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube!");
+    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
     connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
     p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
+
+    QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch from Cube...");
+    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
+    p_mainLayout->addWidget(loadStretchButton, 6, 0);
 
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     sizePolicy.setHeightForWidth(true);
@@ -188,21 +186,6 @@ namespace Isis {
     stream << stretch.Text() << endl;
 
     outfile.close();
-  }
-
-
-  void StretchType::promptName() {
-//  bool ok;
-//  QString text = QInputDialog::getText(this, tr("Save Stretch"),
-//                                       tr("Name of Stretch Pair:"), QLineEdit::Normal,
-//                                       "stretch", &ok);
-//  if (ok && !text.isEmpty()) {
-//    p_name = text;
-//  }
-
-    // warn if a stretch of the same name already exists and that it will be over-written 
-    QString nothing("nothing");
-//    emit saveToCube(); 
   }
 
 
