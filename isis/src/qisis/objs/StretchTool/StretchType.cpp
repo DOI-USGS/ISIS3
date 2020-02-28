@@ -59,17 +59,20 @@ namespace Isis {
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
-    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube...");
-    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
-    p_mainLayout->addWidget(saveToCubeButton, 4, 0);
+    // Save/Restore strech only supported for Grayscale images. Hide buttons if in RGB.
+    if (name.compare("Gray") == 0) {
+      QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube..."); 
+      connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
+      p_mainLayout->addWidget(saveToCubeButton, 4, 0);
 
-    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
-    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
-    p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
+      QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
+      connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
+      p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
 
-    QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch from Cube...");
-    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
-    p_mainLayout->addWidget(loadStretchButton, 6, 0);
+      QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch from Cube...");
+      connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
+      p_mainLayout->addWidget(loadStretchButton, 6, 0);
+    }
 
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     sizePolicy.setHeightForWidth(true);

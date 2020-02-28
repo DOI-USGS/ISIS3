@@ -458,6 +458,7 @@ namespace Isis {
             "\" Could not be found, so there was nothing to delete from the Cube.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
       }
 
       // Don't leave open rw -- not optimal. 
