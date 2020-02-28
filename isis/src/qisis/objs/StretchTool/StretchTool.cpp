@@ -56,7 +56,7 @@ namespace Isis {
     connect(m_advancedStretch, SIGNAL(visibilityChanged()),
             this, SLOT(updateTool()));
     connect(m_advancedStretch, SIGNAL(saveToCube()),
-            this, SLOT(saveMe()));
+            this, SLOT(saveStretchToCube()));
     connect(m_advancedStretch, SIGNAL(deleteFromCube()),
             this, SLOT(deleteFromCube()));
     connect(m_advancedStretch, SIGNAL(loadStretch()),
@@ -392,7 +392,6 @@ namespace Isis {
     if (ok) {
       MdiCubeViewport *cvp = cubeViewport(); 
       Cube* icube = cvp->cube();
-      Pvl* lab = icube->label();
       
       Stretch stretch(stretchName); 
       icube->read(stretch);
@@ -413,7 +412,6 @@ namespace Isis {
     if (ok) {
       MdiCubeViewport *cvp = cubeViewport(); 
       Cube* icube = cvp->cube();
-      Pvl* lab = icube->label();
 
       if (icube->isReadOnly()) {
         try {
@@ -448,17 +446,16 @@ namespace Isis {
   /**
    * Saves a strech to the cube.
    */
-  void StretchTool::saveMe() {
+  void StretchTool::saveStretchToCube() {
     MdiCubeViewport *cvp = cubeViewport();
     Cube* icube = cvp->cube();
     Pvl* lab = icube->label();
 
+    // Create a list of existing Stretch names
     QStringList namelist; 
-
     PvlObject::PvlObjectIterator objIter;
     for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
-        // needs case where there are none
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
         QString tempName = tempKeyword[0];
         namelist.append(tempName); 
@@ -467,71 +464,69 @@ namespace Isis {
 
 
     // DEBUG OUTPUT
-    QString testme = ""; 
-
-    for (int i=0; i<namelist.size(); i++) {
-      testme = testme + " " + namelist[i] + " ";
-    }
+//    QString testme = ""; 
+//    for (int i=0; i<namelist.size(); i++) {
+//      testme = testme + " " + namelist[i] + " ";
+//    }
 
     bool ok;
     QString name; 
 
-    // Get the name for the stretch dialog
+    // "Get the name for the stretch" dialog
     QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
                                          tr("Name of Stretch Pair:"), QLineEdit::Normal,
                                          "stretch", &ok);
 
-    // Stretch Name Already Exists Dialog!
-    if (namelist.contains(text)) {
-      QMessageBox msgBox;
-      msgBox.setText("Stretch Name Already Exists!");
-      msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
-      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setDefaultButton(QMessageBox::Cancel);
-      int ret = msgBox.exec();
+    if (ok) {
+      // Stretch Name Already Exists Dialog!
+      if (namelist.contains(text)) {
+        QMessageBox msgBox;
+        msgBox.setText("Stretch Name Already Exists!");
+        msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        int ret = msgBox.exec();
 
-    switch (ret) {
-    case QMessageBox::Save:
-      break;
-    case QMessageBox::Cancel:
-        // Cancel was clicked
-      return;
-      break;
-    default:
-        // should never be reached
-      break;
-      }
-    }
-
-    // actually needs YES/NO
-       // NO - close this dialog and other dialog, do nothing
-       // YES - saved stretch pair to cube! 
-
-    if (icube->isReadOnly()) {
-      //  ReOpen cube as read/write
-      //  If cube readonly print error
-      try {
-        cvp->cube()->reopen("rw");
-      }
-      catch(IException &) {
-        cvp->cube()->reopen("r");
-        QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write to save stretch");
+      switch (ret) {
+      case QMessageBox::Save:
+        break;
+      case QMessageBox::Cancel:
+          // Cancel was clicked, exist this function
         return;
+        break;
+      default:
+          // should never be reached
+        break;
+        }
       }
+
+      if (icube->isReadOnly()) {
+        //  ReOpen cube as read/write
+        //  If cube readonly print error
+        try {
+          cvp->cube()->reopen("rw");
+        }
+        catch(IException &) {
+          cvp->cube()->reopen("r");
+          QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write to save stretch");
+          return;
+        }
+      }
+
+      Stretch stretch = m_advancedStretch->getGrayStretch();
+
+      // consider moving into Stretch::WriteInit()
+      stretch.Label()["Name"] = text;
+      stretch.Label() += PvlKeyword("StretchType", stretch.getType());
+
+      icube->write(stretch);
+
+      // Don't leave open rw -- not optimal. 
+      cvp->cube()->reopen("r");
     }
-
-    Stretch stretch = m_advancedStretch->getGrayStretch();
-//    QString stretchType = m_advancedStretch->getStretchType(); 
-
-    stretch.Label()["Name"] = text;
-    stretch.Label() += PvlKeyword("StretchType", stretch.getType());
-
-    icube->write(stretch);
-
-    // Don't leave open rw -- not optimal. 
-    cvp->cube()->reopen("r");
   }
+
 
   /**
    * This is called when the visible area changes.

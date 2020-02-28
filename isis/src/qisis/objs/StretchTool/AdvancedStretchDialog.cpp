@@ -134,8 +134,6 @@ namespace Isis {
             this, SIGNAL(deleteFromCube()));
     connect(p_grayStretch, SIGNAL(loadStretch()),
             this, SIGNAL(loadStretch()));
-
-    emit(stretchChanged());
   }
 
 

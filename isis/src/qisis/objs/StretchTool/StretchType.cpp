@@ -11,7 +11,6 @@
 #include <QString>
 #include <QTableWidget>
 #include <QTextStream>
-#include <QInputDialog>
 
 #include "Stretch.h"
 #include "Histogram.h"
