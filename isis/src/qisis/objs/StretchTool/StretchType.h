@@ -81,9 +81,6 @@ namespace Isis {
     private slots:
       void savePairs();
 
-    private: 
-      QString p_name; 
-
   };
 };
 

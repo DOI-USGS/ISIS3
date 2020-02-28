@@ -36,7 +36,6 @@ namespace Isis {
     p_cubeHist = NULL;
     p_graph = NULL;
     p_mainLayout = NULL;
-    p_name = "no name"; 
 
     p_cubeHist = new Histogram(hist);
 
@@ -57,7 +56,7 @@ namespace Isis {
     connect(this, SIGNAL(stretchChanged()), this, SLOT(updateTable()));
     p_mainLayout->addWidget(p_table, 2, 0);
 
-    QPushButton *saveAsButton = new QPushButton("Save Stretch Pairs...");
+    QPushButton *saveAsButton = new QPushButton("Save Stretch Pairs to File...");
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
