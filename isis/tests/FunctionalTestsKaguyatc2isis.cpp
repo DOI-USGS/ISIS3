@@ -5,6 +5,8 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "Endian.h"
+#include "PixelType.h"
 
 #include "gtest/gtest.h"
 
@@ -30,17 +32,15 @@ TEST(kaguyatc2isisTest, kaguyatc2isisTestDefault) {
   Pvl *isisLabel = cube.label();
 
   // Dimensions group
-  PvlGroup &dims = isisLabel->findGroup("Dimensions", Pvl::Traverse);
-  ASSERT_EQ(int(dims["Samples"]), 3208);
-  ASSERT_EQ(int(dims["Lines"]), 3);
-  ASSERT_EQ(int(dims["Bands"]), 1);
+  ASSERT_EQ(cube.sampleCount(), 3208);
+  ASSERT_EQ(cube.lineCount(), 3);
+  ASSERT_EQ(cube.bandCount(), 1);
 
   // Pixels group
-  PvlGroup &pix = isisLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pix["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(pix["ByteOrder"][0].toStdString(), "Lsb");
-  ASSERT_DOUBLE_EQ(double(pix["Base"]), 0.0);
-  ASSERT_DOUBLE_EQ(double(pix["Multiplier"]), 0.013);
+  ASSERT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
+  ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
+  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
+  ASSERT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
