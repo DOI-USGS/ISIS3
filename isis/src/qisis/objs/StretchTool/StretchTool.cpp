@@ -454,7 +454,8 @@ namespace Isis {
       if (!cubeDeleted) {
         QMessageBox msgBox;
         msgBox.setText("Stretch Could Not Be Deleted!");
-        msgBox.setInformativeText("A stretch with name: \"" + toDelete + "\" Could not be found, so there was nothing to delete from the Cube.");
+        msgBox.setInformativeText("A stretch with name: \"" + toDelete + 
+            "\" Could not be found, so there was nothing to delete from the Cube.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);
       }
