@@ -38,7 +38,7 @@ namespace Isis {
    * Constructs a Stretch object with default mapping of special pixel values to
    * themselves.
    */
-  Stretch::Stretch() {
+  Stretch::Stretch() : Blob("NAME", "Stretch") {
     p_null = Isis::NULL8;
     p_lis = Isis::LOW_INSTR_SAT8;
     p_lrs = Isis::LOW_REPR_SAT8;
@@ -47,6 +47,19 @@ namespace Isis {
     p_minimum = p_lrs;
     p_maximum = p_hrs;
     p_pairs = 0;
+    p_type = "none";
+  }
+
+  Stretch::Stretch(QString name) : Blob(name, "Stretch") {
+    p_null = Isis::NULL8;
+    p_lis = Isis::LOW_INSTR_SAT8;
+    p_lrs = Isis::LOW_REPR_SAT8;
+    p_his = Isis::HIGH_INSTR_SAT8;
+    p_hrs = Isis::HIGH_REPR_SAT8;
+    p_minimum = p_lrs;
+    p_maximum = p_hrs;
+    p_pairs = 0;
+    p_type = "none";
   }
 
   /**
@@ -408,6 +421,74 @@ namespace Isis {
     this->p_pairs = other.p_pairs;
     this->p_input = other.p_input;
     this->p_output = other.p_output;
+  }
+
+
+  void Stretch::ReadData(std::istream &is) {
+     streampos sbyte = p_startByte - 1;
+     is.seekg(sbyte, std::ios::beg);
+     if (!is.good()) {
+       QString msg = "Error preparing to read data from " + p_type +
+                    " [" + p_blobName + "]";
+       throw IException(IException::Io, msg, _FILEINFO_);
+     }
+
+     char *buf = new char[p_nbytes+1];
+     memset(buf, 0, p_nbytes + 1);
+
+     is.read(buf, p_nbytes);
+
+     string temp(buf);
+     QString tempFriend = QString::fromStdString(temp);
+     Parse(tempFriend);
+
+     delete [] buf;
+
+     if (!is.good()) {
+       QString msg = "Error reading data from " + p_type + " [" +
+                    p_blobName + "]";
+       throw IException(IException::Io, msg, _FILEINFO_);
+     }
+
+     p_type = p_blobPvl["StretchType"][0];
+   }
+
+  QString Stretch::getType(){
+    return p_type;
+  }
+
+//  void Stretch::ReadInit() {
+//    p_nbytes = Text().toStdString().size();
+//  }
+
+  //!  Initializes for writing polygon to cube blob
+  void Stretch::WriteInit() {
+/*    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
+
+    // Check to see p_polygons is valid data
+    if (!p_polygons) {
+      string msg = "Cannot write a NULL polygon!";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    p_polyStr = wkt->write(p_polygons);
+    p_nbytes = p_polyStr.size();
+
+    delete wkt;*/
+    p_nbytes = Text().toStdString().size(); 
+  }
+
+
+  void Stretch::WriteData(std::fstream &os) {
+ //   std::string temp(
+//    QString temp("Legolas Greenleaf, long under tree...");
+//    os.write(Text().toStdString().c_str(), Text().toStdString().size());
+  //  qDebug() << temp;
+  //  qDebug() << temp.toStdString().size(); 
+    
+  //  QByteArray fred = temp.toUtf8(); 
+//    os.write(temp.toStdString().c_str(), temp.size());
+//    os.write(fred.data(), fred.size());
+    os.write(Text().toStdString().c_str(), p_nbytes);
   }
 
 } // end namespace isis

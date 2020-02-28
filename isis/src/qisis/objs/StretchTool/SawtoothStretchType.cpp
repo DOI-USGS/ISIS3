@@ -308,5 +308,9 @@ namespace Isis {
     return calculateNewStretch(p_offsetEdit->text().toDouble(),
                                p_widthEdit->text().toDouble());
   }
+
+  QString SawtoothStretchType::getStretchType() {
+    return "SawtoothStretch";
+  }
 }
 

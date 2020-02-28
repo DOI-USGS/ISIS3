@@ -37,6 +37,7 @@ namespace Isis {
       ~ManualStretchType();
 
       virtual void setStretch(Stretch);
+      QString getStretchType(); 
 
     private slots:
       void addButtonPressed(bool);

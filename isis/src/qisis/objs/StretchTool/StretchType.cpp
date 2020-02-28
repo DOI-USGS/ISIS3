@@ -61,10 +61,19 @@ namespace Isis {
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
+    QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch From Cube");
+    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
+//    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(promptName()));
+    p_mainLayout->addWidget(loadStretchButton, 6, 0);
+
     QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube!");
     connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
 //    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(promptName()));
     p_mainLayout->addWidget(saveToCubeButton, 4, 0);
+
+    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube!");
+    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
+    p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
 
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     sizePolicy.setHeightForWidth(true);

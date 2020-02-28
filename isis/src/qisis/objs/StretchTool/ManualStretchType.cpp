@@ -149,4 +149,8 @@ namespace Isis {
 
     return stretch;
   }
+
+  QString ManualStretchType::getStretchType() {
+    return "ManualStretch";
+  }
 }

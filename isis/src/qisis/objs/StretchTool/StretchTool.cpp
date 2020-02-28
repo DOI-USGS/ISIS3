@@ -1,5 +1,7 @@
 #include "StretchTool.h"
 
+#include <sstream>
+
 #include <QAction>
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -55,6 +57,10 @@ namespace Isis {
             this, SLOT(updateTool()));
     connect(m_advancedStretch, SIGNAL(saveToCube()),
             this, SLOT(saveMe()));
+    connect(m_advancedStretch, SIGNAL(deleteFromCube()),
+            this, SLOT(deleteFromCube()));
+    connect(m_advancedStretch, SIGNAL(loadStretch()),
+            this, SLOT(loadStretchFromCube()));
 
     QPushButton *hiddenButton = new QPushButton();
     hiddenButton->setVisible(false);
@@ -374,11 +380,86 @@ namespace Isis {
     }
   }
 
+
+  // ALSO HERE
+  void StretchTool::loadStretchFromCube(){
+    bool ok;
+    QString text = QInputDialog::getText(m_advancedStretch, tr("Load Stretch"),
+                                         tr("Name of Stretch to Load:"), QLineEdit::Normal,
+                                         "stretch", &ok);
+    
+    MdiCubeViewport *cvp = cubeViewport(); 
+    Cube* icube = cvp->cube();
+    Pvl* lab = icube->label();
+    
+    QString stretchType = "LinearStretch";
+    PvlObject::PvlObjectIterator objIter;
+    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+      if (objIter->name() == "Stretch") {
+        // needs case where there are none
+        PvlKeyword tempKeyword = objIter->findKeyword("Name");
+        QString tempName = tempKeyword[0];
+        if (tempName.compare(text) == 0) {
+          PvlKeyword temp2 = objIter->findKeyword("StretchType");
+          QString stretchType = temp2[0];
+        }
+        break; 
+      }
+    }
+
+    Stretch stretch(text); 
+    icube->read(stretch);
+    m_advancedStretch->setStretchFromCube(stretch, stretchType);
+  }
+
+  void StretchTool::deleteFromCube() {
+    bool ok;
+    QString text = QInputDialog::getText(m_advancedStretch, tr("Delete Stretch"),
+                                         tr("Name of Stretch to Delete:"), QLineEdit::Normal,
+                                         "stretch", &ok);
+
+    if (ok) {
+      MdiCubeViewport *cvp = cubeViewport(); 
+      Cube* icube = cvp->cube();
+      Pvl* lab = icube->label();
+
+      if (icube->isReadOnly()) {
+        //  ReOpen cube as read/write
+        //  If cube readonly print error
+        try {
+          cvp->cube()->reopen("rw");
+        }
+        catch(IException &) {
+          cvp->cube()->reopen("r");
+          QMessageBox::information((QWidget *)parent(), "Error", 
+                                   "Cannot open cube read/write to delete stretch");
+          return;
+        }
+      }
+
+      // need to add error-checking
+      bool cubeDeleted = icube->deleteBlob("Stretch", text);
+
+      if (!cubeDeleted) {
+        QMessageBox msgBox;
+        msgBox.setText("Stretch Could Not Be Deleted!");
+        msgBox.setInformativeText("A stretch with name: \"" + text + "\. Could not be found, so "
+                                                                     "there was nothing to delete from the Cube.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Critical);
+        int ret = msgBox.exec();
+      }
+      // Don't leave open rw -- not optimal. 
+      cvp->cube()->reopen("r");
+    }
+  }
+
+
 // HERE
   void StretchTool::saveMe() {
     MdiCubeViewport *cvp = cubeViewport();
     Cube* icube = cvp->cube();
-    //Pvl* lab = icube->label();
+    Pvl* lab = icube->label();
 
     // iterate over relevant PVL objects to make sure not taken
     // PvlObjectIterator object = lab->   ->findObject("LinearStretch"); 
@@ -388,39 +469,61 @@ namespace Isis {
 
     // can I get a list of objects and search by name??? 
 
-/*    QStringList namelist; 
+    QStringList namelist; 
 
     PvlObject::PvlObjectIterator objIter;
-    PvlGroup fpgrp;
-    for (objIter=lab->beginObject(); objIter<=lab->endObject(); objIter++) {
+    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
+        // needs case where there are none
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-//        QString tempName = tempKeyword[0];
-//        namelist.append(tempName); 
+        QString tempName = tempKeyword[0];
+        namelist.append(tempName); 
       }
     }
 
-    
+
+    // DEBUG OUTPUT
+    QString testme = ""; 
+
+    for (int i=0; i<namelist.size(); i++) {
+      testme = testme + " " + namelist[i] + " ";
+    }
+
     bool ok;
     QString name; 
+
+    // Get the name for the stretch dialog
     QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
                                          tr("Name of Stretch Pair:"), QLineEdit::Normal,
-                                         "temp", &ok);
-    if (ok && !text.isEmpty()) {
-//      && !lab->hasObject(text)) {
-      name = text;
+                                         "stretch", &ok);
+
+    // Stretch Name Already Exists Dialog!
+    if (namelist.contains(text)) {
+      QMessageBox msgBox;
+      msgBox.setText("Stretch Name Already Exists!");
+      msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
+      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+      msgBox.setIcon(QMessageBox::Warning);
+      msgBox.setDefaultButton(QMessageBox::Cancel);
+      int ret = msgBox.exec();
+
+    switch (ret) {
+    case QMessageBox::Save:
+      break;
+    case QMessageBox::Cancel:
+        // Cancel was clicked
+      return;
+      break;
+    default:
+        // should never be reached
+      break;
       }
-      else {
-      QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
-                                         tr("Name of Stretch Pair not already selected:"), QLineEdit::Normal,
-                                        text, &ok);
-      }*/
+    }
 
-    Stretch stretch = m_advancedStretch->getGrayStretch();
-    QString stretchType = m_advancedStretch->getStretchType(); 
-    QString name = "foxtail_fern";
+    // actually needs YES/NO
+       // NO - close this dialog and other dialog, do nothing
+       // YES - saved stretch pair to cube! 
 
-    //  If cube readonly print error
     if (icube->isReadOnly()) {
       //  ReOpen cube as read/write
       //  If cube readonly print error
@@ -434,10 +537,13 @@ namespace Isis {
       }
     }
 
-    // how to get name and stretchtype from AdvancedStretchTool? 
-    Blob blob(name, stretchType); 
-//              stretch.Text()); <-- contents
-    icube->write(blob);
+    Stretch stretch = m_advancedStretch->getGrayStretch();
+    QString stretchType = m_advancedStretch->getStretchType(); 
+
+    stretch.Label()["Name"] = text;
+    stretch.Label() += PvlKeyword("StretchType", stretchType);
+
+    icube->write(stretch);
 
     // Don't leave open rw -- not optimal. 
     cvp->cube()->reopen("r");

@@ -130,8 +130,18 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
     connect(p_grayStretch, SIGNAL(saveToCube()),
             this, SIGNAL(saveToCube()));
+    connect(p_grayStretch, SIGNAL(deleteFromCube()),
+            this, SIGNAL(deleteFromCube()));
+    connect(p_grayStretch, SIGNAL(loadStretch()),
+            this, SIGNAL(loadStretch()));
+
+    emit(stretchChanged());
   }
 
+
+  void AdvancedStretchDialog::setStretchFromCube(Stretch stretch, QString stretchType){
+    p_grayStretch->setStretchFromCube(stretch, stretchType);
+  }
 
   /**
    * This cleans up memory from currently displayed advanced

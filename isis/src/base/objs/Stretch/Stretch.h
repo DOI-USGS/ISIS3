@@ -26,6 +26,7 @@
 #include <string>
 #include "Pvl.h"
 #include "Histogram.h"
+#include "Blob.h"
 
 namespace Isis {
   /**
@@ -69,7 +70,7 @@ namespace Isis {
    *               to check both sides of boundry condition for valid data
    *
    */
-  class Stretch {
+  class Stretch : public Isis::Blob {
     private:
       std::vector<double> p_input;   //!< Array for input side of stretch pairs
       std::vector<double> p_output;  //!< Array for output side of stretch pairs
@@ -88,10 +89,13 @@ namespace Isis {
       double p_minimum; //!<By default this value is set to p_lrs
       double p_maximum; //!<By default this value is set to p_hrs
 
+      QString p_type;
+
       std::pair<double, double> NextPair(QString &pairs);
 
     public:
       Stretch();
+      Stretch(QString name);
 
       //! Destroys the Stretch object
       ~Stretch() {};
@@ -177,6 +181,7 @@ namespace Isis {
         return p_pairs;
       };
 
+      QString getType(); 
       double Input(const int index) const;
       double Output(const int index) const;
 
@@ -188,6 +193,11 @@ namespace Isis {
       };
 
       void CopyPairs(const Stretch &other);
+
+    protected:
+      void ReadData(std::istream &is);
+      void WriteInit();
+      void WriteData(std::fstream &os);
   };
 };
 

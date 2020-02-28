@@ -374,4 +374,8 @@ namespace Isis {
 
     return newStretch;
   }
+
+  QString BinaryStretchType::getStretchType() {
+    return "BinaryStretch";
+  }
 }

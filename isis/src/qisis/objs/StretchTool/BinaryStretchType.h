@@ -35,6 +35,7 @@ namespace Isis {
       ~BinaryStretchType();
 
       virtual void setStretch(Stretch);
+      QString getStretchType();
 
     private slots:
       void startSliderMoved(int);

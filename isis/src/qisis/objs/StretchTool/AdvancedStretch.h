@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class QStackedWidget;
+class QComboBox;
 class QLayout;
 class QString;
 class QColor;
@@ -36,6 +37,7 @@ namespace Isis {
       ~AdvancedStretch();
       Stretch getStretch();
       void setStretch(Stretch newStretch);
+      void setStretchFromCube(Stretch newStretch, QString stretchType);
       void setHistogram(const Histogram &newHist);
       QString getStretchType();
       QString getName();
@@ -44,15 +46,12 @@ namespace Isis {
       //! Emitted when a new stretch is available
       void stretchChanged();
       void saveToCube();
-
-//  protected slots: 
-//    void saveMe(); 
-
-//    protected:
-
+      void deleteFromCube(); 
+      void loadStretch(); 
 
     private:
       QStackedWidget *p_stretchTypeStack; //!< StretchType's
+      QComboBox *stretchTypeSelection; 
   };
 };
 

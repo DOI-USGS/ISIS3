@@ -77,7 +77,9 @@ namespace Isis {
     signals:
       //! Emitted when a new Stretch object is available
       void saveToCube();
+      void deleteFromCube();
       void stretchChanged();
+      void loadStretch(); 
 
     private slots:
       void savePairs();
