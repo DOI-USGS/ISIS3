@@ -385,14 +385,27 @@ namespace Isis {
    * Restores a saved stretch from the cube
    */
   void StretchTool::loadStretchFromCube(){
+    MdiCubeViewport *cvp = cubeViewport(); 
+    Cube* icube = cvp->cube();
+    Pvl* lab = icube->label();
+
+    // Create a list of existing Stretch names
+    QStringList namelist; 
+    PvlObject::PvlObjectIterator objIter;
+    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+      if (objIter->name() == "Stretch") {
+        PvlKeyword tempKeyword = objIter->findKeyword("Name");
+        QString tempName = tempKeyword[0];
+        namelist.append(tempName); 
+      }
+    }
+
     bool ok;
-    QString stretchName = QInputDialog::getText(m_advancedStretch, tr("Load Stretch"),
-                                                tr("Name of Stretch to Load:"), QLineEdit::Normal,
-                                                "stretch", &ok);
+    QString stretchName = QInputDialog::getItem(m_advancedStretch, tr("Load Stretch"),
+                                         tr("Name of Stretch to Load:"), namelist, 0,
+                                         false, &ok);
+
     if (ok) {
-      MdiCubeViewport *cvp = cubeViewport(); 
-      Cube* icube = cvp->cube();
-      
       Stretch stretch(stretchName); 
       icube->read(stretch);
       m_advancedStretch->setStretchFromCube(stretch); 
@@ -404,15 +417,26 @@ namespace Isis {
    * Deletes a saved stretch from the cube
    */
   void StretchTool::deleteFromCube() {
+    MdiCubeViewport *cvp = cubeViewport(); 
+    Cube* icube = cvp->cube();
+    Pvl* lab = icube->label();
+
+    // Create a list of existing Stretch names
+    QStringList namelist; 
+    PvlObject::PvlObjectIterator objIter;
+    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+      if (objIter->name() == "Stretch") {
+        PvlKeyword tempKeyword = objIter->findKeyword("Name");
+        QString tempName = tempKeyword[0];
+        namelist.append(tempName); 
+      }
+    }
+
     bool ok;
-    QString toDelete = QInputDialog::getText(m_advancedStretch, tr("Delete Stretch"),
-                                         tr("Name of Stretch to Delete:"), QLineEdit::Normal,
-                                         "stretch", &ok);
-
+    QString toDelete = QInputDialog::getItem(m_advancedStretch, tr("Delete Stretch"),
+                                         tr("Name of Stretch to Delete:"), namelist, 0,
+                                         false, &ok);
     if (ok) {
-      MdiCubeViewport *cvp = cubeViewport(); 
-      Cube* icube = cvp->cube();
-
       if (icube->isReadOnly()) {
         try {
           cvp->cube()->reopen("rw");
@@ -430,11 +454,9 @@ namespace Isis {
       if (!cubeDeleted) {
         QMessageBox msgBox;
         msgBox.setText("Stretch Could Not Be Deleted!");
-        msgBox.setInformativeText("A stretch with name: \"" + toDelete + "\. Could not be found, so "
-                                  "there was nothing to delete from the Cube.");
+        msgBox.setInformativeText("A stretch with name: \"" + toDelete + "\" Could not be found, so there was nothing to delete from the Cube.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);
-        int ret = msgBox.exec();
       }
 
       // Don't leave open rw -- not optimal. 
@@ -462,13 +484,6 @@ namespace Isis {
       }
     }
 
-
-    // DEBUG OUTPUT
-//    QString testme = ""; 
-//    for (int i=0; i<namelist.size(); i++) {
-//      testme = testme + " " + namelist[i] + " ";
-//    }
-
     bool ok;
     QString name; 
 
@@ -492,11 +507,12 @@ namespace Isis {
       case QMessageBox::Save:
         break;
       case QMessageBox::Cancel:
-          // Cancel was clicked, exist this function
+          // Cancel was clicked, exit this function
         return;
         break;
       default:
           // should never be reached
+        return;
         break;
         }
       }
