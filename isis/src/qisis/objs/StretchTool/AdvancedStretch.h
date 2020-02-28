@@ -37,7 +37,7 @@ namespace Isis {
       ~AdvancedStretch();
       Stretch getStretch();
       void setStretch(Stretch newStretch);
-      void setStretchFromCube(Stretch newStretch);
+      void restoreSavedStretch(Stretch newStretch);
       void setHistogram(const Histogram &newHist);
 
     signals:

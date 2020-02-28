@@ -120,12 +120,12 @@ namespace Isis {
 
   /**
    * Used to restore a saved Stretch from a cube. This function is 
-   * distinct from setStretch in that setStretch delibrately _does not_ 
+   * distinct from setStretch in that setStretch deliberately _does not_ 
    * change the stretch type, and this function does change the stretch type.  
    *  
    * @param newStretch saved stretch to restore
    */
-  void AdvancedStretch::setStretchFromCube(Stretch newStretch) {
+  void AdvancedStretch::restoreSavedStretch(Stretch newStretch) {
     QString stretchTypeName = newStretch.getType(); 
 
     int index = 0;
@@ -142,9 +142,6 @@ namespace Isis {
       index = 3;
     }
     // Fail by defaulting to Linear
-
-
-//    p_stretchTypeStack->setCurrentIndex(index); <- does not work. 
 
     p_stretchTypeSelection->setCurrentIndex(index);
     StretchType *stretchType = (StretchType *)

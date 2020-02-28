@@ -72,7 +72,6 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
     connect(p_bluStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
-    // add signal for RGB
   }
 
   /**
@@ -142,8 +141,8 @@ namespace Isis {
    *  
    * @param stretch 
    */
-  void AdvancedStretchDialog::setStretchFromCube(Stretch stretch){
-    p_grayStretch->setStretchFromCube(stretch);
+  void AdvancedStretchDialog::restoreSavedStretch(Stretch stretch){
+    p_grayStretch->restoreSavedStretch(stretch);
   }
 
 

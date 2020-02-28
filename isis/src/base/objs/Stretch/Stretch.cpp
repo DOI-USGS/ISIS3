@@ -38,7 +38,7 @@ namespace Isis {
    * Constructs a Stretch object with default mapping of special pixel values to
    * themselves.
    */
-  Stretch::Stretch() : Blob("NAME", "Stretch") {
+  Stretch::Stretch() : Blob("ImageStretch", "Stretch") {
     p_null = Isis::NULL8;
     p_lis = Isis::LOW_INSTR_SAT8;
     p_lrs = Isis::LOW_REPR_SAT8;

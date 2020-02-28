@@ -408,7 +408,7 @@ namespace Isis {
     if (ok) {
       Stretch stretch(stretchName); 
       icube->read(stretch);
-      m_advancedStretch->setStretchFromCube(stretch); 
+      m_advancedStretch->restoreSavedStretch(stretch); 
     }
   }
 
@@ -489,15 +489,17 @@ namespace Isis {
 
     // "Get the name for the stretch" dialog
     QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
-                                         tr("Name of Stretch Pair:"), QLineEdit::Normal,
+                                         tr("Enter a name to save the stretch as:"), QLineEdit::Normal,
                                          "stretch", &ok);
 
     if (ok) {
       // Stretch Name Already Exists Dialog!
       if (namelist.contains(text)) {
         QMessageBox msgBox;
-        msgBox.setText("Stretch Name Already Exists!");
-        msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and the existing saved data will be overwritten. Are you sure you wish to proceed?");
+        msgBox.setText(tr("Stretch Name Already Exists!"));
+        msgBox.setInformativeText("A stretch pair with name: \"" + text + "\" already exists and "
+                                  "the existing saved data will be overwritten. Are you sure you "
+                                  "wish to proceed?");
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setDefaultButton(QMessageBox::Cancel);
@@ -535,6 +537,9 @@ namespace Isis {
       // consider moving into Stretch::WriteInit()
       stretch.Label()["Name"] = text;
       stretch.Label() += PvlKeyword("StretchType", stretch.getType());
+
+      // Greyscale is only available option for now
+      stretch.Label() += PvlKeyword("Color", "Greyscale");
 
       icube->write(stretch);
 

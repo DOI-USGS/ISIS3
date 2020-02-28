@@ -48,7 +48,7 @@ namespace Isis {
                           Histogram &grayHist);
       void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
-      void setStretchFromCube(Stretch stretch); 
+      void restoreSavedStretch(Stretch stretch); 
 
       Stretch getGrayStretch();
       Stretch getRedStretch();
