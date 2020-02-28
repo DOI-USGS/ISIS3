@@ -104,14 +104,6 @@ namespace Isis {
     return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretch();
   }
 
-  // This seems like a bad idea?  (if keep, can eliminate at the StretchType level? In theory???? 
-  QString AdvancedStretch::getStretchType() {
-    return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretchType();
-  }
-
-  QString AdvancedStretch::getName() {
-    return ((StretchType *)p_stretchTypeStack->currentWidget())->getName();
-  }
 
   /**
    * This is called when the user creates a stretch outside of the
@@ -143,6 +135,7 @@ namespace Isis {
       index = 3;
     }
 
+    qDebug() << "stretchTypeName" << stretchTypeName; 
     qDebug() << "INDEX" << index;
     // never other option
 

@@ -51,8 +51,6 @@ namespace Isis {
       void setStretchFromCube(Stretch stretch, QString stretchType);
 
       Stretch getGrayStretch();
-      QString getStretchType(); 
-      QString getName(); 
       Stretch getRedStretch();
       Stretch getGrnStretch();
       Stretch getBluStretch();

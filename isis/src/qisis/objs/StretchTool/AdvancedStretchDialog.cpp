@@ -289,15 +289,6 @@ namespace Isis {
   }
 
 
-  // also bad idea?  /// THIS IS OF TYPE AdvancedStretch, so ... something. need to draw out. 
-  QString AdvancedStretchDialog::getStretchType() {
-    return p_grayStretch->getStretchType();
-  }
-
-  QString AdvancedStretchDialog::getName() {
-    return p_grayStretch->getName();
-  }
-
   /**
    * This returns the advanced stretch's stretch for red.
    *

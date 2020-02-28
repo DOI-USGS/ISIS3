@@ -62,7 +62,6 @@ namespace Isis {
     protected slots:
       void updateGraph();
       void updateTable();
-      void promptName(); 
 
     protected: // data
       QGridLayout *p_mainLayout; //!< Main layout

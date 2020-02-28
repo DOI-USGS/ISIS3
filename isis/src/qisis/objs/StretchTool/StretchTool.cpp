@@ -387,29 +387,30 @@ namespace Isis {
     QString text = QInputDialog::getText(m_advancedStretch, tr("Load Stretch"),
                                          tr("Name of Stretch to Load:"), QLineEdit::Normal,
                                          "stretch", &ok);
-    
-    MdiCubeViewport *cvp = cubeViewport(); 
-    Cube* icube = cvp->cube();
-    Pvl* lab = icube->label();
-    
-    QString stretchType = "LinearStretch";
-    PvlObject::PvlObjectIterator objIter;
-    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
-      if (objIter->name() == "Stretch") {
-        // needs case where there are none
-        PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
-        if (tempName.compare(text) == 0) {
-          PvlKeyword temp2 = objIter->findKeyword("StretchType");
-          QString stretchType = temp2[0];
-        }
-        break; 
-      }
-    }
+    if (ok) {
+      MdiCubeViewport *cvp = cubeViewport(); 
+      Cube* icube = cvp->cube();
+      Pvl* lab = icube->label();
+      
+/*      QString stretchType = "LinearStretch"; // default if setting fails
 
-    Stretch stretch(text); 
-    icube->read(stretch);
-    m_advancedStretch->setStretchFromCube(stretch, stretchType);
+      PvlObject::PvlObjectIterator objIter;
+      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+        if (objIter->name() == "Stretch") {
+          PvlKeyword tempKeyword = objIter->findKeyword("Name");
+          QString tempName = tempKeyword[0];
+//          if (tempName.compare(text) == 0) {
+//            PvlKeyword temp2 = objIter->findKeyword("StretchType");
+//            stretchType = temp2[0];
+          }
+          break; 
+        }
+      }*/
+
+      Stretch stretch(text); 
+      icube->read(stretch);
+      m_advancedStretch->setStretchFromCube(stretch, stretch.getType());
+    }
   }
 
   void StretchTool::deleteFromCube() {
@@ -538,7 +539,7 @@ namespace Isis {
     }
 
     Stretch stretch = m_advancedStretch->getGrayStretch();
-    QString stretchType = m_advancedStretch->getStretchType(); 
+//    QString stretchType = m_advancedStretch->getStretchType(); 
 
     stretch.Label()["Name"] = text;
     stretch.Label() += PvlKeyword("StretchType", stretch.getType());

@@ -39,8 +39,6 @@ namespace Isis {
       void setStretch(Stretch newStretch);
       void setStretchFromCube(Stretch newStretch, QString stretchType);
       void setHistogram(const Histogram &newHist);
-      QString getStretchType();
-      QString getName();
 
     signals:
       //! Emitted when a new stretch is available
