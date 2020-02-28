@@ -8,7 +8,6 @@
 #include <QMessageBox>
 
 #include "Stretch.h"
-#include "StretchTool.h"
 #include "IString.h"
 #include "IException.h"
 #include "StretchType.h"
@@ -37,14 +36,13 @@ namespace Isis {
     typeSelectionArea->setLayout(new QHBoxLayout());
     typeSelectionArea->layout()->addWidget(new QLabel("Stretch Type"));
 
-//    QComboBox *stretchTypeSelection = new QComboBox();
-    stretchTypeSelection = new QComboBox();
-    stretchTypeSelection->addItem("Linear",   0);
-    stretchTypeSelection->addItem("Sawtooth", 1);
-    stretchTypeSelection->addItem("Binary",   2);
-    stretchTypeSelection->addItem("Manual",   3);
+    p_stretchTypeSelection = new QComboBox();
+    p_stretchTypeSelection->addItem("Linear",   0);
+    p_stretchTypeSelection->addItem("Sawtooth", 1);
+    p_stretchTypeSelection->addItem("Binary",   2);
+    p_stretchTypeSelection->addItem("Manual",   3);
 
-    typeSelectionArea->layout()->addWidget(stretchTypeSelection);
+    typeSelectionArea->layout()->addWidget(p_stretchTypeSelection);
     layout()->addWidget(typeSelectionArea);
 
     p_stretchTypeStack = new QStackedWidget();
@@ -81,9 +79,9 @@ namespace Isis {
     p_stretchTypeStack->addWidget(manual);
 
     layout()->addWidget(p_stretchTypeStack);
-    connect(stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
+    connect(p_stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
             p_stretchTypeStack, SLOT(setCurrentIndex(int)));
-    connect(stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
+    connect(p_stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
             this, SIGNAL(stretchChanged()));
   }
 
@@ -120,7 +118,16 @@ namespace Isis {
   }
 
 
-  void AdvancedStretch::setStretchFromCube(Stretch newStretch, QString stretchTypeName) {
+  /**
+   * Used to restore a saved Stretch from a cube. This function is 
+   * distinct from setStretch in that setStretch delibrately _does not_ 
+   * change the stretch type, and this function does change the stretch type.  
+   *  
+   * @param newStretch saved stretch to restore
+   */
+  void AdvancedStretch::setStretchFromCube(Stretch newStretch) {
+    QString stretchTypeName = newStretch.getType(); 
+
     int index = 0;
     if (stretchTypeName.compare("LinearStretch") == 0 ) {
       index = 0; 
@@ -134,13 +141,12 @@ namespace Isis {
     else if (stretchTypeName.compare("ManualStretch") == 0) {
       index = 3;
     }
+    // Fail by defaulting to Linear
 
-    qDebug() << "stretchTypeName" << stretchTypeName; 
-    qDebug() << "INDEX" << index;
-    // never other option
 
-    //p_stretchTypeStack->setCurrentIndex(index);
-    stretchTypeSelection->setCurrentIndex(index);
+//    p_stretchTypeStack->setCurrentIndex(index); <- does not work. 
+
+    p_stretchTypeSelection->setCurrentIndex(index);
     StretchType *stretchType = (StretchType *)
                                p_stretchTypeStack->currentWidget();
     stretchType->setStretch(newStretch);

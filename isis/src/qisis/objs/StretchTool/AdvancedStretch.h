@@ -37,7 +37,7 @@ namespace Isis {
       ~AdvancedStretch();
       Stretch getStretch();
       void setStretch(Stretch newStretch);
-      void setStretchFromCube(Stretch newStretch, QString stretchType);
+      void setStretchFromCube(Stretch newStretch);
       void setHistogram(const Histogram &newHist);
 
     signals:
@@ -49,7 +49,7 @@ namespace Isis {
 
     private:
       QStackedWidget *p_stretchTypeStack; //!< StretchType's
-      QComboBox *stretchTypeSelection; 
+      QComboBox *p_stretchTypeSelection; //!< ComboBox of StretchTypes
   };
 };
 

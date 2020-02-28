@@ -139,9 +139,15 @@ namespace Isis {
   }
 
 
-  void AdvancedStretchDialog::setStretchFromCube(Stretch stretch, QString stretchType){
-    p_grayStretch->setStretchFromCube(stretch, stretchType);
+  /**
+   * Restores a saved stretch from the cube 
+   *  
+   * @param stretch 
+   */
+  void AdvancedStretchDialog::setStretchFromCube(Stretch stretch){
+    p_grayStretch->setStretchFromCube(stretch);
   }
+
 
   /**
    * This cleans up memory from currently displayed advanced
