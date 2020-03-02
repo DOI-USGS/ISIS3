@@ -38,7 +38,7 @@ dependencies:
   - ninja==1.7.2
   - conda-forge/label/gcc7::nn
   - openblas==0.2.19
-  - opencv
+  - opencv==3.2.0
   - openssl==1.0.2n
   - pcl==1.8.1
   - pip==9.0.1
