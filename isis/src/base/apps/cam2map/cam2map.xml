@@ -7,13 +7,13 @@
   </brief>
 
   <description>
-    This program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
-    <def link="Cube">cube</def> to a <def link="MAP">map</def> (ISIS <def link="Level2">level2</def> cube).  
+    This program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def>
+    <def link="Cube">cube</def> to a <def link="MAP">map</def> (ISIS <def link="Level2">level2</def> cube).
     The input cube requires <def>SPICE</def> data and therefore <i>spiceinit</i> should be executed prior to
-    running <i>cam2map</i>.  The <def link="Map Projection">map projection</def> is defined using a 
+    running <i>cam2map</i>.  The <def link="Map Projection">map projection</def> is defined using a
     <def>PVL</def> file which is specified in <i>cam2map</i> in the MAP parameter.  Note: the system defaults
     to the Sinusoidal projection (ISIS projection based templates are located in $ISIS3DATA/base/templates/maps).
-    To learn more about using map projections in ISIS, refer to the ISIS Workshop 
+    To learn more about using map projections in ISIS, refer to the ISIS Workshop
     <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
@@ -43,7 +43,7 @@
   EndGroup
     </pre>
 
-    <p>If you need to generate your own map file you can use the <i>maptemplate</i> program, or alternatively, 
+    <p>If you need to generate your own map file you can use the <i>maptemplate</i> program, or alternatively,
     hand create a file using any text editor. The file need only specify the ProjectionName, as defaults will be
     computed for the remaining map file parameters.  The following table indicates how the defaults are
     established:
@@ -62,7 +62,7 @@
 
       <tr>
         <td>Equatorial<def>Radius</def><br />PolarRadius</td>
-        <td>Read from SPICE PCK file set during <i>spiceinit</i>.  The PCK file is defined in the Kernels 
+        <td>Read from SPICE PCK file set during <i>spiceinit</i>.  The PCK file is defined in the Kernels
         group via the TargetAttitudeShape keyword</td>
       </tr>
 
@@ -84,8 +84,8 @@
 
       <tr>
         <td>Minimum<def>Latitude</def><br />MaximumLatitude<br />Minimum<def>Longitude</def><br />MaximumLongitude</td>
-        <td>Computed from the input cube or read from the map file.   However, any combination of the 
-        four values can then be overridden by the user.  The values the user specifies are expected 
+        <td>Computed from the input cube or read from the map file.   However, any combination of the
+        four values can then be overridden by the user.  The values the user specifies are expected
         to be in the coordinate system of the projection.</td>
       </tr>
 
@@ -96,7 +96,7 @@
 
     </table>
 
-   <p>Alternatively, the map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels 
+   <p>Alternatively, the map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels
    and contains the Mapping group.  Depending on the values of the input parameters, the output cube can
    use some or all of the keyword values of the map file.  For instance, setting MATCHMAP=yes causes all
    of the mapping parameters to come from the map file, resulting in an output cube having the same
@@ -106,7 +106,7 @@
    the user or computed from the FROM cube.
    </p>
 
-   <p>If you are attempting to construct a mosaic, it is <b>essential</b> that the PixelResolution, EquatorialRadius, 
+   <p>If you are attempting to construct a mosaic, it is <b>essential</b> that the PixelResolution, EquatorialRadius,
    PolarRadius, LatitudeType, LongitudeDirection, LongitudeDomain, ProjectionName, and projection specific
    parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is, you should create
    one map file and use it as input for all the cubes in your mosaic.  Otherwise, the program will throw and error.
@@ -125,14 +125,14 @@
  EndGroup
    </pre>
    <p>
-     Finally, depending on the projection, problems can occur with cubes that fall on the projection 
-     longitude seam.  For example, if you are making a mosaic with LongitudeDomain=360 and your 
-     cube crosses 0/360 seam, the program will compute the default longitude range of the cube to 
+     Finally, depending on the projection, problems can occur with cubes that fall on the projection
+     longitude seam.  For example, if you are making a mosaic with LongitudeDomain=360 and your
+     cube crosses 0/360 seam, the program will compute the default longitude range of the cube to
      MinimumLongitude=0 and MaximumLongitude=360.  A larger than necessary output image will be
      created, with size inversely proportional to pixel resolution.  The LONSEAM parameter allows you
      to selectively handle this case. If you are making mosaics near the seam you will need to understand
      and alter the default for this parameter. <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams">
-     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help 
+     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help
      illustrate the problem.
    </p>
   </description>
@@ -209,27 +209,27 @@
      <change name="Steven Lambright" date="2007-08-22">
        Fixed lonseam option to work with minimize option correctly
      </change>
-     <change name="Stuart Sides" date="2008-02-11"> 
-       Fixed bug where the ground range was not pulled from the map file when 
+     <change name="Stuart Sides" date="2008-02-11">
+       Fixed bug where the ground range was not pulled from the map file when
        it was supposed to be (using DEFAULTRANGE = MAP).
      </change>
      <change name="Christopher Austin" date="2008-04-18">
        Added the MATCHMAP option.
      </change>
      <change name="Steven Lambright" date="2008-05-12">
-       Removed references to CubeInfo 
+       Removed references to CubeInfo
      </change>
      <change name="Christopher Austin" date="2008-07-15">
        Changed MATCHMAP to default off
      </change>
      <change name="Steven Lambright" date="2008-08-04">
-       Changed MATCHMAP to have exclusions. If MATCHMAP is true, the PIXRES and DEFAULTRANGE 
+       Changed MATCHMAP to have exclusions. If MATCHMAP is true, the PIXRES and DEFAULTRANGE
        options can not be set. Changed the code to enforce MATCHMAP.
      </change>
      <change name="Steven Lambright" date="2008-09-10">
        Added the ability to change ProcessRubberSheet's tiling sizes. Now the Camera will decide upon the
        tiling sizes used in ProcessRubberSheet, in order to fix problems found with the push frame cameras which
-       have small framelet sizes (less than 64 pixels tall). This is a passive ability with respect to the user; 
+       have small framelet sizes (less than 64 pixels tall). This is a passive ability with respect to the user;
        no options or differences should be noticeable.
      </change>
      <change name="Christopher Austin" date="2008-10-31">
@@ -252,7 +252,7 @@
        Updated documentation text, added glossary links, and improved compatibility with Isis documentation.
      </change>
      <change name="Jeff Anderson" date="2012-04-30">
-       Add forward and reverse patch rubbersheeting parameters.  
+       Add forward and reverse patch rubbersheeting parameters.
      </change>
      <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
@@ -283,6 +283,11 @@
         Fixed an error when matchmap was true, the user could attempt to add a mapping file
 	with a targetname that did not match the targetname of the instrument group of
 	the cube file. Fixes #1952.
+     </change>
+     <change name="Adam Paquette" date="2020-03-02">
+        Added one last setImage call to check for pixel occlusion. Where any
+        pixel is occluded when the resulting latitude, or longitude differ from
+        the original latitude or longitude by 0.000001 degrees.
      </change>
   </history>
 
@@ -457,9 +462,9 @@
         <default><item>MINIMIZE</item></default>
         <description>
           This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
-          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can override the default 
-          using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage 
-          of the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size 
+          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can override the default
+          using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage
+          of the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size
           (samples and line) of the output image.
         </description>
 
@@ -481,9 +486,9 @@
           <option value="MINIMIZE">
              <brief>Minimize output image size</brief>
              <description>
-               This option will use the camera and projection in combination to ensure the output image size 
-               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with 
-               curved meridians and/or parallels and hence large output images.  The amount of padding can be 
+               This option will use the camera and projection in combination to ensure the output image size
+               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with
+               curved meridians and/or parallels and hence large output images.  The amount of padding can be
                quite large for extremely high resolution maps.
              </description>
              <inclusions><item>LONSEAM</item></inclusions>
@@ -499,7 +504,7 @@
            <option value="CAMERA">
               <brief> Compute default range from input cube</brief>
               <description>
-                This option will automatically determine the minimum/maximum latitude/longitude from the input 
+                This option will automatically determine the minimum/maximum latitude/longitude from the input
                 camera model cube specified using the FROM parameter.
               </description>
               <inclusions><item>LONSEAM</item></inclusions>
@@ -508,7 +513,7 @@
            <option value="MAP">
               <brief> Read default range from map file</brief>
               <description>
-                This option will read the minimum/maximum latitude/longitude from the input map file.  
+                This option will read the minimum/maximum latitude/longitude from the input map file.
                 All four values are expected to be defined.
               </description>
               <exclusions><item>LONSEAM</item></exclusions>
@@ -521,8 +526,8 @@
         <brief>Minimum Latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum latitude of the output map.   If this is entered by the user it will override 
-          the default camera or map value.  By default, planetocentric latitudes are assumed unless 
+          The minimum latitude of the output map.   If this is entered by the user it will override
+          the default camera or map value.  By default, planetocentric latitudes are assumed unless
           the map file specifies otherwise.
         </description>
 
@@ -535,8 +540,8 @@
         <brief>Maximum Latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum latitude of the output map.   If this is entered by the user it will override 
-          the default camera or map value.  By default, planetocentric latitudes are assumed unless 
+          The maximum latitude of the output map.   If this is entered by the user it will override
+          the default camera or map value.  By default, planetocentric latitudes are assumed unless
           the map file specifies otherwise.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
@@ -549,8 +554,8 @@
         <brief>Minimum Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum longitude of the output map.   If this is entered by the user it will override 
-          the default camera or map value.  By default, positive east longitudes in the range of 0 to 
+          The minimum longitude of the output map.   If this is entered by the user it will override
+          the default camera or map value.  By default, positive east longitudes in the range of 0 to
           360 are assumed unless the map file specifies otherwise.
         </description>
       </parameter>
@@ -560,8 +565,8 @@
         <brief>Maximum Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum longitude of the output map.   If this is entered by the user it will override the 
-          default camera or map value.  By default, positive east longitudes in the range of 0 to 360 
+          The maximum longitude of the output map.   If this is entered by the user it will override the
+          default camera or map value.  By default, positive east longitudes in the range of 0 to 360
           are assumed unless the map file specifies otherwise.
         </description>
         <greaterThan><item>MINLON</item></greaterThan>
@@ -576,7 +581,7 @@
         <description>
           The image is modified. The pixel dimensions of the file are retained; therefore, the number
           of pixels is the same. However, the pixels that fall outside the default or specified latitude
-          and longitude range are set to NULL. 
+          and longitude range are set to NULL.
           <br></br>
           <br></br>
           If camera is selected:
@@ -605,8 +610,8 @@
         </brief>
         <description>
           With this option you can turn on/off the automatic longitude domain switching that occurs
-          when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If 
-          the switching is turn off then you have the choice of making the program continue or 
+          when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If
+          the switching is turn off then you have the choice of making the program continue or
           exit when the cube does cross the boundary.
         </description>
 
@@ -614,8 +619,8 @@
            <option value="AUTO">
               <brief>Automatically correct Longitude Domain</brief>
               <description>
-                If the cube crosses the longitude seam automatically compute the LongitudeDomain.   
-                When the cube is near 0 or 360 degrees the program will assume 180 LongitudeDomain.  
+                If the cube crosses the longitude seam automatically compute the LongitudeDomain.
+                When the cube is near 0 or 360 degrees the program will assume 180 LongitudeDomain.
                 When the cube is near 180 or -180 degrees it will assume 360 LongitudeDomain.
               </description>
             </option>
@@ -630,8 +635,8 @@
             <option value="CONTINUE">
                <brief>Continue program if cube crosses seam</brief>
                <description>
-                 If the cube crosses the longitude seam the program will continue.  The LongitudeDomain 
-                 in the map file will be used.  If the map file does not have a LongitudeDomain, 0-360 
+                 If the cube crosses the longitude seam the program will continue.  The LongitudeDomain
+                 in the map file will be used.  If the map file does not have a LongitudeDomain, 0-360
                  will be used. Note that this could create an extremely large image.
                </description>
              </option>
@@ -691,16 +696,16 @@
             <brief>Forward patch warp algorithm</brief>
             <description>
               Patches are uniformly distributed over the input cube (FROM).  For each input patch, the lat/lons
-              of the four corners coordinates are computed using the camera model.  
-              Those four lat/lon coordinates are used by the 
-              map projection to determine four output pixel coordinates.   Then the 
-              four output to input image coordinates are fit with two affine transforms.  
+              of the four corners coordinates are computed using the camera model.
+              Those four lat/lon coordinates are used by the
+              map projection to determine four output pixel coordinates.   Then the
+              four output to input image coordinates are fit with two affine transforms.
               That is, isamp=f(osamp,oline) and iline=g(osamp,oline)
               where f = A+B*osamp+C*oline and similarly for g.
-              If the estimated input/sample 
-              line (as computed by the affine transform) at the center of the patch is within a tenth 
-              of a pixel of the actual computation using the projection and camera model, 
-              the affine transforms are used to place the calculated input pixels in the output patch 
+              If the estimated input/sample
+              line (as computed by the affine transform) at the center of the patch is within a tenth
+              of a pixel of the actual computation using the projection and camera model,
+              the affine transforms are used to place the calculated input pixels in the output patch
               (using the specified INTERPOLATOR).
             </description>
             <inclusions><item>PATCHSIZE</item></inclusions>
@@ -708,16 +713,16 @@
           <option value="REVERSEPATCH">
             <brief>Reverse patch warp algorithm</brief>
             <description>
-              Patches are uniformly distributed over the output cube (map projected product).  For each 
-              output patch, the lat/lons of the four corners coordinates 
-              are computed using the map projection.  Those four lat/lon coordinates are used 
-              by the camera model to determine four input pixel coordinates.   Then the 
-              four output to input image coordinates are fit with two affine transforms.  That is, 
+              Patches are uniformly distributed over the output cube (map projected product).  For each
+              output patch, the lat/lons of the four corners coordinates
+              are computed using the map projection.  Those four lat/lon coordinates are used
+              by the camera model to determine four input pixel coordinates.   Then the
+              four output to input image coordinates are fit with two affine transforms.  That is,
               isamp=f(osamp,oline) and iline=g(osamp,oline) where f = A+B*osamp+C*oline and similarly for g.
-              If the estimated input/sample 
-              line (as computed by the affine transform) at the center of the patch is within a 
-              tenth of a pixel of the actual computation using the projection and camera model, 
-              the affine transforms are used to place the calculated input pixels in the output patch 
+              If the estimated input/sample
+              line (as computed by the affine transform) at the center of the patch is within a
+              tenth of a pixel of the actual computation using the projection and camera model,
+              the affine transforms are used to place the calculated input pixels in the output patch
               (using the specified INTERPOLATOR).
             </description>
             <inclusions><item>PATCHSIZE</item></inclusions>
@@ -725,12 +730,12 @@
           <option value="AUTOMATIC">
             <brief>Automatically select warp algorithm</brief>
             <description>
-               The automatic option will choose the appropriate algorithm depending on the camera type 
-               of the input cube (TO).  If the cube is a framing camera image, 
-               the reverse algorithm will be used with a PATCHSIZE of 4.  If the cube is a line scan image, 
-               the forward algorithm will be used with a PATCHSIZE of 5.  If 
-               the cube is a push frame camera (e.g., LRO WAC, MRO MARCI, or THEMIS VIS) 
-               the forward transform with a PATCHSIZE of the pushframe framelet height will be used.  
+               The automatic option will choose the appropriate algorithm depending on the camera type
+               of the input cube (TO).  If the cube is a framing camera image,
+               the reverse algorithm will be used with a PATCHSIZE of 4.  If the cube is a line scan image,
+               the forward algorithm will be used with a PATCHSIZE of 5.  If
+               the cube is a push frame camera (e.g., LRO WAC, MRO MARCI, or THEMIS VIS)
+               the forward transform with a PATCHSIZE of the pushframe framelet height will be used.
                It is recommended
                that you always use automatic for push frame cameras to ensure the patch size does not cross
                multiple framelets.
@@ -744,7 +749,7 @@
         <type>integer</type>
         <brief>Patch size for forward or reverse warping</brief>
         <description>
-          The forward and reverse patch algorithms try to fit an affine transform between the 
+          The forward and reverse patch algorithms try to fit an affine transform between the
           camera model coordinate and projection coordinate using the four corners of the patches.
           Patches that are too large may run faster at the risk of missing higher resolution information
           about the DTM. For example, a patch of 256x256 may have the same elevation at the four
@@ -762,41 +767,41 @@
       <brief> Demonstrates the AUTO LONSEAM option </brief>
        <description>
          This example is the first of two different runs of <i>cam2map</i>
-         demonstrating the LONSEAM option.  In this case it is set to AUTO.  
+         demonstrating the LONSEAM option.  In this case it is set to AUTO.
          All the user input parameters in this example are identical to the
          following example except for LONSEAM and TO.  The default for LONSEAM
          is AUTO.
        </description>
       <terminalInterface>
-        <commandLine> from=EN0108830655M.cub map=../IN/sinu.map 
-                      to=EN0108830655M_sinu_auto.cub 
+        <commandLine> from=EN0108830655M.cub map=../IN/sinu.map
+                      to=EN0108830655M_sinu_auto.cub
         </commandLine>
         <description>
           This is the command line used to create the output for the AUTO
           version of the LONSEAM example.
         </description>
-      </terminalInterface> 
+      </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/CAM2MAP_MATCHMAP_MAPFILE_GUI.jpeg" width="640" height="1060">
             <brief>
               Example GUI
             </brief>
-            <description> 
-              The top of the GUI shows the parameters filled in for input 
+            <description>
+              The top of the GUI shows the parameters filled in for input
               files, output file, and output map resolution.
             <br></br>
-            <br></br>  
-              The middle of the GUI illustrates the parameters filled in for the  
+            <br></br>
+              The middle of the GUI illustrates the parameters filled in for the
               output map ground range and the longitude seam options.  Under
               the output map ground range section, notice the grayed out
-              parameters.  These values are computed and not allowed to be 
+              parameters.  These values are computed and not allowed to be
               modified when DEFAULTRANGE = MINIMIZE.  This is the default.
               The LONSEAM option has been set to AUTO in this example.
             <br></br>
-            <br></br>              
-              The bottom of the GUI shows the Options menu. 
-              The default value for INTERP is selected (CUBICCONVOLUTION). 
+            <br></br>
+              The bottom of the GUI shows the Options menu.
+              The default value for INTERP is selected (CUBICCONVOLUTION).
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_LONSEAM_AUTO_thumb.jpeg" width="200" height="500" caption="cam2map LONSEAM=AUTO GUI" />
           </image>
@@ -807,7 +812,7 @@
         <dataFile path="assets/IN/sinu.map">
           <brief> Map file </brief>
           <description>
-            Input map file defining the desired output map projection.  This  
+            Input map file defining the desired output map projection.  This
             file is in PVL format.
           </description>
           <parameterName> MAP </parameterName>
@@ -826,7 +831,7 @@
       <outputImages>
         <image src="assets/images/ToFile_EN0108830655M_lonseam_auto.jpg" width="496" height="496">
           <brief> Output image for cam2map LONSEAM=AUTO</brief>
-          <description> This is the output of cam2map demonstrating LONSEAM set 
+          <description> This is the output of cam2map demonstrating LONSEAM set
                         to AUTO.  Contrast this output with the next example
                         which was created with the LONSEAM set to CONTINUE.
           </description>
@@ -845,36 +850,36 @@
          previous example except for LONSEAM and TO.
        </description>
       <terminalInterface>
-        <commandLine> from=EN0108830655M.cub 
-                      map=../IN/sinu.map 
+        <commandLine> from=EN0108830655M.cub
+                      map=../IN/sinu.map
                       to=EN0108830655M_sinu_cont.cub lonseam=cont
         </commandLine>
         <description>
           This is the command line used to create the output for the CONT
           version of the LONSEAM example.
         </description>
-      </terminalInterface> 
+      </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/CAM2MAP_LONSEAM_CONT_GUI.jpeg" width="640" height="1060">
             <brief>
               Example GUI
             </brief>
-            <description> 
-              The top of the GUI shows parameters filled in for input 
+            <description>
+              The top of the GUI shows parameters filled in for input
               files, output file, and output map resolution.
             <br></br>
             <br></br>
-              The middle of the GUI illustrates parameters filled in for the  
+              The middle of the GUI illustrates parameters filled in for the
               output map ground range and the longitude seam options.  Under
               the output map ground range section, notice the grayed out
-              parameters.  These values are computed and not allowed to be 
+              parameters.  These values are computed and not allowed to be
               modified when DEFAULTRANGE = MINIMIZE.  This is the default.
               The LONSEAM option has been set to CONT in this example.
             <br></br>
             <br></br>
-              The bottom of the GUI shows the Options menu. 
-              The default value for INTERP is selected (CUBICCONVOLUTION).               
+              The bottom of the GUI shows the Options menu.
+              The default value for INTERP is selected (CUBICCONVOLUTION).
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_LONSEAM_CONT_thumb.jpeg/" width="200" height="500" caption="cam2map LONSEAM=CONTINUE GUI" />
           </image>
@@ -885,7 +890,7 @@
         <dataFile path="assets/IN/sinu.map">
           <brief> Map file </brief>
           <description>
-            Input map file defining the desired output map projection.  This  
+            Input map file defining the desired output map projection.  This
             file is in PVL format.
           </description>
           <parameterName> MAP </parameterName>
@@ -904,7 +909,7 @@
       <outputImages>
         <image src="assets/images/ToFile_EN0108830655M_lonseam_cont.jpg" width="496" height="496">
           <brief> Output image for cam2map LONSEAM=CONTINUE</brief>
-          <description> This is the output of cam2map demonstrating LONSEAM set 
+          <description> This is the output of cam2map demonstrating LONSEAM set
                         to CONT.  Contrast this output with the previous example
                         which was created with the LONSEAM set to AUTO.
           </description>
@@ -919,9 +924,9 @@
        <description>
          This example is the first of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the next,
-         MATCHMAP is set to YES.  In this case MAP is an Isis3 level 2 image.  
-         The mapping parameters of the output file will be read from the 
-         mapping group of the MAP level 2 image. 
+         MATCHMAP is set to YES.  In this case MAP is an Isis3 level 2 image.
+         The mapping parameters of the output file will be read from the
+         mapping group of the MAP level 2 image.
        </description>
       <terminalInterface>
         <commandLine> from=EN0108827082M.lev1.cub map=EN0108828436M.lev2.cub
@@ -931,33 +936,33 @@
           This is the command line used to create the output for the level 2
           image version of the MATCHMAP example.
         </description>
-      </terminalInterface> 
+      </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/CAM2MAP_MATCHMAP_IMAGE_GUI.jpeg" width="640" height="1060">
             <brief>
               Example GUI
             </brief>
-            <description> 
-              The top of the GUI reveals parameters filled in for input 
+            <description>
+              The top of the GUI reveals parameters filled in for input
               files, output file, and output map resolution. Notice that with
               MATCHMAP checked the remaining output map resolution parameters
-              are grayed out to show that they are no longer available for 
+              are grayed out to show that they are no longer available for
               input.  All the mapping parameters will be read from the level 2
               image entered for MAP.
             <br></br>
             <br></br>
-              The middle of the GUI shows parameters for the  
+              The middle of the GUI shows parameters for the
               output map ground range and the longitude seam options.  Under
               the output map ground range section, notice all the parameters
-              are grayed out.  These values are all read or computed from the  
+              are grayed out.  These values are all read or computed from the
               parameters in the mapping group of the level 2 image entered as
               the MAP and not allowed to be modified because MATCHMAP=YES.
-              The LONSEAM option has been set to AUTO in this example (the 
+              The LONSEAM option has been set to AUTO in this example (the
               default).
             <br></br>
             <br></br>
-              The bottom of the GUI shows the Options menu. 
+              The bottom of the GUI shows the Options menu.
               The default value for INTERP is selected (CUBICCONVOLUTION).
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_MATCHMAP_IMAGE_thumb.jpeg" width="200" height="500" caption="cam2map MATCHMAP GUI" />
@@ -986,9 +991,9 @@
       <outputImages>
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
           <brief> Output image for cam2map LONSEAM=AUTO</brief>
-          <description> This is the output of cam2map demonstrating the use of 
-                        MATCHMAP=YES with an ISIS level 2 image as MAP. 
-                        Contrast this output with the level 2 image used as MAP 
+          <description> This is the output of cam2map demonstrating the use of
+                        MATCHMAP=YES with an ISIS level 2 image as MAP.
+                        Contrast this output with the level 2 image used as MAP
                         and with the next example which was also created with
                         MATCHMAP=YES, but uses an ISIS map file as MAP.
           </description>
@@ -1003,9 +1008,9 @@
        <description>
          This example is the second of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the
-         previous, MATCHMAP is set to YES. However, in this case MAP is an  
-         ISIS map file.  The mapping parameters of the output file will 
-         be read from this map file. 
+         previous, MATCHMAP is set to YES. However, in this case MAP is an
+         ISIS map file.  The mapping parameters of the output file will
+         be read from this map file.
        </description>
       <terminalInterface>
         <commandLine> from=EN0108827082M.lev1.cub map=EN0108828436M.map
@@ -1022,26 +1027,26 @@
             <brief>
               Example GUI
             </brief>
-            <description> 
-              The top of the GUI illustrates parameters filled in for input 
+            <description>
+              The top of the GUI illustrates parameters filled in for input
               files, output file, and output map resolution. Notice that with
               MATCHMAP checked the remaining output map resolution parameters
-              are grayed out to show that they are no longer available for 
+              are grayed out to show that they are no longer available for
               input.  All the mapping parameters will be read from the map file.
               The application will throw an error if any required information
               is missing.
             <br></br>
             <br></br>
-              The screen shot of the middle of GUI shows the parameters for the  
+              The screen shot of the middle of GUI shows the parameters for the
               output map ground range and the longitude seam options.  Under
               the output map ground range section, notice all the parameters
-              are grayed out.  These values are all read or computed from the map 
+              are grayed out.  These values are all read or computed from the map
               file values and not allowed to be modified because MATCHMAP=YES.
-              The LONSEAM option has been set to AUTO in this example (the 
+              The LONSEAM option has been set to AUTO in this example (the
               default).
             <br></br>
             <br></br>
-              The bottom of the GUI shows the Options menu. 
+              The bottom of the GUI shows the Options menu.
               The default value for INTERP is selected (CUBICCONVOLUTION).
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_MATCHMAP_MAPFILE_thumb.jpeg" width="200" height="500" caption="cam2map MATCHMAP MAP GUI" />
@@ -1052,7 +1057,7 @@
         <dataFile path="assets/IN/EN0108828436M.map">
           <brief> Map file </brief>
           <description>
-            Input map file defining the desired output map projection.  This  
+            Input map file defining the desired output map projection.  This
             file is in PVL format.
           </description>
           <parameterName> MAP </parameterName>
@@ -1071,7 +1076,7 @@
       <outputImages>
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
           <brief> Output image for cam2map LONSEAM=AUTO</brief>
-          <description> This is the output of cam2map demonstrating the use of 
+          <description> This is the output of cam2map demonstrating the use of
             MATCHMAP=YES with an Isis map file as MAP.  Contrast this output with
             the previous example, which was also created with MATCHMAP=YES, but
             uses an Isis level 2 image  for MAP.
@@ -1085,7 +1090,7 @@
       <example>
       <brief> The following four examples illustrate the effects of the TRIM option </brief>
         <description>
-          In the GUI below, <i>cam2map</i> is set up to project the input (level1) image to a (level2) 
+          In the GUI below, <i>cam2map</i> is set up to project the input (level1) image to a (level2)
           projected image. The latitude and longitude ranges are calculated using the CAMERA
           option, but note the trim option is not selected in order to output the full extent of
           the input image. In the example immediately following, the GUI is set up to trim the
@@ -1106,7 +1111,7 @@
             <brief>
               Example GUI
             </brief>
-            <description> 
+            <description>
               Screen shot of the entire GUI with parameters filled in for FROM file, TO
               file, default PIXRES, and Output Map Ground Range set to the CAMERA
               of the input cube. The rest of the parameters are all set to the defaults.
@@ -1146,7 +1151,7 @@
             <brief>
             Example GUI
             </brief>
-            <description> 
+            <description>
               Screen shot of the entire GUI with parameters filled in for FROM file, TO file, default PIXRES,
               Output Map Ground Range set to the CAMERA of the input cube, TRIM=YES,  and
               MIN/MAX LAT/LON ranges are defined. The rest of the parameters are all set to the defaults.
@@ -1187,12 +1192,12 @@
             <brief>
             Example GUI
             </brief>
-            <description> 
+            <description>
               Entire <i>cam2map</i> GUI with parameters filled in for FROM file, TO
               file, default PIXRES, and Output Map Ground Range set to the CAMERA
               of the input cube. The rest of the parameters are all set to the defaults.
               Note: the DEFAULT value for the TRIM parameter is NO, and therefore,
-              it is not necessary to define TRIM.              
+              it is not necessary to define TRIM.
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_SINU180_NOTRIM_GUI_thumb.jpeg" width="200" height="500" caption="TRIM=NO GUI "/>
           </image>
@@ -1202,7 +1207,7 @@
         <dataFile path="assets/IN/SINU180_MAP.jpg">
           <brief> Map file </brief>
           <description>
-            Input map file defining the attributes of the desired output map projection.  This  
+            Input map file defining the attributes of the desired output map projection.  This
             file is in PVL format.
           </description>
           <parameterName> MAP </parameterName>
@@ -1219,7 +1224,7 @@
         </image>
       </outputImages>
       </example>
-     
+
       <example>
       <brief> Solution for anomalies using Sinusoidal projections </brief>
         <description>
@@ -1241,10 +1246,10 @@
             <brief>
             Example GUI
             </brief>
-            <description> 
+            <description>
               Entire <i>cam2map</i> GUI with parameters filled in for FROM file, TO
               file, default PIXRES, Output Map Ground Range set to the CAMERA
-              of the input cube, and TRIM=YES. The rest of the parameters are all set to the defaults.              
+              of the input cube, and TRIM=YES. The rest of the parameters are all set to the defaults.
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_SINU180_TRIM_GUI_thumb.jpeg" width="200" height="500" caption="TRIM=YES GUI "/>
           </image>
@@ -1254,7 +1259,7 @@
         <dataFile path="assets/IN/SINU180_MAP.jpg">
           <brief> Map file </brief>
           <description>
-            Input map file defining the attributes of the desired output map projection.  This  
+            Input map file defining the attributes of the desired output map projection.  This
             file is in PVL format.
           </description>
           <parameterName> MAP </parameterName>
@@ -1271,6 +1276,6 @@
         </image>
       </outputImages>
       </example>
-           
+
    </examples>
 </application>
