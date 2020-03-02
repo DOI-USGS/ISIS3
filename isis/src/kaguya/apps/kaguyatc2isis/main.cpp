@@ -57,8 +57,7 @@ void IsisMain() {
 
   importPds.SetPdsFile(label, dataFile);
 
-  CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-  Cube *outcube = importPds.SetOutputCube(ui.GetFileName("TO"), att);
+  Cube *outcube = importPds.SetOutputCube("TO");
 
   // Get user entered special pixel ranges
   if (ui.GetBoolean("SETNULLRANGE")) {
