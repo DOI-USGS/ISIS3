@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace Isis { 
+namespace Isis {
 
   void getUserEnteredKernel(UserInterface &ui, const QString &param, Kernel &kernel);
   bool tryKernels(Cube *icube, Process &p, UserInterface &ui, Pvl *log,
@@ -42,16 +42,16 @@ namespace Isis {
    * @param ui The Application UI
    * @param(out) log The Pvl that attempted kernel sets will be logged to
    */
-  void spiceinit(UserInterface &ui, Pvl *log) { 
+  void spiceinit(UserInterface &ui, Pvl *log) {
     // Open the input cube
     Process p;
-    
+
     CubeAttributeInput cai;
     Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
     spiceinit(icube, ui, log);
     p.EndProcess();
   }
- 
+
 
   /**
    * Spiceinit a Cube
@@ -76,7 +76,7 @@ namespace Isis {
       QString msg = "At least one SPK quality must be selected";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    
+
     // Make sure it is not projected
     Projection *proj = NULL;
     try {
@@ -92,7 +92,7 @@ namespace Isis {
     }
 
     Pvl lab = *icube->label();
-    
+
     // if cube has existing polygon delete it
     if (icube->label()->hasObject("Polygon")) {
       icube->label()->deleteObject("Polygon");
@@ -144,7 +144,7 @@ namespace Isis {
       Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
       QList< priority_queue<Kernel> > ck;
       lk        = baseKernels.leapSecond(lab);
-      pck       = baseKernels.targetAttitudeShape(lab);
+      pck       = ckKernels.targetAttitudeShape(lab);
       targetSpk = baseKernels.targetPosition(lab);
       ik        = baseKernels.instrument(lab);
       sclk      = baseKernels.spacecraftClock(lab);
@@ -152,7 +152,7 @@ namespace Isis {
       fk        = ckKernels.frame(lab);
       ck        = ckKernels.spacecraftPointing(lab);
       spk       = spkKernels.spacecraftPosition(lab);
-      
+
       if (ui.GetBoolean("CKNADIR")) {
         // Only add nadir if no spacecraft pointing found, so we will set (priority) type to 0.
         QStringList nadirCk;
@@ -198,7 +198,7 @@ namespace Isis {
                          _FILEINFO_);
       }
       else if (ui.WasEntered("CK")) {
-        // if user entered ck 
+        // if user entered ck
         // empty ck queue list found in system
         while (ck.size()) {
           ck.pop_back();
@@ -209,10 +209,10 @@ namespace Isis {
         emptyKernelQueue.push(Kernel());
         ck.push_back(emptyKernelQueue);
       }
-      
+
       // while the first queue is not empty, loop through it until tryKernels() succeeds
       while (ck.at(0).size() != 0 && !kernelSuccess) {
-        // create an empty kernel 
+        // create an empty kernel
         Kernel realCkKernel;
         QStringList ckKernelList;
 
@@ -236,13 +236,13 @@ namespace Isis {
               Kernel topPriority = ck.at(i).top();
               ckKernelList.append(topPriority.kernels());
               // set the type to equal the type of the to priority of the first
-              //queue 
-              realCkKernel.setType(topPriority.type()); 
+              //queue
+              realCkKernel.setType(topPriority.type());
             }
           }
 
         }
-        // pop the top priority ck off only the first queue so that the next 
+        // pop the top priority ck off only the first queue so that the next
         // iteration will test the next highest priority of the first queue with
         // the top priority of each of the other queues.
         ck[0].pop();
@@ -267,14 +267,14 @@ namespace Isis {
   }
 
   /**
-   * If the user entered the parameter param, then kernel is replaced by the 
+   * If the user entered the parameter param, then kernel is replaced by the
    * user's values and quality is reset to 0. Otherwise, the kernels loaded by the
    * KernelDb class will be kept.
    *
    * @param param Name of the kernel input parameter
-   *  
-   * @param kernel Kernel object to be overwritten if the specified user parameter 
-   *               was entered. 
+   *
+   * @param kernel Kernel object to be overwritten if the specified user parameter
+   *               was entered.
    */
   void getUserEnteredKernel(UserInterface &ui, const QString &param, Kernel &kernel) {
     if (ui.WasEntered(param)) {
@@ -395,7 +395,7 @@ namespace Isis {
     // Get rid of old keywords from previously inited cubes
     if (currentKernels.hasKeyword("Source"))
       currentKernels.deleteKeyword("Source");
-    
+
     if (currentKernels.hasKeyword("SpacecraftPointing"))
       currentKernels.deleteKeyword("SpacecraftPointing");
 
@@ -450,7 +450,7 @@ namespace Isis {
       try {
         cam = icube->camera();
         currentKernels = icube->group("Kernels");
-        
+
         PvlKeyword source("Source");
 
         if (cam->isUsingAle()) {
@@ -461,11 +461,11 @@ namespace Isis {
         }
 
         currentKernels += source;
-        icube->putGroup(currentKernels);   
+        icube->putGroup(currentKernels);
         if (log){
           log->addGroup(currentKernels);
-        } 
-          
+        }
+
       }
       catch(IException &e) {
         Pvl errPvl = e.toPvl();
@@ -665,7 +665,7 @@ namespace Isis {
         continue;
       }
     }
-    
+
     if (log) {
       log->addGroup(logGrp);
     }

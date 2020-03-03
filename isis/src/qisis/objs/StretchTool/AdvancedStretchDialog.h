@@ -48,6 +48,7 @@ namespace Isis {
                           Histogram &grayHist);
       void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
+      void restoreSavedStretch(Stretch stretch); 
 
       Stretch getGrayStretch();
       Stretch getRedStretch();
@@ -77,6 +78,9 @@ namespace Isis {
       void stretchChanged();
       //! Emitted when this dialog is shown or hidden
       void visibilityChanged();
+      void saveToCube(); 
+      void deleteFromCube(); 
+      void loadStretch(); 
 
     public slots:
       void updateStretch(CubeViewport *);
