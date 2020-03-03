@@ -234,11 +234,11 @@ void WriteOutput(Isis::Buffer &buf) {
 
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   // Get the directory where the MRO HiRISE translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Mex"] + "/translations/";
+  // PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
-  FileName transFile(transDir + "hrscInstrument.trn");
+  FileName transFile(transDir + "mexHrscInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
@@ -259,12 +259,12 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   outLabel.findGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
 
   // Translate the BandBin group
-  transFile  = transDir + "hrscBandBin.trn";
+  transFile  = transDir + "mexHrscBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(inLabels, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile  = transDir + "hrscArchive.trn";
+  transFile  = transDir + "mexHrscArchive.trn";
   PvlToPvlTranslationManager archiveXlater(inLabels, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
