@@ -773,6 +773,15 @@
           occluded pixels.  A pixel is determined to be occluded if the lat/lon
           value of the pixel in projected image space does not match (within a
           tolerance) the lat/lon value of the pixel in unprojected image space.
+          <br></br>
+          <br></br>
+          Highly dependent on DEM / image pixel resolution and accuracy of
+          coregistration between the two.
+          <br></br>
+          <br></br>
+          This parameter also significantly increases projection time.  It is
+          recommended that this option is only used on images with known areas
+          of occlusion.
         </description>
         <default><item>false</item></default>
       </parameter>
