@@ -17,9 +17,9 @@ if [ ! "$ISISROOT" ]; then
 fi
 
 if [ -d $ISISROOT/../data ]; then
-  ISISDATA=$ISISROOT/../data
+  ISISDATA=$ISISROOT/../isis_data
 else
-  ISISDATA=/usgs/cpkgs/isis3/data
+  ISISDATA=/usgs/cpkgs/isis3/isis_data
 fi
 export ISISDATA
 
