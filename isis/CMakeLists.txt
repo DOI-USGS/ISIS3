@@ -450,8 +450,8 @@ install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 
 # Create the appdata directory and translations directory
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates)
 
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
@@ -503,6 +503,12 @@ add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn
   ${CMAKE_BINARY_DIR}/appdata/translations)
 add_dependencies(isis3 appdata)
+
+# Add custom build target to copy modified template files to the build/appdata/templates
+# directory. (As above - may need to be updated)
+add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
+add_dependencies(isis3 templates)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
