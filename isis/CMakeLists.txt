@@ -466,6 +466,9 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/templates DESTINATION .)
 # Set up install of the make folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 
+# Set up install of appdata folder
+install(DIRECTORY ${CMAKE_BINARY_DIR}/appdata DESTINATION ${CMAKE_INSTALL_PREFIX})
+
 # Have CMake process all of the source code and tests.
 add_subdirectory(src objects)
 
