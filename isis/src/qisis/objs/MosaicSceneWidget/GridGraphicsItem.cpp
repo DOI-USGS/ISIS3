@@ -53,7 +53,6 @@ namespace Isis {
         lonMin = lonMax;
         lonMax = temp;
       }
-      
       if (mappingGroup["LatitudeType"][0] == "Planetographic") {
 
           Distance equaRad(tproj->EquatorialRadius(), Distance::Meters);
@@ -115,6 +114,7 @@ namespace Isis {
                           Angle::Degrees);
           maxLat = Latitude(latMax.degrees(), mappingGroup,
                           Angle::Degrees);
+          
 
           // Make sure our lat increment is non-zero
           if (!qFuzzyCompare(latInc.radians(), 0.0)) {
@@ -131,7 +131,7 @@ namespace Isis {
           if (qFuzzyCompare(endLat.degrees(), 90.0))
             endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
         }
-
+        
         Longitude minLon(lonMin.degrees(), mappingGroup,
                         Angle::Degrees);
         Longitude maxLon(lonMax.degrees(), mappingGroup,
@@ -143,7 +143,7 @@ namespace Isis {
           startLon = Longitude(
             baseLon - Angle(floor((baseLon - minLon) / lonInc) * lonInc));
         }
-
+        
         Longitude endLon =
             (long)((maxLon - startLon) / lonInc) * lonInc + startLon;
 
@@ -199,7 +199,7 @@ namespace Isis {
               double y = 0;
               
               bool valid;
-
+              
               // Set ground according to lon direction to get correct X,Y values 
               // when drawing lines. 
               if (tproj->IsPositiveWest()) {
@@ -276,7 +276,7 @@ namespace Isis {
           firstIteration = true;
           atMaxLat = false;
           atMaxLon = false;
-
+          
           // Create the longitude grid lines
           for (Longitude lon = minLon; lon != maxLon + lonInc; lon += lonInc) {
             if (lon > endLon && lon < maxLon) {
@@ -300,8 +300,10 @@ namespace Isis {
               // Set ground according to lon direction to get correct X,Y values 
               // when drawing lines.  
               bool valid;
+              
               if (tproj->IsPositiveWest()) {
-                valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
+                  double glon = tproj->Has180Domain() ? -1*lon.positiveEast(Angle::Degrees): lon.positiveWest(Angle::Degrees);
+                  valid = tproj->SetGround(lat.degrees(), glon);
               }
               else {
                 valid = tproj->SetGround(lat.degrees(), lon.positiveEast(Angle::Degrees));

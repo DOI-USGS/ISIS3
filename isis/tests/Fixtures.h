@@ -18,6 +18,7 @@
 #include "PvlObject.h"
 #include "ControlNet.h"
 #include "FileList.h"
+#include "FileName.h"
 
 using json = nlohmann::json;
 
@@ -51,6 +52,9 @@ namespace Isis {
       Cube *cube1;
       Cube *cube2;
       Cube *cube3;
+
+      FileName *threeImageOverlapFile;
+      FileName *twoImageOverlapFile;
 
       FileList *cubeList;
       QString cubeListFile;
