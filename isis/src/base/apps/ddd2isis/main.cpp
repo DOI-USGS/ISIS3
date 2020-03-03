@@ -100,6 +100,7 @@ void IsisMain() {
   dataTypes.insert(1450903360, 8);
   dataTypes.insert(8, 1);
   dataTypes.insert(16, 2);
+  dataTypes.insert(32, 4);
   dataTypes.insert(48, 2);
 
   // Read bytes 16-19 to get the bit type
@@ -128,6 +129,12 @@ void IsisMain() {
     // Old header format's offset is always 1024.
      dataTypeBytes = dataTypes.value(totalBandBits);
      nOffset = 1024;
+  }
+
+  if (dataTypeBytes == 0) {
+    string msg = "The value totalBandBits [" + to_string(totalBandBits) + "] does not map " +
+                  "to any byte size in the dataTypes table.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   fin.close();

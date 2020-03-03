@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QMessageBox>
 
 #include "Stretch.h"
 #include "IString.h"
@@ -35,40 +36,52 @@ namespace Isis {
     typeSelectionArea->setLayout(new QHBoxLayout());
     typeSelectionArea->layout()->addWidget(new QLabel("Stretch Type"));
 
-    QComboBox *stretchTypeSelection = new QComboBox();
-    stretchTypeSelection->addItem("Linear",   0);
-    stretchTypeSelection->addItem("Sawtooth", 1);
-    stretchTypeSelection->addItem("Binary",   2);
-    stretchTypeSelection->addItem("Manual",   3);
+    p_stretchTypeSelection = new QComboBox();
+    p_stretchTypeSelection->addItem("Linear",   0);
+    p_stretchTypeSelection->addItem("Sawtooth", 1);
+    p_stretchTypeSelection->addItem("Binary",   2);
+    p_stretchTypeSelection->addItem("Manual",   3);
 
-    typeSelectionArea->layout()->addWidget(stretchTypeSelection);
+    typeSelectionArea->layout()->addWidget(p_stretchTypeSelection);
     layout()->addWidget(typeSelectionArea);
 
     p_stretchTypeStack = new QStackedWidget();
     LinearStretchType *linear = new LinearStretchType(hist, curStretch,
         name, color);
     connect(linear, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
+    connect(linear, SIGNAL(saveToCube()), this, SIGNAL(saveToCube()));
+    connect(linear, SIGNAL(deleteFromCube()), this, SIGNAL(deleteFromCube()));
+    connect(linear, SIGNAL(loadStretch()), this, SIGNAL(loadStretch()));
     p_stretchTypeStack->addWidget(linear);
 
     SawtoothStretchType *sawtooth = new SawtoothStretchType(hist, curStretch,
         name, color);
     connect(sawtooth, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
+    connect(sawtooth, SIGNAL(saveToCube()), this, SIGNAL(saveToCube()));
+    connect(sawtooth, SIGNAL(deleteFromCube()), this, SIGNAL(deleteFromCube()));
+    connect(sawtooth, SIGNAL(loadStretch()), this, SIGNAL(loadStretch()));
     p_stretchTypeStack->addWidget(sawtooth);
 
     BinaryStretchType *binary = new BinaryStretchType(hist, curStretch,
         name, color);
     connect(binary, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
+    connect(binary, SIGNAL(saveToCube()), this, SIGNAL(saveToCube()));
+    connect(binary, SIGNAL(deleteFromCube()), this, SIGNAL(deleteFromCube()));
+    connect(binary, SIGNAL(loadStretch()), this, SIGNAL(loadStretch()));
     p_stretchTypeStack->addWidget(binary);
 
     ManualStretchType *manual = new ManualStretchType(hist, curStretch,
         name, color);
     connect(manual, SIGNAL(stretchChanged()), this, SIGNAL(stretchChanged()));
+    connect(manual, SIGNAL(saveToCube()), this, SIGNAL(saveToCube()));
+    connect(manual, SIGNAL(deleteFromCube()), this, SIGNAL(deleteFromCube()));
+    connect(manual, SIGNAL(loadStretch()), this, SIGNAL(loadStretch()));
     p_stretchTypeStack->addWidget(manual);
 
     layout()->addWidget(p_stretchTypeStack);
-    connect(stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
+    connect(p_stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
             p_stretchTypeStack, SLOT(setCurrentIndex(int)));
-    connect(stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
+    connect(p_stretchTypeSelection, SIGNAL(currentIndexChanged(int)),
             this, SIGNAL(stretchChanged()));
   }
 
@@ -99,6 +112,38 @@ namespace Isis {
    * @param newStretch
    */
   void AdvancedStretch::setStretch(Stretch newStretch) {
+    StretchType *stretchType = (StretchType *)
+                               p_stretchTypeStack->currentWidget();
+    stretchType->setStretch(newStretch);
+  }
+
+
+  /**
+   * Used to restore a saved Stretch from a cube. This function is 
+   * distinct from setStretch in that setStretch deliberately _does not_ 
+   * change the stretch type, and this function does change the stretch type.  
+   *  
+   * @param newStretch saved stretch to restore
+   */
+  void AdvancedStretch::restoreSavedStretch(Stretch newStretch) {
+    QString stretchTypeName = newStretch.getType(); 
+
+    int index = 0;
+    if (stretchTypeName.compare("LinearStretch") == 0 ) {
+      index = 0; 
+    }
+    else if (stretchTypeName.compare("SawtoothStretch") == 0 ) {
+      index = 1; 
+    }
+    else if (stretchTypeName.compare("BinaryStretch") == 0) {
+      index = 2; 
+    }
+    else if (stretchTypeName.compare("ManualStretch") == 0) {
+      index = 3;
+    }
+    // Fail by defaulting to Linear
+
+    p_stretchTypeSelection->setCurrentIndex(index);
     StretchType *stretchType = (StretchType *)
                                p_stretchTypeStack->currentWidget();
     stretchType->setStretch(newStretch);

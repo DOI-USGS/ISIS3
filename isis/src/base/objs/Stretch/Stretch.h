@@ -26,6 +26,7 @@
 #include <string>
 #include "Pvl.h"
 #include "Histogram.h"
+#include "Blob.h"
 
 namespace Isis {
   /**
@@ -67,9 +68,10 @@ namespace Isis {
    *               Created second Parse method for handling pairs where the
    *               input side is a perentage.  Fixed Input and Output getters
    *               to check both sides of boundry condition for valid data
-   *
+   *  @history 2020-02-27 Kristin Berry - Updated to inherit from Blob so Stretches can be
+   *               saved and restored from cubes. 
    */
-  class Stretch {
+  class Stretch : public Isis::Blob {
     private:
       std::vector<double> p_input;   //!< Array for input side of stretch pairs
       std::vector<double> p_output;  //!< Array for output side of stretch pairs
@@ -88,10 +90,13 @@ namespace Isis {
       double p_minimum; //!<By default this value is set to p_lrs
       double p_maximum; //!<By default this value is set to p_hrs
 
+      QString p_type; //! Type of stretch. This is only currently used in the AdvancedStretchTool.
+
       std::pair<double, double> NextPair(QString &pairs);
 
     public:
       Stretch();
+      Stretch(QString name);
 
       //! Destroys the Stretch object
       ~Stretch() {};
@@ -177,6 +182,9 @@ namespace Isis {
         return p_pairs;
       };
 
+      QString getType(); 
+      void setType(QString type); 
+
       double Input(const int index) const;
       double Output(const int index) const;
 
@@ -188,6 +196,11 @@ namespace Isis {
       };
 
       void CopyPairs(const Stretch &other);
+
+    protected:
+      void WriteInit();
+      void ReadData(std::istream &is);
+      void WriteData(std::fstream &os);
   };
 };
 
