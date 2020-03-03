@@ -71,6 +71,7 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("LinearStretch");
     setLayout(p_mainLayout);
 
     setStretch(stretch);
@@ -254,8 +255,8 @@ namespace Isis {
     }
   }
 
-
   Stretch LinearStretchType::getStretch() {
     return *p_stretch;
   }
+
 }

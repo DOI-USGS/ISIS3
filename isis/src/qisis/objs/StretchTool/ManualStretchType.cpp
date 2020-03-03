@@ -55,6 +55,8 @@ namespace Isis {
             this, SLOT(readTable()));
     disconnect(this, SIGNAL(stretchChanged()), this, SLOT(updateTable()));
 
+    p_stretch->setType("ManualStretch");
+
     setLayout(p_mainLayout);
     setStretch(stretch);
   }

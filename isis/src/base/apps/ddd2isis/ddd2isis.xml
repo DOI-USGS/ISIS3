@@ -41,6 +41,10 @@
       bands. Removed the internal default of the output parameter set to None so
       that an output file is now requried. Fixes #703.
     </change>
+    <change name="Adam Paquette" date="2020-02-28">
+      Updated the dataTypes QMap with a new mapping (32, 4) to handle ingesting
+      the updated uvflat files from malin. Fixes #3715.
+    </change>
   </history>
 
   <category>

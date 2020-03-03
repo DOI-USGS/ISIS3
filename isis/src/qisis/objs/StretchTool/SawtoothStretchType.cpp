@@ -71,6 +71,8 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("SawtoothStretch"); 
+
     setLayout(p_mainLayout);
 
     p_widthEdit->setText(QString::number(
