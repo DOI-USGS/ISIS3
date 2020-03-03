@@ -1,4 +1,4 @@
-ObservationKeys = 4
+ObservationKeys = 3
 
 Group = Keyword1
   Auto
@@ -23,20 +23,10 @@ End_Group
 
 Group = Keyword3
   Auto
-  InputKey       = FilterNumber
-  InputGroup     = "IsisCube,BandBin"
-  InputPosition  = (IsisCube, BandBin)
-  OutputName     = Keyword3
-  OutputPosition = (Group, SerialNumberKeywords)
-  Translation    = (*, *)
-End_Group
-
-Group = Keyword4
-  Auto
-  InputKey       = StartTime
+  InputKey       = SpacecraftClockStartCount
   InputGroup     = "IsisCube,Instrument"
   InputPosition  = (IsisCube, Instrument)
-  OutputName     = Keyword4
+  OutputName     = Keyword3
   OutputPosition = (Group, SerialNumberKeywords)
   Translation    = (*, *)
 End_Group
