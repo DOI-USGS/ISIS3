@@ -291,11 +291,11 @@ void IsisMain() {
  */
 void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   // Get the directory where the Juno translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Juno"];
+  // PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
-  FileName instTransFile(missionDir + "/translations/junoJunoCamInstrument.trn");
+  FileName instTransFile(transDir + "junoJunoCamInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(inputLabel, instTransFile.expanded());
   instrumentXlater.Auto(outputLabel);
   PvlGroup &inst = outputLabel.findGroup("Instrument", PvlObject::Traverse);
@@ -317,7 +317,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   }
 
   // Translate the BandBin group
-  FileName bandBinTransFile(missionDir + "/translations/junoJunoCamBandBin.trn");
+  FileName bandBinTransFile(transDir + "junoJunoCamBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
   bandBinXlater.Auto(outputLabel);
   PvlGroup &bandBin = outputLabel.findGroup("BandBin", PvlObject::Traverse);
@@ -341,7 +341,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   }
 
   // Translate the Archive group
-  FileName archiveTransFile(missionDir + "/translations/junoJunoCamArchive.trn");
+  FileName archiveTransFile(transDir + "junoJunoCamArchive.trn");
   PvlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outputLabel);
   PvlGroup &archive = outputLabel.findGroup("Archive", PvlObject::Traverse);
