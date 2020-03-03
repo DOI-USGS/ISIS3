@@ -21,6 +21,7 @@
 # Translation may be repeated as needed.
 #
 Group = SoftwareVersionId
+  Optional
   Auto
   InputKey       = SOFTWARE_VERSION_ID
   InputGroup     = ROOT
@@ -31,6 +32,7 @@ Group = SoftwareVersionId
 End_Group
 
 Group = DataSetName
+  Optional
   Auto
   InputKey       = DATA_SET_NAME
   InputGroup     = ROOT
@@ -106,6 +108,67 @@ Group = ProductVersionId
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = ProductVersionId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentType
+  Auto
+  InputKey       = INSTRUMENT_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageMidTime
+  Auto
+  InputKey       = IMAGE_MID_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ImageMidTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProcessingLevelId
+  Auto
+  InputKey       = PROCESSING_LEVEL_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProcessingLevelId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EncodingType
+  Auto
+  InputKey       = ENCODING_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = EncodingType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PhotometricCorrectionType
+  Optional
+  Auto
+  InputKey       = PHOTOMETRIC_CORRECTION_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = PhotometricCorrectionType
   OutputPosition = (Object, IsisCube, Group, Archive)
   Translation    = (*, *)
 End_Group
