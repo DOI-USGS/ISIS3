@@ -81,6 +81,7 @@ void IsisMain() {
   int samples, lines;
   TProjection *outmap = NULL;
   bool trim = ui.GetBoolean("TRIM");
+  bool occlusion = ui.GetBoolean("OCCLUSION");
 
   // Make sure the target name of the input cube and map file match.
   if (userGrp.hasKeyword("TargetName") && !icube->group("Instrument").findKeyword("TargetName").isNull()) {
@@ -330,7 +331,7 @@ void IsisMain() {
   else if (ui.GetString("WARPALGORITHM") == "REVERSEPATCH") {
     transform = new cam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   outmap, trim);
+                                   outmap, trim, occlusion);
 
     int patchSize = ui.GetInteger("PATCHSIZE");
     int minPatchSize = 4;
@@ -349,7 +350,7 @@ void IsisMain() {
   else if (incam->GetCameraType() == Camera::Framing) {
     transform = new cam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   outmap, trim);
+                                   outmap, trim, occlusion);
     p.SetTiling(4, 4);
     p.StartProcess(*transform, *interp);
   }
@@ -420,7 +421,7 @@ void IsisMain() {
   else {
     transform = new cam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   outmap, trim);
+                                   outmap, trim, occlusion);
 
     int tileStart, tileEnd;
     incam->GetGeometricTilingHint(tileStart, tileEnd);
@@ -503,7 +504,7 @@ int cam2mapForward::OutputLines() const {
 cam2mapReverse::cam2mapReverse(const int inputSamples, const int inputLines,
                                Camera *incam, const int outputSamples,
                                const int outputLines, TProjection *outmap,
-                               bool trim) {
+                               bool trim, bool occlusion) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
   p_incam = incam;
@@ -513,6 +514,7 @@ cam2mapReverse::cam2mapReverse(const int inputSamples, const int inputLines,
   p_outmap = outmap;
 
   p_trim = trim;
+  p_occlusion = occlusion;
 }
 
 // Transform method mapping output line/samps to lat/lons to input line/samps
@@ -548,8 +550,10 @@ bool cam2mapReverse::Xform(double &inSample, double &inLine,
   // Good to ground one last time to check for occlusion
   p_incam->SetImage(inSample, inLine);
 
-  if (abs(lat - p_incam->UniversalLatitude()) > 0.00001 || abs(lon - p_incam->UniversalLongitude()) > 0.00001) {
-    return false;
+  if (p_occlusion){
+    if (abs(lat - p_incam->UniversalLatitude()) > 0.00001 || abs(lon - p_incam->UniversalLongitude()) > 0.00001) {
+      return false;
+    }
   }
 
   return true;

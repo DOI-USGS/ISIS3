@@ -20,16 +20,18 @@ class cam2mapReverse : public Transform {
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
+    bool p_occlusion;
     int p_outputSamples;
     int p_outputLines;
 
   public:
     // constructor
-    cam2mapReverse(const int inputSamples, const int inputLines, 
+    cam2mapReverse(const int inputSamples, const int inputLines,
                    Camera *incam,
-                   const int outputSamples, const int outputLines, 
+                   const int outputSamples, const int outputLines,
                    TProjection *outmap,
-                   bool trim);
+                   bool trim,
+                   bool occlusion=false);
 
     // destructor
     ~cam2mapReverse() {};
@@ -58,9 +60,9 @@ class cam2mapForward : public Transform {
 
   public:
     // constructor
-    cam2mapForward(const int inputSamples, const int inputLines, 
+    cam2mapForward(const int inputSamples, const int inputLines,
                    Camera *incam,
-                   const int outputSamples, const int outputLines, 
+                   const int outputSamples, const int outputLines,
                    TProjection *outmap,
                    bool trim);
 

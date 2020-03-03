@@ -289,6 +289,9 @@
         pixel is occluded when the resulting latitude, or longitude differ from
         the original latitude or longitude by 0.000001 degrees.
      </change>
+     <change name="Austin Sanders" date="2020-03-02">
+        Added an additional parameter (occlusion) to toggle occlusion processing.
+     </change>
   </history>
 
   <oldName>
@@ -709,6 +712,7 @@
               (using the specified INTERPOLATOR).
             </description>
             <inclusions><item>PATCHSIZE</item></inclusions>
+            <exclusions><item>OCCLUSION</item></exclusions>
           </option>
           <option value="REVERSEPATCH">
             <brief>Reverse patch warp algorithm</brief>
@@ -740,7 +744,7 @@
                that you always use automatic for push frame cameras to ensure the patch size does not cross
                multiple framelets.
             </description>
-            <exclusions><item>PATCHSIZE</item></exclusions>
+            <exclusions><item>PATCHSIZE</item><item>OCCLUSION</item></exclusions>
           </option>
         </list>
       </parameter>
@@ -758,6 +762,19 @@
           patch sizes are recommended (e.g., 4, 8).
         </description>
         <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name ="OCCLUSION">
+        <type>boolean</type>
+        <brief>Detect and mark occluded pixels.</brief>
+        <description>
+          This parameter is used to toggle the occlusion detection algorithm.
+          If set true, then the occlusion detection algorithm locates and nullifies
+          occluded pixels.  A pixel is determined to be occluded if the lat/lon
+          value of the pixel in projected image space does not match (within a
+          tolerance) the lat/lon value of the pixel in unprojected image space.
+        </description>
+        <default><item>false</item></default>
       </parameter>
     </group>
   </groups>
