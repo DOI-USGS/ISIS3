@@ -70,7 +70,7 @@ Group = DataSetId
   Translation    = (*, *)
 End_Group
 
-Group = ProductId 
+Group = ProductId
   Auto
   InputKey       = PRODUCT_ID
   InputGroup     = ROOT
@@ -80,7 +80,7 @@ Group = ProductId
   Translation    = (*, *)
 End_Group
 
-Group = ProductType 
+Group = ProductType
   Auto
   InputKey       = PRODUCT_TYPE
   InputGroup     = ROOT
@@ -96,6 +96,16 @@ Group = StandardDataProductId
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = StandardDataProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputKey       = OBSERVATION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ObservationId
   OutputPosition = (Object, IsisCube, Group, Archive)
   Translation    = (*, *)
 End_Group
