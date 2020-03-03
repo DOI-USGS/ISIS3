@@ -20,25 +20,6 @@
 # Translation is the native and corresponding foreign values.
 # Translation may be repeated as needed.
 #
-Group = TelemetrySourceId
-  Auto
-  InputKey       = TELEMETRY_SOURCE_ID
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = TelemetrySourceId
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = InstrumentHostId
-  Auto
-  InputKey       = INSTRUMENT_HOST_ID
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentHostId
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
 
 Group = SpacecraftName
   Auto
@@ -51,6 +32,7 @@ Group = SpacecraftName
 End_Group
 
 Group = MissionPhaseName
+  Optional
   Auto
   InputKey       = MISSION_PHASE_NAME
   InputGroup     = ROOT
@@ -66,26 +48,6 @@ Group = InstrumentId
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = InstrumentId
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = InstrumentName
-  Auto
-  InputKey       = INSTRUMENT_NAME
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentName
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = InstrumentType
-  Auto
-  InputKey       = INSTRUMENT_TYPE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentType
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -130,126 +92,6 @@ Group = StopTime
   Translation    = (*, *)
 End_Group
 
-Group = ImageMidTime
-  Auto
-  InputKey       = IMAGE_MID_TIME
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ImageMidTime
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = RightAscension
-  Auto
-  InputKey       = RIGHT_ASCENSION
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = RightAscension
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = Declination
-  Auto
-  InputKey       = DECLINATION
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = Declination
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = TwistAngle
-  Auto
-  InputKey       = TWIST_ANGLE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = TwistAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = CelestialNorthClockAngle
-  Auto
-  InputKey       = CELESTIAL_NORTH_CLOCK_ANGLE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = CelestialNorthClockAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = Quaternion
-  Auto
-  InputKey       = QUATERNION
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = Quaternion
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = QuaternionDesc
-  Auto
-  InputKey       = QUATERNION_DESC
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = QuaternionDesc
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SpacecraftSolarDistance
-  Auto
-  InputKey       = SPACECRAFT_SOLAR_DISTANCE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SpacecraftSolarDistance
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ScSunPositionVector
-  Auto
-  InputKey       = SC_SUN_POSITION_VECTOR
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScSunPositionVector
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ScSunVelocityVector
-  Auto
-  InputKey       = SC_SUN_VELOCITY_VECTOR
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScSunVelocityVector
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SpiceFileName
-  Auto
-  InputKey       = SPICE_FILE_NAME
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SpiceFileName
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = TargetType
-  Auto
-  InputKey       = TARGET_TYPE 
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = TargetType
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
 Group = TargetName
   Auto
   InputKey       = TARGET_NAME 
@@ -257,80 +99,24 @@ Group = TargetName
   InputPosition  = ROOT
   OutputName     = TargetName
   OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (VESTA, "4 VESTA")
+  Translation    = (CERES, "1 CERES")
   Translation    = (*, *)
 End_Group
 
-Group = CoordinateSystemName
+Group = OriginalTargetName
+  Optional
   Auto
-  InputKey       = COORDINATE_SYSTEM_NAME
+  InputKey       = TARGET_NAME 
   InputGroup     = ROOT
   InputPosition  = ROOT
-  OutputName     = CoordinateSystemName
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = CoordinateSystemCenterName
-  Auto
-  InputKey       = COORDINATE_SYSTEM_CENTER_NAME
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = CoordinateSystemCenterName
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSpacecraftLatitude
-  Auto
-  InputKey       = SUB_SPACECRAFT_LATITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSpacecraftLatitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSpacecraftLongitude
-  Auto
-  InputKey       = SUB_SPACECRAFT_LONGITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSpacecraftLongitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSpacecraftAzimuth
-  Auto
-  InputKey       = SUB_SPACECRAFT_AZIMUTH
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSpacecraftAzimuth
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SpacecraftAltitude
-  Auto
-  InputKey       = SPACECRAFT_ALTITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SpacecraftAltitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = TargetCenterDistance
-  Auto
-  InputKey       = TARGET_CENTER_DISTANCE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = TargetCenterDistance
+  OutputName     = OriginalTargetName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
 Group = OrbitNumber
+  Optional
   Auto
   InputKey       = ORBIT_NUMBER
   InputGroup     = ROOT
@@ -340,222 +126,13 @@ Group = OrbitNumber
   Translation    = (*, *)
 End_Group
 
-Group = ScTargetPositionVector
-  Auto
-  InputKey       = SC_TARGET_POSITION_VECTOR
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScTargetPositionVector
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ScTargetVelocityVector
-  Auto
-  InputKey       = SC_TARGET_VELOCITY_VECTOR
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScTargetVelocityVector
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = LocalHourAngle
-  Auto
-  InputKey       = LOCAL_HOUR_ANGLE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = LocalHourAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSolarLatitude
-  Auto
-  InputKey       = SUB_SOLAR_LATITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSolarLatitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSolarLongitude
-  Auto
-  InputKey       = SUB_SOLAR_LONGITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSolarLongitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SubSolarAzimuth
-  Auto
-  InputKey       = SUB_SOLAR_AZIMUTH
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SubSolarAzimuth
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = IncidenceAngle
-  Auto
-  InputKey       = INCIDENCE_ANGLE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = IncidenceAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = EmissionAngle
-  Auto
-  InputKey       = EMISSION_ANGLE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = EmissionAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = PhaseAngle
-  Auto
-  InputKey       = PHASE_ANGLE 
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = PhaseAngle
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SlantDistance
-  Auto
-  InputKey       = SLANT_DISTANCE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = SlantDistance
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = MaximumLatitude
-  Auto
-  InputKey       = MAXIMUM_LATITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = MaximumLatitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = MinimumLatitude
-  Auto
-  InputKey       = MINIMUM_LATITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = MinimumLatitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = CenterLatitude
-  Auto
-  InputKey       = CENTER_LATITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = CenterLatitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = EasternmostLongitude
-  Auto
-  InputKey       = EASTERNMOST_LONGITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = EasternmostLongitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = WesternmostLongitude
-  Auto
-  InputKey       = WESTERNMOST_LONGITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = WesternmostLongitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = CenterLongitude
-  Auto
-  InputKey       = CENTER_LONGITUDE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = CenterLongitude
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = HorizontalPixelScale
-  Auto
-  InputKey       = HORIZONTAL_PIXEL_SCALE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = HorizontalPixelScale
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = VerticalPixelScale
-  Auto
-  InputKey       = VERTICAL_PIXEL_SCALE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = VerticalPixelScale
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = NorthAzimuth
-  Auto
-  InputKey       = NORTH_AZIMUTH
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = NorthAzimuth
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ProcessingLevelId
-  Auto
-  InputKey       = PROCESSING_LEVEL_ID
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ProcessingLevelId
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
 Group = DataQualityId
+  Optional
   Auto
   InputKey       = DATA_QUALITY_ID
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = DataQualityId
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = DataQualityDesc
-  Auto
-  InputKey       = DATA_QUALITY_DESC
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = DataQualityDesc
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -580,26 +157,6 @@ Group = InstrumentModeId
   Translation    = (*, *)
 End_Group
 
-Group = InstrumentModeDesc
-  Auto
-  InputKey       = INSTRUMENT_MODE_DESC
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentModeDesc
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = EncodingType
-  Auto
-  InputKey       = ENCODING_TYPE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = EncodingType
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
 Group = ScanModeId
   Auto
   InputKey       = SCAN_MODE_ID 
@@ -611,31 +168,12 @@ Group = ScanModeId
 End_Group
 
 Group = ScanParameter
+  Optional
   Auto
   InputKey       = DAWN:SCAN_PARAMETER
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = ScanParameter
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ScanParameterDesc
-  Auto
-  InputKey       = DAWN:SCAN_PARAMETER_DESC
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScanParameterDesc
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = ScanParameterUnit
-  Auto
-  InputKey       = DAWN:SCAN_PARAMETER_UNIT
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = ScanParameterUnit
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -646,26 +184,6 @@ Group = FrameParameter
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = FrameParameter
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = FrameParameterDesc
-  Auto
-  InputKey       = FRAME_PARAMETER_DESC
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = FrameParameterDesc
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = FrameParameterUnit
-  Auto
-  InputKey       = DAWN:FRAME_PARAMETER_UNIT
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = FrameParameterUnit
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -715,41 +233,12 @@ Group = VirVisStartYPosition
 End_Group
 
 Group = MaximumInstrumentTemperature
+  Optional
   Auto
   InputKey       = MAXIMUM_INSTRUMENT_TEMPERATURE
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = MaximumInstrumentTemperature
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = InstrumentTemperaturePoint
-  Auto
-  InputKey       = INSTRUMENT_TEMPERATURE_POINT
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentTemperaturePoint
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = InstrumentTemperatureUnit
-  Auto
-  InputKey       = DAWN:INSTRUMENT_TEMPERATURE_UNIT
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = InstrumentTemperatureUnit
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = PhotometricCorrectionType
-  Auto
-  InputKey       = PHOTOMETRIC_CORRECTION_TYPE
-  InputGroup     = ROOT
-  InputPosition  = ROOT
-  OutputName     = PhotometricCorrectionType
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
