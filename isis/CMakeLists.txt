@@ -446,8 +446,12 @@ endif()
 file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../3rdParty/plugins/\n")
 install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/xml)
 
-#Create the inc directory
+# Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
+
+# Create the appdata directory and translations directory
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
 
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
@@ -489,6 +493,13 @@ add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp
   ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.h ${CMAKE_BINARY_DIR}/inc)
 add_dependencies(isis3 incs)
+
+# Add custom build target to copy modified translation files to the build/appdata/translations
+# directory. (As above - may need to be updated)
+add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn
+  ${CMAKE_BINARY_DIR}/appdata/translations)
+add_dependencies(isis3 appdata)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
