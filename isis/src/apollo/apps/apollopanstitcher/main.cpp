@@ -166,7 +166,7 @@ void IsisMain() {
 
   //parameters for maximum correlation autoregestration
   // see: ///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
-  FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
+  FileName fiducialPvl("$ISISROOT/templates/apolloPanFiducialFinder.pvl");
   pvl.read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
