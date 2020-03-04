@@ -25,7 +25,7 @@ void IsisMain() {
   outcam = mcube->camera();
 
   // Open the input projection cube and get the projection information
-  ProcessRubberSheet rub;
+  ProcessRubberSheet rub(2, 1);
   Cube *icube = rub.SetInputCube("FROM");
   TProjection *inmap = (TProjection *) icube->projection();
 
@@ -90,12 +90,18 @@ map2cam::map2cam(const int inputSamples, const int inputLines,
 bool map2cam::Xform(double &inSample, double &inLine,
                     const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
-  if(!p_outcam->SetImage(outSample, outLine)) return false;
+  if(!p_outcam->SetImage(outSample, outLine)) {
+    std::cout << "Failed to project into output image" << '\n';
+    return false;
+  }
 
   // Get the universal lat/lon and see if it can be converted to input line/samp
   double lat = p_outcam->UniversalLatitude();
   double lon = p_outcam->UniversalLongitude();
-  if(!p_inmap->SetUniversalGround(lat, lon)) return false;
+  if(!p_inmap->SetUniversalGround(lat, lon)) {
+    std::cout << "Failed to set ground in projection" << '\n';
+    return false;
+  }
 
   // Make sure the point is inside the input image
   if(p_inmap->WorldX() < 0.5) return false;

@@ -1,80 +1,86 @@
 #ifndef cam2map_h
 #define cam2map_h
 
+#include "Application.h"
 #include "TProjection.h"
 #include "Transform.h"
+#include "UserInterface.h"
+#include "Pvl.h"
 
-using namespace Isis;
+namespace Isis {
+  extern void cam2map(UserInterface &ui, Pvl *log=nullptr);
 
-/**
- * @author ????-??-?? Unknown
- *
- * @internal
- *   @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
- *                          References #775.
- */
-class cam2mapReverse : public Transform {
-  private:
-    Camera *p_incam;
-    TProjection *p_outmap;
-    int p_inputSamples;
-    int p_inputLines;
-    bool p_trim;
-    bool p_occlusion;
-    int p_outputSamples;
-    int p_outputLines;
+  extern void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log);
 
-  public:
-    // constructor
-    cam2mapReverse(const int inputSamples, const int inputLines,
-                   Camera *incam,
-                   const int outputSamples, const int outputLines,
-                   TProjection *outmap,
-                   bool trim,
-                   bool occlusion=false);
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   *   @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                          References #775.
+   */
+  class cam2mapReverse : public Transform {
+    private:
+      Camera *p_incam;
+      TProjection *p_outmap;
+      int p_inputSamples;
+      int p_inputLines;
+      bool p_trim;
+      bool p_occlusion;
+      int p_outputSamples;
+      int p_outputLines;
 
-    // destructor
-    ~cam2mapReverse() {};
+    public:
+      // constructor
+      cam2mapReverse(const int inputSamples, const int inputLines,
+                     Camera *incam,
+                     const int outputSamples, const int outputLines,
+                     TProjection *outmap,
+                     bool trim,
+                     bool occlusion=false);
 
-    // Implementations for parent's pure virtual members
-    bool Xform(double &inSample, double &inLine,
-               const double outSample, const double outLine);
-    int OutputSamples() const;
-    int OutputLines() const;
-};
+      // destructor
+      ~cam2mapReverse() {};
 
-/**
- * @author 2012-04-19 Jeff Anderson
- *
- * @internal
- */
-class cam2mapForward : public Transform {
-  private:
-    Camera *p_incam;
-    TProjection *p_outmap;
-    int p_inputSamples;
-    int p_inputLines;
-    bool p_trim;
-    int p_outputSamples;
-    int p_outputLines;
+      // Implementations for parent's pure virtual members
+      bool Xform(double &inSample, double &inLine,
+                 const double outSample, const double outLine);
+      int OutputSamples() const;
+      int OutputLines() const;
+  };
 
-  public:
-    // constructor
-    cam2mapForward(const int inputSamples, const int inputLines,
-                   Camera *incam,
-                   const int outputSamples, const int outputLines,
-                   TProjection *outmap,
-                   bool trim);
+  /**
+   * @author 2012-04-19 Jeff Anderson
+   *
+   * @internal
+   */
+  class cam2mapForward : public Transform {
+    private:
+      Camera *p_incam;
+      TProjection *p_outmap;
+      int p_inputSamples;
+      int p_inputLines;
+      bool p_trim;
+      int p_outputSamples;
+      int p_outputLines;
 
-    // destructor
-    ~cam2mapForward() {};
+    public:
+      // constructor
+      cam2mapForward(const int inputSamples, const int inputLines,
+                     Camera *incam,
+                     const int outputSamples, const int outputLines,
+                     TProjection *outmap,
+                     bool trim);
 
-    // Implementations for parent's pure virtual members
-    bool Xform(double &outSample, double &outLine,
-               const double inSample, const double inLine);
-    int OutputSamples() const;
-    int OutputLines() const;
-};
+      // destructor
+      ~cam2mapForward() {};
 
+      // Implementations for parent's pure virtual members
+      bool Xform(double &outSample, double &outLine,
+                 const double inSample, const double inLine);
+      int OutputSamples() const;
+      int OutputLines() const;
+  };
+}
 
 #endif

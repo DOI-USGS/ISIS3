@@ -855,7 +855,8 @@ namespace Isis {
       if (p_bandChangeFunct != NULL) p_bandChangeFunct(band);
       iportal.SetPosition(1,1,band);
 
-      for (int line = m_patchStartLine; line <= InputCubes[0]->lineCount();
+      for (int line = m_patchStartLine;
+            line <= InputCubes[0]->lineCount();
             line += m_patchLineIncrement) {
         for (int samp = m_patchStartSample;
               samp <= InputCubes[0]->sampleCount();
@@ -1085,8 +1086,8 @@ namespace Isis {
     }
 
     // If there are any special pixel Null values in this output brick, we may be
-    // up against an edge of the input image where the interpolaters get Nulls from 
-    // outside the image. Since the patches have some overlap due to finding the 
+    // up against an edge of the input image where the interpolaters get Nulls from
+    // outside the image. Since the patches have some overlap due to finding the
     // rectangular area (bounding box, min/max line/samp) of the four points input points
     // projected into the output space, this causes valid DNs
     // from a previously processed patch to be replaced with Null DNs from this patch.
@@ -1118,6 +1119,7 @@ namespace Isis {
                                        Transform &trans, Interpolator &interp) {
 
     // Is the input patch too small to even worry about transforming?
+    std::cout << "SPLITTING" << '\n';
     if ((esamp - ssamp < 0.1) && (eline - sline < 0.1)) return;
 
     // It's big enough so break it into four pieces
