@@ -65,7 +65,7 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Specify user options that can be passed in with the initial CMake command.
-option(isis3Data       "Directory containing Isis3Data"                 OFF )
+option(isisData        "Directory containing IsisData"                  OFF )
 option(isis3TestData   "Directory containing Isis3TestData"             OFF )
 option(testOutputDir   "Directory to store app test output folders"     OFF )
 option(buildCore       "Build the core ISIS modules"                    ON  )
@@ -82,18 +82,18 @@ if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
 endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
-if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
- set(isis3Data $ENV{ISIS3DATA})
+if(DEFINED ENV{ISISDATA} AND NOT isisData)
+ set(isisData $ENV{ISISDATA})
 endif()
 if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
  set(isis3TestData $ENV{ISIS3TESTDATA})
 endif()
 
-if(EXISTS ${isis3Data})
- set(ENV{ISIS3DATA} "${isis3Data}")
+if(EXISTS ${isisData})
+ set(ENV{ISISDATA} "${isisData}")
 else()
- message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
- set(isis3Data OFF)
+ message(WARNING "Isis Data directory ${isisData} not found, unit tests will fail.")
+ set(isisData OFF)
 endif()
 
 if(EXISTS ${isis3TestData})
@@ -124,7 +124,7 @@ message("\tBUILD CORE: ${buildCore}")
 message("\tBUILD MISSIONS: ${buildMissions}")
 message("\tJP2K SUPPORT: ${JP2KFLAG}")
 message("\tPYTHON BINDINGS: ${pybindings}")
-message("\tISIS3DATA: ${isis3Data}")
+message("\tISISDATA: ${isisData}")
 message("\tISISTESTDATA: ${isis3TestData}")
 message("\tTEST OUTPUT DIR: ${testOutputDir}")
 message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
@@ -452,6 +452,7 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 # Create the appdata directory and translations directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates)
+<<<<<<< HEAD
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/targets)
@@ -516,6 +517,7 @@ add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
 add_dependencies(isis3 templates)
 
+<<<<<<< HEAD
 # Either add these for maps, labels, autoreg, images or approach in a different way.
 
 # Add custom build target to copy modified template files to the build/appdata/templates
