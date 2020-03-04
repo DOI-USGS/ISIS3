@@ -1,0 +1,48 @@
+#****************************************************************************
+# This is a map template file for the upturned ellipsoid transverse azimuthal
+# projection.
+#
+# Most of the parameters are commented (#) which means a program will try 
+# to determine a good value.  For example, a program will look at cube
+# labels to determine the target name and then read system radii values.
+#
+# If you want to use something other than a system default uncomment the 
+# approriate line and give the parameter your value.  For example,
+# PixelResolution = 10 <meters/pixel>
+#
+# The upturned ellipsoid transverse azimuthal projection has 
+# two required parameters:  CenterLongitude and CenterLatitude
+# which you must uncomment and supply. 
+#
+# If the CenterLongitude is not entered, a default of 0.0 will be used. 
+# The MinimumLongitude and MaximumLongitude must be within 90 degrees 
+# of the CenterLongitude.
+#
+#****************************************************************************
+
+Group = Mapping
+  ProjectionName          = UpturnedEllipsoidTransverseAzimuthal
+
+#  CenterLatitude          = 0.0 <degrees>
+#  CenterLongitude         = 180.0 <degrees>
+
+#  TargetName              = ITOKAWA
+#  EquatorialRadius        = 274.0 <meters>
+#  PolarRadius             = 138.0 <meters>
+
+#  LatitudeType            = Planetocentric
+#  LongitudeDirection      = PositiveEast
+#  LongitudeDomain         = 360
+
+#  MinimumLatitude         = -90.0 <degrees>
+#  MaximumLatitude         = 90.0 <degrees>
+#  MinimumLongitude        = 100.0 <degrees>
+#  MaximumLongitude        = 230.0 <degrees>
+
+#  PixelResolution         = 1.07 <meters/pixel>
+
+End_Group
+
+
+
+
