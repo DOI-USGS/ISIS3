@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.10.0")
+set(VERSION            "3.10.1")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
