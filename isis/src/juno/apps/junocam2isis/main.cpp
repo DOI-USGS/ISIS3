@@ -294,7 +294,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
-  FileName instTransFile(transDir + "junoJunoCamInstrument.trn");
+  FileName instTransFile(transDir + "JunoJunoCamInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(inputLabel, instTransFile.expanded());
   instrumentXlater.Auto(outputLabel);
   PvlGroup &inst = outputLabel.findGroup("Instrument", PvlObject::Traverse);
@@ -316,7 +316,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   }
 
   // Translate the BandBin group
-  FileName bandBinTransFile(transDir + "junoJunoCamBandBin.trn");
+  FileName bandBinTransFile(transDir + "JunoJunoCamBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
   bandBinXlater.Auto(outputLabel);
   PvlGroup &bandBin = outputLabel.findGroup("BandBin", PvlObject::Traverse);
@@ -340,7 +340,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   }
 
   // Translate the Archive group
-  FileName archiveTransFile(transDir + "junoJunoCamArchive.trn");
+  FileName archiveTransFile(transDir + "JunoJunoCamArchive.trn");
   PvlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outputLabel);
   PvlGroup &archive = outputLabel.findGroup("Archive", PvlObject::Traverse);
