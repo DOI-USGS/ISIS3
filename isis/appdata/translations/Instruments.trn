@@ -74,7 +74,7 @@ Group = InstrumentName
   Translation   = (Ideal, IdealCamera)
 
   # Juno (JUNO)
-  Translation   = (Juno, JNC)
+  Translation   = (JunoCam, JNC)
 
   # Kaguya
   Translation   = (Kaguya, MI-VIS)
