@@ -1,0 +1,117 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputDefault   = UNKNOWN
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  OutputName     = StartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  OutputName     = StopTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  OutputName     = MissionPhaseName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (Mars, MARS)
+  Translation    = (Phobos, PHOBOS)
+  Translation    = (Deimos, DEIMOS)
+  Translation    = (Cal, CAL)
+End_Group
+
+Group = FocalPlaneTemperature
+  Auto
+  Optional
+  InputKey       = FOCAL_PLANE_TEMPERATURE
+  OutputName     = FocalPlaneTemperature
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LensTemperature
+  Auto
+  Optional
+  InputKey       = LENS_TEMPERATURE
+  OutputName     = LensTemperature
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentTemperature
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_TEMPERATURE
+  OutputName     = InstrumentTemperature
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End
