@@ -84,7 +84,6 @@ void IsisMain ()
   p.StartProcess ();
 
   // Get the directory where the DAWN translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
