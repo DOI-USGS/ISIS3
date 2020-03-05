@@ -1,0 +1,88 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_ID
+  OutputName     = ProducerId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  OutputName     = ProductVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RationaleDescription
+  Auto
+  InputKey       = RATIONALE_DESCRIPTION
+  InputDefault   = Null
+  OutputName     = RationaleDescription
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  InputKey       = ORBIT_NUMBER
+  OutputName     = OrbitNumber
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityId
+  Auto
+  InputKey       = DATA_QUALITY_ID
+  OutputName     = DataQualityId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalProductId
+  Auto
+  InputKey       = ORIGINAL_PRODUCT_ID
+  OutputName     = OriginalProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+End

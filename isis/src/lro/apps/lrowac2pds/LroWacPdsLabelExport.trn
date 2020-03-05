@@ -1,0 +1,577 @@
+Group = DATA_SET_ID
+  Auto
+  InputKey       = DATA_SET_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = DATA_SET_ID
+  OutputPosition = Root
+  Translation    = (LRO-L-LROC-3-CDR-V1.0, *)
+End_Group
+
+Group = ORIGINAL_PRODUCT_ID
+  Auto
+  InputKey       = ORIGINAL_PRODUCT_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = ORIGINAL_PRODUCT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCT_ID
+  Auto
+  InputKey       = PRODUCT_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = PRODUCT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = MISSION_NAME
+  Auto
+  InputKey       = MISSION_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = MISSION_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = MISSION_PHASE_NAME
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = MISSION_PHASE_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_HOST_NAME
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INSTRUMENT_HOST_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_HOST_ID
+  Auto
+  InputKey       = INSTRUMENT_HOST_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INSTRUMENT_HOST_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_NAME
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INSTRUMENT_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_ID
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INSTRUMENT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = START_TIME
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = START_TIME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = STOP_TIME
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = STOP_TIME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_START_COUNT
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = SPACECRAFT_CLOCK_START_COUNT
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_STOP_COUNT
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = SPACECRAFT_CLOCK_STOP_COUNT
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = ORBIT_NUMBER
+  Auto
+  InputKey       = ORBIT_NUMBER
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = ORBIT_NUMBER
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCER_ID
+  Auto
+  InputKey       = PRODUCER_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = PRODUCER_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCT_CREATION_TIME
+  Auto
+  InputKey       = NULL
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = NULL
+  OutputName     = PRODUCT_CREATION_TIME
+  OutputPosition = Root
+  Translation    = (*, *)
+  OutputGroup    = Root
+End_Group
+
+Group = PRODUCER_INSTITUTION_NAME
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = PRODUCER_INSTITUTION_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+  OutputGroup    = ROOT
+End_Group
+
+Group = PRODUCT_TYPE
+  Auto
+  InputKey       = NULL
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = PRODUCT_TYPE
+  OutputPosition = Root
+  Translation    = (CDR, *)
+  OutputGroup    = ROOT
+End_Group
+
+Group = PRODUCT_VERSION_ID
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = PRODUCT_VERSION_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+  OutputGroup    = ROOT
+End_Group
+
+Group = UPLOAD_ID
+  Auto
+  InputKey       = UPLOAD_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = UPLOAD_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+  OutputGroup    = ROOT
+End_Group
+
+Group = TARGET_NAME
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = TARGET_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = RATIONALE_DESC
+  Auto
+  InputKey       = RATIONALE_DESC
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = RATIONALE_DESC
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = DATA_QUALITY_ID
+  Auto
+  InputKey       = DATA_QUALITY_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = DATA_QUALITY_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = DATA_QUALITY_DESC
+  Auto
+  InputKey       = DATA_QUALITY_DESC
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = DATA_QUALITY_DESC
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BEGIN_TEMPERATURE_SCS
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_SCS
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BEGIN_TEMPERATURE_SCS
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:MIDDLE_TEMPERATURE_SCS
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_SCS
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:MIDDLE_TEMPERATURE_SCS
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:END_TEMPERATURE_SCS
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_SCS
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:END_TEMPERATURE_SCS
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BEGIN_TEMPERATURE_FPA
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_FPA
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BEGIN_TEMPERATURE_FPA
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:MIDDLE_TEMPERATURE_FPA
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_FPA
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:MIDDLE_TEMPERATURE_FPA
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:END_TEMPERATURE_FPA
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_FPA
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:END_TEMPERATURE_FPA
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BEGIN_TEMPERATURE_SCS_RAW
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_SCS_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BEGIN_TEMPERATURE_SCS_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:MIDDLE_TEMPERATURE_SCS_RAW
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_SCS_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:MIDDLE_TEMPERATURE_SCS_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:END_TEMPERATURE_SCS_RAW
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_SCS_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:END_TEMPERATURE_SCS_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BEGIN_TEMPERATURE_FPA_RAW
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_FPA_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BEGIN_TEMPERATURE_FPA_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:MIDDLE_TEMPERATURE_FPA_RAW
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_FPA_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:MIDDLE_TEMPERATURE_FPA_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:END_TEMPERATURE_FPA_RAW
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_FPA_RAW
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:END_TEMPERATURE_FPA_RAW
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = EXPOSURE_DURATION
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = EXPOSURE_DURATION
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:EXPOSURE_CODE
+  Auto
+  InputKey       = LRO:EXPOSURE_CODE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:EXPOSURE_CODE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INTERFRAME_DELAY
+  Auto
+  InputKey       = INTERFRAME_DELAY
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INTERFRAME_DELAY
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_MODE_ID
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = INSTRUMENT_MODE_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FILTER_NUMBER
+  Auto
+  InputKey       = FILTER_NUMBER
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = FILTER_NUMBER
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = CENTER_FILTER_WAVELENGTH
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = CENTER_FILTER_WAVELENGTH
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = BANDWIDTH
+  Auto
+  InputKey       = BANDWIDTH
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = BANDWIDTH
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:LOOKUP_TABLE_TYPE
+  Auto
+  InputKey       = LRO:LOOKUP_TABLE_TYPE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:LOOKUP_TABLE_TYPE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:LOOKUP_CONVERSION_TABLE
+  Auto
+  InputKey       = LRO:LOOKUP_CONVERSION_TABLE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:LOOKUP_CONVERSION_TABLE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:COMPRESSION_FLAG
+  Auto
+  InputKey       = LRO:COMPRESSION_FLAG
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:COMPRESSION_FLAG
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:MODE
+  Auto
+  InputKey       = LRO:MODE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:MODE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:NFRAMES
+  Auto
+  InputKey       = LRO:NFRAMES
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:NFRAMES
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BAND_CODE
+  Auto
+  InputKey       = LRO:BAND_CODE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BAND_CODE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:INTERFRAME_GAP_CODE
+  Auto
+  InputKey       = LRO:INTERFRAME_GAP_CODE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:INTERFRAME_GAP_CODE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:COMPAND_CODE
+  Auto
+  InputKey       = LRO:COMPAND_CODE
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:COMPAND_CODE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = LRO:BACKGROUND_OFFSET
+  Auto
+  InputKey       = LRO:BACKGROUND_OFFSET
+  InputGroup     = Root
+  InputPosition  = Root
+  InputDefault   = UNKNOWN
+  OutputName     = LRO:BACKGROUND_OFFSET
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+End

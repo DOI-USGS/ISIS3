@@ -456,12 +456,8 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
                      Pvl &isis3UvEven, Pvl &isis3UvOdd) {
   // Let's start by running through the generic translations.
 
-  // Get the directory where the translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Lro"] + "/translations/";
-
-  // Translate the in
-  FileName transFile(transDir + "lrowacInstrument.trn");
+  // Translate the instrument group
+  FileName transFile("$ISISROOT/appdata/translations/lrowacInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
   instrumentXlater.Auto(isis3VisEven);
   instrumentXlater.Auto(isis3VisOdd);
@@ -469,7 +465,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   instrumentXlater.Auto(isis3UvOdd);
 
   // Translate the Archive group
-  transFile = transDir + "lrowacArchive.trn";
+  transFile = "$ISISROOT/appdata/translations/lrowacArchive.trn";
   PvlToPvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
 
   archiveXlater.Auto(isis3VisEven);

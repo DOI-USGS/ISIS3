@@ -1,0 +1,250 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  InputDefault   = UNKNOWN
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalProductId
+  Auto
+  InputKey       = ORIGINAL_PRODUCT_ID
+  InputDefault   = UNKNOWN
+  OutputName     = OriginalProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  InputDefault   = UNKNOWN
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_ID
+  InputDefault   = UNKNOWN
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerInstitutionName
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerInstitutionName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductVersionId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UploadId
+  Auto
+  InputKey       = UPLOAD_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UploadId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  InputKey       = ORBIT_NUMBER
+  InputDefault   = UNKNOWN
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RationaleDescription
+  Auto
+  InputKey       = RATIONALE_DESC
+  InputDefault   = UNKNOWN
+  OutputName     = RationaleDescription
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityId
+  Auto
+  InputKey       = DATA_QUALITY_ID
+  InputDefault   = UNKNOWN
+  OutputName     = DataQualityId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TemperatureSCSRaw
+  Auto
+  InputKey       = LRO:TEMPERATURE_SCS_RAW
+  InputDefault   = UNKNOWN
+  OutputName     = TemperatureSCSRaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TemperatureFPARaw
+  Auto
+  InputKey       = LRO:TEMPERATURE_FPA_RAW
+  InputDefault   = UNKNOWN
+  OutputName     = TemperatureFPARaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TemperatureFPGARaw
+  Auto
+  InputKey       = LRO:TEMPERATURE_FPGA_RAW
+  InputDefault   = UNKNOWN
+  OutputName     = TemperatureFPGARaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TemperatureTelescopeRaw
+  Auto
+  InputKey       = LRO:TEMPERATURE_TELESCOPE_RAW
+  InputDefault   = UNKNOWN
+  OutputName     = TemperatureTelescopeRaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LineExposureCode
+  Auto
+  InputKey       = LRO:LINE_EXPOSURE_CODE
+  InputDefault   = UNKNOWN
+  OutputName     = LineExposureCode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DACResetLevel
+  Auto
+  InputKey       = LRO:DAC_RESET_LEVEL
+  InputDefault   = UNKNOWN
+  OutputName     = DACResetLevel
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ChannelAOffset
+  Auto
+  InputKey       = LRO:CHANNEL_A_OFFSET
+  InputDefault   = UNKNOWN
+  OutputName     = ChannelAOffset
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ChannelBOffset
+  Auto
+  InputKey       = LRO:CHANNEL_B_OFFSET
+  InputDefault   = UNKNOWN
+  OutputName     = ChannelBOffset
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CompandCode
+  Auto
+  InputKey       = LRO:COMPAND_CODE
+  InputDefault   = UNKNOWN
+  OutputName     = CompandCode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LineCode
+  Auto
+  InputKey       = LRO:LINE_CODE
+  InputDefault   = UNKNOWN
+  OutputName     = LineCode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = BTerms
+  Auto
+  InputKey       = LRO:BTERM
+  InputDefault   = UNKNOWN
+  OutputName     = BTerms
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MTerms
+  Auto
+  InputKey       = LRO:MTERM
+  InputDefault   = UNKNOWN
+  OutputName     = MTerms
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = XTerms
+  Auto
+  InputKey       = LRO:XTERM
+  InputDefault   = UNKNOWN
+  OutputName     = XTerms
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionFlag
+  Auto
+  InputKey       = LRO:COMPRESSION_FLAG
+  InputDefault   = UNKNOWN
+  OutputName     = CompressionFlag
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Mode
+  Auto
+  InputKey       = LRO:MODE
+  InputDefault   = UNKNOWN
+  OutputName     = Mode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+End
