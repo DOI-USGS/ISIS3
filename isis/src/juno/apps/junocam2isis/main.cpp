@@ -291,7 +291,6 @@ void IsisMain() {
  */
 void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   // Get the directory where the Juno translation tables are
-  // PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
