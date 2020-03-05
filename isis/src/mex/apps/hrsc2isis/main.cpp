@@ -234,7 +234,6 @@ void WriteOutput(Isis::Buffer &buf) {
 
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   // Get the directory where the MRO HiRISE translation tables are.
-  // PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
