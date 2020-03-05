@@ -513,7 +513,7 @@ add_dependencies(isis3 appdata)
 # Add custom build target to copy modified template files to the build/appdata/templates
 # directory. (As above - may need to be updated)
 add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/src/*/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
+  ${CMAKE_SOURCE_DIR}/src/*/templates/*.def ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
 add_dependencies(isis3 templates)
 
 #execute_command(cp -r ${CMAKE_SOURCE_DIR}/src/*/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
