@@ -1,8 +1,10 @@
-#ifndef cam2map_h
-#define cam2map_h
+#ifndef map2cam_h
+#define map2cam_h
 
+#include "Camera.h"
 #include "Transform.h"
 #include "TProjection.h"
+#include "UserInterface.h"
 /**
  * @author ????-??-?? Unknown
  *
@@ -35,7 +37,7 @@ namespace Isis {
       int OutputLines() const;
   };
 
-  void map2cam_f(UserInterface &ui);
-  void BandChange(const int band);
+  extern void map2cam_f(UserInterface &ui);
+  extern void BandChange(const int band);
 }
 #endif

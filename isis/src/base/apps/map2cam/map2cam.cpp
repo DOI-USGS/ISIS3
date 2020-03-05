@@ -19,12 +19,16 @@ namespace Isis{
     FileName match = FileName(ui.GetFileName("MATCH"));
 
     Process p;
-    mcube = p.SetInputCube("MATCH");
+    QString fname = ui.GetFileName("MATCH");
+    Isis::CubeAttributeInput &inputAtt = ui.GetInputAttribute("MATCH");
+    mcube = p.SetInputCube(fname, inputAtt);
     outcam = mcube->camera();
 
     // Open the input projection cube and get the projection information
     ProcessRubberSheet rub;
-    Cube *icube = rub.SetInputCube("FROM");
+    fname = ui.GetFileName("FROM");
+    inputAtt = ui.GetInputAttribute("FROM");
+    Cube *icube = rub.SetInputCube(fname, inputAtt);
     TProjection *inmap = (TProjection *) icube->projection();
 
     // Set up for rubbersheeting
@@ -38,7 +42,10 @@ namespace Isis{
     // Allocate the output cube but don't propagate any labels from the map
     // file. Instead propagate from the camera file
     rub.PropagateLabels(false);
-    rub.SetOutputCube("TO", transform->OutputSamples(),
+    fname = ui.GetFileName("TO");
+    Isis::CubeAttributeOutput &outputAtt = ui.GetOutputAttribute("TO");
+    rub.SetOutputCube(fname, outputAtt,
+                      transform->OutputSamples(),
                       transform->OutputLines(),
                       icube->bandCount());
     rub.PropagateLabels(match.expanded());
@@ -69,7 +76,6 @@ namespace Isis{
     delete transform;
     delete interp;
   }
-
 
   // Transform object constructor
   map2cam::map2cam(const int inputSamples, const int inputLines,
