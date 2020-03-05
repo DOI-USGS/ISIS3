@@ -91,17 +91,17 @@ void IsisMain ()
   Pvl outLabel;
 
   // Translate the BandBin group
-  FileName transFile (transDir + "dawnVirBandBin.trn");
+  FileName transFile (transDir + "DawnVirBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater (labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile = transDir + "dawnVirArchive.trn";
+  transFile = transDir + "DawnVirArchive.trn";
   PvlToPvlTranslationManager archiveXlater (labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
-  transFile = transDir + "dawnVirInstrument.trn";
+  transFile = transDir + "DawnVirInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater (labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 

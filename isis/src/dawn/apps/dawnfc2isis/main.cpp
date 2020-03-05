@@ -75,17 +75,17 @@ void IsisMain() {
   Pvl outLabel;
 
   // Translate the BandBin group
-  FileName transFile(transDir + "dawnFcBandBin.trn");
+  FileName transFile(transDir + "DawnFcBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile = transDir + "dawnFcArchive.trn";
+  transFile = transDir + "DawnFcArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
-  transFile = transDir + "dawnFcInstrument.trn";
+  transFile = transDir + "DawnFcInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
