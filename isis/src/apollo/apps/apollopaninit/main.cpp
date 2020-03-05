@@ -114,7 +114,7 @@ void IsisMain() {
   double deg2rad = acos(-1.0)/180.0;
 
   ProcessImport jp;
-  FileName transFile("$ISISROOT/appdata/translations/apollopantranstable.trn");
+  FileName transFile("$ISISROOT/appdata/translations/ApolloPanInit.trn");
   PvlTranslationTable transTable(transFile);
   PvlGroup kernels_pvlG;
 
