@@ -32,125 +32,125 @@ Group = InstrumentName
   InputPosition = (IsisCube, Instrument)
 
   # AerialPhoto (EROS Archive)
-  Translation   = (aerialphoto, AERIALPHOTO)
-  Translation   = (aerialphoto, AerialPhoto)
+  Translation   = (AerialPhoto, AERIALPHOTO)
+  Translation   = (AerialPhoto, AerialPhoto)
 
   # Apollo
-  Translation   = (panoramic, PAN)
-  Translation   = (metric, METRIC)
+  Translation   = (Panoramic, PAN)
+  Translation   = (Metric, METRIC)
 
   # Cassini
-  Translation   = (vims, VIMS)
-  Translation   = (iss, ISSNA)
-  Translation   = (iss, ISSWA)
+  Translation   = (Vims, VIMS)
+  Translation   = (Iss, ISSNA)
+  Translation   = (Iss, ISSWA)
 
   # Chandrayaan
-  Translation   = (m3, M3)
+  Translation   = (M3, M3)
 
   # Clementine
-  Translation   = (hires, HIRES)
-  Translation   = (lwir, LWIR)
-  Translation   = (nir, NIR)
-  Translation   = (uvvis, UVVIS)
-  
+  Translation   = (Hires, HIRES)
+  Translation   = (Lwir, LWIR)
+  Translation   = (Nir, NIR)
+  Translation   = (Uvvis, UVVIS)
+
   # Dawn
-  Translation   = (fc, FC1)
-  Translation   = (fc, FC2)
-  Translation   = (vir, VIR)
+  Translation   = (Fc, FC1)
+  Translation   = (Fc, FC2)
+  Translation   = (Vir, VIR)
 
   # Galileo
-  Translation   = (ssi, "SOLID STATE IMAGING SYSTEM")
+  Translation   = (Ssi, "SOLID STATE IMAGING SYSTEM")
 
   # Hayabusa
-  Translation   = (amica, AMICA)
-  Translation   = (nirs, NIRS)
+  Translation   = (Amica, AMICA)
+  Translation   = (Nirs, NIRS)
 
   # Hayabusa 2
-  Translation = (onc, ONC-T)
-  Translation = (onc, ONC-W1)
-  Translation = (onc, ONC-W2)
+  Translation = (Onc, ONC-T)
+  Translation = (Onc, ONC-W1)
+  Translation = (Onc, ONC-W2)
 
-  # Ideal 
-  Translation   = (ideal, IdealCamera)
+  # Ideal
+  Translation   = (Ideal, IdealCamera)
 
-  # Juno (JUNO) 
-  Translation   = (juno, JNC)
+  # Juno (JUNO)
+  Translation   = (Juno, JNC)
 
   # Kaguya
-  Translation   = (kaguya, MI-VIS)
-  Translation   = (kaguya, MI-NIR)
-  Translation   = (kaguya, TC1)
-  Translation   = (kaguya, TC2)
+  Translation   = (Kaguya, MI-VIS)
+  Translation   = (Kaguya, MI-NIR)
+  Translation   = (Kaguya, TC1)
+  Translation   = (Kaguya, TC2)
 
-  # LO 
-  Translation   = (lo, "High Resolution Camera")
-  Translation   = (lo, "Medium Resolution Camera")
+  # LO
+  Translation   = (Lo, "High Resolution Camera")
+  Translation   = (Lo, "Medium Resolution Camera")
 
   # LRO
-  Translation   = (nac, NACL)
-  Translation   = (nac, NACR)
-  Translation   = (minirf, MRFFR)
-  Translation   = (minirf, MRFLRO)
+  Translation   = (Nac, NACL)
+  Translation   = (Nac, NACR)
+  Translation   = (Minirf, MRFFR)
+  Translation   = (Minirf, MRFLRO)
 
   # Mariner
-  Translation   = (mariner10, M10_VIDICON_A)
-  Translation   = (mariner10, M10_VIDICON_B)
+  Translation   = (Mariner10, M10_VIDICON_A)
+  Translation   = (Mariner10, M10_VIDICON_B)
 
   # MER
-  Translation   = (mer, MI)
-  Translation   = (mer, "MICROSCOPIC IMAGER")
+  Translation   = (Mer, MI)
+  Translation   = (Mer, "MICROSCOPIC IMAGER")
 
   # MEX
-  Translation   = (hrsc, HRSC)
+  Translation   = (Hrsc, HRSC)
 
   # Messenger
-  Translation   = (mdis, MDIS-NAC)
-  Translation   = (mdis, MDIS-WAC)
+  Translation   = (Mdis, MDIS-NAC)
+  Translation   = (Mdis, MDIS-WAC)
 
   # MGS
-  Translation   = (moc, MOC-WA)
-  Translation   = (moc, MOC-NA)
+  Translation   = (Moc, MOC-WA)
+  Translation   = (Moc, MOC-NA)
 
   # MRO
-  Translation   = (hirise, HIRISE)
-  Translation   = (ctx, CTX)
-  Translation   = (crism, CRISM)
+  Translation   = (Hirise, HIRISE)
+  Translation   = (Ctx, CTX)
+  Translation   = (Crism, CRISM)
 
   # NEAR
-  Translation   = (msi, MSI)
-  
+  Translation   = (Msi, MSI)
+
   # New Horizons
-  Translation   = (leisa, LEISA)
-  Translation   = (lorri, LORRI)
-  Translation   = (mvic, MVIC_TDI)
-  Translation   = (mvic, MVIC_FRAMING)
+  Translation   = (Leisa, LEISA)
+  Translation   = (Lorri, LORRI)
+  Translation   = (Mvic, MVIC_TDI)
+  Translation   = (Mvic, MVIC_FRAMING)
 
   # Odyssey
-  Translation   = (themis, THEMIS-IR)
-  Translation   = (themis, THEMIS_IR)
-  Translation   = (themis, THEMIS-VIS)
-  Translation   = (themis, THEMIS_VIS)
+  Translation   = (Themis, THEMIS-IR)
+  Translation   = (Themis, THEMIS_IR)
+  Translation   = (Themis, THEMIS-VIS)
+  Translation   = (Themis, THEMIS_VIS)
 
   # OSIRIS_REx
-  Translation   = (ocams, MapCam)
-  Translation   = (ocams, SamCam)
-  Translation   = (ocams, PolyCam)
+  Translation   = (OCams, MapCam)
+  Translation   = (OCams, SamCam)
+  Translation   = (OCams, PolyCam)
 
   # Rosetta
-  Translation   = (osiris, OSINAC)
-  Translation   = (osiris, OSIWAC)
+  Translation   = (Osiris, OSINAC)
+  Translation   = (Osiris, OSIWAC)
 
-  # Trace Gas Orbiter (ExoMars TGO) 
-  Translation   = (tgo, CaSSIS)
+  # Trace Gas Orbiter (ExoMars TGO)
+  Translation   = (Tgo, CaSSIS)
 
   # Viking
-  Translation   = (vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_A)
-  Translation   = (vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_B)
+  Translation   = (Vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_A)
+  Translation   = (Vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_B)
 
   # Voyager
-  Translation   = (voyager, WIDE_ANGLE_CAMERA)
-  Translation   = (voyager, NARROW_ANGLE_CAMERA)
-  
+  Translation   = (Voyager, WIDE_ANGLE_CAMERA)
+  Translation   = (Voyager, NARROW_ANGLE_CAMERA)
+
 #  Translation   = (*,*)
 End_Group
 End
