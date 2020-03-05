@@ -1,0 +1,156 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# This file is used to translate the InstrumentId from the
+# Isis cube Instrument group to an InstrumentName
+#
+# history Jeannie Backer and Adam Goins - Added Kaguya TC.
+
+Group = InstrumentName
+
+  InputKey      = InstrumentId
+  InputGroup    = "IsisCube,Instrument"
+  InputPosition = (IsisCube, Instrument)
+
+  # AerialPhoto (EROS Archive)
+  Translation   = (aerialphoto, AERIALPHOTO)
+  Translation   = (aerialphoto, AerialPhoto)
+
+  # Apollo
+  Translation   = (panoramic, PAN)
+  Translation   = (metric, METRIC)
+
+  # Cassini
+  Translation   = (vims, VIMS)
+  Translation   = (iss, ISSNA)
+  Translation   = (iss, ISSWA)
+
+  # Chandrayaan
+  Translation   = (m3, M3)
+
+  # Clementine
+  Translation   = (hires, HIRES)
+  Translation   = (lwir, LWIR)
+  Translation   = (nir, NIR)
+  Translation   = (uvvis, UVVIS)
+  
+  # Dawn
+  Translation   = (fc, FC1)
+  Translation   = (fc, FC2)
+  Translation   = (vir, VIR)
+
+  # Galileo
+  Translation   = (ssi, "SOLID STATE IMAGING SYSTEM")
+
+  # Hayabusa
+  Translation   = (amica, AMICA)
+  Translation   = (nirs, NIRS)
+
+  # Hayabusa 2
+  Translation = (onc, ONC-T)
+  Translation = (onc, ONC-W1)
+  Translation = (onc, ONC-W2)
+
+  # Ideal 
+  Translation   = (ideal, IdealCamera)
+
+  # Juno (JUNO) 
+  Translation   = (juno, JNC)
+
+  # Kaguya
+  Translation   = (kaguya, MI-VIS)
+  Translation   = (kaguya, MI-NIR)
+  Translation   = (kaguya, TC1)
+  Translation   = (kaguya, TC2)
+
+  # LO 
+  Translation   = (lo, "High Resolution Camera")
+  Translation   = (lo, "Medium Resolution Camera")
+
+  # LRO
+  Translation   = (nac, NACL)
+  Translation   = (nac, NACR)
+  Translation   = (minirf, MRFFR)
+  Translation   = (minirf, MRFLRO)
+
+  # Mariner
+  Translation   = (mariner10, M10_VIDICON_A)
+  Translation   = (mariner10, M10_VIDICON_B)
+
+  # MER
+  Translation   = (mer, MI)
+  Translation   = (mer, "MICROSCOPIC IMAGER")
+
+  # MEX
+  Translation   = (hrsc, HRSC)
+
+  # Messenger
+  Translation   = (mdis, MDIS-NAC)
+  Translation   = (mdis, MDIS-WAC)
+
+  # MGS
+  Translation   = (moc, MOC-WA)
+  Translation   = (moc, MOC-NA)
+
+  # MRO
+  Translation   = (hirise, HIRISE)
+  Translation   = (ctx, CTX)
+  Translation   = (crism, CRISM)
+
+  # NEAR
+  Translation   = (msi, MSI)
+  
+  # New Horizons
+  Translation   = (leisa, LEISA)
+  Translation   = (lorri, LORRI)
+  Translation   = (mvic, MVIC_TDI)
+  Translation   = (mvic, MVIC_FRAMING)
+
+  # Odyssey
+  Translation   = (themis, THEMIS-IR)
+  Translation   = (themis, THEMIS_IR)
+  Translation   = (themis, THEMIS-VIS)
+  Translation   = (themis, THEMIS_VIS)
+
+  # OSIRIS_REx
+  Translation   = (ocams, MapCam)
+  Translation   = (ocams, SamCam)
+  Translation   = (ocams, PolyCam)
+
+  # Rosetta
+  Translation   = (osiris, OSINAC)
+  Translation   = (osiris, OSIWAC)
+
+  # Trace Gas Orbiter (ExoMars TGO) 
+  Translation   = (tgo, CaSSIS)
+
+  # Viking
+  Translation   = (vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_A)
+  Translation   = (vik, VISUAL_IMAGING_SUBSYSTEM_CAMERA_B)
+
+  # Voyager
+  Translation   = (voyager, WIDE_ANGLE_CAMERA)
+  Translation   = (voyager, NARROW_ANGLE_CAMERA)
+  
+#  Translation   = (*,*)
+End_Group
+End

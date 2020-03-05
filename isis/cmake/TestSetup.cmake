@@ -52,7 +52,7 @@ macro(add_makefile_test_target testName makeFile inputDir outputDir truthDir)
            -DMAKEFILE=${makeFile}
            -DCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
            -DCODE_ROOT=${PROJECT_SOURCE_DIR}
-           -DDATA_ROOT=$ENV{ISIS3DATA}
+           -DDATA_ROOT=$ENV{ISISDATA}
            -DINPUT_DIR=${inputDir}
            -DOUTPUT_DIR=${outputDir}
            -DTRUTH_DIR=${truthDir}
@@ -76,7 +76,7 @@ macro(add_unit_test_target testFile truthFile labels)
            COMMAND ${CMAKE_COMMAND}
            -DTEST_PROG=${fullTestPath}
            -DTRUTH_FILE=${truthFile}
-           -DDATA_ROOT=$ENV{ISIS3DATA}
+           -DDATA_ROOT=$ENV{ISISDATA}
            -DCODE_ROOT=${PROJECT_SOURCE_DIR}
            -P ${thisFolder}/RunUnitTest.cmake)
   set_tests_properties(${testName} PROPERTIES LABELS "unit;${labels}")

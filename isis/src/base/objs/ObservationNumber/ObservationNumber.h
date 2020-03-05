@@ -56,6 +56,8 @@ namespace Isis {
    *
    *  @history 2008-05-09 Steven Lambright - Optimized the
    *           FindObservationTranslation method
+   *  @history 2020-03-03 Kristin Berry - Updated to use translation files migrated into source.
+   *                                      See #3727
    */
   class ObservationNumber : public Isis::SerialNumber {
     public:
