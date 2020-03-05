@@ -452,6 +452,11 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 # Create the appdata directory and translations directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/targets)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/labels)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/autoreg)
 
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
@@ -500,7 +505,8 @@ add_dependencies(isis3 incs)
 # Add custom build target to copy modified translation files to the build/appdata/translations
 # directory. (As above - may need to be updated)
 add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn
+  ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/appdata/translations/*.trn  
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn
   ${CMAKE_BINARY_DIR}/appdata/translations)
 add_dependencies(isis3 appdata)
 
@@ -509,6 +515,31 @@ add_dependencies(isis3 appdata)
 add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
 add_dependencies(isis3 templates)
+
+# Either add these for maps, labels, autoreg, images or approach in a different way.
+
+# Add custom build target to copy modified template files to the build/appdata/templates
+# directory. (As above - may need to be updated)
+
+add_custom_target(icons ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/images/icons/* ${CMAKE_BINARY_DIR}/appdata/images/icons)
+add_dependencies(isis3 icons)
+
+add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/images/targets/* ${CMAKE_BINARY_DIR}/appdata/images/targets)
+add_dependencies(isis3 targets)
+
+add_custom_target(maps ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/maps/*.map ${CMAKE_BINARY_DIR}/appdata/maps)
+add_dependencies(isis3 maps)
+
+add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/labels/*.pft ${CMAKE_BINARY_DIR}/appdata/labels)
+add_dependencies(isis3 labels)
+
+add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/autoreg/*.def ${CMAKE_BINARY_DIR}/appdata/autoreg)
+add_dependencies(isis3 autoreg)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
