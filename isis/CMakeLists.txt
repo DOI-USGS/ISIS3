@@ -451,7 +451,7 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 
 # Create the appdata directory and translations directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/apollo)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/targets)
@@ -513,8 +513,10 @@ add_dependencies(isis3 appdata)
 # Add custom build target to copy modified template files to the build/appdata/templates
 # directory. (As above - may need to be updated)
 add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
+  ${CMAKE_SOURCE_DIR}/src/*/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
 add_dependencies(isis3 templates)
+
+#execute_command(cp -r ${CMAKE_SOURCE_DIR}/src/*/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
 
 # Either add these for maps, labels, autoreg, images or approach in a different way.
 
