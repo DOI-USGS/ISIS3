@@ -238,7 +238,7 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the Instrument group
-  FileName transFile(transDir + "mexHrscInstrument.trn");
+  FileName transFile(transDir + "MexHrscInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
@@ -259,12 +259,12 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   outLabel.findGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
 
   // Translate the BandBin group
-  transFile  = transDir + "mexHrscBandBin.trn";
+  transFile  = transDir + "MexHrscBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(inLabels, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile  = transDir + "mexHrscArchive.trn";
+  transFile  = transDir + "MexHrscArchive.trn";
   PvlToPvlTranslationManager archiveXlater(inLabels, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
