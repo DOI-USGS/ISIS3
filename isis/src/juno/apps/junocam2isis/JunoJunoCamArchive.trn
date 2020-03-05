@@ -1,0 +1,55 @@
+Group = MissionPhase
+  Auto
+  Optional
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionPhase
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  Optional
+  InputKey       = ORBIT_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalPlaneTemperature
+  Auto
+  Optional
+  InputKey       = FOCAL_PLANE_TEMPERATURE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FocalPlaneTemperature
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TDICount
+  Auto
+  Optional
+  InputKey       = JNO:TDI_STAGES_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TDICount
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionType
+  Auto
+  Optional
+  InputKey       = COMPRESSION_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = CompressionType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+End
