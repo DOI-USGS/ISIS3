@@ -31,13 +31,6 @@ for (lbl in labels) {
                 // Checkout
                 checkout scm
 
-                if (label == "Mac") {
-                    sh '''
-                        cp isis/make/config.darwin-MacOSX10_13 \
-                        isis/make/config.darwin-MacOSX10_15
-                    '''
-                }
-
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
