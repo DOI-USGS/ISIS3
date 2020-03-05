@@ -34,8 +34,10 @@ namespace Isis {
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
+      Cube *projTestCube;
 
       Pvl label;
+      Pvl projLabel;
       json isd;
 
       void SetUp() override;

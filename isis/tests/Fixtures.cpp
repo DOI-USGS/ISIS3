@@ -12,11 +12,17 @@ namespace Isis {
 
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
+    std::ifstream projCubeLabel("data/defaultImage/projDefaultCube.pvl");
+
     isdFile >> isd;
     cubeLabel >> label;
+    projCubeLabel >> projLabel;
 
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+
+    projTestCube = new Cube();
+    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
 
@@ -24,7 +30,13 @@ namespace Isis {
     if (testCube->isOpen()) {
       testCube->close();
     }
+
+    if (projTestCube->isOpen()) {
+      projTestCube->close();
+    }
+
     delete testCube;
+    delete projTestCube;
   }
 
 
