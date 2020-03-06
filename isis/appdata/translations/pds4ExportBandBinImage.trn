@@ -1,0 +1,177 @@
+# Initial ISIS3 to PDS4 export of ISIS3 BandBin group to PDS4 imaging discipline. 
+# This can be used for Array_3D_Image or Array_2D_Image objects. 
+# Note that the LocalIdentifierReference value (written to img:local_identifier_reference)
+# is required to match the local_identifier value in the File_Area_Observational>File section.
+#
+# Sections of an example PDS4 output label are included above the relevant translation groups
+#
+# history 2018-05-10 Jeannie Backer  - Original Version
+
+
+#  <img:Local_Internal_Reference>
+#    <img:local_identifier_reference>
+#      MUST MATCH LOCAL ID FOR FILE AREA OBSERVATIONAL TOO!!! ???
+#    </img:local_identifier_reference>
+#    <img:local_reference_type>
+#    ???
+#    </img:local_reference_type>
+#  </img:Local_Internal_Reference>
+Group = LocalIdentifierReference
+  Auto
+  InputDefault     = Image_Array_Object
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = local_identifier_reference
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, Local_Internal_Reference)
+  Translation      = (*, *)
+End_Group
+
+Group = LocalReferenceType
+  Auto
+  InputDefault     = imaging_parameters_to_image_object
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = local_reference_type
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, Local_Internal_Reference)
+  Translation      = (*, *)
+End_Group
+
+#          <img:Image_Product_Information>
+#            <img:Filter>
+#               <img:filter_name>PANL2</img:filter_name>
+#               <img:filter_id>PANL2</img:filter_name>
+#               <img:filter_number>1</img:filter_number>
+#               <img:bandwidth unit="nm">20.000</img:bandwidth>
+#               <img:center_filter_wavelength unit="nm">753.000</img:center_filter_wavelength>
+#               <img:comment>optional</img:comment>
+#            </img:Filter>
+
+Group = FilterName1
+  Auto
+  Debug
+  Optional
+  InputKey         = FilterName
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_name 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterName2
+  Auto
+  Debug
+  Optional
+  InputKey         = Name
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_name 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterName3
+  Auto
+  Debug
+  Optional
+  InputKey         = FilterId
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_name 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterId1
+  Auto
+  Debug
+  Optional
+  InputKey         = FilterId
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_id 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterId2
+  Auto
+  Debug
+  Optional
+  InputKey         = FilterName
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_id 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterId3
+  Auto
+  Debug
+  Optional
+  InputKey         = Name
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_id 
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterNumber1
+  Auto
+  Optional
+  InputKey         = OriginalBand
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_number
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterNumber2
+  Auto
+  Optional
+  InputKey         = FilterNumber
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_number
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = BandWidth1
+  Auto
+  Optional
+  InputKey         = Width
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:bandwidth
+  OutputAttributes = unit|nm
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = BandWidth2
+  Auto
+  Optional
+  InputKey         = FilterWidth
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:bandwidth
+  OutputAttributes = unit|nm
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = CenterWavelength1
+  Auto
+  Debug
+  Optional
+  InputKey         = Center
+  InputPosition    = (IsisCube,BandBin)
+  OutputName       = img:center_filter_wavelength
+  OutputAttributes = unit|nm
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = CenterWavelength2
+  Auto
+  Debug
+  Optional
+  InputKey         = FilterCenter
+  InputPosition    = (IsisCube,BandBin)
+  OutputName       = img:center_filter_wavelength
+  OutputAttributes = unit|nm
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group

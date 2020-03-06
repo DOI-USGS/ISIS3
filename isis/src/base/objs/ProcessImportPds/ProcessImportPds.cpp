@@ -61,7 +61,7 @@ namespace Isis {
 
     // Set up a translater for PDS file of type IMAGE
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
-    p_transDir = (QString) dataDir["Base"];
+    p_transDir = "$ISISROOT/appdata";
   }
 
 
@@ -373,7 +373,7 @@ namespace Isis {
     yoff = 0.5;
 
     //  Open projectionOffsetMults file
-    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY_V2.def");
+    Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY.def");
 
     Isis::PvlObject &projDef = p.findObject("ProjectionOffsetMults",
                                             Pvl::Traverse);

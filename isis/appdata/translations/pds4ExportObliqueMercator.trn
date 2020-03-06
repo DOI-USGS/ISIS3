@@ -1,0 +1,255 @@
+# Translation file for converting Isis cube projection labels for Oblique Mercator
+# to PDS4 cartography labels
+
+#### Keywords for Bounding Coordinates
+Group = north_bounding_coordinate
+  Auto
+  InputKey       = MaximumLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = cart:north_bounding_coordinate
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  Translation    = (*, *)
+End_Group
+
+Group = south_bounding_coordinate
+  Auto
+  InputKey       = MinimumLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = cart:south_bounding_coordinate
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  Translation    = (*, *)
+End_Group
+
+Group = east_bounding_coordinate
+  Auto
+  InputKey       = MinimumLongitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = cart:east_bounding_coordinate
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  Translation    = (*, *)
+End_Group
+
+Group = west_bounding_coordinate
+  Auto
+  InputKey       = MaximumLongitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = cart:west_bounding_coordinate
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  Translation    = (*, *)
+End_Group
+
+# TODO: add units (degrees) 
+
+### Keywords for Geo Transformation
+
+# Keywords for Geodetic Model  (not inside Planar)
+# TODO: add units
+# is spheroid name required? 
+#<cart:Geodetic_Model>
+#<cart:spheroid_name>Mercury</cart:spheroid_name>
+#</cart:Geodetic_Model>
+
+Group = latitude_type
+  Auto
+  InputKey       = LatitudeType
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:latitude_type
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  Translation    = (PLANETOCENTRIC, Planetocentric)
+  Translation    = (PLANETOGRAPHIC, Planetographic)
+End_Group
+
+Group = semi_major_radius
+  Auto
+  InputKey       = EquatorialRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:semi_major_radius
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  Translation    = (*, *)
+End_Group
+
+Group = semi_minor_radius
+  Auto
+  InputKey       = EquatorialRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:semi_minor_radius
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  Translation    = (*, *)
+End_Group
+
+Group = polar_radius
+  Auto
+  InputKey       = PolarRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:polar_radius
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  Translation    = (*, *)
+End_Group
+
+Group = longitude_direction
+  Auto
+  InputKey       = LongitudeDirection
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:longitude_direction
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  Translation    = ("Positive East", PositiveEast)
+  Translation    = ("Positive West", PositiveWest)
+End_Group
+
+### Map Projection ###
+# TODO: add units
+
+Group = map_projection_name
+  Auto
+  InputKey       = ProjectionName
+  InputGroup     = "IsisCube, Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:map_projection_name
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar)
+  Translation    = (Oblique_Mercator, *)
+End_Group
+
+# TODO: is N/A a valid value? 
+Group = standard_parallel_1
+  Auto
+  Optional
+  InputKey       = FirstStandardParallel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:standard_parallel_1
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cat:Oblique_Mercator)
+  Translation    = (N/A, *)
+End_Group
+
+Group = standard_parallel_2
+  Auto
+  Optional
+  InputKey       = SecondStandardParallel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:standard_parallel_2
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cat:Oblique_Mercator)
+  Translation    = (N/A, *)
+End_Group
+
+
+Group = latitude_of_projection_origin
+  Auto
+  Optional
+  InputKey       = CenterLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:latitude_of_projection_origin
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cat:Oblique_Mercator)
+  Translation    = (*, *)
+End_Group
+
+Group = longitude_of_central_meridian
+  Auto
+  Optional
+  InputKey       = CenterLongitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:longitude_of_central_meridian
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cat:Oblique_Mercator)
+  Translation    = (*, *)
+End_Group
+
+## Planar Coordinate Information ##
+# TODO: add units
+# <cart:planar_coordinate_encoding_method>Coordinate Pair</cart:planar_coordinate_encoding_method>
+# Group = planar_coordinate_encoding_method? 
+
+Group = pixel_resolution_x
+  Auto
+  InputKey       = Scale
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:pixel_resolution_x
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information)
+  Translation    = (*, *)
+End_Group
+
+Group = pixel_resolution_y
+  Auto
+  InputKey       = Scale
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:pixel_resolution_y
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information)
+  Translation    = (*, *)
+End_Group
+
+Group = pixel_scale_x
+  Auto
+  InputKey       = PixelResolution
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:pixel_scale_x
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information)
+  Translation    = (*, *)
+End_Group
+
+Group = pixel_scale_y
+  Auto
+  InputKey       = PixelResolution
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:pixel_scale_y
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information)
+  Translation    = (*, *)
+End_Group
+
+# Geo_Transformation 
+# TODO: add units
+
+Group = upperleft_corner_x
+  Auto
+  Optional
+  InputKey       = UpperLeftCornerX
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:upperleft_corner_x
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Geo_Transformation)
+  Translation    = (*, *)
+End_Group
+
+Group = upperleft_corner_y
+  Auto
+  Optional
+  InputKey       = UpperLeftCornerY
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = cart:upperleft_corner_y
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Map_Projection, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Geo_Transformation)
+  Translation    = (*, *)
+End_Group
+
+# Omitted min/max (s,l) because did not see a reference to these in the PDS4 standards. 
+
+# Map Rotation not supported by PDS4? 
+#Group = MAP_PROJECTION_ROTATION
+#  Auto
+#  InputKey       = MapProjectionRotation
+#  InputGroup     = "IsisCube,Mapping"
+#  InputPosition  = (IsisCube, Mapping)
+#  InputDefault   = 0.0
+#  OutputName     = MAP_PROJECTION_ROTATION
+#  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+#  Translation    = (0.0, *)
+#End_Group
+
+End

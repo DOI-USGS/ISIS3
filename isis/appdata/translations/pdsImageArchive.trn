@@ -1,0 +1,176 @@
+Group = DataSetID
+  Auto
+  Optional
+  InputKey       = DATA_SET_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataSetName
+  Auto
+  Optional
+  InputKey       = DATA_SET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataSetName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerInstitutionName
+  Auto
+  Optional
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerInstitutionName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  Optional
+  InputKey       = PRODUCER_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerFullName
+  Auto
+  Optional
+  InputKey       = PRODUCER_FULL_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerFullName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  Optional
+  InputKey       = OBSERVATION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ObservationId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  Optional
+  InputKey       = PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  Optional
+  InputKey       = PRODUCT_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentHostName
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentHostName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentHostId
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_HOST_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentHostId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentName
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  Optional
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  Auto
+  Optional
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionPhaseName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  Optional
+  InputKey       = ORBIT_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OrbitNumber
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RationaleDescription
+  Auto
+  Optional
+  InputKey       = RATIONALE_DESC
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = RationaleDescription
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+End
