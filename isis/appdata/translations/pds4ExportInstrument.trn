@@ -1,0 +1,90 @@
+# Translate ISIS3 Instrument group values to PDS4.
+#
+# history 2017-10-31 Jeannie Backer - Original version
+# history 2017-11-17 Kristin Berry - Added reference_type
+# history 2018-05-16 Christopher Combs - Added lid_reference
+# history 2018-05-11 Jeannie Backer - Added ExposureDuration
+
+# Time Coordinate
+Group = StartDateTime
+  Auto
+  InputKey        = StartTime 
+  InputPosition   = (IsisCube, Instrument)
+  InputDefault    = ""
+  OutputName      = start_date_time
+  OutputPosition  = (Product_Observational, Observation_Area, Time_Coordinates)
+  Translation     = (*, *)
+End_Group
+
+# create the output keyword using the StartTime. The value will be fixed in ProcessExportPds4
+Group = StopDateTime
+  Auto
+  InputKey        = StartTime
+  InputPosition   = (IsisCube, Instrument)
+  InputDefault    = ""
+  OutputName      = stop_date_time
+  OutputPosition  = (Product_Observational, Observation_Area, Time_Coordinates)
+  Translation     = (*, *)
+End_Group
+
+# Investigation Area
+Group = MissionName
+  Auto
+  InputKey        = SpacecraftName 
+  InputPosition   = (IsisCube, Instrument)
+  InputDefault    = TBD
+  OutputName      = name
+  OutputSiblings  = (type|Mission)
+  OutputPosition  = (Product_Observational, Observation_Area, Investigation_Area)
+  Translation     = (*, *)
+End_Group
+
+Group = LIDReference
+  Auto
+  InputDefault    = urn:nasa:pds:TBD
+  OutputName      = lid_reference
+  OutputPosition  = (Product_Observational, Observation_Area, Investigation_Area, Internal_Reference)
+  Translation     = (*, *)
+End_Group
+
+Group = MissionInternalReference
+  Auto
+  InputDefault    = data_to_investigation
+  OutputName      = reference_type 
+  OutputPosition  = (Product_Observational, Observation_Area, Investigation_Area, Internal_Reference)
+  Translation     = (*, *)
+End_Group
+
+# Observing System
+Group = SpacecraftName
+  Auto
+  InputKey        = SpacecraftName 
+  InputPosition   = (IsisCube, Instrument)
+  InputDefault    = TBD
+  OutputName      = name 
+  OutputSiblings  = (type|Spacecraft)
+  OutputPosition  = (Product_Observational, Observation_Area, Observing_System, new@Observing_System_Component)
+  Translation     = (*, *)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey        = InstrumentId 
+  InputPosition   = (IsisCube, Instrument)
+  InputDefault    = TBD
+  OutputName      = name 
+  OutputSiblings  = (type|Instrument)
+  OutputPosition  = (Product_Observational, Observation_Area, Observing_System, new@Observing_System_Component)
+  Translation     = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  Optional
+  InputKey        = ExposureDuration 
+  InputPosition   = (IsisCube, Instrument)
+  OutputName      = img:exposure_duration
+  OutputAttributes = unit|s
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
+  Translation     = (*, *)
+End_Group

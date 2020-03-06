@@ -32,7 +32,7 @@ namespace Isis {
     m_toolBarWidget = NULL;
     m_toolList = NULL;
 
-    QString tempFileName = FileName("$base/icons").expanded();
+    QString tempFileName = FileName("$ISISROOT/appdata/images/icons").expanded();
     m_toolIconDir = tempFileName;
   }
 

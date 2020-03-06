@@ -1,0 +1,101 @@
+Group = TargetName
+  Auto
+  Optional
+  InputKey       = TARGET_NAME
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (Adrastea, ADRASTEA)
+  Translation    = (Amalthea, AMALTHEA)
+  Translation    = (Ariel, ARIEL)
+  Translation    = (Atlas, ATLAS)
+  Translation    = (Callisto, CALLISTO)
+  Translation    = (Calypso, CALYPSO)
+  Translation    = (Daphnis, DAPHNIS)
+  Translation    = (Deimos, DEIMOS)
+  Translation    = (Dione, DIONE)
+  Translation    = (Earth, EARTH)
+  Translation    = (Enceladus, ENCELADUS)
+  Translation    = (Epimetheus, EPIMETHEUS)
+  Translation    = (Europa, EUROPA)
+  Translation    = (Fomalhaut, FOMALHAUT)
+  Translation    = (Ganymede, GANYMEDE)
+  Translation    = (Helene, HELENE)
+  Translation    = (Himalia, HIMALIA)
+  Translation    = (Hyperion, HYPERION)
+  Translation    = (Iapetus, IAPETUS)
+  Translation    = (Io, IO)
+  Translation    = (Janus, JANUS)
+  Translation    = (Jupiter, JUPITER)
+  Translation    = (JupiterRings, J_RINGS)
+  Translation    = (Larissa, LARISSA)
+  Translation    = (Mars, MARS)
+  Translation    = (Mercury, MERCURY)
+  Translation    = (Methone, METHONE)
+  Translation    = (Metis, METIS)
+  Translation    = (Mimas, MIMAS)
+  Translation    = (Miranda, MIRANDA)
+  Translation    = (Moon, MOON)
+  Translation    = (Neptune, NEPTUNE)
+  Translation    = (Nereid, NEREID)
+  Translation    = (NeptuneRings, N_RINGS)
+  Translation    = (Oberon, OBERON)
+  Translation    = (Pallene, PALLENE)
+  Translation    = (Pan, PAN)
+  Translation    = (Pandora, PANDORA)
+  Translation    = (Phobos, PHOBOS)
+  Translation    = (Phoebe, PHOEBE)
+  Translation    = (Polydeuces, POLYDEUCES)
+  Translation    = (Prometheus, PROMETHEUS)
+  Translation    = (Proteus, PROTEUS)
+  Translation    = (Puck, PUCK)
+  Translation    = (Rhea, RHEA)
+  Translation    = (Saturn, SATURN)
+  Translation    = (SaturnRings, S_RINGS)
+  Translation    = (Sky, "DARK SKY")
+  Translation    = (Spica, SPICA)
+  Translation    = (Telesto, TELESTO)
+  Translation    = (Tethys, TETHYS)
+  Translation    = (Thebe, THEBE)
+  Translation    = (Titan, TITAN)
+  Translation    = (Titania, TITANIA)
+  Translation    = (Triton, TRITON)
+  Translation    = (Uranus, URANUS)
+  Translation    = (Umbriel, UMBRIEL)
+  Translation    = (Venus, VENUS)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  Optional
+  InputKey       = SPACECRAFT_NAME
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = ("CLEMENTINE 1", CLEMENTINE_1)
+End_Group
+
+Group = StartTime
+  Auto
+  Optional
+  InputKey       = START_TIME
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = StartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

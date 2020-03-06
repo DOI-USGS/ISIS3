@@ -1,0 +1,229 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataFilePointer
+  InputKey    = ^QUBE
+  Translation = (*, *)
+End_Group
+
+Group = DataStart
+  InputKey     = ^QUBE
+  InputDefault = 1
+  Translation  = (*, *)
+End_Group
+
+Group = DataFileRecordBytes
+  InputKey    = RECORD_BYTES
+  Translation = (*, *)
+End_Group
+
+Group = CoreAxisNames
+  InputKey      = AXIS_NAME
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreSamples
+  InputKey      = CORE_ITEMS
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLines
+  InputKey      = CORE_ITEMS
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBands
+  InputKey      = CORE_ITEMS
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBands
+  InputKey      = BANDS
+  InputGroup    = IMAGE
+  InputPosition = IMAGE
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBitsPerPixel
+  InputKey      = CORE_ITEM_BYTES
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 1
+  Translation   = (8, 1)
+  Translation   = (16, 2)
+  Translation   = (32, 4)
+End_Group
+
+Group = CorePixelType
+  InputKey      = CORE_ITEM_TYPE
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = LSB_INTEGER
+  Translation   = (Integer, LSB_INTEGER)
+  Translation   = (Integer, MSB_INTEGER)
+  Translation   = (Integer, PC_INTEGER)
+  Translation   = (Integer, MAC_INTEGER)
+  Translation   = (Integer, SUN_INTEGER)
+  Translation   = (Integer, VAX_INTEGER)
+  Translation   = (Natural, UNSIGNED_INTEGER)
+  Translation   = (Natural, LSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, MSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, PC_UNSIGNED_INTEGER)
+  Translation   = (Natural, MAC_UNSIGNED_INTEGER)
+  Translation   = (Natural, SUN_UNSIGNED_INTEGER)
+  Translation   = (Natural, VAX_UNSIGNED_INTEGER)
+  Translation   = (Real, FLOAT)
+  Translation   = (Real, REAL)
+  Translation   = (Real, PC_REAL)
+  Translation   = (Real, IEEE_REAL)
+  Translation   = (Real, MAC_REAL)
+  Translation   = (Real, SUN_REAL)
+  Translation   = (Real, VAX_REAL)
+End_Group
+
+Group = CoreByteOrder
+  InputKey      = CORE_ITEM_TYPE
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = LSB_INTEGER
+  Translation   = (LSB, LSB_INTEGER)
+  Translation   = (MSB, MSB_INTEGER)
+  Translation   = (LSB, PC_INTEGER)
+  Translation   = (MSB, MAC_INTEGER)
+  Translation   = (MSB, SUN_INTEGER)
+  Translation   = (LSB, VAX_INTEGER)
+  Translation   = (MSB, UNSIGNED_INTEGER)
+  Translation   = (LSB, LSB_UNSIGNED_INTEGER)
+  Translation   = (MSB, MSB_UNSIGNED_INTEGER)
+  Translation   = (LSB, PC_UNSIGNED_INTEGER)
+  Translation   = (MSB, MAC_UNSIGNED_INTEGER)
+  Translation   = (MSB, SUN_UNSIGNED_INTEGER)
+  Translation   = (LSB, VAX_UNSIGNED_INTEGER)
+  Translation   = (MSB, FLOAT)
+  Translation   = (MSB, REAL)
+  Translation   = (MSB, IEEE_REAL)
+  Translation   = (MSB, MAC_REAL)
+  Translation   = (MSB, SUN_REAL)
+  Translation   = (LSB, PC_REAL)
+  Translation   = (LSB, VAX_REAL)
+End_Group
+
+Group = BandBase
+  InputKey      = BAND_BIN_BASE
+  InputGroup    = BAND_BIN
+  InputPosition = BAND_BIN
+  Translation   = (*, *)
+End_Group
+
+Group = BandMultiplier
+  InputKey      = BAND_BIN_MULTIPLIER
+  InputGroup    = BAND_BIN
+  InputPosition = BAND_BIN
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBase
+  InputKey      = CORE_BASE
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 0.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreMultiplier
+  InputKey      = CORE_MULTIPLIER
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 1.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreOrganization
+  InputKey      = AXIS_NAME
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreNull
+  InputKey      = CORE_NULL
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLRS
+  InputKey      = CORE_LOW_REPR_SATURATION
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLIS
+  InputKey      = CORE_LOW_INSTR_SATURATION
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHRS
+  InputKey      = CORE_HIGH_REPR_SATURATION
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHIS
+  InputKey      = CORE_HIGH_INSTR_SATURATION
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  Translation   = (*, *)
+End_Group
+
+Group = SuffixItemSize
+  InputKey      = SUFFIX_BYTES
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 4
+  Translation   = (*, *)
+End_Group
+
+Group = AxisSuffixCount
+  InputKey      = SUFFIX_ITEMS
+  InputGroup    = QUBE
+  InputPosition = QUBE
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+End

@@ -1,0 +1,72 @@
+# Exports the display settings from ISIS3 to PDS4.
+# 
+# history 2017-10-26 Jeannie Backer - Original version.
+# history 2017-11-15 Kristin Berry - Moved HorizontalDisplayAxis into this file from pds4Export.trn
+#                        added LocalIdentifierReference and DisplaySettingsToArray
+# history 2018-05-16 Christopher Combs - Changed 3D_Image_Object to Array_3D_Image
+
+#Group = LocalInternalReference
+#  Auto
+#  InputDefault    = ""
+#  OutputName      = Local_Internal_Reference
+##  OutputSiblings  = ("att@local_identifier_reference|TBD", "att@local_reference_type|TBD")
+#  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings)
+#  Translation     = (*, *)
+#End_Group
+
+Group = LocalIdentifierReference
+  Auto
+  InputDefault    = Image_Array_Object
+  OutputName      = local_identifier_reference
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings,
+                     Local_Internal_Reference)
+  Translation     = (*, *)
+End_Group
+
+Group = DisplaySettingsToArray
+  Auto
+  InputDefault    = display_settings_to_array
+  OutputName      = local_reference_type
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings,
+                     Local_Internal_Reference)
+  Translation     = (*, *)
+End_Group
+
+Group = HorizontalDisplayAxis
+  Auto
+  InputDefault    = Sample 
+  OutputName      = disp:horizontal_display_axis
+#  OutputSiblings  = ("disp:horizontal_display_direction|Left To Right",
+#                     "disp:vertical_display_axis|Line",
+#                     "disp:vertical_display_direction|Top To Bottom")
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area,
+                     disp:Display_Settings,disp:Display_Direction)
+  Translation     = (*, *)
+End_Group
+
+Group = HorizontalDisplayDirection
+  Auto
+  InputDefault    = "Left to Right"
+  OutputName      = disp:horizontal_display_direction
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+                     disp:Display_Direction)
+  Translation     = (*, *)
+End_Group
+
+Group = VerticalDisplayAxis
+  Auto
+  InputDefault    = Line 
+  OutputName      = disp:vertical_display_axis
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+                     disp:Display_Direction)
+  Translation     = (*, *)
+End_Group
+
+Group = VerticalDisplayDirection
+  Auto
+  InputDefault    = "Top to Bottom"
+  OutputName      = disp:vertical_display_direction
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+                     disp:Display_Direction)
+  Translation     = (*, *)
+End_Group
