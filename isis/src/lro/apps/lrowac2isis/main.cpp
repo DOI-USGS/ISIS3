@@ -457,7 +457,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   // Let's start by running through the generic translations.
 
   // Translate the instrument group
-  FileName transFile("$ISISROOT/appdata/translations/lrowacInstrument.trn");
+  FileName transFile("$ISISROOT/appdata/translations/LroWacInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
   instrumentXlater.Auto(isis3VisEven);
   instrumentXlater.Auto(isis3VisOdd);
@@ -465,7 +465,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   instrumentXlater.Auto(isis3UvOdd);
 
   // Translate the Archive group
-  transFile = "$ISISROOT/appdata/translations/lrowacArchive.trn";
+  transFile = "$ISISROOT/appdata/translations/LroWacArchive.trn";
   PvlToPvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
 
   archiveXlater.Auto(isis3VisEven);
