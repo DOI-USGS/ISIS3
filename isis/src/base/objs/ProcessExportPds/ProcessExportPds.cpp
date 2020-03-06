@@ -109,7 +109,7 @@ namespace Isis {
       setFormat(JP2);
     }
 
-    m_formatter = new PvlFormatPds("$base/translations/pdsExportRootGen.typ");
+    m_formatter = new PvlFormatPds("$ISISROOT/appdata/translations/pdsExportRootGen.typ");
     m_label->setFormat(m_formatter);
     m_label->setTerminator("END");
 
@@ -163,7 +163,7 @@ namespace Isis {
     // The IMAGE_MAP_PROJECTION group is located in the ROOT for PDS IMAGEs. The
     // standard routines will add the IMAGE_MAP_PROJECTION correctly
     StandardAllMapping(mainPvl);
-    mainPvl.format()->add("$base/translations/pdsExportAllMapping.typ");
+    mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportAllMapping.typ");
   }
 
 
@@ -249,7 +249,7 @@ namespace Isis {
    * @param mainPvl
    */
   void ProcessExportPds::StreamJP2ImageRoot(Pvl &mainPvl) {
-    mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
+    mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageJP2.typ");
     // Create standard ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
     QString sImageFile = m_detachedPdsLabelFile;
@@ -340,7 +340,7 @@ namespace Isis {
    * @param  mainPvl
    */
   void ProcessExportPds::FixedJP2ImageRoot(Pvl &mainPvl) {
-    mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
+    mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageJP2.typ");
     //Create fixed ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
     QString sImageFile = m_detachedPdsLabelFile;
@@ -400,12 +400,12 @@ namespace Isis {
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardImageImage(Pvl &mainPvl) {
-    mainPvl.format()->add("$base/translations/pdsExportImageImage.typ");
+    mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImage.typ");
     // Build up an IMAGE object:
     // Auto translate standard keywords for the IMAGE object
     Pvl *inputLabel = InputCubes[0]->label();
     FileName transfile;
-    transfile = "$base/translations/pdsExportImageImage.trn";
+    transfile = "$ISISROOT/appdata/translations/pdsExportImageImage.trn";
     PvlToPvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
@@ -461,7 +461,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel8.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -472,7 +472,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -483,7 +483,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -494,7 +494,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -505,7 +505,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
@@ -522,7 +522,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel32.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel32.typ");
     }
     else {
       QString msg = "Unsupported PDS pixel type or sample size";
@@ -541,15 +541,15 @@ namespace Isis {
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardJP2Image(Pvl &mainPvl) {
-    mainPvl.format()->add("$base/translations/pdsExportImageImage.typ");
+    mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImage.typ");
     if(m_pdsFileType == ProcessExportPds::JP2Image) {
-      mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageJP2.typ");
     }
     // Build up a JP2 IMAGE object:
     // Auto translate standard keywords for the IMAGE object
     Pvl *inputLabel = InputCubes[0]->label();
     FileName transfile;
-    transfile = "$base/translations/pdsExportImageJP2.trn";
+    transfile = "$ISISROOT/appdata/translations/pdsExportImageJP2.trn";
     PvlToPvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
@@ -605,7 +605,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel8.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -616,7 +616,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -627,7 +627,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -638,7 +638,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -649,7 +649,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
@@ -666,7 +666,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
-      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel32.typ");
+      mainPvl.format()->add("$ISISROOT/appdata/translations/pdsExportImageImagePixel32.typ");
     }
     else {
       QString msg = "Unsupported PDS pixel type or sample size";
@@ -694,12 +694,12 @@ namespace Isis {
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
     QString projName = ProjectionName(*inputLabel);
     PvlToPvlTranslationManager xlatSpecProj(*inputLabel,
-                                       "$base/translations/pdsExport" + projName + ".trn");
+                                       "$ISISROOT/appdata/translations/pdsExport" + projName + ".trn");
     xlatSpecProj.Auto(outputPvl);
 
     // Translate the target name
     PvlToPvlTranslationManager xlatTarget(*inputLabel,
-                                     "$base/translations/pdsExportTarget.trn");
+                                     "$ISISROOT/appdata/translations/pdsExportTarget.trn");
     xlatTarget.Auto(outputPvl);
 
     // Add keywords to the PDS labels that could not be handled automatically

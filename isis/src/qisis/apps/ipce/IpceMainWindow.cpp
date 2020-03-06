@@ -453,7 +453,7 @@ namespace Isis {
     QAction *activateWhatsThisAct = new QAction("&What's This", this);
     activateWhatsThisAct->setShortcut(Qt::SHIFT | Qt::Key_F1);
     activateWhatsThisAct->setIcon(
-        QPixmap(FileName("$base/icons/contexthelp.png").expanded()));
+        QPixmap(FileName("$ISISROOT/appdata/images/icons/contexthelp.png").expanded()));
     activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
         "this program to see more information about them");
     connect(activateWhatsThisAct, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));

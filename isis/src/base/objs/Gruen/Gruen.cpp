@@ -818,7 +818,7 @@ namespace Isis {
    */
   Pvl &Gruen::getDefaultParameters() {
     static Pvl regdef;
-    regdef = Pvl("$base/templates/autoreg/coreg.adaptgruen.p1515s3030.def");
+    regdef = Pvl("$ISISROOT/appdata/templates/autoreg/coreg.adaptgruen.p1515s3030.def");
     return (regdef);
   }
 

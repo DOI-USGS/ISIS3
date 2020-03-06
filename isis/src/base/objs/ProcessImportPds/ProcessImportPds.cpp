@@ -1668,7 +1668,7 @@ namespace Isis {
     // contain the projection specific translations from PDS to ISIS for each
     // projection
 
-    QString projSpecificFileName = "$base/translations/pdsImport";
+    QString projSpecificFileName = "$ISISROOT/appdata/translations/pdsImport";
     projSpecificFileName += p_projection + ".trn";
     Isis::PvlToPvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
 

@@ -175,9 +175,9 @@ namespace Isis {
    *
    */
   void BlinkTool::updateTool() {
-    QString unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
+    QString unlinkedIcon = FileName("$ISISROOT/appdata/images/icons/unlinked.png").expanded();
     static QIcon unlinked(unlinkedIcon);
-    QString linkedIcon = FileName("$base/icons/linked.png").expanded();
+    QString linkedIcon = FileName("$ISISROOT/appdata/images/icons/linked.png").expanded();
     static QIcon linked(linkedIcon);
     p_listWidget->clear();
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
