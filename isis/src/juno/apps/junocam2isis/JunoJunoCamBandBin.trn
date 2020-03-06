@@ -1,0 +1,37 @@
+Group = FilterName
+  Auto
+  Optional
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputKey       = FILTER_NAME
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  Optional
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputKey       = FILTER_NAME
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (BLUE,  480.1)
+  Translation    = (GREEN, 553.5)
+  Translation    = (RED,   698.9)
+End_Group
+
+Group = Width
+  Auto
+  Optional
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputKey       = FILTER_NAME
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (BLUE,  45.5)
+  Translation    = (GREEN, 79.3)
+  Translation    = (RED,   175.4)
+End_Group
+End
