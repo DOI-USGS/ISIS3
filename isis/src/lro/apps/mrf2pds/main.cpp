@@ -142,10 +142,10 @@ void IsisMain() {
   // Distinguish betweeen Level 2 and 3 images by calling the camera()
   // function as only non mosaic images(Level2) have a camera
   if(bLevel2) {
-    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel2.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MrfPdsLevel2.pft");
   }
   else {
-    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MrfPdsLevel3.pft");
   }
 
   int iFound = outFileName.indexOf(".lbl");
