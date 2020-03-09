@@ -61,8 +61,12 @@ void IsisMain() {
 
   QString maskParameter = "$ISIS3DATA/viking" + toString(spn) +
     "/calibration/vik" + toString(spn);
-  if(even) maskParameter += "evenMask.cub";
-  else maskParameter += "oddMask.cub";
+  if(even) {
+    maskParameter += "evenMask.cub";
+  }
+  else {
+    maskParameter += "oddMask.cub";
+  }
   pipeline.Application("mask").AddConstParameter("mask", maskParameter);
 
   // Run a low pass filter on the invalid data in the cube
