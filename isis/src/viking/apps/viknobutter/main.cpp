@@ -59,7 +59,7 @@ void IsisMain() {
   pipeline.Application("mask").SetInputParameter("FROM", false);
   pipeline.Application("mask").SetOutputParameter("TO", "step3");
 
-  QString maskParameter = "$ISIS3DATA/viking" + toString(spn) +
+  QString maskParameter = "$ISISDATA/viking" + toString(spn) +
     "/calibration/vik" + toString(spn);
   if(even) {
     maskParameter += "evenMask.cub";
