@@ -455,7 +455,7 @@ namespace Isis {
       contextMenu.addSeparator();
 
       QString configureIconFile =
-          FileName("$base/icons/plot_configure.png").expanded();
+          FileName("$ISISROOT/appdata/images/icons/plot_configure.png").expanded();
       QAction *configureAct = new QAction(QPixmap(configureIconFile),
                                           "Configure...", this);
       contextMenu.addAction(configureAct);
