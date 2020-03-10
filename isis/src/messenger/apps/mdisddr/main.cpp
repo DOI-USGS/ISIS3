@@ -199,7 +199,7 @@ void IsisMain() {
     // Translates the ISIS labels along with the original EDR labels
     origLabel.addObject(*from.label());
     PvlToPvlTranslationManager labels(origLabel,
-                                 "$messenger/translations/mdisDDRLabel.trn");
+                                 "$ISISROOT/appdata/translations/MessengerMdisDdrLabel.trn");
     labels.Auto(pdsLabel);
     p.CheckStatus();
 
@@ -212,15 +212,15 @@ void IsisMain() {
 
     // Fix bad keywords
     // data set id
-    PvlKeyword &dataSetIdKeyword = pdsLabel.findKeyword("DATA_SET_ID", 
+    PvlKeyword &dataSetIdKeyword = pdsLabel.findKeyword("DATA_SET_ID",
                                                         Pvl::Traverse);
     dataSetIdKeyword.setValue(dataSetID);
 
     // product set id
     QString prodid(input.baseName());
-    PvlKeyword &productIdKeyword = pdsLabel.findKeyword("PRODUCT_ID", 
+    PvlKeyword &productIdKeyword = pdsLabel.findKeyword("PRODUCT_ID",
                                                         Pvl::Traverse);
-    if ((productIdKeyword.size() == 0) 
+    if ((productIdKeyword.size() == 0)
         || ((productIdKeyword.size() > 0) && (productIdKeyword[0] == "N/A"))) {
       productIdKeyword.setValue(prodid);
     }
@@ -239,22 +239,22 @@ void IsisMain() {
     if (!toEntered) ui.PutFileName("TO", output.expanded());
 
     // product creation time
-    PvlKeyword &productCreationTimeKeyword = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", 
+    PvlKeyword &productCreationTimeKeyword = pdsLabel.findKeyword("PRODUCT_CREATION_TIME",
                                                              Pvl::Traverse);
     productCreationTimeKeyword.setValue(mdisddrRuntime);
-    
+
     // software name
-    PvlKeyword &softwareNameKeyword = pdsLabel.findKeyword("SOFTWARE_NAME", 
+    PvlKeyword &softwareNameKeyword = pdsLabel.findKeyword("SOFTWARE_NAME",
                                                            Pvl::Traverse);
     softwareNameKeyword.setValue(mdisddrProgram);
-    
+
     // software version id
-    PvlKeyword &softwareVersionIdKeyword = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", 
+    PvlKeyword &softwareVersionIdKeyword = pdsLabel.findKeyword("SOFTWARE_VERSION_ID",
                                                                 Pvl::Traverse);
     softwareVersionIdKeyword.setValue(quote(mdisddrVersion));
-    
+
     // filter number
-    PvlKeyword &filterNumberKeyword = pdsLabel.findKeyword("FILTER_NUMBER", 
+    PvlKeyword &filterNumberKeyword = pdsLabel.findKeyword("FILTER_NUMBER",
                                                            Pvl::Traverse);
     if ((filterNumberKeyword.size() > 0)) {
       filterNumberKeyword.setValue(quote(filterNumberKeyword[0]));
@@ -263,30 +263,30 @@ void IsisMain() {
 
     // Add quotes
     // data quality id
-    PvlKeyword &dataQualityIdKeyword = pdsLabel.findKeyword("DATA_QUALITY_ID", 
+    PvlKeyword &dataQualityIdKeyword = pdsLabel.findKeyword("DATA_QUALITY_ID",
                                                             Pvl::Traverse);
     dataQualityIdKeyword.setValue(quote(dataQualityIdKeyword));
-    
+
     // sequence name
-    PvlKeyword &sequenceNameKeyword = pdsLabel.findKeyword("SEQUENCE_NAME", 
+    PvlKeyword &sequenceNameKeyword = pdsLabel.findKeyword("SEQUENCE_NAME",
                                                            Pvl::Traverse);
     sequenceNameKeyword.setValue(quote(sequenceNameKeyword));
-    
+
     // spacecraft clock start count
-    PvlKeyword &startCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", 
+    PvlKeyword &startCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT",
                                                          Pvl::Traverse);
     startCountKeyword.setValue(quote(startCountKeyword));
-    
+
     // spacecraft clock stop count
-    PvlKeyword &stopCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", 
+    PvlKeyword &stopCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT",
                                                         Pvl::Traverse);
     stopCountKeyword.setValue(quote(stopCountKeyword));
-    
+
     // source product id
     //  For DDRs, the SOURCE_PRODUCT_ID is made up of SPICE kernels.  I need to go get em.
     Kernels kernels(from);
     QStringList kfiles = kernels.getKernelList();
-    PvlKeyword &sourceProductIdKeyword = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", 
+    PvlKeyword &sourceProductIdKeyword = pdsLabel.findKeyword("SOURCE_PRODUCT_ID",
                                                               Pvl::Traverse);
     sourceProductIdKeyword.clear();
     for (int i = 0; i < kfiles.size(); i++) {
@@ -296,7 +296,7 @@ void IsisMain() {
     //  Enforce parentheses for scalars
     if (sourceProductIdKeyword.size() == 1)
       sourceProductIdKeyword.setValue('(' + sourceProductIdKeyword[0] + ')');
-    
+
     // Removes keywords
     PvlObject imageObject(pdsLabel.findObject("IMAGE"));
     if (imageObject.hasKeyword("CENTER_FILTER_WAVELENGTH")) {

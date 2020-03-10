@@ -174,7 +174,7 @@ void IsisMain() {
     processPds.SetOutputHrs(pow(2.0, (double)(nbits)) - 1.0);
     dataSetID += "0";
   }
-  else { // 16 < nbits < 32 
+  else { // 16 < nbits < 32
     QString msg = "[" + toString(nbits) + "] is not a supported bit length.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -202,7 +202,7 @@ void IsisMain() {
   // Translates the ISIS labels along with the original EDR labels
   origLabel.addObject(*(incube->label()));
   PvlToPvlTranslationManager labels(origLabel,
-                               "$messenger/translations/mdisCDRLabel.trn");
+                               "$ISISROOT/appdata/translations/MessengerMdisCdrLabel.trn");
   labels.Auto(pdsLabel);
 
   p.CheckStatus();
@@ -215,7 +215,7 @@ void IsisMain() {
   PvlKeyword &empiricalCorrection(pdsLabel.findKeyword("MESS:EC_FACTOR"));
   if (empiricalCorrection[0] == "N/A") {
     if (incube->label()->hasKeyword("ContaminationEventFactor", Pvl::Traverse)) {
-      empiricalCorrection.setValue(incube->label()->findKeyword("ContaminationEventFactor", 
+      empiricalCorrection.setValue(incube->label()->findKeyword("ContaminationEventFactor",
                                                                 Pvl::Traverse)[0]);
     }
   }
@@ -257,31 +257,31 @@ void IsisMain() {
 
   // Fixes bad keywords
   // data set id
-  PvlKeyword &dataSetIdKeyword = pdsLabel.findKeyword("DATA_SET_ID", 
+  PvlKeyword &dataSetIdKeyword = pdsLabel.findKeyword("DATA_SET_ID",
                                                       Pvl::Traverse);
   dataSetIdKeyword.setValue(dataSetID);
-  
+
   // product id
-  PvlKeyword &productIdKeyword = pdsLabel.findKeyword("PRODUCT_ID", 
+  PvlKeyword &productIdKeyword = pdsLabel.findKeyword("PRODUCT_ID",
                                                       Pvl::Traverse);
   if (productIdKeyword[0] == "N/A") {
     productIdKeyword.setValue(output.baseName());
   }
-  
+
   // product creation time
-  PvlKeyword &productCreationTimeKeyword = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", 
+  PvlKeyword &productCreationTimeKeyword = pdsLabel.findKeyword("PRODUCT_CREATION_TIME",
                                                                 Pvl::Traverse);
   productCreationTimeKeyword.setValue(mdis2pdsRuntime);
-  
+
   // software name
-  PvlKeyword &softwareNameKeyword = pdsLabel.findKeyword("SOFTWARE_NAME", 
+  PvlKeyword &softwareNameKeyword = pdsLabel.findKeyword("SOFTWARE_NAME",
                                                          Pvl::Traverse);
   if (softwareNameKeyword[0] == "N/A") {
     softwareNameKeyword.setValue(mdis2pdsProgram);
   }
-  
+
   // software version id
-  PvlKeyword &softwareVersionIdKeyword = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", 
+  PvlKeyword &softwareVersionIdKeyword = pdsLabel.findKeyword("SOFTWARE_VERSION_ID",
                                                               Pvl::Traverse);
   if (softwareVersionIdKeyword[0] == "N/A") {
     softwareVersionIdKeyword.setValue(quote(mdis2pdsVersion));
@@ -289,9 +289,9 @@ void IsisMain() {
   else {
     softwareVersionIdKeyword.setValue(softwareVersionIdKeyword[0]);
   }
-  
+
   // filter number
-  PvlKeyword &filterNumberKeyword = pdsLabel.findKeyword("FILTER_NUMBER", 
+  PvlKeyword &filterNumberKeyword = pdsLabel.findKeyword("FILTER_NUMBER",
                                                          Pvl::Traverse);
   if ((filterNumberKeyword.size() > 0)) {
     filterNumberKeyword.setValue(quote(filterNumberKeyword[0]));
@@ -300,32 +300,32 @@ void IsisMain() {
 
   // Add quotes
   // data quality id
-  PvlKeyword &dataQualityIdKeyword = pdsLabel.findKeyword("DATA_QUALITY_ID", 
+  PvlKeyword &dataQualityIdKeyword = pdsLabel.findKeyword("DATA_QUALITY_ID",
                                                           Pvl::Traverse);
   dataQualityIdKeyword.setValue(quote(dataQualityIdKeyword));
-  
+
   // sequence name
-  PvlKeyword &sequenceNameKeyword = pdsLabel.findKeyword("SEQUENCE_NAME", 
+  PvlKeyword &sequenceNameKeyword = pdsLabel.findKeyword("SEQUENCE_NAME",
                                                          Pvl::Traverse);
   sequenceNameKeyword.setValue(quote(sequenceNameKeyword));
-  
+
   // spacecraft clock start count
-  PvlKeyword &startCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", 
+  PvlKeyword &startCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT",
                                                        Pvl::Traverse);
   startCountKeyword.setValue(quote(startCountKeyword));
-  
+
   // spacecraft clock stop count
-  PvlKeyword &stopCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", 
+  PvlKeyword &stopCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT",
                                                       Pvl::Traverse);
   stopCountKeyword.setValue(quote(stopCountKeyword));
-  
+
   // site id
-  PvlKeyword &siteIdKeyword = pdsLabel.findKeyword("SITE_ID", 
+  PvlKeyword &siteIdKeyword = pdsLabel.findKeyword("SITE_ID",
                                                    Pvl::Traverse);
   siteIdKeyword.setValue(quote(siteIdKeyword));
-  
+
   // source product id
-  PvlKeyword &sourceProductIdKeyword = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", 
+  PvlKeyword &sourceProductIdKeyword = pdsLabel.findKeyword("SOURCE_PRODUCT_ID",
                                                             Pvl::Traverse);
   for (int i = 0; i < sourceProductIdKeyword.size(); i++) {
     sourceProductIdKeyword[i] = quote(sourceProductIdKeyword[i]);
