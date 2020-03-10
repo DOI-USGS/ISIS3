@@ -1,0 +1,70 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# history 2018-10-02 Jeannie Backer - Original version. Copied
+#                        from tcmapArchive.trn to generalize
+#                        for all supported TC images.
+Group = FilterName
+  Optional
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FilterName
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Optional
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Optional
+  Auto
+  InputKey       = BANDWIDTH
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = BaseBand
+  Optional
+  Auto
+  InputKey       = BASE_BAND
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = BaseBand
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+End
