@@ -359,7 +359,7 @@ void IsisMain() {
     p.CheckStatus();
 
     // All done...write result.
-    pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/templates/mdisddr/MessengerMdisPdsDdr.def");
     QString ofile(output.expanded());
     ofstream outstream(ofile.toLatin1().data());
     processPds.OutputLabel(outstream);
