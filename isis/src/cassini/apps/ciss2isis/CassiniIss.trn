@@ -1,0 +1,348 @@
+#Archive Group
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageNumber
+  Auto
+  InputKey       = IMAGE_NUMBER
+  OutputName     = ImageNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputKey       = OBSERVATION_ID
+  OutputName     = ObservationId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+#Instrument Group
+Group = SpacecraftName
+  Auto
+  InputKey       = MISSION_NAME
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Cassini-Huygens, CASSINI-HUYGENS)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (ISSNA, ISSNA)
+  Translation    = (ISSWA, ISSWA)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Aegaeon, AEGAEON)
+  Translation    = (Albiorix, ALBIORIX)
+  Translation    = (Anthe, ANTHE)
+  Translation    = (Atlas, ATLAS)
+  Translation    = (Bebhionn, BEBHIONN)
+  Translation    = (Bergelmir, BERGELMIR)
+  Translation    = (Bestla, BESTLA)
+  Translation    = (Callisto, CALLISTO)
+  Translation    = (Calypso, CALYPSO)
+  Translation    = (Daphnis, DAPHNIS)
+  Translation    = (Sky, "DARK SKY")
+  Translation    = (Dione, DIONE)
+  Translation    = (Earth, EARTH)
+  Translation    = (Enceladus, ENCELADUS)
+  Translation    = (Epimetheus, EPIMETHEUS)
+  Translation    = (Erriapo, ERRIAPO)
+  Translation    = (Erriapus, ERRIAPUS)
+  Translation    = (Europa, EUROPA)
+  Translation    = (Fomalhaut, FOMALHAUT)
+  Translation    = (Fornjot, FORNJOT)
+  Translation    = (Ganymede, GANYMEDE)
+  Translation    = (Greip, GREIP)
+  Translation    = (Hati, HATI)
+  Translation    = (Helene, HELENE)
+  Translation    = (Himalia, HIMALIA)
+  Translation    = (Hyperion, HYPERION)
+  Translation    = (Hyrokkin, HYROKKIN)
+  Translation    = (Iapetus, IAPETUS)
+  Translation    = (Ijiraq, IJIRAQ)
+  Translation    = (Io, IO)
+  Translation    = (Janus, JANUS)
+  Translation    = (Jarnsaxa, JARNSAXA)
+  Translation    = (Jupiter, JUPITER)
+  Translation    = (K07S4, K07S4)
+  Translation    = (Kari, KARI)
+  Translation    = (Kiviuq, KIVIUQ)
+  Translation    = (Loge, LOGE)
+  Translation    = (Masursky, MASURSKY)
+  Translation    = (Methone, METHONE)
+  Translation    = (Mimas, MIMAS)
+  Translation    = (Moon, MOON)
+  Translation    = (Mundilfari, MUNDILFARI)
+  Translation    = (Narvi, NARVI)
+  Translation    = (None, NONE)
+  Translation    = (Paaliaq, PAALIAQ)
+  Translation    = (Pallene, PALLENE)
+  Translation    = (Pan, PAN)
+  Translation    = (Pandora, PANDORA)
+  Translation    = (Phoebe, PHOEBE)
+  Translation    = (Polydeuces, POLYDEUCES)
+  Translation    = (Prometheus, PROMETHEUS)
+  Translation    = (Rhea, RHEA)
+  Translation    = (Sky, S8_2004)
+  Translation    = (Sky, S12_2004)
+  Translation    = (Sky, S13_2004)
+  Translation    = (Sky, S14_2004)
+  Translation    = (Sky, S18_2004)
+  Translation    = (Saturn, SATURN)
+  Translation    = (Siarnaq, SIARNAQ)
+  Translation    = (Skadi, SKADI)
+  Translation    = (Skathi, SKATHI)
+  Translation    = (Skoll, SKOLL)
+  Translation    = (Sky, SKY)
+  Translation    = (Spica, SPICA)
+  Translation    = (Surtur, SURTUR)
+  Translation    = (Suttung, SUTTUNG)
+  Translation    = (Suttungr, SUTTUNGR)
+  Translation    = (Sun, SUN)
+  Translation    = (Tarqeq, TARQEQ)
+  Translation    = (Tarvos, TARVOS)
+  Translation    = (Telesto, TELESTO)
+  Translation    = (Tethys, TETHYS)
+  Translation    = (Thrym, THRYM)
+  Translation    = (Thrymr, THRYMR)
+  Translation    = (Titan, TITAN)
+  Translation    = (Unknown, UNK)
+  Translation    = (Venus, VENUS)
+  Translation    = (Ymir, YMIR)
+
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = AntibloomingStateFlag
+  Auto
+  InputKey       = ANTIBLOOMING_STATE_FLAG
+  OutputName     = AntibloomingStateFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Off, OFF)
+  Translation    = (On, ON)
+  Translation    = (Unknown, UNK)
+End_Group
+
+Group = BiasStripMean
+  Auto
+  InputKey       = BIAS_STRIP_MEAN
+  OutputName     = BiasStripMean
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionRatio1
+  Auto
+  Optional
+  InputKey       = INST_CMPRS_RATIO
+  OutputName     = CompressionRatio
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NotCompressed, N/A)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionRatio2
+  Auto
+  Optional
+  InputKey       = COMPRESSION_RATIO
+  OutputName     = CompressionRatio
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NotCompressed, N/A)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionType1
+  Auto
+  Optional
+  InputKey       = INST_CMPRS_TYPE
+  OutputName     = CompressionType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NotCompressed, NOTCOMP)
+  Translation    = (Lossless, LOSSLESS)
+  Translation    = (Lossy, LOSSY)
+End_Group
+
+Group = CompressionType2
+  Auto
+  Optional
+  InputKey       = ENCODING_TYPE
+  OutputName     = CompressionType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NotCompressed, NOTCOMP)
+  Translation    = (Lossless, LOSSLESS)
+  Translation    = (Lossy, LOSSY)
+End_Group
+
+Group = DataConversionType
+  Auto
+  InputKey       = DATA_CONVERSION_TYPE
+  OutputName     = DataConversionType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (12Bit, 12BIT)
+  Translation    = (Table, TABLE)
+  Translation    = (8LSB, 8LSB)
+End_Group
+
+Group = DelayedReadoutFlag
+  Auto
+  InputKey       = DELAYED_READOUT_FLAG
+  OutputName     = DelayedReadoutFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Yes, YES)
+  Translation    = (No, NO)
+  Translation    = (Unknown, UNK)
+End_Group
+
+Group = FlightSoftwareVersionId
+  Auto
+  InputKey       = FLIGHT_SOFTWARE_VERSION_ID
+  OutputName     = FlightSoftwareVersionId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Unknown, UNK)
+  Translation    = (1.2, 1.2)
+  Translation    = (1.3, 1.3)
+  Translation    = (1.4, 1.4)
+End_Group
+
+Group = GainModeId
+  Auto
+  InputKey       = GAIN_MODE_ID
+  OutputName     = GainModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (12, "12 ELECTRONS PER DN")
+  Translation    = (29, "29 ELECTRONS PER DN")
+  Translation    = (95, "95 ELECTRONS PER DN")
+  Translation    = (215, "215 ELECTRONS PER DN")
+End_Group
+
+Group = GainState
+  Auto
+  InputKey       = GAIN_MODE_ID
+  OutputName     = GainState
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (3, "12 ELECTRONS PER DN")
+  Translation    = (2, "29 ELECTRONS PER DN")
+  Translation    = (1, "95 ELECTRONS PER DN")
+  Translation    = (0, "215 ELECTRONS PER DN")
+End_Group
+
+Group = ImageTime
+  Auto
+  InputKey       = IMAGE_TIME
+  OutputName     = ImageTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentDataRate
+  Auto
+  InputKey       = INSTRUMENT_DATA_RATE
+  OutputName     = InstrumentDataRate
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OpticsTemperature
+  Auto
+  InputKey       = OPTICS_TEMPERATURE
+  OutputName     = OpticsTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Unknown, UNK)
+  Translation    = (*, *)
+End_Group
+
+Group = ReadoutCycleIndex
+  Auto
+  InputKey       = READOUT_CYCLE_INDEX
+  OutputName     = ReadoutCycleIndex
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Unknown, UNK)
+  Translation    = (*, *)
+End_Group
+
+Group = ShutterModeId
+  Auto
+  InputKey       = SHUTTER_MODE_ID
+  OutputName     = ShutterModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Unknown, UNK)
+  Translation    = (BothSim, BOTSIM)
+  Translation    = (NacOnly, NACONLY)
+  Translation    = (WacOnly, WACONLY)
+End_Group
+
+Group = ShutterStateId
+  Auto
+  InputKey       = SHUTTER_STATE_ID
+  OutputName     = ShutterStateId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Enabled, ENABLED)
+  Translation    = (Disabled, DISABLED)
+End_Group
+
+Group = SummingMode
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  OutputName     = SummingMode
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (1, FULL)
+  Translation    = (2, SUM2)
+  Translation    = (4, SUM4)
+End_Group
+
+Group = InstrumentModeId
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  OutputName     = InstrumentModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Full, FULL)
+  Translation    = (Sum2, SUM2)
+  Translation    = (Sum4, SUM4)
+End_Group
+End
