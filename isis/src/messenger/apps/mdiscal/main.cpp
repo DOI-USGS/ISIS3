@@ -25,8 +25,8 @@ using namespace std;
 // Global variables
 // dark current
 /**
- * Enumeration to determine the type of dark current correction to be applied, 
- * if any. 
+ * Enumeration to determine the type of dark current correction to be applied,
+ * if any.
  */
 enum MdisDarkCurrentMode {
   DarkCurrentNone,     //!< No dark current correction applied.
@@ -90,7 +90,7 @@ void IsisMain() {
   // We will be processing by column in case of a linear dark current fit. This will make the
   // calibration a one pass system in this case, rather than two.
   ProcessByLine p;
-  FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
+  FileName calibFile("$ISISROOT/appdata/translations/MessengerMdisCalibration.trn");
   calibFile = calibFile.highestVersion();
   g_configFile.read(calibFile.expanded());
 
@@ -146,7 +146,7 @@ void IsisMain() {
   // Get the trusted filter number
   if (!g_isNarrowAngleCamera) {
     g_filterNumber = ((int)(icube->group("BandBin")["Number"])) - 1;
-  } 
+  }
   else {
     g_filterNumber = 1;  // For the NAC
   }
@@ -204,15 +204,15 @@ void IsisMain() {
   unique_ptr<DarkModelPixel> darkModel;
   if (darkCurr == "NONE") {
     g_darkCurrentMode = DarkCurrentNone;
-  } 
+  }
   else if (darkCurr == "STANDARD") {
     g_darkCurrentMode = DarkCurrentStandard;
     g_calibrationValues.resize(icube->lineCount());
-  } 
+  }
   else if (darkCurr == "LINEAR") {
     g_darkCurrentMode = DarkCurrentLinear;
     g_calibrationValues.resize(icube->lineCount());
-  } 
+  }
   else {//if (darkCurr == "MODEL") { ...in this case g_nValidDark > 0
     if (g_exposureDuration > 1.0) {
       // set processing to standard
@@ -226,7 +226,7 @@ void IsisMain() {
       IException ie(IException::User, mess, _FILEINFO_);
       ie.print();
 
-    } 
+    }
     else {
       g_darkCurrentMode = DarkCurrentModel;
     }
@@ -237,11 +237,11 @@ void IsisMain() {
     if (g_darkCurrentMode != DarkCurrentModel) {
       p.Progress()->SetText("Gathering Dark Current Statistics");
       p.StartProcess(gatherDarkStatistics);
-    } 
+    }
     else {
       // read in dark current table variables and report the filename used
-      darkModel = unique_ptr<DarkModelPixel>(new DarkModelPixel(pxlBin, 
-                                                              g_ccdTemperature, 
+      darkModel = unique_ptr<DarkModelPixel>(new DarkModelPixel(pxlBin,
+                                                              g_ccdTemperature,
                                                               g_exposureDuration));
       darkCurrentFile = darkModel->loadCoefficients(g_isNarrowAngleCamera, g_isBinnedData);
       g_model = darkModel.get();
@@ -306,7 +306,7 @@ void IsisMain() {
   if (applyECFactor) {  // Get correction for WAC filters
     empiricalCorrectionFile = "";
     g_empiricalCorrectionFactor = loadEmpiricalCorrection(startTime, g_filterNumber + 1,
-                                                          empiricalCorrectionFile, 
+                                                          empiricalCorrectionFile,
                                                           empiricalCorrectionDate);
     empiricalCorrectionFactor = toString(g_empiricalCorrectionFactor);
   }
@@ -333,7 +333,7 @@ void IsisMain() {
       g_Ff = sol[2];
       g_iof = pi_c() * (g_solarDist * g_solarDist) / g_Ff;
       validIOF = true;
-    } 
+    }
     else {
       // already set g_iof = 1.0;
       validIOF = false;
@@ -346,7 +346,7 @@ void IsisMain() {
   FileName flatfield = determineFlatFieldFile();
   if (pxlBin > 0) {
     QString scale(toString(pxlBin));
-    FileName newflat = FileName::createTempFile("$temporary/" 
+    FileName newflat = FileName::createTempFile("$temporary/"
                                                 + flatfield.baseName() + "_reduced.cub");
     reducedFlat = newflat.expanded();
     QString parameters = "FROM=" + flatfield.expanded() +
@@ -394,10 +394,10 @@ void IsisMain() {
   calibrationLog.addKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
 
   if (g_darkCurrentMode == DarkCurrentLinear) {
-    QString equation = "Y = " + toString(g_calibrationValues[0]) + QString(" + ") 
+    QString equation = "Y = " + toString(g_calibrationValues[0]) + QString(" + ")
                        + toString(g_calibrationValues[1]) + QString("x");
     calibrationLog.addKeyword(PvlKeyword("DarkCurrentEquation", (QString)equation));
-  } 
+  }
   else if (g_darkCurrentMode == DarkCurrentModel) {
     calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile));
   }
@@ -405,9 +405,9 @@ void IsisMain() {
   calibrationLog.addKeyword(PvlKeyword("BinnedImage", toString((int)g_isBinnedData)));
   calibrationLog.addKeyword(PvlKeyword("FilterNumber", toString(g_filterNumber + 1)));
   if (g_applyFlatfield) {
-    calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", 
+    calibrationLog.addKeyword(PvlKeyword("FlatFieldFile",
                                          flatfield.originalPath() + "/" + flatfield.name()));
-  } 
+  }
   else {
     calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", "N/A"));
   }
@@ -430,11 +430,11 @@ void IsisMain() {
     calibrationLog.addKeyword(PvlKeyword("FilterIrradianceFactor", toString(g_Ff)));
     calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_iof)));
     calibType = "IF";
-  } 
+  }
   else if (g_applyRadiometric) {
     calibrationLog.addKeyword(PvlKeyword("Units", "W / (m**2 micrometer sr)"));
     calibType = "RA";
-  } 
+  }
   else {
     calibrationLog.addKeyword(PvlKeyword("Units", "DN"));
     calibType = "DN";
@@ -451,8 +451,8 @@ void IsisMain() {
                             Pvl::Replace);
   if (g_darkStrip.TotalPixels() > 0) {
     double avgDark = (g_darkStrip.ValidPixels() > 0) ? g_darkStrip.Average() : 0.0;
-    calibrationLog.addKeyword(PvlKeyword("DarkStripMean", toString(avgDark)), 
-                                         Pvl::Replace); 
+    calibrationLog.addKeyword(PvlKeyword("DarkStripMean", toString(avgDark)),
+                                         Pvl::Replace);
   }
 
   // Report nulled sample count
@@ -473,7 +473,7 @@ void IsisMain() {
     for (int i = 0; i < key.size(); i++) {
       key[i] = quote(key[i]);
     }
-  } 
+  }
   else {
     key = PvlKeyword("SourceProductId", quote(orgProdId));
   }
@@ -506,7 +506,7 @@ FileName determineFlatFieldFile() {
   if (g_isNarrowAngleCamera) {
     // NAC spec is simpler
     filename += "_?.cub";
-  } 
+  }
   else {
     // add a zero if the filter is 1-digit
     filename += "_FIL";
@@ -540,7 +540,7 @@ void gatherDarkStatistics(Buffer& in) {
 
       // grab the middle element in the array for the median
       g_calibrationValues[in.Line() - 1] = calibValues[nDark / 2];
-    } 
+    }
     else if (g_darkCurrentMode == DarkCurrentLinear) {
       // Presently the linear regression only uses the first sample in the
       // dark current data
@@ -590,15 +590,15 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // Step 1: Perform dark current corrections
     if (g_darkCurrentMode == DarkCurrentNone) {
       imageOut[i] = imageIn[i];
-    } 
+    }
     else if (g_darkCurrentMode == DarkCurrentStandard) {
       imageOut[i] = imageIn[i] - g_calibrationValues[imageIn.Line() - 1];
-    } 
+    }
     else if (g_darkCurrentMode == DarkCurrentLinear) {
       // Linear: out = in - bestfitline = in - (A + Bx)
       imageOut[i] = imageIn[i] - (g_calibrationValues[0] + g_calibrationValues[1] *
                                   (imageIn.Line() - 1));
-    } 
+    }
     else if (g_darkCurrentMode == DarkCurrentModel) {
       imageOut[i] = imageIn[i] - g_model->getDarkPixel(i, imageIn.Line() - 1);
     }
@@ -607,16 +607,16 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     if (g_isNarrowAngleCamera == true) {
       if (imageOut[i] <= 0.0) {
         imageOut[i] /= 0.912031;
-      } 
+      }
       else {
         imageOut[i] /= 0.011844 * log10(imageOut[i]) + 0.912031;
       }
-    } 
+    }
     else {
       // Wide angle camera
       if (imageOut[i] <= 0.0) {
         imageOut[i] /= 0.936321;
-      } 
+      }
       else {
         imageOut[i] /= 0.008760 * log10(imageOut[i]) + 0.936321;
       }
@@ -629,7 +629,7 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
 
     g_prevLineData[i] = imageOut[i];
-    
+
     // Step 4: Uniformity (flat field)
     if (g_applyFlatfield) {
       imageOut[i] /= flatField[i]; // divide by flat field
@@ -638,7 +638,7 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // Step 5: Absolute coefficient
     // Using g_exposureDuration (in seconds). This gives ~ the same results
     // as the previous version of mdiscal did. Using exposureTime gives
-    // a factor of 1000 smaller value, as one would expect. 
+    // a factor of 1000 smaller value, as one would expect.
     if (g_exposureDuration > 0.0) {
       imageOut[i] = imageOut[i] / g_exposureDuration * g_absCoef;
     }
