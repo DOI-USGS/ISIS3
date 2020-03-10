@@ -1,0 +1,202 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityDesc
+  Auto
+  Optional
+  InputKey       = DATA_QUALITY_DESC
+  OutputName     = DataQualityDesc
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (Null, NULL)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityId
+  Auto
+  Optional
+  InputKey       = DATA_QUALITY_ID
+  OutputName     = DataQualityId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (Null, NULL)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalProductId
+  Auto
+  Optional
+  InputKey       = ORIGINAL_PRODUCT_ID
+  OutputName     = OriginalProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EdrSourceProductId
+  Auto
+  Optional
+  InputKey       = SOURCE_PRODUCT_ID
+  OutputName     = EdrSourceProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SequenceName
+  Auto
+  InputKey       = SEQUENCE_NAME
+  InputDefault   = UNKNOWN
+  OutputName     = SequenceName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputKey       = OBSERVATION_ID
+  InputDefault   = UNKNOWN
+  OutputName     = ObservationId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationType
+  Auto
+  InputKey       = OBSERVATION_TYPE
+  InputDefault   = UNKNOWN
+  OutputName     = ObservationType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SiteId
+  Auto
+  InputKey       = SITE_ID
+  InputDefault   = UNKNOWN
+  OutputName     = SiteId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionElapsedTime
+  Auto
+  InputKey       = MESS:MET_EXP
+  InputDefault   = NULL
+  OutputName     = MissionElapsedTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EdrProductCreationTime
+  Auto
+  InputKey       = PRODUCT_CREATION_TIME
+  OutputName     = EdrProductCreationTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationStartTime
+  Auto
+  InputKey       = START_TIME
+  OutputName     = ObservationStartTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputDefault   = -9999
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputDefault   = -9999
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Exposure
+  Auto
+  InputKey       = MESS:EXPOSURE
+  InputDefault   = -9999
+  OutputName     = Exposure
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CCDTemperature
+  Auto
+  InputKey       = MESS:CCD_TEMP
+  InputDefault   = -9999
+  OutputName     = CCDTemperature
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterNumber
+  Auto
+  InputKey       = FILTER_NUMBER
+  InputDefault   = 0
+  OutputName     = OriginalFilterNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (0, N/A)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  Optional
+  InputKey       = ORBIT_NUMBER
+  InputDefault   = 0
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (0, N/A)
+  Translation    = (*, *)
+End_Group
+End

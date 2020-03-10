@@ -1,0 +1,57 @@
+
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = FilterName
+  Auto
+  OutputName = Name
+  OutputPosition = ("Object","IsisCube","Group","BandBin")
+  InputKey = FILTER_NAME
+  Translation = (Monochrome, N/A)
+  Translation = (*,*)
+EndGroup
+Group = FilterNumber
+  Auto
+  OutputName = Number
+  OutputPosition = ("Object","IsisCube","Group","BandBin")
+  InputKey = FILTER_NUMBER
+  Translation = (0, N/A)
+  Translation = (*,*)
+  InputDefault = 0
+EndGroup
+Group = FilterCenter
+  Auto
+  OutputName = Center
+  OutputPosition = ("Object","IsisCube","Group","BandBin")
+  InputKey = CENTER_FILTER_WAVELENGTH
+  Translation = (750, N/A)
+  Translation = (*, *)
+EndGroup
+Group = FilterWidth
+  Auto
+  OutputName = Width
+  OutputPosition = ("Object","IsisCube","Group","BandBin")
+  InputKey = BANDWIDTH
+  Translation = (50, N/A)
+  Translation = (*, *)
+EndGroup
+End

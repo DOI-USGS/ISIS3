@@ -1,0 +1,1308 @@
+#Base
+
+Group = SpacecraftName
+  Auto
+  OutputName = MISSION_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = SpacecraftName
+  Translation = ('"MESSENGER"',"Messenger")
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_HOST_NAME
+  Auto
+  OutputName = INSTRUMENT_HOST_NAME
+  OutputPosition = ("ROOT")
+  InputKey = INSTRUMENT_HOST_NAME
+  InputGroup = OriginalLabelObject
+  Translation = ('"MESSENGER"',"MESSENGER")
+  Translation = (*,*)
+EndGroup
+
+Group = DataSetId
+  Auto
+  OutputName = DATA_SET_ID
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = DataSetId
+  Translation = (*,*)
+EndGroup
+
+Group = DataQualityId
+  Auto
+  OutputName = DATA_QUALITY_ID
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = DataQualityId
+  Translation = (*,*)
+EndGroup
+
+Group = ProductId
+  Auto
+  OutputName = PRODUCT_ID
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = ProductId
+  Translation = (*,*)
+  InputDefault = "N/A"
+EndGroup
+
+Group = SOURCE_PRODUCT_ID
+  Auto
+  OutputName = SOURCE_PRODUCT_ID
+  OutputPosition = (Root)
+  InputKey = SOURCE_PRODUCT_ID
+  InputGroup = Root,IsisCube,Archive
+  Translation = (*,*)
+  InputDefault = N/A
+EndGroup
+
+Group = ProducerId
+  Auto
+  OutputName = PRODUCER_INSTITUTION_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = ProducerId
+  Translation = (*,*)
+EndGroup
+
+Group = SOFTWARE_NAME
+  Auto
+  OutputName = SOFTWARE_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,RadiometricCalibration
+  InputKey = SoftwareName
+  Translation = (*,*)
+  InputDefault = N/A
+EndGroup
+
+Group = SOFTWARE_VERSION_ID
+  Auto
+  OutputName = SOFTWARE_VERSION_ID
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,RadiometricCalibration
+  InputKey = SOFTWARE_VERSION_ID
+  Translation = (*,*)
+  InputDefault = "N/A"
+EndGroup
+
+Group = MissionPhaseName
+  Auto
+  OutputName = MISSION_PHASE_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = MissionPhaseName
+  Translation = (*,*)
+EndGroup
+
+Group = TARGET_NAME
+  Auto
+  OutputName = TARGET_NAME
+  OutputPosition = (Root)
+  InputGroup = OriginalLabelObject
+  InputKey = TARGET_NAME
+  Translation = (*,*)
+EndGroup
+
+Group = SEQUENCE_NAME
+  Auto
+  OutputName = SEQUENCE_NAME
+  OutputPosition = ("ROOT")
+  InputKey = SEQUENCE_NAME
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+  InputDefault = N/A
+EndGroup
+
+# Times
+
+Group = StartTime
+  Auto
+  OutputName = START_TIME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = StartTime
+  Translation = (*,*)
+EndGroup
+
+Group = StopTime
+  Auto
+  OutputName = STOP_TIME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = StopTime
+  Translation = (*,*)
+EndGroup
+
+Group = SpacecraftClockStartCount
+  Auto
+  OutputName = SPACECRAFT_CLOCK_START_COUNT
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = SpacecraftClockStartCount
+  Translation = (*,*)
+EndGroup
+
+Group = SpacecraftClockStopCount
+  Auto
+  OutputName = SPACECRAFT_CLOCK_STOP_COUNT
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = SpacecraftClockStopCount
+  Translation = (*,*)
+EndGroup
+
+Group = EdrProductCreationTime
+  Auto
+  OutputName = PRODUCT_CREATION_TIME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Archive
+  InputKey = EdrProductCreationTime
+  Translation = (*,*)
+EndGroup
+
+# Instrument
+
+Group = InstrumentName
+  Auto
+  OutputName = INSTRUMENT_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = InstrumentName
+  Translation = (*,*)
+EndGroup
+
+Group = InstrumentId
+  Auto
+  OutputName = INSTRUMENT_ID
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = InstrumentId
+  Translation = (*,*)
+EndGroup
+
+Group = FILTER_NAME
+  Auto
+  OutputName = FILTER_NAME
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,BandBin
+  InputKey = Name
+  Translation = (*,*)
+EndGroup
+
+Group = FILTER_NUMBER
+  Auto
+  OutputName = FILTER_NUMBER
+  OutputPosition = (Root)
+  InputGroup = OriginalLabelObject
+  InputKey = FILTER_NUMBER
+#  Translation = (N/A, 0)
+  Translation = (*,*)
+#  InputDefault = N/A
+EndGroup
+
+Group = CENTER_FILTER_WAVELENGTH
+  Auto
+  OutputName = CENTER_FILTER_WAVELENGTH
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,BandBin
+  InputKey = Center
+  Translation = (*,*)
+EndGroup
+
+Group = FilterWidth
+  Auto
+  OutputName = BANDWIDTH
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,BandBin
+  InputKey = Width
+#  Translation = (N/A, 50)
+  Translation = (*,*)
+EndGroup
+
+Group = ExposureDuration
+  Auto
+  OutputName = EXPOSURE_DURATION
+  OutputPosition = (Root)
+  InputGroup = Root,IsisCube,Instrument
+  InputKey = ExposureDuration
+  Translation = (*,*)
+  InputDefault = N/A
+EndGroup
+
+Group = ExposureType
+  Auto
+  OutputName = EXPOSURE_TYPE
+  OutputPosition = (Root)
+  InputKey = ExposureType
+  InputGroup = Root,IsisCube,Instrument
+  Translation = ("MANUAL", "Manual")
+  Translation = ("AUTOMATIC", "Automatic")
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+
+Group = Units
+  Auto
+  OutputName = UNIT
+  OutputPosition = ("Object","IMAGE")
+  InputGroup = Root,IsisCube,RadiometricCalibration
+  InputKey = Units
+  Translation = (*,*)
+  InputDefault = N/A
+EndGroup
+
+Group = DarkStripMean
+  Auto
+  OutputName = DARK_STRIP_MEAN
+  OutputPosition = ("Object","IMAGE")
+  InputGroup = Root,IsisCube,RadiometricCalibration
+  InputKey = DarkStripMean
+  Translation = (*,*)
+  InputDefault = "N/A"
+EndGroup
+
+Group = DETECTOR_TEMPERATURE
+  Auto
+  OutputName = DETECTOR_TEMPERATURE
+  OutputPosition = ("ROOT")
+  InputKey = DETECTOR_TEMPERATURE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = FOCAL_PLANE_TEMPERATURE
+  Auto
+  OutputName = FOCAL_PLANE_TEMPERATURE
+  OutputPosition = ("ROOT")
+  InputKey = FOCAL_PLANE_TEMPERATURE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = FILTER_TEMPERATURE
+  Auto
+  OutputName = FILTER_TEMPERATURE
+  OutputPosition = ("ROOT")
+  InputKey = FILTER_TEMPERATURE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = OPTICS_TEMPERATURE
+  Auto
+  OutputName = OPTICS_TEMPERATURE
+  OutputPosition = ("ROOT")
+  InputKey = OPTICS_TEMPERATURE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:MET_EXP
+  Auto
+  OutputName = MESS:MET_EXP
+  OutputPosition = ("ROOT")
+  InputKey = MESS:MET_EXP
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_CLOCK_COUNT
+  Auto
+  OutputName = MESS:ATT_CLOCK_COUNT
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_CLOCK_COUNT
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_Q1
+  Auto
+  OutputName = MESS:ATT_Q1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_Q1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_Q2
+  Auto
+  OutputName = MESS:ATT_Q2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_Q2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_Q3
+  Auto
+  OutputName = MESS:ATT_Q3
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_Q3
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_Q4
+  Auto
+  OutputName = MESS:ATT_Q4
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_Q4
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:ATT_FLAG
+  Auto
+  OutputName = MESS:ATT_FLAG
+  OutputPosition = ("ROOT")
+  InputKey = MESS:ATT_FLAG
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_GOAL
+  Auto
+  OutputName = MESS:PIV_GOAL
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_GOAL
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_POS
+  Auto
+  OutputName = MESS:PIV_POS
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_POS
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_READ
+  Auto
+  OutputName = MESS:PIV_READ
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_READ
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_CAL
+  Auto
+  OutputName = MESS:PIV_CAL
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_CAL
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FW_GOAL
+  Auto
+  OutputName = MESS:FW_GOAL
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FW_GOAL
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FW_POS
+  Auto
+  OutputName = MESS:FW_POS
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FW_POS
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FW_READ
+  Auto
+  OutputName = MESS:FW_READ
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FW_READ
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:CCD_TEMP
+  Auto
+  OutputName = MESS:CCD_TEMP
+  OutputPosition = ("ROOT")
+  InputKey = MESS:CCD_TEMP
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:CAM_T1
+  Auto
+  OutputName = MESS:CAM_T1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:CAM_T1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:CAM_T2
+  Auto
+  OutputName = MESS:CAM_T2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:CAM_T2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:EXPOSURE
+  Auto
+  OutputName = MESS:EXPOSURE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:EXPOSURE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:DPU_ID
+  Auto
+  OutputName = MESS:DPU_ID
+  OutputPosition = ("ROOT")
+  InputKey = MESS:DPU_ID
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:IMAGER
+  Auto
+  OutputName = MESS:IMAGER
+  OutputPosition = ("ROOT")
+  InputKey = MESS:IMAGER
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SOURCE
+  Auto
+  OutputName = MESS:SOURCE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SOURCE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FPU_BIN
+  Auto
+  OutputName = MESS:FPU_BIN
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FPU_BIN
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:COMP12_8
+  Auto
+  OutputName = MESS:COMP12_8
+  OutputPosition = ("ROOT")
+  InputKey = MESS:COMP12_8
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:COMP_ALG
+  Auto
+  OutputName = MESS:COMP_ALG
+  OutputPosition = ("ROOT")
+  InputKey = MESS:COMP_ALG
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:COMP_FST
+  Auto
+  OutputName = MESS:COMP_FST
+  OutputPosition = ("ROOT")
+  InputKey = MESS:COMP_FST
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:TIME_PLS
+  Auto
+  OutputName = MESS:TIME_PLS
+  OutputPosition = ("ROOT")
+  InputKey = MESS:TIME_PLS
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:LATCH_UP
+  Auto
+  OutputName = MESS:LATCH_UP
+  OutputPosition = ("ROOT")
+  InputKey = MESS:LATCH_UP
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:EXP_MODE
+  Auto
+  OutputName = MESS:EXP_MODE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:EXP_MODE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_STAT
+  Auto
+  OutputName = MESS:PIV_STAT
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_STAT
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_MPEN
+  Auto
+  OutputName = MESS:PIV_MPEN
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_MPEN
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_PV
+  Auto
+  OutputName = MESS:PIV_PV
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_PV
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIV_RV
+  Auto
+  OutputName = MESS:PIV_RV
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIV_RV
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FW_PV
+  Auto
+  OutputName = MESS:FW_PV
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FW_PV
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:FW_RV
+  Auto
+  OutputName = MESS:FW_RV
+  OutputPosition = ("ROOT")
+  InputKey = MESS:FW_RV
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_STAT
+  Auto
+  OutputName = MESS:AEX_STAT
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_STAT
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_STHR
+  Auto
+  OutputName = MESS:AEX_STHR
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_STHR
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_TGTB
+  Auto
+  OutputName = MESS:AEX_TGTB
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_TGTB
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_BACB
+  Auto
+  OutputName = MESS:AEX_BACB
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_BACB
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_MAXE
+  Auto
+  OutputName = MESS:AEX_MAXE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_MAXE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:AEX_MINE
+  Auto
+  OutputName = MESS:AEX_MINE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:AEX_MINE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:DLNKPRIO
+  Auto
+  OutputName = MESS:DLNKPRIO
+  OutputPosition = ("ROOT")
+  InputKey = MESS:DLNKPRIO
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:WVLRATIO
+  Auto
+  OutputName = MESS:WVLRATIO
+  OutputPosition = ("ROOT")
+  InputKey = MESS:WVLRATIO
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:PIXELBIN
+  Auto
+  OutputName = MESS:PIXELBIN
+  OutputPosition = ("ROOT")
+  InputKey = MESS:PIXELBIN
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBFRAME
+  Auto
+  OutputName = MESS:SUBFRAME
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBFRAME
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_X1
+  Auto
+  OutputName = MESS:SUBF_X1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_X1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_Y1
+  Auto
+  OutputName = MESS:SUBF_Y1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_Y1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DX1
+  Auto
+  OutputName = MESS:SUBF_DX1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DX1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DY1
+  Auto
+  OutputName = MESS:SUBF_DY1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DY1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_X2
+  Auto
+  OutputName = MESS:SUBF_X2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_X2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_Y2
+  Auto
+  OutputName = MESS:SUBF_Y2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_Y2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DX2
+  Auto
+  OutputName = MESS:SUBF_DX2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DX2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DY2
+  Auto
+  OutputName = MESS:SUBF_DY2
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DY2
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_X3
+  Auto
+  OutputName = MESS:SUBF_X3
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_X3
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_Y3
+  Auto
+  OutputName = MESS:SUBF_Y3
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_Y3
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DX3
+  Auto
+  OutputName = MESS:SUBF_DX3
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DX3
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DY3
+  Auto
+  OutputName = MESS:SUBF_DY3
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DY3
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_X4
+  Auto
+  OutputName = MESS:SUBF_X4
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_X4
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_Y4
+  Auto
+  OutputName = MESS:SUBF_Y4
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_Y4
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DX4
+  Auto
+  OutputName = MESS:SUBF_DX4
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DX4
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DY4
+  Auto
+  OutputName = MESS:SUBF_DY4
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DY4
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_X5
+  Auto
+  OutputName = MESS:SUBF_X5
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_X5
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_Y5
+  Auto
+  OutputName = MESS:SUBF_Y5
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_Y5
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DX5
+  Auto
+  OutputName = MESS:SUBF_DX5
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DX5
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:SUBF_DY5
+  Auto
+  OutputName = MESS:SUBF_DY5
+  OutputPosition = ("ROOT")
+  InputKey = MESS:SUBF_DY5
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:CRITOPNV
+  Auto
+  OutputName = MESS:CRITOPNV
+  OutputPosition = ("ROOT")
+  InputKey = MESS:CRITOPNV
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:JAILBARS
+  Auto
+  OutputName = MESS:JAILBARS
+  OutputPosition = ("ROOT")
+  InputKey = MESS:JAILBARS
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:JB_X0
+  Auto
+  OutputName = MESS:JB_X0
+  OutputPosition = ("ROOT")
+  InputKey = MESS:JB_X0
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:JB_X1
+  Auto
+  OutputName = MESS:JB_X1
+  OutputPosition = ("ROOT")
+  InputKey = MESS:JB_X1
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = MESS:JB_SPACE
+  Auto
+  OutputName = MESS:JB_SPACE
+  OutputPosition = ("ROOT")
+  InputKey = MESS:JB_SPACE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RIGHT_ASCENSION
+  Auto
+  OutputName = RIGHT_ASCENSION
+  OutputPosition = ("ROOT")
+  InputKey = RIGHT_ASCENSION
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = DECLINATION
+  Auto
+  OutputName = DECLINATION
+  OutputPosition = ("ROOT")
+  InputKey = DECLINATION
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = TWIST_ANGLE
+  Auto
+  OutputName = TWIST_ANGLE
+  OutputPosition = ("ROOT")
+  InputKey = TWIST_ANGLE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RA_DEC_REF_PIXEL
+  Auto
+  OutputName = RA_DEC_REF_PIXEL
+  OutputPosition = ("ROOT")
+  InputKey = RA_DEC_REF_PIXEL
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RETICLE_POINT_RA
+  Auto
+  OutputName = RETICLE_POINT_RA
+  OutputPosition = ("ROOT")
+  InputKey = RETICLE_POINT_RA
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RETICLE_POINT_DECLINATION
+  Auto
+  OutputName = RETICLE_POINT_DECLINATION
+  OutputPosition = ("ROOT")
+  InputKey = RETICLE_POINT_DECLINATION
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SC_TARGET_POSITION_VECTOR
+  Auto
+  OutputName = SC_TARGET_POSITION_VECTOR
+  OutputPosition = ("ROOT")
+  InputKey = SC_TARGET_POSITION_VECTOR
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = TARGET_CENTER_DISTANCE
+  Auto
+  OutputName = TARGET_CENTER_DISTANCE
+  OutputPosition = ("ROOT")
+  InputKey = TARGET_CENTER_DISTANCE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SLANT_DISTANCE
+  Auto
+  OutputName = SLANT_DISTANCE
+  OutputPosition = ("ROOT")
+  InputKey = SLANT_DISTANCE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = CENTER_LATITUDE
+  Auto
+  OutputName = CENTER_LATITUDE
+  OutputPosition = ("ROOT")
+  InputKey = CENTER_LATITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = CENTER_LONGITUDE
+  Auto
+  OutputName = CENTER_LONGITUDE
+  OutputPosition = ("ROOT")
+  InputKey = CENTER_LONGITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = HORIZONTAL_PIXEL_SCALE
+  Auto
+  OutputName = HORIZONTAL_PIXEL_SCALE
+  OutputPosition = ("ROOT")
+  InputKey = HORIZONTAL_PIXEL_SCALE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = VERTICAL_PIXEL_SCALE
+  Auto
+  OutputName = VERTICAL_PIXEL_SCALE
+  OutputPosition = ("ROOT")
+  InputKey = VERTICAL_PIXEL_SCALE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SMEAR_MAGNITUDE
+  Auto
+  OutputName = SMEAR_MAGNITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SMEAR_MAGNITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SMEAR_AZIMUTH
+  Auto
+  OutputName = SMEAR_AZIMUTH
+  OutputPosition = ("ROOT")
+  InputKey = SMEAR_AZIMUTH
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = NORTH_AZIMUTH
+  Auto
+  OutputName = NORTH_AZIMUTH
+  OutputPosition = ("ROOT")
+  InputKey = NORTH_AZIMUTH
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RETICLE_POINT_LATITUDE
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("ROOT")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = RETICLE_POINT_LONGITUDE
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("ROOT")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SPACECRAFT_LATITUDE
+  Auto
+  OutputName = SUB_SPACECRAFT_LATITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SPACECRAFT_LATITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SPACECRAFT_LONGITUDE
+  Auto
+  OutputName = SUB_SPACECRAFT_LONGITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SPACECRAFT_LONGITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SPACECRAFT_ALTITUDE
+  Auto
+  OutputName = SPACECRAFT_ALTITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SPACECRAFT_ALTITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SPACECRAFT_AZIMUTH
+  Auto
+  OutputName = SUB_SPACECRAFT_AZIMUTH
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SPACECRAFT_AZIMUTH
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SPACECRAFT_SOLAR_DISTANCE
+  Auto
+  OutputName = SPACECRAFT_SOLAR_DISTANCE
+  OutputPosition = ("ROOT")
+  InputKey = SPACECRAFT_SOLAR_DISTANCE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SC_SUN_POSITION_VECTOR
+  Auto
+  OutputName = SC_SUN_POSITION_VECTOR
+  OutputPosition = ("ROOT")
+  InputKey = SC_SUN_POSITION_VECTOR
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SC_SUN_VELOCITY_VECTOR
+  Auto
+  OutputName = SC_SUN_VELOCITY_VECTOR
+  OutputPosition = ("ROOT")
+  InputKey = SC_SUN_VELOCITY_VECTOR
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SOLAR_DISTANCE
+  Auto
+  OutputName = SOLAR_DISTANCE
+  OutputPosition = ("ROOT")
+  InputKey = SOLAR_DISTANCE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SOLAR_AZIMUTH
+  Auto
+  OutputName = SUB_SOLAR_AZIMUTH
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SOLAR_AZIMUTH
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SOLAR_LATITUDE
+  Auto
+  OutputName = SUB_SOLAR_LATITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SOLAR_LATITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUB_SOLAR_LONGITUDE
+  Auto
+  OutputName = SUB_SOLAR_LONGITUDE
+  OutputPosition = ("ROOT")
+  InputKey = SUB_SOLAR_LONGITUDE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = INCIDENCE_ANGLE
+  Auto
+  OutputName = INCIDENCE_ANGLE
+  OutputPosition = ("ROOT")
+  InputKey = INCIDENCE_ANGLE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = PHASE_ANGLE
+  Auto
+  OutputName = PHASE_ANGLE
+  OutputPosition = ("ROOT")
+  InputKey = PHASE_ANGLE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = EMISSION_ANGLE
+  Auto
+  OutputName = EMISSION_ANGLE
+  OutputPosition = ("ROOT")
+  InputKey = EMISSION_ANGLE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = LOCAL_HOUR_ANGLE
+  Auto
+  OutputName = LOCAL_HOUR_ANGLE
+  OutputPosition = ("ROOT")
+  InputKey = LOCAL_HOUR_ANGLE
+  InputGroup = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME1_PARAMETERS
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("Group","SUBFRAME1_PARAMETERS")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME1_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME1_PARAMETERS2
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("Group","SUBFRAME1_PARAMETERS")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME1_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME2_PARAMETERS
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("Group","SUBFRAME2_PARAMETERS")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME2_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME2_PARAMETERS2
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("Group","SUBFRAME2_PARAMETERS")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME2_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME3_PARAMETERS
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("Group","SUBFRAME3_PARAMETERS")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME3_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME3_PARAMETERS2
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("Group","SUBFRAME3_PARAMETERS")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME3_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME4_PARAMETERS
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("Group","SUBFRAME4_PARAMETERS")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME4_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME4_PARAMETERS2
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("Group","SUBFRAME4_PARAMETERS")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME4_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME5_PARAMETERS
+  Auto
+  OutputName = RETICLE_POINT_LATITUDE
+  OutputPosition = ("Group","SUBFRAME5_PARAMETERS")
+  InputKey = RETICLE_POINT_LATITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME5_PARAMETERS
+  Translation = (*,*)
+EndGroup
+
+Group = SUBFRAME5_PARAMETERS2
+  Auto
+  OutputName = RETICLE_POINT_LONGITUDE
+  OutputPosition = ("Group","SUBFRAME5_PARAMETERS")
+  InputKey = RETICLE_POINT_LONGITUDE
+  InputGroup = OriginalLabelObject,SUBFRAME5_PARAMETERS
+  Translation = (*,*)
+EndGroup

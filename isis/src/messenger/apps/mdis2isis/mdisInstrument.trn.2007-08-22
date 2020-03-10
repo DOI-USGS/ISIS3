@@ -1,0 +1,183 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+
+Group = SpacecraftName
+  Auto
+  OutputName = SpacecraftName
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MISSION_NAME
+  Translation = ("Messenger", "MESSENGER")
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = InstrumentName
+  Auto
+  OutputName = InstrumentName
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = INSTRUMENT_NAME
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = InstrumentId
+  Auto
+  OutputName = InstrumentId
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = INSTRUMENT_ID
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = TargetName
+  Auto
+  OutputName = TargetName
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = TARGET_NAME
+  Translation = ("Earth", "EARTH")
+  Translation = ("Mercury", "MERCURY")
+  Translation = ("Sky", "NULL")
+  Translation = (*,*)
+  InputDefault = Sky
+EndGroup
+Group = StartTime
+  Auto
+  OutputName = StartTime
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = START_TIME
+  Translation = (*,*)
+  InputDefault = -9999
+EndGroup
+Group = StopTime
+  Auto
+  OutputName = StopTime
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = STOP_TIME
+  Translation = (*,*)
+  InputDefault = -9999
+EndGroup
+Group = SpacecraftClockCount
+  Auto
+  OutputName = SpacecraftClockCount
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = SPACECRAFT_CLOCK_START_COUNT
+  Translation = (*,*)
+  InputDefault = -9999
+EndGroup
+Group = MissionPhaseName
+  Auto
+  OutputName = MissionPhaseName
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MISSION_PHASE_NAME
+  Translation = ("Cruise", NULL)
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = ExposureDuration
+  Auto
+  OutputName = ExposureDuration
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = EXPOSURE_DURATION
+  Translation = (*,*)
+  InputDefault = -9999
+EndGroup
+Group = ExposureType
+  Auto
+  OutputName = ExposureType
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = EXPOSURE_TYPE
+  Translation = ("Manual", "MANUAL")
+  Translation = ("Automatic", "AUTOMATIC")
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = AttitudeQuality
+  Auto
+  OutputName = AttitudeQuality
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:ATT_FLAG
+  Translation = (Ok,7)
+  Translation = (Ok,6)
+  Translation = (Ok,5)
+  Translation = (Illegal,4)
+  Translation = (Bad,3)
+  Translation = (Bad,2)
+  Translation = (Bad,1)
+  Translation = (Bad,0)
+  InputDefault = UNKNOWN
+EndGroup
+Group = FilterWheelPosition
+  Auto
+  OutputName = FilterWheelPosition
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:FW_POS
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = PivotPosition
+  Auto
+  OutputName = PivotPosition
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:PIV_POS
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = FpuBinningMode
+  Auto
+  OutputName = FpuBinningMode
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:FPU_BIN
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = PixelBinningMode
+  Auto
+  OutputName = PixelBinningMode
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:PIXELBIN
+  Translation = (*,*)
+  InputDefault = UNKNOWN
+EndGroup
+Group = SubFrameMode
+  Auto
+  OutputName = SubFrameMode
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:SUBFRAME
+  Translation = (*,*)
+  InputDefault = 0
+EndGroup
+Group = JailBars
+  Auto
+  OutputName = JailBars
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:JAILBARS
+  Translation = (*,*)
+  InputDefault = 0
+EndGroup
+Group = DpuId
+  Auto
+  OutputName = DpuId
+  OutputPosition = ("Object","IsisCube","Group","Instrument")
+  InputKey = MESS:DPU_ID
+  Translation = (DPU-A,0)
+  Translation = (DPU-B,1)
+  InputDefault = UNKNOWN
+EndGroup
+End
