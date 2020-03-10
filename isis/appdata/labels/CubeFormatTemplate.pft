@@ -1,0 +1,42 @@
+
+Object = IsisCube
+  Object = Core
+    Group = Dimensions
+    End_Group
+
+    Group = Pixels
+    End_Group
+  End_Object
+
+  Group = Instrument
+  End_Group
+
+  Group = Archive
+  End_Group
+
+  Group = BandBin
+  End_Group
+
+  Group = Kernels
+  End_Group
+
+  Group = Radiometry
+  End_Group
+
+  Group = Mapping
+    Isis:PvlTemplate:File = $base/templates/labels/MappingGroupKeywords.pft
+  End_Group
+
+  Group = AlphaCube
+  End_Group
+End_Object
+
+Object = Label
+End_Object
+
+Object = Table
+End_Object
+
+Object = History
+End_Object
+End
