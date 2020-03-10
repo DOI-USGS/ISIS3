@@ -38,7 +38,7 @@ namespace Isis {
       image.load(":cassini-iss-nac");
     }
     else if (displayName.contains("Metric")) {
-      image.load(FileName("$base/images/nasa_apollo_metric_camera.png")
+      image.load(FileName("$ISISROOT/images/icons/nasa_apollo_metric_camera.png")
                           .expanded());
     }
     else if (displayName.contains("HiRISE")) {

@@ -90,16 +90,15 @@ namespace Isis {
    */
   PvlGroup SerialNumber::FindSerialTranslation(Pvl &label) {
     Pvl outLabel;
-    static PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
 
     // Get the mission name
-    static QString missionTransFile = (QString) dataDir["base"] + "/translations/MissionName2DataDir.trn";
+    static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
     static PvlToPvlTranslationManager missionXlater(missionTransFile);
     missionXlater.SetLabel(label);
     QString mission = missionXlater.Translate("MissionName");
 
     // Get the instrument name
-    static QString instTransFile = (QString) dataDir["base"] + "/translations/Instruments.trn";
+    static QString instTransFile = "$ISISROOT/appdata/translations/Instruments.trn";
     static PvlToPvlTranslationManager instrumentXlater(instTransFile);
     instrumentXlater.SetLabel(label);
     QString instrument = instrumentXlater.Translate("InstrumentName");
@@ -122,8 +121,10 @@ namespace Isis {
     // If we don't succeed, create one
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      FileName snFile((QString) dataDir[mission] + "/translations/" +
-                                    instrument + "SerialNumber????.trn");
+
+      FileName snFile((QString) "$ISISROOT/translations/" + mission + instrument + "SerialNumber????.trn");
+      std::cout << "SERIALNUMBER: " << snFile.baseName() << std::endl; 
+
       snFile = snFile.highestVersion();
 
       // use the translation file to generate keywords

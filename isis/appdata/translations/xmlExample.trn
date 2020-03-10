@@ -1,0 +1,241 @@
+#
+# This example demonstrates how to write a translation table for use with the
+# XmlTranslationManager class.
+#
+# This stranslation table was written to translate the following xml document
+#
+# <Nation>
+#   <Name>XmlLand</Name>
+#   <Ruler>
+#     <Name>Xerxes</Name>
+#     <Age>49</Age>
+#     <Spouse>Amestris</Spouse>
+#     <Child>
+#       <Ascension_Order>First</Ascension_Order>
+#       <Name>Darius</Name>
+#       <Mother>Amestris</Mother>
+#     </Child>
+#     <Child>
+#       <Ascension_Order>Second</Ascension_Order>
+#       <Name>Hystaspes</Name>
+#       <Mother>Amestris</Mother>
+#     </Child>
+#     <Child>
+#       <Ascension_Order>Fifth</Ascension_Order>
+#       <Name>Artarius</Name>
+#       <Mother>Unknown</Mother>
+#     </Child>
+#   </Ruler>
+#   <Region>
+#     <Name>Formatia</Name>
+#     <Climate Biome="Desert">Arid</Climate>
+#     <City>
+#       <Name>Regexia</Name>
+#       <Population>3000</Population>
+#       <Area Units="Square_Kilometers">50</Area>
+#     </City>
+#     <City>
+#       <Name Era="Modern">Schemitia</Name>
+#       <Name Era="Ancient">Schemata</Name>
+#       <Population>5000</Population>
+#       <Area Units="Square_Kilometers">100</Area>
+#       <type>Capital</type>
+#     </City>
+#   </Region>
+# </Nation>
+#
+# The translated Pvl would be
+#
+# Group = Court
+#   King               = Xerxes
+#   Queen              = Amestris
+#   Heir               = Darius
+#   Illegitimate_Child = Artarius
+# End_Group
+#
+# Group = Capital
+#   Classification     = Desert
+#   Ancient_Name       = Schemata
+#   Modern_Name        = Schemitia
+#   Population         = 5000
+#   Size               = 100
+#   Size_Units         = km2
+# End_Group
+#
+
+
+#
+# The following group contains the minimum required keywords to translate a
+# value.
+#
+# The group name is the name of the output keyword
+#
+# The InputPosition keyword is the sequence of elements from the document
+# element, the <Nation> element, to the parent element of the
+# input element, <Name>.
+#
+# The InputKey is the input element that the input value will be retrieved
+# from. By default the text value of the input element will be used for the
+# input value. There are options to use the value of an element instead.
+#
+# The OutputName is the name of the output keyword. It should match the group
+# name.
+#
+# The OutputPosition is the location of the output keyword in the output Pvl.
+#
+# The Translation keyword allows for converting a specific input value into a
+# different output value. The value consists of a pair, the input value to
+# change is the second element and the output value is the first element. A
+# star in the output value will result in no change, output=input, and a star
+# in the input value will match any input value.
+#
+Group = King
+  InputPosition  = Ruler
+  InputKey       = Name
+  OutputName     = King
+  OutputPosition = (Group, Court)
+  Translation    = (*, *)
+End_Group
+
+#
+# Similar to the previous group, this group translates one of the <Ruler> 
+# element's child elements. instead of the <Name> element, this translates the
+# <Spouse> element.
+#
+Group = Queen
+  InputPosition  = Ruler
+  InputKey       = Spouse
+  OutputName     = Queen
+  OutputPosition = (Group, Court)
+  Translation    = (*, *)
+End_Group
+
+#
+# The following group demonstrates how to translate elements that are not
+# unique.
+#
+# The <Ruler> element has 3 different <Child> elements, so the InputPosition
+# does not uniquely describe the input parent. So, the InputKeyDependencies
+# keyword places a requirement upon the input parent.  In this case, it
+# specifies that the input parent has a child element named <Ascension_Order>
+# with a value of "First".
+#
+# The Auto keyword in this group specifies that this keyword will be translated
+# if LabelTranslationManager's Auto method is called.
+#
+Group = Heir
+  Auto
+  InputPosition        = (Ruler, Child)
+  InputKey             = Name
+  InputKeyDependencies = "tag@Ascension_Order:First"
+  OutputName           = Heir
+  OutputPosition       = (Group, Court)
+  Translation          = (*, *)
+End_Group
+
+#
+# Similar to the previous group, this group translates the <Name> of one of the
+# <Child> elements. The dependencies here specify to use the <Child> element
+# that has a child element called <Mother> with a value of <Unknown>.
+#
+# If an input value cannot be found for a keyword, it will ususally cause an
+# error. The Optional keyword in this group specifies that if an input value
+# cannot be found, then it will not cause an error.
+#
+Group = Illegitimate_Child
+  Optional
+  InputPosition        = (Ruler, Child)
+  InputKey             = Name
+  InputKeyDependencies = "tag@Mother:Unknown"
+  OutputName           = Heir
+  OutputPosition       = (Group, Court)
+  Translation          = (*, *)
+End_Group
+
+#
+# This group demonstrates how to get an input value from an attribute. the
+# InputKeyAttribute keyword specifies an attribute of the InputKey element to
+# use for the input value. In this case, the input value will be taken from
+# the <Climate> key's "Biome" attribute.
+#
+# All of the previous groups have output a keyword in the Court group. The
+# OutputPosition keyword in this group specifies that the translated keyword
+# will be output in the Capital group.
+#
+Group = Classification
+  Auto
+  InputPosition     = Region
+  InputKey          = Climate
+  InputKeyAttribute = Biome
+  OutputName        = Classification
+  OutputPosition    = (Group, Capital)
+  Translation       = (*, *)
+End_Group
+
+#
+# This group demonstrates how multiple dependencies can be used to specify an
+# input element. The <Region> element has two <City> elements. The first
+# dependency specifies to use the one with a child element called <Type> with a
+# value of <Capital>. This <City> element has two <Name> elements. The second
+# dependency specifies to use the <Name> element with an attribute called
+# "Era" and a value of "Ancient".
+#
+Group = Ancient_Name
+  Auto
+  Optional
+  InputPosition        = (Region, City)
+  InputKey             = Name
+  InputKeyDependencies = ("tag@Type:Capital", "att@Era:Ancient")
+  OutputName           = Ancient_Capital
+  OutputPosition       = (Group, Capital)
+  Translation          = (*, *)
+End_Group
+
+Group = Modern_Name
+  Auto
+  InputPosition        = (Region, City)
+  InputKey             = Name
+  InputKeyDependencies = ("tag@Type:Capital", "att@Era:Modern")
+  InputDefault         = Schemitia
+  OutputName           = Modern_Capital
+  OutputPosition       = (Group, Capital)
+  Translation          = (*, *)
+End_Group
+
+Group = Population
+  Auto
+  InputPosition        = (Region, City)
+  InputKey             = Population
+  InputKeyDependencies = "tag@Type:Capital"
+  OutputName           = Capital_Population
+  OutputPosition       = (Group, Capital)
+  Translation          = (*, *)
+End_Group
+
+Group = Size
+  Auto
+  InputPosition        = (Region, City)
+  InputKey             = Area
+  InputKeyDependencies = "tag@Type:Capital"
+  OutputName           = Capital_Size
+  OutputPosition       = (Group, Capital)
+  Translation          = (*, *)
+End_Group
+
+#
+# This group demonstrates how to change an input value into a different output
+# value. If the input value from the "Units" attribute is "Square_Kilometers",
+# then the output value will be km2.
+#
+Group = Size_Units
+  Auto
+  Optional
+  InputPosition        = (Region, City)
+  InputKey             = Area
+  InputKeyAttribute    = Units
+  InputKeyDependencies = "tag@Type:Capital"
+  OutputName           = Capital_Size_Units
+  OutputPosition       = (Group, Capital)
+  Translation          = (km2, Square_Kilometers)
+End_Group
+End

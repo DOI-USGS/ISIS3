@@ -1,0 +1,31 @@
+Object = AutoRegistration
+  Group = Algorithm
+    Name             = MaximumCorrelation
+    Tolerance        = 0.75
+    ChipInterpolator = BiLinearType
+    SubPixelAccuracy = FALSE
+    ReductionFactor  = 1
+    Gradient         = None
+  End_Group
+
+  Group = patternChip
+    Samples       = 17
+    Lines         = 17
+    MinimumZScore = 1.0e-05
+    ValidPercent  = 100
+  End_Group
+
+  Group = SearchChip
+    Samples             = 28
+    Lines               = 28
+    SubchipValidPercent = 100
+  End_Group
+
+  Group = SurfaceModel
+    DistanceTolerance = 5
+    WindowSize        = 11
+    EccentricityRatio = 100
+    ResidualTolerance = 0.25
+  End_Group
+End_Object
+End

@@ -342,7 +342,7 @@ namespace Isis {
       return proj->Mapping();
     }
     catch (IException &) {
-      Pvl mappingPvl("$base/templates/maps/equirectangular.map");
+      Pvl mappingPvl("$ISISROOT/appdata/maps/equirectangular.map");
       PvlGroup &mappingGrp = mappingPvl.findGroup("Mapping");
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
       mappingGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
@@ -381,7 +381,7 @@ namespace Isis {
     connect(this, SIGNAL(destroyed()), m_mapButton, SLOT(deleteLater()));
     m_mapButton->setText(tr("View/Edit/Load Map File"));
     m_mapButton->setToolTip(tr("View/Edit/Load Map File"));
-    m_mapButton->setIcon(QIcon(FileName("$base/icons/ographic.png").expanded()));
+    m_mapButton->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded()));
     m_mapButton->setWhatsThis(tr("This is the projection used by the mosaic "
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used. "
@@ -399,7 +399,7 @@ namespace Isis {
 
     m_quickMapAction = new QAction(tr("Quick Load Map"), this);
     m_quickMapAction->setToolTip(tr("Quick Load Map"));
-    m_quickMapAction->setIcon(QIcon(FileName("$base/icons/quickopen.png").expanded()));
+    m_quickMapAction->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/quickopen.png").expanded()));
     m_quickMapAction->setWhatsThis(tr("This is the projection used by the mosaic "
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used."));
@@ -1100,7 +1100,7 @@ namespace Isis {
     QLabel *overviewMapIcon = new QLabel;
 
     overviewMapIcon->setPixmap(
-        QIcon(FileName("$base/icons/ographic.png").expanded()).pixmap(32, 32));
+        QIcon(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded()).pixmap(32, 32));
     mapHelpLayout->addWidget(overviewMapIcon);
 
     QLabel *defaultMapFile = new QLabel(tr(
@@ -1151,10 +1151,9 @@ namespace Isis {
         "on creating a custom map file that defines the desired projection, latitude "
         "system, and longitude direction and domain. This program will use the latitude range "
         "and longitude range if they exist in the loaded file. A choice of map templates that can be used as "
-        "a starting point for supported map projections can be found in $base/templates/maps (refer "
+        "a starting point for supported map projections can be found in $ISISROOT/appdata/maps (refer "
         "to maptemplate or mosrange for more details and information on the required parameters "
-        "for a projection). Note that through the file name selection box, $base will need "
-        "to be replaced with the specific Isis3 system path. The website: "
+        "for a projection). The website: "
         "<a href='%1'>%1</a> also provides useful information about map projections.")
         .arg(mapProjWorkshopUrl));
 

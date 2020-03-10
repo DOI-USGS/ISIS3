@@ -68,7 +68,7 @@ namespace Isis {
     p_leftGroundMap = 0;
     p_rightGroundMap = 0;
 
-    p_templateFileName = "$base/templates/autoreg/qnetReg.def";
+    p_templateFileName = "$ISISROOT/appdata/templates/autoreg/qnetReg.def";
 
     createPointEditor(parent);
     if (cnet != NULL) emit newControlNetwork(cnet);
@@ -114,7 +114,7 @@ namespace Isis {
     //  grid row
     int row = 0;
 
-    QString tempFileName = FileName("$base/icons").expanded();
+    QString tempFileName = FileName("$ISISROOT/appdata/images/icons").expanded();
     QString toolIconDir = tempFileName;
 
     QSize isize(27, 27);
@@ -150,7 +150,7 @@ namespace Isis {
     if (p_allowLeftMouse) {
       // Add arrows for panning
       leftPanUp = new QToolButton(parent);
-      leftPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
+      leftPanUp->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/up.png").
                                expanded()));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
@@ -158,7 +158,7 @@ namespace Isis {
       leftPanUp->setWhatsThis("Move the left measure up 1 screen pixel.");
 
       leftPanDown = new QToolButton(parent);
-      leftPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
+      leftPanDown->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/down.png").
                                  expanded()));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
@@ -166,7 +166,7 @@ namespace Isis {
       leftPanDown->setWhatsThis("Move the left measure down 1 screen pixel.");
 
       leftPanLeft = new QToolButton(parent);
-      leftPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
+      leftPanLeft->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/back.png").
                                  expanded()));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
@@ -174,7 +174,7 @@ namespace Isis {
                                 "pixel.");
 
       leftPanRight = new QToolButton(parent);
-      leftPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
+      leftPanRight->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/forward.png").
                                   expanded()));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
@@ -197,7 +197,7 @@ namespace Isis {
     p_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
 
     p_rightZoomOut = new QToolButton();
-    p_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
+    p_rightZoomOut->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/viewmag-.png").
                                   expanded()));
     p_rightZoomOut->setIconSize(isize);
     p_rightZoomOut->setToolTip("Zoom Out 2x");
@@ -216,21 +216,21 @@ namespace Isis {
 
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
-    rightPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
+    rightPanUp->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/up.png").
                               expanded()));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure up 1 screen pixel.");
 
     QToolButton *rightPanDown = new QToolButton(parent);
-    rightPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
+    rightPanDown->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/down.png").
                                 expanded()));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure down 1 screen pixel.");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
-    rightPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
+    rightPanLeft->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/back.png").
                                 expanded()));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
@@ -238,7 +238,7 @@ namespace Isis {
                               "pixel.");
 
     QToolButton *rightPanRight = new QToolButton(parent);
-    rightPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
+    rightPanRight->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/forward.png").
                                  expanded()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");

@@ -1,0 +1,93 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# This file is used to translate the SpacecraftName from the
+# Isis cube Instrument group to an IsisPreference value.
+# The left value in a translation entry should be exactly
+# the same as the IsisPreference and the right side should
+# be exactly the same as the SpacecraftName from the cube.
+#
+# history 2018-10-04 Jeannie Backer and Adam Goins - Added SELENE translation.
+Group = MissionName
+  InputKey      = SpacecraftName
+  InputGroup    = "IsisCube,Instrument"
+  InputPosition = (IsisCube, Instrument)
+  Translation   = (Aircraft, "Aircraft")
+  Translation   = (Apollo15, "APOLLO 15")
+  Translation   = (Apollo15, "APOLLO15")
+  Translation   = (Apollo16, "APOLLO 16")
+  Translation   = (Apollo16, "APOLLO16")
+  Translation   = (Apollo17, "APOLLO 17")
+  Translation   = (Apollo17, "APOLLO17")
+  Translation   = (Cassini, Cassini-Huygens)
+#  Translation   = (Chan1, "CHANDRAYAAN-1 ORBITER")
+#  Translation   = (Chan1, CHANDRAYAAN1_ORBITER)
+#  Translation   = (Chan1, CHANDRAYAAN-1)
+  Translation   = (Chandrayaan1, "CHANDRAYAAN-1 ORBITER")
+  Translation   = (Chandrayaan1, CHANDRAYAAN1_ORBITER)
+  Translation   = (Chandrayaan1, CHANDRAYAAN-1)
+  Translation   = (Clementine1, CLEMENTINE_1)
+  Translation   = (Clementine1, "CLEMENTINE 1")
+  Translation   = (Clipper, "CLIPPER")
+  Translation   = (Dawn, "DAWN")
+  Translation   = (Galileo, "Galileo Orbiter")
+  Translation   = (Hayabusa, HAYABUSA)
+  Translation   = (Hayabusa2, HAYABUSA-2)
+  Translation   = (Ideal, IdealSpacecraft)
+  Translation   = (Juno, JUNO)
+  Translation   = (Kaguya, KAGUYA)
+  Translation   = (Kaguya, SELENE-M)
+  Translation   = (Kaguya, SELENE)
+  Translation   = (Lo, "Lunar Orbiter 3")
+  Translation   = (Lo, "Lunar Orbiter 4")
+  Translation   = (Lo, "Lunar Orbiter 5")
+  Translation   = (Lro, "LUNAR RECONNAISSANCE ORBITER")
+  Translation   = (Lro, "Lunar Reconnaissance Orbiter")
+  Translation   = (Mariner10, Mariner_10)
+  Translation   = (Mariner10, MARINER_10)
+  Translation   = (Mer, "MARS EXPLORATION ROVER 1")
+  Translation   = (Mer, MARS_EXPLORATION_ROVER_1)
+  Translation   = (Mer, "MARS EXPLORATION ROVER 2")
+  Translation   = (Mer, "SIMULATED MARS EXPLORATION ROVER 1")
+  Translation   = (Mer, "SIMULATED MARS EXPLORATION ROVER 2")
+  Translation   = (Messenger, MESSENGER)
+  Translation   = (Messenger, Messenger)
+  Translation   = (Mex, "MARS EXPRESS")
+  Translation   = (Mex, "Mars Express")
+  Translation   = (Mgs, MARSGLOBALSURVEYOR)
+  Translation   = (Mgs, "MARS GLOBAL SURVEYOR")
+  Translation   = (Mro, "MARS RECONNAISSANCE ORBITER")
+  Translation   = (Mro, Mars_Reconnaissance_Orbiter)
+  Translation   = (NewHorizons, "NEW HORIZONS")
+  Translation   = (Near, NEAR)
+  Translation   = (Near, "NEAR EARTH ASTEROID RENDEZVOUS")
+  Translation   = (Odyssey, MARS_ODYSSEY)
+  Translation   = (OsirisRex, OSIRIS-REX)
+  Translation   = (Rosetta, ROSETTA-ORBITER)
+  Translation   = (Smart1, SMART1)
+  Translation   = (Tgo, "TRACE GAS ORBITER")
+  Translation   = (Viking1, VIKING_ORBITER_1)
+  Translation   = (Viking2, VIKING_ORBITER_2)
+  Translation   = (Voyager1, VOYAGER_1)
+  Translation   = (Voyager2, VOYAGER_2)
+End_Group
+End
