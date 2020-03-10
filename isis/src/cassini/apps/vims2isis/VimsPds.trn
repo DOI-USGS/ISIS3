@@ -190,6 +190,42 @@ Group = SwathLength
   Translation    = (*, *)
 End_Group
 
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = MissionPhaseName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SequenceId
+  Auto
+  InputKey       = SEQUENCE_ID
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = SequenceId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SequenceTitle
+  Auto
+  InputKey       = SEQUENCE_TITLE
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = SequenceTitle
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
 Group = ObservationId
   Auto
   InputKey       = OBSERVATION_ID
@@ -238,6 +274,18 @@ Group = CompressorId
   Translation    = (*, *)
 End_Group
 
+Group = PowerStateFlag
+  Auto
+  InputKey       = POWER_STATE_FLAG
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = PowerStateFlag
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
 Group = SpectralSummingFlag
   Auto
   InputKey       = SPECTRAL_SUMMING_FLAG
@@ -261,4 +309,29 @@ Group = SpectralEditingFlag
   OutputPosition = (Group, Archive)
   Translation    = (*, *)
 End_Group
+
+Group = StarTracking
+  Auto
+  InputKey       = STAR_TRACKING
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = StarTracking
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SnapshotMode
+  Auto
+  InputKey       = SNAPSHOT_MODE
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = SnapshotMode
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
 End
