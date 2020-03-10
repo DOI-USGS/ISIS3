@@ -24,3 +24,12 @@ Group = Keyword3
   InputKey = SpacecraftClockCount
   Translation = (*,*)
 EndGroup
+Group = Keyword4
+  Auto
+  Optional
+  OutputPosition = ("Group","SerialNumberKeywords")
+  OutputName = Keyword4
+  InputGroup = IsisCube,Instrument
+  InputKey = Framelets 
+  Translation = (*,*)
+EndGroup
