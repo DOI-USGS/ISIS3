@@ -1,0 +1,37 @@
+Group = Keyword1
+  Auto
+  OutputPosition = ("Group","SerialNumberKeywords")
+  OutputName = Keyword1
+  InputGroup = IsisCube,Instrument
+  InputKey = SpacecraftName
+  NativePosition = ("Group","SerialNumberKeywords")
+  NativeName = Keyword1
+  ForeignGroup = IsisCube,Instrument
+  ForeignKey = SpacecraftName
+  Translation = ("Cassini", "CASSINI")
+  Translation = (*,*)
+EndGroup
+Group = Keyword2
+  Auto
+  OutputPosition = ("Group","SerialNumberKeywords")
+  OutputName = Keyword2
+  InputGroup = IsisCube,Instrument
+  InputKey = InstrumentId
+  NativePosition = ("Group","SerialNumberKeywords")
+  NativeName = Keyword2
+  ForeignGroup = IsisCube,Instrument
+  ForeignKey = InstrumentId
+  Translation = (*,*)
+EndGroup
+Group = Keyword3
+  Auto
+  OutputPosition = ("Group","SerialNumberKeywords")
+  OutputName = Keyword3
+  InputGroup = IsisCube,Instrument
+  InputKey = SpacecraftClockCount
+  NativePosition = ("Group","SerialNumberKeywords")
+  NativeName = Keyword3
+  ForeignGroup = IsisCube,Instrument
+  ForeignKey = SpacecraftClockCount
+  Translation = (*,*)
+EndGroup
