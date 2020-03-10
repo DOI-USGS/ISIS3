@@ -13,4 +13,4 @@ You will also need to test the code, update any tests that are now failing becau
 # Create a Pull Request
 Next, commit your changes to your local branch with the command 
 `git commit -m “<message>”` where <message> is your commit message. Then, push up your changes to your fork 
-`git push origin <branch_name>` where <branch_name> is the name of your local branch you made your changes on. Finally, head over to your fork, click on the “Branch” dropdown, select the branch <branch_name> from the dropdown, and click “New Pull Request”. Give your PR a descriptive but brief title and fill out the description skeleton. After submitting your PR, wait for someone to review it, and make any necessary changes.
+`git push origin <branch_name>` where `<branch_name>` is the name of your local branch you made your changes on. Finally, head over to your fork, click on the “Branch” dropdown, select the branch `<branch_name>` from the dropdown, and click “New Pull Request”. Give your PR a descriptive but brief title and fill out the description skeleton. After submitting your PR, wait for someone to review it, and make any necessary changes.
