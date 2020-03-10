@@ -1,0 +1,121 @@
+Group = DATA_SET_ID
+  Auto
+  InputKey       = DataSetId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = DATA_SET_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCER_ID
+  Auto
+  InputKey       = ProducerId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = PRODUCER_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = OBSERVATION_ID
+  Auto
+  InputKey       = ObservationId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = OBSERVATION_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCT_ID
+  Auto
+  InputKey       = ProductId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = PRODUCT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCT_VERSION_ID
+  Auto
+  InputKey       = ProductVersionId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = PRODUCT_VERSION_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_ID
+  Auto
+  InputKey       = InstrumentId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  InputDefault   = NULL
+  OutputName     = INSTRUMENT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_NAME
+  Auto
+  InputKey       = InstrumentName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  InputDefault   = NULL
+  OutputName     = INSTRUMENT_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = MISSION_PHASE_NAME
+  Auto
+  InputKey       = MissionPhaseName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  InputDefault   = NULL
+  OutputName     = MISSION_PHASE_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = ORBIT_NUMBER
+  Auto
+  InputKey       = OrbitNumber
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = ORBIT_NUMBER
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = RATIONALE_DESC
+  Auto
+  InputKey       = RationaleDescription
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = RATIONALE_DESC
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = SOFTWARE_NAME
+  Auto
+  InputKey       = SoftwareName
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  InputDefault   = NULL
+  OutputName     = SOFTWARE_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+End

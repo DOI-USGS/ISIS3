@@ -1,0 +1,245 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (DAWN, "DAWN")
+End_Group
+
+Group = MissionPhaseName
+  Optional
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionPhaseName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (VESTA, "4 VESTA")
+  Translation    = (CERES, "1 CERES")
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalTargetName
+  Optional
+  Auto
+  InputKey       = TARGET_NAME 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalTargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Optional
+  Auto
+  InputKey       = ORBIT_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityId
+  Optional
+  Auto
+  InputKey       = DATA_QUALITY_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataQualityId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ChannelId
+  Auto
+  InputKey       = CHANNEL_ID 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ChannelId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentModeId
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ScanModeId
+  Auto
+  InputKey       = SCAN_MODE_ID 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ScanModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ScanParameter
+  Optional
+  Auto
+  InputKey       = DAWN:SCAN_PARAMETER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ScanParameter
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FrameParameter
+  Auto
+  InputKey       = FRAME_PARAMETER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FrameParameter
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirIrStartXPosition
+  Optional
+  Auto
+  InputKey       = DAWN:VIR_IR_START_X_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirIrStartXPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirIrStartYPosition
+  Optional
+  Auto
+  InputKey       = DAWN:VIR_IR_START_Y_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirIrStartYPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirVisStartXPosition
+  Optional
+  Auto
+  InputKey       = DAWN:VIR_VIS_START_X_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirVisStartXPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirVisStartYPosition
+  Optional
+  Auto
+  InputKey       = DAWN:VIR_VIS_START_Y_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirVisStartYPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MaximumInstrumentTemperature
+  Optional
+  Auto
+  InputKey       = MAXIMUM_INSTRUMENT_TEMPERATURE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MaximumInstrumentTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

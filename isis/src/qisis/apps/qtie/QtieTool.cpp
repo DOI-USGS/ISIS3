@@ -207,7 +207,7 @@ namespace Isis {
    */
   void QtieTool::createMenus() {
 
-    p_saveNet = new QAction(QIcon(FileName("$base/icons/mActionFileSaveAs.png").expanded()),
+    p_saveNet = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/mActionFileSaveAs.png").expanded()),
                             "Save Control Network &As...",
                             p_tieTool);
     p_saveNet->setToolTip("Save current control network to chosen file");
@@ -251,7 +251,7 @@ namespace Isis {
     regMenu->addAction(viewTemplate);
     //    registrationMenu->addAction(interestOp);
     
-    p_whatsThis = new QAction(QIcon(FileName("$base/icons/contexthelp.png").expanded()),
+    p_whatsThis = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/contexthelp.png").expanded()),
                               "&Whats's This", 
                               p_tieTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);

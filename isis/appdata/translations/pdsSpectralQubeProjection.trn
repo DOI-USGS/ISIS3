@@ -1,0 +1,219 @@
+Group = ProjectionName
+  InputKey      = MAP_PROJECTION_TYPE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (Equirectangular, EQUIRECTANGULAR)
+  Translation   = (Equirectangular, EQUIRECTANGULAR_CYLINDRICAL)
+  Translation   = (Equirectangular, "EQUIRECTANGULAR CYLINDRICAL")
+  Translation   = (LambertConformal, "LAMBERT CONFORMAL")
+  Translation   = (LambertConformal, LAMBERT_CONFORMAL)
+  Translation   = (LambertConformal, LAMBERT_CONFORMAL_CONIC)
+  Translation   = (Mercator, MERCATOR)
+  Translation   = (ObliqueCylindrical, OBLIQUE_CYLINDRICAL)
+  Translation   = (ObliqueCylindrical, "OBLIQUE CYLINDRICAL")
+  Translation   = (Orthographic, ORTHOGRAPHIC)
+  Translation   = (PointPerspective, POINT_PERSPECTIVE)
+  Translation   = (PolarStereographic, "POLAR STEREOGRAPHIC")
+  Translation   = (PolarStereographic, POLAR_STEREOGRAPHIC)
+  Translation   = (PolarStereographic, STEREOGRAPHIC)
+  Translation   = (Robinson, ROBINSON)
+  Translation   = (SimpleCylindrical, SIMPLE_CYLINDRICAL)
+  Translation   = (SimpleCylindrical, "SIMPLE CYLINDRICAL")
+  Translation   = (Sinusoidal, SINUSOIDAL)
+  Translation   = (Sinusoidal, SINUSOIDAL_EQUAL-AREA)
+  Translation   = (Sinusoidal, "SINUSOIDAL EQUAL-AREA")
+  Translation   = (TransverseMercator, TRANSVERSE_MERCATOR)
+  Translation   = (TransverseMercator, "TRANSVERSE MERCATOR")
+End_Group
+
+Group = TargetName
+  InputKey      = TARGET_NAME
+  InputGroup    = SPECTRAL_QUBE
+  InputPosition = SPECTRAL_QUBE
+  Translation   = (Adrastea, ADRASTEA)
+  Translation   = (Amalthea, AMALTHEA)
+  Translation   = (Ariel, ARIEL)
+  Translation   = (Atlas, ATLAS)
+  Translation   = (Callisto, CALLISTO)
+  Translation   = (Calypso, CALYPSO)
+  Translation   = (Daphnis, DAPHNIS)
+  Translation   = (Deimos, DEIMOS)
+  Translation   = (Dione, DIONE)
+  Translation   = (Enceladus, ENCELADUS)
+  Translation   = (Epimetheus, EPIMETHEUS)
+  Translation   = (Europa, EUROPA)
+  Translation   = (Fomalhaut, FOMALHAUT)
+  Translation   = (Ganymede, GANYMEDE)
+  Translation   = (Helene, HELENE)
+  Translation   = (Himalia, HIMALIA)
+  Translation   = (Hyperion, HYPERION)
+  Translation   = (Iapetus, IAPETUS)
+  Translation   = (Io, IO)
+  Translation   = (Janus, JANUS)
+  Translation   = (Jupiter, JUPITER)
+  Translation   = (JupiterRings, J_RINGS)
+  Translation   = (Larissa, LARISSA)
+  Translation   = (Mars, MARS)
+  Translation   = (Mercury, MERCURY)
+  Translation   = (Methone, METHONE)
+  Translation   = (Metis, METIS)
+  Translation   = (Mimas, MIMAS)
+  Translation   = (Miranda, MIRANDA)
+  Translation   = (Moon, MOON)
+  Translation   = (Neptune, NEPTUNE)
+  Translation   = (Nereid, NEREID)
+  Translation   = (NeptuneRings, N_RINGS)
+  Translation   = (Oberon, OBERON)
+  Translation   = (Pallene, PALLENE)
+  Translation   = (Pan, PAN)
+  Translation   = (Pandora, PANDORA)
+  Translation   = (Phobos, PHOBOS)
+  Translation   = (Phoebe, PHOEBE)
+  Translation   = (Polydeuces, POLYDEUCES)
+  Translation   = (Prometheus, PROMETHEUS)
+  Translation   = (Proteus, PROTEUS)
+  Translation   = (Puck, PUCK)
+  Translation   = (Rhea, RHEA)
+  Translation   = (Saturn, SATURN)
+  Translation   = (SaturnRings, S_RINGS)
+  Translation   = (Sky, "DARK SKY")
+  Translation   = (Spica, SPICA)
+  Translation   = (Telesto, TELESTO)
+  Translation   = (Tethys, TETHYS)
+  Translation   = (Thebe, THEBE)
+  Translation   = (Titan, TITAN)
+  Translation   = (Titania, TITANIA)
+  Translation   = (Triton, TRITON)
+  Translation   = (Uranus, URANUS)
+  Translation   = (Umbriel, UMBRIEL)
+  Translation   = (Venus, VENUS)
+End_Group
+
+Group = EquatorialRadius
+  InputKey      = A_AXIS_RADIUS
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = PolarRadius
+  InputKey      = C_AXIS_RADIUS
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = LongitudeDirection
+  InputKey      = POSITIVE_LONGITUDE_DIRECTION
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault  = WEST
+  Translation   = (PositiveEast, EAST)
+  Translation   = (PositiveWest, WEST)
+End_Group
+
+Group = LatitudeType
+  InputKey      = KEYWORD_LATITUDE_TYPE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault  = PLANETOGRAPHIC
+  Translation   = (Planetographic, PLANETOGRAPHIC)
+  Translation   = (Planetocentric, PLANETOCENTRIC)
+End_Group
+
+Group = LatitudeType2
+  InputKey      = COORDINATE_SYSTEM_NAME
+  InputGroup    = IMAGE_MAP_PROJECTION
+  InputPosition = IMAGE_MAP_PROJECTION
+  InputDefault  = PLANETOCENTRIC
+  Translation   = (Planetographic, PLANETOGRAPHIC)
+  Translation   = (Planetocentric, PLANETOCENTRIC)
+End_Group
+
+Group = LongitudeDomain
+  InputKey      = LONGITUDE_SYSTEM
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault  = 360
+  Translation   = (360, 360)
+  Translation   = (180, 180)
+End_Group
+
+Group = MinimumLatitude
+  InputKey      = MINIMUM_LATITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = MaximumLatitude
+  InputKey      = MAXIMUM_LATITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = MinimumLongitude
+  InputKey      = EASTERNMOST_LONGITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = MinimumLongitude2
+  InputKey      = MINIMUM_LONGITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = MaximumLongitude
+  InputKey      = WESTERNMOST_LONGITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = MaximumLongitude2
+  InputKey      = MAXIMUM_LONGITUDE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = PixelResolution
+  InputKey      = MAP_SCALE
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = Scale
+  InputKey      = MAP_RESOLUTION
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = Rotation
+  InputKey      = MAP_PROJECTION_ROTATION
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault  = 0.0
+  Translation   = (*, *)
+End_Group
+
+Group = LineProjectionOffset
+  InputKey      = LINE_PROJECTION_OFFSET
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+
+Group = SampleProjectionOffset
+  InputKey      = SAMPLE_PROJECTION_OFFSET
+  InputGroup    = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  Translation   = (*, *)
+End_Group
+End

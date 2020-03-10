@@ -1,0 +1,219 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataFilePointer
+  InputKey      = ^RDN_IMAGE
+  InputPosition = RDN_FILE
+  Translation   = (*, *)
+End_Group
+
+Group = DataStart
+  InputKey      = ^RDN_IMAGE
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = DataFileRecordBytes
+  InputKey    = RECORD_BYTES
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation = (*, *)
+End_Group
+
+Group = CoreSamples
+  InputKey      = LINE_SAMPLES
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLines
+  InputKey      = LINES
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBands
+  InputKey      = BANDS 
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+  InputDefault  = 1
+End_Group
+
+Group = CoreBitsPerPixel
+  InputKey      = SAMPLE_BITS
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 8
+  Translation   = (8, 8)
+  Translation   = (16, 16)
+  Translation   = (32, 32)
+End_Group
+
+Group = CorePixelType
+  InputKey      = SAMPLE_TYPE
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = LSB_INTEGER
+  Translation   = (Integer, LSB_INTEGER)
+  Translation   = (Integer, MSB_INTEGER)
+  Translation   = (Integer, PC_INTEGER)
+  Translation   = (Integer, MAC_INTEGER)
+  Translation   = (Integer, SUN_INTEGER)
+  Translation   = (Integer, VAX_INTEGER)
+  Translation   = (Natural, UNSIGNED_INTEGER)
+  Translation   = (Natural, LSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, MSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, PC_UNSIGNED_INTEGER)
+  Translation   = (Natural, MAC_UNSIGNED_INTEGER)
+  Translation   = (Natural, SUN_UNSIGNED_INTEGER)
+  Translation   = (Natural, VAX_UNSIGNED_INTEGER)
+  Translation   = (Real, FLOAT)
+  Translation   = (Real, REAL)
+  Translation   = (Real, PC_REAL)
+  Translation   = (Real, IEEE_REAL)
+  Translation   = (Real, MAC_REAL)
+  Translation   = (Real, SUN_REAL)
+  Translation   = (VaxReal, VAX_REAL)
+End_Group
+
+Group = CoreByteOrder
+  InputKey      = SAMPLE_TYPE
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = LSB_INTEGER
+  Translation   = (LSB, LSB_INTEGER)
+  Translation   = (MSB, MSB_INTEGER)
+  Translation   = (LSB, PC_INTEGER)
+  Translation   = (MSB, MAC_INTEGER)
+  Translation   = (MSB, SUN_INTEGER)
+  Translation   = (LSB, VAX_INTEGER)
+  Translation   = (MSB, UNSIGNED_INTEGER)
+  Translation   = (LSB, LSB_UNSIGNED_INTEGER)
+  Translation   = (MSB, MSB_UNSIGNED_INTEGER)
+  Translation   = (LSB, PC_UNSIGNED_INTEGER)
+  Translation   = (MSB, MAC_UNSIGNED_INTEGER)
+  Translation   = (MSB, SUN_UNSIGNED_INTEGER)
+  Translation   = (LSB, VAX_UNSIGNED_INTEGER)
+  Translation   = (MSB, FLOAT)
+  Translation   = (MSB, REAL)
+  Translation   = (MSB, IEEE_REAL)
+  Translation   = (LSB, PC_REAL)
+  Translation   = (MSB, MAC_REAL)
+  Translation   = (MSB, SUN_REAL)
+  Translation   = (LSB, VAX_REAL)
+End_Group
+
+Group = CoreBase
+  InputKey      = OFFSET
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 0.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreMultiplier
+  InputKey      = SCALING_FACTOR
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 1.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreOrganization
+  InputKey      = BAND_STORAGE_TYPE
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = BAND_SEQUENTIAL
+  Translation   = (BSQ, BAND_SEQUENTIAL)
+  Translation   = (BSQ, "BAND SEQUENTIAL")
+  Translation   = (BIL, LINE_INTERLEAVED)
+  Translation   = (BIP, SAMPLE_INTERLEAVED)
+End_Group
+
+Group = CoreNull
+  InputKey      = NULL
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreNull2
+  InputKey      = CORE_NULL
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLRS
+  InputKey      = LOW_REPR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLRS2
+  InputKey      = CORE_LOW_REPR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLIS
+  InputKey      = LOW_INSTR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLIS2
+  InputKey      = CORE_LOW_INSTR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHRS
+  InputKey      = HIGH_REPR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHRS2
+  InputKey      = CORE_HIGH_REPR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHIS
+  InputKey      = HIGH_INSTR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreHIS2
+  InputKey      = CORE_HIGH_INSTR_SATURATION
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLineSuffixBytes
+  InputKey      = LINE_SUFFIX_BYTES
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLinePrefixBytes
+  InputKey      = LINE_PREFIX_BYTES
+  InputPosition = (RDN_FILE, RDN_IMAGE)
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+End

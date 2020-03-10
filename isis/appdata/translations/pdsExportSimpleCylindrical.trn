@@ -1,0 +1,253 @@
+# Translation file for converting Isis cube projection labels for SIMPLE CYLINDRICAL
+# to PDS IMAGE_MAP_PROJECTION labels
+Group = MAP_PROJECTION_TYPE
+  Auto
+  InputKey       = ProjectionName
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = MAP_PROJECTION_TYPE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = ("SIMPLE CYLINDRICAL", *)
+End_Group
+
+Group = PROJECTION_LATITUDE_TYPE
+  Auto
+  InputKey       = LatitudeType
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = PROJECTION_LATITUDE_TYPE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (PLANETOCENTRIC, Planetocentric)
+  Translation    = (PLANETOGRAPHIC, Planetographic)
+End_Group
+
+Group = A_AXIS_RADIUS
+  Auto
+  InputKey       = EquatorialRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = A_AXIS_RADIUS
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = B_AXIS_RADIUS
+  Auto
+  InputKey       = EquatorialRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = B_AXIS_RADIUS
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = C_AXIS_RADIUS
+  Auto
+  InputKey       = PolarRadius
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = C_AXIS_RADIUS
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = FIRST_STANDARD_PARALLEL
+  Auto
+  InputKey       = FirstStandardParallel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = N/A
+  OutputName     = FIRST_STANDARD_PARALLEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (N/A, *)
+End_Group
+
+Group = SECOND_STANDARD_PARALLEL
+  Auto
+  InputKey       = SecondStandardParallel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = N/A
+  OutputName     = SECOND_STANDARD_PARALLEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (N/A, *)
+End_Group
+
+Group = COORDINATE_SYSTEM_NAME
+  Auto
+  InputKey       = LatitudeType
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = COORDINATE_SYSTEM_NAME
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (PLANETOCENTRIC, Planetocentric)
+  Translation    = (PLANETOGRAPHIC, Planetographic)
+End_Group
+
+Group = POSITIVE_LONGITUDE_DIRECTION
+  Auto
+  InputKey       = LongitudeDirection
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = POSITIVE_LONGITUDE_DIRECTION
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (EAST, PositiveEast)
+  Translation    = (WEST, PositiveWest)
+End_Group
+
+Group = KEYWORD_LATITUDE_TYPE
+  Auto
+  InputKey       = LatitudeType
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = KEYWORD_LATITUDE_TYPE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (PLANETOCENTRIC, Planetocentric)
+  Translation    = (PLANETOGRAPHIC, Planetographic)
+End_Group
+
+Group = CENTER_LATITUDE
+  Auto
+  InputKey       = CenterLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = 0.0
+  OutputName     = CENTER_LATITUDE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = CENTER_LONGITUDE
+  Auto
+  InputKey       = CenterLongitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = 0.0
+  OutputName     = CENTER_LONGITUDE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+#Group = REFERENCE_LONGITUDE
+#  Auto
+#  OutputName = REFERENCE_LONGITUDE
+#  OutputPosition = ("Object","IMAGE_MAP_PROJECTION")
+#  InputGroup = "IsisCube,Mapping"
+#  InputKey = ReferenceLongitude
+#  NativeName = REFERENCE_LONGITUDE
+#  NativePosition = ("Object","IMAGE_MAP_PROJECTION")
+#  ForeignGroup = IsisCube,Mapping
+#  ForeignKey = ReferenceLongitude
+#  Translation = ("N/A",*)
+#  InputDefault = "N/A"
+#  ForeignDefault = "N/A"
+#EndGroup
+Group = LINE_FIRST_PIXEL
+  Auto
+  InputKey       = LineFirstPixel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = 1
+  OutputName     = LINE_FIRST_PIXEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (1, *)
+End_Group
+
+Group = LINE_LAST_PIXEL
+  Auto
+  InputKey       = Lines
+  InputGroup     = "IsisCube,Core,Dimensions"
+  InputPosition  = (IsisCube, Core, Dimensions)
+  OutputName     = LINE_LAST_PIXEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = SAMPLE_FIRST_PIXEL
+  Auto
+  InputKey       = SampleFirstPixel
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = 1
+  OutputName     = SAMPLE_FIRST_PIXEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (1, *)
+End_Group
+
+Group = SAMPLE_LAST_PIXEL
+  Auto
+  InputKey       = Samples
+  InputGroup     = "IsisCube,Core,Dimensions"
+  InputPosition  = (IsisCube, Core, Dimensions)
+  OutputName     = SAMPLE_LAST_PIXEL
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+#Group = REFERENCE_LATITUDE
+#  Auto
+#  OutputName = REFERENCE_LATITUDE
+#  OutputPosition = ("Object","IMAGE_MAP_PROJECTION")
+#  InputGroup = "IsisCube,Mapping"
+#  InputKey = ReferenceLatitude
+#  InputDefault = "N/A"
+#  NativeName = REFERENCE_LATITUDE
+#  NativePosition = ("Object","IMAGE_MAP_PROJECTION")
+#  ForeignGroup = IsisCube,Mapping
+#  ForeignKey = ReferenceLatitude
+#  Translation = ("N/A",*)
+#  ForeignDefault = "N/A"
+#EndGroup
+Group = MAP_PROJECTION_ROTATION
+  Auto
+  InputKey       = MapProjectionRotation
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = 0.0
+  OutputName     = MAP_PROJECTION_ROTATION
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (0.0, *)
+End_Group
+
+Group = MAP_RESOLUTION
+  Auto
+  InputKey       = Scale
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = MAP_RESOLUTION
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = MAP_SCALE
+  Auto
+  InputKey       = PixelResolution
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  OutputName     = MAP_SCALE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = MAXIMUM_LATITUDE
+  Auto
+  InputKey       = MaximumLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = MAXIMUM_LATITUDE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+
+Group = MINIMUM_LATITUDE
+  Auto
+  InputKey       = MinimumLatitude
+  InputGroup     = "IsisCube,Mapping"
+  InputPosition  = (IsisCube, Mapping)
+  InputDefault   = UNK
+  OutputName     = MINIMUM_LATITUDE
+  OutputPosition = (Object, IMAGE_MAP_PROJECTION)
+  Translation    = (*, *)
+End_Group
+End

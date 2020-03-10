@@ -1,0 +1,44 @@
+Group = FilterName
+  Auto
+  Optional
+  InputKey       = BAND_BIN_FILTER_NAME
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = FilterName
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  Optional
+  InputKey       = BAND_BIN_CENTER
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Auto
+  Optional
+  InputKey       = BAND_BIN_WIDTH
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalBand
+  Auto
+  Optional
+  InputKey       = BAND_BIN_ORIGINAL_BAND
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = OriginalBand
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

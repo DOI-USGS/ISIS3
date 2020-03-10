@@ -122,7 +122,7 @@ namespace Isis {
         if (GTIFKeyGet(m_geotiff, ProjectedCSTypeGeoKey, &coordSysType, 0, 1) == 1) {
 
           // Get the mapping group data for this code: proj name, clat, clon, ...
-          FileName transFile((QString) "$base/translations/geotiff/" + 
+          FileName transFile((QString) "$ISISROOT/appdata/translations/" + 
                                  toString(coordSysType) + ".trn");
           if (transFile.fileExists()) {
             Pvl tmp; 

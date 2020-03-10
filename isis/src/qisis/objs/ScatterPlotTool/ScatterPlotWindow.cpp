@@ -119,21 +119,21 @@ namespace Isis {
 
     m_colorize = new QAction(this);
     m_colorize->setText("Colorize");
-    m_colorize->setIcon(QPixmap(FileName("$base/icons/rgb.png").expanded()));
+    m_colorize->setIcon(QPixmap(FileName("$ISISROOT/appdata/images/icons/rgb.png").expanded()));
     connect(m_colorize, SIGNAL(triggered()),
             this, SLOT(colorPlot()));
 
     m_contour = new QAction(this);
     m_contour->setText("Hide Contour Lines");
     m_contour->setIcon(
-        QPixmap(FileName("$base/icons/scatterplotcontour.png").expanded()));
+        QPixmap(FileName("$ISISROOT/appdata/images/icons/scatterplotcontour.png").expanded()));
     connect(m_contour, SIGNAL(triggered()),
             this, SLOT(showHideContour()));
 
     QAction *configureAlarmingAct = new QAction(this);
     configureAlarmingAct->setText("Change Alarming");
     configureAlarmingAct->setIcon(
-        QPixmap(FileName("$base/icons/scatterplotalarming.png").expanded()));
+        QPixmap(FileName("$ISISROOT/appdata/images/icons/scatterplotalarming.png").expanded()));
     connect(configureAlarmingAct, SIGNAL(triggered()),
             this, SLOT(configureAlarming()));
 
@@ -550,7 +550,7 @@ namespace Isis {
    */
   void ScatterPlotWindow::colorPlot() {
     if (m_colorize->text().compare("Colorize") == 0) {
-      m_colorize->setIcon(QPixmap(FileName("$base/icons/gray.png").expanded()));
+      m_colorize->setIcon(QPixmap(FileName("$ISISROOT/appdata/images/icons/gray.png").expanded()));
       m_colorize->setText("Gray");
       QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::darkCyan, Qt::red);
       colorMap->addColorStop(DBL_EPSILON, Qt::cyan);
@@ -560,7 +560,7 @@ namespace Isis {
       plot()->setCanvasBackground(Qt::darkCyan);
     }
     else {
-      m_colorize->setIcon(QPixmap(FileName("$base/icons/rgb.png").expanded()));
+      m_colorize->setIcon(QPixmap(FileName("$ISISROOT/appdata/images/icons/rgb.png").expanded()));
       m_colorize->setText("Colorize");
       QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::black, Qt::white);
       colorMap->addColorStop(DBL_EPSILON, Qt::darkGray);

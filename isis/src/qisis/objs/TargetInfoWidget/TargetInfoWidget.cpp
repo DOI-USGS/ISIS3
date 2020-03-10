@@ -30,25 +30,25 @@ namespace Isis {
     // Ken TODO - set up map between target display names and icon/image names
     QPixmap image;
     if (name.compare("MOON") == 0) {
-      image.load(FileName("$base/images/nasa_moon_large.png").expanded());
-      setWindowIcon(QIcon(FileName("$base/icons/weather-clear-night.png")
+      image.load(FileName("$ISISROOT/appdata/images/targets/nasa_moon_large.png").expanded());
+      setWindowIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/weather-clear-night.png")
                                    .expanded()));
     }
     else if (name.compare("Enceladus") == 0) {
-      image.load(FileName("$base/images/nasa_enceladus_saturn.png").expanded());
-      setWindowIcon(QIcon(FileName("$base/icons/nasa_enceladus.png").expanded()));
+      image.load(FileName("$ISISROOT/appdata/images/targets/nasa_enceladus_saturn.png").expanded());
+      setWindowIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/nasa_enceladus.png").expanded()));
     }
     else if (name.compare("Europa") == 0) {
-      image.load(FileName("$base/images/nasa_europa_large.png").expanded());
-      setWindowIcon(QIcon(FileName("$base/icons/nasa_europa.png").expanded()));
+      image.load(FileName("$ISISROOT/appdata/images/targets/nasa_europa_large.png").expanded());
+      setWindowIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/nasa_europa.png").expanded()));
     }
     else if (name.compare("Mars") == 0) {
-      image.load(FileName("$base/images/nasa_mars_large.png").expanded());
-      setWindowIcon(QIcon(FileName("$base/icons/nasa_mars.png").expanded()));
+      image.load(FileName("$ISISROOT/appdata/images/targets/nasa_mars_large.png").expanded());
+      setWindowIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/nasa_mars.png").expanded()));
     }
     else if (name.compare("Titan") == 0) {
-      image.load(FileName("$base/images/nasa_titan_large.png").expanded());
-      setWindowIcon(QIcon(FileName("$base/icons/nasa_titan.png").expanded()));
+      image.load(FileName("$ISISROOT/appdata/images/targets/nasa_titan_large.png").expanded());
+      setWindowIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/nasa_titan.png").expanded()));
     }
 
     m_ui->bodySystemlabel->setText(tr("System: %1").arg(m_target->naifPlanetSystemName()));

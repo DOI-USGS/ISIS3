@@ -85,7 +85,7 @@ void IsisMain() {
 
     // Translates the ISIS labels along with the original EDR labels
     cOrigLabel.addObject(*(cInCube->label()));
-    PvlToPvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
+    PvlToPvlTranslationManager cCubeLabel2(cOrigLabel, "$ISISROOT/appdata/translations/lro/AllMrfExportOrigLabel.trn");
     cCubeLabel2.Auto(pdsLabel);
 
 
@@ -93,11 +93,11 @@ void IsisMain() {
       PvlKeyword &cKeyMissionName = cInLabel->findObject("IsisCube").findGroup("Instrument").findKeyword("MissionName");
       int sFound = cKeyMissionName[0].indexOf("CHANDRAYAAN");
       if(sFound != -1) {
-        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelCH1.trn");
+        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$ISISROOT/appdata/translations/lro/Chandrayaan1MrfExportOrigLabel.trn");
         cCubeLabel2.Auto(pdsLabel);
       }
       else {
-        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelLRO.trn");
+        cCubeLabel2 = PvlToPvlTranslationManager(cOrigLabel, "$ISISROOT/appdata/translations/lro/LroMrfExportOrigLabel.trn");
         cCubeLabel2.Auto(pdsLabel);
       }
     }
@@ -142,10 +142,10 @@ void IsisMain() {
   // Distinguish betweeen Level 2 and 3 images by calling the camera()
   // function as only non mosaic images(Level2) have a camera
   if(bLevel2) {
-    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel2.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MrfPdsLevel2.pft");
   }
   else {
-    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MrfPdsLevel3.pft");
   }
 
   int iFound = outFileName.indexOf(".lbl");
