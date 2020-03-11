@@ -1,0 +1,59 @@
+Object = ControlNetDiffOptions
+  Object = IncludedItems
+    NetworkId    = true
+    TargetName   = true
+    UserName     = true
+    Created      = false
+    Description  = true
+    
+    PointType           = true
+    PointChooserName    = true
+    PointDateTime       = false
+    PointEditLocked     = true
+    PointRejected       = true
+    PointIgnored        = true
+    Fixed               = true
+    Constrained         = true
+    XYZ                 = true
+    XYZSigma            = true
+    LatLon              = true
+    LatLonSigma         = true
+    AprioriXYZ          = true
+    AprioriXYZSimga     = true
+    AprioriLatLon       = true
+    AprioriLatLonSigma  = true
+    
+    MeasureType         = true
+    MeasureChooserName  = true
+    MeasureDateTime     = false
+    LineSample          = true
+    AprioriLineSample   = true
+    LineSampleResidual  = true
+    LineSampleSigma     = true
+    LineSampleShift     = true
+    PixelShift          = true
+    MeasureEditLocked   = true
+    MeasureRejected     = true
+    MeasureIgnored      = true
+    Measured            = true
+    Registered          = true
+  End_Object
+  
+  Object = Tolerances
+    XYZ                = 0.0
+    XYZSigma           = 0.0
+    AprioriXYZ         = 0.0
+    AprioriXYZSigma    = 0.0
+    LatLon             = 0.0
+    LatLonSigma        = 0.0
+    AprioriLatLon      = 0.0
+    AprioriLatLonSigma = 0.0
+    LineSample         = 0.0
+    AprioriLineSample  = 0.0
+    LineSampleResidual = 0.0
+    LineSampleSigma    = 0.0
+    LineSampleShift    = 0.0
+    PixelShift         = 0.0
+  End_Object
+End_Object
+    

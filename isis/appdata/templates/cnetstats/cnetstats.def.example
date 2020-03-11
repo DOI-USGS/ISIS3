@@ -1,0 +1,90 @@
+Object = Filters
+    Group = Point_PixelShift
+        LessThan = double
+        GreaterThan = double       
+    EndGroup
+
+    Group = Point_EditLock
+        EditLock = (true, false)
+    EndGroup
+
+    Group = Point_NumMeasuresEditLock
+        LessThan = integer
+        GreaterThan = integer
+    EndGroup
+
+    Group = Point_ResidualMagnitude
+        LessThan = double
+        GreaterThan = double
+    EndGroup
+    
+    Group = Point_IdExpression
+        Expression = string        
+    EndGroup
+
+    Group = Point_NumMeasures
+        LessThan = integer
+        GreaterThan = integer        
+    EndGroup
+
+    Group = Point_Properties
+        PointType  = (All, Fixed, Constrained, Free)
+        Ignore = (true, false)            
+    EndGroup
+
+    Group = Point_LatLon
+        MinLat = double
+        MaxLat = double
+        MinLon = double
+        MaxLon = double        
+    EndGroup
+
+    Group = Point_GoodnessOfFit        
+        LessThan = double
+        GreaterThan = double
+    EndGroup
+
+    Group = Point_Distance
+        MaxDistance = double
+        Units = (meters, pixels)        
+    EndGroup
+
+    Group = Point_MeasureProperties
+        MeasureType = (All, Candidate, Manual, RegisteredPixel, RegisteredSubPixel)
+        Ignore = true, false
+    EndGroup    
+
+    Group = Point_GoodnessOfFit
+        LessThan = double
+        GreaterThan = double       
+    EndGroup
+
+    Group = Point_CubeNames
+        Cube =  string        
+    EndGroup
+  
+    Group = Cube_NameExpression
+        Expression = string        
+    EndGroup
+
+    Group = Cube_NumPoints
+        LessThan = integer       
+        GreaterThan = integer        
+    EndGroup
+
+    Group = Cube_Distance
+        MaxDistance = double
+        Units = meters, pixels      
+    EndGroup
+
+    Group = Cube_ConvexHullRatio
+	LessThan = double
+	GreaterThan = double
+    EndGroup
+EndObject     
+     
+
+
+
+
+

@@ -1,0 +1,47 @@
+##################################################
+##  This file was converted from ISIS2          ##
+##  Date of last revision:  2012 Oct 04         ##  
+##################################################
+##  File: ~/$ISISDATA/photom.marsred.sav        ##
+##  Description: This file is the  Mars  lookup ##
+##    file for  default  photometric correction ##
+##    parameters for the photometric correction ##
+##    program, "photomet". This file contains   ##
+##    Lunar-lambert and Minnaert empirical fits ##
+##    to a Hapke model for Mars in the red band ##
+##    wh=0.52, hh=b0=0, theta=30.0, hg1=0.213,  ##
+##    hg2=1.0.  Parameters are based on Johnson ##
+##    et al. (1999) Hapke fits to MPF IMP images##
+##    of Mermaid dune, with opposition surge set##
+##    to zero and roughness adjusted to 30 deg  ##
+##    based on Kirk et al. (2000)               ##
+##  Author: Randolph L Kirk                     ##
+##  Data: Randolph L Kirk                       ##
+##  Date of Last Revision:  2003 Jul 07         ##
+##################################################
+##  Use # at the beginning of the line for      ##
+##  comments.                                   ##
+##  Use , to delineate the coefficient values.  ##
+##  New line starts new parameter.              ##
+##  formatting for coeffs: (f15.8)              ##
+##  declaration for coeffs: real*8              ##
+##  declaration for line: character*256         ##
+##################################################
+
+Object = PhotometricModel
+  # the angles at which the coefficient values for Empirical Lunar Lambert L
+  # approximation are calculated (ALL ON ONE LINE!)
+  Group = Algorithm
+    PhtName = LunarLambertEmpirical
+    PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180."
+    LList = "0.946,0.748,0.616,0.522,0.435,0.350,0.266,0.187,0.118,0.062,0.018,-0.012,-0.027,-0.035,-0.036,-0.037,-0.031,-0.012,-0.010"
+    PhaseCurveList = "0.1578,0.1593,0.1558,0.1484,0.1391,0.1292,0.1194,0.1099,0.1008,0.09176,0.08242,0.07234,0.06165,0.05106,0.04091,0.03137,0.02171,0.01038,0."
+  EndGroup
+
+  Group = Algorithm
+    PhtName = MinnaertEmpirical
+    PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180."
+    KList = "0.518,0.595,0.660,0.709,0.753,0.796,0.837,0.875,0.904,0.922,0.926,0.935,0.954,0.986,1.019,1.063,1.099,1.095,1.090"
+    PhaseCurveList = "0.1574,0.1582,0.1546,0.1470,0.1375,0.1273,0.1174,0.1077,0.09797,0.08750,0.07594,0.06466,0.05471,0.04665,0.03935,0.03339,0.02642,0.01482,0."
+  EndGroup
+EndObject
