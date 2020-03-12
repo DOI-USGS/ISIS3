@@ -6,10 +6,12 @@
 #include "Transform.h"
 #include "UserInterface.h"
 #include "Pvl.h"
+#include "ProcessRubberSheet.h"
 
 namespace Isis {
   extern void cam2map(UserInterface &ui, Pvl *log=nullptr);
-
+  extern void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &rs,
+                      UserInterface &ui, Pvl *log);
   extern void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log);
 
   /**

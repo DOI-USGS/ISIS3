@@ -11,7 +11,7 @@
 #include "PvlKeyword.h"
 #include "TestUtilities.h"
 #include "FileName.h"
-
+#include "ProjectionFactory.h"
 #include "Fixtures.h"
 #include "Mocks.h"
 
@@ -145,4 +145,71 @@ TEST_F(DefaultCube, ForwardXformUnitTestCam2map) {
 
   ASSERT_EQ(outSample, 10.0);
   ASSERT_EQ(outLine, 10.0);
+
+TEST_F(DefaultCube, FunctionalTestCam2mapMock) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 10 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 10 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to=/tmp/level2.cub", "matchmap=yes"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  MockProcessRubberSheet rs;
+  FileName fn("/tmp/level2.cub");
+  CubeAttributeOutput  outputAttr(fn);
+  Cube outputCube;
+  outputCube.setDimensions(1, 1, 1);
+  outputCube.create(fn.expanded(), outputAttr);
+  outputCube.reopen("rw");
+
+  int samples = 6;
+  int lines = 6;
+
+  TProjection *outmap;
+  outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap,
+                                                            samples,
+                                                            lines,
+                                                            true);
+  cam2mapReverse *transform = 0;
+  transform = new cam2mapReverse(testCube->sampleCount(),
+                                 testCube->lineCount(), testCube->camera(),
+                                 samples, lines,
+                                 outmap, 0, 0);
+
+  std::cout << (*transform==*transform) << '\n';
+  Interpolator *interp = NULL;
+  interp = new Interpolator(Interpolator::CubicConvolutionType);
+
+  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
+  EXPECT_CALL(rs, SetTiling(4,4)).Times(AtLeast(1));
+  //EXPECT_CALL(rs, StartProcess(*transform, *interp)).Times(AtLeast(1));
+  EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
+  //EXPECT_CALL(rs, )
+
+  cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }

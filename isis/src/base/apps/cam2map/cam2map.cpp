@@ -31,9 +31,15 @@ namespace Isis {
     cam2map(&icube, userMap, userGrp, ui, log);
   }
 
+
   void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log) {
-    // We will be warping a cube
     ProcessRubberSheet p;
+    cam2map(icube, userMap, userGrp, p, ui, log);
+  }
+
+
+  void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &p,
+                UserInterface &ui, Pvl *log){
 
     // Get the camera from the input cube
     p.SetInputCube(icube);
