@@ -1,0 +1,66 @@
+Group = Operator
+
+    # Required Keyword "Name"
+    # The Name of the interest operator
+    # Calculates the region of greatest gradient interest across a boxcar,
+    # to find the greatest point of interest.
+    Name      = Gradient
+
+    # Required keyword "MiniumInterest" 
+    # This keyword is used to define the minumum gradient used to move control
+    # points. Points within the image that do not meet this minimum will not be
+    # considered interesting enough to bother moving the point. If no points
+    # within the (Samples,Lines) boxcar meet this minimum, then the point will
+    # be set to "Ignore = True"
+    MinimumInterest = 0.1
+
+    # Required keywords "Samples" and "Lines"
+    # These keywords define the size of the boxcar used by the algorithm.
+    # In this example an 18 sample by 21 line area will be used to
+    # calculate the standard deviation for the center pixel.
+    Samples   = 18
+    Lines     = 21
+
+    # Required keywords "DeltaSamp" and "DeltaLine"
+    # The values define the distance the algorithm will be allowed to
+    # move the point on the reference image from its current position.
+    # In this example the point may move up to 25 samples and 48 lines away
+    # from its original position.
+    DeltaSamp = 25
+    DeltaLine = 48    
+EndGroup
+
+Group=ValidMeasure
+
+    # Optional keywords "MinDN" and/or "MaxDN"
+    # The values define the valid range of DNs used by the algorithm
+    # In this example the gradient will not use DNs below 0.2 or
+    # above 1.0
+    MinDN = 0.2
+    MaxDN = 1.0
+
+    # Optional keywords "MinEmission" and/or "MaxEmission"
+    # The value represents the valid range of  Emission angle used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be of interest
+    MinEmission = 0 
+    MaxEmission = 135         
+
+    # Optional keyword "MinIncidence" and/or "MaxIncidence"
+    # The value represents the valid range of  Incidence angle used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be of interest
+    MinIncidence = 0 
+    MaxIncidence = 135
+
+    # Optional keyword "MinResolution" and/or "MaxResolution"
+    # The value represents the valid range of Resolution used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be of interest
+    MinResolution = 100.0 
+    MaxResolution = 500.0
+
+    # Optional keywords "PixelsFromEdge" or "MetersFromEdge"
+    # The values represent the minm pixels and meters each measure must be
+    # from its edge to be not ignored and to be considered to be of interest
+    PixelsFromEdge = 0
+    MetersFromEdge = 0.0
+
+EndGroup
