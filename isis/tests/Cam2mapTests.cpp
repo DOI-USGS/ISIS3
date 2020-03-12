@@ -145,6 +145,7 @@ TEST_F(DefaultCube, ForwardXformUnitTestCam2map) {
 
   ASSERT_EQ(outSample, 10.0);
   ASSERT_EQ(outLine, 10.0);
+}
 
 TEST_F(DefaultCube, FunctionalTestCam2mapMock) {
   std::istringstream labelStrm(R"(
@@ -200,7 +201,6 @@ TEST_F(DefaultCube, FunctionalTestCam2mapMock) {
                                  samples, lines,
                                  outmap, 0, 0);
 
-  std::cout << (*transform==*transform) << '\n';
   Interpolator *interp = NULL;
   interp = new Interpolator(Interpolator::CubicConvolutionType);
 
