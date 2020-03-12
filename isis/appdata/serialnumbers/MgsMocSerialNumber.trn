@@ -3,7 +3,7 @@ Group = Keyword1
   Auto
   OutputPosition = ("Group","SerialNumberKeywords")
   OutputName = Keyword1
-  InputGroup = IsisCube,Instrument
+  InputGroup = "IsisCube,Instrument"
   InputKey = SpacecraftName
   Translation = ("MGS", "MARSGLOBALSURVEYOR")
   Translation = ("MGS", "MARS GLOBAL SURVEYOR")
@@ -13,7 +13,7 @@ Group = Keyword2
   Auto
   OutputPosition = ("Group","SerialNumberKeywords")
   OutputName = Keyword2
-  InputGroup = IsisCube,Instrument
+  InputGroup = "IsisCube,Instrument"
   InputKey = SpacecraftClockCount
   Translation = (*,*)
 EndGroup
@@ -21,7 +21,7 @@ Group = Keyword3
   Auto
   OutputPosition = ("Group","SerialNumberKeywords")
   OutputName = Keyword3
-  InputGroup = IsisCube,Instrument
+  InputGroup = "IsisCube,Instrument"
   InputKey = InstrumentId
   Translation = (*,*)
 EndGroup
@@ -29,7 +29,7 @@ Group = Keyword4
   Auto
   OutputPosition = ("Group","SerialNumberKeywords")
   OutputName = Keyword4
-  InputGroup = IsisCube,BandBin
+  InputGroup = "IsisCube,BandBin"
   InputKey = FilterName
   Translation = (*,*)
 EndGroup
