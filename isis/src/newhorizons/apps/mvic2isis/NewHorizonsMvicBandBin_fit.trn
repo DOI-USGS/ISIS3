@@ -1,0 +1,45 @@
+Group = FilterName
+  Auto
+  InputKey       = FILTER
+  InputPosition  = FITSLABELS
+  OutputName     = Name
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterCenter
+  Auto
+  InputKey       = FILTER
+  InputPosition  = FITSLABELS
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (625, RED)
+  Translation    = (475, BLUE)
+  Translation    = (870, NIR)
+  Translation    = (895, CH4)
+  Translation    = (680, CLEAR)
+End_Group
+
+Group = FilterWidth
+  Auto
+  InputKey       = FILTER
+  InputPosition  = FITSLABELS
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (150, RED)
+  Translation    = (150, BLUE)
+  Translation    = (180, NIR)
+  Translation    = (40, CH4)
+  Translation    = (560, CLEAR)
+End_Group
+
+Group = FilterTime
+  Optional
+  Auto
+  InputKey       = UTCMID00
+  InputPosition  = FITSLABELS
+  OutputName     = UtcTime
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End
