@@ -1,0 +1,15 @@
+# This translation file is used to produce the ISIS 3 Kernels label group
+# for Hayabusa NIRS.
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2018-06-15 Jeannie Backer - Original version.
+
+Group = NaifCode
+  Auto
+  InputDefault  = -130200
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation       = (*, *)
+End_Group
+
+End
