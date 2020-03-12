@@ -1,0 +1,15 @@
+Group = ValidMeasure
+    MinDN = double
+    MaxDN = double
+    MinEmission = double 
+    MaxEmission = double
+    MinIncidence = double
+    MaxIncidence = double
+    MinResolution = double
+    MaxResolution = double
+    PixelsFromEdge = integer OR MetersFromEdge = double  
+    SampleResidual = double
+    LineResidual = double
+    ResidualMagnitude = double  
+EndGroup
+

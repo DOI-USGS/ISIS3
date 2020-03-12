@@ -1,0 +1,307 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# history 2018-10-02 Jeannie Backer - Original version. Copied
+#                        from tcmapArchive.trn to generalize
+#                        for all supported TC images.
+# history 2018-10-04 Jeannie Backer - Added more keywords needed
+#                        for Kaguya TC camera model.
+# history 2020-02-24 Austin Sanders - Added IlluminationCondition.
+# history 2020-02-24 Austin Sanders - Moved geometry keywords
+# 			 from instrument translation file to
+# 			 archive translation file.
+# history 2020-02-26 Austin Sanders - Added default value to
+# 			 SpacecraftName in order to support
+# 			 products from JAXA online archive
+Group = MissionName
+  Auto
+  InputKey       = MISSION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = SELENE-M
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = (KAGUYA, SELENE-M)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Optional
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationModeId
+  Optional
+  Auto
+  InputKey       = OBSERVATION_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ObservationModeId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription
+  Optional
+  Auto
+  InputKey       = SENSOR_DESCRIPTION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription2
+  Optional
+  Auto
+  InputKey       = SENSOR_DESCRIPTION2
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription2
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageCenterLatitude
+  Optional
+  Auto
+  InputKey       = IMAGE_CENTER_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ImageCenterLatitude
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageCenterLongitude
+  Optional
+  Auto
+  InputKey       = IMAGE_CENTER_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ImageCenterLongitude
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Optional
+  Auto
+  InputKey       = CORRECTED_START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Optional
+  Auto
+  InputKey       = CORRECTED_STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalStartTime
+  Optional
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalStartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalStopTime
+  Optional
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalStopTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureModeId
+  Optional
+  Auto
+  InputKey       = EXPOSURE_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ExposureModeId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Optional
+  Auto
+  InputKey       = LINE_EXPOSURE_DURATION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ExposureDuration
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalSpacecraftClockStartCount
+  Optional
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalSpacecraftClockStartCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalSpacecraftClockStopCount
+  Optional
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalSpacecraftClockStopCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Optional
+  Auto
+  InputKey       = CORRECTED_SC_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Optional
+  Auto
+  InputKey       = CORRECTED_SC_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalLineSamplingInterval
+  Optional
+  Auto
+  InputKey       = LINE_SAMPLING_INTERVAL
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalLineSamplingInterval
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LineSamplingInterval
+  Optional
+  Auto
+  InputKey       = CORRECTED_SAMPLING_INTERVAL
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LineSamplingInterval
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EncodingType
+  Optional
+  Auto
+  InputKey       = ENCODING_TYPE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = EncodingType
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SwathModeId
+  Optional
+  Auto
+  InputKey       = SWATH_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SwathModeId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = IlluminationCondition
+  Optional
+  Auto
+  InputKey       = ILLUMINATION_CONDITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = IlluminationCondition
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

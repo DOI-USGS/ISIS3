@@ -1,0 +1,21 @@
+ Object = AutoRegistration
+   Group = Algorithm
+     Name         = MaximumCorrelation
+     Tolerance    = 0.7
+
+     # Valid gradient value is Sobel.
+     # Gradient = Sobel
+   EndGroup
+ 
+   Group = PatternChip
+     Samples = 15 
+     Lines   = 15 
+   EndGroup
+ 
+   Group = SearchChip
+     Samples = 30 
+     Lines   = 30 
+   EndGroup
+ EndObject
+
+
