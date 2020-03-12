@@ -1,0 +1,28 @@
+Group = FilterName
+  Auto
+  InputKey       = FILTER_NAME
+  InputDefault   = None
+  OutputName     = Name
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterCenter
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputDefault   = 600
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (600, 600)
+End_Group
+
+Group = FilterWidth
+  Auto
+  InputKey       = BAND_WIDTH
+  InputDefault   = 500
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (500, 500)
+End_Group
+
+End
