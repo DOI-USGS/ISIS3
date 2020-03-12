@@ -1,0 +1,178 @@
+Object = Filters
+    Filters__Required = true
+
+    Group = Point_PixelShift
+        Point_PixelShift_Required = false
+        LessThan = double
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = double
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false  
+    EndGroup
+
+    Group = Point_EditLock
+        Point_EditLock__Required = false
+        EditLock = boolean
+        EditLock__Required = true
+        EditLock__Repeated = false
+    EndGroup
+
+    Group = Point_NumMeasuresEditLock
+        Point_MeasureEditLock_Required = false
+        LessThan = integer
+        LessThan__Type     = positive
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = integer
+        GreaterThan__Type    = positive
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false
+    EndGroup
+
+    Group = Point_ResidualMagnitude
+        Point_ResidualMagnitude__Required = false
+        LessThan = double
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = double
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false
+    EndGroup   
+    
+    Group = Point_IdExpression
+        Point_IdExpression__Required = false
+        Expression = string
+        Expression__Required = true
+        Expression__Repeated = false
+    EndGroup
+
+    Group = Point_NumMeasures
+        Point_NumMeasures__Required = false
+        LessThan = integer
+        LessThan__Type     = positive
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = integer
+        GreaterThan__Type    = positive
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false
+    EndGroup
+
+    Group = Point_Properties
+        Point_Properties__Required = false
+        Point_Type = string
+        PointType__Value    = (All, Fixed, Constrained, Free)
+        PointType__Required = true
+        PointType__Repeated = false
+        Ignore = boolean
+        Ignore__Required = false
+        Ignore__Repeated = false        
+    EndGroup
+
+    Group = Point_LatLon
+        Point_LatLon__Required = false
+        MinLat = double
+        MinLat__Required = false
+        MinLat__Repeated = false
+        MaxLat = double
+        MaxLat__Required = false
+        MaxLat__Repeated = false
+        MinLon = double
+        MinLon__Required = false
+        MinLon__Repeated = false
+        MaxLon = double
+        MaxLon__Required = false
+        MaxLon__Repeated = false
+    EndGroup
+
+    Group = Point_Distance
+        Point_Distance__Required = false
+        MaxDistance = double
+        MaxDistance__Type     = positive
+        MaxDistance__Required = true
+        MaxDistance__Repeated = false
+        Units=(string, meters, pixels)
+        Units__Required = false
+        Units__Repeated = false
+    EndGroup
+
+    Group = Point_MeasureProperties
+        Point_MeasureProperties__Required = false
+        MeasureType = string
+        MeasureType__Value    = (All, Candidate, Manual, RegisteredPixel, RegisteredSubPixel)
+        MeasureType__Required = true
+        MeasureType__Repeated = false       
+        Ignore = boolean
+        Ignore__Required = true
+        Ignore__Repeated = false
+    EndGroup    
+
+    Group = Point_CubeNames
+        Point_CubeNames__Required = false
+        Cube =  string
+        Cube__Required = true
+        Cube__Repeated = true
+    EndGroup
+
+    Group = Point_GoodnessOfFit
+        Point_GoodnessOfFit__Required = false
+        LessThan = double
+        LessThan__Type     = positive
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = double
+        GreaterThan__Type    = positive
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false       
+    EndGroup
+  
+    Group = Cube_NameExpression
+        Cube_NameExpression__Required = false
+        Expression = string
+        Expression__Required = true
+        Expression__Repeated = false
+    EndGroup
+
+    Group = Cube_NumPoints
+        Cube_NumPoints__Required = false
+        LessThan = integer
+        LessThan__Type     = positive
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = integer
+        GreaterThan__Type     = positive
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false
+    EndGroup
+
+    Group = Cube_Distance
+        Cube_Distance__Required = false
+        MaxDistance = double
+        MaxDistance__Type     = positive
+        MaxDistance__Required = true
+        MaxDistance__Repeated = false
+        Units=(string, meters, pixels)
+        Units__Required = false
+        Units__Repeated = false
+    EndGroup
+
+    Group = Cube_ConvexHullRatio
+	    Cube_ConvexHullRatio__Required = false
+        LessThan = double
+        LessThan__Type     = positive
+        LessThan__Required = false
+        LessThan__Repeated = false
+        GreaterThan = double
+        GreaterThan__Type     = positive
+        GreaterThan__Required = false
+        GreaterThan__Repeated = false
+    EndGroup
+
+EndObject     
+     
+
+
+
+
+
