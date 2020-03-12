@@ -42,9 +42,9 @@ namespace Isis {
   void LineScannerCube::SetUp() {
     TempTestingFiles::SetUp();
 
-    std::ifstream isdFile("data/LineScannerCube/defaultLineScanner.isd");
-    std::ifstream cubeLabel("data/LineScannerCube/defaultLineScanner.pvl");
-    std::ifstream projCubeLabel("data/LineScannerCube/projDefaultLineScanner.pvl");
+    std::ifstream isdFile("data/LineScannerImage/defaultLineScanner.isd");
+    std::ifstream cubeLabel("data/LineScannerImage/defaultLineScanner.pvl");
+    std::ifstream projCubeLabel("data/LineScannerImage/projDefaultLineScanner.pvl");
 
     isdFile >> isd;
     cubeLabel >> label;
