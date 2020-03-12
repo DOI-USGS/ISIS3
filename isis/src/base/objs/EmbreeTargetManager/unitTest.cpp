@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Create a new target shape for the same file";
-    QString copyDSKFile = "$ISIS3DATA/base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds";
+    QString copyDSKFile = "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds";
     EmbreeTargetShape *copyTargetShape = manager->create(copyDSKFile);
     qDebug() << "Target shape status:";
     qDebug() << "  Number of polygons: " << copyTargetShape->numberOfPolygons();
