@@ -1,0 +1,105 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = SpacecraftName
+  InputKey    = SPACECRAFT_NAME
+  Translation = ("MARS GLOBAL SURVEYOR", MARS_GLOBAL_SURVEYOR)
+End_Group
+
+Group = FirstLineSample
+  InputKey    = EDIT_MODE_ID
+  Translation = (*, *)
+End_Group
+
+Group = CrosstrackSumming
+  InputKey    = CROSSTRACK_SUMMING
+  Translation = (*, *)
+End_Group
+
+Group = DowntrackSumming
+  InputKey    = DOWNTRACK_SUMMING
+  Translation = (*, *)
+End_Group
+
+Group = FocalPlaneTemperature
+  InputKey    = FOCAL_PLANE_TEMPERATURE
+  Translation = (*, *)
+End_Group
+
+Group = GainModeId
+  InputKey    = GAIN_MODE_ID
+  Translation = (*, *)
+End_Group
+
+Group = InstrumentId
+  InputKey    = INSTRUMENT_ID
+  Translation = (*, *)
+End_Group
+
+Group = LineExposureDuration
+  InputKey    = LINE_EXPOSURE_DURATION
+  Translation = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  InputKey    = MISSION_PHASE_NAME
+  Translation = (*, *)
+End_Group
+
+Group = OffsetModeId
+  InputKey    = OFFSET_MODE_ID
+  Translation = (*, *)
+End_Group
+
+Group = SpacecraftClockCount
+  InputKey    = SPACECRAFT_CLOCK_START_COUNT
+  Translation = (*, *)
+End_Group
+
+Group = RationaleDesc
+  Optional
+  InputKey     = RATIONALE_DESC
+  InputDefault = NONE
+  Translation  = (*, *)
+End_Group
+
+Group = OrbitNumber
+  InputKey     = ORBIT_NUMBER
+  InputDefault = -999
+  Translation  = (*, *)
+End_Group
+
+Group = Targetname
+  InputKey    = TARGET_NAME
+  Translation = (Mars, MARS)
+End_Group
+
+Group = StartTime
+  InputKey    = START_TIME
+  Translation = (*, *)
+End_Group
+
+Group = StopTime
+  InputKey    = STOP_TIME
+  Translation = (*, *)
+End_Group
+End
