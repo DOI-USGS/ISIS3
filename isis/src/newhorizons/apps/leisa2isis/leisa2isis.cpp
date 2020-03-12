@@ -21,7 +21,7 @@ using namespace std;
 
 namespace Isis {
   void processFunc(Buffer &in);
-  Cube *outputCubeForLeisa2Isis; 
+  Cube *outputCubeForLeisa2Isis;
 
   void leisa2isis(UserInterface &ui, Pvl *log) {
     ProcessImportFits importFits;
@@ -45,12 +45,12 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-     bool replace = ui.GetBoolean("REPLACE"); 
+     bool replace = ui.GetBoolean("REPLACE");
 
-    // Check to see if the calibration error image was requested from the FITS file and 
+    // Check to see if the calibration error image was requested from the FITS file and
     // that it has the corresponding extension
     if (ui.WasEntered("ERRORMAP")) {
-      PvlGroup extensionLabel; 
+      PvlGroup extensionLabel;
       try {
         extensionLabel = importFits.fitsImageLabel(5);
   /**      if (!extensionLabel.hasKeyword("XTENSION")) {
@@ -79,12 +79,12 @@ namespace Isis {
 
     }
 
-    // Check to see if the quality image was requested from the FITS file and 
+    // Check to see if the quality image was requested from the FITS file and
     // that it has the corresponding extension
     if (ui.WasEntered("QUALITY") || replace) {
-      PvlGroup  extensionLabel; 
+      PvlGroup  extensionLabel;
       try {
-        extensionLabel = importFits.fitsImageLabel(6); 
+        extensionLabel = importFits.fitsImageLabel(6);
   /**      if (!extensionLabel.hasKeyword("XTENSION")) {
           QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
                         "LEISA FITS file. XTENSION keyword is missing in the sixth extension.")
@@ -114,27 +114,27 @@ namespace Isis {
     importFits.SetOrganization(ProcessImport::BIL);
     importFits.setProcessFileStructure(0);
 
-    Cube *output = NULL; 
-    FileName outputFile; 
+    Cube *output = NULL;
+    FileName outputFile;
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
 
     if (replace){
       outputFile = FileName::createTempFile(FileName("$TEMPORARY/dn.cub"));
       importFits.SetPixelType(Isis::Real);
-      output = importFits.SetOutputCube(outputFile.toString(), att); 
-    } 
+      output = importFits.SetOutputCube(outputFile.toString(), att);
+    }
     else {
       if (importFits.PixelType() == Isis::None) {
         importFits.SetPixelType(Isis::Real);
       }
-      importFits.SetAttributes(att); 
-      output = importFits.SetOutputCube(ui.GetFileName("TO"), att); 
+      importFits.SetAttributes(att);
+      output = importFits.SetOutputCube(ui.GetFileName("TO"), att);
     }
 
     // Get the directory where the New Horizons translation tables are.
     PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-    QString transDir = (QString) dataDir["NewHorizons"] + "/translations/";
+    QString transDir = "$ISISROOT/appdata/translations/";
 
     // Temp storage of translated labels
     Pvl outLabel;
@@ -143,7 +143,7 @@ namespace Isis {
     Pvl fitsLabel;
     fitsLabel.addGroup(importFits.fitsImageLabel(0));
     // Create an Instrument group
-    FileName insTransFile(transDir + "leisaInstrument_fit.trn");
+    FileName insTransFile(transDir + "NewHorizonsLeisaInstrument_fit.trn");
     PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
     insXlater.Auto(outLabel);
 
@@ -157,19 +157,19 @@ namespace Isis {
     output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
     // Create an Archive group
-    FileName archiveTransFile(transDir + "leisaArchive_fit.trn");
+    FileName archiveTransFile(transDir + "NewHorizonsLeisaArchive_fit.trn");
     PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
     archiveXlater.Auto(outLabel);
     output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
     //Create a Band Bin Group
-    FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
+    FileName bandTransFile(transDir + "NewHorizonsLeisaBandBin_fit.trn");
     PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
     bandBinXlater.Auto(outLabel);
     output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
     // Create a Kernels group
-    FileName kernelsTransFile(transDir + "leisaKernels_fit.trn");
+    FileName kernelsTransFile(transDir + "NewHorizonsLeisaKernels_fit.trn");
     PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
     kernelsXlater.Auto(outLabel);
     output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
@@ -197,7 +197,7 @@ namespace Isis {
 
     QString exposureTime = inst["ExposureDuration"];
     double frameRate = 1.0/exposureTime.toDouble();
-    inst.addKeyword(PvlKeyword("FrameRate", QString::number(frameRate)), PvlGroup::Replace); 
+    inst.addKeyword(PvlKeyword("FrameRate", QString::number(frameRate)), PvlGroup::Replace);
     inst.findKeyword("FrameRate").setUnits("Hz");
 
     // Save the input FITS label in the Cube original labels
@@ -217,15 +217,15 @@ namespace Isis {
       importFits.SetOrganization(ProcessImport::BIL);
       importFits.setProcessFileStructure(6);
 
-      FileName qualityFile = FileName::createTempFile("$TEMPORARY/quality.cub"); 
+      FileName qualityFile = FileName::createTempFile("$TEMPORARY/quality.cub");
       CubeAttributeOutput &cao = ui.GetOutputAttribute("TO");
 
       // Set to Isis::Real
       if (cao.propagatePixelType()) {
-        cao.setPixelType(Isis::Real); 
+        cao.setPixelType(Isis::Real);
       }
 
-      outputCubeForLeisa2Isis = importFits.SetOutputCube(qualityFile.toString(), cao); 
+      outputCubeForLeisa2Isis = importFits.SetOutputCube(qualityFile.toString(), cao);
 
       importFits.Progress()->SetText("Preparing quality image for comparing against LEISA pixels");
       importFits.StartProcess(processFunc);
@@ -243,7 +243,7 @@ namespace Isis {
 
       // Cleanup by removing temporary cubes
       remove(qualityFile.toString().toStdString().c_str());
-      remove(outputFile.toString().toStdString().c_str()); 
+      remove(outputFile.toString().toStdString().c_str());
     }
 
     // Import the ERRORMAP image. It is the 6th image in the FITS file (i.e., 5th extension)
@@ -289,11 +289,11 @@ namespace Isis {
     for (int i = 0; i < in.size(); i++) {
       if (((in[i] == 1) || (in[i] == 2)) || (in[i] == 8)) {
         in[i] = Isis::NULL8;
-      } 
+      }
       else {
           in[i] = 0;
       }
     }
-    outputCubeForLeisa2Isis->write(in); 
+    outputCubeForLeisa2Isis->write(in);
   }
 }

@@ -1,0 +1,11 @@
+Group = NaifCode
+  Auto
+  InputKey       = FORMAT
+  InputPosition  = FITSLABELS
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation    = (-98301, 0)
+  Translation    = (-98302, 1)
+End_Group
+
+End
