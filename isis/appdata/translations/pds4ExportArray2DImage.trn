@@ -1,0 +1,57 @@
+# Translates ISIS3 cube information to Array_2D_Image section of PDS4 label
+# 
+# history 2018-05-11 Jeannie Backer - Original version.
+
+Group = ImageLocalId
+  Auto
+  InputDefault      = Image_Array_Object
+  OutputName        = local_identifier
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_2D_Image)
+  Translation       = (*, *)
+End_Group
+
+Group = OffsetBytes
+  Auto
+  InputDefault      = 0
+  OutputName        = offset
+  OutputAttributes  = unit|byte
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_2D_Image)
+  Translation       = (*, *)
+End_Group
+
+Group = AxesCount
+  Auto
+  InputDefault      = 2
+  OutputName        = axes
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_2D_Image)
+  Translation       = (*, *)
+End_Group
+
+Group = AxisIndexOrder
+  Auto
+  InputDefault      = "Last Index Fastest"
+  OutputName        = axis_index_order
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_2D_Image)
+  Translation       = (*, *)
+End_Group
+
+Group = Samples
+  Auto
+  InputKey        = Samples
+  InputPosition   = (IsisCube, Core, Dimensions)
+  OutputName      = elements
+  OutputSiblings  = (axis_name|Sample, sequence_number|1)
+  OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)
+  Translation     = (*, *)
+End_Group
+
+Group = Lines
+  Auto
+  InputKey        = Lines
+  InputPosition   = (IsisCube, Core, Dimensions)
+  OutputName      = elements
+  OutputSiblings  = (axis_name|Line, sequence_number|2)
+  OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)
+  Translation     = (*, *)
+End_Group
+

@@ -156,11 +156,8 @@ void IsisMain() {
  * @param outFile FileName of the output file
  */
 void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outFile) {
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
-  QString transDir = (QString) dataDir["Base"];
-
   Pvl pdsLabel(inFileName);
-  Isis::FileName transFile(transDir + "/" + "translations/pdsQube.trn");
+  Isis::FileName transFile("$ISISROOT/appdata/translations/pdsQube.trn");
   Isis::PvlToPvlTranslationManager pdsXlater(pdsLabel, transFile.expanded());
 
 
@@ -483,11 +480,7 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
 //  Return:      None
 //************************************************************
 void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
-
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
-  QString transDir = (QString) dataDir["Cassini"];
-
-  Isis::FileName transFile(transDir + "/" + "translations/vimsPds.trn");
+  Isis::FileName transFile("$ISISROOT/appdata/translations/CassiniVimsPds.trn");
   PvlObject qube(pdsLab.findObject("Qube"));
   Pvl pdsLabel(pdsLab);
   Isis::PvlToPvlTranslationManager labelXlater(pdsLabel, transFile.expanded());

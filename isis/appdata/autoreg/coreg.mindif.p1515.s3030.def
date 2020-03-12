@@ -1,0 +1,168 @@
+ Object = AutoRegistration
+   # Algorithm specification.
+   Group = Algorithm
+
+		 # This is the minimum difference algorithm, which 
+		 #  defines goodness-of-fit as the average difference
+		 #  per pixel between the pattern chip and the search 
+		 #  sub-region.  A value of 0 in the goodness-of-fit
+		 #  result implies a perfect match.
+		 #REQUIRED
+     Name         = MinimumDifference
+
+		 # The tolerance for the goodness-of-fit.  For the 
+		 #  MinimumDifference algorithm, the goodness-of-fit value must
+		 #  be less than Tolerance, before the algorithm is considered
+		 #  to have converged to a user-acceptable solution. In addition,
+		 #  the tolerance value is dependent on the images being 
+		 #  matched.  For example, 100 might work for DN values in
+		 #  an image pair that have not been radiometrically 
+		 #  calibrated, but 0.1 may be necessary for an image pair
+		 #  that have radiometrically calibrated values of I/F.
+		 #Possible Values: [0,infinity)
+		 #REQUIRED
+     Tolerance    = 100 
+
+		 # Calculate the registration to subpixel accuracy.  This is a 
+		 #  boolean (True or False).
+ 		 #Possible Values: {True, False}
+		 #OPTIONAL
+     #SubPixelAccuracy = True
+
+		 # Reduce the size of of the Pattern and Search chips by a
+		 #  the ReductionFactor for a first-run through the data 
+		 #  to find a low-accuracy match.  Then focus the 
+		 #  full-accuracy match to the surrounding area.
+		 #Possible Values: Natural Numbers
+     #OPTIONAL 
+		 #ReductionFactor = 1
+
+		 # Apply a Sobel gradient filter to the chips before running the
+		 #  pattern matching Algorithm.  This essentially highlights
+		 #  edges within the chips, possibly increasing the chance of 
+		 #  finding a good match between the search and pattern chips.
+		 #Possible Values: {None, Sobel}
+		 #OPTIONAL
+		 #Gradient = None
+
+		 # If the two images to be registered do not have the same 
+		 #  geometry, pattern matching becomes more difficult.  This
+		 #  option informs the algorithm to warp the pattern cube to
+		 #  match the geometry of the search cube by using map
+		 #  projections and/or camera models.  The warping requires
+		 #  interpolation, and the type of interpolation is chosen here.
+		 #Possible Values: {NearestNeighborType, BiLinearType, CubicConvolutionType}
+		 #OPTIONAL
+		 #ChipInterpolator = NearestNeighborType
+   EndGroup
+ 
+	 #Pattern Chip Definitions
+   Group = PatternChip
+		#Size of the PatternChip in Samples and Lines
+		#Possible Values: Natural Numbers
+	  #REQUIRED
+     Samples = 15 
+     Lines   = 15 
+
+		#The minimum/maximum pixel value the algorithm should use for registration.
+		# If a pixel is outside of this range, then it will not be used in the
+		# registration calculations.
+		#Possible Values: (-infinity, infinity), ValidMinimum < ValidMaximum
+		#OPTIONAL
+		#ValidMinimum = -100
+		#ValidMaximum = 100
+
+		#The MinimumZScore is used to guarantee that the pattern chip has
+		# enough variability--if the chip is too smooth, spurious matches
+		# are likely to occur.
+		#Possible Values: (0.0,infinity)
+		#OPTIONAL
+		#MinimumZScore = 1.0
+
+		#The ValidPercent parameter specifies how many invalid pixels 
+		# (NULL, HIS, etc.) are allowed in the chip before the chip is
+		# considered invalid and the match fails.
+		#Possible Values: (0.0,100.0]
+		#OPTIONAL
+    #ValidPercent = 50.0
+   EndGroup
+ 
+	 #Search Chip Definitions
+   Group = SearchChip
+		#Size of the SearchChip in Samples and Lines
+		#Possible Values: Natural Numbers
+	  #REQUIRED
+     Samples = 30 
+     Lines   = 30 
+
+		#The minimum/maximum pixel value the algorithm should use for registration.
+		# If a pixel is outside of this range, then it will not be used in the
+		# registration calculations.
+		#Possible Values: (-infinity, infinity), ValidMinimum < ValidMaximum
+		#OPTIONAL
+		#ValidMinimum = -100
+		#ValidMaximum = 100
+
+		#The SubchipValidPercent parameter specifies how many invalid pixels 
+    # (NULL, HIS, etc.) are allowed in the subchip before it is
+    # considered invalid and the match fails.
+		#Possible Values: (0.0, 100.0]
+		#OPTIONAL
+		#SubchipValidPercent = 50.0
+   EndGroup
+
+	 #If the SubPixelAccuracy parameter is TRUE, then a continuous surface 
+	 # based on the fit chip is generated.  A least squares fit is then used
+	 # to estimate the true registration position (likely to be between pixels).
+	 Group = SurfaceModel
+		#The result of a sub-pixel accuracy computation is likely to move 
+		# the result away from its original whole-pixel fit. However, 
+    # sometimes the move could be so drastic that it calls into 
+    # question the validity of the match. This tolerance value 
+    # thus specifies the max number of pixels the sub-pixel accuracy 
+    # computation can move the best fit before the registration is rejected 
+    # entirely. 
+		#Possible Values (0.0, infinity) 
+		#OPTIONAL
+		#DistanceTolerance = 1.5	
+
+		#When refining a whole-pixel match to sub-pixel accuracy, it is important 
+    # to consider how much area around that best whole-pixel fit to sample 
+    # for constructing a surface model. The WindowSize keyword defines the 
+    # size of the window, centered on the best whole-pixel match, that will 
+    # be used for modelling the surface. Values for WindowSize specify the 
+    # N of an NxN chip, and must be odd numbers greater than or equal to 3. 
+    #Possible Values: [3, infinity), odd integer
+    #OPTIONAL
+		#WindowSize 	= 5
+
+		#After the least squares fit is performed to model a surface, the 
+	  # ideal result is a circular formation of goodness-of-fit values 
+		# improving towards the center of the surface. The less circular, 
+		# or more "eccentric", the formation of goodness-of-fit values, 
+		# the less likely the modelling result is accurate. The 
+		# conditions under which a high ratio occurs is when there are 
+		# primiarily linear features in the search and pattern chips.
+		# In an attempt to let the user define what constitutes a tolerable 
+		# amount of eccentricity in their surface models, we introduce the 
+		# notion of an "Eccentricity Ratio". Here we think of eccentricity 
+		# as a ratio between the semi-major and semi-minor axes of an ellipse. 
+ 		#Possible Values [1.0, infinity]
+		#OPTIONAL
+		#EccentricityRatio = 1.0
+
+		#The least squares fit performed to construct the surface model 
+		# takes discrete data from the whole-pixels around the best-fit. 
+		# When these discrete data are fit with a continuous function, 
+		# there is likely going to be some amount of error between the 
+	 	# original value for some pixel and its interpolated value in the 
+		# least squares solution. The ResidualTolerance keyword thus 
+		# allows the user to specify the maximum average residual, or 
+		# mean absolute error, for all pixels in the surface model area, 
+		# that will be tolerated before the sub-pixel accuracy computation 
+		# is rejected and the registration fails for that point. 
+		#Possible Values: 	[0.0, infinity]
+		#OPTIONAL
+		#ResidualTolerance = 0.0
+	 EndGroup
+ EndObject

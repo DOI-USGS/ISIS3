@@ -207,7 +207,7 @@ namespace Isis {
     if (inputLabel->findObject("IsisCube").hasGroup("Instrument")) {
       
       // Translate the Instrument group
-      translationFileName = "$base/translations/pds4ExportInstrument.trn";
+      translationFileName = "$ISISROOT/appdata/translations/pds4ExportInstrument.trn";
       PvlToXmlTranslationManager instXlator(*inputLabel, translationFileName.expanded());
       instXlator.Auto(*m_domDoc);
       
@@ -269,7 +269,7 @@ namespace Isis {
       }
       
       // Translate the Target name
-      translationFileName = "$base/translations/pds4ExportTargetFromInstrument.trn"; 
+      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromInstrument.trn"; 
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
 
@@ -279,7 +279,7 @@ namespace Isis {
     }
     else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
 
-      translationFileName = "$base/translations/pds4ExportTargetFromMapping.trn"; 
+      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromMapping.trn"; 
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
     }
@@ -468,7 +468,7 @@ namespace Isis {
   void ProcessExportPds4::identificationArea() {
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
-    translationFileName = "$base/translations/pds4ExportIdentificationArea.trn";
+    translationFileName = "$ISISROOT/appdata/translations/pds4ExportIdentificationArea.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
@@ -533,7 +533,7 @@ namespace Isis {
 
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
-    translationFileName = "$base/translations/pds4ExportDisplaySettings.trn";
+    translationFileName = "$ISISROOT/appdata/translations/pds4ExportDisplaySettings.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
   }
@@ -576,7 +576,7 @@ namespace Isis {
    * Export BandBin group for 2D or 3D Image format.
    */
   void ProcessExportPds4::translateBandBinImage(Pvl &inputLabel) {
-    QString translationFile = "$base/translations/";
+    QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
     FileName translationFileName(translationFile);
     PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
@@ -588,7 +588,7 @@ namespace Isis {
    * Export BandBin group for uniformly spaced 3D Spectral data format.
    */
   void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
-    QString translationFile = "$base/translations/";
+    QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
     FileName translationFileName(translationFile);
     PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
@@ -730,7 +730,7 @@ namespace Isis {
    * Export BandBin group for non-uniformly spaced 3D Spectral data format.
    */
   void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
-    QString translationFile = "$base/translations/";
+    QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
     FileName translationFileName(translationFile);
     PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
@@ -809,7 +809,7 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label(); 
     QString imageObject = "";
 
-    QString translationFile = "$base/translations/pds4Export";
+    QString translationFile = "$ISISROOT/appdata/translations/pds4Export";
     if (m_imageType == StandardImage) {
       int bands = (int)inputLabel->findObject("IsisCube")
                                   .findObject("Core")
@@ -1185,7 +1185,7 @@ namespace Isis {
     QString projName = proj->Name();
     try {
       PvlToXmlTranslationManager xlatorSpecProj(*inputLabel, 
-                                                "$base/translations/pds4Export" + projName + ".trn");
+                                                "$ISISROOT/appdata/translations/pds4Export" + projName + ".trn");
       xlatorSpecProj.Auto(*m_domDoc);
     } 
     catch (IException &e) {
@@ -1457,7 +1457,7 @@ namespace Isis {
    * This method uses a pvl config file to determine what the proper PDS4
    * format is and what potential input formats are. The file is converted to
    * a map which is then used to convert all of the input units. See
-   * $base/translations/pds4ExportUnits.pvl for more information on this file.
+   * $ISISROOT/appdata/translations/pds4ExportUnits.pvl for more information on this file.
    * 
    * This method is automatically called in StandardPds4Label(), but may need
    * to be called again if the label is changed afterwards.

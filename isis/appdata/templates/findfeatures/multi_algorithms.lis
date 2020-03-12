@@ -1,0 +1,4 @@
+# Generalized matcher algorithm. Uses a FASTX edge detector and SIFT extractor
+# with the default matcher (BFMatcher(L2_NORM)). The maxpoints parameter 
+# restricts the number of initial detected features before outlier detection.
+detector.fastx@threshold:25@type:2/sift/parameters@maxpoints:400

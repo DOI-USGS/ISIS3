@@ -1,0 +1,31 @@
+Object = AutoRegistration
+  Group = Algorithm
+    Name             = MaximumCorrelation
+    Tolerance        = 0.7
+    ReductionFactor  = 1
+    SubpixelAccuracy = True
+
+    # Valid gradient value is Sobel.
+    # Gradient = Sobel
+  End_Group
+
+  Group = PatternChip
+    Samples       = 3
+    Lines         = 3
+    MinimumZScore = 1.0
+  End_Group
+
+  Group = SearchChip
+    Samples       = 5
+    Lines         = 5
+    ValidPercent  = 50.0
+  End_Group
+
+  Group = SurfaceModel
+    DistanceTolerance = 1.5
+    WindowSize        = 5
+    EccentricityRatio = 2.0
+    ResidualTolerance = 0.1
+  End_Group
+End_Object
+End

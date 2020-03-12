@@ -236,30 +236,30 @@ namespace Isis {
 
 
   void CnetEditorWindow::createActions() {
-    openNetAct = new QAction(QIcon(FileName("$base/icons/fileopen.png").expanded()),
+    openNetAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/fileopen.png").expanded()),
                              tr("&Open control network"), this);
     openNetAct->setShortcut(tr("Ctrl+O"));
     openNetAct->setStatusTip(tr("Open a control network file"));
     connect(openNetAct, SIGNAL(triggered()), this, SLOT(openNet()));
 
-    openCubeListAct = new QAction(QIcon(FileName("$base/icons/openList.png").expanded()),
+    openCubeListAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/openList.png").expanded()),
                                   tr("Open cube &list"), this);
     openCubeListAct->setShortcut(tr("Ctrl+L"));
     openCubeListAct->setStatusTip(tr("Open a cube list file"));
     connect(openCubeListAct, SIGNAL(triggered()), this, SLOT(openCubeList()));
 
-    saveAct = new QAction(QIcon(FileName("$base/icons/filesave.png").expanded()),
+    saveAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/filesave.png").expanded()),
                           tr("&Save"), this);
     saveAct->setShortcut(tr("Ctrl+S"));
     saveAct->setStatusTip(tr("save changes"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    saveAsAct = new QAction(QIcon(FileName("$base/icons/filesaveas.png").expanded()),
+    saveAsAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/filesaveas.png").expanded()),
                             tr("Save&As"), this);
     saveAsAct->setStatusTip(tr("Save control network to specified file"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    closeAct = new QAction(QIcon(FileName("$base/icons/fileclose.png").expanded()),
+    closeAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/fileclose.png").expanded()),
                            tr("&Close"), this);
     closeAct->setStatusTip(tr("Close control net file"));
     connect(closeAct, SIGNAL(triggered()), this, SLOT(closeNetwork()));
@@ -268,7 +268,7 @@ namespace Isis {
     aboutAct->setStatusTip(tr("Show cneteditor's about box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    quitAct = new QAction(QIcon(FileName("$base/icons/exit.png").expanded()),
+    quitAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/exit.png").expanded()),
                           tr("&Quit"), this);
     quitAct->setShortcut(tr("Ctrl+Q"));
     quitAct->setStatusTip(tr("Quit cneteditor"));

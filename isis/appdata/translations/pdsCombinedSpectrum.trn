@@ -1,0 +1,223 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataFilePointer
+  InputKey      = ^COMBINED_SPECTRUM
+  InputGroup    = ROOT
+  InputGroup    = FILE
+  InputGroup    = UNCOMPRESSED_FILE
+  InputPosition = ROOT
+  InputPosition = FILE
+  InputPosition = UNCOMPRESSED_FILE
+  Translation   = (*, *)
+End_Group
+
+Group = DataStart
+  InputKey      = ^COMBINED_SPECTRUM
+  InputGroup    = ROOT
+  InputGroup    = FILE
+  InputGroup    = UNCOMPRESSED_FILE
+  InputPosition = ROOT
+  InputPosition = FILE
+  InputPosition = UNCOMPRESSED_FILE
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = DataFileRecordBytes
+  InputKey    = RECORD_BYTES
+  Translation = (*, *)
+End_Group
+
+Group = CoreSamples
+  InputKey      = ITEMS
+  InputGroup    = "COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "FILE,COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM,COLUMN"
+  InputPosition = (COMBINED_SPECTRUM,COLUMN)
+  InputPosition = (FILE, COMBINED_SPECTRUM,COLUMN)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM,COLUMN)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLines
+  InputKey      = COLUMNS
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBands
+  InputKey      = ROWS
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreBitsPerPixel
+  InputKey      = ITEM_BYTES
+  InputGroup    = "COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "FILE,COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM,COLUMN"
+  InputPosition = (COMBINED_SPECTRUM,COLUMN)
+  InputPosition = (FILE, COMBINED_SPECTRUM, COLUMN)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM, COLUMN)
+  InputDefault  = 4
+  Translation   = (8, 1)
+  Translation   = (16, 2)
+  Translation   = (32, 4)
+End_Group
+
+Group = CorePixelType
+  InputKey      = DATA_TYPE
+  InputGroup    = "COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "FILE,COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM,COLUMN"
+  InputPosition = (COMBINED_SPECTRUM, COLUMN)
+  InputPosition = (FILE, COMBINED_SPECTRUM, COLUMN)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM, COLUMN)
+  InputDefault  = LSB_INTEGER
+  Translation   = (Integer, LSB_INTEGER)
+  Translation   = (Integer, MSB_INTEGER)
+  Translation   = (Integer, PC_INTEGER)
+  Translation   = (Integer, MAC_INTEGER)
+  Translation   = (Integer, SUN_INTEGER)
+  Translation   = (Integer, VAX_INTEGER)
+  Translation   = (Natural, UNSIGNED_INTEGER)
+  Translation   = (Natural, LSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, MSB_UNSIGNED_INTEGER)
+  Translation   = (Natural, PC_UNSIGNED_INTEGER)
+  Translation   = (Natural, MAC_UNSIGNED_INTEGER)
+  Translation   = (Natural, SUN_UNSIGNED_INTEGER)
+  Translation   = (Natural, VAX_UNSIGNED_INTEGER)
+  Translation   = (Real, FLOAT)
+  Translation   = (Real, REAL)
+  Translation   = (Real, PC_REAL)
+  Translation   = (Real, IEEE_REAL)
+  Translation   = (Real, MAC_REAL)
+  Translation   = (Real, SUN_REAL)
+  Translation   = (VaxReal, VAX_REAL)
+End_Group
+
+Group = CoreByteOrder
+  InputKey      = DATA_TYPE
+  InputGroup    = "COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "FILE,COMBINED_SPECTRUM,COLUMN"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM,COLUMN"
+  InputPosition = (COMBINED_SPECTRUM, COLUMN)
+  InputPosition = (FILE, COMBINED_SPECTRUM, COLUMN)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM, COLUMN)
+  InputDefault  = LSB_INTEGER
+  Translation   = (LSB, LSB_INTEGER)
+  Translation   = (MSB, MSB_INTEGER)
+  Translation   = (LSB, PC_INTEGER)
+  Translation   = (MSB, MAC_INTEGER)
+  Translation   = (MSB, SUN_INTEGER)
+  Translation   = (LSB, VAX_INTEGER)
+  Translation   = (MSB, UNSIGNED_INTEGER)
+  Translation   = (LSB, LSB_UNSIGNED_INTEGER)
+  Translation   = (MSB, MSB_UNSIGNED_INTEGER)
+  Translation   = (LSB, PC_UNSIGNED_INTEGER)
+  Translation   = (MSB, MAC_UNSIGNED_INTEGER)
+  Translation   = (MSB, SUN_UNSIGNED_INTEGER)
+  Translation   = (LSB, VAX_UNSIGNED_INTEGER)
+  Translation   = (MSB, FLOAT)
+  Translation   = (MSB, REAL)
+  Translation   = (MSB, IEEE_REAL)
+  Translation   = (LSB, PC_REAL)
+  Translation   = (MSB, MAC_REAL)
+  Translation   = (MSB, SUN_REAL)
+  Translation   = (LSB, VAX_REAL)
+End_Group
+
+Group = CoreBase
+  InputKey      = OFFSET
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = 0.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreMultiplier
+  InputKey      = SCALING_FACTOR
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = 1.0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreOrganization
+  InputKey      = BAND_STORAGE_TYPE
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = BAND_SEQUENTIAL
+  Translation   = (BSQ, BAND_SEQUENTIAL)
+  Translation   = (BSQ, "BAND SEQUENTIAL")
+  Translation   = (BIL, LINE_INTERLEAVED)
+  Translation   = (BIP, SAMPLE_INTERLEAVED)
+End_Group
+
+Group = CoreLineSuffixBytes
+  InputKey      = LINE_SUFFIX_BYTES
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreLinePrefixBytes
+  InputKey      = LINE_PREFIX_BYTES
+  InputGroup    = COMBINED_SPECTRUM
+  InputGroup    = "FILE,COMBINED_SPECTRUM"
+  InputGroup    = "UNCOMPRESSED_FILE,COMBINED_SPECTRUM"
+  InputPosition = COMBINED_SPECTRUM
+  InputPosition = (FILE, COMBINED_SPECTRUM)
+  InputPosition = (UNCOMPRESSED_FILE, COMBINED_SPECTRUM)
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+End
