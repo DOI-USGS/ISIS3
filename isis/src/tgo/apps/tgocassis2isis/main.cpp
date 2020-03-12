@@ -48,8 +48,8 @@ void IsisMain() {
 
     Cube *outputCube = importer.SetOutputCube("TO");
 
-    QString transRawFile = "/translations/tgoCassisInstrument.trn";
-    QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
+    QString transRawFile = "TgoCassisInstrument.trn";
+    QString transExportFile = "TgoCassisExportedInstrument.trn";
 
     // first assume lev1b image
     Pvl *outputLabel = outputCube->label();
@@ -116,19 +116,18 @@ void IsisMain() {
  */
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   // Get the directory where the Tgo translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Tgo"];
+  QString missionDir = "$ISISROOT/appdata/translations/";
 
   // Get the translation manager ready
   FileName transFile;
   try {
-    transFile = FileName(missionDir + "/translations/tgoCassis.trn");
+    transFile = FileName(missionDir + "TgoCassis.trn");
     XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
     translateCoreInfo(labelXlater, importer);
   }
   catch (IException &e) {
     // if exported, use this!
-    transFile = FileName(missionDir + "/translations/tgoCassisRdr.trn");
+    transFile = FileName(missionDir + "TgoCassisRdr.trn");
     XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
     translateCoreInfo(labelXlater, importer);
   }
@@ -183,9 +182,8 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
 bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
   //Translate the Mapping Group
   try {
-    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-    QString missionDir = (QString) dataDir["Tgo"];
-    FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
+    QString missionDir = "$ISISROOT/appdata/translations";
+    FileName mapTransFile(missionDir + "/translations/TgoCassisMapping.trn");
 
     // Get the translation manager ready for translating the mapping label
 
@@ -245,15 +243,14 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
         QStringList logicalIdStringList = logicalIdText.split(":");
         if (logicalIdStringList.contains("data_mosaic")) {
           try {
-            PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-            QString missionDir = (QString) dataDir["Tgo"];
-            FileName bandBinTransFile(missionDir + "/translations/tgoCassisMosaicBandBin.trn");
+            QString missionDir = "$ISISROOT/appdata/translations";
+            FileName bandBinTransFile(missionDir + "/translations/TgoCassisMosaicBandBin.trn");
             // Get the translation manager ready for translating the band bin label
             XmlToPvlTranslationManager labelXBandBinlater(xmlFileName, bandBinTransFile.expanded());
             // Pvl output label
             Pvl *outputLabel = outputCube->label();
             labelXBandBinlater.Auto(*(outputLabel));
-            FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
+            FileName mosaicTransFile(missionDir + "/translations/TgoCassisMosaic.trn");
 
             // Get the translation manager ready for translating the mosaic label
             XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
@@ -292,8 +289,7 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
  */
 void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFile) {
   // Get the directory where the Tgo translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Tgo"];
+  QString missionDir = "$ISISROOT/appdata/translations/";
   FileName transFile(missionDir + instTransFile);
 
   // Get the translation manager ready for translating the instrument label
@@ -310,7 +306,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   inst.findKeyword("ExposureDuration").setUnits("seconds");
 
   // Translate BandBin group
-  FileName bandBinTransFile(missionDir + "/translations/tgoCassisBandBin.trn");
+  FileName bandBinTransFile(missionDir + "/translations/TgoCassisBandBin.trn");
   XmlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
 
   // Pvl output label
@@ -322,10 +318,10 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   bandBin.findKeyword("Width").setUnits("nm");
 
   // Create the Archive Group
-  FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
+  FileName archiveTransFile(missionDir + "/translations/TgoCassisArchive.trn");
   XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
 
-  FileName subTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
+  FileName subTransFile(missionDir + "/translations/TgoCassisSubWindow.trn");
   XmlToPvlTranslationManager subXlater(inputLabel, subTransFile.expanded());
 
   // Pvl output label
@@ -484,7 +480,7 @@ QString convertUniqueIdToObservationId(Pvl &outputLabel) {
   BigInt uniqueIdDecimalValue = uniqueId.toLongLong();
   BigInt operationPeriod = (uniqueIdDecimalValue & 1879048192);
   operationPeriod /= qPow(2,28);
-  FileName transFile("$tgo/translations/tgoCassisOperationPeriod.trn");
+  FileName transFile("$ISISROOT/appdata/translations/TgoCassisOperationPeriod.trn");
   PvlTranslationTable transTable(transFile);
   observationId = transTable.Translate("OperationPeriod", toString(operationPeriod));
   BigInt orbitNumber = (uniqueIdDecimalValue & 268433408);
