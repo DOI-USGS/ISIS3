@@ -38,25 +38,25 @@ void IsisMain() {
   QString logicalId = ui.GetString("PDS4LOGICALIDENTIFIER");
   process.setLogicalId(logicalId);
 
-  QString translationFile = "$hayabusa/translations/";
+  QString translationFile = "$ISISROOT/appdata/translations/";
   PvlGroup instGroup = inputLabel->findObject("IsisCube").findGroup("Instrument");
   if (instGroup["InstrumentId"][0].compare("NIRS", Qt::CaseInsensitive) == 0) {
 
     process.setImageType(ProcessExportPds4::BinSetSpectrum);
     QDomDocument &pdsLabel = process.StandardPds4Label();
 
-    translationFile += "nirsPds4Export.trn";
+    translationFile += "HayabusaNirsPds4Export.trn";
     PvlToXmlTranslationManager xlator(*(inputLabel), translationFile);
     xlator.Auto(pdsLabel);
 
     ProcessExportPds4::translateUnits(pdsLabel);
 
-  } 
+  }
   else { // AMICA
 
     QDomDocument &pdsLabel = process.StandardPds4Label();
 
-    translationFile += "amicaPds4Export.trn";
+    translationFile += "HayabusaAmicaPds4Export.trn";
     PvlToXmlTranslationManager xlator(*(inputLabel), translationFile);
     xlator.Auto(pdsLabel);
 
@@ -64,33 +64,33 @@ void IsisMain() {
      * Add additional pds label data here
      */
     QStringList xmlPath;
-    xmlPath << "Product_Observational" 
-            << "Observation_Area" 
-            << "Discipline_Area" 
-            << "img:Imaging" 
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "img:Imaging"
             << "img:Subframe_Parameters";
     if (instGroup.hasKeyword("FirstLine") && instGroup.hasKeyword("LastLine")) {
-  
+
       int lines = (int) instGroup["LastLine"] - (int) instGroup["FirstLine"];
       QDomElement baseElement = pdsLabel.documentElement();
       QDomElement subframeParametersElement = process.getElement(xmlPath, baseElement);
-  
+
       QDomElement linesElement = pdsLabel.createElement("img:lines");
       PvlToXmlTranslationManager::setElementValue(linesElement, toString(lines));
       subframeParametersElement.appendChild(linesElement);
-  
+
     }
-  
+
     if (instGroup.hasKeyword("FirstSample") && instGroup.hasKeyword("LastSample")) {
       int samples = (int) instGroup["LastSample"] - (int) instGroup["FirstSample"];
       QDomElement baseElement = pdsLabel.documentElement();
       QDomElement subframeParametersElement = process.getElement(xmlPath, baseElement);
-  
+
       QDomElement samplesElement = pdsLabel.createElement("img:samples");
       PvlToXmlTranslationManager::setElementValue(samplesElement, toString(samples));
       subframeParametersElement.appendChild(samplesElement);
     }
-  
+
     double radianceScalingFactor = 1.0;
     if (instGroup.hasKeyword("RadianceScaleFactor")) {
       radianceScalingFactor *= (double)instGroup["RadianceScaleFactor"];
@@ -131,7 +131,7 @@ void generateCSVOutput(Pvl &inputCubeLabel) {
     QString outputImage = ui.GetAsString("TO");
     FileName imgOutput(outputImage);
     FileName csvOutput = imgOutput.removeExtension().setExtension("csv");
-    
+
     PvlGroup instGroup = inputCubeLabel.findObject("IsisCube").findGroup("Instrument");
     if (instGroup["InstrumentId"][0].compare("amica", Qt::CaseInsensitive) == 0) {
       if (inputCubeLabel.findObject("IsisCube").hasGroup("RadiometricCalibration")) {
@@ -160,4 +160,3 @@ void generateCSVOutput(Pvl &inputCubeLabel) {
     }
   }
 }
-
