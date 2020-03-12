@@ -1,0 +1,204 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+ 
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+ 
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = TI_0
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = TI_1
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  InputDefault   = "N/A"
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (ITOKAWA, "25143 ITOKAWA")
+  Translation    = (*, *)
+End_Group
+
+Group = TargetType
+  Auto
+  InputKey       = TARGET_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = TargetType
+  InputDefault   = "N/A"
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalTargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = OriginalTargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+ 
+Group = Binning
+  Auto
+  InputKey       = BINNING
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = Binning
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FirstLine
+  Auto
+  InputKey       = START_V
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = FirstLine
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LastLine
+  Auto
+  InputKey       = LAST_V
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = LastLine
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FirstSample
+  Auto
+  InputKey       = START_H
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = FirstSample
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LastSample
+  Auto
+  InputKey       = LAST_H
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = LastSample
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CcdTemperature
+  Auto
+  InputKey       = TEMP_0
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = CcdTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+
+End

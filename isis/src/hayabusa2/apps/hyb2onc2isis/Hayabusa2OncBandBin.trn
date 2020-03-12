@@ -1,0 +1,75 @@
+#
+# This translation file is used to produce the ISIS 3 BandBin label group
+# for the Hayabusa 2 ONC-T camera.
+# Translation = (left,right) convert the input "right" to "left"
+#
+
+Group = FilterNumber
+  Auto
+  Optional
+  InputKey       = FILTER
+  InputPosition  = FitsLabels
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (1, "NO.1: 390nm")
+  Translation    = (2, "NO.2: WIDE")
+  Translation    = (3, "NO.3: 550nm")
+  Translation    = (4, "NO.4: 700nm")
+  Translation    = (5, "NO.5: 860nm")
+  Translation    = (6, "NO.6: 589nm")
+  Translation    = (7, "NO.7: 950nm")
+  Translation    = (8, "NO.8: 480nm")
+End_Group
+
+Group = FilterName
+  Auto
+  InputKey       = FILTER
+  InputPosition  = FitsLabels
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (ul,   "NO.1: 390nm")
+  Translation    = (Wide, "NO.2: WIDE")
+  Translation    = (v,    "NO.3: 550nm")
+  Translation    = (w,    "NO.4: 700nm")
+  Translation    = (x,    "NO.5: 860nm")
+  Translation    = (Na,   "NO.6: 589nm")
+  Translation    = (p,    "NO.7: 950nm")
+  Translation    = (b,    "NO.8: 480nm")
+  Translation    = (None,    "NONE")
+End_Group
+
+Group = Center
+  Auto
+  Optional
+  InputKey       = FILTER
+  InputPosition  = FitsLabels
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (390,   "NO.1: 390nm")
+  Translation    = (775,   "NO.2: WIDE")
+  Translation    = (550,   "NO.3: 550nm")
+  Translation    = (700,   "NO.4: 700nm")
+  Translation    = (860,   "NO.5: 860nm")
+  Translation    = (589.5, "NO.6: 589nm")
+  Translation    = (950,   "NO.7: 950nm")
+  Translation    = (480,   "NO.8: 480nm")
+End_Group
+
+Group = Width
+  Auto
+  Optional
+  InputKey       = FILTER
+  InputPosition  = FitsLabels
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (40,  "NO.1: 390nm")
+  Translation    = (850, "NO.2: WIDE")
+  Translation    = (30,  "NO.3: 550nm")
+  Translation    = (30,  "NO.4: 700nm")
+  Translation    = (40,  "NO.5: 860nm")
+  Translation    = (10,  "NO.6: 589nm")
+  Translation    = (60,  "NO.7: 950nm")
+  Translation    = (30,  "NO.8: 480nm")
+End_Group
+
+End
