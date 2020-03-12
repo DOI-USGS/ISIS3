@@ -62,23 +62,23 @@ void IsisMain() {
 
   // Translate the remaining MI MAP labels
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
-  FileName transFile(transDir + "mimapBandBin.trn");
+  FileName transFile(transDir + "KaguyaMiMapBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
   bandBinXlater.Auto(otherLabels);
 
-  transFile = transDir + "mimapInstrument.trn";
+  transFile = transDir + "KaguyaMiMapInstrument.trn";
   PvlToPvlTranslationManager instXlater(label, transFile.expanded());
   instXlater.Auto(otherLabels);
 
   PvlKeyword processId = label.findKeyword("PROCESS_VERSION_ID");
 
   if (processId[0] == "L3C") {
-    transFile = transDir + "mil3cArchive.trn";;
+    transFile = transDir + "KaguyaMil3cArchive.trn";;
   }
   else {
-    transFile = transDir + "mimapArchive.trn";
+    transFile = transDir + "KaguyaMiMapArchive.trn";
   }
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);

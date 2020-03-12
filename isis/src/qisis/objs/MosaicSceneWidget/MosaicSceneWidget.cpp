@@ -386,7 +386,7 @@ namespace Isis {
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used. "
         "The selected file should be a map file, examples are available in "
-        "$base/templates/maps."));
+        "$ISISROOT/appdata/maps."));
     m_mapButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(m_mapButton, SIGNAL(clicked()), this, SLOT(configProjectionParameters()));
 
