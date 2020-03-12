@@ -5,6 +5,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "IException.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -19,6 +20,7 @@ using namespace Isis;
 using ::testing::Return;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
+
 
 TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   std::istringstream labelStrm(R"(
@@ -35,9 +37,9 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
       LongitudeDomain    = 360 <degrees>
 
       MinimumLatitude    = 0 <degrees>
-      MaximumLatitude    = 10 <degrees>
+      MaximumLatitude    = 5 <degrees>
       MinimumLongitude   = 0 <degrees>
-      MaximumLongitude   = 10 <degrees>
+      MaximumLongitude   = 5 <degrees>
 
       PixelResolution    = 100000 <meters/pixel>
       Scale              = 512.0 <pixels/degree>
@@ -48,7 +50,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=yes"};
+  QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
   UserInterface ui(APP_XML, args);
 
   Pvl log;
@@ -76,6 +78,144 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
 
   ASSERT_EQ(cubeMapGroup.findKeyword("PixelResolution"), userGrp.findKeyword("PixelResolution"));
   ASSERT_EQ(cubeMapGroup.findKeyword("Scale"), userGrp.findKeyword("Scale"));
+}
+
+TEST_F(DefaultCube, FunctionalTestCam2mapMismatch) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = Moon
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 5 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 5 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(testCube, userMap, userGrp, ui, &log);
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), 2);
+  }
+}
+
+TEST_F(DefaultCube, FunctionalTestCam2mapUserLatlon) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 5 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 5 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=no", "minlon=0",
+                           "maxlon=10", "minlat=0", "maxlat=10", "defaultrange=camera",
+                           "pixres=map"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+
+  cam2map(testCube, userMap, userGrp, ui, &log);
+  Cube ocube(tempDir.path()+"/level2.cub");
+
+  ASSERT_EQ(userGrp.findKeyword("PixelResolution")[0], "100000.0");
+  ASSERT_EQ(userGrp.findKeyword("Scale")[0], "0.59274697523306");
+
+  ASSERT_EQ(userGrp.findKeyword("MinimumLongitude")[0], "0.0");
+  ASSERT_EQ(userGrp.findKeyword("MaximumLongitude")[0], "10.0");
+  ASSERT_EQ(userGrp.findKeyword("MinimumLatitude")[0], "0.0");
+  ASSERT_EQ(userGrp.findKeyword("MaximumLatitude")[0], "10.0");
+
+  ASSERT_EQ(userGrp.findKeyword("UpperLeftCornerX")[0], "0.0");
+  ASSERT_EQ(userGrp.findKeyword("UpperLeftCornerY")[0], "600000.0");
+}
+
+TEST_F(LineScannerCube, FunctionalTestCam2mapMapLatlon) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MOON
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 1 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 2 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=no",
+                           "defaultrange=map", "pixres=camera"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+
+  cam2map(testCube, userMap, userGrp, ui, &log);
+  Cube ocube(tempDir.path()+"/level2.cub");
+
+  ASSERT_EQ(userGrp.findKeyword("PixelResolution")[0], "9.0084341025159");
+  ASSERT_EQ(userGrp.findKeyword("Scale")[0], "6579.9113196323");
+
+  ASSERT_EQ(userGrp.findKeyword("MinimumLongitude")[0], "0");
+  ASSERT_EQ(userGrp.findKeyword("MaximumLongitude")[0], "2");
+  ASSERT_EQ(userGrp.findKeyword("MinimumLatitude")[0], "0");
+  ASSERT_EQ(userGrp.findKeyword("MaximumLatitude")[0], "1");
+
+  ASSERT_EQ(userGrp.findKeyword("UpperLeftCornerX")[0], "0.0");
+  ASSERT_EQ(userGrp.findKeyword("UpperLeftCornerY")[0], "59275.496394555");
 }
 
 TEST_F(DefaultCube, ReverseXformUnitTestCam2map) {
