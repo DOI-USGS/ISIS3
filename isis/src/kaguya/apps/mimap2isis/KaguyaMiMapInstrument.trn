@@ -1,0 +1,103 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = MissionName
+  Auto
+  InputKey       = MISSION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = (KAGUYA, SELENE-M)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationModeId
+  Auto
+  InputKey       = OBSERVATION_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ObservationModeId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription
+  Auto
+  InputKey       = SENSOR_DESCRIPTION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription2
+  Auto
+  InputKey       = SENSOR_DESCRIPTION2
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription2
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

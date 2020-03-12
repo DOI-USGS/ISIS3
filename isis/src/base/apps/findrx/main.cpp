@@ -28,7 +28,7 @@ void IsisMain() {
     regdef = new Pvl(ui.GetFileName("REGDEF"));
   }
   else {
-    regdef = new Pvl("$base/templates/autoreg/findrx.def");
+    regdef = new Pvl("$ISISROOT/appdata/templates/autoreg/findrx.def");
   }
   PvlGroup &reseaus = cube.label()->findGroup("Reseaus", Pvl::Traverse);
 

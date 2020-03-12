@@ -54,7 +54,7 @@ pipeline {
               def build_ok = true
               def condaPath = ""
               def isisEnv = [
-                "ISIS3DATA=/isisData/data",
+                "ISISDATA=/isisData/isis_data",
                 "ISIS3TESTDATA=/isisData/testData",
                 "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
                 "MALLOC_CHECK_=1"

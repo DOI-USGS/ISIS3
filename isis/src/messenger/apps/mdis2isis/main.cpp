@@ -184,23 +184,23 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
 
   // Get the directory where the MESSENGER/MDIS translation tables are.
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Messenger"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Get a filename for the MESSENGER EDR label
   Pvl labelPvl(labelFile.expanded());
 
   // Translate the Instrument group
-  FileName transFile(transDir + "mdisInstrument.trn");
+  FileName transFile(transDir + "MessengerMdisInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
-  transFile  = transDir + "mdisBandBin.trn";
+  transFile  = transDir + "MessengerMdisBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile  = transDir + "mdisArchive.trn";
+  transFile  = transDir + "MessengerMdisArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
@@ -289,7 +289,7 @@ int CreateFilterSpecs(const QString &instId, int filter_code,
   }
   else if(instId == "MDIS-WAC") {
     //  Set up WAC calibration file
-    FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
+    FileName calibFile("$ISISROOT/appdata/translations/MessengerMdisCalibration.trn");
     calibFile = calibFile.highestVersion();
     Pvl config(calibFile.expanded());
 
@@ -405,4 +405,3 @@ LutTable LoadLut(Pvl &label, QString &tableused, QString &froot) {
   // cout << "Lut Table " << mlut << endl;
   return (mlut);
 }
-
