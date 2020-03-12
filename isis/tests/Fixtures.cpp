@@ -39,6 +39,38 @@ namespace Isis {
     delete projTestCube;
   }
 
+  void LineScannerCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::ifstream isdFile("data/LineScannerCube/defaultLineScanner.isd");
+    std::ifstream cubeLabel("data/LineScannerCube/defaultLineScanner.pvl");
+    std::ifstream projCubeLabel("data/LineScannerCube/projDefaultLineScanner.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+    projCubeLabel >> projLabel;
+
+    testCube = new Cube();
+    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+
+    projTestCube = new Cube();
+    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+  }
+
+
+  void LineScannerCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (projTestCube->isOpen()) {
+      projTestCube->close();
+    }
+
+    delete testCube;
+    delete projTestCube;
+  }
+
 
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();

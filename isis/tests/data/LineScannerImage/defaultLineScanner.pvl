@@ -1,0 +1,440 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1024
+    TileLines   = 3
+
+    Group = Dimensions
+      Samples = 4096
+      Lines   = 3
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 0.013
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName                       = SELENE
+    SpacecraftName                    = KAGUYA
+    InstrumentName                    = "Terrain Camera 2"
+    InstrumentId                      = TC2
+    TargetName                        = MOON
+    ObservationModeId                 = NORMAL
+    SensorDescription                 = "Imagery type:Pushbroom.
+                                         ImageryMode:Mono,Stereo.
+                                         ExposureTimeMode:Long,Middle,Short.
+                                         CompressionMode:NonComp,DCT.
+                                         Q-table:32 patterns. H-table:4
+                                         patterns.
+                                         SwathMode:F(Full),N(Nominal),H(Half).
+                                         First pixel
+                                         number:1(F),297(N),1172(H)."
+    SensorDescription2                = "Pixel size:7x7[micron^2](TC1/TC2).
+                                         Wavelength range:430-850[nm](TC1/TC2).
+                                         A/D rate:10[bit](TC1/TC2). Slant
+                                         angle:+/-15[degree] (from nadir to +x
+                                         of S/C)(TC1/TC2). Focal
+                                         length:72.45/72.63[mm](TC1/TC2). F
+                                         number:3.97/3.98(TC1/TC2)."
+    StartTime                         = 2008-06-14T13:32:10.933207
+    StopTime                          = 2008-06-14T13:32:41.190476
+    OriginalStartTime                 = 2008-06-14T13:32:10.936996
+    OriginalStopTime                  = 2008-06-14T13:32:41.194496
+    ExposureModeId                    = LONG
+    ExposureDuration                  = 6.5 <msec>
+    OriginalSpacecraftClockStartCount = 897485524.5615 <sec>
+    OriginalSpacecraftClockStopCount  = 897485554.819 <sec>
+    SpacecraftClockStartCount         = 897485524.557711 <sec>
+    SpacecraftClockStopCount          = 897485554.81498 <sec>
+    OriginalLineSamplingInterval      = 6.5 <msec>
+    LineSamplingInterval              = 6.49995 <msec>
+    EncodingType                      = DCT_DECOMPRESSED
+    SwathModeId                       = FULL
+    IlluminationCondition             = MORNING
+  End_Group
+
+  Group = Archive
+    ProductId                   = TC2S2B0_01_03043N107E3384
+    SoftwareName                = "RGC_TC_s_Level2B0 (based on RGC_TC_MI
+                                   version 2.10.1)"
+    SoftwareVersion             = 1.0.0
+    ProcessVersionId            = L2B
+    ProductCreationTime         = 2013-06-07T16:04:31
+    ProgramStartTime            = 2013-06-07T15:53:01
+    ProducerId                  = LISM
+    ProductSetId                = TC_s_Level2B0
+    ProductVersionId            = 01
+    RegisteredProduct           = Y
+    Level2AFileName             = TC2S2A0_02DLF03043_003_0023.img
+    SpiceMetakernelFileName     = RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i-
+                                  _05_LongCK_D_V02_de421_110706.mk
+    DataSetId                   = TC2_Level2B
+    ImageValueType              = RADIANCE
+    ImageUnit                   = W/m**2/micron/sr
+    MinForStatisticalEvaluation = 0
+    MaxForStatisticalEvaluation = 32767
+    SceneMaximumDn              = 3565
+    SceneMinimumDn              = 5
+    SceneAverageDn              = 920.5
+    SceneStdevDn                = 489.7
+    SceneModeDn                 = 836
+    ShadowedAreaMinimum         = 0
+    ShadowedAreaMaximum         = 0
+    ShadowedAreaPercentage      = 0
+    InvalidType                 = (SATURATION, MINUS, DUMMY_DEFECT, OTHER)
+    InvalidValue                = (-20000, -21000, -22000, -23000)
+    InvalidPixels               = (0, 0, 0, 0)
+    DarkFileName                = TC2_DRK_02952_03218_L_C_b05.csv
+    FlatFileName                = TC2_FLT_00293_04739_N_C_b05.csv
+    EfficFileName               = TC2_EFF_PRFLT_N_N_v01.csv
+    NonlinFileName              = TC2_NLT_PRFLT_N_N_v01.csv
+    RadCnvCoef                  = 3.723389 <W/m**2/micron/sr>
+    L2aDeadPixelThreshold       = 30
+    L2aSaturationThreshold      = 1023
+    DarkValidMinimum            = -5
+    RadianceSaturationThreshold = 425.971 <W/m**2/micron/sr>
+    UpperLeftLatitude           = 11.4702 <deg>
+    UpperLeftLongitude          = 337.822567 <deg>
+    UpperRightLatitude          = 11.456914 <deg>
+    UpperRightLongitude         = 339.052847 <deg>
+    LowerLeftLatitude           = 9.905093 <deg>
+    LowerLeftLongitude          = 337.809655 <deg>
+    LowerRightLatitude          = 9.892042 <deg>
+    LowerRightLongitude         = 339.028925 <deg>
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 640nm
+    Width      = 420nm
+  End_Group
+
+  Group = Kernels
+    NaifCkCode                = -131370
+    NaifFrameCode             = -131371
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $kaguya/kernels/pck/moon_080317.tf,
+                                 $kaguya/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $kaguya/kernels/tspk/moon_pa_de421_1900-2050.-
+                                 bpc, $kaguya/kernels/tspk/de421.bsp)
+    InstrumentPointing        = (Table, $kaguya/kernels/ck/SEL_M_ALL_D_V02.BC,
+                                 $kaguya/kernels/fk/SEL_V01.TF)
+    Instrument                = $kaguya/kernels/ik/SEL_TC_V01.TI
+    SpacecraftClock           = $kaguya/kernels/sclk/SEL_M_V01.TSC
+    InstrumentPosition        = (Table,
+                                 /usgs/cpkgs/isis3/data/kaguya/kernels/spk//SE-
+                                 L_M_071020_090610_SGMH_02.BSP)
+    InstrumentAddendum        = $kaguya/kernels/iak/kaguyaTcAddendum007.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 97513
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-131000, 1)
+  ConstantFrames      = (-131370, -131320, -131000)
+  ConstantRotation    = (0.96569856739975, 4.90579395610543e-04,
+                         0.25966523882478, -1.7391330559124e-04,
+                         0.99999921298743, -0.0012424889096337,
+                         -0.25966564400443, 0.0011547105200122,
+                         0.96569789270112)
+  CkTableStartTime    = 266722396.06431
+  CkTableEndTime      = 266722396.08381
+  CkTableOriginalSize = 4
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($kaguya/kernels/ck/SEL_M_ALL_D_V02.BC,
+                         $kaguya/kernels/fk/SEL_V01.TF)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 97641
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 266722396.06431
+  SpkTableEndTime      = 266722396.08381
+  SpkTableOriginalSize = 4.0
+  Description          = "Created by spiceinit"
+  Kernels              = /usgs/cpkgs/isis3/data/kaguya/kernels/spk//SEL_M_071-
+                         020_090610_SGMH_02.BSP
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 97809
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = 266722396.06431
+  CkTableEndTime      = 266722396.08381
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($kaguya/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                         $kaguya/kernels/tspk/de421.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $kaguya/kernels/pck/moon_080317.tf,
+                         $kaguya/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 121.19460024425
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 97937
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 266722396.06431
+  SpkTableEndTime      = 266722396.08381
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($kaguya/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                          $kaguya/kernels/tspk/de421.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 98049
+  Bytes     = 1532
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 90730
+  Bytes     = 6783
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                               = 301
+  BODY301_RADII                           = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE                         = 31001
+  INS-131371_SWAP_OBSERVER_TARGET         = TRUE
+  INS-131371_LIGHTTIME_CORRECTION         = NONE
+  INS-131371_LT_SURFACE_CORRECT           = FALSE
+  INS-131371_FOCAL_LENGTH                 = 72.63
+  INS-131371_PIXEL_PITCH                  = 0.007
+  CLOCK_ET_-131_897485524.557711_COMPUTED = 2ded20b8b8cbaf41
+  INS-131371_TRANSX                       = (0.0, 0.0, -0.007)
+  INS-131371_TRANSY                       = (0.0, -0.007, 0.0)
+  INS-131371_ITRANSS                      = (0.0, 0.0, -142.857142857)
+  INS-131371_ITRANSL                      = (0.0, -142.857142857, 0.0)
+  INS-131371_BORESIGHT_SAMPLE             = 2048.0
+  INS-131371_BORESIGHT_LINE               = 0.5
+  INS-131371_DISTORTION_COEF_X            = (0.0029786, 7.7836e-05,
+                                             3.9265e-06, -4.4088e-06)
+  INS-131371_DISTORTION_COEF_Y            = (9.241e-04, -1.1994e-04,
+                                             2.9281e-05, -3.7239e-07)
+  INS-131371_BORESIGHT                    = (-0.0474, 0.0126)
+End_Object
+End
