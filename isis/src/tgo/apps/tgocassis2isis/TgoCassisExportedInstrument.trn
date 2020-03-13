@@ -99,16 +99,6 @@ Group = StartTime
   Translation          = (*, *)
 End_Group
 
-#Group = SpacecraftClockStartCount
-#  Auto
-#  InputPosition        = CaSSIS_Header
-#  InputKey             = FSW_HEADER
-#  InputKeyAttribute    = Timestamp
-#  OutputName           = SpacecraftClockStartCount
-#  OutputPosition       = (Object,IsisCube,Group,Instrument)
-#  Translation          = (*, *)
-#End_Group
-
 Group = ExposureDuration
   Auto
   InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
@@ -138,7 +128,6 @@ End_Group
 
 Group = Center
   Auto
-  Debug
   InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   InputKey       = img:filter_name
   OutputName     = Center
@@ -152,7 +141,6 @@ End_Group
 
 Group = Width
   Auto
-  Debug
   InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   InputKey       = img:filter_name
   OutputName     = Width

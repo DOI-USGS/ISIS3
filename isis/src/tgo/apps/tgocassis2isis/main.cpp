@@ -58,7 +58,6 @@ void IsisMain() {
       translateLabels(xmlFileName, outputCube, transRawFile);
     }
     catch (IException &e) {
-      std::cout << e.toString() << std::endl; 
       if (translateMappingLabel(xmlFileName, outputCube)) {
         if (!translateMosaicLabel(xmlFileName, outputCube)) {
           translateLabels(xmlFileName, outputCube, transExportFile);
@@ -182,8 +181,8 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
 bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
   //Translate the Mapping Group
   try {
-    QString missionDir = "$ISISROOT/appdata/translations";
-    FileName mapTransFile(missionDir + "/translations/TgoCassisMapping.trn");
+    QString missionDir = "$ISISROOT/appdata/translations/";
+    FileName mapTransFile(missionDir + "TgoCassisMapping.trn");
 
     // Get the translation manager ready for translating the mapping label
 
