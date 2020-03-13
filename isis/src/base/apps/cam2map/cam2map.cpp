@@ -3,7 +3,6 @@
 #include "Camera.h"
 #include "IException.h"
 #include "IString.h"
-#include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "Pvl.h"
@@ -330,10 +329,9 @@ namespace Isis {
       int patchSize = ui.GetInteger("PATCHSIZE");
       int minPatchSize = 4;
       if (patchSize < minPatchSize) {
-        minPatchSize = patchSize;
+        patchSize = minPatchSize;
       }
-      p.SetTiling(patchSize, minPatchSize);
-
+      p.SetTiling(patchSize, patchSize);
 
       p.StartProcess(*transform, *interp);
     }

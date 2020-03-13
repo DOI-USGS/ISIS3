@@ -107,7 +107,9 @@ namespace Isis {
        *
        * @return int The number of samples in the output image.
        */
-      virtual int OutputSamples() const = 0;
+      virtual int OutputSamples() const{
+        return 0;
+      }
 
       /**
        * Allows the retrieval of the calculated number of lines in the output
@@ -115,7 +117,9 @@ namespace Isis {
        *
        * @return int The number of lines in the output image.
        */
-      virtual int OutputLines() const = 0;
+      virtual int OutputLines() const {
+        return 0;
+      }
 
       /**
        * Transforms the given output line and sample to the corresponding output
@@ -135,9 +139,11 @@ namespace Isis {
        */
       virtual bool Xform(double &inSample, double &inLine,
                          const double outSample,
-                         const double outLine) = 0;
+                         const double outLine) {
+        return true;
+      }
+
   };
 };
 
 #endif
-

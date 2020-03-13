@@ -287,7 +287,7 @@ TEST_F(DefaultCube, ForwardXformUnitTestCam2map) {
   ASSERT_EQ(outLine, 10.0);
 }
 
-TEST_F(DefaultCube, FunctionalTestCam2mapMock) {
+TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
   std::istringstream labelStrm(R"(
     Group = Mapping
       ProjectionName  = Sinusoidal
@@ -315,41 +315,175 @@ TEST_F(DefaultCube, FunctionalTestCam2mapMock) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to=/tmp/level2.cub", "matchmap=yes"};
+  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
   UserInterface ui(APP_XML, args);
 
   Pvl log;
   MockProcessRubberSheet rs;
-  FileName fn("/tmp/level2.cub");
+  FileName fn(tempDir.path() + "level2.cub");
   CubeAttributeOutput  outputAttr(fn);
   Cube outputCube;
   outputCube.setDimensions(1, 1, 1);
   outputCube.create(fn.expanded(), outputAttr);
   outputCube.reopen("rw");
 
-  int samples = 6;
-  int lines = 6;
-
-  TProjection *outmap;
-  outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap,
-                                                            samples,
-                                                            lines,
-                                                            true);
-  cam2mapReverse *transform = 0;
-  transform = new cam2mapReverse(testCube->sampleCount(),
-                                 testCube->lineCount(), testCube->camera(),
-                                 samples, lines,
-                                 outmap, 0, 0);
-
-  Interpolator *interp = NULL;
-  interp = new Interpolator(Interpolator::CubicConvolutionType);
-
   EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
   EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
   EXPECT_CALL(rs, SetTiling(4,4)).Times(AtLeast(1));
-  //EXPECT_CALL(rs, StartProcess(*transform, *interp)).Times(AtLeast(1));
+  EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
-  //EXPECT_CALL(rs, )
+  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+}
 
+TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
+
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName     = Sinusoidal
+      CenterLongitude    = 338.43365399713
+      TargetName         = MOON
+      EquatorialRadius   = 1737400.0 <meters>
+      PolarRadius        = 1737400.0 <meters>
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360
+      MinimumLatitude    = 11.463745149835
+      MaximumLatitude    = 11.476785565832
+      MinimumLongitude   = 337.81781569041
+      MaximumLongitude   = 339.04949230384
+      UpperLeftCornerX   = -18307.842628129 <meters>
+      UpperLeftCornerY   = 348018.60964676 <meters>
+      PixelResolution    = 8.926300647552 <meters/pixel>
+      Scale              = 3397.0792180819 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
+
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  MockProcessRubberSheet rs;
+  FileName fn(tempDir.path() + "level2.cub");
+  CubeAttributeOutput outputAttr(fn);
+  Cube outputCube;
+  outputCube.setDimensions(1, 1, 1);
+  outputCube.create(fn.expanded(), outputAttr);
+  outputCube.reopen("rw");
+
+  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
+  EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
+  EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
+
+  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+}
+
+
+TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 10 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 10 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to=" + tempDir.path()+ "level2.cub",
+                          "matchmap=yes",
+                          "warpalgorithm=forwardpatch",
+                          "patchsize=0"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  MockProcessRubberSheet rs;
+  FileName fn(tempDir.path() + "level2.cub");
+  CubeAttributeOutput  outputAttr(fn);
+  Cube outputCube;
+  outputCube.setDimensions(1, 1, 1);
+  outputCube.create(fn.expanded(), outputAttr);
+  outputCube.reopen("rw");
+
+  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
+  EXPECT_CALL(rs, setPatchParameters(1, 1, 3, 3, 2, 2)).Times(AtLeast(1));
+  EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
+  EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
+  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+}
+
+
+
+TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 10 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 10 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub",
+                          "matchmap=yes",
+                          "warpalgorithm=reversepatch",
+                          "patchsize=3"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  MockProcessRubberSheet rs;
+  FileName fn(tempDir.path() + "level2.cub");
+  CubeAttributeOutput  outputAttr(fn);
+  Cube outputCube;
+  outputCube.setDimensions(1, 1, 1);
+  outputCube.create(fn.expanded(), outputAttr);
+  outputCube.reopen("rw");
+
+  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
+  EXPECT_CALL(rs, SetTiling(4, 4)).Times(AtLeast(1));
+  EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));
+  EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }
