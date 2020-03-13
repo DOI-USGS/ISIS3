@@ -1119,7 +1119,6 @@ namespace Isis {
                                        Transform &trans, Interpolator &interp) {
 
     // Is the input patch too small to even worry about transforming?
-    std::cout << "SPLITTING" << '\n';
     if ((esamp - ssamp < 0.1) && (eline - sline < 0.1)) return;
 
     // It's big enough so break it into four pieces
