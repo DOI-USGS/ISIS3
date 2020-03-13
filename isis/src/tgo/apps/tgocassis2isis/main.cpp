@@ -58,7 +58,7 @@ void IsisMain() {
       translateLabels(xmlFileName, outputCube, transRawFile);
     }
     catch (IException &e) {
-
+      std::cout << e.toString() << std::endl; 
       if (translateMappingLabel(xmlFileName, outputCube)) {
         if (!translateMosaicLabel(xmlFileName, outputCube)) {
           translateLabels(xmlFileName, outputCube, transExportFile);
@@ -306,7 +306,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   inst.findKeyword("ExposureDuration").setUnits("seconds");
 
   // Translate BandBin group
-  FileName bandBinTransFile(missionDir + "/translations/TgoCassisBandBin.trn");
+  FileName bandBinTransFile(missionDir + "TgoCassisBandBin.trn");
   XmlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
 
   // Pvl output label
@@ -318,10 +318,10 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   bandBin.findKeyword("Width").setUnits("nm");
 
   // Create the Archive Group
-  FileName archiveTransFile(missionDir + "/translations/TgoCassisArchive.trn");
+  FileName archiveTransFile(missionDir + "TgoCassisArchive.trn");
   XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
 
-  FileName subTransFile(missionDir + "/translations/TgoCassisSubWindow.trn");
+  FileName subTransFile(missionDir + "TgoCassisSubWindow.trn");
   XmlToPvlTranslationManager subXlater(inputLabel, subTransFile.expanded());
 
   // Pvl output label
