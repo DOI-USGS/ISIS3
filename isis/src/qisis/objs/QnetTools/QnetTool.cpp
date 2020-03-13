@@ -604,7 +604,7 @@ namespace Isis {
         SLOT(saveTemplateFileAs()));
 
     m_whatsThis = new QAction(QIcon(FileName(
-      "$base/icons/contexthelp.png").expanded()),"&Whats's This", m_qnetTool);
+      "$ISISROOT/appdata/images/icons/contexthelp.png").expanded()),"&Whats's This", m_qnetTool);
     m_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     m_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");

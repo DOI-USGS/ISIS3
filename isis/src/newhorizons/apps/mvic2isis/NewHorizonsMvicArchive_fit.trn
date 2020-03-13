@@ -1,0 +1,37 @@
+#
+# This translation file is used to produce the ISIS 3 Archive label group
+# for the New Horizons LORRI camera.
+#
+Group = HighSpeedCompressionMode
+  Auto
+  InputKey       = HSCOMPR
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = HighSpeedCompressionMode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationCompletionStatus
+  Auto
+  InputKey       = OBSCOMPL
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = ObservationCompletionStatus
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (COMPLETE, COMPLETE)
+  Translation    = (UNKNOWN, UNKNOWN)
+  Translation    = (*, *)
+End_Group
+
+Group = SequenceDescription
+  Auto
+  InputKey       = REQDESC
+  InputPosition  = FITSLABELS
+  InputDefault   = NONE
+  OutputName     = SequenceDescription
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+End

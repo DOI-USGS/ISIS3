@@ -1,0 +1,16 @@
+# This translation file is used to produce the ISIS 3 Kernels label group
+# for Hayabusa AMICA.
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2018-06-15 Jeannie Backer - Original version.
+
+# Use the HAYABUSA_AMICA frame code rather than HAYABUSA_AMICA_IDEAL
+Group = NaifCode
+  Auto
+  InputDefault  = -130102
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation       = (*, *)
+End_Group
+
+End

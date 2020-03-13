@@ -1,0 +1,72 @@
+# This is a sample template to be used as a guide in creating 
+# the pvl file used by jigsaw to set target body parameters
+# to be solved for and their a priori values and uncertainties
+# (sigmas). All entries must be for the target body must be filled.
+# 
+# For bodies with known values for these parameters, the values
+# typically come from the planetary constants kernel (pck). The
+# user can enter the values from the pck and potentially modify
+# the value if for example a value from another source exists (and
+# may be known to be better).
+#
+# Units required for each parameter and uncertainty are as follows:
+#
+# RaValue, RaSigma: degrees
+# RaVelocityValue, RaVelocitySigma: degrees/second
+# RaAccelerationValue, RaAccelerationSigma: degrees/second/second
+# DecValue, DecSigma: degrees
+# DecVelocityValue, DecVelocitySigma: degrees/second
+# DecAccelerationValue, DecAccelerationSigma: degrees/second/second
+# PmValue, PmSigma: degrees
+# PmVelocityValue, PmVelocitySigma: degrees/second
+# PmAccelerationValue, PmAccelerationSigma: degrees/second/second
+# All Radii parameters/sigmas: meters
+#
+Object = Target
+  Group = "NAME"
+    Name=Enceladus
+  EndGroup
+# pole right ascension solve option is a string none, position, velocity, acceleration
+  Group = "POLERIGHTASCENSION"
+    Ra=position
+    RaValue=40.66
+    RaSigma=0.0
+    RaVelocityValue=-0.036
+    RaVelocitySigma=1.0
+    RaAccelerationValue=0.0
+    RaAccelerationSigma=1.0
+  EndGroup
+  Group = "POLEDECLINATION"
+# pole declination solve option is a string none, position, velocity, acceleration
+    Dec=position
+    DecValue=83.52
+    DecSigma=0.0
+    DecVelocityValue=-0.004
+    DecVelocitySigma=1.0
+    DecAccelerationValue=0.0
+    DecAccelerationSigma=1.0
+  EndGroup
+# prime meridian solve option is a string none, position, velocity, acceleration
+  Group = "PRIME MERIDIAN"
+    Pm=velocity
+    PmValue=6.32
+    PmSigma=0.0
+    PmVelocityValue=262.7318996
+    PmVelocitySigma=0.0
+    PmAccelerationValue=0.0
+    PmAccelerationSigma=1.0
+  EndGroup
+# radii solve option is a string none, triaxial, or mean
+  Group = "RADII"
+    RadiiSolveOption=triaxial
+    RadiusAValue=256600.0
+    RadiusASigma=0.0
+    RadiusBValue=251400.0
+    RadiusBSigma=0.0
+    RadiusCValue=248300.0
+    RadiusCSigma=0.0
+    MeanRadiusValue=252100.0
+    MeanRadiusSigma=0.0
+  EndGroup
+EndObject
+End

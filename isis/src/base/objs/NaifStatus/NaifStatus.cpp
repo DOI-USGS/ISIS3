@@ -88,7 +88,7 @@ namespace Isis {
     errorDescription.addKeyword(PvlKeyword("LongMessage", naifLong));
     error.addGroup(errorDescription);
 
-    PvlToPvlTranslationManager trans(error, "$base/translations/NaifErrors.trn");
+    PvlToPvlTranslationManager trans(error, "$ISISROOT/appdata/translations/NaifErrors.trn");
 
     try {
       errMsg = trans.Translate("ShortMessage");

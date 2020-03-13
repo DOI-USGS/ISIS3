@@ -1,0 +1,63 @@
+Group = LINES
+  Auto
+  InputKey       = Lines
+  InputGroup     = "IsisCube,Core,Dimensions"
+  InputPosition  = (IsisCube, Core, Dimensions)
+  OutputName     = LINES
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+
+Group = LINE_SAMPLES
+  Auto
+  InputKey       = Samples
+  InputGroup     = "IsisCube,Core,Dimensions"
+  InputPosition  = (IsisCube, Core, Dimensions)
+  OutputName     = LINE_SAMPLES
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+
+Group = BANDS
+  Auto
+  InputKey       = Bands
+  InputGroup     = "IsisCube,Core,Dimensions"
+  InputPosition  = (IsisCube, Core, Dimensions)
+  OutputName     = BANDS
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+
+Group = BAND_NAME
+  Auto
+  Optional
+  InputKey       = Name
+  InputGroup     = "IsisCube,BandBin"
+  InputPosition  = (IsisCube, BandBin)
+  OutputName     = FILTER_NAME
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+
+Group = CENTER_FILTER_WAVELENGTH
+  Auto
+  Optional
+  InputKey       = Center
+  InputGroup     = "IsisCube,Bandbin"
+  InputPosition  = (IsisCube, Bandbin)
+  OutputName     = CENTER_FILTER_WAVELENGTH
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+
+Group = BANDWIDTH
+  Auto
+  Optional
+  InputKey       = Width
+  InputGroup     = "IsisCube,Bandbin"
+  InputPosition  = (IsisCube, Bandbin)
+  OutputName     = BANDWIDTH
+  OutputPosition = (Object, IMAGE)
+  Translation    = (*, *)
+End_Group
+End

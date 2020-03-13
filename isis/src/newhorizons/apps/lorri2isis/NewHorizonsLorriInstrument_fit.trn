@@ -1,0 +1,106 @@
+#
+# This translation file is used to produce the ISIS 3 Instrument label group
+# for the New Horizons LORRI camera.
+#
+Group = SpacecraftName
+  Auto
+  InputKey       = HOSTNAME
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("NEW HORIZONS", "NEW HORIZONS")
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRU
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (LORRI, lor)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Jupiter, JUPITER)
+  Translation    = (IO, IO)
+  Translation    = (Ganymede, GANYMEDE)
+  Translation    = (Callisto, CALLISTO)
+  Translation    = (Europa, EUROPA)
+  Translation    = (Himalia, HIMALIA)
+  Translation    = (Elara, ELARA)
+  Translation    = (Pluto, PLUTO)
+  Translation    = (Charon, CHARON)
+  Translation    = (Sky, SKY)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = SPCUTCAL
+  InputPosition  = FITSLABELS
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+# Commented out until/if we have start and stop times
+# Currently there are only center of exposure times
+#Group = StopTime
+#  Auto
+#  InputKey       = SPCUTCAL
+#  InputPosition  = FITSLABELS
+#  OutputName     = StopTime
+#  OutputPosition = (Object, IsisCube, Group, Instrument)
+#  Translation    = (*, *)
+#End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPCSCLK
+  InputPosition  = FITSLABELS
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+# Commented out until/if we have start and stop times
+# Currently there are only center of exposure times
+#Group = SpacecraftClockStopCount
+#  Auto
+#  InputKey       = SPCSCDP
+#  InputPosition  = FITSLABELS
+#  OutputName     = SpacecraftClockStopCount
+#  OutputPosition = (Object, IsisCube, Group, Instrument)
+#  Translation    = (*, *)
+#End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPTIME
+  InputPosition  = FITSLABELS
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+# Not used with the current camera model
+# The summing modes are handeled through two different Naif codes
+# One for 1x1 and another for 4x4 summing.
+#Group = Summing
+#  Auto
+#  InputKey       = SUMMING
+#  InputPosition  = FITSLABELS
+#  OutputName     = Summing
+#  OutputPosition = (Object, IsisCube, Group, Instrument)
+#  Translation    = (*, *)
+#End_Group
+
+End
