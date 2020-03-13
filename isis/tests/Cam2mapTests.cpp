@@ -18,9 +18,9 @@
 
 using namespace Isis;
 using ::testing::Return;
+using ::testing::AtLeast;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
-
 
 TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   std::istringstream labelStrm(R"(
@@ -383,7 +383,6 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }
 
-
 TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   std::istringstream labelStrm(R"(
     Group = Mapping
@@ -434,8 +433,6 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }
-
-
 
 TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
   std::istringstream labelStrm(R"(

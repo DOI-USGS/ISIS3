@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QTemporaryDir>
+#include <QTemporaryFile>
 
 #include <nlohmann/json.hpp>
 
