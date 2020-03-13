@@ -452,11 +452,22 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 # Create the appdata directory and translations directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/apollo)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/autoreg) # *.def
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/autoseed) # *.def, *.pvl
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/cnetref) # *.def, *.def.example
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats) # *.def, *.def.example
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure) # *.def, *.def.example
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures) # *.lis
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff) # *.lis
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw) # *.pvl
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/kernels) # *.txt
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/photometry) # *.pvl
+
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/targets)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/labels)
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/autoreg)
+#execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/autoreg)
 
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
@@ -507,7 +518,8 @@ add_dependencies(isis3 incs)
 add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/appdata/translations/*.trn  
   ${CMAKE_SOURCE_DIR}/appdata/translations/*.typ ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.typ
-  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.pft
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn  ${CMAKE_SOURCE_DIR}/src/*/translations/*.trn
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.pft ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.def
   ${CMAKE_BINARY_DIR}/appdata/translations)
 add_dependencies(isis3 appdata)
 
@@ -517,7 +529,56 @@ add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/templates/*.def ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
 add_dependencies(isis3 templates)
 
-#execute_command(cp -r ${CMAKE_SOURCE_DIR}/src/*/templates/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates)
+# Add custom build target to copy modified template files to the build/appdata/templates
+# directory. (As above - may need to be updated)
+add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoreg/*.def ${CMAKE_BINARY_DIR}/appdata/templates/autoreg/)
+add_dependencies(isis3 autoreg)
+
+add_custom_target(autoseed ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/*.pvl 
+  ${CMAKE_BINARY_DIR}/appdata/templates/autoseed/)
+add_dependencies(isis3 autoseed)
+
+add_custom_target(cnetref ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def.example
+  ${CMAKE_BINARY_DIR}/appdata/templates/cnetref/)
+add_dependencies(isis3 cnetref)
+
+add_custom_target(cnetstats ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/*.def.example
+  ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats/)
+add_dependencies(isis3 cnetstats)
+
+add_custom_target(cnetvalid ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/*.def.example
+  ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure/)
+add_dependencies(isis3 cnetvalid)
+
+add_custom_target(findfeatures ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/*.lis
+  ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/)
+add_dependencies(isis3 findfeatures)
+
+add_custom_target(fullcnetdiff ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/fullcnetdiff/*.def
+  ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff/)
+add_dependencies(isis3 fullcnetdiff)
+
+add_custom_target(jigsaw ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/jigsaw/*.pvl
+  ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw/)
+add_dependencies(isis3 jigsaw)
+
+add_custom_target(kernels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/kernels/*.txt
+  ${CMAKE_BINARY_DIR}/appdata/templates/kernels/)
+add_dependencies(isis3 kernels)
+
+add_custom_target(photometry ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/photometry/*.pvl
+  ${CMAKE_BINARY_DIR}/appdata/templates/photometry/)
+add_dependencies(isis3 photometry)
 
 # Either add these for maps, labels, autoreg, images or approach in a different way.
 
@@ -540,9 +601,9 @@ add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/labels/*.pft ${CMAKE_BINARY_DIR}/appdata/labels)
 add_dependencies(isis3 labels)
 
-add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/autoreg/*.def ${CMAKE_BINARY_DIR}/appdata/autoreg)
-add_dependencies(isis3 autoreg)
+#add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#  ${CMAKE_SOURCE_DIR}/appdata/autoreg/*.def ${CMAKE_BINARY_DIR}/appdata/autoreg)
+#add_dependencies(isis3 autoreg)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

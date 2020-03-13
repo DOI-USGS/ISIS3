@@ -1,0 +1,10 @@
+Group = NaifCode
+  Auto
+  InputKey       = SPCINSID
+  InputPosition  = FITSLABELS
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation = (-98901, -98201)
+End_Group
+
+End

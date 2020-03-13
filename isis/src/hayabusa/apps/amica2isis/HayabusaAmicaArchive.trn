@@ -1,0 +1,170 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = FileName
+  Auto
+  InputKey       = ^HEADER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = FileName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductName
+  Auto
+  InputKey       = PRODUCT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = ProductName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductCreationTime
+  Auto
+  InputKey       = PRODUCT_CREATION_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = ProductCreationTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SubImageCount
+  Auto
+  InputKey       = NSUBIMG
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = SubImageCount
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageNumber
+  Auto
+  InputKey       = IMG_NO_0
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = Image1Number
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataType
+  Auto
+  InputKey       = DAT_TYPE
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = DataType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OutputMode
+  Auto
+  InputKey       = OUT_MODE
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = OutputMode
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OperationType
+  Auto
+  InputKey       = IMG_OPE
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = OperationType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LutNumber
+  Auto
+  InputKey       = LUT_NO
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = LutNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = QualityFlag
+  Auto
+  InputKey       = QF
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = QualityFlag
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = QualityDesc
+  Auto
+  InputKey       = QF
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  InputDefault   = "N/A"
+  OutputName     = QualityDesc
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = ("GOOD", 0)
+  Translation    = ("TRANSFER ERROR", 1)
+  Translation    = ("COMMAND ERROR", 2)
+  Translation    = (*, *)
+End_Group
+
+
+End

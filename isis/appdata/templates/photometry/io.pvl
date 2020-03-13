@@ -1,0 +1,40 @@
+##################################################
+##  This file was converted from ISIS2          ##
+##  Date of last revision:  2012 Oct 04         ##  
+##################################################
+##  File: ~/$ISISDATA/photom.io.sav             ##
+##  Description: This file is the mars file     ##
+##    looking up default photometric correction ##
+##    parameters for the photometric correction ##
+##    program.                                  ##
+##  Author: K. Teal Thompson                    ##
+##  Data: Randy L Kirk                          ##
+##  Date of Last Revision:  15 Dec 99           ##
+##################################################
+##  use # for comments.                         ##
+##  use , to delineate the coefficient values.  ##
+##  formatting for coeffs: (f15.8)              ##
+##  declaration for coeffs: real*8              ##
+##  declaration for line: character*256         ##
+##################################################
+
+Object = PhotometricModel
+  Group = Algorithm
+    PhtName = LunarLambertEmpirical
+    PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180."
+    LList = "0.830,0.662,0.544,0.457,0.373,0.290,0.206,0.129,0.062,0.009,-0.029,-0.053,-0.061,-0.061,-0.055,-0.049,-0.037,-0.013,0.010"
+    PhaseCurveList = "1.000,1.008,0.985,0.941,0.886,0.829,0.774,0.720,0.666,0.608,0.544,0.470,0.389,0.309,0.233,0.166,0.104,0.043,0.000"
+  EndGroup
+  
+  #McEwen et al. (1988) global average
+  
+  Group = Algorithm
+    PhtName = HapkeHen
+    Wh = 0.9
+    Hh = 0.0
+    B0 = 0.0
+    Theta = 30.0
+    Hg1 = -0.26
+    Hg2 = 0.0
+  EndGroup
+EndObject

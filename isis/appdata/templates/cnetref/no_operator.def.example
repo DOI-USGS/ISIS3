@@ -1,0 +1,34 @@
+Group = ValidMeasure
+    # Optional keywords "MinDN" and/or "MaxDN"
+    # The values define the valid range of DNs used by the algorithm
+    # In this example the standard deviation will not use DNs below 0.2 or
+    # above 1.0
+    MinDN = 0.2
+    MaxDN = 1.0
+
+    # Optional keywords "MinEmission" and/or "MaxEmission"
+    # The value represents the valid range of  Emission angle used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be the reference
+    MinEmission = 0 
+    MaxEmission = 135         
+
+    # Optional keyword "MinIncidence" and/or "MaxIncidence"
+    # The value represents the valid range of  Incidence angle used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be the reference
+    MinIncidence = 0 
+    MaxIncidence = 135
+
+    # Optional keyword "MinResolution" and/or "MaxResolution"
+    # The value represents the valid range of Resolution used by the algorithm 
+    # for a control measure to be not ignored and to be considered to be the reference
+    MinResolution = 100.0 
+    MaxResolution = 500.0
+
+    # Optional keywords "PixelsFromEdge" or "MetersFromEdge"
+    # The values represent the minm pixels and meters each measure must be
+    # from its edge to be not ignored and to be considered to be of interest
+    # Only one of them must be defined in a DefFile
+    PixelsFromEdge = 0
+    MetersFromEdge = 0.0
+
+EndGroup

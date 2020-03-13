@@ -60,7 +60,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // Check to see if the undistorted image was requested from the FITS file and that it has the 
+  // Check to see if the undistorted image was requested from the FITS file and that it has the
   // corresponding extension and keywords
   if (ui.WasEntered("UNDISTORTED")) {
     PvlGroup undistortedLabel = importFits.fitsImageLabel(1);
@@ -74,7 +74,7 @@ void IsisMain() {
     }
   }
 
-  // Check to see if the error image was requested from the FITS file and it has the 
+  // Check to see if the error image was requested from the FITS file and it has the
   // corresponding extension and keywords
   if (ui.WasEntered("ERROR")) {
     PvlGroup errorLabel = importFits.fitsImageLabel(2);
@@ -87,7 +87,7 @@ void IsisMain() {
     }
   }
 
-  // Check to see if the quality image was requested from the FITS file and it has the 
+  // Check to see if the quality image was requested from the FITS file and it has the
   // corresponding extension and keywords
   if (ui.WasEntered("QUALITY")) {
     PvlGroup qualityLabel = importFits.fitsImageLabel(3);
@@ -100,7 +100,7 @@ void IsisMain() {
     }
   }
 
-  // Convert the primary image 
+  // Convert the primary image
   QString bitpix = primaryLabel.findKeyword("BITPIX", Pvl::Traverse);
   int bytesPerPix = abs(toInt(bitpix)) / 8;
   importFits.SetDataPrefixBytes(bytesPerPix * 12);
@@ -122,7 +122,7 @@ void IsisMain() {
   importFits.EndProcess();
 
 
-  // Convert the bias-subtracted, flattened, distortion removed image. It is currently assumed 
+  // Convert the bias-subtracted, flattened, distortion removed image. It is currently assumed
   // to be the 2rd image in the FITS file (i.e., 1st extension)
   if (ui.WasEntered("UNDISTORTED")) {
     PvlGroup undistortedLabel = importFits.fitsImageLabel(1);
@@ -204,11 +204,11 @@ void translateLabels(Pvl &label, Cube *ocube) {
 
   // Get the directory where the New Horizons translation tables are.
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["NewHorizons"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   Pvl *isisLabel = ocube->label();
   // Create an Instrument group
-  FileName insTransFile(transDir + "mvicInstrument_fit.trn");
+  FileName insTransFile(transDir + "NewHorizonsMvicInstrument_fit.trn");
   PvlToPvlTranslationManager insXlater(label, insTransFile.expanded());
   insXlater.Auto(*(isisLabel));
 
@@ -234,13 +234,13 @@ void translateLabels(Pvl &label, Cube *ocube) {
   //  and spacecraft clock kernels to calculate time.
   NaifStatus::CheckErrors();
   // Leapsecond kernel
-  QString lsk = "$ISIS3DATA/base/kernels/lsk/naif????.tls";
+  QString lsk = "$ISISDATA/base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
   furnsh_c(lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
-  QString sclk = "$ISIS3DATA/newhorizons/kernels/sclk/new_horizons_???.tsc";
+  QString sclk = "$ISISDATA/newhorizons/kernels/sclk/new_horizons_???.tsc";
   FileName sclkName(sclk);
   sclkName = sclkName.highestVersion();
   furnsh_c(sclkName.expanded().toLatin1().data());
@@ -262,7 +262,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
   inst.addKeyword(PvlKeyword("StartTime", QString(utc)));
 
   // Create a Band Bin group
-  FileName bandTransFile(transDir + "mvicBandBin_fit.trn");
+  FileName bandTransFile(transDir + "NewHorizonsMvicBandBin_fit.trn");
   PvlToPvlTranslationManager bandBinXlater(label, bandTransFile.expanded());
   bandBinXlater.Auto(*(isisLabel));
   // Add units and OriginalBand keyword
@@ -292,18 +292,18 @@ void translateLabels(Pvl &label, Cube *ocube) {
   }
 
   // Create an Archive group
-  FileName archiveTransFile(transDir + "mvicArchive_fit.trn");
+  FileName archiveTransFile(transDir + "NewHorizonsMvicArchive_fit.trn");
   PvlToPvlTranslationManager archiveXlater(label, archiveTransFile.expanded());
   archiveXlater.Auto(*(isisLabel));
 
   // Create a Kernels group
-  FileName kernelsTransFile(transDir + "mvicKernels_fit.trn");
+  FileName kernelsTransFile(transDir + "NewHorizonsMvicKernels_fit.trn");
   PvlToPvlTranslationManager kernelsXlater(label, kernelsTransFile.expanded());
   kernelsXlater.Auto(*(isisLabel));
-  
+
   // If Level 2 product, Create a RadiometricCalibration group
   if (label.hasKeyword("SOCL2VER", Pvl::Traverse)) {
-    FileName calibrationTransFile(transDir + "mvicCalibration_fit.trn"); 
+    FileName calibrationTransFile(transDir + "NewHorizonsMvicCalibration_fit.trn");
     PvlToPvlTranslationManager calibrationXlater(label, calibrationTransFile.expanded());
     calibrationXlater.Auto(*(isisLabel));
 
@@ -351,4 +351,3 @@ void translateLabels(Pvl &label, Cube *ocube) {
 //    swap(in[i], in[in.size() - i - 1]);
 //  }
 //}
-

@@ -237,7 +237,7 @@ void translateMsiLabels(Pvl inputLabelPvl, Pvl *isisLabelPvl) {
   kernelsGrp += PvlKeyword("NaifFrameCode", "-93001");
 
   PvlToPvlTranslationManager labelXlater(inputLabelPvl, 
-                                    "$near/translations/nearImportPdsLabel.trn");
+                                    "$ISISROOT/appdata/translations/NearMsiImportPdsLabel.trn");
   labelXlater.Auto(*isisLabelPvl);
 
   // Add units to center wave length

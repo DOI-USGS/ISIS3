@@ -1,0 +1,105 @@
+#
+# This translation file is used to produce the ISIS 3 Archive label group
+# for the Hayabusa 2 ONC-W1, ONC-W2, and ONC-T cameras.
+#
+
+Group = ProducerId
+  Auto
+  Optional
+  InputKey       = ORIGIN
+  InputPosition  = FitsExtras
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = L0FileName
+  Auto  
+  InputKey       = P_L0NAME
+  InputPosition  = FitsLabels
+  OutputName     = L0FileName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FormatType
+  Auto
+  Optional
+  InputKey       = FMTTYPE
+  InputPosition  = FitsExtras
+  OutputName     = FormatType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FormatTypeVersion
+  Auto
+  Optional
+  InputKey       = FTYPEVER
+  InputPosition  = FitsExtras
+  OutputName     = FormatTypeVersion
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ContentType
+  Auto
+  Optional
+  InputKey       = CNTTYPE
+  InputPosition  = FitsExtras
+  OutputName     = ContentType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ContentVersion
+  Auto
+  Optional
+  InputKey       = CNTVER
+  InputPosition  = FitsExtras
+  OutputName     = ContentVersion
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageType
+  Auto
+  Optional
+  InputKey       = P_IMGTYP
+  InputPosition  = FitsExtras 
+  OutputName     = ImageType
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SourceProductId
+  Auto
+  InputKey       = FILENAME
+  InputPosition  = FitsExtras
+  OutputName     = SourceProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SubImageCount
+  Auto
+  InputKey       = NSUBIMG
+  InputPosition  = FitsLabels
+  OutputName     = SubImageCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+# the following image ID is assigned by the onboard image processor.
+# AMICA calls this one "ImageNumber"
+Group = ImageNumber
+  Auto
+  InputKey       = P_IMGID
+  InputPosition  = FitsExtras
+  OutputName     = ImageNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End
+
