@@ -370,7 +370,7 @@ int main(void) {
     }
 
     try {
-      FileName pvlFile("$base/translations/pdsImage.trn");
+      FileName pvlFile("$ISISROOT/appdata/translations/pdsImage.trn");
       stringstream simpleTrans;
       simpleTrans << "Group = Version" << endl;
       simpleTrans << "  Auto" << endl;
