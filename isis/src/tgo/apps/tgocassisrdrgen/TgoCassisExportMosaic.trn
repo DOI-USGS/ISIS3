@@ -214,7 +214,6 @@ End_Group
 
 # Internal Reference
 
-# Todo: need internal ref from PDS? 
 Group = InternalReference
   Auto
   Optional
@@ -263,7 +262,6 @@ Group = Comment
   Translation     = (*, *)
 End_Group
 
-# 
 # New Mission_Area exports
 Group = MissionPhase
   Auto
@@ -356,17 +354,6 @@ Group = ObservationContextIdentifier
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Observation_Context)
   Translation     = (*, *)
 End_Group
-
-# Quality_Information
-
-#Group = QualityInformation
-#  Auto
-#  Optional
-#  InputPosition   = (IsisCube, Archive, ObservationId)
-#  OutputName      = psa:quality_flag
-#  OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Quality_Information)
-#  Translation     = (*, *)
-#End_Group
 
 Group = IFOV
   Auto
@@ -539,52 +526,6 @@ Group = CKKernel
   Translation     = (*, *)
 End_Group
 
-# Commented out as this now needs to be output in different places depending on 
-# 2D or 3D cube
-#Group = Description
-#  Auto
-#  Optional
-#  InputDefault    = "Pixel values are in units of I/F (intensity/flux). I/F is defined as the
-#                    ratio of the observed radiance and the radiance of a 100% lambertian
-#                    reflector with the sun and camera orthogonal to the observing surface."
-#  OutputName      = description
-#  OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image)
-#  Translation     = (*, *)
-#End_Group
 
-# Commented-out unneeded CaSSIS_Header
-# left translation groups here for now in case we want to translate the input values into
-# a PDS4-compliant structure later.
-
-#Group = ProductId
-#  Auto
-#  Optional
-#  InputKey        = ProductId
-#  InputPosition   = (IsisCube, Mosaic)
-#  OutputName      = product_id
-#  OutputPosition  = (Product_Observational, CaSSIS_Header, IDENTIFICATION_DATA)
-#  Translation     = (*, *)
-#End_Group
-#
-#Group = ObservationId
-#  Auto
-#  Optional
-#  InputKey        = ObservationId
-#  InputPosition   = (IsisCube, Mosaic)
-#  OutputName      = observation_id
-#  OutputPosition  = (Product_Observational, CaSSIS_Header, IDENTIFICATION_DATA)
-#  Translation     = (*, *)
-#End_Group
-#
-#
-#
-#Group = FSW_HEADER
-#  Auto
-#  InputKey        = SpacecraftClockStartCount
-#  InputPosition   = (IsisCube, Mosaic)
-#  OutputName      = "att@Timestamp"
-#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
-#  Translation     = (*, *)
-#End_Group
 
 

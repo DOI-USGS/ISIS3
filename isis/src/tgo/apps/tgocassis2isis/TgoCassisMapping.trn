@@ -80,7 +80,6 @@ Group = PixelResolution
   Translation          = (*, *)
 End_Group
 
-## for min/max lat/lons, can we assume equivalent to N/S E/W min/max ? 
 Group = MaximumLatitude
   Auto
   InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Domain, cart:Bounding_Coordinates)
