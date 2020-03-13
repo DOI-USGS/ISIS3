@@ -37,7 +37,7 @@ using namespace Isis;
  */
 
  void ReportError(QString err) {
-   cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+   cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/mgs"), "mgs") << endl;
  }
 
 int main() {
