@@ -11,7 +11,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/files.lis;
 	$(APPNAME) FROMLIST=$(OUTPUT)/files.lis \
-	MAP=$(ISIS3DATA)/base/templates/maps/equirectangular.map \
+	MAP=$(ISISROOT)/appdata/maps/equirectangular.map \
 	TO=$(OUTPUT)/mosrange_equi.map PRECISION=4 > /dev/null;
 	/bin/mv $(OUTPUT)/mosrange_equi.map $(OUTPUT)/mosrange_equi.txt
 	$(RM) $(OUTPUT)/files.lis;
