@@ -1,0 +1,680 @@
+# Translation for TGO CaSSIS export from ISIS3 cube to PDS4 product.
+#
+# Note these translations must be are ordered based on the required PDS4 order.
+#
+# history 2017-11-07 Jeannie Backer - Removed the StartTime group since this is now handled generally for
+#                        all PDS4 exports.
+# history 2017-11-13 Jeannie Backer - Commented out unknown values. Reordered translations for consistency.
+# history 2018-05-14 Kaitlyn Lee - Removed duplicate InputDefault and InputKey from FNumber group.
+# history 2018-05-16 Adam Goins - Added product_id and observation_id to CaSSIS_Header.
+# history 2018-05-17 Kaitlyn Lee - Changed input position of ObservationId and ProductId
+#                        to the Instrument group from the Archive group.
+# history 2018-05-18 Kristin Berry - Added SolarLongitude translation.
+# history 2018-05-18 Jeannie Backer - Changed group names to upper camel case for consistency.
+# history 2018-05-22 Kaitlyn Lee - Moved mosaic keywords to tgoCassisExportMosaic.trn.
+# history 2018-06-18 Jeannie Backer - Look for ObservationId in Archive group
+# history 2019-06-12 Kristin Berry - Removed CaSSIS_Header for non-PDS4 compliance. 
+
+#Group = FileName
+#  Auto
+#  InputKey        = FileName
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = title
+#  OutputPosition  = (Product_Observational, Identification_Area)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = DataSetId
+#  Auto
+#  Optional
+#  InputKey        = DataSetId
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = logical_identifier
+#  OutputPosition  = (Product_Observational, Identification_Area)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = ProducerId
+#  Auto
+#  Optional
+#  InputKey        = ProducerId
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Producer_id
+#  OutputPosition  = (Product_Observational, Identification_Area, Producer_data)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = ProducerName
+#  Auto
+#  Optional
+#  InputKey        = ProducerName
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Producer_full_name
+#  OutputPosition  = (Product_Observational, Identification_Area, Producer_data)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = ProductVersionId
+#  Auto
+#  Optional
+#  InputKey        = ProductVersionId
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = version_id
+#  OutputPosition  = (Product_Observational, Identification_Area)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = ProductCreationTime
+#  Auto
+#  Optional
+#  InputKey        = ProductCreationTime
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = creation_date_time
+#  OutputPosition  = (Product_Observational, File_Area_Observational, File)
+#  Translation     = (*, *)
+#End_Group
+
+# Added for Alias_List
+Group = AliasList
+  Auto
+  Optional
+  InputKey        = ObservationId
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = alternate_id
+  OutputPosition  = (Product_Observational, Identification_Area, Alias_List, Alias)
+  Translation     = (*, *)
+End_Group
+
+Group = Comment
+  Auto
+  Optional
+  InputDefault    = "CaSSIS Internal Identifier"
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = comment
+  OutputPosition  = (Product_Observational, Identification_Area, Alias_List, Alias)
+  Translation     = (*, *)
+End_Group
+
+# New Mission_Area exports
+
+#Group = SmithedCK
+#  Auto
+#  Optional
+#  InputKey        = SmithedCK 
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = cassis:smithedck
+#  OutputPosition  = (Product_Observational, Mission_Area, cassis:CaSSIS)
+#  Translation     = (*, *)
+#End_Group
+
+#Group = CKKernel
+#  Auto
+#  Optional
+#  InputKey        = CKKernel
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = cassis:ckkernel
+#  OutputPosition  = (Product_Observational, Mission_Area, cassis:CaSSIS)
+#  Translation     = (*, *)
+#End_Group
+
+# Commented-out non-PDS4 compliant CaSSIS_Header. Left in here in case
+# we want to translate these into a PDS4-compliant structure in the future. 
+
+#Group = ProductId
+#  Auto
+#  Optional
+#  InputKey        = ProductId
+#  InputPosition   = (IsisCube, Instrument)
+#  OutputName      = product_id
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IDENTIFICATION_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ObservationId
+#  Auto
+#  Optional
+#  InputKey        = ObservationId
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = observation_id
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IDENTIFICATION_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = PredictMaximumExposureTime
+#  Auto
+#  Optional
+#  InputKey        = PredictMaximumExposureTime
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = PREDICTED_MAXIMUM_EXPOSURE_TIME
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = CassisOffNadirAngle
+#  Auto
+#  Optional
+#  InputKey        = CassisOffNadirAngle
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = CASSIS_OFF_NADIR_ANGLE
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = PredictedRepetitionFrequency
+#  Auto
+#  Optional
+#  InputKey        = PredictedRepetitionFrequency
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = PREDICTED_REQUIRED_REPETITION_FREQUENCY
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = GroundTrackVelocity
+#  Auto
+#  Optional
+#  InputKey        = GroundTrackVelocity
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = TGO_GROUND_TRACK_VELOCITY
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ForwardRotationAngle
+#  Auto
+#  Optional
+#  InputKey        = ForwardRotationAngle
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = FORWARD_ROTATION_ANGLE_REQUIRED
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = SpiceMisalignment
+#  Auto
+#  Optional
+#  InputKey        = SpiceMisalignment
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = SPICE_KERNEL_MISALIGNMENT_PREDICT
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, GEOMETRIC_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = FocalLength
+#  Auto
+#  Optional
+#  InputKey        = FocalLength
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = TELESCOPE_FOCAL_LENGTH
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, CaSSIS_General)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = FNumber
+#  Auto
+#  Optional
+#  InputKey        = FNumber
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = TELESCOPE_F_NUMBER
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, CaSSIS_General)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ExposureTimeCommand
+#  Auto
+#  Optional
+#  InputKey        = ExposureTimeCommand
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = T_exp
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IMAGE_COMMAND)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = FrameletNumber
+#  Auto
+#  Optional
+#  InputKey        = FrameletNumber
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@SequenceCounter
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = NumberOfFramelets
+#  Auto
+#  Optional
+#  InputKey        = NumberOfFramelets
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Num_exp
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IMAGE_COMMAND)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ImageFrequency
+#  Auto
+#  Optional
+#  InputKey        = ImageFrequency
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Step_exp
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IMAGE_COMMAND)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = NumberOfWindows
+#  Auto
+#  Optional
+#  InputKey        = NumberOfWindows
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Num_win
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IMAGE_COMMAND)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = UniqueIdentifier
+#  Auto
+#  Optional
+#  InputKey        = UniqueIdentifier
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = Unique_Identifier
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, IMAGE_COMMAND)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = UID
+#  Auto
+#  Optional
+#  InputKey        = UID
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@UID
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ExposureTimestamp
+#  Auto
+#  Optional
+#  InputKey        = ExposureTimestamp
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@ExposureTimestamp
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = WindowCount
+#  Auto
+#  Optional
+#  InputKey        = Window_Count
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@WindowCounter
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow1
+#  Auto
+#  Optional
+#  InputKey        = Window_1_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_1
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow2
+#  Auto
+#  Optional
+#  InputKey        = Window_2_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_2
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow3
+#  Auto
+#  Optional
+#  InputKey        = Window_3_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_3
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow4
+#  Auto
+#  Optional
+#  InputKey        = Window_4_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_4
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow5
+#  Auto
+#  Optional
+#  InputKey        = Window_5_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_5
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = BinningWindow6
+#  Auto
+#  Optional
+#  InputKey        = Window_6_Binning
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Binning_window_6
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ExposureTimePEHK
+#  Auto
+#  Optional
+#  InputKey        = ExposureTimePEHK
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Exposure_Time
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = PixelsPossiblySaturated
+#  Auto
+#  Optional
+#  InputKey         = PixelsPossiblySaturated
+#  InputPosition    = (IsisCube, Archive)
+#  OutputName       = PixelsPossiblySaturated
+#  OutputPosition   = (Product_Observational, CaSSIS_Header, DERIVED_HEADER_DATA)
+#  Translation      = (*, *)
+#End_Group
+#
+#Group = Timestamp
+#  Auto
+#  InputKey        = SpacecraftClockStartCount
+#  InputPosition   = (IsisCube, Instrument)
+#  OutputName      = "att@Timestamp"
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, FSW_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = ExposureDuration
+#  Auto
+#  InputKey        = ExposureDuration
+#  InputPosition   = (IsisCube, Instrument)
+#  OutputName      = "att@Exposure_Time"
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = SummingMode
+#  Auto
+#  InputKey        = SummingMode
+#  InputPosition   = (IsisCube, Instrument)
+#  InputDefault    = "0"
+#  OutputName      = "att@Binning_window_1"
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Expanded
+#  Auto
+#  Optional
+#  InputKey        = Expanded
+#  InputPosition   = (IsisCube, Instrument)
+#  OutputName      = Expanded
+#  OutputAttribute = Flag|N/A
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, DERIVED_HEADER_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = FilterName
+#  Auto
+#  InputKey        = FilterName
+#  InputPosition   = (IsisCube, BandBin)
+#  OutputName      = Filter
+#  OutputAttribute = Form|Acronym
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, DERIVED_HEADER_DATA)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window1EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_1_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window1_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window1EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_1_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window1_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window1StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_1_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window1_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window1StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_1_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window1_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window2EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_2_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window2_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window2EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_2_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window2_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window2StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_2_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window2_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window2StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_2_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window2_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window3EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_3_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window3_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window3EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_3_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window3_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window3StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_3_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window3_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window3StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_3_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window3_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window4EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_4_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window4_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window4EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_4_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window4_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window4StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_4_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window4_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window4StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_4_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window4_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window5EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_5_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window5_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window5EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_5_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window5_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window5StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_5_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window5_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window5StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_5_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window5_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window6EndColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_6_End_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window6_End_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window6EndRow
+#  Auto
+#  Optional
+#  InputKey        = Window_6_End_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window6_End_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window6StartColumn
+#  Auto
+#  Optional
+#  InputKey        = Window_6_Start_Sample
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window6_Start_Col
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group
+#
+#Group = Window6StartRow
+#  Auto
+#  Optional
+#  InputKey        = Window_6_Start_Line
+#  InputPosition   = (IsisCube, Archive)
+#  OutputName      = att@Window6_Start_Row
+#  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
+#  Translation     = (*, *)
+#End_Group

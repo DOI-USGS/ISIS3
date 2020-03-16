@@ -122,10 +122,7 @@ namespace Isis {
     if(translationIterator == missionTranslators.end()) {
       // Get the file
 
-      FileName snFile((QString) "$ISISROOT/translations/" + mission + instrument + "SerialNumber????.trn");
-      std::cout << "SERIALNUMBER: " << snFile.baseName() << std::endl; 
-
-      snFile = snFile.highestVersion();
+      FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + instrument + "SerialNumber.trn");
 
       // use the translation file to generate keywords
       missionTranslators.insert(
@@ -134,7 +131,6 @@ namespace Isis {
 
       translationIterator = missionTranslators.find(key);
     }
-
     translationIterator->second.SetLabel(label);
     translationIterator->second.Auto(outLabel);
 

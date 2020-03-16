@@ -128,10 +128,10 @@ void IsisMain() {
   QDomDocument &pdsLabel = process.GetLabel();
 
   // The default translation for for non-mosaicked output
-  QString exportTranslationFile = "$tgo/translations/tgoCassisExport.trn"; 
+  QString exportTranslationFile = "$ISISROOT/appdata/translations/TgoCassisExport.trn"; 
 
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    exportTranslationFile = "$tgo/translations/tgoCassisExportMosaic.trn";
+    exportTranslationFile = "$ISISROOT/appdata/translations/TgoCassisExportMosaic.trn";
   }
 
   Pvl *labelPvl = icube->label();
