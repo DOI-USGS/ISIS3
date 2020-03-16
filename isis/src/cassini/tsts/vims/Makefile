@@ -99,7 +99,7 @@ commands:
 #  images because the vims camera model finds solution for any lat/lon and the range checking 
 #  was not working correctly.
 	$(CAM2MAP) $(TSTARGS) from=$(INPUT)/C1514302573_1.irBand71.cub to=$(OUTPUT)/C1514302573_1.irBand71.sinu.cub \
-          map='$$base/templates/maps/sinusoidal.map' \
+          map='$ISISROOT/appdata/maps/sinusoidal.map' \
           pixres=ppd resolution=2 defaultrange=map minlat=-90 maxlat=90 minlon=0 maxlon=360 \
           trim=yes > /dev/null
 

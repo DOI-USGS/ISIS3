@@ -521,6 +521,7 @@ add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn  ${CMAKE_SOURCE_DIR}/src/*/translations/*.trn
   ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.pft ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.def
   ${CMAKE_SOURCE_DIR}/appdata/translations/*.def ${CMAKE_SOURCE_DIR}/appdata/translations/*.pvl
+#  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.pvl
   ${CMAKE_BINARY_DIR}/appdata/translations)
 add_dependencies(isis3 appdata)
 
