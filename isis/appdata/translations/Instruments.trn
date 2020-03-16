@@ -141,15 +141,15 @@ Group = InstrumentName
   Translation   = (Osiris, OSIWAC)
 
   # Trace Gas Orbiter (ExoMars TGO)
-  Translation   = (Tgo, CaSSIS)
+  Translation   = (Cassis, CaSSIS)
 
   # Viking
   Translation   = (CameraA, VISUAL_IMAGING_SUBSYSTEM_CAMERA_A)
   Translation   = (CameraB, VISUAL_IMAGING_SUBSYSTEM_CAMERA_B)
 
   # Voyager
-  Translation   = (Voyager, WIDE_ANGLE_CAMERA)
-  Translation   = (Voyager, NARROW_ANGLE_CAMERA)
+  Translation   = (Wac, WIDE_ANGLE_CAMERA)
+  Translation   = (Nac, NARROW_ANGLE_CAMERA)
 
 End_Group
 End
