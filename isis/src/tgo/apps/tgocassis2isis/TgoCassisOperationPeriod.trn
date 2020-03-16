@@ -1,0 +1,11 @@
+Group = OperationPeriod
+  InputDefault = UNK
+  Translation = (CRUS, 0)
+  Translation = (MY34, 1)
+  Translation = (MY35, 2)
+  Translation = (MY36, 3)
+  Translation = (MY37, 4)
+  Translation = (MY38, 5)
+  Translation = (TBD, 6)
+  Translation = (TEST, 7)
+EndGroup

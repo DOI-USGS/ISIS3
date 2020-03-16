@@ -1,0 +1,352 @@
+#
+# This translation table is for translating subwindowing information in CaSSIS
+# xml labels into alpha cubes on ingested cubes.
+#
+# See $base/translations/XmlExample.trn for an example xml translation table
+# and documentation for the different options.
+#
+# history 2017-11-18 Jesse Mapel - Original version.
+# history 2018-05-18 Jeannie Backer - Changed group names to upper camel case for consistency.
+
+Group = WindowCount
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = FSW_HEADER
+  InputKeyAttribute = WindowCounter
+  OutputName     = Window_Count
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window1Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_1
+  OutputName     = Window_1_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window1StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window1_Start_Col
+  OutputName     = Window_1_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window1EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window1_End_Col
+  OutputName     = Window_1_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window1StartLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window1_Start_Row
+  OutputName     = Window_1_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window1EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window1_End_Row
+  OutputName     = Window_1_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window2Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_2
+  OutputName     = Window_2_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window2StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window2_Start_Col
+  OutputName     = Window_2_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window2EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window2_End_Col
+  OutputName     = Window_2_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window2StartLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window2_Start_Row
+  OutputName     = Window_2_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window2EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window2_End_Row
+  OutputName     = Window_2_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window3Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_3
+  OutputName     = Window_3_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window3StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window3_Start_Col
+  OutputName     = Window_3_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window3EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window3_End_Col
+  OutputName     = Window_3_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window3StartLine
+  Optional
+  Auto
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window3_Start_Row
+  OutputName     = Window_3_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window3EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window3_End_Row
+  OutputName     = Window_3_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window4Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_4
+  OutputName     = Window_4_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window4StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window4_Start_Col
+  OutputName     = Window_4_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window4EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window4_End_Col
+  OutputName     = Window_4_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window4StartLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window4_Start_Row
+  OutputName     = Window_4_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window4EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window4_End_Row
+  OutputName     = Window_4_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window5Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_5
+  OutputName     = Window_5_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window5StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window5_Start_Col
+  OutputName     = Window_5_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window5EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window5_End_Col
+  OutputName     = Window_5_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window5StartLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window5_Start_Row
+  OutputName     = Window_5_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window5EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window5_End_Row
+  OutputName     = Window_5_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window6Binning
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Binning_window_6
+  OutputName     = Window_6_Binning
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window6StartSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window6_Start_Col
+  OutputName     = Window_6_Start_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window6EndSample
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window6_End_Col
+  OutputName     = Window_6_End_Sample
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window6StartLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window6_Start_Row
+  OutputName     = Window_6_Start_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Window6EndLine
+  Auto
+  Optional
+  InputPosition  = CaSSIS_Header
+  InputKey       = PEHK_HEADER
+  InputKeyAttribute = Window6_End_Row
+  OutputName     = Window_6_End_Line
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+End

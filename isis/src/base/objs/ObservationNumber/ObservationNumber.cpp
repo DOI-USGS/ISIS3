@@ -100,9 +100,8 @@ namespace Isis {
 
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      FileName snFile((QString) dataDir[mission] + "/translations/" +
-                                    instrument + "SerialNumber????.trn");
-      snFile = snFile.highestVersion();
+      FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + 
+                                 instrument + "SerialNumber.trn");
 
       // Delets the extra
       Pvl translation(snFile.expanded());
