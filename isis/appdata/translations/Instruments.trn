@@ -97,8 +97,8 @@ Group = InstrumentName
   Translation   = (Mariner10, M10_VIDICON_B)
 
   # MER
-  Translation   = (Mer, MI)
-  Translation   = (Mer, "MICROSCOPIC IMAGER")
+  Translation   = (Mi, MI)
+  Translation   = (Mi, "MICROSCOPIC IMAGER")
 
   # MEX
   Translation   = (Hrsc, HRSC)
