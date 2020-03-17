@@ -1,0 +1,62 @@
+Group = FiducialCoordinateMicron
+  Auto
+  InputKey       = LO:FIDUCIAL_COORDINATE_MICRON
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = FiducialCoordinateMicron
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FiducialID
+  Auto
+  InputKey       = LO:FIDUCIAL_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FiducialID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FiducialSamples
+  Auto
+  InputKey       = LO:FIDUCIAL_SAMPLES
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FiducialSamples
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FiducialLines
+  Auto
+  InputKey       = LO:FIDUCIAL_LINES
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FiducialLines
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FiducialXCoordinates
+  Auto
+  InputKey       = LO:FIDUCIAL_X_COORDINATES
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FiducialXCoordinates
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FiducialYCoordinates
+  Auto
+  InputKey       = LO:FIDUCIAL_Y_COORDINATES
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FiducialYCoordinates
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End
