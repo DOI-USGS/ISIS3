@@ -98,12 +98,9 @@ void writeLine(Buffer &b) {
  */
 
 void translateLabels(FileName in, Cube *ocube) {
-  // Get the directory where the Clementine translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["clementine1"];
-  FileName transFile(transDir + "/translations/clementine.trn");
+  QString transDir = "$ISISROOT/appdata/translations/";
+  FileName transFile(transDir + "Clementine.trn");
 
   Pvl pdsLab(in.expanded());
   PvlToPvlTranslationManager labelXlater(pdsLab, transFile.expanded());
