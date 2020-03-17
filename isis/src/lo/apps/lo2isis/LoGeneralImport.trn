@@ -1,0 +1,77 @@
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_TARGET"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_TARGET)
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Moon, MOON)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("Lunar Orbiter 3", LUNAR_ORBITER_3)
+  Translation    = ("Lunar Orbiter 4", LUNAR_ORBITER_4)
+  Translation    = ("Lunar Orbiter 5", LUNAR_ORBITER_5)
+End_Group
+
+Group = ImageNumber
+  Auto
+  InputKey       = IMAGE_NUMBER
+  InputGroup     = ROOT
+  InputGroup     = QUBE
+  InputPosition  = ROOT
+  InputPosition  = QUBE
+  OutputName     = ImageNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("High Resolution Camera", 24_INCH_FOCAL_LENGTH_CAMERA)
+  Translation    = ("High Resolution Camera", 24INCH_FLC)
+  Translation    = ("Medium Resolution Camera", 80_MM_FOCAL_LENGTH_CAMERA)
+  Translation    = ("Medium Resolution Camera", 80MM_FLC)
+End_Group
+
+Group = FrameNumber
+  Auto
+  InputKey       = FRAME_NUMBER
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = FrameNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

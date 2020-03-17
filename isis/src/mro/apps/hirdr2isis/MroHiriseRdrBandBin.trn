@@ -1,0 +1,86 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = Name
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = IMAGE
+  InputGroup     = QUBE
+  InputGroup     = SPECTRAL_QUBE
+  InputGroup     = "UNCOMPRESSED_FILE,IMAGE"
+  InputGroup     = "UNCOMPRESSED_FILE,QUBE"
+  InputGroup     = "UNCOMPRESSED_FILE,SPECTRAL_QUBE"
+  InputPosition  = IMAGE
+  InputPosition  = QUBE
+  InputPosition  = SPECTRAL_QUBE
+  InputPosition  = (UNCOMPRESSED_FILE,IMAGE)
+  InputPosition  = (UNCOMPRESSED_FILE,QUBE)
+  InputPosition  = (UNCOMPRESSED_FILE,SPECTRAL_QUBE)
+  OutputName     = Name
+  OutputPosition = (Group, BandBin)
+  Translation    = (Red, RED)
+  Translation    = (BlueGreen, BLUE-GREEN)
+  Translation    = (NearInfrared, NEAR-INFRARED)
+End_Group
+
+Group = Center
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputGroup     = IMAGE
+  InputGroup     = QUBE
+  InputGroup     = SPECTRAL_QUBE
+  InputGroup     = "UNCOMPRESSED_FILE,IMAGE"
+  InputGroup     = "UNCOMPRESSED_FILE,QUBE"
+  InputGroup     = "UNCOMPRESSED_FILE,SPECTRAL_QUBE"
+  InputPosition  = IMAGE
+  InputPosition  = QUBE
+  InputPosition  = SPECTRAL_QUBE
+  InputPosition  = (UNCOMPRESSED_FILE,IMAGE)
+  InputPosition  = (UNCOMPRESSED_FILE,QUBE)
+  InputPosition  = (UNCOMPRESSED_FILE,SPECTRAL_QUBE)
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputGroup     = IMAGE
+  InputGroup     = QUBE
+  InputGroup     = SPECTRAL_QUBE
+  InputGroup     = "UNCOMPRESSED_FILE,IMAGE"
+  InputGroup     = "UNCOMPRESSED_FILE,QUBE"
+  InputGroup     = "UNCOMPRESSED_FILE,SPECTRAL_QUBE"
+  InputPosition  = IMAGE
+  InputPosition  = QUBE
+  InputPosition  = SPECTRAL_QUBE
+  InputPosition  = (UNCOMPRESSED_FILE,IMAGE)
+  InputPosition  = (UNCOMPRESSED_FILE,QUBE)
+  InputPosition  = (UNCOMPRESSED_FILE,SPECTRAL_QUBE)
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (200, 500)
+  Translation    = (300, 700)
+  Translation    = (200, 900)
+End_Group
+End

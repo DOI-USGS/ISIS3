@@ -1,0 +1,20 @@
+Group = BoresightSample
+  Auto
+  InputKey       = LO:BORESIGHT_SAMPLE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = BoresightSample
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BoresightLine
+  Auto
+  InputKey       = LO:BORESIGHT_LINE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = BoresightLine
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

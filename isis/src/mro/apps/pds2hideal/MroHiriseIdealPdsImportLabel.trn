@@ -3,7 +3,7 @@
 Group = SpacecraftName
   Auto
   InputKey       = SPACECRAFT_NAME
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = SpacecraftName 
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (IdealSpacecraft, *)
@@ -12,7 +12,7 @@ End_Group
 Group = InstrumentId
   Auto
   InputKey       = INSTRUMENT_ID
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = InstrumentId 
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (IdealCamera, *)
@@ -22,7 +22,7 @@ Group = TargetName
   Auto
   InputKey       = TARGET_NAME 
   InputKey       = TargetName
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = TargetName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -32,7 +32,7 @@ Group = SampleDetectors
   Auto
   InputKey       = SAMPLE_DETECTORS
   InputKey       = SampleDetectors
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = SampleDetectors
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -42,7 +42,7 @@ Group = LineDetectors
   Auto
   InputKey       = LINE_DETECTORS
   InputKey       = LineDetectors
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = LineDetectors
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -52,7 +52,7 @@ Group = InstrumentType
   Auto
   InputKey       = INSTRUMENT_TYPE
   InputKey       = InstrumentType
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = InstrumentType
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -63,7 +63,7 @@ Group = FocalLength
   Optional
   InputKey       = FOCAL_LENGTH
   InputKey       = FocalLength
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = FocalLength
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -74,7 +74,7 @@ Group = PixelPitch
   Optional
   InputKey       = PIXEL_PITCH
   InputKey       = PixelPitch
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = PixelPitch
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -84,7 +84,7 @@ Group = EphemerisTime
   Auto
   InputKey       = EPHEMERIS_TIME 
   InputKey       = EphemerisTime
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = EphemerisTime
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -114,7 +114,7 @@ Group = FocalPlaneXDependency
   Auto
   InputKey       = FOCAL_PLANE_X_DEPENDENCY
   InputKey       = FocalPlaneXDependency
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = FocalPlaneXDependency
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (1, SAMPLE)
@@ -125,7 +125,7 @@ Group = TransX
   Auto
   InputKey       = TRANS_X
   InputKey       = TransX
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = TransX
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -135,7 +135,7 @@ Group = TransY
   Auto
   InputKey       = TRANS_Y
   InputKey       = TransY
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = TransY
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -145,7 +145,7 @@ Group = ExposureDuration
   Auto
   InputKey       = EXPOSURE_DURATION
   InputKey       = ExposureDuration
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = ExposureDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -155,7 +155,7 @@ Group = MatchedCube
   Auto
   InputKey       = MATCHED_CUBE 
   InputKey       = MatchedCube
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = MatchedCube
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -165,7 +165,7 @@ Group = ImageJitterCorrected
   Auto
   InputKey       = IMAGE_JITTER_CORRECTED 
   InputKey       = ImageJitterCorrected
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = ImageJitterCorrected
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
@@ -213,7 +213,7 @@ End_Group
 Group = OriginalSpacecraftName
   Auto
   InputKey       = SPACECRAFT_NAME
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = SpacecraftName 
   OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
   Translation    = ("MARS RECONNAISSANCE ORBITER", *)
@@ -222,7 +222,7 @@ End_Group
 Group = OriginalInstrumentId
   Auto
   InputKey       = INSTRUMENT_ID
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = InstrumentId 
   OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
   Translation    = (HIRISE, *)
@@ -232,7 +232,7 @@ Group = OriginalTargetName
   Auto
   InputKey       = TARGET_NAME 
   InputKey       = TargetName
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = TargetName
   OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
   Translation    = (*, *)
@@ -279,7 +279,7 @@ End_Group
 Group = BODY_FRAME_CODE
   Auto
   InputKey       = BODY_FRAME_CODE
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = BODY_FRAME_CODE
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -288,7 +288,7 @@ End_Group
 Group = IDEAL_FOCAL_LENGTH
   Auto
   InputKey       = IDEAL_FOCAL_LENGTH
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_FOCAL_LENGTH
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -297,7 +297,7 @@ End_Group
 Group = IDEAL_PIXEL_PITCH
   Auto
   InputKey       = IDEAL_PIXEL_PITCH
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_PIXEL_PITCH
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -306,7 +306,7 @@ End_Group
 Group = IDEAL_TRANSX
   Auto
   InputKey       = IDEAL_TRANSX
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_TRANSX
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -315,7 +315,7 @@ End_Group
 Group = IDEAL_TRANSY
   Auto
   InputKey       = IDEAL_TRANSY
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_TRANSY
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -324,7 +324,7 @@ End_Group
 Group = IDEAL_TRANSL
   Auto
   InputKey       = IDEAL_TRANSL
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_TRANSL
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)
@@ -333,7 +333,7 @@ End_Group
 Group = IDEAL_TRANSS
   Auto
   InputKey       = IDEAL_TRANSS
-  InputPostion   = ROOT
+  InputPosition   = ROOT
   OutputName     = IDEAL_TRANSS
   OutputPosition = (Object, NaifKeywords)
   Translation    = (*, *)

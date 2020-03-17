@@ -84,8 +84,8 @@ Group = InstrumentName
   Translation   = (Kaguya, TC2)
 
   # LO
-  Translation   = (Lo, "High Resolution Camera")
-  Translation   = (Lo, "Medium Resolution Camera")
+  Translation   = (Hrc, "High Resolution Camera")
+  Translation   = (Mrc, "Medium Resolution Camera")
 
   # LRO
   Translation   = (Nac, NACL)
@@ -93,12 +93,12 @@ Group = InstrumentName
   Translation   = (Minirf, MRFLRO)
 
   # Mariner
-  Translation   = (Mariner10, M10_VIDICON_A)
-  Translation   = (Mariner10, M10_VIDICON_B)
+  Translation   = (VidiconA, M10_VIDICON_A)
+  Translation   = (VidiconB, M10_VIDICON_B)
 
   # MER
-  Translation   = (Mer, MI)
-  Translation   = (Mer, "MICROSCOPIC IMAGER")
+  Translation   = (Mi, MI)
+  Translation   = (Mi, "MICROSCOPIC IMAGER")
 
   # MEX
   Translation   = (Hrsc, HRSC)

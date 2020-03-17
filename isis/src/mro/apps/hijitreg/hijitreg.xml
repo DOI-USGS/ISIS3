@@ -265,7 +265,7 @@
           The registration template for correlations. Default will be MaximumCorrelation function
           with a tolerance of 0.7, a search chip of 30X70 pixels, and a pattern chip of 17X45 pixels.
           There may also be other templates available in the default MRO directory as well as
-          the base templates directory, $base/templates/autoreg.
+          the base templates directory, $ISISROOT/templates/autoreg.
         </description>
         <filter>
           *.def

@@ -1,0 +1,35 @@
+Group = Keyword1
+  Auto
+  InputKey       = SpacecraftName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword1
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (MER, "MARS EXPLORATION ROVER 1")
+  Translation    = (MER, MARS_EXPLORATION_ROVER_1)
+  Translation    = (MER, "MARS EXPLORATION ROVER 2")
+  Translation    = (MER, "SIMULATED MARS EXPLORATION ROVER 1")
+  Translation    = (MER, "SIMULATED MARS EXPLORATION ROVER 2")
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword2
+  Auto
+  InputKey       = InstrumentId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword2
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword3
+  Auto
+  InputKey       = SpacecraftClockStartCount
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword3
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+End
