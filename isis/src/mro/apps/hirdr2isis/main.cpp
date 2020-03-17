@@ -29,17 +29,16 @@ void IsisMain() {
   Pvl otherLabels;
   p.TranslatePdsProjection(otherLabels);
 
-  // Get the directory where the MRO HiRISE RDR translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Mro"] + "/translations/";
+  // Get the path where the MRO HiRISE RDR translation tables are.
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Translate the BandBin group
-  FileName transFile(transDir + "hiriseRdrBandBin.trn");
+  FileName transFile(transDir + "MroHiriseRdrBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
   bandBinXlater.Auto(otherLabels);
 
   // Translate the Mosaic group
-  transFile = transDir + "hiriseRdrMosaic.trn";
+  transFile = transDir + "MroHiriseRdrMosaic.trn";
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 

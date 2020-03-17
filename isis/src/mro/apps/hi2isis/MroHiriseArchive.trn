@@ -1,0 +1,146 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_ID
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputKey       = OBSERVATION_ID
+  OutputName     = ObservationId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  OutputName     = ProductVersionId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EdrProductCreationTime
+  Auto
+  InputKey       = PRODUCT_CREATION_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = EdrProductCreationTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RationaleDescription
+  Auto
+  InputKey       = RATIONALE_DESCRIPTION
+  InputDefault   = Null
+  OutputName     = RationaleDescription
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  InputKey       = ORBIT_NUMBER
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SoftwareName
+  Auto
+  InputKey       = SOFTWARE_NAME
+  OutputName     = SoftwareName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationStartTime
+  Auto
+  InputKey       = MRO:OBSERVATION_START_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = ObservationStartTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ReadoutStartTime
+  Auto
+  InputKey       = MRO:READOUT_START_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = ReadoutStartTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TrimLines
+  Auto
+  InputKey       = MRO:TRIM_LINES
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = TrimLines
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FelicsCompressionFlag
+  Auto
+  InputKey       = MRO:FELICS_COMPRESSION_FLAG
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = FelicsCompressionFlag
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = IdFlightSoftwareName
+  Auto
+  InputKey       = FLIGHT_SOFTWARE_VERSION_ID
+  InputDefault   = UNKNOWN
+  OutputName     = IdFlightSoftwareName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+End

@@ -218,7 +218,7 @@
             <option value="SYSTEM">
               <brief>Search system for a default shape model</brief>
               <description>
-                This option will search the default system data area ($ISIS3DATA/base/dems) for a shape model that 
+                This option will search the default system data area ($ISISDATA/base/dems) for a shape model that 
                 matches the target of the input cube.  If none are found then no shape model will be used and the default 
                 ellipsoid parameters found in the planetary constants (PCK) file define the shape.
               </description>
