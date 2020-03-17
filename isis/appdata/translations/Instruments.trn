@@ -83,8 +83,8 @@ Group = InstrumentName
   Translation   = (Kaguya, TC2)
 
   # LO
-  Translation   = (Lo, "High Resolution Camera")
-  Translation   = (Lo, "Medium Resolution Camera")
+  Translation   = (Hrc, "High Resolution Camera")
+  Translation   = (Mrc, "Medium Resolution Camera")
 
   # LRO
   Translation   = (Nac, NACL)

@@ -21,7 +21,6 @@ Group = Keyword2
   OutputName     = Keyword2
   OutputPosition = (Group, SerialNumberKeywords)
   Translation    = (HRC, "High Resolution Camera")
-  Translation    = (MRC, "Medium Resolution Camera")
   Translation    = (*, *)
 End_Group
 

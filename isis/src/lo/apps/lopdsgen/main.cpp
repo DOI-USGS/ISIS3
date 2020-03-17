@@ -223,7 +223,7 @@ void IsisMain() {
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
-  QString formatDir = "$ISISROOT/templates/lopdsgen/"; // FIXME double-check and update cmake to handle
+  QString formatDir = "$ISISROOT/appdata/templates/lopdsgen/";
   pdsLabel.setFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file

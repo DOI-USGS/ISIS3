@@ -462,6 +462,7 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetd
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw) # *.pvl
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/kernels) # *.txt
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/photometry) # *.pvl
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/lopdsgen) # *.pvl
 
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
@@ -529,6 +530,12 @@ add_dependencies(isis3 appdata)
 add_custom_target(templates ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/templates/*.def ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
 add_dependencies(isis3 templates)
+
+# Add custom build target to copy modified template files to the build/appdata/templates
+# directory. (As above - may need to be updated)
+add_custom_target(lopdsgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/src/lo/apps/lopdsgen/*.pft ${CMAKE_BINARY_DIR}/appdata/templates/lopdsgen/)
+add_dependencies(isis3 lopdsgen)
 
 # Add custom build target to copy modified template files to the build/appdata/templates
 # directory. (As above - may need to be updated)
