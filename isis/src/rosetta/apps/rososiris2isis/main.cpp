@@ -68,24 +68,23 @@ void IsisMain() {
   Cube *outcube = p2.SetOutputCube("TO");
 
   // Get the directory where the OSIRIS translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["rosetta"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 
   // Translate the Archive group
-  FileName transFile(transDir + "osirisArchive.trn");
+  FileName transFile(transDir + "RosettaOsirisArchive.trn");
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the BandBin group
-  transFile = transDir + "osirisBandBin.trn";
+  transFile = transDir + "RosettaOsirisBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Instrument group
-  transFile = transDir + "osirisInstrument.trn";
+  transFile = transDir + "RosettaOsirisInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
@@ -112,7 +111,7 @@ void IsisMain() {
   for (int i = 0; i < filterNames.size(); i++) {
     // Translate the Instrument group
     try {
-      transFile = transDir + "osirisFilters.trn";
+      transFile = transDir + "RosettaOsirisFilters.trn";
       PvlTranslationTable filterTable(transFile.expanded());
       filterCenters[i] = toDouble(filterTable.Translate("FilterCenter_" + instId, 
                                                         filterNames[i]));
