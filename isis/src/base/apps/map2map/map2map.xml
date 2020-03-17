@@ -167,8 +167,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$base/templates/maps</defaultPath>
-        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL.  This
           file can be a simple label file, hand produced or created via
@@ -184,7 +184,7 @@
               This helper button will cat out the mapping group of the given mapfile to the session log
                of the application
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+            <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>
@@ -324,7 +324,7 @@
               DEFAULTRANGE = MAP, this will copy the latitudes/longitudes from 
               the map files and calculate the unfound ones from the input cube.
              </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+            <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
       </parameter>
