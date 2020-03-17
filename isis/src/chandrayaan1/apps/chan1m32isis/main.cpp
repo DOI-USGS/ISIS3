@@ -316,13 +316,13 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
   QString transDir = (QString) dataDir["Chandrayaan1"] + "/translations/";
 
   // Translate the archive group
-  FileName transFile(transDir + "m3Archive.trn");
+  FileName transFile("$ISISROOT/appdata/translations/m3Archive.trn");
   PvlToPvlTranslationManager archiveXlator(pdsLabel, transFile.expanded());
   archiveXlator.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   // Translate the instrument group
-  transFile = transDir + "m3Instrument.trn";
+  transFile = "$ISISROOT/appdata/translations/m3Instrument.trn";
   PvlToPvlTranslationManager instrumentXlator(pdsLabel, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 

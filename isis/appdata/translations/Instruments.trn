@@ -46,6 +46,7 @@ Group = InstrumentName
 
   # Chandrayaan
   Translation   = (M3, M3)
+  Translation   = (Minirf, MRFFR)
 
   # Clementine
   Translation   = (Hires, HIRES)
@@ -89,7 +90,6 @@ Group = InstrumentName
   # LRO
   Translation   = (Nac, NACL)
   Translation   = (Nac, NACR)
-  Translation   = (Minirf, MRFFR)
   Translation   = (Minirf, MRFLRO)
 
   # Mariner
