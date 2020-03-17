@@ -46,5 +46,14 @@ For users wishing to propose changes, this model will support pull requests. We 
   - Refactor the SPICE data area to remove the *_v00x.<ext> versioning and go to a true git-like solution. We would need to do a cost/benefit analysis on this see if any meaningful data volume savings were achievable.
 
 # Update_2020-03-16
-Plan
-Status
+As of this date, the usability of the existing LFS services is not viable. The time required to download the ~60GB of test data is too long (minimum 2.5hr, some time tests were much higher). The 800GB main data area would be an order of magnitude greater. 
+
+The current plan is to move the application specific files out of the data area and into the source code GitHub repository. This will eliminate the need to store and maintain some 800 files currently in the data area and make them available to all developers to edit and PR back into the system. The remainder of the data is mostly SPICE and DEMs. The test data will be distributed along side the data area, but as a separate download. Efforts to significantly reduce the test data volume are ongoing as tests are converted to the gtest environment. 
+
+Moving forward, there are currently two possibilities for how the data will be distributed:
+1) Move the data area to a S3 buckets. Options for this are being investigated
+1) Continue to use the mirrored rsync servers (aka, isisdist).
+
+In either of the two cases above, two versions of the data area will be maintained for a time TBD. This means both will continue to receive daily updates. The first will be compatible with versions of ISIS prior to 4.1.0 and structured identical to the current version distributed on the isisdist rsync servers. The second will be the version compatible with ISIS 4.1.0 and up with the application specific data moved to the GitHub repository. 
+
+This feature is expected to be released with ISIS 4.1.0. ISIS 4.1.0 Release Candidate is due out the first week in April 2020 with the full version being released near May 1.
