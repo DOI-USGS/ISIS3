@@ -169,7 +169,7 @@ void IsisMain() {
 
   // Translate the keywords from the input cube label that go in the PDS label
   PvlToPvlTranslationManager cubeLab(*(icube2->label()),
-                                "$mro/translations/hirisePdsRdrCubeLabel.trn");
+                                "$ISISROOT/appdata/translations/MroHirisePdsRdrCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
   // Translate the keywords from the original EDR PDS label that go in
@@ -181,7 +181,7 @@ void IsisMain() {
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
   PvlToPvlTranslationManager orig(origLabel,
-                             "$mro/translations/hirisePdsRdrOriginalLabel.trn");
+                             "$ISISROOT/appdata/translations/MroHirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
   // Add labels to the PDS product that could not be handled by the translater
@@ -474,7 +474,7 @@ void IsisMain() {
 
   // Add a keyword type (i.e., QString, bool, int...) file to the PDS label Pvl
   PvlFormat *formatter = pdsLabel.format();
-  formatter->add("$mro/translations/hirisePdsRdrExtras.typ");
+  formatter->add("$ISISROOT/appdata/translations/hirisePdsRdrExtras.typ");
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL

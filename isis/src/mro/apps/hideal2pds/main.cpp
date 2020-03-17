@@ -168,7 +168,7 @@ void IsisMain() {
 
   // Translate the keywords from the input cube label that go in the PDS label
   PvlToPvlTranslationManager cubeLab(*(inputCube->label()), 
-                                "$mro/translations/hiriseIdealPdsExportCubeLabel.trn");
+                             "$ISISROOT/appdata/translations/MroHiriseIdealPdsExportCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
   // get original label information
@@ -178,7 +178,8 @@ void IsisMain() {
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
-  PvlToPvlTranslationManager orig(origLabel, "$mro/translations/hirisePdsRdrOriginalLabel.trn");
+  PvlToPvlTranslationManager orig(origLabel, 
+                                 "$ISISROOT/appdata/translations/MroHirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
   updatePdsLabelTimeParametersGroup(pdsLabel);

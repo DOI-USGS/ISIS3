@@ -1,0 +1,60 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = FilterName
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = Name
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (Red, RED)
+  Translation    = (BlueGreen, BLUE-GREEN)
+  Translation    = (NearInfrared, NEAR-INFRARED)
+End_Group
+
+Group = FilterCenter
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (700, 700)
+  Translation    = (500, 500)
+  Translation    = (900, 900)
+  Translation    = ("--- Illegal Value ---", *)
+End_Group
+
+# SCS 2006-03-30 Modified translations keywords. Removed 100 and 150. Added 200
+Group = FilterWidth
+  Auto
+  InputKey       = BANDWIDTH
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (200, 200)
+  Translation    = (300, 300)
+  Translation    = ("--- Illegal Value ---", *)
+End_Group
+End
