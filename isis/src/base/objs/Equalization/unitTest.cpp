@@ -17,7 +17,7 @@ using namespace std;
 using namespace Isis;
 
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/odyssey"), "odyssey") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/testData"), "testData") << endl;
 }
 
 class TestFunctor {

@@ -8546,13 +8546,13 @@ Testing loadInputs exception ...
 **USER ERROR** The input file [HoldList.lst] must contain at least 2 file names.
 
 Testing errorCheck exception (1)...
-**USER ERROR** Number of bands do not match between cubes [odyssey/testData/I00824006RDR.lev2.cub] and [/usgs/cpkgs/isis3/isis_data/base/testData/isisTruth.cub].
+**USER ERROR** Number of bands do not match between cubes [testData/I00824006RDR.lev2.cub] and [testData/isisTruth.cub].
 
 Testing errorCheck exception (2)...
-**USER ERROR** Mapping groups do not match between cubes [odyssey/testData/I00824006RDR.lev2.cub] and [odyssey/testData/I56632006EDR.lev2.cub].
+**USER ERROR** Mapping groups do not match between cubes [testData/I00824006RDR.lev2.cub] and [testData/I56632006EDR.lev2.cub].
 
 Testing validateInputStatistics exception (1)...
 **USER ERROR** Each input file in the FROM LIST must have a corresponding input file in the INPUT STATISTICS.
 
 Testing validateInputStatistics exception (2)...
-**USER ERROR** The from list file [odyssey/testData/I00824006RDR.lev2.cub] does not have any corresponding file in the stats list.
+**USER ERROR** The from list file [testData/I00824006RDR.lev2.cub] does not have any corresponding file in the stats list.
