@@ -180,7 +180,7 @@
     </p>
     <p>
     A set of photomet PVL templates for Mars and other planetary bodies
-    developed in ISIS2 are now available in $ISIS3DATA/base/templates/photometry/
+    developed in ISIS2 are now available in $ISISROOT/appdata/templates/photometry/
     directory.  There are also additional examples of PVL files for different
     photometric models under "Example PVL files," later in this document.
     </p>
@@ -1079,7 +1079,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               file and display the information to the session log of the application,
               see text box in bottom portion of GUI
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadPvl</function>
@@ -1088,7 +1088,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               This helper button will take the values in the FROMPVL file and
               load them into their correct locations in the GUI
              </description>
-             <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
          </helpers>
         <filter>
@@ -2038,7 +2038,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           The Minnaert Empirical and Lunar Lambert Empirical function phase
           angle list entered as a comma delimited string describing how the
           parameters of the empirical function vary with <def>phase angle</def>.
-          See "$ISIS3DATA/base/templates/photometry/marsred.pvl" for an example.
+          See "$ISISROOT/appdata/templates/photometry/marsred.pvl" for an example.
         </description>
         <default><item>No List</item></default>
         <internalDefault>
@@ -2055,7 +2055,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           The Minnaert Empirical function exponent list of limb darkening values
           entered as a comma delimited string that describes how the parameters
           of the empirical function vary with phase angle.
-          See "$ISIS3DATA/base/templates/photometry/marsred.pvl" for an example.
+          See "$ISISROOT/appdata/templates/photometry/marsred.pvl" for an example.
         </description>
         <default><item>No List</item></default>
         <internalDefault>
@@ -2072,7 +2072,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           The Lunar Lambert Empirical function parameter list of limb darkening
           values entered as a comma delimited string that describes how the
           parameters of the empirical function vary with phase angle.  See
-          "$ISIS3DATA/base/templates/photometry/marsred.pvl" for an example.
+          "$ISISROOT/appdata/templates/photometry/marsred.pvl" for an example.
         </description>
         <default><item>No List</item></default>
         <internalDefault>
@@ -2089,7 +2089,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
           The Minnaert Empirical or Lunar Lambert Empirical function phase curve
           list of brightness values corresponding to a set of phase angles
           defined in the PHASELIST parameter.  See
-          "$ISIS3DATA/base/templates/photometry/marsred.pvl" for an example.
+          "$ISISROOT/appdata/templates/photometry/marsred.pvl" for an example.
         </description>
         <default><item>No List</item></default>
         <internalDefault>

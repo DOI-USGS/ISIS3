@@ -46,7 +46,7 @@
      To convert a raw instrument/camera cube (<def>Level1</def>) to a map projected 
      image (<def>Level2</def>) the user must (1) create a  custom <def>PVL</def> formatted 
      text file, (2) use this <i>maptemplate</i> application to produce one, or (3) use 
-     the automated, projection-specific Map File Template in $ISIS3DATA/base/templates/maps.
+       the automated, projection-specific Map File Template in $ISISROOT/appdata/templates/maps.
      Whichever method that you choose, the Map File Template should contain the necessary 
      keywords to project an image. 
    </p>
@@ -91,7 +91,7 @@
        it requires keywords that are not defined in the program.<br /><br />
      </li>
      <li>
-       Templates in $ISIS3DATA/base/templates/maps:  the template contains all the 
+	 Templates in $ISISROOT/appdata/templates/maps:  the template contains all the 
        parameters necessary to project an image, and only the Projection name is 
        "uncommented" in the file. This is because some projections only require 
        that you enter a projection name, and the default values are computed for 
@@ -434,7 +434,7 @@ Group = Mapping
             <description>This Help button will display the current map file in 
 	    the log area
 	    </description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
           <helper name="H2">
             <function>helperButtonLoadMap</function>
@@ -443,7 +443,7 @@ Group = Mapping
               This Help button will take the values currently in the map file 
 	      and load them into their correct locations in the GUI
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
         <filter>
@@ -935,7 +935,7 @@ Group = Mapping
             <function>helperButtonLogTargDef</function>
             <brief>View MAP file contents in log area</brief>
             <description>This Help button will display the selected map file contents in the log area</description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
           <helper name="H3">
             <function>helperButtonLoadTargDef</function>
@@ -944,7 +944,7 @@ Group = Mapping
               This Help button will take the values in the map file and 
               load them into their correct locations in the GUI.
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
       </parameter>
@@ -1073,7 +1073,7 @@ Group = Mapping
               This button will display the system radii values for the target 
 	        name in the log area
             </description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
         </helpers>
       </parameter>
@@ -1123,7 +1123,7 @@ Group = Mapping
               The ranges will be calculated using the target information in the GUI.  
               If no target information is entered, then the camera defaults will be used.
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
         <list>
@@ -1247,7 +1247,7 @@ Group = Mapping
               the FROMLIST.  The result of this calculation will be in meters/pixel 
               and defined as the PixelResolution in the map file.
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
         <list>

@@ -221,7 +221,7 @@ int main() {
     cube.close();
 
     // Test plane shape  TBD
-    // inputFile = "$ISIS3DATA/;
+    // inputFile = "$ISISDATA/;
     // cube.open(inputFile);
     // c = cube.camera();
     // radii = c->target()->radii();

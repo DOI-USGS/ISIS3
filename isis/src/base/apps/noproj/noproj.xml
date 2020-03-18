@@ -164,7 +164,7 @@
                     <function>LoadMatchSummingMode</function>
                     <brief>Load Output Summing Mode from Match file</brief>
                     <description>This helper button will load the default summing mode from the match camera </description>
-                    <icon>$ISIS3DATA/base/icons/exec.png</icon>
+		    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
                 </helper>
                 <helper name="H2">
                     <function>LoadInputSummingMode</function>

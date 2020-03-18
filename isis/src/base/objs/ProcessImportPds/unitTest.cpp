@@ -197,5 +197,5 @@ void IsisMain() {
  *                           Fixes #4738.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/galileo"), "galileo") << endl;
 }
