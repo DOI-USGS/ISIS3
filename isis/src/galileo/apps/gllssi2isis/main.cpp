@@ -167,12 +167,9 @@ void translateData(Isis::Buffer &inData) {
 }
 
 void translateLabels(Pvl &pdsLabel, Cube *ocube) {
-  // Get the directory where the MOC translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["Galileo"];
-  FileName transFile(transDir + "/translations/galileoSsi.trn");
+  FileName transFile("$ISISROOT/appdata/translations/GalileoSsi.trn");
 
   // Get the translation manager ready
   PvlToPvlTranslationManager labelXlater(pdsLabel, transFile.expanded());

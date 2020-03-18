@@ -89,7 +89,7 @@ void IsisMain() {
 
 /**
  * @brief   Main function called by IsisMain which takes an input NIMS cube and separates
- *          it into an ISIS3 cube that contains core mission data, and a suffix ISIS3 cube
+ *          it into an ISIS cube that contains core mission data, and a suffix ISIS cube
  *          which contains backplane data gathered from the spectrometers and other instruments.
  * @param   coreParamName The XML doc parameter where the user-specified core cube filename is
  *          entered via the user interface.
@@ -480,10 +480,10 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["galileo"] + "/translations/";
 
-  QString instrument="galileoNIMSInstrument.trn";
-  QString archive = "galileoNIMSArchive.trn";
-  QString coreBandBin = "galileoNIMSCoreBandBin.trn";
-  QString suffixBandBin = "galileoNIMSSuffixBandBin.trn";
+  QString instrument="GalileoNIMSInstrument.trn";
+  QString archive = "GalileoNIMSArchive.trn";
+  QString coreBandBin = "GalileoNIMSCoreBandBin.trn";
+  QString suffixBandBin = "GalileoNIMSSuffixBandBin.trn";
 
   FileName coreBandBinFile(transDir+coreBandBin);
   FileName suffixBandBinFile(transDir+suffixBandBin);
