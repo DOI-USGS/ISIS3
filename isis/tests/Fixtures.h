@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QTemporaryDir>
+#include <QTemporaryFile>
 
 #include <nlohmann/json.hpp>
 
@@ -35,14 +36,28 @@ namespace Isis {
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
+      Cube *projTestCube;
 
       Pvl label;
+      Pvl projLabel;
       json isd;
 
       void SetUp() override;
       void TearDown() override;
   };
 
+  class LineScannerCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+      Cube *projTestCube;
+
+      Pvl label;
+      Pvl projLabel;
+      json isd;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
 
   class ThreeImageNetwork : public TempTestingFiles {
     protected:
