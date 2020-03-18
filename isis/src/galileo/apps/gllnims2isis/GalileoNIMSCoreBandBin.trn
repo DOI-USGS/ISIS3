@@ -79,20 +79,3 @@ Group = Sensitivity
         OutputPosition   =  (Group,BandBin)
         Translation      =  (*, *)
 End_Group
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
