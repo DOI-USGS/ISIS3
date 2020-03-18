@@ -83,22 +83,22 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>Finally, setup the environment variables:
         <pre>
           <em>#Execute the ISIS3 variable initialization script with default arguments.</em>
-          <em>#This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA</em>
+          <em>#This script prepares default values for:  $ISISROOT/$ISISDATA/$ISIS3TESTDATA</em>
 
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
         </pre>
 
-        Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data,
+        Executing this script with no arguments will result in $ISISDATA=$CONDA_PREFIX/data,
         and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
         for both of these optional values:
         <pre>
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
         </pre>
 
-        More information about the ISIS3DATA environment variable and the ISIS3 Data Area
+        More information about the ISISDATA environment variable and the ISIS3 Data Area
         can be found <a href="#ISIS3DataDownload">here.</a>
 
-        Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA
+        Now everytime the isis3 environment is activated, $ISISROOT, $ISISDATA, and $ISIS3TESTDATA
         will be set to the values passed to isis3VarInit.py. This does not happen retroactively,
         re-activate the isis3 envionment with the following command:
         <pre>
@@ -197,12 +197,12 @@ is a popular choice and may be downloaded below.
    translation tables to convert labels, calibration applications require flat files to do
    flat field correct, and map projection applications require DTMs to accurately compute intersections.
    Due to its size, this data is stored in a separate directory called the ISIS3 Data Area. Any
-   location can be used for the ISIS3 Data Area, the software simply requires that the ISIS3DATA
+   location can be used for the ISIS3 Data Area, the software simply requires that the ISISDATA
    environment variable is set to its location.
    </p>
 
 <h3>Structure of the ISIS3 Data Area</h3>
-   <p>Under the root directory of the ISIS3 Data Area pointed to by the ISIS3DATA environment
+   <p>Under the root directory of the ISIS3 Data Area pointed to by the ISISDATA environment
    variable are a variety of sub-directories. Each mission supported by ISIS3 has a sub-directory
    that contains mission specific processing data such as flat files and mission specific SPICE.
    There are also data areas used by more generic applications. These sub-directories contain
@@ -231,7 +231,7 @@ is a popular choice and may be downloaded below.
    </p>
 
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
       </pre>
 
@@ -247,7 +247,7 @@ is a popular choice and may be downloaded below.
    </p>
 
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base .
       </pre>
 
@@ -282,7 +282,7 @@ is a popular choice and may be downloaded below.
    </p>
 
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv <strong>--exclude='kernels'</strong> --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
       </pre>
 
@@ -298,7 +298,7 @@ is a popular choice and may be downloaded below.
    <p>Apollo Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 .
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo16 .
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 .
@@ -308,7 +308,7 @@ is a popular choice and may be downloaded below.
    <p>Cassini Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
       </pre>
 
@@ -316,7 +316,7 @@ is a popular choice and may be downloaded below.
    <p>Chandrayaan Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 .
       </pre>
 
@@ -324,7 +324,7 @@ is a popular choice and may be downloaded below.
    <p>Clementine Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 .
       </pre>
 
@@ -332,7 +332,7 @@ is a popular choice and may be downloaded below.
    <p>Dawn Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn .
       </pre>
 
@@ -340,7 +340,7 @@ is a popular choice and may be downloaded below.
    <p>ExoMars Trace Gas Orbiter Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo .
       </pre>
 
@@ -348,7 +348,7 @@ is a popular choice and may be downloaded below.
    <p>Galileo Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo .
       </pre>
 
@@ -356,7 +356,7 @@ is a popular choice and may be downloaded below.
    <p>Hayabusa Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa .
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa2 .
       </pre>
@@ -365,7 +365,7 @@ is a popular choice and may be downloaded below.
    <p>Juno Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/juno .
       </pre>
 
@@ -373,7 +373,7 @@ is a popular choice and may be downloaded below.
    <p>Kaguya Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/kaguya .
       </pre>
 
@@ -381,7 +381,7 @@ is a popular choice and may be downloaded below.
    <p>Lunar Orbiter Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo .
       </pre>
 
@@ -389,7 +389,7 @@ is a popular choice and may be downloaded below.
    <p>Lunar Reconnaissance Orbiter Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro .
       </pre>
 
@@ -397,7 +397,7 @@ is a popular choice and may be downloaded below.
   <p>Mars Exploration Rover Mission (kernels can be excluded):
   </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer .
       </pre>
 
@@ -405,7 +405,7 @@ is a popular choice and may be downloaded below.
    <p>Mariner10 Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 .
       </pre>
 
@@ -413,7 +413,7 @@ is a popular choice and may be downloaded below.
    <p>Messenger Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger .
       </pre>
 
@@ -421,7 +421,7 @@ is a popular choice and may be downloaded below.
    <p>Mars Express Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex .
       </pre>
 
@@ -429,7 +429,7 @@ is a popular choice and may be downloaded below.
    <p>Mars Global Surveyor Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs .
       </pre>
 
@@ -437,7 +437,7 @@ is a popular choice and may be downloaded below.
    <p>Mars Reconnaissance Orbiter Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro .
       </pre>
 
@@ -445,7 +445,7 @@ is a popular choice and may be downloaded below.
    <p>Mars Odyssey Mission (kernels can be excluded):
    </p>
         <pre>
-        cd $ISIS3DATA
+        cd $ISISDATA
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey .
         </pre>
 
@@ -453,7 +453,7 @@ is a popular choice and may be downloaded below.
    <p>Near Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/near .
       </pre>
 
@@ -461,7 +461,7 @@ is a popular choice and may be downloaded below.
    <p>New Horizons Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons .
       </pre>
 
@@ -469,7 +469,7 @@ is a popular choice and may be downloaded below.
    <p>Odyssey Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey .
       </pre>
 
@@ -477,7 +477,7 @@ is a popular choice and may be downloaded below.
    <p>Rolo Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo .
       </pre>
 
@@ -485,7 +485,7 @@ is a popular choice and may be downloaded below.
    <p>Rosetta Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rosetta .
       </pre>
 
@@ -493,7 +493,7 @@ is a popular choice and may be downloaded below.
    <p>Smart1 Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 .
       </pre>
 
@@ -501,7 +501,7 @@ is a popular choice and may be downloaded below.
    <p>Viking Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 .
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 .
       </pre>
@@ -510,7 +510,7 @@ is a popular choice and may be downloaded below.
    <p>Voyager Mission (kernels can be excluded):
    </p>
       <pre>
-      cd $ISIS3DATA
+      cd $ISISDATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 .
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 .
       </pre>
