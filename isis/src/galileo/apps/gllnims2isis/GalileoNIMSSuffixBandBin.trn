@@ -44,20 +44,3 @@ Group = BandSuffixMulitplier
         OutputPosition   =  (Group,BandBin)
         Translation      =  (*, *)
 End_Group
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
