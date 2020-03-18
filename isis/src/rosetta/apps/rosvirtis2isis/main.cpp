@@ -391,12 +391,12 @@ void IsisMain ()
   instrumentXlater.Auto(outLabel);
 
   if (procLevel == 3) {
-    // Fix the StartTime and SpacecraftStartClockCount in the ISIS3 label
+    // Fix the StartTime and SpacecraftStartClockCount in the ISIS label
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
     // Pass the Start/Stop SCET values to naif to get the utc time. 
-    QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
-    QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
+    QString sclk = "$ISISDATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
+    QString lsk  = "$ISISDATA/base/kernels/lsk/naif????.tls"; 
     FileName sclkName(sclk);
     FileName lskName(lsk); 
 

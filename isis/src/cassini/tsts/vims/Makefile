@@ -20,7 +20,7 @@ commands:
 
 #  Test IR
 	$(SPICEINIT) $(TSTARGS) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-ir.cub \
-	  PCK=$(ISIS3DATA)/cassini/kernels/pck/cpck24Jul2006.tpc \
+	  PCK=$(ISISDATA)/cassini/kernels/pck/cpck24Jul2006.tpc \
 	  > /dev/null
 
 	$(CAMPT) $(TSTARGS) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-ir.cub \
@@ -51,7 +51,7 @@ commands:
 
 #  Test Vis
 	$(SPICEINIT) $(TSTARGS) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
-          PCK=$(ISIS3DATA)/cassini/kernels/pck/cpck24Jul2006.tpc \
+          PCK=$(ISISDATA)/cassini/kernels/pck/cpck24Jul2006.tpc \
           > /dev/null
 
 	$(CAMPT) $(TSTARGS) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
@@ -99,7 +99,7 @@ commands:
 #  images because the vims camera model finds solution for any lat/lon and the range checking 
 #  was not working correctly.
 	$(CAM2MAP) $(TSTARGS) from=$(INPUT)/C1514302573_1.irBand71.cub to=$(OUTPUT)/C1514302573_1.irBand71.sinu.cub \
-          map='$ISISROOT/appdata/maps/sinusoidal.map' \
+          map=$(ISISROOT)/appdata/maps/sinusoidal.map \
           pixres=ppd resolution=2 defaultrange=map minlat=-90 maxlat=90 minlon=0 maxlon=360 \
           trim=yes > /dev/null
 

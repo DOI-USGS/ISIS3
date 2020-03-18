@@ -51,7 +51,7 @@ namespace Isis {
     grid->addWidget(p_fileButton, param, 3);
 
     QAction *action = new QAction(this);
-    QString file = FileName("$ISIS3DATA/base/icons/view_tree.png").expanded();
+    QString file = FileName("$ISISROOT/appdata/image/icons/view_tree.png").expanded();
     action->setIcon(QPixmap(file));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(SelectFile()));
 

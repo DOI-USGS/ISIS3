@@ -738,7 +738,7 @@
           <li>Copy input files into the input directory</li>
           <ol>
             <li type="a">In the example above copy isisTruth.cub into the input directory
-              from the $ISIS3DATA/base/testData area. </li>
+              from the $ISISDATA/base/testData area. </li>
           </ol>
           <li>Copy the truth file from the application test to the truth directory</li>
           <ol>

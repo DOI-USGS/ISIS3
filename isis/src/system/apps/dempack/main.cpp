@@ -95,7 +95,7 @@ void IsisMain() {
     os << "<pack name=\"" << keys[i].toStdString() << "\">";
     QList<QString> fileList = demMap[keys[i]];
     for (int j = 0; j < fileList.size(); j++) {
-      QString izpackFile = fileList[j].replace("ISIS3DATA", "{ENV[ISIS3DATA]}");
+      QString izpackFile = fileList[j].replace("ISISDATA", "{ENV[ISISDATA]}");
       os << "<file src=\"" << izpackFile.toStdString() << "\" />";
     }
     os << "</pack>";
