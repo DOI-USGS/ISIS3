@@ -477,8 +477,7 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   PvlObject qube(pdsLab.findObject("Qube"));
 
   // Directory containing translation tables
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["galileo"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   QString instrument="GalileoNIMSInstrument.trn";
   QString archive = "GalileoNIMSArchive.trn";

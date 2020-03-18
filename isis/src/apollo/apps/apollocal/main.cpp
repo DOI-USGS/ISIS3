@@ -21,8 +21,7 @@ void IsisMain() {
 
   PvlGroup &dataDir =
       Preference::Preferences().findGroup("DataDirectory");
-  PvlTranslationTable tTable(
-      (QString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  PvlTranslationTable tTable("$ISISROOT/appdata/translations/MissionName2DataDir.trn");
   QString missionDir = dataDir[tTable.Translate("MissionName",
       (inCube->group("Instrument")).findKeyword("SpacecraftName")[0])][0];
   QString camera =
