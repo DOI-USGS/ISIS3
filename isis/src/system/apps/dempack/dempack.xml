@@ -36,7 +36,7 @@
         </brief>
         <description>
           The DB file used to generate the new XML file. Defaulted to use
-          $ISIS3DATA/base/dems/kernels.????.db
+          $ISISDATA/base/dems/kernels.????.db
         </description>
         <internalDefault>
           Automatic

@@ -385,7 +385,7 @@ xsi:noNamespaceSchemaLocation=
               This helper button will print the definition file to the session
               log of the application
             </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
           <helper name="H2">
             <function>EditDefFile</function>
@@ -393,7 +393,7 @@ xsi:noNamespaceSchemaLocation=
             <description>
               This helper button opens an editor to able to edit the DefFile
             </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
       </parameter>

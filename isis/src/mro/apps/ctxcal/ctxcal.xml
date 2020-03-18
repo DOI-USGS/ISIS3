@@ -146,7 +146,7 @@
       Removed hard coded flatfile, now searchs for highest version
     </change>
     <change name="Ian Humphrey" date="2014-06-23">
-      Modified hard coded flatfile in app tests to relative paths using $ISIS3DATA. Fixes #2054.
+      Modified hard coded flatfile in app tests to relative paths using $ISISDATA. Fixes #2054.
     </change>
     <change name="Jesse Mapel" date="2019-05-15">
       Now loads latest Mars satellites kernel because the planets kernel (de430)
