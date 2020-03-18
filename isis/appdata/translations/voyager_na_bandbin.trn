@@ -1,0 +1,75 @@
+#
+# This ISIS 3 translation file is used to create ISIS 3 band bin cube labels
+# from Voyager ".IMG" labels. Other sections of the ISIS 3 labels are 
+# handled by other translation files.
+#
+
+# This translation contains the known filter names for both the NA camera. It
+# translates them one for one. The (*,*) would have worked, but
+# they are listed for documentation purposes. Note the filter name does not
+# correspond directly to the filter number unless the camera is known (NA, WA).
+Group = FilterName
+  Auto
+  InputKey       = FILTER_NAME
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (CLEAR, CLEAR)
+  Translation    = (VIOLET, VIOLET)
+  Translation    = (BLUE, BLUE)
+  Translation    = (ORANGE, ORANGE)
+  Translation    = (CLEAR, CLEAR)
+  Translation    = (GREEN, GREEN)
+  Translation    = (GREEN, GREEN)
+  Translation    = (UV, UV)
+  Translation    = (*, *)
+End_Group
+
+# The filter numbers are different for NA and WA. Valid filter numbers are 0-7
+Group = FilterNumber
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0, 0)
+  Translation    = (1, 1)
+  Translation    = (2, 2)
+  Translation    = (3, 3)
+  Translation    = (4, 4)
+  Translation    = (5, 5)
+  Translation    = (6, 6)
+  Translation    = (7, 7)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterFilterWavelength
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0.460000, 0)
+  Translation    = (0.400000, 1)
+  Translation    = (0.480000, 2)
+  Translation    = (0.615000, 3)
+  Translation    = (0.460000, 4)
+  Translation    = (0.585000, 5)
+  Translation    = (0.585000, 6)
+  Translation    = (0.325000, 7)
+  Translation    = (0.0, *)
+ End_Group
+
+Group = BandWidth
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0.360000, 0)
+  Translation    = (0.100000, 1)
+  Translation    = (0.100000, 2)
+  Translation    = (0.050000, 3)
+  Translation    = (0.360000, 4)
+  Translation    = (0.110000, 5)
+  Translation    = (0.110000, 6)
+  Translation    = (0.090000, 7)
+  Translation    = (0.0, *)
+End_Group
+
