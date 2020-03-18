@@ -61,7 +61,6 @@ void IsisMain() {
   p.TranslatePdsProjection(otherLabels);
 
   // Translate the remaining MI MAP labels
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = "$ISISROOT/appdata/translations/";
 
   FileName transFile(transDir + "KaguyaMiMapBandBin.trn");

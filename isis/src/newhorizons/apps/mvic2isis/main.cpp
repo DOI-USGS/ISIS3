@@ -202,8 +202,7 @@ void IsisMain() {
 
 void translateLabels(Pvl &label, Cube *ocube) {
 
-  // Get the directory where the New Horizons translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
+  // Get the path where the New Horizons translation tables are.
   QString transDir = "$ISISROOT/appdata/translations/";
 
   Pvl *isisLabel = ocube->label();

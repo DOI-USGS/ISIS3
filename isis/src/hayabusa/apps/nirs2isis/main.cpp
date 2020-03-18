@@ -122,7 +122,6 @@ void IsisMain() {
     stdevCube->write(stdevManager);
   }
 
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse));
   QString transDir = "$ISISROOT/appdata/translations/";
   Pvl newLabel;
 

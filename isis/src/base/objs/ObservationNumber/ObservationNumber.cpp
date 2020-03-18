@@ -74,7 +74,6 @@ namespace Isis {
    */
   PvlGroup ObservationNumber::FindObservationTranslation(Pvl &label) {
     Pvl outLabel;
-    static PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
 
     // Get the mission name
     static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";

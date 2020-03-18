@@ -96,8 +96,7 @@ void IsisMain ()
     image.next();
   }
 
-  // Get the directory where the Hayabusa translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
+  // Get the path where the Hayabusa translation tables are.
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
