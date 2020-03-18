@@ -1,0 +1,186 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductId
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = SourceProductId
+  Auto
+  InputKey       = SOURCE_PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SourceProductId
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = StartTime
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = StopTime
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = IncidenceAngle
+  Auto
+  InputKey       = INCIDENCE_ANGLE
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = IncidenceAngle
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = EmissionAngle
+  Auto
+  InputKey       = EMISSION_ANGLE
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = EmissionAngle
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = PhaseAngle
+  Auto
+  InputKey       = PHASE_ANGLE
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = PhaseAngle
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = LocalTime
+  Auto
+  InputKey       = LOCAL_TIME
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = LocalTime
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = SolarLongitude
+  Auto
+  InputKey       = SOLAR_LONGITUDE
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = SolarLongitude
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = SubSolarAzimuth
+  Auto
+  InputKey       = SUB_SOLAR_AZIMUTH
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = SubSolarAzimuth
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = NorthAzimuth
+  Auto
+  InputKey       = NORTH_AZIMUTH
+  InputGroup     = VIEWING_PARAMETERS
+  InputPosition  = VIEWING_PARAMETERS
+  OutputName     = NorthAzimuth
+  OutputPosition = (Group, Mosaic)
+  Translation    = (*, *)
+End_Group
+
+Group = TdiFlag
+  Auto
+  InputKey       = MRO:TDI
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = cpmmTdiFlag
+  OutputPosition = (Group, Mosaic)
+  Translation    = (Null, -9998)
+  Translation    = (*, *)
+End_Group
+
+Group = SummingFlag
+  Auto
+  InputKey       = MRO:BINNING
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = cpmmSummingFlag
+  OutputPosition = (Group, Mosaic)
+  Translation    = (Null, -9998)
+  Translation    = (*, *)
+End_Group
+
+Group = SpecialProcessingFlag
+  Auto
+  InputKey       = MRO:SPECIAL_PROCESSING_FLAG
+  InputGroup     = INSTRUMENT_SETTING_PARAMETERS
+  InputPosition  = INSTRUMENT_SETTING_PARAMETERS
+  OutputName     = SpecialProcessingFlag
+  OutputPosition = (Group, Mosaic)
+  Translation    = (Null, -9998)
+  Translation    = (Null, NULL)
+  Translation    = (*, *)
+End_Group
+End

@@ -1,0 +1,190 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# history 2017-05-12 Jeannie Backer - Added TargetName translation from 
+#                        CP/CHURYUMOV-GERASIMENKO 1 (1969 R1) to CG/67P.
+# history 2018-04-21 Jesse Mapel - Changed CP/CHURYUMOV-GERASIMENKO translation
+#                        to use NAIF name "67P/CHURYUMOV-GERASIMENKO (1969 R1)"
+ 
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*,*)
+End_Group
+ 
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+ 
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+
+#exposure duration input group changed from [ROOT]
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION 
+  InputGroup     = SR_ACQUIRE_OPTIONS
+  InputPosition  = SR_ACQUIRE_OPTIONS
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+#pixel average width input group changed from [ROOT]
+Group = PixelAveragingWidth
+  Auto
+  InputKey       = PIXEL_AVERAGING_WIDTH
+  InputGroup     = SR_COMPRESSION
+  InputPosition  = SR_COMPRESSION
+  InputDefault   = 1
+  OutputName     = PixelAveragingWidth
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+#pixel average width input group changed from [ROOT]
+Group = PixelAveragingHeight
+  Auto
+  InputKey       = PIXEL_AVERAGING_HEIGHT
+  InputGroup     = SR_COMPRESSION
+  InputPosition  = SR_COMPRESSION
+  InputDefault   = 1
+  OutputName     = PixelAveragingHeight
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  InputDefault   = "N/A"
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (STEINS,  "2867 STEINS")
+  Translation    = (LUTETIA, "21 LUTETIA")
+  Translation    = ("67P/CHURYUMOV-GERASIMENKO (1969 R1)", "67P/CHURYUMOV-GERASIMENKO 1 (1969 R1)")
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalTargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = OriginalTargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = FirstLine
+  Auto
+  InputKey       = FIRST_LINE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = FirstLine
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FirstLineSample
+  Auto
+  InputKey       = FIRST_LINE_SAMPLE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = FirstLineSample
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ProcessingLevelID
+  Auto
+  InputKey       = PROCESSING_LEVEL_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProcessingLevelID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ProcessingLevelDescription
+  Auto
+  InputKey       = PROCESSING_LEVEL_DESC
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProcessingLevelDescription
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

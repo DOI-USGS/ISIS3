@@ -1,7 +1,6 @@
 Group = PRODUCER_INSTITUTION_NAME
   Auto
   InputKey       = PRODUCER_INSTITUTION_NAME
-  InputKey       = ProducerInstitutionName
   InputGroup     = OriginalLabelObject
   InputPosition  = OriginalLabelObject
   OutputName     = PRODUCER_INSTITUTION_NAME
@@ -12,7 +11,6 @@ End_Group
 Group = PRODUCER_ID
   Auto
   InputKey       = PRODUCER_ID
-  InputKey       = ProducerId
   InputGroup     = OriginalLabelObject
   InputPosition  = OriginalLabelObject
   OutputName     = PRODUCER_ID
@@ -23,7 +21,6 @@ End_Group
 Group = PRODUCER_FULL_NAME
   Auto
   InputKey       = PRODUCER_FULL_NAME
-  InputKey       = ProducerFullName
   InputGroup     = OriginalLabelObject
   InputPosition  = OriginalLabelObject
   OutputName     = PRODUCER_FULL_NAME
@@ -34,7 +31,6 @@ End_Group
 Group = OBSERVATION_ID
   Auto
   InputKey       = OBSERVATION_ID
-  InputKey       = ObservationId
   InputGroup     = OriginalLabelObject
   InputPosition  = OriginalLabelObject
   OutputName     = OBSERVATION_ID
@@ -42,6 +38,16 @@ Group = OBSERVATION_ID
   Translation    = (*, *)
 End_Group
 
+# Stuart Sides 2008-06-06
+# Removed when the value of this keyword was added as an input parameter
+#Group = PRODUCT_VERSION_ID
+#  Auto
+#  OutputName = PRODUCT_VERSION_ID
+#  OutputPosition = ("ROOT")
+#  InputKey = PRODUCT_VERSION_ID
+#  InputGroup = "OriginalLabelObject"
+#  Translation = (*,*)
+#EndGroup
 Group = INSTRUMENT_HOST_NAME
   Auto
   InputKey       = INSTRUMENT_HOST_NAME
@@ -112,6 +118,15 @@ Group = RATIONALE_DESC
   Translation    = (*, *)
 End_Group
 
+# Removed so the app could place what it wanted in this keyword
+#Group = SOFTWARE_NAME
+#  Auto
+#  OutputName = SOFTWARE_NAME
+#  OutputPosition = ("ROOT")
+#  InputKey = SOFTWARE_NAME
+#  InputGroup = "OriginalLabelObject"
+#  Translation = (*,*)
+#EndGroup
 Group = MRO:OBSERVATION_START_TIME
   Auto
   InputKey       = MRO:OBSERVATION_START_TIME

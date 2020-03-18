@@ -1,0 +1,109 @@
+Group = INTERCHANGE_FORMAT
+  Auto
+  InputKey       = INTERCHANGE_FORMAT
+  InputDefault   = BINARY
+  OutputName     = INTERCHANGE_FORMAT
+  OutputPosition = Root
+  Translation    = (BINARY, *)
+End_Group
+
+Group = ORIGINAL_PRODUCT_ID
+  Auto
+  InputKey       = ORIGINAL_PRODUCT_ID
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = ORIGINAL_PRODUCT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = MISSION_NAME
+  Auto
+  InputKey       = MISSION_NAME
+  InputDefault   = "LUNAR ORBITER"
+  OutputName     = MISSION_NAME
+  OutputPosition = Root
+  Translation    = ("LUNAR ORBITER", *)
+End_Group
+
+Group = PRODUCER_INSTITUTION_NAME
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  InputDefault   = "U.S. GEOLOGICAL SURVEY"
+  OutputName     = PRODUCER_INSTITUTION_NAME
+  OutputPosition = Root
+  Translation    = ("U.S. GEOLOGICAL SURVEY", *)
+End_Group
+
+Group = SPACECRAFT_NAME
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = SPACECRAFT_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = DATA_SET_ID
+  Auto
+  InputKey       = DATA_SET_ID
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = DATA_SET_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_NAME
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = INSTRUMENT_NAME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_ID
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = INSTRUMENT_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = TARGET_NAME
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = TARGET_NAME
+  OutputPosition = ROOT
+  Translation    = (MOON, MOON)
+End_Group
+
+Group = FRAME_NUMBER
+  Auto
+  InputKey       = FRAME_NUMBER
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = FRAME_NUMBER
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FILMSTRIP_SCAN_CREATION_DATE
+  Auto
+  InputKey       = LO:FILMSTRIP_SCAN_CREATION_DATE
+  InputGroup     = "OriginalLabelObject"
+  InputPosition  = (OriginalLabelObject)
+  OutputName     = LO:FILMSTRIP_SCAN_CREATION_DATE
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+End

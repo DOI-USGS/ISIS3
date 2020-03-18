@@ -1,0 +1,162 @@
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("CLEMENTINE 1", "CLEMENTINE 1")
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  InputKey       = REVOLUTION_NUMBER
+  OutputName     = OrbitNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalPlaneTemperature
+  Auto
+  InputKey       = FOCAL_PLANE_TEMPERATURE
+  OutputName     = FocalPlaneTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OffsetModeID
+  Auto
+  InputKey       = OFFSET_MODE_ID
+  OutputName     = OffsetModeID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = GainModeID
+  Auto
+  InputKey       = GAIN_MODE_ID
+  OutputName     = GainModeID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CryocoolerDuration
+  Auto
+  InputKey       = CRYOCOOLER_DURATION
+  OutputName     = CryocoolerDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+#Group = RawMaximum
+#  Auto
+#  InputGroup = "IMAGE"
+#  InputKey = MAXIMUM
+#  OutputPosition = ("Object","IsisCube","Group","Instrument")
+#  OutputName = RawMaximum
+#  Translation = (*,*)
+#EndGroup
+#Group = RawMinimum
+#  Auto
+#  InputGroup = "IMAGE"
+#  InputKey = MINIMUM
+#  OutputPosition = ("Object","IsisCube","Group","Instrument")
+#  OutputName = RawMinimum
+#  Translation = (*,*)
+#EndGroup
+#Group = RawMean
+#  Auto
+#  InputGroup = "IMAGE"
+#  InputKey = MEAN
+#  OutputPosition = ("Object","IsisCube","Group","Instrument")
+#  OutputName = RawMean
+#  Translation = (*,*)
+#EndGroup
+#Group = RawStandardDeviation
+#  Auto
+#  InputGroup = "IMAGE"
+#  InputKey = STANDARD_DEVIATION
+#  OutputPosition = ("Object","IsisCube","Group","Instrument")
+#  OutputName = RawStandardDeviation
+#  Translation = (*,*)
+#EndGroup
+Group = EncodingCompressionRatio
+  Auto
+  InputKey       = ENCODING_COMPRESSION_RATIO
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = EncodingCompressionRatio
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductID
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductID
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhase
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  OutputName     = MissionPhase
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterName
+  Auto
+  InputKey       = FILTER_NAME
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Auto
+  InputKey       = BANDWIDTH
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End
