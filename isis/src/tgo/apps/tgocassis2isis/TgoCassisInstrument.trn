@@ -38,7 +38,7 @@
 # This translation table is for translating CaSSIS xml labels into pvl cube
 # labels.
 #
-# See $base/translations/XmlExample.trn for an example xml translation table
+# See $ISISROOT/appdata/translations/XmlExample.trn for an example xml translation table
 # and documentation for the different options.
 #
 # history 2018-05-17 Kaitlyn Lee - Added ObservationId with a placeholder value for now.

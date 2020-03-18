@@ -161,7 +161,7 @@
               If no file is entered in the CALKERNEL parameter then the system
               file will be displayed.
             </description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
         </helpers>
      </parameter>

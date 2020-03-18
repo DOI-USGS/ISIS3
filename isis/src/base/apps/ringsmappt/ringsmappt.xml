@@ -438,7 +438,7 @@ End_Group
               This help button will display the mapping group of the selected 
 	      Map File to the session log of the application
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>

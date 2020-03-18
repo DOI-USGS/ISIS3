@@ -182,7 +182,7 @@ namespace Isis {
     // actual pixels from the detector are peculiar.  Hence, I have
     // designed this camera model such that the offsets can be managed
     // external to the code.  See the MDIS instrument kernel addendum
-    // in $ISIS3DATA/messenger/kernels/iak/mdisAddendum???.ti for the
+    // in $ISISDATA/messenger/kernels/iak/mdisAddendum???.ti for the
     // offsets for *each* detector.  Note that an offset is only applied
     // when FPU binning is performed.
     int fpuBinMode   = inst["FpuBinningMode"];
@@ -210,8 +210,8 @@ namespace Isis {
 
     // Setup distortion map.  As of 2007/12/06, we now have an actual model.
     // Note that this model supports distinct distortion for each WAC filter.
-    // See $ISIS3DATA/messenger/kernels/iak/mdisAddendumXXX.ti or possibly
-    // $ISIS3DATA/messenger/kernels/ik/msgr_mdis_vXXX.ti for the *_OD_K
+    // See $ISISDATA/messenger/kernels/iak/mdisAddendumXXX.ti or possibly
+    // $ISISDATA/messenger/kernels/ik/msgr_mdis_vXXX.ti for the *_OD_K
     // parameters.
     // NAC has a new implementation of its distortion contributed by
     // Scott Turner and Lillian Nguyen at JHUAPL.
