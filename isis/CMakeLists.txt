@@ -453,6 +453,7 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/translations)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/apollo)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/autoreg) # *.def
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/noproj) # *.pvl
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/autoseed) # *.def, *.pvl
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/cnetref) # *.def, *.def.example
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats) # *.def, *.def.example
@@ -548,6 +549,11 @@ add_custom_target(autoseed ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/*.pvl 
   ${CMAKE_BINARY_DIR}/appdata/templates/autoseed/)
 add_dependencies(isis3 autoseed)
+
+add_custom_target(noproj ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/noproj/*.pvl
+  ${CMAKE_BINARY_DIR}/appdata/templates/noproj/)
+add_dependencies(isis3 noproj)
 
 add_custom_target(cnetref ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def.example
