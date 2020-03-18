@@ -810,7 +810,7 @@ namespace Isis {
   }
 
   /**
-   * @brief Load default Gruen parameter file in $ISIS3DATA/base/templates
+   * @brief Load default Gruen parameter file in $ISISROOT/appdata/templates
    *
    * @author Kris Becker - 5/22/2011
    *

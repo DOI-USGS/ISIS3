@@ -948,7 +948,7 @@ namespace Isis {
     QString env2 = "printenv HOME >> " + tempFile;
     QString env3 = "printenv PWD >> " + tempFile;
     QString env5 = "printenv ISISROOT >> " + tempFile;
-    QString env6 = "printenv ISIS3DATA >> " + tempFile;
+    QString env6 = "printenv ISISDATA >> " + tempFile;
     ProgramLauncher::RunSystemCommand(env1);
     ProgramLauncher::RunSystemCommand(env2);
     ProgramLauncher::RunSystemCommand(env3);
@@ -966,7 +966,7 @@ namespace Isis {
     readTemp.getline(value, 255);
     envGroup.addKeyword(PvlKeyword("ISISROOT", value));
     readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("ISIS3DATA", value));
+    envGroup.addKeyword(PvlKeyword("ISISDATA", value));
 
     // remove temp file and return
     QString cleanup = "rm -f " + tempFile;
