@@ -369,7 +369,7 @@
           SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE, SPACECRAFT_POSITION_SIGMA,
           SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA, CAMERA_ANGLES_SIGMA,
           CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA. An example
-          template is located at $base/templates/jigsaw/SC_Parameters.pvl.
+          template is located at $ISISROOT/appdata/templates/jigsaw/SC_Parameters.pvl.
         </description>
         <exclusions>
           <item>HELDLIST</item>
@@ -412,7 +412,7 @@
           SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
           CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
           If any of these keywords are missing, then their defaults will be used. There is
-          an example template at $base/templates/jigsaw/SensorParameters.pvl that can be
+          an example template at $ISISROOT/appdata/templates/jigsaw/SensorParameters.pvl that can be
           used as a guide.
         </description>
         <filter>
@@ -1018,7 +1018,7 @@
         <description>
           Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
 	  using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
-	  $base/templates/jigsaw/TargetBodyParameters.pvl.
+	  $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl.
         </description>
         <inclusions>
           <item>TBPARAMETERS</item>
@@ -1034,7 +1034,7 @@
         <description>
           This file contains target body parameters to solve for in the bundle adjustment, their
 	  a priori values, and uncertainties. The file must be in PVL format. An example template
-          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl. Instructions for the PVL
+          PVL file is located at $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl. Instructions for the PVL
 	  structure are given in the template.
         </description>
         <filter>

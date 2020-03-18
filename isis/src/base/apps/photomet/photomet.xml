@@ -1064,7 +1064,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <brief>
           Input PVL file
         </brief>
-        <defaultPath>$base/templates/photometry</defaultPath>
+        <defaultPath>$ISISROOT/appdata/templates/photometry</defaultPath>
         <internalDefault>None Specified</internalDefault>
         <description>
           This text file contains the parameter names and values to be used

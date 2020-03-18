@@ -346,8 +346,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$base/templates/maps</defaultPath>
-        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in
           <def>PVL</def> form.  This file can be a simple hand produced label

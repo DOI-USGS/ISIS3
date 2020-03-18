@@ -125,13 +125,13 @@
          </internalDefault>
           <description>
            This file contains the specifications for the "ideal" camera based on the original instrument.   If no value is entered, the default
-           specs file will be read from "$base/applications/noprojInstruments???.pvl", where ??? indicates the highest version of the file.
+           specs file will be read from "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl"
          </description>
          <filter>
            *.pvl
          </filter>
          <defaultPath>
-             $base/applications/
+             $ISISROOT/appdata/templates/noproj/
          </defaultPath>
        </parameter>
 

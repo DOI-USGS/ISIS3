@@ -137,7 +137,7 @@ End
       <parameter name="MAP">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <defaultPath>$base/templates/maps</defaultPath>
+        <defaultPath>$ISISROOT/appdata/maps</defaultPath>
         <internalDefault>None</internalDefault>
           <filter>*.map *.cub</filter>
         <brief>

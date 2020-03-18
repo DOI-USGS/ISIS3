@@ -296,8 +296,8 @@
         <filter>
           *.def
         </filter>
-        <default><item>$base/templates/autoreg/coreg.maxcor.p2020.s5050.def</item></default>
-        <defaultPath>$base/templates/autoreg</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/autoreg/coreg.maxcor.p2020.s5050.def</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/autoreg</defaultPath>
       </parameter>
     </group>
 

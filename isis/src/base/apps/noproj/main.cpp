@@ -72,8 +72,7 @@ void IsisMain() {
     specs = ui.GetFileName("SPECS");
   }
   else {
-    specs = "$base/applications/noprojInstruments???.pvl";
-    specs = specs.highestVersion();
+    specs = "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl";
   }
   Pvl idealSpecs(specs.expanded());
   PvlObject obSpecs = idealSpecs.findObject("IdealInstrumentsSpecifications");

@@ -259,7 +259,7 @@ See <i>photomet</i> documetation for additional information.
          <brief>
            Input PVL file with photometric parameters
          </brief>
-	 <defaultPath>$base/templates/photometry</defaultPath>
+	 <defaultPath>$ISISROOT/appdata/templates/photometry</defaultPath>
          <internalDefault>None Specified</internalDefault>
          <description>
            Use this parameter to select an existing PVL filename that contains a 
