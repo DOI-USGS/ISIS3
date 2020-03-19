@@ -94,6 +94,6 @@ OBJECT = UNCOMPRESSED_FILE
 END_OBJECT = UNCOMPRESSED_FILE
 
 OBJECT = IMAGE_MAP_PROJECTION
-    Isis:PvlTemplate:File = $base/templates/labels/pdsExportAllMapping.pft
+    Isis:PvlTemplate:File = $ISISROOT/appdata/translations/pdsExportAllMapping.pft
 END_OBJECT = IMAGE_MAP_PROJECTION
 End
