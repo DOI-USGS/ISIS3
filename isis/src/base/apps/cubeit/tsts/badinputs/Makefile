@@ -35,7 +35,7 @@ commands:
 	fi;
 
 #    Remove Paths
-	$(SED) "s+\[/.*/base/+\[base/+" $(OUTPUT)/error_temp.txt > $(OUTPUT)/error_temp2.txt;
+	$(SED) "s+\[.*/\(.*\.cub]\)+\[\1+" $(OUTPUT)/error_temp.txt > $(OUTPUT)/error_temp2.txt;
 	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp2.txt > $(OUTPUT)/error_temp3.txt;
 	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp3.txt > $(OUTPUT)/error.txt;
 

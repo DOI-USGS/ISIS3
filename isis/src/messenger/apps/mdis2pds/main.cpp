@@ -367,7 +367,7 @@ void IsisMain() {
   p.CheckStatus();
 
   // All done...write result.
-  pdsLabel.setFormatTemplate("$ISISROOT/appdata/templates/mdis2pds/mdisPdsCdr.def");
+  pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/mdisPdsCdr.def");
   QString ofile(output.expanded());
   ofstream outstream(ofile.toLatin1().data());
   processPds.OutputLabel(outstream);
