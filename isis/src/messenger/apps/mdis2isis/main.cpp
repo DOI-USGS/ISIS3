@@ -182,8 +182,6 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
   //Create a PVL to store the translated labels
   Pvl outLabel;
 
-  // Get the directory where the MESSENGER/MDIS translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Get a filename for the MESSENGER EDR label

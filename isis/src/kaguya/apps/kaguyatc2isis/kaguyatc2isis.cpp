@@ -85,7 +85,6 @@ namespace Isis {
     importPds.TranslatePdsProjection(otherLabels);
 
     // Translate the remaining MI MAP labels
-    PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
     QString transDir = "$ISISROOT/appdata/translations/";
 
     FileName transFile(transDir + "KaguyaTcBandBin.trn");

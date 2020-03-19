@@ -132,8 +132,7 @@ namespace Isis {
       output = importFits.SetOutputCube(ui.GetFileName("TO"), att);
     }
 
-    // Get the directory where the New Horizons translation tables are.
-    PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
+    // Get the path where the New Horizons translation tables are.
     QString transDir = "$ISISROOT/appdata/translations/";
 
     // Temp storage of translated labels

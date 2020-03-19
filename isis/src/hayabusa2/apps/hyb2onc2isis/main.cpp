@@ -26,7 +26,6 @@ void IsisMain () {
   Cube *outputCube = importFits.SetOutputCube("TO");
 
   // Get the directory where the Hayabusa translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
