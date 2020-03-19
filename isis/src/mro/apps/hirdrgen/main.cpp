@@ -474,24 +474,24 @@ void IsisMain() {
 
   // Add a keyword type (i.e., QString, bool, int...) file to the PDS label Pvl
   PvlFormat *formatter = pdsLabel.format();
-  formatter->add("$ISISROOT/appdata/translations/hirisePdsRdrExtras.typ");
+  formatter->add("$ISISROOT/appdata/translations/MroHirisePdsRdrExtras.typ");
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
   if (projName == "EQUIRECTANGULAR") {
     if (enctype.Equal("jp2")) {
-      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrEquiJP2.pft");
+      pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsRdrEquiJP2.pft");
     }
     else {
-      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrEqui.pft");
+      pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsRdrEqui.pft");
     }
   }
   else {
     if (enctype.Equal("jp2")) {
-      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrPolarJP2.pft");
+      pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsRdrPolarJP2.pft");
     }
     else {
-      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrPolar.pft");
+      pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsRdrPolar.pft");
     }
   }
 
