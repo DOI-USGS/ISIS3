@@ -272,8 +272,8 @@ void FixDns(Buffer &buf) {
  */
 void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
-  QString missionDir = "$ISISROOT/appdata/";
-  FileName transFile(missionDir + "translations/CassiniIss.trn");
+  QString dir = "$ISISROOT/appdata/translations";
+  FileName transFile(dir + "/CassiniIss.trn");
 
   // Get the translation manager ready
   Pvl inputLabel(labelFile.expanded());
@@ -336,10 +336,10 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   QString instrumentID = inst.findKeyword("InstrumentId");
   QString cameraAngleDefs;
   if(instrumentID.at(3) == 'N') {
-    cameraAngleDefs = missionDir + "templates/ciss2isis/NarrowAngle.def";
+    cameraAngleDefs = dir + "/CassiniIssNarrowAngle.def";
   }
   else if(instrumentID.at(3) == 'W') {
-    cameraAngleDefs = missionDir + "templates/ciss2isis/WideAngle.def";
+    cameraAngleDefs = dir + "/CassiniIssWideAngle.def";
   }
 
   double center = 0;
