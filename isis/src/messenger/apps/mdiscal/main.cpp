@@ -91,7 +91,6 @@ void IsisMain() {
   // calibration a one pass system in this case, rather than two.
   ProcessByLine p;
   FileName calibFile("$ISISROOT/appdata/translations/MessengerMdisCalibration.trn");
-  calibFile = calibFile.highestVersion();
   g_configFile.read(calibFile.expanded());
 
   // Initialize variables
