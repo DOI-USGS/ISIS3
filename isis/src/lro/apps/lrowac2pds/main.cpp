@@ -364,7 +364,8 @@ QString MD5Checksum ( QString filename ) {
 void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     //Pvl to store the labels
     Pvl outLabel;
-    PvlFormatPds *p_formatter = new PvlFormatPds("$ISISROOT/appdata/translations/LroPdsExportRootGen.typ");
+    PvlFormatPds *p_formatter = new PvlFormatPds(
+                                "$ISISROOT/appdata/translations/LroNacPdsExportRootGen.typ");
     labelPvl.setFormat(p_formatter);
     labelPvl.setTerminator("END");
 
