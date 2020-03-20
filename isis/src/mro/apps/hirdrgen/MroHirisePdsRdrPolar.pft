@@ -81,6 +81,6 @@ OBJECT = IMAGE
 END_OBJECT = IMAGE
 
 OBJECT = IMAGE_MAP_PROJECTION
-    Isis:PvlTemplate:File = $ISISROOT/appdata/translations/pdsExportAllMapping.pft
+    Isis:PvlTemplate:File = $ISISROOT/appdata/labels/pdsExportAllMapping.pft
 END_OBJECT = IMAGE_MAP_PROJECTION
 End

@@ -97,6 +97,6 @@ OBJECT = IMAGE_MAP_PROJECTION
     A_AXIS_RADIUS
     B_AXIS_RADIUS
     C_AXIS_RADIUS
-    Isis:PvlTemplate:File = $ISISROOT/appdata/translations/pdsExportAllMapping.pft
+    Isis:PvlTemplate:File = $ISISROOT/appdata/labels/pdsExportAllMapping.pft
 END_OBJECT = IMAGE_MAP_PROJECTION
 End
