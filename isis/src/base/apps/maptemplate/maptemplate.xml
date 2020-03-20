@@ -917,9 +917,6 @@ Group = Mapping
 
       <parameter name="FILE">
         <type>filename</type>
-        <defaultPath>
-          $ISIS3DATA/base/templates/targets/
-        </defaultPath>
         <brief>
             Name of the Map File
         </brief>
