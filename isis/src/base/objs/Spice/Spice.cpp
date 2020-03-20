@@ -179,21 +179,17 @@ namespace Isis {
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
       try {
-        // At this time ALE does not compute pointing for the nadir option in spiceinit
-        // If NADIR is turned on fail here so ISIS can create nadir pointing
-        if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
-          QString msg = "Falling back to ISIS generation of nadir pointing";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        
         if (isd == NULL){
           // try using ALE
           std::ostringstream kernel_pvl;
           kernel_pvl << kernels;
 
           json props;
-          props["kernels"] = kernel_pvl.str();
+          if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
+            props["nadir"] = true;
+          }
 
+          props["kernels"] = kernel_pvl.str();
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
         }
         
