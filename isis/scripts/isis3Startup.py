@@ -21,11 +21,11 @@ def setisis():
   else:
     os.environ['ISISDATA'] = "/usgs/cpkgs/isis3/isis_data"
 
-  #Check for the ISIS3TESTDATA directory. If it does not exist use a default
+  #Check for the ISISTESTDATA directory. If it does not exist use a default
   if os.path.exists("%s/../testData" % (ISISROOT)):
-    os.environ['ISIS3TESTDATA'] = "%s/../testData" % ISISROOT
+    os.environ['ISISTESTDATA'] = "%s/../testData" % ISISROOT
   else:
-    os.environ['ISIS3TESTDATA'] = "/usgs/cpkgs/isis3/isis_testData"
+    os.environ['ISISTESTDATA'] = "/usgs/cpkgs/isis3/isis_testData"
 
   #If PATH is not set, just set it to a default location. Else append
   #the isis path to the end of the current path
