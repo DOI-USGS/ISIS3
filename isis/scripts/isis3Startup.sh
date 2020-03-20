@@ -27,7 +27,7 @@ export ISISDATA
 if [ -d $ISISROOT/../testData ]; then
   ISIS3TESTDATA=$ISISROOT/../testData
 else
-  ISIS3TESTDATA=/usgs/cpkgs/isis3/testData
+  ISIS3TESTDATA=/usgs/cpkgs/isis3/isis_testData
 fi
 export ISIS3TESTDATA
 
