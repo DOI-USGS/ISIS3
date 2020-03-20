@@ -163,6 +163,7 @@ Group = DataDirectory
   Chan1        = $ISIS3DATA/chan1
   Chandrayaan1 = $ISIS3DATA/chandrayaan1
   Clementine1  = $ISIS3DATA/clementine1
+  Clipper      = $ISIS3DATA/../datalocal/clipper
   Control      = $ISIS3DATA/control
   Dawn         = $ISIS3DATA/dawn
   Tgo          = $ISIS3DATA/tgo

@@ -1,0 +1,385 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 6
+    TileLines   = 6
+
+    Group = Dimensions
+      Samples = 6
+      Lines   = 6
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = VIKING_ORBITER_1
+    InstrumentId         = VISUAL_IMAGING_SUBSYSTEM_CAMERA_B
+    TargetName           = MARS
+    StartTime            = 1977-07-09T20:05:51
+    ExposureDuration     = 0.008480 <seconds>
+    SpacecraftClockCount = 33322515
+    FloodModeId          = ON
+    GainModeId           = HIGH
+    OffsetModeId         = ON
+  End_Group
+
+  Group = Archive
+    DataSetId       = VO1/VO2-M-VIS-2-EDR-V2.0
+    ProductId       = 387A06
+    MissonPhaseName = EXTENDED_MISSION
+    ImageNumber     = 33322515
+    OrbitNumber     = 387
+  End_Group
+
+  Group = BandBin
+    FilterName = CLEAR
+    FilterId   = 4
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -27002
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
+                                 $base/kernels/spk/mar097.bsp)
+    InstrumentPointing        = (Table, $viking1/kernels/ck/vo1_sedr_ck2.bc,
+                                 $viking1/kernels/fk/vo1_v10.tf)
+    Instrument                = Null
+    SpacecraftClock           = ($viking1/kernels/sclk/vo1_fict.tsc,
+                                 $viking1/kernels/sclk/vo1_fsc.tsc)
+    InstrumentPosition        = (Table, $viking1/kernels/spk/viking1a.bsp)
+    InstrumentAddendum        = $viking1/kernels/iak/vikingAddendum003.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 0.0 <degrees>
+    TargetName         = MARS
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360 <degrees>
+    MinimumLatitude    = 0 <degrees>
+    MaximumLatitude    = 10 <degrees>
+    MinimumLongitude   = 0 <degrees>
+    MaximumLongitude   = 10 <degrees>
+    UpperLeftCornerX   = 0.0 <meters>
+    UpperLeftCornerY   = 600000.0 <meters>
+    PixelResolution    = 100000.0 <meters/pixel>
+    Scale              = 0.59274697523306 <pixels/degree>
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 1204
+    AlphaLines          = 1056
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 1204.5
+    AlphaEndingLine     = 1056.5
+    BetaSamples         = 1204
+    BetaLines           = 1056
+  End_Group
+
+  Group = Reseaus
+    Line     = (5, 6, 8, 9, 10, 11, 12, 13, 14, 14, 15, 133, 134, 135, 137,
+                138, 139, 140, 141, 141, 142, 143, 144, 263, 264, 266, 267,
+                268, 269, 269, 270, 271, 272, 273, 393, 393, 395, 396, 397,
+                398, 399, 399, 400, 401, 402, 403, 523, 524, 525, 526, 527,
+                527, 528, 529, 530, 530, 532, 652, 652, 654, 655, 656, 657,
+                657, 658, 659, 660, 661, 662, 781, 783, 784, 785, 786, 787,
+                788, 788, 789, 790, 791, 911, 912, 913, 914, 915, 916, 917,
+                918, 918, 919, 920, 921, 1040, 1041, 1043, 1044, 1045, 1045,
+                1046, 1047, 1047, 1048, 1050)
+    Sample   = (24, 142, 259, 375, 491, 607, 723, 839, 954, 1070, 1185, 24,
+                84, 201, 317, 433, 549, 665, 780, 896, 1011, 1127, 1183, 25,
+                142, 259, 375, 492, 607, 722, 838, 953, 1068, 1183, 25, 84,
+                201, 317, 433, 549, 665, 779, 895, 1010, 1125, 1182, 25, 143,
+                259, 375, 491, 607, 722, 837, 952, 1067, 1182, 25, 84, 201,
+                317, 433, 548, 664, 779, 894, 1009, 1124, 1181, 25, 142, 258,
+                374, 490, 605, 720, 835, 951, 1066, 1180, 24, 83, 200, 316,
+                431, 547, 662, 776, 892, 1007, 1122, 1179, 23, 140, 257, 373,
+                488, 603, 718, 833, 948, 1063, 1179)
+    Type     = (1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6)
+    Valid    = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    Template = $viking1/reseaus/vo1.visb.template.cub
+    Status   = Nominal
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 65681
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-27000, 1)
+  ConstantFrames      = (-27002, -27000)
+  ConstantRotation    = (-3.97934996889671e-04, 0.99992928417985,
+                         -0.011885633652183, -0.99999976485974,
+                         -4.04545016850832e-04, -5.53736215646997e-04,
+                         -5.58505331602465e-04, 0.011885410506373,
+                         0.99992921003884)
+  CkTableStartTime    = -709401200.26114
+  CkTableEndTime      = -709401200.26114
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Kernels             = Null
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 65745
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -709401200.26114
+  SpkTableEndTime      = -709401200.26114
+  SpkTableOriginalSize = 1.0
+  Kernels              = Null
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 65801
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = -709401200.26114
+  CkTableEndTime      = -709401200.26114
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Kernels             = Null
+  SolarLongitude      = -1.79769313486231e+308
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 65865
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -709401200.26114
+  SpkTableEndTime      = -709401200.26114
+  SpkTableOriginalSize = 1.0
+  Kernels              = Null
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY499_RADII                     = (3396.19, 3396.19, 3376.2)
+  BODY_CODE                         = 499
+  BODY_FRAME_CODE                   = 10014
+  CLOCK_ET_-27999_33322515_COMPUTED = d5b9203a4d24c5c1
+  INS-27002_ITRANSL                 = (0, 0, 85)
+  INS-27002_ITRANSS                 = (0, 85, 0)
+  INS-27002_TRANSX                  = (0, 0.0117647, 0)
+  INS-27002_TRANSY                  = (0, 0, 0.0117647)
+End_Object
+End

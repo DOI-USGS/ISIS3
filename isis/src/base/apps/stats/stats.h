@@ -11,6 +11,7 @@
 
 namespace Isis {
   extern void stats(UserInterface &ui);
+  extern void stats(Cube *inputCube, UserInterface &ui); 
   extern Pvl stats(
         Cube *cube,
         double validMin,

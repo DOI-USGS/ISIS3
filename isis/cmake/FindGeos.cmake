@@ -6,7 +6,7 @@
 #   GEOS_LIBRARY
 
 find_path(GEOS_INCLUDE_DIR
-  NAME geos.h
+  NAMES geos.h
   PATH_SUFFIXES "geos/geos${Geos_FIND_VERSION}" "geos"
 )
 

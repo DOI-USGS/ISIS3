@@ -45,6 +45,7 @@ namespace Isis {
       virtual ~StretchType();
 
       virtual Stretch getStretch();
+
       /**
        * Children must re-implement this to update their stretch pairs and GUI
        *   elements appropriately. This could be called with a
@@ -72,11 +73,14 @@ namespace Isis {
 
     signals:
       //! Emitted when a new Stretch object is available
+      void saveToCube();
+      void deleteFromCube();
       void stretchChanged();
-
+      void loadStretch(); 
 
     private slots:
       void savePairs();
+
   };
 };
 

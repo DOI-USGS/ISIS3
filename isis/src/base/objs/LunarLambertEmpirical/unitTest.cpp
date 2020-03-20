@@ -62,5 +62,64 @@ int main() {
     e.print();
   }
 
+  // Test Keyword = (1,2,3,4,5) format for input
+  // 
+  // The actual numbers used for this test are not relevant -- this test's primary purpose is to 
+  // ensure that this format of input is usable for the calculations done by the class without the 
+  // program error-ing out. 
+  PvlGroup algOtherFormat("Algorithm");
+  algOtherFormat += PvlKeyword("Name", "LunarLambertEmpirical");
+
+  PvlKeyword phaseList("PhaseList");
+  PvlKeyword lList("LList"); 
+  PvlKeyword phaseCurveList("PhaseCurveList");
+
+  for (int i=0; i < 15; i++) {
+    phaseList += QString::number(i*10);
+    lList += QString::number(i*0.1); 
+    phaseCurveList += QString::number(i*0.3);
+  }
+
+  algOtherFormat += phaseList; 
+  algOtherFormat += lList; 
+  algOtherFormat += phaseCurveList; 
+
+  PvlObject photometricModel("PhotometricModel");
+  photometricModel.addGroup(algOtherFormat);
+
+  Pvl pvlOtherFormat;
+  pvlOtherFormat.addObject(photometricModel);
+  std::cout << pvlOtherFormat << std::endl << std::endl;
+
+  try {
+    PhotoModel *pm = PhotoModelFactory::Create(pvlOtherFormat);
+
+    std::vector<double>phaselist = pm->PhotoPhaseList();
+
+    std::cout << "Test phase=0.0, incidence=0.0, emission=0.0 ..." <<
+              std::endl;
+    std::cout << "Albedo = " << pm->CalcSurfAlbedo(0.0, 0.0, 0.0) <<
+              std::endl;
+    std::cout << "Test phase=38.0, incidence=11.0, emission=20.0 ..." <<
+              std::endl;
+    std::cout << "Albedo = " << pm->CalcSurfAlbedo(38.0, 11.0, 20.0) <<
+              std::endl;
+    std::cout << "Test phase=65.0, incidence=45.0, emission=30.0 ..." <<
+              std::endl;
+    std::cout << "Albedo = " << pm->CalcSurfAlbedo(65.0, 45.0, 30.0) <<
+              std::endl;
+    std::cout << "Test phase=127.0, incidence=52.0, emission=33.0 ..." <<
+              std::endl;
+    std::cout << "Albedo = " << pm->CalcSurfAlbedo(127.0, 52.0, 33.0) <<
+              std::endl;
+    std::cout << "Test phase=180.0, incidence=90.0, emission=90.0 ..." <<
+              std::endl;
+    std::cout << "Albedo = " << pm->CalcSurfAlbedo(180.0, 90.0, 90.0) <<
+              std::endl << std::endl;
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
   return 0;
 }

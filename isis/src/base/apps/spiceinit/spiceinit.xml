@@ -90,9 +90,9 @@
        not have their paths expanded.  This is to allow variables like $msg/ to work correctly.
     </p>
     <p>
-      The spiceinit program will also add the RayTraceEngine, OnError, and Tolerance keywords to the Kernels 
-      group if specified in the IsisPreferences file. If included, these keywords specify the ray-tracing engine to use and how to use it for shapemodels. 
-      Please see the IsisPreferences file for more details. 
+      The spiceinit program will also add the RayTraceEngine, OnError, and Tolerance keywords to the Kernels
+      group if specified in the IsisPreferences file. If included, these keywords specify the ray-tracing engine to use and how to use it for shapemodels.
+      Please see the IsisPreferences file for more details.
 
     </p>
     <p><b>Troubleshooting:</b> If spiceinit is failing with the error
@@ -279,16 +279,21 @@
     </change>
     <change name="Kristin Berry" date="2017-06-06">
       Updated spiceinit to retain ShapeModel-related keywords set by the ShapeModelFactory and add them to the kernel
-      group. Like other keywords in the kernels group, if they are present at the beginning of a spiceinit run (if we are re-spiceiniting) 
-      they are removed. 
+      group. Like other keywords in the kernels group, if they are present at the beginning of a spiceinit run (if we are re-spiceiniting)
+      they are removed.
     </change>
     <change name="Kristin Berry" date="2017-08-06">
-      Updated spiceinit to remove code dealing with the CubeSupported Pvl Keyword, from the ShapeModel group in the IsisPreferences file, 
+      Updated spiceinit to remove code dealing with the CubeSupported Pvl Keyword, from the ShapeModel group in the IsisPreferences file,
       which has been removed.
     </change>
     <change name="Christopher Combs" date="2018-01-11">
       Made change to camera construction error throw for better reporting on uninstantiated cameras.
       Fixes #5163.
+    </change>
+    <change name="Jesse Mapel" date="2020-02-26">
+      Changed PCK selection to use the same qualities as CK so that target body parameters
+      derived from bundle adjustment can be used alongside CKs derived from bundle adjustment.
+      Fixes #3669.
     </change>
   </history>
 

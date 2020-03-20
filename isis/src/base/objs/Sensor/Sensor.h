@@ -197,9 +197,9 @@ namespace Isis {
       bool HasSurfaceIntersection() const;
       void Coordinate(double p[3]) const;
 
-      double UniversalLatitude() const;
+      virtual double UniversalLatitude() const;
       Latitude GetLatitude() const;
-      double UniversalLongitude() const;
+      virtual double UniversalLongitude() const;
       Longitude GetLongitude() const;
       SurfacePoint GetSurfacePoint() const;
 

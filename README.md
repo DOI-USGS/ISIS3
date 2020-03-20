@@ -3,14 +3,25 @@
 [![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
+[![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
 
 ## Table of Contents
 
-* [FAQ](README.md##FAQ)
-* [Installation](README.md##Installation)
+* [Requests for Comment](README.md#Requests-for-Comment)
+* [FAQ](README.md#FAQ)
+* [Installation](README.md#Installation)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
-* [ISIS Data Area](README.md##The ISIS Data Area)
-* [Installing Older Versions of ISIS](README.md##Installing older versions of ISIS)
+* [ISIS Data Area](README.md#The-ISIS-Data-Area)
+* [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
+
+## Requests for Comment
+The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](astrodiscuss.usgs.gov).
+
+Current open RFCs:
+  * [Migration of ISIS Data to Git](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC4---Migration-of-ISIS-Data-to-Git)
+  * [Removal of LOLAGRAIL SPKs from the data area](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC5-Remove-old-LOLAGRAIL-SPKs)
+  
+  We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software.
 
 ## FAQ
 We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
@@ -67,16 +78,18 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
 6.  The environment is now ready to download ISIS3 and its dependencies:
 
-        conda install -c usgs-astrogeology isis3
+        conda install -c usgs-astrogeology isis
 
-    If you would like to work with our latest Release Candidate instead run:
+    If you would like to work with our latest ISIS version 3, rather than updating
+    to ISIS 4, instead run:
 
-        conda install -c usgs-astrogeology/label/RC isis3
+	    conda install -c usgs-astrogeology isis=3.10.0
+
 
 7.  Finally, setup the environment variables:
 
         #Execute the ISIS3 variable initialization script with default arguments.
-        #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
+        #This script prepares default values for:  $ISISROOT, $ISIS3DATA, $ISIS3TESTDATA
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
 
@@ -93,9 +106,16 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
 ### Updating
 
-  To update to a new version of ISIS, simply run `conda update isis3`
+  To update to a new version of ISIS up to version 3.9.1, simply run `conda update isis3`
 
-  To update to our latest release candidate, run `conda update -c usgs-astrogeology/label/RC isis3`
+  To update to our latest release candidate up to version 3.9.1, run `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+
+  Note that for ISIS versions 3.10 and above, new versions and release candidates will only be 
+  available under the package name `isis` and `conda update isis3` and  
+  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3` 
+  will no longer work for additional updates. Instead, after installing an `isis` package,
+  `conda update isis` should be used to update to a new version and 
+  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 

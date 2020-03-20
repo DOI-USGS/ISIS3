@@ -337,7 +337,7 @@ namespace Isis {
               int x1, y1;
               activeViewport->cubeToViewport(x, y, x1, y1);
               geos::geom::Coordinate c(x1, y1);
-              geos::geom::Point *p = globalFactory.createPoint(c);
+              geos::geom::Point *p = globalFactory->createPoint(c);
               bool contains = p->within(polygon);
               delete p;
 

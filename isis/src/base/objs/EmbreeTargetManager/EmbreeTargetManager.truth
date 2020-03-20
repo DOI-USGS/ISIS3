@@ -37,7 +37,7 @@ Set the maximum number of target shapes to 0
 New maximum cache size:  0
 
 Attempt to create a new target shape
-**PROGRAMMER ERROR** Failed creating EmbreeTargetShape for [/usgs/cpkgs/isis3/data/base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds] Too many EmbreeTargetShapes are already open.
+**PROGRAMMER ERROR** Failed creating EmbreeTargetShape for [$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds] Too many EmbreeTargetShapes are already open.
 
 Attempt to free a shape that doesn't exist
 **PROGRAMMER ERROR** Cannot free EmbreeTargetShape for file [Not a DSK file] because it is not stored in the cache.

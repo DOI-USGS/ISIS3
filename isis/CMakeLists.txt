@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.9.1")
+set(VERSION            "4.1.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
@@ -41,7 +41,7 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
 string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
-set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
+set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
@@ -163,13 +163,15 @@ set(thirdPartyCppFlags -Wall
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
-		       -Wno-strict-overflow
+                       -DUSE_UNSTABLE_GEOS_CPP_API=1
+		               -Wno-strict-overflow
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
  # Append CPP flags set in the third party lib file to the string set in this file.
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
 
@@ -258,6 +260,8 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
+find_package(ale               REQUIRED)
+find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -265,16 +269,17 @@ find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
 find_package(GMM       5.0     REQUIRED)
+SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
-find_package(PCL       1.8     REQUIRED)
+find_package(PCL               REQUIRED)
 find_package(Protobuf  2.6.1   REQUIRED)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
-find_package(TIFF      4.0.5   REQUIRED)
+find_package(TIFF      4.0.0   REQUIRED)
 find_package(TNT       126     REQUIRED)
 find_package(XercesC   3.1.2   REQUIRED)
 find_package(X11       6       REQUIRED)
@@ -424,6 +429,11 @@ install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3
 EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
+
+# Install the header files
+install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+file(GLOB ISIS_INCLUDE_FILES ${CMAKE_BINARY_DIR}/inc/*)
+install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
 
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.

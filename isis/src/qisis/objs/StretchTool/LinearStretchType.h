@@ -36,7 +36,6 @@ namespace Isis {
       virtual Stretch getStretch();
       virtual void setStretch(Stretch);
 
-
     private slots:
       void startSliderMoved(int);
       void startEditChanged(const QString &);

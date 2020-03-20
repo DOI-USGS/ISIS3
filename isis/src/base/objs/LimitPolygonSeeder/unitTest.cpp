@@ -65,10 +65,10 @@ int main() {
       pts->add(geos::geom::Coordinate(1, 0));
       pts->add(geos::geom::Coordinate(0, 0));
 
-      polys.push_back(Isis::globalFactory.createPolygon(
-                        Isis::globalFactory.createLinearRing(pts), NULL));
+      polys.push_back(Isis::globalFactory->createPolygon(
+                        Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon(polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
@@ -93,7 +93,7 @@ int main() {
       vector<geos::geom::Point *> points;
       for(unsigned int pt = 0; pt < seedValues.size(); pt ++) {
         if(proj->SetCoordinate(seedValues[pt]->getX(), seedValues[pt]->getY())) {
-          points.push_back(Isis::globalFactory.createPoint(
+          points.push_back(Isis::globalFactory->createPoint(
                              geos::geom::Coordinate(proj->UniversalLongitude(),
                                  proj->UniversalLatitude())));
         }
@@ -127,10 +127,10 @@ int main() {
       pts->add(geos::geom::Coordinate(0.0125, 0));
       pts->add(geos::geom::Coordinate(0, 0));
 
-      polys.push_back(Isis::globalFactory.createPolygon(
-                        Isis::globalFactory.createLinearRing(pts), NULL));
+      polys.push_back(Isis::globalFactory->createPolygon(
+                        Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon(polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 

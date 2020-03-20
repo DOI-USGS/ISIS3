@@ -113,7 +113,7 @@ namespace Isis {
         delete centroid;
 
         geos::geom::Coordinate c(gridCenterX, gridCenterY);
-        points.push_back(Isis::globalFactory.createPoint(c));
+        points.push_back(Isis::globalFactory->createPoint(c));
       }
     }
 
@@ -145,7 +145,7 @@ namespace Isis {
     points->add(geos::geom::Coordinate(dMinX, dMaxY));
     points->add(geos::geom::Coordinate(dMinX, dMinY));
 
-    geos::geom::Polygon *poly = Isis::globalFactory.createPolygon(Isis::globalFactory.createLinearRing(points), NULL);
+    geos::geom::Polygon *poly = Isis::globalFactory->createPolygon(Isis::globalFactory->createLinearRing(points), NULL);
     geos::geom::Geometry *overlap = poly->intersection(&orig);
 
     return overlap;
