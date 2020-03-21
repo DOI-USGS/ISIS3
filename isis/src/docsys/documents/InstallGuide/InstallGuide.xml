@@ -83,13 +83,13 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>Finally, setup the environment variables:
         <pre>
           <em>#Execute the ISIS3 variable initialization script with default arguments.</em>
-          <em>#This script prepares default values for:  $ISISROOT/$ISISDATA/$ISIS3TESTDATA</em>
+          <em>#This script prepares default values for:  $ISISROOT/$ISISDATA/$ISISTESTDATA</em>
 
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
         </pre>
 
         Executing this script with no arguments will result in $ISISDATA=$CONDA_PREFIX/data,
-        and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
+        and $ISISTESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
         for both of these optional values:
         <pre>
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
@@ -98,7 +98,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         More information about the ISISDATA environment variable and the ISIS3 Data Area
         can be found <a href="#ISIS3DataDownload">here.</a>
 
-        Now everytime the isis3 environment is activated, $ISISROOT, $ISISDATA, and $ISIS3TESTDATA
+        Now everytime the isis3 environment is activated, $ISISROOT, $ISISDATA, and $ISISTESTDATA
         will be set to the values passed to isis3VarInit.py. This does not happen retroactively,
         re-activate the isis3 envionment with the following command:
         <pre>
