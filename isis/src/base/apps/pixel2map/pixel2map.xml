@@ -393,8 +393,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$ISISROOT/appdata/maps</defaultPath>
-        <default><item>$ISISROOT/appdata/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL.  This
           file can be a simple label file, hand produced, or created via
@@ -843,7 +843,7 @@
       <terminalInterface>
         <commandLine>
           from=C1621694254_1.ir.band248.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=default.cub
           lonseam=continue
         </commandLine>
@@ -903,7 +903,7 @@
       <terminalInterface>
         <commandLine>
           from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=dawn_vir_instantaneous_fov.cub
         </commandLine>
         <description>
@@ -957,7 +957,7 @@
       <terminalInterface>
         <commandLine>
           from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=dawn_vir_full_fov.cub
           fovrange=fullexposure
         </commandLine>
