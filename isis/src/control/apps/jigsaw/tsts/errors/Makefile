@@ -14,6 +14,7 @@ APPNAME = jigsaw
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
+	$(LS) -1 $(INPUT)/*cub > $(OUTPUT)/cubes.lis;
 # TEST A: CAMSOLVE=None and SPSOLVE=None
 	echo -e "Error Test A:" > $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
@@ -32,7 +33,7 @@ commands:
 # TEST C: SOLVETARGETBODY=yes and TBPARAMETERS file missing Target object
 	echo -e "Error Test C:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
-	  fromlist=$(INPUT)/empty.lis \
+	  fromlist=$(OUTPUT)/cubes.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
@@ -45,7 +46,7 @@ commands:
 # TEST D: SOLVETARGETBODY=yes and # of parameters to solve is 0
 	echo -e "Error Test D:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
-	  fromlist=$(INPUT)/empty.lis \
+	  fromlist=$(OUTPUT)/cubes.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
@@ -58,7 +59,7 @@ commands:
 # TEST F: CNET=[invalid control net file]
 	echo -e "Error Test F:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
-	  fromlist=$(INPUT)/empty.lis \
+	  fromlist=$(OUTPUT)/cubes.lis \
 	  cnet=$(INPUT)/notacnet.net \
 	  onet=$(OUTPUT)/out.net \
 	  radius=yes \
@@ -74,3 +75,4 @@ commands:
 # Remove paths from errors file
 	$(SED) 's/\(\[\)\/.*\(input\)/\1\2/g' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
 	$(RM) $(OUTPUT)/error_temp.txt;
+	$(RM) $(OUTPUT)/cubes.lis > /dev/null;
