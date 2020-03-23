@@ -152,15 +152,15 @@ void IsisMain() {
 
     if (ui.GetBoolean("CHECKVERSION") ) {
       QStringList remoteVersion = otherVersion.split(QRegExp("\\s+"))[0].split(QRegExp("\\."));
-      if ( remoteVersion[1].toInt() < 5) {
+      if ( remoteVersion[0].toInt() <= 3 && remoteVersion[1].toInt() < 5) {
 
        QString msg ="The SPICE server only supports Isis versions greater than or equal to 3.5.*.*.";
                msg += "Your version:   [" + otherVersion + "] is not compatible";
         throw IException(IException::User, msg, _FILEINFO_);
-
       }
 
     }
+    
     // This next section looks a lot like spiceinit, its semi-duplicated because
     //   I did not want users to be able to spiceinit a label without cube
     //   data.
