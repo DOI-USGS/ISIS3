@@ -287,10 +287,10 @@ void IsisMain() {
   // Read in the proper keyword types (Real, Enum, String, Integer, etc) for 
   // each PvlKeyword so that the PDS labels have proper format
   PvlFormat *formatter = pdsLabel.format();
-  formatter->add("$mro/templates/labels/hiriseIdealPds.typ");
+  formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds.typ");
 
   // Format ordering of keywords/objects/groups/comments in the PDS labels
-  pdsLabel.setFormatTemplate("$mro/templates/labels/hiriseIdealPds.pft");
+  pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHiriseIdealPds.pft");
 
   // image line/byte offsets are calculated and values are updated in the labels
   // now that all translations/additions/modifications to the labels have been

@@ -48,9 +48,9 @@ endif
 
 # Initialize the ISISTESTDATA environment variable
 if (-d $ISISROOT/../testData) then
-  setenv ISIS3TESTDATA $ISISROOT/../testData
+  setenv ISISTESTDATA $ISISROOT/../testData
 else
-  setenv ISIS3TESTDATA /usgs/cpkgs/isis3/isis_testData
+  setenv ISISTESTDATA /usgs/cpkgs/isis3/isis_testData
 endif
 
 # Insert ISISROOT/bin in the PATH environment variable if it's not already there
