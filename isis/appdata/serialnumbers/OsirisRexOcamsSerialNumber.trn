@@ -1,0 +1,57 @@
+# history 2017-11-29 Kristin Berry - Updated translation to output OSIRIS-REX for input osiris-rex 
+#                        (case insensitive) for the SpacecraftName portion of the serial number.
+#                        This output was chosen for backwards compatability.
+# history 2017-12-05 Jeannie Backer - Updated translation to always output OSIRIS-REX for any
+#                        input of the SpacecraftName portion of the serial number. 
+# history 2020-03-19 Jesse Mapel - Reverted changes to SpacecraftName and merged changes from Kris
+#                        Becker. Added optional keyword for use with controlling to the surface
+#                        model.
+
+Group = Keyword1
+  Auto
+  InputKey = SpacecraftName
+  InputGroup = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName = Keyword1
+  OutputPosition = ("Group","SerialNumberKeywords")
+  Translation = ("OsirisRex", "OSIRIS-REx")
+  Translation = (*,*)
+EndGroup
+Group = Keyword2
+  Auto
+  InputKey = InstrumentId
+  InputGroup = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName = Keyword2
+  OutputPosition = ("Group","SerialNumberKeywords")
+  Translation = (*,*)
+EndGroup
+Group = Keyword3
+  Auto
+  InputKey = SpacecraftClockStartCount
+  InputGroup = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName = Keyword3
+  OutputPosition = ("Group","SerialNumberKeywords")
+  Translation = (*,*)
+EndGroup
+
+/* This keyword is an optional keyword that is to be used to */
+/* create unique serial numbers for images derived from the  */
+/* original. This is intended for use such as applying the  */
+/* local incidence backplane as a control source. By manually */
+/* adding this keyword to the Instrument group with any   */
+/* value, it creates a new (unique) serial number for control */
+/* processing. It has no effect if the keyword does not   */
+/* exist. */
+Group = Keyword4
+  Auto
+  Optional
+  InputKey = ControlSN
+  InputGroup = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName = Keyword4
+  OutputPosition = ("Group","SerialNumberKeywords")
+  Translation = (*,*)
+EndGroup
+End

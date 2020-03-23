@@ -1,0 +1,24 @@
+#
+# This translation file is used to produce the ISIS 3 Kernels label group
+# for the OSIRIS-REx MapCam and SamCam cameras.
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2017-08-23 Jeannie Backer - Moved PolyCam to its own translation file since it uses 
+#                        a different input label value to find the proper code.
+
+Group = NaifCode
+  Auto
+  InputKey       = CAMERAID
+  InputPosition  = FITSLABELS
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  # MAP
+  Translation    = (-64361, 0)
+  # SAM
+  Translation    = (-64362, 1)
+  # POLY - this line left here so older version of ocams2isis continue to work.
+  # New vewsions (after 2017/08/23) use ocamsPolyCamKernels_fit.trn
+   Translation    = (-64360, 2)
+End_Group
+
+End
