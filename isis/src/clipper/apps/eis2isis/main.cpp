@@ -126,13 +126,9 @@ void IsisMain() {
  *   @history 2017-01-20 Jeannie Backer - Original Version
  */
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
-  // Get the directory where the Clipper translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Clipper"];
 
   // Get the translation manager ready
-  FileName transFile;
-  transFile = FileName(missionDir + "/translations/clipperEIS.trn");
+  FileName transFile = "$ISISROOT/appdata/translations/ClipperEisCore.trn";
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
   translateCoreInfo(labelXlater, importer);
 }
@@ -191,12 +187,9 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
  * @param Pvl outputCube Pointer to the output cube where ISIS labels will be added and updated.
 */
 void translateEISLabels(FileName &inputLabel, Pvl *outputLabel) {
-  // Get the directory where the Clipper translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Clipper"];
   
-  // Make a call to translate labels for each translation file needed
-  translateLabels(inputLabel, outputLabel, FileName(missionDir + "/translations/clipperEisInstrument.trn"));
+  // Translate labels for each translation file needed
+  translateLabels(inputLabel, outputLabel, FileName("$ISISROOT/appdata/translations/ClipperEisInstrument.trn"));
 }
 
 
