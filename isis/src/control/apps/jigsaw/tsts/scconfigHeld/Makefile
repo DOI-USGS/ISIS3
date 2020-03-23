@@ -4,12 +4,12 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) -1 $(INPUT)/*cub > $(OUTPUT)/cubes.lis;
-	$(LS) $(INPUT)/lor_0299148119_0x632_sci.cub > $(OUTPUT)/hold.lis;
+	$(LS) $(INPUT)/I28234014RDR.cub > $(OUTPUT)/hold.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cubes.lis \
 	  heldlist=$(OUTPUT)/hold.lis \
-	  cnet=$(INPUT)/ground.net \
-	  onet=$(OUTPUT)/ground_jig.net \
-	  scconfig=$(INPUT)/config.pvl \
+	  cnet=$(INPUT)/themis_dayir_VO_arcadia_extract_hand.net \
+	  onet=$(OUTPUT)/themis_dayir_VO_arcadia_extract_hand_jig.net \
+	  scconfig=$(INPUT)/themis_vo.pvl \
 	  bundleout_txt=no \
 	  output_csv=no \
 	  residuals_csv=no > /dev/null;
