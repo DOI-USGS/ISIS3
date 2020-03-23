@@ -146,6 +146,9 @@ This step covers creating the builds and the installation environments of ISIS f
     * For a standard release, the environment should be named `isisX.Y.Z`.
     * For a release candidate, the environment should be named `isisX.Y.Z-RC#`.
     * For a custom build, the environment should be named `isisX.Y.Z-<custom-label>`.
+    * For the step which sets up the data and testData areas, make sure to use the new isis_data and isis_testData directories, i.e.: `python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=/usgs/cpkgs/isis3/isis_data  --test-dir=/usgs/cpkgs/isis3/isis_testData`
+
+
 * Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
 
 ## Step 9: Update Documentation
