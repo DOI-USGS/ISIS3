@@ -54,6 +54,12 @@ Group = InstrumentName
   Translation   = (Nir, NIR)
   Translation   = (Uvvis, UVVIS)
 
+  # Clipper (Europa)
+  Translation = (EisWacFrame, WacFrame)
+  Translation = (EisWacPushBroom, WacPushBroom)
+  Translation = (EisNacRollingShutter, NacRollingShutter)
+  Translation = (EisNacPushBroom, NacPushBroom)
+
   # Dawn
   Translation   = (Fc, FC1)
   Translation   = (Fc, FC2)
