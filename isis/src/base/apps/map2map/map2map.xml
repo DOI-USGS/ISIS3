@@ -167,8 +167,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$ISISROOT/appdata/maps</defaultPath>
-        <default><item>$ISISROOT/appdata/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL.  This
           file can be a simple label file, hand produced or created via
