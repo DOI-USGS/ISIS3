@@ -342,7 +342,7 @@ namespace Isis {
       return proj->Mapping();
     }
     catch (IException &) {
-      Pvl mappingPvl("$ISISROOT/appdata/maps/equirectangular.map");
+      Pvl mappingPvl("$ISISROOT/appdata/templates/maps/equirectangular.map");
       PvlGroup &mappingGrp = mappingPvl.findGroup("Mapping");
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
       mappingGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
@@ -386,7 +386,7 @@ namespace Isis {
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used. "
         "The selected file should be a map file, examples are available in "
-        "$ISISROOT/appdata/maps."));
+        "$ISISROOT/appdata/templates/maps."));
     m_mapButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(m_mapButton, SIGNAL(clicked()), this, SLOT(configProjectionParameters()));
 
@@ -1151,7 +1151,7 @@ namespace Isis {
         "on creating a custom map file that defines the desired projection, latitude "
         "system, and longitude direction and domain. This program will use the latitude range "
         "and longitude range if they exist in the loaded file. A choice of map templates that can be used as "
-        "a starting point for supported map projections can be found in $ISISROOT/appdata/maps (refer "
+        "a starting point for supported map projections can be found in $ISISROOT/appdata/templates/maps (refer "
         "to maptemplate or mosrange for more details and information on the required parameters "
         "for a projection). The website: "
         "<a href='%1'>%1</a> also provides useful information about map projections.")

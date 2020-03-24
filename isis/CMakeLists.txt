@@ -465,10 +465,10 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/kernels) 
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/photometry) # *.pvl
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen) # *.pvl
 
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/maps)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/maps)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/icons)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/images/targets)
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/labels)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/templates/labels)
 #execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/appdata/autoreg)
 
 # Create an xml folder in the source directory that we will need later
@@ -614,11 +614,11 @@ add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
 add_dependencies(isis3 targets)
 
 add_custom_target(maps ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/maps/*.map ${CMAKE_BINARY_DIR}/appdata/maps)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/*.map ${CMAKE_BINARY_DIR}/appdata/templates/maps)
 add_dependencies(isis3 maps)
 
 add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/labels/*.pft ${CMAKE_BINARY_DIR}/appdata/labels)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/*.pft ${CMAKE_BINARY_DIR}/appdata/templates/labels)
 add_dependencies(isis3 labels)
 
 #add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different

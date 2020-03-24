@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
   cout << endl << "Test reading a random PVL file" << endl << endl;
   try {
-    ControlNetVersioner invalidVersioner("$ISISROOT/appdata/maps/equirectangular.map");
+    ControlNetVersioner invalidVersioner("$ISISROOT/appdata/templates/maps/equirectangular.map");
   }
   catch (IException &e) {
     e.print();
