@@ -1,6 +1,7 @@
 #include "cam2map.h"
 
 #include "Camera.h"
+#include "CubeAttribute.h"
 #include "IException.h"
 #include "IString.h"
 #include "ProjectionFactory.h"
@@ -21,6 +22,10 @@ namespace Isis {
   void cam2map(UserInterface &ui, Pvl *log) {
     // Open the input cube
     Cube icube(ui.GetFileName("FROM"));
+    CubeAttributeInput inAtt(ui.GetFileName("FROM"));
+    if (inAtt.bands().size() != 0) {
+      icube.setVirtualBands(inAtt.bands());
+    }
 
     // Get the map projection file provided by the user
     Pvl userMap;
