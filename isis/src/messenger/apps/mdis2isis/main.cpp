@@ -287,7 +287,8 @@ int CreateFilterSpecs(const QString &instId, int filter_code,
   }
   else if(instId == "MDIS-WAC") {
     //  Set up WAC calibration file
-    FileName calibFile("$ISISROOT/appdata/translations/MessengerMdisCalibration.trn");
+    FileName calibFile("$messenger/calibration/mdisCalibration????.trn"); 
+    calibFile = calibFile.highestVersion();
     Pvl config(calibFile.expanded());
 
     PvlGroup &confgrp = config.findGroup("FilterWheel");

@@ -90,7 +90,8 @@ void IsisMain() {
   // We will be processing by column in case of a linear dark current fit. This will make the
   // calibration a one pass system in this case, rather than two.
   ProcessByLine p;
-  FileName calibFile("$ISISROOT/appdata/translations/MessengerMdisCalibration.trn");
+  FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
+  calibFile = calibFile.highestVersion();
   g_configFile.read(calibFile.expanded());
 
   // Initialize variables
@@ -491,7 +492,7 @@ void IsisMain() {
   // Write Calibration group to file and log
   ocube->putGroup(calibrationLog);
   Application::Log(calibrationLog);
-  g_configFile.clear();
+//  g_configFile.clear();
 }
 
 FileName determineFlatFieldFile() {
