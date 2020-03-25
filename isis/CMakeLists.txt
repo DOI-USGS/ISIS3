@@ -521,62 +521,60 @@ add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
 add_dependencies(isis3 appdata)
 
 # Add custom build targets to copy modified template files to build/appdata/templates
-add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/*.pvl ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
-add_dependencies(isis3 hidtmgen)
+add_custom_target(apollotemplate ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/src/*/templates/*.def ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
+add_dependencies(isis3 apollotemplate)
+
+add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoreg/* ${CMAKE_BINARY_DIR}/appdata/templates/autoreg/)
+add_dependencies(isis3 autoreg)
+
+add_custom_target(autoseed ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/* ${CMAKE_BINARY_DIR}/appdata/templates/autoseed/)
 
 add_custom_target(noproj ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/noproj/*.pvl
-  ${CMAKE_BINARY_DIR}/appdata/templates/noproj/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/noproj/* ${CMAKE_BINARY_DIR}/appdata/templates/noproj/)
 add_dependencies(isis3 noproj)
 
 add_custom_target(cnetref ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/*.def.example
-  ${CMAKE_BINARY_DIR}/appdata/templates/cnetref/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/* ${CMAKE_BINARY_DIR}/appdata/templates/cnetref/)
 add_dependencies(isis3 cnetref)
 
 add_custom_target(cnetstats ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/*.def.example
-  ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/* ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats/)
 add_dependencies(isis3 cnetstats)
 
 add_custom_target(cnetvalid ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/*.def ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/*.def.example
-  ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/* ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure/)
 add_dependencies(isis3 cnetvalid)
 
 add_custom_target(controlnetworks ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/controlnetworks/*.template
-  ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/controlnetworks/* ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks/)
 add_dependencies(isis3 controlnetworks)
 
 add_custom_target(findfeatures ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/*.lis
-  ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/* ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/)
 add_dependencies(isis3 findfeatures)
 
 add_custom_target(fullcnetdiff ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/fullcnetdiff/*.def
-  ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/fullcnetdiff/* ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff/)
 add_dependencies(isis3 fullcnetdiff)
 
 add_custom_target(jigsaw ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/jigsaw/*.pvl
-  ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/jigsaw/* ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw/)
 add_dependencies(isis3 jigsaw)
 
 add_custom_target(kernels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/kernels/*.txt
-  ${CMAKE_BINARY_DIR}/appdata/templates/kernels/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/kernels/* ${CMAKE_BINARY_DIR}/appdata/templates/kernels/)
 add_dependencies(isis3 kernels)
 
 add_custom_target(photometry ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/photometry/*.pvl
-  ${CMAKE_BINARY_DIR}/appdata/templates/photometry/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/photometry/* ${CMAKE_BINARY_DIR}/appdata/templates/photometry/)
 add_dependencies(isis3 photometry)
 
 add_custom_target(icons ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/images/icons/* ${CMAKE_BINARY_DIR}/appdata/images/icons)
+  ${CMAKE_SOURCE_DIR}/appdata/images/icons/* ${CMAKE_SOURCE_DIR}/appdata/images/icons/licenses/* 
+  ${CMAKE_BINARY_DIR}/appdata/images/icons)
 add_dependencies(isis3 icons)
 
 add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -584,12 +582,16 @@ add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
 add_dependencies(isis3 targets)
 
 add_custom_target(maps ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/*.map ${CMAKE_BINARY_DIR}/appdata/templates/maps)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/* ${CMAKE_BINARY_DIR}/appdata/templates/maps)
 add_dependencies(isis3 maps)
 
 add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/*.pft ${CMAKE_BINARY_DIR}/appdata/templates/labels)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/* ${CMAKE_BINARY_DIR}/appdata/templates/labels)
 add_dependencies(isis3 labels)
+
+add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
+add_dependencies(isis3 hidtmgen)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
