@@ -78,7 +78,7 @@ class TestPayload : public DefaultCube {
 TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
   QString outputFile = tempDir.path() + "out.txt";
 
-  QVector<QString> args = {"From="+hexPayloadPath, "To="+outputFile};
+  QVector<QString> args = {"From="+hexPayloadPath, "To="+outputFile, "TEMPFILE="+tempDir.path()+"/temp.cub"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
