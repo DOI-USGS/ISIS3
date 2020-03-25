@@ -224,7 +224,7 @@ namespace Isis {
       */
 
       // Check if labels contain min/max lat/lon or comparable
-      bool HasGroundRange() const;
+      virtual bool HasGroundRange() const;
 
       // get rotation
       double Rotation() const;
@@ -248,11 +248,11 @@ namespace Isis {
       virtual bool SetUnboundUniversalGround(const double coord1, const double coord2);
 
       // Set world position (calls SetCoordinate on projected x/y)
-      bool SetWorld(const double x, const double y);
+      virtual bool SetWorld(const double x, const double y);
 
       // Get computed world X/Y after successful SetGround
-      double WorldX() const;
-      double WorldY() const;
+      virtual double WorldX() const;
+      virtual double WorldY() const;
 
       // convert from projected coordinate to world coordinate
       double ToWorldX(const double projectionX) const;

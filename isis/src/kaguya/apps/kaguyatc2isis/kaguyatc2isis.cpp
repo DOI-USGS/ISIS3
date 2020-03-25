@@ -100,6 +100,7 @@ namespace Isis {
     archiveXlater.Auto(otherLabels);
 
     transFile = transDir + "KaguyaTcKernels.trn";
+
     PvlToPvlTranslationManager kernelsXlater(label, transFile.expanded());
     kernelsXlater.Auto(otherLabels);
 

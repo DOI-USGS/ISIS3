@@ -256,12 +256,12 @@ namespace Isis {
       virtual ~Camera();
 
       // Methods
-      bool SetImage(const double sample, const double line);
-      virtual bool SetImage(const double sample, const double line, const double deltaT); 
+      virtual bool SetImage(const double sample, const double line);
+      virtual bool SetImage(const double sample, const double line, const double deltaT);
 
-      bool SetUniversalGround(const double latitude, const double longitude);
-      bool SetUniversalGround(const double latitude, const double longitude,
-                              const double radius);
+      virtual bool SetUniversalGround(const double latitude, const double longitude);
+      virtual bool SetUniversalGround(const double latitude, const double longitude,
+                                      const double radius);
       bool SetGround(Latitude latitude, Longitude longitude);
       bool SetGround(const SurfacePoint & surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
@@ -276,9 +276,9 @@ namespace Isis {
       int ReferenceBand() const;
       bool HasReferenceBand() const;
       virtual void SetBand(const int band);
-      double Sample();
+      virtual double Sample();
       int Band();
-      double Line();
+      virtual double Line();
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);

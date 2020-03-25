@@ -1303,6 +1303,11 @@ namespace Isis {
     }
 
     *(this->label()) += spice.getStoredNaifKeywords();
+
+    // Access the camera here while all of the kernels are still loaded.
+    // This needs to be done for some cameras that need loaded spice data
+    // to actually create the camera model. (KaguyaTC for example)
+    this->camera();
   }
 
 
