@@ -8,54 +8,69 @@ xsi:noNamespaceSchemaLocation=
 
   <description>
     <p>
-      This program converts a PDS or ISIS2 formatted file to an ISIS3 
-      <def link="Cube">cube</def> format.  The standard PDS image is defined in 
-      the "FROM" parameter, and not the "IMAGE" parameter.  If the PDS file has 
-      a detached label file and an image file, both are required to exist in the 
-      working directory.  If the label is detached, the detached label filename 
+      This program converts a PDS or ISIS2 formatted file to an ISIS3
+      <def link="Cube">cube</def> format.  The standard PDS image is defined in
+      the "FROM" parameter, and not the "IMAGE" parameter.  If the PDS file has
+      a detached label file and an image file, both are required to exist in the
+      working directory.  If the label is detached, the detached label filename
       is defined as the input file for the "FROM" parameter.  The "IMAGE" parameter
-      does not need to be defined, unless the program fails to find the image file 
+      does not need to be defined, unless the program fails to find the image file
       specifed in the label file upon the program's execution.
-      
-      The default settings normally work for most PDS products, but occasionally 
-      the user may need to modify the default values in order to obtain an image 
+
+      The default settings normally work for most PDS products, but occasionally
+      the user may need to modify the default values in order to obtain an image
       that meets their specific requirements.
      </p>
      <p>
-      The incoming <def link="Special Pixels">special pixel</def> values in the 
-      PDS file are assigned equivalent values for special pixels in ISIS3.  The 
-      order of precedence for special pixels in ISIS from highest to lowest 
-      priority is the following:  
+      The incoming <def link="Special Pixels">special pixel</def> values in the
+      PDS file are assigned equivalent values for special pixels in ISIS3.  The
+      order of precedence for special pixels in ISIS from highest to lowest
+      priority is the following:
       <blockquote>
       <ol>
-        <li><def>NULL</def></li> 
-	<li><def>HRS</def></li> 
-	<li><def>LRS</def></li> 
+        <li><def>NULL</def></li>
+	<li><def>HRS</def></li>
+	<li><def>LRS</def></li>
 	<li><def>HIS</def></li>
 	<li><def>LIS</def></li>
       </ol>
-      </blockquote> 
-      If any incoming <def link="Digital Number">pixel value</def> falls within 
-      two different special pixel types, the <def link="Special Pixel">special 
-      pixel</def> with the higher priority is assigned.  The user may also 
+      </blockquote>
+      If any incoming <def link="Digital Number">pixel value</def> falls within
+      two different special pixel types, the <def link="Special Pixel">special
+      pixel</def> with the higher priority is assigned.  The user may also
       specify a range of pixel values to be assigned to the different special pixels.
-      If the range of pixel values defined by the user for the different special 
-      pixels overlap, the special pixel with the highest priority is assigned.  For 
-      example, if NULLMIN=0.0, NULLMAX=3.0, LISMIN=3.0, and LISMAX=5.0, the actual 
-      raw value 3.0 can be assigned as a NULL or LIS, but is translated to NULL because 
-      NULL has a higher priority than LIS.  The conversion of images from ISIS2 to 
-      ISIS3 follows the same rules as PDS images, except that the label information 
+      If the range of pixel values defined by the user for the different special
+      pixels overlap, the special pixel with the highest priority is assigned.  For
+      example, if NULLMIN=0.0, NULLMAX=3.0, LISMIN=3.0, and LISMAX=5.0, the actual
+      raw value 3.0 can be assigned as a NULL or LIS, but is translated to NULL because
+      NULL has a higher priority than LIS.
+    <p>
+      It should be noted for 8-bit images
+      that ISIS uses zero as it's default NULL value so any
+      <def link="Digital Number">pixel value</def> of zero will be convert to a
+      NULL value in the output cube. It is recommended that any 8-bit images
+      either be converted to 16-bit images or run the following:
+    </p>
+    <p>
+      <b>pds2isis from=input8bit.img to=output8bit.cub</b>
+      <br/>
+      <b>stretch from=output8bit.cub to=output16bit.cub+16bit NULL=0</b>
+    </p>
+    </p>
+    <p>
+      The conversion of images from ISIS2 to ISIS3
+      follows the same rules as PDS images, except that the label information
       is propagated to the output file.
      </p>
      <p>
-      The best option to convert files from ISIS2 to ISIS3 is to maintain all the 
-      input file settings, and do not change the <def link="Bit Type">bit type</def> 
-      or change any incoming pixel values to special pixels.  When an ISIS2 
-      <def>Level1</def> image is imported into ISIS3, it is important to note the 
-      label information is not propagated from the ISIS2 to the ISIS3 cube file.  
-      For an ISIS2 <def>Level2</def> image or mosaic file, a limited set of label 
-      information is transferred to the ISIS3 labels that include the "Instrument," 
-      "<def link="Band">BandBin</def>," and "<def link="Map Projection">Mapping</def>" 
+      The best option to convert files from ISIS2 to ISIS3 is to maintain all the
+      input file settings, and do not change the <def link="Bit Type">bit type</def>
+      or change any incoming pixel values to special pixels.  When an ISIS2
+      <def>Level1</def> image is imported into ISIS3, it is important to note the
+      label information is not propagated from the ISIS2 to the ISIS3 cube file.
+      For an ISIS2 <def>Level2</def> image or mosaic file, a limited set of label
+      information is transferred to the ISIS3 labels that include the "Instrument,"
+      "<def link="Band">BandBin</def>," and "<def link="Map Projection">Mapping</def>"
       groups.
     </p>
   </description>
@@ -89,8 +104,8 @@ xsi:noNamespaceSchemaLocation=
     </change>
    <change name="Tracie Sucharski" date="2007-04-10">
        Added LatitudeType2 group to translation table to handle CTX cubes.
-       Additonal changes to projection translation tables for other possible 
-       values for Longitude direction, latitude type.  If the min or max 
+       Additonal changes to projection translation tables for other possible
+       values for Longitude direction, latitude type.  If the min or max
        longitude values are greater than 180, change longitude domain to 360.
        Only call TranslateIsis2Labels if pds file is an Isis2 cube.
    </change>
@@ -112,7 +127,7 @@ xsi:noNamespaceSchemaLocation=
       NIMS RDR products fixes #1029.
     </change>
     <change name="Ella Mae Lee" date="2012-11-09">
-      Improve the documentation, document capability to import ISIS2 images, 
+      Improve the documentation, document capability to import ISIS2 images,
       fixes #1172.
     </change>
     <change name="Kimberly Oyama" date="2012-11-21">
@@ -125,10 +140,10 @@ xsi:noNamespaceSchemaLocation=
      References:  #2368.
     </change>
     <change name="Summer Stapleton" date="2017-06-27">
-     Added conditional to check whether default offsets and multipliers where changed from their 
+     Added conditional to check whether default offsets and multipliers where changed from their
      default values and log them if so.
     </change>
-	
+
   </history>
 
   <category>
@@ -148,7 +163,7 @@ xsi:noNamespaceSchemaLocation=
         <description>
           Specify a PDS file, PDS label file, or ISIS2 cube file.  If the
 	  input file is a PDS detached label file and the companion image
-	  file is not in the same directory, use the parameter "IMAGE" to 
+	  file is not in the same directory, use the parameter "IMAGE" to
 	  define the location and filename of the image, otherwise just
 	  enter the label file name.
         </description>
@@ -161,7 +176,7 @@ xsi:noNamespaceSchemaLocation=
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Detached image file 
+          Detached image file
         </brief>
         <description>
           Use this parameter if the pointer to the image data in the
@@ -202,14 +217,14 @@ xsi:noNamespaceSchemaLocation=
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
 	  defined by the NULLMIN and NULLMAX parameters are converted to <def>NULL</def>
-	  pixels.  All other valid pixels that do not fall within the ranges 
-	  specified for LIS, LRS, HIS, and HRS pixels are transferred to the output file 
-	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
-	  file is changed, the NULL and HRS <def link="Special Pixels">special 
-	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
-	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
-	  and "255" may be converted to actual values instead of retaining the 
-	  special pixel property.  If the output file remains as 8-bit, then "0" 
+	  pixels.  All other valid pixels that do not fall within the ranges
+	  specified for LIS, LRS, HIS, and HRS pixels are transferred to the output file
+	  unchanged.  If the <def link="Bit Type">bit type</def> of the input
+	  file is changed, the NULL and HRS <def link="Special Pixels">special
+	  pixels</def> may be incorrectly set to valid pixel values.  For example,
+	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0"
+	  and "255" may be converted to actual values instead of retaining the
+	  special pixel property.  If the output file remains as 8-bit, then "0"
 	  stays as NULL and "255" stays as HRS.
         </description>
         <inclusions>
@@ -249,14 +264,14 @@ xsi:noNamespaceSchemaLocation=
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
 	  defined by the HRSMIN and HRSMAX parameters are converted to HRS
-	  pixels.  All other valid pixels that do not fall within the ranges 
-	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file 
-	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
-	  file is changed, the NULL and HRS <def link="Special Pixels">special 
-	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
-	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
-	  and "255" may be converted to actual values instead of retaining the 
-	  special pixel property.  If the output file remains as 8-bit, then "0" 
+	  pixels.  All other valid pixels that do not fall within the ranges
+	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file
+	  unchanged.  If the <def link="Bit Type">bit type</def> of the input
+	  file is changed, the NULL and HRS <def link="Special Pixels">special
+	  pixels</def> may be incorrectly set to valid pixel values.  For example,
+	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0"
+	  and "255" may be converted to actual values instead of retaining the
+	  special pixel property.  If the output file remains as 8-bit, then "0"
 	  stays as NULL and "255" stays as HRS.
         </description>
         <inclusions>
@@ -296,9 +311,9 @@ xsi:noNamespaceSchemaLocation=
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
 	  defined by the HISMIN and HISMAX parameters are converted to HIS
-	  pixels.  All other valid pixels that do not fall within the ranges 
-	  specified for LIS, LRS, HRS, and NULL pixels are transferred to the 
-	  output file unchanged. 
+	  pixels.  All other valid pixels that do not fall within the ranges
+	  specified for LIS, LRS, HRS, and NULL pixels are transferred to the
+	  output file unchanged.
         </description>
         <inclusions>
           <item>HISMIN</item>
@@ -337,8 +352,8 @@ xsi:noNamespaceSchemaLocation=
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
 	  defined by the LRSMIN and LRSMAX parameters are converted to LRS
-	  pixels.  All other valid pixels that do not fall within the ranges 
-	  specified for LIS, HIS, HRS, and NULL pixels are transferred to the 
+	  pixels.  All other valid pixels that do not fall within the ranges
+	  specified for LIS, HIS, HRS, and NULL pixels are transferred to the
 	  output file unchanged.
         </description>
         <inclusions>
@@ -378,8 +393,8 @@ xsi:noNamespaceSchemaLocation=
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
 	  defined by the LISMIN and LISMAX parameters are converted to LIS
-	  pixels.  All other valid pixels that do not fall within the ranges 
-	  specified for LRS, HIS, HRS, and NULL pixels are transferred to the 
+	  pixels.  All other valid pixels that do not fall within the ranges
+	  specified for LRS, HIS, HRS, and NULL pixels are transferred to the
 	  output file unchanged.
         </description>
         <inclusions>
@@ -421,17 +436,17 @@ xsi:noNamespaceSchemaLocation=
       </brief>
       <description>
         The example ingests a PDS formatted file, and outputs an ISIS3 cube file
-	using the default settings for the program. 
+	using the default settings for the program.
       </description>
       <terminalInterface>
         <commandLine>
 	   from=input.img to=out.cub
         </commandLine>
         <description>
-	   This example shows the use of pds2isis to create an ISIS3 cube file. 
+	   This example shows the use of pds2isis to create an ISIS3 cube file.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/pds2isisGUI.jpg">
@@ -458,14 +473,14 @@ xsi:noNamespaceSchemaLocation=
           <parameterName>FROM</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="458" height="550" src="assets/images/out.jpg">
           <brief>
 	      The ISIS3 output cube file
           </brief>
           <description>
-	      This screenshot displays the ouput of the pds2isis application.    
+	      This screenshot displays the ouput of the pds2isis application.
           </description>
           <thumbnail caption= "The ISIS3 image cube after conversion"
           src="assets/thumbs/out.jpg" width="167" height="200"/>
