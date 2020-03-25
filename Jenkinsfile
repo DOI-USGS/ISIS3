@@ -10,6 +10,7 @@ for (lbl in labels) {
     def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
 
     nodes[label] = {
+        customWorkspace "${JENKINS_HOME}/workspace/${JOB_NAME}/${BUILD_NUMBER}"
         stage(label) {
             isisNode(label) {
                 def isisEnv = [
