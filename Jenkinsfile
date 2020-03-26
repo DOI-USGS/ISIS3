@@ -2,7 +2,7 @@
 
 def NUM_CORES = 8
 def errors = []
-def labels = ['CentOS', 'Fedora', 'Ubuntu', 'mac'] // labels for Jenkins node types we will build on
+def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
 for (lbl in labels) {
@@ -10,7 +10,6 @@ for (lbl in labels) {
     def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
 
     nodes[label] = {
-        customWorkspace "${JENKINS_HOME}/workspace/${JOB_NAME}/${BUILD_NUMBER}"
         stage(label) {
             isisNode(label) {
                 def isisEnv = [
