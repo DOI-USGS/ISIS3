@@ -22,7 +22,7 @@ namespace Isis {
   void cam2map(UserInterface &ui, Pvl *log) {
     // Open the input cube
     Cube icube;
-    CubeAttributeInput inAtt(ui.GetAsString("FROM"));
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
