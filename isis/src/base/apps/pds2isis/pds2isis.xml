@@ -36,7 +36,7 @@ xsi:noNamespaceSchemaLocation=
       </ol>
       </blockquote>
       If any incoming <def link="Digital Number">pixel value</def> falls within
-      two different special pixel types, the <def link="Special Pixel">special
+      two different special pixel types, the <def link="Special Pixels">special
       pixel</def> with the higher priority is assigned.  The user may also
       specify a range of pixel values to be assigned to the different special pixels.
       If the range of pixel values defined by the user for the different special
@@ -63,13 +63,13 @@ xsi:noNamespaceSchemaLocation=
      <p>
       The best option to convert files from ISIS2 to ISIS3 is to maintain all the
       input file settings, and do not change the <def link="Bit Type">bit type</def>
-      or change any incoming pixel values to special pixels.  When an ISIS2
-      <def>Level1</def> image is imported into ISIS3, it is important to note the
-      label information is not propagated from the ISIS2 to the ISIS3 cube file.
-      For an ISIS2 <def>Level2</def> image or mosaic file, a limited set of label
-      information is transferred to the ISIS3 labels that include the "Instrument,"
-      "<def link="Band">BandBin</def>," and "<def link="Map Projection">Mapping</def>"
-      groups.
+      or change any incoming pixel values to <def link="Special Pixels">special pixels</def>.
+      When an ISIS2 <def>Level1</def> image is imported into ISIS3, it is
+      important to note the label information is not propagated from the ISIS2 to
+      the ISIS3 cube file. For an ISIS2 <def>Level2</def> image or mosaic file,
+      a limited set of label information is transferred to the ISIS3 labels that
+      include the "Instrument," "<def link="Band">BandBin</def>," and
+      "<def link="Map Projection">Mapping</def>" groups.
     </p>
   </description>
 
