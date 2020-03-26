@@ -52,7 +52,7 @@ xsi:noNamespaceSchemaLocation=
       output cube. The special pixel values for each bit type can be found
       <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SpecialPixels">here</a>.
       This is most commenly an issue with 8-bit data. If you are working with
-      an 8-bit image and need either 0 or 255 either convert the data to 16-bit
+      an 8-bit image and need either 0 or 255, either convert the data to 16-bit
       or use Stretch after ingestion.
     </p>
     <p>
