@@ -44,18 +44,13 @@ xsi:noNamespaceSchemaLocation=
       example, if NULLMIN=0.0, NULLMAX=3.0, LISMIN=3.0, and LISMAX=5.0, the actual
       raw value 3.0 can be assigned as a NULL or LIS, but is translated to NULL because
       NULL has a higher priority than LIS.
-    <p>
-      It should be noted for 8-bit images
-      that ISIS uses zero as it's default NULL value so any
-      <def link="Digital Number">pixel value</def> of zero will be convert to a
-      NULL value in the output cube. It is recommended that any 8-bit images
-      either be converted to 16-bit images or run the following:
     </p>
     <p>
-      <b>pds2isis from=input8bit.img to=output8bit.cub</b>
-      <br/>
-      <b>stretch from=output8bit.cub to=output16bit.cub+16bit NULL=0</b>
-    </p>
+      It should be noted if any incoming <def link="Digital Number">pixel values</def>
+      are equal to one of the ISIS <def link="Special Pixel">special pixel</def>
+      values for the corresponding bit type, those pixels will be special in the
+      output cube. If you are working with an 8-bit image and need either 0
+      or 255 either convert the data to 16-bit or use Stretch after ingestion.
     </p>
     <p>
       The conversion of images from ISIS2 to ISIS3
