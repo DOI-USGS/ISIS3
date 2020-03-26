@@ -35,8 +35,8 @@ namespace Isis {
     bool WriteFile = ui.GetBoolean("FILE");
     bool WriteSN = ui.GetBoolean("SN");
     bool WriteObservation = ui.GetBoolean("OBSERVATION");
-
-    QString from = ui.GetFileName("FROM");    
+    
+    QString from = cube->fileName();    
     QString format = ui.GetString("FORMAT");
     bool pvl;
     if (format == "PVL") {
