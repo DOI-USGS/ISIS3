@@ -31,7 +31,8 @@ void IsisMain() {
 
   cerr << "Testing Enlarge Class ... " << endl;
   p.StartProcess(*trans, *interp);
-  trans->UpdateOutputLabel(outCube);
+  PvlGroup results = trans->UpdateOutputLabel(outCube);
+  cerr << results << endl;
   Pvl *outLabel = outCube->label();
   outLabel->deleteObject("History");
   cerr << *outLabel;
