@@ -89,4 +89,7 @@ Object = IsisCube
     Status   = Nominal
   End_Group
 End_Object
+Object = Label
+    Bytes = 65536
+End_Object
 End
