@@ -55,7 +55,7 @@ No. The [[DN]] value 0 is defined as [[NULL]] only in an 8-bit file. For the 16-
 
 ---
 
-{{isisdemo(isis-special-pixels)}}
+<not migrated?>
 
 ## Working with Special Pixels
 
