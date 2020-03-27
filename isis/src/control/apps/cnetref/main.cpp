@@ -58,10 +58,10 @@ void IsisMain() {
 
       Pvl pvlTemplate, pvlResults;
       if (sCriteria == "INTEREST") {
-        pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_operator.def");
+        pvlTemplate = Pvl("$ISISROOT/appdata/templates/cnetref/cnetref_operator.def");
       }
       else {
-        pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_nooperator.def");
+        pvlTemplate = Pvl("$ISISROOT/appdata/templates/cnetref/cnetref_nooperator.def");
       }
       pvlTemplate.validatePvl(*pvlDefFile, pvlResults);
       if (pvlResults.groups() > 0 || pvlResults.keywords() > 0) {

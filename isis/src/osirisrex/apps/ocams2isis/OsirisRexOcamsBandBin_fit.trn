@@ -1,0 +1,37 @@
+#
+# This translation file is used to produce the ISIS 3 BandBin label group
+# for the OSIRIS-REx MapCam, SamCam and PolyCan cameras.
+# Translation = (left,right) convert the input "right" to "left"
+#
+
+Group = FilterName
+  Auto
+  Optional
+  InputKey       = FILTNAME
+  InputPosition  = FITSLABELS
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  InputDefault   = Unknown
+  Translation    = (*, *)
+End_Group
+
+Group = FilterCenter
+  Auto
+  Optional
+  InputKey       = FILTNAME
+  InputPosition  = FITSLABELS
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (473, B)
+  Translation    = (550, V)
+  Translation    = (698, W)
+  Translation    = (847, X)
+
+  # A PAN filter is in all OCAMS instruments. ISIS input translations does
+  # not support this with just one keyword if its not specifically defined in
+  # the input label. It must be handled in the import program. This one is
+  # the MapCam PAN filter wavelength.
+  Translation    = (650, PAN)
+  Translation    = (NULL, *)
+End_Group
+End

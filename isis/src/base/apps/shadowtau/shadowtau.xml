@@ -1036,7 +1036,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
       PhtName = LunarLambertEmpirical
 
      The numbers below are entered on a single line in the text file for each
-     parameter name (see $ISIS3DATA/base/templates/photometry/marsred.pvl).
+	 parameter name (see $ISISROOT/appdata/templates/photometry/marsred.pvl).
 
      PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,
                   140.,150.,160.,170.,180."

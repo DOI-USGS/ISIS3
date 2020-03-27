@@ -1,0 +1,81 @@
+# History:
+#   2016-02-10 - Tyler Wilson
+
+
+Group = BinCenter
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_CENTER
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  BandBinCenter
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+Group = BinUnit
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_UNIT
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  BandBinUnit
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+Group = OriginalBand
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_ORIGINAL_BAND
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  OriginalBand
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+Group = GratingPosition
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_GRATING_POSIITON
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  GratingPosition
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+Group = Detector
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_DETECTOR
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  Detector
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+
+Group = SolarFlux
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_SOLAR_FLUX
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  SolarFlux
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group
+
+Group = Sensitivity
+	Auto
+	Optional
+        InputKey         =  BAND_BIN_SENSITIVITY
+	InputGroup	 =  "QUBE,BAND_BIN"  
+	InputPosition	 =  (QUBE,BAND_BIN)
+        OutputName       =  Sensitivity
+        OutputPosition   =  (Group,BandBin)
+        Translation      =  (*, *)
+End_Group

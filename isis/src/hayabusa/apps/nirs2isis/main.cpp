@@ -122,23 +122,22 @@ void IsisMain() {
     stdevCube->write(stdevManager);
   }
 
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse));
-  QString transDir = (QString) dataDir["hayabusa"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
   Pvl newLabel;
 
-  QString instTrans = transDir + "nirsInstrument.trn";
+  QString instTrans = transDir + "HayabusaNirsInstrument.trn";
   Isis::PvlToPvlTranslationManager instXlater(label, instTrans);
   instXlater.Auto(newLabel);
 
-  QString archTrans = transDir + "nirsArchive.trn";
+  QString archTrans = transDir + "HayabusaNirsArchive.trn";
   Isis::PvlToPvlTranslationManager archXlater(label, archTrans);
   archXlater.Auto(newLabel);
 
-  QString bandTrans = transDir + "nirsBandBin.trn";
+  QString bandTrans = transDir + "HayabusaNirsBandBin.trn";
   Isis::PvlToPvlTranslationManager bandXlater(label, bandTrans);
   bandXlater.Auto(newLabel);
 
-  QString kernTrans = transDir + "nirsKernels.trn";
+  QString kernTrans = transDir + "HayabusaNirsKernels.trn";
   Isis::PvlToPvlTranslationManager kernXlater(label, kernTrans);
   kernXlater.Auto(newLabel);
 

@@ -114,7 +114,7 @@ void IsisMain() {
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
     p.SetPdsFile("data/pdsImageWithTables.lbl",
-                 "$ISIS3TESTDATA/isis/src/base/objs/ProcessImportPds/pdsImageWithTables.img", plab);
+                 "$ISISTESTDATA/isis/src/base/objs/ProcessImportPds/pdsImageWithTables.img", plab);
     p.SetOutputCube("TO");
     p.ImportTable("SUN_POSITION_TABLE");
     p.StartProcess();
@@ -197,5 +197,5 @@ void IsisMain() {
  *                           Fixes #4738.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/galileo"), "galileo") << endl;
 }

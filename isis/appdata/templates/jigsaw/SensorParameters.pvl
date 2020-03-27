@@ -1,0 +1,69 @@
+# This is an example template that can be used to create the 
+# sensor parameters pvl file used in jigsaw to set parameters
+# separately for different image sensors. Each sensor that
+# is represented by the images in the bundle adjustment must
+# have a Group defined in this file along with the appropriate
+# parameters for that sensor.
+#
+# The Group name for each sensor is formed by combining the
+# SpacecraftName and the InstrumentId from the labels of images 
+# containing data for that sensor. The units required for each 
+# uncertainty is as follows:
+#
+# Spacecraft_Position_Sigma is in meters
+# Spacecraft_Velocity_Sigma is in meters/second
+# Spacecraft_Acceleration_Sigma is in meters/second/second
+# Camera_Angles_Sigma is in decimal degrees
+# Camera_Angular_Velocity_Sigma is in decimal degrees/second
+# Camera_Angular_Acceleration_Sigma is in decimal degrees/second/second
+#
+# If an image in the cube list provided to jigsaw does not have a matching
+# group in this file, then an error will occur. Every sensor represented
+# by the images in the cube list must have an entry in this file with all
+# required parameters set.
+#
+Object = SensorParameters
+  Group = APOLLO15/METRIC
+    CKDegree=2
+    CKSolveDegree=2 
+    CamSolve=Angles
+    Twist=yes
+    SPSolve=positions
+    Spacecraft_position_sigma=1000.0
+    Camera_Angles_Sigma=2.0
+  EndGroup
+  Group = "LUNARRECONNAISSANCEORBITER/NACL"
+    CamSolve=accelerations
+    Twist=yes
+    OverExisting=yes
+    SPSolve=accelerations
+    overhermite=yes
+    Spacecraft_position_sigma=100.0
+    Spacecraft_velocity_sigma=1.0
+    Spacecraft_acceleration_sigma=0.1
+    Camera_Angles_Sigma=2.0
+    Camera_AngularVelocity_Sigma=0.1
+    Camera_AngularAcceleration_Sigma=0.01
+  EndGroup
+  Group = "LUNARRECONNAISSANCEORBITER/NACR"
+    CamSolve=accelerations
+    Twist=yes
+    OverExisting=yes
+    SPSolve=accelerations
+    overhermite=yes
+    Spacecraft_position_sigma=100.0
+    Spacecraft_velocity_sigma=1.0
+    Spacecraft_acceleration_sigma=0.1
+    Camera_Angles_Sigma=2.0
+    Camera_AngularVelocity_Sigma=0.1
+    Camera_AngularAcceleration_Sigma=0.01
+  EndGroup
+  Group = "LUNARORBITER5/HIGHRESOLUTIONCAMERA"
+    CamSolve=angles
+    Twist=yes
+    Camera_Angles_Sigma=2.0
+    SPSolve=positions
+    Spacecraft_position_sigma=1000.0
+  EndGroup
+EndObject
+End

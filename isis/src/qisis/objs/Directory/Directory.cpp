@@ -1,5 +1,5 @@
 /**
- * @file
+ * @File
  * $Revision: 1.19 $
  * $Date: 2010/03/22 19:44:53 $
  *
@@ -428,14 +428,14 @@ namespace Isis {
 
     QAction *openProjectAction = m_openProjectWorkOrder->clone();
     openProjectAction->setIcon(QIcon(FileName(
-                "$base/icons/archive-insert-directory.png").expanded()));
+                "$ISISROOT/appdata/images/icons/archive-insert-directory.png").expanded()));
     fileMenu->addAction(openProjectAction);
     m_permToolBarActions.append(openProjectAction);
 
 
     QAction *saveAction = m_saveProjectWorkOrder->clone();
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
-    saveAction->setIcon( QIcon(FileName("$base/icons/document-save.png")
+    saveAction->setIcon( QIcon(FileName("$ISISROOT/appdata/images/icons/document-save.png")
                                         .expanded()));
     saveAction->setDisabled(true);
     connect( project()->undoStack(), SIGNAL( cleanChanged(bool) ),
@@ -444,7 +444,7 @@ namespace Isis {
     m_permToolBarActions.append(saveAction);
 
     QAction *saveAsAction = m_saveProjectAsWorkOrder->clone();
-    saveAsAction->setIcon(QIcon(FileName("$base/icons/document-save-as.png")
+    saveAsAction->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/document-save-as.png")
                                          .expanded()));
     fileMenu->addAction(saveAsAction);
     m_permToolBarActions.append(saveAsAction);

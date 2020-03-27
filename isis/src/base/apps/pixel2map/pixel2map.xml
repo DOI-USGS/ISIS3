@@ -393,8 +393,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$base/templates/maps</defaultPath>
-        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL.  This
           file can be a simple label file, hand produced, or created via
@@ -410,7 +410,7 @@
               This helper button will cat out the mapping group of the given mapfile to the session log
                of the application
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>
@@ -480,7 +480,7 @@
             <function>LoadCameraRes</function>
             <brief>Load Camera Resolution </brief>
             <description>This helper button will load the default resolution from the camera</description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadMapRes</function>
@@ -560,7 +560,7 @@
             <function>LoadCameraRange</function>
             <brief>Load Camera Ground Range </brief>
             <description>This helper button will load the default ground range from the camera</description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadMapRange</function>
@@ -843,7 +843,7 @@
       <terminalInterface>
         <commandLine>
           from=C1621694254_1.ir.band248.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=default.cub
           lonseam=continue
         </commandLine>
@@ -903,7 +903,7 @@
       <terminalInterface>
         <commandLine>
           from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=dawn_vir_instantaneous_fov.cub
         </commandLine>
         <description>
@@ -957,7 +957,7 @@
       <terminalInterface>
         <commandLine>
           from=VIR_IR_1B_1_506266095_refl_1.b75.l1.cub
-          map=/usgs/cpkgs/isis3/data/base/templates/maps/equirectangular.map
+          map=$ISISROOT/appdata/templates/maps/equirectangular.map
           to=dawn_vir_full_fov.cub
           fovrange=fullexposure
         </commandLine>

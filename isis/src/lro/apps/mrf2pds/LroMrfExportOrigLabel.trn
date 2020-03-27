@@ -1,0 +1,20 @@
+Group = AZIMUTH_RESOLUTION
+  Auto
+  OutputName = AZIMUTH_RESOLUTION
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = LRO:AZIMUTH_RESOLUTION
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+  InputDefault = 0.0
+EndGroup
+
+Group = RANGE_RESOLUTION
+  Auto
+  OutputName = RANGE_RESOLUTION
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = LRO:RANGE_RESOLUTION
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+  InputDefault = 0.0
+EndGroup
+

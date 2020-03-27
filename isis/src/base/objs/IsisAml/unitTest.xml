@@ -135,7 +135,7 @@
               This helper buttion will...
             </description>
             <function>myHelper2</function>
-            <icon>$ISIS3DATA/base/icons/back.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/back.png</icon>
           </helper>
         </helpers>
         <default>
@@ -276,7 +276,7 @@
               Long Description for Helper 3
             </description>
             <function>myHelper3</function>
-            <icon>$ISIS3DATA/base/icons/up.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/up.png</icon>
           </helper>
         </helpers>
         <greaterThan>
@@ -531,7 +531,7 @@
               Long Description for Helper 5...
             </description>
             <function>myHelper5</function>
-            <icon>$ISIS3DATA/base/icons/link.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/link.png</icon>
           </helper>
         </helpers>
         <default>

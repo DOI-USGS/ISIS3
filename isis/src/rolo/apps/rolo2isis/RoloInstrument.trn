@@ -1,0 +1,281 @@
+#Begin
+Group = LunarDate
+  Auto
+  InputKey       = LUNAR_DATE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = LunarDate
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UniversalDate
+  Auto
+  InputKey       = UNIVERSAL_DATE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = UniversalDate
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SeriesNumber
+  Auto
+  InputKey       = SERIES_NUMBER
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = SeriesNumber
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObjectType
+  Auto
+  InputKey       = OBJECT_TYPE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = ObjectType
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObjectId
+  Auto
+  InputKey       = OBJECT_ID
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = ObjectId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FlapPosition
+  Auto
+  InputKey       = FLAP_POSITION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = FlapPosition
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ShutterMode
+  Auto
+  InputKey       = SHUTTER_MODE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = ShutterMode
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = RightAscension
+  Auto
+  InputKey       = RIGHT_ASCENSION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = RightAscension
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Declination
+  Auto
+  InputKey       = DECLINATION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = Declination
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Epoch
+  Auto
+  InputKey       = EPOCH
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = Epoch
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TeleHourAngle
+  Auto
+  InputKey       = TELE_HOUR_ANGLE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TeleHourAngle
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TeleRightAscension
+  Auto
+  InputKey       = TELE_RIGHT_ASCENSION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TeleRightAscension
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TeleDeclination
+  Auto
+  InputKey       = TELE_DECLINATION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TeleDeclination
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TeleEpoch
+  Auto
+  InputKey       = TELE_EPOCH
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TeleEpoch
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = RaTrackingRate
+  Auto
+  InputKey       = RA_TRACKING_RATE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = RaTrackingRate
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DecTrackingRate
+  Auto
+  InputKey       = DEC_TRACKING_RATE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = DecTrackingRate
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CcdStartingRow
+  Auto
+  InputKey       = CCD_STARTING_ROW
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = CcdStartingRow
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CcdStartingColumn
+  Auto
+  InputKey       = CCD_STARTING_COLUMN
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = CcdStartingColumn
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Rows
+  Auto
+  InputKey       = ROWS
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = Rows
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Columns
+  Auto
+  InputKey       = COLUMNS
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = Columns
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = AirTemperature
+  Auto
+  InputKey       = AIR_TEMPERATURE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = AirTemperature
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = WindSpeed
+  Auto
+  InputKey       = WIND_SPEED
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = WindSpeed
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TelescopeLocationX
+  Auto
+  InputKey       = TELESCOPE_LOCATION_X
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TelescopeLocationX
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TelescopeLocationY
+  Auto
+  InputKey       = TELESCOPE_LOCATION_Y
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TelescopeLocationY
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TelescopeLocationZ
+  Auto
+  InputKey       = TELESCOPE_LOCATION_Z
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = TelescopeLocationZ
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = PixelResolution
+  Auto
+  InputKey       = PIXEL_RESOLUTION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = PixelResolution
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = NorthOrientation
+  Auto
+  InputKey       = NORTH_ORIENTATION
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = NorthOrientation
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

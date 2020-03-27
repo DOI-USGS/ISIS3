@@ -1,0 +1,81 @@
+Group = ValidMeasure
+    MinDN = double
+    MinDN__Required = false
+    MinDN__Repeated = false  
+
+    MaxDN = double
+    MaxDN__Required = false
+    MaxDN__Repeated = false  
+
+    MinEmission = double 
+    MinEmission__Range    = (0,135)
+    MinEmission__Required = false
+    MinEmission__Repeated = false 
+
+    MaxEmission = double
+    MaxEmission__Range    = (0,135)
+    MaxEmission__Required = false
+    MaxEmission__Repeated = false          
+
+    MinIncidence = double
+    MinIncidence__Range    = (0,135)
+    MinIncidence__Required = false
+    MinIncidence__Repeated = false
+     
+    MaxIncidence = double
+    MaxIncidence__Range    = (0,135)
+    MaxIncidence__Required = false
+    MaxIncidence__Repeated = false
+
+    MinResolution = double
+    MinResolution__Type     = positive
+    MinResolution__Required = false
+    MinResolution__Repeated = false
+     
+    MaxResolution = double
+    MaxResolution__Type     = positive
+    MaxResolution__Required = false
+    MaxResolution__Repeated = false
+
+    PixelsFromEdge = integer
+    PixelsFromEdge__Type     = positive
+    PixelsFromEdge__Required = false
+    PixelsFromEdge__Repeated = false
+
+    MetersFromEdge = double
+    MetersFromEdge__Type     = positive
+    MetersFromEdge__Required = false
+    MetersFromEdge__Repeated = false
+
+    SampleResidual = double
+    SampleResidual__Type     = positive
+    SampleResidual__Required = false
+    SampleResidual__Repeated = false
+
+    LineResidual = double
+    LineResidual__Type     = positive
+    LineResidual__Required = false
+    LineResidual__Repeated = false
+
+    ResidualMagnitude = double
+    ResidualMagnitude__Type     = positive
+    ResidualMagnitude__Required = false
+    ResidualMagnitude__Repeated = false
+
+    SampleShift = double
+    SampleShift__Type     = positive
+    SampleShift__Required = false
+    SampleShift__Repeated = false
+
+    LineShift = double
+    LineShift__Type     = positive
+    LineShift__Required = false
+    LineShift__Repeated = false
+
+    PixelShift           = double
+    PixelShift__Type     = positive
+    PixelShift__Required = false
+    PixelShift__Repeated = false
+
+EndGroup
+

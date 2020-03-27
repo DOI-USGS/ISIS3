@@ -1,0 +1,16 @@
+#
+# This translation file is used to produce the ISIS 3 Kernels label group
+# for the Hayabusa 2 ONC-W1, ONC-W2, and ONC-T cameras.
+# Translation = (left,right) convert the input "right" to "left"
+
+Group = NaifCode
+  Auto
+  Optional
+  InputKey       = P_ID
+  InputPosition  = FitsLabels
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation    = (*, *)
+End_Group
+
+End
