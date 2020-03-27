@@ -141,8 +141,8 @@ namespace Isis {
     resultsGrp += PvlKeyword("EndingSample",    toString((int)mdEndSample));
     resultsGrp += PvlKeyword("LineIncrement",   toString(1. / mdLineScale));
     resultsGrp += PvlKeyword("SampleIncrement", toString(1. / mdSampleScale));
-    resultsGrp += PvlKeyword("OutputLines",     toString(miOutputSamples));
-    resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputLines));
+    resultsGrp += PvlKeyword("OutputLines",     toString(miOutputLines));
+    resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputSamples));
 
     SubArea subArea;
     subArea.SetSubArea(mInCube->lineCount(), mInCube->sampleCount(), (int)mdStartLine, (int)mdStartSample,

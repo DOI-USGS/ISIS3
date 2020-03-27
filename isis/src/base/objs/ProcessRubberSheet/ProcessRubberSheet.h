@@ -130,12 +130,12 @@ namespace Isis {
       virtual void StartProcess(Transform &trans, Interpolator &interp);
 
       // Input driven processing method for one input and output cube
-      void processPatchTransform(Transform &trans, Interpolator &interp);
+      virtual void processPatchTransform(Transform &trans, Interpolator &interp);
 
       // Register a function to be called when the band number changes
-      void BandChange(void (*funct)(const int band));
+      virtual void BandChange(void (*funct)(const int band));
 
-      void ForceTile(double Samp, double Line) {
+      virtual void ForceTile(double Samp, double Line) {
         p_forceSamp = Samp;
         p_forceLine = Line;
       }
@@ -148,14 +148,14 @@ namespace Isis {
        * @param end End position; must be at least 4, a power of 2 and less than
        *          start
        */
-      void SetTiling(long long start, long long end) {
+      virtual void SetTiling(long long start, long long end) {
         p_startQuadSize = start;
         p_endQuadSize = end;
       }
 
-      void setPatchParameters(int startSample, int startLine,
-                              int samples, int lines,
-                              int sampleIncrement, int lineIncrement);
+      virtual void setPatchParameters(int startSample, int startLine,
+                                int samples, int lines,
+                                int sampleIncrement, int lineIncrement);
 
 
     private:

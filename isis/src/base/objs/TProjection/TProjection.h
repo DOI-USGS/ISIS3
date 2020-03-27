@@ -253,10 +253,10 @@ namespace Isis {
       QString LongitudeDomainString() const;
 
       // Get min/max lat/lon
-      double MinimumLatitude() const;
-      double MaximumLatitude() const;
-      double MinimumLongitude() const;
-      double MaximumLongitude() const;
+      virtual double MinimumLatitude() const;
+      virtual double MaximumLatitude() const;
+      virtual double MinimumLongitude() const;
+      virtual double MaximumLongitude() const;
 
       //  Calculations
       // Set ground position or x/y coordinate
@@ -265,22 +265,22 @@ namespace Isis {
 
       // Methods that depend on successful completion
       // of SetGround/SetCoordinate Get lat,lon, x,y
-      double Latitude() const;
-      double Longitude() const;
+      virtual double Latitude() const;
+      virtual double Longitude() const;
 
       // Set the universal ground coordinate (calls SetGround)
-      bool SetUniversalGround(const double lat, const double lon);
+      virtual bool SetUniversalGround(const double lat, const double lon);
       bool SetUnboundUniversalGround(const double coord1, const double coord2);
 
       // Return the universal ground coordinate after successful SetCoordinate
-      double UniversalLatitude();
-      double UniversalLongitude();
+      virtual double UniversalLatitude();
+      virtual double UniversalLongitude();
 
       // get scale for mapping world coordinates
       double Scale() const;
 
       // Return the x/y range which covers the lat/lon range in the labels
-      virtual bool XYRange(double &minX, double &maxX, 
+      virtual bool XYRange(double &minX, double &maxX,
                            double &minY, double &maxY);
 
       // get mapping information
