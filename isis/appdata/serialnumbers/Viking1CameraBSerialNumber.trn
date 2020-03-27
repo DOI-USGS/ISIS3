@@ -17,7 +17,6 @@ Group = Keyword2
   OutputName     = Keyword2
   OutputPosition = (Group, SerialNumberKeywords)
   Translation    = (VISB, VISUAL_IMAGING_SUBSYSTEM_CAMERA_B)
-  Translation    = (*, *)
 End_Group
 
 Group = Keyword3
