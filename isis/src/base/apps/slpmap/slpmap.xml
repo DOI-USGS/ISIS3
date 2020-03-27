@@ -26,21 +26,13 @@
       G  H  I
     </pre>
 
-    Each output pixel is computed as follows:
-    
-    <pre>
-      <b>SLOPE EQUATION</b>
-      [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / (8 * X_PIXEL_RESOLUTION)
-      [dz/dy] = ((G + 2H + I) - (A + 2B + C)) / (8 * Y_PIXEL_RESOLUTION)
+    <p>
+      <b>Aspect:</b>
+      The aspect represents the direction or 0 to 360 degrees of the slope in pixel space (see
+      figure below). From the center pixel E, 0 degrees is straight towards B (generally north),
+      45 is towards C, 90 is towards F, 135 is towards I, 180 is towards H, and so on.
+    </p>
 
-      slope = ATAN ( SQRT ( [dz/dx]^2 + [dz/dy]^2 ) )
-      percentslope = slope / 90
-    </pre>
-
-    The slope equation above assumes the pixels are not square, hence X_PIXEL_RESOLUTION and
-    Y_PIXEL_RESOLUTION are not equal. That is, the x distance across the pixel is not equal to the y distance
-    form top to bottom of the pixel.
-    
     <pre>
       <b>ASPECT EQUATION</b>
       [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / 8
@@ -50,61 +42,63 @@
       if (aspect &lt; 0) then aspect = aspect + 360
     </pre>
 
-    <p><b>Slope:</b>
+    <p>
+      <b>Slope:</b>
       Slope is typically between 0 and 90 degrees, where 0 is flat and 90 is vertical. Slope may be
       output in radians, degrees, or percent slope.
     </p>
 
-    <p><b>Aspect:</b>
-    The aspect represents the direction or 0 to 360 degrees of the slope in pixel space (see
-    figure below). From the center pixel E, 0 degrees is straight towards B (generally north),
-    45 is towards C, 90 is towards F, 135 is towards I, 180 is towards H, and so on.
+    <pre>
+      <b>SLOPE EQUATION</b>
+      [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / (8 * X_PIXEL_RESOLUTION)
+      [dz/dy] = ((G + 2H + I) - (A + 2B + C)) / (8 * Y_PIXEL_RESOLUTION)
 
-    <pre><b>
-      A  B  C
-      D  E  F
-      G  H  I
-    </b></pre>
-    </p>
-    
+      slope = ATAN ( SQRT ( [dz/dx]^2 + [dz/dy]^2 ) )
+      percentslope = slope / 90
+    </pre>
+
     <p>
-      <b>Scale Construction:</b>
-      By default, the program will attempt to remove any scaling differences by using the map
-      projection information (PIXRES=AUTOMATIC). This computation is done at every pixel so the
-      correct x-to-y ratio is computed. This is important, for example, for global maps where
-      the x/y ratio deviates with distance from the latitude and/or longitude of true scale in
-      a map projection. This only works for radius DTMs.
+      The slope equation above assumes the pixels are not square, hence the two variables:
+      X_PIXEL_RESOLUTION and Y_PIXEL_RESOLUTION. That is, the x distance across the pixel is not 
+      equal to the y distance form top to bottom of the pixel.
     </p>
 
     <p>
-      <b>What if the input cube Z units are in elevation values instead of radius values?</b>
-    </p>
+      <b>Pixel Resolution:</b>
+      <ul>
+        <li>  
+            By default, the program will attempt to remove any scaling differences by using the map
+            projection information (PIXRES=AUTOMATIC). This computation is done at every pixel so the
+            correct x-to-y ratio is computed. This is important, for example, for global maps where
+            the x/y ratio deviates with distance from the latitude and/or longitude of true scale in
+            a map projection. <b>This only works for radius DTMs and does not work for elevations.</b>
+        </li>
+
+        <li>
+            The default setting PIXRES=AUTOMATIC will not work if the input cube Z units are in 
+            elevation values instead of radius values. You will need to set PIXRES=FILE
+            (recommended for a map projected file) or  PIXRES=USER. Note: unlike PIXRES=AUTOMATIC,
+            these later two methods do not correct for distortions in the map projection. They will
+            return good results for smaller regions when the map projection is defined to minimize
+            distortions (e.g. LROC NAC or HIRISE sereo DTMs).
+        </li>
+
+        <li>
+            If the image lacks a map projection, you must provide the pixel resolution via 
+            PIXRES=USER (for this option the pixels are assumed to be square). You must also 
+            provide a single value using the RESOLUTION parameter that will be applied to all pixels 
+            in the image and in both directions. 
+        </li>
+      </ul>
+  </p>
+  
+    <b>Conversion:</b>
     <p>
-      The default setting PIXRES=AUTOMATIC will not work. You will need to set PIXRES=FILE
-      (recommended for a map projected file) or  PIXRES=USER. Note: unlike PIXRES=AUTOMATIC,
-      these later two methods do not correct for distortions in the map projection. They will
-      return good results for smaller regions when the map projection is defined to minimize
-      distortions (e.g. LROC NAC or HIRISE sereo DTMs).
+      The program assumes the xy units are the same as the z (pixel) unit by default
+      but allows you to scale the z units to the xy
+      units using the CONVERSION parameter if the PIXRES=USER option is selected.
     </p>
 
-    <p>
-      <b>What if the input cube is not map projected?</b>
-    </p>
-    <p>
-      If the image lacks a map projection, you must provide the pixel resolution via PIXRES=USER
-      (for this option the pixels are assumed to be square). You must also provide a single value
-      using the RESOLUTION parameter that will be applied to all pixels in the image and in both
-      directions.
-    </p>
-
-    <p>
-      <b>What if the xy units are not the same as the z units?</b>
-    </p>
-    <p>
-      The program assumes the xy units are the same as the z (pixel) units. By default,
-      the program assumes the units are the same but allows you to scale the z units to the xy
-      units using the CONVERSIONFACTOR parameter if the PIXRES=USER option is selected.
-    </p>
   </description>
 
   <history>
@@ -137,6 +131,9 @@
       Added the FILE option to the PIXRES parameter. This allows the user to specify that the
       pixel resolution from the input cube's projection should be used. Updated the documentation.
       Fixes #1764.
+    </change>
+    <change name="Lauren Adoram-Kershner and Kaitlyn Lee" date="2020-03-27">
+      Reformatted documentation. Fixes #3562. 
     </change>
   </history>
 
