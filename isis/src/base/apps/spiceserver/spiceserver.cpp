@@ -166,7 +166,7 @@ namespace Isis {
 
       // Set up for getting the mission name
       // Get the directory where the system missions translation table is.
-      QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
+      QString transFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
 
       // Get the mission translation manager ready
       PvlToPvlTranslationManager missionXlater(label, transFile);
