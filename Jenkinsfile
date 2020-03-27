@@ -35,7 +35,7 @@ for (lbl in labels) {
                     // Environment
                     loginShell """
                         conda install -c conda-forge python=3
-                        conda env update -f ${WORKSPACE}/${JOB_NAME}/${BUILD_NUMBER}/${envFile} --prune
+                        conda env update -f ${WORKSPACE}/${BUILD_NUMBER}/ISIS3/${envFile} --prune
                         mkdir build install
                     """
 
@@ -50,7 +50,7 @@ for (lbl in labels) {
                             stageStatus = "Building ISIS on ${label}"
                             try {
                                 loginShell """
-                                    cmake -GNinja ${cmakeFlags.join(' ')} ${WORKSPACE}/${JOB_NAME}/${BUILD_NUMBER}/ISIS3/isis
+                                    cmake -GNinja ${cmakeFlags.join(' ')} ${WORKSPACE}/${BUILD_NUMBER}/ISIS3/isis
                                     ninja -j${NUM_CORES} install
                                 """
                             } catch(e) {
