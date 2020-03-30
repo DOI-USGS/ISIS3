@@ -5,7 +5,7 @@
 - Author: Laura
 
 # Updates
-- [2020-03-16]: The RFC has been adopted with a merge of #3804.
+- 2020-03-30: The RFC has been adopted with a merge of #3804.
 - [2020-03-16](#Update_2020-03-16) : Current plan, status, expected feature release
 
 <!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new wiki page titled RFC#:Title, where the number is the next incrementing number. If you would like to submit an RFC, but are unable to edit the wiki, please open an issue and we will assist you in getting your RFC posted. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
