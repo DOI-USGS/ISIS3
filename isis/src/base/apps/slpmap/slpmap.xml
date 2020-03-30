@@ -60,7 +60,7 @@
     <p>
       The slope equation above assumes the pixels are not square, hence the two variables:
       X_PIXEL_RESOLUTION and Y_PIXEL_RESOLUTION. That is, the x distance across the pixel is not 
-      equal to the y distance form top to bottom of the pixel.
+      equal to the y distance from top to bottom of the pixel.
     </p>
 
     <p>
