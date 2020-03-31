@@ -1,0 +1,312 @@
+# History:
+#   2016-02-10 - Tyler Wilson
+
+
+
+
+Group = StdDevSelectedBandNumber
+        Auto
+	Optional
+        InputKey        =  STD_DEV_SELECTED_NUMBER
+        InputPosition   =  QUBE
+        OutputName      =  StdDevSelectedNumber
+        OutputPosition  =  (Object,IsisCube,Group,Instrument)
+        Translation     =  (*, *)
+End_Group
+
+
+
+Group = StdDevSelectedBackplane
+        Auto
+	Optional
+        InputKey        =  STD_DEV_SELECTED_BACKPLANE
+        InputPosition   =  QUBE
+        OutputName      =  StdDevSelectedBackplane
+        OutputPosition  =  (Object,IsisCube,Group,Instrument)
+        Translation     =  (*, *)
+End_Group
+
+
+Group = DataSetID
+	Auto
+	Optional
+	InputKey	=  DATA_SET_ID
+	InputPosition	=  QUBE
+	OutputName	=  DataSetID
+	OutputPosition  =  (Object,IsisCube,Group,Instrument)
+	Translation	=  (*, *)
+End_Group
+
+Group = SpacecraftName
+	Auto
+	Optional
+        InputKey         =  SPACECRAFT_NAME
+        InputPosition    =  QUBE
+        OutputName       =  SpacecraftName
+        OutputPosition   =  (Object,IsisCube,Group,Instrument)	
+        Translation      =  (Galileo-Orbiter, GALILEO_ORBITER)
+End_Group
+
+Group = MissionPhaseName
+	Auto
+	Optional
+        InputKey         = MISSION_PHASE_NAME
+        InputPosition    = QUBE
+        OutputName       = MissionPhaseName
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = InstrumentName
+	Auto
+	Optional
+        InputKey         = INSTRUMENT_NAME
+        InputPosition    = QUBE
+        OutputName       = InstrumentName
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = InstrumentID
+	Auto
+	Optional
+        InputKey         = INSTRUMENT_ID
+        InputPosition    = QUBE
+        OutputName       = InstrumentID
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = InstrumentDescription
+	Auto
+	Optional
+        InputKey         = ^INSTRUMENT_DESCRIPTION
+        InputPosition    = QUBE
+        OutputName       = InstrumentDescription
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = TargetName
+	Auto
+	Optional
+        InputKey         = TARGET_NAME
+        InputPosition    = QUBE
+        OutputName       = TargetName
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = StartTime
+	Auto
+	Optional
+        InputKey         = START_TIME
+        InputPosition    = QUBE
+        OutputName       = StartTime
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = EndTime
+	Auto
+	Optional
+        InputKey         = STOP_TIME 
+        InputPosition    = QUBE
+        OutputName       = EndTime
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = NativeStartTime
+	Auto
+	Optional
+        InputKey         = NATIVE_START_TIME
+        InputPosition    = QUBE
+        OutputName       = NativeStartTime
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = NativeStopTime
+	Auto
+	Optional
+        InputKey         = NATIVE_STOP_TIME
+        InputPosition    = QUBE
+        OutputName       = NativeStopTime
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = ObservationName
+	Auto
+	Optional
+        InputKey         = OBSERVATION_NAME
+        InputPosition    = QUBE
+        OutputName       = ObservationName
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MissionNote        
+	Auto
+	Optional
+        InputKey         = NOTE
+        InputPosition    = QUBE
+        OutputName       = MissionNote
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+
+
+Group = InstrumentModeID
+        Auto
+	Optional
+        InputKey         = INSTRUMENT_MODE_ID
+        InputPosition    = QUBE
+        OutputName       = InstrumentModeID
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+
+Group = GainModeID
+        Auto
+	Optional
+        InputKey         = GAIN_MODE_ID
+        InputPosition    = QUBE
+        OutputName       = GainModeID
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = ChopperModeID
+        Auto
+	Optional
+        InputKey         = CHOPPER_MODE_ID
+        InputPosition    = QUBE
+        OutputName       = ChopperModeID
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = StartGratingPosition
+        Auto
+	Optional
+        InputKey         = START_GRATING_POSITION
+        InputPosition    = QUBE
+        OutputName       = StartGratingPosition
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = GratingPositions
+        Auto
+	Optional
+        InputKey         = GRATING_POSITIONS
+        InputPosition    = QUBE
+        OutputName       = GratingPositions
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = OffsetGratingPosition
+        Auto
+	Optional
+        InputKey         = OFFSET_GRATING_POSITION
+        InputPosition    = QUBE
+        OutputName       = OffsetGratingPosition
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = GratingPositionIncrement
+        Auto
+	Optional
+        InputKey        =  GRATING_POSIITON_INCRMENT
+        InputPosition   =  QUBE
+        OutputName      =  GratingPositionIncrement
+        OutputPosition  =  (Object,IsisCube,Group,Instrument)
+        Translation     =  (*, *)
+End_Group
+
+
+
+Group = MeanFocalPlaneTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_FOCAL_PLANE_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanFocalPlaneTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanRadShieldTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_RAD_SHIELD_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanRadShieldTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanTelescopeTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_TELESCOPE_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanTelescopeTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanGratingTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_GRATING_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanGratingTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanChopperTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_CHOPPER_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanChopperTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanElectronicsTemperature
+        Auto
+	Optional
+        InputKey         = MEAN_ELECTRONICS_TEMPERATURE
+        InputPosition    = QUBE
+        OutputName       = MeanElectronicsTemperature
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanDarkDataNumber
+	Auto
+	Optional
+        InputKey         = MEAN_DARK_DATA_NUMBER
+        InputPosition    = QUBE
+        OutputName       = MeanDarkDataNumber
+        OutputPosition   = (Object,IsisCube,Group,Instrument)
+        Translation      = (*, *)
+End_Group
+
+Group = MeanDarkDataNumberNote
+	Auto
+	Optional
+	InputKey	= MEAN_DARK_DATA_NUMBER_NOTE
+	InputPosition   = QUBE
+	OutputName 	= MeanDarkDataNumberNote
+	OutputPosition  = (Object,IsisCube,Group,Instrument)
+End_Group

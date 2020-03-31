@@ -1,0 +1,36 @@
+#****************************************************************************
+# This is a map template file for the ringcylindrical projection.
+#
+# Most of the parameters are commented (#) which means a program will try 
+# to determine a good value.  For example, a program will look at cube
+# labels to determine the target name and then read system radii values.
+#
+# If you want to use something other than a system default uncomment the 
+# approriate line and give the parameter your value.  For example,
+# PixelResolution = 10 <meters/pixel>
+#
+# The ringcylindrical projection has two required parameters:
+# CenterRingRadius and CenterRingLongitude.
+# If not uncommented in this file, programs usually
+# compute it to be the average of the radius/longitude ranges, respectively.
+#
+#****************************************************************************
+
+Group = Mapping
+  ProjectionName          = RingCylindrical
+#  CenterRingRadius       = 200000.0 <meters>
+#  CenterRingLongitude    = 0.0 <degrees>
+
+#  TargetName             = Saturn
+
+#  RingLongitudeDirection = CounterClockwise
+#  RingLongitudeDomain    = 360 <degrees>
+
+#  MinimumRingRadius      = 87899725.492461 <meters>
+#  MaximumRingRadius      = 165123259.31231<meters>
+#  MinimumRingLongitude   = 182.0 <degrees>
+#  MaximumRingLongitude   = 248.0 <degrees>
+
+#  PixelResolution        = 93183.457495214 <meters/pixel>
+# Scale                   = 512.0 <pixels/degree>
+End_Group

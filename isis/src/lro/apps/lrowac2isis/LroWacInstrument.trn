@@ -1,0 +1,177 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = SpacecraftName
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_HOST_NAME
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputDefault   = UNKNOWN
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (WAC, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputDefault   = UNKNOWN
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (Mars, MARS)
+  Translation    = (Phobos, PHOBOS)
+  Translation    = (Deimos, DEIMOS)
+  Translation    = (Moon, MOON)
+  Translation    = (Cal, CAL)
+  Translation    = (Sky, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  OutputName     = StartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  OutputName     = StopTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFTCLOCK_START_COUNT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFTCLOCK_STOP_COUNT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  OutputName     = MissionPhaseName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InterframeDelay
+  Auto
+  InputKey       = INTERFRAME_DELAY
+  OutputName     = InterframeDelay
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BeginTemperatureFpa
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_FPA
+  OutputName     = BeginTemperatureFpa
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MiddleTemperatureFpa
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_FPA
+  OutputName     = MiddleTemperatureFpa
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EndTemperatureFpa
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_FPA
+  OutputName     = EndTemperatureFpa
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BeginTemperatureScs
+  Auto
+  InputKey       = LRO:BEGIN_TEMPERATURE_SCS
+  OutputName     = BeginTemperatureScs
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MiddleTemperatureScs
+  Auto
+  InputKey       = LRO:MIDDLE_TEMPERATURE_SCS
+  OutputName     = MiddleTemperatureScs
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EndTemperatureScs
+  Auto
+  InputKey       = LRO:END_TEMPERATURE_SCS
+  OutputName     = EndTemperatureScs
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BackgroundOffset
+  Auto
+  Optional
+  InputKey       = LRO:BACKGROUND_OFFSET
+  OutputName     = BackgroundOffset
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Mode
+  Auto
+  Optional
+  InputKey       = LRO:MODE
+  OutputName     = Mode
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

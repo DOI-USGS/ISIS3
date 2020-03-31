@@ -305,10 +305,10 @@ Let: x,y     = line and sample position of pixel in an image
           dark current file.  In most cases, the default should be
           used for this parameter to indicate the derived dark file
           is to be used.  The name of the derived dark current file
-          is "$ISIS3DATA/clementine1/calibration/nir/dark_nir.cub"
+          is "$ISISDATA/clementine1/calibration/nir/dark_nir.cub"
           When InstrumentCompressionType = "CLEM-JPEG-0" the name
           of the derived dark current file is
-          "$ISIS3DATA/clementine1/calibration/nir/dark_nir_cmp0.cub"
+          "$ISISDATA/clementine1/calibration/nir/dark_nir_cmp0.cub"
         </description>
         <filter>
           *.cub
@@ -327,10 +327,10 @@ Let: x,y     = line and sample position of pixel in an image
           bias file.  In most cases, the default should be
           used for this parameter to indicate the derived bias file
           is to be used.  The name of the derived bias file
-          is "$ISIS3DATA/clementine1/calibration/nir/bias_nir.cub"
+          is "$ISISDATA/clementine1/calibration/nir/bias_nir.cub"
           When InstrumentCompressionType = "CLEM-JPEG-0" the name
           of the derived bias file is
-          "$ISIS3DATA/clementine1/calibration/nir/bias_nir_cmp0.cub"
+          "$ISISDATA/clementine1/calibration/nir/bias_nir_cmp0.cub"
         </description>
         <filter>
           *.cub
@@ -349,10 +349,10 @@ Let: x,y     = line and sample position of pixel in an image
           bad pixel file.  In most cases, the default should be
           used for this parameter to indicate the derived
           bad pixel file is to be used.  The name of the derived
-          bad pixel file is "$ISIS3DATA/clementine1/calibration/nir/badpix_nir.v3.cub"
+          bad pixel file is "$ISISDATA/clementine1/calibration/nir/badpix_nir.v3.cub"
           When InstrumentCompressionType = "CLEM-JPEG-0" the name
           of the derived bad pixel file is
-          "$ISIS3DATA/clementine1/calibration/nir/badpix_nir_cmp0.v3.cub"
+          "$ISISDATA/clementine1/calibration/nir/badpix_nir_cmp0.v3.cub"
         </description>
         <filter>
           *.cub

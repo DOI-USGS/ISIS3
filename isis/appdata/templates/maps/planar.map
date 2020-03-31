@@ -1,0 +1,35 @@
+#****************************************************************************
+# This is a map template file for the planar projection.
+#
+# Most of the parameters are commented (#) which means a program will try 
+# to determine a good value.  For example, a program will look at cube
+# labels to determine the target name.
+#
+# If you want to use something other than a system default uncomment the 
+# approriate line and give the parameter your value.  For example,
+# PixelResolution = 10 <meters/pixel>
+#
+# The planar projection has one required parameter:
+# CenterRingLongitude.  If not uncommented in this file programs usually
+# compute them to be the average of the azimuth range.
+#
+#****************************************************************************
+
+Group = Mapping
+  ProjectionName         = Planar
+# CenterRingRadius       = 0.0 <meters>
+# CenterRingLongitude    = 0.0 <degrees>
+
+# TargetName             = Saturn
+
+# RingLongitudeDirection = CounterClockwise
+# RingLongitudeDomain    = 360 <degrees>
+
+# MinimumRingRadius      = 100000.0 <meters>
+# MaximumRingRadius      = 120000.0 <meters>
+# MinimumRingLongitude   = 170.0 <degrees>
+# MaximumRingLongitude   = 270.0 <degrees>
+
+# PixelResolution        = 10000.0 <meters/pixel>
+# Scale                  = 23.0 <pixels/degree>
+End_Group

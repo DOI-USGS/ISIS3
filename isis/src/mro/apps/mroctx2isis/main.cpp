@@ -220,18 +220,16 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
 
   //Pvl to store the labels
   Pvl outLabel;
-  //Set up the directory where the translations are
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Mro"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
-  FileName transFile(transDir + "mroctxInstrument.trn");
+  FileName transFile(transDir + "MroCtxInstrument.trn");
   PvlToPvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive grooup
-  transFile  = transDir + "mroctxArchive.trn";
+  transFile  = transDir + "MroCtxArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 

@@ -117,15 +117,14 @@ void IsisMain ()
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Rosetta"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   if (procLevel == 2) {
 
     // Retrieve HK settings file and read in HK values.
     QList<VirtisHK> hk;
 
-    FileName hkTranslationFile = transDir + "virtis_housekeeping.txt";
+    FileName hkTranslationFile = transDir + "RosettaVirtisMHousekeeping.def";
     QFile hkFile(hkTranslationFile.toString());
 
     if(!hkFile.open(QIODevice::ReadOnly)) {
@@ -382,22 +381,22 @@ void IsisMain ()
   Pvl outLabel;
 
   // Translate the Archive group
-  FileName transFile = transDir + "virtisArchive.trn";
+  FileName transFile = transDir + "RosettaVirtisArchive.trn";
   PvlToPvlTranslationManager archiveXlater (pdsLabel, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
-  transFile = transDir + "virtisInstruments.trn";
+  transFile = transDir + "RosettaVirtisInstruments.trn";
   PvlToPvlTranslationManager instrumentXlater (pdsLabel, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   if (procLevel == 3) {
-    // Fix the StartTime and SpacecraftStartClockCount in the ISIS3 label
+    // Fix the StartTime and SpacecraftStartClockCount in the ISIS label
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
     // Pass the Start/Stop SCET values to naif to get the utc time. 
-    QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
-    QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
+    QString sclk = "$ISISDATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
+    QString lsk  = "$ISISDATA/base/kernels/lsk/naif????.tls"; 
     FileName sclkName(sclk);
     FileName lskName(lsk); 
 

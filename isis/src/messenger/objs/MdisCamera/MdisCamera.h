@@ -34,7 +34,7 @@ namespace Isis {
    *
    * This camera model is desinfed to be externally managed as much as
    * possible through the Messenger MDIS instrument kernel (IAK).  See the
-   * file $ISIS3DATA/messenger/kernels/iak/mdisAddendum???.ti for details.
+   * file $ISISDATA/messenger/kernels/iak/mdisAddendum???.ti for details.
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Messenger 

@@ -318,7 +318,7 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
 	  contain a description of how the output file will be used and the 
 	  input parameter settings that were used to derive the values for the 
 	  empirical photometric function.  See 
-	  "$ISIS3DATA/base/templates/photometry/marsred.pvl" for an example.  
+	    "$ISISROOT/appdata/templates/photometry/marsred.pvl" for an example.  
         </description>
       </parameter>
     </group>

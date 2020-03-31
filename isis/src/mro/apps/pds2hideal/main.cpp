@@ -66,7 +66,7 @@ void IsisMain() {
 
   Pvl *isisLabel = outputCube->label();
   PvlToPvlTranslationManager labelXlater(pdsLabelPvl, 
-                                    "$mro/translations/hiriseIdealPdsImportLabel.trn");
+                                 "$ISISROOT/appdata/translations/MroHiriseIdealPdsImportLabel.trn");
   labelXlater.Auto(*isisLabel);
   
   PvlObject &naifKeywords = isisLabel->findObject("NaifKeywords");

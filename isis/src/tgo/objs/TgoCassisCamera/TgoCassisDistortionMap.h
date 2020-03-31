@@ -39,7 +39,7 @@ namespace Isis {
    * @ingroup Tgo
    *
    * @see TgoCassisCamera
-   * @see $ISIS3DATA/tgo/assets/distortion
+   * @see $ISISDATA/tgo/assets/distortion
    *
    * @author 2017-04-03 Jeannie Backer
    *

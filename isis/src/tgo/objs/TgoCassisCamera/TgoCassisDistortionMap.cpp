@@ -109,7 +109,7 @@ namespace Isis {
     // -1/2 * pixel pitch * CCD height = -10.24 < y < 10.24 = 1/2 * pixel pitch * CCD height
     // 
     // Also, the zeros for the divider variable fall well outside the boundary
-    // of the CCD. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3CorrRoots.jpg).
+    // of the CCD. (See $ISISDATA/tgo/assets/distortion/DistortionModelA3CorrRoots.jpg).
     // 
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs
@@ -176,7 +176,7 @@ namespace Isis {
     // -1/2 * pixel pitch * CCD height = -10.24 < y < 10.24 = 1/2 * pixel pitch * CCD height
     // 
     // Also, the zeros for the divider variable fall well outside the boundary
-    // of the CCD. (See $ISIS3DATA/tgo/assets/distortion/DistortionModelA3DistRoots.jpg).
+    // of the CCD. (See $ISISDATA/tgo/assets/distortion/DistortionModelA3DistRoots.jpg).
     // 
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs

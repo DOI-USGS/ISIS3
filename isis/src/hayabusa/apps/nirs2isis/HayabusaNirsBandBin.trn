@@ -1,0 +1,25 @@
+# Create the bandbin group
+# The following equation is from:
+# Abe et al., 2004. Characteristics and current status of near infrared
+# spectrometer for Hayabusa mission. Lunar & Planet. Sci. XXXV, 1724.
+#
+# history 2018-06-15 Jeannie Backer - Original version.
+Group = BinWidth  # in <micrometers>
+  Auto
+  InputDefault   = 0.02356
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Units
+  Auto
+  InputKey       = BAND_BIN_UNIT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "Micrometers"
+  OutputName     = Unit
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

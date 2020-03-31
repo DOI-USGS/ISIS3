@@ -52,9 +52,9 @@
     
     This program extracts the filter position, exposure time, and frame-rate
     from the label of the input file to determine the required gain file
-    to use.  The file $ISIS3DATA/galileo/calibration/gll_gain.sav defines the 
+    to use.  The file $ISISDATA/galileo/calibration/gll_gain.sav defines the 
     gain file to use for the given filter, gain state, and frame mode.  The
-    file $ISIS3DATA/galileo/calibration/gll_dc.sav defines the DC file to use
+    file $ISISDATA/galileo/calibration/gll_dc.sav defines the DC file to use
     for the given, gain state, frame mode, frame rate, blemish protection mode,
     clock mode, and extended exposure mode.
     <br/><br/>

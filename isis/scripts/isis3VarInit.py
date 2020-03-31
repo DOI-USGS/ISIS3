@@ -17,7 +17,7 @@ import sys
 #
 #
 #   Description:  This program builds the shell scripts that define the
-#       ISISROOT/ISIS3DATA/ISIS3TESTDATA environment variables for the user
+#       ISISROOT/ISISDATA/ISISTESTDATA environment variables for the user
 #       when the ISIS3 conda environment is activated, and clean up when it is
 #       deactivated.
 #
@@ -116,15 +116,15 @@ activate_deactivate_files = ["/env_vars.sh", "/env_vars.csh", "/env_vars.fish"]
 activate_scripts = ["""
                     #!/usr/bin/env sh
                     export ISISROOT={}
-                    export ISIS3DATA={}
-                    export ISIS3TESTDATA={}
+                    export ISISDATA={}
+                    export ISISTESTDATA={}
                     export ALESPICEROOT={}
                     """,
                     """
                     #!/usr/bin/env csh
                     setenv ISISROOT {}
-                    setenv ISIS3DATA {}
-                    setenv ISIS3TESTDATA {}
+                    setenv ISISDATA {}
+                    setenv ISISTESTDATA {}
                     setenv ALESPICEROOT {}
 
                     source $CONDA_PREFIX/scripts/tabCompletion.csh
@@ -132,8 +132,8 @@ activate_scripts = ["""
                     """
                     #!/usr/bin/env fish
                     set -gx ISISROOT {}
-                    set -gx ISIS3DATA {}
-                    set -gx ISIS3TESTDATA {}
+                    set -gx ISISDATA {}
+                    set -gx ISISTESTDATA {}
                     set -gx ALESPICEROOT {}
                     """]
 
@@ -141,22 +141,22 @@ activate_scripts = ["""
 deactivate_scripts = ["""
                       #!/usr/bin/env sh
                       unset ISISROOT
-                      unset ISIS3DATA
-                      unset ISIS3TESTDATA
+                      unset ISISDATA
+                      unset ISISTESTDATA
                       unset ALESPICEROOT
                       """,
                       """
                       #!/usr/bin/env csh
                       unsetenv ISISROOT
-                      unsetenv ISIS3DATA
-                      unsetenv ISIS3TESTDATA
+                      unsetenv ISISDATA
+                      unsetenv ISISTESTDATA
                       unsetenv ALESPICEROOT
                       """,
                       """
                       #!/usr/bin/env fish
                       set -e ISISROOT
-                      set -e ISIS3DATA
-                      set -e ISIS3TESTDATA
+                      set -e ISISDATA
+                      set -e ISISTESTDATA
                       set -e ALESPICEROOT
                       """]
 

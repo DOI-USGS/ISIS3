@@ -1,0 +1,82 @@
+Group = Operator    
+    Name           = string
+    Name__Value    = (StandardDeviation, Gradient)
+    Name__Required = true
+    Name__Repeated = false
+    
+    MinimumInterest = double
+    MinimumInterest__Required = true
+    MinimumInterest__Repeated = false
+
+    Samples = integer
+    Samples__Type     = positive
+    Samples__Required = true
+    Samples__Repeated = false
+
+    Lines = integer
+    Lines__Type     = positive
+    Lines__Required = true
+    Lines__Repeated = false
+
+    DeltaSamp = integer
+    DeltaSamp__Type     = positive
+    DeltaSamp__Required = true
+    DeltaSamp__Repeated = false
+
+    DeltaLine = integer 
+    DeltaLine__Type     = positive
+    DeltaLine__Required = true
+    DeltaLine__Repeated = false   
+EndGroup
+
+Group = ValidMeasure
+    MinDN = double
+    MinDN__Required = false
+    MinDN__Repeated = false  
+
+    MaxDN = double
+    MaxDN__Required = false
+    MaxDN__Repeated = false  
+
+    MinEmission = double 
+    MinEmission__Range    = (0,135)
+    MinEmission__Required = false
+    MinEmission__Repeated = false 
+
+    MaxEmission = double
+    MaxEmission__Range    = (0,135)
+    MaxEmission__Required = false
+    MaxEmission__Repeated = false          
+
+    MinIncidence = double
+    MinIncidence__Range    = (0,135)
+    MinIncidence__Required = false
+    MinIncidence__Repeated = false
+     
+    MaxIncidence = double
+    MaxIncidence__Range    = (0,135)
+    MaxIncidence__Required = false
+    MaxIncidence__Repeated = false
+
+    MinResolution = double
+    MinResolution__Type     = positive
+    MinResolution__Required = false
+    MinResolution__Repeated = false
+     
+    MaxResolution = double
+    MaxResolution__Type     = positive
+    MaxResolution__Required = false
+    MaxResolution__Repeated = false
+
+    PixelsFromEdge = integer
+    PixelsFromEdge__Type     = positive
+    PixelsFromEdge__Required = false
+    PixelsFromEdge__Repeated = false
+
+    MetersFromEdge = double
+    MetersFromEdge__Type     = positive
+    MetersFromEdge__Required = false
+    MetersFromEdge__Repeated = false
+
+EndGroup
+

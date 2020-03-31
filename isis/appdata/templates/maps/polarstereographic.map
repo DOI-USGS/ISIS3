@@ -1,0 +1,38 @@
+#****************************************************************************
+# This is a map template file for the polar stereographic projection.
+#
+# Most of the parameters are commented (#) which means a program will try 
+# to determine a good value.  For example, a program will look at cube
+# labels to determine the target name and then read system radii values.
+#
+# If you want to use something other than a system default uncomment the 
+# approriate line and give the parameter your value.  For example,
+# PixelResolution = 10 <meters/pixel>
+#
+# The polar stereographic projection has two required parameters CenterLatitude
+# and CenterLongitude.  If not uncommented in this file programs usually
+# compute them to be the average of the latitude/longitude range.
+#
+#****************************************************************************
+
+Group = Mapping
+  ProjectionName  = PolarStereographic
+# CenterLatitude  = 0.0 <degrees>
+# CenterLongitude = 0.0 <degrees>
+
+# TargetName         = Mars
+# EquatorialRadius   = 3396190.0 <meters>
+# PolarRadius        = 3376200.0 <meters>
+
+# LatitudeType       = Planetocentric
+# LongitudeDirection = PositiveEast
+# LongitudeDomain    = 360 <degrees>
+
+# MinimumLatitude    = 47.431079407022 <degrees>
+# MaximumLatitude    = 49.323205331047 <degrees>
+# MinimumLongitude   = 276.4825037824 <degrees>
+# MaximumLongitude   = 279.27207041615 <degrees>
+
+# PixelResolution    = 115.77089360021 <meters/pixel>
+# Scale              = 512.0 <pixels/degree>
+End_Group

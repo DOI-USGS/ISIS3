@@ -1,0 +1,290 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+ 
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*,*)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = ChannelID
+  Auto
+  InputKey       = ROSETTA:CHANNEL_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ChannelID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  InputDefault   = "N/A"
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (STEINS,  "2867 STEINS")
+  Translation    = (LUTETIA, "21 LUTETIA")
+  Translation    = ("67P/CHURYUMOV-GERASIMENKO (1969 R1)", "67P/CHURYUMOV-GERASIMENKO 1 (1969 R1)")
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalTargetName
+  Optional
+  Auto
+  InputKey       = TARGET_NAME 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = OriginalTargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+
+Group = TargetType
+  Auto
+  InputKey       = TARGET_TYPE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = TargetType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+ 
+Group = ProcessingLevelID
+  Auto
+  InputKey       = PROCESSING_LEVEL_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProcessingLevelID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentModeId
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ScanModeId
+  Auto
+  Optional
+  InputKey       = ROSETTA:SCAN_MODE_ID 
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ScanModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ScanParameter
+  Optional
+  Auto
+  InputKey       = SCAN_PARAMETER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ScanParameter
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ScanParameterDesc
+  Optional
+  Auto
+  InputKey       = SCAN_PARAMETER_DESC
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ScanParameterDesc
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FrameParameter
+  Auto
+  InputKey       = FRAME_PARAMETER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FrameParameter
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FrameParameterDesc
+  Auto
+  InputKey       = FRAME_PARAMETER_DESC
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FrameParameterDesc
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirIrStartXPosition
+  Optional
+  Auto
+  InputKey       = ROSETTA:VIR_IR_START_X_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirIrStartXPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirIrStartYPosition
+  Optional
+  Auto
+  InputKey       = ROSETTA:VIR_IR_START_Y_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirIrStartYPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirVisStartXPosition
+  Optional
+  Auto
+  InputKey       = ROSETTA:VIR_VIS_START_X_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirVisStartXPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = VirVisStartYPosition
+  Optional
+  Auto
+  InputKey       = ROSETTA:VIR_VIS_START_Y_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = VirVisStartYPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MaximumInstrumentTemperature
+  Optional
+  Auto
+  InputKey       = MAXIMUM_INSTRUMENT_TEMPERATURE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MaximumInstrumentTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityId
+  Optional
+  Auto
+  InputKey       = DATA_QUALITY_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataQualityId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DataQualityDesc
+  Optional
+  Auto
+  InputKey       = DATA_QUALITY_DESC
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataQualityDesc
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

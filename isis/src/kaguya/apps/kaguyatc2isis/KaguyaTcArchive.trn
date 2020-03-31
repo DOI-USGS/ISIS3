@@ -1,0 +1,923 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+# history 2018-10-02 Jeannie Backer - Original version. Copied
+#                        from tcmapArchive.trn and generalized
+#                        for all supported TC images. Set 
+#                        StretchedFlag to Optional.
+# history 2020-02-24 Austin Sanders - Moved geometry keywords
+# 			 from instrument translation file to
+# 			 archive translation file.
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SoftwareName
+  Auto
+  InputKey       = SOFTWARE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SoftwareName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SoftwareVersion
+  Auto
+  InputKey       = SOFTWARE_VERSION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SoftwareVersion
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProcessVersionId
+  Auto
+  InputKey       = PROCESS_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProcessVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductCreationTime
+  Auto
+  InputKey       = PRODUCT_CREATION_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductCreationTime
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProgramStartTime
+  Optional
+  Auto
+  InputKey       = PROGRAM_START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProgramStartTime
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductSetId
+  Auto
+  InputKey       = PRODUCT_SET_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RegisteredProduct
+  Optional
+  Auto
+  InputKey       = REGISTERED_PRODUCT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = RegisteredProduct
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Level2AFileName
+  Optional
+  Auto
+  InputKey       = LEVEL2A_FILE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = Level2AFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SpiceMetakernelFileName
+  Optional
+  Auto
+  InputKey       = SPICE_METAKERNEL_FILE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpiceMetakernelFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageValueType
+  Auto
+  InputKey       = IMAGE_VALUE_TYPE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ImageValueType
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageUnit
+  Optional
+  Auto
+  InputKey       = UNIT
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ImageUnit
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MinForStatisticalEvaluation
+  Optional
+  Auto
+  InputKey       = MIN_FOR_STATISTICAL_EVALUATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = MinForStatisticalEvaluation
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MaxForStatisticalEvaluation
+  Optional
+  Auto
+  InputKey       = MAX_FOR_STATISTICAL_EVALUATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = MaxForStatisticalEvaluation
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneMaximumDn
+  Optional
+  Auto
+  InputKey       = SCENE_MAXIMUM_DN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = SceneMaximumDn
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneMinimumDn
+  Optional
+  Auto
+  InputKey       = SCENE_MINIMUM_DN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = SceneMinimumDn
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneAverageDn
+  Optional
+  Auto
+  InputKey       = SCENE_AVERAGE_DN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = SceneAverageDn
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneStdevDn
+  Optional
+  Auto
+  InputKey       = SCENE_STDEV_DN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = SceneStdevDn
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneModeDn
+  Optional
+  Auto
+  InputKey       = SCENE_MODE_DN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = SceneModeDn
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ShadowedAreaMinimum
+  Optional
+  Auto
+  InputKey       = SHADOWED_AREA_MINIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ShadowedAreaMinimum
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ShadowedAreaMaximum
+  Optional
+  Auto
+  InputKey       = SHADOWED_AREA_MAXIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ShadowedAreaMaximum
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ShadowedAreaPercentage
+  Optional
+  Auto
+  InputKey       = SHADOWED_AREA_PERCENTAGE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ShadowedAreaPercentage
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InvalidType
+  Optional
+  Auto
+  InputKey       = INVALID_TYPE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = InvalidType
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InvalidValue
+  Optional
+  Auto
+  InputKey       = INVALID_VALUE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = InvalidValue
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = InvalidPixels
+  Optional
+  Auto
+  InputKey       = INVALID_PIXELS
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = InvalidPixels
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OutOfImageBoundsValue
+  Optional
+  Auto
+  InputKey       = OUT_OF_IMAGE_BOUNDS_VALUE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = OutOfImageBoundsValue
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OutOfImageBoundsPixel
+  Optional
+  Auto
+  InputKey       = OUT_OF_IMAGE_BOUNDS_PIXELS
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = OutOfImageBoundsPixel
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = StretchedFlag
+  Optional
+  Auto
+  InputKey       = STRETCHED_FLAG
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = StretchedFlag
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DarkFileName
+  Optional
+  Auto
+  InputKey       = DARK_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = DarkFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FtFileName
+  Optional
+  Auto
+  InputKey       = FT_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = FtFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FlatFileName
+  Optional
+  Auto
+  InputKey       = FLAT_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = FlatFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EfficFileName
+  Optional
+  Auto
+  InputKey       = EFFIC_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = EfficFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = NonlinFileName
+  Optional
+  Auto
+  InputKey       = NONLIN_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = NonlinFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RadCnvCoef
+  Optional
+  Auto
+  InputKey       = RAD_CNV_COEF
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RadCnvCoef
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RefCnvCoef
+  Optional
+  Auto
+  InputKey       = REF_CNV_COEF
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RefCnvCoef
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = StandardGeometry
+  Optional
+  Auto
+  InputKey       = STANDARD_GEOMETRY
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = StandardGeometry
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PhotoCorrId
+  Optional
+  Auto
+  InputKey       = PHOTO_CORR_ID
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = PhotoCorrId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PhotoCorrCoef
+  Optional
+  Auto
+  InputKey       = PHOTO_CORR_COEF
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = PhotoCorrCoef
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ResamplingMethod
+  Optional
+  Auto
+  InputKey       = RESAMPLING_METHOD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = ResamplingMethod
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TcoMosaicFileName
+  Optional
+  Auto
+  InputKey       = TCO_MOSAIC_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = TcoMosaicFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DtmMosaicFileName
+  Optional
+  Auto
+  InputKey       = DTM_MOSAIC_FILE_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = DtmMosaicFileName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OverlapSelectionId
+  Optional
+  Auto
+  InputKey       = OVERLAP_SELECTION_ID
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = OverlapSelectionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MatchingMosaic
+  Optional
+  Auto
+  InputKey       = MATCHING_MOSAIC
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = MatchingMosaic
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = L2aDeadPixelThreshold
+  Optional
+  Auto
+  InputKey       = L2A_DEAD_PIXEL_THRESHOLD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = L2aDeadPixelThreshold
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = L2aSaturationThreshold
+  Optional
+  Auto
+  InputKey       = L2A_SATURATION_THRESHOLD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = L2aSaturationThreshold
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DarkValidMinimum
+  Optional
+  Auto
+  InputKey       = DARK_VALID_MINIMUM
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = DarkValidMinimum
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FtValidMinimum
+  Optional
+  Auto
+  InputKey       = FT_VALID_MINIMUM
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = FtValidMinimum
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RadianceSaturationThreshold
+  Optional
+  Auto
+  InputKey       = RADIANCE_SATURATION_THRESHOLD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RadianceSaturationThreshold
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RefSaturationThreshold
+  Optional
+  Auto
+  InputKey       = REF_SATURATION_THRESHOLD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RefSaturationThreshold
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ParameterSetName
+  Optional
+  Auto
+  InputKey       = PARAMETER_SET_NAME
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = ParameterSetName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RefCnvSw
+  Optional
+  Auto
+  InputKey       = REF_CNV_SW
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RefCnvSw
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RefCnvCoef
+  Optional
+  Auto
+  InputKey       = REF_CNV_COEF
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = RefCnvCoef
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = StandardGeometry
+  Optional
+  Auto
+  InputKey       = STANDARD_GEOMETRY
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = StandardGeometry
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PhotoCorrId
+  Optional
+  Auto
+  InputKey       = PHOTO_CORR_ID
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = PhotoCorrId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PhotoCorrCoef
+  Optional
+  Auto
+  InputKey       = PHOTO_CORR_COEF
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = PhotoCorrCoef
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = HorizontalTransformMethod
+  Optional
+  Auto
+  InputKey       = HORIZONTAL_TRANSFORM_METHOD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = HorizontalTransformMethod
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = VerticalTransformMethod
+  Optional
+  Auto
+  InputKey       = VERTICAL_TRANSFORM_METHOD
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = VerticalTransformMethod
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MosaicPriority
+  Optional
+  Auto
+  InputKey       = MOSAIC_PRIORITY
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = MosaicPriority
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SmoothingWidth
+  Optional
+  Auto
+  InputKey       = SMOOTHING_WIDTH
+  InputGroup     = PROCESSING_PARAMETERS
+  InputPosition  = PROCESSING_PARAMETERS
+  OutputName     = SmoothingWidth
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ValidMinimum
+  Optional
+  Auto
+  InputKey       = VALID_MINIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ValidMinimum
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ValidMaximum
+  Optional
+  Auto
+  InputKey       = VALID_MAXIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ValidMaximum
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Dummy
+  Optional
+  Auto
+  InputKey       = DUMMY
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Dummy
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowReprSaturation
+  Optional
+  Auto
+  InputKey       = LOW_REPR_SATURATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = LowReprSaturation
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowInstrSaturation
+  Optional
+  Auto
+  InputKey       = LOW_INSTR_SATURATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = LowInstrSaturation
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = HighReprSaturation
+  Optional
+  Auto
+  InputKey       = HIGH_REPR_SATURATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = HighReprSaturation
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = HighInstrSaturation
+  Optional
+  Auto
+  InputKey       = HIGH_INSTR_SATURATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = HighInstrSaturation
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Minimum
+  Optional
+  Auto
+  InputKey       = MINIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Minimum
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Maximum
+  Optional
+  Auto
+  InputKey       = MAXIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Maximum
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Average
+  Optional
+  Auto
+  InputKey       = AVERAGE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Average
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Stdev
+  Optional
+  Auto
+  InputKey       = STDEV
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Stdev
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ModePixel
+  Optional
+  Auto
+  InputKey       = MODE_PIXEL
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = ModePixel
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftLatitude
+  Optional
+  Auto
+  InputKey       = UPPER_LEFT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperLeftLatitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftLongitude
+  Optional
+  Auto
+  InputKey       = UPPER_LEFT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperLeftLongitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperRightLatitude
+  Optional
+  Auto
+  InputKey       = UPPER_RIGHT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperRightLatitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperRightLongitude
+  Optional
+  Auto
+  InputKey       = UPPER_RIGHT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperRightLongitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerLeftLatitude
+  Optional
+  Auto
+  InputKey       = LOWER_LEFT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerLeftLatitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerLeftLongitude
+  Optional
+  Auto
+  InputKey       = LOWER_LEFT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerLeftLongitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerRightLatitude
+  Optional
+  Auto
+  InputKey       = LOWER_RIGHT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerRightLatitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerRightLongitude
+  Optional
+  Auto
+  InputKey       = LOWER_RIGHT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerRightLongitude
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+
+End

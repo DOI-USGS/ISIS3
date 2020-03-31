@@ -353,14 +353,14 @@
             <function>helperButtonLog</function>
             <brief>View file in log area</brief>
             <description>This helper button will display the regdef file in the log area</description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+            <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
         </helpers>
         <filter>
           *.def
         </filter>
-        <default><item>$base/templates/autoreg/coreg.adaptgruen.p1515s3030.def</item></default>
-        <defaultPath>$base/templates/autoreg</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/autoreg/coreg.adaptgruen.p1515s3030.def</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/autoreg</defaultPath>
       </parameter>
     </group>
 

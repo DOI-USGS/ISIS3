@@ -1942,7 +1942,7 @@ namespace Isis {
 
     m_mutex = new QMutex();
     m_formatTemplateFile =
-         new FileName("$base/templates/labels/CubeFormatTemplate.pft");
+         new FileName("$ISISROOT/appdata/templates/labels/CubeFormatTemplate.pft");
 
     initialize();
   }
