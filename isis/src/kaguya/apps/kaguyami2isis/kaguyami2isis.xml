@@ -6,7 +6,7 @@
 
   <description>
     <p>
-      This program will import a PDS formatted Kaguya MI VIS and NIR level 1 (EDR)
+      This program will import a PDS formatted Kaguya MI VIS and NIR level 1 (EDR) or level 2B2
       image into an Isis cube.
     </p>
     <p>
@@ -78,6 +78,9 @@
       Added a new error message informing the user that the file they are using is not compatible with
       kaguyami2isis. Fixes #2358.
     </change>
+    <change name="Kaitlyn Lee" date="2020-03-31">
+      Updated documentation to include level 2B2 support.
+    </change>
   </history>
 
   <category>
@@ -94,11 +97,10 @@
         </brief>
         <description>
           Use this parameter to select the Kaguya MI VIS or
-	  NIR EDR filename. This file must contain the PDS
-          labels.
+	        NIR level 1 or level 2B2 filename. This file must contain the PDS labels.
         </description>
         <filter>
-          *.img *.IMG
+          *.img *.IMG *.lbl *.LBL
         </filter>
       </parameter>
 
