@@ -4,6 +4,7 @@
 [![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3697216.svg)](https://doi.org/10.5281/zenodo.3697216)
 
 ## Table of Contents
 
