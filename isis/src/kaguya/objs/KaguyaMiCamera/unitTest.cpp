@@ -44,8 +44,10 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406, 60.8041933170744215, 0.0};
-    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660, 135.3886983694549713, 0.0};
+    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406, 
+                            60.8041933170744215, 60.1567063916710580};
+    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660, 
+                           135.3886983694549713, 135.3809757236753057};
 
     char files[4][1024] = { "$kaguya/testData/MI_VIS.cub", "$kaguya/testData/MI_NIR.cub", 
                             "$kaguya/testData/MVA_2B2_01_01228N608E1354.cub", 
