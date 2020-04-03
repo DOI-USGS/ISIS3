@@ -12,10 +12,11 @@ namespace Isis{
     enlarge(cube, ui, log);
   }
 
-  void enlarge(Cube *cube, UserInterface &ui, Pvl *log) {
+  void enlarge(Cube *icube, UserInterface &ui, Pvl *log) {
     ProcessRubberSheet p;
+    std::cout<<cube<< std::endl;
 
-    Cube *icube = p.setInputCube(cube);
+    p.SetInputCube(icube);
 
     // Input number of samples, lines, and bands
     int ins = icube->sampleCount();

@@ -7,7 +7,7 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void enlarge(Cube *cube, UserInterface &ui, Pvl *log);
+  extern void enlarge(Cube *icube, UserInterface &ui, Pvl *log);
   extern void enlarge(UserInterface &ui, Pvl *log);
 }
 
