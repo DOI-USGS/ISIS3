@@ -1,0 +1,21 @@
+# Translations for HRSC Stereo and SRC instrument.
+# ISIS cube label Kernels group
+
+Group = NaifIkCode
+  Auto
+  InputKey       = DETECTOR_ID
+  OutputName     = DetectorId
+  OutputPosition = (Group, Archive)
+  Translation    = (-41210, "MEX_HRSC_HEAD")
+  Translation    = (-41211, "MEX_HRSC_S2")
+  Translation    = (-41212, "MEX_HRSC_RED")
+  Translation    = (-41213, "MEX_HRSC_P2")
+  Translation    = (-41214, "MEX_HRSC_BLUE")
+  Translation    = (-41215, "MEX_HRSC_NADIR")
+  Translation    = (-41216, "MEX_HRSC_GREEN")
+  Translation    = (-41217, "MEX_HRSC_P1")
+  Translation    = (-41218, "MEX_HRSC_IR")
+  Translation    = (-41219, "MEX_HRSC_S1")
+  Translation    = (-41220, "MEX_HRSC_SRC")
+End_Group
+
