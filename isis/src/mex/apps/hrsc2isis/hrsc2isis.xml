@@ -8,23 +8,22 @@
     <p>
       This program imports Mars Express HRSC files. This includes both the HRSC 
       Stereo and the SRC instruments with procesing level of "1" or "2" (not "3"). 
+      The program populates all label keywords necessary to create the corrisponding camera
+      models.
     </p>
     <p>
-      For the stereo instrument, we first
-      determining whether or not the input file has prefix data. If there is
-      prefix data, the prefix data is collected and used to look for "gaps" - HRSC
-      files can give us a time and exposure duration  for each line, we look for 
-      where the time + exposure duration =/= next line's time.   We populate a 
-      table (LineScanTimes) with the prefix data and lineInFile with whether or 
-      not a gap should be inserted. For all files, we now process the data and if 
-      there were gaps, they will be put in their proper places. This is a two-pass
-      system for files with prefix data, one-pass for files without.  The Isis2
-      equivalent to this program is mex2isis.pl. It is worth noting that
-      regardless of the  input file's byte order, the prefix data byte order is 
-      always LSB.
+      For the stereo instrument there is always prefix data. The
+      prefix data is collected and used to look for "gaps" aka missing lines. The 
+      line prefix data for HRSC
+      files contain time and exposure duration for each line. We look for occurrences  
+      where the time + exposure duration is not equal to the next line's time to find missing
+      lines. This program uses two passes, the first reads the PDS file into a cube, the
+      second inserts lines where gaps were identified.
     </p>
     <p>
-      For the SRC instrument, 
+      For the SRC instrument, this program reads the PDS file and converts it to an ISIS cube. The
+      PDS file for the SRC instrument is much simpler than the stereo instrument files and requires
+      no special processing. 
     </p>
   </description>
 

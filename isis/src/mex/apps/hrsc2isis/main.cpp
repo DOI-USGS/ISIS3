@@ -63,7 +63,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // This progream is setup to work with Mex HRSC processing level 1 and 2 only.
+  // This program is setup to work with Mex HRSC processing level 1 and 2 only.
   // Not level 3 (Mapped)
   if ((int)label["PROCESSING_LEVEL_ID"] >= 3) {
     QString msg = "File [" + ui.GetFileName("FROM");
@@ -133,12 +133,12 @@ void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label) {
  * get the import class to collect prefix data. Once the prefix data is populated, we look for
  * "gaps" - HRSC files with prefix data give us a time and exposure duration for each line, we
  * look for where the time + exposure duration != next line's time. We populate a table
- * (LineScanTimes) with the prefix data and lineInFile with whether or   not a gap should be
- * inserted.                                                            
+ * (LineScanTimes) with the prefix data and lineInFile with whether or not a missing line should
+ * be inserted.
  *                                                                      
- * Second pass through the file is a Process called with the WriteOutp  ut function. If there were
- * gaps, WriteOutput will add lines at the appropriate positions in th  e output cube. Finally, we
- * translate the labels and put the LineScanTimes (if necessary) in th  e output cube.
+ * Second pass through the file is a Process called with the WriteOutput function. If there were
+ * gaps, WriteOutput will add lines at the appropriate positions in the output cube. Finally, we
+ * translate the labels and put the LineScanTimes (if necessary) in the output cube.
  *
  * This is a two-pass system for files with prefix data, one-pass for files without.
  *  
@@ -231,7 +231,7 @@ void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label) {
 
   outCube->write(timesTable);
 
-  // Get as many of the other labels as we can
+  // Translate the PDS labels into ISIS labels and add them to the cube
   Pvl otherLabels;
 
   TranslateHrscLabels(label, otherLabels);
