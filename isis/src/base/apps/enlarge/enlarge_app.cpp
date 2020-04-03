@@ -14,8 +14,6 @@ namespace Isis{
 
   void enlarge(Cube *icube, UserInterface &ui, Pvl *log) {
     ProcessRubberSheet p;
-    std::cout<<cube<< std::endl;
-
     p.SetInputCube(icube);
 
     // Input number of samples, lines, and bands
