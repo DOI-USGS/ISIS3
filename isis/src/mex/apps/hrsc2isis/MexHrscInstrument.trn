@@ -82,7 +82,7 @@ End_Group
 Group = Summing
   Auto
   InputKey       = MACROPIXEL_SIZE
-  Default        = 1
+  InputDefault   = 1
   OutputName     = Summing
   OutputPosition = (Group, Instrument)
   Translation    = (*, *)

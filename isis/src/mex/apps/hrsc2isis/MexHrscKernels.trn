@@ -5,7 +5,7 @@ Group = NaifIkCode
   Auto
   InputKey       = DETECTOR_ID
   OutputName     = DetectorId
-  OutputPosition = (Group, Archive)
+  OutputPosition = (Group, Kernels)
   Translation    = (-41210, "MEX_HRSC_HEAD")
   Translation    = (-41211, "MEX_HRSC_S2")
   Translation    = (-41212, "MEX_HRSC_RED")
