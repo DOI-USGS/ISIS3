@@ -39,6 +39,28 @@ namespace Isis {
     delete projTestCube;
   }
 
+  void ImageDataCube::SetUp() {
+    DefaultCube::SetUp();
+    //setup buffer - 3 samples, 2 lines, 1 band
+    Brick brick = Brick(*testCube, 3, 2, 1);
+    brick.SetBasePosition(0, 0, 0);
+
+    int brickIndex = 0;
+    for (int outputLine = 0; outputLine < 2; outputLine++) {
+      for (int outputSample = 0; outputSample < 3; outputSample++) {
+        brick[brickIndex] = 1;
+        brickIndex++;
+      }
+    }
+
+    testCube->write(brick);
+  }
+
+
+  void ImageDataCube::TearDown() {
+    DefaultCube::TearDown();
+  }
+
   void LineScannerCube::SetUp() {
     TempTestingFiles::SetUp();
 
