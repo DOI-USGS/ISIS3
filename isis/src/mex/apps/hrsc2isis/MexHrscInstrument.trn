@@ -88,6 +88,15 @@ Group = Summing
   Translation    = (*, *)
 End_Group
 
+Group = ExpousreDuration
+  Auto
+  Optional
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
 Group = FocalPlaneTemperature
   Auto
   Optional
