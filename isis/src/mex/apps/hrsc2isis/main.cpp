@@ -88,16 +88,11 @@ void IsisMain() {
 // Import a PDS3, HRSC, SRC Camera image.
 void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label) {
 
-  UserInterface &ui = Application::GetUserInterface();
-
   outCube = p.SetOutputCube("TO");
   p.StartProcess();
 
   Pvl otherLabels;
   TranslateHrscLabels(label, otherLabels);
-
-  std::cout << "========================================" <<
-    otherLabels << "=======================================================" << std::endl;
 
   if (otherLabels.hasGroup("Instrument") &&
       (otherLabels.findGroup("Instrument").keywords() > 0)) {
@@ -119,10 +114,7 @@ void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label) {
     outCube->putGroup(otherLabels.findGroup("Kernels"));
   }
 
-
-
   p.EndProcess();
-
 }
 
 
