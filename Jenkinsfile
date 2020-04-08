@@ -27,10 +27,12 @@ for (lbl in labels) {
                 ]
 
                 def stageStatus = "Checking out ISIS on ${label}"
-
-                // Checkout
-                checkout scm
-
+                
+                retry(10) { 
+                  // Checkout
+                  checkout scm
+                }
+                
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
