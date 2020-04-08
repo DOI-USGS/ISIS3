@@ -47,16 +47,16 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 5.  Next setup your Anaconda environment for ISIS3. In the bash prompt, run the following commands:
 
         #Create a new conda environment to install ISIS3 in
-        conda create -n isis3 python=3.6
+        conda create -n isis python=3.6
 
         #Activate the environment
         #Depending on your version of Anaconda use one of the following:
 
         #Anaconda 3.4 and up:
-        conda activate isis3
+        conda activate isis
 
         #Prior to Anaconda 3.4:
-        source activate isis3
+        source activate isis
 
         #Add the following channels to the environment
         conda config --env --add channels conda-forge
@@ -100,10 +100,10 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
 
-    More information about the ISIS3DATA environment variable and the ISIS3 Data Area can be found [here]("#The-ISIS3-Data-Area"). Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with one of the following commands:
+    More information about the ISIS3DATA environment variable and the ISIS3 Data Area can be found [here]("#The-ISIS3-Data-Area"). Now everytime the isis environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis envionment with one of the following commands:
 
-        for Anaconda 3.4 and up - conda activate isis3
-        prior to Anaconda 3.4 - source activate isis3
+        for Anaconda 3.4 and up - conda activate isis
+        prior to Anaconda 3.4 - source activate isis
 
 
 ### Practical Usage with other conda packages
@@ -133,16 +133,16 @@ The first step is to create 'working' and add whatever conda packages you want.
 
 #### Easy mode, with stacking
 
-1.  `conda activate isis3`
+1.  `conda activate isis`
 
 2.  `conda activate --stack working`
 
 That's it.  Told you it was easy.
 
-This activates the isis3 environment, gets it all set up, and
+This activates the isis environment, gets it all set up, and
 then it 'stacks' the new working environment on top of it.  To get
 out, you'll have to `conda deactivate` two times to get out of
-`working` and then out of `isis3`.
+`working` and then out of `isis`.
 
 
 #### Harder mode, with activation script hacking
@@ -161,43 +161,73 @@ the activate.d/ and deactivate.d/ scripts is handy.
 packages you need.  If you were reading the directions above, you've
 already done this.
 
-2.  Locate the path to your ISIS conda environment.  Depending on
-how you installed conda, it may be in `$HOME/.anaconda3/envs/isis3/`
-or somewhere similar.  Likewise, your new 'working' environment
-will then be at `$HOME/.anaconda3/envs/working`.
+2.  Locate the path to your conda environments:
 
-3.  Copy the ISIS activation and deactivation scripts to your new environment:
+        conda activate
+        echo $CONDA_PREFIX
+        conda deactivate
 
-        cd $HOME/.anaconda3/envs/
+You'll probably get a directory that is in your home directory and
+is named `anaconda3` or `miniconda3` or something similar.  For the
+rest of this set of instructions, we'll refer to it as `$HOME/anaconda3`
+to represent a directory named `anaconda3` in your home directory, but
+this should be whatever you get from the above echo command.
+
+3.  Locate the path to your ISIS conda environment:
+
+        conda activate isis
+        echo $CONDA_PREFIX
+        conda deactivate
+
+This should probably be `$HOME/anaconda3/envs/isis`.  You can see
+that it starts with whatever you got from step 1, and ends in the
+name of your isis environment, if you followed the installation
+instructions above, you called that environment 'isis'.
+
+You can do the same thing to find the path to your new 'working'
+environment, but in this example, it will be at
+`$HOME/anaconda3/envs/working`.
+
+4.  Copy the ISIS activation and deactivation scripts to your new
+environment.  Please note that the directory names in the instructions
+below are based on how you installed conda and what you named the
+'isis' environment and the 'working' environment.  You may *not* be
+able to just copy and paste these instructions directly, they are
+an example.  Likewise, if your shell doesn't take the bash syntax
+in the .sh files, then you may need to select one of the other
+`env_vars.*` files in the isis directories.
+
+        cd $HOME/anaconda3/envs/
         mkdir -p working/etc/conda/activate.d/
         mkdir -p working/etc/conda/deactivate.d/
-        cp isis3/etc/conda/activate.d/env_vars.sh working/etc/conda/activate.d/env_vars.sh
-        cp isis3/etc/conda/deactivate.d/env_vars.sh working/etc/conda/deactivate.d/env_vars.sh
+        cp isis/etc/conda/activate.d/env_vars.sh working/etc/conda/activate.d/env_vars.sh
+        cp isis/etc/conda/deactivate.d/env_vars.sh working/etc/conda/deactivate.d/env_vars.sh
 
-Copy the appropriate `env_vars.*` files for your shell, if it isn't
-the .sh flavor.
-
-4.  Edit the copied activation file to add the ISIS executable
-directory to the path, by adding this line at the end:
+5.  Edit the copied activation file in
+`$HOME/anaconda3/envs/working/etc/conda/activate.d/` to add the
+ISIS executable directory to the path, by adding this line at the
+end:
 
         export PATH=$PATH:$ISISROOT/bin
 
-Or whatever is appropriate for your shell.
+    Or whatever is appropriate for your shell if you aren't using the .sh file.
 
-5.  Edit the copied deactivation file to remove the path, by adding
-this line at the end:
+6.  Edit the copied deactivation file in
+`$HOME/anaconda3/envs/working/etc/conda/deactivate.d/` to remove
+the path, by adding this line at the end:
 
-        export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '/isis3/ {next} {print}' | sed 's/:$//'`;`
+        export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '/isis/ {next} {print}' | sed 's/:$//'`;`
 
-If your ISIS environment is not called `isis3`, then you need to
-replace that part in the awk line above.  You can look in the
-`activate.d/env_vars.sh` file to see what it should be.
+    Or whatever is appropriate for your shell if you aren't using the
+    .sh file.  If your ISIS environment is not called `isis`, then you
+    need to replace that part in the awk line above.  You can look in
+    the `activate.d/env_vars.sh` file to see what it should be.
 
-Adding the lines in steps 4 and 5, manually adds the executable
+Adding the lines in steps 5 and 6 manually adds the 'bin/'
 directory of the ISIS environment to your path (step 4), and then
 manually removes it (step 5) on deactivation.  If you are using
 some other shell, you may need to use a different syntax to add and
-remove these elements to your path.
+remove these elements to and from your path.
 
 
 
