@@ -14,7 +14,6 @@
 #include "IException.h"
 #include "PvlGroup.h"
 
-#include "Brick.h"
 #include "Cube.h"
 #include "Pvl.h"
 #include "PvlObject.h"
@@ -43,12 +42,6 @@ namespace Isis {
       Pvl projLabel;
       json isd;
 
-      void SetUp() override;
-      void TearDown() override;
-  };
-
-  class ImageDataCube : public DefaultCube {
-    protected:
       void SetUp() override;
       void TearDown() override;
   };

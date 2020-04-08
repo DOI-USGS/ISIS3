@@ -1,4 +1,6 @@
 #include "Fixtures.h"
+#include "LineManager.h"
+
 
 namespace Isis {
 
@@ -21,8 +23,19 @@ namespace Isis {
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
 
-    projTestCube = new Cube();
-    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+    LineManager line(*testCube);
+    long j = 0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) 1;
+        j++;
+      }
+      j--;
+      testCube->write(line);
+    }
+
+    // projTestCube = new Cube();
+    // projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
 
@@ -31,35 +44,31 @@ namespace Isis {
       testCube->close();
     }
 
-    if (projTestCube->isOpen()) {
-      projTestCube->close();
-    }
+    // if (projTestCube->isOpen()) {
+    //   projTestCube->close();
+    // }
 
     delete testCube;
-    delete projTestCube;
+    // delete projTestCube;
   }
 
-  void ImageDataCube::SetUp() {
-    DefaultCube::SetUp();
-    //setup buffer - 3 samples, 2 lines, 1 band
-    Brick brick = Brick(*testCube, 3, 2, 1);
-    brick.SetBasePosition(0, 0, 0);
+    // //setup buffer - 3 samples, 2 lines, 1 band
+    // Brick brick = Brick(*testCube, 3, 2, 1);
+    // brick.SetBasePosition(0, 0, 0);
+    // std::cout<<"AFTER BRICK INIT"<<std::endl;
 
-    int brickIndex = 0;
-    for (int outputLine = 0; outputLine < 2; outputLine++) {
-      for (int outputSample = 0; outputSample < 3; outputSample++) {
-        brick[brickIndex] = 1;
-        brickIndex++;
-      }
-    }
-
-    testCube->write(brick);
-  }
-
-
-  void ImageDataCube::TearDown() {
-    DefaultCube::TearDown();
-  }
+    // int brickIndex = 0;
+    // for (int outputLine = 0; outputLine < 2; outputLine++) {
+    //   for (int outputSample = 0; outputSample < 3; outputSample++) {
+    //     std::cout<<"IN LOOP"<<std::endl;
+    //     brick[brickIndex] = 1;
+    //     brickIndex++;
+    //   }
+    // }
+    // std::cout<<"BEFORE WRITE"<<std::endl;
+    // testCube->write(brick);
+    // std::cout<<"AFTER WRITE"<<std::endl;
+  // }
 
   void LineScannerCube::SetUp() {
     TempTestingFiles::SetUp();

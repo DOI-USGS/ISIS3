@@ -14,10 +14,9 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/enlarge.xml").expanded();
 
-TEST_F(ImageDataCube, FunctionalTestEnlargeDefaultParameters) {
+TEST_F(DefaultCube, FunctionalTestEnlargeDefaultParameters) {
   QVector<QString> args = {};
   UserInterface options(APP_XML, args);
   Pvl appLog;
-
   enlarge(testCube, options, &appLog);
 }
