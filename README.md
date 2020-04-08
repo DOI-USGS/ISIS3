@@ -227,8 +227,8 @@ the path, by adding this line at the end:
     the `activate.d/env_vars.sh` file to see what it should be.
 
 Adding the lines in steps 5 and 6 manually adds the 'bin/'
-directory of the ISIS environment to your path (step 4), and then
-manually removes it (step 5) on deactivation.  If you are using
+directory of the ISIS environment to your path (step 5), and then
+manually removes it (step 6) on deactivation.  If you are using
 some other shell, you may need to use a different syntax to add and
 remove these elements to and from your path.
 
