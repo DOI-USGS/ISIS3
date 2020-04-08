@@ -133,9 +133,9 @@ The first step is to create 'working' and add whatever conda packages you want.
 
 #### Easy mode, with stacking
 
-1.  conda activate isis3
+1.  `conda activate isis3`
 
-2.  conda activate --stack working
+2.  `conda activate --stack working`
 
 That's it.  Told you it was easy.
 
@@ -148,15 +148,14 @@ out, you'll have to `conda deactivate` two times to get out of
 #### Harder mode, with activation script hacking
 
 The above stacking situation may have issues if you have a particularly
-complicated set of packages or other dependencies.  This this means
-you'll probably need a solution like this.  The idea here is that
+complicated set of packages or other dependencies.  The idea here is that
 the only thing you *really* need in your 'working' environment are
 the ISIS environment variables and the path to the ISIS executables.
 
 And we can do this via customizations in the conda environment's
-activate.d and deactivate.d directories.  Adding these things can
+activate.d/ and deactivate.d/ directories.  Adding these things can
 also be done manually from the command line, but encoding them in
-the activate.d and deactivate.d scripts is handy.
+the activate.d/ and deactivate.d/ scripts is handy.
 
 1.  Create your conda environment however you like, adding whatever
 packages you need.  If you were reading the directions above, you've
@@ -170,10 +169,10 @@ will then be at `$HOME/.anaconda3/envs/working`.
 3.  Copy the ISIS activation and deactivation scripts to your new environment:
 
         cd $HOME/.anaconda3/envs/
-        mkdir -p /working/etc/conda/activate.d/
-        mkdir -p /working/etc/conda/deactivate.d/
-        cp isis3/etc/conda/activate.d/env_vars.sh /working/etc/conda/activate.d/env_vars.sh
-        cp isis3/etc/conda/deactivate.d/env_vars.sh /working/etc/conda/deactivate.d/env_vars.sh
+        mkdir -p working/etc/conda/activate.d/
+        mkdir -p working/etc/conda/deactivate.d/
+        cp isis3/etc/conda/activate.d/env_vars.sh working/etc/conda/activate.d/env_vars.sh
+        cp isis3/etc/conda/deactivate.d/env_vars.sh working/etc/conda/deactivate.d/env_vars.sh
 
 Copy the appropriate `env_vars.*` files for your shell, if it isn't
 the .sh flavor.
