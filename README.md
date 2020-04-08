@@ -105,6 +105,103 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         for Anaconda 3.4 and up - conda activate isis3
         prior to Anaconda 3.4 - source activate isis3
 
+
+### Practical Usage with other conda packages
+
+If you don't use conda for anything else on your computer, you can
+skip this section.
+
+If you use conda to install other packages, you may run into
+difficulties with adding the isis conda pacakge to those environments
+or adding other conda pacakges to the isis environment you just
+created above.  This is because the isis conda package pins a number
+of requirements that may clash with other packages.
+
+At this time, we recommend creating the isis environment as detailed
+above, and then not adding any other conda packages to it.  This
+is similar to the best practice usage of not adding any conda
+packages to your 'base' conda environment.
+
+Instead, when you need to have a conda environment with other
+packages that also needs to be able to run ISIS programs, we have
+two different options.  In both cases, we'll assume that you create
+a new environment called 'working' (but it could be named anything)
+that you want to add some conda packages to, but from which you
+also want ISIS access.
+
+The first step is to create 'working' and add whatever conda packages you want.
+
+#### Easy mode, with stacking
+
+1.  conda activate isis3
+
+2.  conda activate --stack working
+
+That's it.  Told you it was easy.
+
+This activates the isis3 environment, gets it all set up, and
+then it 'stacks' the new working environment on top of it.  To get
+out, you'll have to `conda deactivate` two times to get out of
+`working` and then out of `isis3`.
+
+
+#### Harder mode, with activation script hacking
+
+The above stacking situation may have issues if you have a particularly
+complicated set of packages or other dependencies.  This this means
+you'll probably need a solution like this.  The idea here is that
+the only thing you *really* need in your 'working' environment are
+the ISIS environment variables and the path to the ISIS executables.
+
+And we can do this via customizations in the conda environment's
+activate.d and deactivate.d directories.  Adding these things can
+also be done manually from the command line, but encoding them in
+the activate.d and deactivate.d scripts is handy.
+
+1.  Create your conda environment however you like, adding whatever
+packages you need.  If you were reading the directions above, you've
+already done this.
+
+2.  Locate the path to your ISIS conda environment.  Depending on
+how you installed conda, it may be in `$HOME/.anaconda3/envs/isis3/`
+or somewhere similar.  Likewise, your new 'working' environment
+will then be at `$HOME/.anaconda3/envs/working`.
+
+3.  Copy the ISIS activation and deactivation scripts to your new environment:
+
+        cd $HOME/.anaconda3/envs/
+        mkdir -p /working/etc/conda/activate.d/
+        mkdir -p /working/etc/conda/deactivate.d/
+        cp isis3/etc/conda/activate.d/env_vars.sh /working/etc/conda/activate.d/env_vars.sh
+        cp isis3/etc/conda/deactivate.d/env_vars.sh /working/etc/conda/deactivate.d/env_vars.sh
+
+Copy the appropriate `env_vars.*` files for your shell, if it isn't
+the .sh flavor.
+
+4.  Edit the copied activation file to add the ISIS executable
+directory to the path, by adding this line at the end:
+
+        export PATH=$PATH:$ISISROOT/bin
+
+Or whatever is appropriate for your shell.
+
+5.  Edit the copied deactivation file to remove the path, by adding
+this line at the end:
+
+        export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '/isis3/ {next} {print}' | sed 's/:$//'`;`
+
+If your ISIS environment is not called `isis3`, then you need to
+replace that part in the awk line above.  You can look in the
+`activate.d/env_vars.sh` file to see what it should be.
+
+Adding the lines in steps 4 and 5, manually adds the executable
+directory of the ISIS environment to your path (step 4), and then
+manually removes it (step 5) on deactivation.  If you are using
+some other shell, you may need to use a different syntax to add and
+remove these elements to your path.
+
+
+
 ### Updating
 
   To update to a new version of ISIS up to version 3.9.1, simply run `conda update isis3`
