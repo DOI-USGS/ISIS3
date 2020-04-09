@@ -15,13 +15,12 @@ namespace Isis{
   void enlarge(Cube *icube, UserInterface &ui, Pvl *log) {
     ProcessRubberSheet p;
     p.SetInputCube(icube);
-    std::cout<<"SET INPUT CUBE"<< std::endl;
 
     // Input number of samples, lines, and bands
     int ins = icube->sampleCount();
     int inl = icube->lineCount();
     int inb = icube->bandCount();
-    std::cout<<"GOT INPUT CUBE DIMENSIONS"<< std::endl;
+    
     // Output samples and lines
     int ons, onl;
 
@@ -71,10 +70,12 @@ namespace Isis{
                     ui.GetString("INTERP") + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    std::cout<<"RIGHT BEFORE OUTPUT CUBE IS SET"<< std::endl;
+    
     // Allocate the output file, the number of bands does not change in the output
-    Cube *ocube = p.SetOutputCube("TO", ons, onl, inb);
-
+    QString outputFileName = ui.GetFileName("TO");
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    Cube *ocube = p.SetOutputCube(outputFileName, att, ons, onl, inb);
+    
     // Set up the transform object with the calculated scale and number of
     // output pixels
     //Transform *transform = new Enlarge(icube, sampleScale, lineScale);
