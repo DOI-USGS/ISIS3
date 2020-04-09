@@ -197,9 +197,7 @@ namespace Isis {
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
         }
         
-        std::cerr << isd << std::endl; 
         json aleNaifKeywords = isd["naif_keywords"];
-        std::cerr << aleNaifKeywords << std::endl;
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
         
         // Still need to load clock kernels for now 
@@ -967,8 +965,7 @@ namespace Isis {
 
 
   /**
-   * This returns the PvlObject that stores all of the requested Naif data
-   *   and can be a replacement for furnishing text kernels.
+   * This returns the PvlObject that stores all of the requested Naif data  *   and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;
