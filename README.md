@@ -112,8 +112,8 @@ If you don't use conda for anything else on your computer, you can
 skip this section.
 
 If you use conda to install other packages, you may run into
-difficulties with adding the isis conda pacakge to those environments
-or adding other conda pacakges to the isis environment you just
+difficulties with adding the isis conda package to those environments
+or adding other conda packages to the isis environment you just
 created above.  This is because the isis conda package pins a number
 of requirements that may clash with other packages.
 
