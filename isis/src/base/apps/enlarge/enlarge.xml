@@ -74,6 +74,15 @@
     <change name="Sharmila Prasad" date="2011-09-15">
       Fixed issue 0000280 - enlarge fails when run with a batchlist
     </change>
+    <change name="Kaitlyn Lee" date="2020-04-09">
+      The SetOutputCube method from Process we were originally using called
+      Application::GetUserInterface(), but this became a problem when trying to 
+      call enlarge(), or run the application, programmatically since we are no
+      longer using Application in the application's cpp file. Changed the call
+      to the one that takes in a CubeAttribute object. Also, removed the check
+      to see if an invalid interpolation method was passed in since the UserInterface
+      class checks and throws the excpetion and it was unreachable code.
+    </change>
   </history>
 
   <category>

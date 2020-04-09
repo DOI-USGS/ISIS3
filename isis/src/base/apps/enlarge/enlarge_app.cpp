@@ -62,13 +62,8 @@ namespace Isis{
     else if(ui.GetString("INTERP") == "BILINEAR") {
       interp = new Interpolator(Interpolator::BiLinearType);
     }
-    else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+    else {  // CUBICCONVOLUTION
       interp = new Interpolator(Interpolator::CubicConvolutionType);
-    }
-    else {
-      QString msg = "Unknown value for INTERP [" +
-                    ui.GetString("INTERP") + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
     // Allocate the output file, the number of bands does not change in the output
