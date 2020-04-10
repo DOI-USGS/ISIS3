@@ -81,7 +81,7 @@
       longer using Application in the application's cpp file. Changed the call
       to the one that takes in a CubeAttribute object. Also, removed the check
       to see if an invalid interpolation method was passed in since the UserInterface
-      class checks and throws the excpetion and it was unreachable code.
+      class checks and throws the exception and it was unreachable code.
     </change>
   </history>
 
