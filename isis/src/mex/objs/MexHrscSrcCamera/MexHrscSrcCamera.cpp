@@ -78,8 +78,7 @@ namespace Isis {
 
     // The distortion is documented as near 1 pixel at the corners. This is less than the
     // point spread, so zero distortion is used
-    new CameraDistortionMap(this, -1);
-    CameraDistortionMap *distortionMap = new CameraDistortionMap(this, -1);
+    new CameraDistortionMap(this);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
