@@ -10,12 +10,13 @@ using namespace Isis;
 namespace Isis{
 
   void enlarge(UserInterface &ui, Pvl *log) {
-    Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
+    Cube icube;
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
-      cube->setVirtualBands(inAtt.bands());
+      icube.setVirtualBands(inAtt.bands());
     }
-    enlarge(cube, ui, log);
+    icube.open(ui.GetFileName("FROM"));
+    enlarge(&icube, ui, log);
   }
 
   void enlarge(Cube *icube, UserInterface &ui, Pvl *log) {
