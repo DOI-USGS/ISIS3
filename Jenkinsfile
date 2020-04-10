@@ -28,7 +28,7 @@ for (lbl in labels) {
 
                 def stageStatus = "Checking out ISIS on ${label}"
                 
-                retry(10) { 
+                retry(20) { 
                   // Checkout
                   checkout scm
                 }
