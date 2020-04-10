@@ -1,5 +1,7 @@
-#include "Enlarge.h"
 #include "enlarge_app.h"
+
+#include "CubeAttribute.h"
+#include "Enlarge.h"
 #include "IException.h"
 #include "ProcessRubberSheet.h"
 
@@ -9,6 +11,10 @@ namespace Isis{
 
   void enlarge(UserInterface &ui, Pvl *log) {
     Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      cube->setVirtualBands(inAtt.bands());
+    }
     enlarge(cube, ui, log);
   }
 
