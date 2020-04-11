@@ -172,7 +172,7 @@ The ISIS3 Data Area is hosted on rsync servers and not through conda channels li
 To download all ISIS3 data, enter the following commands in the location where you want to install the ISIS3 Data Area:
 
     cd $ISIS3DATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data.
+    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
 
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
