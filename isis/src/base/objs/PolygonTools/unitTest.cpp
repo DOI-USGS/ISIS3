@@ -25,6 +25,40 @@ int main() {
   try {
     cout << "Unit test for PolygonTools" << endl << endl;
 
+    // test Geos C-API functions 
+    PolygonTools::geosInit(); 
+    QVector<QPoint> pointVector(5);
+    pointVector[0] = QPoint(0,0);
+    pointVector[1] = QPoint(0,1);
+    pointVector[2] = QPoint(1,1);
+    pointVector[3] = QPoint(1,0);
+    pointVector[4] = QPoint(0,0);
+    
+    GEOSCoordSequence *cseq = PolygonTools::coordSequenceFromVector(pointVector); 
+    QPoint qp = PolygonTools::getCoordSeqXY(cseq, 0); 
+    std::cout << "point 0: " << qp.x() << ", " << qp.y() << std::endl;
+    qp = PolygonTools::getCoordSeqXY(cseq, 1);
+    std::cout << "point 1: " << qp.x() << ", " << qp.y() << std::endl;
+    qp = PolygonTools::getCoordSeqXY(cseq, 2);
+    std::cout << "point 2: " << qp.x() << ", " << qp.y() << std::endl;
+    qp = PolygonTools::getCoordSeqXY(cseq, 3);
+    std::cout << "point 3: " << qp.x() << ", " << qp.y() << std::endl;
+    qp = PolygonTools::getCoordSeqXY(cseq, 4);
+    std::cout << "point 4: " << qp.x() << ", " << qp.y() << std::endl << std::endl;
+
+    // force error 
+    try {
+      qp = PolygonTools::getCoordSeqXY(cseq, 6);
+    } catch (IException &e) {
+      std::cout << e.what() << std::endl << std::endl;
+    }
+    
+    GEOSGeometry * cring = GEOSGeom_createLinearRing(cseq);
+    std::cout << "As LinearRing WKT: " << GEOSGeomToWKT(cring) << std::endl;  
+    GEOSGeometry * cpoly = GEOSGeom_createPolygon(cring, nullptr, 0);
+    std::cout << "As Polygon WKT: " << GEOSGeomToWKT(cpoly) << std::endl;  
+    
+
     // Create coordinate sequence for the first of two polygons
     geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
     pts->add(geos::geom::Coordinate(0.0, 0.0));
