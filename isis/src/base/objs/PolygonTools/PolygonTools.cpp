@@ -30,6 +30,7 @@
 #include <cmath>
 
 #include <QDebug>
+
 #include "geos/geom/BinaryOp.h"
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/CoordinateSequence.h"
@@ -2209,5 +2210,221 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
+
+ 
+  /** 
+   * A static method for handling geos errors. 
+   * required for initing geos c-api and converts geos  
+   * errors to ISIS exceptions
+   *  
+   * @param fmt
+   *  
+   * @throw IException::Programmer
+   */  
+  void PolygonTools::geosNotice(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    char buffer[1024];
+    vsprintf(buffer, fmt, ap);
+    va_end(ap);
+    throw IException(IException::Programmer, buffer, _FILEINFO_);
+  }
+
+
+  /** 
+   * A static method for handling geos errors. 
+   * required for initing geos c-api and converts geos  
+   * errors to ISIS exceptions
+   *
+   * @param fmt
+   *  
+   * @throw IException::Programmer
+   */  
+  void PolygonTools::geosError(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    char buffer[1024];
+    vsprintf(buffer, fmt, ap);
+    va_end(ap);
+    throw IException(IException::Programmer, buffer, _FILEINFO_);
+  }
+
+  /** 
+   * inits geos 
+   *
+   */
+  void PolygonTools::geosInit() {
+    initGEOS(geosNotice, geosError);
+  }
+  
+  /** 
+   * Get size of GEOS coordseq object 
+   * 
+   * @param seq pointer to GEOS coordseq object to get the size of  
+   *
+   */
+  unsigned int PolygonTools::getCoordSeqSize(const GEOSCoordSequence* seq) {
+    unsigned int size; 
+    int code = GEOSCoordSeq_getSize(seq, &size);
+    
+    if (code == 0) {
+      std::string msg = "Unable to get X value from GEOS Coord Sequence due to ";
+      msg += "unknown exception";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return size; 
+  }
+
+  /** 
+   * Get the x value of some coord at some index for a geos coordinate sequence 
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   *
+   * @return double value of x coordinate 
+   */
+  double PolygonTools::getCoordSeqX(const GEOSCoordSequence* seq, unsigned int idx) {
+    // c-api doesn't check sizes
+    if (idx > getCoordSeqSize(seq)) {
+       std::string msg = "Unable to get X value from GEOS Coord Sequence due to ";
+      msg += "index being greater than sequence size";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
+    double x; 
+    int code = GEOSCoordSeq_getX(seq, idx, &x);
+    
+    if (code == 0) {
+      std::string msg = "Unable to get X value from GEOS Coord Sequence due to ";
+      msg += "unknown exception";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return x; 
+  }
+
+  /** 
+   * Get the y value of some coord at some index for a geos coordinate sequence 
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   *
+   * @return double value of y coordinate 
+   */
+  double PolygonTools::getCoordSeqY(const GEOSCoordSequence* seq, unsigned int idx) {
+    // c-api doesn't check sizes
+    if (idx > getCoordSeqSize(seq)) {
+       std::string msg = "Unable to get Y value from GEOS Coord Sequence due to ";
+      msg += "index being greater than sequence size";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    double y;
+    
+    int code = GEOSCoordSeq_getY(seq, idx, &y);
+
+    if (code == 0) {
+      std::string msg = "Unable to get Y value from GEOS Coord Sequence due to ";
+      msg += "unknown exception";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+ 
+    return y;  
+  }
+
+  /** 
+   * Get the xy value of some coord at some index for a geos coordinate sequence 
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   *
+   * @return QPoint point object containing coordinate values  
+   */
+  QPoint PolygonTools::getCoordSeqXY(const GEOSCoordSequence* seq, unsigned int idx) {
+    double x = getCoordSeqX(seq, idx); 
+    double y = getCoordSeqY(seq, idx);
+    return QPoint(x,y);
+  }
+
+  /** 
+   * Set the x value of some coord at some index for a geos coordinate sequence  
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   * @param x value to set 
+   */
+  void PolygonTools::setCoordSeqX(GEOSCoordSequence* seq, unsigned int idx, double x) {
+    // c-api doesn't check sizes
+    if (idx > getCoordSeqSize(seq)) {
+       std::string msg = "Unable to set X value from GEOS Coord Sequence due to ";
+      msg += "index being greater than sequence size";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    int code = GEOSCoordSeq_setX(seq, idx, x);
+    
+    if (code == 0) {
+      std::string msg = "Unable to set X value from GEOS Coord Sequence due to ";
+      msg += "unknown exception";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    } 
+  }
+
+  /** 
+   * Set the y value of some coord at some index for a geos coordinate sequence  
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   * @param y value to set 
+   */
+  void PolygonTools::setCoordSeqY(GEOSCoordSequence* seq, unsigned int idx, double y) {
+    // c-api doesn't check sizes
+    if (idx > getCoordSeqSize(seq)) {
+       std::string msg = "Unable to set Y value from GEOS Coord Sequence due to ";
+      msg += "index being greater than sequence size";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
+    int code = GEOSCoordSeq_setY(seq, idx, y);
+    
+    if (code == 0) {
+      std::string msg = "Unable to set Y value from GEOS Coord Sequence due to ";
+      msg += "unknown exception";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /** 
+   * Set the xy value of some coord at some index for a geos coordinate sequence  
+   * 
+   * @param seq pointer to GEOS coordseq object to get the value of 
+   * @param idx index of coordinate 
+   * @param x x-value to set
+   * @param y y-value to set
+   */
+  void PolygonTools::setCoordSeqXY(GEOSCoordSequence* seq, unsigned int idx, double x, double y) {
+    setCoordSeqX(seq, idx, x);  
+    setCoordSeqY(seq, idx, y);
+  }
+
+  /** 
+   * syntax sugar to covert a Vector of points to a GEOS coordinate sequence. 
+   *
+   * @param vec QVector of QPoints to convert to GEOS coordinate sequence 
+   *
+   * @return GEOSCoordSequence* pointer to GEOS coord sequence 
+   */
+  GEOSCoordSequence *PolygonTools::coordSequenceFromVector(QVector<QPoint> vec) {
+    GEOSCoordSequence *seq = GEOSCoordSeq_create(vec.size(), 2);
+    
+    for(int i = 0; i < vec.size(); i++) {
+      setCoordSeqXY(seq, i, vec[i].x(), vec[i].y()); 
+    }
+
+    return seq; 
+  }
+    
+
 } // end namespace isis
 

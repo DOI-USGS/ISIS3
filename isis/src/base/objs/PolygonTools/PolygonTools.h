@@ -26,7 +26,13 @@
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/CoordinateSequence.h>
 
+// geos library
+#include <geos_c.h>
+
 #include <QString>
+#include <QVector>
+#include <QPoint>
+
 
 namespace Isis {
 
@@ -151,6 +157,7 @@ namespace Isis {
       // Return a deep copy of a multpolygon
       static geos::geom::MultiPolygon *CopyMultiPolygon(const geos::geom::MultiPolygon *mpolygon);
       static geos::geom::MultiPolygon *CopyMultiPolygon(const geos::geom::MultiPolygon &mpolygon);
+      static GEOSGeometry *CopyMultiPolygon(const GEOSGeometry &mpolygon);
 
       static geos::geom::MultiPolygon *Despike(const geos::geom::Geometry *geom);
       static geos::geom::MultiPolygon *Despike(const geos::geom::MultiPolygon *multiPoly);
@@ -207,6 +214,17 @@ namespace Isis {
                                                       UniversalGroundMap *ugm);
       static geos::geom::MultiPolygon *SplitPolygonOn360(const geos::geom::Polygon *inPoly);
 
+      static void geosNotice(const char* fmt, ...);
+      static void geosError(const char*fmt, ...); 
+      static void geosInit(); 
+      static unsigned int getCoordSeqSize(const GEOSCoordSequence* seq);
+      static double getCoordSeqX(const GEOSCoordSequence* seq, unsigned int idx);
+      static double getCoordSeqY(const GEOSCoordSequence* seq, unsigned int idx);
+      static QPoint getCoordSeqXY(const GEOSCoordSequence* seq, unsigned int idx); 
+      static void setCoordSeqX(GEOSCoordSequence *seq, unsigned int idx, double x); 
+      static void setCoordSeqY(GEOSCoordSequence *seq, unsigned int idx, double y); 
+      static void setCoordSeqXY(GEOSCoordSequence *seq, unsigned int idx, double x, double y);
+      static GEOSCoordSequence *coordSequenceFromVector(QVector<QPoint> vec);
 
     private:
       //! Returns true if the middle point is spiked
