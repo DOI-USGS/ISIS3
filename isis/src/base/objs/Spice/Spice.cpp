@@ -29,7 +29,7 @@
 
 #include <getSpkAbCorrState.hpp>
 
-#include <ale.h>
+#include <ale/Load.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
