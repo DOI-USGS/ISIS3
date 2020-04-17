@@ -429,32 +429,32 @@ namespace Isis {
     m_frameType = CK;
 
     // Load the full cache time information from the label if available
-    p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
-    p_fullCacheEndTime = isdRot["CkTableEndTime"].get<double>();
-    p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>();
-    p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>();
-    p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
+    p_fullCacheStartTime = isdRot["ck_table_start_time"].get<double>();
+    p_fullCacheEndTime = isdRot["ck_table_end_time"].get<double>();
+    p_fullCacheSize = isdRot["ck_table_original_size"].get<double>();
+    p_cacheTime = isdRot["ephemeris_times"].get<std::vector<double>>();
+    p_timeFrames = isdRot["time_dependent_frames"].get<std::vector<int>>();
 
-    for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
+    for (auto it = isdRot["quaternions"].begin(); it != isdRot["quaternions"].end(); it++) {
         std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
         Quaternion q(quat);
         std::vector<double> CJ = q.ToMatrix();
         p_cache.push_back(CJ);
     }
 
-    if (isdRot["AngularVelocity"].size() != 0) {
-      for (auto it = isdRot["AngularVelocity"].begin(); it != isdRot["AngularVelocity"].end(); it++) {
+    if (isdRot["angular_velocity"].size() != 0) {
+      for (auto it = isdRot["angular_velocity"].begin(); it != isdRot["angular_velocity"].end(); it++) {
           std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
           p_cacheAv.push_back(av);
       }
       p_hasAngularVelocity = true;
     }
 
-    bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
+    bool hasConstantFrames = isdRot.find("constant_frames") != isdRot.end();
 
     if (hasConstantFrames) {
-      p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();
-      p_TC = isdRot["ConstantRotation"].get<std::vector<double>>();
+      p_constantFrames = isdRot["constant_frames"].get<std::vector<int>>();
+      p_TC = isdRot["constant_rotation"].get<std::vector<double>>();
 
     }
     else {
