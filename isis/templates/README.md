@@ -18,12 +18,7 @@ appropriate location, depending on file type.
     For more details about the LICENSE terms and the AUTHORS, you will
     find files of those names at the top level of this repository.
 
-Also include this as a separate comment underneath the above,
-to make it easier to find-and-replace if we ever need to:
-
     SPDX-License-Identifier: CC0-1.0
 
-Configuration files and minor READMEs like this one don't really
-need it, as the blanket LICENSE file covers those to the extent
-needed.  PR reviewers should be able to help advise if you are
-unsure.
+If you are unsure if a particular files needs these comments, leave
+a comment in your PR, and the PR reviewers should be able to advise.
