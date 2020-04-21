@@ -4,7 +4,7 @@ channels:
   - defaults
 
 dependencies:
-  - qt=5.9.6
+  - qt
   - gdal>=3
   - protobuf
   - qwt
