@@ -30,6 +30,7 @@ dependencies:
   - gmm
   - tnt
   - embree
+  - mesalib
 
   # build tools
   - ninja
