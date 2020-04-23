@@ -11,7 +11,7 @@ dependencies:
   - qwt
   - ale >=0.8.0           
   - boost
-  - opencv>=3,<4         # API changes past 4.0 
+  - opencv>=4        
   - geos>=3.7,<3.8       # API changes past 3.8
   - bullet=2.86.1=0      # This needs to be our channel's build 
   - armadillo            
@@ -32,6 +32,7 @@ dependencies:
   - tnt
   - embree
   - mesalib
+  - xalan-c
 
   # build tools
   - ninja

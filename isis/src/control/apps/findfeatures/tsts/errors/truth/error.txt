@@ -1,0 +1,8 @@
+Error Test A: 
+**USER ERROR** No feature matcher algorithms provided!.
+Error Test B: 
+**USER ERROR** No feature matcher algorithms provided!.
+Error Test C: 
+**USER ERROR** Must provide both a FROM/FROMLIST and MATCH cube or image filename.
+Error Test D: 
+**USER ERROR** No control points found!!.

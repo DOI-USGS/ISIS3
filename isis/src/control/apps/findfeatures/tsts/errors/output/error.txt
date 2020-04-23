@@ -1,0 +1,12 @@
+Error Test A: 
+libc++abi.dylib: terminating with uncaught exception of type cv::Exception: OpenCV(4.2.0) ../opencv_contrib/modules/xfeatures2d/src/sift.cpp:1210: error: (-213:The function/feature is not implemented) This algorithm is patented and is excluded in this configuration; Set OPENCV_ENABLE_NONFREE CMake option and rebuild the library in function 'create'
+
+Error Test B: 
+libc++abi.dylib: terminating with uncaught exception of type cv::Exception: OpenCV(4.2.0) ../opencv_contrib/modules/xfeatures2d/src/sift.cpp:1210: error: (-213:The function/feature is not implemented) This algorithm is patented and is excluded in this configuration; Set OPENCV_ENABLE_NONFREE CMake option and rebuild the library in function 'create'
+
+Error Test C: 
+libc++abi.dylib: terminating with uncaught exception of type cv::Exception: OpenCV(4.2.0) ../opencv_contrib/modules/xfeatures2d/src/sift.cpp:1210: error: (-213:The function/feature is not implemented) This algorithm is patented and is excluded in this configuration; Set OPENCV_ENABLE_NONFREE CMake option and rebuild the library in function 'create'
+
+Error Test D: 
+libc++abi.dylib: terminating with uncaught exception of type cv::Exception: OpenCV(4.2.0) ../opencv_contrib/modules/xfeatures2d/src/sift.cpp:1210: error: (-213:The function/feature is not implemented) This algorithm is patented and is excluded in this configuration; Set OPENCV_ENABLE_NONFREE CMake option and rebuild the library in function 'create'
+
