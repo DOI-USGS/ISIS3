@@ -1,0 +1,51 @@
+# Fiducal data that goes into ROOT of the PDS label
+Group = FIDUCIAL_ID
+  Auto           = Null
+  InputKey       = FiducialId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:FIDUCIAL_ID
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FIDUCIAL_SAMPLES
+  Auto           = Null
+  InputKey       = FiducialSamples
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:FIDUCIAL_SAMPLES
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FIDUCIAL_LINES
+  Auto           = Null
+  InputKey       = FiducialLines
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:FIDUCIAL_LINES
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FIDUCIAL_X_COORDINATES
+  Auto           = Null
+  InputKey       = FiducialXCoordinates
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:FIDUCIAL_X_COORDINATES
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = FIDUCIAL_Y_COORDINATES
+  Auto           = Null
+  InputKey       = FiducialYCoordinates
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:FIDUCIAL_Y_COORDINATES
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+End

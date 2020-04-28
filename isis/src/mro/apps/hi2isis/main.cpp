@@ -451,25 +451,24 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
   //Create a PVL to store the translated labels
   Pvl outLabel;
 
-  // Get the directory where the MRO HiRISE translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Mro"] + "/translations/";
+  // Get the path where the MRO HiRISE translation tables are.
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Get a filename for the HiRISE EDR label
   Pvl labelPvl(labelFile.expanded());
 
   // Translate the Instrument group
-  FileName transFile(transDir + "hiriseInstrument.trn");
+  FileName transFile(transDir + "MroHiriseInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
-  transFile  = transDir + "hiriseBandBin.trn";
+  transFile  = transDir + "MroHiriseBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile  = transDir + "hiriseArchive.trn";
+  transFile  = transDir + "MroHiriseArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 

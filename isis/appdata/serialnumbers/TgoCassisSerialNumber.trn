@@ -1,0 +1,58 @@
+# Serial number for TGO CaSSIS cubes.
+# Version 3
+# 
+# The serial number is unique to each individual cube. This is usually a single framelet 
+# cropped from the full frame.
+# 
+# The observation ID is unique to each full frame exposure. All individual filter framelets 
+# within a frame will have the same ObservationId.
+# 
+# Serial Number:  TGO/CaSSIS/<StartTime>/<Filter>
+# Observation ID: TGO/CaSSIS/<StartTime>
+# 
+# history 2018-05-18 Jeannie Backer - Hardcoded output for InstrumentId section so that 
+#                        we don't have to worry about SN changing if InstrumentId
+#                        form changes.
+ObservationKeys = 3
+Group = Keyword1
+  Auto
+  InputKey       = SpacecraftName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword1
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (TGO, "TRACE GAS ORBITER")
+End_Group
+
+Group = Keyword2
+  Auto
+  InputKey       = InstrumentId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword2
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (CaSSIS, *)
+End_Group
+
+Group = Keyword3
+  Auto
+  InputKey       = StartTime
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword3
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword4
+  Auto
+  InputKey       = Filter
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword4
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+
+End
+

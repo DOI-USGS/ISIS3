@@ -191,7 +191,7 @@ Test Bad ground point using ShapeModel=Null
 Has Intersection    = 0
 
 
-Test SetLookDirection using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
+Test SetLookDirection using ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 0
 Has Intersection    = 1
 Latitude            = 34.331244
@@ -343,10 +343,10 @@ Local Solar Time    = 17.155984
 Spacecraft Altitude = 302.21627
 Solar Distance      = 1.4234193
 
-Test bad look direction using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
+Test bad look direction using ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 0
 
-Test SetUniversalGround (lat/lon only) using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
+Test SetUniversalGround (lat/lon only) using ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 1
 Latitude            = 11.571436
 Longitude           = 223.32865
@@ -362,7 +362,7 @@ Local Solar Time    = 17.155986
 Spacecraft Altitude = 302.21627
 Solar Distance      = 1.4234193
 
-Test SetUniversalGround (lat/lon/radius) using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
+Test SetUniversalGround (lat/lon/radius) using ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 1
 Latitude            = 11.571436
 Longitude           = 223.32865
@@ -379,7 +379,7 @@ Local Solar Time    = 17.155986
 Spacecraft Altitude = 302.21627
 Solar Distance      = 1.4234234
 
-Test Bad ground point using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
+Test Bad ground point using ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 0
 Test name methods ...
 Spacecraft Name Long: My Spacecraft

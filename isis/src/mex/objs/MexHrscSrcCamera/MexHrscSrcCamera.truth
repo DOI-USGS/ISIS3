@@ -1,0 +1,34 @@
+Unit Test for MexHrscSrcCamera...
+FileName: H0010_0023_SR2.cub
+CK Frame: -41220
+
+Kernel IDs: 
+CK Frame ID = -41001
+CK Reference ID = 1
+SPK Target ID = -41
+SPK Reference ID = 1
+
+Spacecraft Name Long: Mars Express
+Spacecraft Name Short: MEX
+Instrument Name Long: Super Resolution Channel
+Instrument Name Short: SRC
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK

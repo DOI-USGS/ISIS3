@@ -1,0 +1,4 @@
+# Single matcher algorithm. Designed to be used with a Scharr filter. Using
+# the crop function will further limit the number of features detected.
+detector.fastx@threshold:17@type:2/sift/parameters@geomtype:crop@filter:scharr@maxpoints:2000
+

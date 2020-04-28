@@ -213,7 +213,7 @@
             Output image
           </brief>
           <description>
-            Output image after gllssi2isis has imported it to ISIS3.
+            Output image after gllssi2isis has imported it to ISIS.
           </description>
           <thumbnail width="187" height="200" caption="Output cube imported with defaults" src="assets/thumbs/gllssi2isisOutputAutoThumb.jpg" />
           <parameterName>

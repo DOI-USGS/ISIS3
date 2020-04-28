@@ -37,11 +37,8 @@ void IsisMain() {
 
 void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
-  // Get the directory where the Lunar translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["Lo"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
   FileName bandBinTransFile;

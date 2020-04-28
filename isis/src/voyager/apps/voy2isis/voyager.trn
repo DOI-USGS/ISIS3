@@ -1,0 +1,204 @@
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  OutputName     = MissionPhaseName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (JUPITER_ENCOUNTER, JUPITER_ENCOUNTER)
+  Translation    = (NEPTUNE_ENCOUNTER, NEPTUNE_ENCOUNTER)
+  Translation    = (SATURN_ENCOUNTER, SATURN_ENCOUNTER)
+  Translation    = (URANUS_ENCOUNTER, URANUS_ENCOUNTER)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = IMAGE_ID
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+# SpacecraftClockCount used to be called FDS_COUNT
+Group = SpacecraftClockCount
+  Auto
+  InputKey       = IMAGE_NUMBER
+  OutputName     = SpacecraftClockCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputKey       = INSTRUMENT_HOST_NAME
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("VOYAGER_1", "VOYAGER_1")
+  Translation    = ("VOYAGER_2", "VOYAGER_2")
+  Translation    = ("VOYAGER_1", "VOYAGER 1")
+  Translation    = ("VOYAGER_2", "VOYAGER 2")
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Jupiter, JUPITER)
+  Translation    = (Adrastea, ADRASTEA)
+  Translation    = (Amalthea, AMALTHEA)
+  Translation    = (Callisto, CALLISTO)
+  Translation    = (Europa, EUROPA)
+  Translation    = (Ganymede, GANYMEDE)
+  Translation    = (Io, IO)
+  Translation    = (JupiterRings, J_RINGS)
+  Translation    = (Metis, METIS)
+  Translation    = (Thebe, THEBE)
+  Translation    = (Neptune, NEPTUNE)
+  Translation    = (Larissa, LARISSA)
+  Translation    = (Nereid, NEREID)
+  Translation    = (NeptuneRings, N_RINGS)
+  Translation    = (Proteus, PROTEUS)
+  Translation    = (Triton, TRITON)
+  Translation    = (Saturn, SATURN)
+  Translation    = (Calypso, CALYPSO)
+  Translation    = (Dione, DIONE)
+  Translation    = (Enceladus, ENCELADUS)
+  Translation    = (Epimetheus, EPIMETHEUS)
+  Translation    = (Helene, HELENE)
+  Translation    = (Hyperion, HYPERION)
+  Translation    = (Iapetus, IAPETUS)
+  Translation    = (Janus, JANUS)
+  Translation    = (Mimas, MIMAS)
+  Translation    = (Pandora, PANDORA)
+  Translation    = (Phoebe, PHOEBE)
+  Translation    = (Rhea, RHEA)
+  Translation    = (SaturnRings, S_RINGS)
+  Translation    = (Telesto, TELESTO)
+  Translation    = (Tethys, TETHYS)
+  Translation    = (Titan, TITAN)
+  Translation    = (System, SYSTEM)
+  Translation    = (Uranus, URANUS)
+  Translation    = (Ariel, ARIEL)
+  Translation    = (Miranda, MIRANDA)
+  Translation    = (Oberon, OBERON)
+  Translation    = (Puck, PUCK)
+  Translation    = (Titania, TITANIA)
+  Translation    = (Umbriel, UMBRIEL)
+  Translation    = (UranusRings, U_RINGS)
+  Translation    = (Unknown, UNK)
+  Translation    = (BetaCMa, BETACMA)
+  Translation    = (CalLamps, CALLAMPS)
+  Translation    = (Dark, DARK)
+  Translation    = (Orion, ORION)
+  Translation    = (Plaque, PLAQUE)
+  Translation    = (Pleiades, PLEIADES)
+  Translation    = (Scorpius, SCORPIUS)
+  Translation    = (SigmaSagittarii, SIGMASGR)
+  Translation    = (Sky, SKY)
+  Translation    = (Star, STAR)
+  Translation    = (ThetaCar, THETACAR)
+  Translation    = (Vega, VEGA)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = IMAGE_TIME
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputDefault   = Unknown
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NARROW_ANGLE_CAMERA, NARROW_ANGLE_CAMERA)
+  Translation    = (WIDE_ANGLE_CAMERA, WIDE_ANGLE_CAMERA)
+  Translation    = (NARROW_ANGLE_CAMERA, "IMAGING SCIENCE SUBSYSTEM - NARROW ANGLE")
+  Translation    = (WIDE_ANGLE_CAMERA, "IMAGING SCIENCE SUBSYSTEM - WIDE ANGLE")
+  Translation    = ("Unknown", "Unknown")
+End_Group
+
+Group = ScanModeId
+  Auto
+  InputKey       = SCAN_MODE_ID
+  OutputName     = ScanModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (1:1, 1:1)
+  Translation    = (2:1, 2:1)
+  Translation    = (3:1, 3:1)
+  Translation    = (5:1, 5:1)
+  Translation    = (10:1, 10:1)
+  Translation    = (*, *)
+End_Group
+
+Group = ShutterModeId
+  Auto
+  InputKey       = SHUTTER_MODE_ID
+  OutputName     = ShutterModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+
+  # narrow angle camera shuttered only
+  Translation    = (NAONLY, NAONLY)
+
+  # wide angle camera shuttered only
+  Translation    = (WAONLY, WAONLY)
+
+  # both cameras shuttered simultaneously
+  Translation    = (BOTSIM, BOTSIM)
+
+  # both cameras shuttered alternating???
+  Translation    = (BOTALT, BOTALT)
+
+  # BOTSIM followed by NAONLY
+  Translation    = (BSIMAN, BSIMAN)
+
+  # shutter remained closed for both cameras
+  Translation    = (BODARK, BODARK)
+
+  # narrow angle read out without shuttering
+  Translation    = (NADARK, NADARK)
+
+  # wide angle read out without shuttering
+  Translation    = (WADARK, WADARK)
+
+  # others
+  Translation    = (*, *)
+End_Group
+
+Group = GainModeId
+  Auto
+  InputKey       = GAIN_MODE_ID
+  OutputName     = GainModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (LOW, LOW)
+  Translation    = (HIGH, HIGH)
+  Translation    = (*, *)
+End_Group
+
+Group = EditModeId
+  Auto
+  InputKey       = EDIT_MODE_ID
+  OutputName     = EditModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (1:1, 1:1)
+  Translation    = (1:2, 1:2)
+  Translation    = (1:3, 1:3)
+  Translation    = (1:5, 1:5)
+  Translation    = (1:10, 1:10)
+  Translation    = (3:4, 3:4)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

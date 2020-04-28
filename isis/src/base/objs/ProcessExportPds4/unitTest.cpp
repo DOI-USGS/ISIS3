@@ -203,7 +203,7 @@ void IsisMain() {
     }
     catch(Isis::IException &e) {
       QString message = e.toString();
-      cout << message.replace(QRegExp("file.*base/translations"), "file [base/translations");
+      cout << message.replace(QRegExp("file.*/translations"), "file [translations");
       cout << endl;
       cout << endl;
     }

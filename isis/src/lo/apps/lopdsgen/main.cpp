@@ -84,11 +84,8 @@ void IsisMain() {
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
 
-  // Get the directory where the Lunar translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["Lo"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Isis 3 cubes being exported for the first time
   if(!origLabel.hasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
@@ -226,7 +223,7 @@ void IsisMain() {
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
-  QString formatDir = (QString) dataDir["Lo"] + "/templates/labels/";
+  QString formatDir = "$ISISROOT/appdata/translations/";
   pdsLabel.setFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file

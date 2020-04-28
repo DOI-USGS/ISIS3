@@ -1,0 +1,159 @@
+# History:
+#   2009-04-23 - Steve Koechle - Added InputDefault to ReadoutMode, this allows ingestion of early SSI images
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = ImageId
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputKey       = observationId
+  OutputName     = ObservationId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = spacecraftName
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("Galileo Orbiter", "GALILEO ORBITER")
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("SOLID_STATE_IMAGING_SYSTEM", "SOLID_STATE_IMAGING")
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = targetName
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = spacecraftClockStartCount
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = imageTime
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = exposureDuration
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = GainModeId
+  Auto
+  InputKey       = gainModeId
+  OutputName     = GainModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (10000, 10K)
+  Translation    = (40000, 40K)
+  Translation    = (100000, 100K)
+  Translation    = (400000, 400K)
+End_Group
+
+Group = TelemetryFormat
+  Auto
+  InputKey       = telemetryFormatId
+  OutputName     = TelemetryFormat
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LightFloodStateFlag
+  Auto
+  InputKey       = lightFloodStateFlag
+  OutputName     = LightFloodStateFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InvertedClockStateFlag
+  Auto
+  InputKey       = invertedClockStateFlag
+  OutputName     = InvertedClockStateFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BlemishProtectionFlag
+  Auto
+  InputKey       = blemishProtectionFlag
+  OutputName     = BlemishProtectionFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureType
+  Auto
+  InputKey       = exposureType
+  OutputName     = ExposureType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterName
+  Auto
+  InputKey       = filterName
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterNumber
+  Auto
+  InputKey       = filterNumber
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ReadoutMode
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  InputDefault   = N/A
+  OutputName     = ReadoutMode
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Contiguous, CONTIGUOUS)
+  Translation    = (Contiguous, "CONTIGUOUS READOUT")
+  Translation    = (Sample, SAMPLE)
+  Translation    = (Sample, "SAMPLE READOUT")
+  Translation    = (View, VIEW)
+
+  # Isis 2's SSI Calibration program, ssical, is converting N/A to Contiguous
+  Translation    = (Contiguous, N/A)
+  Translation    = (Contiguous, "NOT APPLICABLE")
+End_Group
+End

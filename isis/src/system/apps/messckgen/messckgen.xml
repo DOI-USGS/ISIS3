@@ -30,7 +30,7 @@
         </brief>
         <description>
           The CK PVL group DB file used to generate the new DB file. Defaulted
-          to use $ISIS3DATA/messenger/kernels/ck/kernels.????.db.  This file is
+          to use $ISISDATA/messenger/kernels/ck/kernels.????.db.  This file is
           primarily used to extract formatting and old groups that need to be
           updated and transferred to the new CK DB file.
         </description>
@@ -50,7 +50,7 @@
         </brief>
         <description>
           The new DB file that is the matching CK file.  Defaulted to use
-          $ISIS3DATA/messenger/kernels/ck/kernels.????.db.
+          $ISISDATA/messenger/kernels/ck/kernels.????.db.
         </description>
         <internalDefault>
           Automatic
@@ -69,7 +69,7 @@
         <description>
           The latest CK pivot file used to extract new date ranges and the
           latest pivot file.  Defaulted to use
-          $ISIS3DATA/messenger/kernels/ck/pivot_kernels.????.db.
+          $ISISDATA/messenger/kernels/ck/pivot_kernels.????.db.
         </description>
         <internalDefault>
           Automatic
@@ -88,7 +88,7 @@
         <description>
           The latest CK pivot file used to extract new date ranges and the
           latest attitude history file.  Defaulted to use
-          $ISIS3DATA/messenger/kernels/ck/atthist_kernels.????.db.
+          $ISISDATA/messenger/kernels/ck/atthist_kernels.????.db.
         </description>
         <internalDefault>
           Automatic

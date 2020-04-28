@@ -1,0 +1,559 @@
+#Begin
+Group = BandBinUnit
+  InputKey       = BAND_BIN_UNIT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = OriginalBand
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalBand
+  Auto
+  InputKey       = BAND_BIN_ORIGINAL_BAND
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = OriginalBand
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  InputKey       = BAND_BIN_CENTER
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Auto
+  InputKey       = BAND_BIN_WIDTH
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureUnit
+  InputKey       = BAND_BIN_EXPOSURE_UNIT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ExposureUnit
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Exposure
+  Auto
+  InputKey       = BAND_BIN_EXPOSURE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Exposure
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = NumberCoAdds
+  Auto
+  InputKey       = BAND_BIN_NUMBER_CO_ADDS
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = NumberCoAdds
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CameraHeadTemp
+  Auto
+  InputKey       = BAND_BIN_CAMERA_HEAD_TEMP
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CameraHeadTemp
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterId
+  Auto
+  InputKey       = BAND_BIN_FILTER_ID
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = FilterId
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterHole
+  Auto
+  InputKey       = BAND_BIN_FILTER_HOLE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = FilterHole
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Ut
+  Auto
+  InputKey       = BAND_BIN_UT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Ut
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = HourAngle
+  Auto
+  InputKey       = HOUR_ANGLE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = HourAngle
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = RightAscension
+  Auto
+  InputKey       = RIGHT_ASCENSION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = RightAscension
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Declination
+  Auto
+  InputKey       = DECLINATION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Declination
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Epoch
+  Auto
+  InputKey       = EPOCH
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Epoch
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ZenithDistance
+  Auto
+  InputKey       = ZENITH_DISTANCE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ZenithDistance
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Azimuth
+  Auto
+  InputKey       = AZIMUTH
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Azimuth
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SiderealTime
+  Auto
+  InputKey       = SIDEREAL_TIME
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SiderealTime
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = JulianDate
+  Auto
+  InputKey       = JULIAN_DATE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = JulianDate
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = HourAngleRate
+  Auto
+  InputKey       = HOUR_ANGLE_RATE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = HourAngleRate
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = DeclinationRate
+  Auto
+  InputKey       = DECLINATION_RATE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = DeclinationRate
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = LunarPhase
+  Auto
+  InputKey       = LUNAR_PHASE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = LunarPhase
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = LunarSemiDiameter
+  Auto
+  InputKey       = LUNAR_SEMI_DIAMETER
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = LunarSemiDiameter
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = LunarBrightLimb
+  Auto
+  InputKey       = LUNAR_BRIGHT_LIMB
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = LunarBrightLimb
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = LunarPositionAxis
+  Auto
+  InputKey       = LUNAR_POSITION_AXIS
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = LunarPositionAxis
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SubEarthLatitude
+  Auto
+  InputKey       = SUB_EARTH_LATITUDE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SubEarthLatitude
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SubEarthLongitude
+  Auto
+  InputKey       = SUB_EARTH_LONGITUDE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SubEarthLongitude
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SubSolarLatitude
+  Auto
+  InputKey       = SUB_SOLAR_LATITUDE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SubSolarLatitude
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SubSolarLongitude
+  Auto
+  InputKey       = SUB_SOLAR_LONGITUDE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SubSolarLongitude
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = PlanetDeclination
+  Auto
+  InputKey       = PLANET_DECLINATION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = PlanetDeclination
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = PlanetRightAscension
+  Auto
+  InputKey       = PLANET_RIGHT_ASCENSION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = PlanetRightAscension
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = PlanetRotation
+  Auto
+  InputKey       = PLANET_ROTATION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = PlanetRotation
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScTargetPositionX
+  Auto
+  InputKey       = SC_TARGET_POSITION_X
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScTargetPositionX
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScTargetPositionY
+  Auto
+  InputKey       = SC_TARGET_POSITION_Y
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScTargetPositionY
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScTargetPositionZ
+  Auto
+  InputKey       = SC_TARGET_POSITION_Z
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScTargetPositionZ
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScSunPositionX
+  Auto
+  InputKey       = SC_SUN_POSITION_X
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScSunPositionX
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScSunPositionY
+  Auto
+  InputKey       = SC_SUN_POSITION_Y
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScSunPositionY
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = ScSunPositionZ
+  Auto
+  InputKey       = SC_SUN_POSITION_Z
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = ScSunPositionZ
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = MoonSum
+  Auto
+  InputKey       = MOONSUM
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = MoonSum
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = MoonErr
+  Auto
+  InputKey       = MOONERR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = MoonErr
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SkyVal
+  Auto
+  InputKey       = SKYVAL
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SkyVal
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = SkyErr
+  Auto
+  InputKey       = SKYERR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = SkyErr
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Ef2Sp1
+  Auto
+  InputKey       = EF2_SP1
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Ef2Sp1
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Ef2Sp2
+  Auto
+  InputKey       = EF2_SP2
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Ef2Sp2
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Ef2Sp3
+  Auto
+  InputKey       = EF2_SP3
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Ef2Sp3
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Quality
+  Auto
+  InputKey       = QUALITY
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Quality
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterLine
+  Auto
+  InputKey       = BAND_BIN_CENTER_LINE
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CenterLine
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterSamp
+  Auto
+  InputKey       = BAND_BIN_CENTER_SAMP
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CenterSamp
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Radius
+  Auto
+  InputKey       = BAND_BIN_RADIUS
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Radius
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterLineError
+  Auto
+  InputKey       = BAND_BIN_CENTER_LINE_ERROR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CenterLineError
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterSampError
+  Auto
+  InputKey       = BAND_BIN_CENTER_SAMP_ERROR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CenterSampError
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = RadiusError
+  Auto
+  InputKey       = BAND_BIN_RADIUS_ERROR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = RadiusError
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = CalibrationFactor
+  Auto
+  InputKey       = BAND_BIN_CALIBRATION_FACTOR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = CalibrationFactor
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = UcalibrationFactor
+  Auto
+  InputKey       = BAND_BIN_U_CALIBRATION_FACTOR
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = UcalibrationFactor
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Extinction
+  Auto
+  InputKey       = BAND_BIN_EXTINCTION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Extinction
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Uextinction
+  Auto
+  InputKey       = BAND_BIN_U_EXTINCTION
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Uextinction
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

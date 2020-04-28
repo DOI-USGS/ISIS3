@@ -1,0 +1,24 @@
+#  All Mvic frames have the boresight in the -X directions, while Isis assumes boresight is either
+#  in +/- Z direction.  A new frame was created for each Mvic ccd's to do a final rotation into the
+#  Isis assumed boresight.  This is a 90 degree rotation around the Y-axis.  New Naif Id's were
+#  created by simply adding 700 to the Mission Naif ID.
+#
+#  This was done as an extra frame rather than in the FocalPlaneMap code because of ckwriter and
+#  spkwriter.
+
+Group = NaifCode
+  Auto
+  InputKey       = SPCINSID
+  InputPosition  = FITSLABELS
+  OutputName     = NaifFrameCode
+  OutputPosition = (Object, IsisCube, Group, Kernels)
+  Translation    = (-98903, -98203)
+  Translation    = (-98904, -98204)
+  Translation    = (-98905, -98205)
+  Translation    = (-98906, -98206)
+  Translation    = (-98907, -98207)
+  Translation    = (-98908, -98208)
+  Translation    = (-98909, -98209)
+End_Group
+
+End

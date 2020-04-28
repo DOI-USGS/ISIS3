@@ -1,0 +1,106 @@
+#Begin
+Group = ProjectionName
+  Auto
+  InputDefault   = LunarAzimuthalEqualArea
+  OutputName     = ProjectionName
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputDefault   = Moon
+  OutputName     = TargetName
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = MaximumLibration
+  Auto
+  InputDefault   = 11
+  OutputName     = MaximumLibration
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = EquatorialRadius
+  Auto
+  InputDefault   = 1737400.0000 <meters>
+  OutputName     = EquatorialRadius
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = PolarRadius
+  Auto
+  InputDefault   = 1737400.0000 <meters>
+  OutputName     = PolarRadius
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+#  Group = LongitudeDirection
+#    Auto
+#    OutputPosition = ("Group","Mapping")
+#    OutputName = LongitudeDirection
+#    InputGroup = "QUBE,IMAGE_MAP_PROJECTION"
+#    InputKey = POSITIVE_LONGITUDE_DIRECTION
+#    Translation = (PositiveEast,EAST)
+#    Translation = (PositiveWest,WEST)
+#  EndGroup
+Group = Scale
+  Auto
+  InputDefault   = 5.02654
+  OutputName     = Scale
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftCornerX
+  Auto
+  InputDefault   = -1737402.8501027 <meters>
+  OutputName     = UpperLeftCornerX
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftCornerY
+  Auto
+  InputDefault   = 1737402.8501027 <meters>
+  OutputName     = UpperLeftCornerY
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = LatitudeType
+  Auto
+  InputDefault   = Planetocentric
+  OutputName     = LatitudeType
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = LongitudeDomain
+  Auto
+  InputDefault   = 180
+  OutputName     = LongitudeDomain
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = LogitudeDirection
+  Auto
+  InputDefault   = PositiveEast
+  OutputName     = LongitudeDirection
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = PixelResolution
+  Auto
+  InputDefault   = 6032.6487850787 <meters>
+  OutputName     = PixelResolution
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+End

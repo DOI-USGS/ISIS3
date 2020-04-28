@@ -113,7 +113,7 @@
               appropriate field in the GUI, clearing the field to blank 
               and wrapping back to the top after the last table is hit.  
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
       </parameter>

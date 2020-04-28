@@ -11,11 +11,10 @@
 
 #include <nlohmann/json.hpp>
 
-#include "IException.h"
-#include "PvlGroup.h"
-
 #include "Cube.h"
+#include "IException.h"
 #include "Pvl.h"
+#include "PvlGroup.h"
 #include "PvlObject.h"
 #include "ControlNet.h"
 #include "FileList.h"

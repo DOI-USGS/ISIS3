@@ -1,0 +1,132 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DataSetName
+  Auto
+  InputKey       = DATA_SET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DataSetName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  InputKey       = PRODUCER_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerFullName
+  Auto
+  InputKey       = PRODUCER_FULL_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerFullName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerInstitutionName
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProducerInstitutionName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  InputKey       = PRODUCT_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductCreationTime
+  Auto
+  InputKey       = PRODUCT_CREATION_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ProductCreationTime
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ReleaseId
+  Auto
+  InputKey       = RELEASE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ReleaseId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SoftwareName
+  Auto
+  InputKey       = SOFTWARE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SoftwareName
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SoftwareVersionId
+  Auto
+  InputKey       = SOFTWARE_VERSION_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SoftwareVersionId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+End

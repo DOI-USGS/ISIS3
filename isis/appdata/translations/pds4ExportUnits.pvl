@@ -1,0 +1,163 @@
+# This translation file is for converting from commonly used ISIS units to
+# PDS4 units. It is not an ISIS translations table but rather a configuration
+# file that lists possible ISIS units for a cooresponding PDS4 unit.
+#
+# Objects in this file represent a type of unit, time, pixel resolution, etc.
+# Groups are then individual units, seconds, micrometers, meters per pixel.
+# Groups will contain the PDS4 standard unit and a list of possible ISIS units.
+#
+# Case for ISIS units does not matter. Both "m/pixel" and "m/Pixel" will match,
+# but case for PDS4 units does matter. Additionally, the PDS4 standard for the
+# unit is not expected to be duplicated in the list of ISIS units. Because of
+# this, the ISIS_Units keyword is not required. For example, if ISIS used Au
+# for astronomical units and PDS4 used AU for astronomical units, the
+# config group would be
+#
+# Group = Astronomical_Unit
+#   PDS4_Unit = "AU"
+# End_Group
+#
+# See the PDS4 Information Model Unit_Of_Measure class for more information
+# about how PDS4 formats different units.
+
+Object = Angle
+
+  Group = degree
+    PDS4_Unit = "deg"
+    ISIS_Units = ("degree", "degrees")
+  End_Group
+
+End_Object
+
+Object = Storage
+
+  Group = byte
+    PDS4_Unit = "byte"
+  End_Group
+
+End_Object
+
+
+Object = Length
+
+  Group = kilometer
+    PDS4_Unit = "km"
+    ISIS_Units = ("kilometer", "kilometers")
+  End_Group
+
+  Group = meter
+    PDS4_Unit = "m"
+    ISIS_Units = ("meter", "meters")
+  End_Group
+
+  Group = centimeter
+    PDS4_Unit = "cm"
+    ISIS_Units = ("centimeter", "centimeters")
+  End_Group
+
+  Group = millimeter
+    PDS4_Unit = "mm"
+    ISIS_Units = ("millimeter", "millimeters")
+  End_Group
+
+  Group = micrometer
+    PDS4_Unit = "micrometer"
+    ISIS_Units = "micrometers"
+  End_Group
+
+  Group = nanometer
+    PDS4_Unit = "nm"
+    ISIS_Units = ("nanometer", "nanometers")
+  End_Group
+
+End_Object
+
+
+Object = Velocity
+
+  Group = kilometer_per_second
+    PDS4_Unit = "km/s"
+    ISIS_Units = ("kilometer/second", "kilometers/second")
+  End_Group
+
+  Group = meter_per_second
+    PDS4_Unit = "m/s"
+    ISIS_Units = ("meter/second", "meters/second")
+  End_Group
+
+  Group = centimeter_per_second
+    PDS4_Unit = "cm/s"
+    ISIS_Units = ("centimeter/second", "centimeters/second")
+  End_Group
+
+End_Object
+
+
+Object = Time
+
+  Group = second
+    PDS4_Unit = "s"
+    ISIS_Units = ("second", "seconds")
+  End_Group
+
+  Group = millisecond
+    PDS4_Unit = "ms"
+    ISIS_Units = ("millisecond", "milliseconds")
+  End_Group
+
+  Group = microsecond
+    PDS4_Unit = "microsecond"
+    ISIS_Units = "microseconds"
+  End_Group
+
+End_Object
+
+
+Object = Pixel_Resolution
+
+  Group = km_per_pixel
+    PDS4_Unit = "km/pixel"
+    ISIS_Units = ("kilometers/pixel", "kilometer/pixel")
+  End_Group
+
+  Group = m_per_pixel
+    PDS4_Unit = "m/pixel"
+    ISIS_Units = ("meters/pixel", "meter/pixel")
+  End_Group
+
+  Group = millimeter_per_pixel
+    PDS4_Unit = "mm/pixel"
+    ISIS_Units = ("millimeters/pixel", "millimeter/pixel")
+  End_Group
+
+  Group = degree_per_pixel
+    PDS4_Unit = "deg/pixel"
+    ISIS_Units = ("degree/pixel", "degrees/pixel")
+  End_Group
+
+End_Object
+
+
+Object = Pixel_Scale
+
+  Group = pixel_per_kilometer
+    PDS4_Unit = "pixel/km"
+    ISIS_Units = ("pixel/kilometer", "pixels/kilometer")
+  End_Group
+
+  Group = pixel_per_meter
+    PDS4_Unit = "pixel/m"
+    ISIS_Units = ("pixel/meter", "pixels/meter")
+  End_Group
+
+  Group = pixel_per_millimeter
+    PDS4_Unit = "pixel/mm"
+    ISIS_Units = ("pixel/millimeter", "pixels/millimeter")
+  End_Group
+
+  Group = pixel_per_degree
+    PDS4_Unit = "pixel/deg"
+    ISIS_Units = ("pixel/degree", "pixels/degree")
+  End_Group
+
+End_Object

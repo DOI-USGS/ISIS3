@@ -1,0 +1,355 @@
+# Translation file for converting Isis cube projection labels 
+# to PDS IMAGE_MAP_PROJECTION labels 
+
+Group = MISSION_NAME
+  Auto
+  OutputName = MISSION_NAME
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = MISSION_NAME 
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_HOST_NAME
+  Auto
+  OutputName = INSTRUMENT_HOST_NAME
+  OutputPosition = ("ROOT")
+  InputKey = INSTRUMENT_HOST_NAME
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_HOST_ID
+  Auto
+  OutputName = INSTRUMENT_HOST_ID
+  OutputPosition = ("ROOT")
+  InputKey = INSTRUMENT_HOST_ID
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_NAME
+  Auto
+  OutputName = INSTRUMENT_NAME
+  OutputPosition = ("ROOT")
+  InputKey = INSTRUMENT_NAME
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_ID
+  Auto
+  OutputName = INSTRUMENT_ID
+  OutputPosition = ("ROOT")
+  InputKey = INSTRUMENT_ID
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = START_TIME
+  Auto
+  OutputName = START_TIME
+  OutputPosition = ("ROOT")
+  InputKey = START_TIME
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = STOP_TIME
+  Auto
+  OutputName = STOP_TIME
+  OutputPosition = ("ROOT")
+  InputKey = STOP_TIME
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SPACECRAFT_CLOCK_START_COUNT
+  Auto
+  OutputName = SPACECRAFT_CLOCK_START_COUNT
+  OutputPosition = ("ROOT")
+  InputKey = SPACECRAFT_CLOCK_START_COUNT
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = SPACECRAFT_CLOCK_STOP_COUNT
+  Auto
+  OutputName = SPACECRAFT_CLOCK_STOP_COUNT
+  OutputPosition = ("ROOT")
+  InputKey = SPACECRAFT_CLOCK_STOP_COUNT
+  InputPosition = OriginalLabelObject
+  Translation = (*,*)
+EndGroup
+
+Group = LINE_EXPOSURE_DURATION
+  Auto
+  OutputName = LINE_EXPOSURE_DURATION
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = LINE_EXPOSURE_DURATION
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = SCALED_PIXEL_HEIGHT
+  Auto 
+  OutputName = SCALED_PIXEL_HEIGHT
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = SCALED_PIXEL_HEIGHT
+  InputPosition =  (OriginalLabelObject,IMAGE) 
+  Translation = (*,*)
+EndGroup
+
+Group = SCALED_PIXEL_WIDTH
+  Auto
+  OutputName = SCALED_PIXEL_WIDTH
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = SCALED_PIXEL_WIDTH
+  InputPosition =  (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = MINIMUM
+  Auto
+  OutputName = MINIMUM
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = MINIMUM
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = MAXIMUM
+  Auto
+  OutputName = MAXIMUM
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = MAXIMUM
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = MEAN
+  Auto
+  OutputName = MEAN
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = MEAN
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = STANDARD_DEVIATION
+  Auto
+  OutputName = STANDARD_DEVIATION
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = STANDARD_DEVIATION
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = BAND_NAME
+  Auto
+  OutputName = BAND_NAME
+  OutputPosition = ("OBJECT", "IMAGE")
+  InputKey = BAND_NAME
+  InputPosition = (OriginalLabelObject,IMAGE)
+  Translation = (*,*)
+EndGroup
+
+Group = LABEL_REVISION_NOTE
+  Auto
+  OutputName = LABEL_REVISION_NOTE
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = LABEL_REVISION_NOTE
+  Translation = (*,*)
+EndGroup
+
+Group = DATA_SET_ID
+  Auto
+  OutputName = DATA_SET_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = DATA_SET_ID
+  Translation = (*,*)
+EndGroup
+
+Group = DATA_SET_NAME
+  Auto
+  OutputName = DATA_SET_NAME
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = DATA_SET_NAME
+  Translation = (*,*)
+EndGroup
+
+Group = PRODUCER_ID
+  Auto
+  OutputName = PRODUCER_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = PRODUCER_ID
+  Translation = (*,*)
+EndGroup
+
+Group = PRODUCER_FULL_NAME
+  Auto
+  OutputName = PRODUCER_FULL_NAME
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = PRODUCER_FULL_NAME
+  Translation = (*,*)
+EndGroup
+
+Group = PRODUCER_INSTITUTION_NAME
+  Auto
+  OutputName = PRODUCER_INSTITUTION_NAME
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = PRODUCER_INSTITUTION_NAME
+  Translation = (*,*)
+EndGroup
+
+Group = PRODUCT_ID
+  Auto
+  OutputName = PRODUCT_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = PRODUCT_ID
+  Translation = (*,*)
+EndGroup
+
+Group = PRODUCT_VERSION_ID
+  Auto
+  OutputName = PRODUCT_VERSION_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = PRODUCT_VERSION_ID
+  Translation = (*,*)
+EndGroup
+
+Group = RELEASE_ID
+  Auto
+  OutputName = RELEASE_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = RELEASE_ID
+  Translation = (*,*)
+EndGroup
+
+
+Group = ORBIT_NUMBER
+  Auto
+  OutputName = ORBIT_NUMBER
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = ORBIT_NUMBER
+  Translation = (*,*)
+EndGroup
+
+Group = INCIDENCE_ANGLE
+  Auto
+  OutputName = INCIDENCE_ANGLE
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = INCIDENCE_ANGLE
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_MODE_ID
+  Auto
+  OutputName = INSTRUMENT_MODE_ID
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = INSTRUMENT_MODE_ID
+  Translation = (*,*)
+EndGroup
+
+Group = INSTRUMENT_MODE_DESC
+  Auto
+  OutputName = INSTRUMENT_MODE_DESC
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = INSTRUMENT_MODE_DESC
+  Translation = (*,*)
+EndGroup
+
+Group = LOOK_DIRECTION
+  Auto
+  OutputName = LOOK_DIRECTION
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = LOOK_DIRECTION
+  Translation = (*,*)
+EndGroup
+
+Group = DESCRIPTION
+  Auto
+  OutputName = DESCRIPTION
+  OutputPosition = ("ROOT")
+  InputPosition = OriginalLabelObject
+  InputKey = DESCRIPTION
+  Translation = (*,*)
+EndGroup
+
+Group = NAME
+  Auto
+  OutputName = NAME
+  OutputPosition = ("Object","IMAGE")
+  InputPosition = (OriginalLabelObject,IMAGE)
+  InputKey = NAME
+  Translation = (*,*)
+EndGroup
+
+Group = DESCRIPTION_IMG
+  Auto
+  OutputName = DESCRIPTION
+  OutputPosition = ("Object","IMAGE")
+  InputPosition = (OriginalLabelObject,IMAGE)
+  InputKey = DESCRIPTION
+  Translation = (*,*)
+EndGroup
+
+Group = ^TEXT
+  Auto
+  OutputName = ^TEXT
+  OutputPosition = ("OBJECT","PARAMETER_FILE")
+  InputPosition = (OriginalLabelObject,PARAMETER_FILE)
+  InputKey = ^TEXT
+  Translation = (*,*)
+EndGroup
+
+Group = RECORD_TYPE
+  Auto
+  OutputName = RECORD_TYPE
+  OutputPosition = ("OBJECT","PARAMETER_FILE")
+  InputPosition = (OriginalLabelObject,PARAMETER_FILE)
+  InputKey = RECORD_TYPE
+  Translation = (*,*)
+EndGroup
+
+Group = FILE_RECORDS
+  Auto
+  OutputName = FILE_RECORDS
+  OutputPosition = ("OBJECT","PARAMETER_FILE")
+  InputPosition = (OriginalLabelObject,PARAMETER_FILE)
+  InputKey = FILE_RECORDS
+  Translation = (*,*)
+EndGroup
+
+Group = PUBLICATION_DATE
+  Auto
+  OutputName = PUBLICATION_DATE
+  OutputPosition = ("OBJECT","PARAMETER_FILE", "OBJECT", "TEXT")
+  InputPosition = (OriginalLabelObject,PARAMETER_FILE,TEXT)
+  InputKey = PUBLICATION_DATE
+  Translation = (*,*)
+EndGroup
+
+Group = NOTE
+  Auto
+  OutputName = NOTE
+  OutputPosition = ("OBJECT","PARAMETER_FILE", "OBJECT", "TEXT")
+  InputPosition = (OriginalLabelObject,PARAMETER_FILE,TEXT)
+  InputKey = NOTE
+  Translation = (*,*)
+EndGroup
+

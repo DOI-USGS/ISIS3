@@ -125,13 +125,13 @@
          </internalDefault>
           <description>
            This file contains the specifications for the "ideal" camera based on the original instrument.   If no value is entered, the default
-           specs file will be read from "$base/applications/noprojInstruments???.pvl", where ??? indicates the highest version of the file.
+           specs file will be read from "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl"
          </description>
          <filter>
            *.pvl
          </filter>
          <defaultPath>
-             $base/applications/
+             $ISISROOT/appdata/templates/noproj/
          </defaultPath>
        </parameter>
 
@@ -164,7 +164,7 @@
                     <function>LoadMatchSummingMode</function>
                     <brief>Load Output Summing Mode from Match file</brief>
                     <description>This helper button will load the default summing mode from the match camera </description>
-                    <icon>$ISIS3DATA/base/icons/exec.png</icon>
+		    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
                 </helper>
                 <helper name="H2">
                     <function>LoadInputSummingMode</function>

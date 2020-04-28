@@ -1,0 +1,45 @@
+Group = CenterLatitude
+  Auto
+  InputKey       = CENTER_LATITUDE
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault   = 0
+  OutputName     = CenterLatitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterLongitude
+  Auto
+  InputKey       = CENTER_LONGITUDE
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault   = 0
+  OutputName     = CenterLongitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = Distance
+  Auto
+  InputKey       = IMAGE_HEIGHT
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  InputDefault   = 0
+  OutputName     = Distance
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+End

@@ -4,7 +4,7 @@
    xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS3 cube format.
+    Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS cube format.
   </brief>
 
   <description>
@@ -177,7 +177,7 @@
     <example>
       <brief>Importing a NIMS cube</brief>
       <description>
-        This example shows how to import Galileo NIMS cubes into ISIS3.
+        This example shows how to import Galileo NIMS cubes into ISIS.
       </description>
       <terminalInterface>
         <commandLine>
@@ -211,7 +211,7 @@
             Output image of core data.
           </brief>
           <description>
-            Output image of core data after gllnims2isis has imported it to ISIS3.
+            Output image of core data after gllnims2isis has imported it to ISIS.
           </description>
           <thumbnail width="172" height="187" caption="Output core data cube."
           src="assets/thumbs/gllnims2isisCOREThumb.png" />
@@ -225,7 +225,7 @@
             Output image of suffix data.
           </brief>
           <description>
-            Output image of suffix (backplane) data after gllnims2isis has imported it to ISIS3.
+            Output image of suffix (backplane) data after gllnims2isis has imported it to ISIS.
           </description>
           <thumbnail width="172" height="186" caption="Output suffix data cube."
           src="assets/thumbs/gllnims2isisSUFFIXThumb.png" />

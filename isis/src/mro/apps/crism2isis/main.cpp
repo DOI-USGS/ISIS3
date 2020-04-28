@@ -17,7 +17,7 @@ void IsisMain() {
   FileName inFile = ui.GetFileName("FROM");
 
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
-  //65535 is set to NULL
+  // 65535 is set to NULL
   p.SetNull(65535, 65535);
 
   Cube *ocube = p.SetOutputCube("TO");
@@ -143,12 +143,12 @@ void IsisMain() {
   }
 
   // Translate the Instrument group
-  FileName transFile("$mro/translations/crismInstrument.trn");
+  FileName transFile("$ISISROOT/appdata/translations/MroCrismInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile  = "$mro/translations/crismArchive.trn";
+  transFile  = "$ISISROOT/appdata/translations/MroCrismArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 

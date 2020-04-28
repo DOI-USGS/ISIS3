@@ -476,11 +476,11 @@ void setProjectionInformation(Cube *inCube, Pvl &pdsLabel,
     setEquirectangularRadii(inCube, mappingObject);
     mappingObject["MAP_PROJECTION_TYPE"].setValue("\"EQUIRECTANGULAR\"");
     northAzimuth = 270;
-    pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMEqui.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsDTMEqui.pft");
   }
   else if (QString::compare(projectionType, "POLAR STEREOGRAPHIC", Qt::CaseInsensitive) == 0) {
     northAzimuth = polarStereoGraphicNorthAzimuth(mappingObject);
-    pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMPolar.pft");
+    pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsDTMPolar.pft");
   }
   else {
     QString msg = "The projection type [" +

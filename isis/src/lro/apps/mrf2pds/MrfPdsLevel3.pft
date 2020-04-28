@@ -1,0 +1,84 @@
+PDS_VERSION_ID      
+LABEL_REVISION_NOTE 
+
+/* File Identification and Structures. */
+RECORD_TYPE   
+RECORD_BYTES  
+FILE_RECORDS
+
+/* Pointer to data object. */
+^IMAGE
+
+/* Identification Data Elements. */
+DATA_SET_ID  
+DATA_SET_NAME    
+PRODUCER_ID 
+PRODUCER_FULL_NAME 
+PRODUCER_INSTITUTION_NAME 
+PRODUCT_ID    
+PRODUCT_VERSION_ID  
+PRODUCT_CREATION_TIME 
+RELEASE_ID 
+MISSION_NAME  
+TARGET_NAME
+SOURCE_PRODUCT_ID  
+START_TIME 
+STOP_TIME    
+SPACECRAFT_CLOCK_START_COUNT 
+SPACECRAFT_CLOCK_STOP_COUNT 
+ORBIT_NUMBER      
+SOFTWARE_NAME 
+SOFTWARE_VERSION_ID   
+DESCRIPTION  
+
+/* Data Object Description. */
+OBJECT                        =  IMAGE
+  NAME   
+  LINES                
+  LINE_SAMPLES      
+  SAMPLE_TYPE      
+  SAMPLE_BITS  
+  BANDS 
+  BAND_STORAGE_TYPE 
+  BAND_NAME  
+  DESCRIPTION  
+END_OBJECT                    =  IMAGE
+
+OBJECT = IMAGE_MAP_PROJECTION
+   ^DATA_SET_MAP_PROJECTION    
+   COORDINATE_SYSTEM_TYPE       
+   MAP_PROJECTION_TYPE           
+   A_AXIS_RADIUS                 
+   B_AXIS_RADIUS                 
+   C_AXIS_RADIUS                 
+   FIRST_STANDARD_PARALLEL       
+   SECOND_STANDARD_PARALLEL     
+   COORDINATE_SYSTEM_NAME        
+   POSITIVE_LONGITUDE_DIRECTION  
+   KEYWORD_LATITUDE_TYPE        
+/* NOTE:  CENTER_LATITUDE and CENTER_LONGITUDE describe   */
+/* the location of the center of projection, which is not */
+/* necessarily equal to the location of the center point  */
+/*   of the file.                                         */
+
+   CENTER_LATITUDE               
+   CENTER_LONGITUDE                          
+   LINE_FIRST_PIXEL              
+   LINE_LAST_PIXEL               
+   SAMPLE_FIRST_PIXEL            
+   SAMPLE_LAST_PIXEL             
+   MAP_PROJECTION_ROTATION       
+   MAP_RESOLUTION                
+   MAP_SCALE                     
+   MAXIMUM_LATITUDE              
+   MINIMUM_LATITUDE              
+   EASTERNMOST_LONGITUDE         
+   WESTERNMOST_LONGITUDE         
+   LINE_PROJECTION_OFFSET        
+   SAMPLE_PROJECTION_OFFSET      
+END_OBJECT = IMAGE_MAP_PROJECTION
+
+END
+
+
+

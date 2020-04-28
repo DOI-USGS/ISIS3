@@ -1,0 +1,19 @@
+# Translations for HRSC Stereo and SRC instrument.
+# ISIS cube label BandBin group
+
+Group = FilterWidth
+  Auto
+  InputKey       = BANDWIDTH
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterCenter
+  Auto
+  InputKey       = CENTER_FILTER_WAVELENGTH
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

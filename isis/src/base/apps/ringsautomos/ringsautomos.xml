@@ -827,7 +827,7 @@
             <description>
               This button will calculate the ring radius and ring longitude range using the files in the FROMLIST.
             </description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
         </helpers>
       </parameter>

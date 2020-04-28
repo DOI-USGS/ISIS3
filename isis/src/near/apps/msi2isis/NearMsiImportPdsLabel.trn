@@ -1,0 +1,113 @@
+############################# To Instrument Group #############################
+Group = SpacecraftName
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputPostion   = ROOT
+  OutputName     = SpacecraftName 
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("NEAR EARTH ASTEROID RENDEZVOUS", *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputPostion   = ROOT
+  OutputName     = InstrumentId 
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (MSI, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME 
+  InputPostion   = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  InputPosition  = ROOT
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+############################## To BandBin Group ##############################
+Group = FilterNumber
+  Auto
+  InputKey       = FILTER_NUMBER
+  InputPosition  = ROOT
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+# Get the center wavelength from the filter number. 
+# The filter number is also the value for "m" in the PRODUCT_ID pattern, 
+# MnnnnnnnnnnXm_pY.FIT 
+#
+#                     filter  wavelength
+#   broadband filter:   0        700 nm           
+#   spectral filters:   1        550 nm          
+#                       2        450 nm          
+#                       3        760 nm          
+#                       4        950 nm 
+#                       5        900 nm 
+#                       6       1000 nm
+#                       7       1050 nm
+Group = Center
+  Auto
+  InputKey       = FILTER_NUMBER
+  InputPosition  = ROOT
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (700, 0)
+  Translation    = (550, 1)
+  Translation    = (450, 2)
+  Translation    = (760, 3)
+  Translation    = (950, 4)
+  Translation    = (900, 5)
+  Translation    = (1000, 6)
+  Translation    = (1050, 7)
+End_Group
+End
+

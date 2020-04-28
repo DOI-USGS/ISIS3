@@ -12,8 +12,8 @@
     The input cube requires <def>SPICE</def> data and therefore <i>spiceinit</i> should be executed prior to
     running <i>cam2map</i>.  The <def link="Map Projection">map projection</def> is defined using a
     <def>PVL</def> file which is specified in <i>cam2map</i> in the MAP parameter.  Note: the system defaults
-    to the Sinusoidal projection (ISIS projection based templates are located in $ISIS3DATA/base/templates/maps).
-    To learn more about using map projections in ISIS, refer to the ISIS Workshop
+      to the Sinusoidal projection (ISIS projection based templates are located in $ISISROOT/appdata/templates/maps).
+    To learn more about using map projections in ISIS, refer to the ISIS Workshop 
     <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
@@ -323,8 +323,8 @@
         <brief>
           File containing mapping parameters
         </brief>
-        <defaultPath>$base/templates/maps</defaultPath>
-        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <defaultPath>$ISISROOT/appdata/templates/maps</defaultPath>
+        <default><item>$ISISROOT/appdata/templates/maps/sinusoidal.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL format. This
           file can be a simple label file, or can be hand produced, or created via
@@ -340,7 +340,7 @@
               This helper button will cat out the mapping group of the given mapfile to the session log
                of the application
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>
@@ -397,7 +397,7 @@
             <function>LoadCameraRes</function>
             <brief>Load Camera Resolution </brief>
             <description>This helper button will load the default resolution from the camera</description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadMapRes</function>
@@ -476,7 +476,7 @@
             <function>LoadCameraRange</function>
             <brief>Load Camera Ground Range </brief>
             <description>This helper button will load the default ground range from the camera</description>
-            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadMapRange</function>

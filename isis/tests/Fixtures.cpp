@@ -1,4 +1,6 @@
 #include "Fixtures.h"
+#include "LineManager.h"
+
 
 namespace Isis {
 
@@ -20,6 +22,14 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) 1;
+      }
+      testCube->write(line);
+    }
 
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");

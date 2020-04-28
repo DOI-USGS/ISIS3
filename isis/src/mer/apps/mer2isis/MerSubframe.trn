@@ -1,0 +1,44 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = FIRST_LINE
+  Auto
+  InputKey       = FIRST_LINE
+  InputGroup     = SUBFRAME_REQUEST_PARMS
+  InputPosition  = SUBFRAME_REQUEST_PARMS
+  InputDefault   = NULL
+  OutputName     = FirstLine
+  OutputPosition = (Object, IsisCube, Group, MerSubframeRequestParms)
+  Translation    = (*, *)
+End_Group
+
+Group = FIRST_LINE_SAMPLE
+  Auto
+  InputKey       = FIRST_LINE_SAMPLE
+  InputGroup     = SUBFRAME_REQUEST_PARMS
+  InputPosition  = SUBFRAME_REQUEST_PARMS
+  InputDefault   = NULL
+  OutputName     = FirstLineSamples
+  OutputPosition = (Object, IsisCube, Group, MerSubframeRequestParms)
+  Translation    = (*, *)
+End_Group
+End
