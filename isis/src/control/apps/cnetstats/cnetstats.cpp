@@ -65,7 +65,7 @@ namespace Isis{
         }
 
         // Verify DefFile comparing with the Template
-        Pvl pvlTemplate("$ISIS3DATA/base/templates/cnetstats/cnetstats.def");
+        Pvl pvlTemplate("$ISISROOT/appdata/templates/cnetstats/cnetstats.def");
         Pvl pvlResults;
         pvlTemplate.validatePvl(pvlDefFile, pvlResults);
         if(pvlResults.objects() != 0 || pvlResults.groups() != 0 || pvlResults.keywords() != 0){

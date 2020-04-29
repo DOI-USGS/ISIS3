@@ -1,0 +1,72 @@
+##################################################
+##  This file was converted from ISIS2          ##
+##  Date of last revision:  2012 Oct 04         ##  
+##################################################
+##  File: ~/$ISISDATA/photom.sav                ##
+##  Description: This file is the general file  ##
+##    looking up default photometric correction ##
+##    parameters for the photometric correction ##
+##    program.                                  ##
+##  Author: K. Teal Thompson                    ##
+##  Date of Last Revision:  14 Oct 98           ##
+##################################################
+
+Object = PhotometricModel
+  Group = Algorithm
+    PhtName = LunarLambert
+    L = 1.0
+  EndGroup
+
+  Group = Algorithm
+    PhtName = Minnaert
+    K = 1.0
+  EndGroup
+
+  Group = Algorithm
+    PhtName = HapkeHen
+    Wh = 0.8
+    Hh = 0.0
+    B0 = 0.0
+    Theta = 0.0
+    Hg1 = 0.0
+    Hg2 = 0.0
+  EndGroup
+  
+  Group = Algorithm
+    PhtName = HapkeLeg
+    Wh = 0.8
+    Hh = 0.0
+    B0 = 0.0
+    Theta = 0.0
+    Bh = 1.0
+    Ch = 1.0
+  EndGroup
+EndObject
+
+##########################################################
+#  The setup below may not be the correct set up to these 
+#  ISIS2 settings
+# 
+#  LAMBERT_ISOTROPIC_ATMOSPHERE
+#    ssalbedo =0.8
+#    optdepth =0.3
+#    shellratio =0.003
+#
+##########################################################
+
+Object = PhotometricModel
+  Group = Algorithm
+    PhtName = Lambert
+  EndGroup
+EndObject
+
+Object = AtmosphericModel  
+  Group = Algorithm
+    Atmname = Isotropic1
+    Hnorm = 0.003
+    Tau = 0.3
+    Tauref = 0.0
+    Wha = 0.8
+  EndGroup
+EndObject
+End

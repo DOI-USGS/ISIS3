@@ -1,0 +1,77 @@
+# ISIS3 to PDS4 export of ISIS3 cube information to Array_3D_Spectrum 
+# for uniformly sampled spectral arrays.
+#
+# Based on requirements and options specified in
+# https://pds.nasa.gov/datastandards/schema/released/sp/v1/PDS4_SP_1100.xsd
+# and https://pds.nasa.gov/datastandards/schema/released/sp/v1/PDS4_SP_1100.sch
+#
+# Spectral_Characteristics:Local_Internal_Reference:local_identifier_reference
+#     = Array_3D_Spectrum:local_identifier
+#     = Spectral_Array_Object
+#
+# history 2018-05-09 Jeannie Backer - Original version.
+
+Group = ImageLocalId
+  Auto
+  InputDefault      = Spectral_Array_Object
+  OutputName        = local_identifier
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_3D_Spectrum)
+  Translation       = (*, *)
+End_Group
+
+Group = OffsetBytes
+  Auto
+  InputDefault      = 0
+  OutputName        = offset
+  OutputAttributes  = unit|byte
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_3D_Spectrum)
+  Translation       = (*, *)
+End_Group
+
+Group = AxesCount
+  Auto
+  InputDefault      = 3
+  OutputName        = axes
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_3D_Spectrum)
+  Translation       = (*, *)
+End_Group
+
+Group = AxisIndexOrder
+  Auto
+  InputDefault      = "Last Index Fastest"
+  OutputName        = axis_index_order
+  OutputPosition    = (Product_Observational, File_Area_Observational, Array_3D_Spectrum)
+  Translation       = (*, *)
+End_Group
+
+Group = Bands
+  Auto
+  InputKey        = Bands
+  InputPosition   = (IsisCube, Core, Dimensions)
+  OutputName      = elements
+  OutputSiblings  = (axis_name|Band, sequence_number|1)
+  OutputPosition  = (Product_Observational, File_Area_Observational, Array_3D_Spectrum, new@Axis_Array)
+  Translation     = (*, *)
+End_Group
+
+Group = Lines
+  Auto
+  InputKey        = Lines
+  InputPosition   = (IsisCube, Core, Dimensions)
+  OutputName      = elements
+  OutputSiblings  = (axis_name|Line, sequence_number|2)
+  OutputPosition  = (Product_Observational, File_Area_Observational, Array_3D_Spectrum, new@Axis_Array)
+  Translation     = (*, *)
+End_Group
+
+Group = Samples
+  Auto
+  InputKey        = Samples
+  InputPosition   = (IsisCube, Core, Dimensions)
+  OutputName      = elements
+  OutputSiblings  = (axis_name|Sample, sequence_number|3)
+  OutputPosition  = (Product_Observational, File_Area_Observational, Array_3D_Spectrum, new@Axis_Array)
+  Translation     = (*, *)
+End_Group
+
+

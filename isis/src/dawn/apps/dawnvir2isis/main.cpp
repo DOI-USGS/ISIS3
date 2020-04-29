@@ -84,24 +84,23 @@ void IsisMain ()
   p.StartProcess ();
 
   // Get the directory where the DAWN translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Dawn"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 
   // Translate the BandBin group
-  FileName transFile (transDir + "dawnvirBandBin.trn");
+  FileName transFile (transDir + "DawnVirBandBin.trn");
   PvlToPvlTranslationManager bandBinXlater (labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile = transDir + "dawnvirArchive.trn";
+  transFile = transDir + "DawnVirArchive.trn";
   PvlToPvlTranslationManager archiveXlater (labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
-  transFile = transDir + "dawnvirInstrument.trn";
+  transFile = transDir + "DawnVirInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater (labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 

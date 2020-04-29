@@ -1,0 +1,18 @@
+# Translation for Hayabusa 1 export from ISIS3 cube to PDS4 product.
+#
+# Note these translations must be are ordered based on the required PDS4 order.
+#
+# history 2018-05-09 Jeannie Backer - Original version.
+
+Group = ExposureDuration
+  Auto
+  Optional
+  InputKey        = TotalIntegrationTime 
+  InputPosition   = (IsisCube, Instrument)
+  OutputName      = img:exposure_duration
+  OutputAttributes = unit|s
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
+  Translation     = (*, *)
+End_Group
+
+

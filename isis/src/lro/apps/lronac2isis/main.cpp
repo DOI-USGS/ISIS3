@@ -185,22 +185,20 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
   //Pvl to store the labels
   Pvl outLabel;
   //Set up the directory where the translations are
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Lro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
-  FileName transFile(transDir + "lronacInstrument.trn");
+  FileName transFile("$ISISROOT/appdata/translations/LroNacInstrument.trn");
   PvlToPvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive group
-  transFile = transDir + "lronacArchive.trn";
+  transFile = "$ISISROOT/appdata/translations/LroNacArchive.trn";
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   //Translate the BandBin group
-  transFile = transDir + "lronacBandBin.trn";
+  transFile = "$ISISROOT/appdata/translations/LroNacBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 

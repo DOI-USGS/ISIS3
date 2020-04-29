@@ -1,0 +1,39 @@
+Group = PolygonSeederAlgorithm
+
+  # Seeds the polygon with Control Points by creating a grid, the centermost
+  # grid is placed in the center of the polygon. Then, 2 points within each
+  # grid is checked for overlap. One of these points lies 1/6th of the grid
+  # dimension up and left from the grid's center point, while the other checked
+  # point lies 1/6th of the grid dimension down and right from the grid's center
+  # point. If these new points contain overlap, then they are seeded with a
+  # Control Point.The following XSpacing/YSpacing parameters denote the dimensions
+  # of the grid.
+  # Strip is best used on polygons whos overlaps results in strips of data,
+  # such as polygons from line scan cameras.
+  Name             = Strip
+
+  # The minimum thickness required to seed the polygon with Control Points. A
+  # thickness of 1.0 means that the polygon is a square. A thickness of 0.5
+  # means that the polygon is a 2:1 rectangle.  A thickness of 0.25 means that
+  # the polygon is a 4:1 rectangle, and so forth.
+  # Any polygon with a thickness less than MinimumThickness will not be seeded.
+  MinimumThickness = 0.3
+
+  # The minimum area (in square meters) required to seed the polygon with
+  # Control Points. Any polygon with an area less than MinimumArea will not be
+  # seeded.
+  MinimumArea      = 10
+
+  # The spacing in meters between Control Points in the X direction. One
+  # Control Point will be placed every XSpacing meters in the X direction.
+  # This combined with the YSpacing, will create a grid of Control Points
+  # across the polygon.
+  XSpacing         = 1500
+
+  # The spacing in meters between Control Points in the Y direction. One
+  # Control Point will be placed every YSpacing meters in the Y direction.
+  # This combined with the XSpacing, will create a grid of Control Points
+  # across the polygon.
+  YSpacing         = 1500
+
+End_Group

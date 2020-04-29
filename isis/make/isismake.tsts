@@ -14,7 +14,7 @@ PVLFILES =  pvl
 DIR := `pwd`
 STR :=$(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, \"/isis/\" ); print substr( str, pos, length( str ) - pos + 1 ) }'
 ISIS_PATH := $(shell $(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, "/isis/src" ); print substr( str, pos, length( str ) - pos + 1 ) }' )
-TESTDATA_PATH := $(ISIS3TESTDATA)$(ISIS_PATH)
+TESTDATA_PATH := $(ISISTESTDATA)$(ISIS_PATH)
 
 ifneq ("$(shell echo $(ISIS_PATH) | cut -d '/' -f2,3,5,7)", "isis/src/apps/tsts")
   ifneq ("$(shell echo $(ISIS_PATH) | cut -d '/' -f2,3,5)", "isis/src/tsts")
@@ -666,7 +666,7 @@ modBin: FORCE
 # Dependencies = copyInTruth
 #
 # Copies data from the test into the test data area.
-# ISIS3TESTDATA needs to be set to know where to copy
+# ISISTESTDATA needs to be set to know where to copy
 # data for this test to.  Data in the input and all of the truth
 # directories are copied to the test data area.
 #
@@ -681,7 +681,7 @@ modBin: FORCE
 # Modified to properly sync the input folder because it is not required
 #----------------------------------------------------------------------------
 checkin: FORCE
-	if [ "$(ISIS3TESTDATA)" != "" ]; \
+	if [ "$(ISISTESTDATA)" != "" ]; \
 	then \
 	  if [ -d "$(TRUTH)" ]; \
 	  then \
@@ -715,7 +715,7 @@ checkin: FORCE
 	    echo "Truth directory not found"; \
 	  fi; \
 	else \
-	  echo "ISIS3TESTDATA not set"; \
+	  echo "ISISTESTDATA not set"; \
 	fi
 
 #----------------------------------------------------------------------------
@@ -745,7 +745,7 @@ copyInTruth: FORCE
 # Dependencies = dirs copyOutTruth
 #
 # Copies data from the test data area into the test.
-# ISIS3TESTDATA needs to be set to know where to get the
+# ISISTESTDATA needs to be set to know where to get the
 # test data from.  Uses the TESTDATA_PATH to get the data
 # for this test.  Copies the files from the input directory in the
 # TESTDATA_PATH to the input directory of the test.  Then
@@ -754,9 +754,9 @@ copyInTruth: FORCE
 # is printed and no copying takes place.
 #----------------------------------------------------------------------------
 checkout: FORCE
-	if [ "$(ISIS3TESTDATA)" = "" ]; \
+	if [ "$(ISISTESTDATA)" = "" ]; \
 	then \
-	  echo "ISIS3TESTDATA not set"; \
+	  echo "ISISTESTDATA not set"; \
 	elif [  -d "$(LOCAL_INPUT)" ]; \
 	then \
 	  echo "Input directory already exists, nothing copied"; \
@@ -806,7 +806,7 @@ copyOutTruth: FORCE
 #                                                                            #
 # Deletes all extraneous files and folders inside the current directory.     #
 # If any of these files or folders do not exist or don't match the ones      #
-# in $ISIS3TESTDATA then the user is prompted before continuing.             #
+# in $ISISTESTDATA then the user is prompted before continuing.             #
 #----------------------------------------------------------------------------#
 release: FORCE clean
 	proceedWithRelease="true";                                                 \

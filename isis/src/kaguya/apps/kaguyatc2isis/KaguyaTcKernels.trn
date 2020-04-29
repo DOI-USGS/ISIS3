@@ -1,0 +1,28 @@
+# This translation file is used to produce the ISIS 3 Kernels label group
+# for the Kaguya Terrain camera.
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2018-10-04 Jeannie Backer - Original version.
+Group = NaifCkCode
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = NaifCkCode
+  OutputPosition = (Group, Kernels)
+  Translation    = (-131350, TC1)
+  Translation    = (-131370, TC2)
+End_Group
+Group = NaifFrameCode
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = NaifFrameCode
+  OutputPosition = (Group, Kernels)
+  Translation    = (-131351, TC1)
+  Translation    = (-131371, TC2)
+End_Group
+End

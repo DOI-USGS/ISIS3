@@ -1,0 +1,73 @@
+Group = FiducialCoordinateMicron
+  Auto
+  InputKey       = FIDUCIAL_COORD_MICRON
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = FiducialCoordinateMicron
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BoresightSample
+  Auto
+  InputKey       = BORESIGHT_SAMPLE
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = BoresightSample
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BoresightLine
+  Auto
+  InputKey       = BORESIGHT_LINE
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,ISIS_INSTRUMENT"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, ISIS_INSTRUMENT)
+  OutputName     = BoresightLine
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FilterName
+  Auto
+  InputKey       = BAND_BIN_UNIT
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (none, NONE)
+  Translation    = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  InputKey       = BAND_BIN_CENTER
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = OriginalBand
+  Auto
+  InputKey       = BAND_BIN_ORIGINAL_BAND
+  InputGroup     = ROOT
+  InputGroup     = "QUBE,BAND_BIN"
+  InputPosition  = ROOT
+  InputPosition  = (QUBE, BAND_BIN)
+  OutputName     = OriginalBand
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

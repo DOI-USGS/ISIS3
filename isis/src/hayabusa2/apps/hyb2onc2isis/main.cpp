@@ -26,8 +26,7 @@ void IsisMain () {
   Cube *outputCube = importFits.SetOutputCube("TO");
 
   // Get the directory where the Hayabusa translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Hayabusa2"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outputLabel;
@@ -39,7 +38,7 @@ void IsisMain () {
     fitsLabel.addGroup(importFits.extraFitsLabel(0));
   }
   catch (IException &e) {
-    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() + 
+    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
                   "] does not appear to be a Hayabusa2/ONC label file.";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
@@ -48,32 +47,32 @@ void IsisMain () {
   QString missid;
   try {
     instid = fitsLabel.findGroup("FitsLabels").findKeyword("INSTRUME")[0];
-    missid = fitsLabel.findGroup("FitsLabels").findKeyword ("SPCECRFT")[0]; 
+    missid = fitsLabel.findGroup("FitsLabels").findKeyword ("SPCECRFT")[0];
   }
   catch (IException &e) {
-    QString msg = "Unable to read instrument ID, [INSTRUME], or spacecraft ID, [SPCECRFT], " 
+    QString msg = "Unable to read instrument ID, [INSTRUME], or spacecraft ID, [SPCECRFT], "
                   "from input file [" + FileName(ui.GetFileName("FROM")).expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
   missid = missid.simplified().trimmed();
   if (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0) {
-    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() + 
+    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
                   "] does not appear to be a Hayabusa2 label file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   instid = instid.simplified().trimmed();
   if (QString::compare(instid, "Optical Navigation Camera", Qt::CaseInsensitive) != 0) {
-    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() + 
+    QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
                   "] does not appear to be a Hayabusa2/ONC label file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Translate the Instrument group
-  FileName transFile(transDir + "hyb2oncInstrument.trn");
+  FileName transFile(transDir + "Hayabusa2OncInstrument.trn");
   PvlToPvlTranslationManager instrumentXlater (fitsLabel, transFile.expanded());
   instrumentXlater.Auto(outputLabel);
-  
+
   //  Update target if user specifies it
   PvlGroup &instGrp = outputLabel.findGroup("Instrument",Pvl::Traverse);
   QString target;
@@ -84,7 +83,7 @@ void IsisMain () {
   outputCube->putGroup(instGrp);
 
   // Translate the BandBin group
-  transFile = transDir + "hyb2oncBandBin.trn";
+  transFile = transDir + "Hayabusa2OncBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater (fitsLabel, transFile.expanded());
   bandBinXlater.Auto(outputLabel);
   PvlGroup &bandGrp = outputLabel.findGroup("BandBin",Pvl::Traverse);
@@ -95,7 +94,7 @@ void IsisMain () {
   outputCube->putGroup(outputLabel.findGroup("BandBin",Pvl::Traverse));
 
   // Translate the Archive group
-  transFile = transDir + "hyb2oncArchive.trn";
+  transFile = transDir + "Hayabusa2OncArchive.trn";
   PvlToPvlTranslationManager archiveXlater (fitsLabel, transFile.expanded());
   archiveXlater.Auto(outputLabel);
   PvlGroup &archGrp = outputLabel.findGroup("Archive", Pvl::Traverse);
@@ -110,7 +109,7 @@ void IsisMain () {
 
 
   // Create a Kernels group
-  transFile = transDir + "hyb2oncKernels.trn";
+  transFile = transDir + "Hayabusa2OncKernels.trn";
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, transFile.expanded());
   kernelsXlater.Auto(outputLabel);
   outputCube->putGroup(outputLabel.findGroup("Kernels", Pvl::Traverse));
@@ -126,4 +125,3 @@ void IsisMain () {
   importFits.Finalize();
 
 }
-

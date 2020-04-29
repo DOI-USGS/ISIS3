@@ -20,7 +20,7 @@ commands:
 	# re-spiceinit to get appropriate kernels and sun position table
 	spiceinit from=$(OUTPUT)/st_2395699394_v.lev0.cub \
 	shape=user \
-	model=$(ISIS3DATA)/hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds \
+	model=$(ISISDATA)/hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds \
 	> /dev/null;
 
 	# save off labels from the first run 
