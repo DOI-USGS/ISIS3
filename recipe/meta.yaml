@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "4.1.0_RC2" %}
+{% set version = "4.1.0" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -46,7 +46,7 @@ requirements:
   build:
   - ale >=0.7.1
   - boost=1.68.0
-  - armadillo==8.200.0
+  - armadillo
   - blas
   - bullet=2.86.1=0
   - bz2file
@@ -78,8 +78,8 @@ requirements:
   - nanoflann
   - nlohmann_json
   - ninja==1.7.2
-  - nn
-  - opencv=3.2.0
+  - conda-forge/label/gcc7::nn
+  - opencv>=3.0.0,<=4.0.0
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
@@ -102,7 +102,7 @@ requirements:
   run:
   - ale >=0.7.1
   - boost=1.68.0
-  - armadillo==8.200.0
+  - armadillo
   - blas
   - bullet=2.86.1=0
   - bz2file
@@ -132,7 +132,7 @@ requirements:
   - nanoflann
   - nlohmann_json
   - conda-forge/label/gcc7::nn
-  - opencv=3.2.0
+  - opencv>=3.0.0,<=4.0.0
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
