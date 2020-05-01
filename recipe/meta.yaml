@@ -46,6 +46,7 @@ requirements:
   build:
   - armadillo==8.200.0
   - blas==1.1
+  - boost==1.67
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
@@ -77,7 +78,7 @@ requirements:
   - ninja==1.7.2
   - conda-forge/label/gcc7::nn
   - openblas==0.2.19
-  - opencv
+  - opencv==3.2.0
   - openssl==1.0.2n
   - pcl==1.8.1
   - pip==9.0.1
@@ -104,6 +105,7 @@ requirements:
   run:
   - armadillo==8.200.0
   - blas==1.1
+  - boost==1.67
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
@@ -132,7 +134,7 @@ requirements:
   - nanoflann==1.2.2
   - conda-forge/label/gcc7::nn
   - openblas==0.2.19
-  - opencv
+  - opencv==3.2.0
   - openssl==1.0.2n
   - pcl==1.8.1
   - pip==9.0.1
