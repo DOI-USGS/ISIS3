@@ -225,7 +225,7 @@ namespace Isis {
   QList<QPointF> PixelFOV::envelope(QList<QPointF> vertices) const{
 
     //Put the vertices in a line string
-    QScopedPointer<geos::geom::CoordinateSequence> points(new geos::geom::CoordinateArraySequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> points(new geos::geom::CoordinateArraySequence());
 
     for (int i = 0; i < vertices.size(); i++) {
       points->add(geos::geom::Coordinate(vertices[i].x(), vertices[i].y()));
@@ -234,10 +234,10 @@ namespace Isis {
                                                                            points.take()));
 
     //Compute a convex hull for the line string
-    QScopedPointer<geos::geom::Geometry> boundingHull(pointString->convexHull());
+    QScopedPointer<geos::geom::Geometry> boundingHull(pointString->convexHull().release());
 
     //Get the points
-    geos::geom::CoordinateSequence *boundingPoints = boundingHull->getCoordinates();
+    geos::geom::CoordinateSequence *boundingPoints = boundingHull->getCoordinates().release();
 
     QList<QPointF> boundingVertices;
     for (unsigned int i = 0; i < boundingPoints->getSize(); i++) {
@@ -264,7 +264,7 @@ namespace Isis {
     QList< QList<QPointF> > splitPoints;
 
     // Create a polygon to split.
-    QScopedPointer<geos::geom::CoordinateSequence> pts(new geos::geom::CoordinateArraySequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> pts(new geos::geom::CoordinateArraySequence());
     for (int i = 0; i < vertices.size(); i++) {
       pts->add(geos::geom::Coordinate(vertices[i].y(), vertices[i].x()));
     }
@@ -286,7 +286,7 @@ namespace Isis {
       const geos::geom::Polygon *subPolygon = 
           dynamic_cast<const geos::geom::Polygon *>(splitPolygons->getGeometryN(i));
       geos::geom::CoordinateSequence *subCoordinates = subPolygon->
-                                                           getExteriorRing()->getCoordinates();
+                                                           getExteriorRing()->getCoordinates().release();
       for (unsigned int j = 0; j < subCoordinates->getSize(); j++) {
         subVertices.append(QPointF(subCoordinates->getAt(j).y,subCoordinates->getAt(j).x));
       }

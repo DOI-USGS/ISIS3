@@ -48,7 +48,7 @@ namespace Isis {
 
     if (crosses) {
       // Make a polygon from the lat/lon vectors and split it on 360
-      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
       for (unsigned int i = 0; i < lat.size(); i++) {
         pts->add(geos::geom::Coordinate(lon[i], lat[i]));
       }
@@ -75,7 +75,7 @@ namespace Isis {
           const geos::geom::Polygon *poly = 
               dynamic_cast<const geos::geom::Polygon *>(splitPoly->getGeometryN(g));
 
-          geos::geom::CoordinateSequence *llcoords = poly->getExteriorRing()->getCoordinates();
+          geos::geom::CoordinateSequence *llcoords = poly->getExteriorRing()->getCoordinates().release();
 
           // Move each coordinate in the exterior ring of this lat/lon polygon to vectors
           // Ignore any holes in the polygon

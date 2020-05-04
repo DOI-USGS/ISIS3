@@ -773,7 +773,7 @@ namespace Isis {
 
 
     // Checks for self-intersection and attempts to correct
-    geos::geom::CoordinateSequence *tempPts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *tempPts = new geos::geom::CoordinateArraySequence();
 
     // Gets the starting, second, second to last, and last points to check for validity
     tempPts->add(geos::geom::Coordinate((*p_pts)[0].x, (*p_pts)[0].y));
@@ -787,7 +787,11 @@ namespace Isis {
 
     // Remove the last point of the sequence if it produces invalid polygons
     if (!tempPoly->isValid()) {
-      p_pts->deleteAt(p_pts->size() - 2);
+      std::vector<geos::geom::Coordinate> coords;
+      p_pts->toVector(coords);
+      coords.erase(coords.begin() + p_pts->size() - 2);
+      p_pts->setPoints(coords);
+      //p_pts->deleteAt(p_pts->size() - 2);
     }
 
     delete tempPts;
@@ -960,7 +964,7 @@ namespace Isis {
     }
 
     // split image at the pole
-    geos::geom::CoordinateSequence *new_points = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *new_points = new geos::geom::CoordinateArraySequence();
     for (unsigned int i = 0; i < p_pts->size(); i++) {
       geos::geom::Coordinate temp = p_pts->getAt(i);
       new_points->add(temp);
@@ -1117,7 +1121,7 @@ namespace Isis {
     bool convertLon = false;
     bool negAdjust = false;
     bool newCoords = false;  //  coordinates have been adjusted
-    geos::geom::CoordinateSequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
     double lon, lat;
     double lonOffset = 0;
     double prevLon = p_pts->getAt(0).x;
@@ -1180,8 +1184,8 @@ namespace Isis {
       geos::geom::Polygon *newPoly = globalFactory->createPolygon
                                      (globalFactory->createLinearRing(newLonLatPts), NULL);
 
-      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
-      geos::geom::CoordinateSequence *pts2 = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *pts2 = new geos::geom::CoordinateArraySequence();
 
       // Depending on direction of compensation bound accordingly
       //***************************************************
@@ -1251,14 +1255,14 @@ namespace Isis {
       geos::geom::Geometry *newGeom = NULL;
 
       for (unsigned int i = 0; i < convertPoly->getNumGeometries(); i++) {
-        newGeom = (convertPoly->getGeometryN(i))->clone();
-        pts = convertPoly->getGeometryN(i)->getCoordinates();
-        geos::geom::CoordinateSequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
+        newGeom = (convertPoly->getGeometryN(i))->clone().release();
+        geos::geom::CoordinateSequence *pts3 = convertPoly->getGeometryN(i)->getCoordinates().release();
+        geos::geom::CoordinateArraySequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
         // fix the points
 
-        for (unsigned int k = 0; k < pts->getSize() ; k++) {
-          double lon = pts->getAt(k).x;
-          double lat = pts->getAt(k).y;
+        for (unsigned int k = 0; k < pts3->getSize() ; k++) {
+          double lon = pts3->getAt(k).x;
+          double lat = pts3->getAt(k).y;
           if (negAdjust) {
             lon = lon + 360;
           }
@@ -1271,15 +1275,16 @@ namespace Isis {
         // Add the points to polys
         finalpolys->push_back(globalFactory->createPolygon
                               (globalFactory->createLinearRing(newLonLatPts), NULL));
+        delete pts3;
       }
 
       // This loop is over polygons that will always be in 0-360 space no need to convert
       for (unsigned int i = 0; i < convertPoly2->getNumGeometries(); i++) {
-        newGeom = (convertPoly2->getGeometryN(i))->clone();
+        newGeom = (convertPoly2->getGeometryN(i))->clone().release();
         finalpolys->push_back(newGeom);
       }
 
-      p_polygons = globalFactory->createMultiPolygon(*finalpolys);
+      p_polygons = globalFactory->createMultiPolygon(finalpolys);
 
       delete finalpolys;
       delete newGeom;
@@ -1346,7 +1351,7 @@ namespace Isis {
     }
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
-    p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
+    p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr).release());
     delete wkt;
   }
 

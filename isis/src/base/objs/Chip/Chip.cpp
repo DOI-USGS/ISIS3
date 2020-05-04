@@ -83,7 +83,7 @@ namespace Isis {
 
     if (other.m_clipPolygon) {
       m_clipPolygon = PolygonTools::MakeMultiPolygon(
-          other.m_clipPolygon->clone());
+          other.m_clipPolygon->clone().release());
     }
     else {
       m_clipPolygon = NULL;
@@ -1066,7 +1066,7 @@ namespace Isis {
 
     if (other.m_clipPolygon) {
       m_clipPolygon = PolygonTools::MakeMultiPolygon(
-          other.m_clipPolygon->clone());
+          other.m_clipPolygon->clone().release());
     }
 
     m_affine = other.m_affine;

@@ -224,7 +224,7 @@ namespace Isis {
     }
 
     foreach (QString sn, cnetSerials) {
-      geos::geom::CoordinateSequence * ptCoordinates =
+      geos::geom::CoordinateArraySequence * ptCoordinates =
           new geos::geom::CoordinateArraySequence();
 
       // setup vector for number of image properties and init to 0
@@ -279,8 +279,8 @@ namespace Isis {
         // Even though geos doesn't create valid linear rings/polygons from this set of coordinates,
         //   because it self-intersects many many times, it still correctly does a convex hull
         //   calculation on the points in the polygon.
-        geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(ptCoordinates), 0)->convexHull();
+        geos::geom::Geometry *convexHull = geosFactory->createPolygon(
+          geosFactory->createLinearRing(ptCoordinates), 0)->convexHull().release();
 
         // Calculate the area of the convex hull
         imgStats[imgConvexHullArea] = convexHull->getArea();

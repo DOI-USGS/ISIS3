@@ -83,7 +83,7 @@ namespace Isis {
   void ProcessPolygons::FillPolygon(int Flag) {
 
     // Create a sample/line polygon for the input pixel vertices
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     for (unsigned int i = 0; i < m_sampleVertices.size(); i++) {
       pts->add(geos::geom::Coordinate(m_sampleVertices[i], m_lineVertices[i]));
     }
@@ -128,7 +128,7 @@ namespace Isis {
       if (!projectedInputPixelPoly->intersects(m_imagePoly)) return;
 
       geos::geom::MultiPolygon *intersectPoly = PolygonTools::MakeMultiPolygon(
-          m_imagePoly->intersection(projectedInputPixelPoly));
+          m_imagePoly->intersection(projectedInputPixelPoly).release());
       geos::geom::prep::PreparedPolygon *preparedPoly =
         new geos::geom::prep::PreparedPolygon(intersectPoly);
       const geos::geom::Envelope *envelope = intersectPoly->getEnvelopeInternal();
@@ -149,7 +149,7 @@ namespace Isis {
             delete p;
           }
           else {
-            geos::geom::CoordinateSequence *tpts = new geos::geom::CoordinateArraySequence();
+            geos::geom::CoordinateArraySequence *tpts = new geos::geom::CoordinateArraySequence();
             tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
             tpts->add(geos::geom::Coordinate(x + 0.5, y - 0.5));
             tpts->add(geos::geom::Coordinate(x + 0.5, y + 0.5));

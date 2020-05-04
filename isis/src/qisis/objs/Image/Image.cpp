@@ -723,7 +723,7 @@ namespace Isis {
         _FILEINFO_);
     e.print();
 
-    return PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone());
+    return PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone().release());
   }
 
 
@@ -817,7 +817,7 @@ namespace Isis {
   void Image::initQuickFootprint() {
     ImagePolygon poly;
     cube()->read(poly);
-    m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
+    m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone().release());
   }
 
 
@@ -965,8 +965,7 @@ namespace Isis {
                                      const QString &qName) {
     if (localName == "footprint" && !m_characters.isEmpty()) {
       geos::io::WKTReader wktReader(*globalFactory);
-      m_image->m_footprint = PolygonTools::MakeMultiPolygon(
-          wktReader.read(m_characters.toStdString()));
+      m_image->m_footprint = PolygonTools::MakeMultiPolygon(wktReader.read(m_characters.toStdString()).release());
     }
     else if (localName == "image" && !m_image->m_footprint) {
       QMutex mutex;

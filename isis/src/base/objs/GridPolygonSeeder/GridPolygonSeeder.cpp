@@ -100,7 +100,7 @@ namespace Isis {
 
     // Starting at the centroid of the xy polygon populate the polygon with a
     // grid of points with the requested spacing
-    geos::geom::Point *centroid = multiPoly->getCentroid();
+    geos::geom::Point *centroid = multiPoly->getCentroid().release();
     double centerX = centroid->getX();
     double centerY = centroid->getY();
     delete centroid;
@@ -152,7 +152,7 @@ namespace Isis {
       return points;
     }
 
-    geos::geom::Point *centroid = multiPoly->getCentroid();
+    geos::geom::Point *centroid = multiPoly->getCentroid().release();
     double centerX = centroid->getX();
     double centerY = centroid->getY();
     delete centroid;

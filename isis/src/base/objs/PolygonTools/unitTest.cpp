@@ -26,7 +26,7 @@ int main() {
     cout << "Unit test for PolygonTools" << endl << endl;
 
     // Create coordinate sequence for the first of two polygons
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     pts->add(geos::geom::Coordinate(0.0, 0.0));
     pts->add(geos::geom::Coordinate(0.0, 1.0));
     pts->add(geos::geom::Coordinate(1.0, 1.0));
@@ -40,7 +40,7 @@ int main() {
                       Isis::globalFactory->createLinearRing(pts), NULL));
 
     // Create coordinate sequence for the second of two polygons
-    geos::geom::CoordinateSequence *pts2 = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts2 = new geos::geom::CoordinateArraySequence();
     pts2->add(geos::geom::Coordinate(360.0, 1.0));
     pts2->add(geos::geom::Coordinate(359.0, 1.0));
     pts2->add(geos::geom::Coordinate(359.0, 0.0));
@@ -49,7 +49,7 @@ int main() {
     cout << "Coordinates of polygon 2:" << pts2->toString() << endl << endl;
 
     // Create coordinate sequence for the hole in the second polygon
-    geos::geom::CoordinateSequence *pts3 = new geos::geom::DefaultCoordinateSequence();
+    geos::geom::CoordinateArraySequence *pts3 = new geos::geom::DefaultCoordinateSequence();
     pts3->add(geos::geom::Coordinate(359.75, 0.75));
     pts3->add(geos::geom::Coordinate(359.25, 0.75));
     pts3->add(geos::geom::Coordinate(359.25, 0.25));
@@ -57,7 +57,7 @@ int main() {
     pts3->add(geos::geom::Coordinate(359.75, 0.75));
     cout << "Coordinates of hole for polygon 2:" << pts3->toString() << endl << endl;
 
-    vector<geos::geom::Geometry *> *hole2 = new vector<geos::geom::Geometry *>;
+    vector<geos::geom::LinearRing *> *hole2 = new vector<geos::geom::LinearRing *>;
     hole2->push_back(Isis::globalFactory->createLinearRing(pts3));
 
     // Create the second polygon
@@ -65,7 +65,7 @@ int main() {
                       Isis::globalFactory->createLinearRing(pts2), hole2));
 
     // Create a multipolygon from the two polygons
-    geos::geom::MultiPolygon *mPolygon = Isis::globalFactory->createMultiPolygon(polys);
+    geos::geom::MultiPolygon *mPolygon = Isis::globalFactory->createMultiPolygon(&polys);
 
     // Create a copy of the multipolygon
     geos::geom::MultiPolygon *tmpMp = PolygonTools::CopyMultiPolygon(mPolygon);
@@ -113,7 +113,7 @@ int main() {
     UniversalGroundMap ugm = UniversalGroundMap(cube);
 
     // Create coordinate sequence for the first of two polygons
-    geos::geom::CoordinateSequence *llpts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *llpts = new geos::geom::CoordinateArraySequence();
     ugm.SetImage(1.0, 1.0);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
@@ -141,7 +141,7 @@ int main() {
     llpolys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(llpts), NULL));
 
-    geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory->createMultiPolygon(llpolys);
+    geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory->createMultiPolygon(&llpolys);
 
     geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(*llmPolygon, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
@@ -149,7 +149,7 @@ int main() {
 
     cout << endl << "Testing LatLonToSampleLine() with coords outside of the valid range." << endl;
     // Create coordinate sequence for the first of two polygons
-    geos::geom::CoordinateSequence *llpts2 = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *llpts2 = new geos::geom::CoordinateArraySequence();
     llpts2->add(geos::geom::Coordinate(175, 0));
     llpts2->add(geos::geom::Coordinate(175.6, -28));
     llpts2->add(geos::geom::Coordinate(181.5, -30.6));
@@ -162,7 +162,7 @@ int main() {
     llpolys2.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(llpts2), NULL));
 
-    geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory->createMultiPolygon(llpolys2);
+    geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory->createMultiPolygon(&llpolys2);
 
     geos::geom::MultiPolygon *slmPolygon2 = PolygonTools::LatLonToSampleLine(*llmPolygon2, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
@@ -219,7 +219,7 @@ int main() {
     pts->add(geos::geom::Coordinate(1.0, 5.0));
     pts->add(geos::geom::Coordinate(1.0, 1.0));
     geos::geom::Polygon *poly1 = Isis::globalFactory->createPolygon(Isis::globalFactory->createLinearRing(*pts), NULL);
-    cout << "Same Poly Equal?                     " << PolygonTools::Equal(poly1, poly1) << " - " << poly1->equals(poly1) << endl;
+    cout << "Same Poly Equal? e                    " << PolygonTools::Equal(poly1, poly1) << " - " << poly1->equals(poly1) << endl;
     pts2 = new geos::geom::CoordinateArraySequence();
     pts2->add(geos::geom::Coordinate(5.0, 1.0));
     pts2->add(geos::geom::Coordinate(5.0, 5.0));

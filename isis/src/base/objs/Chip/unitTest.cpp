@@ -129,7 +129,7 @@ int main() {
   cout << "Test load chip from cube with rotation and clipping polygon " << endl;
   chip.TackCube(26.0, 25.0);
 
-  geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+  geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
   pts->add(geos::geom::Coordinate(23.0, 22.0));
   pts->add(geos::geom::Coordinate(28.0, 22.0));
   pts->add(geos::geom::Coordinate(28.0, 27.0));
@@ -138,7 +138,7 @@ int main() {
   vector<geos::geom::Geometry *> polys;
   geos::geom::GeometryFactory::Ptr gf = geos::geom::GeometryFactory::create();
   polys.push_back(gf->createPolygon(gf->createLinearRing(pts), NULL));
-  geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(polys);
+  geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(&polys);
 
   chip.SetClipPolygon(*mPolygon);
   chip.Load(junk, 45.0);
