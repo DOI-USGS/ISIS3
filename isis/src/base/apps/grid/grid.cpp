@@ -158,7 +158,7 @@ namespace Isis {
         }
       }
 
-      bool imageDrawLine(int line) const{
+      bool imageDrawLine(int line) const {
         bool drawLine = false;
 
         for (int y = line - m_lineWidth; y <= line + m_lineWidth; y ++) {
@@ -168,7 +168,7 @@ namespace Isis {
         return drawLine;
       }
 
-      bool imageDrawSample(int samp) const{
+      bool imageDrawSample(int samp) const {
         bool drawSamp = false;
 
         for (int x = samp - m_lineWidth; x <= samp + m_lineWidth; x ++) {
@@ -205,6 +205,9 @@ namespace Isis {
       UniversalGroundMap *m_gmap;
       GroundGrid *m_latLonGrid;
 
+      int tempValue = 0;
+      int *m_currentBand = &tempValue;
+
     public:
       GroundGridFunctor(int lineWidth, int tickSize, int numSamples, int numLines, double lineValue, 
                         double bkgndValue, bool outline, bool image, bool ticks, bool diagTicks, 
@@ -235,7 +238,6 @@ namespace Isis {
         m_lonInc = lonInc;
         m_gmap = gmap;
         m_latLonGrid = latLonGrid;
-      
       }
       
       /**
@@ -246,27 +248,26 @@ namespace Isis {
        * @param out Mosaic cube
        */
       void operator()(Buffer &in, Buffer &out) const {
-        int currentBand = 0;
-        // Since changeBand changes m_latLonGrid and this has to be a const method, save the value of
-        // m_latLonGrid in a new variable that can be changed/
-        GroundGrid *newGrid = m_latLonGrid; 
 
-        //check to see if we're in the same band: 
-        if ( (currentBand != in.Band()) && m_recalculateForEachBand ) {
-          currentBand = in.Band(); 
-          changeBand(currentBand, newGrid); 
+        // check to see if we're in the same band 
+        if ( (*m_currentBand != in.Band()) && m_recalculateForEachBand ) {
+          *m_currentBand = in.Band(); 
+          changeBand(*m_currentBand); 
         }
+
 
         for (int samp = 1; samp <= in.SampleDimension(); samp++) {
           if (!m_ticks) {
-            if (groundDrawPoint(samp, in.Line(), newGrid)) {
+            if (groundDrawPoint(samp, in.Line())) {
               out[samp - 1] = m_lineValue;
             }
             else {
-              if (m_useImage)
+              if (m_useImage) {
                 out[samp - 1] = in[samp - 1];
-              else
+              }
+              else {
                 out[samp - 1] = m_bkgndValue;
+              }
             }
           }
           else {
@@ -283,8 +284,8 @@ namespace Isis {
               for (int sampleTest = samp - m_tickSize;
                   (sampleTest <= samp + m_tickSize) && (out[samp - 1] != Hrs);
                   sampleTest ++) {
-                if (groundDrawPoint(sampleTest, in.Line(), newGrid, true) &&
-                    groundDrawPoint(sampleTest, in.Line(), newGrid, false)) {
+                if (groundDrawPoint(sampleTest, in.Line(), true) &&
+                    groundDrawPoint(sampleTest, in.Line(), false)) {
                   out[samp - 1] = m_lineValue;
                 }
               }
@@ -293,8 +294,8 @@ namespace Isis {
               for (int lineTest = in.Line() - m_tickSize;
                   (lineTest <= in.Line() + m_tickSize) && (out[samp - 1] != Hrs);
                   lineTest ++) {
-                if (groundDrawPoint(samp, lineTest, newGrid, true) &&
-                    groundDrawPoint(samp, lineTest, newGrid, false)) {
+                if (groundDrawPoint(samp, lineTest, true) &&
+                    groundDrawPoint(samp, lineTest, false)) {
                   out[samp - 1] = m_lineValue;
                 }
               }
@@ -309,8 +310,8 @@ namespace Isis {
               while ((out[samp - 1] != Hrs) &&
                     (lineTest <= in.Line() + m_tickSize) &&
                     (sampleTest <= samp + m_tickSize)) {
-                if (groundDrawPoint(sampleTest, lineTest, newGrid, true) &&
-                    groundDrawPoint(sampleTest, lineTest, newGrid, false)) {
+                if (groundDrawPoint(sampleTest, lineTest, true) &&
+                    groundDrawPoint(sampleTest, lineTest, false)) {
                   out[samp - 1] = m_lineValue;
                 }
 
@@ -325,8 +326,8 @@ namespace Isis {
               while ((out[samp - 1] != Hrs) &&
                     (lineTest <= in.Line() + m_tickSize) &&
                     (sampleTest >= samp - m_tickSize)) {
-                if (groundDrawPoint(sampleTest, lineTest, newGrid, true) &&
-                    groundDrawPoint(sampleTest, lineTest, newGrid, false)) {
+                if (groundDrawPoint(sampleTest, lineTest, true) &&
+                    groundDrawPoint(sampleTest, lineTest, false)) {
                   out[samp - 1] = m_lineValue;
                 }
 
@@ -355,18 +356,23 @@ namespace Isis {
         }
       }
 
-      void changeBand(int band, GroundGrid *latLonGrid) const{ 
+      void changeBand(int band) const { 
         Progress progress;
+
+        // Since changeBand changes m_latLonGrid and this has to be a const method, save the value of
+        // m_latLonGrid in a new variable that can be changed
+        GroundGrid *latLonGrid = m_latLonGrid;
 
         // change band of UniversalGroundMap
         m_gmap->SetBand(band);
 
-        //update latLonGrid to use new UniversalGroundMap
-        latLonGrid = new GroundGrid(m_gmap, m_ticks, m_extendGrid,
-                                    m_numSamples, m_numLines);
+        // update latLonGrid to use new UniversalGroundMap
+        GroundGrid newGrid(m_gmap, m_ticks, m_extendGrid, m_numSamples, m_numLines);
+        *latLonGrid = newGrid;
 
-        //re-set old ground limits from GUI
+        // re-set old ground limits from GUI
         latLonGrid->SetGroundLimits(m_minLat, m_minLon, m_maxLat, m_maxLon);
+
         // If the grid is not going to reach the min/max lon warn the user.
         if (!m_extendGrid) {
           // Check that the min/max lon values match the lon domain
@@ -401,22 +407,23 @@ namespace Isis {
         QString progressMessage = QString("Recalculating grid for band %1").arg(band);
         progress.SetText(progressMessage);
 
-        //re-set lat/lon base/in from GUI
+        // re-set lat/lon base/in from GUI
         latLonGrid->CreateGrid(m_baseLat, m_baseLon, m_latInc, m_lonInc, &progress);
 
         if (m_walkBoundary) {
           latLonGrid->WalkBoundary();
         }
       }
-      bool groundDrawPoint(int samp, int line, GroundGrid *latLonGrid, bool latGrid = true) const{
+
+      bool groundDrawPoint(int samp, int line, bool latGrid = true) const {
         bool drawPoint = false;
 
         for (int x = samp - m_lineWidth; x <= samp + m_lineWidth; x ++) {
-          drawPoint = drawPoint || latLonGrid->PixelOnGrid(x - 1, line - 1, latGrid);
+          drawPoint = drawPoint || m_latLonGrid->PixelOnGrid(x - 1, line - 1, latGrid);
         }
 
         for (int y = line - m_lineWidth; y <= line + m_lineWidth; y ++) {
-          drawPoint = drawPoint || latLonGrid->PixelOnGrid(samp - 1, y - 1, latGrid);
+          drawPoint = drawPoint || m_latLonGrid->PixelOnGrid(samp - 1, y - 1, latGrid);
         }
 
         return drawPoint;
@@ -425,11 +432,9 @@ namespace Isis {
 
   void grid(UserInterface &ui, Pvl *log) {
     Cube icube;
-    std::cout<<"GOT HERE1" << std::endl;
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
-      std::cout<<"GOT HERE2" << std::endl;
     }
     icube.open(ui.GetFileName("FROM"));
     grid(&icube, ui, log);
@@ -513,14 +518,14 @@ namespace Isis {
                                         inputSamples, inputLines, lineValue, bkgndValue, outline, 
                                         image, ticks, tickSize, diagonalTicks);
 
-      p.ProcessCube(imageGrid);
+      p.ProcessCube(imageGrid, false);
       p.EndProcess();
     }
     // Lat/Lon based grid
     else {
       p.SetOutputCube("TO");
 
-      //if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
+      // if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
       // each band
       bool recalculateForEachBand = false;
       if (icube->hasGroup("Instrument")) {
@@ -604,13 +609,14 @@ namespace Isis {
                         bkgndValue, outline, image, ticks, diagonalTicks, recalculateForEachBand, 
                         walkBoundary, extendGrid, baseLat, baseLon, minLat, maxLat, minLon, maxLon, 
                         latInc, lonInc, gmap, latLonGrid);
-      p.ProcessCube(groundGrid);
+      p.ProcessCube(groundGrid, false);
       p.EndProcess();
 
-      delete latLonGrid;
-      latLonGrid = NULL;
-
+      // delete latLonGrid;
+      // latLonGrid = NULL;
+      std::cout<< "Deleted latLonGrid" << std::endl;
       delete gmap;
+      std::cout<< "Deleted gmap" << std::endl;
       gmap = NULL;
     }
   }
