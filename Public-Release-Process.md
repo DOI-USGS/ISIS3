@@ -128,7 +128,7 @@ This step covers how to update the data on the rysnc servers. This is where our 
 
 
 ### Part B: Update the Remote Server
-* Conduct a dry run using the command ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
+* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
