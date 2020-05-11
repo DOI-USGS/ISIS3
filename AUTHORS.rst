@@ -14,9 +14,9 @@ ISIS3 Contributors
 - Curtis Rose 
 - David Miller 
 - Debbie Cook 
-- Eric Gault
 - Ella Mae Lee 
 - Elpitha Howington-Kraus 
+- Eric Gault
 - Eric Hyer 
 - Evin Dunn 
 - Ian Humphrey 
@@ -24,13 +24,11 @@ ISIS3 Contributors
 - Jai Rideout 
 - James Alexander Crough 
 - Janet Barrett 
-- jay 
+- Jason Laura 
 - Jeannie Backer 
-- Jeannie Walldren 
 - Jeff Anderson 
 - Jeffrey Covington 
 - Jesse Mapel 
-- Jason Laura 
 - John Bonn 
 - Kaitlyn Lee 
 - Kaj E Williams  
