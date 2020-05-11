@@ -38,8 +38,7 @@ ISIS3 Contributors
 - K.-Michael Aye 
 - Kris Becker 
 - Kristin Berry 
-- Lauren Adoram-Kershner 
-- Lee 
+- Lauren Adoram-Kershner  
 - Lynn Weller 
 - Mackenzie Boyd 
 - Makayla Shepherd 
