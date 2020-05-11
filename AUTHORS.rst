@@ -47,7 +47,6 @@ ISIS3 Contributors
 - Moses Milazzo 
 - Oleg Alexandrov 
 - Orrin Thomas 
-- oxez 
 - Peter Giroux 
 - Raad A. Saleh 
 - Ross Beyer 
