@@ -35,7 +35,6 @@ ISIS3 Contributors
 - Kelvin Rodriguez 
 - Ken Edmundson 
 - Kim Oyama  
-- K.-Michael Aye 
 - Kris Becker 
 - Kristin Berry 
 - Lauren Adoram-Kershner  
