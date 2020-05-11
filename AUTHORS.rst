@@ -14,7 +14,7 @@ ISIS3 Contributors
 - Curtis Rose 
 - David Miller 
 - Debbie Cook 
-- egaultUSGS 
+- Eric Gault
 - Ella Mae Lee 
 - Elpitha Howington-Kraus 
 - Eric Hyer 
@@ -30,7 +30,7 @@ ISIS3 Contributors
 - Jeff Anderson 
 - Jeffrey Covington 
 - Jesse Mapel 
-- jlaura 
+- Jason Laura 
 - John Bonn 
 - Kaitlyn Lee 
 - Kaj E Williams  
