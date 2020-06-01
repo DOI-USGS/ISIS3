@@ -612,11 +612,11 @@ namespace Isis {
       p.ProcessCube(groundGrid, false);
       p.EndProcess();
 
-      // delete latLonGrid;
-      // latLonGrid = NULL;
+      delete latLonGrid;
+      latLonGrid = NULL;
       std::cout<< "Deleted latLonGrid" << std::endl;
+      
       delete gmap;
-      std::cout<< "Deleted gmap" << std::endl;
       gmap = NULL;
     }
   }
