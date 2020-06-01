@@ -1,6 +1,6 @@
  {
-  "isis_camera_version": 1,
-  "naif_keywords": {
+  "CameraVersion": 1,
+  "NaifKeywords": {
     "BODY_CODE": 499,
     "BODY499_RADII": [
       3396.19,
@@ -30,18 +30,18 @@
       85.0
     ]
   },
-  "instrument_pointing": {
-    "time_dependent_frames": [
+  "InstrumentPointing": {
+    "TimeDependentFrames": [
       -27000,
       1
     ],
-    "ck_table_start_time": -709401200.2611448,
-    "ck_table_end_time": -709401200.2611448,
-    "ck_table_original_size": 1,
-    "ephemeris_times": [
+    "CkTableStartTime": -709401200.2611448,
+    "CkTableEndTime": -709401200.2611448,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
       -709401200.2611448
     ],
-    "quaternions": [
+    "Quaternions": [
       [
         0.31520810249542935,
         -0.9166503199522611,
@@ -49,18 +49,18 @@
         -0.18786937311160073
       ]
     ],
-    "angular_velocity": [
+    "AngularVelocity": [
       [
         0.0,
         0.0,
         0.0
       ]
     ],
-    "constant_frames": [
+    "ConstantFrames": [
       -27002,
       -27000
     ],
-    "constant_rotation": [
+    "ConstantRotation": [
       -0.0003979349968896706,
       0.9999292841798486,
       -0.011885633652183106,
@@ -72,18 +72,18 @@
       0.9999292100388355
     ]
   },
-  "body_rotation": {
-    "time_dependent_frames": [
+  "BodyRotation": {
+    "TimeDependentFrames": [
       10014,
       1
     ],
-    "ck_table_start_time": -709401200.2611448,
-    "ck_table_end_time": -709401200.2611448,
-    "ck_table_original_size": 1,
-    "ephemeris_times": [
+    "CkTableStartTime": -709401200.2611448,
+    "CkTableEndTime": -709401200.2611448,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
       -709401200.2611448
     ],
-    "quaternions": [
+    "Quaternions": [
       [
         0.53600001724021,
         0.07306205657296709,
@@ -91,7 +91,7 @@
         0.7819827021000583
       ]
     ],
-    "angular_velocity": [
+    "AngularVelocity": [
       [
         3.1626696613081345e-05,
         -2.8772751199032417e-05,
@@ -99,21 +99,21 @@
       ]
     ]
   },
-  "instrument_position": {
-    "spk_table_start_time": -709401200.2611448,
-    "spk_table_end_time": -709401200.2611448,
-    "spk_table_original_size": 1,
-    "ephemeris_times": [
+  "InstrumentPosition": {
+    "SpkTableStartTime": -709401200.2611448,
+    "SpkTableEndTime": -709401200.2611448,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
       -709401200.2611448
     ],
-    "positions": [
+    "Positions": [
       [
         -2314.3697349186045,
         1641.5929356131498,
         3043.112681407324
       ]
     ],
-    "velocities": [
+    "Velocities": [
       [
         -4.130724817121533,
         -0.7713952678774164,
@@ -121,21 +121,21 @@
       ]
     ]
   },
-  "sun_position": {
-    "spk_table_start_time": -709401200.2611448,
-    "spk_table_end_time": -709401200.2611448,
-    "spk_table_original_size": 1,
-    "ephemeris_times": [
+  "SunPosition": {
+    "SpkTableStartTime": -709401200.2611448,
+    "SpkTableEndTime": -709401200.2611448,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
       -709401200.2611448
     ],
-    "positions": [
+    "Positions": [
       [
         -199122331.6742814,
         -67302869.13807923,
         -25474695.77623297
       ]
     ],
-    "velocities": [
+    "Velocities": [
       [
         7.293383953631856,
         -22.524325637284665,
