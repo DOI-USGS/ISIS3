@@ -1,0 +1,33 @@
+Group = PRODUCT_TYPE
+  Auto           = Null
+  InputKey       = PRODUCT_TYPE
+  InputDefault   = CDR
+  OutputName     = PRODUCT_TYPE
+  OutputPosition = Root
+  Translation    = (CDR, *)
+End_Group
+
+Group = START_TIME
+  Auto           = Null
+  InputKey       = START_TIME
+  InputGroup     = "OriginalLabelObject"
+  InputGroup     = "OriginalLabelObject,QUBE,ISIS_INSTRUMENT"
+  InputPosition  = (OriginalLabelObject)
+  InputPosition  = (OriginalLabelObject, QUBE, ISIS_INSTRUMENT)
+  OutputName     = START_TIME
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = IMAGE_NUMBER
+  Auto           = Null
+  InputKey       = IMAGE_NUMBER
+  InputGroup     = "OriginalLabelObject"
+  InputGroup     = "OriginalLabelObject,QUBE,ISIS_MOSAIC"
+  InputPosition  = (OriginalLabelObject)
+  InputPosition  = (OriginalLabelObject, QUBE, ISIS_MOSAIC)
+  OutputName     = IMAGE_NUMBER
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+End

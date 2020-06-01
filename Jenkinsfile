@@ -2,7 +2,7 @@
 
 def NUM_CORES = 8
 def errors = []
-def labels = ['Mac'] // labels for Jenkins node types we will build on
+def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
 for (lbl in labels) {
@@ -27,82 +27,77 @@ for (lbl in labels) {
                 ]
 
                 def stageStatus = "Checking out ISIS on ${label}"
-                
-                timestamps { 
-                  // Checkout
+
+                // Checkout
                 checkout scm
-                
+
+                condaEnv("isis3") {
+                    // Environment
+                    loginShell """
+                        conda install -c conda-forge python=3
+                        conda env update -f ${envFile} --prune
+                        mkdir build install
+                    """
+
+                    def osFailed = false
+                    isisEnv.add("ISISROOT=${pwd()}/build")
+                    isisEnv.add("PATH=${pwd()}/install/bin:${env.PATH}")
+                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+
+                    withEnv(isisEnv) {
+                        dir(env.ISISROOT) {
+                            // Build
+                            stageStatus = "Building ISIS on ${label}"
+                            try {
+                                loginShell """
+                                    cmake -GNinja ${cmakeFlags.join(' ')} ../isis
+                                    ninja -j${NUM_CORES} install
+                                """
+                            } catch(e) {
+                                // Die right here
+                                error stageStatus
+                            }
+
+                            // Unit tests
+                            stageStatus = "Running unit tests on ${label}"
+                            try {
+                                loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            // App tests
+                            stageStatus = "Running app tests on ${label}"
+                            try {
+                                loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            try {
+                                loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            // Gtests
+                            stageStatus = "Running gtests on ${label}"
+                            try {
+                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            if (osFailed) {
+                                error "Failed on ${label}"
+                            }
+                        }
+                    }
                 }
-
-                
-                // condaEnv("isis3") {
-                //     // Environment
-                //     loginShell """
-                //         conda install -c conda-forge python=3
-                //         conda env update -f ${WORKSPACE}/${BUILD_NUMBER}/${envFile} --prune
-                //         mkdir build install
-                //     """
-
-                //     def osFailed = false
-                // 
-                // isisEnv.add("ISISROOT=${pwd()}/build")
-                //     isisEnv.add("PATH=${pwd()}/install/bin:${env.PATH}")
-                //     cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
-
-                //     withEnv(isisEnv) {
-                //         dir(env.ISISROOT) {
-                //             // Build
-                //             stageStatus = "Building ISIS on ${label}"
-                //             try {
-                //                 loginShell """
-                //                     cmake -GNinja ${cmakeFlags.join(' ')} ${WORKSPACE}/${BUILD_NUMBER}/isis
-                //                     ninja -j${NUM_CORES} install
-                //                 """
-                //             } catch(e) {
-                //                 // Die right here
-                //                 error stageStatus
-                //             }
-
-                //             // Unit tests
-                //             stageStatus = "Running unit tests on ${label}"
-                //             try {
-                //                 loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
-                //             } catch(e) {
-                //                 errors.add(stageStatus)
-                //                 osFailed = true
-                //             }
-
-                //             // App tests
-                //             stageStatus = "Running app tests on ${label}"
-                //             try {
-                //                 loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
-                //             } catch(e) {
-                //                 errors.add(stageStatus)
-                //                 osFailed = true
-                //             }
-
-                //             try {
-                //                 loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
-                //             } catch(e) {
-                //                 errors.add(stageStatus)
-                //                 osFailed = true
-                //             }
-
-                //             // Gtests
-                //             stageStatus = "Running gtests on ${label}"
-                //             try {
-                //                 loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
-                //             } catch(e) {
-                //                 errors.add(stageStatus)
-                //                 osFailed = true
-                //             }
-
-                //             if (osFailed) {
-                //                 error "Failed on ${label}"
-                //             }
-                //         }
-                //     }
-                // }
             }
         }
     }

@@ -1,0 +1,84 @@
+Group = PoleLatitude
+  Auto
+  InputKey       = OBLIQUE_PROJ_POLE_LATITUDE
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = PoleLatitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = PoleLongitude
+  Auto
+  InputKey       = OBLIQUE_PROJ_POLE_LONGITUDE
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = PoleLongitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = PoleRotation
+  Auto
+  InputKey       = OBLIQUE_PROJ_POLE_ROTATION
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = PoleRotation
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = XAxisVector
+  Auto
+  InputKey       = OBLIQUE_PROJ_X_AXIS_VECTOR
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = XAxisVector
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = YAxisVector
+  Auto
+  InputKey       = OBLIQUE_PROJ_Y_AXIS_VECTOR
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = YAxisVector
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+
+Group = ZAxisVector
+  Auto
+  InputKey       = OBLIQUE_PROJ_Z_AXIS_VECTOR
+  InputGroup     = IMAGE_MAP_PROJECTION
+  InputGroup     = "QUBE,IMAGE_MAP_PROJECTION"
+  InputGroup     = "SPECTRAL_QUBE,IMAGE_MAP_PROJECTION"
+  InputPosition  = IMAGE_MAP_PROJECTION
+  InputPosition  = (QUBE, IMAGE_MAP_PROJECTION)
+  InputPosition  = (SPECTRAL_QUBE, IMAGE_MAP_PROJECTION)
+  OutputName     = ZAxisVector
+  OutputPosition = (Group, Mapping)
+  Translation    = (*, *)
+End_Group
+End

@@ -234,13 +234,18 @@
           Select the definition of the shape model for spiceinit
         </brief>
         <description>
-          ISIS camera models can use a shape model (a  projected ISIS cube that defines the radii for a global or regional area).  You can choose
-          to select a shape model or to use the definition of the ellipsoid found in the planetary constants (PCK) file.
+	    ISIS camera models can use a shape model (a projected ISIS cube that defines 
+	    the radii for a global or regional area).  You can choose
+            to select a shape model or to use the definition of the ellipsoid found 
+	    in the planetary constants (PCK) file.
         </description>
         <list>
           <option value="ELLIPSOID">
             <brief>Use triiaxial ellipsoid from PCK</brief>
-            <description>The camera will use the radii defined in the planetary constants file (PCK) when determining intersections of the body surface</description>
+	    <description>
+		The camera will use the radii defined in the planetary constants file (PCK) 
+		when determining intersections of the body surface
+	    </description>
             <exclusions>
               <item>MODEL</item>
             </exclusions>
@@ -248,8 +253,10 @@
           <option value="SYSTEM">
             <brief>Search system for a default shape model</brief>
             <description>
-              This option will search the default system data area ($ISIS3DATA/base/dems) for a shape model that matches the target of the input cube.  If none are
-              found then no shape model will be used and the default ellipsoid parameters found in the planetary constants (PCK) file define the shape.
+		This option will search the default system data area ($ISISDATA/base/dems) 
+		for a shape model that matches the target of the input cube.  If none are
+                found then no shape model will be used and the default ellipsoid parameters 
+		found in the planetary constants (PCK) file define the shape.
             </description>
             <exclusions>
               <item>MODEL</item>
@@ -257,7 +264,9 @@
           </option>
           <option value="USER">
             <brief>User specified shape model file</brief>
-            <description>The camera will use shape model defined by the parameter MODEL</description>
+	    <description>
+		The camera will use shape model defined by the parameter MODEL
+	    </description>
           </option>
         </list>
       </parameter>
@@ -269,8 +278,9 @@
           User defined ISIS cube shape model.
         </brief>
         <description>
-          A map projected ISIS cube which contains the radii of the target.  The file can cover more than the input cube
-           (FROM) but must minimally cover the data in the input cube.
+	    A map projected ISIS cube which contains the radii of the target.  The file 
+	    can cover more than the input cube
+            (FROM) but must minimally cover the data in the input cube.
         </description>
         <defaultPath>$base/dems/</defaultPath>
         <filter>*.cub</filter>

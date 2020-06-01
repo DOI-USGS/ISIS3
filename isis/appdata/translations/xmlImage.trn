@@ -1,0 +1,112 @@
+#
+# This translation table is for translating an xml image label
+#
+# See $base/translations/XmlExample.trn for an example xml translation table
+# and documentation for the different options.
+#
+# Created 2017-01-19 Jesse Mapel
+#
+
+Group = DataFilePointer
+  InputPosition = (File_Area_Observational, File)
+  InputKey      = file_name
+  Translation   = (*, *)
+End_Group
+
+# This is not in the labels at the moment, but it will always be 0
+Group = DataStart
+  InputPosition = File_Area_Observational
+  InputKey      = UNKNOWN
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreSamples
+  InputPosition        = (Product_Observational, File_Area_Observational,
+                         Array_2D_Image, Axis_Array)
+  InputKeyDependencies = "tag@axis_name:Sample"
+  InputKey             = elements
+  Translation          = (*, *)
+End_Group
+
+Group = CoreLines
+  InputPosition        = (Product_Observational, File_Area_Observational,
+                         Array_2D_Image, Axis_Array)
+  InputKeyDependencies = "tag@axis_name:Line"
+  InputKey             = elements
+  Translation          = (*, *)
+End_Group
+
+Group = CoreBands
+  InputPosition        = (Product_Observational, File_Area_Observational,
+                         Array_2D_Image, Axis_Array)
+  InputKeyDependencies = "tag@axis_name:Band"
+  InputKey             = elements
+  InputDefault         = 1
+  Translation          = (*, *)
+End_Group
+
+Group = CoreBitsPerPixel
+  InputPosition = (File_Area_Observational, Array_2D_Image,
+                  Element_Array)
+  InputKey      = idl_data_type
+  Translation   = (16, 2)
+  Translation   = (16, 12)
+  Translation   = (32, 4)
+End_Group
+
+Group = CorePixelType
+  InputPosition = (File_Area_Observational, Array_2D_Image,
+                  Element_Array)
+  InputKey      = idl_data_type
+  Translation   = (Integer, 2)
+  Translation   = (Integer, 12)
+  Translation   = (Real, 4)
+End_Group
+
+Group = CoreByteOrder
+  InputPosition = (File_Area_Observational, Array_2D_Image,
+                  Element_Array)
+  InputKey      = data_type
+  Translation   = (LSB, IEEE754LSBSingle)
+  Translation   = (LSB, SignedLSB2)
+End_Group
+
+Group = CoreBase
+  InputPosition = (File_Area_Observational, Array_2D_Image,
+                  Element_Array
+  InputKey      = offset
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+
+Group = CoreMultiplier
+  InputPosition = (File_Area_Observational, Array_2D_Image,
+                  Element_Array
+  InputKey      = scaling_factor
+  InputDefault  = 1
+  Translation   = (*, *)
+End_Group
+
+Group = CoreOrganization
+  InputPosition = UNKNOWN
+  InputKey      = UNKOWN
+  InputDefault  = BSQ
+  translate     = (*, *)
+End_Group
+
+# This is not in the labels at the moment, presumed to be 0
+Group = CoreLineSuffixBytes
+  InputPosition = UNKOWN
+  InputKey      = UNKNOWN
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group
+
+# This is not in the labels at the moment, presumed to be 0
+Group = CoreLinePrefixBytes
+  InputPosition = UNKOWN
+  InputKey      = UNKNOWN
+  InputDefault  = 0
+  Translation   = (*, *)
+End_Group

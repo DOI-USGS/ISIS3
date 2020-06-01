@@ -81,6 +81,8 @@ namespace Isis {
    *  @history 2008-05-09 Steven Lambright Optimized the FindSerialTranslation
    *           method
    *  @history 2008-05-18 Steven Lambright Fixed documentation
+   *  @history 2020-03-03 Kristin Berry - Updated to use translation files moved into source.
+   *                                      References #3727.
    */
   class SerialNumber {
     public:

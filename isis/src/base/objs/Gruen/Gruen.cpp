@@ -810,7 +810,7 @@ namespace Isis {
   }
 
   /**
-   * @brief Load default Gruen parameter file in $ISIS3DATA/base/templates
+   * @brief Load default Gruen parameter file in $ISISROOT/appdata/templates
    *
    * @author Kris Becker - 5/22/2011
    *
@@ -818,7 +818,7 @@ namespace Isis {
    */
   Pvl &Gruen::getDefaultParameters() {
     static Pvl regdef;
-    regdef = Pvl("$base/templates/autoreg/coreg.adaptgruen.p1515s3030.def");
+    regdef = Pvl("$ISISROOT/appdata/templates/autoreg/coreg.adaptgruen.p1515s3030.def");
     return (regdef);
   }
 

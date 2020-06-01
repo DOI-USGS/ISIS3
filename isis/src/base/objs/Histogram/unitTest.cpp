@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
   Isis::Progress progress;
   Isis::FileName netName("$base/testData/enceladus_sp-Jig.net");
   flist.append(netName.expanded());
-  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data").toStdString() << endl;
+  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/*data"), "data").toStdString() << endl;
 
   Isis::ControlNet net(flist[0], &progress);
 

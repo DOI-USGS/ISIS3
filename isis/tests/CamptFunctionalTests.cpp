@@ -55,11 +55,11 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Flat file must have a name."))
+    EXPECT_TRUE(e.toString().toLatin1().contains("Flat file must have a name"))
       << e.toString().toStdString();
   }
   catch(...) {
-    FAIL() << "Expected an IException with message: \"Flat file must have a name.\"";
+    FAIL() << "Expected an IException with message: \"Flat file must have a name\"";
   }
 }
 

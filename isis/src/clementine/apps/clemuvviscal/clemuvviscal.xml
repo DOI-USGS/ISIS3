@@ -360,7 +360,7 @@ Step 8b. Conversion to Reflectance
 	  current file. In most cases, the default should be used for
 	  this parameter to indicate the derived dark current file is
 	  to be used.  The name of the derived dark current file is
-	  $ISIS3DATA/clementine1/calibration/uvvis/dark_5_15_96.cub.
+	  $ISISDATA/clementine1/calibration/uvvis/dark_5_15_96.cub.
         </description>
         <filter>
           *.cub
@@ -382,9 +382,9 @@ Step 8b. Conversion to Reflectance
 	  is to be used.  There is a different version of the flat
 	  file for compressed and uncompressed images. The name of the
 	  derived flat-field file is
-	     $ISIS3DATA/clementine1/calibration/uvvis/lu[filter]_[un]comp_flat_long.cub.
+	     $ISISDATA/clementine1/calibration/uvvis/lu[filter]_[un]comp_flat_long.cub.
 	  An example for a compressed B filter image is
-	     $ISIS3DATA/clementine1/calibration/uvvis/lub_comp_flat_long.cub.
+	     $ISISDATA/clementine1/calibration/uvvis/lub_comp_flat_long.cub.
         </description>
         <filter>
           *.cub

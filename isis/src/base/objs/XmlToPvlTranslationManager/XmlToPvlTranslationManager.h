@@ -107,7 +107,7 @@ namespace Isis {
    * </ul>
    * <p>
    * An example Xml translation table can be found at
-   * $base/translations/XmlLabel.trn.
+   * $ISISROOT/appdata/translations/XmlLabel.trn.
    * </p>
    *
    * @ingroup Parsing

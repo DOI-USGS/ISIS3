@@ -115,7 +115,7 @@
       <parameter name="KERNEL">
          <type>filename</type>
          <fileMode>input</fileMode>
-         <defaultPath>$base/templates/kernels/</defaultPath>
+         <defaultPath>$ISISROOT/appdata/templates/kernels/</defaultPath>
          <brief>
            The kernel that describes the filter to be applied
          </brief>

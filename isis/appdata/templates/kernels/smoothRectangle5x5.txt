@@ -1,0 +1,10 @@
+  Group=Kernel
+    samples=5
+    lines=5
+    weight=.04
+    data= (1, 1 , 1 , 1 , 1 , 
+	   1, 1 , 1 , 1 , 1 ,
+	   1, 1 , 1 , 1 , 1 ,
+	   1, 1 , 1 , 1 , 1 ,
+	   1, 1 , 1 , 1 , 1 )
+  EndGroup

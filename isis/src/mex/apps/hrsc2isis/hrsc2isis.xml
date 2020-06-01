@@ -5,18 +5,26 @@
   <brief>Import HRSC image</brief>
 
   <description> 
-    This program imports Mars Express HRSC files. This works by first
-    determining whether or not the input file has prefix data. If there is
-    prefix data, the prefix data is collected and used to look for "gaps" - HRSC
-    files can give us a time and exposure duration  for each line, we look for 
-    where the time + exposure duration =/= next line's time.   We populate a 
-    table (LineScanTimes) with the prefix data and lineInFile with whether or 
-    not a gap should be inserted. For all files, we now process the  data and if 
-    there were gaps, they will be put in their proper places. This is a two-pass
-    system for files with prefix data, one-pass for files without.  The Isis2
-    equivalent to this program is mex2isis.pl. It is worth noting that
-    regardless of the  input file's byte order, the prefix data byte order is 
-    always LSB.
+    <p>
+      This program imports Mars Express HRSC files. This includes both the HRSC 
+      Stereo and the SRC instruments with procesing level of "1" or "2" (not "3"). 
+      The program populates all label keywords necessary to create the corresponding camera
+      models.
+    </p>
+    <p>
+      For the stereo instrument there is always prefix data. The
+      prefix data is collected and used to look for "gaps" aka missing lines. The 
+      line prefix data for HRSC
+      files contain time and exposure duration for each line. We look for occurrences  
+      where the time + exposure duration is not equal to the next line's time to find missing
+      lines. This program uses two passes, the first reads the PDS file into a cube, the
+      second inserts lines where gaps were identified.
+    </p>
+    <p>
+      For the SRC instrument, this program reads the PDS file and converts it to an ISIS cube. The
+      PDS file for the SRC instrument is much simpler than the stereo instrument files and requires
+      no special processing. 
+    </p>
   </description>
 
   <history>
@@ -32,13 +40,16 @@
     </change>
     <change name="Steven Lambright" date="2008-07-28">
       Updated to support the HRSC camera model. The Kernels group now has the IK code
-        properly added, the summing keyword is propagated, the times table is now compressed
-        into only having entries on time changes, and the times no longer have a 'Z' at the end
-        of them once imported.
+      properly added, the summing keyword is propagated, the times table is now compressed
+      into only having entries on time changes, and the times no longer have a 'Z' at the end
+      of them once imported.
     </change>
     <change name="Adam Paquette" date="2016-10-05">
       Updated the error messages thrown when hrsc2isis trys to ingest an image that is not an HRSC
       image, and when hrsc2isis trys to ingest a map projected image. Fixes #4259.
+    </change>
+    <change name="Stuart Sides" date="2020-03-31">
+      Added ability to read HRSC SRC images
     </change>
   </history>
 
@@ -57,7 +68,7 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input HRSC Image
+          Input HRSC Stereo or SRC Image
         </brief>
         <description>
           Use this parameter to select the PDS filename.  This file
@@ -68,7 +79,7 @@
           binary image data.
         </description>
         <filter>
-          *.lbl *.img
+          *.lbl *.LBL *.img *.IMG
         </filter>
       </parameter>
 
@@ -90,10 +101,10 @@
 
   <examples>
     <example>
-      <brief>Import an HRSC image with gaps</brief>
+      <brief>Import an HRSC stereo instrument image with gaps</brief>
       <description>
-        This example covers importing an HRSC image and shows what happens when 
-        gaps are found.
+        This example covers importing an HRSC stereo instrument image and shows 
+        what happens when gaps are found.
       </description>
       <terminalInterface>
         <commandLine> from=h0279_0000_re2.img to=h0279_0000_re2.cub</commandLine>

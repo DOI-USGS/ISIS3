@@ -1,0 +1,118 @@
+#
+# This translation table is for translating CaSSIS xml labels into pvl cube
+# labels.
+#
+# The Dependencies keyword specifies a tag or attribute at the same level as
+# the InputKey that uniquely identifies the InputKey.
+#
+# Consider the following translation group and xml
+#
+# Group = CoreSamples
+#   Auto
+#   InputPosition  = (Array_2D_Image, Axis_Array)
+#   Dependencies   = "tag@axis_name|Sample"
+#   InputKey       = elements
+#   OutputName     = CoreSamples
+#   OutputPosition = (Group, Dimensions)
+#   Translation    = (*, *)
+# End_Group
+#
+# <Array_2D_Image>
+#   <Axis_Array>
+#     <axis_name>Line</axis_name>
+#     <sequence_number>1</sequence_number>
+#     <elements>2048</elements>
+#   </Axis_Array>
+#   <Axis_Array>
+#     <axis_name>Sample</axis_name>
+#     <sequence_number>2</sequence_number>
+#     <elements>279</elements>
+#   </Axis_Array>
+# </Array_2D_Image>
+#
+# There are two Axis_Array tags below Array_2D_Image and both of them have an
+# elements tag.  So, the Dependencies keyword specifies to take the value of
+# the elements tag under the second Axis_Array array tag because it also has a
+# axis_name tag with a value of Sample.
+#
+# history 2018-06-06 Jeannie Backer - Original version.
+
+Group = CoreSamples
+  Auto
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Axis_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Axis_Array)
+  InputKeyDependencies   = "tag@axis_name|Sample"
+  InputKey       = elements
+  OutputName     = CoreSamples
+  OutputPosition = (Group, Dimensions)
+  Translation    = (*, *)
+End_Group
+
+Group = CoreLines
+  Auto
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Axis_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Axis_Array)
+  InputKeyDependencies   = "tag@axis_name|Line"
+  InputKey       = elements
+  OutputName     = CoreLines
+  OutputPosition = (Group, Dimensions)
+  Translation    = (*, *)
+End_Group
+
+Group = CoreBands
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Axis_Array)
+  InputKeyDependencies   = "tag@axis_name|Band"
+  InputKey       = elements
+  InputDefault   = 1
+  OutputName     = CoreBands
+  OutputPosition = (Group, Dimensions)
+  Translation    = (*, *)
+End_Group
+
+Group = CoreType
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Element_Array)
+  InputKey       = data_type
+  OutputName     = CoreType
+  OutputPosition = (Group, Pixels)
+  Translation    = (Real, IEEE754LSBSingle)
+End_Group
+
+Group = CoreByteOrder
+  Auto
+  InputDefault   = 1.0
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Element_Array)
+  InputKey       = data_type
+  OutputName     = CoreByteOrder
+  OutputPosition = (Group, Pixels)
+  Translation    = (Lsb, IEEE754LSBSingle)
+  Translation    = (Lsb, SignedLSB2)
+End_Group
+
+Group = CoreBase
+  Auto
+  InputDefault   = 0.0
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Element_Array)
+  InputKey       = offset
+  OutputName     = CoreBase
+  OutputPosition = (Group, Pixels)
+  Translation    = (*, *)
+End_Group
+
+Group = CoreMultiplier
+  Auto
+  InputDefault   = 1.0
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputPosition  = (File_Area_Observational, Array_3D_Image, Element_Array)
+  InputKey       = scaling_factor
+  OutputName     = CoreMultiplier
+  OutputPosition = (Group, Pixels)
+  Translation    = (*, *)
+End_Group
+End

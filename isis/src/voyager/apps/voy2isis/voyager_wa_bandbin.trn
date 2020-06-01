@@ -1,0 +1,109 @@
+
+#
+# This ISIS 3 translation file is used to create ISIS 3 band bin cube labels
+# from Voyager ".IMG" labels for the WA camera. Other sections of the ISIS 3
+# labels are handled by other translation files.
+#
+
+# This translation contains the known filter names for the WA 
+# camera. It translates them one for one. The (*,*) would have worked, but
+# they are listed for documentation purposes. Note the filter name does not
+# correspond directly to the filter number unless the camera is known (NA, WA).
+# Note: NAD is not listed in some references instead SODIUM is listed. 
+Group = FilterName
+  Auto
+  InputKey       = FILTER_NAME
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (CH4_JS, CH4_JS)
+  Translation    = (BLUE, BLUE)
+  Translation    = (CLEAR, CLEAR)
+  Translation    = (VIOLET, VIOLET)
+  Translation    = (SODIUM, SODIUM)
+  Translation    = (NAD, NAD)
+  Translation    = (GREEN, GREEN)
+  Translation    = (CH4_U, CH4_U)
+  Translation    = (ORANGE, ORANGE)
+  Translation    = (*, *)
+End_Group
+
+# The filter numbers are different for NA and WA
+Group = FilterNumber
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0, 0)
+  Translation    = (1, 1)
+  Translation    = (2, 2)
+  Translation    = (3, 3)
+  Translation    = (4, 4)
+  Translation    = (5, 5)
+  Translation    = (6, 6)
+  Translation    = (7, 7)
+  Translation    = (*, *)
+End_Group
+
+# This translation was added because some references found refer to different
+# filter names than those listed in the labels.
+Group = FilterNameLong
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = FilterNameLong
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (METHANE-JST, 0)
+  Translation    = (BLUE, 1)
+  Translation    = (CLEAR, 2)
+  Translation    = (VIOLET, 3)
+  Translation    = (SODIUM-D, 4)
+  Translation    = (GREEN, 5)
+  Translation    = (METHANE-U, 6)
+  Translation    = (ORANGE, 7)
+  Translation    = (UNKNOWN, *)
+End_Group
+
+# Center wavelengths are identical to documentation except for #6 (Methane-U).
+# The documentation lists the center as 0.540000 nm.
+Group = CenterFilterWavelength
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0.619000, 0)
+  Translation    = (0.480000, 1)
+  Translation    = (0.460000, 2)
+  Translation    = (0.400000, 3)
+  Translation    = (0.589000, 4)
+  Translation    = (0.585000, 5)
+  Translation    = (0.541000, 6)
+  Translation    = (0.615000, 7)
+  Translation    = (0.0, *)
+
+  Translation    = (0.619000, CH4_JS)
+  Translation    = (0.541000, CH4_U)
+  Translation    = (, NAD)
+  Translation    = (0.589000, SODIUM)
+ End_Group
+
+Group = BandWidth
+  Auto
+  InputKey       = FILTER_NUMBER
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (0.360000, 0)
+  Translation    = (0.100000, 1)
+  Translation    = (0.100000, 2)
+  Translation    = (0.050000, 3)
+  Translation    = (0.360000, 4)
+  Translation    = (0.110000, 5)
+  Translation    = (0.110000, 6)
+  Translation    = (0.090000, 7)
+  Translation    = (0.0, *)
+  
+  Translation    = (0.010000, CH4_JS)
+  Translation    = (0.010000, CH4_U)
+  Translation    = (0.110000, GREEN)
+  Translation    = ( ,NAD)
+  Translation    = (0.002000, SODIUM)
+End_Group
+

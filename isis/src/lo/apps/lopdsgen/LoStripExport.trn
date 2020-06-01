@@ -1,0 +1,29 @@
+Group = PRODUCT_TYPE
+  Auto           = Null
+  InputKey       = PRODUCT_TYPE
+  InputDefault   = IMAGE_SCAN
+  OutputName     = PRODUCT_TYPE
+  OutputPosition = Root
+  Translation    = (IMAGE_SCAN, *)
+End_Group
+
+Group = IMAGE_NUMBER
+  Auto           = Null
+  InputKey       = IMAGE_NUMBER
+  InputGroup     = "OriginalLabelObject,QUBE"
+  InputPosition  = (OriginalLabelObject, QUBE)
+  OutputName     = IMAGE_NUMBER
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = STRIP_NUMBER
+  Auto           = Null
+  InputKey       = STRIP_NUMBER
+  InputGroup     = "OriginalLabelObject,QUBE,ISIS_INSTRUMENT"
+  InputPosition  = (OriginalLabelObject, QUBE, ISIS_INSTRUMENT)
+  OutputName     = STRIP_NUMBER
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+End
