@@ -161,6 +161,12 @@ void IsisMain() {
   
   b.SetBasePosition(intSamp, intLine, 1);
   icube->read(b);
+  
+  QString filterName = "Null";
+  PvlGroup bandBin = icube->label()->findObject("IsisCube").findGroup("BandBin");
+  if (bandBin.hasKeyword("FilterName")) {
+      filterName = bandBin.findKeyword("FilterName")[0];
+  }
 
   // Log the position
   if(proj->IsGood()) {
@@ -169,6 +175,7 @@ void IsisMain() {
     results += PvlKeyword("Sample", toString(proj->WorldX()));
     results += PvlKeyword("Line", toString(proj->WorldY()));
     results += PvlKeyword("Band", toString(icube->physicalBand(1)));
+    results += PvlKeyword("FilterName", filterName);
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
     results += PvlKeyword("X", toString(proj->XCoord()));
     results += PvlKeyword("Y", toString(proj->YCoord()));
