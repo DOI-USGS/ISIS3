@@ -13,8 +13,8 @@ for (lbl in labels) {
         stage(label) {
             isisNode(label) {
                 def isisEnv = [
-                    "ISISDATA=/isisData/data",
-                    "ISISTESTDATA=/isisData/testData",
+                    "ISISDATA=/isisData/isis_data",
+                    "ISISTESTDATA=/isisData/isis_testData",
                     "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
                     "MALLOC_CHECK_=1"
                 ]
