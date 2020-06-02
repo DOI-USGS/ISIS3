@@ -354,22 +354,22 @@ namespace Isis {
     }
 
     // Load the full cache time information from the label if available
-    p_fullCacheStartTime = isdPos["spk_table_start_time"].get<double>();
-    p_fullCacheEndTime = isdPos["spk_table_end_time"].get<double>();
-    p_fullCacheSize = isdPos["spk_table_original_size"].get<double>();
-    p_cacheTime = isdPos["ephemeris_times"].get<std::vector<double>>();
+    p_fullCacheStartTime = isdPos["SpkTableStartTime"].get<double>();
+    p_fullCacheEndTime = isdPos["SpkTableEndTime"].get<double>();
+    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
+    p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
 
-    for (auto it = isdPos["positions"].begin(); it != isdPos["positions"].end(); it++) {
+    for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
       std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
       p_cache.push_back(pos);
     }
 
     p_cacheVelocity.clear();
 
-    bool hasVelocityKey = isdPos.find("velocities") != isdPos.end();
+    bool hasVelocityKey = isdPos.find("Velocities") != isdPos.end();
 
     if (hasVelocityKey) {
-      for (auto it = isdPos["velocities"].begin(); it != isdPos["velocities"].end(); it++) {
+      for (auto it = isdPos["Velocities"].begin(); it != isdPos["Velocities"].end(); it++) {
         std::vector<double> vel = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
         p_cacheVelocity.push_back(vel);
       }
