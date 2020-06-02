@@ -43,6 +43,7 @@ void IsisMain() {
   if(ui.GetString("TYPE") == "IMAGE") {
     double samp = ui.GetDouble("SAMPLE");
     double line = ui.GetDouble("LINE");
+
     if (!outsideAllowed) {
       if (samp < .5 || line < .5 || samp > cubeSampleLimit || line > cubeLineLimit) {
         QString error = "Requested line,sample is not on the image";
@@ -157,6 +158,7 @@ void IsisMain() {
   Brick b(1, 1, 1, icube->pixelType());
   int intSamp = (int)(proj->WorldX() + 0.5);
   int intLine = (int)(proj->WorldY() + 0.5);
+  
   b.SetBasePosition(intSamp, intLine, 1);
   icube->read(b);
 
@@ -166,6 +168,7 @@ void IsisMain() {
                           FileName(ui.GetFileName("FROM")).expanded());
     results += PvlKeyword("Sample", toString(proj->WorldX()));
     results += PvlKeyword("Line", toString(proj->WorldY()));
+    results += PvlKeyword("Band", toString(icube->physicalBand(1)));
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
     results += PvlKeyword("X", toString(proj->XCoord()));
     results += PvlKeyword("Y", toString(proj->YCoord()));
