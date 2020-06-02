@@ -31,7 +31,7 @@ for (lbl in labels) {
                 // Checkout
                 checkout scm
 
-                condaEnv("isis") {
+                condaEnv("isis3") {
                     // Environment
                     loginShell """
                         conda install -c conda-forge python=3
