@@ -22,84 +22,84 @@ class ConstVelIsd : public ::testing::Test {
 
   void SetUp() {
     constVelIsdStr = json::parse(R"(
-    {"isis_camera_version": 2,
-     "naif_keywords": {
+    {"CameraVersion": 2,
+         "NaifKeywords": {
            "BODY301_RADII": [ 1000, 2000, 3000 ],
            "BODY_FRAME_CODE": 31001,
            "BODY_CODE": 301,
            "INS-85600_FOCAL_LENGTH" : 699.62,
            "INS-85600_CK_FRAME_ID": -85000,
            "FRAME_-85600_NAME": "LRO_LROCNACL"
-      },
-    "instrument_pointing": {
-      "time_dependent_frames": [-85600, -85000, 1],
-      "ck_table_start_time": 100,
-      "ck_table_end_time": 100.1,
-      "ck_table_original_size": 2,
-      "ephemeris_times": [
+       },
+    "InstrumentPointing": {
+      "TimeDependentFrames": [-85600, -85000, 1],
+      "CkTableStartTime": 100,
+      "CkTableEndTime": 100.1,
+      "CkTableOriginalSize": 2,
+      "EphemerisTimes": [
         100,
         100.1
       ],
-      "quaternions": [
+      "Quaternions": [
         [0.0, -0.660435174378928, 0, 0.750883067090392],
         [0.0, -0.660435174378928, 0, 0.750883067090392]
       ],
-      "angular_velocity": [
+      "AngularVelocity": [
         [0, 0, 0],
         [0, 0, 0]
       ],
-      "constant_frames": [-85600],
-      "constant_rotation": [1, 0, 0, 0, 1, 0, 0, 0, 1]
+      "ConstantFrames": [-85600],
+      "ConstantRotation": [1, 0, 0, 0, 1, 0, 0, 0, 1]
     },
-    "body_rotation": {
-      "time_dependent_frames": [31006, 1],
-      "ck_table_start_time": 100,
-      "ck_table_end_time": 100.1,
-      "ck_table_original_size": 2,
-      "ephemeris_times": [
+    "BodyRotation": {
+      "TimeDependentFrames": [31006, 1],
+      "CkTableStartTime": 100,
+      "CkTableEndTime": 100.1,
+      "CkTableOriginalSize": 2,
+      "EphemerisTimes": [
         100,
         100.1
       ],
-      "quaternions": [
+      "Quaternions": [
         [ 0, 0.8509035, 0, 0.525322 ],
         [ 0, 0.8509035, 0, 0.525322 ]
       ],
-      "angular_velocity": [
+      "AngularVelocity": [
         [0, 0, 0],
         [0, 0, 0]
       ],
-      "constant_frames": [31001, 31007, 31006],
-      "constant_rotation": [-0.4480736,  0,  0.8939967, 0,  1,  0, -0.8939967,  0, -0.4480736]
+      "ConstantFrames": [31001, 31007, 31006],
+      "ConstantRotation": [-0.4480736,  0,  0.8939967, 0,  1,  0, -0.8939967,  0, -0.4480736]
     },
-    "instrument_position": {
-      "spk_table_start_time": 100,
-      "spk_table_end_time": 100.1,
-      "spk_table_original_size": 2,
-      "ephemeris_times": [
+    "InstrumentPosition": {
+      "SpkTableStartTime": 100,
+      "SpkTableEndTime": 100.1,
+      "SpkTableOriginalSize": 2,
+      "EphemerisTimes": [
         100,
         100.1
       ],
-      "positions": [
+      "Positions": [
         [1000, 0, 0],
         [1000, 0, 0]
       ],
-      "velocities": [
+      "Velocities": [
         [0, 0, 0],
         [0, 0, 0]
       ]
     },
-    "sun_position": {
-      "spk_table_start_time": 100,
-      "spk_table_end_time": 100.1,
-      "spk_table_original_size": 2,
-      "ephemeris_times": [
+    "SunPosition": {
+      "SpkTableStartTime": 100,
+      "SpkTableEndTime": 100.1,
+      "SpkTableOriginalSize": 2,
+      "EphemerisTimes": [
         100,
         100.1
       ],
-      "positions": [
+      "Positions": [
         [0, 20, 0]
       ],
-      "velocities": [
+      "Velocities": [
         [10,10,10]
       ]
     }
