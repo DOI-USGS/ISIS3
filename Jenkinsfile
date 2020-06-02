@@ -13,8 +13,8 @@ for (lbl in labels) {
         stage(label) {
             isisNode(label) {
                 def isisEnv = [
-                    "ISIS3DATA=/isisData/data",
-                    "ISIS3TESTDATA=/isisData/testData",
+                    "ISISDATA=/isisData/data",
+                    "ISISTESTDATA=/isisData/testData",
                     "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
                     "MALLOC_CHECK_=1"
                 ]
@@ -31,7 +31,7 @@ for (lbl in labels) {
                 // Checkout
                 checkout scm
 
-                condaEnv("isis3") {
+                condaEnv("isis") {
                     // Environment
                     loginShell """
                         conda install -c conda-forge python=3
