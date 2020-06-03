@@ -27,7 +27,7 @@ namespace Isis {
 
   }
 
-  void DefaultCube::TearDown() {
+  void SmallCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
     }
