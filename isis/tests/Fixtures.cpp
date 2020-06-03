@@ -9,6 +9,35 @@ namespace Isis {
   }
 
 
+  void SmallCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(10, 10, 10);
+    testCube->create(tempDir.path() + "/small.cub");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+
+  }
+
+  void DefaultCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+
   void DefaultCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -22,14 +51,6 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
-
-    LineManager line(*testCube);
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = (double) 1;
-      }
-      testCube->write(line);
-    }
 
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
@@ -121,7 +142,7 @@ namespace Isis {
   void ThreeImageNetwork::TearDown() {
     delete cubeList;
     delete network;
-  
+
     delete cube1;
     delete cube2;
     delete cube3;
