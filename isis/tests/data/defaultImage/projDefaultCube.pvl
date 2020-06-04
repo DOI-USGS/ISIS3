@@ -8,7 +8,7 @@ Object = IsisCube
     Group = Dimensions
       Samples = 6
       Lines   = 6
-      Bands   = 1
+      Bands   = 2
     End_Group
 
     Group = Pixels
@@ -40,8 +40,8 @@ Object = IsisCube
   End_Group
 
   Group = BandBin
-    FilterName = CLEAR
-    FilterId   = 4
+    FilterName = (CLEAR, NIR)
+    FilterId   = (4, 5)
   End_Group
 
   Group = Kernels
@@ -128,7 +128,7 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
+  Bytes = 65550
 End_Object
 
 Object = Table
