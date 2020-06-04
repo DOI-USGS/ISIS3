@@ -1,9 +1,12 @@
 #include "Isis.h"
 
 #include <QFile>
+#include <QHash>
 #include <QtGlobal>
 #include <QTextStream>
 #include <QScopedPointer>
+#include <QSet>
+#include <QStringList>
 
 // boost library
 #include <boost/foreach.hpp>
@@ -47,6 +50,27 @@ inline bool isWorthy(const ControlPoint *point ) {
 /** Check measure for validity */
 inline bool isValid(const ControlMeasure *m)  {
    return ( !( m->IsIgnored() || m->IsRejected() ) );
+}
+
+/**
+ * Recursive function that merges the logs when points are merged together.
+ * This ensures that previous merges are retained when a point is merged
+ * multiple times. This function searches the merge log for any previous merges
+ * into the control points that are now being merged into another point. The old
+ * merges are then removed from the log and appended to the new merge.
+ *
+ * @param(in/out) mergeLog The merge log to check/update
+ * @param newMerges        The set of new point IDs to append
+ */
+QSet<QString> combineMerges(QHash<QString, QSet<QString>> &mergeLog, QSet<QString> newMerges) {
+  QSet<QString> combinedMerges(newMerges);
+  BOOST_FOREACH ( QString pointId, newMerges ) {
+    // Recursively append everything previously merged into this point
+    if (mergeLog.contains(pointId)) {
+      combinedMerges.unite(combineMerges(mergeLog, mergeLog.take(pointId)));
+    }
+  }
+  return combinedMerges;
 }
 
 // Control network manager
@@ -235,6 +259,13 @@ void IsisMain() {
   double image_tolerance  = ui.GetDouble("IMAGETOL");
   double search_radius_sq = image_tolerance * image_tolerance;
 
+  // Optional logging
+  // Note: This is can store a significant number of strings, but all of them
+  //       already exist elsewhere so it's very lightweight as long as we don't
+  //       modify any of them.
+  QHash<QString, QSet<QString>> mergeLog;
+  bool logMerges = ui.WasEntered("LOGFILE");
+
   //  Run through all valid points. Note they may be invalided as processing
   //  is done through mergers, so validity must be checked at each point.
   BigInt nfound(0);
@@ -256,6 +287,18 @@ void IsisMain() {
           ControlPointMerger merger(image_tolerance);
           p_merged += merger.apply(point, m_points);
           nfound   += merger.size();
+
+          if (logMerges && nfound > 0) {
+            QHash<QString, QSet<QString>>::iterator logIt = mergeLog.find(point->GetId());
+            // point hasn't had any points merged into it yet
+            if (logIt == mergeLog.end()) {
+              mergeLog.insert( point->GetId(), combineMerges(mergeLog, merger.mergedPoints()) );
+            }
+            // point has already had points merged into it
+            else {
+              logIt.value().unite( combineMerges(mergeLog, merger.mergedPoints()) );
+            }
+          }
         }
       }
       nMerged += p_merged;
