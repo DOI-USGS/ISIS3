@@ -21,6 +21,7 @@ Camera *cam;
 TProjection *proj;
 int nbands;
 bool noCamera;
+bool specialPixels;
 
 bool dn;
 bool phase;
@@ -51,8 +52,7 @@ bool bodyFixedZ;
 
 int raBandNum;
 
-void phocubeDN(Buffer &in, Buffer &out);
-void phocube(Buffer &out);
+void phocube(Buffer &in, Buffer &out);
 
 
 // Function to create a keyword with same values of a specified count
@@ -288,27 +288,13 @@ void IsisMain() {
     name += "Body Fixed Z";
   }
 
-  // Create the output cube.  Note we add the input cube to expedite propagation
-  // of input cube elements (label, blobs, etc...).  It will be cleared
-  // prior to systematic processing only if the DN option is not selected.
-  // If DN is chosen by the user, then we propagate the input buffer with a
-  // different function - one that accepts both input and output buffers.
+  specialPixels = ui.GetBoolean("SPECIALPIXELS");
+
   (void) p.SetInputCube("FROM", OneBand);
   Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
                                 icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
-
-  if (dn) {
-    // Process with input and output buffers
-    p.StartProcess(phocubeDN);
-  }
-  else {
-    // Toss the input file as stated above
-    p.ClearInputCubes();
-
-    // Start the processing
-    p.StartProcess(phocube);
-  }
+  p.StartProcess(phocube);
 
   // Add the bandbin group to the output label.  If a BandBin group already
   // exists, remove all existing keywords and add the keywords for this app.
@@ -333,42 +319,38 @@ void IsisMain() {
 
   UpdateBandKey("Width", bb, nvals, "1.0");
 
-
-
   p.EndProcess();
 }
-
-
-//  This propagates the input plane to the output plane, then passes it off to
-//  the general routine
-void phocubeDN(Buffer &in, Buffer &out) {
-  for (int i = 0 ; i < in.size() ; i++) {
-    out[i] = in[i];
-  }
-  phocube(out);
-}
-
 
 //  Computes all the geometric properties for the output buffer.  Certain
 //  knowledge of the buffers size is assumed below, so ensure the buffer
 //  is still of the expected size.
-void phocube(Buffer &out) {
-
-
-  // If the DN option is selected, it is already added by the phocubeDN
-  // function.  We must compute the offset to start at the second band.
-  int skipDN = (dn) ? 64 * 64   :  0;
-
+void phocube(Buffer &in, Buffer &out) {
   for (int i = 0; i < 64; i++) {
     for (int j = 0; j < 64; j++) {
 
       MosData mosd, *p_mosd(0);  // For special mosaic angles
 
-      int index = i * 64 + j + skipDN;
+      int index = i * 64 + j;
+      int inIndex = index;
+
+      if (dn) {
+        out[index] = in[index];
+        index += 64 * 64;
+      }
+
+      // If dn is true, make sure to not overwrite the original pixels with NULL for the dn band
+      if (!specialPixels && IsSpecial(in[inIndex])) {
+        for (int band = (dn) ? 1 : 0; band < nbands; band++) {
+          out[index] = Isis::NULL8;
+          index += 64 * 64;
+        }
+        continue;
+      }
+
+      // Checks to see if the point is off the body
       double samp = out.Sample(index);
       double line = out.Line(index);
-
-      // Checks to see if the point is in outer space
       bool isGood = false;
       if (noCamera) {
         isGood = proj->SetWorld(samp, line);
@@ -532,17 +514,19 @@ void phocube(Buffer &out) {
 
       // Trim outer space except RA and dec bands
       else {
-        for (int b = (skipDN) ? 1 : 0; b < nbands; b++) {
-          if(ra && b == raBandNum) {
+        for (int band = (dn) ? 1 : 0; band < nbands; band++) {
+          if(ra && band == raBandNum) {
             out[index] = cam->RightAscension();
+            index += 64 * 64;
           }
-          else if (declination && b == raBandNum + 1) {
+          else if (declination && band == raBandNum + 1) {
             out[index] = cam->Declination();
+            index += 64 * 64;
           }
           else {
             out[index] = Isis::NULL8;
+            index += 64 * 64;
           }
-          index += 64 * 64;
         }
       }
     }

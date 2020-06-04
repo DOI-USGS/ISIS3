@@ -305,6 +305,10 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2019-02-15">
       Allowed RA and DEC to be exported regardless if the pixel is off body. Fixes #4446.
     </change>
+    <change name="Kaitlyn Lee" date="2020-06-04">
+      Added SPECIALPIXELS parameter to allow users to skip calculations on special pixels, excluding
+      RA and DEC. This changed merged the two process functions.
+    </change>
   </history>
 
   <category>
@@ -403,6 +407,15 @@ xsi:noNamespaceSchemaLocation=
     </group>
 
     <group name="Photometry">
+      <parameter name="SPECIALPIXELS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Include special pixels in the ouptut image</brief>
+        <description>
+          If this parameter is true, calculations will be done on special pixels.
+          If this parameter is false, special pixels will be skipped and set to NULL in the output image for all bands selected.
+        </description>
+      </parameter>
       <parameter name="DN">
         <type>boolean</type>
         <default><item>FALSE</item></default>
