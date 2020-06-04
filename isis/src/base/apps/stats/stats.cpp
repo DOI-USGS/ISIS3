@@ -133,11 +133,11 @@ namespace Isis {
         results += PvlKeyword("Minimum", toString(stats->Minimum()));
         results += PvlKeyword("Maximum", toString(stats->Maximum()));
         results += PvlKeyword("Sum", toString(stats->Sum()));
-      } else {
+      }
+      else {
         results += PvlKeyword("Average", "N/A");
         results += PvlKeyword("StandardDeviation", "N/A");
         results += PvlKeyword("Variance", "N/A");
-        // These statistics only worked on a histogram
         results += PvlKeyword("Median", "N/A");
         results += PvlKeyword("Mode", "N/A");
         results += PvlKeyword("Skew", "N/A");
