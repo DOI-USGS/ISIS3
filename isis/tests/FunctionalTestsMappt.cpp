@@ -126,15 +126,11 @@ TEST_F(DefaultCube, FunctionalTestMapptFlatFileTest) {
   int lineNumber = 0;
   QTextStream flatStream(&flatFile);
   
-  std::cout << "sdfas" << std::endl;
-
   if (flatFile.open(QIODevice::ReadOnly)) {
     while(!flatStream.atEnd()) {
       QString line = flatStream.readLine();
       QStringList fields = line.split(",");
       
-      std::cout << "sdfas" << std::endl;
-
       if(lineNumber == 0) {
         EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(0), "Filename");
         EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(1), "Sample");
