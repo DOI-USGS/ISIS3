@@ -146,14 +146,16 @@ TEST_F(DefaultCube, FunctionalTestMapptAllowOutside) {
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), -1.0);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);
   
-  // TODO: Doesn't throw error when allowoutside=false
-  //try{ 
-  //   args = {"type=image", "sample=-1", "line=-1", "allowoutside=false"};
-  //   mappt(projTestCube, options, &appLog);
-  //   FAIL() << "Expected Error thrown"; 
-  //} catch (IException &e) {
-  //  std::cout << e.toString() << std::endl;
-  //}
+  args = {"type=image", "sample=-1", "line=-1", "allowoutside=false"};
+  mappt(projTestCube, options, &appLog);
+
+  PvlGroup mapPoint = appLog.findGroup("Results");
+
+  std::cout << mapPoint << std::endl;
+  
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("OutsideOfImage"), "Requested point falls outside of image boundaries");
+
+  
 }
 
 TEST_F(DefaultCube, FunctionalTestMapptBandTest) {
