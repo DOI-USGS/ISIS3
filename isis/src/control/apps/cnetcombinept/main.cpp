@@ -443,6 +443,27 @@ void IsisMain() {
     cnet->Write( ui.GetAsString("ONET") );
   }
 
+  // Write out the merge log
+  if (logMerges) {
+    FileName mergeLogFileName( ui.GetFileName("LOGFILE") );
+    QFile mergeLogfile(mergeLogFileName.expanded());
+    if ( !mergeLogfile.open(QIODevice::WriteOnly | QIODevice::Truncate |
+                       QIODevice::Text | QIODevice::Unbuffered) ) {
+      QString mess = "Unable to open/create merge log file " + mergeLogFileName.name();
+      throw IException(IException::User, mess, _FILEINFO_);
+    }
+
+    QTextStream mergeLogStream(&mergeLogfile);
+    mergeLogStream << "pointID,mergedIDs" << "\n";
+    for (auto mergeLogIt = mergeLog.constBegin(); mergeLogIt != mergeLog.constEnd(); mergeLogIt++) {
+      mergeLogStream << mergeLogIt.key() << ","
+                     << QStringList(mergeLogIt.value().toList()).join(" ")
+                     << "\n";
+    }
+
+    mergeLogfile.close();
+  }
+
   // Write out a report
   int pMerged = validPoints - vPoints;
   PvlGroup summary("Summary");

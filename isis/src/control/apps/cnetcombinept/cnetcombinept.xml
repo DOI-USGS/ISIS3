@@ -176,7 +176,7 @@
       </parameter>
 
       <parameter name="LOGFILE">
-        <type>string</type>
+        <type>filename</type>
         <internalDefault>None</internalDefault>
         <brief>File that logs which points were merged together</brief>
         <description>
