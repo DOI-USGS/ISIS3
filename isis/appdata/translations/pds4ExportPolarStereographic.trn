@@ -248,13 +248,12 @@ End_Group
 
 Group = StraightVerticalLongitudeFromPole
   Auto
-  InputKey       = CenterLatitude
+  InputKey       = CenterLongitude
   InputGroup     = "IsisCube,Mapping"
   InputPosition  = (IsisCube, Mapping)
   OutputName     = cart:straight_vertical_longitude_from_pole
   OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cart:Polar_Stereographic)
-  Translation    = (180, 90.0)
-  Translation    = (0, -90.0)
+  Translation    = (*, *)
 End_Group
 
 End
