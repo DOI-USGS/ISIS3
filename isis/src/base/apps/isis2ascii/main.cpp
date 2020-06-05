@@ -80,9 +80,10 @@ void IsisMain() {
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {
-    fout << "Input_Cube " << endl << icube->fileName() << " ";
-    fout << "Samples Lines Bands " << endl << icube->sampleCount() << " " <<
-         icube->lineCount() << " " << icube->bandCount() << endl;
+    fout << "Input_Cube " << icube->fileName() << endl;
+    fout << "Samples " << icube->sampleCount() << endl;
+    fout << "Lines " << icube->lineCount() << endl;
+    fout << "Bands " << icube->bandCount() << endl;
   }
 
   //Determine special pixel values
