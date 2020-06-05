@@ -145,6 +145,17 @@ namespace Isis {
         results += PvlKeyword("Maximum", "N/A");
         results += PvlKeyword("Sum", "N/A");
       }
+      else {
+        results += PvlKeyword("Average", "N/A");
+        results += PvlKeyword("StandardDeviation", "N/A");
+        results += PvlKeyword("Variance", "N/A");
+        results += PvlKeyword("Median", "N/A");
+        results += PvlKeyword("Mode", "N/A");
+        results += PvlKeyword("Skew", "N/A");
+        results += PvlKeyword("Minimum", "N/A");
+        results += PvlKeyword("Maximum", "N/A");
+        results += PvlKeyword("Sum", "N/A");
+      }
       results += PvlKeyword("TotalPixels", toString(stats->TotalPixels()));
       results += PvlKeyword("ValidPixels", toString(stats->ValidPixels()));
       results += PvlKeyword("OverValidMaximumPixels", toString(stats->OverRangePixels()));
