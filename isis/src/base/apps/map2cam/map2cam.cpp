@@ -13,7 +13,9 @@ namespace Isis{
   Cube *mcube;
   Camera *outcam;
 
+
   void map2cam_f(UserInterface &ui) {
+
     // Open the input camera cube that we will be matching and create
     // the camera object
     FileName match = FileName(ui.GetFileName("MATCH"));
@@ -75,6 +77,8 @@ namespace Isis{
     // Cleanup
     delete transform;
     delete interp;
+
+    p.EndProcess();
   }
 
   // Transform object constructor
