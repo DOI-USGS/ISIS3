@@ -143,6 +143,7 @@ Sum                     High instrument saturation (HIS) pixels
     <change name="Austin Sanders" date="2020-06-04">
       Updated to fill columns with N/A in cases where images contained only
       special or invalid pixels.
+    </change>
   </history>
 
   <oldName>
