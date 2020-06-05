@@ -80,9 +80,9 @@ void IsisMain() {
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {
-    fout << "Input Cube:  " << icube->fileName() << endl;
-    fout << "Samples:Lines:Bands:  " << icube->sampleCount() << ":" <<
-         icube->lineCount() << ":" << icube->bandCount() << endl;
+    fout << "Input_Cube " << endl << icube->fileName() << " ";
+    fout << "Samples Lines Bands " << endl << icube->sampleCount() << " " <<
+         icube->lineCount() << " " << icube->bandCount() << endl;
   }
 
   //Determine special pixel values
@@ -102,9 +102,9 @@ void IsisMain() {
   }
 
   SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis);
-  
+
   fout << std::setprecision(7);
-  
+
   // List the cube
   p.ProcessCubeInPlace(isis2ascii, false);
   p.EndProcess();
