@@ -307,7 +307,9 @@ xsi:noNamespaceSchemaLocation=
     </change>
     <change name="Kaitlyn Lee" date="2020-06-04">
       Added SPECIALPIXELS parameter to allow users to skip calculations on special pixels, excluding
-      RA and DEC. This changed merged the two process functions.
+      RA and DEC. This changed merged the two process functions, which were created to speed up 
+      the application when copying over DN values. After a few time tests, it doesn't look like the 
+      merge causes the application to run longer.
     </change>
   </history>
 
