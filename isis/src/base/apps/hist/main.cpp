@@ -27,16 +27,38 @@ void IsisMain() {
     QString msg = "The [TO] parameter must be entered";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
-  // Setup the histogram
-  Histogram hist(*icube, 1, p.Progress() );
-  if(ui.WasEntered("MINIMUM") ) {
-    hist.SetValidRange(ui.GetDouble("MINIMUM"),ui.GetDouble("MAXIMUM") );     
-  }
 
-  if(ui.WasEntered("NBINS")) {
-    hist.SetBins(ui.GetInteger("NBINS"));
+  Histogram *hist;
+  if (ui.WasEntered("MINIMUM") && ui.WasEntered("MAXIMUM")){
+    int nbins = 0;
+
+    if (ui.WasEntered("NBINS")){
+      nbins = ui.GetInteger("NBINS");
+    }
+    else {
+      // Calculate bins based on data type.
+      // Bin calculations are based on logic in Histogram::InitializeFromCube
+      if (icube->pixelType() == UnsignedByte) {
+        nbins = 256;
+      }
+      else if (icube->pixelType() == SignedWord ||
+               icube->pixelType() == UnsignedWord ||
+               icube->pixelType() == UnsignedInteger ||
+               icube->pixelType() == SignedInteger ||
+               icube->pixelType() == Real) {
+        nbins = 65536;
+      }
+      else {
+        IString msg = "Unsupported pixel type";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    hist = new Histogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
   }
+  else {
+    hist = new Histogram(*icube, 1, p.Progress());
+  }
+  // Setup the histogram
 
   // Loop and accumulate histogram
   p.Progress()->SetText("Gathering Histogram");
@@ -47,7 +69,7 @@ void IsisMain() {
   for(int i = 1; i <= icube->lineCount(); i++) {
     line.SetLine(i);
     icube->read(line);
-    hist.AddData(line.DoubleBuffer(), line.size());
+    hist->AddData(line.DoubleBuffer(), line.size());
     p.Progress()->CheckStatus();
   }
 
@@ -59,22 +81,22 @@ void IsisMain() {
 
     fout << "Cube:           " << ui.GetFileName("FROM") << endl;
     fout << "Band:           " << icube->bandCount() << endl;
-    fout << "Average:        " << hist.Average() << endl;
-    fout << "Std Deviation:  " << hist.StandardDeviation() << endl;
-    fout << "Variance:       " << hist.Variance() << endl;
-    fout << "Median:         " << hist.Median() << endl;
-    fout << "Mode:           " << hist.Mode() << endl;
-    fout << "Skew:           " << hist.Skew() << endl;
-    fout << "Minimum:        " << hist.Minimum() << endl;
-    fout << "Maximum:        " << hist.Maximum() << endl;
+    fout << "Average:        " << hist->Average() << endl;
+    fout << "Std Deviation:  " << hist->StandardDeviation() << endl;
+    fout << "Variance:       " << hist->Variance() << endl;
+    fout << "Median:         " << hist->Median() << endl;
+    fout << "Mode:           " << hist->Mode() << endl;
+    fout << "Skew:           " << hist->Skew() << endl;
+    fout << "Minimum:        " << hist->Minimum() << endl;
+    fout << "Maximum:        " << hist->Maximum() << endl;
     fout << endl;
-    fout << "Total Pixels:    " << hist.TotalPixels() << endl;
-    fout << "Valid Pixels:    " << hist.ValidPixels() << endl;
-    fout << "Null Pixels:     " << hist.NullPixels() << endl;
-    fout << "Lis Pixels:      " << hist.LisPixels() << endl;
-    fout << "Lrs Pixels:      " << hist.LrsPixels() << endl;
-    fout << "His Pixels:      " << hist.HisPixels() << endl;
-    fout << "Hrs Pixels:      " << hist.HrsPixels() << endl;
+    fout << "Total Pixels:    " << hist->TotalPixels() << endl;
+    fout << "Valid Pixels:    " << hist->ValidPixels() << endl;
+    fout << "Null Pixels:     " << hist->NullPixels() << endl;
+    fout << "Lis Pixels:      " << hist->LisPixels() << endl;
+    fout << "Lrs Pixels:      " << hist->LrsPixels() << endl;
+    fout << "His Pixels:      " << hist->HisPixels() << endl;
+    fout << "Hrs Pixels:      " << hist->HrsPixels() << endl;
 
     //  Write histogram in tabular format
     fout << endl;
@@ -84,14 +106,14 @@ void IsisMain() {
     Isis::BigInt total = 0;
     double cumpct = 0.0;
 
-    for(int i = 0; i < hist.Bins(); i++) {
-      if(hist.BinCount(i) > 0) {
-        total += hist.BinCount(i);
-        double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
+    for(int i = 0; i < hist->Bins(); i++) {
+      if(hist->BinCount(i) > 0) {
+        total += hist->BinCount(i);
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
 
-        fout << hist.BinMiddle(i) << ",";
-        fout << hist.BinCount(i) << ",";
+        fout << hist->BinMiddle(i) << ",";
+        fout << hist->BinCount(i) << ",";
         fout << total << ",";
         fout << pct << ",";
         fout << cumpct << endl;
@@ -137,13 +159,13 @@ void IsisMain() {
     QVector<QPointF> binCountData;
     QVector<QPointF> cumPctData;
     double cumpct = 0.0;
-    for(int i = 0; i < hist.Bins(); i++) {
-      if(hist.BinCount(i) > 0) {
-        binCountData.append(QPointF(hist.BinMiddle(i), hist.BinCount(i) ) );
+    for(int i = 0; i < hist->Bins(); i++) {
+      if(hist->BinCount(i) > 0) {
+        binCountData.append(QPointF(hist->BinMiddle(i), hist->BinCount(i) ) );
 
-        double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
-        cumPctData.append(QPointF(hist.BinMiddle(i), cumpct) );
+        cumPctData.append(QPointF(hist->BinMiddle(i), cumpct) );
       }
     }
 
@@ -172,7 +194,7 @@ void IsisMain() {
     for(int y = 0; y < binCountData.size(); y++) {
 
       intervals[y].interval = QwtInterval(binCountData[y].x(),
-                                          binCountData[y].x() + hist.BinSize());
+                                          binCountData[y].x() + hist->BinSize());
 
       intervals[y].value = binCountData[y].y();
 //       if(values[y] > maxYValue) maxYValue = values[y];
@@ -194,14 +216,14 @@ void IsisMain() {
 //     plot->setScale(QwtPlot::yLeft, 0, maxYValue);
 //     plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
 
-    QLabel *label = new QLabel("  Average = " + QString::number(hist.Average()) + '\n' +
-           "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +
-           "\n  Maximum = " + QString::number(hist.Maximum()) + '\n' +
-           "\n  Stand. Dev.= " + QString::number(hist.StandardDeviation()) + '\n' +
-           "\n  Variance = " + QString::number(hist.Variance()) + '\n' +
-           "\n  Median = " + QString::number(hist.Median()) + '\n' +
-           "\n  Mode = " + QString::number(hist.Mode()) + '\n' +
-           "\n  Skew = " + QString::number(hist.Skew()), plot);
+    QLabel *label = new QLabel("  Average = " + QString::number(hist->Average()) + '\n' +
+           "\n  Minimum = " + QString::number(hist->Minimum()) + '\n' +
+           "\n  Maximum = " + QString::number(hist->Maximum()) + '\n' +
+           "\n  Stand. Dev.= " + QString::number(hist->StandardDeviation()) + '\n' +
+           "\n  Variance = " + QString::number(hist->Variance()) + '\n' +
+           "\n  Median = " + QString::number(hist->Median()) + '\n' +
+           "\n  Mode = " + QString::number(hist->Mode()) + '\n' +
+           "\n  Skew = " + QString::number(hist->Skew()), plot);
     plot->getDockWidget()->setWidget(label);
 
     plot->showWindow();
