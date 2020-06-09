@@ -1,7 +1,7 @@
 APPNAME = isis2ascii
 
 include $(ISISROOT)/make/isismake.tsts
-vesta64ascii.txt.SKIPLINES = 1
+isisTruthAsciiUser.txt.SKIPLINES = 1
 
 
 commands:
