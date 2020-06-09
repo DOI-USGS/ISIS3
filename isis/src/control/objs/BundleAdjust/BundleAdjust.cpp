@@ -532,9 +532,9 @@ namespace Isis {
    *                           printed to stdout. References #4313.
    */
   bool BundleAdjust::validateNetwork() {
-     
+
     outputBundleStatus("\nValidating network...");
-    
+
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
     int numObservations = m_bundleObservations.size();
@@ -559,7 +559,7 @@ namespace Isis {
     }
 
     outputBundleStatus("\nValidation complete!...\n");
-    
+
     return true;
   }
 
@@ -622,7 +622,7 @@ namespace Isis {
         observation++;
       }
     }
-    else {     
+    else {
       for (int i = 0; i < nBlockColumns; i++) {
         m_sparseNormals.at(i)->setStartColumn(nParameters);
         nParameters += m_bundleObservations.at(i)->numberParameters();
@@ -947,9 +947,9 @@ namespace Isis {
 
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
         clock_t errorPropStartClock = clock();
-        
+
         outputBundleStatus("\nStarting Error Propagation");
-        
+
         errorPropagation();
         emit statusUpdate("\n\nError Propagation Complete\n");
         clock_t errorPropStopClock = clock();
@@ -1061,7 +1061,7 @@ namespace Isis {
     int num3DPoints = m_bundleControlPoints.size();
 
     outputBundleStatus("\n\n");
-    
+
     for (int i = 0; i < num3DPoints; i++) {
       emit(pointUpdate(i+1));
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -1638,7 +1638,7 @@ namespace Isis {
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
 
       if ( !normalsColumn ) {
-        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " + 
+        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " +
                          QString::number(columnIndex);
         outputBundleStatus(status);
         return false;
@@ -2116,7 +2116,7 @@ namespace Isis {
 
       t += numTargetBodyParameters;
     }
-       
+
     // Update spice for each BundleObservation
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
@@ -2134,10 +2134,10 @@ namespace Isis {
     }
     // TODO - When BundleXYZ gets merged into dev, go with Ken's version of merging the updating of
     //              of the adjusted surface point into BundleControlPoint.
-    
+
     int pointIndex = 0;
     int numControlPoints = m_bundleControlPoints.size();
-    
+
     for (int i = 0; i < numControlPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
@@ -2147,7 +2147,7 @@ namespace Isis {
       }
 
       point->applyParameterCorrections(m_imageSolution, m_sparseNormals,
-                                       m_bundleTargetBody); 
+                                       m_bundleTargetBody);
       pointIndex++;
 
     } // end loop over point corrections
@@ -2374,14 +2374,14 @@ namespace Isis {
       status.append(QString("%1").arg(medianDev));
       status.append("\n");
       outputBundleStatus(status);
-      
+
       mad = 1.4826 * medianDev;
 
       status = "\nmad: ";
       status.append(QString("%1").arg(mad));
       status.append("\n");
       outputBundleStatus(status);
-      
+
       m_bundleResults.setRejectionLimit(median
                                         + m_bundleSettings->outlierRejectionMultiplier() * mad);
 
@@ -2389,7 +2389,7 @@ namespace Isis {
       status.append(QString("%1").arg(m_bundleResults.rejectionLimit()));
       status.append("\n");
       outputBundleStatus(status);
-      
+
       return true;
   }
 
@@ -2416,7 +2416,7 @@ namespace Isis {
     int numComingBack = 0;
 
     int numObjectPoints = m_bundleControlPoints.size();
-    
+
     outputBundleStatus("\n");
     for (int i = 0; i < numObjectPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -2512,14 +2512,14 @@ namespace Isis {
     status.append(QString("%1").arg(usedRejectionLimit));
     status.append(")\n");
     outputBundleStatus(status);
-    
+
     m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
     status = "\nMeasures that came back: ";
     status.append(QString("%1").arg(numComingBack));
     status.append("\n");
     outputBundleStatus(status);
-         
+
     return true;
   }
 
@@ -2573,11 +2573,11 @@ namespace Isis {
    *                           us to create the inverse matrix correlation file. References #4315.
    *   @history 2016-10-28 Ian Humphrey - Added extra newline between Error Propagation: Inverse
    *                           Blocking and Filling point covariance messages. References #4463.
-   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ 
-   *                            branch on (2018-05-31).  Moved productAlphaAV and control point 
-   *                            parameter correction code to BundleControlPoint.  Earlier revised 
-   *                            errorPropagation to compute the sigmas via the variance/ 
-   *                            covariance matrices instead of the sigmas.  This should produce 
+   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ
+   *                            branch on (2018-05-31).  Moved productAlphaAV and control point
+   *                            parameter correction code to BundleControlPoint.  Earlier revised
+   *                            errorPropagation to compute the sigmas via the variance/
+   *                            covariance matrices instead of the sigmas.  This should produce
    *                            more accurate results.  References #4649 and #501.
    */
   bool BundleAdjust::errorPropagation() {
@@ -2587,7 +2587,7 @@ namespace Isis {
     cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
 
     LinearAlgebra::Matrix T(3, 3);
-    // *** TODO *** 
+    // *** TODO ***
     // Can any of the control point specific code be moved to BundleControlPoint?
 
     double sigma0Squared = m_bundleResults.sigma0() * m_bundleResults.sigma0();
@@ -2595,12 +2595,12 @@ namespace Isis {
     int numObjectPoints = m_bundleControlPoints.size();
 
     std::string currentTime = iTime::CurrentLocalTime().toLatin1().data();
-    
+
     QString status = "     Time: ";
     status.append(currentTime.c_str());
     status.append("\n\n");
-    outputBundleStatus(status); 
-    
+    outputBundleStatus(status);
+
     // create and initialize array of 3x3 matrices for all object points
     std::vector< symmetric_matrix<double> > pointCovariances(numObjectPoints,
                                                              symmetric_matrix<double>(3));
@@ -2827,9 +2827,9 @@ namespace Isis {
     cholmod_free_dense(&b,&m_cholmodCommon);
 
     outputBundleStatus("\n\n");
-     
+
     currentTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-    
+
     status = "\rFilling point covariance matrices: Time ";
     status.append(currentTime.c_str());
     outputBundleStatus(status);
@@ -2860,17 +2860,17 @@ namespace Isis {
 
       // Update and reset the matrix
       // Get the Limiting Error Propagation uncertainties:  sigmas for coordinate 1, 2, and 3 in meters
-      // 
+      //
       SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
 
-      // Get the TEP by adding the corresponding members of pCovar and covariance      
+      // Get the TEP by adding the corresponding members of pCovar and covariance
       boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> pCovar;
-      
+
       if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
         pCovar = SurfacePoint.GetSphericalMatrix(SurfacePoint::Kilometers);
       }
       else {
-        // Assume Rectangular coordinates 
+        // Assume Rectangular coordinates
         pCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Kilometers);
       }
       pCovar += covariance;
@@ -2884,14 +2884,14 @@ namespace Isis {
       //   std:: cout << "     sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
       // std::cout <<  "      Adjusted matrix = " << std::endl;
       // std::cout << "       " << pCovar(0,0) << "   " << pCovar(0,1) << "   "
-      //           << pCovar(0,2) << std::endl; 
+      //           << pCovar(0,2) << std::endl;
       // std::cout << "        " << pCovar(1,0) << "   " << pCovar(1,1) << "   "
-      //           << pCovar(1,2) << std::endl; 
+      //           << pCovar(1,2) << std::endl;
       // std::cout << "        " << pCovar(2,0) << "   " << pCovar(2,1) << "   "
       //           << pCovar(2,2) << std::endl;
       // }
       // end debug
-      
+
       // Distance units are km**2
       SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(),pCovar);
       point->setAdjustedSurfacePoint(SurfacePoint);
@@ -2899,7 +2899,7 @@ namespace Isis {
       // if (j < 3) {
       //   boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> recCovar;
       //   recCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Meters);
-      //   std:: cout << "     sigmaLat (meters) = " << 
+      //   std:: cout << "     sigmaLat (meters) = " <<
       //     point->adjustedSurfacePoint().GetSigmaDistance(SurfacePoint::Latitudinal,
       //     SurfacePoint::One).meters() << std::endl;
       //   std:: cout << "     sigmaLon (meters) = " <<
@@ -2908,9 +2908,9 @@ namespace Isis {
       //   std:: cout << "   sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
       //   std::cout << "Rectangular matrix with radius in meters" << std::endl;
       //   std::cout << "       " << recCovar(0,0) << "   " << recCovar(0,1) << "   "
-      //           << recCovar(0,2) << std::endl; 
+      //           << recCovar(0,2) << std::endl;
       //   std::cout << "        " << recCovar(1,0) << "   " << recCovar(1,1) << "   "
-      //           << recCovar(1,2) << std::endl; 
+      //           << recCovar(1,2) << std::endl;
       //   std::cout << "        " << recCovar(2,0) << "   " << recCovar(2,1) << "   "
       //           << recCovar(2,2) << std::endl;
       // }
@@ -2921,7 +2921,7 @@ namespace Isis {
 
     return true;
   }
-  
+
 
   /**
    * Returns a pointer to the output control network.
@@ -3110,7 +3110,7 @@ namespace Isis {
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
-    if (QCoreApplication::applicationName() != "ipce") { 
+    if (QCoreApplication::applicationName() != "ipce") {
       printf("%s", status.toStdString().c_str());
     }
   }
@@ -3202,10 +3202,10 @@ namespace Isis {
       // Latitude or X
       Distance minSigmaCoord1Dist;
       QString  minSigmaCoord1PointId = "";
-      
+
       Distance maxSigmaCoord1Dist;
       QString  maxSigmaCoord1PointId = "";
-      
+
       // Longitude or Y
       Distance minSigmaCoord2Dist;
       QString  minSigmaCoord2PointId = "";
@@ -3219,7 +3219,7 @@ namespace Isis {
 
       Distance maxSigmaCoord3Dist;
       QString  maxSigmaCoord3PointId = "";
-      
+
       // compute stats for point sigmas
       Statistics sigmaCoord1Stats;
       Statistics sigmaCoord2Stats;
