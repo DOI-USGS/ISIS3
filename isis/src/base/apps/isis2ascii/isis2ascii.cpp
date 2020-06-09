@@ -93,7 +93,6 @@ namespace Isis {
       his = ui.GetString("HISVALUE");
       lrs = ui.GetString("LRSVALUE");
       lis = ui.GetString("LISVALUE");
-      std::cout << null << '\n';
     }
     else {
       null = "NULL";

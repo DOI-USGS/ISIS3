@@ -1,6 +1,6 @@
 #include "Fixtures.h"
 #include "LineManager.h"
-
+#include "SpecialPixel.h"
 
 namespace Isis {
 
@@ -28,6 +28,54 @@ namespace Isis {
   }
 
   void SmallCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+  void SpecialSmallCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(10, 10, 10);
+    testCube->create(tempDir.path() + "/small.cub");
+
+    // Use a line manager to update select lines with ISIS special pixel values
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    int lineNum = 0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        if (lineNum == 2) {
+          line[i] = NULL8;
+        }
+        else if (lineNum == 3) {
+          line[i] = LOW_REPR_SAT8;
+        }
+        else if (lineNum == 4) {
+          line[i] = HIGH_REPR_SAT8;
+        }
+        else if (lineNum == 5) {
+          line[i] = LOW_INSTR_SAT8;
+        }
+        else if (lineNum == 6) {
+          line[i] = HIGH_INSTR_SAT8;
+        }
+        else {
+          line[i] = (double) pixelValue++;
+        }
+      }
+      lineNum++;
+      testCube->write(line);
+    }
+
+  }
+
+  void SpecialSmallCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
     }

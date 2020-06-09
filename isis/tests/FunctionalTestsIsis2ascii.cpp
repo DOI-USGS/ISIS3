@@ -80,51 +80,29 @@ TEST_F(SmallCube, FunctionalTestIsis2asciiNoHeader) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2asciiSetPixelValues) {
+TEST_F(SpecialSmallCube, FunctionalTestIsis2asciiSetPixelValues) {
   QString outputFile = tempDir.path()+"/output.txt";
   QVector<QString> args = {"to=" + outputFile, "setpixelvalues=yes",
                            "nullvalue=0", "lrsvalue=0", "lisvalue=0",
                            "hisvalue=255", "hrsvalue=255"};
   UserInterface ui(APP_XML, args);
-
-  // Use a line manager to update select values with ISIS special pixel values
-  LineManager line(*testCube);
-  double pixelValue = 0.0;
-  for(line.begin(); !line.end(); line++) {
-    for(int i = 0; i < line.size(); i++) {
-      if (pixelValue == 10) {
-        line[i] = Isis::NULL8;
-      }
-      else if (pixelValue == 11) {
-        line[i] = Isis::LOW_REPR_SAT8;
-      }
-      else if (pixelValue == 12) {
-        line[i] = Isis::HIGH_REPR_SAT8;
-      }
-      else if (pixelValue == 13) {
-        line[i] = Isis::LOW_INSTR_SAT8;
-      }
-      else if (pixelValue == 14) {
-        line[i] = Isis::HIGH_INSTR_SAT8;
-      }
-      else {
-        line[i] = (double) pixelValue;
-      }
-      pixelValue++;
-    }
-    testCube->write(line);
-  }
-
   isis2ascii(testCube, ui);
 
   CSVReader::CSVAxis csvLine;
   CSVReader reader = CSVReader(outputFile,
                                false, 4, ' ', false, true);
   // Check the special pixel values were output correctly
-  csvLine = reader.getRow(1);
-  ASSERT_EQ(csvLine[0].toInt(), 0);
-  ASSERT_EQ(csvLine[1].toInt(), 0);
-  ASSERT_EQ(csvLine[2].toInt(), 255);
-  ASSERT_EQ(csvLine[3].toInt(), 0);
-  ASSERT_EQ(csvLine[4].toInt(), 255);
+  double expected_res = 0.0;
+  for (int rowNum = 2; rowNum < 7; rowNum++) {
+    csvLine = reader.getRow(rowNum);
+    for (int i = 0; i < csvLine.dim(); i++) {
+      if (rowNum == 2 || rowNum == 3 || rowNum == 5) {
+        expected_res = 0.0;
+      }
+      else if (rowNum == 4 || rowNum == 6) {
+        expected_res = 255.0;
+      }
+      ASSERT_EQ(csvLine[i].toInt(), expected_res);
+    }
+  }
 }
