@@ -56,7 +56,7 @@
       Added application test
     </change>
     <change name="Elizabeth Miller" date="2006-06-29">
-      Changed name to mappt and made ui look like skypt and campt
+      Changed name to mappt and made ui look like skypt and mappt
     </change>
     <change name="Sean Crosby" date="2007-04-12">
       Changed flatfile output so it duplicates PVL data.  User now
@@ -305,7 +305,7 @@
           Selecting this parameter will enable the 'COORDLIST' and 'COORDTYPE' parameters in the
           GUI.
           <p>
-            Note that this parameter is optional when running <i>campt</i> on the
+            Note that this parameter is optional when running <i>mappt</i> on the
             command line.
           </p>
         </description>
@@ -333,7 +333,7 @@
         <internalDefault>None</internalDefault>
         <description>
           An input comma-delimited flatfile of image coordinates or ground coordinates.
-          This allows the program to process multiple coordinates in a single run of <i>campt</i>,
+          This allows the program to process multiple coordinates in a single run of <i>mappt</i>,
           and output the results to the specified output file.
           <p>
             Expected order for image coordinates: sample, line<br/>
@@ -343,11 +343,11 @@
             The "Error" keyword will only appear when using a coordinate list. The value of "Error"
             will then be NULL unless an error occurs during the processing of a coordinate in the
             coordinate list. Then, the value of this keyword will be the error message. This allows
-            for <i>campt</i> to continue processing the remaining coordinates in the coordinate
+            for <i>mappt</i> to continue processing the remaining coordinates in the coordinate
             list.
           </p>
           <p>
-            For the input of Latitude and Longitude, campt expects
+            For the input of Latitude and Longitude, mappt expects
             <def>Planetocentric Latitude</def> (within -90 to 90 boundary) and
             <def>Positive East Longitude</def> (with 0-360 boundary) to find the location in the
             input camera image.
