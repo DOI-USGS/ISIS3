@@ -302,7 +302,7 @@
           Enable coordinate list parameters in the GUI
         </brief>
         <description>
-          Selecting this parameter will enable the 'COORDLIST' and 'COORDTYPE' parameters in the
+          Selecting this parameter will enable the 'COORDLIST' parameter in the
           GUI.
           <p>
             Note that this parameter is optional when running <i>mappt</i> on the
@@ -332,12 +332,13 @@
         </brief>
         <internalDefault>None</internalDefault>
         <description>
-          An input comma-delimited flatfile of image coordinates or ground coordinates.
+          An input comma-delimited flatfile of image, ground or projection coordinates.
           This allows the program to process multiple coordinates in a single run of <i>mappt</i>,
           and output the results to the specified output file.
           <p>
             Expected order for image coordinates: sample, line<br/>
             Expected order for ground coordinates: latitude, longitude
+            Expected order for projection coordinates: X, Y
           </p>
           <p>
             The "Error" keyword will only appear when using a coordinate list. The value of "Error"
