@@ -1269,10 +1269,14 @@ namespace Isis {
 
           QRgb *rgb = (QRgb *) p_image->scanLine(y);
 
+          Stretch redStretch = p_red.getStretch();
+          Stretch greenStretch = p_green.getStretch();
+          Stretch blueStretch = p_blue.getStretch();
+
           for(int x = dataArea.left(); x <= dataArea.right(); x++) {
-            int redPix = (int)(p_red.getStretch().Map(redLine[ x - p_redBuffer->bufferXYRect().left()]) + 0.5);
-            int greenPix = (int)(p_green.getStretch().Map(greenLine[ x - p_greenBuffer->bufferXYRect().left()]) + 0.5);
-            int bluePix = (int)(p_blue.getStretch().Map(blueLine[ x - p_blueBuffer->bufferXYRect().left()]) + 0.5);
+            int redPix = (int)(redStretch.Map(redLine[ x - p_redBuffer->bufferXYRect().left()]) + 0.5);
+            int greenPix = (int)(greenStretch.Map(greenLine[ x - p_greenBuffer->bufferXYRect().left()]) + 0.5);
+            int bluePix = (int)(blueStretch.Map(blueLine[ x - p_blueBuffer->bufferXYRect().left()]) + 0.5);
 
             rgb[x] = qRgb(redPix, greenPix, bluePix);
           }
