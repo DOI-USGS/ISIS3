@@ -80,6 +80,10 @@
       Removed calls to set control net target radii because they are no longer needed by
       the control network. Fixes #5457.
     </change>
+    <change name="Jesse Mapel" date="2020-06-09">
+      Added a the LOGFILE argmuent that generates a log of which
+      control points were merged together.
+    </change>
   </history>
 
   <category>
@@ -180,12 +184,14 @@
         <internalDefault>None</internalDefault>
         <brief>File that logs which points were merged together</brief>
         <description>
-          A two column CSV file that contains which input control points were
+          A four column CSV file that contains which input control points were
           merged into output control points. The first column contains the
           ID of each output control point that had at least one input control
-          point merged into it. The Second column contains a space separated
-          list of the IDs of input control points that were merged into
-          the output control point in the first column.
+          point merged into it. The second column contains the number of measures
+          in the input control point. The third column contains the number of
+          measures in the output control point. The fourth column contains a
+          space separated list of the IDs of input control points that were
+          merged into the output control point.
         </description>
       </parameter>
     </group>
