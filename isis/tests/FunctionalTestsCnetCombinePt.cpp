@@ -1,8 +1,10 @@
 #include <iostream>
 
 #include <QFile>
+#include <QHash>
 #include <QSet>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 #include "cnetcombinept.h"
@@ -223,6 +225,47 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptDistance) {
   EXPECT_EQ(point1aMerged200->GetMeasure("bar")->GetLine(), 250.0);
   EXPECT_EQ(point1aMerged200->GetMeasure("baz")->GetSample(), 300.0);
   EXPECT_EQ(point1aMerged200->GetMeasure("baz")->GetLine(), 100.0);
+}
+
+TEST_F(CombineNetworks, FunctionalTestCnetcombineptLog) {
+  QString logFileName = tempDir.path()+"/merged.log";
+  QString mergedNetFile = tempDir.path()+"/merged.net";
+  QVector<QString> args = {"cnetbase="+firstNetFile,
+                           "cnetlist="+listFile,
+                           "imagetol=55",
+                           "onet="+mergedNetFile,
+                           "logfile="+logFileName};
+  UserInterface ui(APP_XML, args);
+
+  cnetcombinept(ui);
+
+  QFile logFileHandle(logFileName);
+  logFileHandle.open(QIODevice::ReadOnly | QIODevice::Text);
+  QString headerLine = logFileHandle.readLine();
+  QStringList headerColumns = headerLine.trimmed().split(",");
+  ASSERT_EQ(headerColumns.size(), 2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[0], "pointID");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[1], "mergedIDs");
+  QHash<QString, QSet<QString>> merges;
+  while (!logFileHandle.atEnd()) {
+    QStringList splitLine = QString(logFileHandle.readLine()).trimmed().split(',');
+    ASSERT_EQ(splitLine.size(), 2);
+    QSet<QString> pointMerges;
+    foreach(QString pointId, splitLine[1].split(' ')) {
+      pointMerges.insert(pointId);
+    }
+    EXPECT_EQ(pointMerges.size(), splitLine[1].split(' ').size());
+    merges.insert(splitLine[0], pointMerges);
+  }
+  EXPECT_EQ(merges.size(), 2);
+  ASSERT_TRUE(merges.contains("1a"));
+  EXPECT_EQ(merges["1a"].size(), 1);
+  EXPECT_TRUE(merges["1a"].contains("2a"));
+  ASSERT_TRUE(merges.contains("1b"));
+  EXPECT_EQ(merges["1b"].size(), 3);
+  EXPECT_TRUE(merges["1b"].contains("3a"));
+  EXPECT_TRUE(merges["1b"].contains("2b"));
+  EXPECT_TRUE(merges["1b"].contains("3b"));
 }
 
 TEST_F(CombineNetworks, FunctionalTestCnetcombineptList) {
