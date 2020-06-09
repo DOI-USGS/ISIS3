@@ -196,3 +196,97 @@ TEST_F(DefaultCube, FunctionalTestMapptBandTest) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FilterName"), "NIR");
   EXPECT_EQ( (double) mapPoint.findKeyword("Band"), 2);
 }
+
+
+TEST_F(DefaultCube, FunctionalTestMapptImageCoordList) {
+  std::ofstream of;
+  of.open(tempDir.path().toStdString()+"/coords.txt");
+  of << "1, 1\n2, 2\n 3, 3";
+  of.close();
+  
+  QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt",
+                           "UseCoordList=True", 
+                           "append=false",
+                           "type=image"};
+  UserInterface options(APP_XML, args);
+
+  Pvl appLog; 
+  mappt(projTestCube, options, &appLog);
+  
+  PvlGroup mapPoint = appLog.group(0);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FileName"), projTestCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FilterName"), "CLEAR");
+  EXPECT_EQ( (double) mapPoint.findKeyword("Band"), 1);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Sample"), 1, 1e-8);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Line"), 1, 1e-8);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetographicLatitude"), 9.3870849567571);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetocentricLatitude"), 9.2788326719634);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest360Longitude"), 359.14528612684);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast360Longitude"), 0.85471387315749);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast180Longitude"), 0.85471387315749);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest180Longitude"), -0.85471387315751); 
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("x"), 50000);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("y"), 550000); 
+  
+  mapPoint = appLog.group(1);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FileName"), projTestCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FilterName"), "CLEAR");
+  EXPECT_EQ( (double) mapPoint.findKeyword("Band"), 1);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Sample"), 2, 1e-8);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Line"), 2, 1e-8);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetographicLatitude"), 7.6808677548562);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetocentricLatitude"), 7.5917721861518);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest360Longitude"), 357.44703128109);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast360Longitude"), 2.5529687189083);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast180Longitude"), 2.5529687189083);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest180Longitude"), -2.5529687189083); 
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("x"), 150000);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("y"), 450000);
+  
+  mapPoint = appLog.group(2);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FileName"), projTestCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, mapPoint.findKeyword("FilterName"), "CLEAR");
+  EXPECT_EQ( (double) mapPoint.findKeyword("Band"), 1);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Sample"), 3, 1e-8);
+  EXPECT_NEAR( (double) mapPoint.findKeyword("Line"), 3, 1e-8);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetographicLatitude"), 5.9743363392284);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PlanetocentricLatitude"), 5.9047117003403);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest360Longitude"), 355.75985208984);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast360Longitude"), 4.2401479101647);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveEast180Longitude"), 4.2401479101647);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest180Longitude"), -4.2401479101646); 
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("x"), 250000);
+  EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("y"), 350000.0);
+}
+
+TEST_F(DefaultCube, FunctionalTestMapptBadColumnError) {
+  std::ofstream of;
+  of.open(tempDir.path().toStdString()+"/coords.txt");
+  of << "1, 1\n2\n 3, 3";
+  of.close();
+  
+  QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt",
+                           "UseCoordList=True", 
+                           "append=false",
+                           "type=image"};
+  UserInterface options(APP_XML, args);
+
+  Pvl appLog;
+  try {
+    mappt(projTestCube, options, &appLog);
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(IException &e) {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Coordinate file formatted incorrectly."))
+      << e.toString().toStdString();
+  }
+  catch(...) {
+    FAIL() << "Expected an IException with message: \"Coordinate file formatted incorrectly.\n"
+              "Each row must have two columns: a sample,line or a latitude,longitude pair.\"";
+  }
+
+  PvlGroup mapPoint = appLog.group(0);
+}
