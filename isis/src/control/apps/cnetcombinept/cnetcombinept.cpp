@@ -257,10 +257,12 @@ namespace Isis{
     double search_radius_sq = image_tolerance * image_tolerance;
 
     // Optional logging
-    // Note: This is can store a significant number of strings, but all of them
+    // Note: These is can store a significant number of strings, but all of them
     //       already exist elsewhere so it's very lightweight as long as we don't
     //       modify any of them.
     QHash<QString, QSet<QString>> mergeLog;
+    QHash<QString, int> startingPointSizes;
+    QHash<QString, int> endingPointSizes;
     bool logMerges = ui.WasEntered("LOGFILE");
 
     //  Run through all valid points. Note they may be invalided as processing
@@ -274,6 +276,11 @@ namespace Isis{
         // Get all valid measures only in the point
         QList<ControlMeasure *> v_measures = point->getMeasures( true );
 
+        // Log starting point size
+        if (logMerges) {
+          startingPointSizes.insert(point->GetId(), point->GetNumMeasures());
+        }
+
         int p_merged(0);
         BOOST_FOREACH ( ControlMeasure *v_m, v_measures ) {
           PointType m_p(v_m);     // This associates the measure to its point
@@ -285,6 +292,7 @@ namespace Isis{
             p_merged += merger.apply(point, m_points);
             nfound   += merger.size();
 
+            // Log any points that were merged
             if (logMerges && nfound > 0) {
               QHash<QString, QSet<QString>>::iterator logIt = mergeLog.find(point->GetId());
               // point hasn't had any points merged into it yet
@@ -393,6 +401,11 @@ namespace Isis{
         }
       }
 
+      // Log final point size
+      if (logMerges) {
+        endingPointSizes.insert(pid, m_p->GetNumMeasures());
+      }
+
       // Save invalid points?  We are not going to create the network if only if
       // requested by the user with the good points as its a very expensive
       // operation.
@@ -451,9 +464,11 @@ namespace Isis{
       }
 
       QTextStream mergeLogStream(&mergeLogfile);
-      mergeLogStream << "pointID,mergedIDs" << "\n";
+      mergeLogStream << "pointID,startNumMeasures,endNumMeasures,mergedIDs" << "\n";
       for (auto mergeLogIt = mergeLog.constBegin(); mergeLogIt != mergeLog.constEnd(); mergeLogIt++) {
         mergeLogStream << mergeLogIt.key() << ","
+                       << startingPointSizes[mergeLogIt.key()] << ","
+                       << endingPointSizes[mergeLogIt.key()] << ","
                        << QStringList(mergeLogIt.value().toList()).join(" ")
                        << "\n";
       }

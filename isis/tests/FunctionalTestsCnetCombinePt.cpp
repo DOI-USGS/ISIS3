@@ -243,20 +243,36 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptLog) {
   logFileHandle.open(QIODevice::ReadOnly | QIODevice::Text);
   QString headerLine = logFileHandle.readLine();
   QStringList headerColumns = headerLine.trimmed().split(",");
-  ASSERT_EQ(headerColumns.size(), 2);
+  ASSERT_EQ(headerColumns.size(), 4);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[0], "pointID");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[1], "mergedIDs");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[1], "startNumMeasures");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[2], "endNumMeasures");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, headerColumns[3], "mergedIDs");
   QHash<QString, QSet<QString>> merges;
+  QHash<QString, int> startSizes;
+  QHash<QString, int> endSizes;
   while (!logFileHandle.atEnd()) {
     QStringList splitLine = QString(logFileHandle.readLine()).trimmed().split(',');
-    ASSERT_EQ(splitLine.size(), 2);
+    ASSERT_EQ(splitLine.size(), 4);
+    startSizes.insert(splitLine[0], splitLine[1].toInt());
+    endSizes.insert(splitLine[0], splitLine[2].toInt());
     QSet<QString> pointMerges;
-    foreach(QString pointId, splitLine[1].split(' ')) {
+    foreach(QString pointId, splitLine[3].split(' ')) {
       pointMerges.insert(pointId);
     }
-    EXPECT_EQ(pointMerges.size(), splitLine[1].split(' ').size());
+    EXPECT_EQ(pointMerges.size(), splitLine[3].split(' ').size());
     merges.insert(splitLine[0], pointMerges);
   }
+  EXPECT_EQ(startSizes.size(), 2);
+  ASSERT_TRUE(startSizes.contains("1a"));
+  EXPECT_EQ(startSizes["1a"], 2);
+  ASSERT_TRUE(startSizes.contains("1b"));
+  EXPECT_EQ(startSizes["1b"], 2);
+  EXPECT_EQ(endSizes.size(), 2);
+  ASSERT_TRUE(endSizes.contains("1a"));
+  EXPECT_EQ(endSizes["1a"], 3);
+  ASSERT_TRUE(endSizes.contains("1b"));
+  EXPECT_EQ(endSizes["1b"], 3);
   EXPECT_EQ(merges.size(), 2);
   ASSERT_TRUE(merges.contains("1a"));
   EXPECT_EQ(merges["1a"].size(), 1);
