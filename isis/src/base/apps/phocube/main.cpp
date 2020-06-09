@@ -287,9 +287,10 @@ void IsisMain() {
         // If dn is true, make sure to not overwrite the original pixels with NULL for the dn band
         if (!specialPixels && IsSpecial(in[inIndex])) {
           for (int band = (dn) ? 1 : 0; band < nbands; band++) {
-            out[index] = Isis::NULL8;
+            out[index] = Isis::Null;
             index += 64 * 64;
           }
+
           continue;
         }
 
@@ -462,16 +463,14 @@ void IsisMain() {
           for (int band = (dn) ? 1 : 0; band < nbands; band++) {
             if(ra && band == raBandNum) {
               out[index] = cam->RightAscension();
-              index += 64 * 64;
             }
             else if (declination && band == raBandNum + 1) {
               out[index] = cam->Declination();
-              index += 64 * 64;
             }
             else {
-              out[index] = Isis::NULL8;
-              index += 64 * 64;
+              out[index] = Isis::Null;
             }
+            index += 64 * 64;
           }
         }
       }
