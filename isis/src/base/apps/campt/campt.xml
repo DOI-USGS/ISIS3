@@ -9,7 +9,7 @@ xsi:noNamespaceSchemaLocation=
 
   <description>
     <p>
-    campt computes geometric and photometric information at a given pixel
+    Campt computes geometric and photometric information at a given pixel
     location or list of pixel locations in the input image <def link="Cube">cube</def>.
     The program computes spacecraft and instrument related information, and other types of
     coordinates as described later in this document. The user will have a choice of coordinates
@@ -21,7 +21,7 @@ xsi:noNamespaceSchemaLocation=
     <ul>
       <li>The input image requires <def>SPICE</def> information (see <i>spiceinit</i>).</li>
       <li>The input image cube must be a <def>Level0</def>  or a <def>Level1</def> ISIS cube.</li>
-      <li>To use a <def>Level2</def> file as the input image (see <i>campt</i>).</li>
+      <li>To use a <def>Level2</def> file as the input image (see <i>mappt</i>).</li>
     </ul>
     </p>
     <p>
@@ -231,7 +231,7 @@ End_Group
   <seeAlso>
     <applications>
       <item>spiceinit</item>
-      <item>campt</item>
+      <item>mappt</item>
       <item>getkey</item>
     </applications>
   </seeAlso>
