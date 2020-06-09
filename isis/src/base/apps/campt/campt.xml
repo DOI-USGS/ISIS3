@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="campt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<application name="mappt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation=
 "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
@@ -9,7 +9,7 @@ xsi:noNamespaceSchemaLocation=
 
   <description>
     <p>
-    Campt computes geometric and photometric information at a given pixel
+    mappt computes geometric and photometric information at a given pixel
     location or list of pixel locations in the input image <def link="Cube">cube</def>.
     The program computes spacecraft and instrument related information, and other types of
     coordinates as described later in this document. The user will have a choice of coordinates
@@ -35,7 +35,7 @@ xsi:noNamespaceSchemaLocation=
     flatfile of coordinates.
     </p>
     <p>
-    The following is a partial list of coordinates computed in the <i>campt</i> application:<br />
+    The following is a partial list of coordinates computed in the <i>mappt</i> application:<br />
     <br />
     <b>Geometric Information</b>: <def>Latitude</def>, <def>Longitude</def>, <def>Oblique Detector Resolution</def>,
        <def>Line Resolution</def>, <def>Oblique Line Resolution</def> <br />
@@ -56,10 +56,10 @@ xsi:noNamespaceSchemaLocation=
     a choice of a <def>PVL</def> file or a flat file. A PVL file is a text
     file in label format, while the flat file is a comma-delimited text file
     that is easily imported into most databases and digital spreadsheets
-    such as Microsoft Excel. Below is an example of <i>campt</i> output in <def>PVL</def>
+    such as Microsoft Excel. Below is an example of <i>mappt</i> output in <def>PVL</def>
     format. You can skim the left column of this PVL-formatted output file for
     a thorough listing of the types of coordinates, sun and instrument-related
-    information computed when using <i>campt</i>.
+    information computed when using <i>mappt</i>.
     </p>
 
     <pre>
@@ -200,7 +200,7 @@ End_Group
     </change>
     <change name="Ian Humphrey" date="2014-11-05">
       Added new parameters, USECOORDLIST, COORDLIST, and COORDTYPE for processing a list of
-      points as input. Reorganized campt. Fixes #1449.
+      points as input. Reorganized mappt. Fixes #1449.
     </change>
     <change name="Ian Humphrey" date="2015-03-03">
       Updated documentation. References #1449.
@@ -213,7 +213,7 @@ End_Group
     </change>
     <change name="Kaj Williams" date="2017-06-13">
       Resolved issue where the default value for the "allowoutside" parameter was supposed
-      to be set to "true", but the default _behavior_ of campt was instead consistent with a
+      to be set to "true", but the default _behavior_ of mappt was instead consistent with a
       setting of "false". In addition, corrected behavior where
       manually setting "allowoutside" to "false" was ignored. Ref # 2258.
     </change>
@@ -263,7 +263,7 @@ End_Group
           Selecting this parameter will enable the 'COORDLIST' and 'COORDTYPE' parameters in the
           GUI.
           <p>
-            Note that this parameter is optional when running <i>campt</i> on the
+            Note that this parameter is optional when running <i>mappt</i> on the
             command line.
           </p>
         </description>
@@ -289,7 +289,7 @@ End_Group
         <internalDefault>None</internalDefault>
         <description>
           An input comma-delimited flatfile of image coordinates or ground coordinates.
-          This allows the program to process multiple coordinates in a single run of <i>campt</i>,
+          This allows the program to process multiple coordinates in a single run of <i>mappt</i>,
           and output the results to the specified output file.
           <p>
             Expected order for image coordinates: sample, line<br/>
@@ -299,11 +299,11 @@ End_Group
             The "Error" keyword will only appear when using a coordinate list. The value of "Error"
             will then be NULL unless an error occurs during the processing of a coordinate in the
             coordinate list. Then, the value of this keyword will be the error message. This allows
-            for <i>campt</i> to continue processing the remaining coordinates in the coordinate
+            for <i>mappt</i> to continue processing the remaining coordinates in the coordinate
             list.
           </p>
           <p>
-            For the input of Latitude and Longitude, campt expects
+            For the input of Latitude and Longitude, mappt expects
             <def>Planetocentric Latitude</def> (within -90 to 90 boundary) and
             <def>Positive East Longitude</def> (with 0-360 boundary) to find the location in the
             input camera image.
@@ -354,7 +354,7 @@ End_Group
         <internalDefault>None</internalDefault>
         <description>
           A text file in label format (<def>PVL</def>) which will
-          contain the results of <i>campt</i>.  This file can
+          contain the results of <i>mappt</i>.  This file can
           be used in conjunction with the <i>getkey</i> application
           in order to pass the results to another program when developing
           scripts.
@@ -410,11 +410,11 @@ End_Group
           Allow sample/line values outside the image to be reported
         </brief>
         <description>
-          The Allowoutside parameter influences how <i>campt</i> will report
+          The Allowoutside parameter influences how <i>mappt</i> will report
           resulting latitude/longitude and sample/line coordinates that fall
           outside the input cube pixel boundaries.
           <p>
-          The default is set to True, which allows <i>campt</i> to return
+          The default is set to True, which allows <i>mappt</i> to return
           the values that are outside the cube pixel boundaries. For example,
           a given latitude/longitude might return a sample location of -1.0
           (a single whole pixel coordinate off the left side of the image).
@@ -422,7 +422,7 @@ End_Group
           </p>
           <p>
           When set to False, if a returned coordinate is off the image,
-          <i>campt</i> will fail.  This failure can be indicated and ignored
+          <i>mappt</i> will fail.  This failure can be indicated and ignored
           within a batch script when only coordinates that fall within the
           image cube pixel boundaries are desired.
           </p>
