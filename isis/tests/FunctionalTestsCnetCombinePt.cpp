@@ -31,10 +31,6 @@ class CombineNetworks : public TempTestingFiles {
     QString thirdNetFile;
     QString listFile;
 
-    ControlNet *firstNet;
-    ControlNet *secondNet;
-    ControlNet *thirdNet;
-
     void SetUp() override {
       TempTestingFiles::SetUp();
 
@@ -43,7 +39,7 @@ class CombineNetworks : public TempTestingFiles {
       thirdNetFile = tempDir.path() + "/third.net";
       listFile = tempDir.path() + "/secondthird.lis";
 
-      firstNet = new ControlNet();
+      ControlNet firstNet;
 
       ControlPoint *point1a = new ControlPoint("1a");
       ControlMeasure *measure1aFoo = new ControlMeasure();
@@ -54,7 +50,7 @@ class CombineNetworks : public TempTestingFiles {
       measure1aBar->SetCubeSerialNumber("bar");
       measure1aBar->SetCoordinate(50.0, 250.0);
       point1a->Add(measure1aBar);
-      firstNet->AddPoint(point1a);
+      firstNet.AddPoint(point1a);
 
       ControlPoint *point1b = new ControlPoint("1b");
       ControlMeasure *measure1bFoo = new ControlMeasure();
@@ -65,12 +61,12 @@ class CombineNetworks : public TempTestingFiles {
       measure1bBaz->SetCubeSerialNumber("baz");
       measure1bBaz->SetCoordinate(300.0, 100.0);
       point1b->Add(measure1bBaz);
-      firstNet->AddPoint(point1b);
+      firstNet.AddPoint(point1b);
 
-      firstNet->Write(firstNetFile);
+      firstNet.Write(firstNetFile);
 
 
-      secondNet = new ControlNet();
+      ControlNet secondNet;
 
       ControlPoint *point2a = new ControlPoint("2a");
       ControlMeasure *measure2aBar = new ControlMeasure();
@@ -81,7 +77,7 @@ class CombineNetworks : public TempTestingFiles {
       measure2aBaz->SetCubeSerialNumber("baz");
       measure2aBaz->SetCoordinate(250.0, 50.0);
       point2a->Add(measure2aBaz);
-      secondNet->AddPoint(point2a);
+      secondNet.AddPoint(point2a);
 
       ControlPoint *point2b = new ControlPoint("2b");
       ControlMeasure *measure2bBar = new ControlMeasure();
@@ -92,12 +88,12 @@ class CombineNetworks : public TempTestingFiles {
       measure2bFoo->SetCubeSerialNumber("foo");
       measure2bFoo->SetCoordinate(450.0, 400.0);
       point2b->Add(measure2bFoo);
-      secondNet->AddPoint(point2b);
+      secondNet.AddPoint(point2b);
 
-      secondNet->Write(secondNetFile);
+      secondNet.Write(secondNetFile);
 
 
-      thirdNet = new ControlNet();
+      ControlNet thirdNet;
 
       ControlPoint *point3a = new ControlPoint("3a");
       ControlMeasure *measure3aBaz = new ControlMeasure();
@@ -108,7 +104,7 @@ class CombineNetworks : public TempTestingFiles {
       measure3aBar->SetCubeSerialNumber("bar");
       measure3aBar->SetCoordinate(100.0, 300.0);
       point3a->Add(measure3aBar);
-      thirdNet->AddPoint(point3a);
+      thirdNet.AddPoint(point3a);
 
       ControlPoint *point3b = new ControlPoint("3b");
       ControlMeasure *measure3bBaz = new ControlMeasure();
@@ -119,9 +115,9 @@ class CombineNetworks : public TempTestingFiles {
       measure3bFoo->SetCubeSerialNumber("foo");
       measure3bFoo->SetCoordinate(450.0, 400.0);
       point3b->Add(measure3bFoo);
-      thirdNet->AddPoint(point3b);
+      thirdNet.AddPoint(point3b);
 
-      thirdNet->Write(thirdNetFile);
+      thirdNet.Write(thirdNetFile);
 
       QFile listFileHandle(listFile);
       listFileHandle.open(QIODevice::WriteOnly);
@@ -129,19 +125,6 @@ class CombineNetworks : public TempTestingFiles {
       listFileStream << secondNetFile << "\n";
       listFileStream << thirdNetFile << "\n";
       listFileHandle.close();
-    }
-
-
-    void TearDown() override {
-      if (firstNet) {
-        delete firstNet;
-      }
-      if (secondNet) {
-        delete secondNet;
-      }
-      if (thirdNet) {
-        delete thirdNet;
-      }
     }
 };
 
