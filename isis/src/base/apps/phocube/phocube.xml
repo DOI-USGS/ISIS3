@@ -108,6 +108,7 @@ xsi:noNamespaceSchemaLocation=
      <li>ALBEDORANK</li>
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
+     <li><def link="Local Solar Time">LOCALTIME</def></li>
      </ul>
 	The following options are available for Level2 images:
      <ul>
