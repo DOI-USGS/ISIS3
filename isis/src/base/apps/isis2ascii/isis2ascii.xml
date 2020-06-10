@@ -76,9 +76,8 @@
       a space delimited CSV reader.
     </change>
     <change name="Adam Paquette" date="2020-06-09">
-      Increased the width of DN entries in the text output from 13 to 14
-      this address an issue were there wouldn't be any spaces given
-      a long negative value.
+      Changed output formatting to use a delimiter that is placed after each
+      entry, rather than depending on a set width.
     </change>
   </history>
 
@@ -117,41 +116,52 @@
           <item>YES</item>
         </default>
       </parameter>
+      <parameter name="DELIMITER">
+        <type>string</type>
+        <brief>Output Delimiter</brief>
+        <description>
+          Sets the value to place between entries in the output file. This will
+          default to a space if nothing is entered.
+        </description>
+        <default>
+          <item></item>
+        </default>
+      </parameter>
     </group>
 
     <group name="Special Pixels">
       <parameter name="SETPIXELVALUES">
         <type>boolean</type>
-	<default>
-	  <item>NO</item>
-	</default>
-	<brief>User defined output for special pixels</brief>
-	<description>
-	      Determine whether the user would like a
-	      specific output for the special pixels in the image.
-	</description>
-	<inclusions>
-	  <item>NULLVALUE</item>
-	  <item>LRSVALUE</item>
-	  <item>LISVALUE</item>
-          <item>HISVALUE</item>
-	  <item>HRSVALUE</item>
-	</inclusions>
+      	<default>
+      	  <item>NO</item>
+      	</default>
+      	<brief>User defined output for special pixels</brief>
+      	<description>
+      	      Determine whether the user would like a
+      	      specific output for the special pixels in the image.
+      	</description>
+      	<inclusions>
+      	  <item>NULLVALUE</item>
+      	  <item>LRSVALUE</item>
+      	  <item>LISVALUE</item>
+                <item>HISVALUE</item>
+      	  <item>HRSVALUE</item>
+      	</inclusions>
       </parameter>
 
       <parameter name="NULLVALUE">
-	<type>string</type>
-	<default>
-	  <item>NULL</item>
-	</default>
-	<brief>Value to set to any null pixel</brief>
-	<description>
-	    Value that will replace any null pixel within a cub with
-	    the number entered. Defaults to NULL if nothing is entered.
-	</description>
-	<inclusions>
-	  <item>SETPIXELVALUES</item>
-	</inclusions>
+      	<type>string</type>
+      	<default>
+      	  <item>NULL</item>
+      	</default>
+      	<brief>Value to set to any null pixel</brief>
+      	<description>
+      	    Value that will replace any null pixel within a cub with
+      	    the number entered. Defaults to NULL if nothing is entered.
+      	</description>
+      	<inclusions>
+      	  <item>SETPIXELVALUES</item>
+      	</inclusions>
       </parameter>
 
       <parameter name="LRSVALUE">
