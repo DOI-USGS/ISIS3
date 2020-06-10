@@ -32,7 +32,7 @@ namespace Isis {
 
       void operator() (Buffer &in) const {
           for(int i = 0; i < in.size(); i++) {
-            fout.width(13);        //  Width must be set everytime
+            fout.width(14);        //  Width must be set everytime
             if(IsSpecial(in[i])) {
               if(IsNullPixel(in[i])) fout << null;
               if(IsHrsPixel(in[i])) fout << hrs;
