@@ -80,6 +80,27 @@ TEST_F(SmallCube, FunctionalTestIsis2asciiNoHeader) {
 
 }
 
+TEST_F(SmallCube, FunctionalTestIsis2asciiCustomDelimiter) {
+  QString outputFile = tempDir.path()+"/output.txt";
+  QVector<QString> args = {"to=" + outputFile, "delimiter=,"};
+  UserInterface ui(APP_XML, args);
+
+  isis2ascii(testCube, ui);
+
+  CSVReader::CSVAxis csvLine;
+  // Check that the data after the "Header" is correct
+  CSVReader reader = CSVReader(outputFile,
+                               false, 4, ',', false, true);
+
+  int pixelValue = 0.0;
+  for (int i = 0; i < reader.rows(); i++) {
+    csvLine = reader.getRow(i);
+    for (int j = 0; j < csvLine.dim(); j++) {
+      ASSERT_EQ(csvLine[j].toInt(), pixelValue++);
+    }
+  }
+}
+
 TEST_F(SpecialSmallCube, FunctionalTestIsis2asciiSetPixelValues) {
   QString outputFile = tempDir.path()+"/output.txt";
   QVector<QString> args = {"to=" + outputFile, "setpixelvalues=yes",
