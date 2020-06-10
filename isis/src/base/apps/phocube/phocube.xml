@@ -312,6 +312,9 @@ xsi:noNamespaceSchemaLocation=
       merge causes the application to run longer. Changed the process function to be a lambda function
       to get rid of global variables.
     </change>
+    <change name="Kristin Berry" date="2020-06-10">
+      Added the LOCALTIME parameter to output a band with the local solar time for each pixel. Fixes #
+    </change>
   </history>
 
   <category>
@@ -403,6 +406,7 @@ xsi:noNamespaceSchemaLocation=
               <item>NORTHAZIMUTH</item>
               <item>RADEC</item>
               <item>BODYFIXED</item>
+              <item>LOCALTIME</item>
             </exclusions>
           </option>
         </list>
@@ -734,6 +738,16 @@ xsi:noNamespaceSchemaLocation=
 	   the output cube. The output cube labels will contain "Body Fixed X", "Body Fixed Y",
 	   and "Body Fixed Z" in the BandBin group, in the band sequence of the output file.
 	   Body Fixed Coordinates are in kilometers.
+	 </description>
+       </parameter>
+      <parameter name="LOCALTIME">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create a band with local solar time</brief>
+         <description>
+	   If this parameter is true, the <def>Local Solar Time</def> will be calculated for
+	   every pixel in the output cube. The output cube label will contain "Local Solar Time"
+	   in the BandBin group. Local Solar Time is in hours.
 	 </description>
        </parameter>
     </group>
