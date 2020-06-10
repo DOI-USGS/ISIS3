@@ -84,6 +84,10 @@ namespace Isis {
       Cube *cube1;
       Cube *cube2;
       Cube *cube3;
+      
+      FileName *isdPath1;
+      FileName *isdPath2;
+      FileName *isdPath3; 
 
       FileName *threeImageOverlapFile;
       FileName *twoImageOverlapFile;

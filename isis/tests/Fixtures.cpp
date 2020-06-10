@@ -158,21 +158,21 @@ namespace Isis {
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
     FileName labelPath3("data/threeImageNetwork/cube3.pvl");
 
-    FileName isdPath1("data/threeImageNetwork/cube1.isd");
-    FileName isdPath2("data/threeImageNetwork/cube2.isd");
-    FileName isdPath3("data/threeImageNetwork/cube3.isd");
+    isdPath1 = new FileName("data/threeImageNetwork/cube1.isd");
+    isdPath2 = new FileName("data/threeImageNetwork/cube2.isd");
+    isdPath3 = new FileName("data/threeImageNetwork/cube3.isd");
 
     threeImageOverlapFile = new FileName("data/threeImageNetwork/threeImageOverlaps.lis");
     twoImageOverlapFile = new FileName("data/threeImageNetwork/twoImageOverlaps.lis");
 
     cube1 = new Cube();
-    cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, isdPath1, "rw");
+    cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, *isdPath1, "rw");
 
     cube2 = new Cube();
-    cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, isdPath2, "rw");
+    cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
 
     cube3 = new Cube();
-    cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, isdPath3, "rw");
+    cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
 
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
@@ -194,5 +194,12 @@ namespace Isis {
     delete cube1;
     delete cube2;
     delete cube3;
+
+    delete isdPath1;
+    delete isdPath2;
+    delete isdPath3; 
+
+    delete threeImageOverlapFile; 
+    delete twoImageOverlapFile; 
   }
 }
