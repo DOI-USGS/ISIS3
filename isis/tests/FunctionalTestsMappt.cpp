@@ -121,11 +121,12 @@ TEST_F(DefaultCube, FunctionalTestMapptFlatFileTest) {
   UserInterface options(APP_XML, args);
   Pvl appLog;
   mappt(projTestCube, options, &appLog);
+
   PvlGroup mapPoint = appLog.findGroup("Results");
   
   int lineNumber = 0;
   QTextStream flatStream(&flatFile);
-  
+
   if (flatFile.open(QIODevice::ReadOnly)) {
     while(!flatStream.atEnd()) {
       QString line = flatStream.readLine();
@@ -165,6 +166,9 @@ TEST_F(DefaultCube, FunctionalTestMapptFlatFileTest) {
       }
       lineNumber++;
     }
+  }
+  else {
+    FAIL() << "FAILED TO OPEN FLATFILE";
   }
 }
 
@@ -260,6 +264,76 @@ TEST_F(DefaultCube, FunctionalTestMapptImageCoordList) {
   EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("PositiveWest180Longitude"), -4.2401479101646); 
   EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("x"), 250000);
   EXPECT_DOUBLE_EQ( (double) mapPoint.findKeyword("y"), 350000.0);
+
+}
+
+TEST_F(DefaultCube, FunctionalTestMapptCoordListFlatFile) {
+  std::ofstream of;
+  of.open(tempDir.path().toStdString()+"/coords.txt");
+  of << "1, 1\n2, 2\n 3, 3";
+  of.close();
+   
+  QFile flatFile(tempDir.path() + "/testOut.txt");
+  QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt","to=" + flatFile.fileName(), 
+                           "UseCoordList=True", 
+                           "append=false", "format=flat",
+                           "type=image"};
+  UserInterface options(APP_XML, args);
+
+  Pvl appLog; 
+  mappt(projTestCube, options, &appLog);
+  
+  int lineNumber = 0;
+  QTextStream flatStream(&flatFile);
+  
+  PvlGroup mapPoint = appLog.group(0);
+
+  if (flatFile.open(QIODevice::ReadOnly)) {
+    while(!flatStream.atEnd()) {
+      QString line = flatStream.readLine();
+      QStringList fields = line.split(",");
+      
+      if(lineNumber == 0) {
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(0), "Filename");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(1), "Sample");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(2), "Line");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(3), "Band");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(4), "FilterName");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(5), "PixelValue");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(6), "X");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(7), "Y");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(8), "PlanetocentricLatitude");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(9), "PlanetographicLatitude");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(10), "PositiveEast360Longitude");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(11), "PositiveEast180Longitude");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(12), "PositiveWest360Longitude");
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(13), "PositiveWest180Longitude");
+      }
+      else {
+        mapPoint = appLog.group(lineNumber-1); 
+        
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(0), mapPoint.findKeyword("FileName"));
+        EXPECT_DOUBLE_EQ(fields.value(1).toDouble(), mapPoint.findKeyword("Sample"));
+        EXPECT_DOUBLE_EQ(fields.value(2).toDouble(), mapPoint.findKeyword("Line"));
+        EXPECT_DOUBLE_EQ(fields.value(3).toDouble(), mapPoint.findKeyword("Band"));
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(4), mapPoint.findKeyword("FilterName"));
+        EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(5), mapPoint.findKeyword("PixelValue"));
+        EXPECT_DOUBLE_EQ(fields.value(6).toDouble(), mapPoint.findKeyword("X"));
+        EXPECT_DOUBLE_EQ(fields.value(7).toDouble(), mapPoint.findKeyword("Y"));
+        EXPECT_DOUBLE_EQ(fields.value(8).toDouble(), mapPoint.findKeyword("PlanetocentricLatitude"));
+        EXPECT_DOUBLE_EQ(fields.value(9).toDouble(), mapPoint.findKeyword("PlanetographicLatitude") );
+        EXPECT_DOUBLE_EQ(fields.value(10).toDouble(), mapPoint.findKeyword("PositiveEast360Longitude"));
+        EXPECT_DOUBLE_EQ(fields.value(11).toDouble(), mapPoint.findKeyword("PositiveEast180Longitude"));
+        EXPECT_DOUBLE_EQ(fields.value(12).toDouble(), mapPoint.findKeyword("PositiveWest360Longitude"));
+        EXPECT_DOUBLE_EQ(fields.value(13).toDouble(), mapPoint.findKeyword("PositiveWest180Longitude"));
+      }
+
+      lineNumber++;
+    }
+  }
+  else {
+    FAIL() << "FAILED TO OPEN FLATFILE";
+  }
 }
 
 TEST_F(DefaultCube, FunctionalTestMapptBadColumnError) {

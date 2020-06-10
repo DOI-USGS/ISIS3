@@ -43,6 +43,72 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
       log->addGroup(getProjPointInfo(icube, points[i], ui, log));
     } 
   }
+
+  // Write an output label file if necessary
+  if(ui.WasEntered("TO")) {
+    // Get user params from ui
+    QString outFile = FileName(ui.GetFileName("TO")).expanded();
+    bool exists = FileName(outFile).fileExists();
+    bool append = ui.GetBoolean("APPEND");
+
+    // Write the pvl group out to the file
+    if(ui.GetString("FORMAT") == "PVL") {
+      if(append) {
+        log->append(outFile);
+      }
+      else {
+        log->write(outFile);
+      }
+    }
+
+    // Create a flatfile of the same data
+    // The flatfile is comma delimited and can be imported into Excel
+    else {
+      ofstream os;
+      bool writeHeader = false;
+      if(append) {
+        os.open(outFile.toLatin1().data(), ios::app);
+        if(!exists) {
+          writeHeader = true;
+        }
+      }
+      else {
+        os.open(outFile.toLatin1().data(), ios::out);
+        writeHeader = true;
+      }
+      
+      PvlGroup fResult = log->group(0); 
+
+      if(writeHeader) {
+        for(int i = 0; i < fResult.keywords(); i++) {
+          os << fResult[i].name();
+
+          if(i < fResult.keywords() - 1) {
+            os << ",";
+          }
+        }
+        os << endl;
+      }
+      
+      for(int i = 0; i < log->groups(); i++) {
+        PvlGroup group = log->group(i);
+        std::cout << group << std::endl;
+        for(int j = 0; j < group.keywords(); j++) {
+          os << (QString)group[j];
+          std::cout << (QString)group[j] << std::endl; 
+          if(j < group.keywords() - 1) {
+            os << ",";
+          }
+        }
+        os << endl;    
+      } // end of keyword loop
+    } // end of group loop 
+  
+  }
+  else if(ui.GetString("FORMAT") == "FLAT") {
+    QString msg = "Flat file must have a name.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
 }
 
 
@@ -177,9 +243,12 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
   icube->read(b);
   
   QString filterName = "Null";
-  PvlGroup bandBin = icube->label()->findObject("IsisCube").findGroup("BandBin");
-  if (bandBin.hasKeyword("FilterName")) {
-      filterName = bandBin.findKeyword("FilterName")[0];
+
+  if ( icube->label()->findObject("IsisCube").hasGroup("BandBin")) {
+    PvlGroup bandBin = icube->label()->findObject("IsisCube").findGroup("BandBin");
+    if (bandBin.hasKeyword("FilterName")) {
+        filterName = bandBin.findKeyword("FilterName")[0];
+    }
   }
 
   // Log the position
@@ -217,6 +286,7 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
       PvlKeyword("PositiveWest180Longitude",
                  toString(proj->To180Domain(proj->ToPositiveEast(
                             proj->UniversalLongitude(), 360))));
+
 
     // Input map coordinate system location
     // Latitude
@@ -282,7 +352,24 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
         results += pE180;
         results += pW360;
       }
-    } 
+    }
+    
+    if (ui.GetString("FORMAT") == "FLAT") {
+      // Rearrange the order of the lat/lons for the csv
+      results.deleteKeyword( pE360.name() );
+      results.deleteKeyword( pE180.name() );
+      results.deleteKeyword( pW360.name() );
+      results.deleteKeyword( pW180.name() );
+      results.deleteKeyword( centLat.name() );
+      results.deleteKeyword( graphLat.name() );
+      //Correct order.
+      results += centLat;
+      results += graphLat;
+      results += pE360;
+      results += pE180;
+      results += pW360;
+      results += pW180;
+    }
   }
 
   return results; 
@@ -331,7 +418,7 @@ QList< QPair<double, double> > getMapPoints(const UserInterface &ui, bool usePoi
       }
       points.append(QPair<double, double>(point1, point2));
     }
-
+    
     return points;
 }
 }
