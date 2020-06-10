@@ -228,6 +228,6 @@ void IsisMain() {
 
     plot->showWindow();
   }
-
+  delete hist;
   p.EndProcess();
 }
