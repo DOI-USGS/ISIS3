@@ -84,12 +84,17 @@ namespace Isis {
     QString to = ui.GetFileName("TO", "txt");
     fout.open(to.toLatin1().data());
 
+    QString delimiter = ui.GetString("DELIMITER");
+    if (delimiter.isEmpty()) {
+      delimiter = " ";
+    }
+
     // Print header if needed
     if(ui.GetBoolean("HEADER")) {
-      fout << "Input_Cube " << icube->fileName() << endl;
-      fout << "Samples " << icube->sampleCount() << endl;
-      fout << "Lines " << icube->lineCount() << endl;
-      fout << "Bands " << icube->bandCount() << endl;
+      fout << "Input_Cube" << delimiter << icube->fileName() << endl;
+      fout << "Samples" << delimiter << icube->sampleCount() << endl;
+      fout << "Lines" << delimiter << icube->lineCount() << endl;
+      fout << "Bands" << delimiter << icube->bandCount() << endl;
     }
 
     //Determine special pixel values
@@ -108,10 +113,6 @@ namespace Isis {
       lis = "LIS";
     }
 
-    QString delimiter = ui.GetString("DELIMITER");
-    if (delimiter.isEmpty()) {
-      delimiter = " ";
-    }
     SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis, delimiter);
 
     fout << std::setprecision(7);
