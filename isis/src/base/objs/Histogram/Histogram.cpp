@@ -460,8 +460,6 @@ namespace Isis {
           index = 0;
         }
         else {
-          // index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-          //                     (data[i] - BinRangeStart() ) + 0.5);
           index = (int) floor( ((double) nbins / (BinRangeEnd() - BinRangeStart())) *
                               (data[i] - BinRangeStart()) );
         }
@@ -653,9 +651,6 @@ namespace Isis {
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
-    // double binSize = (BinRangeEnd() - BinRangeStart()) / (double)(p_bins.size() - 1);
-    // low = BinRangeStart() - binSize / 2.0 + binSize * (double) index;
-    // high = low + binSize;
     double binSize = (BinRangeEnd() - BinRangeStart()) / (double) p_bins.size();
     low = BinRangeStart() + binSize * (double) index;
     high = low + binSize;
