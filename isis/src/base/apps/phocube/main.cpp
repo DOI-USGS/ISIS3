@@ -100,6 +100,7 @@ void IsisMain() {
   bool bodyFixedX = false;
   bool bodyFixedY = false;
   bool bodyFixedZ = false;
+  bool localSolarTime = false;
   int raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
 
   if (!noCamera) {
@@ -125,6 +126,7 @@ void IsisMain() {
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
   }
 
   bool dn;
@@ -259,8 +261,10 @@ void IsisMain() {
   if (bodyFixedZ) {
     name += "Body Fixed Z";
   }
-
-  bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
+  if (localSolarTime) {
+    name += "Local Solar Time";
+  }
+  bool specialPixels = ui.GetBoolean("SPECIALPIXELS"); 
 
   /**
    * Computes all the geometric properties for the output buffer. Certain
@@ -455,6 +459,10 @@ void IsisMain() {
               out[index] = pB[2];
               index += 64 * 64;
             }
+          }
+          if (localSolarTime) {
+            out[index] = cam->LocalSolarTime();
+            index += 64 * 64;
           }
         }
 
