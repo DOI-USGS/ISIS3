@@ -34,7 +34,7 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
-                        conda install -c conda-forge python=3
+                        conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
                         mkdir build install
                     """

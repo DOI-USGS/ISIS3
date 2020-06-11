@@ -27,16 +27,38 @@ void IsisMain() {
     QString msg = "The [TO] parameter must be entered";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
-  // Setup the histogram
-  Histogram hist(*icube, 1, p.Progress() );
-  if (ui.WasEntered("MINIMUM") ) {
-    hist.SetValidRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM") );     
-  }
 
-  if (ui.WasEntered("NBINS")) {
-    hist.SetBins(ui.GetInteger("NBINS"));
+  Histogram *hist;
+  if (ui.WasEntered("MINIMUM") && ui.WasEntered("MAXIMUM")){
+    int nbins = 0;
+
+    if (ui.WasEntered("NBINS")){
+      nbins = ui.GetInteger("NBINS");
+    }
+    else {
+      // Calculate bins based on data type.
+      // Bin calculations are based on logic in Histogram::InitializeFromCube
+      if (icube->pixelType() == UnsignedByte) {
+        nbins = 256;
+      }
+      else if (icube->pixelType() == SignedWord ||
+               icube->pixelType() == UnsignedWord ||
+               icube->pixelType() == UnsignedInteger ||
+               icube->pixelType() == SignedInteger ||
+               icube->pixelType() == Real) {
+        nbins = 65536;
+      }
+      else {
+        IString msg = "Unsupported pixel type";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    hist = new Histogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
   }
+  else {
+    hist = new Histogram(*icube, 1, p.Progress());
+  }
+  // Setup the histogram
 
   // Loop and accumulate histogram
   p.Progress()->SetText("Gathering Histogram");
@@ -47,7 +69,7 @@ void IsisMain() {
   for (int i = 1; i <= icube->lineCount(); i++) {
     line.SetLine(i);
     icube->read(line);
-    hist.AddData(line.DoubleBuffer(), line.size());
+    hist->AddData(line.DoubleBuffer(), line.size());
     p.Progress()->CheckStatus();
   }
 
@@ -176,7 +198,7 @@ void IsisMain() {
     for (int y = 0; y < binCountData.size(); y++) {
 
       intervals[y].interval = QwtInterval(binCountData[y].x(),
-                                          binCountData[y].x() + hist.BinSize());
+                                          binCountData[y].x() + hist->BinSize());
 
       intervals[y].value = binCountData[y].y();
     }
@@ -192,18 +214,18 @@ void IsisMain() {
     plot->add(histCurve);
     plot->add(cdfCurve);
 
-    QLabel *label = new QLabel("  Average = " + QString::number(hist.Average()) + '\n' +
-           "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +
-           "\n  Maximum = " + QString::number(hist.Maximum()) + '\n' +
-           "\n  Stand. Dev.= " + QString::number(hist.StandardDeviation()) + '\n' +
-           "\n  Variance = " + QString::number(hist.Variance()) + '\n' +
-           "\n  Median = " + QString::number(hist.Median()) + '\n' +
-           "\n  Mode = " + QString::number(hist.Mode()) + '\n' +
-           "\n  Skew = " + QString::number(hist.Skew()), plot);
+    QLabel *label = new QLabel("  Average = " + QString::number(hist->Average()) + '\n' +
+           "\n  Minimum = " + QString::number(hist->Minimum()) + '\n' +
+           "\n  Maximum = " + QString::number(hist->Maximum()) + '\n' +
+           "\n  Stand. Dev.= " + QString::number(hist->StandardDeviation()) + '\n' +
+           "\n  Variance = " + QString::number(hist->Variance()) + '\n' +
+           "\n  Median = " + QString::number(hist->Median()) + '\n' +
+           "\n  Mode = " + QString::number(hist->Mode()) + '\n' +
+           "\n  Skew = " + QString::number(hist->Skew()), plot);
     plot->getDockWidget()->setWidget(label);
 
     plot->showWindow();
   }
-
+  delete hist;
   p.EndProcess();
 }
