@@ -346,8 +346,9 @@ TEST_F(DefaultCube, FunctionalTestMapptBadColumnError) {
                            "UseCoordList=True", 
                            "append=false",
                            "type=image"};
-  UserInterface options(APP_XML, args);
 
+  UserInterface options(APP_XML, args);
+  std::cout << "here" << std::endl;
   Pvl appLog;
   try {
     mappt(projTestCube, options, &appLog);
@@ -362,5 +363,4 @@ TEST_F(DefaultCube, FunctionalTestMapptBadColumnError) {
               "Each row must have two columns: a sample,line or a latitude,longitude pair.\"";
   }
 
-  PvlGroup mapPoint = appLog.group(0);
 }
