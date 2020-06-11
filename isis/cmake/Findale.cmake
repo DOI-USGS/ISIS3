@@ -6,7 +6,7 @@
 #   ALE_LIBRARY
 
 find_path(ALE_INCLUDE_DIR
-    NAMES ale.h
+    NAMES Isd.h
     PATH_SUFFIXES ale
 )
 
