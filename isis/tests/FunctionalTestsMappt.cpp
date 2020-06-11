@@ -348,7 +348,6 @@ TEST_F(DefaultCube, FunctionalTestMapptBadColumnError) {
                            "type=image"};
 
   UserInterface options(APP_XML, args);
-  std::cout << "here" << std::endl;
   Pvl appLog;
   try {
     mappt(projTestCube, options, &appLog);

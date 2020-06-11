@@ -92,10 +92,8 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
       
       for(int i = 0; i < log->groups(); i++) {
         PvlGroup group = log->group(i);
-        std::cout << group << std::endl;
         for(int j = 0; j < group.keywords(); j++) {
           os << (QString)group[j];
-          std::cout << (QString)group[j] << std::endl; 
           if(j < group.keywords() - 1) {
             os << ",";
           }
