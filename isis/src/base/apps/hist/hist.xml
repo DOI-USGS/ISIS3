@@ -66,7 +66,7 @@
       Histogram object no longer has SetRange, updated to use SetValidRange
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Noah Hilt" date="2008-08-01">
       Changed the plot window to the new HistogramToolWindow
@@ -79,7 +79,11 @@
     <change name="Curtis Rose" date="2016-06-10">
      Changed the application to fail immediately if the TO argument is not
      entered from the commandline. Fixes #3914.
-    </change>	
+    </change>
+    <change name="Austin Sanders" date="2020-06-08">
+      Updated logic such that min/max values are no longer calculated from .cub
+      if values are provided by the user.  Fixes #3881.
+    </change>
   </history>
 
   <oldName>
