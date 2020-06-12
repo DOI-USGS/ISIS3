@@ -167,20 +167,8 @@ namespace Isis {
 
    rangesFromNet(net,statFunc);
 
-
-   //stretch the domain so that it is an even multiple of binWidth
-   //for some reason Histogram makes the end points of the bin range be at the center of
-   //bins.  Thus the +/-0.5 forces it to point the bin range at the ends of the bins.
-   //SetBinRange(binWidth*( floor(this->ValidMinimum()/binWidth )+0.5),
-   //            binWidth*(ceil( this->ValidMaximum()/binWidth )-0.5) );
-
-
    //Keep an eye on this to see if it breaks anything.  Also, I need to create
    //a dataset to give this constructor for the unit test.
-
-    //tjw:  SetValidRange is moved into SetBinRange
-   //SetValidRange(binWidth*floor(this->ValidMinimum()/binWidth),
-   //              binWidth*ceil(this->ValidMaximum()/binWidth));
 
    //from the domain of the data and the requested bin width calculate the number of bins
    double domain = this->ValidMaximum() - this->ValidMinimum();
