@@ -73,7 +73,7 @@ void IsisMain() {
     p.Progress()->CheckStatus();
   }
 
-  if (ui.WasEntered("TO") ) {
+  if (!ui.IsInteractive() || ui.WasEntered("TO") ) {
     // Write the results
     QString outfile = ui.GetFileName("TO");
     ofstream fout;
