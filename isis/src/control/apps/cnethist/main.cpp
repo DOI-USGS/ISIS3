@@ -39,7 +39,7 @@ void IsisMain() {
   HistogramPlotWindow *plot=NULL;
 
   //setup plot tile and axis labels (if any)
-  if(ui.IsInteractive()) { 
+  if(ui.IsInteractive()) {
     // Set the title for the dialog
     QString title;
     if(ui.WasEntered("TITLE")) {
@@ -70,24 +70,24 @@ void IsisMain() {
     }
 
     QString yaxis = "";
-    plot->setAxisLabel(QwtPlot::yRight, yaxis); 
+    plot->setAxisLabel(QwtPlot::yRight, yaxis);
   }
 
   //open text report file (if any)
-  ofstream fout; 
-  if(!ui.IsInteractive() || ui.WasEntered("TO")) { 
+  ofstream fout;
+  if(!ui.IsInteractive() || ui.WasEntered("TO")) {
     // Write the results
 
     if(!ui.WasEntered("TO")) {
       QString msg = "The [TO] parameter must be entered";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    QString outfile = ui.GetFileName("TO");     
+    QString outfile = ui.GetFileName("TO");
     fout.open(outfile.toLatin1().data());
   }
 
   //loop throught the control nets writing reports and drawing histograms as needed
-  for (int i=0;i<fList.size();i++) {  
+  for (int i=0;i<fList.size();i++) {
     ControlNet net(fList[i].toString(),&progress);
     Histogram *hist;
     // Setup the histogram
@@ -95,7 +95,7 @@ void IsisMain() {
       hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
     }
     catch (IException &e) {
-      QString msg = "The following error was thrown while building a histogram from netfile [" + 
+      QString msg = "The following error was thrown while building a histogram from netfile [" +
                     fList[i].expanded() + "]: " +e.toString() + "\n";
       if (ui.IsInteractive())  //if in gui mode print the error message to the terminal
         Application::GuiLog(msg);
@@ -107,9 +107,9 @@ void IsisMain() {
 
       continue; //skip to the next next net file
     }
-       
 
-    //Tabular Histogram Data 
+
+    //Tabular Histogram Data
     if(!ui.IsInteractive() || ui.WasEntered("TO")) {
       fout << "Network:        " << fList[i].toString() << endl;
       fout << "Average:        " << hist->Average() << endl;
@@ -121,7 +121,7 @@ void IsisMain() {
       fout << "Minimum:        " << hist->Minimum() << endl;
       fout << "Maximum:        " << hist->Maximum() << endl;
       fout << "Total Measures: " << hist->TotalPixels() << endl;
-        
+
       //  Write histogram in tabular format
       fout << endl;
       fout << "ResidualMagnitudeMin,ResidualMagnitudeMax,MeasuresInBin,CumulativeMeasures,Percent,CumulativePercent" << endl;
@@ -138,7 +138,7 @@ void IsisMain() {
           cumpct += pct;
 
           hist->BinRange(j, low, high);
-    
+
           fout << low << ",";
           fout << high << ",";
           fout << hist->BinCount(j) << ",";
@@ -172,13 +172,13 @@ void IsisMain() {
       QString baseName = FileName(fList[i]).baseName();
       histCurve->setTitle(baseName);
 
- 
+
       QPen *pen = new QPen(curveColor(i));
       pen->setWidth(2);
       histCurve->setYAxis(QwtPlot::yLeft);
-      histCurve->setPen(*pen);  
+      histCurve->setPen(*pen);
       histCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
-  
+
       histCurve->setData(new QwtPointSeriesData(binCountData));
 
       plot->add(histCurve);

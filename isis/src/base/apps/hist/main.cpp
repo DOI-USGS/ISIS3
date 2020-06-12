@@ -81,24 +81,24 @@ void IsisMain() {
 
     fout << "Cube:              " << ui.GetFileName("FROM") << endl;
     fout << "Band:              " << icube->bandCount() << endl;
-    fout << "Average:           " << hist.Average() << endl;
-    fout << "Std Deviation:     " << hist.StandardDeviation() << endl;
-    fout << "Variance:          " << hist.Variance() << endl;
-    fout << "Median:            " << hist.Median() << endl;
-    fout << "Mode:              " << hist.Mode() << endl;
-    fout << "Skew:              " << hist.Skew() << endl;
-    fout << "Minimum:           " << hist.Minimum() << endl;
-    fout << "Maximum:           " << hist.Maximum() << endl;
+    fout << "Average:           " << hist->Average() << endl;
+    fout << "Std Deviation:     " << hist->StandardDeviation() << endl;
+    fout << "Variance:          " << hist->Variance() << endl;
+    fout << "Median:            " << hist->Median() << endl;
+    fout << "Mode:              " << hist->Mode() << endl;
+    fout << "Skew:              " << hist->Skew() << endl;
+    fout << "Minimum:           " << hist->Minimum() << endl;
+    fout << "Maximum:           " << hist->Maximum() << endl;
     fout << endl;
-    fout << "Total Pixels:      " << hist.TotalPixels() << endl;
-    fout << "Valid Pixels:      " << hist.ValidPixels() << endl;
-    fout << "Pixels Below Min:  " << hist.UnderRangePixels() << endl;
-    fout << "Pixels Above Max:  " << hist.OverRangePixels() << endl;
-    fout << "Null Pixels:       " << hist.NullPixels() << endl;
-    fout << "Lis Pixels:        " << hist.LisPixels() << endl;
-    fout << "Lrs Pixels:        " << hist.LrsPixels() << endl;
-    fout << "His Pixels:        " << hist.HisPixels() << endl;
-    fout << "Hrs Pixels:        " << hist.HrsPixels() << endl;
+    fout << "Total Pixels:      " << hist->TotalPixels() << endl;
+    fout << "Valid Pixels:      " << hist->ValidPixels() << endl;
+    fout << "Pixels Below Min:  " << hist->UnderRangePixels() << endl;
+    fout << "Pixels Above Max:  " << hist->OverRangePixels() << endl;
+    fout << "Null Pixels:       " << hist->NullPixels() << endl;
+    fout << "Lis Pixels:        " << hist->LisPixels() << endl;
+    fout << "Lrs Pixels:        " << hist->LrsPixels() << endl;
+    fout << "His Pixels:        " << hist->HisPixels() << endl;
+    fout << "Hrs Pixels:        " << hist->HrsPixels() << endl;
 
     //  Write histogram in tabular format
     fout << endl;
@@ -110,17 +110,17 @@ void IsisMain() {
     double low;
     double high;
 
-    for (int i = 0; i < hist.Bins(); i++) {
-      if (hist.BinCount(i) > 0) {
-        total += hist.BinCount(i);
-        double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
+    for (int i = 0; i < hist->Bins(); i++) {
+      if (hist->BinCount(i) > 0) {
+        total += hist->BinCount(i);
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
 
-        hist.BinRange(i, low, high);
+        hist->BinRange(i, low, high);
 
         fout << low << ",";
         fout << high << ",";
-        fout << hist.BinCount(i) << ",";
+        fout << hist->BinCount(i) << ",";
         fout << total << ",";
         fout << pct << ",";
         fout << cumpct << endl;
@@ -168,12 +168,12 @@ void IsisMain() {
     double cumpct = 0.0;
     double low;
     double high;
-    for (int i = 0; i < hist.Bins(); i++) {
-      if (hist.BinCount(i) > 0) {
-        hist.BinRange(i, low, high);
-        binCountData.append(QPointF(low, hist.BinCount(i) ) );
+    for (int i = 0; i < hist->Bins(); i++) {
+      if (hist->BinCount(i) > 0) {
+        hist->BinRange(i, low, high);
+        binCountData.append(QPointF(low, hist->BinCount(i) ) );
 
-        double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.0;
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.0;
         cumpct += pct;
         cumPctData.append(QPointF(low, cumpct) );
       }
