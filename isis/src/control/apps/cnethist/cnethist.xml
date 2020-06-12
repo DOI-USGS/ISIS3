@@ -22,7 +22,6 @@
       bins instead of the DN of the pixel in the middle of the bin. These changes were also
       reflected in the histrogram creation. The x-axis is now based off of the min value of a bin instead of the middle value. These changes were made alongside changes made to Histogram and hist.
     </change>
-    </change>
   </history>
 
   <groups>
