@@ -17,6 +17,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2016-06-15 Adam Paquette - Original Version
+   *   @history 2020-06-10 Adam Paquette - Added delimiter variable to use in
+   *                                       output file and removed static spacing
    *
    */
 
@@ -27,12 +29,12 @@ namespace Isis {
                                    QString hrs,
                                    QString his,
                                    QString lrs,
-                                   QString lis) :
-          null(null), hrs(hrs), his(his), lrs(lrs), lis(lis) {}
+                                   QString lis,
+                                   QString delimiter) :
+          null(null), hrs(hrs), his(his), lrs(lrs), lis(lis), delimiter(delimiter) {}
 
       void operator() (Buffer &in) const {
           for(int i = 0; i < in.size(); i++) {
-            fout.width(13);        //  Width must be set everytime
             if(IsSpecial(in[i])) {
               if(IsNullPixel(in[i])) fout << null;
               if(IsHrsPixel(in[i])) fout << hrs;
@@ -43,6 +45,9 @@ namespace Isis {
             else {
               fout << in[i];
             }
+            if (i != in.size() - 1) {
+              fout << delimiter;
+            }
           }
           fout << endl;
       }
@@ -52,6 +57,7 @@ namespace Isis {
       QString his;
       QString lrs;
       QString lis;
+      QString delimiter;
   };
 
   void isis2ascii(UserInterface &ui) {
@@ -78,12 +84,17 @@ namespace Isis {
     QString to = ui.GetFileName("TO", "txt");
     fout.open(to.toLatin1().data());
 
+    QString delimiter = ui.GetString("DELIMITER");
+    if (delimiter.isEmpty()) {
+      delimiter = " ";
+    }
+
     // Print header if needed
     if(ui.GetBoolean("HEADER")) {
-      fout << "Input_Cube " << icube->fileName() << endl;
-      fout << "Samples " << icube->sampleCount() << endl;
-      fout << "Lines " << icube->lineCount() << endl;
-      fout << "Bands " << icube->bandCount() << endl;
+      fout << "Input_Cube" << delimiter << icube->fileName() << endl;
+      fout << "Samples" << delimiter << icube->sampleCount() << endl;
+      fout << "Lines" << delimiter << icube->lineCount() << endl;
+      fout << "Bands" << delimiter << icube->bandCount() << endl;
     }
 
     //Determine special pixel values
@@ -102,7 +113,7 @@ namespace Isis {
       lis = "LIS";
     }
 
-    SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis);
+    SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis, delimiter);
 
     fout << std::setprecision(7);
 

@@ -128,6 +128,9 @@ namespace Isis {
    *  @history 2018-07-31 Kaitlyn Lee - Added setTrackingCube() and trackingCube() so that a
    *                          tracking cube is stored when needed and we do not have to open it in
    *                          AdvancedTrackTool every time the cursor is moved.
+   *  @history 2020-06-09 Kristin Berry - Updated paintPixmap() to move getStretch out of inner
+   *                          for loops. This provides a significant speed increase for qisis
+   *                          applications with cube viewports.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
