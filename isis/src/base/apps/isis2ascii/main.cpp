@@ -33,12 +33,12 @@ public:
                                  QString hrs,
                                  QString his,
                                  QString lrs,
-                                 QString lis) :
-        null(null), hrs(hrs), his(his), lrs(lrs), lis(lis) {}
+                                 QString lis,
+                                 QString delimiter) :
+        null(null), hrs(hrs), his(his), lrs(lrs), lis(lis), delimiter(delimiter) {}
 
     void operator() (Buffer &in) const {
         for(int i = 0; i < in.size(); i++) {
-          fout.width(13);        //  Width must be set everytime
           if(IsSpecial(in[i])) {
             if(IsNullPixel(in[i])) fout << null;
             if(IsHrsPixel(in[i])) fout << hrs;
@@ -49,6 +49,9 @@ public:
           else {
             fout << in[i];
           }
+          if (i != in.size() - 1) {
+            fout << delimiter;
+          }
         }
         fout << endl;
     }
@@ -58,6 +61,7 @@ private:
     QString his;
     QString lrs;
     QString lis;
+    QString delimiter;
 };
 
 void IsisMain() {
@@ -77,6 +81,11 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString to = ui.GetFileName("TO", "txt");
   fout.open(to.toLatin1().data());
+
+  QString delimiter = ui.GetString("DELIMITER");
+  if (delimiter.isEmpty()) {
+    delimiter = " ";
+  }
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {
@@ -101,10 +110,10 @@ void IsisMain() {
     lis = "LIS";
   }
 
-  SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis);
-  
+  SpecialPixelFunctor isis2ascii(null, hrs, his, lrs, lis, delimiter);
+
   fout << std::setprecision(7);
-  
+
   // List the cube
   p.ProcessCubeInPlace(isis2ascii, false);
   p.EndProcess();

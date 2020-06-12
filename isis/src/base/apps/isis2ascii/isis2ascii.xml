@@ -4,9 +4,9 @@
 
   <description>
     This program converts sn ISIS cube to ASCII file format.  Special pixels such as
-    <def>NULL</def>, <def>LIS</def>, <def>LRS</def>, <def>HIS</def> and <def>HRS</def> 
-    have predetermined pixel values. You may opt to assign a range of pixel values to 
-    the individual <def>Special Pixels</def> using the SETPIXELVALUES parameter. Bands in the cube 
+    <def>NULL</def>, <def>LIS</def>, <def>LRS</def>, <def>HIS</def> and <def>HRS</def>
+    have predetermined pixel values. You may opt to assign a range of pixel values to
+    the individual <def>Special Pixels</def> using the SETPIXELVALUES parameter. Bands in the cube
     will be output in band sequential format.
     <br />
     <br />
@@ -63,13 +63,17 @@
         Documentation fixes
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Makayla Shepherd" date="2015-01-30">
       Increased precision of the DNs in the output text file from 6 to 7
     </change>
     <change name="Adam Paquette" date="2016-06-15">
       Added the ability for a user to specify the special pixel values
+    </change>
+    <change name="Adam Paquette" date="2020-06-09">
+      Changed output formatting to use a delimiter that is placed after each
+      entry, rather than depending on a set width.
     </change>
   </history>
 
@@ -108,6 +112,17 @@
           <item>YES</item>
         </default>
       </parameter>
+      <parameter name="DELIMITER">
+        <type>string</type>
+        <brief>Output Delimiter</brief>
+        <description>
+          Sets the value to place between entries in the output file. This will
+          default to a space if nothing is entered.
+        </description>
+        <default>
+          <item></item>
+        </default>
+      </parameter>
     </group>
 
     <group name="Special Pixels">
@@ -118,7 +133,7 @@
 	</default>
 	<brief>User defined output for special pixels</brief>
 	<description>
-	      Determine whether the user would like a 
+	      Determine whether the user would like a
 	      specific output for the special pixels in the image.
 	</description>
 	<inclusions>
@@ -129,7 +144,7 @@
 	  <item>HRSVALUE</item>
 	</inclusions>
       </parameter>
-      
+
       <parameter name="NULLVALUE">
 	<type>string</type>
 	<default>
@@ -215,12 +230,12 @@
 
     <example>
       <brief> Header default </brief>
-      <description> 
+      <description>
 	Demonstrate the isis2ascii application with header
       </description>
       <terminalInterface>
         <commandLine> f=../IN/f332s28.cub t=OUT/isis2ascii.txt </commandLine>
-        <description> 
+        <description>
 	  Convert Viking ISIS image to ascii file.  Let header default to yes.
         </description>
       </terminalInterface>
@@ -237,7 +252,7 @@
       <outputImages>
         <image src="assets/image/isis2asciiTxt.jpg" width="500" height="523">
           <brief> Example output ascii text from isis2ascii run</brief>
-          <description> 
+          <description>
 	    This is the output ascii text file isis2ascii.txt with the header.
           </description>
           <thumbnail caption="Output image showing results of the isis2ascii application." src="assets/thumb/isis2asciiTxt.jpg" width="200" height="209"/>
