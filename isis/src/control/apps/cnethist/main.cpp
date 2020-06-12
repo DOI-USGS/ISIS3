@@ -124,18 +124,23 @@ void IsisMain() {
         
       //  Write histogram in tabular format
       fout << endl;
-      fout << "ResidualMagnitude,MeasuresInBin,CumulativeMeasures,Percent,CumulativePercent" << endl;
+      fout << "ResidualMagnitudeMin,ResidualMagnitudeMax,MeasuresInBin,CumulativeMeasures,Percent,CumulativePercent" << endl;
 
       Isis::BigInt total = 0;
       double cumpct = 0.0;
+      double low;
+      double high;
 
       for(int j = 0; j < hist->Bins(); j++) {
         if(hist->BinCount(j) > 0) {
           total += hist->BinCount(j);
           double pct = (double)hist->BinCount(j) / hist->ValidPixels() * 100.;
           cumpct += pct;
+
+          hist->BinRange(j, low, high);
     
-          fout << hist->BinMiddle(j) << ",";
+          fout << low << ",";
+          fout << high << ",";
           fout << hist->BinCount(j) << ",";
           fout << total << ",";
           fout << pct << ",";
@@ -152,9 +157,12 @@ void IsisMain() {
     if(ui.IsInteractive()) {
       //Transfer data from histogram to the plotcurve
       QVector<QPointF> binCountData;
+      double low;
+      double high;
       for(int j = 0; j < hist->Bins(); j++) {
         if(hist->BinCount(j) > 0) {
-          binCountData.append(QPointF(hist->BinMiddle(j), hist->BinCount(j)));
+          hist->BinRange(j, low, high);
+          binCountData.append(QPointF(low, hist->BinCount(j)));
         }
       }
 

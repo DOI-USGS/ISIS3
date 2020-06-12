@@ -81,6 +81,11 @@ namespace Isis {
    *                            #1673.
    *   @history 2018-07-27 Jesse Mapel - Added support for initializing a histogram from
    *                           signed and unsigned word cubes. References #971.
+   *   @history 2020-06-11 Kaitlyn Lee - Changed how to detemine which bin a pixel/measure falls 
+   *                           into in AddData(). Changed how the bin range is calculated in 
+   *                           BinRange(). The math for these functions were incorrect and not
+   *                           intuitive. These changes were made alongside changes made 
+   *                           to cnethist and hist.
    */
 
   class Histogram : public Statistics {
