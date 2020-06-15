@@ -288,7 +288,7 @@ To build and compile ISIS requires following the instructions listed below, whic
 
 ### Ancillary Data
 
-Many ISIS applications require ancillary data. For example, ingestion applications require translation tables to convert labels, calibration applications require flat files to do flat field correct, and map projection applications require DTMs to accurately compute intersections. Due to its size, this data is stored in a separate directory called the ISIS Data Area. Any location can be used for the ISIS Data Area, the software simply requires that the ISISDATA environment variable is set to its location.
+Many ISIS applications require ancillary data. For example, calibration applications require flat files to do flat field corrections, and map projection applications require DTMs to accurately compute intersections. Due to its size, this data is stored in a separate directory called the ISIS Data Area. Any location can be used for the ISIS Data Area, the software simply requires that the ISISDATA environment variable is set to its location.
 
 ### Structure of the ISIS3 Data Area
 
@@ -313,7 +313,7 @@ To download all ISIS data, enter the following commands in the location where yo
 
 ### Partial Download of ISIS Base Data
 
-The base data area is separate from the source code. This data area contains data that is common between multiple missions such as DEMS and leap second kernels. As of ISIS 4.1, the base data area is no longer required to run many applications as data such as icons and templates has been moved into the binary distribution. If you plan to work with any camera models, it is still recommended that you download the base data area. To download the base data area run the following commands:
+This data area contains data that is common between multiple missions such as DEMS and leap second kernels. As of ISIS 4.1, the base data area is no longer required to run many applications as data such as icons and templates has been moved into the binary distribution. If you plan to work with any applications that use camera models (e.g., cam2map, campt, qview), it is still recommended you download the base data area. To download the base data area run the following commands:
 
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
