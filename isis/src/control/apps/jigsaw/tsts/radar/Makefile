@@ -26,13 +26,9 @@ commands:
 	           onet=$(OUTPUT)/radar_sparse_poh_out.net \
 	           maxits=10 \
 	           errorprop=yes \
+		   bundleout_txt=no \
 	           spsolve=accelerations \
 	           camsolve=no > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/radar_sparse_poh_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/radar_sparse_poh_residuals.csv;
 #	$(CAT) bundleout_images.csv \
@@ -41,7 +37,7 @@ commands:
 #	       > $(OUTPUT)/radar_sparse_poh_bundleout_images.csv;
 #	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_poh_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	           cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
@@ -50,12 +46,8 @@ commands:
 	           errorprop=yes \
 	           spsolve=position \
 	           overhermite=yes \
+		   bundleout_txt=no \
 	           camsolve=no > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/radar_sparse_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/radar_sparse_residuals.csv
 	$(CAT) bundleout_images.csv \
@@ -65,5 +57,5 @@ commands:
 	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;

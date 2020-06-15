@@ -60,4 +60,4 @@ commands:
 	$(RM) $(OUTPUT)/*.lis
 	$(RM) $(OUTPUT)/*equi.cub;
 	$(RM) $(OUTPUT)/*B1.cub;
-
+	$(RM) $(OUTPUT)/*_tracking*;

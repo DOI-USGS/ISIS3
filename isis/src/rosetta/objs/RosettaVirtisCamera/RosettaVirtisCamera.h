@@ -40,6 +40,8 @@ namespace Isis {
 
     private:
       void readHouseKeeping(const QString &filename, double lineRate);
+      void readSCET(const QString &filename);
+
       QString scrub(const QString &text) const;
       double exposureTime() const;
       double scanLineTime() const;

@@ -330,9 +330,9 @@ void outputModelStatus(EmbreeShapeModel &embreeModel) {
   if ( embreeModel.hasNormal() ) {
     embreeNormal = embreeModel.normal();
     qDebug() << "  Surface Normal: ("
-              << embreeNormal[0] << ", "
-              << embreeNormal[1] << ", "
-              << embreeNormal[2] << ")";
+              << roundToPrecision(embreeNormal[0], 0.0001) << ", "
+              << roundToPrecision(embreeNormal[1], 0.0001) << ", "
+              << roundToPrecision(embreeNormal[2], 0.0001) << ")";
   }
   qDebug() << "";
 }

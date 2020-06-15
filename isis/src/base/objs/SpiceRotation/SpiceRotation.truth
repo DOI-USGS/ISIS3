@@ -631,6 +631,55 @@ CJ = 0.93816333 -0.34618155 -0.002810256
      0.15418909 0.41056193 0.89870163
 
 
+Testing loading cache from ALE ISD with only time dependent quaternions ...
+Frame type = 3
+Is cached? Yes
+Has AV? No
+Time dependent frame chain = { -94031, 10014, 1 }
+Time dependent frame chain = { -94031 }
+Time = 0
+CJ(0) = -1 0 0
+        0 -1 0
+        0 0 1
+Time = 1
+CJ(1) = 0 1 0
+        -1 0 0
+        0 0 1
+Time = 2
+CJ(2) = 0 1 0
+        1 0 0
+        0 0 -1
+Time = 3
+CJ(3) = -8.6595606e-17 2.220446e-16 -1
+        -1 8.6595606e-17 8.6595606e-17
+        8.6595606e-17 1 5.5511151e-17
+
+
+Testing loading cache from ALE ISD with time dependent quaternions and AV ...
+Has AV? Yes
+
+
+Testing loading cache from ALE ISD with time dependent quaternions and constant rotation ...
+Time dependent frame chain = { -94030, 10014, 1 }
+Time dependent frame chain = { -94031, -94030 }
+Time = 0
+CJ(0) = -1 0 0
+        0 0 1
+        0 -1 0
+Time = 1
+CJ(1) = 0 1 0
+        0 0 1
+        -1 0 0
+Time = 2
+CJ(2) = 0 1 0
+        0 0 -1
+        1 0 0
+Time = 3
+CJ(3) = -8.6595606e-17 2.220446e-16 -1
+        8.6595606e-17 1 5.5511151e-17
+        -1 8.6595606e-17 8.6595606e-17
+
+
 Testing exceptions...
 
 **I/O ERROR** Cannot find [INS-99999_TRANSX] in text kernels.
@@ -660,3 +709,5 @@ Testing exceptions...
 **USER ERROR** Time cache not available -- rerun spiceinit.
 
 **PROGRAMMER ERROR** The SpiceRotation pointing angles must be fit to polynomials in order to compute angular velocity.
+
+**PROGRAMMER ERROR** SpiceRotation::LoadCache(json) only supports Spice source.

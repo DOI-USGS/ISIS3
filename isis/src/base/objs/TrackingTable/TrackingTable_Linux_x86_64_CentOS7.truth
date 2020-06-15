@@ -12,12 +12,12 @@ Third record : fileName3.dat, 456789
 TrackingTable object created
 
 Testing the pixelToFileName method ...
-FileName with pixel value 2 does not exist and an exception is thrown.
+FileName with pixel value 2: does not exist and an exception is thrown.
 **PROGRAMMER ERROR** Cannot convert pixel [2] to a filename, pixel is below valid minimum [3].
 FileName with pixel value 3: fileName1.cub
 FileName with pixel value 4: fileName2.cub
 FileName with pixel value 5: fileName3.dat
-FileName with pixel value 6 does not exist and an exception is thrown.
+FileName with pixel value 6: does not exist and an exception is thrown.
 **PROGRAMMER ERROR** Cannot convert pixel [6] to a filename, pixel is above valid maximum [6].
 
 Testing the fileNameToPixel method ...

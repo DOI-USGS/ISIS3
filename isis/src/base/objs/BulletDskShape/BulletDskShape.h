@@ -34,9 +34,9 @@ namespace Isis {
 
 /**
  * Bullet Target Shape for NAIF type 2 DSK models
- * 
- * @author 2017-03-17 Kris Becker 
- * @internal 
+ *
+ * @author 2017-03-17 Kris Becker
+ * @internal
  *   @history 2017-03-17  Kris Becker  Original Version
  */
   class BulletDskShape : public BulletTargetShape {
@@ -48,8 +48,8 @@ namespace Isis {
       int getNumTriangles() const;
       int getNumVertices() const;
 
-      virtual btVector3 getNormal(const int indexId) const;
-      virtual btMatrix3x3 getTriangle(const int index) const;
+      virtual btVector3 getNormal(const int indexId, const int segment=0) const;
+      virtual btMatrix3x3 getTriangle(const int index, const int segment=0) const;
 
     private:
       QSharedPointer<btTriangleIndexVertexArray> m_mesh; /**! Triangular mesh representation of
@@ -58,7 +58,7 @@ namespace Isis {
                                                               except the DSK uses 1-based indexing
                                                               and this uses 0-based indexing. */
 
-      // Custom DSK reader 
+      // Custom DSK reader
       void loadFromDsk(const QString &dskfile);
 
   };
@@ -66,4 +66,3 @@ namespace Isis {
 } // namespace Isis
 
 #endif
-

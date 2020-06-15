@@ -82,6 +82,10 @@ namespace Isis {
    *                          p_pB. References Mantis ticket TBD.
    *  @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #3971.
    *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *  @history 2019-04-15 Debbie A. Cook - Added optional bool argument to main GetXY method to 
+   *                          allow the bundle adjustment to skip the back of planet test during iterations. 
+   *                          Also changed the name of the angle variable to cosangle to be more 
+   *                          descriptive. References #2591.
    */
   class CameraGroundMap {
     public:
@@ -108,7 +112,8 @@ namespace Isis {
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
-      virtual bool GetXY(const SurfacePoint &spoint, double *cudx, double *cudy);
+      virtual bool GetXY(const SurfacePoint &spoint, double *cudx, 
+                       double *cudy, bool test=true);
       virtual bool GetXY(const double lat, const double lon,
                          const double radius, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,

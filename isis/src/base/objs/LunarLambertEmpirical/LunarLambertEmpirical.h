@@ -55,6 +55,10 @@ namespace Isis {
    *
    * @internal
    *  @history 2011-08-17 Janet Barrett - Ported from ISIS2 to ISIS3.
+   *  @history 2019-12-19 Kristin Berry - Updated to add support for PvlKeywords to
+   *                         SetPhotoPhaseList, SetPhotoLList, and SetPhotoPhaseCurveList
+   *                         Fixes #3608, this allows photomet to work with this model
+   *                         using FROMPVL, rather than specifying the lists directly. 
    */
   class LunarLambertEmpirical : public PhotoModel {
     public:
@@ -62,8 +66,11 @@ namespace Isis {
       virtual ~LunarLambertEmpirical();
 
       void SetPhotoPhaseList(QString phasestrlist);
+      void SetPhotoPhaseList(PvlKeyword phaselist); 
       void SetPhotoLList(QString kstrlist);
+      void SetPhotoLList(PvlKeyword lstrList);
       void SetPhotoPhaseCurveList(QString phasecurvestrlist);
+      void SetPhotoPhaseCurveList(PvlKeyword phasecurvestrlist);
 
       //! Return photometric phase angle list
 //      inline std::vector<double> PhotoPhaseList() const {

@@ -134,6 +134,15 @@ TEST_F(stats_MockHist, TestStats) {
   EXPECT_EQ(1, (int) (band2Stats.findKeyword("LrsPixels")));
   EXPECT_EQ(1, (int) (band2Stats.findKeyword("HisPixels")));
   EXPECT_EQ(1, (int) (band2Stats.findKeyword("HrsPixels")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Average")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("StandardDeviation")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Variance")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Median")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Mode")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Skew")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Minimum")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Maximum")));
+  EXPECT_TRUE("N/A" == (band2Stats.findKeyword("Sum")));
 }
 
 TEST(stats, ValidMinimum) {

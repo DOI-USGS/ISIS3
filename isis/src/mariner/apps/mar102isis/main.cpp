@@ -323,15 +323,12 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 
 // Translate Isis 2 labels into Isis 3 labels.
 void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
-  // Get the directory where the Mariner translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["Mariner10"] + "/translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
 
-  transFile = transDir + "mariner10isis2.trn";
+  transFile = transDir + "Mariner10isis2.trn";
 
   // Get the translation manager ready
   PvlToPvlTranslationManager translation(inputLabel, transFile.expanded());

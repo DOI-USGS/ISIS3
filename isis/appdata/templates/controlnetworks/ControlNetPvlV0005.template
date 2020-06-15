@@ -1,0 +1,78 @@
+#############################################################
+#                                                           #
+# This is a template file for a PVLV0005 Control Network.   #
+#                                                           #
+#                                                           #
+# Required keywords are marked with a * next to their name. #
+#                                                           #
+#############################################################
+#
+#  Object = ControlNetwork
+#  NetworkId*   = ExampleNetwork1
+#  TargetName   = Template
+#  UserName     = aexample
+#  Created      = 2012-01-04T12:09:57
+#  LastModified = 2012-01-04T12:09:57
+#  Description  = "Example PvlV0005 ControlNetwork template."
+#  Version      = 5
+#
+#  Object = ControlPoint
+#    PointType                = "Fixed    # (Fixed, Constrained, Free)"
+#    PointId*                 = I00826010RDR_ex_1_ID
+#    ChooserName              = aexample
+#    DateTime                 = 2012-01-04T17:01:32
+#    EditLock                 = True
+#    Ignore                   = True
+#    AprioriXYZSource         = "User # (None, User, AverageOfMeasures, Reference, Basemap, BundleSolution)"
+#    AprioriXYZSourceFile     = /home/temp/xyzSource.cub
+#    AprioriRadiusSource      = "User   # (AverageOfMeasures, BundleSolution, Ellipsoid, DEM)"
+#    AprioriRadiusSourceFile  = /home/temp/radiusSource.cub
+#  
+#    # AprioriLatitude = 1.1 <degrees>
+#    AprioriX                 = 100 <meters>
+#  
+#    # AprioriLongitude = 2.2 <degrees>
+#    AprioriY                 = 100 <meters>
+#  
+#    # AprioriRadius = 3.3 <meters>
+#    AprioriZ                 = 100 <meters>
+#    AprioriCovarianceMatrix  = (1.1, 2.2, 3.3, 4.4, 5.5, 6.6)
+#    LatitudeConstrained      = True
+#    LongitudeConstrained     = True
+#    RadiusConstrained        = True
+#  
+#    # AdjustedLatitude = 1.1 <degrees>
+#    AdjustedX                = 100 <meters>
+#  
+#    # AdjustedLongitude = 2.2 <degrees>
+#    AdjustedY                = 100 <meters>
+#    
+#    # AdjustedRadius = 3.3 <meters>
+#    AdjustedZ                = 100 <meters>
+#    AdjustedCovarianceMatrix = (1.1, 2.2, 3.3, 4.4, 5.5, 6.6)
+#  
+#    Group = ControlMeasure
+#      SerialNumber*      = Example/Measure/111.000
+#      MeasureType        = "Candidate   # (Candidate, Manual, RegisteredPixel, RegisteredSubPixel)"
+#      ChooserName        = aexample
+#      DateTime           = 2012-01-04T17:01:32
+#      EditLock           = True
+#      Ignore             = True
+#      Sample             = 180.0
+#      Line               = 270.0
+#      Diameter           = 10.0
+#      AprioriSample      = 50
+#      AprioriLine        = 50
+#      SampleSigma        = 10 <pixels>
+#      LineSigma          = 10 <pixels>
+#      SampleResidual     = 10 <pixels>
+#      LineResidual       = -10 <pixels>
+#      JigsawRejected     = Yes
+#      MinimumPixelZScore = -6.9339878963865
+#      MaximumPixelZScore = 7.8509687345151
+#      GoodnessOfFit      = 0.7774975693515
+#      Reference          = True
+#      End_Group
+#    End_Object
+#  End_Object
+#  End

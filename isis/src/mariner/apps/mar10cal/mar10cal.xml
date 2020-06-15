@@ -159,7 +159,7 @@
           current file. In most cases, the default should be used for
           this parameter to indicate the derived dark current file is
           to be used.  The name of the derived dark current file is
-          $ISIS3DATA/mariner10//mariner_10_"InstrumentId"_dc.cub.  The 
+          $ISISDATA/mariner10//mariner_10_"InstrumentId"_dc.cub.  The 
           InstrumentId wil have a value of "A" or "B".
         </description>
       </parameter>

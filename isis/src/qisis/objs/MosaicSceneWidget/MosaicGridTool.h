@@ -122,7 +122,8 @@ namespace Isis {
       void drawGrid(bool draw);
       void onCubesChanged();
       void onToolOpen(bool check);
-
+      void onProjectionChanged();
+    
     protected:
       QWidget *createToolBarWidget();
       QAction *getPrimaryAction();

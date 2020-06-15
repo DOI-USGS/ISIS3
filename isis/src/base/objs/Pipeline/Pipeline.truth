@@ -1,36 +1,36 @@
 Simple Pipe
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="/work1/out.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="/work1/out.cub"
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="/work1/out.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="/work1/out.cub"
 spiceinit FROM="/work1/out.cub" SHAPE="ELLIPSOID"
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub" TO="/work1/out.cub"
 rm ./out.lev1.cub
@@ -38,41 +38,41 @@ PIPELINE -------> unitTest2 <------- PIPELINE
 
 Simple Pipe 2
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 cubeatt FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cubeatt FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cam2map FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
 PIPELINE -------> unitTest2 <------- PIPELINE
 
 PIPELINE -------> unitTest2 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.cub" SHAPE="ELLIPSOID"
 cubeatt FROM="./out.lev1.cub+2,4-5" TO="/work1/out.cub"
 rm ./out.lev1.cub
@@ -80,7 +80,7 @@ PIPELINE -------> unitTest2 <------- PIPELINE
 
 Non-Merging Branching Pipe
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 cubeatt FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
 cubeatt FROM="./out.lev1.odd.cub+2,4-5" TO="/work1/out.odd.cub"
 rm ./out.lev1.even.cub
@@ -88,7 +88,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 cubeatt FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
@@ -98,7 +98,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
@@ -108,7 +108,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -122,7 +122,7 @@ rm ./out.flat.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -140,7 +140,7 @@ rm ./out.cal.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -158,7 +158,7 @@ rm ./out.cal.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -181,7 +181,7 @@ rm ./out.lis
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -204,7 +204,7 @@ rm ./out.lis
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -228,7 +228,7 @@ PIPELINE -------> unitTest1 <------- PIPELINE
 
 Standard Branching Pipe
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 cubeatt FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
 cubeatt FROM="./out.lev1.odd.cub+2,4-5" TO="/work1/out.odd.cub"
 rm ./out.lev1.even.cub
@@ -236,7 +236,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 cubeatt FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
@@ -246,7 +246,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="/work1/out.even.cub"
@@ -256,7 +256,7 @@ rm ./out.lev1.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -270,7 +270,7 @@ rm ./out.flat.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -288,7 +288,7 @@ rm ./out.cal.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -306,7 +306,7 @@ rm ./out.cal.odd.cub
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -329,7 +329,7 @@ rm ./out.lis
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -352,7 +352,7 @@ rm ./out.lis
 PIPELINE -------> unitTest1 <------- PIPELINE
 
 PIPELINE -------> unitTest1 <------- PIPELINE
-thm2isis FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
+thm2isis FROM="$odyssey/testData/I00831002RDR.even.cub" TO="./out.lev1.cub"
 spiceinit FROM="./out.lev1.even.cub" SHAPE="ELLIPSOID"
 spiceinit FROM="./out.lev1.odd.cub" SHAPE="ELLIPSOID"
 thmvisflat FROM="./out.lev1.even.cub+2,4-5" TO="./out.flat.even.cub"
@@ -367,13 +367,13 @@ PIPELINE -------> unitTest1 <------- PIPELINE
 
 Complicated Branching Pipe
 PIPELINE -------> unitTest3 <------- PIPELINE
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="/work1/out.FROM.mag.cub" MAGNITUDE="/work1/out.FROM2.mag.cub" PHASE="/work1/out.FROM2.phase.cub" PHASE="/work1/out.FROM.phase.cub"
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="/work1/out.FROM2.mag.cub" PHASE="/work1/out.FROM2.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="/work1/out.FROM.mag.cub" MAGNITUDE="/work1/out.FROM2.mag.cub" PHASE="/work1/out.FROM2.phase.cub" PHASE="/work1/out.FROM.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="/work1/out.FROM2.mag.cub" PHASE="/work1/out.FROM2.phase.cub"
 PIPELINE -------> unitTest3 <------- PIPELINE
 
 PIPELINE -------> unitTest3 <------- PIPELINE
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
 echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.FROM.mag.lis
 fx FILELIST="./out.FROM.mag.lis" TO="/work1/out.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.FROM.mag.lis" TO="/work1/out.FROM2.phase.cub" MODE="list" equation="1+3"
@@ -385,8 +385,8 @@ rm ./out.FROM.mag.lis
 PIPELINE -------> unitTest3 <------- PIPELINE
 
 PIPELINE -------> unitTest3 <------- PIPELINE
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
 echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.fx2.FROM.mag.lis
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM2.phase.cub" MODE="list" equation="1+3"
@@ -401,8 +401,8 @@ rm ./out.fx2.FROM.mag.lis
 PIPELINE -------> unitTest3 <------- PIPELINE
 
 PIPELINE -------> unitTest3 <------- PIPELINE
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
-fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
+fft FROM="$odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
 echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.fx2.FROM.mag.lis
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM2.phase.cub" MODE="list" equation="1+3"
@@ -439,8 +439,8 @@ PIPELINE -------> unitTest4 <------- PIPELINE
 
 *** Branching Pipe with a branch disabled ***
 PIPELINE -------> unitTest5 <------- PIPELINE
-lowpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.lowpass.lpf.cub" SAMPLES="3" LINES="3"
-highpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.highpass.hpf.cub" SAMPLES="3" LINES="3"
+lowpass FROM="$odyssey/testData/I00831002RDR.cub" TO="./out.lowpass.lpf.cub" SAMPLES="3" LINES="3"
+highpass FROM="$odyssey/testData/I00831002RDR.cub" TO="./out.highpass.hpf.cub" SAMPLES="3" LINES="3"
 echo -e "\n./out.highpass.hpf.cub\n./out.lowpass.lpf.cub" > ./out.add.lis
 fx FROMLIST="./out.add.lis" TO="./out.add.cub" MODE="LIST" EQUATION="f1+f2"
 cubeatt FROM="./out.add.cub+2,4-5" TO="./out.cub"
@@ -451,26 +451,22 @@ rm ./out.add.lis
 PIPELINE -------> unitTest5 <------- PIPELINE
 
 *** Continue option ***
-input=$ISIS3DATA/odyssey/testData/I00831002RDR.cub
+input=$odyssey/testData/I00831002RDR.cub
 PIPELINE -------> unitTest6 <------- PIPELINE
-noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
-lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
+noisefilter FROM="$mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
+lowpass FROM="$mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3" -PREFERENCE="$ISISROOT/TestPreferences"
 PIPELINE -------> unitTest6 <------- PIPELINE
 
 **ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 
 *** Application level continue option ***
 PIPELINE -------> unitTest7 <------- PIPELINE
-noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
-lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
+noisefilter FROM="$mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
+lowpass FROM="$mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3" -PREFERENCE="$ISISROOT/TestPreferences"
 PIPELINE -------> unitTest7 <------- PIPELINE
 
 **ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed

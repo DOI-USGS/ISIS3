@@ -37,7 +37,7 @@ using namespace Isis;
  */
 
  void ReportError(QString err) {
-   cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+   cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/mgs"), "mgs") << endl;
  }
 
 int main() {
@@ -192,7 +192,7 @@ int main() {
 
     // Test demshape with ShapeModel keyword
     cout << endl << "  Testing DEM shape..." << endl;
-    QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
+    QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();
@@ -208,7 +208,7 @@ int main() {
 
     // Test ellipsoid shape (ShapeModel = Null)
     cout << endl << "  Testing Ellipsoid shape..." << endl;
-    inputFile = "$ISIS3DATA/galileo/testData/1213r.cub";
+    inputFile = "$galileo/testData/1213r.cub";
     cube.open(inputFile);
     c = cube.camera();
     radii = c->target()->radii();
@@ -221,7 +221,7 @@ int main() {
     cube.close();
 
     // Test plane shape  TBD
-    // inputFile = "$ISIS3DATA/;
+    // inputFile = "$ISISDATA/;
     // cube.open(inputFile);
     // c = cube.camera();
     // radii = c->target()->radii();

@@ -166,22 +166,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   Pvl inputLabel(inputLab);
 
   // Get the directory where the Voyager translation tables are
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir;
-  if (inputLabel.hasKeyword("SPACECRAFT_NAME")) {
-    missionDir = (QString) dataDir[(QString)inputLabel["SPACECRAFT_NAME"]];
-  }
-  else if (inputLabel.hasKeyword("INSTRUMENT_HOST_NAME")) {
-    if ((QString)inputLabel["INSTRUMENT_HOST_NAME"] == "VOYAGER 1") {
-      missionDir = (QString) dataDir["VOYAGER_1"];
-    }
-    else if ((QString)inputLabel["INSTRUMENT_HOST_NAME"] == "VOYAGER 2") {
-      missionDir = (QString) dataDir["VOYAGER_2"];
-    }
-    else {
-      missionDir = (QString) dataDir[(QString)inputLabel["INSTRUMENT_HOST_NAME"]];
-    }
-  }
+  QString missionDir = "$ISISROOT/appdata";
   FileName transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
@@ -234,7 +219,9 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   PvlGroup kern("Kernels");
   QString spacecraftNumber;
   int spacecraftCode = 0;
+
   QString instId = (QString) inst.findKeyword("InstrumentId");
+
   if((QString) inst.findKeyword("SpacecraftName") == "VOYAGER_1") {
     spacecraftNumber = "1";
     if(instId == "NARROW_ANGLE_CAMERA") {
@@ -249,7 +236,9 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
     }
     else {
       QString msg = "Instrument ID [" + instId + "] does not match Narrow or " +
-                    "Wide angle camera. The cube was created, but the labels were not translated.";
+                    "Wide angle camera. The cube was created, but the labels were not translated. "
+                    "To create a cube with translated labels, re-run this application with "
+                    "INSTRUMENT set to NAC or WAC.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -267,7 +256,9 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
     }
     else {
       QString msg = "Instrument ID [" + instId + "] does not match Narrow or " +
-                    "Wide angle camera. The cube was created, but the labels were not translated.";
+                    "Wide angle camera. The cube was created, but the labels were not translated. "
+                    "To create a cube with translated labels, re-run this application with "
+                    "INSTRUMENT set to NAC or WAC.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -359,13 +350,13 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   NaifStatus::CheckErrors();
   //* 3 *//
   // Leapsecond kernel
-  QString lsk = "$ISIS3DATA/base/kernels/lsk/naif????.tls";
+  QString lsk = "$base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
   furnsh_c(lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
-  QString sclk = "$ISIS3DATA/voyager";
+  QString sclk = "$ISISDATA/voyager";
   sclk.append(spacecraftNumber);
   sclk.append("/kernels/sclk/vg");
   sclk.append(spacecraftNumber);
@@ -375,7 +366,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   furnsh_c(sclkName.expanded().toLatin1().data());
 
   // The purpose of the next two steps, getting the spacecraft clock count,
-  // are simply to get get the partition, the very first number 1/...
+  // are simply to get the partition, the very first number 1/...
   double approxEphemeris = 0.0;
   utc2et_c(inst["StartTime"][0].toLatin1().data(), &approxEphemeris);
   char approxSpacecraftClock[80];
@@ -484,16 +475,30 @@ QByteArray fixLabels(QString fileName, History *hist){
 
   // Check if the instrument name is valid
   if (labels.contains(QByteArray("INSTRUMENT_NAME\n"))) {
-    labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = Unknown");
+ 
+    // Only set name to Unknown and warn the user about a missing INSTRUMENT_NAME 
+    // if it wasn't specified by the user.
+    UserInterface &ui = Application::GetUserInterface();
+    if (ui.GetString("INSTRUMENT") == "AUTOMATIC") {
+      labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = Unknown");
+      PvlGroup insNameWarning("Warning"); 
+      PvlKeyword insNameMsg("Message", "The INSTRUMENT_NAME for [" + fileName + "] is empty."
+                                + "The InstrumentId in the output cube will instead be set to "
+                                + "[Unknown] and the labels will not translate. To create a cube "  
+                                + "with translated labels, re-run this "
+                                + "application with INSTRUMENT set to NAC or WAC.");
 
-    PvlGroup insNameWarning("Warning");
-    PvlKeyword insNameMsg("Message", "The INSTRUMENT_NAME for [" + fileName + "] is empty."
-                              + "The InstrumentId in the output cube will instead be set to "
-                              + "[Unknown] and the labels will not translate.");
-    insNameWarning += insNameMsg;
-    Application::Log(insNameWarning);
+      insNameWarning += insNameMsg;
+      Application::Log(insNameWarning);
 
-    hEntry += insNameWarning;
+      hEntry += insNameWarning;
+    }
+    else if (ui.GetString("INSTRUMENT") == "NAC") {
+      labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = NARROW_ANGLE_CAMERA");
+    }
+    else if (ui.GetString("INSTRUMENT") == "WAC") {
+      labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = WIDE_ANGLE_CAMERA");
+    }
   }
 
   // Check if image id is valid

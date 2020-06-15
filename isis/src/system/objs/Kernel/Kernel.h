@@ -87,5 +87,8 @@ namespace Isis {
       QStringList m_kernels; //!< List of kernel file names
       Type m_kernelType;     //!< Enumeration value indicating the kernel type
   };
+
+
+  Kernel::Type operator|(Kernel::Type a, Kernel::Type b);
 };
 #endif

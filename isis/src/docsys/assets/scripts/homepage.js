@@ -29,7 +29,7 @@ function writeAnnouncements() {
                      "</p>" ) ;
     }
     */
-  document.write("Visit the <a href=\"http://isis.astrogeology.usgs.gov/fixit/\" target=\"_top\">ISIS Support Center</a> for the latest news and announcements.");
+  document.write("Visit the <a href=\"https://astrodiscuss.usgs.gov/\" target=\"_top\">Astro Discussion Board</a> for the latest news and announcements.");
 }
 
 function writeWhatsUpAtTheSupportCenter () {

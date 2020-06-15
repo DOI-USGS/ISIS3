@@ -1,0 +1,19 @@
+Object = AutoSeed
+   Group = PolygonSeederAlgorithm
+     Name = Grid
+     MinimumThickness = 0.0
+     MinimumArea = 1000 <meters>
+     XSpacing = 20000 <meters>
+     YSpacing = 10000 <meters>
+     PixelsFromEdge = 20.0
+     MinEmission = 20.0
+     MaxEmission = 75.0
+     MinIncidence = 25.0
+     MaxIncidecne = 80.0
+     MinResolution = 255.0
+     MaxResolution = 259.0
+     # MinDN and MaxDN are costly checks
+     MinDN = 0.145
+     MaxDN = 0.175
+   EndGroup
+EndObject

@@ -301,7 +301,7 @@ namespace Isis {
   // Create the "Begin/Start Processing" action
   QAction *Gui::CreateProcessAction() {
     QAction *processAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     processAction->setIcon(QPixmap(baseDir + "/guiRun.png"));
     processAction->setText("&Run");
     processAction->setToolTip("Run");
@@ -388,7 +388,7 @@ namespace Isis {
   // Create the "Exit" action
   QAction *Gui::CreateExitAction() {
     QAction *exitAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     exitAction->setIcon(QPixmap(baseDir + "/guiExit.png"));
     exitAction->setText("&Exit");
     exitAction->setToolTip("Exit");
@@ -403,7 +403,7 @@ namespace Isis {
   // Create the "Reset" action
   QAction *Gui::CreateResetAction() {
     QAction *resetAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     resetAction->setIcon(QPixmap(baseDir + "/guiReset.png"));
     resetAction->setText("&Reset");
     resetAction->setToolTip("Reset parameters");
@@ -420,7 +420,7 @@ namespace Isis {
   // Create the "Stop" action
   QAction *Gui::CreateStopAction() {
     QAction *stopAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     stopAction->setIcon(QPixmap(baseDir + "/guiStop.png"));
     stopAction->setText("&Stop");
     stopAction->setToolTip("Stop");
@@ -437,7 +437,7 @@ namespace Isis {
   // Create the "SaveLog" action
   QAction *Gui::CreateSaveLogAction() {
     QAction *saveLogAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     saveLogAction->setIcon(QPixmap(baseDir + "/guiSaveLog.png"));
     saveLogAction->setText("&Save Log...");
     saveLogAction->setToolTip("Save log");
@@ -453,7 +453,7 @@ namespace Isis {
   // Create the "ClearLog" action
   QAction *Gui::CreateClearLogAction() {
     QAction *clearlogAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     clearlogAction->setIcon(QPixmap(baseDir + "/guiClearLog.png"));
     clearlogAction->setText("&Clear Log");
     clearlogAction->setToolTip("Clear log");
@@ -470,7 +470,7 @@ namespace Isis {
   // Create the "Previous History" action
   QAction *Gui::CreatePreviousHistoryAction() {
     QAction *previousHistoryAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     previousHistoryAction->setIcon(QPixmap(baseDir + "/guiPrevHistory.png"));
     previousHistoryAction->setText("&Previous");
     previousHistoryAction->setToolTip("Previous parameters");
@@ -487,7 +487,7 @@ namespace Isis {
   // Create the "Next History" action
   QAction *Gui::CreateNextHistoryAction() {
     QAction *nextHistoryAction = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     nextHistoryAction->setIcon(QPixmap(baseDir + "/guiNextHistory.png"));
     nextHistoryAction->setText("&Next");
     nextHistoryAction->setToolTip("Next parameters");
@@ -504,7 +504,7 @@ namespace Isis {
   // Create the Whats Action action
   QAction *Gui::CreateWhatsThisAction() {
     QAction *action = new QAction(this);
-    QString baseDir = FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
     action->setIcon(QPixmap(baseDir + "/contexthelp.png"));
     action->setText("&What's This");
     action->setToolTip("What's This");

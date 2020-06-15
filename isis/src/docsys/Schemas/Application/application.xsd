@@ -47,6 +47,13 @@
   <xs:annotation>
     <xs:documentation>2017-06-26 Jesse Mapel - Added  missionItem_type enummeration for Juno.</xs:documentation>
   </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2018-03-27 Tyler Wilson - Added  missionItem_type enummeration for Clipper.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2020-01-20 Stuart Sides - Changed missionItem_type enummeration for Clipper to Europa Clipper.</xs:documentation>
+  </xs:annotation>
+
   <xs:element name="application">
     <xs:annotation>
       <xs:documentation>XML file describing an Isis application</xs:documentation>
@@ -447,6 +454,7 @@
       <xs:enumeration value="Chandrayaan 1"/>
       <xs:enumeration value="Clementine"/>
       <xs:enumeration value="Dawn"/>
+      <xs:enumeration value="Europa Clipper"/>
       <xs:enumeration value="ExoMars Trace Gas Orbiter"/>
       <xs:enumeration value="Galileo"/>
       <xs:enumeration value="Hayabusa"/>

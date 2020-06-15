@@ -32,8 +32,11 @@
  document.write(" <br> ");
  document.write(" <i> ");
  document.write(" To contact us, please post comments and questions on the ");
- document.write(" <A HREF=\"http://isis.astrogeology.usgs.gov/fixit\" target=\"_top\"> ");
- document.write(" ISIS Support Center</a></i><br> ");
+ document.write(" <a href=\"https://astrodiscuss.usgs.gov/\" target=\"_top\"> ");
+ document.write(" USGS Astrogeology Discussion Board</a></i> ");
+ document.write(" <br>")
+ document.write(" <i>To report a bug, or suggest a feature go to: <a href=\"https://github.com/USGS-Astrogeology/ISIS3\" target=\"top\">ISIS Github</a></i>");
+ document.write(" <br>");
  document.write(" ");
  document.write(" <script language=\"javaScript\" type=\"text/javascript\"> ");
  document.write(" document.write(\"File Modified: \" + document.lastModified); ");
@@ -41,4 +44,3 @@
  document.write(" ");
  document.write(" ");
  document.write(" </table> ");
-

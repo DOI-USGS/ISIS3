@@ -25,14 +25,8 @@ commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cubes.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cubes.lis cnet=$(INPUT)/enc_global_fin2-cl14_forken_extract_cl-salih-lon-constrained.net \
 	onet=$(OUTPUT)/mean.net errorpropagation=yes solvetargetbody=yes camera_angles_sigma=2.0 tbparameters=$(INPUT)/EnceladusTargetBodyParameters-pole-ra-dec-w0-wDot-mean-radius.pvl \
+	bundleout_txt=no \
 	file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       | sed 's/\ -0.00/ 0.00/' \
-	       | sed 's/\ -0.00/ 0.00/' \
-	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout.txt;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout_images.csv;
@@ -45,4 +39,3 @@ commands:
 	$(RM) $(OUTPUT)/cubes.lis > /dev/null;
 	$(MV) $(OUTPUT)/mean.net $(OUTPUT)/out-pole-ra-dec-w0-wDot-mean-radiius.net > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt > /dev/null;

@@ -7,12 +7,12 @@
   <description>
     <p>
       This program computes a set of statistics for the pixels in each selected <def link="Band">band</def>
-      of an image <def link="Cube">cube</def>, and outputs the results of each band. By default, all bands are 
-      processed. The <i>stats</i> program generates statistics that will help you find new insights 
+      of an image <def link="Cube">cube</def>, and outputs the results of each band. By default, all bands are
+      processed. The <i>stats</i> program generates statistics that will help you find new insights
       in your data to make more accurate predictions and achieve better outcomes.
     </p>
 
-    
+
     <h4>
       Output:
     </h4>
@@ -20,9 +20,9 @@
     <p>
       The statistics are output to both the screen and the print.prt file in PVL format. Additionally,
       if the user specifies a file using the TO parameter, the statistics are written to that file in
-      PVL format (default) or as a comma delimited text file (FLAT file), as specified by the FORMAT parameter. 
-      For multi-band images, each band has its own statistics information that will be appended to the 
-      output file.  The contents of the PVL file can be read using the <i>getkey</i> program. The 
+      PVL format (default) or as a comma delimited text file (FLAT file), as specified by the FORMAT parameter.
+      For multi-band images, each band has its own statistics information that will be appended to the
+      output file.  The contents of the PVL file can be read using the <i>getkey</i> program. The
       comma delimited text file can be imported into Excel or other applications.  The statistics
       calculated and reported are as follows:
     </p>
@@ -46,7 +46,7 @@ Maximum                 Low instrument saturation (LIS) pixels
 
 Sum                     High instrument saturation (HIS) pixels
     </pre>
-    
+
     <p>
       If the output file exists and the APPEND parameter is set to "no," the contents will be
       overwritten.
@@ -58,9 +58,9 @@ Sum                     High instrument saturation (HIS) pixels
 
     <p>
       You may process one or a few specific bands if you indicate the band(s) in which you desire
-      to gather statistics. A <def link="Band">band</def> may be specified by simply placing a 
-      plus sign and the band number after the input filename (e.g., peaks.cub+3). For several 
-      bands, commas and hyphens are used to communicate effectively with the program as in the 
+      to gather statistics. A <def link="Band">band</def> may be specified by simply placing a
+      plus sign and the band number after the input filename (e.g., peaks.cub+3). For several
+      bands, commas and hyphens are used to communicate effectively with the program as in the
       following example: peaks.cub+2,4-6.
     </p>
 
@@ -109,21 +109,21 @@ Sum                     High instrument saturation (HIS) pixels
     <change name="Jacob Danton" date="2006-01-23">
         Fixed appTest to comply to changes in iString
     </change>
-    <change name="Steven Lambright" date="2008-05-06"> 
+    <change name="Steven Lambright" date="2008-05-06">
       Added Above Range, Below Range reports
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Steven Lambright" date="2008-08-15">
-      A bug where the VALIDMIN,VALIDMAX were ignored was fixed; 
+      A bug where the VALIDMIN,VALIDMAX were ignored was fixed;
       these should always be used.
     </change>
     <change name="Stacy Alley" date="2009-01-16">
       Added the Format option for the output file.
     </change>
     <change name="Sharmila Prasad" date="2011-03-31">
-      Added Band Keyword - displays the first physical band used to get the 
+      Added Band Keyword - displays the first physical band used to get the
       stats
     </change>
     <change name="James Alexander Crough" date="2011-06-17">
@@ -139,6 +139,10 @@ Sum                     High instrument saturation (HIS) pixels
       Updated documentation of FORMAT and APPEND parameters as well as
       general edits for clarity. Also added undocumented output statistics
       to the list in the description.
+    </change>
+    <change name="Austin Sanders" date="2020-06-04">
+      Updated to fill columns with N/A in cases where images contained only
+      special or invalid pixels.
     </change>
   </history>
 
@@ -163,8 +167,8 @@ Sum                     High instrument saturation (HIS) pixels
           Input cube
         </brief>
         <description>
-  	  This specifies the input <def link="Cube">cube</def>. The default is 
-	  to calculate statistics for each band in the input cube, but this can be 
+  	  This specifies the input <def link="Cube">cube</def>. The default is
+	  to calculate statistics for each band in the input cube, but this can be
 	  overridden using the band specifier (e.g., file.cub+3).
         </description>
         <filter>
@@ -182,8 +186,8 @@ Sum                     High instrument saturation (HIS) pixels
           No output file is created
         </internalDefault>
         <description>
-          This text file will contain the statistics for each individual band. 
-	  If it is written in PVL format (default), the values can be read using the 
+          This text file will contain the statistics for each individual band.
+	  If it is written in PVL format (default), the values can be read using the
 	  <i>getkey</i> program. This is useful for developing scripts. If it is
           written as a comma delimited text file (FLAT) the output can be easily
           imported into spreadsheet applications like Excel.
@@ -199,9 +203,9 @@ Sum                     High instrument saturation (HIS) pixels
           Output file format (PVL or comma delimited text)
         </brief>
         <description>
-          This is the format type for the output file. <def>PVL</def> format is the 
+          This is the format type for the output file. <def>PVL</def> format is the
 	  default. The format is ignored unless the TO parameter is specified.
-        </description>  
+        </description>
         <default><item>PVL</item></default>
         <list>
           <option value="PVL">
@@ -218,14 +222,14 @@ Sum                     High instrument saturation (HIS) pixels
               Format the output file specified by TO as a comma delimited text file.
             </brief>
             <description>
-              Output the results to a comma delimited text file specified by TO. 
+              Output the results to a comma delimited text file specified by TO.
               This file format can easily be imported into spreadsheet applications
               like Excel.
             </description>
           </option>
         </list>
       </parameter>
-      
+
       <parameter name="APPEND">
         <type>boolean</type>
         <brief>
@@ -233,15 +237,15 @@ Sum                     High instrument saturation (HIS) pixels
         </brief>
         <description>
           <p>
-            If this option is not selected, the output from the <i>stats</i> 
+            If this option is not selected, the output from the <i>stats</i>
 	    application is appended to the output file. If this option is
-	    set to "NO" or "FALSE," any information in the TO file is 
+	    set to "NO" or "FALSE," any information in the TO file is
 	    overwritten.
           </p>
           <p>
-            Note: This will append the formatted results to the end of the TO 
+            Note: This will append the formatted results to the end of the TO
             file without regard to the formatting of the current contents.
-          </p> 
+          </p>
         </description>
         <default><item>TRUE</item></default>
       </parameter>
@@ -258,7 +262,7 @@ Sum                     High instrument saturation (HIS) pixels
           No minimum DN value
         </internalDefault>
         <description>
-          The statistics will exclude any <def link="Digital Number">DN</def> 
+          The statistics will exclude any <def link="Digital Number">DN</def>
 	  values below this value.
         </description>
       </parameter>
@@ -272,7 +276,7 @@ Sum                     High instrument saturation (HIS) pixels
           No maximum DN value
         </internalDefault>
         <description>
-          The statistics will exclude any <def link="Digital Number">DN</def> 
+          The statistics will exclude any <def link="Digital Number">DN</def>
 	  values above this value.
         </description>
       </parameter>
@@ -283,17 +287,17 @@ Sum                     High instrument saturation (HIS) pixels
   <example>
       <brief>Calculate statistics for all bands in a cube</brief>
       <description>
-        This example shows the statistics computed for all bands in 
+        This example shows the statistics computed for all bands in
 	the input cube. When no band is specified by the user, <i>stats</i>
-	default behavior is to calculate statistics for all bands in a cube. 
+	default behavior is to calculate statistics for all bands in a cube.
       </description>
       <terminalInterface>
         <commandLine>
           from=peaks.cub to=peaks0_stats.log
         </commandLine>
         <description>
-          Command to run stats in the command line mode using all bands in 
-	  peaks.cub and output the results to peaks0_stats.log. 
+          Command to run stats in the command line mode using all bands in
+	  peaks.cub and output the results to peaks0_stats.log.
         </description>
       </terminalInterface>
       <dataFiles>
@@ -309,12 +313,12 @@ Sum                     High instrument saturation (HIS) pixels
         </dataFile>
       </dataFiles>
     </example>
-    
+
     <example>
       <brief>Calculate statistics for a single band from an input cube</brief>
       <description>
-        This example shows the statistics computed from band 3 of the input 
-	cube.  A band may be specified by simply placing the plus sign and 
+        This example shows the statistics computed from band 3 of the input
+	cube.  A band may be specified by simply placing the plus sign and
 	the band number after the input filename.
       </description>
       <terminalInterface>
@@ -322,7 +326,7 @@ Sum                     High instrument saturation (HIS) pixels
           from=peaks.cub+3 to=peaks1_stats.log
         </commandLine>
         <description>
-          Command to run stats in the command line mode using the third band  
+          Command to run stats in the command line mode using the third band
 	  of peaks.cub and output the results to peaks1_stats.log.
         </description>
       </terminalInterface>
@@ -342,9 +346,9 @@ Sum                     High instrument saturation (HIS) pixels
     <example>
       <brief>Calculate statistics for multiple bands from an input cube</brief>
       <description>
-        This example shows the statistics computed for selected bands of a cube. 
-	In addition to the plus suffix, the comma and hyphen are used to specify 
-	multiple bands from the input cube to process. 
+        This example shows the statistics computed for selected bands of a cube.
+	In addition to the plus suffix, the comma and hyphen are used to specify
+	multiple bands from the input cube to process.
       </description>
       <terminalInterface>
         <commandLine>
@@ -352,7 +356,7 @@ Sum                     High instrument saturation (HIS) pixels
         </commandLine>
         <description>
           Command to run stats in the command line mode using the second, fourth,
-	  fifth, and sixth bands of peaks.cub and output the results to 
+	  fifth, and sixth bands of peaks.cub and output the results to
 	  peaks2_stats.log.
         </description>
       </terminalInterface>

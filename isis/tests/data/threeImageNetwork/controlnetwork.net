@@ -1,0 +1,573 @@
+Object = ControlNetwork
+  NetworkId    = SubNetwork
+  TargetName   = Mars
+  UserName     = kelvin
+  Created      = 2020-02-11T13:19:09
+  LastModified = 2020-02-11T13:19:09
+  Description  = SubNetwork
+  Version      = 5
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0001
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 228.80589277809
+      Line          = 156.92190302091
+      AprioriSample = 228.80589277809
+      AprioriLine   = 156.92190302091
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 220.18396506
+      Line          = 63.201942873137
+      AprioriSample = 220.18396506
+      AprioriLine   = 63.201942873137
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0002
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 383.14452061022
+      Line          = 147.07629190927
+      AprioriSample = 383.14452061022
+      AprioriLine   = 147.07629190927
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 375.2780209604
+      Line          = 53.124398279587
+      AprioriSample = 375.2780209604
+      AprioriLine   = 53.124398279587
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0003
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 17.675940999352
+      Line          = 171.42464238065
+      AprioriSample = 17.675940999352
+      AprioriLine   = 171.42464238065
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 8.4451843334066
+      Line          = 78.004067354008
+      AprioriSample = 8.4451843334066
+      AprioriLine   = 78.004067354008
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0004
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 173.20833273148
+      Line          = 160.59883342263
+      AprioriSample = 173.20833273148
+      AprioriLine   = 160.59883342263
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 164.37636615478
+      Line          = 66.962899586019
+      AprioriSample = 164.37636615478
+      AprioriLine   = 66.962899586019
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0005
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 226.24766502813
+      Line          = 258.4810918044
+      AprioriSample = 226.24766502813
+      AprioriLine   = 258.4810918044
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 217.54703937924
+      Line          = 164.71596723318
+      AprioriSample = 217.54703937924
+      AprioriLine   = 164.71596723318
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 207.61919431515
+      Line          = 59.312399581815
+      AprioriSample = 207.61919431515
+      AprioriLine   = 59.312399581815
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0006
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 380.52119476009
+      Line          = 248.62582224815
+      AprioriSample = 380.52119476009
+      AprioriLine   = 248.62582224815
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 372.59754444743
+      Line          = 154.6410556163
+      AprioriSample = 372.59754444743
+      AprioriLine   = 154.6410556163
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 362.57823607122
+      Line          = 49.196518196145
+      AprioriSample = 362.57823607122
+      AprioriLine   = 49.196518196145
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0007
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 29.811716060026
+      Line          = 271.95387847384
+      AprioriSample = 29.811716060026
+      AprioriLine   = 271.95387847384
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 20.539614889787
+      Line          = 178.46895229748
+      AprioriSample = 20.539614889787
+      AprioriLine   = 178.46895229748
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 11.119990049256
+      Line          = 73.104971595301
+      AprioriSample = 11.119990049256
+      AprioriLine   = 73.104971595301
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0008
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 236.38714512115
+      Line          = 340.66174853041
+      AprioriSample = 236.38714512115
+      AprioriLine   = 340.66174853041
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 227.76159312058
+      Line          = 246.82117220351
+      AprioriSample = 227.76159312058
+      AprioriLine   = 246.82117220351
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 217.73248710454
+      Line          = 141.08602696088
+      AprioriSample = 217.73248710454
+      AprioriLine   = 141.08602696088
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0009
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 390.36510018295
+      Line          = 330.8578866842
+      AprioriSample = 390.36510018295
+      AprioriLine   = 330.8578866842
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 382.50096637563
+      Line          = 236.81269351077
+      AprioriSample = 382.50096637563
+      AprioriLine   = 236.81269351077
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 372.43046732013
+      Line          = 131.02666889389
+      AprioriSample = 372.43046732013
+      AprioriLine   = 131.02666889389
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0010
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 55.042765662596
+      Line          = 353.00409447012
+      AprioriSample = 55.042765662596
+      AprioriLine   = 353.00409447012
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 45.850272446133
+      Line          = 259.40653658562
+      AprioriSample = 45.850272446133
+      AprioriLine   = 259.40653658562
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 36.219319732537
+      Line          = 153.76721712236
+      AprioriSample = 36.219319732537
+      AprioriLine   = 153.76721712236
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0011
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 246.65171030691
+      Line          = 422.94241522925
+      AprioriSample = 246.65171030691
+      AprioriLine   = 422.94241522925
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 237.95101584306
+      Line          = 329.00694546391
+      AprioriSample = 237.95101584306
+      AprioriLine   = 329.00694546391
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 227.86089090061
+      Line          = 223.07213827008
+      AprioriSample = 227.86089090061
+      AprioriLine   = 223.07213827008
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0012
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 400.29496356154
+      Line          = 413.17584266871
+      AprioriSample = 400.29496356154
+      AprioriLine   = 413.17584266871
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 392.36790734441
+      Line          = 319.01962362425
+      AprioriSample = 392.36790734441
+      AprioriLine   = 319.01962362425
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 382.22182235659
+      Line          = 213.04278545381
+      AprioriSample = 382.22182235659
+      AprioriLine   = 213.04278545381
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0013
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/688540926:0/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 83.337596224522
+      Line          = 433.98119303466
+      AprioriSample = 83.337596224522
+      AprioriLine   = 433.98119303466
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 74.102470573819
+      Line          = 340.25011487649
+      AprioriSample = 74.102470573819
+      AprioriLine   = 340.25011487649
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 64.363168008683
+      Line          = 234.39046282228
+      AprioriSample = 64.363168008683
+      AprioriLine   = 234.39046282228
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0014
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 473.7469640969
+      Line          = 162.78007319315
+      AprioriSample = 473.7469640969
+      AprioriLine   = 162.78007319315
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 463.81758592084
+      Line          = 57.248865375936
+      AprioriSample = 463.81758592084
+      AprioriLine   = 57.248865375936
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0015
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 351.8699514082
+      Line          = 418.80490933913
+      AprioriSample = 351.8699514082
+      AprioriLine   = 418.80490933913
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 341.7778194892
+      Line          = 312.75211440658
+      AprioriSample = 341.7778194892
+      AprioriLine   = 312.75211440658
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0016
+    ChooserName = autoseed
+    DateTime    = 2020-02-11T13:19:16
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/691204200:96/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 58.012974793777
+      Line          = 438.48867875995
+      AprioriSample = 58.012974793777
+      AprioriLine   = 438.48867875995
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = MGS/718369703:160/MOC-WA/RED
+      MeasureType   = Candidate
+      ChooserName   = autoseed
+      DateTime      = 2020-02-11T13:19:16
+      Sample        = 48.24240863711
+      Line          = 332.65844622308
+      AprioriSample = 48.24240863711
+      AprioriLine   = 332.65844622308
+    End_Group
+  End_Object
+End_Object
+End

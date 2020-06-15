@@ -23,7 +23,7 @@ void flip(Buffer &in);
 
 void IsisMain() {
 
-  // NOTE: 
+  // NOTE:
   // Still to be done/considered
   //   Process the other FITS channels. One of them contains pixel quality info
   //   May want to set special pixel values using this channel
@@ -57,7 +57,7 @@ void IsisMain() {
   // Get the label of extension #2 and make sure this is a New Horizons LORRI Quality image
   if (ui.WasEntered("QUALITY")) {
     PvlGroup qualityLabel = importFits.fitsImageLabel(2);
-    if (qualityLabel["XTENSION"][0] != "IMAGE" || 
+    if (qualityLabel["XTENSION"][0] != "IMAGE" ||
         qualityLabel["EXTNAME"][0] != "LORRI Quality flag image") {
       QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Quality image. "
           "Input file label value for EXTNAME is [%2] and XTENSION is [%3]").
@@ -70,9 +70,8 @@ void IsisMain() {
 
   Cube *output = importFits.SetOutputCube("TO");
 
-  // Get the directory where the New Horizons translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["NewHorizons"] + "/translations/";
+  // Get the path where the New Horizons translation tables are.
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Temp storage of translated labels
   Pvl outLabel;
@@ -82,7 +81,7 @@ void IsisMain() {
   fitsLabel.addGroup(importFits.fitsImageLabel(0));
 
   // Create an Instrument group
-  FileName insTransFile(transDir + "lorriInstrument_fit.trn");
+  FileName insTransFile(transDir + "NewHorizonsLorriInstrument_fit.trn");
   PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
   insXlater.Auto(outLabel);
 
@@ -96,19 +95,19 @@ void IsisMain() {
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
   // Create a Band Bin group
-  FileName bandTransFile(transDir + "lorriBandBin_fit.trn");
+  FileName bandTransFile(transDir + "NewHorizonsLorriBandBin_fit.trn");
   PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
   bandBinXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
   // Create an Archive group
-  FileName archiveTransFile(transDir + "lorriArchive_fit.trn");
+  FileName archiveTransFile(transDir + "NewHorizonsLorriArchive_fit.trn");
   PvlToPvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   // Create a Kernels group
-  FileName kernelsTransFile(transDir + "lorriKernels_fit.trn");
+  FileName kernelsTransFile(transDir + "NewHorizonsLorriKernels_fit.trn");
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
@@ -182,4 +181,3 @@ void IsisMain() {
 //    swap(in[i], in[in.size() - i - 1]);
 //  }
 //}
-

@@ -1,145 +1,122 @@
-properties([pipelineTriggers([githubPush()])])
+// vim: ft=groovy
 
-def nodes = [:]
+def NUM_CORES = 8
+def errors = []
+def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
+def nodes = [:] 
 
-nodes["isis-fedora-25"] = {
-    node("isis-fedora-25") {
-        withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-            stage ("Fedora 25") {
-                git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-//                sh """
-//                    git clone https://github.com/abseil/googletest.git gtest
-//                    conda config --set channel_alias http://astro-bin.wr.usgs.gov/conda
-//                    conda config --prepend channels anaconda
-//                    conda config --append channels conda-forge
-//                    conda config --append channels usgs-astrogeology
-//                    conda config --prepend default_channels anaconda
-//                    conda env create -n isis3 -f environment.yml
-//                    source activate isis3
-//                    mkdir -p ./install ./build && cd build
-//                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-//                    set +e
-//                    ninja -j8 && ninja install
-//                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-//                    ctest -V -R _unit_ --timeout 500
-//                    ctest -V -R _app_ --timeout 500
-//                    ctest -V -R _module_ --timeout 500
-//                """
+for (lbl in labels) {
+    def label = lbl
+    def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
+
+    nodes[label] = {
+        stage(label) {
+            isisNode(label) {
+                def isisEnv = [
+                    "ISISDATA=/isisData/isis_data",
+                    "ISISTESTDATA=/isisData/isis_testData",
+                    "ISIS3MGRSCRIPTS=/isisData/data/isis3mgr_scripts",
+                    "MALLOC_CHECK_=1"
+                ]
+
+                def cmakeFlags = [
+                    "-DJP2KFLAG=ON",
+                    "-DKAKADU_INCLUDE_DIR=/isisData/kakadu",
+                    "-Dpybindings=OFF",
+                    "-DCMAKE_BUILD_TYPE=RELEASE"
+                ]
+
+                def stageStatus = "Checking out ISIS on ${label}"
+
+                // Checkout
+                checkout scm
+
+                condaEnv("isis3") {
+                    // Environment
+                    loginShell """
+                        conda install -c conda-forge python=3 findutils
+                        conda env update -f ${envFile} --prune
+                        mkdir build install
+                    """
+
+                    def osFailed = false
+                    isisEnv.add("ISISROOT=${pwd()}/build")
+                    isisEnv.add("PATH=${pwd()}/install/bin:${env.PATH}")
+                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+
+                    withEnv(isisEnv) {
+                        dir(env.ISISROOT) {
+                            // Build
+                            stageStatus = "Building ISIS on ${label}"
+                            try {
+                                loginShell """
+                                    cmake -GNinja ${cmakeFlags.join(' ')} ../isis
+                                    ninja -j${NUM_CORES} install
+                                """
+                            } catch(e) {
+                                // Die right here
+                                error stageStatus
+                            }
+
+                            // Unit tests
+                            stageStatus = "Running unit tests on ${label}"
+                            try {
+                                loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            // App tests
+                            stageStatus = "Running app tests on ${label}"
+                            try {
+                                loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            try {
+                                loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            // Gtests
+                            stageStatus = "Running gtests on ${label}"
+                            try {
+                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            if (osFailed) {
+                                error "Failed on ${label}"
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-nodes["isis-centos-7"] = {
-    node("isis-centos-7") {
-        withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-            stage ("CentOS 7") {
-                git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-//                sh """
-//                    git clone https://github.com/abseil/googletest.git gtest
-//                    conda config --set channel_alias http://astro-bin.wr.usgs.gov/conda
-//                    conda config --prepend channels anaconda
-//                    conda config --append channels conda-forge
-//                    conda config --append channels usgs-astrogeology
-//                    conda config --prepend default_channels anaconda
-//                    conda env create -n isis3 -f environment.yml
-//                    source activate isis3
-//                    mkdir -p ./install ./build && cd build
-//                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-//                    set +e
-//                    ninja -j8 && ninja install
-//                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-//                    ctest -V -R _unit_ --timeout 500
-//                    ctest -V -R _app_ --timeout 500
-//                    ctest -V -R _module_ --timeout 500
-//                """
-            }
+// Run the builds in parallel
+node {
+    try {
+        parallel nodes
+
+    } catch(e) {
+        // Report result to GitHub
+        currentBuild.result = "FAILURE"
+        
+        def comment = "Failed during:\n"
+        errors.each {
+            comment += "- ${it}\n"
         }
+
+        setGithubStatus(comment)
     }
 }
-
-nodes["isis-debian-9"] = {
-    node("isis-debian-9") {
-        withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-            stage ("Debian 9") {
-                git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-//                sh """
-//                    git clone https://github.com/abseil/googletest.git gtest
-//                    conda config --set channel_alias http://astro-bin.wr.usgs.gov/conda
-//                    conda config --prepend channels anaconda
-//                    conda config --append channels conda-forge
-//                    conda config --append channels usgs-astrogeology
-//                    conda config --prepend default_channels anaconda
-//                    conda env create -n isis3 -f environment.yml
-//                    source activate isis3
-//                    mkdir -p ./install ./build && cd build
-//                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-//                    set +e
-//                    ninja -j8 && ninja install
-//                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-//                    ctest -V -R _unit_ --timeout 500
-//                    ctest -V -R _app_ --timeout 500
-//                    ctest -V -R _module_ --timeout 500
-//                """
-            }
-        }
-    }
-}
-
-nodes["isis-ubuntu-1804"] = {
-    node("isis-ubuntu-1804") {
-        withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-            stage ("Ubuntu 18.04") {
-                git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-//                sh """
-//                    git clone https://github.com/abseil/googletest.git gtest
-//                    conda config --set channel_alias http://astro-bin.wr.usgs.gov/conda
-//                    conda config --prepend channels anaconda
-//                    conda config --append channels conda-forge
-//                    conda config --append channels usgs-astrogeology
-//                    conda config --prepend default_channels anaconda
-//                    conda env create -n isis3 -f environment.yml
-//                    source activate isis3
-//                    mkdir -p ./install ./build && cd build
-//                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-//                    set +e
-//                    ninja -j8 && ninja install
-//                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-//                    ctest -V -R _unit_ --timeout 500
-//                    ctest -V -R _app_ --timeout 500
-//                    ctest -V -R _module_ --timeout 500
-//                """
-            }
-        }
-    }
-}
-
-nodes["mac1013"] = {
-    node("mac1013") {
-        withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-            stage ("MacOS 10.13 (High Sierra)") {
-                git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-//                sh """
-//                    git clone https://github.com/abseil/googletest.git gtest
-//                    conda config --set channel_alias http://astro-bin.wr.usgs.gov/conda
-//                    conda config --prepend channels anaconda
-//                    conda config --append channels conda-forge
-//                    conda config --append channels usgs-astrogeology
-//                    conda config --prepend default_channels anaconda
-//                    conda env create -n isis3 -f environment.yml
-//                    source activate isis3
-//                    mkdir -p ./install ./build && cd build
-//                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-//                    set +e
-//                    ninja -j8 && ninja install
-//                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-//                    ctest -V -R _unit_ --timeout 500
-//                    ctest -V -R _app_ --timeout 500
-//                    ctest -V -R _module_ --timeout 500
-//                """
-            }
-        }
-    }
-}
-
-parallel nodes

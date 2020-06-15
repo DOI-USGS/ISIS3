@@ -15,3 +15,4 @@ foreach( mod ${modules} )
   string(REPLACE "${CMAKE_CURRENT_LIST_DIR}/" "" strippedmod ${mod})
   add_isis_module(${strippedmod} ${strippedmod})
 endforeach()
+

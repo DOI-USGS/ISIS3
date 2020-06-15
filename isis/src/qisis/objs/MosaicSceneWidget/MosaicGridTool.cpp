@@ -58,6 +58,10 @@ namespace Isis {
     m_minLon = domainMinLon();
     m_maxLon = domainMaxLon();
     m_density = 10000;
+    
+    connect(getWidget(), SIGNAL(projectionChanged(Projection *)),
+            this, SLOT(onProjectionChanged()), Qt::UniqueConnection);
+
   }
 
 
@@ -445,6 +449,7 @@ namespace Isis {
 
         case Cubes:
           if (tproj->SetCoordinate(boundingRect.topLeft().x(), -boundingRect.topLeft().y())) {
+            
             topLeft = tproj->Longitude();
           }
           else {
@@ -796,6 +801,30 @@ namespace Isis {
     configDialog->setAttribute(Qt::WA_DeleteOnClose);
     configDialog->show();
   }
+  
+  /*
+   * Updates lat/lon ranges when a new projection file is loaded. Also 
+   * forces the lat/lon extent source to Map resetting user options in the grid tool dialog. 
+   * 
+   */
+  void MosaicGridTool::onProjectionChanged() {
+    TProjection * tproj = (TProjection *)getWidget()->getProjection();
+    
+    // If Projection changed from a file, force extents to come from 
+    // the new map file
+    m_latExtents = Map;
+    m_lonExtents = Map; 
+
+    Latitude minLat = Latitude(tproj->MinimumLatitude(), Angle::Degrees);
+    Latitude maxLat = Latitude(tproj->MaximumLatitude(), Angle::Degrees);
+    
+    setLatExtents(m_latExtents, minLat, maxLat);
+  
+    Longitude minLon = Longitude(tproj->MinimumLongitude(), Angle::Degrees);
+    Longitude maxLon = Longitude(tproj->MaximumLongitude(), Angle::Degrees);
+  
+    setLonExtents(m_lonExtents, minLon, maxLon);
+  }
 
 
   /**
@@ -813,7 +842,7 @@ namespace Isis {
     m_drawGridCheckBox->blockSignals(true);
     m_drawGridCheckBox->setChecked(true);
     m_drawGridCheckBox->blockSignals(false);
-
+    
     if (!getWidget()->getProjection()) {
       QString msg = "Please set the mosaic scene's projection before trying to "
                     "draw a grid. This means either open a cube (a projection "
@@ -821,19 +850,21 @@ namespace Isis {
       QMessageBox::warning(NULL, tr("Grid Tool Requires Projection"), msg);
     }
 
+    
     if (m_minLon.degrees() < m_maxLon.degrees() && m_minLat.degrees() < m_maxLat.degrees()) {
       m_gridItem = new GridGraphicsItem(m_baseLat, m_baseLon, m_latInc, m_lonInc, getWidget(),
                                         m_density, m_minLat, m_maxLat, m_minLon, m_maxLon);
     }
-
+    
     connect(getWidget(), SIGNAL(projectionChanged(Projection *)),
             this, SLOT(drawGrid()), Qt::UniqueConnection);
 
     connect(getWidget(), SIGNAL(cubesChanged()),
             this, SLOT(onCubesChanged()));
-
+  
     if (m_gridItem != NULL)
       getWidget()->getScene()->addItem(m_gridItem);
+    
   }
 
 

@@ -71,6 +71,8 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("SawtoothStretch"); 
+
     setLayout(p_mainLayout);
 
     p_widthEdit->setText(QString::number(
@@ -106,12 +108,9 @@ namespace Isis {
     double width = 0.0;
     bool changed = false;
 
+    // Too few pairs to do a saw tooth with
     if(newStretch.Pairs() < 3) {
-      // Disable all interpretation of linear stretches
-      interpretted.CopyPairs(calculateNewStretch());
-      offset = p_offsetEdit->text().toDouble();
-      width = p_widthEdit->text().toDouble();
-      changed = true;
+      return;
     }
     else {
       // find an offset... should be the second or third point

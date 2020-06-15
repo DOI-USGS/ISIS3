@@ -96,30 +96,29 @@ void IsisMain ()
     image.next();
   }
 
-  // Get the directory where the Hayabusa translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Hayabusa"] + "/translations/";
+  // Get the path where the Hayabusa translation tables are.
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 
   // Translate the Instrument group
-  FileName transFile = transDir + "amicaInstrument.trn";
+  FileName transFile = transDir + "HayabusaAmicaInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater (label, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
-  transFile = transDir + "amicaArchive.trn";
+  transFile = transDir + "HayabusaAmicaArchive.trn";
   PvlToPvlTranslationManager archiveXlater (label, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the BandBin group
-  transFile = transDir + "amicaBandBin.trn";
+  transFile = transDir + "HayabusaAmicaBandBin.trn";
   PvlToPvlTranslationManager bandBinXlater (label, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Kernels group
-  transFile = transDir + "amicaKernels.trn";
+  transFile = transDir + "HayabusaAmicaKernels.trn";
   PvlToPvlTranslationManager kernelsXlater (label, transFile.expanded());
   kernelsXlater.Auto(outLabel);
 

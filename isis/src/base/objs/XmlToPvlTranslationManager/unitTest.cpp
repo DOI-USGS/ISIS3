@@ -370,7 +370,7 @@ int main(void) {
     }
 
     try {
-      FileName pvlFile("$base/translations/pdsImage.trn");
+      FileName pvlFile("$ISISROOT/appdata/translations/pdsImage.trn");
       stringstream simpleTrans;
       simpleTrans << "Group = Version" << endl;
       simpleTrans << "  Auto" << endl;
@@ -385,7 +385,7 @@ int main(void) {
     }
     catch(IException &e) {
       QString message = e.toString();
-      cout << message.replace(QRegExp("in file.*base/translations"), "in file [base/translations");
+      cout << message.replace(QRegExp("in file.*/translations"), "in file [/translations");
       cout << endl;
       cout << endl;
     }

@@ -105,7 +105,7 @@
             <function>helperButtonLog</function>
             <brief>View file in log area</brief>
             <description>This helper button will display the input file in the log area</description>
-            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+	    <icon>$ISISROOT/appdata/images/icons/view_text.png</icon>
           </helper>
         </helpers>
       </parameter>

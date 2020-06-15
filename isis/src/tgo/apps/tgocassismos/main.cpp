@@ -13,7 +13,7 @@
 #include "ProgramLauncher.h"
 #include "TProjection.h"
 #include "UserInterface.h"
-
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -166,10 +166,13 @@ void IsisMain() {
     // get the min SCLK values ( do this with QString comp.)
     // get the value from the original label blob
     QString startClock;
-    QString startTime;
+    QString firstStartTime;
+    QString lastStartTime;
     QString instrumentId;
     QString spacecraftName;
     QString observationId;
+    QString stopTime;
+    QString exposureDuration;
 
     for (int i = 0; i < (int)cubeList.size(); i++) {
       // himos used original label here.
@@ -182,20 +185,32 @@ void IsisMain() {
         spacecraftName = instGroup["SpacecraftName"][0];
         instrumentId =   instGroup["InstrumentId"][0];
         observationId =  archiveGroup["ObservationId"][0];
-        startTime =      instGroup["StartTime"][0];
+        firstStartTime =      instGroup["StartTime"][0];
         startClock =     instGroup["SpacecraftClockStartCount"][0];
+        lastStartTime   =     instGroup["StartTime"][0]; 
+        exposureDuration  = instGroup["ExposureDuration"][0]; 
       }
       else {
-        QString testStartTime = instGroup["StartTime"][0];
-        if (testStartTime < startTime) {
-          startTime = testStartTime;
+        // current cube's StartTime/StopTime values
+        iTime currentStartTime = iTime(instGroup["StartTime"][0]);
+
+        if (currentStartTime < iTime(firstStartTime)) {
+          firstStartTime = currentStartTime.UTC();
           startClock = instGroup["SpacecraftClockStartCount"][0];
+        }
+        if (currentStartTime > iTime(lastStartTime)) {
+          lastStartTime = currentStartTime.UTC();
         }
       }
     }
+       
+   // After selecting the last StartTime, calculate the StopTime
+   iTime lastStartTimeValue = iTime(lastStartTime);
+   iTime stopTimeValue = lastStartTimeValue + exposureDuration.toDouble(); 
+   stopTime = stopTimeValue.UTC(3);
 
-    // Get the blob of original labels from first image in list
-   // Pvl *org = cubeList[0]->label();
+   // Get the archiveGroup from the first cube in the list
+    PvlGroup archiveGroup = cubeList[0]->group("Archive");
 
     //close all cubes
     for (int i = 0; i < (int)cubeList.size(); i++) {
@@ -209,7 +224,8 @@ void IsisMain() {
     QString toMosaic = ui.GetFileName("TO");
     QString mosaicPriority = ui.GetString("PRIORITY");
 
-    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority 
+                          + " TRACK=TRUE";
 
     if (QString::compare(ui.GetString("GRANGE"), "USER", Qt::CaseInsensitive) == 0) {
       parameters += " GRANGE=USER";
@@ -222,13 +238,12 @@ void IsisMain() {
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic
-
-
     PvlGroup mos("Mosaic");
     mos += PvlKeyword("SpacecraftName", spacecraftName);
     mos += PvlKeyword("InstrumentId", instrumentId);
     mos += PvlKeyword("ObservationId ", observationId);
-    mos += PvlKeyword("StartTime ", startTime);
+    mos += PvlKeyword("StartTime ", firstStartTime);
+    mos += PvlKeyword("StopTime ", stopTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
     mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
     mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");
@@ -242,10 +257,9 @@ void IsisMain() {
     mosCube.open(ui.GetFileName("TO"), "rw");
     PvlObject &lab = mosCube.label()->findObject("IsisCube");
     lab.addGroup(mos);
-    //add orginal label blob to the output cube
-//    mosCube.write(org);
-    mosCube.close();
 
+    lab.addGroup(archiveGroup);
+    mosCube.close();
   }
   catch(IException &e) {
     e.print();

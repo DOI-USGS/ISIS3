@@ -388,7 +388,10 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if (IsSpecial(latitude)) {
+    // Since the Angle constructor handles special pixels, we will never get to this line of code
+    // when passing in a special pixel.
+    // Left this here just in case the functionality in Angle changes.
+    if (IsSpecial(latitude)) {  
       QString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);

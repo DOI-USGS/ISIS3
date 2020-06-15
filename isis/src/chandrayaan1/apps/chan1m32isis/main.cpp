@@ -311,18 +311,15 @@ void writeCubeWithDroppedLines(Buffer &in) {
 void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
                                    ProcessImportPds::PdsFileType fileType) {
   Pvl outLabel;
-  // Directory containing translation tables
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Chandrayaan1"] + "/translations/";
 
   // Translate the archive group
-  FileName transFile(transDir + "m3Archive.trn");
+  FileName transFile("$ISISROOT/appdata/translations/Chandrayaan1M3Archive.trn");
   PvlToPvlTranslationManager archiveXlator(pdsLabel, transFile.expanded());
   archiveXlator.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   // Translate the instrument group
-  transFile = transDir + "m3Instrument.trn";
+  transFile = "$ISISROOT/appdata/translations/Chandrayaan1M3Instrument.trn";
   PvlToPvlTranslationManager instrumentXlator(pdsLabel, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 

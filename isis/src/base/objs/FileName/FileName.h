@@ -110,7 +110,8 @@ namespace Isis {
    *   @history 2017-04-21 Cole Neubauer - Updated documentation for the class Fixes #4121
    *   @history 2018-04-06 Kaitlyn Lee - Moved method documentation to cpp file and
    *                           updated it for consistency. Fixes #5230.
-
+   *   @history 2019-08-07 Jesse Mapel - Replaced QDate::fromFile call with QLocale::toDate
+   *                           calls to ensure US English is always used. Fixes #3340
    */
   class FileName {
     public:

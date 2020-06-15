@@ -7,7 +7,7 @@
 
 find_path(OPENCV_INCLUDE_DIR
     NAMES cv.h
-    PATH_SUFFIXES opencv
+    PATH_SUFFIXES opencv "opencv4/opencv2"
 )
 
 find_library(OPENCV_CORE_LIBRARY              NAMES opencv_core)

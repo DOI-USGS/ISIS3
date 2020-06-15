@@ -75,7 +75,7 @@ $python makecubes.py /scratch/cal_files/solar-spectrum solar 0002
 
 After the cubes are generated, then copy them to the appropriate folder in:
 
-$ISIS3DATA/cassini/calibration/vims/RC19
+$ISISDATA/cassini/calibration/vims/RC19
 
 RC19 has the same subfolders as those enumerated above.  Obviously you will need to be logged
 in as isis3mgr to do this.
@@ -83,7 +83,7 @@ in as isis3mgr to do this.
 
 ****THE PVL MULTIPLIER FILE****
 
-In $ISIS3DATA/cassini/calibration/vims, there is a file called:  vimsCalibration????.trn which
+In $ISISDATA/cassini/calibration/vims, there is a file called:  vimsCalibration????.trn which
 looks like this:
 
 Group=CalibrationMultipliers

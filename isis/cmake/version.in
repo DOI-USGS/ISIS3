@@ -1,0 +1,3 @@
+${VERSION} # Public version number
+${VERSION_DATE} # Release date
+${RELEASE_STAGE} # Release stage (alpha, beta, stable)

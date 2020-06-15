@@ -442,22 +442,28 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(false);
+    std::stringstream fpOut1;
+    bo2.bundleOutputString(fpOut1, false);
+    qDebug().noquote() << QString::fromStdString(fpOut1.str());
+    std::stringstream fpOut2;
+    bo2.bundleOutputString(fpOut2, true);
+    qDebug().noquote() << QString::fromStdString(fpOut2.str());
+    
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
-
-
-
+    qDebug().noquote() << bo2.bundleOutputCSV(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(false);
+    std::stringstream fpOut3;
+    bo2.bundleOutputString(fpOut3, false);
+    qDebug().noquote() << QString::fromStdString(fpOut3.str());
+    std::stringstream fpOut4;
+    bo2.bundleOutputString(fpOut4, true);
+    qDebug().noquote() << QString::fromStdString(fpOut4.str());
 
     qDebug() << "    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...";
     bo3.setSolveSettings(bsFromEmptyXml);
@@ -503,9 +509,11 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo3.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo3.formatBundleOutputString(false);
-    qDebug().noquote() << bo3.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo3.bundleOutputCSV(false);
+    std::stringstream fpOut5;
+    bo3.bundleOutputString(fpOut5, false);
+    qDebug().noquote() << QString::fromStdString(fpOut5.str());
+    qDebug().noquote() << bo3.bundleOutputCSV(true);
     qDebug() << "init exterior orientiation successful?  "
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation

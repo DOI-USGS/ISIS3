@@ -210,7 +210,7 @@ namespace Isis {
    * @author Sharmila Prasad (11/1/2011)
    */
   void ControlNetStatistics::GenerateImageStats() {
-    geos::geom::GeometryFactory geosFactory;
+    geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
 
     CubeManager cubeMgr;
     cubeMgr.SetNumOpenCubes(50);
@@ -279,8 +279,8 @@ namespace Isis {
         // Even though geos doesn't create valid linear rings/polygons from this set of coordinates,
         //   because it self-intersects many many times, it still correctly does a convex hull
         //   calculation on the points in the polygon.
-        geos::geom::Geometry * convexHull = geosFactory.createPolygon(
-          geosFactory.createLinearRing(ptCoordinates), 0)->convexHull();
+        geos::geom::Geometry * convexHull = geosFactory->createPolygon(
+          geosFactory->createLinearRing(ptCoordinates), 0)->convexHull();
 
         // Calculate the area of the convex hull
         imgStats[imgConvexHullArea] = convexHull->getArea();

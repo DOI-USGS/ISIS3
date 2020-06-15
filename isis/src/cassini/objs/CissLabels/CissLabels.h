@@ -44,6 +44,7 @@ namespace Isis {
    *  @history 2008-11-07 Jeannie Walldren - Fixed documentation.
    *  @history 2011-05-03 Jeannie Walldren - Fixed documentation.
    *  @history 2017-08-22 Cole Neubauer - Added labels for latest Cisscal upgrade
+   *  @history 2019-08-14 Kaitlyn Lee - Added ShutterStateId.
    */
 
   class CissLabels {
@@ -389,6 +390,19 @@ namespace Isis {
 
 
       /**
+       * @brief Returns ShutterStateId from the Instrument group.
+       *
+       *  Indicates whether the shutter was enabled during image 
+       *  exposure. Valid values include "Disabled" and "Enabled".
+       *
+       *  @returns @b QString ShutterStateId
+       */
+      inline QString         ShutterStateId()         const {
+        return p_shutterStateId;
+      };
+
+
+      /**
        * @brief Returns SummingMode from the Instrument group.
        *
        *  Finds the summation mode, which is dependent on the
@@ -493,6 +507,8 @@ namespace Isis {
       int p_readoutOrder;
       //! Value of the PDS keyword ShutterModeId in the cube's labels
       QString p_shutterModeId;
+      //! Value of the PDS keyword ShutterState in the cube's labels
+      QString p_shutterStateId;
       //! Value of the PDS keyword SummingMode in the cube's labels
       int p_summingMode;
       //! Value of the PDS keyword TargetName in the cube's labels

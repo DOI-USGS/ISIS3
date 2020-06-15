@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 Compares two comma-separated-value files cell by cell, optionally using a
@@ -149,4 +149,4 @@ for i in range(len(csv_1)):
             "(line %d, column %s)!" % (line_num, column_1))
 
 # No errors, all was good
-print "SUCCESS All error values are within expected tolerance!"
+print("SUCCESS All error values are within expected tolerance!")

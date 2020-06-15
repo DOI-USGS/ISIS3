@@ -101,6 +101,7 @@
  * @history  2016-09-12 Marjorie Hahn - Added the Apollo, Chandrayaan1, Dawn, Hayabusa, Hayabusa2, Kaguya, Mars Express, ROLO, Rosetta, and SMART1 missions. Fixes #4300.
  * @history  2017-01-19 Kristin Berry - Added the ExoMars Trace Gas Orbiter mission. References #4584
  * @history  2017-06-26 Jesse Mapel - Added the Juno mission.
+ * @history  2018-03-27 Tyler Wilson - Added the Europa Clipper mission.
  * 
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
@@ -326,7 +327,16 @@
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Clementine/
            */
-          
+          // CLIPPER
+          /**
+           * \defgroup  Clipper                    Clipper
+           *
+           * These objects provide functionality for manipulating data from the
+           * Clipper mission to Jupiter's satellite Europa.
+           *
+           * Mission site: https://www.jpl.nasa.gov/missions/europa-clipper/
+           *
+           */          
           // DAWN
           /**
            * \defgroup  Dawn                       Dawn

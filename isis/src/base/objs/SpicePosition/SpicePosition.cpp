@@ -17,6 +17,8 @@
 #include "PolynomialUnivariate.h"
 #include "TableField.h"
 
+using json = nlohmann::json;
+
 namespace Isis {
   /**
    * Construct an empty SpicePosition class using valid body codes.
@@ -31,33 +33,33 @@ namespace Isis {
   }
 
 /**
- * @brief Constructor for swapping observer/target order 
- *  
- * This specialized constructor is provided to expressly support swap of 
- * observer/target order in the NAIF spkez_c/spkezp_c routines when determining 
- * the state of spacecraft and target body. 
- *  
- * Traditionally, ISIS3 (and ISIS2!) has had the target/observer order swapped 
- * improperly to determine state vector between the two bodies.  This 
- * constructor provides a transaitional path to correct this in a 
- * controlled way.  See SpacecraftPosition for details. 
- *  
- * Note that the targetCode and observerCode are always provided in the same 
- * order as the orignal constructor (i.e., targetCode=s/c, observerCode=planet) 
- * as the swapObserverTarget boolean parameter provides the means to properly 
- * implement the swap internally. 
- *  
- * It is not as simple as simply swapping the codes in the constructor as 
- * internal representation of the state vector is in body fixed state of the 
- * target body relative to observer.  If the swap is invoked, the state vector 
- * must be inverted. 
- * 
+ * @brief Constructor for swapping observer/target order
+ *
+ * This specialized constructor is provided to expressly support swap of
+ * observer/target order in the NAIF spkez_c/spkezp_c routines when determining
+ * the state of spacecraft and target body.
+ *
+ * Traditionally, ISIS3 (and ISIS2!) has had the target/observer order swapped
+ * improperly to determine state vector between the two bodies.  This
+ * constructor provides a transaitional path to correct this in a
+ * controlled way.  See SpacecraftPosition for details.
+ *
+ * Note that the targetCode and observerCode are always provided in the same
+ * order as the orignal constructor (i.e., targetCode=s/c, observerCode=planet)
+ * as the swapObserverTarget boolean parameter provides the means to properly
+ * implement the swap internally.
+ *
+ * It is not as simple as simply swapping the codes in the constructor as
+ * internal representation of the state vector is in body fixed state of the
+ * target body relative to observer.  If the swap is invoked, the state vector
+ * must be inverted.
+ *
  * @author 2012-10-29 Kris Becker
- * 
+ *
  * @param targetCode         Traditional s/c code
  * @param observerCode       Traditional target/planet code
- * @param swapObserverTarget True indicates implement the observer/target swap, 
- *                             false will invoke preexisting behavior 
+ * @param swapObserverTarget True indicates implement the observer/target swap,
+ *                             false will invoke preexisting behavior
  */
   SpicePosition::SpicePosition(int targetCode, int observerCode,
                                bool swapObserverTarget) {
@@ -65,16 +67,16 @@ namespace Isis {
   }
 
 /**
- * @brief Internal initialization of the object support observer/target swap 
- *  
- * This initailizer provides options to swap observer/target properly. 
- * 
+ * @brief Internal initialization of the object support observer/target swap
+ *
+ * This initailizer provides options to swap observer/target properly.
+ *
  * @author 2012-10-29 Kris Becker
- *  
+ *
  * @param targetCode         Traditional s/c code
  * @param observerCode       Traditional target/planet code
- * @param swapObserverTarget True indicates implement the observer/target swap, 
- *                             false will invoke preexisting behavior   
+ * @param swapObserverTarget True indicates implement the observer/target swap,
+ *                             false will invoke preexisting behavior
  */
   void SpicePosition::init(int targetCode, int observerCode,
                            const bool &swapObserverTarget) {
@@ -92,7 +94,7 @@ namespace Isis {
     p_fullCacheEndTime = 0;
     p_fullCacheSize = 0;
     p_hasVelocity = false;
- 
+
     p_override = NoOverrides;
     p_source = Spice;
 
@@ -128,7 +130,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  @brief Apply a time bias when invoking SetEphemerisTime method.
    *
    * The bias is used only when reading from NAIF kernels.  It is added to the
@@ -145,36 +147,36 @@ namespace Isis {
   }
 
 /**
- * @brief Returns the value of the time bias added to ET 
- * 
+ * @brief Returns the value of the time bias added to ET
+ *
  * @author 2012-10-29 Kris Becker
- * 
+ *
  * @return double Returns time bias for current object
  */
   double SpicePosition::GetTimeBias() const {
     return (p_timeBias);
   }
 
-  /** 
+  /**
    *  @brief Set the aberration correction (light time)
-   *  
+   *
    * See NAIF required reading for more information on this correction at
    * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/spk.req
    *
    * @param correction  This value must be one of the following: "NONE", "LT",
-   * "LT+S", "CN", "CN+S", "XLT", "XLT+S", "XCN" and "XCN+S" where LT is a 
+   * "LT+S", "CN", "CN+S", "XLT", "XLT+S", "XCN" and "XCN+S" where LT is a
    * correction for planetary aberration (light time), CN is converged Newtonian,
-   * XLT is transmission case using Newtonian formulation, XCN is transmission 
-   * case using converged Newtonian formuation and S a correction for stellar 
-   * aberration. See 
-   * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkezr_c.html for 
-   * additional information on the "abcorr" parameters.  If never called the 
-   * default is "LT+S". 
-   *  
-   * @internal 
-   * @history 2012-10-10 Kris Becker - Added support for all current abcorr 
+   * XLT is transmission case using Newtonian formulation, XCN is transmission
+   * case using converged Newtonian formuation and S a correction for stellar
+   * aberration. See
+   * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkezr_c.html for
+   * additional information on the "abcorr" parameters.  If never called the
+   * default is "LT+S".
+   *
+   * @internal
+   * @history 2012-10-10 Kris Becker - Added support for all current abcorr
    *          parameters options in the NAIF spkezX functions.
-   *  
+   *
    */
   void SpicePosition::SetAberrationCorrection(const QString &correction) {
     QString abcorr(correction);
@@ -194,13 +196,13 @@ namespace Isis {
   }
 
 /**
- * @brief Returns current state of stellar aberration correction 
- *  
- * The aberration correction is the value of the parameter that will be 
- * provided to the spkez_c/spkezp_c routines when determining the 
- * targer/observer vector state.  See SetAberrationCorrection() for valid 
- * values. 
- * 
+ * @brief Returns current state of stellar aberration correction
+ *
+ * The aberration correction is the value of the parameter that will be
+ * provided to the spkez_c/spkezp_c routines when determining the
+ * targer/observer vector state.  See SetAberrationCorrection() for valid
+ * values.
+ *
  * @author 2012-10-29 Kris Becker
  */
   QString SpicePosition::GetAberrationCorrection() const {
@@ -208,22 +210,22 @@ namespace Isis {
   }
 
 /**
- * @brief Return the light time coorection value 
- *  
- * This method returns the light time correction of the last call to 
- * SetEphemerisTimeSpice.  This is the actual time after adjustments that has 
- * resulting int the adjustment of the target body.  The observer position 
- * should be unchanged. 
- * 
+ * @brief Return the light time coorection value
+ *
+ * This method returns the light time correction of the last call to
+ * SetEphemerisTimeSpice.  This is the actual time after adjustments that has
+ * resulting int the adjustment of the target body.  The observer position
+ * should be unchanged.
+ *
  * @author 2012-10-29 Kris Becker
- * 
- * @return double Returns the light time determined from the last call to 
+ *
+ * @return double Returns the light time determined from the last call to
  *         SetEphemerisTime[Spice].
  */
   double SpicePosition::GetLightTime() const {
     return (m_lt);
   }
- 
+
   /** Return J2000 coordinate at given time.
    *
    * This method returns the J2000 coordinates (x,y,z) of the body at a given
@@ -336,6 +338,48 @@ namespace Isis {
     LoadCache(time, time, 1);
   }
 
+
+  /**
+   * Load the cached data from an ALE ISD.
+   *
+   * The SpicePosition object must be set to a SPICE source before loading the
+   * cache.
+   *
+   * @param isdPos The ALE ISD as a JSON object.
+   *
+   */
+  void SpicePosition::LoadCache(json &isdPos) {
+    if (p_source != Spice) {
+        throw IException(IException::Programmer, "SpicePosition::LoadCache(json) only supports Spice source", _FILEINFO_);
+    }
+
+    // Load the full cache time information from the label if available
+    p_fullCacheStartTime = isdPos["SpkTableStartTime"].get<double>();
+    p_fullCacheEndTime = isdPos["SpkTableEndTime"].get<double>();
+    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
+    p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
+
+    for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+      std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+      p_cache.push_back(pos);
+    }
+
+    p_cacheVelocity.clear();
+
+    bool hasVelocityKey = isdPos.find("Velocities") != isdPos.end();
+
+    if (hasVelocityKey) {
+      for (auto it = isdPos["Velocities"].begin(); it != isdPos["Velocities"].end(); it++) {
+        std::vector<double> vel = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+        p_cacheVelocity.push_back(vel);
+      }
+    }
+
+    p_hasVelocity = !p_cacheVelocity.empty();
+    p_source = Memcache;
+
+    SetEphemerisTime(p_cacheTime[0]);
+  }
 
   /** Cache J2000 positions using a table file.
    *
@@ -728,7 +772,7 @@ namespace Isis {
 
     //If it's already a hermite cache, just return it.
     if (p_source == HermiteCache) {
-      return Cache(tableName); 
+      return Cache(tableName);
     }
 
     // Make sure a polynomial function is already loaded
@@ -1065,7 +1109,7 @@ namespace Isis {
    * @param [in] baseTime The baseTime to use and override the computed base time
    *
    * @internal
-   *   @history 2011-04-08 Debbie A. Cook - Corrected p_override set to 
+   *   @history 2011-04-08 Debbie A. Cook - Corrected p_override set to
    *                         BaseAndScale
    */
   void SpicePosition::SetOverrideBaseTime(double baseTime, double timeScale) {
@@ -1146,7 +1190,7 @@ namespace Isis {
     if (fabs(time) <= Epsilon) time = 0.0;
 
     // Only compute for coefficient index > 0 to avoid problems like 0 ** -1
-    if (coeffIndex   > 0) 
+    if (coeffIndex   > 0)
       derivative = coeffIndex * pow(time, coeffIndex-1) / p_timeScale;
 
     // Reset the velocity coordinate to its derivative
@@ -1221,7 +1265,6 @@ namespace Isis {
       p_coordinate[0] = p_cache[0][0];
       p_coordinate[1] = p_cache[0][1];
       p_coordinate[2] = p_cache[0][2];
-
       if(p_hasVelocity) {
         p_velocity[0] = p_cacheVelocity[0][0];
         p_velocity[1] = p_cacheVelocity[0][1];
@@ -1263,6 +1306,7 @@ namespace Isis {
         p_velocity[2] = (p2[2] - p1[2]) * mult + p1[2];
       }
     }
+
   }
 
 
@@ -1391,12 +1435,12 @@ namespace Isis {
       if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
       }
-      else { 
+      else {
         p_velocity[0] = ComputeVelocityInTime(WRT_X);
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
       }
-        
+
 //         p_velocity[0] = functionX.DerivativeVar(rtime);
 //         p_velocity[1] = functionY.DerivativeVar(rtime);
 //         p_velocity[2] = functionZ.DerivativeVar(rtime);
@@ -1407,9 +1451,9 @@ namespace Isis {
   /**
    * This is a protected method that is called by
    * SetEphemerisTime() when Source type is PolyFunctionOverHermiteConstant.  It
-   * calculates J2000 coordinates (x,y,z) of the body that correspond to a given 
-   * et in seconds. These coordinates are obtained by adding a constant cubic 
-   * Hermite spline added to an nth degree polynomial function fit to 
+   * calculates J2000 coordinates (x,y,z) of the body that correspond to a given
+   * et in seconds. These coordinates are obtained by adding a constant cubic
+   * Hermite spline added to an nth degree polynomial function fit to
    * each coordinate of the position vector.
    * @see SetEphemerisTime()
    * @internal
@@ -1782,7 +1826,7 @@ namespace Isis {
    */
   std::vector<double> SpicePosition::HermiteCoordinate() {
     if (p_source != PolyFunctionOverHermiteConstant) {
-      throw IException(IException::Programmer, 
+      throw IException(IException::Programmer,
         "Hermite coordinates only available for PolyFunctionOverHermiteConstant",
           _FILEINFO_);
     }
@@ -1796,17 +1840,17 @@ namespace Isis {
   }
 
   //=========================================================================
-  //  Observer/Target swap and light time correction methods 
+  //  Observer/Target swap and light time correction methods
   //=========================================================================
 
 /**
  * @brief Returns observer code
- * 
- * This methods returns the proper observer code as specified in constructor. 
- * Code has been subjected to swapping if requested. 
- *  
- * @author 2012-10-29 Kris Becker 
- *  
+ *
+ * This methods returns the proper observer code as specified in constructor.
+ * Code has been subjected to swapping if requested.
+ *
+ * @author 2012-10-29 Kris Becker
+ *
  * @return int NAIF code of observer
  */
   int SpicePosition::getObserverCode() const {
@@ -1814,13 +1858,13 @@ namespace Isis {
   }
 
 /**
- * @brief Returns target code 
- *  
- * This methods returns the proper target code as specified in constructor. 
- * Code has been subjected to swapping if requested. 
- * 
+ * @brief Returns target code
+ *
+ * This methods returns the proper target code as specified in constructor.
+ * Code has been subjected to swapping if requested.
+ *
  * @author 2012-10-29 Kris Becker
- * 
+ *
  * @return int NAIF code for target body
  */
   int SpicePosition::getTargetCode() const {
@@ -1829,14 +1873,14 @@ namespace Isis {
 
 
 /**
- * @brief Returns adjusted ephemeris time 
- *  
- * This method returns the actual ephemeris time adjusted by a specifed time 
- * bias.  The bias typically comes explicitly from the camera model but could 
- * be adjusted by the environment they are utlized in. 
- * 
+ * @brief Returns adjusted ephemeris time
+ *
+ * This method returns the actual ephemeris time adjusted by a specifed time
+ * bias.  The bias typically comes explicitly from the camera model but could
+ * be adjusted by the environment they are utlized in.
+ *
  * @author 2012-10-29 Kris Becker
- * 
+ *
  * @return double Adjusted ephemeris time with time bias applied
  */
   double SpicePosition::getAdjustedEphemerisTime() const {
@@ -1845,40 +1889,40 @@ namespace Isis {
 
 
 /**
- * @brief Computes the state vector of the target w.r.t observer 
- *  
- * This method computes the state vector of the target that is relative of the 
- * observer.  It first attempts to retrieve with velocity vectors. If that 
- * fails, it makes an additional attempt to get the state w/o velocity vectors. 
- * The final result is indicated by the hasVelocity parameter. 
- *  
- * The parameters to this routine are the same as the NAIF spkez_c/spkezp_c 
- * routines. See 
- * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html for 
- * complete description. 
- *  
- * Note that this routine does not actually affect the internals of this object 
- * (hence the constness of the method).  It is up to the caller to apply the 
- * results and potentially handle swapping of observer/target and light time 
- * correction. See SpacecraftPosition for additional details on this 
- * application of the results. 
- * 
+ * @brief Computes the state vector of the target w.r.t observer
+ *
+ * This method computes the state vector of the target that is relative of the
+ * observer.  It first attempts to retrieve with velocity vectors. If that
+ * fails, it makes an additional attempt to get the state w/o velocity vectors.
+ * The final result is indicated by the hasVelocity parameter.
+ *
+ * The parameters to this routine are the same as the NAIF spkez_c/spkezp_c
+ * routines. See
+ * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html for
+ * complete description.
+ *
+ * Note that this routine does not actually affect the internals of this object
+ * (hence the constness of the method).  It is up to the caller to apply the
+ * results and potentially handle swapping of observer/target and light time
+ * correction. See SpacecraftPosition for additional details on this
+ * application of the results.
+ *
  * @author 2012-10-29 Kris Becker
- * 
+ *
  * @param et          Time to compute state vector for
  * @param target      NAIF target code
  * @param observer    NAIF observer code
  * @param refFrame    Reference frame to express coordinates in (e.g., J2000)
  * @param abcorr      Stellar aberration correction option
- * @param state       Returns the 6-element state vector in target body fixed 
+ * @param state       Returns the 6-element state vector in target body fixed
  *                    coordinates
  * @param hasVelocity Returns knowledge of whether the velocity vector is valid
- * @param lightTime   Returns the light time correct resulting from the request 
+ * @param lightTime   Returns the light time correct resulting from the request
  *                    if applicable
  */
-  void SpicePosition::computeStateVector(double et, int target, int observer, 
-                                         const QString &refFrame, 
-                                         const QString &abcorr, 
+  void SpicePosition::computeStateVector(double et, int target, int observer,
+                                         const QString &refFrame,
+                                         const QString &abcorr,
                                          double state[6], bool &hasVelocity,
                                          double &lightTime) const {
 
@@ -1886,7 +1930,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     hasVelocity = true;
     lightTime = 0.0;
-    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(), 
+    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
             abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
 
     // If Naif fails attempting to get the entire state, assume the velocity vector is
@@ -1897,7 +1941,7 @@ namespace Isis {
     if ( spfailure ) {
       hasVelocity = false;
       lightTime = 0.0;
-      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(), 
+      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
                abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
     }
     NaifStatus::CheckErrors();
@@ -1905,27 +1949,27 @@ namespace Isis {
   }
 
 /**
- * @brief Sets the state of target relative to observer 
- *  
- * This method sets the state of the target (vector) relative to the observer. 
- * Note that is the only place where the swap of observer/target adjustment to 
- * the state vector is handled.  All contributors to this computation *must* 
- * compute the state vector representing the position and velocity of the 
- * target relative to the observer where the first three components of state[] 
- * are the x-, y- and z-component cartesian coordinates of the target's 
- * position; the last three are the corresponding velocity vector. 
- *  
- * This routine maintains the directional integrity of the state vector should 
- * the observer/target be swapped.  See the documentation for the spkez_c at 
- * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html. 
- * 
+ * @brief Sets the state of target relative to observer
+ *
+ * This method sets the state of the target (vector) relative to the observer.
+ * Note that is the only place where the swap of observer/target adjustment to
+ * the state vector is handled.  All contributors to this computation *must*
+ * compute the state vector representing the position and velocity of the
+ * target relative to the observer where the first three components of state[]
+ * are the x-, y- and z-component cartesian coordinates of the target's
+ * position; the last three are the corresponding velocity vector.
+ *
+ * This routine maintains the directional integrity of the state vector should
+ * the observer/target be swapped.  See the documentation for the spkez_c at
+ * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html.
+ *
  * @author 2012-10-29 Kris Becker
- * 
- * @param state        State vector.  First three components of this 6 element 
+ *
+ * @param state        State vector.  First three components of this 6 element
  *                     array is the body fixed coordinates of the vector from
  *                     the target to the observer.  The last three components
- *                     are the velocity state. 
- * @param hasVelocity  If true, then the velocity components of the state 
+ *                     are the velocity state.
+ * @param hasVelocity  If true, then the velocity components of the state
  *                     vector are valid, otherwise they should be ignored.
  */
   void SpicePosition::setStateVector(const double state[6],
@@ -1947,7 +1991,7 @@ namespace Isis {
     }
     p_hasVelocity = hasVelocity;
 
-    // Negate vectors if swap of observer target is requested so interface 
+    // Negate vectors if swap of observer target is requested so interface
     // remains consistent
     if (m_swapObserverTarget) {
       vminus_c(&p_velocity[0],   &p_velocity[0]);
@@ -1973,9 +2017,3 @@ namespace Isis {
   //    return;
   //  }
 }
-
-
-
-
-
-

@@ -2,6 +2,7 @@
 
 #include <QList>
 #include <QString>
+#include <QStringList>
 
 #include "Buffer.h"
 #include "Camera.h"
@@ -22,7 +23,7 @@ using namespace Isis;
 void calibration(vector<Buffer *> &in,
                  vector<Buffer *> &out);
 PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy);
-void checkCoefficient(PvlObject &coefficients, QString keyName);
+void checkCoefficients(PvlObject &coefficients, QStringList keyNames);
 
 // Linearity correction
 bool linear;
@@ -103,11 +104,8 @@ void IsisMain() {
 
     calib = fetchCoefficients(calibra, hierarchy);
 
-    checkCoefficient(calib, "OmegaNaught");
-    checkCoefficient(calib, "SunDistance");
-    checkCoefficient(calib, "GainCorrection");
-    checkCoefficient(calib, "OffsetCorrection");
-    checkCoefficient(calib, "DeltaExposureTime");
+    checkCoefficients(calib, QStringList{"OmegaNaught", "SunDistance", "GainCorrection",
+                                         "OffsetCorrection", "DeltaExposureTime"});
   }
   catch (IException &e) {
     string msg = "Could not find match in [voycal.pvl] calibration file,";
@@ -142,9 +140,9 @@ void IsisMain() {
       // Search voylin.pvl for appropriate object
       lin = fetchCoefficients(linearity, hierarchy);
 
-      checkCoefficient(lin, "NormalizingPower");
-      checkCoefficient(lin, "B_HighEndNon-LinearityCorrection");
-      checkCoefficient(lin, "K_PowerOfNon-Linearity");
+      checkCoefficients(lin ,QStringList{"NormalizingPower",
+                                         "B_HighEndNon-LinearityCorrection",
+                                         "K_PowerOfNon-Linearity"});
     }
     catch (IException &e) {
       string msg = "Could not find match in [voylin.pvl] calibration file,";
@@ -328,12 +326,18 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
 }
 
 
-void checkCoefficient(PvlObject &coefficients, QString keyName) {
-  if (!coefficients.hasKeyword(keyName))
+void checkCoefficients(PvlObject &coefficients, QStringList keyNames) {
+  QStringList missingCoeffs;
+  foreach(const QString &key, keyNames) {
+    if (!coefficients.hasKeyword(key)) {
+      missingCoeffs.append(key);
+    }
+  }
+  if (!missingCoeffs.isEmpty()) {
     throw IException(
         IException::Programmer,
-        "Coefficient [" + keyName + "] was not found in the calibration PVL "
-        "for the input data.  Consider adding a default.",
+        "Coefficients [" + missingCoeffs.join(", ") + "] were not found in the "
+        "calibration PVL for the input data.  Consider adding a default.",
         _FILEINFO_);
+  }
 }
-

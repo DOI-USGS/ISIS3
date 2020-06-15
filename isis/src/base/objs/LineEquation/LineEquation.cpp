@@ -90,6 +90,7 @@ namespace Isis {
     }
     else if(!p_slopeDefined) {
       p_slope = (p_y[0] - p_y[1]) / (p_x[0] - p_x[1]);
+      p_slopeDefined = true;
     }
     return p_slope;
   }
@@ -110,6 +111,7 @@ namespace Isis {
     }
     else if(!p_interceptDefined) {
       p_intercept = p_y[0] - Slope() * p_x[0];
+      p_interceptDefined = true;
     }
 
     return p_intercept;

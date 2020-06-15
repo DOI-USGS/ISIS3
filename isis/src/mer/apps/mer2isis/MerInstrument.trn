@@ -1,0 +1,264 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = ROVER_MOTION_COUNTER
+  Auto
+  InputKey       = ROVER_MOTION_COUNTER
+  InputDefault   = NULL
+  OutputName     = RoverMotionCounter
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ROVER_MOTION_COUNTER_NAME
+  Auto
+  InputKey       = ROVER_MOTION_COUNTER_NAME
+  InputDefault   = NULL
+  OutputName     = RoverMotionCounterName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_NAME
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputDefault   = NULL
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (MARS_EXPLORATION_ROVER_1, "MARS EXPLORATION ROVER 1")
+  Translation    = (MARS_EXPLORATION_ROVER_2, "MARS EXPLORATION ROVER 2")
+  Translation    = (SIMULATED_MARS_EXPLORATION_ROVER_1,
+                    "SIMULATED MARS EXPLORATION ROVER 1")
+  Translation    = (SIMULATED_MARS_EXPLORATION_ROVER_2,
+                    "SIMULATED MARS EXPLORATION ROVER 2")
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_ID
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputDefault   = NULL
+  OutputName     = InstrumentID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_NAME
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputDefault   = NULL
+  OutputName     = InstrumentName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_SERIAL_NUMBER
+  Auto
+  InputKey       = INSTRUMENT_SERIAL_NUMBER
+  InputDefault   = NULL
+  OutputName     = InstrumentSerialNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LOCAL_TRUE_SOLAR_TIME
+  Auto
+  InputKey       = LOCAL_TRUE_SOLAR_TIME
+  InputDefault   = NULL
+  OutputName     = LocalTrueSolarTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = PLANET_DAY_NUMBER
+  Auto
+  InputKey       = PLANET_DAY_NUMBER
+  InputDefault   = NULL
+  OutputName     = PlanetDayNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SOLAR_LONGITUDE
+  Auto
+  InputKey       = SOLAR_LONGITUDE
+  InputDefault   = NULL
+  OutputName     = SolarLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_CNT_PARTITION
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_CNT_PARTITION
+  InputDefault   = NULL
+  OutputName     = SpacecraftClockCntPartition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_START_COUNT
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputDefault   = NULL
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_STOP_COUNT
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputDefault   = NULL
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = START_TIME
+  Auto
+  InputKey       = START_TIME
+  InputDefault   = NULL
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = STOP_TIME
+  Auto
+  InputKey       = STOP_TIME
+  InputDefault   = NULL
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EXPOSURE_DURATION
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EXPOSURE_DURATION_COUNT
+  Auto
+  InputKey       = EXPOSURE_DURATION_COUNT
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = ExposureDurationCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FILTER_NAME
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FILTER_NUMBER
+  Auto
+  InputKey       = FILTER_NUMBER
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = FilterNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FLAT_FIELD_CORRECTION_FLAG
+  Auto
+  InputKey       = FLAT_FIELD_CORRECTION_FLAG
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = FlatFieldCorrectionFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_MODE_ID
+  Auto
+  InputKey       = INSTRUMENT_MODE_ID
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = InstrumentModeID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_TEMPERATURE
+  Auto
+  InputKey       = INSTRUMENT_TEMPERATURE
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = InstrumentTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_TEMPERATURE_NAME
+  Auto
+  InputKey       = INSTRUMENT_TEMPERATURE_NAME
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = InstrumentTemperatureName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = OFFSET_MODE_ID
+  Auto
+  InputKey       = OFFSET_MODE_ID
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = OffsetModeID
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SHUTTER_EFFECT_CORRECTION_FLAG
+  Auto
+  InputKey       = SHUTTER_EFFECT_CORRECTION_FLAG
+  InputGroup     = INSTRUMENT_STATE_PARMS
+  InputPosition  = INSTRUMENT_STATE_PARMS
+  InputDefault   = NULL
+  OutputName     = ShutterEffectCorrectionFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

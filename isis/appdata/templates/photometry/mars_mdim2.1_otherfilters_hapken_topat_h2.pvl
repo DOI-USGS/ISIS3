@@ -1,0 +1,60 @@
+#################################################################
+##  File:  mdim2.1_hapken_topoatm_hapkeATM2_otherfilters.pvl   ##
+##                                                             ##
+##  This file was converted from ISIS2 for use                 ##
+##  under isis3production.                                     ##
+##  Date of last revision:  2012 Oct 06                        ##                                   ##
+#################################################################
+
+###########################################################
+##  Original File: /usgs/isisd/data/photom.mars.sav      ##
+##  Description: This file is the general file           ##
+##    looking up default photometric correction          ##
+##    parameters for the photomet program.               ##
+##  Author: K. Teal Thompson                             ##
+##  Date of Last Revision:  14 Oct 98                    ## 
+###########################################################
+
+###  All other filters
+# "photomet from=$div func=haphen genmod=topat albedo=.15";
+# " to=$topat incref=30 atmos=h2 hnorm=.003 tau=$tauvalue";
+# " tauref=0.5 wha=.95 inc=$incang ema=$emaang hga=0.68";
+# " wh=0.52 hh=0.0 b0=0.0 theta=30.0 hg1=.213 hg2=1.0";
+ 
+ 
+# The function below was used for all other filter except blue 
+# and violet filter images in MDIM2.1 mosaic.  Enter Incidence 
+# and Emission Angles and Tau at the command line.
+
+Object = PhotometricModel
+  Group = Algorithm
+    PhtName = HapkeHen
+    Wh = 0.52
+    Hh = 0.0
+    B0 = 0.0
+    Theta = 30.0
+    Hg1 = 0.213
+    Hg2 = 1.0
+  EndGroup
+EndObject
+  
+Object = NormalizationModel
+  Group = Algorithm
+    NormName = TopoAtm
+    Incref = 30.0
+    Albedo = 0.15
+  EndGroup
+EndObject
+  
+Object = AtmosphericModel
+  Group = Algorithm
+    AtmName = HapkeATM2
+    Hnorm = 0.003
+    Hga = 0.68
+    Tauref = 0.5
+    Wha = 0.95
+    Nulneg = No
+    #Enter tau at command line because it changes for different images
+    #Tau = ??
+  EndGroup
+EndObject

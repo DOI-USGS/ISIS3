@@ -12,7 +12,7 @@ commands:
 	to=hist.txt \
 	bin_width = 0.1 >& $(OUTPUT)/temp.txt;
 	cat $(OUTPUT)/temp.txt | grep -v "Processed" | grep -v "Reading Control Points" \
-		| grep -v "Adding Control Points to Network"  | grep -v "Program" > $(OUTPUT)/error.pvl;
+		| grep -v "Adding Control Points to Network" > $(OUTPUT)/error.pvl;
 	cat hist.txt  \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \

@@ -222,12 +222,9 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     _endTime = _times[size(_times)-1];
 
     // Load necessary kernels (IAK for Cassini, mainly)
-    _kernels.Load("FK,SCLK,LSK,IAK");
+    _kernels.Load("CK,FK,SCLK,LSK,IAK");
 
-//    _kernels.Load("FK,SCLK,LSK,IAK,SPK");
-//   QStringList loaded = _kernels.getLoadedList();
-//   cout << "\nKernels prior to conversion...\n" << loaded.join("\n");
-
+    _kernels.getLoadedList();
 
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
@@ -263,11 +260,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
-    _kernels.UnLoad("FK,SCLK,LSK,IAK");
-
-//    _kernels.UnLoad("FK,SCLK,LSK,IAK,SPK");
-//    loaded = _kernels.getLoadedList();
-//    cout << "\nKernels after unloading...\n" << loaded.join("\n");
+    _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
 
   } catch ( IException &ie  ) {
     ostringstream mess;
@@ -498,8 +491,6 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeStateRotation(const QString &fram
                                                          double etTime) const {
   SMatrix state(6,6);
   NaifStatus::CheckErrors();
-//  cout << "StateRotations for frame1 = " << frame1
-//       << " to frame2 = " << frame2 << "\n";
 
   try {
     // Get pointing w/AVs
@@ -548,7 +539,6 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeChainRotation(
      SpiceInt fromId = chain[i];
      QString CfromId = getFrameName(fromId);
      QString CtoId = getFrameName(toId);
-//     cout << "FromFrame: " << CfromId << ", ToFrame: " << CtoId << "\n";
      SMatrix left = computeStateRotation(CtoId, CfromId, etTime);
      NaifStatus::CheckErrors();
      mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
@@ -587,8 +577,6 @@ void CkSpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &tabl
   // Set CK instrument code
   _instCode = leftId;
 
-  // Load SPICE and extract necessary contents
-  Spice mySpice(cube, true);  // load w/out tables
   _instFrame = getFrameName(leftId);
   _refFrame = getFrameName(rightId);
 

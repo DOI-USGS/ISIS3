@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision$ 
- * $Date$ 
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -27,41 +27,41 @@
 
 namespace Isis {
 /** Generic constructor is simply an identity transform */
-GenericTransform::GenericTransform() : ImageTransform("GenericTransform"), 
+GenericTransform::GenericTransform() : ImageTransform("GenericTransform"),
                                        m_matrix(), m_inverse(), m_size(0,0) {
   setMatrix(cv::Mat::eye(3, 3, CV_64FC1));
 }
 
 /** Named generic identity matrix */
-GenericTransform::GenericTransform(const QString &name) : ImageTransform(name), 
-                                                          m_matrix(), 
-                                                          m_inverse(), 
-                                                          m_size(0,0) { 
+GenericTransform::GenericTransform(const QString &name) : ImageTransform(name),
+                                                          m_matrix(),
+                                                          m_inverse(),
+                                                          m_size(0,0) {
   setMatrix(cv::Mat::eye(3, 3, CV_64FC1));
 }
 
 /** Construct named transform with a 3x3 transformation matrix */
-GenericTransform::GenericTransform(const QString &name, const cv::Mat &matrix) : 
-                                   ImageTransform(name), m_matrix(), m_inverse(), 
-                 m_size(0,0) { 
+GenericTransform::GenericTransform(const QString &name, const cv::Mat &matrix) :
+                                   ImageTransform(name), m_matrix(), m_inverse(),
+                 m_size(0,0) {
   setMatrix( matrix );
 }
 
 /** Construct named transfrom with 3x3 matrix with a size specification */
 GenericTransform::GenericTransform(const QString &name, const cv::Mat &matrix,
-                                   const cv::Size &imSize) : 
-                                   ImageTransform(name), m_matrix(), 
-                                   m_inverse(), 
-                                   m_size(imSize) { 
+                                   const cv::Size &imSize) :
+                                   ImageTransform(name), m_matrix(),
+                                   m_inverse(),
+                                   m_size(imSize) {
   setMatrix( matrix );
 }
 
 /** Construct named transfrom with 3x3 matrix with a subarea specification */
 GenericTransform::GenericTransform(const QString &name, const cv::Mat &matrix,
-                                   const GenericTransform::RectArea &subarea) : 
-                                   ImageTransform(name), m_matrix(), 
-                                   m_inverse(), m_size(subarea.size()) { 
-  cv::Mat tmatrix = ImageTransform::translation(-subarea.x, -subarea.y); 
+                                   const GenericTransform::RectArea &subarea) :
+                                   ImageTransform(name), m_matrix(),
+                                   m_inverse(), m_size(subarea.size()) {
+  cv::Mat tmatrix = ImageTransform::translation(-subarea.x, -subarea.y);
   setMatrix( tmatrix * matrix );
   setSize( subarea.size() );
 }
@@ -78,23 +78,23 @@ cv::Mat GenericTransform::getMatrix() const {
 cv::Mat GenericTransform::getInverse() const {
   return ( m_inverse);
 }
- 
+
 /** Return the resulting size of the transformed image */
 cv::Size GenericTransform::getSize(const cv::Mat &image) const {
   if ( 0 == m_size.width ) {  return ( image.size() );  }
-  return (m_size); 
+  return (m_size);
 }
 
 /** Transform the image matrix using the matrix and size constraints */
 cv::Mat GenericTransform::render(const cv::Mat &image) const {
   cv::Mat result;
-  warpPerspective(image, result, getMatrix(), getSize(image), 
-                  CV_INTER_LINEAR); 
+  warpPerspective(image, result, getMatrix(), getSize(image),
+                  CV_INTER_LINEAR);
 #if 0
   // Gots to be run in the GUI in order for this to work!!
   cv::namedWindow("Original", CV_WINDOW_AUTOSIZE);
   cv::imshow("Original", image);
-   
+
   cv::namedWindow("Transformed", CV_WINDOW_AUTOSIZE);
   cv::imshow("Transformed", result);
 
@@ -106,11 +106,11 @@ cv::Mat GenericTransform::render(const cv::Mat &image) const {
 
 /**
  * @brief Compute the forward transform of a point
- *  
- * This method applies the matrix to a point using a perspective transform. 
- *  
+ *
+ * This method applies the matrix to a point using a perspective transform.
+ *
  * @param point   Point to transform
- * 
+ *
  * @return cv::Point2f Rsulting transformed point using the matrix
  */
 cv::Point2f GenericTransform::forward(const cv::Point2f &point) const {
@@ -122,9 +122,9 @@ cv::Point2f GenericTransform::forward(const cv::Point2f &point) const {
 
 /**
  * @brief Compute the inverse transform of a point
- * 
+ *
  * @param point Point to invert
- * 
+ *
  * @return cv::Point2f Resulting inverse tranform
  */
 cv::Point2f GenericTransform::inverse(const cv::Point2f &point) const {
@@ -148,6 +148,11 @@ void GenericTransform::setInverse(const cv::Mat &matrix) {
 
 /** Calculate the inverse transform from the forward matrix */
 cv::Mat GenericTransform::calculateInverse(const cv::Mat &matrix) {
+  if (matrix.empty()) {  // inverting an empty matrix causes a segfault
+    QString msg = "Can't invert empty matrix.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
   return ( matrix.inv() );
 }
 

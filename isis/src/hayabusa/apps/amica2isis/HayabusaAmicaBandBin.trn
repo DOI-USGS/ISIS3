@@ -1,0 +1,113 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = OriginalBand
+  Auto
+  Optional
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = 1
+  OutputName     = OriginalBand
+  OutputPosition = (Group, BandBin)
+  Translation    = (1, *)
+End_Group
+
+Group = Name
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = Name
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+
+Group = Number
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = Number
+  OutputPosition = (Group, BandBin)
+  Translation    = (1, UL)
+  Translation    = (2, B)
+  Translation    = (3, V)
+  Translation    = (4, W)
+  Translation    = (5, X)
+  Translation    = (6, P)
+  Translation    = (7, ZS)
+  Translation    = (8, WIDE)
+  Translation    = (0, *)
+End_Group
+
+Group = Center # in nanometers
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = Center
+  OutputPosition = (Group, BandBin)
+  Translation    = (381, UL) 
+  Translation    = (429, B)
+  Translation    = (553, V)
+  Translation    = (700, W)
+  Translation    = (861, X)
+  Translation    = (960, P)
+  Translation    = (1008, ZS)
+  Translation    = (650, WIDE)
+  Translation    = (*, *)
+End_Group
+
+Group = Width
+  Auto
+  InputKey       = FILTER_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "N/A"
+  OutputName     = Width
+  OutputPosition = (Group, BandBin)
+  Translation    = (45, UL)
+  Translation    = (108, B)
+  Translation    = (72, V)
+  Translation    = (70, W)
+  Translation    = (81, X)
+  Translation    = (75, P)
+  Translation    = (66, ZS)
+  Translation    = (300, WIDE)
+  Translation    = (*, *)
+End_Group
+
+Group = Units
+  Auto
+  InputKey       = BAND_BIN_UNIT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  InputDefault   = "Nanometers"
+  OutputName     = Unit
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End
