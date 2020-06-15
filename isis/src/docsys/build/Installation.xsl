@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -14,8 +14,8 @@ Deborah Lee Soltesz
 
 -->
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -66,7 +66,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -104,13 +104,13 @@ Deborah Lee Soltesz
         </table>
 
       <p>
-      See the <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">ISIS 3 Installation Guide</a>
-      for instructions on downloading and installing ISIS 3.
+      See the <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">ISIS Installation Guide</a>
+      for instructions on downloading and installing ISIS 3.6 and later.
       </p>
 
       <p>
       See the <a href="../documents/LegacyInstallGuide/index.html">Legacy ISIS 3 Installation Guide</a>
-      for instructions on downloading and installing versions of ISIS3 3.5.2 and earlier. 
+      for instructions on downloading and installing versions of ISIS3 3.5.2 and earlier.
       </p>
 
       <p>
@@ -297,4 +297,3 @@ Deborah Lee Soltesz
 
   </xsl:template>
 </xsl:stylesheet>
-
