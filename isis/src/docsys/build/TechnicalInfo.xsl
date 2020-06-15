@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -16,8 +16,8 @@ Deborah Lee Soltesz
 -->
 
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -68,7 +68,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -148,7 +148,7 @@ Deborah Lee Soltesz
             ISIS Application XML Reference</a><br/>
             Reference guide for the ISIS Application XML language
           </p>
-      
+
         <!-- hard coded links -->
           <p>
             <a href="../Schemas/Documentation/documentation/index.html">
@@ -173,13 +173,26 @@ Deborah Lee Soltesz
       <hr/>
       <h2>For System Administrators</h2>
       <table class="tableTOC">
+        <tbody>
+          <tr valign="top">
+            <th style="width:25%">
+              <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">Installing ISIS</a>
+            </th>
+            <td>
+              Downloading and installing ISIS3
+              <br/>
+            </td>
+          </tr>
 
-      <xsl:for-each select="//document[normalize-space(category/categoryItem) != 'hidden' and
-                                       normalize-space(audience/target) = 'administrator']">
-        <xsl:sort order="ascending" select="normalize-space(.)"/>
-        <xsl:apply-templates mode="singleColumn" select="."/>
+          <xsl:for-each select="//document[normalize-space(category/categoryItem) != 'hidden' and
+                                           normalize-space(audience/target) = 'administrator']">
+            <xsl:sort order="ascending" select="normalize-space(.)"/>
+            <xsl:apply-templates mode="singleColumn" select="."/>
 
-      </xsl:for-each>
+          </xsl:for-each>
+
+        </tbody>
+
       </table>
 
 
@@ -393,4 +406,3 @@ Deborah Lee Soltesz
   </xsl:template>
 
 </xsl:stylesheet>
-

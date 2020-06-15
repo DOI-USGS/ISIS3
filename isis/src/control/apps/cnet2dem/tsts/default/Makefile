@@ -1,5 +1,8 @@
 # Standard use case test (default) for cnet2dem
 # Tests CNET, TO, MAP, ALGORITHM
+
+truthDemNet.cub.TOLERANCE  = 0.00000001
+
 APPNAME = cnet2dem
 
 include $(ISISROOT)/make/isismake.tsts

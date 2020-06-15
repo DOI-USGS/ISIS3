@@ -132,4 +132,5 @@ commands:
 	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
 	$(RM) $(OUTPUT)/panCassisMosaic.cub;
 	$(RM) $(OUTPUT)/redCassisMosaic.cub;
+	$(RM) $(OUTPUT)/*_tracking*.cub;
 	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl;

@@ -782,8 +782,8 @@ namespace Isis {
     tempPts->add(geos::geom::Coordinate((*p_pts)[p_pts->size()-2].x, (*p_pts)[p_pts->size()-2].y));
     tempPts->add(geos::geom::Coordinate((*p_pts)[0].x, (*p_pts)[0].y));
 
-    geos::geom::Polygon *tempPoly = globalFactory.createPolygon
-                                    (globalFactory.createLinearRing(tempPts), NULL);
+    geos::geom::Polygon *tempPoly = globalFactory->createPolygon
+                                    (globalFactory->createLinearRing(tempPts), NULL);
 
     // Remove the last point of the sequence if it produces invalid polygons
     if (!tempPoly->isValid()) {
@@ -1168,8 +1168,8 @@ namespace Isis {
 
     // Nothing was done so return
     if (!newCoords) {
-      geos::geom::Polygon *newPoly = globalFactory.createPolygon
-                                     (globalFactory.createLinearRing(newLonLatPts), NULL);
+      geos::geom::Polygon *newPoly = globalFactory->createPolygon
+                                     (globalFactory->createLinearRing(newLonLatPts), NULL);
       p_polygons = PolygonTools::MakeMultiPolygon(newPoly);
       delete newLonLatPts;
       return;
@@ -1177,8 +1177,8 @@ namespace Isis {
 
     // bisect into seperate polygons
     try {
-      geos::geom::Polygon *newPoly = globalFactory.createPolygon
-                                     (globalFactory.createLinearRing(newLonLatPts), NULL);
+      geos::geom::Polygon *newPoly = globalFactory->createPolygon
+                                     (globalFactory->createLinearRing(newLonLatPts), NULL);
 
       geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
       geos::geom::CoordinateSequence *pts2 = new geos::geom::CoordinateArraySequence();
@@ -1225,10 +1225,10 @@ namespace Isis {
         pts2->add(geos::geom::Coordinate(360., 90.));
       }
 
-      geos::geom::Polygon *boundaryPoly = globalFactory.createPolygon
-                                          (globalFactory.createLinearRing(pts), NULL);
-      geos::geom::Polygon *boundaryPoly2 = globalFactory.createPolygon
-                                           (globalFactory.createLinearRing(pts2), NULL);
+      geos::geom::Polygon *boundaryPoly = globalFactory->createPolygon
+                                          (globalFactory->createLinearRing(pts), NULL);
+      geos::geom::Polygon *boundaryPoly2 = globalFactory->createPolygon
+                                           (globalFactory->createLinearRing(pts2), NULL);
       /*------------------------------------------------------------------------
       /  Intersecting the original polygon (converted coordinates) with the
       /  boundary polygons will create the multi polygons with the converted coordinates.
@@ -1269,8 +1269,8 @@ namespace Isis {
 
         }
         // Add the points to polys
-        finalpolys->push_back(globalFactory.createPolygon
-                              (globalFactory.createLinearRing(newLonLatPts), NULL));
+        finalpolys->push_back(globalFactory->createPolygon
+                              (globalFactory->createLinearRing(newLonLatPts), NULL));
       }
 
       // This loop is over polygons that will always be in 0-360 space no need to convert
@@ -1279,7 +1279,7 @@ namespace Isis {
         finalpolys->push_back(newGeom);
       }
 
-      p_polygons = globalFactory.createMultiPolygon(*finalpolys);
+      p_polygons = globalFactory->createMultiPolygon(*finalpolys);
 
       delete finalpolys;
       delete newGeom;
@@ -1345,7 +1345,7 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    geos::io::WKTReader *wkt = new geos::io::WKTReader(&(globalFactory));
+    geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
     p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
     delete wkt;
   }

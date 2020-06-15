@@ -29,6 +29,7 @@ namespace Isis {
       Longitude lonMin, Longitude lonMax) {
     setZValue(DBL_MAX);
 
+
     if (latInc > Angle(0.0, Angle::Degrees) && lonInc > Angle(0.0, Angle::Degrees)) {
       // Walk the grid, creating a QGraphicsLineItem for each line segment.
       Projection *proj = projectionSrc->getProjection();
@@ -42,8 +43,17 @@ namespace Isis {
         Latitude maxLat;
         Latitude startLat;
         Latitude endLat;
+      
 
-        if (mappingGroup["LatitudeType"][0] == "Planetographic") {
+      if (tproj->IsPositiveWest()) {
+        // GridGraphicsItem is written assuming positive east 
+        // for all angles. On positive West, lons come in swapped so we 
+        // need to account for this.
+        Longitude temp = lonMin;
+        lonMin = lonMax;
+        lonMax = temp;
+      }
+      if (mappingGroup["LatitudeType"][0] == "Planetographic") {
 
           Distance equaRad(tproj->EquatorialRadius(), Distance::Meters);
           Distance polRad(tproj->PolarRadius(), Distance::Meters);
@@ -104,6 +114,7 @@ namespace Isis {
                           Angle::Degrees);
           maxLat = Latitude(latMax.degrees(), mappingGroup,
                           Angle::Degrees);
+          
 
           // Make sure our lat increment is non-zero
           if (!qFuzzyCompare(latInc.radians(), 0.0)) {
@@ -120,7 +131,7 @@ namespace Isis {
           if (qFuzzyCompare(endLat.degrees(), 90.0))
             endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
         }
-
+        
         Longitude minLon(lonMin.degrees(), mappingGroup,
                         Angle::Degrees);
         Longitude maxLon(lonMax.degrees(), mappingGroup,
@@ -132,7 +143,7 @@ namespace Isis {
           startLon = Longitude(
             baseLon - Angle(floor((baseLon - minLon) / lonInc) * lonInc));
         }
-
+        
         Longitude endLon =
             (long)((maxLon - startLon) / lonInc) * lonInc + startLon;
 
@@ -186,7 +197,17 @@ namespace Isis {
 
               double x = 0;
               double y = 0;
-              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
+              
+              bool valid;
+              
+              // Set ground according to lon direction to get correct X,Y values 
+              // when drawing lines. 
+              if (tproj->IsPositiveWest()) {
+                valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
+              }
+              else {
+                valid = tproj->SetGround(lat.degrees(), lon.positiveEast(Angle::Degrees));
+              }
 
               if (valid) {
                 x = tproj->XCoord();
@@ -255,10 +276,9 @@ namespace Isis {
           firstIteration = true;
           atMaxLat = false;
           atMaxLon = false;
-
+          
           // Create the longitude grid lines
           for (Longitude lon = minLon; lon != maxLon + lonInc; lon += lonInc) {
-
             if (lon > endLon && lon < maxLon) {
               lon = endLon;
             }
@@ -276,16 +296,24 @@ namespace Isis {
             while (!atMaxLat) {
               double x = 0;
               double y = 0;
-              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
+              
+              // Set ground according to lon direction to get correct X,Y values 
+              // when drawing lines.  
+              bool valid;
+              
+              if (tproj->IsPositiveWest()) {
+                  double glon = tproj->Has180Domain() ? -1*lon.positiveEast(Angle::Degrees): lon.positiveWest(Angle::Degrees);
+                  valid = tproj->SetGround(lat.degrees(), glon);
+              }
+              else {
+                valid = tproj->SetGround(lat.degrees(), lon.positiveEast(Angle::Degrees));
+              }
 
               if (valid) {
                 x = tproj->XCoord();
                 y = -1 * tproj->YCoord();
 
                 if(havePrevious) {
-                  x = proj->XCoord();
-                  y = -1 * proj->YCoord();
-
                   if(previousX != x || previousY != y) {
                     QGraphicsLineItem* lonLine = 
                         new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);

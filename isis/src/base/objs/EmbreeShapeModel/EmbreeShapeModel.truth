@@ -46,7 +46,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
 Model has normal?  true
-  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 
 Testing observer look direction non-intersection
@@ -73,7 +73,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.0087 ,  0.0886 ,  0.0878 )
 Model has normal?  true
-  Surface Normal: ( -0.04559 ,  0.672259 ,  0.738911 )
+  Surface Normal: ( -0.0455 ,  0.6722 ,  0.7389 )
 
 
 Testing latitude, longitude occlusion
@@ -94,7 +94,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.0255 ,  -0.1383 ,  -0.0001 )
 Model has normal?  true
-  Surface Normal: ( 0.397582 ,  -0.895341 ,  -0.200733 )
+  Surface Normal: ( 0.3975 ,  -0.8953 ,  -0.2007 )
 
 
 Testing surface point intersection
@@ -108,7 +108,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( -0.2165 ,  -0.0778 ,  0 )
 Model has normal?  true
-  Surface Normal: ( -0.73405 ,  -0.654923 ,  0.17957 )
+  Surface Normal: ( -0.734 ,  -0.6549 ,  0.1795 )
 
 
 Testing surface point occlusion
@@ -127,7 +127,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
 Model has normal?  true
-  Surface Normal: ( 0.250858 ,  0.57346 ,  -0.779881 )
+  Surface Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
 
 
 Testing local radius
@@ -142,7 +142,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
 Model has normal?  true
-  Surface Normal: ( 0.250858 ,  0.57346 ,  -0.779881 )
+  Surface Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
 
 Testing visibility check
 
@@ -152,7 +152,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
 Model has normal?  true
-  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 Intersection is visible from same position and look direction?  true
 Intersection is visible with non-intersecting look?  false
@@ -167,14 +167,14 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
 Model has normal?  true
-  Surface Normal: ( 0.847198 ,  -0.194495 ,  0.494395 )
+  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 Model status after recalculating
 Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
 Model has normal?  true
-  Surface Normal: ( 0.999747 ,  -0.0209697 ,  0.00810027 )
+  Surface Normal: ( 0.9997 ,  -0.0209 ,  0.0081 )
 
 Testing photometric angles
 
@@ -183,7 +183,7 @@ Embree shape model status:
 Model has intersection?  true
   Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
 Model has normal?  true
-  Surface Normal: ( 0.999747 ,  -0.0209697 ,  0.00810027 )
+  Surface Normal: ( 0.9997 ,  -0.0209 ,  0.0081 )
 
 Emission angle:  1.28823
 Incidence angle:  6.92945

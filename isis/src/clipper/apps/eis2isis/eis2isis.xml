@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="eis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import Clipper EIS NAC files into ISIS format
+  </brief>
+  <description>
+    <p>
+      This program will import PDS4 formatted files from the Europa Clipper Europa Imaging System (EIS) instrument into the ISIS
+      Cube format. This includes three required components: the main EIS data image, the associated image label, and the associated
+      main image readout times table (CSV). Two additional (optional) files are the checkline image (and associated xml label) 
+      and the checkline image readout times table (CSV).
+    </p>
+  </description>
+
+  <history>
+    <change name="Makayla Shepherd, Stuart Sides, Ian Humphrey" date="2017-12-19">
+      Original version.
+    </change>
+    <change name="Tyler Wilson" date="2018-04-03">
+      Added normalizeTimeTable which outputs check tables (and check line tables) with time values
+      normalized in the interval [-1,1].  Added checktable/check line readout table, and normalized
+      readout table to the output cubes (the main image and the checkline image).
+    </change>
+     <change name="Tyler Wilson" date="2018-04-04">
+        Added PvlGroup jitter with PvlKeyword Coefficients to output cube labels, and initialized 
+        the Coefficients array to (0.0,0.0,0.0)
+    </change>
+    <change name="Tyler Wilson" date="2018-04-12">
+       Added the ability to write the checkline cube as a Blob to the Pvl label of the main
+       EIS cube.
+   </change>
+   <change name="Summer Stapleton-Greig" date="2019-06-13">
+      Updated application to be able to handle both the nacRs and the wacFc
+      image ingestion. This change should cover the basics of the other two
+      camera models as well. Also updated logic for the nacRs to handle cases
+      differently: a main image may now be ingested without the associated
+      checkline image, a main image may not be ingested without the associated
+      times text file, and a checkline image may not be ingested without it's
+      associated line times text file. Test have been updated to reflect these
+      changes.
+  </change>
+  <change name="Stuart Sides and Summer Stapleton-Greig" date="2019-06-17">
+     Updated application to ingest PDS4 rather than PDS3 files as the mission
+     will be using the PDS4 standards for their label .xml files.
+ </change>
+  <change name="Kristin Berry" date="2020-01-08">
+     Updates to documentation to add detail and bring it up to date with the current version of the software, prior to checkin to dev. 
+     Move NAC-only keywords into a NAC-only group.
+ </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>pds2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>Clipper</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          An EIS main image file to be converted to an ISIS cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of the xml label for a a Clipper EIS <em>main image</em>
+          file to be converted to a cube. This is expected to be a PDS4 formatted file. The associated image must 
+	  have the same name as the label and end in ".dat." 
+        </description>
+        <filter>
+          *.xml
+        </filter>
+      </parameter>
+
+    <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file for the main image
+        </brief>
+        <description>
+          The output cube file that will contain the EIS NAC <em>main image</em> in ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+    </group>
+
+    <group name="NAC Only"> 
+
+	<parameter name="FROM2">
+	  <type>filename</type>
+	  <fileMode>input</fileMode>
+	  <internalDefault>None</internalDefault>
+	  <brief>
+	    An EIS NAC checkline image file to be converted to an ISIS cube
+	  </brief>
+	  <description>
+	    Use this parameter to select the filename of the xml label for a Clipper EIS NAC <em>checkline image</em>
+	    file to be converted to a cube. This is expceted to be a PDS4 formatted file.  The associated image must 
+	    have the same name as the label and end in ".dat." 
+	  </description>
+	  <filter>
+	    *.xml
+	  </filter>
+	</parameter>
+
+      <parameter name="MAINREADOUT">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Input CSV file containing the main image readout times
+        </brief>
+        <description>
+          Use this parameter to select the filename of the main image readout times CSV file. This
+          file contains the line numbers and associated readout times for each line.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+      <parameter name="CHECKLINEREADOUT">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Input CSV file containing the checkline readout times
+        </brief>
+        <description>
+          Use this parameter to select the filename of the checkline image readout times CSV file.
+          This file contains the <em>checkline</em> numbers and associated readout times for each
+          <em>checkline</em>.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+
+      <parameter name="TO2">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output ISIS cube file for the checkline image 
+        </brief>
+        <description>
+          The output cube file that will contain the EIS NAC <em>checkline image</em> ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+   </groups>
+
+</application>

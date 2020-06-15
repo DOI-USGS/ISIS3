@@ -16,46 +16,10 @@
 using namespace std;
 using namespace Isis;
 
-// Global variables
-Camera *cam;
-TProjection *proj;
-int nbands;
-bool noCamera;
-
-bool dn;
-bool phase; 
-bool emission;
-bool incidence;
-bool localEmission;
-bool localIncidence;
-bool latitude;
-bool longitude;
-bool pixelResolution;
-bool lineResolution;
-bool sampleResolution;
-bool detectorResolution;
-bool obliqueDetectorResolution;
-bool northAzimuth;
-bool sunAzimuth;
-bool spacecraftAzimuth;
-bool offnadirAngle;
-bool subSpacecraftGroundAzimuth;
-bool subSolarGroundAzimuth;
-bool morphologyRank;
-bool albedoRank;
-bool ra;
-bool declination;
-bool bodyFixedX;
-bool bodyFixedY;
-bool bodyFixedZ;
-
-void phocubeDN(Buffer &in, Buffer &out);
-void phocube(Buffer &out);
-
 
 // Function to create a keyword with same values of a specified count
-template <typename T> PvlKeyword makeKey(const QString &name, 
-                                         const int &nvals, 
+template <typename T> PvlKeyword makeKey(const QString &name,
+                                         const int &nvals,
                                          const T &value);
 
 // Structure containing new mosaic planes
@@ -68,10 +32,8 @@ struct MosData {
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
-void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value = "Null");
-
-
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -80,6 +42,8 @@ void IsisMain() {
   // projection information
   Process p1;
   Cube *icube = p1.SetInputCube("FROM", OneBand);
+
+  bool noCamera;
   if (ui.GetString("SOURCE") == "CAMERA") {
     noCamera = false;
   }
@@ -87,6 +51,8 @@ void IsisMain() {
     noCamera = true;
   }
 
+  Camera *cam;
+  TProjection *proj;
   if(noCamera) {
     try {
       proj = (TProjection *) icube->projection();
@@ -95,7 +61,7 @@ void IsisMain() {
       QString msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-  } 
+  }
   else {
     try {
       cam = icube->camera();
@@ -111,29 +77,32 @@ void IsisMain() {
   ProcessByBrick p;
 
   // Find out which bands are to be created
-  nbands = 0;
-  phase = false;
-  emission = false;
-  incidence = false;
-  localEmission = false;
-  localIncidence = false;
-  lineResolution = false;
-  sampleResolution = false;
-  detectorResolution = false;
-  obliqueDetectorResolution = false;
-  sunAzimuth = false;
-  spacecraftAzimuth = false;
-  offnadirAngle = false;
-  subSpacecraftGroundAzimuth = false;
-  subSolarGroundAzimuth = false;
-  morphologyRank = false;
-  albedoRank = false;
-  northAzimuth = false;
-  ra = false;
-  declination = false;
-  bodyFixedX = false;
-  bodyFixedY = false;
-  bodyFixedZ = false;
+  int nbands = 0;
+  bool phase = false;
+  bool emission = false;
+  bool incidence = false;
+  bool localEmission = false;
+  bool localIncidence = false;
+  bool lineResolution = false;
+  bool sampleResolution = false;
+  bool detectorResolution = false;
+  bool obliqueDetectorResolution = false;
+  bool sunAzimuth = false;
+  bool spacecraftAzimuth = false;
+  bool offnadirAngle = false;
+  bool subSpacecraftGroundAzimuth = false;
+  bool subSolarGroundAzimuth = false;
+  bool morphologyRank = false;
+  bool albedoRank = false;
+  bool northAzimuth = false;
+  bool ra = false;
+  bool declination = false;
+  bool bodyFixedX = false;
+  bool bodyFixedY = false;
+  bool bodyFixedZ = false;
+  bool localSolarTime = false;
+  int raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
+
   if (!noCamera) {
     if ((phase = ui.GetBoolean("PHASE"))) nbands++;
     if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
@@ -149,27 +118,36 @@ void IsisMain() {
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
     if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
     if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
-    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
-    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++; 
-    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
+    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
+    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
     if ((ra = ui.GetBoolean("RADEC"))) nbands++;
     if ((declination = ui.GetBoolean("RADEC"))) nbands++;
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
   }
-  if((dn = ui.GetBoolean("DN"))) nbands++;
-  if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
-  if((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
-  if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
 
-  if(nbands < 1) {
+  bool dn;
+  if ((dn = ui.GetBoolean("DN"))) nbands++;
+
+  bool latitude;
+  if ((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
+
+  bool longitude;
+  if ((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
+
+  bool pixelResolution;
+  if ((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
+
+  if (nbands < 1) {
     QString message = "At least one photometry parameter must be entered"
                      "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
+  // If outputting a dn band, retrieve the orignal values for the filter name from the input cube,
   // if it exists.  Otherwise, the default will be "DN"
   QString bname = "DN";
   if ( dn && icube->hasGroup("BandBin") ) {
@@ -184,61 +162,340 @@ void IsisMain() {
 
   // Create a bandbin group for the output label
   PvlKeyword name("Name");
-  if (dn) name += bname;
-  if (phase) name += "Phase Angle";
-  if (emission) name += "Emission Angle";
-  if (incidence) name += "Incidence Angle";
-  if (localEmission) name += "Local Emission Angle";
-  if (localIncidence) name += "Local Incidence Angle";
-  if (latitude) name += "Latitude";
-  if (longitude) name += "Longitude";
-  if (pixelResolution) name += "Pixel Resolution";
-  if (lineResolution) name += "Line Resolution";
-  if (sampleResolution) name += "Sample Resolution";
-  if (detectorResolution) name += "Detector Resolution";
-  if (obliqueDetectorResolution) name += "Oblique Detector Resolution";
-  if (northAzimuth) name += "North Azimuth";
-  if (sunAzimuth) name += "Sun Azimuth";
-  if (spacecraftAzimuth) name += "Spacecraft Azimuth";
-  if (offnadirAngle) name += "OffNadir Angle";
-  if (subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
-  if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
-  if (morphologyRank) name += "Morphology Rank";
-  if (albedoRank) name += "Albedo Rank";
-  if (ra) name += "Right Ascension";
-  if (declination) name += "Declination";
-  if (bodyFixedX) name += "Body Fixed X";
-  if (bodyFixedY) name += "Body Fixed Y";
-  if (bodyFixedZ) name += "Body Fixed Z";
+  if (dn) {
+    name += bname;
+    raBandNum++;
+  } 
+  if (phase) {
+    name += "Phase Angle";
+    raBandNum++;
+  } 
+  if (emission) {
+    name += "Emission Angle";
+    raBandNum++;
+  }
+  if (incidence) {
+    name += "Incidence Angle";
+    raBandNum++;
+  }
+  if (localEmission) {
+    name += "Local Emission Angle";
+    raBandNum++;
+  }
+  if (localIncidence) {
+    name += "Local Incidence Angle";
+    raBandNum++;
+  }
+  if (latitude) {
+    name += "Latitude";
+    raBandNum++;
+  }
+  if (longitude) {
+    name += "Longitude";
+    raBandNum++;
+  }
+  if (pixelResolution) {
+    name += "Pixel Resolution";
+    raBandNum++;
+  }
+  if (lineResolution) {
+    name += "Line Resolution";
+    raBandNum++;
+  }
+  if (sampleResolution) {
+    name += "Sample Resolution";
+    raBandNum++;
+  }
+  if (detectorResolution) {
+    name += "Detector Resolution";
+    raBandNum++;
+  }
+  if (obliqueDetectorResolution) {
+    name += "Oblique Detector Resolution";
+    raBandNum++;
+  }
+  if (northAzimuth) {
+    name += "North Azimuth";
+    raBandNum++;
+  }
+  if (sunAzimuth) {
+    name += "Sun Azimuth";
+    raBandNum++;
+  }
+  if (spacecraftAzimuth) {
+    name += "Spacecraft Azimuth";
+    raBandNum++;
+  }
+  if (offnadirAngle) {
+    name += "OffNadir Angle";
+    raBandNum++;
+  }
+  if (subSpacecraftGroundAzimuth) {
+    name += "Sub Spacecraft Ground Azimuth";
+    raBandNum++;
+  }
+  if (subSolarGroundAzimuth) {
+    name += "Sub Solar Ground Azimuth";
+    raBandNum++;
+  }
+  if (morphologyRank) {
+    name += "Morphology Rank";
+    raBandNum++;
+  }
+  if (albedoRank) {
+    name += "Albedo Rank";
+    raBandNum++;
+  }
+  if (ra) {
+    name += "Right Ascension";
+  }
+  if (declination) {
+    name += "Declination";
+  }
+  if (bodyFixedX) {
+    name += "Body Fixed X";
+  }
+  if (bodyFixedY) {
+    name += "Body Fixed Y";
+  }
+  if (bodyFixedZ) {
+    name += "Body Fixed Z";
+  }
+  if (localSolarTime) {
+    name += "Local Solar Time";
+  }
+  bool specialPixels = ui.GetBoolean("SPECIALPIXELS"); 
 
+  /**
+   * Computes all the geometric properties for the output buffer. Certain
+   * knowledge of the buffers size is assumed below, so ensure the buffer
+   * is still of the expected size.
+   * 
+   * @param in  The input cube buffer.
+   * @param out The output cube buffer.
+   */
+  auto phocube = [&](Buffer &in, Buffer &out)->void {
+    for (int i = 0; i < 64; i++) {
+      for (int j = 0; j < 64; j++) {
 
-  // Create the output cube.  Note we add the input cube to expedite propagation
-  // of input cube elements (label, blobs, etc...).  It will be cleared
-  // prior to systematic processing only if the DN option is not selected.
-  // If DN is chosen by the user, then we propagate the input buffer with a 
-  // different function - one that accepts both input and output buffers.
+        MosData mosd, *p_mosd(0);  // For special mosaic angles
+
+        int index = i * 64 + j;
+        int inIndex = index;
+
+        if (dn) {
+          out[index] = in[index];
+          index += 64 * 64;
+        }
+
+        // If dn is true, make sure to not overwrite the original pixels with NULL for the dn band
+        if (!specialPixels && IsSpecial(in[inIndex])) {
+          for (int band = (dn) ? 1 : 0; band < nbands; band++) {
+            out[index] = Isis::Null;
+            index += 64 * 64;
+          }
+
+          continue;
+        }
+
+        // Checks to see if the point is off the body
+        double samp = out.Sample(index);
+        double line = out.Line(index);
+        bool isGood = false;
+        if (noCamera) {
+          isGood = proj->SetWorld(samp, line);
+        }
+        else {
+          isGood = cam->SetImage(samp, line);
+        }
+
+        if (isGood) {
+
+          if (phase) {
+            out[index] = cam->PhaseAngle();
+            index += 64 * 64;
+          }
+          if (emission) {
+            out[index] = cam->EmissionAngle();
+            index += 64 * 64;
+          }
+          if (incidence) {
+            out[index] = cam->IncidenceAngle();
+            index += 64 * 64;
+          }
+          if (localEmission || localIncidence) {
+            Angle phase;
+            Angle incidence;
+            Angle emission;
+            bool success;
+            cam->LocalPhotometricAngles(phase, incidence, emission, success);
+
+            if (localEmission) {
+              out[index] = emission.degrees();
+              index += 64 * 64;
+            }
+
+            if (localIncidence) {
+              out[index] = incidence.degrees();
+              index += 64 * 64;
+            }
+          }
+          if (latitude) {
+            if (noCamera) {
+              out[index] = proj->UniversalLatitude();
+            }
+            else {
+              out[index] = cam->UniversalLatitude();
+            }
+            index += 64 * 64;
+          }
+          if (longitude) {
+            if (noCamera) {
+              out[index] = proj->UniversalLongitude();
+            }
+            else {
+              out[index] = cam->UniversalLongitude();
+            }
+            index += 64 * 64;
+          }
+          if (pixelResolution) {
+            if (noCamera) {
+              out[index] = proj->Resolution();
+            }
+            else {
+              out[index] = cam->PixelResolution();
+            }
+            index += 64 * 64;
+          }
+          if (lineResolution) {
+            out[index] = cam->LineResolution();
+            index += 64 * 64;
+          }
+          if (sampleResolution) {
+            out[index] = cam->SampleResolution();
+            index += 64 * 64;
+          }
+          if (detectorResolution) {
+            out[index] = cam->DetectorResolution();
+            index += 64 * 64;
+          }
+          if (obliqueDetectorResolution) {
+            out[index] = cam->ObliqueDetectorResolution();
+            index += 64 * 64;
+          }
+          if (northAzimuth) {
+            out[index] = cam->NorthAzimuth();
+            index += 64 * 64;
+          }
+          if (sunAzimuth) {
+            out[index] = cam->SunAzimuth();
+            index += 64 * 64;
+          }
+          if (spacecraftAzimuth) {
+            out[index] = cam->SpacecraftAzimuth();
+            index += 64 * 64;
+          }
+          if (offnadirAngle) {
+            out[index] = cam->OffNadirAngle();
+            index += 64 * 64;
+          }
+          if (subSpacecraftGroundAzimuth) {
+            double ssplat, ssplon;
+            ssplat = ssplon = 0.0;
+            cam->subSpacecraftPoint(ssplat, ssplon);
+            out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
+                cam->UniversalLongitude(), ssplat, ssplon);
+            index += 64 * 64;
+          }
+          if (subSolarGroundAzimuth) {
+            double sslat, sslon;
+            sslat = sslon = 0.0;
+            cam->subSolarPoint(sslat,sslon);
+            out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
+                cam->UniversalLongitude(), sslat, sslon);
+            index += 64 * 64;
+          }
+
+          // Special Mosaic indexes
+          if (morphologyRank) {
+            if (!p_mosd) {
+              p_mosd = getMosaicIndicies(*cam, mosd);
+            }
+            out[index] = mosd.m_morph;
+            index += 64 * 64;
+          }
+
+          if (albedoRank) {
+            if (!p_mosd) {
+              p_mosd = getMosaicIndicies(*cam, mosd);
+            }
+            out[index] = mosd.m_albedo;
+            index += 64 * 64;
+          }
+
+          if (ra) {
+            out[index] = cam->RightAscension();
+            index += 64 * 64;
+          }
+
+          if (declination) {
+            out[index] = cam->Declination();
+            index += 64 * 64;
+          }
+
+          if (!noCamera) {
+            double pB[3];
+            cam->Coordinate(pB);
+            if (bodyFixedX) {
+              out[index] = pB[0];
+              index += 64 * 64;
+            }
+
+            if (bodyFixedY) {
+              out[index] = pB[1];
+              index += 64 * 64;
+            }
+            if (bodyFixedZ) {
+              out[index] = pB[2];
+              index += 64 * 64;
+            }
+          }
+          if (localSolarTime) {
+            out[index] = cam->LocalSolarTime();
+            index += 64 * 64;
+          }
+        }
+
+        // Trim outer space except RA and dec bands
+        else {
+          for (int band = (dn) ? 1 : 0; band < nbands; band++) {
+            if(ra && band == raBandNum) {
+              out[index] = cam->RightAscension();
+            }
+            else if (declination && band == raBandNum + 1) {
+              out[index] = cam->Declination();
+            }
+            else {
+              out[index] = Isis::Null;
+            }
+            index += 64 * 64;
+          }
+        }
+      }
+    }
+  };
+
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), 
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
                                 icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
-
-  if (dn) {
-    // Process with input and output buffers
-    p.StartProcess(phocubeDN);
-  }
-  else {
-    // Toss the input file as stated above
-    p.ClearInputCubes();
-
-    // Start the processing
-    p.StartProcess(phocube);
-  }
+  p.StartProcess(phocube);
 
   // Add the bandbin group to the output label.  If a BandBin group already
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
   PvlObject &cobj = ocube->label()->findObject("IsisCube");
-  if(!cobj.hasGroup("BandBin")) {
+  if (!cobj.hasGroup("BandBin")) {
     cobj.addGroup(PvlGroup("BandBin"));
   }
 
@@ -257,207 +514,7 @@ void IsisMain() {
 
   UpdateBandKey("Width", bb, nvals, "1.0");
 
-
-
   p.EndProcess();
-}
-
-
-//  This propagates the input plane to the output plane, then passes it off to
-//  the general routine
-void phocubeDN(Buffer &in, Buffer &out) {
-  for (int i = 0 ; i < in.size() ; i++) {
-    out[i] = in[i];
-  }
-  phocube(out);
-}
-
-
-//  Computes all the geometric properties for the output buffer.  Certain
-//  knowledge of the buffers size is assumed below, so ensure the buffer
-//  is still of the expected size.
-void phocube(Buffer &out) {
-
-
-  // If the DN option is selected, it is already added by the phocubeDN
-  // function.  We must compute the offset to start at the second band.
-  int skipDN = (dn) ? 64 * 64   :  0;
-
-  for(int i = 0; i < 64; i++) {
-    for(int j = 0; j < 64; j++) {
-
-      MosData mosd, *p_mosd(0);  // For special mosaic angles
-
-      int index = i * 64 + j + skipDN;
-      double samp = out.Sample(index);
-      double line = out.Line(index);
-
-      bool isGood=false;
-      if (noCamera) {
-        isGood = proj->SetWorld(samp, line);
-      }
-      else {
-        isGood = cam->SetImage(samp, line);
-      }
-
-      if (isGood) {
-        if(phase) {
-          out[index] = cam->PhaseAngle();
-          index += 64 * 64;
-        }
-        if(emission) {
-          out[index] = cam->EmissionAngle();
-          index += 64 * 64;
-        }
-        if(incidence) {
-          out[index] = cam->IncidenceAngle();
-          index += 64 * 64;
-        }
-        if(localEmission || localIncidence) {
-          Angle phase;
-          Angle incidence;
-          Angle emission;
-          bool success;
-          cam->LocalPhotometricAngles(phase, incidence, emission, success);
-
-          if (localEmission) {
-            out[index] = emission.degrees();
-            index += 64 * 64;
-          }
-
-          if (localIncidence) {
-            out[index] = incidence.degrees();
-            index += 64 * 64;
-          }
-        }
-        if(latitude) {
-          if(noCamera) {
-            out[index] = proj->UniversalLatitude();
-          }
-          else {
-            out[index] = cam->UniversalLatitude();
-          }
-          index += 64 * 64;
-        }
-        if(longitude) {
-          if(noCamera) {
-            out[index] = proj->UniversalLongitude();
-          }
-          else {
-            out[index] = cam->UniversalLongitude();
-          }
-          index += 64 * 64;
-        }
-        if(pixelResolution) {
-          if(noCamera) {
-            out[index] = proj->Resolution();
-          }
-          else {
-            out[index] = cam->PixelResolution();
-          }
-          index += 64 * 64;
-        }
-        if(lineResolution) {
-          out[index] = cam->LineResolution();
-          index += 64 * 64;
-        }
-        if(sampleResolution) {
-          out[index] = cam->SampleResolution();
-          index += 64 * 64;
-        }
-        if(detectorResolution) {
-          out[index] = cam->DetectorResolution();
-          index += 64 * 64;
-        }
-        if(obliqueDetectorResolution) {
-          out[index] = cam->ObliqueDetectorResolution();
-          index += 64 * 64;
-        }
-        if(northAzimuth) {
-          out[index] = cam->NorthAzimuth();
-          index += 64 * 64;
-        }
-        if(sunAzimuth) {
-          out[index] = cam->SunAzimuth();
-          index += 64 * 64;
-        }
-        if(spacecraftAzimuth) {
-          out[index] = cam->SpacecraftAzimuth();
-          index += 64 * 64;
-        }
-        if(offnadirAngle) {
-          out[index] = cam->OffNadirAngle();
-          index += 64 * 64;
-        }
-        if(subSpacecraftGroundAzimuth) {
-          double ssplat, ssplon;
-          ssplat = ssplon = 0.0;
-          cam->subSpacecraftPoint(ssplat, ssplon);
-          out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
-              cam->UniversalLongitude(), ssplat, ssplon);
-          index += 64 * 64;
-        }
-        if(subSolarGroundAzimuth) {
-          double sslat, sslon;
-          sslat = sslon = 0.0;
-          cam->subSolarPoint(sslat,sslon);
-          out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
-              cam->UniversalLongitude(), sslat, sslon);
-          index += 64 * 64;
-        }
-
-        // Special Mosaic indexes
-        if (morphologyRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
-          out[index] = mosd.m_morph;
-          index += 64 * 64;
-        }
-
-        if (albedoRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
-          out[index] = mosd.m_albedo;
-          index += 64 * 64;
-        }
-        
-        if (ra) {
-          out[index] = cam->RightAscension();
-          index += 64 * 64;
-        }
-        
-        if (declination) {
-          out[index] = cam->Declination();
-          index += 64 * 64;
-        }
-        
-        
-        if (!noCamera) {
-          double pB[3];
-          cam->Coordinate(pB);
-          if (bodyFixedX) {
-          out[index] = pB[0];
-          index += 64 * 64;
-          }
-        
-          if (bodyFixedY) {
-            out[index] = pB[1];
-            index += 64 * 64;
-          }
-          if (bodyFixedZ) {
-            out[index] = pB[2];
-            index += 64 * 64;
-          }
-        }
-        
-      }
-      // Trim outerspace
-      else {
-        for(int b = (skipDN) ? 1 : 0; b < nbands; b++) {
-          out[index] = Isis::NULL8;
-          index += 64 * 64;
-        }
-      }
-    }
-  }
 }
 
 
@@ -525,4 +582,3 @@ void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
   bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
   return;
 }
-

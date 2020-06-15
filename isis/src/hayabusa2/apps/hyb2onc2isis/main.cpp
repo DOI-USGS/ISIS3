@@ -10,6 +10,4 @@ using namespace Isis;
 void IsisMain () {
   UserInterface &ui = Application::GetUserInterface();
   hyb2onc2isis(ui);
-
 }
-

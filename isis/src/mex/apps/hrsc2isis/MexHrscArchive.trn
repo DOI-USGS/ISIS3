@@ -1,0 +1,43 @@
+# Translations for HRSC Stereo and SRC instrument.
+# ISIS cube label Archive group
+
+Group = DataSetId
+  Auto
+  InputKey       = DATA_SET_ID
+  OutputName     = DataSetId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DetectorId
+  Auto
+  InputKey       = DETECTOR_ID
+  OutputName     = DetectorId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = EventType
+  Auto
+  InputKey       = EVENT_TYPE
+  OutputName     = EventType
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = OrbitNumber
+  Auto
+  InputKey       = ORBIT_NUMBER
+  OutputName     = OrbitNumber
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  InputKey       = PRODUCT_ID
+  OutputName     = ProductId
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+End

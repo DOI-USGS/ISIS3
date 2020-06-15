@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     cout << "Instrument ID                = " << lab1.InstrumentId()          << endl;
     cout << "Readout Cycle Index          = " << lab1.ReadoutCycleIndex()     << endl;
     cout << "Shutter Mode ID              = " << lab1.ShutterModeId()         << endl;
+    cout << "Shutter State ID             = " << lab1.ShutterStateId()        << endl;
     cout << "Summing Mode                 = " << lab1.SummingMode()           << endl;
 
 
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
     cout << "Instrument ID                = " << lab2.InstrumentId()          << endl;
     cout << "Readout Cycle Index          = " << lab2.ReadoutCycleIndex()     << endl;
     cout << "Shutter Mode ID              = " << lab2.ShutterModeId()         << endl;
+    cout << "Shutter State ID             = " << lab1.ShutterStateId()        << endl;
     cout << "Summing Mode                 = " << lab2.SummingMode()           << endl;
 
 
@@ -88,6 +90,7 @@ int main(int argc, char *argv[]) {
     cout << "Instrument ID                = " << lab3.InstrumentId()          << endl;
     cout << "Readout Cycle Index          = " << lab3.ReadoutCycleIndex()     << endl;
     cout << "Shutter Mode ID              = " << lab3.ShutterModeId()         << endl;
+    cout << "Shutter State ID             = " << lab1.ShutterStateId()        << endl;
     cout << "Summing Mode                 = " << lab3.SummingMode()           << endl;
 
     // 8LSB
@@ -112,6 +115,7 @@ int main(int argc, char *argv[]) {
     cout << "Instrument ID                = " << lab4.InstrumentId()          << endl;
     cout << "Readout Cycle Index          = " << lab4.ReadoutCycleIndex()     << endl;
     cout << "Shutter Mode ID              = " << lab4.ShutterModeId()         << endl;
+    cout << "Shutter State ID             = " << lab1.ShutterStateId()        << endl;
     cout << "Summing Mode                 = " << lab4.SummingMode()           << endl;
     cout  << endl;
     return 0;

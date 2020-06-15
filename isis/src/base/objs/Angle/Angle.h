@@ -56,6 +56,8 @@ namespace Isis {
    *                           method in the SpecialPixel header. References #1659.
    *   @history 2017-07-03 Makayla Shepherd - Updated documentation. References #4807.
    *   @history 2018-11-13 Kristin Berry - Made protected methods public as part of testing refactor.
+   *   @history 2019-03-11 Kaitlyn Lee - Added comments to > and < operators to clarify why
+   *                           the != comparison was needed.
    */
   class Angle {
 

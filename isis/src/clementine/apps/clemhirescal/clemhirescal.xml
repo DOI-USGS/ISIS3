@@ -9,13 +9,30 @@
       camera. It does so through the use of some constants based on offset and
       flat images based on filter type. There are six possible offsets, with the
       resultant change being anywhere between eight and fifty to the DN. There
-      are four flat images, one for each of the four possible filters. 
-      Information for this program came from JGR Vol 108, A radiometric 
+      are four flat images, one for each of the four possible filters.
+      Information for this program came from JGR Vol 108, A radiometric
       calibration for the Clementine Hires camera: Robinson, Malaret, White.
+      The original paper can be found at https://doi.org/10.1029/2000JE001241
+
+      The equation for the A filter yields k values that are identical to those
+      in Table 5 from Robinson et al. (2003), therefore the pixel values in the
+      output image are the same as they would be if the k values from Table 5
+      were hard coded into the script.
+      
+      The equation for the D filter yields k values that differ from the
+      hard-coded values by less than 1 standard deviation as reported in Table 6
+      of Robinson et al. (2003).  The radiance values that result from the
+      computed k values differ by no more than .0583% of the radiance values
+      computed from the k values published in Table 6.
+
   </description>
   <history>
     <change name="Mackenzie Boyd" date="2009-08-03">
       Original version
+    </change>
+    <change name="Austin Sanders" date="2019-11-06">
+      Replaced lookup tables with calibration equations.
+      See description for more detailed information. Issue #3495
     </change>
   </history>
 
@@ -110,7 +127,7 @@
         </brief>
         <description>
             The K value is the absolute coefficient per wavelength and MCP gain
-            state. This is an average of several possible K values, the default 
+            state. This is an average of several possible K values, the default
             should not be used when possible as it is an average.
         </description>
       </parameter>

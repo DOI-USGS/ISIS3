@@ -1,4 +1,16 @@
 Testing Enlarge Class ... 
+Group = Results
+  InputLines      = 126
+  InputSamples    = 126
+  StartingLine    = 1
+  StartingSample  = 1
+  EndingLine      = 126
+  EndingSample    = 126
+  LineIncrement   = 0.5
+  SampleIncrement = 0.5
+  OutputLines     = 252
+  OutputSamples   = 252
+End_Group
 Object = IsisCube
   Object = Core
     StartByte   = 65537

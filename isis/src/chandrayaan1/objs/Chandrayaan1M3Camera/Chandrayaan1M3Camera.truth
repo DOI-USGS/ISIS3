@@ -32,10 +32,5 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
-RightAscension = 242.182569911
-Declination = -84.617919659
-
-Testing a Level-2 CH1 cube: 
-
-For a central pixel position ...
-SetImage succeeded.
+RightAscension = 242.411157332
+Declination = -84.577243705

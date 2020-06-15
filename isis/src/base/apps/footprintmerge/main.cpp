@@ -91,7 +91,7 @@ void IsisMain() {
 
   //  Create union poly
   geos::geom::GeometryCollection *polyCollection =
-    Isis::globalFactory.createGeometryCollection(allPolys);
+    Isis::globalFactory->createGeometryCollection(allPolys);
   geos::geom::Geometry *unionPoly = polyCollection->buffer(0);
 
 

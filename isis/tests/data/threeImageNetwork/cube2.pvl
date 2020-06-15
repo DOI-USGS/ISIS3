@@ -1,0 +1,110 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 480
+      Lines   = 480
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = "MARS GLOBAL SURVEYOR"
+    InstrumentId          = MOC-WA
+    TargetName            = Mars
+    StartTime             = 2001-11-26T01:09:26.36
+    StopTime              = 2001-11-26T01:10:04.99
+    CrosstrackSumming     = 1
+    DowntrackSumming      = 1
+    FocalPlaneTemperature = 246.9
+    GainModeId            = 4A
+    LineExposureDuration  = 80.480000 <milliseconds>
+    MissionPhaseName      = EXTENDED
+    OffsetModeId          = 13
+    SpacecraftClockCount  = 691204200:96
+    RationaleDesc         = "context image for 4085"
+    OrbitNumber           = 12150
+    FirstLineSample       = 1489
+  End_Group
+
+  Group = Archive
+    DataSetId           = MGS-M-MOC-NA/WA-2-DSDP-L0-V1.0
+    ProductId           = E10/04086
+    ProducerId          = MGS_MOC_TEAM
+    ProductCreationTime = 2002-09-20T23:37:07
+    SoftwareName        = "makepds 1.10"
+    UploadId            = UNK
+    DataQualityDesc     = OK
+    ImageNumber         = 133004086
+    ImageKeyId          = 6912004086
+  End_Group
+
+  Group = BandBin
+    FilterName   = RED
+    OriginalBand = 1
+    Center       = 0.6134 <micrometers>
+    Width        = 0.05 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -94032
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
+                                 $base/kernels/spk/mar097.bsp)
+    InstrumentPointing        = (Table, $mgs/kernels/ck/mgs_sc_ext4.bc)
+    Instrument                = $mgs/kernels/ik/moc20.ti
+    SpacecraftClock           = $mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+    InstrumentPosition        = (Table, $mgs/kernels/spk/mgs_ext4.bsp)
+    InstrumentAddendum        = $mgs/kernels/iak/mocAddendum004.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+
+  Group = Radiometry
+    CalibrationKernel = /usgs/cpkgs/isis3/data/mgs/calibration/moccal.ker.001
+    CoefficientFile   = $MGS/calibration/mocRedWA.coef
+
+    #  Radiometric equation in moccal
+    #  r = (pixel - z + off) / a - g / ex - dc
+    a                 = 5.666
+    off               = 65.0
+    ex                = 80.48
+    z                 = 27.67658
+    dc                = 0.00133691
+    g                 = 0.123262
+
+    #  Reflectance = r * iof, where iof = (s * s) / w0
+    w0                = 3.991
+    s                 = 1.3955600188012
+    iof               = 0.48799493011187
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                          = 499
+  BODY499_RADII                      = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                    = 10014
+  INS-94032_FOCAL_LENGTH             = 11.20537656
+  INS-94032_PIXEL_PITCH              = 0.007
+  CLOCK_ET_-94_691204200:96_COMPUTED = f67a6034529d8c41
+  INS-94032_TRANSX                   = (0.0, 0.0, 0.007)
+  INS-94032_TRANSY                   = (0.0, -0.007, 0.0)
+  INS-94032_ITRANSS                  = (0.0, 0.0, -142.8571429)
+  INS-94032_ITRANSL                  = (0.0, 142.8571429, 0.0)
+End_Object
+End

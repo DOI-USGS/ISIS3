@@ -202,19 +202,19 @@ namespace Isis {
 
       if (name == "MOON")
         m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$base/icons/weather-clear-night.png").expanded()), name, v);
+                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded()), name, v);
       else if (name == "Enceladus")
         m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$base/icons/nasa_enceladus.png").expanded()), name, v);
+                  "$ISISROOT/appdata/images/icons/nasa_enceladus.png").expanded()), name, v);
       else if (name == "Mars")
         m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$base/icons/nasa_mars.png").expanded()), name, v);
+                  "$ISISROOT/appdata/images/icons/nasa_mars.png").expanded()), name, v);
       else if (name == "Titan")
         m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$base/icons/nasa_titan.png").expanded()), name, v);
+                  "$ISISROOT/appdata/images/icons/nasa_titan.png").expanded()), name, v);
       else
         m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$base/icons/weather-clear-night.png").expanded()), name, v);
+                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded()), name, v);
     }
 
     m_ui->radiiButtonGroup->setId(m_ui->noneRadiiRadioButton,0);

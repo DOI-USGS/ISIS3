@@ -17,19 +17,19 @@ if [ ! "$ISISROOT" ]; then
 fi
 
 if [ -d $ISISROOT/../data ]; then
-  ISIS3DATA=$ISISROOT/../data
+  ISISDATA=$ISISROOT/../isis_data
 else
-  ISIS3DATA=/usgs/cpkgs/isis3/data
+  ISISDATA=/usgs/cpkgs/isis3/isis_data
 fi
-export ISIS3DATA
+export ISISDATA
 
 # Do not export when used by outside groups
 if [ -d $ISISROOT/../testData ]; then
-  ISIS3TESTDATA=$ISISROOT/../testData
+  ISISTESTDATA=$ISISROOT/../testData
 else
-  ISIS3TESTDATA=/usgs/cpkgs/isis3/testData
+  ISISTESTDATA=/usgs/cpkgs/isis3/isis_testData
 fi
-export ISIS3TESTDATA
+export ISISTESTDATA
 
 if [ "$PATH" ]; then
   PATH="${PATH}:${ISISROOT}/bin"

@@ -1,0 +1,106 @@
+# This translation file is used to convert a specific GeoTiff PCS code to an 
+#ISIS Mapping label group. 
+# NOTE: This needs to be generalized, so the data is not repeated in many 
+# translations for the other codes
+
+Group = ProjectionName
+  Auto
+  InputKey       = Code
+  OutputName     = ProjectionName
+  OutputPosition = (Group, Mapping)
+  Translation    = (TransverseMercator, 26914)
+End_Group
+
+Group = CenterLatitude
+  Auto
+  InputKey       = Code
+  OutputName     = CenterLatitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (0.0, 26914)
+End_Group
+
+Group = CenterLongitude
+  Auto
+  InputKey       = Code
+  OutputName     = CenterLongitude
+  OutputPosition = (Group, Mapping)
+  Translation    = (-99.0, 26914)
+End_Group
+
+Group = ScaleFactor
+  Auto
+  InputKey       = Code
+  OutputName     = ScaleFactor
+  OutputPosition = (Group, Mapping)
+  Translation    = (0.9996, 26914)
+End_Group
+
+// NOTE: This translation only fills in the False Easting
+// The remainder of the X value comes from the Tiff tiepoint tag
+Group = FalseEasting
+  Auto
+  InputKey       = Code
+  OutputName     = FalseEasting
+  OutputPosition = (Group, Mapping)
+  Translation    = (-500000.0, 26914)
+End_Group
+
+// NOTE: This translation only fills in the False Northing
+// The remainder of the Y value comes from the Tiff tiepoint tag
+Group = FalseNorthing
+  Auto
+  InputKey       = Code
+  OutputName     = FalseNorthing
+  OutputPosition = (Group, Mapping)
+  Translation    = (0.0, 26914)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = Code
+  OutputName     = TargetName
+  OutputPosition = (Group, Mapping)
+  Translation    = (Earth, 26914)
+End_Group
+
+Group = EquatorialRadius
+  Auto
+  InputKey       = Code
+  OutputName     = EquatorialRadius
+  OutputPosition = (Group, Mapping)
+  Translation    = (6378137.00, 26914)
+End_Group
+
+Group = PolarRadius
+  Auto
+  InputKey       = Code
+  OutputName     = PolarRadius
+  OutputPosition = (Group, Mapping)
+  Translation    = (6356752.31, 26914)
+End_Group
+
+Group = LatitudeType
+  Auto
+  InputKey       = Code
+  OutputName     = LatitudeType
+  OutputPosition = (Group, Mapping)
+  Translation    = (Planetographic, 26914)
+End_Group
+
+Group = LongitudeDirection
+  Auto
+  InputKey       = Code
+  OutputName     = LongitudeDirection
+  OutputPosition = (Group, Mapping)
+  Translation    = (PositiveEast, 26914)
+End_Group
+
+Group = LongitudeDomain
+  Auto
+  InputKey       = Code
+  OutputName     = LongitudeDomain
+  OutputPosition = (Group, Mapping)
+  Translation    = (180, 26914)
+End_Group
+
+End

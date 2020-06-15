@@ -71,6 +71,7 @@ namespace Isis {
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
 
+    p_stretch->setType("LinearStretch");
     setLayout(p_mainLayout);
 
     setStretch(stretch);
@@ -118,6 +119,12 @@ namespace Isis {
       if(inMin >= inMax) {
         inMin -= p_cubeHist->BinSize();
         inMax += p_cubeHist->BinSize();
+      }
+
+      // Handles case where the histogram bin size=0
+      if (inMin == inMax) {
+        inMin -= 1.0;
+        inMax += 1.0;
       }
 
       interpretted.AddPair(inMin, 0);
@@ -248,8 +255,8 @@ namespace Isis {
     }
   }
 
-
   Stretch LinearStretchType::getStretch() {
     return *p_stretch;
   }
+
 }

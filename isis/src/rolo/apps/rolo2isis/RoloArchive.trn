@@ -1,0 +1,31 @@
+#Begin
+Group = CoreItemSize
+  Auto
+  InputKey       = CORE_ITEM_SIZE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = CoreItemSize
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FlatFieldFiles
+  Auto
+  InputKey       = FLAT_FIELD_FILES
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = FlatFieldFiles
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = BadPixelFile
+  Auto
+  InputKey       = BAD_PIXEL_FILE
+  InputGroup     = QUBE
+  InputPosition  = QUBE
+  OutputName     = BadPixelFile
+  OutputPosition = (Group, Archive)
+  Translation    = (*, *)
+End_Group
+End

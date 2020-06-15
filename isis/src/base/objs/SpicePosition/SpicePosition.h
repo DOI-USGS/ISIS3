@@ -32,6 +32,8 @@
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Isis {
   class NumericalApproximation;
 
@@ -142,8 +144,8 @@ namespace Isis {
    *   @history 2011-05-27 Debbie A. Cook - Renamed old ReloadCache method for
    *                           converting polynomial functions to Hermite cubic
    *                           splines to LoadHermiteCache for use with spkwriter.
-   *   @history 2012-03-31 Debbie A. Cook - Programmer notes: Added new 
-   *                           interpolation algorithm, 
+   *   @history 2012-03-31 Debbie A. Cook - Programmer notes: Added new
+   *                           interpolation algorithm,
    *                           PolyFunctionOverHermiteConstant, and new supporting
    *                           method, SetEphemerisTimePolyOverHermiteConstant.  Also
    *                           added argument to SetPolynomial methods for type.
@@ -155,7 +157,7 @@ namespace Isis {
    *                           quotation marks with angle braces in 3rd party
    *                           includes, fixed history indentation. References
    *                           #1181.
-   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of 
+   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of
    *                           observer/target and light time correction to
    *                           surface.  Added a new, special protected
    *                           constructor; virtualized the SetEphemerisTimeSpice
@@ -167,7 +169,7 @@ namespace Isis {
    *                           generalization. Fixes (mostly) #0909, #1136 and
    *                           #1223.
    *   @history 2013-03-28 Debbie A. Cook - Fixed bug causing jigsaw to fail with a singular definite
-   *                           matrix on radar data.  The bug was in the method VelocityPartial and 
+   *                           matrix on radar data.  The bug was in the method VelocityPartial and
    *                           occurred when the et = baseTime and the coeffIndex was 0.  This caused
    *                           the derivative equation to be 0 * 0 ** -1.  This update fixes issue #1582.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
@@ -178,13 +180,13 @@ namespace Isis {
    *                           confusing error message before the check.
    *   @history 2017-08-18 Tyler Wilson, Summer Stapleton, Ian Humphrey -  Added opening/closing brackets
    *                           to SetEphemerisTimePolyFunction() so this class compiles without warnings
-   *                           under C++14. References #4809.   
+   *                           under C++14. References #4809.
    */
   class SpicePosition {
     public:
       //??? jw
       /**
-       * This enum indicates the status of the object.  The class 
+       * This enum indicates the status of the object.  The class
        * expects functions to be after MemCache in the list.
        */
       enum Source { Spice,       //!< Object is reading directly from the kernels
@@ -233,6 +235,7 @@ namespace Isis {
       void LoadCache(double startTime, double endTime, int size);
       void LoadCache(double time);
       void LoadCache(Table &table);
+      void LoadCache(nlohmann::json &isd);
 
       Table LineCache(const QString &tableName);
       Table LoadHermiteCache(const QString &tableName);
@@ -304,9 +307,9 @@ namespace Isis {
       int getObserverCode() const;
       int getTargetCode() const;
       double getAdjustedEphemerisTime() const;
-      void computeStateVector(double et, int target, int observer, 
-                              const QString &refFrame, 
-                              const QString &abcorr, 
+      void computeStateVector(double et, int target, int observer,
+                              const QString &refFrame,
+                              const QString &abcorr,
                               double state[6], bool &hasVelocity,
                               double &lightTime) const;
       void setStateVector(const double state[6], const bool &hasVelocity);

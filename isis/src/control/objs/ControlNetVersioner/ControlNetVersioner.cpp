@@ -501,15 +501,13 @@ namespace Isis {
                                    "pixels");
         }
 
-        if ( controlMeasure.GetSampleResidual() != Isis::Null
-             && controlMeasure.GetSampleResidual() != 0. ) {
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("SampleResidual",
                                    toString(controlMeasure.GetSampleResidual()),
                                    "pixels");
         }
 
-        if ( controlMeasure.GetLineResidual() != Isis::Null
-             && controlMeasure.GetLineResidual() != 0. ) {
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
@@ -1675,7 +1673,7 @@ namespace Isis {
          pointByteTotal += writeFirstPoint(&output);
       }
 
-      // // Insert header at the beginning of the file once writing is done.
+      // Insert header at the beginning of the file once writing is done.
       ControlNetFileHeaderV0005 protobufHeader;
 
       protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
@@ -1803,10 +1801,7 @@ namespace Isis {
           pointType = ControlPointFileEntryV0002_PointType_Fixed;
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetType())) + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          pointType = ControlPointFileEntryV0002_PointType_Free;
           break;
       }
       protoPoint.set_type(pointType);
@@ -1852,11 +1847,7 @@ namespace Isis {
                            ControlPointFileEntryV0002_AprioriSource_BundleSolution);
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetAprioriSurfacePointSource()))
-                        + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_None);
           break;
       }
 
@@ -1883,11 +1874,7 @@ namespace Isis {
           protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetAprioriRadiusSource()))
-                        + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_None);
           break;
       }
 

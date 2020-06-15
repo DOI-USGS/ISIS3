@@ -186,7 +186,7 @@ void IsisMain() {
   Application::Log(calibInfo);
 
   p.EndProcess();
-  
+
 
   //This is used to create normalized spectral plots
 #if 0
@@ -616,6 +616,8 @@ void calculateSpecificEnergy(Cube *icube) {
   QString specEnergyFile = "$cassini/calibration/vims/"+calVersion+"/RC19-mults/RC19."
       +yearString+"_v????.cub";
 
+  QString visPerfFile = "$cassini/calibration/vims/vis_perf_v????.cub";
+
 
   //B multiplier
   //QString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
@@ -627,6 +629,8 @@ void calculateSpecificEnergy(Cube *icube) {
   FileName specEnergyFileName(specEnergyFile);
   specEnergyFileName = specEnergyFileName.highestVersion();
 
+  FileName visPerfFileName(visPerfFile);
+  visPerfFileName = visPerfFileName.highestVersion();
 
   FileName waveCalFileName(waveCalFile);
   waveCalFileName = waveCalFileName.highestVersion();
@@ -635,25 +639,35 @@ void calculateSpecificEnergy(Cube *icube) {
   Cube specEnergyCube;
   specEnergyCube.open(specEnergyFileName.expanded());
 
+  Cube visPerfCube;
+  visPerfCube.open(visPerfFileName.expanded());
+
   Cube waveCalCube;
   waveCalCube.open(waveCalFileName.expanded());
 
   calibInfo += PvlKeyword("SpecificEnergyFile",
                           specEnergyFileName.originalPath() + "/" + specEnergyFileName.name());
+  if (g_visBool) {
+    calibInfo += PvlKeyword("VisPerfFile",
+                            visPerfFileName.originalPath() + "/" + visPerfFileName.name());
+  }
   calibInfo += PvlKeyword("WavelengthCalibrationFile",
                           waveCalFileName.originalPath() + "/" + waveCalFileName.name());
 
   LineManager specEnergyMgr(specEnergyCube);
+  LineManager visPerfMgr(specEnergyCube);
   LineManager waveCalMgr(waveCalCube);
 
   for(int i = 0; i < icube->bandCount(); i++) {
     Statistics specEnergyStats;
+    Statistics visPerfStats;
     Statistics waveCalStats;
 
     if(g_visBool) {
       specEnergyMgr.SetLine(1, i + 1);
+      visPerfMgr.SetLine(1, i + 1);
       waveCalMgr.SetLine(1, i + 1);
-      multiplier=g_vis;
+      multiplier=1;
 
     }
     else {
@@ -680,6 +694,13 @@ void calculateSpecificEnergy(Cube *icube) {
 
     double bandCoefficient = coefficient * (multiplier*specEnergyStats.Average())
         *(g_wavecal*waveCalStats.Average() );
+
+    if (g_visBool) {
+      visPerfCube.read(visPerfMgr);
+      visPerfStats.AddData(visPerfMgr.DoubleBuffer(), visPerfMgr.size());
+
+      bandCoefficient *= visPerfStats.Average();
+    }
 
 
     specificEnergyCorrections.push_back(bandCoefficient);

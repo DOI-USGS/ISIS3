@@ -837,13 +837,13 @@ namespace Isis {
           points2->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
           points2->add(geos::geom::Coordinate(verticesList[2].x(), verticesList[2].y()));
 
-          geos::geom::LineString *line1 = globalFactory.createLineString(points1);
-          geos::geom::LineString *line2 = globalFactory.createLineString(points2);
+          geos::geom::LineString *line1 = globalFactory->createLineString(points1);
+          geos::geom::LineString *line2 = globalFactory->createLineString(points2);
           std::vector<geos::geom::Geometry *> *lines = new std::vector<geos::geom::Geometry *>;
           lines->push_back(line1);
           lines->push_back(line2);
 
-          geos::geom::MultiLineString *angle = globalFactory.createMultiLineString(lines);
+          geos::geom::MultiLineString *angle = globalFactory->createMultiLineString(lines);
           geometry = angle;
         }
         break;
@@ -892,8 +892,8 @@ namespace Isis {
 
           points->add(geos::geom::Coordinate(originalX, originalY));
 
-          geometry = globalFactory.createPolygon(
-                       globalFactory.createLinearRing(points), NULL
+          geometry = globalFactory->createPolygon(
+                       globalFactory->createLinearRing(points), NULL
                      );
         }
         break;
@@ -912,7 +912,7 @@ namespace Isis {
 
           points->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
 
-          geometry = globalFactory.createPolygon(globalFactory.createLinearRing(points), NULL);
+          geometry = globalFactory->createPolygon(globalFactory->createLinearRing(points), NULL);
 
         }
         break;
@@ -924,7 +924,7 @@ namespace Isis {
           geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
           points->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
           points->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
-          geos::geom::LineString *line = globalFactory.createLineString(points);
+          geos::geom::LineString *line = globalFactory->createLineString(points);
           geometry = line;
         }
         break;
@@ -938,7 +938,7 @@ namespace Isis {
             points->add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
           }
 
-          geos::geom::LineString *line = globalFactory.createLineString(points);
+          geos::geom::LineString *line = globalFactory->createLineString(points);
           geometry = line;
         }
         break;

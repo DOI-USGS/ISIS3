@@ -24,7 +24,7 @@
 
 namespace Isis {
   /**
-   * @brief LRO Narrow Angle Camera Model
+   * @brief Kaguya MI Camera Model
    *
    * This is the camera model for the Kaguya Multiband pushbroom imagers (VIR and NIR)
    *

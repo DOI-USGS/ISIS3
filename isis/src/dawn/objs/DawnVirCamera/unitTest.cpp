@@ -56,7 +56,7 @@ int main(void) {
     double knownLat = 10.0318264323263371;
     double knownLon = 272.0561372647773055;
 
-    Cube c("$ISIS3TESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub", "r");
     DawnVirCamera *cam = (DawnVirCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

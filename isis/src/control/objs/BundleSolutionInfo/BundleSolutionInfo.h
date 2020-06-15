@@ -155,6 +155,18 @@ namespace Isis {
    *                           References #4649 and #501.
    *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References
    *                           #4649 and #501
+   *   @history 2019-05-14 Tyler Wilson - Replaced call to
+   *                           BundleObservation::formatBundeOutputString(...) in outputText()
+   *                           file to a new function:  BundleObservation::bundleOutput
+   *                           which takes as an argument the std::ostream.
+   *   @history 2019-06-03 Tyler Wilson - Replaced all calls to
+   *                           BundleObservation::formatBundleOutputString where it outputs a
+   *                           csv file with BundleObservation::bundleOutputCSV.
+   *                           BundleObservation::formatBundleOutputString was removed
+   *                           from ISIS3 because it had become unmaintainable.
+   *   @history 2019-06-03 Adam Paquette - Updated the header for the bundleout.txt file for
+   *                           more human readable formatting in the bundleout.txt file.
+   *
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -179,6 +191,7 @@ namespace Isis {
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
       void setOutputControl(Control *outputControl);
+      void setOutputControlName(QString name);
       void setRunTime(QString runTime);
       void setName(QString name);
 
@@ -187,6 +200,7 @@ namespace Isis {
       QString inputControlNetFileName() const;
       QString outputControlNetFileName() const;
       Control *control() const;
+      QString outputControlName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -251,6 +265,7 @@ namespace Isis {
       QString             m_runTime;                     //!< Run time of the bundle adjustment
       FileName           *m_inputControlNetFileName;     //!< Input control network file name
       Control            *m_outputControl;               //!< Output control
+      QString             m_outputControlName;
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results
       QList<ImageList *> *m_images;                      //!< Input image list

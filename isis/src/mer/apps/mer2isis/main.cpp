@@ -53,22 +53,20 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
 
   // Get the directory where the MER translation tables are.
-  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Mer"];
-  transDir = transDir + "/" + "translations/";
+  QString transDir = "$ISISROOT/appdata/translations/";
 
   // Get a filename for the MESSENGER EDR label
   Pvl labelPvl(labelFile.expanded());
   FileName transFile;
 
   // Translate the Archive group
-  transFile = transDir + "merStructure.trn";
+  transFile = transDir + "MerStructure.trn";
   PvlToPvlTranslationManager structXlater(labelPvl, transFile.expanded());
   structXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("ARCHIVE", Pvl::Traverse));
 
   // Translate the Instrument group
-  transFile = transDir + "merInstrument.trn";
+  transFile = transDir + "MerInstrument.trn";
   PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("INSTRUMENT", Pvl::Traverse));
@@ -80,13 +78,13 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   ocube->putGroup(instGroup);
 
   // Translate the Image_Request group
-  transFile = transDir + "merImageRequest.trn";
+  transFile = transDir + "MerImageRequest.trn";
   PvlToPvlTranslationManager imageReqXlater(labelPvl, transFile.expanded());
   imageReqXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
 
   // Translate the Subframe group
-  transFile = transDir + "merSubframe.trn";
+  transFile = transDir + "MerSubframe.trn";
   PvlToPvlTranslationManager subframeXlater(labelPvl, transFile.expanded());
   subframeXlater.Auto(outLabel);
   ocube->putGroup(outLabel.findGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));

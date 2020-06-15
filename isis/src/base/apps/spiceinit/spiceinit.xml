@@ -90,9 +90,9 @@
        not have their paths expanded.  This is to allow variables like $msg/ to work correctly.
     </p>
     <p>
-      The spiceinit program will also add the RayTraceEngine, OnError, and Tolerance keywords to the Kernels 
-      group if specified in the IsisPreferences file. If included, these keywords specify the ray-tracing engine to use and how to use it for shapemodels. 
-      Please see the IsisPreferences file for more details. 
+      The spiceinit program will also add the RayTraceEngine, OnError, and Tolerance keywords to the Kernels
+      group if specified in the IsisPreferences file. If included, these keywords specify the ray-tracing engine to use and how to use it for shapemodels.
+      Please see the IsisPreferences file for more details.
 
     </p>
     <p><b>Troubleshooting:</b> If spiceinit is failing with the error
@@ -279,16 +279,21 @@
     </change>
     <change name="Kristin Berry" date="2017-06-06">
       Updated spiceinit to retain ShapeModel-related keywords set by the ShapeModelFactory and add them to the kernel
-      group. Like other keywords in the kernels group, if they are present at the beginning of a spiceinit run (if we are re-spiceiniting) 
-      they are removed. 
+      group. Like other keywords in the kernels group, if they are present at the beginning of a spiceinit run (if we are re-spiceiniting)
+      they are removed.
     </change>
     <change name="Kristin Berry" date="2017-08-06">
-      Updated spiceinit to remove code dealing with the CubeSupported Pvl Keyword, from the ShapeModel group in the IsisPreferences file, 
+      Updated spiceinit to remove code dealing with the CubeSupported Pvl Keyword, from the ShapeModel group in the IsisPreferences file,
       which has been removed.
     </change>
     <change name="Christopher Combs" date="2018-01-11">
       Made change to camera construction error throw for better reporting on uninstantiated cameras.
       Fixes #5163.
+    </change>
+    <change name="Jesse Mapel" date="2020-02-26">
+      Changed PCK selection to use the same qualities as CK so that target body parameters
+      derived from bundle adjustment can be used alongside CKs derived from bundle adjustment.
+      Fixes #3669.
     </change>
   </history>
 
@@ -328,7 +333,7 @@
           be temporarily unavailable when new Isis releases are being
           distributed. Any mismatch in Isis version will cause this option to fail; only
           the most recent version of ISIS is supported. An active internet
-          connection is required to use this service. Running with this option is slower than downloading the SPICE data locally (download all of $ISIS3DATA) and running spiceinit
+          connection is required to use this service. Running with this option is slower than downloading the SPICE data locally (download all of $ISISDATA) and running spiceinit
           with the local data. This data can take up a lot of space. The size of the download
           will depend heavily on the mission and instrument of your input file.
         </description>
@@ -591,7 +596,7 @@
           file.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
         <filter>*.ti</filter>
       </parameter>
@@ -612,7 +617,7 @@
           file.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
         <filter>*.tsc</filter>
       </parameter>
@@ -633,7 +638,7 @@
           for the given input file.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
         <filter>*.bc</filter>
       </parameter>
@@ -655,7 +660,7 @@
            appropriate kernel(s) for the given input file.
          </description>
          <defaultPath>
-           $ISIS3DATA
+           $ISISDATA
          </defaultPath>
          <filter>*.tf</filter>
        </parameter>
@@ -677,7 +682,7 @@
           for the given input file.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
         <filter>*.bsp</filter>
       </parameter>
@@ -698,7 +703,7 @@
           for the given input file.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
         <filter>*.ti</filter>
       </parameter>
@@ -715,7 +720,7 @@
           referenced in the keyword Extra by the resulting Kernel group.
         </description>
         <defaultPath>
-          $ISIS3DATA
+          $ISISDATA
         </defaultPath>
       </parameter>
     </group>
@@ -757,7 +762,7 @@
           <option value="SYSTEM">
             <brief>Search system for a default shape model</brief>
             <description>
-              This option will search the default system data area ($ISIS3DATA/base/dems) for a
+              This option will search the default system data area ($ISISDATA/base/dems) for a
               shape model that matches the target of the input cube.  If none are found, then no
               shape model will be used and the default ellipsoid parameters found in the
               planetary constants (PCK) file define the shape. The filename and path of the shape
@@ -1049,11 +1054,11 @@
         This example shows how to use spiceinit using a ShapeModel chosen by the user.
 
         In this example, the input cube is of Mars, so we can use a ShapeModel
-        from $ISIS3DATA that was created specifically for use with Mars data.
+        from $ISISDATA that was created specifically for use with Mars data.
       </description>
       <terminalInterface>
         <commandLine>
-          from=hi2isis_RED0.cub shape=user model=$ISIS3DATA/base/dems/ulcn2005_lpo_0005.cub
+          from=hi2isis_RED0.cub shape=user model=$ISISDATA/base/dems/ulcn2005_lpo_0005.cub
         </commandLine>
         <description>
           An example of how to run this program with a chosen ShapeModel.

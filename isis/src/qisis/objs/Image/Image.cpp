@@ -964,7 +964,7 @@ namespace Isis {
   bool Image::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
     if (localName == "footprint" && !m_characters.isEmpty()) {
-      geos::io::WKTReader wktReader(&globalFactory);
+      geos::io::WKTReader wktReader(*globalFactory);
       m_image->m_footprint = PolygonTools::MakeMultiPolygon(
           wktReader.read(m_characters.toStdString()));
     }

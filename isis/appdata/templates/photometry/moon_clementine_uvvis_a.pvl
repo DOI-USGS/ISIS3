@@ -1,0 +1,27 @@
+# Clementine UVVIS FILTER A
+
+# This example uses photometric and normalization models to correct 
+# the image.  The settings were defined by Alfred McEwen for processing 
+# UVVIS filter A (LUA) data acquired by the Clementine Mission.
+  
+Object = PhotometricModel
+  Group  = Algorithm
+    PhtName = LunarLambertMcEwen
+  EndGroup
+EndObject
+
+Object = NormalizationModel
+  Group = Algorithm
+    NormName = MoonAlbedo
+    D = 0.0
+    E = -0.222
+    F = 0.5
+    G2 = 0.39
+    H = 0.062
+    Bsh1 = 2.31
+    Xmul = 1.0
+    Wl = 1.0
+    Xb1 = 1.0
+    Xb2 = 1.0
+  EndGroup
+EndObject

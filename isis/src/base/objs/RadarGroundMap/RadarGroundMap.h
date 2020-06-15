@@ -104,6 +104,9 @@ namespace Isis {
    *                       in the ShapeModel so that photometric angles can be calculated.  References #775
    * @history 2016-07-19 Kristin Berry, Updated SetGround to call p_camera->Sensor::SetGround so that 
    *                       RA, DEC values will be set on level 2 images. References #2400.  
+   *  @history 2019-05-15 Debbie A. Cook - Added optional bool argument to match parent GetXY 
+   *                          method to allow the bundle adjustment to skip the back of planet test during 
+   *                          iterations. References #2591.
    */
   class RadarGroundMap : public CameraGroundMap {
     public:
@@ -117,7 +120,7 @@ namespace Isis {
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
       virtual bool GetXY(const SurfacePoint &spoint, double *cudx,
-                         double *cudy);
+                         double *cudy, bool test=false);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,
                                    int coefIndex, double *cudx, double *cudy);
       virtual bool GetdXYdPoint(std::vector<double> d_lookB, double *dx,

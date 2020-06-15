@@ -155,6 +155,7 @@ namespace Isis {
   class UserInterface : public IsisAml {
     public:
       UserInterface(const QString &xmlfile, int &argc, char *argv[]);
+      UserInterface(const QString &xmlfile, QVector<QString> &args);
       ~UserInterface();
 
       /**
@@ -212,6 +213,8 @@ namespace Isis {
 
     private:
       void loadBatchList(const QString file);
+      void loadCommandLine(QVector<QString> &args, bool ignoreAppName=true);
+       
       void loadCommandLine(int argc, char *argv[]);
       void loadHistory(const QString file);
 

@@ -196,33 +196,45 @@ void IsisMain() {
     Pvl radPvl(radFileName.expanded());
 
     if(g_iof) {
+      iTime startTime((QString) inst["StartTime"]);
+      
       try {
-        iTime startTime((QString) inst["StartTime"]);
-        double etStart = startTime.Et();
-        // Get the distance between the Moon and the Sun at the given time in
-        // Astronomical Units (AU)
-        QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-        QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
-        furnsh_c(bspKernel1.toLatin1().data());
-        furnsh_c(bspKernel2.toLatin1().data());
-        QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-        QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
-        QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
-        furnsh_c(pckKernel1.toLatin1().data());
-        furnsh_c(pckKernel2.toLatin1().data());
-        furnsh_c(pckKernel3.toLatin1().data());
-        double sunpos[6], lt;
-        spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
-        g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
-        unload_c(bspKernel1.toLatin1().data());
-        unload_c(bspKernel2.toLatin1().data());
-        unload_c(pckKernel1.toLatin1().data());
-        unload_c(pckKernel2.toLatin1().data());
-        unload_c(pckKernel3.toLatin1().data());
+        Camera *cam; 
+        cam = iCube->camera();
+        cam->setTime(startTime);
+        g_solarDistance = cam->sunToBodyDist() / KM_PER_AU; 
+        
       }
       catch(IException &e) {
-        QString msg = "Unable to find the necessary SPICE kernels for converting to IOF";
-        throw IException(e, IException::User, msg, _FILEINFO_);
+        // Failed to instantiate a camera, try furnishing kernels directly 
+        try {
+
+          double etStart = startTime.Et();
+          // Get the distance between the Moon and the Sun at the given time in
+          // Astronomical Units (AU)
+          QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+          QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
+          furnsh_c(bspKernel1.toLatin1().data());
+          furnsh_c(bspKernel2.toLatin1().data());
+          QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+          QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
+          QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
+          furnsh_c(pckKernel1.toLatin1().data());
+          furnsh_c(pckKernel2.toLatin1().data());
+          furnsh_c(pckKernel3.toLatin1().data());
+          double sunpos[6], lt;
+          spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
+          g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
+          unload_c(bspKernel1.toLatin1().data());
+          unload_c(bspKernel2.toLatin1().data());
+          unload_c(pckKernel1.toLatin1().data());
+          unload_c(pckKernel2.toLatin1().data());
+          unload_c(pckKernel3.toLatin1().data());
+        }
+        catch(IException &e) {
+          QString msg = "Unable to find the necessary SPICE kernels for converting to IOF";
+          throw IException(e, IException::User, msg, _FILEINFO_);
+        }
       }
       g_iofLeft = radPvl["IOF_LEFT"];
       g_iofRight = radPvl["IOF_RIGHT"];

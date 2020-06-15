@@ -1,0 +1,11 @@
+Most of the icons have been adapted from the oxygen theme are under the LGPLv3 license. The original svg files are located in the svg directory.
+
+For more information, please see: http://www.kde.org/
+
+A copy of the LGPLv3 license is available at licenses/lgpl-3.0.txt
+
+The following files are Copyright (c) U.S. Geological Survey (2012):
+  ographic.png
+
+All images beginning with "nasa_" have been adapted from images provided by NASA. You can review NASA's Media Usage Guidelines at:
+   https://www.nasa.gov/multimedia/guidelines/index.html

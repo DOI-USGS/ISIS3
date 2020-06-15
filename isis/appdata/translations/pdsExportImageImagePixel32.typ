@@ -1,0 +1,8 @@
+SAMPLE_BIT_MASK       = ("Binary",32)
+VALID_MINIMUM         = (Hex, 4)
+CORE_NULL                  = (Hex, 4)
+CORE_LOW_REPR_SATURATION   = (Hex, 4)
+CORE_LOW_INSTR_SATURATION  = (Hex, 4)
+CORE_HIGH_REPR_SATURATION  = (Hex, 4)
+CORE_HIGH_INSTR_SATURATION = (Hex, 4)
+

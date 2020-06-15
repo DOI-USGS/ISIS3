@@ -49,6 +49,8 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "TProjection.h"
+#include "Longitude.h"
 
 using namespace std;
 
@@ -71,6 +73,75 @@ namespace Isis {
     open(fileName.toString(), access);
   }
 
+  /**
+   * Initialize Cube data from a PVL label.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label object representing the new Cube label
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
+    PvlObject cubeLabel = label.findObject("IsisCube");
+    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    close();
+
+    setDimensions(dimensions["Samples"],
+                          dimensions["Lines"],
+                          dimensions["Bands"]);
+
+    create(fileName.expanded());
+
+    for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
+      putGroup(*grpIt);
+    }
+
+    close();
+    open(fileName.toString(), access);
+  }
+
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param label PVL label object representing the new Cube label  
+   * @param isd JSON object containing Ale compatible ISD
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
+    fromLabel(fileName, label, access);
+    attachSpiceFromIsd(isd);
+
+    close();
+    open(fileName.toString(), access);
+  }
+  
+  /**
+   * Initialize Cube data from a PVL label and JSON ISD.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param labelFile Path to PVL label representing the new Cube label
+   * @param isdPath Path to Ale compatible ISD
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
+    std::ifstream isdStream(isdFile.expanded().toStdString());
+    std::ifstream labelStream(labelFile.expanded().toStdString());
+    
+    Pvl label;
+    nlohmann::json isd;
+    
+    isdStream >> isd;
+    labelStream >> label;
+    
+    fromIsd(fileName, label, isd, access);
+    reopen("rw");  
+  }
 
   //! Destroys the Cube object.
   Cube::~Cube() {
@@ -1170,6 +1241,76 @@ namespace Isis {
   }
 
 
+  void Cube::attachSpiceFromIsd(nlohmann::json isd) {
+    PvlKeyword lkKeyword("LeapSecond");
+    PvlKeyword pckKeyword("TargetAttitudeShape");
+    PvlKeyword targetSpkKeyword("TargetPosition");
+    PvlKeyword ckKeyword("InstrumentPointing");
+    PvlKeyword ikKeyword("Instrument");
+    PvlKeyword sclkKeyword("SpacecraftClock");
+    PvlKeyword spkKeyword("InstrumentPosition");
+    PvlKeyword iakKeyword("InstrumentAddendum");
+    PvlKeyword demKeyword("ShapeModel");
+    PvlKeyword exkKeyword("Extra");
+
+    Spice spice(*this->label(), isd);
+    Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
+    ckTable.Label() += PvlKeyword("Kernels");
+
+    for (int i = 0; i < ckKeyword.size(); i++)
+      ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
+
+    this->write(ckTable);
+
+    Table spkTable = spice.instrumentPosition()->Cache("InstrumentPosition");
+    spkTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < spkKeyword.size(); i++)
+      spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
+
+    this->write(spkTable);
+
+    Table bodyTable = spice.bodyRotation()->Cache("BodyRotation");
+    bodyTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    for (int i = 0; i < pckKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
+
+    bodyTable.Label() += PvlKeyword("SolarLongitude",
+        toString(spice.solarLongitude().degrees()));
+    this->write(bodyTable);
+
+    Table sunTable = spice.sunPosition()->Cache("SunPosition");
+    sunTable.Label() += PvlKeyword("Kernels");
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+    this->write(sunTable);
+
+    PvlGroup currentKernels = this->group("Kernels");
+
+    Pvl *label = this->label();
+    int i = 0;
+    while (i < label->objects()) {
+      PvlObject currObj = label->object(i);
+      if (currObj.isNamed("NaifKeywords")) {
+        label->deleteObject(i);
+      }
+      else {
+        i ++;
+      }
+    }
+
+    *(this->label()) += spice.getStoredNaifKeywords();
+
+    // Access the camera here while all of the kernels are still loaded.
+    // This needs to be done for some cameras that need loaded spice data
+    // to actually create the camera model. (KaguyaTC for example)
+    this->camera();
+  }
+
+
   /**
    * If this is an external cube label file, this will give you the cube dn file that this label
    *   references.
@@ -1801,7 +1942,7 @@ namespace Isis {
 
     m_mutex = new QMutex();
     m_formatTemplateFile =
-         new FileName("$base/templates/labels/CubeFormatTemplate.pft");
+         new FileName("$ISISROOT/appdata/templates/labels/CubeFormatTemplate.pft");
 
     initialize();
   }
@@ -2132,6 +2273,98 @@ namespace Isis {
     m_labelFile = new QFile(m_tempCube->expanded());
   }
 
+
+/**
+ * Returns the latitude and longitude range for the Cube. More accurate than the minimum and
+ * maximum latitude and longitude from the mapping group.
+ *
+ * @param[out] minLatitude minimum latitude present in the cube
+ * @param[out] maxLatitude maximum latitude present in the cube
+ * @param[out] minLongitude minimum longitude present in the cube
+ * @param[out] maxLongitude maximum longitude present in the cube
+ */
+  void Cube::latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, double &
+                         maxLongitude) {
+    Camera *cam;
+    TProjection *proj;
+
+    bool isGood = false;
+    bool useProj = true;
+
+    if (hasGroup("Instrument")) {
+      useProj = false;
+    }
+
+    // setup camera or projection
+    if (useProj) {
+     try {
+       proj = (TProjection *) projection();
+     }
+     catch(IException &e) {
+       QString msg = "Cannot calculate lat/lon range without a camera or projection";
+       throw IException(e, IException::User, msg, _FILEINFO_);
+     }
+    }
+    else {
+      try {
+        cam = camera();
+      }
+      catch(IException &e) {
+        QString msg = "Unable to create camera when calculating a lat/lon range.";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Iterate over all samp/line combos in cube
+    minLatitude = 99999;
+    minLongitude = 99999;
+    maxLatitude = -99999;
+    maxLongitude = -99999;
+
+    for (double sample = 0.5; sample < sampleCount() + 0.5; sample++) {
+    // Checks to see if the point is in outer space
+      for (double line = 0.5; line < lineCount() + 0.5; line++) {
+        if (useProj) {
+          isGood = proj->SetWorld(sample, line);
+        }
+        else {
+          isGood = cam->SetImage(sample, line);
+        }
+
+        double lat, lon;
+        if (isGood) {
+          if (useProj) {
+            lat = proj->UniversalLatitude();
+            lon = proj->UniversalLongitude();
+          }
+          else {
+            lat = cam->UniversalLatitude();
+            lon = cam->UniversalLongitude();
+          }
+
+          // update mix/max lat/lons
+          if (lat < minLatitude) {
+            minLatitude = lat;
+          }
+          else if (lat > maxLatitude) {
+            maxLatitude = lat;
+          }
+
+          if (lon < minLongitude) {
+            minLongitude = lon;
+          }
+          else if (lon > maxLongitude) {
+            maxLongitude = lon;
+          }
+        }
+      }
+    }
+    if ( (minLatitude == 99999) || (minLongitude == 99999) || (maxLatitude == -99999) ||
+    (maxLongitude == -99999) ) {
+      QString msg = "Unable to calculate a minimum or maximum latitutde or longitude.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+  }
 
   /**
    * Write the Pvl labels to the cube's label file. Excess data in the attached

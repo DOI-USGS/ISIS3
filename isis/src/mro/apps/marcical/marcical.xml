@@ -44,6 +44,10 @@ K.D. Supulver, and P.C. Thomas
     <change name="Moses Milazzo" date="2014-12-08">
       Fixed a bug in exposure time accounting. Fixes #1860.
     </change>
+    <change name="Stuart Sides" date="2019-11-08">
+      Modified to use the exposure duration from the new label keywords added by
+      marci2isis. Related #2034
+    </change>
   </history>
 
   <groups>

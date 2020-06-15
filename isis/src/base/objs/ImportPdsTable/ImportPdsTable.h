@@ -103,6 +103,8 @@ namespace Isis {
    *   @history 2016-02-24 Ian Humphrey - Updated documentation and unit test. Added edrindex.lbl
    *                           and edrindex.tab files to data directory (for tests). Fixes #2397.
    *   @history 2016-03-10 Jeannie Backer - Removed non-UTF8 character. References #2397.
+   *   @history 2018-02-12 Stuart Sides - Added detached table capabilities for label files
+   *                                      without a "RECORD_BYTES" keyword. References #5525.
    *  
    *  
    * @todo The binary table import methods were written after the ascii table 

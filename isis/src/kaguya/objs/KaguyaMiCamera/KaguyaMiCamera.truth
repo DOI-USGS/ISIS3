@@ -69,6 +69,76 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
+FileName: MVA_2B2_01_01228N608E1354.cub
+CK Frame: -131330
+
+Kernel IDs: 
+CK Frame ID = -131000
+CK Reference ID = 1
+SPK Target ID = -131
+SPK Reference ID = 1
+
+Spacecraft Name Long: Kaguya
+Spacecraft Name Short: Kaguya
+Instrument Name Long: Multi Band Imager Visible
+Instrument Name Short: MI-VIS
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
+FileName: MNA_2B2_01_01228N602E1354.cub
+CK Frame: -131340
+
+Kernel IDs: 
+CK Frame ID = -131000
+CK Reference ID = 1
+SPK Target ID = -131
+SPK Reference ID = 1
+
+Spacecraft Name Long: Kaguya
+Spacecraft Name Short: Kaguya
+Instrument Name Long: Multi Band Imager Infrared
+Instrument Name Short: MI-NIR
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
 
 Testing exceptions:
 

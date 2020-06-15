@@ -1,0 +1,144 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+
+Group = SpacecraftName
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  Optional
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  Optional
+  InputKey       = TI-START
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  Optional
+  InputKey       = TI-END
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  Optional
+  InputKey       = UT-START
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = StartTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  Optional
+  InputKey       = UT-END
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = StopTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TotalIntegrationTime
+  Auto
+  Optional
+  InputKey       = EXPOSURE_DURATION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TotalIntegrationTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = IntegrationTime
+  Auto
+  Optional
+  InputKey       = INTEG
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = IntegrationTime
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = AveragedSpectra
+  Auto
+  Optional
+  InputKey       = HAY:STACK_COUNT
+  InputGroup     = ROOT
+  InputPosition  = FitsLabel
+  OutputName     = AveragedSpectra
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  Optional
+  InputKey       = TARGET
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = TargetName
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetType
+  Auto
+  Optional
+  InputKey       = TARGET_TYPE
+  InputGroup     = FitsLabel
+  InputPosition  = FitsLabel
+  OutputName     = TargetType
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+End

@@ -225,7 +225,8 @@ namespace Isis {
       IString msg = "Cannot compare a invalid angles with the < operator";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    // != comparison allows for angles that are considered equal to be treated
+    // as being equal. == operator override uses qFuzzyCompare().
     return (angle(Radians) < angle2.angle(Radians)) && *this != angle2;
   }
 
@@ -242,7 +243,8 @@ namespace Isis {
       IString msg = "Cannot compare a invalid angles with the > operator";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    // != comparison allows for angles that are considered equal to be treated
+    // as being equal. == operator override uses qFuzzyCompare().
     return (angle(Radians) > angle2.angle(Radians)) && *this != angle2;
   }
 

@@ -90,6 +90,8 @@ namespace Isis {
    *          to compute the new CcdChannelIndex keyword.
    * @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
    *          were signaled. References #2248.
+   * @history 2019-05-16 Jesse Mapel - Added Mars satellite kernel because the
+   *          base planet orbit kernel only has Mars Bayrcenter now.
    */
   class HiCalConf : public DbAccess {
     public:

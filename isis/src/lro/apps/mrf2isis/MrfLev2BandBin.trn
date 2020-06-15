@@ -1,0 +1,33 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = FilterName
+  Auto
+  Optional
+  InputKey       = BAND_NAME
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = FilterName
+  OutputPosition = (Group, BandBin)
+  Translation    = (*, *)
+End_Group
+End

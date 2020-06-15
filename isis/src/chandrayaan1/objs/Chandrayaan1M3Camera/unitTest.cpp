@@ -43,8 +43,8 @@ int main(void) {
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables. NOTE: These are only used
     // for the center of the image test, not the corners.
-    double knownLat = 61.4944183507184832;
-    double knownLon = 74.8961675572936798;
+    double knownLat = 61.50040250242506;
+    double knownLon = 74.89590535143694;
 
     Cube c("$chandrayaan1/testData/M3T20090630T083407_V03_RDN.cub", "r");
     Camera *cam = CameraFactory::Create(c);
@@ -105,26 +105,6 @@ int main(void) {
     cout << "RightAscension = " << cam->RightAscension() << endl;
     cout << "Declination = " << cam->Declination() << endl;     
     
-    // Test a Level-2 image
-    cout << endl << "Testing a Level-2 CH1 cube: " << endl << endl; 
-
-    Cube c2("$chandrayaan1/testData/CH1_xBandLvl2.cub", "r");
-    Camera *cam2 = CameraFactory::Create(c2);
-
-    // Just test the center pixel to make sure the Camera still works on Level-2 
-    // images
-    
-    cout << "For a central pixel position ..." << endl;
-    samp = 2000; 
-    line = 2500; 
-
-    if (!cam2->SetImage(samp, line)) {
-      cout << "ERROR" << endl;
-      return 0;
-    }
-    else {
-      cout << "SetImage succeeded." << endl; 
-    }
   }
   catch (IException &e) {
     e.print();

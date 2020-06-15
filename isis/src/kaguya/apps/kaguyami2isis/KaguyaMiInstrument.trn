@@ -1,0 +1,586 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = MissionName
+  Auto
+  InputKey       = MISSION_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (KAGUYA, SELENE-M)
+  Translation    = (KAGUYA, "SELENE MAIN ORBITER")
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationModeId
+  Auto
+  InputKey       = OBSERVATION_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ObservationModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription
+  Auto
+  InputKey       = SENSOR_DESCRIPTION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SensorDescription2
+  Auto
+  InputKey       = SENSOR_DESCRIPTION2
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SensorDescription2
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = MissionPhaseName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = RevolutionNumber
+  Auto
+  InputKey       = REVOLUTION_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = RevolutionNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StripSequenceNumber
+  Auto
+  InputKey       = STRIP_SEQUENCE_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StripSequenceNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneSequenceNumber
+  Auto
+  InputKey       = SCENE_SEQUENCE_NUMBER
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SceneSequenceNumber
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftDaytimeFlag
+  Auto
+  InputKey       = UPPER_LEFT_DAYTIME_FLAG
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperLeftDaytimeFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperRightDaytimeFlag
+  Auto
+  InputKey       = UPPER_RIGHT_DAYTIME_FLAG
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperRightDaytimeFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerLeftDaytimeFlag
+  Auto
+  InputKey       = LOWER_LEFT_DAYTIME_FLAG
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerLeftDaytimeFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerRightDaytimeFlag
+  Auto
+  InputKey       = LOWER_RIGHT_DAYTIME_FLAG
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerRightDaytimeFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DetectorStatus
+  Auto
+  InputKey       = DETECTOR_STATUS
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DetectorStatus
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureModeId
+  Auto
+  InputKey       = EXPOSURE_MODE_ID
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = ExposureModeId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LineExposureDuration
+  Auto
+  InputKey       = LINE_EXPOSURE_DURATION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LineExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CorrectedScClockStartCount
+  Auto
+  InputKey       = CORRECTED_SC_CLOCK_START_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = CorrectedScClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CorrectedScClockStopCount
+  Auto
+  InputKey       = CORRECTED_SC_CLOCK_STOP_COUNT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = CorrectedScClockStopCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTimeRaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTimeRaw
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CorrectedStartTime
+  Auto
+  InputKey       = CORRECTED_START_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CorrectedStopTime
+  Auto
+  InputKey       = CORRECTED_STOP_TIME
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LineSamplingInterval
+  Auto
+  InputKey       = LINE_SAMPLING_INTERVAL
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LineSamplingInterval
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CorrectedSamplingInterval
+  Auto
+  InputKey       = CORRECTED_SAMPLING_INTERVAL
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = CorrectedSamplingInterval
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftLatitude
+  Auto
+  InputKey       = UPPER_LEFT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperLeftLatitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperLeftLongitude
+  Auto
+  InputKey       = UPPER_LEFT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperLeftLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperRightLatitude
+  Auto
+  InputKey       = UPPER_RIGHT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperRightLatitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = UpperRightLongitude
+  Auto
+  InputKey       = UPPER_RIGHT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = UpperRightLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerLeftLatitude
+  Auto
+  InputKey       = LOWER_LEFT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerLeftLatitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerLeftLongitude
+  Auto
+  InputKey       = LOWER_LEFT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerLeftLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerRightLatitude
+  Auto
+  InputKey       = LOWER_RIGHT_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerRightLatitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LowerRightLongitude
+  Auto
+  InputKey       = LOWER_RIGHT_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LowerRightLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LocationFlag
+  Auto
+  InputKey       = LOCATION_FLAG
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = LocationFlag
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = RollCant
+  Auto
+  InputKey       = ROLL_CANT
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = RollCant
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneCenterLatitude
+  Auto
+  InputKey       = SCENE_CENTER_LATITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SceneCenterLatitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SceneCenterLongitude
+  Auto
+  InputKey       = SCENE_CENTER_LONGITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SceneCenterLongitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = IncidenceAngle
+  Auto
+  InputKey       = INCIDENCE_ANGLE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = IncidenceAngle
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EmissionAngle
+  Auto
+  InputKey       = EMISSION_ANGLE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = EmissionAngle
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = PhaseAngle
+  Auto
+  InputKey       = PHASE_ANGLE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = PhaseAngle
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SolarAzimuthAngle
+  Auto
+  InputKey       = SOLAR_AZIMUTH_ANGLE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SolarAzimuthAngle
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalPlaneTemperature
+  Auto
+  InputKey       = FOCAL_PLANE_TEMPERATURE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FocalPlaneTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TelescopeTemperature
+  Auto
+  InputKey       = TELESCOPE_TEMPERATURE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = TelescopeTemperature
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SatelliteMovingDirection
+  Auto
+  InputKey       = SATELLITE_MOVING_DIRECTION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SatelliteMovingDirection
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FirstSampledLinePosition
+  Auto
+  InputKey       = FIRST_SAMPLED_LINE_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FirstSampledLinePosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FirstDetectorElementPosition
+  Auto
+  InputKey       = FIRST_DETECTOR_ELEMENT_POSITION
+  InputKey       = FIRST_DETECTOR_ELEM_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = FirstDetectorElementPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = AAxisRadius
+  Auto
+  InputKey       = A_AXIS_RADIUS
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = AAxisRadius
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BAxisRadius
+  Auto
+  InputKey       = B_AXIS_RADIUS
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = BAxisRadius
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CAxisRadius
+  Auto
+  InputKey       = C_AXIS_RADIUS
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = CAxisRadius
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DefectPixelPosition
+  Auto
+  InputKey       = DEFECT_PIXEL_POSITION
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = DefectPixelPosition
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftAltitude
+  Auto
+  InputKey       = SPACECRAFT_ALTITUDE
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftAltitude
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftGroundSpeed
+  Auto
+  InputKey       = SPACECRAFT_GROUND_SPEED
+  InputGroup     = ROOT
+  InputPosition  = ROOT
+  OutputName     = SpacecraftGroundSpeed
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

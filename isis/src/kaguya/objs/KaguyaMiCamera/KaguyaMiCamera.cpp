@@ -112,7 +112,6 @@ namespace Isis {
 
 
     KaguyaMiCameraDistortionMap *distMap = new KaguyaMiCameraDistortionMap(this);
-    //LroNarrowAngleDistortionMap *distMap = new LroNarrowAngleDistortionMap(this);
     distMap->SetDistortion(naifIkCode());
 
     // Setup the ground and sky map

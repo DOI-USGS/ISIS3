@@ -78,10 +78,10 @@ int main() {
   pts->add(geos::geom::Coordinate(1, 4));
   pts->add(geos::geom::Coordinate(1, 9));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
 
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -95,9 +95,9 @@ int main() {
   pts->add(geos::geom::Coordinate(3, 7));
   pts->add(geos::geom::Coordinate(3, 10));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -111,9 +111,9 @@ int main() {
   pts->add(geos::geom::Coordinate(15, 5));
   pts->add(geos::geom::Coordinate(11, 5));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -127,9 +127,9 @@ int main() {
   pts->add(geos::geom::Coordinate(5, 8));
   pts->add(geos::geom::Coordinate(14, 8));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -143,9 +143,9 @@ int main() {
   pts->add(geos::geom::Coordinate(10, 4));
   pts->add(geos::geom::Coordinate(10, 6));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -159,9 +159,9 @@ int main() {
   pts->add(geos::geom::Coordinate(4, 1));
   pts->add(geos::geom::Coordinate(1, 1));
 
-  polys.push_back(globalFactory.createPolygon(
-                    globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory->createPolygon(
+                    globalFactory->createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();

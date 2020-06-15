@@ -8,26 +8,26 @@
 
   <description>
     <p>
-      VOYCAL performs radiometric corrections to planetary images acquired by the  
-      Viking orbiter and Voyager spacecraft vidicon cameras. VOYCAL performs a  
-      radiometric correction in two steps. First, VOYCAL corrects for the varying  
-      response of the vidicon across the field-of-view of the camera.  
-      Multiplicative  and additive correction coefficients, as a function of line 
-      and sample position,  are applied to an image array to produce the results 
-      of an 'ideal' camera.   Optionally, for Voyager cameras, a non-linearity 
-      correction can be additionally  applied to the image data.  Secondly, VOYCAL 
-      converts the image data to radiance factor values.  The radiance factor is 
-      defined as the ratio of the observed radiance and the radiance of a white 
+      VOYCAL performs radiometric corrections to planetary images acquired by the
+      Viking orbiter and Voyager spacecraft vidicon cameras. VOYCAL performs a
+      radiometric correction in two steps. First, VOYCAL corrects for the varying
+      response of the vidicon across the field-of-view of the camera.
+      Multiplicative  and additive correction coefficients, as a function of line
+      and sample position,  are applied to an image array to produce the results
+      of an 'ideal' camera.   Optionally, for Voyager cameras, a non-linearity
+      correction can be additionally  applied to the image data.  Secondly, VOYCAL
+      converts the image data to radiance factor values.  The radiance factor is
+      defined as the ratio of the observed radiance and the radiance of a white
       screen, normal to the incident rays of the sun.
     </p>
-    <br>EQUATIONS</br> 
-    <br>-----------------</br> 
+    <br>EQUATIONS</br>
+    <br>-----------------</br>
     <p>
-      The sensitivity of a vidicon camera varies across the field of view of an 
-      image frame.  VOYCAL performs an additive, mutiplicative, and non-linearity 
-      radiometric correction to an image to 
-      correct for the varying sensitivity of the camera.  For information on the 
-      radiometric properties of a vidicon camera, see the references; 
+      The sensitivity of a vidicon camera varies across the field of view of an
+      image frame.  VOYCAL performs an additive, mutiplicative, and non-linearity
+      radiometric correction to an image to
+      correct for the varying sensitivity of the camera.  For information on the
+      radiometric properties of a vidicon camera, see the references;
     </p>
 
     <p>"Inflight Performance of the Viking Visual Imaging Subsystem"
@@ -82,8 +82,8 @@
   </pre>
   <p>The linearity correction to the DN values is performed before the gain
 and offset correction is applied. If the linearity option is chosen, and
-the voylin.pvl file has a table entry for the mission camera of the data being 
-processed, or the user has provided TAE input for the coefficients B,K,LINORM, 
+the voylin.pvl file has a table entry for the mission camera of the data being
+processed, or the user has provided TAE input for the coefficients B,K,LINORM,
 then a linearity correction will be made. The
 result of the linearity correction is fed into the equation shown
 above.  Thus, the result of the linearity correction is called DL(i,j).
@@ -103,6 +103,9 @@ The following linearity equation is used:</p>
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
+    <change name="Jesse Mapel" date="2019-08-06">
+       Updated error message when coefficients cannot be found. References #2685.
     </change>
   </history>
 
@@ -140,7 +143,7 @@ The following linearity equation is used:</p>
           Output cube
          </brief>
          <description>
-           The output cube which will contain the radiometrically corrected 
+           The output cube which will contain the radiometrically corrected
            data.
          </description>
          <filter>
@@ -157,10 +160,10 @@ The following linearity equation is used:</p>
           Option for Linear correction
         </brief>
         <description>
-          Option to apply Linear correction to cube. Must have matching data in 
-          voylin.pvl. Equation can be viewed in general description.   
+          Option to apply Linear correction to cube. Must have matching data in
+          voylin.pvl. Equation can be viewed in general description.
         </description>
-      </parameter> 
+      </parameter>
     </group>
   </groups>
 </application>
