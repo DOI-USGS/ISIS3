@@ -120,8 +120,8 @@ namespace Isis {
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
-    
     m_solarLongitude = new Longitude;
+    
     m_et = NULL;
     m_kernels = new QVector<QString>;
 
@@ -194,12 +194,12 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
         
-        json aleNaifKeywords = isd["NaifKeywords"];
+        json aleNaifKeywords = isd["naif_keywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
-
+        
         // Still need to load clock kernels for now 
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
@@ -379,8 +379,8 @@ namespace Isis {
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load 
     if (m_usingAle) {
-      m_sunPosition->LoadCache(isd["SunPosition"]);
-      m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      m_sunPosition->LoadCache(isd["sun_position"]);
+      m_bodyRotation->LoadCache(isd["body_rotation"]);
       solarLongitude();
     }
     else if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
@@ -421,7 +421,7 @@ namespace Isis {
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
     else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
     }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
@@ -436,7 +436,7 @@ namespace Isis {
     }
     
     if (m_usingAle) {
-      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+      m_instrumentPosition->LoadCache(isd["instrument_position"]);
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
@@ -965,8 +965,7 @@ namespace Isis {
 
 
   /**
-   * This returns the PvlObject that stores all of the requested Naif data
-   *   and can be a replacement for furnishing text kernels.
+   * This returns the PvlObject that stores all of the requested Naif data  *   and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;
