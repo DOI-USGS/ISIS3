@@ -965,7 +965,8 @@ namespace Isis {
 
 
   /**
-   * This returns the PvlObject that stores all of the requested Naif data  *   and can be a replacement for furnishing text kernels.
+   * This returns the PvlObject that stores all of the requested Naif data 
+   * and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;
