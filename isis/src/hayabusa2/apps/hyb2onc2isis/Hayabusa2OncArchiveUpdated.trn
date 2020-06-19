@@ -15,6 +15,7 @@ End_Group
 
 Group = L0FileName
   Auto
+  Optional  
   InputKey       = P_L0NAME
   InputPosition  = FitsLabels
   OutputName     = L0FileName
@@ -94,6 +95,7 @@ End_Group
 # AMICA calls this one "ImageNumber"
 Group = ImageNumber
   Auto
+  Optional
   InputKey       = P_IMGID
   InputPosition  = FitsExtras
   OutputName     = ImageNumber
