@@ -13,7 +13,8 @@
 ################################################################################
 
 if ($?ISISROOT == 0) then
-  setenv ISISROOT /usgs/pkgs/isis3/install
+  echo "ISISROOT environment variable is not set"
+  exit 1
 endif
 
 if ($?ISISDATA == 0) then
