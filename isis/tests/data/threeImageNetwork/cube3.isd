@@ -195,7 +195,7 @@
     ]
   },
   "body_rotation": {
-    "TimeDependentFrames": [
+    "time_dependent_frames": [
       10014,
       1
     ],
