@@ -364,6 +364,9 @@ namespace Isis {
       // Variables support observer/target swap and light time correction
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
+
+      // States attempt #1
+//      ale::States m_states; 
   };
 };
 

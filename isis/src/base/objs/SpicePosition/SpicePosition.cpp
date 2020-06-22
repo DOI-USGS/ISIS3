@@ -17,6 +17,9 @@
 #include "PolynomialUnivariate.h"
 #include "TableField.h"
 
+// ale includes
+#include "ale/States.h"
+
 using json = nlohmann::json;
 
 namespace Isis {
@@ -250,24 +253,44 @@ namespace Isis {
 
     // Read from the cache
     if(p_source == Memcache) {
+//      std::cout << "SOURCE: Memcache" << std::endl;
       SetEphemerisTimeMemcache();
     }
     else if(p_source == HermiteCache) {
       SetEphemerisTimeHermiteCache();
+//      std::cout << "SOURCE: HermiteCache" << std::endl;
     }
     else if(p_source == PolyFunction) {
       SetEphemerisTimePolyFunction();
+//      std::cout << "SOURCE: PolyFunction" << std::endl;
     }
     else if(p_source == PolyFunctionOverHermiteConstant) {
       SetEphemerisTimePolyFunctionOverHermiteConstant();
+//      std::cout << "SOURCE: PolyFunctionOverHermiteConstant" << std::endl;
     }
     else {  // Read from the kernel
+      // Since there is no cached time, cannot use ale::States here.
       SetEphemerisTimeSpice();
+//      std::cout << "SOURCE: Spice(EphemTime)" << std::endl;
+      return p_coordinate;
     }
 
     NaifStatus::CheckErrors();
 
+//    std::cout << "before new code? " << std::endl; 
+    // Add a new constructor for States
+/*    std::vector<ale::Vec3d> positions;
+    for (int i=0; i<p_cache.size(); i++) {
+      positions.push_back(p_cache[i]);
+    }
+    ale::States state(p_cacheTime, positions);
+    ale::Vec3d coordinate = state.getPosition(et);
+
+    // test
+    std::cout << "old-new: " << p_coordinate[0]-coordinate.x << ", " << p_coordinate[1]-coordinate.y << "," <<  p_coordinate[2]-coordinate.z << std::endl; */
+
     // Return the coordinate
+
     return p_coordinate;
   }
 
@@ -1261,7 +1284,7 @@ namespace Isis {
    */
   void SpicePosition::SetEphemerisTimeMemcache() {
     // If the cache has only one position return it
-    if(p_cache.size() == 1) {
+/*    if(p_cache.size() == 1) {
       p_coordinate[0] = p_cache[0][0];
       p_coordinate[1] = p_cache[0][1];
       p_coordinate[2] = p_cache[0][2];
@@ -1271,7 +1294,6 @@ namespace Isis {
         p_velocity[2] = p_cacheVelocity[0][2];
       }
     }
-
     else {
       // Otherwise determine the interval to interpolate
       std::vector<double>::iterator pos;
@@ -1305,8 +1327,37 @@ namespace Isis {
         p_velocity[1] = (p2[1] - p1[1]) * mult + p1[1];
         p_velocity[2] = (p2[2] - p1[2]) * mult + p1[2];
       }
+    }*/
+    if (p_hasVelocity) {
+      std::vector<ale::State> stateCache;
+      for (int i=0; i < p_cache.size(); i++) {
+        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
+      }
+      ale::States states(p_cacheTime, stateCache);
+      ale::State state = states.getState(p_et, ale::LINEAR);
+
+      p_coordinate[0] = state.position.x;
+      p_coordinate[1] = state.position.y;
+      p_coordinate[2] = state.position.z;      
+
+      p_velocity[0] = state.velocity.x;
+      p_velocity[1] = state.velocity.y;
+      p_velocity[2] = state.velocity.z;
+    }
+    else {
+      std::vector<ale::Vec3d> positions;
+      for (int i=0; i < p_cache.size(); i++) {
+        positions.push_back(p_cache[i]);
+      }
+      ale::States states(p_cacheTime, positions);
+      ale::Vec3d position = states.getPosition(p_et, ale::LINEAR);
+      p_coordinate[0] = position.x;
+      p_coordinate[1] = position.y;
+      p_coordinate[2] = position.z;         
     }
 
+    // test
+    //std::cout << "old-new: " << p_coordinate[0]-coordinate.x << ", " << p_coordinate[1]-coordinate.y << "," <<  p_coordinate[2]-coordinate.z << std::endl; 
   }
 
 
@@ -1395,6 +1446,28 @@ namespace Isis {
     velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(sTime);
     velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(sTime);
     velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(sTime);
+    
+    // New code:
+    if (p_hasVelocity) {
+      std::vector<ale::State> stateCache;
+      for (int i=0; i < p_cache.size(); i++) {
+        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
+      }
+      ale::States states(p_cacheTime, stateCache);
+      ale::State state = states.getState(p_et, ale::SPLINE);
+
+      p_coordinate[0] = state.position.x;
+      p_coordinate[1] = state.position.y;
+      p_coordinate[2] = state.position.z;      
+
+      p_velocity[0] = state.velocity.x;
+      p_velocity[1] = state.velocity.y;
+      p_velocity[2] = state.velocity.z;
+    }
+    else {
+      throw IException(IException::Io, "No velocities available. Cannot calculate Hermite Cache.",
+                       _FILEINFO_);
+    }
   }
 
 
@@ -1440,10 +1513,6 @@ namespace Isis {
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
       }
-
-//         p_velocity[0] = functionX.DerivativeVar(rtime);
-//         p_velocity[1] = functionY.DerivativeVar(rtime);
-//         p_velocity[2] = functionZ.DerivativeVar(rtime);
     }
   }
 
@@ -1556,7 +1625,6 @@ namespace Isis {
         p_cacheVelocity.erase(p_cacheVelocity.begin() + i);
       }
     }
-
     p_source = HermiteCache;
   }
 
@@ -1759,6 +1827,7 @@ namespace Isis {
       double et = p_fullCacheStartTime + (double) i * cacheSlope;
       p_cacheTime.push_back(et);
     }
+
   }
 
   /** Compute and return the coordinate at the center time
