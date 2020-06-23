@@ -26,45 +26,52 @@ void testCamera(Cube &c, double knownLat, double knownLon,
                 double s4, double l4);
 void testLineSamp(Camera *cam, double sample, double line);
 
-TEST_F(DefaultCube, Hayabusa2OncCameraW1CameraTest) {
-  PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-  kernels.findKeyword("NaifFrameCode").setValue("-37110");    
-  
-  PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-  inst.findKeyword("InstrumentId").setValue("ONC-W2");
-  inst.findKeyword("SpacecraftName").setValue("HAYABUSA-2");
-  PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-  PvlKeyword stopcc("SpaceCraftClockStopCount", "33322515");
-  PvlKeyword binning("Binning", "1");
-  inst += startcc;
-  inst += stopcc; 
-  inst += binning; 
+class Hayabusa2Cube : public DefaultCube {
+  protected:
+    void setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+      PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+      kernels.findKeyword("NaifFrameCode").setValue(ikid);    
+      
+      PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+      inst.findKeyword("InstrumentId").setValue(instrumentId);
+      inst.findKeyword("SpacecraftName").setValue(spacecraftName);
+      PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
+      PvlKeyword stopcc("SpaceCraftClockStopCount", "33322515");
+      PvlKeyword binning("Binning", "1");
+      inst += startcc;
+      inst += stopcc; 
+      inst += binning; 
 
-  PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-  
-  json nk; 
-  nk["INS-37110_FOCAL_LENGTH"] = 10.44;
-  nk["INS-37110_PIXEL_PITCH"] = 0.013;
-  nk["INS-37110_TRANSX"] = {0.0, 0.013, 0.0};
-  nk["INS-37110_TRANSY"] = {0.0, 0.0, 0.013};
-  nk["INS-37110_ITRANSS"] = {0.0, 76.923076923077, 0.0};
-  nk["INS-37110_ITRANSL"] = {0.0, 0.0, 76.923076923077};
-  nk["INS-37110_BORESIGHT_LINE"] = 490.5;
-  nk["INS-37110_BORESIGHT_SAMPLE"] = 512.5;
-  nk["INS-37110_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
-  nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
-  nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
-  nk["BODY_CODE"] = 499;
-  nk["BODY_FRAME_CODE"] = 10014; 
-  PvlObject newNaifKeywords("NaifKeywords", nk);
-  naifKeywords = newNaifKeywords; 
+      PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+      
+      json nk; 
+      nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 10.44;
+      nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.013;
+      nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.013, 0.0};
+      nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, 0.013};
+      nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 76.923076923077, 0.0};
+      nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, 76.923076923077};
+      nk["INS"+ikid.toStdString()+"_BORESIGHT_LINE"] = 490.5;
+      nk["INS"+ikid.toStdString()+"_BORESIGHT_SAMPLE"] = 512.5;
+      nk["INS"+ikid.toStdString()+"_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
+      nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
+      nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
+      nk["BODY_CODE"] = 499;
+      nk["BODY_FRAME_CODE"] = 10014; 
+      PvlObject newNaifKeywords("NaifKeywords", nk);
+      naifKeywords = newNaifKeywords; 
 
-  QString fileName = testCube->fileName();
-  // need to remove old camera pointer 
-  delete testCube;
-  // This is now a Hayabusa cube
-  testCube = new Cube(fileName, "rw");
-  
+      QString fileName = testCube->fileName();
+      // need to remove old camera pointer 
+      delete testCube;
+      // This is now a Hayabusa cube
+      testCube = new Cube(fileName, "rw");
+    }
+};
+
+
+TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW1CameraTest) {
+  setInstrument("-37110", "ONC-W1", "HAYABUSA-2");
   Camera *cam = testCube->camera();
   EXPECT_EQ(cam->CkFrameId(), -37000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
@@ -81,45 +88,9 @@ TEST_F(DefaultCube, Hayabusa2OncCameraW1CameraTest) {
 }
 
 
-TEST_F(DefaultCube, Hayabusa2OncCameraW2CameraTest) {
-  PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-  kernels.findKeyword("NaifFrameCode").setValue("-37120");    
-  
-  PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-  inst.findKeyword("InstrumentId").setValue("ONC-W2");
-  inst.findKeyword("SpacecraftName").setValue("HAYABUSA-2");
-  PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-  PvlKeyword stopcc("SpaceCraftClockStopCount", "33322515");
-  PvlKeyword binning("Binning", "1");
-  inst += startcc;
-  inst += stopcc; 
-  inst += binning; 
-
-  PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-  
-  json nk; 
-  nk["INS-37120_FOCAL_LENGTH"] = 10.44;
-  nk["INS-37120_PIXEL_PITCH"] = 0.013;
-  nk["INS-37120_TRANSX"] = {0.0, 0.013, 0.0};
-  nk["INS-37120_TRANSY"] = {0.0, 0.0, 0.013};
-  nk["INS-37120_ITRANSS"] = {0.0, 76.923076923077, 0.0};
-  nk["INS-37120_ITRANSL"] = {0.0, 0.0, 76.923076923077};
-  nk["INS-37120_BORESIGHT_LINE"] = 490.5;
-  nk["INS-37120_BORESIGHT_SAMPLE"] = 512.5;
-  nk["INS-37120_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
-  nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
-  nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
-  nk["BODY_CODE"] = 499;
-  nk["BODY_FRAME_CODE"] = 10014; 
-  PvlObject newNaifKeywords("NaifKeywords", nk);
-  naifKeywords = newNaifKeywords; 
-
-  QString fileName = testCube->fileName();
-  // need to remove old camera pointer 
-  delete testCube;
-  // This is now a Hayabusa cube
-  testCube = new Cube(fileName, "rw");
-  
+TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW2CameraTest) {
+  setInstrument("-37120", "ONC-W2", "HAYABUSA-2");
+   
   Camera *cam = testCube->camera();
   EXPECT_EQ(cam->CkFrameId(), -37000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
@@ -137,45 +108,9 @@ TEST_F(DefaultCube, Hayabusa2OncCameraW2CameraTest) {
   
 }
 
-TEST_F(DefaultCube, Hayabusa2OncCameraTelecopicCameraTest) {
-  PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-  kernels.findKeyword("NaifFrameCode").setValue("-37100");    
-  
-  PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-  inst.findKeyword("InstrumentId").setValue("ONC-W1");
-  inst.findKeyword("SpacecraftName").setValue("HAYABUSA-2");
-  PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-  PvlKeyword stopcc("SpaceCraftClockStopCount", "33322515");
-  PvlKeyword binning("Binning", "1");
-  inst += startcc;
-  inst += stopcc; 
-  inst += binning; 
+TEST_F(Hayabusa2Cube, Hayabusa2OncCameraTelecopicCameraTest) {
+  setInstrument("-37100", "ONC-T", "HAYABUSA-2");
 
-  PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-  
-  json nk; 
-  nk["INS-37100_FOCAL_LENGTH"] = 10.44;
-  nk["INS-37100_PIXEL_PITCH"] = 0.013;
-  nk["INS-37100_TRANSX"] = {0.0, 0.013, 0.0};
-  nk["INS-37100_TRANSY"] = {0.0, 0.0, 0.013};
-  nk["INS-37100_ITRANSS"] = {0.0, 76.923076923077, 0.0};
-  nk["INS-37100_ITRANSL"] = {0.0, 0.0, 76.923076923077};
-  nk["INS-37100_BORESIGHT_LINE"] = 490.5;
-  nk["INS-37100_BORESIGHT_SAMPLE"] = 512.5;
-  nk["INS-37100_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
-  nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
-  nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
-  nk["BODY_CODE"] = 499;
-  nk["BODY_FRAME_CODE"] = 10014; 
-  PvlObject newNaifKeywords("NaifKeywords", nk);
-  naifKeywords = newNaifKeywords; 
-
-  QString fileName = testCube->fileName();
-  // need to remove old camera pointer 
-  delete testCube;
-  // This is now a Hayabusa cube
-  testCube = new Cube(fileName, "rw");
-  
   Camera *cam = testCube->camera(); 
   EXPECT_EQ(cam->CkFrameId(), -37000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
