@@ -132,7 +132,7 @@ void testCamera(Cube &c,
                 double s2, double l2, 
                 double s3, double l3, 
                 double s4, double l4) {
-  Hyb2OncCamera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
+  Camera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
   
   // Test Shutter Open/Close 
   const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
@@ -170,7 +170,7 @@ void testLineSamp(Camera *cam, double sample, double line) {
     success = cam->SetUniversalGround(lat, lon);
   }
   else {
-    FAIL() << "Failed to set sample/line";
+    FAIL() << "Failed to set sample/line (Line: " << line << ", Sample: " << sample << ")." ;
   }
 
   if (success) {
