@@ -21,7 +21,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   std::ifstream i(isdPath2->expanded().toStdString());
   i >> newIsd2; 
 
-  newIsd2["InstrumentPosition"]["Positions"] = {{1,1,1}, {2,2,2}, {3,3,3}};
+  newIsd2["instrument_position"]["positions"] = {{1,1,1}, {2,2,2}, {3,3,3}};
   newCube2.fromIsd(tempDir.path()+"/new2.cub", *cube2->label(), newIsd2, "rw"); 
 
   ImagePolygon fp2;
@@ -43,6 +43,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   
   try {
     findimageoverlaps(options, &appLog);
+    std::cout << appLog << std::endl; 
     FAIL() << "Expected an IException with message: \"No overlaps were found\".";
   }
   catch(IException &e) {
