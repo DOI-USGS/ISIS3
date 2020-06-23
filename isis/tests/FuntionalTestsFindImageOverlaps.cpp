@@ -43,7 +43,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   
   try {
     findimageoverlaps(options, &appLog);
-    std::cout << appLog << std::endl; 
     FAIL() << "Expected an IException with message: \"No overlaps were found\".";
   }
   catch(IException &e) {
