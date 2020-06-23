@@ -1,0 +1,22 @@
+# Translation for Hayabusa 2 export from ISIS cube to PDS4 product 
+
+Group = PixelAveragingWidth
+  Auto 
+  Optional
+  InputKey       = Binning 
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = img:pizel_averaging_width 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)
+  Translation    = (*, *)
+End_Group 
+
+Group = PixelAveragingHeight
+  Auto 
+  Optional
+  InputKey       = Binning 
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = img:pizel_averaging_width 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)
+  Translation    = (*, *)
+End_Group 
+
