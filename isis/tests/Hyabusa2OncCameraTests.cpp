@@ -177,4 +177,7 @@ void testLineSamp(Camera *cam, double sample, double line) {
     EXPECT_NEAR(sample, cam->Sample(), .001); 
     EXPECT_NEAR(line, cam->Line(), .001);
   }
+  else {
+    FAIL() << "Failed to set lat/lon (Lat: " << lat << ", Lon: " << lon << ")." ;
+  }
 }
