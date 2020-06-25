@@ -18,8 +18,6 @@
 using namespace std;
 using namespace Isis;
 
-void generateXmlTables(Pvl &inputCubeLabel);
-
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -49,7 +47,3 @@ void IsisMain() {
   return;
 }
 
-
-void generateXmlTables(Pvl &inputCubeLabel) {
-
-}
