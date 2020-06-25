@@ -33,14 +33,65 @@ class Hayabusa2Cube : public DefaultCube {
       kernels.findKeyword("NaifFrameCode").setValue(ikid);    
       
       PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-      inst.findKeyword("InstrumentId").setValue(instrumentId);
-      inst.findKeyword("SpacecraftName").setValue(spacecraftName);
+      std::istringstream iss(R"(
+        Group = Instrument
+         SpacecraftName                  = HAYABUSA-2
+         InstrumentId                    = ONC-W2
+         InstrumentName                  = "Optical Navigation Camera"
+         TargetName                      = Mars
+         StartTime                       = 2015-12-03T07:29:58.232
+         StopTime                        = 2015-12-03T07:29:58.234
+         ExposureDuration                = 0.00272 <seconds>
+         RawSpacecraftClockCount         = 0x3C38845A <1/32 sec>
+         Binning                         = 1
+         SelectedImageAreaX1             = 1
+         SelectedImageAreaY1             = 1
+         SelectedImageAreaX2             = 1024
+         SelectedImageAreaY2             = 1
+         SelectedImageAreaX3             = 1
+         SelectedImageAreaY3             = 1024
+         SelectedImageAreaX4             = 1024
+         SelectedImageAreaY4             = 1024
+         SmearCorrection                 = NON
+         OffsetCorrection                = N/A
+         FlatCorrection                  = NON
+         RadianceConversion              = NON
+         PhotometricCorrection           = NON
+         BandRegistration                = NON
+         L2BFlatFileName                 = N/A
+         L2BSystemEfficiencyFileName     = N/A
+         L2CShapeModelFileName           = N/A
+         L2DPhaseFunctionFileName        = N/A
+         L2DShapeModelFileName           = N/A
+         SubImageCount                   = 1
+         BusLineVoltage                  = 49.28 <V>
+         ONCCurrent                      = 0.52 <V>
+         FLACCurrent                     = 0.00 <V>
+         ONCAETemperature                = 1.53 <degC>
+         ONCTOpticsTemperature           = 19.17 <degC>
+         ONCTCCDTemperature              = -29.62 <degC>
+         ONCTElectricCircuitTemperature  = -11.96 <degC>
+         ONCW1OpticsTemperature          = 1.42 <degC>
+         ONCW1CCDTemperature             = -24.98 <degC>
+         ONCW1ElectricCircuitTemperature = -10.90 <degC>
+         ONCW2OpticsTemperature          = 1.28 <degC>
+         ONCW2CCDTemperature             = -24.67 <degC>
+         ONCW2ElectricCircuitTemperature = -4.12 <degC>
+         FLACTemperature                 = -15.27 <degC>
+       End_Group
+      )");
+      
+      PvlGroup newInstGroup; 
+      iss >> newInstGroup; 
+      
+      newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+      newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+      inst = newInstGroup;
+
       PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-      PvlKeyword stopcc("SpaceCraftClockStopCount", "33322515");
-      PvlKeyword binning("Binning", "1");
+      PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
       inst += startcc;
       inst += stopcc; 
-      inst += binning; 
 
       PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
       
@@ -132,7 +183,8 @@ void testCamera(Cube &c,
                 double s2, double l2, 
                 double s3, double l3, 
                 double s4, double l4) {
-  Camera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
+  
+  Hyb2OncCamera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
   
   // Test Shutter Open/Close 
   const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
@@ -142,8 +194,8 @@ void testCamera(Cube &c,
   str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
   
-  EXPECT_EQ(shuttertimes.first.Et(), -709401200.8161447);
-  EXPECT_EQ(shuttertimes.second.Et(), -709401200.8161362);
+  EXPECT_DOUBLE_EQ(shuttertimes.first.Et(), 502399866.4151246);
+  EXPECT_DOUBLE_EQ(shuttertimes.second.Et(), 502399866.41512734);
 
   // Test all four corners to make sure the conversions are right
   testLineSamp(cam, s1, l1);
@@ -163,10 +215,12 @@ void testCamera(Cube &c,
 
 void testLineSamp(Camera *cam, double sample, double line) {
   bool success = cam->SetImage(sample, line);
+  double lat;
+  double lon;
 
   if (success) {
-    double lat = cam->UniversalLatitude();
-    double lon = cam->UniversalLongitude();
+    lat = cam->UniversalLatitude();
+    lon = cam->UniversalLongitude();
     success = cam->SetUniversalGround(lat, lon);
   }
   else {
