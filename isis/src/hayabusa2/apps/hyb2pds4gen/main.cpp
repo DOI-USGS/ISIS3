@@ -18,17 +18,10 @@
 using namespace std;
 using namespace Isis;
 
-void generateCSVOutput(Pvl &inputCubeLabel);
+void generateXmlTables(Pvl &inputCubeLabel);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-
-  // Check if input file is indeed, a cube
-  if (ui.GetFileName("FROM").right(3) != "cub") {
-    QString msg = "Input file [" + ui.GetFileName("FROM") +
-                  "] does not appear to be a cube";
-    throw  IException(IException::User, msg, _FILEINFO_);
-  }
 
   QString translationFile = "$ISISROOT/appdata/translations/Hayabusa2OncPds4Export.trn";
 
@@ -57,48 +50,6 @@ void IsisMain() {
 }
 
 
-/**
- * Write extra values to an output CSV formatted file.
- */
-void generateCSVOutput(Pvl &inputCubeLabel) {
-  if (inputCubeLabel.findObject("IsisCube").hasGroup("Instrument")) {
-    UserInterface &ui = Application::GetUserInterface();
-    // Create the vars for holding the info
-    QString keys;
-    QString values;
-    const QString delimeter = ",";
+void generateXmlTables(Pvl &inputCubeLabel) {
 
-    // Output the result
-    fstream outFile;//QFile???
-    QString outputImage = ui.GetAsString("TO");
-    FileName imgOutput(outputImage);
-    FileName csvOutput = imgOutput.removeExtension().setExtension("csv");
-
-    PvlGroup instGroup = inputCubeLabel.findObject("IsisCube").findGroup("Instrument");
-    if (instGroup["InstrumentId"][0].compare("amica", Qt::CaseInsensitive) == 0) {
-      if (inputCubeLabel.findObject("IsisCube").hasGroup("RadiometricCalibration")) {
-        outFile.open(csvOutput.expanded().toLatin1().data(), std::ios::out);
-        PvlGroup radiometricGroup = inputCubeLabel.findObject("IsisCube").findGroup("RadiometricCalibration");
-        outFile << "RadiometricCalibrationUnits"
-                << delimeter
-                << "RadianceStandard"
-                << delimeter
-                << "RadianceScaleFactor"
-                << endl;
-        outFile << radiometricGroup["Units"][0]
-                << delimeter
-                << radiometricGroup["RadianceStandard"][0]
-                << delimeter
-                << radiometricGroup["RadianceScaleFactor"][0]
-                << endl;
-        outFile.close();
-      }
-    }
-    else { // NIRS
-      outFile.open(csvOutput.expanded().toLatin1().data(), std::ios::out);
-      outFile << "IntegrationTime" << endl;
-      outFile << instGroup["IntegrationTime"][0] << endl;
-      outFile.close();
-    }
-  }
 }
