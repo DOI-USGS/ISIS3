@@ -1,5 +1,5 @@
 #
-# This translation file is used to produce the ISIS Archive label group
+# This translation file is used to produce the ISIS 3 Archive label group
 # for the Hayabusa 2 ONC-W1, ONC-W2, and ONC-T cameras.
 #
 
@@ -15,6 +15,7 @@ End_Group
 
 Group = L0FileName
   Auto
+  Optional  
   InputKey       = P_L0NAME
   InputPosition  = FitsLabels
   OutputName     = L0FileName
@@ -66,7 +67,7 @@ Group = ImageType
   Auto
   Optional
   InputKey       = P_IMGTYP
-  InputPosition  = FitsExtras
+  InputPosition  = FitsExtras 
   OutputName     = ImageType
   OutputPosition = (Object, IsisCube, Group, Archive)
   Translation    = (*, *)
@@ -94,6 +95,7 @@ End_Group
 # AMICA calls this one "ImageNumber"
 Group = ImageNumber
   Auto
+  Optional
   InputKey       = P_IMGID
   InputPosition  = FitsExtras
   OutputName     = ImageNumber
@@ -102,3 +104,4 @@ Group = ImageNumber
 End_Group
 
 End
+

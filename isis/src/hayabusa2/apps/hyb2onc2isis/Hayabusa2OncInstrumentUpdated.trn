@@ -1,5 +1,5 @@
 #
-# This translation file is used to produce the ISIS Instrument label group
+# This translation file is used to produce the ISIS 3 Instrument label group
 # for the Hayabusa 2 ONC-W1, ONC-W2, and ONC-T cameras.
 # Translation = (left,right) convert the input "right" to the "left"
 #
@@ -15,7 +15,7 @@ End_Group
 
 Group = InstrumentId
   Auto
-  InputKey       = P_NAME
+  InputKey       = NAIFNAME
   InputPosition  = FitsLabels
   OutputName     = InstrumentId
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -78,7 +78,7 @@ End_Group
 
 Group = ExposureDuration
   Auto
-  InputKey       = EXPOSURE
+  InputKey       = XPOSURE
   InputPosition  = FitsLabels
   OutputName     = ExposureDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -87,7 +87,7 @@ End_Group
 
 Group = SpacecraftClockStartCount
   Auto
-  InputKey       = P_SCCSC
+  InputKey       = SCCL-BEG
   InputPosition  = FitsLabels
   OutputName     = SpacecraftClockStartCount
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -96,7 +96,7 @@ End_Group
 
 Group = SpacecraftClockEndCount
   Auto
-  InputKey       = P_SCCEC
+  InputKey       = SCCL-END
   InputPosition  = FitsLabels
   OutputName     = SpacecraftClockStartCount
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -113,10 +113,21 @@ Group = RawSpacecraftClockCount
   Translation    = (*, *)
 End_Group
 
+Group = BitDepth
+  Auto
+  InputKey	= BITDEPTH
+  InputPosition = FitsLabels
+  OutputName    = BitDepth
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation = (*, *)
+End_Group
+  
+
+
 #s/c counter at data recorded time
 Group = OnboardDataRecordedTime
   Auto
-  InputKey       = P_RECTI
+  InputKey       = RECTI
   InputPosition  = FitsExtras
   OutputName     = OnboardDataRecordedTime
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -125,7 +136,7 @@ End_Group
 
 Group = Binning
   Auto
-  InputKey       = P_BINN
+  InputKey       = NPIXBIN
   InputPosition  = FitsLabels
   OutputName     = Binning
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -135,7 +146,7 @@ End_Group
 # selected image areas (units: pixel coords of the detector):
 Group = SelectedImageAreaX1
   Auto
-  InputKey       = P_OPOSX1
+  InputKey       = ROI_LLX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX1
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -144,7 +155,7 @@ End_Group
 
 Group = SelectedImageAreaY1
   Auto
-  InputKey       = P_OPOSY1
+  InputKey       = ROI_LLY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY1
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -153,7 +164,7 @@ End_Group
 
 Group = SelectedImageAreaX2
   Auto
-  InputKey       = P_OPOSX2
+  InputKey       = ROI_URX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX2
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -162,45 +173,9 @@ End_Group
 
 Group = SelectedImageAreaY2
   Auto
-  InputKey       = P_OPOSY2
+  InputKey       = ROI_URY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY2
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SelectedImageAreaX3
-  Auto
-  InputKey       = P_OPOSX3
-  InputPosition  = FitsLabels
-  OutputName     = SelectedImageAreaX3
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SelectedImageAreaY3
-  Auto
-  InputKey       = P_OPOSY3
-  InputPosition  = FitsLabels
-  OutputName     = SelectedImageAreaY3
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SelectedImageAreaX4
-  Auto
-  InputKey       = P_OPOSX4
-  InputPosition  = FitsLabels
-  OutputName     = SelectedImageAreaX4
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = SelectedImageAreaY4
-  Auto
-  InputKey       = P_OPOSY4
-  InputPosition  = FitsLabels
-  OutputName     = SelectedImageAreaY4
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -214,9 +189,9 @@ Group = SmearCorrection
   Translation    = (*, *)
 End_Group
 
-Group = OffsetCorrection
+Group = BiasCorrection
   Auto
-  InputKey       = OFFSETCR
+  InputKey       = BIASCR
   InputPosition  = FitsLabels
   OutputName     = OffsetCorrection
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -234,7 +209,7 @@ End_Group
 
 Group = RadianceConversion
   Auto
-  InputKey       = RADIANCE
+  InputKey       = RADCONV
   InputPosition  = FitsLabels
   OutputName     = RadianceConversion
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -259,45 +234,45 @@ Group = BandRegistration
   Translation    = (*, *)
 End_Group
 
-Group = L2BFlatFileName
+Group = FlatFileName
   Auto
-  InputKey       = L2BFLTFN
+  InputKey       = FLATFN
   InputPosition  = FitsLabels
   OutputName     = L2BFlatFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-Group = L2BSystemEfficiencyFileName
+Group = InstrumentCalibrationFileName
   Auto
-  InputKey       = L2BEFCFN
+  InputKey       = INSCALFN
   InputPosition  = FitsLabels
   OutputName     = L2BSystemEfficiencyFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-Group = L2CShapeModelFileName
+Group = DistortionCorrectionFileName
   Auto
-  InputKey       = L2CSHPFN
+  InputKey       = DISTCRFN
   InputPosition  = FitsLabels
   OutputName     = L2CShapeModelFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-Group = L2DPhaseFunctionFileName
+Group = PhaseFunctionFileName
   Auto
-  InputKey       = L2DPHSFN
+  InputKey       = PHASEFN
   InputPosition  = FitsLabels
   OutputName     = L2DPhaseFunctionFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-Group = L2DShapeModelFileName
+Group = ShapeModelFileName
   Auto
-  InputKey       = L2DSHPFN
+  InputKey       = SHAPEFN
   InputPosition  = FitsLabels
   OutputName     = L2DShapeModelFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -307,7 +282,7 @@ End_Group
 # the following image ID is assigned by the onboard image processor:
 Group = ImageID
   Auto
-  InputKey       = P_IMGID
+  InputKey       = IMGSEQC
   InputPosition  = FitsExtras
   OutputName     = ImageID
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -464,7 +439,7 @@ End_Group
 # Output mode (compression type)
 Group = Compression
   Auto
-  InputKey       = P_CMPSTY
+  InputKey       = IMGCMPRV
   InputPosition  = FitsLabels
   OutputName     = Compression
   OutputPosition = (Object, IsisCube, Group, Instrument)
