@@ -248,7 +248,6 @@ namespace Isis {
 
     // Save the time
     if(et == p_et) {
-      std::cout << "coordinate is already set!" << std::endl; 
       return p_coordinate;
     }
 
@@ -256,24 +255,19 @@ namespace Isis {
 
     // Read from the cache
     if(p_source == Memcache) {
-      std::cout << "SOURCE: Memcache" << std::endl;
       SetEphemerisTimeMemcache();
     }
     else if(p_source == HermiteCache) {
       SetEphemerisTimeHermiteCache();
-      std::cout << "SOURCE: HermiteCache" << std::endl;
     }
     else if(p_source == PolyFunction) {
       SetEphemerisTimePolyFunction();
-      std::cout << "SOURCE: PolyFunction" << std::endl;
     }
     else if(p_source == PolyFunctionOverHermiteConstant) {
       SetEphemerisTimePolyFunctionOverHermiteConstant();
-      std::cout << "SOURCE: PolyFunctionOverHermiteConstant" << std::endl;
     }
     else {  // Read from the kernel
       // Since there is no cached time, cannot use ale::States here.
-      std::cout << "SOURCE: Spice(EphemTime)" << std::endl;
       SetEphemerisTimeSpice();
       return p_coordinate;
     }
@@ -553,7 +547,6 @@ namespace Isis {
    */
   Table SpicePosition::Cache(const QString &tableName) {
     if (p_source == PolyFunctionOverHermiteConstant) {
-      std::cout << "it's this one!" << std::endl; 
       LineCache(tableName);
       // TODO Figure out how to get the tolerance -- for now hard code .01
       Memcache2HermiteCache(0.01);
@@ -747,10 +740,7 @@ namespace Isis {
     // Clear existing positions from thecache
     p_cacheTime.clear();
     
-    if (m_state) {
-      delete m_state; 
-      m_state = NULL;
-    }
+
 
     // Clear the velocity cache if we can calculate it instead.  It can't be calculated for
     // functions of degree 0 (framing cameras), so keep the original velocity.  It is better than nothing.
@@ -758,6 +748,7 @@ namespace Isis {
 
     // Load the time cache first
     LoadTimeCache();
+
     if (p_fullCacheSize > 1) {
     // Load the positions and velocity caches
     p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
@@ -1332,85 +1323,7 @@ namespace Isis {
    *   @history 2009-08-03 Jeannie Walldren - Original version
    */
   void SpicePosition::SetEphemerisTimeHermiteCache() {
-
-    // what if framing camera???
-
-    // On the first SetEphemerisTime, create our splines. Later calls should
-    // reuse these splines.
-   /* if(p_xhermite == NULL) {
-      p_overrideTimeScale = 1.;
-      p_override = ScaleOnly;
-      ComputeBaseTime();
-
-      p_xhermite = new NumericalApproximation(
-          NumericalApproximation::CubicHermite);
-      p_yhermite = new NumericalApproximation(
-          NumericalApproximation::CubicHermite);
-      p_zhermite = new NumericalApproximation(
-          NumericalApproximation::CubicHermite);
-
-      vector<double> xvalues(p_cache.size());
-      vector<double> xhermiteYValues(p_cache.size());
-      vector<double> yhermiteYValues(p_cache.size());
-      vector<double> zhermiteYValues(p_cache.size());
-
-      vector<double> xhermiteVelocities(p_cache.size());
-      vector<double> yhermiteVelocities(p_cache.size());
-      vector<double> zhermiteVelocities(p_cache.size());
-
-      for(unsigned int i = 0; i < p_cache.size(); i++) {
-        vector<double> &cache = p_cache[i];
-        double &cacheTime = p_cacheTime[i];
-        xvalues[i] = (cacheTime - p_baseTime) / p_timeScale;
-
-        xhermiteYValues[i] = cache[0];
-        yhermiteYValues[i] = cache[1];
-        zhermiteYValues[i] = cache[2];
-
-        if(p_hasVelocity) {  // Line scan camera
-          vector<double> &cacheVelocity = p_cacheVelocity[i];
-          xhermiteVelocities[i] = cacheVelocity[0];
-          yhermiteVelocities[i] = cacheVelocity[1];
-          zhermiteVelocities[i] = cacheVelocity[2];
-        }
-        else { // Not line scan camera
-          throw IException(IException::Io, "No velocities available.",
-                           _FILEINFO_);
-        }
-      }
-
-      p_xhermite->AddData(xvalues, xhermiteYValues);
-      p_xhermite->AddCubicHermiteDeriv(xhermiteVelocities);
-
-      p_yhermite->AddData(xvalues, yhermiteYValues);
-      p_yhermite->AddCubicHermiteDeriv(yhermiteVelocities);
-
-      p_zhermite->AddData(xvalues, zhermiteYValues);
-      p_zhermite->AddCubicHermiteDeriv(zhermiteVelocities);
-    }
-
-    // Next line added 07/13/2009 to prevent Camera unit test from bombing
-    // because time is outside domain. DAC Also added etype to Evaluate calls
-    NumericalApproximation::ExtrapType etype =
-        NumericalApproximation::Extrapolate;
-
-    vector<double> &coordinate = p_coordinate;
-    double sTime = (p_et - p_baseTime) / p_timeScale;
-    coordinate[0] = p_xhermite->Evaluate(sTime, etype);
-    coordinate[1] = p_yhermite->Evaluate(sTime, etype);
-    coordinate[2] = p_zhermite->Evaluate(sTime, etype);
-
-    vector<double> &velocity = p_velocity;
-    velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(sTime);
-    velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(sTime);
-    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(sTime);*/
-    
     if (p_hasVelocity) {
-//      std::vector<ale::State> stateCache;
-//      for (int i=0; i < p_cache.size(); i++) {
-//        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
-//      }
-//      ale::States states(p_cacheTime, stateCache);
       ale::State state = m_state->getState(p_et, ale::SPLINE);
 
       p_coordinate[0] = state.position.x;
