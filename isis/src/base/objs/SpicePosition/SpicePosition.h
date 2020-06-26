@@ -32,6 +32,9 @@
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 
+// ale includes
+#include "ale/States.h"
+
 #include <nlohmann/json.hpp>
 
 namespace Isis {
@@ -247,7 +250,7 @@ namespace Isis {
 
       //! Is this position cached
       bool IsCached() const {
-        return (p_cache.size() > 0);
+        return (m_state != NULL);
       };
 
       void SetPolynomial(const Source type = PolyFunction);
@@ -299,7 +302,7 @@ namespace Isis {
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
-      std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
+//      std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
 
       //======================================================================
       // New methods support for light time correction and swap of observer/target
@@ -343,8 +346,8 @@ namespace Isis {
 
       Source p_source;                    //!< Enumerated value for the location of the SPK information used
       std::vector<double> p_cacheTime;    //!< iTime for corresponding position
-      std::vector<std::vector<double> > p_cache;         //!< Cached positions
-      std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
+//      std::vector<std::vector<double> > p_cache;         //!< Cached positions
+//      std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
       std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials fit to 3 coordinates
 
       double p_baseTime;                  //!< Base time used in fit equations
@@ -365,8 +368,7 @@ namespace Isis {
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
 
-      // States attempt #1
-//      ale::States m_states; 
+      ale::States *m_state; ///!< State: stores times, positions, velocities; 
   };
 };
 

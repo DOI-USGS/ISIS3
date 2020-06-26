@@ -17,9 +17,6 @@
 #include "PolynomialUnivariate.h"
 #include "TableField.h"
 
-// ale includes
-#include "ale/States.h"
-
 using json = nlohmann::json;
 
 namespace Isis {
@@ -108,8 +105,10 @@ namespace Isis {
     p_yhermite = NULL;
     p_zhermite = NULL;
 
+
     m_swapObserverTarget = swapObserverTarget;
     m_lt = 0.0;
+    m_state = NULL;
 
     // Determine observer/target ordering
     if ( m_swapObserverTarget ) {
@@ -248,49 +247,40 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Save the time
-    if(et == p_et) return p_coordinate;
+    if(et == p_et) {
+      std::cout << "coordinate is already set!" << std::endl; 
+      return p_coordinate;
+    }
+
     p_et = et;
 
     // Read from the cache
     if(p_source == Memcache) {
-//      std::cout << "SOURCE: Memcache" << std::endl;
+      std::cout << "SOURCE: Memcache" << std::endl;
       SetEphemerisTimeMemcache();
     }
     else if(p_source == HermiteCache) {
       SetEphemerisTimeHermiteCache();
-//      std::cout << "SOURCE: HermiteCache" << std::endl;
+      std::cout << "SOURCE: HermiteCache" << std::endl;
     }
     else if(p_source == PolyFunction) {
       SetEphemerisTimePolyFunction();
-//      std::cout << "SOURCE: PolyFunction" << std::endl;
+      std::cout << "SOURCE: PolyFunction" << std::endl;
     }
     else if(p_source == PolyFunctionOverHermiteConstant) {
       SetEphemerisTimePolyFunctionOverHermiteConstant();
-//      std::cout << "SOURCE: PolyFunctionOverHermiteConstant" << std::endl;
+      std::cout << "SOURCE: PolyFunctionOverHermiteConstant" << std::endl;
     }
     else {  // Read from the kernel
       // Since there is no cached time, cannot use ale::States here.
+      std::cout << "SOURCE: Spice(EphemTime)" << std::endl;
       SetEphemerisTimeSpice();
-//      std::cout << "SOURCE: Spice(EphemTime)" << std::endl;
       return p_coordinate;
     }
 
     NaifStatus::CheckErrors();
 
-//    std::cout << "before new code? " << std::endl; 
-    // Add a new constructor for States
-/*    std::vector<ale::Vec3d> positions;
-    for (int i=0; i<p_cache.size(); i++) {
-      positions.push_back(p_cache[i]);
-    }
-    ale::States state(p_cacheTime, positions);
-    ale::Vec3d coordinate = state.getPosition(et);
-
-    // test
-    std::cout << "old-new: " << p_coordinate[0]-coordinate.x << ", " << p_coordinate[1]-coordinate.y << "," <<  p_coordinate[2]-coordinate.z << std::endl; */
-
     // Return the coordinate
-
     return p_coordinate;
   }
 
@@ -333,13 +323,20 @@ namespace Isis {
     LoadTimeCache();
 
     // Loop and load the cache
+    std::vector<ale::State> stateCache;
     for(int i = 0; i < size; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
-      p_cache.push_back(p_coordinate);
-      if(p_hasVelocity) p_cacheVelocity.push_back(p_velocity);
+
+      if (p_hasVelocity) {
+        stateCache.push_back(ale::State(p_coordinate, p_velocity));
+      }
+      else {
+        stateCache.push_back(ale::State(p_coordinate));
+      }
     }
 
+    m_state = new ale::States(p_cacheTime, stateCache);
     p_source = Memcache;
   }
 
@@ -382,25 +379,31 @@ namespace Isis {
     p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
     p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
 
-    for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
-      std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
-      p_cache.push_back(pos);
-    }
-
-    p_cacheVelocity.clear();
+//    p_hasVelocity = !p_cacheVelocity.empty();
 
     bool hasVelocityKey = isdPos.find("Velocities") != isdPos.end();
+    p_hasVelocity = hasVelocityKey; 
 
+    std::vector<ale::State> stateCache;
     if (hasVelocityKey) {
-      for (auto it = isdPos["Velocities"].begin(); it != isdPos["Velocities"].end(); it++) {
-        std::vector<double> vel = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
-        p_cacheVelocity.push_back(vel);
+      for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+        std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+        int index = it - isdPos["Positions"].begin();
+        std::vector<double> vel = isdPos["Velocities"][index];
+        stateCache.push_back(ale::State(pos, vel));
       }
     }
+    else {
+      for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+        std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+        stateCache.push_back(ale::State(ale::Vec3d(pos)));
+      }
+    }
+    m_state = new ale::States(p_cacheTime, stateCache);
 
-    p_hasVelocity = !p_cacheVelocity.empty();
+//    p_hasVelocity = !p_cacheVelocity.empty(); // can I assume Velocitie key = hasvelocitykey???/
+
     p_source = Memcache;
-
     SetEphemerisTime(p_cacheTime[0]);
   }
 
@@ -468,6 +471,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
+    std::vector<ale::State> stateCache;
     // Loop through and move the table to the cache
     if (p_source != PolyFunction) {
       for (int r = 0; r < table.Records(); r++) {
@@ -487,20 +491,24 @@ namespace Isis {
         j2000Coord.push_back((double)rec[0]);
         j2000Coord.push_back((double)rec[1]);
         j2000Coord.push_back((double)rec[2]);
+
         int inext = 3;
 
-        p_cache.push_back(j2000Coord);
         if (p_hasVelocity) {
           std::vector<double> j2000Velocity;
           j2000Velocity.push_back((double)rec[3]);
           j2000Velocity.push_back((double)rec[4]);
           j2000Velocity.push_back((double)rec[5]);
           inext = 6;
-
-          p_cacheVelocity.push_back(j2000Velocity);
+          
+          stateCache.push_back(ale::State(j2000Coord, j2000Velocity));
+        }
+        else {
+          stateCache.push_back(ale::State(j2000Coord));
         }
         p_cacheTime.push_back((double)rec[inext]);
       }
+      m_state = new ale::States(p_cacheTime, stateCache);
     }
     else {
       // Coefficient table for postion coordinates x, y, and z
@@ -525,7 +533,7 @@ namespace Isis {
       SetOverrideBaseTime(baseTime, timeScale);
       SetPolynomial(coeffX, coeffY, coeffZ);
       if (degree > 0)  p_hasVelocity = true;
-      if(degree == 0  && p_cacheVelocity.size() > 0) p_hasVelocity = true;
+      if(degree == 0  && m_state->hasVelocity()) p_hasVelocity = true;
     }
   }
 
@@ -545,12 +553,10 @@ namespace Isis {
    */
   Table SpicePosition::Cache(const QString &tableName) {
     if (p_source == PolyFunctionOverHermiteConstant) {
+      std::cout << "it's this one!" << std::endl; 
       LineCache(tableName);
       // TODO Figure out how to get the tolerance -- for now hard code .01
       Memcache2HermiteCache(0.01);
-
-      //std::cout << "Cache size is " << p_cache.size();
-
     }
 
     // record to be added to table
@@ -583,28 +589,30 @@ namespace Isis {
 
       int inext = 0;
 
-      for (int i = 0; i < (int)p_cache.size(); i++) {
-        record[inext++] = p_cache[i][0];                     // record[0]
-        record[inext++] = p_cache[i][1];                     // record[1]
-        record[inext++] = p_cache[i][2];                     // record[2]
+      std::vector<ale::State> stateCache = m_state->getStates();
+      for (int i = 0; i < (int)stateCache.size(); i++) {
+        record[inext++] = stateCache[i].position.x;          // record[0]
+        record[inext++] = stateCache[i].position.y;          // record[1]
+        record[inext++] = stateCache[i].position.z;          // record[2]
         if (p_hasVelocity) {
-          record[inext++] = p_cacheVelocity[i][0];           // record[3]
-          record[inext++] = p_cacheVelocity[i][1];           // record[4]
-          record[inext++] = p_cacheVelocity[i][2];           // record[5]
+          record[inext++] = stateCache[i].velocity.x;        // record[3]
+          record[inext++] = stateCache[i].velocity.y;        // record[4]
+          record[inext++] = stateCache[i].velocity.z;        // record[5]
         }
         record[inext] = p_cacheTime[i];                      // record[6]
         table += record;
 
         inext = 0;
       }
+
       CacheLabel(table);
       return table;
     }
 
-    else if(p_source == PolyFunction  &&  p_degree == 0  &&  p_fullCacheSize == 1)
+    else if(p_source == PolyFunction  &&  p_degree == 0  &&  p_fullCacheSize == 1){
       // Just load the position for the single epoch
       return LineCache(tableName);
-
+    }
     // Load the coefficients for the curves fit to the 3 camera angles
     else if (p_source == PolyFunction) {
       // PolyFunction case
@@ -738,31 +746,38 @@ namespace Isis {
 
     // Clear existing positions from thecache
     p_cacheTime.clear();
-    p_cache.clear();
+    
+    if (m_state) {
+      delete m_state; 
+      m_state = NULL;
+    }
 
     // Clear the velocity cache if we can calculate it instead.  It can't be calculated for
     // functions of degree 0 (framing cameras), so keep the original velocity.  It is better than nothing.
-    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
+//    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
 
     // Load the time cache first
     LoadTimeCache();
-
     if (p_fullCacheSize > 1) {
     // Load the positions and velocity caches
     p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
-
+    std::vector<ale::State> stateCache;
       for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
         //        p_et = p_cacheTime.at(pos);
         SetEphemerisTime(p_cacheTime.at(pos));
-        p_cache.push_back(p_coordinate);
-        p_cacheVelocity.push_back(p_velocity);
+        stateCache.push_back(ale::State(ale::Vec3d(p_coordinate), ale::Vec3d(p_velocity)));
       }
+      m_state = new ale::States(p_cacheTime, stateCache);
     }
     else {
     // Load the position for the single updated time instance
       p_et = p_cacheTime[0];
       SetEphemerisTime(p_et);
-      p_cache.push_back(p_coordinate);
+      std::vector<ale::State> stateCache;
+      stateCache.push_back(p_coordinate);
+      std::vector<double> timeCache;
+      timeCache.push_back(p_cacheTime[0]);
+      m_state = new ale::States(timeCache, stateCache);
     }
 
     // Set source to cache and reset current et
@@ -888,6 +903,7 @@ namespace Isis {
     }
 
     // add positions and velocities for these times
+    std::vector<ale::State> stateCache;
     for(int i = 0; i < (int) p_cacheTime.size(); i++) {
       // x,y,z positions
       double time;
@@ -895,14 +911,14 @@ namespace Isis {
       p_coordinate[0] = function1.Evaluate(time);
       p_coordinate[1] = function2.Evaluate(time);
       p_coordinate[2] = function3.Evaluate(time);
-      p_cache.push_back(p_coordinate);
 
       // x,y,z velocities
       p_velocity[0] = b1 + 2 * c1 * (p_cacheTime[i] - p_baseTime);
       p_velocity[1] = b2 + 2 * c2 * (p_cacheTime[i] - p_baseTime);
       p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
-      p_cacheVelocity.push_back(p_velocity);
+      stateCache.push_back(ale::State(p_coordinate, p_velocity));
     }
+    m_state = new ale::States(p_cacheTime, stateCache);
 
     p_source = HermiteCache;
     double et = p_et;
@@ -927,10 +943,11 @@ namespace Isis {
       return;
 
     // Adjust the degree of the polynomial to the available data
-    if (p_cache.size() == 1) {
+    int size = m_state->getStates().size();
+    if (size == 1) {
       p_degree = 0;
     }
-    else if (p_cache.size() == 2) {
+    else if (size == 2) {
       p_degree = 1;
     }
 
@@ -951,14 +968,14 @@ namespace Isis {
     ComputeBaseTime();
     std::vector<double> time;
 
-    if(p_cache.size() == 1) {
+    if(size == 1) {
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       XC.push_back(p_coordinate[0]);
       YC.push_back(p_coordinate[1]);
       ZC.push_back(p_coordinate[2]);
     }
-    else if(p_cache.size() == 2) {
+    else if(size == 2) {
 // Load the times and get the corresponding coordinates
       double t1 = p_cacheTime.at(0);
       SetEphemerisTime(t1);
@@ -1283,59 +1300,9 @@ namespace Isis {
    *            method)
    */
   void SpicePosition::SetEphemerisTimeMemcache() {
-    // If the cache has only one position return it
-/*    if(p_cache.size() == 1) {
-      p_coordinate[0] = p_cache[0][0];
-      p_coordinate[1] = p_cache[0][1];
-      p_coordinate[2] = p_cache[0][2];
-      if(p_hasVelocity) {
-        p_velocity[0] = p_cacheVelocity[0][0];
-        p_velocity[1] = p_cacheVelocity[0][1];
-        p_velocity[2] = p_cacheVelocity[0][2];
-      }
-    }
-    else {
-      // Otherwise determine the interval to interpolate
-      std::vector<double>::iterator pos;
-      pos = upper_bound(p_cacheTime.begin(), p_cacheTime.end(), p_et);
 
-      int cacheIndex;
-      if(pos != p_cacheTime.end()) {
-        cacheIndex = distance(p_cacheTime.begin(), pos);
-        cacheIndex--;
-      }
-      else {
-        cacheIndex = p_cacheTime.size() - 2;
-      }
-
-      if(cacheIndex < 0) cacheIndex = 0;
-
-      // Interpolate the coordinate
-      double mult = (p_et - p_cacheTime[cacheIndex]) /
-                    (p_cacheTime[cacheIndex+1] - p_cacheTime[cacheIndex]);
-      std::vector<double> p2 = p_cache[cacheIndex+1];
-      std::vector<double> p1 = p_cache[cacheIndex];
-
-      p_coordinate[0] = (p2[0] - p1[0]) * mult + p1[0];
-      p_coordinate[1] = (p2[1] - p1[1]) * mult + p1[1];
-      p_coordinate[2] = (p2[2] - p1[2]) * mult + p1[2];
-
-      if(p_hasVelocity) {
-        p2 = p_cacheVelocity[cacheIndex+1];
-        p1 = p_cacheVelocity[cacheIndex];
-        p_velocity[0] = (p2[0] - p1[0]) * mult + p1[0];
-        p_velocity[1] = (p2[1] - p1[1]) * mult + p1[1];
-        p_velocity[2] = (p2[2] - p1[2]) * mult + p1[2];
-      }
-    }*/
-    if (p_hasVelocity) {
-      std::vector<ale::State> stateCache;
-      for (int i=0; i < p_cache.size(); i++) {
-        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
-      }
-      ale::States states(p_cacheTime, stateCache);
-      ale::State state = states.getState(p_et, ale::LINEAR);
-
+    if (p_hasVelocity){
+      ale::State state = m_state->getState(p_et, ale::LINEAR);
       p_coordinate[0] = state.position.x;
       p_coordinate[1] = state.position.y;
       p_coordinate[2] = state.position.z;      
@@ -1344,22 +1311,13 @@ namespace Isis {
       p_velocity[1] = state.velocity.y;
       p_velocity[2] = state.velocity.z;
     }
-    else {
-      std::vector<ale::Vec3d> positions;
-      for (int i=0; i < p_cache.size(); i++) {
-        positions.push_back(p_cache[i]);
-      }
-      ale::States states(p_cacheTime, positions);
-      ale::Vec3d position = states.getPosition(p_et, ale::LINEAR);
+    else{
+      ale::Vec3d position = m_state->getPosition(p_et, ale::LINEAR);
       p_coordinate[0] = position.x;
       p_coordinate[1] = position.y;
-      p_coordinate[2] = position.z;         
+      p_coordinate[2] = position.z;
     }
-
-    // test
-    //std::cout << "old-new: " << p_coordinate[0]-coordinate.x << ", " << p_coordinate[1]-coordinate.y << "," <<  p_coordinate[2]-coordinate.z << std::endl; 
   }
-
 
 
   /**
@@ -1379,7 +1337,7 @@ namespace Isis {
 
     // On the first SetEphemerisTime, create our splines. Later calls should
     // reuse these splines.
-    if(p_xhermite == NULL) {
+   /* if(p_xhermite == NULL) {
       p_overrideTimeScale = 1.;
       p_override = ScaleOnly;
       ComputeBaseTime();
@@ -1445,16 +1403,15 @@ namespace Isis {
     vector<double> &velocity = p_velocity;
     velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(sTime);
     velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(sTime);
-    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(sTime);
+    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(sTime);*/
     
-    // New code:
     if (p_hasVelocity) {
-      std::vector<ale::State> stateCache;
-      for (int i=0; i < p_cache.size(); i++) {
-        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
-      }
-      ale::States states(p_cacheTime, stateCache);
-      ale::State state = states.getState(p_et, ale::SPLINE);
+//      std::vector<ale::State> stateCache;
+//      for (int i=0; i < p_cache.size(); i++) {
+//        stateCache.push_back(ale::State(p_cache[i], p_cacheVelocity[i]));
+//      }
+//      ale::States states(p_cacheTime, stateCache);
+      ale::State state = m_state->getState(p_et, ale::SPLINE);
 
       p_coordinate[0] = state.position.x;
       p_coordinate[1] = state.position.y;
@@ -1506,7 +1463,10 @@ namespace Isis {
     if(p_hasVelocity) {
 
       if( p_degree == 0) {
-        p_velocity = p_cacheVelocity[0];
+        ale::Vec3d velocity = m_state->getVelocities()[0];
+        p_velocity[0] = velocity.x;
+        p_velocity[1] = velocity.y;
+        p_velocity[2] = velocity.z;
       }
       else {
         p_velocity[0] = ComputeVelocityInTime(WRT_X);
@@ -1531,8 +1491,6 @@ namespace Isis {
   void SpicePosition::SetEphemerisTimePolyFunctionOverHermiteConstant() {
     SetEphemerisTimeHermiteCache();
     std::vector<double> hermiteCoordinate = p_coordinate;
-
-//    std::cout << hermiteCoordinate << std::endl;
 
     std::vector<double> hermiteVelocity = p_velocity;
     SetEphemerisTimePolyFunction();
@@ -1600,127 +1558,19 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    // make sure base time is set before it is needed
-    p_overrideTimeScale = 1.;
-    p_override = ScaleOnly;
-    ComputeBaseTime();
-
-    // find current size of cache
-    int n = p_cacheTime.size() - 1;
-
-    // create 3 starting values for the new table
-    vector <int> inputIndices;
-    inputIndices.push_back(0);
-    inputIndices.push_back(n / 2);
-    inputIndices.push_back(n);
-
-    // find all indices needed to make a hermite table within the appropriate tolerance
-    vector <int> indexList = HermiteIndices(tolerance, inputIndices);
-
-    // remove all lines from cache vectors that are not in the index list????
-    for(int i = n; i >= 0; i--) {
-      if(!binary_search(indexList.begin(), indexList.end(), i)) {
-        p_cache.erase(p_cache.begin() + i);
-        p_cacheTime.erase(p_cacheTime.begin() + i);
-        p_cacheVelocity.erase(p_cacheVelocity.begin() + i);
-      }
-    }
+    m_state->minimizeCache(); 
     p_source = HermiteCache;
   }
-
-  /**
-   * This method is called by Memcache2HermiteCache() to determine
-   * which indices from the orginal cache should be saved in the
-   * reduced cache. It is a recursive method that starts with an
-   * index list of 3 elements (first, center and last index
-   * values) and adds values to this list if the tolerance is not
-   * met.
-   *
-   * @param tolerance Maximum error allowed between NAIF kernel
-   *                  coordinate values and values interpolated by
-   *                  the Hermite spline.
-   * @param indexList Vector containing the list of indices to be
-   *                  kept in the cache.  This list grows as the
-   *                  method is recursively called
-   * @return <b>vector/<double/></b> Vector containing final list
-   *         of indices that will be kept for the Hermite cache.
-   * @internal
-   *   @history 2009-08-03 Jeannie Walldren - Original version.
-   *   @history 2009-08-14 Debbie A. Cook - Corrected indexing
-   *            error in loop.
-   */
-  std::vector<int> SpicePosition::HermiteIndices(double tolerance, std::vector <int> indexList) {
-
-    unsigned int n = indexList.size();
-    double sTime;
-
-    NumericalApproximation xhermite(NumericalApproximation::CubicHermite);
-    NumericalApproximation yhermite(NumericalApproximation::CubicHermite);
-    NumericalApproximation zhermite(NumericalApproximation::CubicHermite);
-    for(unsigned int i = 0; i < indexList.size(); i++) {
-      sTime = (p_cacheTime[indexList[i]] - p_baseTime) / p_timeScale;
-      xhermite.AddData(sTime, p_cache[indexList[i]][0]);  // add time, x-position to x spline
-      yhermite.AddData(sTime, p_cache[indexList[i]][1]);  // add time, y-position to y spline
-      zhermite.AddData(sTime, p_cache[indexList[i]][2]);  // add time, z-position to z spline
-
-      if(p_hasVelocity) {  // Line scan camera
-        xhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][0]); // add x-velocity to x spline
-        yhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][1]); // add y-velocity to y spline
-        zhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][2]); // add z-velocity to z spline
-      }
-      else { // Not line scan camera
-        throw IException(IException::Io, "No velocities available.", _FILEINFO_);
-        // xhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-        // yhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-        // zhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-      }
-    }
-
-    // loop through the saved indices from the end
-    for(unsigned int i = indexList.size() - 1; i > 0; i--) {
-      double xerror = 0;
-      double yerror = 0;
-      double zerror = 0;
-
-      // check every value of the original kernel values within interval
-      for(int line = indexList[i-1] + 1; line < indexList[i]; line++) {
-        sTime = (p_cacheTime[line] - p_baseTime) / p_timeScale;
-
-        // find the errors at each value
-        xerror = fabs(xhermite.Evaluate(sTime) - p_cache[line][0]);
-        yerror = fabs(yhermite.Evaluate(sTime) - p_cache[line][1]);
-        zerror = fabs(zhermite.Evaluate(sTime) - p_cache[line][2]);
-
-        if(xerror > tolerance || yerror > tolerance || zerror > tolerance) {
-          // if any error is greater than tolerance, no need to continue looking, break
-          break;
-        }
-      }
-
-      if(xerror < tolerance && yerror < tolerance && zerror < tolerance) {
-        // if errors are less than tolerance after looping interval, no new point is necessary
-        continue;
-      }
-      else {
-        // if any error is greater than tolerance, add midpoint of interval to indexList vector
-        indexList.push_back((indexList[i] + indexList[i-1]) / 2);
-      }
-    }
-
-    if(indexList.size() > n) {
-      sort(indexList.begin(), indexList.end());
-      indexList = HermiteIndices(tolerance, indexList);
-    }
-    return indexList;
-  }
-
 
   /**
    * Removes the entire cache from memory.
    */
   void SpicePosition::ClearCache() {
-    p_cache.clear();
-    p_cacheVelocity.clear();
+    if (m_state) {
+      delete m_state;
+      m_state = NULL;
+    }
+
     p_cacheTime.clear();
 
     if(p_xhermite) {
