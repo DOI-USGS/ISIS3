@@ -1,6 +1,6 @@
 # 2020-06-25 - Kristin Berry - Added a test to check that if nbins is set, it is used.
-#   To make this test, I set the number of bins to much smaller number than the internal default,
-#   and just checked that the output was different from the default test. 
+#   To make the truthdata for this test, I set the number of bins to 25, a number much smaller than 
+#   the internal default, and just checked that the output was different from the default test. 
 
 APPNAME = hist
 histTruth.txt.IGNORELINES = Cube
