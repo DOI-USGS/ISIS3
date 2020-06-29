@@ -184,7 +184,7 @@ void testCamera(Cube &c,
                 double s3, double l3, 
                 double s4, double l4) {
   
-  Hyb2OncCamera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
+  FramingCamera *cam = (FramingCamera*) CameraFactory::Create(c);
   
   // Test Shutter Open/Close 
   const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
