@@ -132,6 +132,8 @@ static double g_effectiveBandwidth(1.0);
 
 static double g_J(1.0);
 
+int lineNum = 0;
+
 
 
 namespace Isis {
@@ -166,6 +168,8 @@ static Pvl g_configFile;
  * @return The value of the function at the point x.
  */
 double linearFun(double Iobs,double x, double g[3]) {
+  // Q: Iobs - ???
+  // --------------
   return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
 
 }
@@ -228,6 +232,9 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 */
 void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
+  lineNum++;
+
+  // WHY IS FLATFIELD = IN[1]???
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
@@ -249,12 +256,17 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
+
     imageOut[i] = imageIn[i]*pow(2.0,12-g_bitDepth);
 
     // Check for special pixel in input image and pass through
     if ( IsSpecial(imageOut[i]) ) {
       imageOut[i] = imageIn[i];
       continue;
+    }
+
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"Original DN: "<< imageOut[i]<<std::endl;
     }
 
     // Apply compression factor here to raise LOSSY dns to proper response
@@ -275,16 +287,24 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"After Bias DN: "<< imageOut[i]<<std::endl;
+    }
 
-    double dn = imageOut[i];    
-    double result = 1.0;
-    double x0 = 1.0;
-    newton_rapheson(dn,x0, g_L,result );   
-    imageOut[i] = result;
+
+    // double dn = imageOut[i];    
+    // double result = 1.0;
+    // double x0 = 1.0;
+    // newton_rapheson(dn,x0, g_L,result );   
+    // imageOut[i] = result;
 
 
     // DARK Current
     imageOut[i] = imageOut[i] - g_darkCurrent;    
+
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"After dark current DN: "<< imageOut[i]<<std::endl;
+    }
 
     //Smear correction
     if (!g_onBoardSmearCorrection) {
@@ -296,8 +316,21 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       smear*=g_timeRatio;
       imageOut[i] = imageOut[i] - smear;
 
-      }
+    }
 
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"After smear DN: "<< imageOut[i]<<std::endl;
+    }
+
+    double dn = imageOut[i];    
+    double result = 1.0;
+    double x0 = 1.0;
+    newton_rapheson(dn,x0, g_L,result );   
+    imageOut[i] = result;
+
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"After linearity DN: "<< imageOut[i]<<std::endl;
+    }
 
     // FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
@@ -316,7 +349,15 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"After flat field DN: "<< imageOut[i]<<std::endl;
+    }
 
+
+  }
+
+  if(lineNum == 774) {
+      std::cout<<"last DN: "<< imageOut[520]<<std::endl;
   }
 
 
@@ -498,6 +539,7 @@ QString loadCalibrationVariables(const QString &config)  {
   g_Tvct = Smear["Tvct"];
 
 
+  // WE DO NOT USE??? - USE CONFIG FILE VARIABLES???
 
   // Load DarkCurrent variables and calculate the dark current
   g_d0 = DarkCurrent["D"][0].toDouble();
@@ -527,21 +569,17 @@ QString loadCalibrationVariables(const QString &config)  {
   g_bae0 = Bias["B_AE"][0].toDouble();
   g_bae1 = Bias["B_AE"][1].toDouble();
 
-
-
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
 
-  g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //bias correction factor
-
+  g_bias *= (g_bae0 - g_bae1*g_AEtemperature); //bias correction factor
+  
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
   g_sensitivity = sensitivity[g_filter.toLower()];
   g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
 
   g_J = g_solarFlux/(g_effectiveBandwidth*.0001);
-
-
 
   //Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
