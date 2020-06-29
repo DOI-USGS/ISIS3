@@ -84,6 +84,10 @@
       Updated logic such that min/max values are no longer calculated from .cub
       if values are provided by the user.  Fixes #3881.
     </change>
+    <change name="Kristin Berry" date="2020-06-25">
+      Re-added the ability to set number of bins without setting min/max values after the last update. 
+      Follow-on to #3881.
+    </change>
   </history>
 
   <oldName>
