@@ -374,13 +374,20 @@ namespace Isis {
                                                   ltState, targetRadius);
 
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
-    
+
 
     // Check to see if we have nadir pointing that needs to be computed &
-    // See if we have table blobs to load 
+    // See if we have table blobs to load
     if (m_usingAle) {
       m_sunPosition->LoadCache(isd["SunPosition"]);
+      if (m_sunPosition->cacheSize() > 3) {
+        m_sunPosition->Memcache2HermiteCache(0.01);
+      }
       m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      m_bodyRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+      if (m_bodyRotation->cacheSize() > 5) {
+        m_bodyRotation->LoadTimeCache();
+      }
       solarLongitude();
     }
     else if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
@@ -422,30 +429,37 @@ namespace Isis {
     }
     else if (m_usingAle) {
      m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+     if (m_instrumentRotation->cacheSize() > 5) {
+       m_instrumentRotation->LoadTimeCache();
+     }
     }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
-    
+
 
     if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
     }
-    
+
     if (m_usingAle) {
       m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+      if (m_instrumentPosition->cacheSize() > 3) {
+        m_instrumentPosition->Memcache2HermiteCache(0.01);
+      }
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-    
-    
+
+
     NaifStatus::CheckErrors();
-  } 
+  }
 
   /**
    * Loads/furnishes NAIF kernel(s)

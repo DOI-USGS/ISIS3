@@ -250,6 +250,11 @@ namespace Isis {
         return (p_cache.size() > 0);
       };
 
+      //! Is this position cached
+      int cacheSize() const {
+        return p_cache.size();
+      };
+
       void SetPolynomial(const Source type = PolyFunction);
 
       void SetPolynomial(const std::vector<double>& XC,
