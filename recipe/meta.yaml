@@ -78,7 +78,7 @@ requirements:
   - nanoflann
   - nlohmann_json
   - ninja==1.7.2
-  - conda-forge/label/gcc7::nn
+  - nn
   - opencv>=3.0.0,<=4.0.0
   - openssl>=1.0.0,<1.1.0
   - pcl
@@ -131,7 +131,7 @@ requirements:
   - mysql-connector-c
   - nanoflann
   - nlohmann_json
-  - conda-forge/label/gcc7::nn
+  - nn
   - opencv>=3.0.0,<=4.0.0
   - openssl>=1.0.0,<1.1.0
   - pcl
