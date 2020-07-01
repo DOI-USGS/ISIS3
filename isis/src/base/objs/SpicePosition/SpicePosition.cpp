@@ -365,34 +365,31 @@ namespace Isis {
     }
 
     // Load the full cache time information from the label if available
-    p_fullCacheStartTime = isdPos["SpkTableStartTime"].get<double>();
-    p_fullCacheEndTime = isdPos["SpkTableEndTime"].get<double>();
-    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
-    p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
+    p_fullCacheStartTime = isdPos["spk_table_start_time"].get<double>();
+    p_fullCacheEndTime = isdPos["spk_table_end_time"].get<double>();
+    p_fullCacheSize = isdPos["spk_table_original_size"].get<double>();
+    p_cacheTime = isdPos["ephemeris_times"].get<std::vector<double>>();
 
-//    p_hasVelocity = !p_cacheVelocity.empty();
-
-    bool hasVelocityKey = isdPos.find("Velocities") != isdPos.end();
-    p_hasVelocity = hasVelocityKey; 
+    bool hasVelocityKey = isdPos.find("velocities") != isdPos.end();
 
     std::vector<ale::State> stateCache;
     if (hasVelocityKey) {
-      for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+      for (auto it = isdPos["positions"].begin(); it != isdPos["positions"].end(); it++) {
         std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
-        int index = it - isdPos["Positions"].begin();
-        std::vector<double> vel = isdPos["Velocities"][index];
+        int index = it - isdPos["positions"].begin();
+        std::vector<double> vel = isdPos["velocities"][index];
         stateCache.push_back(ale::State(pos, vel));
       }
     }
     else {
-      for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+      for (auto it = isdPos["positions"].begin(); it != isdPos["positions"].end(); it++) {
         std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
         stateCache.push_back(ale::State(ale::Vec3d(pos)));
       }
     }
     m_state = new ale::States(p_cacheTime, stateCache);
 
-//    p_hasVelocity = !p_cacheVelocity.empty(); // can I assume Velocitie key = hasvelocitykey???/
+    p_hasVelocity = m_state->hasVelocity();
 
     p_source = Memcache;
     SetEphemerisTime(p_cacheTime[0]);
