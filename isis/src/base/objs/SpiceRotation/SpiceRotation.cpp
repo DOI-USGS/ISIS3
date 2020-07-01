@@ -73,7 +73,6 @@ namespace Isis {
     p_fullCacheSize = 0;
     m_frameType = UNKNOWN;
     m_tOrientationAvailable = false;
-    m_orientation = NULL;
   }
 
 
@@ -113,7 +112,6 @@ namespace Isis {
     p_fullCacheSize = 0;
     m_frameType = DYN;
     m_tOrientationAvailable = false;
-    m_orientation = NULL;
 
     // Determine the axis for the velocity vector
     QString key = "INS" + toString(frameCode) + "_TRANSX";
@@ -182,7 +180,7 @@ namespace Isis {
     p_degree = rotToCopy.p_degree;
     p_hasAngularVelocity = rotToCopy.p_hasAngularVelocity;
     m_frameType = rotToCopy.m_frameType;
-    m_orientation = rotToCopy.m_orientation;
+
   }
 
 
@@ -302,8 +300,7 @@ namespace Isis {
    * @return @b bool Indicates whether this rotation is cached.
    */
   bool SpiceRotation::IsCached() const {
-    return (m_orientation != NULL);
-    return (p_cache.size() > 0); // remove
+    return (p_cache.size() > 0);
   }
 
 
@@ -376,23 +373,12 @@ namespace Isis {
     int cacheSize = p_cacheTime.size();
 
     // Loop and load the cache
-    std::vector<ale::Rotation> rotationCache;
-    std::vector<ale::Vec3d> avCache;
     for (int i = 0; i < cacheSize; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
-      p_cache.push_back(p_CJ); // remove
-      if (p_hasAngularVelocity) p_cacheAv.push_back(p_av); // remove
-      rotationCache.push_back(ale::Rotation(p_CJ[0], p_CJ[1], p_CJ[2], p_CJ[3]));
-
-      if (p_hasAngularVelocity) {
-        avCache.push_back(ale::Vec3d(p_av));
-      }
+      p_cache.push_back(p_CJ);
+      if (p_hasAngularVelocity) p_cacheAv.push_back(p_av);
     }
-
-    m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
-                                       ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
-
     p_source = Memcache;
 
     // Downsize already loaded caches (both time and quats)
@@ -441,39 +427,34 @@ namespace Isis {
     p_cacheAv.clear();
     p_hasAngularVelocity = false;
     m_frameType = CK;
-    m_orientation = NULL;
 
     // Load the full cache time information from the label if available
-    p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
-    p_fullCacheEndTime = isdRot["CkTableEndTime"].get<double>();
-    p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>();
-    p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>();
-    p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
+    p_fullCacheStartTime = isdRot["ck_table_start_time"].get<double>();
+    p_fullCacheEndTime = isdRot["ck_table_end_time"].get<double>();
+    p_fullCacheSize = isdRot["ck_table_original_size"].get<double>();
+    p_cacheTime = isdRot["ephemeris_times"].get<std::vector<double>>();
+    p_timeFrames = isdRot["time_dependent_frames"].get<std::vector<int>>();
 
-    std::vector<ale::Rotation> rotationCache;
-    for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
+    for (auto it = isdRot["quaternions"].begin(); it != isdRot["quaternions"].end(); it++) {
         std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
         Quaternion q(quat);
         std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ); // remove
-        rotationCache.push_back(ale::Rotation(p_CJ[0], p_CJ[1], p_CJ[2], p_CJ[3]));
+        p_cache.push_back(CJ);
     }
 
-    std::vector<ale::Vec3d> avCache;
-    if (isdRot["AngularVelocity"].size() != 0) {
-      for (auto it = isdRot["AngularVelocity"].begin(); it != isdRot["AngularVelocity"].end(); it++) {
+    if (isdRot["angular_velocity"].size() != 0) {
+      for (auto it = isdRot["angular_velocity"].begin(); it != isdRot["angular_velocity"].end(); it++) {
           std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
-          p_cacheAv.push_back(av); // remove
-          avCache.push_back(ale::Vec3d(av));
+          p_cacheAv.push_back(av);
       }
       p_hasAngularVelocity = true;
     }
 
-    bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
+    bool hasConstantFrames = isdRot.find("constant_frames") != isdRot.end();
 
     if (hasConstantFrames) {
-      p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();
-      p_TC = isdRot["ConstantRotation"].get<std::vector<double>>();
+      p_constantFrames = isdRot["constant_frames"].get<std::vector<int>>();
+      p_TC = isdRot["constant_rotation"].get<std::vector<double>>();
 
     }
     else {
@@ -481,8 +462,6 @@ namespace Isis {
       ident_c((SpiceDouble( *)[3]) &p_TC[0]);
     }
 
-    m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
-                                          ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
     p_source = Memcache;
     SetEphemerisTime(p_cacheTime[0]);
   }
@@ -520,7 +499,6 @@ namespace Isis {
     p_cacheTime.clear();
     p_cacheAv.clear();
     p_hasAngularVelocity = false;
-    m_orientation = NULL;
 
     // Load the constant and time-based frame traces and the constant rotation
     if (table.Label().hasKeyword("TimeDependentFrames")) {
@@ -597,7 +575,7 @@ namespace Isis {
 
         Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ); // remove
+        p_cache.push_back(CJ);
         p_cacheTime.push_back((double)rec[4]);
       }
       p_source = Memcache;
@@ -621,13 +599,13 @@ namespace Isis {
 
         Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ); // remove
+        p_cache.push_back(CJ);
 
         std::vector<double> av;
         av.push_back((double)rec[4]);
         av.push_back((double)rec[5]);
         av.push_back((double)rec[6]);
-        p_cacheAv.push_back(av); // remove
+        p_cacheAv.push_back(av);
 
         p_cacheTime.push_back((double)rec[7]);
         p_hasAngularVelocity = true;
@@ -1265,9 +1243,7 @@ namespace Isis {
    * @return @b vector<double> Angular velocity
    */
   std::vector<double> SpiceRotation::AngularVelocity() {
-    return p_av; // remove
-
-    //return m_orientation->getAngularVelocities();  // FIXME
+    return p_av;
   }
 
 
@@ -1278,8 +1254,7 @@ namespace Isis {
    * @return @b vector<int> The frame chain for the constant part of the rotation.
    */
   std::vector<int> SpiceRotation::ConstantFrameChain() {
-    return p_constantFrames; // remove?
-    return m_orientation->getConstantFrames();
+    return p_constantFrames;
   }
 
 
@@ -1289,8 +1264,7 @@ namespace Isis {
    * @return @b vector<int> The frame chain for the rotation.
    */
   std::vector<int> SpiceRotation::TimeFrameChain() {
-    return p_timeFrames; // remove?
-    return m_orientation->getTimeDependentFrames();
+    return p_timeFrames;
   }
 
 
