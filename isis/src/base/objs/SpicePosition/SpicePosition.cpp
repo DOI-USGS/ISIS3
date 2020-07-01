@@ -101,9 +101,6 @@ namespace Isis {
     p_timeBias = 0.0;
     p_timeScale = 1.;
     p_velocity.resize(3);
-    p_xhermite = NULL;
-    p_yhermite = NULL;
-    p_zhermite = NULL;
 
 
     m_swapObserverTarget = swapObserverTarget;
@@ -740,11 +737,9 @@ namespace Isis {
     // Clear existing positions from thecache
     p_cacheTime.clear();
     
-
-
     // Clear the velocity cache if we can calculate it instead.  It can't be calculated for
     // functions of degree 0 (framing cameras), so keep the original velocity.  It is better than nothing.
-//    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
+    //    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
 
     // Load the time cache first
     LoadTimeCache();
@@ -754,7 +749,6 @@ namespace Isis {
     p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
     std::vector<ale::State> stateCache;
       for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
-        //        p_et = p_cacheTime.at(pos);
         SetEphemerisTime(p_cacheTime.at(pos));
         stateCache.push_back(ale::State(ale::Vec3d(p_coordinate), ale::Vec3d(p_velocity)));
       }
@@ -823,8 +817,6 @@ namespace Isis {
 
     // Set velocity vector to true since it is calculated
     p_hasVelocity = true;
-
-//    std::cout <<"time cache size is " << p_cacheTime.size() << std::endl;
 
     // Calculate new postition coordinates from polynomials fit to coordinates &
     // fill cache
@@ -942,7 +934,7 @@ namespace Isis {
       p_degree = 1;
     }
 
-    //Check for polynomial over Hermite constant and initialize coefficients
+    // Check for polynomial over Hermite constant and initialize coefficients
     if (type == PolyFunctionOverHermiteConstant) {
       XC.assign(p_degree + 1, 0.);
       YC.assign(p_degree + 1, 0.);
@@ -967,7 +959,7 @@ namespace Isis {
       ZC.push_back(p_coordinate[2]);
     }
     else if(size == 2) {
-// Load the times and get the corresponding coordinates
+      // Load the times and get the corresponding coordinates
       double t1 = p_cacheTime.at(0);
       SetEphemerisTime(t1);
       std::vector<double> coord1 = p_coordinate;
@@ -978,8 +970,8 @@ namespace Isis {
       t2 = (t2 - p_baseTime) / p_timeScale;
       double slope[3];
       double intercept[3];
-
-// Compute the linear equation for each coordinate and save them
+      
+      // Compute the linear equation for each coordinate and save them
       for(int cIndex = 0; cIndex < 3; cIndex++) {
         Isis::LineEquation posline(t1, coord1[cIndex], t2, coord2[cIndex]);
         slope[cIndex] = posline.Slope();
@@ -1009,7 +1001,7 @@ namespace Isis {
         fitZ->AddKnown(time, coord[2]);
         time.clear();
       }
-      //Solve the equations for the coefficients
+      // Solve the equations for the coefficients
       fitX->Solve();
       fitY->Solve();
       fitZ->Solve();
@@ -1475,6 +1467,7 @@ namespace Isis {
     p_source = HermiteCache;
   }
 
+
   /**
    * Removes the entire cache from memory.
    */
@@ -1485,23 +1478,7 @@ namespace Isis {
     }
 
     p_cacheTime.clear();
-
-    if(p_xhermite) {
-      delete p_xhermite;
-      p_xhermite = NULL;
-    }
-
-    if(p_yhermite) {
-      delete p_xhermite;
-      p_xhermite = NULL;
-    }
-
-    if(p_zhermite) {
-      delete p_xhermite;
-      p_xhermite = NULL;
-    }
   }
-
 
 
   /** Set the degree of the polynomials to be fit to the
