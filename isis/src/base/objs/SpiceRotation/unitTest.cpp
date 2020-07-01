@@ -620,12 +620,12 @@ int main(int argc, char *argv[]) {
   // [-90, 0, 0],
   // [-90, 180, 0],
   // [-90, 180, 90]
-  json aleQuatIsd = {{"CkTableStartTime"    , 0.0},
-                     {"CkTableEndTime"      , 3.0},
-                     {"CkTableOriginalSize" , 4},
-                     {"EphemerisTimes"      , {0.0, 1.0, 2.0, 3.0}},
-                     {"TimeDependentFrames" , {-94031, 10014, 1}},
-                     {"Quaternions"         , {{0.0, 0.0, 0.0, 1.0},
+  json aleQuatIsd = {{"ck_table_start_time"    , 0.0},
+                     {"ck_table_end_time"      , 3.0},
+                     {"ck_table_original_size" , 4},
+                     {"ephemeris_times"      , {0.0, 1.0, 2.0, 3.0}},
+                     {"time_dependent_frames" , {-94031, 10014, 1}},
+                     {"quaternions"         , {{0.0, 0.0, 0.0, 1.0},
                                                {-1.0 / sqrt(2), 0.0, 0.0, 1.0 / sqrt(2)},
                                                {0.0, 1.0 / sqrt(2), 1.0 / sqrt(2), 0.0},
                                                {-0.5, -0.5, 0.5, 0.5}}}};
@@ -644,7 +644,7 @@ int main(int argc, char *argv[]) {
   cout << " }" << endl;
   vector<int> constChain = aleQuatRot.ConstantFrameChain();
   cout << "Time dependent frame chain = { ";
-  for (unsigned int i = 0; i < constChain.size(); i++) {
+  for (int i = 0; i < constChain.size(); i++) {
     if (i > 0) {
       cout << ", ";
     }
@@ -664,7 +664,7 @@ int main(int argc, char *argv[]) {
   cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and AV ..." << endl;
   SpiceRotation aleQuatAVRot(-94031);
   json aleQuatAVIsd(aleQuatIsd);
-  aleQuatAVIsd["AngularVelocity"] = {{-Isis::PI / 2, 0.0, 0.0},
+  aleQuatAVIsd["angular_velocity"] = {{-Isis::PI / 2, 0.0, 0.0},
                                      {0.0, Isis::PI, 0.0},
                                      {0.0, 0.0, Isis::PI / 2},
                                      {0.0, 0.0, Isis::PI / 2}};
@@ -675,13 +675,13 @@ int main(int argc, char *argv[]) {
   cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and constant rotation ..." << endl;
   SpiceRotation aleQuatConstRot(-94031);
   json aleQuatConstIsd(aleQuatIsd);
-  aleQuatConstIsd["TimeDependentFrames"] = {-94030, 10014, 1};
-  aleQuatConstIsd["ConstantFrames"] = {-94031, -94030};
-  aleQuatConstIsd["ConstantRotation"] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
+  aleQuatConstIsd["time_dependent_frames"] = {-94030, 10014, 1};
+  aleQuatConstIsd["constant_frames"] = {-94031, -94030};
+  aleQuatConstIsd["constant_rotation"] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
   aleQuatConstRot.LoadCache(aleQuatConstIsd);
   timeDepChain = aleQuatConstRot.TimeFrameChain();
   cout << "Time dependent frame chain = { ";
-  for (unsigned int i = 0; i < timeDepChain.size(); i++) {
+  for (int i = 0; i < timeDepChain.size(); i++) {
     if (i > 0) {
       cout << ", ";
     }
@@ -690,7 +690,7 @@ int main(int argc, char *argv[]) {
   cout << " }" << endl;
   constChain = aleQuatConstRot.ConstantFrameChain();
   cout << "Time dependent frame chain = { ";
-  for (unsigned int i = 0; i < constChain.size(); i++) {
+  for (int i = 0; i < constChain.size(); i++) {
     if (i > 0) {
       cout << ", ";
     }
