@@ -629,7 +629,11 @@ int main(int argc, char *argv[]) {
                      {"quaternions"         , {{0.0, 0.0, 0.0, 1.0},
                                                {-1.0 / sqrt(2), 0.0, 0.0, 1.0 / sqrt(2)},
                                                {0.0, 1.0 / sqrt(2), 1.0 / sqrt(2), 0.0},
-                                               {-0.5, -0.5, 0.5, 0.5}}}};
+                                               {-0.5, -0.5, 0.5, 0.5}}},
+                     {"angular_velocities"  , {{0.0, 0.0, 0.0},
+                                               {0.0, 0.0, 0.0},
+                                               {0.0, 0.0, 0.0},
+                                               {0.0, 0.0, 0.0}}}};
   aleQuatRot.LoadCache(aleQuatIsd);
   cout << "Frame type = " << aleQuatRot.getFrameType() << endl;
   cout << "Is cached? " << (aleQuatRot.IsCached() ? "Yes" : "No") << endl;
