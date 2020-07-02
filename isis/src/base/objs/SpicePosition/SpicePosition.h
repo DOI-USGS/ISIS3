@@ -250,7 +250,7 @@ namespace Isis {
         return (p_cache.size() > 0);
       };
 
-      //! Is this position cached
+      //! Get the size of the current cached positions
       int cacheSize() const {
         return p_cache.size();
       };
