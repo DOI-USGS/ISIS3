@@ -303,8 +303,6 @@ namespace Isis {
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
-//      std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
-
       //======================================================================
       // New methods support for light time correction and swap of observer/target
       SpicePosition(int targetCode, int observerCode, bool swapObserverTarget);

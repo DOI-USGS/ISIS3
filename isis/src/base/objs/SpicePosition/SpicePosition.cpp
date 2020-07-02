@@ -264,9 +264,7 @@ namespace Isis {
       SetEphemerisTimePolyFunctionOverHermiteConstant();
     }
     else {  // Read from the kernel
-      // Since there is no cached time, cannot use ale::States here.
       SetEphemerisTimeSpice();
-      return p_coordinate;
     }
 
     NaifStatus::CheckErrors();
