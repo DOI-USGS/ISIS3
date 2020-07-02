@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
+  std::cout << "Cache Size: " << rot.cacheSize() << '\n';
   cout << endl;
 
   // Save off cache for polynomial over SPICE test
