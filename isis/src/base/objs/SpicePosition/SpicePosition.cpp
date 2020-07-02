@@ -325,7 +325,11 @@ namespace Isis {
       }
     }
 
-    m_state = new ale::States(p_cacheTime, stateCache);
+    if (m_state != NULL) { 
+      delete m_state;
+    }
+
+    m_state = new ale::States(p_cacheTime, stateCache); 
     p_source = Memcache;
   }
 
@@ -373,8 +377,8 @@ namespace Isis {
     std::vector<ale::State> stateCache;
     if (hasVelocityKey) {
       for (auto it = isdPos["positions"].begin(); it != isdPos["positions"].end(); it++) {
-        std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
         int index = it - isdPos["positions"].begin();
+        std::vector<double> pos = it->get<std::vector<double>>();
         std::vector<double> vel = isdPos["velocities"][index];
         stateCache.push_back(ale::State(pos, vel));
       }
@@ -385,7 +389,12 @@ namespace Isis {
         stateCache.push_back(ale::State(ale::Vec3d(pos)));
       }
     }
-    m_state = new ale::States(p_cacheTime, stateCache);
+
+    if (m_state != NULL) { 
+      delete m_state;
+    }
+
+    m_state = new ale::States(p_cacheTime, stateCache); 
 
     p_hasVelocity = m_state->hasVelocity();
 
@@ -494,7 +503,11 @@ namespace Isis {
         }
         p_cacheTime.push_back((double)rec[inext]);
       }
-      m_state = new ale::States(p_cacheTime, stateCache);
+
+      if (m_state != NULL) { 
+        delete m_state;
+      }
+      m_state = new ale::States(p_cacheTime, stateCache); 
     }
     else {
       // Coefficient table for postion coordinates x, y, and z
@@ -747,7 +760,10 @@ namespace Isis {
         SetEphemerisTime(p_cacheTime.at(pos));
         stateCache.push_back(ale::State(ale::Vec3d(p_coordinate), ale::Vec3d(p_velocity)));
       }
-      m_state = new ale::States(p_cacheTime, stateCache);
+      if (m_state != NULL) { 
+        delete m_state;
+      }
+      m_state = new ale::States(p_cacheTime, stateCache); 
     }
     else {
     // Load the position for the single updated time instance
@@ -757,6 +773,9 @@ namespace Isis {
       stateCache.push_back(p_coordinate);
       std::vector<double> timeCache;
       timeCache.push_back(p_cacheTime[0]);
+      if (m_state != NULL) { 
+        delete m_state;
+      }
       m_state = new ale::States(timeCache, stateCache);
     }
 
@@ -895,6 +914,9 @@ namespace Isis {
       p_velocity[1] = b2 + 2 * c2 * (p_cacheTime[i] - p_baseTime);
       p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
       stateCache.push_back(ale::State(p_coordinate, p_velocity));
+    }
+    if (m_state != NULL) { 
+      delete m_state;
     }
     m_state = new ale::States(p_cacheTime, stateCache);
 
