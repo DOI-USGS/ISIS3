@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
+  std::cout << "Cache Size: " << pos.cacheSize() << '\n';
   cout << endl;
 
   // Test table options
