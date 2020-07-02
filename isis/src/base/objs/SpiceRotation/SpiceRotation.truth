@@ -93,6 +93,7 @@ CJ(9) = -0.61729588 0.4060182 -0.67386573
          0.010223693 0.86060645 0.50916796
          0.78666465 0.30741789 -0.53539982
 av(9) = -1.2932496e-05 -0.0010747293 -0.00063276804
+Cache Size: 10
 
 Testing with functions ... 
 Source = 3
@@ -422,7 +423,7 @@ av(9) = 3.8816777e-05 -0.0010934565 -0.00061098396
 
 Testing vector methods
 v = 0 0 1
-v = 0 0 1
+v = 0 1.6653345e-16 1
 Testing with linear function ... 
 Source = 3
 Time           = -69382819
@@ -656,7 +657,7 @@ CJ(3) = -8.6595606e-17 2.220446e-16 -1
 
 
 Testing loading cache from ALE ISD with time dependent quaternions and AV ...
-Has AV? Yes
+Has AV? No
 
 
 Testing loading cache from ALE ISD with time dependent quaternions and constant rotation ...
