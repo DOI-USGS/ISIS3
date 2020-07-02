@@ -379,11 +379,11 @@ namespace Isis {
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
     if (m_usingAle) {
-      m_sunPosition->LoadCache(isd["SunPosition"]);
+      m_sunPosition->LoadCache(isd["sun_position"]);
       if (m_sunPosition->cacheSize() > 3) {
         m_sunPosition->Memcache2HermiteCache(0.01);
       }
-      m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      m_bodyRotation->LoadCache(isd["body_rotation"]);
       m_bodyRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
       if (m_bodyRotation->cacheSize() > 5) {
         m_bodyRotation->LoadTimeCache();
@@ -428,7 +428,7 @@ namespace Isis {
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
     else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
      m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
      if (m_instrumentRotation->cacheSize() > 5) {
        m_instrumentRotation->LoadTimeCache();
@@ -447,7 +447,7 @@ namespace Isis {
     }
 
     if (m_usingAle) {
-      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+      m_instrumentPosition->LoadCache(isd["instrument_position"]);
       if (m_instrumentPosition->cacheSize() > 3) {
         m_instrumentPosition->Memcache2HermiteCache(0.01);
       }
