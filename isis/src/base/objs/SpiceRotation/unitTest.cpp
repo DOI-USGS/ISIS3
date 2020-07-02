@@ -629,11 +629,7 @@ int main(int argc, char *argv[]) {
                      {"quaternions"         , {{0.0, 0.0, 0.0, 1.0},
                                                {-1.0 / sqrt(2), 0.0, 0.0, 1.0 / sqrt(2)},
                                                {0.0, 1.0 / sqrt(2), 1.0 / sqrt(2), 0.0},
-                                               {-0.5, -0.5, 0.5, 0.5}}},
-                     {"angular_velocities"  , {{0.0, 0.0, 0.0},
-                                               {0.0, 0.0, 0.0},
-                                               {0.0, 0.0, 0.0},
-                                               {0.0, 0.0, 0.0}}}};
+                                               {-0.5, -0.5, 0.5, 0.5}}}};
   aleQuatRot.LoadCache(aleQuatIsd);
   cout << "Frame type = " << aleQuatRot.getFrameType() << endl;
   cout << "Is cached? " << (aleQuatRot.IsCached() ? "Yes" : "No") << endl;
@@ -669,10 +665,10 @@ int main(int argc, char *argv[]) {
   cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and AV ..." << endl;
   SpiceRotation aleQuatAVRot(-94031);
   json aleQuatAVIsd(aleQuatIsd);
-  aleQuatAVIsd["angular_velocity"] = {{-Isis::PI / 2, 0.0, 0.0},
-                                     {0.0, Isis::PI, 0.0},
-                                     {0.0, 0.0, Isis::PI / 2},
-                                     {0.0, 0.0, Isis::PI / 2}};
+  aleQuatAVIsd["angular_velocities"] = {{-Isis::PI / 2, 0.0, 0.0},
+                                        {0.0, Isis::PI, 0.0},
+                                        {0.0, 0.0, Isis::PI / 2},
+                                        {0.0, 0.0, Isis::PI / 2}};
   aleQuatAVRot.LoadCache(aleQuatAVIsd);
   cout << "Has AV? " << (aleQuatAVRot.HasAngularVelocity() ? "Yes" : "No") << endl;
 
