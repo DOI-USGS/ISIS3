@@ -372,10 +372,10 @@ namespace Isis {
     p_fullCacheSize = isdPos["spk_table_original_size"].get<double>();
     p_cacheTime = isdPos["ephemeris_times"].get<std::vector<double>>();
 
-    bool hasVelocityKey = isdPos.find("velocities") != isdPos.end();
+    p_hasVelocity = isdPos.find("velocities") != isdPos.end();
 
     std::vector<ale::State> stateCache;
-    if (hasVelocityKey) {
+    if (p_hasVelocity) {
       for (auto it = isdPos["positions"].begin(); it != isdPos["positions"].end(); it++) {
         int index = it - isdPos["positions"].begin();
         std::vector<double> pos = it->get<std::vector<double>>();
@@ -395,8 +395,6 @@ namespace Isis {
     }
 
     m_state = new ale::States(p_cacheTime, stateCache); 
-
-    p_hasVelocity = m_state->hasVelocity();
 
     p_source = Memcache;
     SetEphemerisTime(p_cacheTime[0]);
@@ -745,17 +743,13 @@ namespace Isis {
     // Clear existing positions from thecache
     p_cacheTime.clear();
     
-    // Clear the velocity cache if we can calculate it instead.  It can't be calculated for
-    // functions of degree 0 (framing cameras), so keep the original velocity.  It is better than nothing.
-    //    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
-
     // Load the time cache first
     LoadTimeCache();
 
     if (p_fullCacheSize > 1) {
-    // Load the positions and velocity caches
-    p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
-    std::vector<ale::State> stateCache;
+      // Load the positions and velocity caches
+      p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
+      std::vector<ale::State> stateCache;
       for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
         SetEphemerisTime(p_cacheTime.at(pos));
         stateCache.push_back(ale::State(ale::Vec3d(p_coordinate), ale::Vec3d(p_velocity)));

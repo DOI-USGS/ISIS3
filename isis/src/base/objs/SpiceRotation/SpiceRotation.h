@@ -30,14 +30,12 @@
 //#include <SpiceZmc.h>
 
 #include <nlohmann/json.hpp>
-#include <ale/Orientations.h>
+
 
 #include "Angle.h"
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 #include "Quaternion.h"
-
-
 
 #define J2000Code    1
 
@@ -601,7 +599,6 @@ namespace Isis {
       static const double m_centScale;
       //! Seconds per day for scaling time in seconds to get target body w
       static const double m_dayScale;
-      ale::Orientations *m_orientation;
   };
 };
 
