@@ -188,6 +188,10 @@ namespace Isis {
    * Destructor for SpiceRotation object.
    */
   SpiceRotation::~SpiceRotation() {
+/*    if (m_orientation) {
+      delete m_orientation;
+      m_orientation = NULL;
+    }*/
   }
 
 
@@ -641,13 +645,13 @@ namespace Isis {
 
         Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
-        rotationCache.push_back(ale::Rotation(CJ)); // had p before
+        rotationCache.push_back(ale::Rotation(CJ));
 
         std::vector<double> av;
         av.push_back((double)rec[4]);
         av.push_back((double)rec[5]);
         av.push_back((double)rec[6]);
-        avCache.push_back(ale::Vec3d(av)); // had p before
+        avCache.push_back(ale::Vec3d(av));
         p_cacheTime.push_back((double)rec[7]);
         p_hasAngularVelocity = true;
       }
@@ -760,7 +764,7 @@ namespace Isis {
         std::vector<double> CJ = tempRot.TimeBasedMatrix();
         rotationCache.push_back(ale::Rotation(CJ));
         if (p_hasAngularVelocity){
-          avCache.push_back(ale::Vec3d(p_av));
+          avCache.push_back(ale::Vec3d(tempRot.AngularVelocity()));
         }
       }
     }
@@ -1163,7 +1167,7 @@ namespace Isis {
 
       table.Label() += PvlKeyword("ConstantRotation");
 
-      for (int i = 0; i < (int) p_TC.size(); i++) {   
+      for (int i = 0; i < (int) p_TC.size(); i++) {
         table.Label()["ConstantRotation"].addValue(toString(p_TC[i]));
       }
     }
@@ -1290,7 +1294,9 @@ namespace Isis {
    * Set the rotation angles (phi, delta, and w) for the current time to define the
    * time-based matrix CJ. This method was created for unitTests and should not
    * be used otherwise.  It only works for cached data with a cache size of 1.
-   *
+   *  
+   * // FIXME - MAYBE THIS SHOULD BE IN THE UNITTEST THEN.... (see comment) 
+   *  
    * @param[in]  angles The angles defining the rotation (phi, delta, and w) in radians
    * @param[in]  axis3    The rotation axis for the third angle
    * @param[in]  axis2    The rotation axis for the second angle
@@ -1298,11 +1304,10 @@ namespace Isis {
    */
   void SpiceRotation::SetAngles(std::vector<double> angles, int axis3, int axis2, int axis1) {
     eul2m_c(angles[2], angles[1], angles[0], axis3, axis2, axis1, (SpiceDouble (*)[3]) &(p_CJ[0]));
-//    p_cache[0] = p_CJ; // FIXME - MAYBE THIS SHOULD BE IN THE UNITTEST THEN.... (see comment)
+
     if (m_orientation) {
       delete m_orientation;
     }
-    // HERE
     std::vector<ale::Rotation> rotationCache;
     rotationCache.push_back(ale::Rotation(p_CJ));
     if (p_TC.size() > 1) {
@@ -1337,8 +1342,8 @@ namespace Isis {
    * @return @b vector<int> The frame chain for the constant part of the rotation.
    */
   std::vector<int> SpiceRotation::ConstantFrameChain() {
-    return p_constantFrames; // remove?
-    return m_orientation->getConstantFrames();
+    return p_constantFrames;
+//    return m_orientation->getConstantFrames();
   }
 
 
@@ -1348,8 +1353,8 @@ namespace Isis {
    * @return @b vector<int> The frame chain for the rotation.
    */
   std::vector<int> SpiceRotation::TimeFrameChain() {
-    return p_timeFrames; // remove?
-    return m_orientation->getTimeDependentFrames();
+    return p_timeFrames;
+//    return m_orientation->getTimeDependentFrames();
   }
 
 
@@ -1714,13 +1719,6 @@ namespace Isis {
     }
 
     // Adjust degree of polynomial on available data
-/*    if (p_cache.size() == 1) {
-      p_degree = 0;
-    }
-    else if (p_cache.size() == 2) {
-      p_degree = 1;
-    }*/
-
     if (m_orientation->getRotations().size() == 1) {
       p_degree = 0;
     }
@@ -2262,7 +2260,7 @@ namespace Isis {
 
     // Multiply the constant matrix to rotate to the targeted reference frame
     double dTJ[3][3];
-    mxm_c((SpiceDouble *) &p_TC[0], dCJ[0], dTJ); // FIXME
+    mxm_c((SpiceDouble *) &p_TC[0], dCJ[0], dTJ);
 
     // Finally rotate the J2000 vector with the derivative matrix, dTJ to
     // get the vector in the targeted reference frame.
@@ -2888,7 +2886,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     std::vector<double> q;
     q.resize(4);
-    m2q_c((SpiceDouble( *)[3]) &p_CJ[0], &q[0]); // FIXME
+    m2q_c((SpiceDouble( *)[3]) &p_CJ[0], &q[0]);
     NaifStatus::CheckErrors();
     return q;
   }
@@ -2900,7 +2898,7 @@ namespace Isis {
    * @return @b vector<double> Time-based rotation matrix, CJ.
    */
   std::vector<double> &SpiceRotation::TimeBasedMatrix() {
-    return p_CJ; // FIXME
+    return p_CJ;
   }
 
 
@@ -2910,7 +2908,7 @@ namespace Isis {
    * @param timeBasedMatrix Time-based rotation matrix, TC.
    */
   void SpiceRotation::SetTimeBasedMatrix(std::vector<double> timeBasedMatrix) {
-    p_CJ = timeBasedMatrix; // FIXME
+    p_CJ = timeBasedMatrix;
     return;
   }
 
@@ -3080,10 +3078,10 @@ namespace Isis {
       for (int col = 0; col < 3; col++) {
         jcol  =  col + 3;
         // Fill the upper left corner
-        stateTJ[irow*6 + col] = p_TC[vpos] * stateCJ[0][col] + p_TC[vpos+1] * stateCJ[1][col] // FIXME
+        stateTJ[irow*6 + col] = p_TC[vpos] * stateCJ[0][col] + p_TC[vpos+1] * stateCJ[1][col]
                                               + p_TC[vpos+2] * stateCJ[2][col];
         // Fill the lower left corner
-        stateTJ[row*6 + col]  =  p_TC[vpos] * stateCJ[3][col] + p_TC[vpos+1] * stateCJ[4][col] // FIXME
+        stateTJ[row*6 + col]  =  p_TC[vpos] * stateCJ[3][col] + p_TC[vpos+1] * stateCJ[4][col]
                                               + p_TC[vpos+2] * stateCJ[5][col];
         // Fill the upper right corner
         stateTJ[irow*6 + jcol] = 0;
@@ -3459,7 +3457,7 @@ namespace Isis {
     std::vector<double> cacheAngles(3);
     std::vector<double> cacheVelocity(3);
     cacheAngles = Angles(p_axis3, p_axis2, p_axis1);
-    cacheVelocity = p_av; // FIXME ??? 
+    cacheVelocity = p_av;
     setEphemerisTimePolyFunction();
     std::vector<double> polyAngles(3);
     // The decomposition fails because the angles are outside the valid range for Naif
@@ -3567,6 +3565,6 @@ namespace Isis {
     eul2xf_c (angsDangs, p_axis3, p_axis2, p_axis1, BJs);
 
     // Decompose the state matrix to the rotation and its angular velocity
-    xf2rav_c(BJs, (SpiceDouble( *)[3]) &p_CJ[0], (SpiceDouble *) &p_av[0]); // FIXME
+    xf2rav_c(BJs, (SpiceDouble( *)[3]) &p_CJ[0], (SpiceDouble *) &p_av[0]);
   }
 }
