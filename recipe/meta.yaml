@@ -79,7 +79,7 @@ requirements:
   - nlohmann_json
   - ninja==1.7.2
   - nn
-  - opencv>=3.0.0,<=4.0.0
+  - opencv=3.2
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
@@ -132,7 +132,7 @@ requirements:
   - nanoflann
   - nlohmann_json
   - nn
-  - opencv>=3.0.0,<=4.0.0
+  - opencv=3.2
   - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
