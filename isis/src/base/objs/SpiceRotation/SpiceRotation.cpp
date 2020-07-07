@@ -188,10 +188,10 @@ namespace Isis {
    * Destructor for SpiceRotation object.
    */
   SpiceRotation::~SpiceRotation() {
-/*    if (m_orientation) {
+    if (m_orientation) {
       delete m_orientation;
       m_orientation = NULL;
-    }*/
+    }
   }
 
 
@@ -3250,8 +3250,7 @@ namespace Isis {
     // Otherwise determine the interval to interpolate
     else {
 
-      p_CJ = m_orientation->interpolate(p_et).toRotationMatrix();
-      std::vector<double> temp= m_orientation->interpolate(p_et).toQuaternion();
+      p_CJ = m_orientation->interpolateTimeDep(p_et).toRotationMatrix();
 
       if (p_hasAngularVelocity) {
         ale::Vec3d av = m_orientation->interpolateAV(p_et);
