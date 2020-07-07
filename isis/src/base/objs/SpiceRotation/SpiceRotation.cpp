@@ -449,6 +449,7 @@ namespace Isis {
     
     if (m_orientation) {
       delete m_orientation;
+      m_orientation = NULL;
     }
 
     // Load the full cache time information from the label if available
@@ -775,6 +776,7 @@ namespace Isis {
 
     if (m_orientation) {
       delete m_orientation; 
+      m_orientation = NULL;
     }
 
     if (p_TC.size() > 1) {
@@ -1307,6 +1309,7 @@ namespace Isis {
 
     if (m_orientation) {
       delete m_orientation;
+      m_orientation = NULL;
     }
     std::vector<ale::Rotation> rotationCache;
     rotationCache.push_back(ale::Rotation(p_CJ));

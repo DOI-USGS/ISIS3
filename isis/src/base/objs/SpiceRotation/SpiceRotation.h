@@ -445,6 +445,7 @@ namespace Isis {
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
+      ale::Orientations *m_orientation;
 
     private:
       // method
@@ -601,7 +602,7 @@ namespace Isis {
       static const double m_centScale;
       //! Seconds per day for scaling time in seconds to get target body w
       static const double m_dayScale;
-      ale::Orientations *m_orientation;
+
   };
 };
 
