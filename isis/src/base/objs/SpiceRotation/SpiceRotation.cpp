@@ -442,8 +442,8 @@ namespace Isis {
         p_cache.push_back(CJ);
     }
 
-    if (isdRot["angular_velocity"].size() != 0) {
-      for (auto it = isdRot["angular_velocity"].begin(); it != isdRot["angular_velocity"].end(); it++) {
+    if (isdRot["angular_velocities"].size() != 0) {
+      for (auto it = isdRot["angular_velocities"].begin(); it != isdRot["angular_velocities"].end(); it++) {
           std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
           p_cacheAv.push_back(av);
       }
