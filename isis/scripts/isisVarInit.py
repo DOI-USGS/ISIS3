@@ -1,73 +1,61 @@
 #!/usr/bin/env python
 """
-This program builds shell scripts that define ISIS3 environment variables during
-conda environment activation and deactivation, and creates some directories.
+This program builds shell scripts that define the ISIS environment
+variables that are sourced during conda environment activation and
+removed at deactivation.
+
+If the directories don't exist, they are created.  If their path is
+not specified, they are placed in $ISISROOT.
 """
 
 import argparse
 import os
-import sys
+from pathlib import Path
 
-##########################################################################################################
+# This is free and unencumbered software released into the public domain.
 #
-#  This work is free and unencumbered software released into the public domain.
-#  In jurisdictions that recognize copyright laws, the author or authors
-#  of this software dedicate any and all copyright interest in the
-#  software to the public domain.
+# The authors of ISIS do not claim copyright on the contents of this file.
+# For more details about the LICENSE terms and the AUTHORS, you will
+# find files of those names at the top level of this repository.
 #
-#
-#   Description:  This program builds the shell scripts that define the
-#       ISISROOT/ISISDATA/ISISTESTDATA environment variables for the user
-#       when the ISIS3 conda environment is activated, and clean up when it is
-#       deactivated.
-#
-#       The data directory and test directory are optional command line arguments.
-#       If the user chooses not to set them, they will both be created in the
-#       $ISISROOT directory.
-#
-#   History:
-#       Author:  Tyler Wilson, USGS
-#       Date:    2018-10-05
-#       Description: Initial commit.
-#
-#       Author:  Tyler Wilson, USGS
-#       Date:    2018-11-01
-#       Description:  Removed a pair of lines which were causing output errors on Mac OS X and were not
-#                     required anyway.
-#
-#       Author:  Ross Beyer
-#       Date:    2018-11-19
-#       Description: Streamlined the program, improved documentation, and made the directory and
-#                    file creation more `pythonic' rather than using system calls.
-#
-#       Author:  Jesse Mapel
-#       Date:    2019-03-25
-#       Description: Added C-Shell support.
-#
-#       Author:  K.-Michael Aye
-#       Date:    2019-08-09
-#       Description: Added support for fish shell.
-#
-#       Author:  Adam Paquette
-#       Date:    2019-12-02
-#       Description: Added ALESPICEROOT environment variable for ISIS 4.
-#
-##########################################################################################################
-
-# There are still a lot of Python 2 installations out there, and if people don't have
-# their conda environment set up properly, the error message they'll get will be hard
-# to decipher.  This might help:
-assert sys.version_info >= (3, 2)  # Must be using Python 3.2 or later
+# SPDX-License-Identifier: CC0-1.0
 
 
-# This just wraps and reports on the directory creation:
-def mkdir(p):
-    if os.path.exists(p):
-        print("Tried to create " + p + ", but it already exists.")
+def mkdir(p: Path):
+    # This just wraps and reports on the directory creation:
+    if p.exists():
+        print(f"{p} exists, don't need to create.")
     else:
-        os.makedirs(p)
-        print("Created " + p)
+        p.mkdir(parents=False)
+        print(f"Created {p}")
     return
+
+
+def activate_text(shell: dict, env_vars: dict) -> str:
+    """Returns the formatted text to write to the activation script
+    based on the passed dictionaries."""
+
+    lines = [shell["shebang"]]
+    for k, v in env_vars.items():
+        lines.append(shell["activate"].format(k, v))
+
+    if shell["activate_extra"] != "":
+        lines.append(shell["activate_extra"])
+
+    lines.append("cat $ISISROOT/version")
+
+    return "\n".join(lines)
+
+
+def deactivate_text(shell: dict, env_vars: dict) -> str:
+    """Returns the formatted text to write to the deactivation script
+    based on the passed dictionaries."""
+
+    lines = [shell["shebang"]]
+    for k in env_vars.keys():
+        lines.append(shell["deactivate"].format(k))
+
+    return "\n".join(lines)
 
 
 # Set up and then parse the command line:
@@ -77,99 +65,82 @@ parser.add_argument(
     "-d",
     "--data-dir",
     default=os.environ["CONDA_PREFIX"] + "/data",
-    help="ISIS3 Data Directory, default: %(default)s",
+    type=Path,
+    help="ISIS Data Directory, default: %(default)s",
 )
 parser.add_argument(
     "-t",
     "--test-dir",
     default=os.environ["CONDA_PREFIX"] + "/testData",
-    help="ISIS3 Test Data Directory, default: %(default)s",
+    type=Path,
+    help="ISIS Test Data Directory, default: %(default)s",
 )
 
 parser.add_argument(
     "-a",
     "--ale-dir",
     default=os.environ["CONDA_PREFIX"] + "/aleData",
-    help="ISIS3 Ale Data Directory, default: %(default)s",
+    type=Path,
+    help="ISIS Ale Data Directory, default: %(default)s",
 )
 args = parser.parse_args()
 
+print("-- ISIS Data Directories --")
 # Create the data directories:
 mkdir(args.data_dir)
 mkdir(args.test_dir)
 mkdir(args.ale_dir)
 
+print("-- Conda activation and deactivation scripts --")
 # Create the conda activation and deactivation directories:
-activate_dir = os.environ["CONDA_PREFIX"] + "/etc/conda/activate.d"
-deactivate_dir = os.environ["CONDA_PREFIX"] + "/etc/conda/deactivate.d"
+activate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/activate.d"
+deactivate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/deactivate.d"
 
 mkdir(activate_dir)
 mkdir(deactivate_dir)
 
-# Write the files that manage the ISIS3 environments:
-# Three coralated lists for zsh, csh, and fish shell
+# Set the environment variables to manage
+env_vars = dict(
+    ISISROOT=os.environ["CONDA_PREFIX"],
+    ISISDATA=args.data_dir,
+    ISISTESTDATA=args.test_dir,
+    ALESPICEROOT=args.ale_dir
+)
 
-# Associated file
-activate_deactivate_files = ["/env_vars.sh", "/env_vars.csh", "/env_vars.fish"]
+# These dicts define the unique aspects of the shell languages
+# for setting and unsetting the environment variables.
 
-# Activation script
-activate_scripts = ["""
-                    #!/usr/bin/env sh
-                    export ISISROOT={}
-                    export ISISDATA={}
-                    export ISISTESTDATA={}
-                    export ALESPICEROOT={}
-                    """,
-                    """
-                    #!/usr/bin/env csh
-                    setenv ISISROOT {}
-                    setenv ISISDATA {}
-                    setenv ISISTESTDATA {}
-                    setenv ALESPICEROOT {}
+sh = dict(  # this covers bash and zsh
+    extension=".sh",
+    shebang="#!/usr/bin/env sh",
+    activate="export {}={}",
+    activate_extra="",
+    deactivate="unset {}"
+)
 
-                    source $CONDA_PREFIX/scripts/tabCompletion.csh
-                    """,
-                    """
-                    #!/usr/bin/env fish
-                    set -gx ISISROOT {}
-                    set -gx ISISDATA {}
-                    set -gx ISISTESTDATA {}
-                    set -gx ALESPICEROOT {}
-                    """]
+csh = dict(
+    extension=".csh",
+    shebang="#!/usr/bin/env csh",
+    activate="setenv {}={}",
+    activate_extra="source $CONDA_PREFIX/scripts/tabCompletion.csh",
+    deactivate="unsetenv {}"
+)
 
-# Deactivation script
-deactivate_scripts = ["""
-                      #!/usr/bin/env sh
-                      unset ISISROOT
-                      unset ISISDATA
-                      unset ISISTESTDATA
-                      unset ALESPICEROOT
-                      """,
-                      """
-                      #!/usr/bin/env csh
-                      unsetenv ISISROOT
-                      unsetenv ISISDATA
-                      unsetenv ISISTESTDATA
-                      unsetenv ALESPICEROOT
-                      """,
-                      """
-                      #!/usr/bin/env fish
-                      set -e ISISROOT
-                      set -e ISISDATA
-                      set -e ISISTESTDATA
-                      set -e ALESPICEROOT
-                      """]
+fish = dict(
+    extension=".fish",
+    shebang="#!/usr/bin/env fish",
+    activate="set -gx {} {}",
+    activate_extra="",
+    deactivate="set -e {}"
+)
 
-# Loop over the files and create the correct script associated with
-# said file
-for i, file in enumerate(activate_deactivate_files):
-    with open(activate_dir + file, mode="w") as a:
-        script = activate_scripts[i].format(
-            os.environ["CONDA_PREFIX"], args.data_dir, args.test_dir, args.ale_dir
-        )
-        a.write(script)
-    print("Wrote " + activate_dir + file)
+# Loop over the shell types and create the correct scripts associated with
+# each:
+for shell in (sh, csh, fish):
+    a_path = activate_dir / ("isis-activate" + shell["extension"])
+    a_path.write_text(activate_text(shell, env_vars))
+    print(f"Wrote {a_path}")
 
-    with open(deactivate_dir + file, mode="w") as d:
-        d.write(deactivate_scripts[i])
-    print("Wrote " + deactivate_dir + file)
+    d_path = deactivate_dir / ("isis-deactivate" + shell["extension"])
+    d_path.write_text(deactivate_text(shell, env_vars))
+    print(f"Wrote {d_path}")
