@@ -194,7 +194,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
         
         json aleNaifKeywords = isd["naif_keywords"];
@@ -965,7 +965,8 @@ namespace Isis {
 
 
   /**
-   * This returns the PvlObject that stores all of the requested Naif data  *   and can be a replacement for furnishing text kernels.
+   * This returns the PvlObject that stores all of the requested Naif data 
+   * and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;

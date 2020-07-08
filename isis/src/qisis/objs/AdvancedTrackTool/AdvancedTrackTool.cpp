@@ -61,7 +61,7 @@ namespace Isis {
     connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(raise()));
     connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(syncColumns()));
     p_tableWin->installEventFilter(this);
-    
+
     // Adds each item of checkBoxItems to the table.
     // If a tool tip is specified, we cannot skip parameters, so -1 and
     // Qt::Horizontal are specified.
@@ -498,7 +498,7 @@ namespace Isis {
       // Always write out columns et and utc, regardless of whether set image succeeds
       iTime time(cvp->camera()->time());
       p_tableWin->table()->item(row, getIndex("Ephemeris Time"))->
-                           setText(QString::number(time.Et(), 'f', 15));      
+                           setText(QString::number(time.Et(), 'f', 15));
       QString time_utc = time.UTC();
       p_tableWin->table()->item(row, getIndex("UTC"))->setText(time_utc);
 
@@ -623,7 +623,7 @@ namespace Isis {
         int iTrackBand = -1;
 
         // This is a mosaic in the new format or the external tracking cube itself
-        if(cCube->hasGroup("Tracking") || 
+        if(cCube->hasGroup("Tracking") ||
                 (cCube->hasTable(trackingTableName) && cCube->bandCount() == 1)) {
           Cube *trackingCube;
           if(cCube->hasGroup("Tracking")) {
@@ -632,7 +632,7 @@ namespace Isis {
           else {
             trackingCube = cCube;
           }
-          
+
           // Read the cube DN value from TRACKING cube at location (piLine, piSample)
           Portal trackingPortal(trackingCube->sampleCount(), 1, trackingCube->pixelType());
           trackingPortal.SetPosition(piSample, piLine, 1);
@@ -694,15 +694,18 @@ namespace Isis {
               psSrcSerialNum = QString(cFileTable[piOrigin][1]);
             }
           }
-        } 
-        
-        if (piOrigin == -1) { // If not from an image, display N/A
-          psSrcFileName = "N/A";
-          psSrcSerialNum = "N/A";
         }
+
       }
       catch (IException &e) {
-          QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
+          // This gets called too frequently to raise a warning; so, suppress the error
+          // and return invalid.
+          piOrigin = -1;
+      }
+
+      if (piOrigin == -1) { // If not from an image, display N/A
+        psSrcFileName = "N/A";
+        psSrcSerialNum = "N/A";
       }
   }
 

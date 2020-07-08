@@ -627,6 +627,8 @@ namespace Isis {
         }
       }
     }
+    fromCube->close();
+    delete fromCube;
   }
 
   /**

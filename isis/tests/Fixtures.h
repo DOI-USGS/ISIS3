@@ -32,6 +32,24 @@ namespace Isis {
   };
 
 
+
+  class SmallCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class SpecialSmallCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
@@ -66,6 +84,10 @@ namespace Isis {
       Cube *cube1;
       Cube *cube2;
       Cube *cube3;
+      
+      FileName *isdPath1;
+      FileName *isdPath2;
+      FileName *isdPath3; 
 
       FileName *threeImageOverlapFile;
       FileName *twoImageOverlapFile;
