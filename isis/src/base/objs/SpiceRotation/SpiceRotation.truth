@@ -1,6 +1,6 @@
 Unit test for SpiceRotation
 Naif code = -94031
-Testing without cache (from SPICE)...
+Testing without cache (from SPICE)... 
 CJ(0) = -0.87506927 0.25477955 -0.41151081
          0.011442263 0.86088548 0.50867009
          0.48386242 0.44041295 -0.75624969
