@@ -21,14 +21,14 @@ from pathlib import Path
 # SPDX-License-Identifier: CC0-1.0
 
 
-def mkdir(p: Path):
-    # This just wraps and reports on the directory creation:
+def mkdir(p: Path) -> str:
+    """Returns a string with a message about the creation or existance
+    of the path, *p*."""
     if p.exists():
-        print(f"{p} exists, don't need to create.")
+        return f"{p} exists, don't need to create."
     else:
         p.mkdir(parents=False)
-        print(f"Created {p}")
-    return
+        return f"Created {p}"
 
 
 def activate_text(shell: dict, env_vars: dict) -> str:
@@ -87,17 +87,17 @@ args = parser.parse_args()
 
 print("-- ISIS Data Directories --")
 # Create the data directories:
-mkdir(args.data_dir)
-mkdir(args.test_dir)
-mkdir(args.ale_dir)
+print(mkdir(args.data_dir))
+print(mkdir(args.test_dir))
+print(mkdir(args.ale_dir))
 
 print("-- Conda activation and deactivation scripts --")
 # Create the conda activation and deactivation directories:
 activate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/activate.d"
 deactivate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/deactivate.d"
 
-mkdir(activate_dir)
-mkdir(deactivate_dir)
+print(mkdir(activate_dir))
+print(mkdir(deactivate_dir))
 
 # Set the environment variables to manage
 env_vars = dict(
@@ -121,7 +121,7 @@ sh = dict(  # this covers bash and zsh
 csh = dict(
     extension=".csh",
     shebang="#!/usr/bin/env csh",
-    activate="setenv {}={}",
+    activate="setenv {} {}",
     activate_extra="source $CONDA_PREFIX/scripts/tabCompletion.csh",
     deactivate="unsetenv {}"
 )
