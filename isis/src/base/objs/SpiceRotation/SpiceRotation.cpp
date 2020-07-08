@@ -180,7 +180,9 @@ namespace Isis {
     p_degree = rotToCopy.p_degree;
     p_hasAngularVelocity = rotToCopy.p_hasAngularVelocity;
     m_frameType = rotToCopy.m_frameType;
-    m_orientation = rotToCopy.m_orientation;
+
+    m_orientation = new ale::Orientations;
+    *m_orientation = *rotToCopy.m_orientation;
   }
 
 
@@ -364,6 +366,11 @@ namespace Isis {
     p_fullCacheStartTime = startTime;
     p_fullCacheEndTime = endTime;
     p_fullCacheSize = size;
+
+    if (m_orientation != NULL) { 
+      delete m_orientation;
+      m_orientation = NULL;
+    }
 
     // Make sure the constant frame is loaded.  This method also does the frame trace.
     if (p_timeFrames.size() == 0) InitConstantRotation(startTime);
@@ -1346,7 +1353,6 @@ namespace Isis {
    */
   std::vector<int> SpiceRotation::ConstantFrameChain() {
     return p_constantFrames;
-//    return m_orientation->getConstantFrames();
   }
 
 
@@ -1357,7 +1363,6 @@ namespace Isis {
    */
   std::vector<int> SpiceRotation::TimeFrameChain() {
     return p_timeFrames;
-//    return m_orientation->getTimeDependentFrames();
   }
 
 
