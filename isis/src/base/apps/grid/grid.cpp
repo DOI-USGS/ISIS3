@@ -1,4 +1,4 @@
-#include <cmath>
+ #include <cmath>
 
 #include "grid.h"
 
@@ -18,417 +18,16 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis {
-  class ImageGridFunctor {
-    private:
-      int m_baseLine;
-      int m_baseSample;
-      int m_sampleInc;
-      int m_lineInc;
-      int m_lineWidth;
-      int m_tickSize;
-      int m_numSamples;
-      int m_numLines;
-      double m_lineValue;
-      double m_bkgndValue;
-      bool m_outline;
-      bool m_ticks;
-      bool m_diagonalTicks;
-      bool m_useImage;
 
-    public:
-      /**
-       * Default Constructor
-       * @param offset       The minimum value of the input cube's pixel type
-       * @param defaultValue Value used for pixels that are not taken from a cube
-       */
-      ImageGridFunctor(int baseLine, int baseSample, int sampleInc, int lineInc, int lineWidth, 
-                       int numSamples, int numLines, double lineValue, double bkgndValue, bool outline, 
-                       bool image, bool ticks, int tickSize, bool diagTicks) {
-        m_baseLine = baseLine;
-        m_baseSample = baseSample;
-        m_sampleInc = sampleInc;
-        m_lineInc = lineInc;
-        m_lineWidth = lineWidth;
-        m_numSamples = numSamples;
-        m_numLines = numLines;
-        m_lineValue = lineValue;
-        m_bkgndValue = bkgndValue;
-        m_outline = outline;
-        m_useImage = image;
-        m_ticks = ticks;
-        m_diagonalTicks = diagTicks;
-        m_tickSize = tickSize;
-      }
-      
-      /**
-       * Copies DN's from the input cube to the tracking cube, subtracts the old offset, and adds
-       * the new offset to each pixel.
-       *
-       * @param in  Input cube
-       * @param out Mosaic cube
-       */
-      void operator()(Buffer &in, Buffer &out) const {
-        for (int samp = 1; samp <= in.size(); samp ++) {
-          if (m_useImage)
-            out[samp - 1] = in[samp - 1];
-          else 
-            out[samp - 1] = m_bkgndValue;
+  bool imageDrawLine(int line, int baseLine, int lineWidth, int lineInc);
+  bool imageDrawSample(int sample, int baseSample, int lineWidth, int sampleInc);
+  void changeBand(int band, GroundGrid *&latLonGrid, UniversalGroundMap *gmap, int ticks, 
+                  bool extendGrid, bool walkBoundary, int numSamples, int numLines, Latitude minLat, 
+                  Latitude maxLat, Longitude minLon, Longitude maxLon, Latitude baseLat, 
+                  Longitude baseLon, Angle latInc, Angle lonInc);
+  bool groundDrawPoint(int samp, int line, int lineWidth, GroundGrid *latLonGrid, 
+                       bool latGrid = true);
 
-          if (!m_ticks) {
-            if (imageDrawSample(samp) || imageDrawLine(in.Line())) {
-              out[samp - 1] = m_lineValue;
-            }
-          }
-          // ticks!
-          else {
-            // tickSize is the width or height divided by 2, so integer rounding
-            //   takes care of the current sample/line while doing +/- tickSize
-            //   creates the appropriate width and height.
-
-            // Vertical/Horizontal Ticks
-            if (!m_diagonalTicks) {
-              // horizontal test
-              for (int sampleTest = samp - m_tickSize;
-                  (sampleTest <= samp + m_tickSize) && (out[samp - 1] != m_lineValue);
-                  sampleTest ++) {
-                if (imageDrawLine(in.Line()) && imageDrawSample(sampleTest)) {
-                  out[samp - 1] = m_lineValue;
-                }
-              }
-
-              // vertical test
-              for (int lineTest = in.Line() - m_tickSize;
-                  (lineTest <= in.Line() + m_tickSize) && (out[samp - 1] != m_lineValue);
-                  lineTest ++) {
-                if (imageDrawLine(lineTest) && imageDrawSample(samp)) {
-                  out[samp - 1] = m_lineValue;
-                }
-              }
-            }
-            // Diagonal Ticks
-            else {
-              // top left to bottom right
-              int sampleTest = samp - m_tickSize;
-              int lineTest = in.Line() - m_tickSize;
-
-              while ((out[samp - 1] != m_lineValue) &&
-                    (lineTest <= in.Line() + m_tickSize) &&
-                    (sampleTest <= samp + m_tickSize)) {
-                if (imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {
-                  out[samp - 1] = m_lineValue;
-                }
-
-                sampleTest ++;
-                lineTest ++;
-              }
-
-              // top right to bottom left
-              sampleTest = samp + m_tickSize;
-              lineTest = in.Line() - m_tickSize;
-
-              while ((out[samp - 1] != m_lineValue) &&
-                    (lineTest <= in.Line() + m_tickSize) &&
-                    (sampleTest >= samp - m_tickSize)) {
-                if (imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {
-                  out[samp - 1] = m_lineValue;
-                }
-
-                sampleTest --;
-                lineTest ++;
-              }
-            }
-          }
-        }
-
-        // draw outline
-        if (m_outline) {
-          if (in.Line() - 1 <= m_lineWidth * 2 ||
-             in.Line() >= m_numLines - m_lineWidth * 2) {
-            for (int i = 0; i < in.size(); i++) {
-              out[i] = Hrs;
-            }
-          }
-          else {
-            for (int i = 0; i <= m_lineWidth * 2; i++)
-              out[i] = Hrs;
-
-            for (int i = m_numSamples - m_lineWidth * 2 - 1; i < in.size(); i++)
-              out[i] = Hrs;
-          }
-        }
-      }
-
-      bool imageDrawLine(int line) const {
-        bool drawLine = false;
-
-        for (int y = line - m_lineWidth; y <= line + m_lineWidth; y ++) {
-          drawLine = drawLine || (y % m_lineInc == m_baseLine % m_lineInc);
-        }
-
-        return drawLine;
-      }
-
-      bool imageDrawSample(int samp) const {
-        bool drawSamp = false;
-
-        for (int x = samp - m_lineWidth; x <= samp + m_lineWidth; x ++) {
-          drawSamp = drawSamp || (x % m_sampleInc == m_baseSample % m_sampleInc);
-        }
-
-        return drawSamp;
-      }
-  };
-
-  class GroundGridFunctor {
-    private:
-      int m_lineWidth;
-      int m_tickSize;
-      int m_numSamples;
-      int m_numLines;
-      double m_lineValue;
-      double m_bkgndValue;
-      bool m_outline;
-      bool m_ticks;
-      bool m_diagonalTicks;
-      bool m_useImage;
-      bool m_recalculateForEachBand;
-      bool m_walkBoundary;
-      bool m_extendGrid;
-      Latitude m_baseLat; 
-      Longitude m_baseLon;
-      Latitude m_minLat;
-      Latitude m_maxLat; 
-      Longitude m_minLon;
-      Longitude m_maxLon; 
-      Angle m_latInc;
-      Angle m_lonInc;
-      UniversalGroundMap *m_gmap;
-      GroundGrid *m_latLonGrid;
-
-      int tempValue = 0;
-      int *m_currentBand = &tempValue;
-
-    public:
-      GroundGridFunctor(int lineWidth, int tickSize, int numSamples, int numLines, double lineValue, 
-                        double bkgndValue, bool outline, bool image, bool ticks, bool diagTicks, 
-                        bool recalculateForEachBand, bool walkBoundary, bool extendGrid, 
-                        Latitude baseLat, Longitude baseLon, Latitude minLat, Latitude maxLat, 
-                        Longitude minLon, Longitude maxLon, Angle latInc, Angle lonInc, 
-                        UniversalGroundMap *gmap, GroundGrid *latLonGrid) {
-        m_lineWidth = lineWidth;
-        m_tickSize = tickSize;
-        m_numSamples = numSamples;
-        m_numLines = numLines;
-        m_lineValue = lineValue;
-        m_bkgndValue = bkgndValue;
-        m_outline = outline;
-        m_useImage = image;
-        m_ticks = ticks;
-        m_diagonalTicks = diagTicks;
-        m_recalculateForEachBand = recalculateForEachBand;
-        m_walkBoundary = walkBoundary;
-        m_extendGrid = extendGrid;
-        m_baseLat = baseLat; 
-        m_baseLon = baseLon;
-        m_minLat = minLat;
-        m_maxLat = maxLat; 
-        m_minLon = minLon;
-        m_maxLon = maxLon;  
-        m_latInc = latInc;
-        m_lonInc = lonInc;
-        m_gmap = gmap;
-        m_latLonGrid = latLonGrid;
-      }
-      
-      /**
-       * Copies DN's from the input cube to the tracking cube, subtracts the old offset, and adds
-       * the new offset to each pixel.
-       *
-       * @param in  Input cube
-       * @param out Mosaic cube
-       */
-      void operator()(Buffer &in, Buffer &out) const {
-
-        // check to see if we're in the same band 
-        if ( (*m_currentBand != in.Band()) && m_recalculateForEachBand ) {
-          *m_currentBand = in.Band(); 
-          changeBand(*m_currentBand); 
-        }
-
-
-        for (int samp = 1; samp <= in.SampleDimension(); samp++) {
-          if (!m_ticks) {
-            if (groundDrawPoint(samp, in.Line())) {
-              out[samp - 1] = m_lineValue;
-            }
-            else {
-              if (m_useImage) {
-                out[samp - 1] = in[samp - 1];
-              }
-              else {
-                out[samp - 1] = m_bkgndValue;
-              }
-            }
-          }
-          else {
-            // We need to check the grids for overlaps near current point
-            out[samp - 1] = in[samp - 1];
-
-            // tickSize is the width or height divided by 2, so integer rounding
-            //   takes care of the current sample/line while doing +/- tickSize
-            //   creates the appropriate width and height.
-
-            // Vertical/Horizontal Ticks
-            if (!m_diagonalTicks) {
-              // horizontal test
-              for (int sampleTest = samp - m_tickSize;
-                  (sampleTest <= samp + m_tickSize) && (out[samp - 1] != Hrs);
-                  sampleTest ++) {
-                if (groundDrawPoint(sampleTest, in.Line(), true) &&
-                    groundDrawPoint(sampleTest, in.Line(), false)) {
-                  out[samp - 1] = m_lineValue;
-                }
-              }
-
-              // vertical test
-              for (int lineTest = in.Line() - m_tickSize;
-                  (lineTest <= in.Line() + m_tickSize) && (out[samp - 1] != Hrs);
-                  lineTest ++) {
-                if (groundDrawPoint(samp, lineTest, true) &&
-                    groundDrawPoint(samp, lineTest, false)) {
-                  out[samp - 1] = m_lineValue;
-                }
-              }
-            }
-            // Diagonal ticks
-            else {
-              // top left to bottom right
-              int sampleTest = samp - m_tickSize;
-              int lineTest = in.Line() - m_tickSize;
-
-
-              while ((out[samp - 1] != Hrs) &&
-                    (lineTest <= in.Line() + m_tickSize) &&
-                    (sampleTest <= samp + m_tickSize)) {
-                if (groundDrawPoint(sampleTest, lineTest, true) &&
-                    groundDrawPoint(sampleTest, lineTest, false)) {
-                  out[samp - 1] = m_lineValue;
-                }
-
-                sampleTest++;
-                lineTest++;
-              }
-
-              // top right to bottom left
-              sampleTest = samp + m_tickSize;
-              lineTest = in.Line() - m_tickSize;
-
-              while ((out[samp - 1] != Hrs) &&
-                    (lineTest <= in.Line() + m_tickSize) &&
-                    (sampleTest >= samp - m_tickSize)) {
-                if (groundDrawPoint(sampleTest, lineTest, true) &&
-                    groundDrawPoint(sampleTest, lineTest, false)) {
-                  out[samp - 1] = m_lineValue;
-                }
-
-                sampleTest--;
-                lineTest++;
-              }
-            }
-          }
-        }
-
-        // draw outline
-        if (m_outline) {
-          if (in.Line() - 1 <= m_lineWidth * 2 ||
-             in.Line() >= m_numLines - m_lineWidth * 2) {
-            for (int i = 0; i < in.size(); i++) {
-              out[i] = Hrs;
-            }
-          }
-          else {
-            for (int i = 0; i <= m_lineWidth * 2; i++)
-              out[i] = Hrs;
-
-            for (int i = m_numSamples - m_lineWidth * 2 - 1; i < in.size(); i++)
-              out[i] = Hrs;
-          }
-        }
-      }
-
-      void changeBand(int band) const { 
-        Progress progress;
-
-        // Since changeBand changes m_latLonGrid and this has to be a const method, save the value of
-        // m_latLonGrid in a new variable that can be changed
-        GroundGrid *latLonGrid = m_latLonGrid;
-
-        // change band of UniversalGroundMap
-        m_gmap->SetBand(band);
-
-        // update latLonGrid to use new UniversalGroundMap
-        GroundGrid newGrid(m_gmap, m_ticks, m_extendGrid, m_numSamples, m_numLines);
-        *latLonGrid = newGrid;
-
-        // re-set old ground limits from GUI
-        latLonGrid->SetGroundLimits(m_minLat, m_minLon, m_maxLat, m_maxLon);
-
-        // If the grid is not going to reach the min/max lon warn the user.
-        if (!m_extendGrid) {
-          // Check that the min/max lon values match the lon domain
-          if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "360" &&
-              (latLonGrid->minLongitude().degrees() < 0.0 ||
-                latLonGrid->maxLongitude().degrees() > 360.0) ) {
-            QString msg = "**WARNING** minimum longitude ["
-                          + toString( latLonGrid->minLongitude().degrees() )
-                          + "] and maximum longitude ["
-                          + toString( latLonGrid->maxLongitude().degrees() )
-                          + "] are not in the 360 degree longitude domain and "
-                            "the EXTENDGRID parameter is set to false. "
-                            "Output grid may not cover the entire map projection for band["
-                          + toString(band) + "].";
-            std::cerr << msg << std::endl;
-          }
-          else if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "180" &&
-                    (latLonGrid->minLongitude().degrees() < -180.0 ||
-                    latLonGrid->maxLongitude().degrees() > 180.0) ) {
-            QString msg = "**WARNING** minimum longitude ["
-                          + toString( latLonGrid->minLongitude().degrees() )
-                          + "] and maximum longitude ["
-                          + toString( latLonGrid->maxLongitude().degrees() )
-                          + "] are not in the 180 degree longitude domain and "
-                            "the EXTENDGRID parameter is set to false. "
-                            "Output grid may not cover the entire map projection for band["
-                          + toString(band) + "].";
-            std::cerr << msg << std::endl;
-          }
-        }
-
-        QString progressMessage = QString("Recalculating grid for band %1").arg(band);
-        progress.SetText(progressMessage);
-
-        // re-set lat/lon base/in from GUI
-        latLonGrid->CreateGrid(m_baseLat, m_baseLon, m_latInc, m_lonInc, &progress);
-
-        if (m_walkBoundary) {
-          latLonGrid->WalkBoundary();
-        }
-      }
-
-      bool groundDrawPoint(int samp, int line, bool latGrid = true) const {
-        bool drawPoint = false;
-
-        for (int x = samp - m_lineWidth; x <= samp + m_lineWidth; x ++) {
-          drawPoint = drawPoint || m_latLonGrid->PixelOnGrid(x - 1, line - 1, latGrid);
-        }
-
-        for (int y = line - m_lineWidth; y <= line + m_lineWidth; y ++) {
-          drawPoint = drawPoint || m_latLonGrid->PixelOnGrid(samp - 1, y - 1, latGrid);
-        }
-
-        return drawPoint;
-      }
-  };
 
   void grid(UserInterface &ui, Pvl *log) {
     Cube icube;
@@ -444,6 +43,7 @@ namespace Isis {
     // We will be processing by line
     ProcessByLine p;
     p.SetInputCube(icube);
+    p.SetOutputCube("TO");
 
     QString mode = ui.GetString("MODE");
 
@@ -466,11 +66,11 @@ namespace Isis {
    
     QString bval = ui.GetString("BKGNDVALUE").toUpper();
 
-    bool image = false;
+    bool useImageAsBkgn = false;
     double bkgndValue;
 
     if (bval == "IMAGE") {
-      image = true;
+      useImageAsBkgn = true;
       bkgndValue = Null;
     }
     if (bval == "HRS") {
@@ -509,21 +109,121 @@ namespace Isis {
 
     // Line & sample based grid
     if (mode == "IMAGE") {
-      p.SetOutputCube("TO");
+      // p.SetOutputCube("TO");
       int baseLine = ui.GetInteger("BASELINE");
       int baseSample = ui.GetInteger("BASESAMPLE");
       int lineInc = ui.GetInteger("LINC");
       int sampleInc = ui.GetInteger("SINC");
-      ImageGridFunctor imageGrid(baseLine, baseSample, sampleInc, lineInc, lineWidth, 
-                                        inputSamples, inputLines, lineValue, bkgndValue, outline, 
-                                        image, ticks, tickSize, diagonalTicks);
 
-      p.ProcessCube(imageGrid, false);
+      /**
+       * Copies DN's from the input cube to the tracking cube, subtracts the old offset, and adds
+       * the new offset to each pixel.
+       *
+       * @param in  Input cube
+       * @param out Mosaic cube
+       */
+      auto imageGrid = [&](Buffer &in, Buffer &out)->void {
+        for (int samp = 1; samp <= in.size(); samp ++) {
+          if (useImageAsBkgn)
+            out[samp - 1] = in[samp - 1];
+          else 
+            out[samp - 1] = bkgndValue;
+
+          if (!ticks) {
+            if (imageDrawSample(samp, baseSample, lineWidth, sampleInc) 
+                                        || imageDrawLine(in.Line(), baseLine, lineWidth, lineInc)) {
+              out[samp - 1] = lineValue;
+            }
+          }
+          // ticks!
+          else {
+            // tickSize is the width or height divided by 2, so integer rounding
+            //   takes care of the current sample/line while doing +/- tickSize
+            //   creates the appropriate width and height.
+
+            // Vertical/Horizontal Ticks
+            if (!diagonalTicks) {
+              // horizontal test
+              for (int sampleTest = samp - tickSize;
+                  (sampleTest <= samp + tickSize) && (out[samp - 1] != lineValue);
+                  sampleTest ++) {
+                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                                && imageDrawSample(sampleTest, baseSample, lineWidth, sampleInc)) {
+                  out[samp - 1] = lineValue;
+                }
+              }
+
+              // vertical test
+              for (int lineTest = in.Line() - tickSize;
+                  (lineTest <= in.Line() + tickSize) && (out[samp - 1] != lineValue);
+                  lineTest ++) {
+                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                                      && imageDrawSample(samp, baseSample, lineWidth, sampleInc)) {
+                  out[samp - 1] = lineValue;
+                }
+              }
+            }
+            // Diagonal Ticks
+            else {
+              // top left to bottom right
+              int sampleTest = samp - tickSize;
+              int lineTest = in.Line() - tickSize;
+
+              while ((out[samp - 1] != lineValue) &&
+                    (lineTest <= in.Line() + tickSize) &&
+                    (sampleTest <= samp + tickSize)) {
+                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                                && imageDrawSample(sampleTest, baseSample, lineWidth, sampleInc)) {
+                  out[samp - 1] = lineValue;
+                }
+
+                sampleTest ++;
+                lineTest ++;
+              }
+
+              // top right to bottom left
+              sampleTest = samp + tickSize;
+              lineTest = in.Line() - tickSize;
+
+              while ((out[samp - 1] != lineValue) &&
+                    (lineTest <= in.Line() + tickSize) &&
+                    (sampleTest >= samp - tickSize)) {
+                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                                && imageDrawSample(sampleTest, baseSample, lineWidth, sampleInc)) {
+                  out[samp - 1] = lineValue;
+                }
+
+                sampleTest --;
+                lineTest ++;
+              }
+            }
+          }
+        }
+
+        // draw outline
+        if (outline) {
+          if (in.Line() - 1 <= lineWidth * 2 ||
+             in.Line() >= inputLines - lineWidth * 2) {
+            for (int i = 0; i < in.size(); i++) {
+              out[i] = Hrs;
+            }
+          }
+          else {
+            for (int i = 0; i <= lineWidth * 2; i++)
+              out[i] = Hrs;
+
+            for (int i = inputSamples - lineWidth * 2 - 1; i < in.size(); i++)
+              out[i] = Hrs;
+          }
+        }
+      };
+
+      p.StartProcess(imageGrid);
       p.EndProcess();
     }
     // Lat/Lon based grid
     else {
-      p.SetOutputCube("TO");
+      // p.SetOutputCube("TO");
 
       // if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
       // each band
@@ -537,7 +237,6 @@ namespace Isis {
       UniversalGroundMap *gmap = new UniversalGroundMap(*icube, UniversalGroundMap::ProjectionFirst);
 
       GroundGrid *latLonGrid = new GroundGrid(gmap, ticks, extendGrid, inputSamples, inputLines);
-
       Latitude baseLat = Latitude(ui.GetDouble("BASELAT"), *latLonGrid->GetMappingGroup(), Angle::Degrees);
       Longitude baseLon = Longitude(ui.GetDouble("BASELON"), *latLonGrid->GetMappingGroup(), Angle::Degrees);
       Angle latInc = Angle(ui.GetDouble("LATINC"), Angle::Degrees);
@@ -605,19 +304,216 @@ namespace Isis {
         walkBoundary = true;
       }
 
-      GroundGridFunctor groundGrid(lineWidth, tickSize, inputSamples, inputLines, lineValue, 
-                        bkgndValue, outline, image, ticks, diagonalTicks, recalculateForEachBand, 
-                        walkBoundary, extendGrid, baseLat, baseLon, minLat, maxLat, minLon, maxLon, 
-                        latInc, lonInc, gmap, latLonGrid);
-      p.ProcessCube(groundGrid, false);
+      int currentBand = 0;
+      auto groundGrid = [&](Buffer &in, Buffer &out)->void {
+        // check to see if we're in the same band 
+        if ( (currentBand != in.Band()) && recalculateForEachBand ) {
+          currentBand = in.Band(); 
+          changeBand(currentBand, latLonGrid, gmap, ticks, extendGrid, walkBoundary, 
+                  inputSamples, inputLines, minLat, maxLat, minLon, maxLon, baseLat, 
+                  baseLon, latInc, lonInc);
+        }
+
+        for (int samp = 1; samp <= in.SampleDimension(); samp++) {
+          if (!ticks) {
+            if (groundDrawPoint(samp, in.Line(), lineWidth, latLonGrid)) {
+              out[samp - 1] = lineValue;
+            }
+            else {
+              if (useImageAsBkgn) {
+                out[samp - 1] = in[samp - 1];
+              }
+              else {
+                out[samp - 1] = bkgndValue;
+              }
+            }
+          }
+          else {
+            // We need to check the grids for overlaps near current point
+            out[samp - 1] = in[samp - 1];
+
+            // tickSize is the width or height divided by 2, so integer rounding
+            //   takes care of the current sample/line while doing +/- tickSize
+            //   creates the appropriate width and height.
+
+            // Vertical/Horizontal Ticks
+            if (!diagonalTicks) {
+              // horizontal test
+              for (int sampleTest = samp - tickSize;
+                  (sampleTest <= samp + tickSize) && (out[samp - 1] != Hrs);
+                  sampleTest ++) {
+                if (groundDrawPoint(sampleTest, in.Line(), lineWidth, latLonGrid, true) &&
+                    groundDrawPoint(sampleTest, in.Line(), lineWidth, latLonGrid, false)) {
+                  out[samp - 1] = lineValue;
+                }
+              }
+
+              // vertical test
+              for (int lineTest = in.Line() - tickSize;
+                  (lineTest <= in.Line() + tickSize) && (out[samp - 1] != Hrs);
+                  lineTest ++) {
+                if (groundDrawPoint(samp, lineTest, lineWidth, latLonGrid, true) &&
+                    groundDrawPoint(samp, lineTest, lineWidth, latLonGrid, false)) {
+                  out[samp - 1] = lineValue;
+                }
+              }
+            }
+            // Diagonal ticks
+            else {
+              // top left to bottom right
+              int sampleTest = samp - tickSize;
+              int lineTest = in.Line() - tickSize;
+
+
+              while ((out[samp - 1] != Hrs) &&
+                    (lineTest <= in.Line() + tickSize) &&
+                    (sampleTest <= samp + tickSize)) {
+                if (groundDrawPoint(sampleTest, lineTest, lineWidth, latLonGrid, true) &&
+                    groundDrawPoint(sampleTest, lineTest, lineWidth, latLonGrid, false)) {
+                  out[samp - 1] = lineValue;
+                }
+
+                sampleTest++;
+                lineTest++;
+              }
+
+              // top right to bottom left
+              sampleTest = samp + tickSize;
+              lineTest = in.Line() - tickSize;
+
+              while ((out[samp - 1] != Hrs) &&
+                    (lineTest <= in.Line() + tickSize) &&
+                    (sampleTest >= samp - tickSize)) {
+                if (groundDrawPoint(sampleTest, lineTest, lineWidth, latLonGrid, true) &&
+                    groundDrawPoint(sampleTest, lineTest, lineWidth, latLonGrid, false)) {
+                  out[samp - 1] = lineValue;
+                }
+
+                sampleTest--;
+                lineTest++;
+              }
+            }
+          }
+        }
+
+        // draw outline
+        if (outline) {
+          if (in.Line() - 1 <= lineWidth * 2 ||
+             in.Line() >= inputLines - lineWidth * 2) {
+            for (int i = 0; i < in.size(); i++) {
+              out[i] = Hrs;
+            }
+          }
+          else {
+            for (int i = 0; i <= lineWidth * 2; i++)
+              out[i] = Hrs;
+
+            for (int i = inputSamples - lineWidth * 2 - 1; i < in.size(); i++)
+              out[i] = Hrs;
+          }
+        }
+      };
+
+      p.StartProcess(groundGrid);
       p.EndProcess();
 
       delete latLonGrid;
       latLonGrid = NULL;
-      std::cout<< "Deleted latLonGrid" << std::endl;
       
       delete gmap;
       gmap = NULL;
     }
+  }
+
+  bool imageDrawLine(int line, int baseLine, int lineWidth, int lineInc) {
+    bool drawLine = false;
+
+    for (int y = line - lineWidth; y <= line + lineWidth; y ++) {
+      drawLine = drawLine || (y % lineInc == baseLine % lineInc);
+    }
+
+    return drawLine;
+  }
+
+  bool imageDrawSample(int sample, int baseSample, int lineWidth, int sampleInc) {
+    bool drawSamp = false;
+
+    for (int x = sample - lineWidth; x <= sample + lineWidth; x ++) {
+      drawSamp = drawSamp || (x % sampleInc == baseSample % sampleInc);
+    }
+
+    return drawSamp;
+  }
+
+  void changeBand(int band, GroundGrid *&latLonGrid, UniversalGroundMap *gmap, int ticks, 
+                  bool extendGrid, bool walkBoundary, int numSamples, int numLines, Latitude minLat, 
+                  Latitude maxLat, Longitude minLon, Longitude maxLon, Latitude baseLat, 
+                  Longitude baseLon, Angle latInc, Angle lonInc) {
+    Progress progress;
+
+    // change band of UniversalGroundMap
+    gmap->SetBand(band);
+
+    // update latLonGrid to use new UniversalGroundMap
+    latLonGrid = new GroundGrid(gmap, ticks, extendGrid, numSamples, numLines);
+
+    // re-set old ground limits from GUI
+    latLonGrid->SetGroundLimits(minLat, minLon, maxLat, maxLon);
+
+    // If the grid is not going to reach the min/max lon warn the user.
+    if (!extendGrid) {
+      // Check that the min/max lon values match the lon domain
+      if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "360" &&
+          (latLonGrid->minLongitude().degrees() < 0.0 ||
+            latLonGrid->maxLongitude().degrees() > 360.0) ) {
+        QString msg = "**WARNING** minimum longitude ["
+                      + toString( latLonGrid->minLongitude().degrees() )
+                      + "] and maximum longitude ["
+                      + toString( latLonGrid->maxLongitude().degrees() )
+                      + "] are not in the 360 degree longitude domain and "
+                        "the EXTENDGRID parameter is set to false. "
+                        "Output grid may not cover the entire map projection for band["
+                      + toString(band) + "].";
+        std::cerr << msg << std::endl;
+      }
+      else if ( latLonGrid->GetMappingGroup()->findKeyword("LongitudeDomain")[0] == "180" &&
+                (latLonGrid->minLongitude().degrees() < -180.0 ||
+                latLonGrid->maxLongitude().degrees() > 180.0) ) {
+        QString msg = "**WARNING** minimum longitude ["
+                      + toString( latLonGrid->minLongitude().degrees() )
+                      + "] and maximum longitude ["
+                      + toString( latLonGrid->maxLongitude().degrees() )
+                      + "] are not in the 180 degree longitude domain and "
+                        "the EXTENDGRID parameter is set to false. "
+                        "Output grid may not cover the entire map projection for band["
+                      + toString(band) + "].";
+        std::cerr << msg << std::endl;
+      }
+    }
+
+    QString progressMessage = QString("Recalculating grid for band %1").arg(band);
+    progress.SetText(progressMessage);
+
+    // re-set lat/lon base/in from GUI
+    latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
+
+    if (walkBoundary) {
+      latLonGrid->WalkBoundary();
+    }
+  }
+
+  bool groundDrawPoint(int samp, int line, int lineWidth, GroundGrid *latLonGrid, 
+                       bool latGrid) {
+    bool drawPoint = false;
+    // RETURN EARLY???
+    for (int x = samp - lineWidth; x <= samp + lineWidth; x++) {
+      drawPoint = drawPoint || latLonGrid->PixelOnGrid(x - 1, line - 1, latGrid);
+    }
+
+    for (int y = line - lineWidth; y <= line + lineWidth; y ++) {
+      drawPoint = drawPoint || latLonGrid->PixelOnGrid(samp - 1, y - 1, latGrid);
+    }
+
+    return drawPoint;
   }
 }
