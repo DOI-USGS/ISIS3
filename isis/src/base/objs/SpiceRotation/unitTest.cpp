@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
+  std::cout << "Cache Size: " << rot.cacheSize() << '\n';
   cout << endl;
 
   // Save off cache for polynomial over SPICE test
@@ -664,10 +665,10 @@ int main(int argc, char *argv[]) {
   cout << endl << endl << "Testing loading cache from ALE ISD with time dependent quaternions and AV ..." << endl;
   SpiceRotation aleQuatAVRot(-94031);
   json aleQuatAVIsd(aleQuatIsd);
-  aleQuatAVIsd["angular_velocity"] = {{-Isis::PI / 2, 0.0, 0.0},
-                                     {0.0, Isis::PI, 0.0},
-                                     {0.0, 0.0, Isis::PI / 2},
-                                     {0.0, 0.0, Isis::PI / 2}};
+  aleQuatAVIsd["angular_velocities"] = {{-Isis::PI / 2, 0.0, 0.0},
+                                        {0.0, Isis::PI, 0.0},
+                                        {0.0, 0.0, Isis::PI / 2},
+                                        {0.0, 0.0, Isis::PI / 2}};
   aleQuatAVRot.LoadCache(aleQuatAVIsd);
   cout << "Has AV? " << (aleQuatAVRot.HasAngularVelocity() ? "Yes" : "No") << endl;
 

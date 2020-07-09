@@ -25,10 +25,6 @@
 #include <string>
 #include <vector>
 
-//#include <SpiceUsr.h>
-//#include <SpiceZfc.h>
-//#include <SpiceZmc.h>
-
 #include <nlohmann/json.hpp>
 #include <ale/Orientations.h>
 
@@ -427,6 +423,10 @@ namespace Isis {
 
       void checkForBinaryPck();
 
+      int cacheSize() {
+        return m_orientation->getRotations().size();
+      }
+
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
       void setEphemerisTimeMemcache();
@@ -436,17 +436,12 @@ namespace Isis {
       void setEphemerisTimePolyFunctionOverSpice();
       void setEphemerisTimePckPolyFunction();
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
-      std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as
-                                                      rotation matrix from J2000
-                                                      to 1st constant frame (CJ) or
-                                                      coefficients of polynomial
-                                                      fit to rotation angles.*/
       int p_degree;                     //!< Degree of fit polynomial for angles
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
-      ale::Orientations *m_orientation;
-
+      ale::Orientations *m_orientation; //! Cached orientation information
+                                       
     private:
       // method
       void setFrameType();
