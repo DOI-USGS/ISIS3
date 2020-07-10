@@ -32,6 +32,9 @@
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 
+// ale includes
+#include "ale/States.h"
+
 #include <nlohmann/json.hpp>
 
 namespace Isis {
@@ -181,6 +184,7 @@ namespace Isis {
    *   @history 2017-08-18 Tyler Wilson, Summer Stapleton, Ian Humphrey -  Added opening/closing brackets
    *                           to SetEphemerisTimePolyFunction() so this class compiles without warnings
    *                           under C++14. References #4809.
+   *   @history 2020-07-01 Kristin Berry - Updated to use ale::States for internal state cache.
    */
   class SpicePosition {
     public:
@@ -247,7 +251,7 @@ namespace Isis {
 
       //! Is this position cached
       bool IsCached() const {
-        return (p_cache.size() > 0);
+        return (m_state != NULL);
       };
 
       //! Get the size of the current cached positions
@@ -304,8 +308,6 @@ namespace Isis {
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
-      std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
-
       //======================================================================
       // New methods support for light time correction and swap of observer/target
       SpicePosition(int targetCode, int observerCode, bool swapObserverTarget);
@@ -339,17 +341,8 @@ namespace Isis {
       std::vector<double> p_coordinate;   //!< J2000 position at time et
       std::vector<double> p_velocity;     //!< J2000 velocity at time et
 
-      //! Hermite spline for x coordinate if Source == HermiteCache
-      NumericalApproximation *p_xhermite;
-      //! Hermite spline for y coordinate if Source == HermiteCache
-      NumericalApproximation *p_yhermite;
-      //! Hermite spline for z coordinate if Source == HermiteCache
-      NumericalApproximation *p_zhermite;
-
       Source p_source;                    //!< Enumerated value for the location of the SPK information used
       std::vector<double> p_cacheTime;    //!< iTime for corresponding position
-      std::vector<std::vector<double> > p_cache;         //!< Cached positions
-      std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
       std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials fit to 3 coordinates
 
       double p_baseTime;                  //!< Base time used in fit equations
@@ -369,6 +362,8 @@ namespace Isis {
       // Variables support observer/target swap and light time correction
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
+
+      ale::States *m_state; ///!< State: stores times, positions, velocities; 
   };
 };
 
