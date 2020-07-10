@@ -257,7 +257,7 @@ namespace Isis {
       //! Get the size of the current cached positions
       int cacheSize() const {
         if (m_state) {
-          return m_state->size():
+          return m_state->size();
         }
         return 0;
       };
