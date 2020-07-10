@@ -256,7 +256,10 @@ namespace Isis {
 
       //! Get the size of the current cached positions
       int cacheSize() const {
-        return p_cache.size();
+        if (m_state) {
+          return m_state->size():
+        }
+        return 0;
       };
 
       void SetPolynomial(const Source type = PolyFunction);
@@ -363,7 +366,7 @@ namespace Isis {
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
 
-      ale::States *m_state; ///!< State: stores times, positions, velocities; 
+      ale::States *m_state; ///!< State: stores times, positions, velocities;
   };
 };
 
