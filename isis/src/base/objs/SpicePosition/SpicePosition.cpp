@@ -325,11 +325,11 @@ namespace Isis {
       }
     }
 
-    if (m_state != NULL) { 
+    if (m_state != NULL) {
       delete m_state;
     }
 
-    m_state = new ale::States(p_cacheTime, stateCache); 
+    m_state = new ale::States(p_cacheTime, stateCache);
     p_source = Memcache;
   }
 
@@ -390,11 +390,11 @@ namespace Isis {
       }
     }
 
-    if (m_state != NULL) { 
+    if (m_state != NULL) {
       delete m_state;
     }
 
-    m_state = new ale::States(p_cacheTime, stateCache); 
+    m_state = new ale::States(p_cacheTime, stateCache);
 
     p_source = Memcache;
     SetEphemerisTime(p_cacheTime[0]);
@@ -493,19 +493,19 @@ namespace Isis {
           j2000Velocity.push_back((double)rec[4]);
           j2000Velocity.push_back((double)rec[5]);
           inext = 6;
-          
+
           stateCache.push_back(ale::State(j2000Coord, j2000Velocity));
         }
         else {
-          stateCache.push_back(ale::State(j2000Coord));
+          stateCache.push_back(ale::Vec3d(j2000Coord));
         }
         p_cacheTime.push_back((double)rec[inext]);
       }
 
-      if (m_state != NULL) { 
+      if (m_state != NULL) {
         delete m_state;
       }
-      m_state = new ale::States(p_cacheTime, stateCache); 
+      m_state = new ale::States(p_cacheTime, stateCache);
     }
     else {
       // Coefficient table for postion coordinates x, y, and z
@@ -742,7 +742,7 @@ namespace Isis {
 
     // Clear existing positions from thecache
     p_cacheTime.clear();
-    
+
     // Load the time cache first
     LoadTimeCache();
 
@@ -754,10 +754,10 @@ namespace Isis {
         SetEphemerisTime(p_cacheTime.at(pos));
         stateCache.push_back(ale::State(ale::Vec3d(p_coordinate), ale::Vec3d(p_velocity)));
       }
-      if (m_state != NULL) { 
+      if (m_state != NULL) {
         delete m_state;
       }
-      m_state = new ale::States(p_cacheTime, stateCache); 
+      m_state = new ale::States(p_cacheTime, stateCache);
     }
     else {
     // Load the position for the single updated time instance
@@ -767,7 +767,7 @@ namespace Isis {
       stateCache.push_back(p_coordinate);
       std::vector<double> timeCache;
       timeCache.push_back(p_cacheTime[0]);
-      if (m_state != NULL) { 
+      if (m_state != NULL) {
         delete m_state;
       }
       m_state = new ale::States(timeCache, stateCache);
@@ -909,7 +909,7 @@ namespace Isis {
       p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
       stateCache.push_back(ale::State(p_coordinate, p_velocity));
     }
-    if (m_state != NULL) { 
+    if (m_state != NULL) {
       delete m_state;
     }
     m_state = new ale::States(p_cacheTime, stateCache);
@@ -981,7 +981,7 @@ namespace Isis {
       t2 = (t2 - p_baseTime) / p_timeScale;
       double slope[3];
       double intercept[3];
-      
+
       // Compute the linear equation for each coordinate and save them
       for(int cIndex = 0; cIndex < 3; cIndex++) {
         Isis::LineEquation posline(t1, coord1[cIndex], t2, coord2[cIndex]);
@@ -1299,7 +1299,7 @@ namespace Isis {
       ale::State state = m_state->getState(p_et, ale::LINEAR);
       p_coordinate[0] = state.position.x;
       p_coordinate[1] = state.position.y;
-      p_coordinate[2] = state.position.z;      
+      p_coordinate[2] = state.position.z;
 
       p_velocity[0] = state.velocity.x;
       p_velocity[1] = state.velocity.y;
@@ -1331,7 +1331,7 @@ namespace Isis {
 
       p_coordinate[0] = state.position.x;
       p_coordinate[1] = state.position.y;
-      p_coordinate[2] = state.position.z;      
+      p_coordinate[2] = state.position.z;
 
       p_velocity[0] = state.velocity.x;
       p_velocity[1] = state.velocity.y;
@@ -1474,7 +1474,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    m_state->minimizeCache(); 
+    m_state->minimizeCache();
     p_source = HermiteCache;
   }
 
