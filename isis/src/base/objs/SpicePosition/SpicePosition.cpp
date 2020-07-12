@@ -1477,6 +1477,7 @@ namespace Isis {
     ale::States *tempStates = new ale::States(m_state->minimizeCache(tolerance));
     delete m_state;
     m_state = tempStates;
+    p_cacheTime = m_state->getTimes();
     p_source = HermiteCache;
   }
 
