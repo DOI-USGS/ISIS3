@@ -497,7 +497,7 @@ namespace Isis {
           stateCache.push_back(ale::State(j2000Coord, j2000Velocity));
         }
         else {
-          stateCache.push_back(ale::Vec3d(j2000Coord));
+          stateCache.push_back(ale::State(ale::Vec3d(j2000Coord)));
         }
         p_cacheTime.push_back((double)rec[inext]);
       }
