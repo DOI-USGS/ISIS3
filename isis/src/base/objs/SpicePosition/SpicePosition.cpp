@@ -1474,7 +1474,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    m_state->minimizeCache();
+    m_state->minimizeCache(tolerance);
     p_source = HermiteCache;
   }
 
