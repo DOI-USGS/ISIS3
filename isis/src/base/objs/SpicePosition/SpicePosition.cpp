@@ -316,12 +316,11 @@ namespace Isis {
     for(int i = 0; i < size; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
-
+      ale::State currentState(ale::Vec3d(p_coordinate));
       if (p_hasVelocity) {
-        stateCache.push_back(ale::State(p_coordinate, p_velocity));
+        currentState.velocity = ale::Vec3d(p_velocity);
       }
-      else {
-        stateCache.push_back(ale::State(p_coordinate));
+      stateCache.push_back(currentState);
       }
     }
 
@@ -380,7 +379,7 @@ namespace Isis {
         int index = it - isdPos["positions"].begin();
         std::vector<double> pos = it->get<std::vector<double>>();
         std::vector<double> vel = isdPos["velocities"][index];
-        stateCache.push_back(ale::State(pos, vel));
+        stateCache.push_back(ale::State(ale::Vec3d(pos), ale::Vec3d(vel)));
       }
     }
     else {
@@ -480,25 +479,19 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        std::vector<double> j2000Coord;
-        j2000Coord.push_back((double)rec[0]);
-        j2000Coord.push_back((double)rec[1]);
-        j2000Coord.push_back((double)rec[2]);
+        ale::State currentState(ale::Vec3d((double)rec[0],
+                                           (double)rec[1],
+                                           (double)rec[2]));
 
         int inext = 3;
 
         if (p_hasVelocity) {
-          std::vector<double> j2000Velocity;
-          j2000Velocity.push_back((double)rec[3]);
-          j2000Velocity.push_back((double)rec[4]);
-          j2000Velocity.push_back((double)rec[5]);
+          currentState.velocity = ale::Vec3d((double)rec[3],
+                                             (double)rec[4],
+                                             (double)rec[5]);
           inext = 6;
-
-          stateCache.push_back(ale::State(j2000Coord, j2000Velocity));
         }
-        else {
-          stateCache.push_back(ale::State(ale::Vec3d(j2000Coord)));
-        }
+        stateCache.push_back(currentState);
         p_cacheTime.push_back((double)rec[inext]);
       }
 
