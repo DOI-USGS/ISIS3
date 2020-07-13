@@ -109,7 +109,6 @@ namespace Isis {
 
     // Line & sample based grid
     if (mode == "IMAGE") {
-      // p.SetOutputCube("TO");
       int baseLine = ui.GetInteger("BASELINE");
       int baseSample = ui.GetInteger("BASESAMPLE");
       int lineInc = ui.GetInteger("LINC");
@@ -157,7 +156,7 @@ namespace Isis {
               for (int lineTest = in.Line() - tickSize;
                   (lineTest <= in.Line() + tickSize) && (out[samp - 1] != lineValue);
                   lineTest ++) {
-                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                if (imageDrawLine(lineTest, baseLine, lineWidth, lineInc) 
                                       && imageDrawSample(samp, baseSample, lineWidth, sampleInc)) {
                   out[samp - 1] = lineValue;
                 }
@@ -172,7 +171,7 @@ namespace Isis {
               while ((out[samp - 1] != lineValue) &&
                     (lineTest <= in.Line() + tickSize) &&
                     (sampleTest <= samp + tickSize)) {
-                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                if (imageDrawLine(lineTest, baseLine, lineWidth, lineInc) 
                                 && imageDrawSample(sampleTest, baseSample, lineWidth, sampleInc)) {
                   out[samp - 1] = lineValue;
                 }
@@ -188,7 +187,7 @@ namespace Isis {
               while ((out[samp - 1] != lineValue) &&
                     (lineTest <= in.Line() + tickSize) &&
                     (sampleTest >= samp - tickSize)) {
-                if (imageDrawLine(in.Line(), baseLine, lineWidth, lineInc) 
+                if (imageDrawLine(lineTest, baseLine, lineWidth, lineInc) 
                                 && imageDrawSample(sampleTest, baseSample, lineWidth, sampleInc)) {
                   out[samp - 1] = lineValue;
                 }
@@ -223,8 +222,6 @@ namespace Isis {
     }
     // Lat/Lon based grid
     else {
-      // p.SetOutputCube("TO");
-
       // if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
       // each band
       bool recalculateForEachBand = false;
