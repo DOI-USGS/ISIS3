@@ -11,6 +11,7 @@
 * [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
 * [Installation](README.md#Installation)
+* [Citing ISIS](README.md#Citing-ISIS)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
@@ -283,6 +284,9 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
 -   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
+
+## Citing ISIS
+This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org)(See 'Which DOI Should I Use in Citations?) to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
 
 ## The ISIS Data Area
 
