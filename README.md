@@ -286,7 +286,7 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
 
 ## Citing ISIS
-This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org)(See 'Which DOI Should I Use in Citations?) to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
+This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org) (See 'Which DOI Should I Use in Citations?) to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
 
 ## The ISIS Data Area
 
