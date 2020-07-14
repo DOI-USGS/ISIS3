@@ -31,10 +31,13 @@ In this step, we will prepare the local repository to build from as well as upda
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
  * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
 
-### Part D: Create a Pull Request
+### Part D: Update the Authors List
+* If there are any new contributors to the project since the last release ensure that they are added to the [AUTHORS.rst](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/AUTHORS.rst) document.
+
+### Part E: Create a Pull Request
 * Make a pull request with your local changes into the `dev` or version branch of the repository.
 
-### Part E: Create or update a Version Branch
+### Part F: Create or update a Version Branch
 Once the PR into `dev` been reviewed and merged:
 
 * If there is already a version branch (ex: 3.10) for this release, after the change from Part B-C is PR'd into `dev`, cherry-pick it into the version branch for your release, and then make a pull request with this change into the version branch. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
@@ -43,7 +46,7 @@ Once the PR into `dev` been reviewed and merged:
    * To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
    * Next, create a branch with the appropriate name for the release version in the format `<major version>.<minor verson>`, by running for example: `git branch -b 3.10`. After creation, this branch can be pushed directly to upstream. (`git push upstream 3.10`.)
 
-### Part F: Make Github Release
+### Part G: Make Github Release
 * Draft a new github release. 
   * Tag the release. 
       * Make sure to change the target from `dev` to the appropriate version branch for your release.
