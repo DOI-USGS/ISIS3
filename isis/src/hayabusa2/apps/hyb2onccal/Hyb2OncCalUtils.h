@@ -239,7 +239,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
 
-  int pixelsToNull = 0;
+  int pixelsToNull = 0; //DIFFERENT IN AMICACAL - 12
 
   // Note that is isn't currently tested, as we do not have a test with a hayabusa2 image that
   // has been on-board cropped.
@@ -256,8 +256,11 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"Original DN: "<< imageIn[i]<<std::endl;
+    }
 
-    imageOut[i] = imageIn[i]*pow(2.0,12-g_bitDepth);
+    imageOut[i] = imageIn[i]*pow(2.0, 12 - g_bitDepth);
 
     // Check for special pixel in input image and pass through
     if ( IsSpecial(imageOut[i]) ) {
@@ -266,7 +269,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
 
     if(lineNum == 774 && i == 520) {
-      std::cout<<"Original DN: "<< imageOut[i]<<std::endl;
+      std::cout<<"After bit fix DN: "<< imageOut[i]<<std::endl;
     }
 
     // Apply compression factor here to raise LOSSY dns to proper response
@@ -274,7 +277,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
     // 1) BIAS Removal - Only needed if not on-board corrected
 
-    if ( !g_onBoardSmearCorrection ) {
+    if (!g_onBoardSmearCorrection) {
 
 
       if ( (imageOut[i] - g_bias) <= 0.0) {
@@ -299,38 +302,37 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // imageOut[i] = result;
 
 
-    // DARK Current
-    imageOut[i] = imageOut[i] - g_darkCurrent;    
-
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After dark current DN: "<< imageOut[i]<<std::endl;
-    }
-
-    //Smear correction
+    // Smear correction
     if (!g_onBoardSmearCorrection) {
 
       double smear = 0;
-      for (int j=0;j < imageIn.size();j++) {
-        smear += (imageOut[j]/imageIn.size() );
+      for (int j = 0; j < imageIn.size(); j++) {
+        smear += (imageOut[j] / imageIn.size());
       }
-      smear*=g_timeRatio;
+      smear *= g_timeRatio;
       imageOut[i] = imageOut[i] - smear;
-
     }
 
     if(lineNum == 774 && i == 520) {
       std::cout<<"After smear DN: "<< imageOut[i]<<std::endl;
     }
 
-    double dn = imageOut[i];    
-    double result = 1.0;
-    double x0 = 1.0;
-    newton_rapheson(dn,x0, g_L,result );   
-    imageOut[i] = result;
+    // // DARK Current
+    // imageOut[i] = imageOut[i] - g_darkCurrent;    
 
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After linearity DN: "<< imageOut[i]<<std::endl;
-    }
+    // if(lineNum == 774 && i == 520) {
+    //   std::cout<<"After dark current DN: "<< imageOut[i]<<std::endl;
+    // }
+
+    // double dn = imageOut[i];    
+    // double result = 1.0;
+    // double x0 = 1.0;
+    // newton_rapheson(dn,x0, g_L,result );   
+    // imageOut[i] = result;
+
+    // if(lineNum == 774 && i == 520) {
+    //   std::cout<<"After linearity DN: "<< imageOut[i]<<std::endl;
+    // }
 
     // FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
@@ -344,9 +346,14 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
       else {
         if (flatField[i] != 0) {
-          imageOut[i] /= (flatField[i]*g_sensitivity*g_texp);
+          imageOut[i] /= (flatField[i]);
         }
       }
+    }
+
+    if(lineNum == 774 && i == 520) {
+      std::cout<<"exposure: "<< g_texp<<std::endl;
+      std::cout<<"flat field DN: "<< flatField[i]<<std::endl;
     }
 
     if(lineNum == 774 && i == 520) {
@@ -570,18 +577,18 @@ QString loadCalibrationVariables(const QString &config)  {
   g_bae1 = Bias["B_AE"][1].toDouble();
 
   // Compute BIAS correction factor (it's a constant so do it once!)
-  g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
+  g_bias = g_b0 + (g_b1 * g_CCD_T_temperature) + (g_b2 * g_ECT_T_temperature);
 
-  g_bias *= (g_bae0 - g_bae1*g_AEtemperature); //bias correction factor
+  g_bias *= (g_bae0 + (g_bae1 * g_AEtemperature)); //bias correction factor
   
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
   g_sensitivity = sensitivity[g_filter.toLower()];
   g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
 
-  g_J = g_solarFlux/(g_effectiveBandwidth*.0001);
+  g_J = g_solarFlux / (g_effectiveBandwidth * .0001);
 
-  //Load the linearity variables
+  // Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
   g_L[1] = linearity["L"][1].toDouble();
   g_L[2] = linearity["L"][2].toDouble();
