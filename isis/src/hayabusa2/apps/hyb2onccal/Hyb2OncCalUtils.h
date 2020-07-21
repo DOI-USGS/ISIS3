@@ -1,16 +1,6 @@
 #ifndef Hyb2OncCalUtils_h
 #define Hyb2OncCalUtils_h
 
-
-
-
-#include "CSVReader.h"
-#include "IException.h"
-#include "LineManager.h"
-#include "NaifStatus.h"
-
-
-
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -28,10 +18,12 @@
 
 #include "AlphaCube.h"
 #include "Buffer.h"
+#include "CSVReader.h"
 #include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "LineManager.h"
+#include "NaifStatus.h"
 #include "Pixel.h"
 #include "ProcessByLine.h"
 #include "ProcessBySample.h"
@@ -44,18 +36,11 @@
 #include "Statistics.h"
 #include "TextFile.h"
 
-
-
-
-
 // OpenCV libraries
 #include <opencv2/opencv.hpp>
 
-
 /**
  * @author 2016-04-04 Tyler Wilson
- *
- *
  */
 using namespace cv;
 using namespace std;
@@ -68,7 +53,7 @@ static int g_bitDepth(12);
 static bool g_cropped(true);
 
 static QString g_filter = "";
-static QString g_target ="";
+static QString g_target = "";
 
 
 //Bias calculation variables
@@ -79,7 +64,7 @@ static double g_bae0(0);
 static double g_bae1(0);
 static double g_bias(0);
 
-//Device (AE/CCD/ECT temps for ONC-T,ONC-W1,ONC-W2
+//Device (AE/CCD/ECT temps for ONC-T, ONC-W1, ONC-W2
 
 static double g_AEtemperature(0.0);
 
@@ -104,7 +89,7 @@ static double g_darkCurrent(0);
 
 //Linearity correction variables
 
-static double g_L[3] = {0.0,0.0,0.0};
+static double g_L[3] = {0.0, 0.0, 0.0};
 
 // TODO: we do not have the readout time (transfer period) for Hayabusa2 ONC.
 //Smear calculation variables
@@ -119,42 +104,31 @@ static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for
 
 static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
 
-//  I/F variables
-
+// I/F variables
 //static double g_iof(1.0);
-
-
-
 static double g_iofScale(1.0);
 static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
 static double g_sensitivity(1.0);
 static double g_effectiveBandwidth(1.0);
-
 static double g_J(1.0);
-
-int lineNum = 0;
-
-
 
 namespace Isis {
 
 // Temporary cube file pointer deleter
 struct TemporaryCubeDeleter {
   static inline void cleanup(Cube *cube) {
-    if ( cube ) {
-
-      FileName filename( cube->fileName() );
+    if (cube) {
+      FileName filename(cube->fileName());
       delete cube;
-      remove( filename.expanded().toLatin1().data() );
+      remove(filename.expanded().toLatin1().data());
     }
   }
 };
 
-enum InstrumentType{ONCW1,ONCW2,ONCT};
+enum InstrumentType{ONCW1, ONCW2, ONCT};
 InstrumentType g_instrument;
 
 static AlphaCube *alpha(0);
-
 static Pvl g_configFile;
 
 
@@ -168,10 +142,7 @@ static Pvl g_configFile;
  * @return The value of the function at the point x.
  */
 double linearFun(double Iobs,double x, double g[3]) {
-  // Q: Iobs - ???
-  // --------------
-  return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
-
+  return Iobs - (g[0] * x) - (g[1] * pow(x, 2.0)) - (g[2] * pow(x, 3.0));
 }
 
 /**
@@ -183,7 +154,7 @@ double linearFun(double Iobs,double x, double g[3]) {
  * @return
  */
 double dFun(double x, double g[3]) {
-  return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
+  return -g[0] - (2 * g[1] * x) - (3 * g[2] * pow(x, 2.0));
 
 }
 
@@ -203,16 +174,15 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
    double x[2];
    double dx = 1.0;
    int iter = 0;
-   int maxIterations=500;
+   int maxIterations = 500;
    x[0] = x0;
-   while (dx > epsilon)  {
 
-     x[1]=x[0] - linearFun(Iobs,x[0],g)/dFun(x[0],g);
-     dx = fabs(x[1]-x[0]) ;
-     x[0]=x[1];
+   while (dx > epsilon) {
+     x[1] = x[0] - linearFun(Iobs, x[0], g) / dFun(x[0], g);
+     dx = fabs(x[1] - x[0]);
+     x[0] = x[1];
      iter++;
      if (iter > maxIterations) {
-
        return false;
      }
    }
@@ -231,36 +201,34 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 *   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
 */
 void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
-
-  lineNum++;
-
-  // WHY IS FLATFIELD = IN[1]???
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
 
-  int pixelsToNull = 0; //DIFFERENT IN AMICACAL - 12
+  int pixelsToNull = 0;
 
   // Note that is isn't currently tested, as we do not have a test with a hayabusa2 image that
   // has been on-board cropped.
   int currentSample = imageIn.Sample();
   int alphaSample = alpha->AlphaSample(currentSample);
 
-  if ( (alphaSample <= pixelsToNull)  || (alphaSample >= (1024 - pixelsToNull ) ) ) {
-
-    for (int i = 0; i < imageIn.size(); i++ ) {
+  if ( (alphaSample <= pixelsToNull) || (alphaSample >= (1024 - pixelsToNull)) ) {
+    for (int i = 0; i < imageIn.size(); i++) {
       imageOut[i] = Isis::Null;
     }
     return;
   }
 
+  double smear = 0;
+  for (int j = 0; j < imageIn.size(); j++) {
+    // Left out g_darkCurrent subtraction for now.
+    smear += ((imageIn[j] * pow(2.0, 12 - g_bitDepth) - g_bias) / imageIn.size());
+  }
+  smear *= g_timeRatio;
+
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"Original DN: "<< imageIn[i]<<std::endl;
-    }
-
-    imageOut[i] = imageIn[i]*pow(2.0, 12 - g_bitDepth);
+    imageOut[i] = imageIn[i] * pow(2.0, 12 - g_bitDepth);
 
     // Check for special pixel in input image and pass through
     if ( IsSpecial(imageOut[i]) ) {
@@ -268,18 +236,11 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       continue;
     }
 
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After bit fix DN: "<< imageOut[i]<<std::endl;
-    }
-
     // Apply compression factor here to raise LOSSY dns to proper response
 
 
-    // 1) BIAS Removal - Only needed if not on-board corrected
-
+    // BIAS Removal - Only needed if not on-board corrected
     if (!g_onBoardSmearCorrection) {
-
-
       if ( (imageOut[i] - g_bias) <= 0.0) {
         imageOut[i] = Null;
         continue;
@@ -290,56 +251,30 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After Bias DN: "<< imageOut[i]<<std::endl;
-    }
-
-
-    // double dn = imageOut[i];    
-    // double result = 1.0;
-    // double x0 = 1.0;
-    // newton_rapheson(dn,x0, g_L,result );   
-    // imageOut[i] = result;
-
-
     // Smear correction
     if (!g_onBoardSmearCorrection) {
-
-      double smear = 0;
-      for (int j = 0; j < imageIn.size(); j++) {
-        smear += (imageOut[j] / imageIn.size());
-      }
-      smear *= g_timeRatio;
       imageOut[i] = imageOut[i] - smear;
     }
 
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After smear DN: "<< imageOut[i]<<std::endl;
-    }
+    // Both dark current and linearity correction are commented out for now since the JAXA team
+    // does not currently do these steps.
 
-    // // DARK Current
+    // DARK Current
     // imageOut[i] = imageOut[i] - g_darkCurrent;    
-
-    // if(lineNum == 774 && i == 520) {
-    //   std::cout<<"After dark current DN: "<< imageOut[i]<<std::endl;
-    // }
-
+    
+    // Linearity Correction
     // double dn = imageOut[i];    
     // double result = 1.0;
     // double x0 = 1.0;
     // newton_rapheson(dn,x0, g_L,result );   
     // imageOut[i] = result;
-
-    // if(lineNum == 774 && i == 520) {
-    //   std::cout<<"After linearity DN: "<< imageOut[i]<<std::endl;
-    // }
 
     // FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
     // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
     if (in.size() == 2) {
       // Note that our current flat-fields to not have special pixel values.
-      if ( IsSpecial(flatField[i])  || IsSpecial(imageOut[i]) )
+      if (IsSpecial(flatField[i]) || IsSpecial(imageOut[i]))
       {
         imageOut[i] = Isis::Null;
         continue;
@@ -350,27 +285,9 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         }
       }
     }
-
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"exposure: "<< g_texp<<std::endl;
-      std::cout<<"flat field DN: "<< flatField[i]<<std::endl;
-    }
-
-    if(lineNum == 774 && i == 520) {
-      std::cout<<"After flat field DN: "<< imageOut[i]<<std::endl;
-    }
-
-
   }
-
-  if(lineNum == 774) {
-      std::cout<<"last DN: "<< imageOut[520]<<std::endl;
-  }
-
-
   return;
 }
-
 
 
 /**
@@ -382,26 +299,21 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
  *
  * @return @b Mat A pointer to the OpenMat object
  */
-Mat * isis2mat(Cube *icube) {
-
+Mat *isis2mat(Cube *icube) {
   int nlines = icube->lineCount();
   int nsamples = icube->sampleCount();
-  Mat *matrix = new Mat(nlines,nsamples,CV_64F);
-
+  Mat *matrix = new Mat(nlines, nsamples, CV_64F);
 
   // Set up line manager and read in the data
   LineManager linereader(*icube);
-  for (int line = 0 ; line < nlines ; line++) {
-    linereader.SetLine(line+1);
+  for (int line = 0; line < nlines; line++) {
+    linereader.SetLine(line + 1);
     icube->read(linereader);
-    for (int samp = 0 ;  samp < nsamples ; samp++) {
-      matrix->at<double>(line,samp) = (double)linereader[samp];
+    for (int samp = 0;  samp < nsamples; samp++) {
+      matrix->at<double>(line, samp) = (double)linereader[samp];
     }
  }
-
-
 return matrix;
-
 }
 
 
@@ -413,7 +325,6 @@ return matrix;
  * @param matrix A pointer to the OpenMat object
  *
  * @param cubeName The name of the Isis::Cube that is being created.
- *
  */
 void mat2isis(Mat *matrix, QString cubeName) {
 
@@ -423,25 +334,21 @@ void mat2isis(Mat *matrix, QString cubeName) {
   set.setPixelType(Real);
 
   Cube ocube;
-  ocube.setDimensions(nsamples,nlines,1);
-  ocube.create(cubeName,set);
+  ocube.setDimensions(nsamples, nlines,1);
+  ocube.create(cubeName, set);
 
   LineManager linewriter(ocube);
 
-  for (int line =0; line < nlines; line++) {
+  for (int line = 0; line < nlines; line++) {
     linewriter.SetLine(line+1);
 
-    for ( int samp=0; samp<nsamples; samp++ ) {
+    for ( int samp=0; samp < nsamples; samp++ ) {
 
-      linewriter[samp] = matrix->at<double>(linewriter.Line()-1,samp);
-
+      linewriter[samp] = matrix->at<double>(linewriter.Line() - 1,samp);
     }
     ocube.write(linewriter);
-
   }
-
   ocube.close();
-
 }
 
 
@@ -453,13 +360,10 @@ void mat2isis(Mat *matrix, QString cubeName) {
  * @param matrix A pointer to the OpenMat object
  *
  * @param cubeName The name of the ISIS::Cube that is being created.
- *
  */
 
-void  translate(Cube *flatField,double *transform, QString fname) {
-
-
-  Mat * originalMat = isis2mat(flatField);
+void translate(Cube *flatField,double *transform, QString fname) {
+  Mat *originalMat = isis2mat(flatField);
   double scale = transform[0];
 
   double startsample = transform[1];
@@ -467,25 +371,24 @@ void  translate(Cube *flatField,double *transform, QString fname) {
   double lastsample = transform[3];
   double lastline = transform[4];
 
-  double  width  = (lastsample-startsample);
-  double height = (lastline-startline);
+  double width = (lastsample - startsample);
+  double height = (lastline - startline);
 
-  Size sz(flatField->lineCount()/scale,flatField->sampleCount()/scale);
+  Size sz(flatField->lineCount() / scale, flatField->sampleCount() / scale);
 
-  Mat * resizedMatrix = new Mat();
+  Mat *resizedMatrix = new Mat();
 
   Mat temp = *originalMat;
 
+  Mat originalCropped = temp(Rect(startsample, startline, width, height));
 
-  Mat originalCropped = temp(Rect(startsample,startline,width,height));
-
-  if (scale ==1) {
+  if (scale == 1) {
     mat2isis(&originalCropped,fname);
   }
   else {
     //Bilinear interpolation
-    resize(originalCropped,*resizedMatrix,sz,INTER_LINEAR);
-    mat2isis(resizedMatrix,fname);
+    resize(originalCropped, *resizedMatrix, sz, INTER_LINEAR);
+    mat2isis(resizedMatrix, fname);
   }
 
 }
@@ -501,13 +404,11 @@ void  translate(Cube *flatField,double *transform, QString fname) {
 *   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
 */
 FileName DetermineFlatFieldFile(const QString &filter) {
-
   QString fileName = "$hayabusa2/calibration/flatfield/";
+
   // FileName consists of binned/notbinned, camera, and filter
   fileName += "flat_" + filter.toLower() + "_norm.cub";
-
   FileName final(fileName);
-
   return final;
 }
 
@@ -517,15 +418,8 @@ FileName DetermineFlatFieldFile(const QString &filter) {
 * @param config QString Name of the calibration file to load.
 *
 * Loads g_b0-g_b2,g_bae0-g_bae1,g_d0-g_d1
-*
-*
 */
 QString loadCalibrationVariables(const QString &config)  {
-
-
-
-  //  UserInterface& ui = Application::GetUserInterface();
-
   FileName calibFile(config);
   if ( config.contains("?") ) calibFile = calibFile.highestVersion();
 
@@ -544,9 +438,6 @@ QString loadCalibrationVariables(const QString &config)  {
 
   // Load Smear Removal Variables
   g_Tvct = Smear["Tvct"];
-
-
-  // WE DO NOT USE??? - USE CONFIG FILE VARIABLES???
 
   // Load DarkCurrent variables and calculate the dark current
   g_d0 = DarkCurrent["D"][0].toDouble();
@@ -567,7 +458,7 @@ QString loadCalibrationVariables(const QString &config)  {
       CCDTemp = g_CCD_T_temperature;
   }
 
-   g_darkCurrent = g_texp*exp(0.10*CCDTemp+0.52);
+   g_darkCurrent = g_texp * exp(g_d0 * (CCDTemp + g_d1));
 
   // Load Bias variables
   g_b0 = Bias["B"][0].toDouble();
@@ -579,7 +470,7 @@ QString loadCalibrationVariables(const QString &config)  {
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0 + (g_b1 * g_CCD_T_temperature) + (g_b2 * g_ECT_T_temperature);
 
-  g_bias *= (g_bae0 + (g_bae1 * g_AEtemperature)); //bias correction factor
+  g_bias *= (g_bae0 - (g_bae1 * g_AEtemperature)); //bias correction factor
   
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
@@ -594,7 +485,7 @@ QString loadCalibrationVariables(const QString &config)  {
   g_L[2] = linearity["L"][2].toDouble();
 
 
-  return ( calibFile.original() );
+  return calibFile.original();
 }
 
 
