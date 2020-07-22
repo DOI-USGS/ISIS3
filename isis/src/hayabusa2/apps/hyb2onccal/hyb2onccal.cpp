@@ -233,8 +233,8 @@ namespace Isis {
         CubeAttributeInput att;
         p.SetInputCube(reducedFlat, att);
       }
+      // The image was cropped, so pull the same subarea from the flat file into a temp file
       else {
-        // Image is cropped so we have to deal with it
         FileName transFlat =
         FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
 
