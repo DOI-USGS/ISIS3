@@ -20,13 +20,6 @@
 using namespace std;
 using namespace Isis;
 
-Pvl toPvl(PvlGroup &container) { 
-  Pvl newPvl;
-  std::stringstream buffer;
-  buffer << container << std::endl; 
-  buffer >> newPvl;
-  return newPvl; 
-}
 
 Pvl toPvl(PvlObject &container) { 
   Pvl newPvl;
