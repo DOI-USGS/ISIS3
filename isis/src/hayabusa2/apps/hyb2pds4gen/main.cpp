@@ -65,7 +65,6 @@ void IsisMain() {
   
   for (int i = 0; i < inputLabel->objects(); i++) {
     PvlObject obj = inputLabel->object(i);
-    std::cout << obj.name() << std::endl; 
     if (obj.name() == "Table") {
       QDomDocument doc = emptyDoc();
       
