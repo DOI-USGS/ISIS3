@@ -39,7 +39,7 @@ using namespace std;
 namespace Isis {
 
   void hyb2onccal(UserInterface &ui) {
-    // g_iofCorrection = ui.GetString("UNITS");
+    g_iofCorrection = ui.GetString("UNITS");
 
     const QString hyb2cal_program = "hyb2onccal";
     const QString hyb2cal_version = "1.1";
@@ -265,26 +265,20 @@ namespace Isis {
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
     QString g_units = "DN";
-    // if ( "radiance" == g_iofCorrection.toLower() ) {
-    //   // Units of RADIANCE
-    //   g_iof = g_iof * g_iofScale;
-    //   g_units = "W / (m**2 micrometer sr)";
-    // }
-    //
-    // if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
-    //    throw IException(IException::Programmer, "Cannot calculate distance to sun!",
-    //                      _FILEINFO_);
-    // }
-    //
-    // if ( "iof" == g_iofCorrection.toLower() ) {
-    //   // Units of I/F
-    //   // TODO: Note, we do not have a correct g_iofScale (== 1 right now). This was provided for
-    //   // Hayabusa AMICA's v-band and all other bands were normalized according to this value. We do
-    //   // not have this value for Hayabusa2 ONC. Need to correct this value.
-    //   g_iof = pi_c() * (g_solarDist * g_solarDist) *
-    //           g_iofScale / g_solarFlux / g_texp;
-    //   g_units = "I over F";
-    // }
+    if (g_iofCorrection.toLower() == "radiance") {
+      // Units of RADIANCE
+      g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
+      g_units = "W / (m**2 micrometer sr)";
+    }
+
+    else if (g_iofCorrection.toLower() == "iof") {
+      // Units of I/F
+      // Included this line because we need to convert to radiance before I/F.
+      g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
+      g_solarDist = (1.0 / 49598073.0) * 1.81034e+08;
+      g_calibrationScale = g_calibrationScale * (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
+      g_units = "I over F";
+    }
 
     // Calibrate!
     try {

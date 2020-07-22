@@ -103,9 +103,10 @@ static int binning(1);         //!< The number of samples/lines which are binned
 static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for LOSSY
 
 static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
+static double g_calibrationScale = 1.0; //!< Radiance or I/F conversion factor
 
 // I/F variables
-//static double g_iof(1.0);
+static double g_solarDist(1.0);
 static double g_iofScale(1.0);
 static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
 static double g_sensitivity(1.0);
@@ -285,6 +286,10 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         }
       }
     }
+
+    // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
+    // in which case the output will be in DNs)
+    imageOut[i] *= g_calibrationScale;
   }
   return;
 }

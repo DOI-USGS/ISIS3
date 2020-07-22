@@ -174,8 +174,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       
     </group>
 
-    <!-- Recall no radiance values have been provided for the filters, so radiance and i/f cannot be
-    correctly computed.
+<!--     Recall no radiance values have been provided for the filters, so radiance and i/f cannot be
+    correctly computed. -->
     <group name="Options">
 
       <parameter name = "UNITS">
@@ -214,6 +214,6 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         </list>
       </parameter>
     </group>
-  -->
+ 
   </groups>
 </application>
