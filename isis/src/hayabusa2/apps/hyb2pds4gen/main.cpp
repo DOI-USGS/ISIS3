@@ -21,6 +21,14 @@ using namespace std;
 using namespace Isis;
 
 
+/**
+ * Converts a PvlObject instance to a PVL instance. 
+ *  
+ * Something about the relationship between the Pvl class and PvlObject class 
+ * makes it impossible to simply cast without a segfault, so we have to do a 
+ * bit more massaging. 
+ *
+ */
 Pvl toPvl(PvlObject &container) { 
   Pvl newPvl;
   std::stringstream buffer;
@@ -29,6 +37,11 @@ Pvl toPvl(PvlObject &container) {
   return newPvl; 
 }
 
+
+/**
+ * Returns a minimal QDomDocument for running it through 
+ * PvlToXmlTranslationManager
+ */ 
 QDomDocument emptyDoc() { 
   QDomDocument doc;
   QDomElement root = doc.createElement("Product_Observational");
@@ -109,7 +122,7 @@ void IsisMain() {
 
       }    
       
-      // trasnlation files do not support adding attrs to sublings so we have to do it manually
+      // translation files do not support adding attrs to sublings so we have to do it manually
       QDomNodeList fieldList = doc.elementsByTagName("field_length");
       for (int j = 0; j < fieldList.size(); j++) {
         fieldList.at(j).toElement().setAttribute("unit", "byte");
