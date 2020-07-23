@@ -119,6 +119,17 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Tyler Wilson" date="2019-02-12">
       Modified version to handle the updated calibration values/formulas.
     </change>
+    <change name="Kaitlyn Lee" date="2020-07-21">
+      Updated calibration method to match JAXAs calibration by:
+      1. moving linearity correction to after smear correction,
+      2. commenting out dark current and linearity correction,
+      3. changing an addition to subtraction in the g_bias calculation,
+      4. refactoring the smear correction to be before the main loop to speed up the program
+         and to be dependent on the bit-corrected input image DNs instead of the already corrected
+         output image DNs,
+      5. and removing `*g_sensitivity*g_texp` in the flat-field correction so that the output
+         aligns with l2b data.
+    </change>
   </history>
 
   <groups>
