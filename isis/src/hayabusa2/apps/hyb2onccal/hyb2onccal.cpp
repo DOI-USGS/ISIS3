@@ -342,7 +342,6 @@ namespace Isis {
     calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
     calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));  
     calibrationLog.addKeyword(PvlKeyword("Units", units));
-
     PvlKeyword linearityCoefs("LinearityCoefficients");
     linearityCoefs.addValue(toString(g_L[0], 16));
     linearityCoefs.addValue(toString(g_L[1], 16));
