@@ -406,8 +406,22 @@ void translate(Cube *flatField,double *transform, QString fname) {
 FileName DetermineFlatFieldFile(const QString &filter) {
   QString fileName = "$hayabusa2/calibration/flatfield/";
 
-  // FileName consists of binned/notbinned, camera, and filter
-  fileName += "flat_" + filter.toLower() + "_norm.cub";
+  if(g_instrument == InstrumentType::ONCT) {
+    if(filter.toLower() == 'v') {
+      // There is no updated v filter flat file
+      fileName += "flat_" + filter.toLower() + "_norm.cub";
+    }
+    else {
+      fileName += "hyb2_onc_flat_t" + filter.toLower() + "f_nr_trim_????????.cub";
+    }
+  }
+  else if(g_instrument == InstrumentType::ONCW1) {
+    fileName += "hyb2_onc_flat_w1f_nr_trim_????????.cub";
+  }
+  else {
+    fileName += "hyb2_onc_flat_w2f_nr_trim_????????.cub";
+  }
+  
   FileName final(fileName);
   return final;
 }
