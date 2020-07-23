@@ -474,7 +474,7 @@ End_Group
 # Distance from sun to Hayabusa2
 Group = SolarDistance
   Auto
-  InputKey       = S_DISTHS
+  InputKey       = S_DISTRS
   InputPosition  = FitsLabels
   OutputName     = SolarDistance
   OutputPosition = (Object, IsisCube, Group, Instrument)
