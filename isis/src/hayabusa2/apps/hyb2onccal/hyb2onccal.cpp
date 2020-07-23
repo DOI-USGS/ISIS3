@@ -39,7 +39,7 @@ using namespace std;
 namespace Isis {
 
   void hyb2onccal(UserInterface &ui) {
-    g_iofCorrection = ui.GetString("UNITS");
+    g_calStep = ui.GetString("UNITS");
 
     const QString hyb2cal_program = "hyb2onccal";
     const QString hyb2cal_version = "1.1";
@@ -257,27 +257,27 @@ namespace Isis {
         CubeAttributeInput att;
         p.SetInputCube(transFlat.expanded(),att);
 
-      }  //Finished setting flatfield file for ONC-T
+      }  // Finished setting flatfield file for ONC-T
 
     }
     Cube *ocube  = p.SetOutputCube("TO");
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
-    QString g_units = "DN";
-    if (g_iofCorrection.toLower() == "radiance") {
+    QString units = "DN";
+    if (g_calStep == "RADIANCE") {
       // Units of RADIANCE
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
-      g_units = "W / (m**2 micrometer sr)";
+      units = "W / (m**2 micrometer sr)";
     }
 
-    else if (g_iofCorrection.toLower() == "iof") {
+    else if (g_calStep == "IOF") {
       // Units of I/F
       // Included this line because we need to convert to radiance before I/F.
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
       g_solarDist = (1.0 / 49598073.0) * 1.81034e+08;
-      g_calibrationScale = g_calibrationScale * (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
-      g_units = "I over F";
+      g_calibrationScale *= (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
+      units = "I over F";
     }
 
     // Calibrate!
@@ -337,11 +337,11 @@ namespace Isis {
     calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
     calibrationLog.addKeyword(PvlKeyword("Smear_texp", toString(g_texp, 16)));
 
-    calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
+    calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_calStep));
 
     calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
     calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));  
-    calibrationLog.addKeyword(PvlKeyword("Units", g_units));
+    calibrationLog.addKeyword(PvlKeyword("Units", units));
 
     PvlKeyword linearityCoefs("LinearityCoefficients");
     linearityCoefs.addValue(toString(g_L[0], 16));
