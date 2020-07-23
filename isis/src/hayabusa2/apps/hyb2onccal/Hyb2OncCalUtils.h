@@ -115,385 +115,381 @@ static double g_J(1.0);
 
 namespace Isis {
 
-// Temporary cube file pointer deleter
-struct TemporaryCubeDeleter {
-  static inline void cleanup(Cube *cube) {
-    if (cube) {
-      FileName filename(cube->fileName());
-      delete cube;
-      remove(filename.expanded().toLatin1().data());
+  // Temporary cube file pointer deleter
+  struct TemporaryCubeDeleter {
+    static inline void cleanup(Cube *cube) {
+      if (cube) {
+        FileName filename(cube->fileName());
+        delete cube;
+        remove(filename.expanded().toLatin1().data());
+      }
     }
+  };
+
+  enum InstrumentType{ONCW1, ONCW2, ONCT};
+  InstrumentType g_instrument;
+
+  static AlphaCube *alpha(0);
+  static Pvl g_configFile;
+
+
+  /**
+   * @brief linearFun:  The linear correction function (used by the newton_rapheson method)
+   * @author 2019-02-12  Tyler Wilson
+   * @param Iobs:  The observed intensity
+   * @param x:  The ideal intensity.
+   * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+   * modelling the linear correction (for DN values < 3400 DN)
+   * @return The value of the function at the point x.
+   */
+  double linearFun(double Iobs,double x, double g[3]) {
+    return Iobs - (g[0] * x) - (g[1] * pow(x, 2.0)) - (g[2] * pow(x, 3.0));
   }
-};
 
-enum InstrumentType{ONCW1, ONCW2, ONCT};
-InstrumentType g_instrument;
+  /**
+   * @brief dFun:  The first-order derivative of linearFun
+   * @author 2019-02-12  Tyler Wilson
+   * @param x:  The ideal intensity.
+   * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+   * modelling the linear correction (for DN values < 3400 DN)
+   * @return
+   */
+  double dFun(double x, double g[3]) {
+    return -g[0] - (2 * g[1] * x) - (3 * g[2] * pow(x, 2.0));
 
-static AlphaCube *alpha(0);
-static Pvl g_configFile;
+  }
 
+  /**
+   * @brief newton_rapheson
+   * @author 2019-02-12 Tyler Wilson
+   * @param Iobs:  The observed DN intensity
+   * @param x0:  The starting value for the Newton-Rapheson method
+   * @param g:  A vector of the coefficients for the linearity function.  It is a third-order
+   * polynomial.
+   * @param result:  The final approximation of the root of the equation.
+   * @param epsilon:  The tolerance on the final solution.
+   * @return A root of the linearity correction function, centered near the origin.
+   */
+  bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
 
-/**
- * @brief linearFun:  The linear correction function (used by the newton_rapheson method)
- * @author 2019-02-12  Tyler Wilson
- * @param Iobs:  The observed intensity
- * @param x:  The ideal intensity.
- * @param g:  The vector of empirically derived coefficients for the third-order polynomial
- * modelling the linear correction (for DN values < 3400 DN)
- * @return The value of the function at the point x.
- */
-double linearFun(double Iobs,double x, double g[3]) {
-  return Iobs - (g[0] * x) - (g[1] * pow(x, 2.0)) - (g[2] * pow(x, 3.0));
-}
+     double x[2];
+     double dx = 1.0;
+     int iter = 0;
+     int maxIterations = 500;
+     x[0] = x0;
 
-/**
- * @brief dFun:  The first-order derivative of linearFun
- * @author 2019-02-12  Tyler Wilson
- * @param x:  The ideal intensity.
- * @param g:  The vector of empirically derived coefficients for the third-order polynomial
- * modelling the linear correction (for DN values < 3400 DN)
- * @return
- */
-double dFun(double x, double g[3]) {
-  return -g[0] - (2 * g[1] * x) - (3 * g[2] * pow(x, 2.0));
-
-}
-
-/**
- * @brief newton_rapheson
- * @author 2019-02-12 Tyler Wilson
- * @param Iobs:  The observed DN intensity
- * @param x0:  The starting value for the Newton-Rapheson method
- * @param g:  A vector of the coefficients for the linearity function.  It is a third-order
- * polynomial.
- * @param result:  The final approximation of the root of the equation.
- * @param epsilon:  The tolerance on the final solution.
- * @return A root of the linearity correction function, centered near the origin.
- */
-bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
-
-   double x[2];
-   double dx = 1.0;
-   int iter = 0;
-   int maxIterations = 500;
-   x[0] = x0;
-
-   while (dx > epsilon) {
-     x[1] = x[0] - linearFun(Iobs, x[0], g) / dFun(x[0], g);
-     dx = fabs(x[1] - x[0]);
-     x[0] = x[1];
-     iter++;
-     if (iter > maxIterations) {
-       return false;
+     while (dx > epsilon) {
+       x[1] = x[0] - linearFun(Iobs, x[0], g) / dFun(x[0], g);
+       dx = fabs(x[1] - x[0]);
+       x[0] = x[1];
+       iter++;
+       if (iter > maxIterations) {
+         return false;
+       }
      }
-   }
-   result = x[1];
-   return true;
-}
+     result = x[1];
+     return true;
+  }
 
 
-/**
-* @brief Apply radiometric correction to each line of a Hayabusa2 image.
-* @author 2016-03-30 Kris Becker
-* @param in   Raw image and flat field
-* @param out  Radometrically corrected image
-* @internal
-*   @history 2017-07-2017 Ian Humphrey & Kaj Williams - Adapted from amicacal.
-*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
-*/
-void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
-  Buffer& imageIn   = *in[0];
-  Buffer& flatField = *in[1];
-  Buffer& imageOut  = *out[0];
+  /**
+  * @brief Apply radiometric correction to each line of a Hayabusa2 image.
+  * @author 2016-03-30 Kris Becker
+  * @param in   Raw image and flat field
+  * @param out  Radometrically corrected image
+  * @internal
+  *   @history 2017-07-2017 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+  *   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
+  */
+  void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
+    Buffer& imageIn   = *in[0];
+    Buffer& flatField = *in[1];
+    Buffer& imageOut  = *out[0];
 
-  int pixelsToNull = 0;
+    int pixelsToNull = 0;
 
-  // Note that is isn't currently tested, as we do not have a test with a hayabusa2 image that
-  // has been on-board cropped.
-  int currentSample = imageIn.Sample();
-  int alphaSample = alpha->AlphaSample(currentSample);
+    // Note that is isn't currently tested, as we do not have a test with a hayabusa2 image that
+    // has been on-board cropped.
+    int currentSample = imageIn.Sample();
+    int alphaSample = alpha->AlphaSample(currentSample);
 
-  if ( (alphaSample <= pixelsToNull) || (alphaSample >= (1024 - pixelsToNull)) ) {
+    if ( (alphaSample <= pixelsToNull) || (alphaSample >= (1024 - pixelsToNull)) ) {
+      for (int i = 0; i < imageIn.size(); i++) {
+        imageOut[i] = Isis::Null;
+      }
+      return;
+    }
+
+    double smear = 0;
+    for (int j = 0; j < imageIn.size(); j++) {
+      // Left out g_darkCurrent subtraction for now.
+      smear += ((imageIn[j] * pow(2.0, 12 - g_bitDepth) - g_bias) / imageIn.size());
+    }
+    smear *= g_timeRatio;
+
+    // Iterate over the line space
     for (int i = 0; i < imageIn.size(); i++) {
-      imageOut[i] = Isis::Null;
+      imageOut[i] = imageIn[i] * pow(2.0, 12 - g_bitDepth);
+
+      // Check for special pixel in input image and pass through
+      if ( IsSpecial(imageOut[i]) ) {
+        imageOut[i] = imageIn[i];
+        continue;
+      }
+
+      // Apply compression factor here to raise LOSSY dns to proper response
+
+
+      // BIAS Removal - Only needed if not on-board corrected
+      if (!g_onBoardSmearCorrection) {
+        if ( (imageOut[i] - g_bias) <= 0.0) {
+          imageOut[i] = Null;
+          continue;
+        }
+        else {
+
+          imageOut[i] = imageOut[i] - g_bias;
+        }
+      }
+
+      // Smear correction
+      if (!g_onBoardSmearCorrection) {
+        imageOut[i] = imageOut[i] - smear;
+      }
+
+      // Both dark current and linearity correction are commented out for now since the JAXA team
+      // does not currently do these steps.
+
+      // DARK Current
+      // imageOut[i] = imageOut[i] - g_darkCurrent;    
+      
+      // Linearity Correction
+      // double dn = imageOut[i];    
+      // double result = 1.0;
+      // double x0 = 1.0;
+      // newton_rapheson(dn,x0, g_L,result );   
+      // imageOut[i] = result;
+
+      // FLATFIELD correction
+      //  Check for any special pixels in the flat field (unlikely)
+      // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
+      if (in.size() == 2) {
+        // Note that our current flat-fields to not have special pixel values.
+        if (IsSpecial(flatField[i]) || IsSpecial(imageOut[i]))
+        {
+          imageOut[i] = Isis::Null;
+          continue;
+        }
+        else {
+          if (flatField[i] != 0) {
+            imageOut[i] /= (flatField[i]);
+          }
+        }
+      }
+
+      // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
+      // in which case the output will be in DNs)
+      imageOut[i] *= g_calibrationScale;
     }
     return;
   }
 
-  double smear = 0;
-  for (int j = 0; j < imageIn.size(); j++) {
-    // Left out g_darkCurrent subtraction for now.
-    smear += ((imageIn[j] * pow(2.0, 12 - g_bitDepth) - g_bias) / imageIn.size());
+
+  /**
+   * @brief Translates a 1-banded Isis::Cube to an OpenMat object
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param icube A pointer to the input cube
+   *
+   * @return @b Mat A pointer to the OpenMat object
+   */
+  Mat *isis2mat(Cube *icube) {
+    int nlines = icube->lineCount();
+    int nsamples = icube->sampleCount();
+    Mat *matrix = new Mat(nlines, nsamples, CV_64F);
+
+    // Set up line manager and read in the data
+    LineManager linereader(*icube);
+    for (int line = 0; line < nlines; line++) {
+      linereader.SetLine(line + 1);
+      icube->read(linereader);
+      for (int samp = 0;  samp < nsamples; samp++) {
+        matrix->at<double>(line, samp) = (double)linereader[samp];
+      }
+   }
+  return matrix;
   }
-  smear *= g_timeRatio;
-
-  // Iterate over the line space
-  for (int i = 0; i < imageIn.size(); i++) {
-    imageOut[i] = imageIn[i] * pow(2.0, 12 - g_bitDepth);
-
-    // Check for special pixel in input image and pass through
-    if ( IsSpecial(imageOut[i]) ) {
-      imageOut[i] = imageIn[i];
-      continue;
-    }
-
-    // Apply compression factor here to raise LOSSY dns to proper response
 
 
-    // BIAS Removal - Only needed if not on-board corrected
-    if (!g_onBoardSmearCorrection) {
-      if ( (imageOut[i] - g_bias) <= 0.0) {
-        imageOut[i] = Null;
-        continue;
+  /**
+   * @brief Translates an OpenMat object to an ISIS::Cube with one band
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param matrix A pointer to the OpenMat object
+   *
+   * @param cubeName The name of the Isis::Cube that is being created.
+   */
+  void mat2isis(Mat *matrix, QString cubeName) {
+
+    int nlines = matrix->rows;
+    int nsamples = matrix->cols;
+    CubeAttributeOutput set;
+    set.setPixelType(Real);
+
+    Cube ocube;
+    ocube.setDimensions(nsamples, nlines,1);
+    ocube.create(cubeName, set);
+
+    LineManager linewriter(ocube);
+
+    for (int line = 0; line < nlines; line++) {
+      linewriter.SetLine(line+1);
+
+      for ( int samp=0; samp < nsamples; samp++ ) {
+
+        linewriter[samp] = matrix->at<double>(linewriter.Line() - 1,samp);
       }
-      else {
+      ocube.write(linewriter);
+    }
+    ocube.close();
+  }
 
-        imageOut[i] = imageOut[i] - g_bias;
-      }
+
+  /**
+   * @brief Translates/scales a cube using Bilinear Interpolation
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param matrix A pointer to the OpenMat object
+   *
+   * @param cubeName The name of the ISIS::Cube that is being created.
+   */
+
+  void translate(Cube *flatField,double *transform, QString fname) {
+    Mat *originalMat = isis2mat(flatField);
+    double scale = transform[0];
+
+    double startsample = transform[1];
+    double startline = transform[2];
+    double lastsample = transform[3];
+    double lastline = transform[4];
+
+    double width = (lastsample - startsample);
+    double height = (lastline - startline);
+
+    Size sz(flatField->lineCount() / scale, flatField->sampleCount() / scale);
+
+    Mat *resizedMatrix = new Mat();
+
+    Mat temp = *originalMat;
+
+    Mat originalCropped = temp(Rect(startsample, startline, width, height));
+
+    if (scale == 1) {
+      mat2isis(&originalCropped,fname);
+    }
+    else {
+      //Bilinear interpolation
+      resize(originalCropped, *resizedMatrix, sz, INTER_LINEAR);
+      mat2isis(resizedMatrix, fname);
     }
 
-    // Smear correction
-    if (!g_onBoardSmearCorrection) {
-      imageOut[i] = imageOut[i] - smear;
+  }
+
+
+  /**
+  * @brief Determine name of flat field file to apply
+  * @author 2016-03-30 Kris Becker
+  * @param filter  Name of ONC filter
+  * @return FileName Path and name of flat file file
+  * @internal
+  *   @history 2017-07-27 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+  *   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
+  */
+  FileName DetermineFlatFieldFile(const QString &filter) {
+    QString fileName = "$hayabusa2/calibration/flatfield/";
+
+    // FileName consists of binned/notbinned, camera, and filter
+    fileName += "flat_" + filter.toLower() + "_norm.cub";
+    FileName final(fileName);
+    return final;
+  }
+
+
+  /**
+  * @brief Loads the calibration variables into the program.
+  * @param config QString Name of the calibration file to load.
+  *
+  * Loads g_b0-g_b2,g_bae0-g_bae1,g_d0-g_d1
+  */
+  QString loadCalibrationVariables(const QString &config)  {
+    FileName calibFile(config);
+    if ( config.contains("?") ) calibFile = calibFile.highestVersion();
+
+    // Pvl configFile;
+    g_configFile.read(calibFile.expanded());
+
+    // Load the groups
+    PvlGroup &Bias = g_configFile.findGroup("Bias");
+    PvlGroup &DarkCurrent = g_configFile.findGroup("DarkCurrent");
+    PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
+    PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
+    PvlGroup &sensitivity = g_configFile.findGroup("SENSITIVITYFACTOR");
+    PvlGroup & effectiveBW = g_configFile.findGroup("EFFECTIVEBW");
+    PvlGroup &linearity = g_configFile.findGroup("Linearity");
+
+    // Load Smear Removal Variables
+    g_Tvct = Smear["Tvct"];
+
+    // Load DarkCurrent variables and calculate the dark current
+    g_d0 = DarkCurrent["D"][0].toDouble();
+    g_d1 = DarkCurrent["D"][1].toDouble();
+    double CCDTemp(0.0);
+
+    switch (g_instrument) {
+      case InstrumentType::ONCT:
+        CCDTemp = g_CCD_T_temperature;
+      break;
+      case InstrumentType::ONCW1:
+        CCDTemp = g_CCD_W1_temperature;
+      break;
+      case InstrumentType::ONCW2:
+        CCDTemp = g_CCD_W2_temperature;
+      break;
+      default:
+        CCDTemp = g_CCD_T_temperature;
     }
 
-    // Both dark current and linearity correction are commented out for now since the JAXA team
-    // does not currently do these steps.
+     g_darkCurrent = g_texp * exp(g_d0 * (CCDTemp + g_d1));
 
-    // DARK Current
-    // imageOut[i] = imageOut[i] - g_darkCurrent;    
+    // Load Bias variables
+    g_b0 = Bias["B"][0].toDouble();
+    g_b1 = Bias["B"][1].toDouble();
+    g_b2 = Bias["B"][2].toDouble();
+    g_bae0 = Bias["B_AE"][0].toDouble();
+    g_bae1 = Bias["B_AE"][1].toDouble();
+
+    // Compute BIAS correction factor (it's a constant so do it once!)
+    g_bias = g_b0 + (g_b1 * g_CCD_T_temperature) + (g_b2 * g_ECT_T_temperature);
+
+    g_bias *= (g_bae0 - (g_bae1 * g_AEtemperature)); //bias correction factor
     
-    // Linearity Correction
-    // double dn = imageOut[i];    
-    // double result = 1.0;
-    // double x0 = 1.0;
-    // newton_rapheson(dn,x0, g_L,result );   
-    // imageOut[i] = result;
+    // Load the Solar Flux for the specific filter
+    g_solarFlux = solar[g_filter.toLower()];
+    g_sensitivity = sensitivity[g_filter.toLower()];
+    g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
 
-    // FLATFIELD correction
-    //  Check for any special pixels in the flat field (unlikely)
-    // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
-    if (in.size() == 2) {
-      // Note that our current flat-fields to not have special pixel values.
-      if (IsSpecial(flatField[i]) || IsSpecial(imageOut[i]))
-      {
-        imageOut[i] = Isis::Null;
-        continue;
-      }
-      else {
-        if (flatField[i] != 0) {
-          imageOut[i] /= (flatField[i]);
-        }
-      }
-    }
+    g_J = g_solarFlux / (g_effectiveBandwidth * .0001);
 
-    // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
-    // in which case the output will be in DNs)
-    imageOut[i] *= g_calibrationScale;
+    // Load the linearity variables
+    g_L[0] = linearity["L"][0].toDouble();
+    g_L[1] = linearity["L"][1].toDouble();
+    g_L[2] = linearity["L"][2].toDouble();
+
+    return calibFile.original();
   }
-  return;
-}
-
-
-/**
- * @brief Translates a 1-banded Isis::Cube to an OpenMat object
- *
- * @author 2016-04-19 Tyler Wilson
- *
- * @param icube A pointer to the input cube
- *
- * @return @b Mat A pointer to the OpenMat object
- */
-Mat *isis2mat(Cube *icube) {
-  int nlines = icube->lineCount();
-  int nsamples = icube->sampleCount();
-  Mat *matrix = new Mat(nlines, nsamples, CV_64F);
-
-  // Set up line manager and read in the data
-  LineManager linereader(*icube);
-  for (int line = 0; line < nlines; line++) {
-    linereader.SetLine(line + 1);
-    icube->read(linereader);
-    for (int samp = 0;  samp < nsamples; samp++) {
-      matrix->at<double>(line, samp) = (double)linereader[samp];
-    }
- }
-return matrix;
-}
-
-
-/**
- * @brief Translates an OpenMat object to an ISIS::Cube with one band
- *
- * @author 2016-04-19 Tyler Wilson
- *
- * @param matrix A pointer to the OpenMat object
- *
- * @param cubeName The name of the Isis::Cube that is being created.
- */
-void mat2isis(Mat *matrix, QString cubeName) {
-
-  int nlines = matrix->rows;
-  int nsamples = matrix->cols;
-  CubeAttributeOutput set;
-  set.setPixelType(Real);
-
-  Cube ocube;
-  ocube.setDimensions(nsamples, nlines,1);
-  ocube.create(cubeName, set);
-
-  LineManager linewriter(ocube);
-
-  for (int line = 0; line < nlines; line++) {
-    linewriter.SetLine(line+1);
-
-    for ( int samp=0; samp < nsamples; samp++ ) {
-
-      linewriter[samp] = matrix->at<double>(linewriter.Line() - 1,samp);
-    }
-    ocube.write(linewriter);
-  }
-  ocube.close();
-}
-
-
-/**
- * @brief Translates/scales a cube using Bilinear Interpolation
- *
- * @author 2016-04-19 Tyler Wilson
- *
- * @param matrix A pointer to the OpenMat object
- *
- * @param cubeName The name of the ISIS::Cube that is being created.
- */
-
-void translate(Cube *flatField,double *transform, QString fname) {
-  Mat *originalMat = isis2mat(flatField);
-  double scale = transform[0];
-
-  double startsample = transform[1];
-  double startline = transform[2];
-  double lastsample = transform[3];
-  double lastline = transform[4];
-
-  double width = (lastsample - startsample);
-  double height = (lastline - startline);
-
-  Size sz(flatField->lineCount() / scale, flatField->sampleCount() / scale);
-
-  Mat *resizedMatrix = new Mat();
-
-  Mat temp = *originalMat;
-
-  Mat originalCropped = temp(Rect(startsample, startline, width, height));
-
-  if (scale == 1) {
-    mat2isis(&originalCropped,fname);
-  }
-  else {
-    //Bilinear interpolation
-    resize(originalCropped, *resizedMatrix, sz, INTER_LINEAR);
-    mat2isis(resizedMatrix, fname);
-  }
-
-}
-
-
-/**
-* @brief Determine name of flat field file to apply
-* @author 2016-03-30 Kris Becker
-* @param filter  Name of ONC filter
-* @return FileName Path and name of flat file file
-* @internal
-*   @history 2017-07-27 Ian Humphrey & Kaj Williams - Adapted from amicacal.
-*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
-*/
-FileName DetermineFlatFieldFile(const QString &filter) {
-  QString fileName = "$hayabusa2/calibration/flatfield/";
-
-  // FileName consists of binned/notbinned, camera, and filter
-  fileName += "flat_" + filter.toLower() + "_norm.cub";
-  FileName final(fileName);
-  return final;
-}
-
-
-/**
-* @brief Loads the calibration variables into the program.
-* @param config QString Name of the calibration file to load.
-*
-* Loads g_b0-g_b2,g_bae0-g_bae1,g_d0-g_d1
-*/
-QString loadCalibrationVariables(const QString &config)  {
-  FileName calibFile(config);
-  if ( config.contains("?") ) calibFile = calibFile.highestVersion();
-
-  // Pvl configFile;
-  g_configFile.read(calibFile.expanded());
-
-  // Load the groups
-  PvlGroup &Bias = g_configFile.findGroup("Bias");
-  PvlGroup &DarkCurrent = g_configFile.findGroup("DarkCurrent");
-  PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
-  PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
-  PvlGroup &sensitivity = g_configFile.findGroup("SENSITIVITYFACTOR");
-  PvlGroup & effectiveBW = g_configFile.findGroup("EFFECTIVEBW");
-  PvlGroup &linearity = g_configFile.findGroup("Linearity");
-  // PvlGroup &iof = g_configFile.findGroup("RAD");
-
-  // Load Smear Removal Variables
-  g_Tvct = Smear["Tvct"];
-
-  // Load DarkCurrent variables and calculate the dark current
-  g_d0 = DarkCurrent["D"][0].toDouble();
-  g_d1 = DarkCurrent["D"][1].toDouble();
-  double CCDTemp(0.0);
-
-  switch (g_instrument) {
-    case InstrumentType::ONCT:
-      CCDTemp = g_CCD_T_temperature;
-    break;
-    case InstrumentType::ONCW1:
-      CCDTemp = g_CCD_W1_temperature;
-    break;
-    case InstrumentType::ONCW2:
-      CCDTemp = g_CCD_W2_temperature;
-    break;
-    default:
-      CCDTemp = g_CCD_T_temperature;
-  }
-
-   g_darkCurrent = g_texp * exp(g_d0 * (CCDTemp + g_d1));
-
-  // Load Bias variables
-  g_b0 = Bias["B"][0].toDouble();
-  g_b1 = Bias["B"][1].toDouble();
-  g_b2 = Bias["B"][2].toDouble();
-  g_bae0 = Bias["B_AE"][0].toDouble();
-  g_bae1 = Bias["B_AE"][1].toDouble();
-
-  // Compute BIAS correction factor (it's a constant so do it once!)
-  g_bias = g_b0 + (g_b1 * g_CCD_T_temperature) + (g_b2 * g_ECT_T_temperature);
-
-  g_bias *= (g_bae0 - (g_bae1 * g_AEtemperature)); //bias correction factor
-  
-  // Load the Solar Flux for the specific filter
-  g_solarFlux = solar[g_filter.toLower()];
-  g_sensitivity = sensitivity[g_filter.toLower()];
-  g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
-
-  g_J = g_solarFlux / (g_effectiveBandwidth * .0001);
-
-  // Load the linearity variables
-  g_L[0] = linearity["L"][0].toDouble();
-  g_L[1] = linearity["L"][1].toDouble();
-  g_L[2] = linearity["L"][2].toDouble();
-
-
-  return calibFile.original();
-}
-
-
 }
 
 #endif

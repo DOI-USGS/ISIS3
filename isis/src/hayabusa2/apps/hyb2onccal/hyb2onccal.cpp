@@ -78,10 +78,10 @@ namespace Isis {
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
-    if (instrument=="ONC-W1") {
+    if (instrument == "ONC-W1") {
       g_instrument = InstrumentType::ONCW1;
     }
-    else if (instrument=="ONC-W2") {
+    else if (instrument == "ONC-W2") {
       g_instrument = InstrumentType::ONCW2;
     }
     else if (instrument == "ONC-T") {
@@ -160,6 +160,17 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to read [SpacecraftClockStartCount] keyword in the Instrument group "
+                    "from input file [" + icube->fileName() + "]";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    try {
+      // Convert from KM to AU
+      QString solarDistance = inst["SolarDistance"][0].replace('D', 'e');
+      g_solarDist = solarDistance.toDouble() * (1.0 / 49598073.0);
+    }
+    catch(IException &e) {
+      QString msg = "Unable to read [SolarDistance] keyword in the Instrument group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -275,7 +286,6 @@ namespace Isis {
       // Units of I/F
       // Included this line because we need to convert to radiance before I/F.
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
-      g_solarDist = (1.0 / 49598073.0) * 1.81034e+08;
       g_calibrationScale *= (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
       units = "I over F";
     }
