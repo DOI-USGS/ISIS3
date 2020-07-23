@@ -446,4 +446,15 @@ Group = Compression
   Translation    = (*, *)
 End_Group
 
+
+# Distance from sun to Hayabusa2
+Group = SolarDistance
+  Auto
+  InputKey       = S_DISTHS
+  InputPosition  = FitsLabels
+  OutputName     = SolarDistance
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
 End
