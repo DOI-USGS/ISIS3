@@ -37,7 +37,7 @@ void hyb2onc2isis(UserInterface &ui) {
 
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
 
-  hyb2onc2isis(fitsFileName,outputCubeFileName,att,target);
+  hyb2onc2isis(fitsFileName, outputCubeFileName, att, target);
 
   return;
 }
