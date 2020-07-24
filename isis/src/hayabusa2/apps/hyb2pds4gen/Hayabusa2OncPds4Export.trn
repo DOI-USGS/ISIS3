@@ -1,22 +1,159 @@
 # Translation for Hayabusa 2 export from ISIS cube to PDS4 product 
 
-Group = PixelAveragingWidth
-  Auto 
+Group = LocalInternalReference 
+  Auto
+  InputDefault   = ""
+  OutputName     = "Image_Array_Object"
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, Local_Internal_Reference)
+  OutputSiblings = local_reference_type|imaging_parameters_to_image_object
+  Translation    = (*,*)
+End_Group
+
+Group = ExposureDuration
+  Auto
   Optional
-  InputKey       = Binning 
-  InputPosition  = (IsisCube, Instrument)
-  OutputName     = img:pizel_averaging_width 
-  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)
-  Translation    = (*, *)
-End_Group 
+  InputKey         = ExposureDuration
+  InputPosition    = (IsisCube, Instrument)
+  OutputName       = img:exposure_duration
+  OutputAttributes = unit|s
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Exposure_Parameters)
+  Translation      = (*, *)
+End_Group
+
+Group = ActiveFlag
+  Auto
+  Optional
+  InputKey         = ActiveFlag
+  InputPosition    = (IsisCube, RadiometricCalibration)
+  OutputName       = img:active_flag
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Data_Correction_Parameters, img:Data_Correction)
+  Translation      = (*, *)
+End_Group
+
+Group = DataCorrelationType
+  Auto
+  Optional
+  InputKey         = DataCorrectionType
+  InputPosition    = (IsisCube, RadiometricCalibration)
+  OutputName       = img:data_correction_type
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Data_Correction_Parameters, img:Data_Correction)
+  Translation      = (*, *)
+End_Group
+
+Group = DataCorrelationTypeName
+  Auto
+  Optional
+  InputKey         = DataCorrectionTypeName
+  InputPosition    = (IsisCube, RadiometricCalibration)
+  OutputName       = img:data_correction_type_name
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Data_Correction_Parameters, img:Data_Correction, img:Radiometric_Correction_Parameters)
+  Translation      = (*, *)
+End_Group
+
+Group = RadianceScalingFactor
+  Auto
+  Optional
+  InputKey         = ScaleFactor
+  InputPosition    = (IsisCube, RadiometricCalibration)
+  OutputName       = img:radiance_scaling_factor
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Data_Correction_Parameters, img:Data_Correction, img:Radiometric_Correction_Parameters)
+  Translation      = (*, *)
+End_Group
+
+Group = RadianceOffset
+  Auto
+  InputDefault     = 1.0
+  InputPosition    = (IsisCube, Instrument)
+  OutputName       = img:radiance_offset
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Data_Correction_Parameters, img:Data_Correction, img:Radiometric_Correction_Parameters)
+  OutputAttributes = unit|W/m**2/sr/nm
+  Translation      = (*, *)
+End_Group
+
+Group = FilterName
+  Auto
+  InputKey         = Name
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_name
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterId
+  Auto
+  InputKey         = Name
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_id
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = FilterNumber
+  Auto
+  InputKey         = FilterNumber
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:filter_number
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  Translation      = (*, *)
+End_Group
+
+Group = BandWidth
+  Auto
+  InputKey         = Width
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:bandwidth
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  OutputAttributes = unit|nm
+  Translation      = (*, *)
+End_Group
+
+Group = CenterWavelength
+  Auto
+  InputKey         = Center
+  InputPosition    = (IsisCube, BandBin)
+  OutputName       = img:center_filter_wavelength
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  OutputAttributes = unit|nm
+  Translation      = (*, *)
+End_Group
 
 Group = PixelAveragingHeight
   Auto 
   Optional
   InputKey       = Binning 
   InputPosition  = (IsisCube, Instrument)
-  OutputName     = img:pizel_averaging_width 
-  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)
+  OutputName     = img:height_pixels 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Downsampling_Parameters, img:Pixel_Averaging_Dimensions)
   Translation    = (*, *)
 End_Group 
+
+Group = PixelAveragingWidth
+  Auto 
+  Optional
+  InputKey       = Binning 
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = img:width_pixels 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Downsampling_Parameters, img:Pixel_Averaging_Dimensions)
+  Translation    = (*, *)
+End_Group 
+
+Group = FirstLine
+  Auto 
+  Optional
+  InputKey       = FirstLine 
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = img:first_line 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Subframe_Parameters)
+  Translation    = (*, *)
+End_Group 
+
+Group = FirstSample
+  Auto 
+  Optional
+  InputKey       = FirstSample
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = img:first_sample 
+  OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Subframe_Parameters)
+  Translation    = (*, *)
+End_Group
 

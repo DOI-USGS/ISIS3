@@ -80,12 +80,18 @@ void IsisMain() {
       QDomElement recordBinary = doc.createElement("Record_Binary");
       QDomElement fields = doc.createElement("fields");
       QDomElement groups = doc.createElement("groups");
+      QDomElement record_len = doc.createElement("record_length");
+      
       QDomElement tableBinary = process.getElement({"Product_Observational", "File_Area_Observational", "Table_Binary"}, doc.documentElement()); 
       
       PvlToXmlTranslationManager::setElementValue(fields, QString::number(obj.groups()));
       PvlToXmlTranslationManager::setElementValue(groups, QString::number(0)); 
+      PvlToXmlTranslationManager::setElementValue(record_len, obj["Bytes"]); 
+      record_len.setAttribute("unit", "byte"); 
+      
       tableBinary.appendChild(recordBinary).appendChild(fields); 
       recordBinary.appendChild(groups); 
+      recordBinary.appendChild(record_len);
 
       // Translate Field Groups 
       for (int j = 0; j < obj.groups(); j++) {
@@ -133,10 +139,18 @@ void IsisMain() {
       base.appendChild(tableElement);
     }
   }
- 
+  
+  // remove elements not wanted in hyb2
+  QDomElement del = process.getElement({"Product_Observational", "Observation_Area", "Discipline_Area"}, pdsLabel.documentElement());
+  del.removeChild(del.firstChildElement("img:Imaging"));
+  del.removeChild(del.firstChildElement("sp:Spectral_Characteristics"));  
+
+  del = process.getElement({"Product_Observational", "File_Area_Observational", "Array_3D_Spectrum"}, pdsLabel.documentElement()); 
+  del.removeChild(del.firstChildElement("Special_Constants")); 
+  
   PvlToXmlTranslationManager xlator(*(inputLabel), translationFile);
   xlator.Auto(pdsLabel);
-  
+
   QDomElement base = process.getElement(xmlPath, pdsLabel.documentElement()); 
 
   QDomDocument tempDoc = emptyDoc(); 
@@ -150,7 +164,44 @@ void IsisMain() {
   histXlator.Auto(tempDoc); 
   QDomElement histElem = process.getElement(xmlPath, tempDoc.documentElement()).firstChildElement("Header");
   base.appendChild(histElem);  
+  
+  tempDoc = emptyDoc();
+  PvlToXmlTranslationManager labXlator(*(inputLabel), "$ISISROOT/appdata/translations/pds4ExportLabelObject.trn");
+  labXlator.Auto(tempDoc); 
+  QDomElement labElem = process.getElement(xmlPath, tempDoc.documentElement()).firstChildElement("Header");
+  QDomElement fileElem = process.getElement({"Product_Observational", "File_Area_Observational", "Array_3D_Spectrum"}, pdsLabel.documentElement());
+  base.insertBefore(labElem, fileElem);   
 
+  PvlGroup instGroup = inputLabel->findObject("IsisCube").findGroup("Instrument");
+ 
+  QStringList subFramePath = {"Product_Observational",
+                              "Observation_Area",
+                              "Discipline_Area",
+                              "img:Imaging",
+                              "img:Image_Product_Information",
+                              "img:Subframe_Parameters"};
+
+  if (instGroup.hasKeyword("FirstLine") && instGroup.hasKeyword("LastLine")) {
+
+    int lines = (int) instGroup["LastLine"] - (int) instGroup["FirstLine"];
+    QDomElement baseElement = pdsLabel.documentElement();
+    QDomElement subframeParametersElement = process.getElement(subFramePath, baseElement);
+    
+    QDomElement linesElement = pdsLabel.createElement("img:lines");
+    PvlToXmlTranslationManager::setElementValue(linesElement, toString(lines));
+    subframeParametersElement.appendChild(linesElement);
+
+  }
+
+  if (instGroup.hasKeyword("FirstSample") && instGroup.hasKeyword("LastSample")) {
+    int samples = (int) instGroup["LastSample"] - (int) instGroup["FirstSample"];
+    QDomElement baseElement = pdsLabel.documentElement();
+    QDomElement subframeParametersElement = process.getElement(subFramePath, baseElement);
+
+    QDomElement samplesElement = pdsLabel.createElement("img:samples");
+    PvlToXmlTranslationManager::setElementValue(samplesElement, toString(samples));
+    subframeParametersElement.appendChild(samplesElement);
+  }
 
   QString outFile = ui.GetFileName("TO");
   process.WritePds4(outFile);
