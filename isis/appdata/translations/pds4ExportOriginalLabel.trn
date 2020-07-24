@@ -1,0 +1,36 @@
+Group = Name
+  Auto
+  OutputName      = local_identifier
+  InputDefault    = OriginalLabel
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Header)
+End_Group
+
+Group = StartByte 
+  Auto 
+  InputKey         = StartByte
+  InputPosition    = OriginalLabel
+  OutputName       = offset 
+  OutputAttributes = unit|byte
+  OutputPosition   = (File_Area_Observational, Header)
+  Translation      = (*, *)
+End_Group
+
+Group = Bytes
+  Auto
+  InputKey          = Bytes
+  InputPosition     = OriginalLabel
+  OutputName        = object_length
+  OutputAttributes  = unit|byte
+  OutputSiblings   = parsing_standard_id|PDS3 
+  Translation       = (*, *)
+  OutputPosition    = (File_Area_Observational, Header)
+End_Group
+
+Group = Description
+  Auto
+  OutputName      = description
+  InputDefault    =  "Original label of the image (FITS/PDS3) before ingestion to ISIS3"
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Header)
+End_Group

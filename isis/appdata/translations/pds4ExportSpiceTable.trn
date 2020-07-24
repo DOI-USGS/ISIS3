@@ -1,0 +1,32 @@
+
+Group = TableName
+  Auto
+  InputKey        = Name 
+  InputPosition   = Table
+  InputDefault    = ""
+  OutputName      = local_identifier
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Table_Binary)
+End_Group
+
+Group = TableOffset
+  Auto
+  InputKey        = StartByte
+  InputPosition   = Table
+  InputDefault    = ""
+  OutputName      = offset
+  OutputAttributes  = unit|byte
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Table_Binary)
+End_Group
+
+Group = TableRecords
+  Auto
+  InputKey        = Records 
+  InputPosition   = Table
+  InputDefault    = ""
+  OutputName      = records
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Table_Binary)
+End_Group
+
