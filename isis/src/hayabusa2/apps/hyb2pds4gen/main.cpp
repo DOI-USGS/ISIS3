@@ -21,33 +21,25 @@ using namespace std;
 using namespace Isis;
 
 
-/**
- * Converts a PvlObject instance to a PVL instance. 
- *  
- * Something about the relationship between the Pvl class and PvlObject class 
- * makes it impossible to simply cast without a segfault, so we have to do a 
- * bit more massaging. 
- *
- */
-Pvl toPvl(PvlObject &container) { 
-  Pvl newPvl;
-  std::stringstream buffer;
-  buffer << container << std::endl; 
-  buffer >> newPvl;
-  return newPvl; 
-}
+static QMap<QString, QString> descMap({
+        {"J2000Q0",  "element q0 of quaternion representing a rotation"},
+        {"J2000Q1",  "element q1 of quaternion representing a rotation"},
+        {"J2000Q2",  "element q2 of quaternion representing a rotation"},
+        {"J2000Q3",  "element q3 of quaternion representing a rotation"},
+        {"AV1",      "Angular velocity vector"},
+        {"AV2",      "Angular velocity vector"},
+        {"AV3",      "Angular velocity vector"},
+        {"ET",       "Ephemeris time"},
+        {"J2000X",   "J2000 position x"},
+        {"J2000Y",   "J2000 position y"},
+        {"J2000Z",   "J2000 position z"},
+        {"J2000XV",  "J2000 velocity xv"},
+        {"J2000YV",  "J2000 velocity yv"},
+        {"J2000ZV",  "J2000 velocity zv"}
+    }); 
 
-
-/**
- * Returns a minimal QDomDocument for running it through 
- * PvlToXmlTranslationManager
- */ 
-QDomDocument emptyDoc() { 
-  QDomDocument doc;
-  QDomElement root = doc.createElement("Product_Observational");
-  doc.appendChild(root);
-  return doc; 
-}
+Pvl toPvl(PvlObject &container);
+QDomDocument emptyDoc(); 
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -116,7 +108,7 @@ void IsisMain() {
         fieldLength.setAttribute("unit", "byte"); 
 
         QDomElement description = doc.createElement("description");
-        PvlToXmlTranslationManager::setElementValue(description, "Spice Table Field");
+        PvlToXmlTranslationManager::setElementValue(description, descMap[grp["Name"]]);
         
         field.appendChild(name);
         field.appendChild(fieldNumber);
@@ -128,7 +120,7 @@ void IsisMain() {
 
       }    
       
-      // translation files do not support adding attrs to sublings so we have to do it manually
+      // translation files do not support adding attrs to siblings so we have to do it manually
       QDomNodeList fieldList = doc.elementsByTagName("field_length");
       for (int j = 0; j < fieldList.size(); j++) {
         fieldList.at(j).toElement().setAttribute("unit", "byte");
@@ -208,4 +200,34 @@ void IsisMain() {
 
   return;
 }
+
+
+/**
+ * Converts a PvlObject instance to a PVL instance. 
+ *  
+ * Something about the relationship between the Pvl class and PvlObject class 
+ * makes it impossible to simply cast without a segfault, so we have to do a 
+ * bit more massaging. 
+ *
+ */
+Pvl toPvl(PvlObject &container) { 
+  Pvl newPvl;
+  std::stringstream buffer;
+  buffer << container << std::endl; 
+  buffer >> newPvl;
+  return newPvl; 
+}
+
+
+/**
+ * Returns a minimal QDomDocument for running it through 
+ * PvlToXmlTranslationManager
+ */ 
+QDomDocument emptyDoc() { 
+  QDomDocument doc;
+  QDomElement root = doc.createElement("Product_Observational");
+  doc.appendChild(root);
+  return doc; 
+}
+
 
