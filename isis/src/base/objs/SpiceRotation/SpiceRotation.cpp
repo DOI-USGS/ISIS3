@@ -901,7 +901,7 @@ namespace Isis {
         record[2] = quat[2];
         record[3] = quat[3];
 
-        if (p_hasAngularVelocity) {
+        if (m_orientation->getAngularVelocities().size() > 0) {
           ale::Vec3d angularVelocity = m_orientation->getAngularVelocities()[i];
           record[4] = angularVelocity.x;
           record[5] = angularVelocity.y;
@@ -3248,8 +3248,9 @@ namespace Isis {
     NaifStatus::CheckErrors();
     if (m_orientation->getRotations().size() == 1) {
       p_CJ = m_orientation->getRotations()[0].toRotationMatrix();
-      if (p_hasAngularVelocity) {
-        ale::Vec3d av = m_orientation->getAngularVelocities()[0];
+//      if (p_hasAngularVelocity) {
+      if (m_orientation->getAngularVelocities().size() > 0) {
+        ale::Vec3d av = m_orientation->getAngularVelocities()[0]; 
         p_av[0] = av.x;
         p_av[1] = av.y;
         p_av[2] = av.z;
