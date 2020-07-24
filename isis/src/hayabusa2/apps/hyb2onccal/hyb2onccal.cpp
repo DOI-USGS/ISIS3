@@ -189,77 +189,74 @@ namespace Isis {
     g_target = target;
 
     // NOTE we do not have a valid flat-field for the W1 or W2 images.
-    FileName flatfile = "NONE";
+    FileName flatfile = DetermineFlatFieldFile(g_filter);
     PvlGroup alphaCube;
 
-    if (g_instrument == InstrumentType::ONCT) {
-      QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
-      flatfile = DetermineFlatFieldFile(g_filter);
-      QString reducedFlat(flatfile.expanded());
+    QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
+    QString reducedFlat(flatfile.expanded());
 
-      try {
-        alphaCube = icube->group("AlphaCube");
-      }
-
-     catch(IException &e) {
-       g_cropped = false;
-      }
-
-      // Image is not cropped
-      if (!g_cropped) {
-        // Determine if we need to subsample the flat field if pixel binning occurred
-        // TODO: test a binned image (add test case).
-        if (binning > 1) {
-          QString scale(toString(binning));
-          FileName newflat = FileName::createTempFile("$TEMPORARY/" +
-          flatfile.baseName() + "_reduced.cub");
-          reducedFlat = newflat.expanded();
-          QString parameters = "FROM=" + flatfile.expanded() +
-                               " TO="   + newflat.expanded() +
-                               " MODE=SCALE" +
-                               " LSCALE=" + scale +
-                               " SSCALE=" + scale;
-
-          try {
-            ProgramLauncher::RunIsisProgram("reduce", parameters);
-          }
-          catch (IException& ie) {
-            remove(reducedFlat.toLatin1().data());
-            throw ie;
-          }
-        }
-
-        // Set up processing for flat field as a second input file
-        CubeAttributeInput att;
-        p.SetInputCube(reducedFlat, att);
-      }
-      // The image was cropped, so pull the same subarea from the flat file into a temp file
-      else {
-        FileName transFlat =
-        FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
-
-        Cube *flatOriginal = new Cube(flatfile.expanded() );
-
-        double alphaStartSample = alphaCube["AlphaStartingSample"][0].toDouble();
-        double alphaStartLine = alphaCube["AlphaStartingLine"][0].toDouble();
-        double alphaEndSample = alphaCube["AlphaEndingSample"][0].toDouble();
-        double alphaEndLine = alphaCube["AlphaEndingLine"][0].toDouble();
-
-        double transform[5] = {(double)binning, alphaStartSample, alphaStartLine, alphaEndSample, alphaEndLine};
-
-        // Translates and scales the flatfield image.  Scaling
-        // might be necessary in the event that the raw image was also binned.
-        translate(flatOriginal,transform,transFlat.expanded());
-
-        QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
-        flatcube.swap(translated);
-
-        CubeAttributeInput att;
-        p.SetInputCube(transFlat.expanded(),att);
-
-      }  //Finished setting flatfield file for ONC-T
-
+    try {
+      alphaCube = icube->group("AlphaCube");
     }
+
+   catch(IException &e) {
+     g_cropped = false;
+    }
+
+    // Image is not cropped
+    if (!g_cropped) {
+      // Determine if we need to subsample the flat field if pixel binning occurred
+      // TODO: test a binned image (add test case).
+      if (binning > 1) {
+        QString scale(toString(binning));
+        FileName newflat = FileName::createTempFile("$TEMPORARY/" +
+        flatfile.baseName() + "_reduced.cub");
+        reducedFlat = newflat.expanded();
+        QString parameters = "FROM=" + flatfile.expanded() +
+                             " TO="   + newflat.expanded() +
+                             " MODE=SCALE" +
+                             " LSCALE=" + scale +
+                             " SSCALE=" + scale;
+
+        try {
+          ProgramLauncher::RunIsisProgram("reduce", parameters);
+        }
+        catch (IException& ie) {
+          remove(reducedFlat.toLatin1().data());
+          throw ie;
+        }
+      }
+
+      // Set up processing for flat field as a second input file
+      CubeAttributeInput att;
+      p.SetInputCube(reducedFlat, att);
+    }
+    // The image was cropped, so pull the same subarea from the flat file into a temp file
+    else {
+      FileName transFlat =
+      FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
+
+      Cube *flatOriginal = new Cube(flatfile.expanded() );
+
+      double alphaStartSample = alphaCube["AlphaStartingSample"][0].toDouble();
+      double alphaStartLine = alphaCube["AlphaStartingLine"][0].toDouble();
+      double alphaEndSample = alphaCube["AlphaEndingSample"][0].toDouble();
+      double alphaEndLine = alphaCube["AlphaEndingLine"][0].toDouble();
+
+      double transform[5] = {(double)binning, alphaStartSample, alphaStartLine, alphaEndSample, alphaEndLine};
+
+      // Translates and scales the flatfield image.  Scaling
+      // might be necessary in the event that the raw image was also binned.
+      translate(flatOriginal,transform,transFlat.expanded());
+
+      QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
+      flatcube.swap(translated);
+
+      CubeAttributeInput att;
+      p.SetInputCube(transFlat.expanded(),att);
+
+    }  //Finished setting flatfield file
+
     Cube *ocube  = p.SetOutputCube("TO");
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
