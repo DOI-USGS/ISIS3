@@ -239,7 +239,6 @@ namespace Isis {
 
       // Apply compression factor here to raise LOSSY dns to proper response
 
-
       // BIAS Removal - Only needed if not on-board corrected
       if (!g_onBoardSmearCorrection) {
         if ( (imageOut[i] - g_bias) <= 0.0) {
@@ -271,25 +270,17 @@ namespace Isis {
       // imageOut[i] = result;
 
       // FLATFIELD correction
-      //  Check for any special pixels in the flat field (unlikely)
+      // Check for any special pixels in the flat field (unlikely)
       // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
-      if (in.size() == 2) {
-        // Note that our current flat-fields to not have special pixel values.
-        if (IsSpecial(flatField[i]) || IsSpecial(imageOut[i]))
-        {
-          imageOut[i] = Isis::Null;
-          continue;
-        }
-        else {
-          if (flatField[i] != 0) {
-            imageOut[i] /= (flatField[i]);
-          }
+      if (IsSpecial(flatField[i]) || IsSpecial(imageOut[i])) {
+        imageOut[i] = Isis::Null;
+        continue;
+      }
+      else {
+        if (flatField[i] != 0) {
+          imageOut[i] /= (flatField[i]);
         }
       }
-
-      // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
-      // in which case the output will be in DNs)
-      imageOut[i] *= g_calibrationScale;
     }
     return;
   }
@@ -307,11 +298,26 @@ namespace Isis {
   FileName DetermineFlatFieldFile(const QString &filter) {
     QString fileName = "$hayabusa2/calibration/flatfield/";
 
-    // FileName consists of binned/notbinned, camera, and filter
-    fileName += "flat_" + filter.toLower() + "_norm.cub";
+    if(g_instrument == InstrumentType::ONCT) {
+      if(filter.toLower() == 'v') {
+        // There is no updated v filter flat file
+        fileName += "flat_" + filter.toLower() + "_norm.cub";
+      }
+      else {
+        fileName += "hyb2_onc_flat_t" + filter.toLower() + "f_nr_trim_20190131.cub";
+      }
+    }
+    else if(g_instrument == InstrumentType::ONCW1) {
+      fileName += "hyb2_onc_flat_w1f_nr_20190131.cub";
+    }
+    else {
+      fileName += "hyb2_onc_flat_w2f_nr_20190131.cub";
+    }
+    
     FileName final(fileName);
     return final;
   }
+
 
 
   /**

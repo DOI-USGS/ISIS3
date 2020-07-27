@@ -1,0 +1,37 @@
+Group = Name
+  Auto
+  OutputName      = local_identifier
+  InputDefault    = History
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Header)
+End_Group
+
+Group = StartByte
+  Auto
+  InputKey          = StartByte
+  InputPosition     = History
+  OutputName        = offset
+  OutputAttributes  = unit|byte
+  Translation       = (*, *)
+  OutputPosition    = (File_Area_Observational, Header)
+End_Group
+
+Group = Bytes
+  Auto
+  InputKey          = Bytes
+  InputPosition     = History
+  OutputName        = object_length
+  OutputAttributes  = unit|byte
+  OutputSiblings    = parsing_standard_id|ISIS3
+  Translation       = (*, *)
+  OutputPosition    = (File_Area_Observational, Header)
+End_Group
+
+Group = Description
+  Auto
+  OutputName      = description
+  InputDefault    = "History of ISIS routines applied"
+  Translation     = (*, *)
+  OutputPosition  = (File_Area_Observational, Header)
+ End_Group
+

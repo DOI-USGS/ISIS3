@@ -1,0 +1,35 @@
+Group = HeaderId 
+  Auto 
+  InputDefault     = "ISIS_cube_label"
+  OutputName       = local_identifier 
+  OutputPosition   = (Product_Observational, File_Area_Observational, Header)
+  Translation      = (*, *)
+End_Group
+
+Group = HeaderBytes 
+  Auto 
+  InputDefault     = 0
+  OutputName       = offset 
+  OutputPosition   = (Product_Observational, File_Area_Observational, Header)
+  OutputAttributes = unit|byte
+  Translation      = (*, *)
+End_Group
+
+Group = Header 
+  Auto 
+  InputKey         = Bytes
+  InputPosition    = Label
+  OutputName       = object_length 
+  OutputPosition   = (Product_Observational, File_Area_Observational, Header)
+  OutputSiblings   = ( parsing_standard_id|ISIS3)
+  OutputAttributes = unit|byte
+  Translation      = (*, *)
+End_Group 
+
+Group = HeaderDescription
+  Auto 
+  InputDefault     = "ISIS cube label with describing the ISIS .cub image"
+  OutputName       = description 
+  OutputPosition   = (Product_Observational, File_Area_Observational, Header)
+  Translation      = (*, *)
+End_Group
