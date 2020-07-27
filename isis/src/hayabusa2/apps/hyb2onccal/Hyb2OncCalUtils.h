@@ -229,13 +229,13 @@ namespace Isis {
 
     // Iterate over the line space
     for (int i = 0; i < imageIn.size(); i++) {
-      imageOut[i] = imageIn[i] * pow(2.0, 12 - g_bitDepth);
-
       // Check for special pixel in input image and pass through
-      if ( IsSpecial(imageOut[i]) ) {
-        imageOut[i] = imageIn[i];
+      if ( IsSpecial(imageIn[i]) ) {
+        imageOut[i] = Isis::Null;
         continue;
       }
+
+      imageOut[i] = imageIn[i] * pow(2.0, 12 - g_bitDepth);
 
       // Apply compression factor here to raise LOSSY dns to proper response
 
