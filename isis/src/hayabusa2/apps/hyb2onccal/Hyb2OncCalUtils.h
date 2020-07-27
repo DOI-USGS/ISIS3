@@ -281,8 +281,115 @@ namespace Isis {
           imageOut[i] /= (flatField[i]);
         }
       }
+
+      // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
+      // in which case the output will be in DNs)
+      imageOut[i] *= g_calibrationScale;
     }
     return;
+  }
+
+
+  /**
+   * @brief Translates a 1-banded Isis::Cube to an OpenMat object
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param icube A pointer to the input cube
+   *
+   * @return @b Mat A pointer to the OpenMat object
+   */
+  Mat *isis2mat(Cube *icube) {
+    int nlines = icube->lineCount();
+    int nsamples = icube->sampleCount();
+    Mat *matrix = new Mat(nlines, nsamples, CV_64F);
+
+    // Set up line manager and read in the data
+    LineManager linereader(*icube);
+    for (int line = 0; line < nlines; line++) {
+      linereader.SetLine(line + 1);
+      icube->read(linereader);
+      for (int samp = 0;  samp < nsamples; samp++) {
+        matrix->at<double>(line, samp) = (double)linereader[samp];
+      }
+   }
+  return matrix;
+  }
+
+
+  /**
+   * @brief Translates an OpenMat object to an ISIS::Cube with one band
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param matrix A pointer to the OpenMat object
+   *
+   * @param cubeName The name of the Isis::Cube that is being created.
+   */
+  void mat2isis(Mat *matrix, QString cubeName) {
+
+    int nlines = matrix->rows;
+    int nsamples = matrix->cols;
+    CubeAttributeOutput set;
+    set.setPixelType(Real);
+
+    Cube ocube;
+    ocube.setDimensions(nsamples, nlines,1);
+    ocube.create(cubeName, set);
+
+    LineManager linewriter(ocube);
+
+    for (int line = 0; line < nlines; line++) {
+      linewriter.SetLine(line+1);
+
+      for ( int samp=0; samp < nsamples; samp++ ) {
+
+        linewriter[samp] = matrix->at<double>(linewriter.Line() - 1,samp);
+      }
+      ocube.write(linewriter);
+    }
+    ocube.close();
+  }
+
+
+  /**
+   * @brief Translates/scales a cube using Bilinear Interpolation
+   *
+   * @author 2016-04-19 Tyler Wilson
+   *
+   * @param matrix A pointer to the OpenMat object
+   *
+   * @param cubeName The name of the ISIS::Cube that is being created.
+   */
+  void translate(Cube *flatField,double *transform, QString fname) {
+    Mat *originalMat = isis2mat(flatField);
+    double scale = transform[0];
+
+    double startsample = transform[1];
+    double startline = transform[2];
+    double lastsample = transform[3];
+    double lastline = transform[4];
+
+    double width = (lastsample - startsample);
+    double height = (lastline - startline);
+
+    Size sz(flatField->lineCount() / scale, flatField->sampleCount() / scale);
+
+    Mat *resizedMatrix = new Mat();
+
+    Mat temp = *originalMat;
+
+    Mat originalCropped = temp(Rect(startsample, startline, width, height));
+
+    if (scale == 1) {
+      mat2isis(&originalCropped,fname);
+    }
+    else {
+      //Bilinear interpolation
+      resize(originalCropped, *resizedMatrix, sz, INTER_LINEAR);
+      mat2isis(resizedMatrix, fname);
+    }
+
   }
 
 
