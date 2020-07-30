@@ -39,7 +39,7 @@ using namespace std;
 namespace Isis {
 
   void hyb2onccal(UserInterface &ui) {
-    // g_iofCorrection = ui.GetString("UNITS");
+    g_calStep = ui.GetString("UNITS");
 
     const QString hyb2cal_program = "hyb2onccal";
     const QString hyb2cal_version = "1.1";
@@ -78,10 +78,10 @@ namespace Isis {
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
-    if (instrument=="ONC-W1") {
+    if (instrument == "ONC-W1") {
       g_instrument = InstrumentType::ONCW1;
     }
-    else if (instrument=="ONC-W2") {
+    else if (instrument == "ONC-W2") {
       g_instrument = InstrumentType::ONCW2;
     }
     else if (instrument == "ONC-T") {
@@ -160,6 +160,17 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to read [SpacecraftClockStartCount] keyword in the Instrument group "
+                    "from input file [" + icube->fileName() + "]";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    try {
+      // Convert from KM to AU
+      QString solarDistance = inst["SolarDistance"][0].replace('D', 'e');
+      g_solarDist = solarDistance.toDouble() * (1.0 / 49598073.0);
+    }
+    catch(IException &e) {
+      QString msg = "Unable to read [SolarDistance] keyword in the Instrument group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -261,27 +272,20 @@ namespace Isis {
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
-    QString g_units = "DN";
-    // if ( "radiance" == g_iofCorrection.toLower() ) {
-    //   // Units of RADIANCE
-    //   g_iof = g_iof * g_iofScale;
-    //   g_units = "W / (m**2 micrometer sr)";
-    // }
-    //
-    // if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
-    //    throw IException(IException::Programmer, "Cannot calculate distance to sun!",
-    //                      _FILEINFO_);
-    // }
-    //
-    // if ( "iof" == g_iofCorrection.toLower() ) {
-    //   // Units of I/F
-    //   // TODO: Note, we do not have a correct g_iofScale (== 1 right now). This was provided for
-    //   // Hayabusa AMICA's v-band and all other bands were normalized according to this value. We do
-    //   // not have this value for Hayabusa2 ONC. Need to correct this value.
-    //   g_iof = pi_c() * (g_solarDist * g_solarDist) *
-    //           g_iofScale / g_solarFlux / g_texp;
-    //   g_units = "I over F";
-    // }
+    QString units = "DN";
+    if (g_calStep == "RADIANCE") {
+      // Units of RADIANCE
+      g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
+      units = "W / (m**2 micrometer sr)";
+    }
+
+    else if (g_calStep == "IOF") {
+      // Units of I/F
+      // Included this line because we need to convert to radiance before I/F.
+      g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
+      g_calibrationScale *= (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
+      units = "I over F";
+    }
 
     // Calibrate!
     try {
@@ -340,12 +344,11 @@ namespace Isis {
     calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
     calibrationLog.addKeyword(PvlKeyword("Smear_texp", toString(g_texp, 16)));
 
-    calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
+    calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_calStep));
 
     calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
     calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));  
-    calibrationLog.addKeyword(PvlKeyword("Units", g_units));
-
+    calibrationLog.addKeyword(PvlKeyword("Units", units));
     PvlKeyword linearityCoefs("LinearityCoefficients");
     linearityCoefs.addValue(toString(g_L[0], 16));
     linearityCoefs.addValue(toString(g_L[1], 16));
