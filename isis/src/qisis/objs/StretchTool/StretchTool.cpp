@@ -538,32 +538,9 @@ namespace Isis {
         }
       }
 
-//      Stretch stretch = m_advancedStretch->getGrayStretch();
       CubeStretch stretch = m_advancedStretch->getGrayCubeStretch();
       stretch.setName(text);
-
       StretchBlob stretchBlob(stretch);
-
-//      StretchBlob stretchBlob = stretch.getBlob();
-//
-//      // consider moving into Stretch::WriteInit()
-//   // stretch.Label()["Name"] = text;
-//   // stretch.Label() += PvlKeyword("StretchType", stretch.getType());
-//   //
-//   // // Greyscale is only available option for now
-//   // stretch.Label() += PvlKeyword("Color", "Greyscale");
-//   //
-//   // icube->write(stretch);
-//
-//      stretchBlob.Label()["Name"] = text;
-//      stretchBlob.Label() += PvlKeyword("StretchType", stretch.getType());
-//      stretchBlob.Label() += PvlKeyword("Color", "Greyscale"); // maybe just the band matters.
-//
-//      icube->write(stretchBlob);
-//
-      stretchBlob.Label()["Name"] = text;
-
-
       icube->write(stretchBlob);
 
       // Don't leave open rw -- not optimal. 
