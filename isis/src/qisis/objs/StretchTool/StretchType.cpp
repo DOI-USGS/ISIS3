@@ -15,6 +15,7 @@
 #include "Stretch.h"
 #include "Histogram.h"
 #include "HistogramWidget.h"
+#include "CubeStretch.h"
 
 namespace Isis {
   /**
@@ -197,5 +198,10 @@ namespace Isis {
    */
   Stretch StretchType::getStretch() {
     return *p_stretch;
+  }
+
+  CubeStretch StretchType::getCubeStretch() {
+    CubeStretch cubeStretch(*p_stretch);
+    return cubeStretch;
   }
 }

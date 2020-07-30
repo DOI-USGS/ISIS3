@@ -5,6 +5,7 @@
 
 #include "CubeViewport.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "AdvancedStretch.h"
 
 namespace Isis {
@@ -141,7 +142,7 @@ namespace Isis {
    *  
    * @param stretch 
    */
-  void AdvancedStretchDialog::restoreSavedStretch(Stretch stretch){
+  void AdvancedStretchDialog::restoreSavedStretch(CubeStretch stretch){
     p_grayStretch->restoreSavedStretch(stretch);
   }
 
@@ -284,6 +285,22 @@ namespace Isis {
   Stretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
       return p_grayStretch->getStretch();
+    }
+    else {
+      QString msg = "Gray mode not enabled, cannot get gray stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * This returns the advanced stretch's stretch for gray.
+   *
+   * @return Stretch
+   */
+  CubeStretch AdvancedStretchDialog::getGrayCubeStretch() {
+    if(p_grayStretch) {
+      return p_grayStretch->getCubeStretch();
     }
     else {
       QString msg = "Gray mode not enabled, cannot get gray stretch";

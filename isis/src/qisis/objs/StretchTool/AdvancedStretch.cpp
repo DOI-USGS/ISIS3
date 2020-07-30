@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "IString.h"
 #include "IException.h"
 #include "StretchType.h"
@@ -103,6 +104,11 @@ namespace Isis {
   }
 
 
+  CubeStretch AdvancedStretch::getCubeStretch() {
+    return ((StretchType *)p_stretchTypeStack->currentWidget())->getCubeStretch();
+  }
+
+
   /**
    * This is called when the user creates a stretch outside of the
    * advanced stretch. For example, they do a global stretch. The
@@ -125,20 +131,19 @@ namespace Isis {
    *  
    * @param newStretch saved stretch to restore
    */
-  void AdvancedStretch::restoreSavedStretch(Stretch newStretch) {
-    QString stretchTypeName = newStretch.getType(); 
-
+  void AdvancedStretch::restoreSavedStretch(CubeStretch newStretch) { 
+    QString stretchTypeName = newStretch.getType();
     int index = 0;
-    if (stretchTypeName.compare("LinearStretch") == 0 ) {
+    if (stretchTypeName.compare("Linear") == 0 ) {
       index = 0; 
     }
-    else if (stretchTypeName.compare("SawtoothStretch") == 0 ) {
+    else if (stretchTypeName.compare("Sawtooth") == 0 ) {
       index = 1; 
     }
-    else if (stretchTypeName.compare("BinaryStretch") == 0) {
+    else if (stretchTypeName.compare("Binary") == 0) {
       index = 2; 
     }
-    else if (stretchTypeName.compare("ManualStretch") == 0) {
+    else if (stretchTypeName.compare("Manual") == 0) {
       index = 3;
     }
     // Fail by defaulting to Linear

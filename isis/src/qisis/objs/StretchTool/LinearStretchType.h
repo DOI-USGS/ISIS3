@@ -11,6 +11,7 @@ class QString;
 namespace Isis {
   class Histogram;
   class Stretch;
+  class CubeStretch;
 
   /**
    * @brief This handles the advanced linear stretch
@@ -34,6 +35,7 @@ namespace Isis {
       ~LinearStretchType();
 
       virtual Stretch getStretch();
+      virtual CubeStretch getCubeStretch();
       virtual void setStretch(Stretch);
 
     private slots:

@@ -34,6 +34,9 @@
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 
+#include "CubeStretch.h"
+#include "StretchBlob.h"
+
 using namespace std;
 
 namespace Isis {
@@ -406,9 +409,10 @@ namespace Isis {
                                          false, &ok);
 
     if (ok) {
-      Stretch stretch(stretchName); 
-      icube->read(stretch);
-      m_advancedStretch->restoreSavedStretch(stretch); 
+      StretchBlob stretchBlob(stretchName);
+      icube->read(stretchBlob);
+      CubeStretch cubeStretch = stretchBlob.getStretch();
+      m_advancedStretch->restoreSavedStretch(cubeStretch);
     }
   }
 
@@ -534,16 +538,33 @@ namespace Isis {
         }
       }
 
-      Stretch stretch = m_advancedStretch->getGrayStretch();
+//      Stretch stretch = m_advancedStretch->getGrayStretch();
+      CubeStretch stretch = m_advancedStretch->getGrayCubeStretch();
+      stretch.setName(text);
 
-      // consider moving into Stretch::WriteInit()
-      stretch.Label()["Name"] = text;
-      stretch.Label() += PvlKeyword("StretchType", stretch.getType());
+      StretchBlob stretchBlob(stretch);
 
-      // Greyscale is only available option for now
-      stretch.Label() += PvlKeyword("Color", "Greyscale");
+//      StretchBlob stretchBlob = stretch.getBlob();
+//
+//      // consider moving into Stretch::WriteInit()
+//   // stretch.Label()["Name"] = text;
+//   // stretch.Label() += PvlKeyword("StretchType", stretch.getType());
+//   //
+//   // // Greyscale is only available option for now
+//   // stretch.Label() += PvlKeyword("Color", "Greyscale");
+//   //
+//   // icube->write(stretch);
+//
+//      stretchBlob.Label()["Name"] = text;
+//      stretchBlob.Label() += PvlKeyword("StretchType", stretch.getType());
+//      stretchBlob.Label() += PvlKeyword("Color", "Greyscale"); // maybe just the band matters.
+//
+//      icube->write(stretchBlob);
+//
+      stretchBlob.Label()["Name"] = text;
 
-      icube->write(stretch);
+
+      icube->write(stretchBlob);
 
       // Don't leave open rw -- not optimal. 
       cvp->cube()->reopen("r");
