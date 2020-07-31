@@ -89,24 +89,24 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 7.  Finally, setup the environment variables:
 
-For versions of ISIS 4.2.0 and earlier, use: 
+    For versions of ISIS 4.2.0 and earlier, use: 
 
         #Execute the ISIS variable initialization script with default arguments.
         #This script prepares default values for:  $ISISROOT, $ISISDATA, $ISISTESTDATA
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
 
-For version of ISIS after 4.2.0, use:
+    For version of ISIS after 4.2.0, use:
 
 	python $CONDA_PREFIX/scripts/isisVarInit.py
 
     Executing this script with no arguments will result in $ISISDATA=$CONDA\_PREFIX/data, and $ISISTESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
 
-For ISIS 4.2.0 and earlier, use: 
+    For ISIS 4.2.0 and earlier, use: 
 
         python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
-For versions of ISIS after 4.2.0, use: 
+    For versions of ISIS after 4.2.0, use: 
 
         python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
