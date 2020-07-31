@@ -89,10 +89,9 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 7.  Finally, setup the environment variables:
 
-    For versions of ISIS 4.2.0 and earlier, use: 
+    To use the default values for: `$ISISROOT, $ISISDATA, $ISISTESTDATA`, run the ISIS variable initialization script with default arguments.
 
-        #Execute the ISIS variable initialization script with default arguments.
-        #This script prepares default values for:  $ISISROOT, $ISISDATA, $ISISTESTDATA
+    To do this, for versions of ISIS 4.2.0 and earlier, use: 
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
 
