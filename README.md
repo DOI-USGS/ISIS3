@@ -98,7 +98,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     For versions of ISIS after 4.2.0, use:
 
-	python $CONDA_PREFIX/scripts/isisVarInit.py
+        python $CONDA_PREFIX/scripts/isisVarInit.py
 
     Executing this script with no arguments will result in $ISISDATA=$CONDA\_PREFIX/data, and $ISISTESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
 
