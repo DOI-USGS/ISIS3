@@ -540,6 +540,7 @@ namespace Isis {
 
       CubeStretch stretch = m_advancedStretch->getGrayCubeStretch();
       stretch.setName(text);
+      stretch.setBandNumber(cvp->comboIndex());
       StretchBlob stretchBlob(stretch);
       icube->write(stretchBlob);
 
