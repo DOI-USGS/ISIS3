@@ -398,8 +398,11 @@ namespace Isis {
     for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
-        namelist.append(tempName); 
+        int bandNumber = int(objIter->findKeyword("BandNumber"));
+        if (cvp->grayBand() == bandNumber) {
+          QString tempName = tempKeyword[0]; 
+          namelist.append(tempName); 
+        }
       }
     }
 
@@ -431,8 +434,11 @@ namespace Isis {
     for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
-        namelist.append(tempName); 
+        int bandNumber = int(objIter->findKeyword("BandNumber"));
+        if (cvp->grayBand() == bandNumber) {
+          QString tempName = tempKeyword[0]; 
+          namelist.append(tempName); 
+        }
       }
     }
 
@@ -540,7 +546,7 @@ namespace Isis {
 
       CubeStretch stretch = m_advancedStretch->getGrayCubeStretch();
       stretch.setName(text);
-      stretch.setBandNumber(cvp->comboIndex());
+      stretch.setBandNumber(cvp->grayBand());
       StretchBlob stretchBlob(stretch);
       icube->write(stretchBlob);
 
