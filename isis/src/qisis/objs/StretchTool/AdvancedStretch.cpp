@@ -146,12 +146,10 @@ namespace Isis {
     else if (stretchTypeName.compare("Manual") == 0) {
       index = 3;
     }
-    // Fail by defaulting to Linear
+
+    // Fail by defaulting to Linear. This is correct for non-Advanced Stretch
 
     p_stretchTypeSelection->setCurrentIndex(index);
-    StretchType *stretchType = (StretchType *)
-                               p_stretchTypeStack->currentWidget();
-    stretchType->setStretch(newStretch);
   }
 
 
