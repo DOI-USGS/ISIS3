@@ -27,6 +27,8 @@
 
 // This is needed for the QVariant macro
 #include <QMetaType>
+#include <QList>
+#include <QPair>
 
 #include <nlohmann/json.hpp>
 
@@ -257,9 +259,10 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob) const;
+      void read(Blob &blob, 
+                const QList<QPair<QString,QString>> keywords = QList<QPair<QString,QString>>()) const;
       void read(Buffer &rbuf) const;
-      void write(Blob &blob);
+      void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);

@@ -24,6 +24,9 @@
  */
 
 #include <string>
+#include <QList>
+#include <QPair>
+
 #include "PvlObject.h"
 
 namespace Isis {
@@ -76,16 +79,19 @@ namespace Isis {
       int Size() const;
       PvlObject &Label();
 
-      void Read(const QString &file);
-      void Read(const QString &file, const Pvl &pvlLabels);
-      virtual void Read(const Pvl &pvl, std::istream &is);
+      void Read(const QString &file, const QList<QPair<QString,QString>> 
+                keywords=QList<QPair<QString,QString>>());
+      void Read(const QString &file, const Pvl &pvlLabels, 
+                const QList<QPair<QString,QString>> keywords = QList<QPair<QString,QString>>());
+      virtual void Read(const Pvl &pvl, std::istream &is, 
+                        const QList<QPair<QString,QString>> keywords = QList<QPair<QString,QString>>());
 
       void Write(const QString &file);
       void Write(Pvl &pvl, std::fstream &stm,
-                 const QString &detachedFileName = "");
+                 const QString &detachedFileName = "", bool overwrite=true);
 
     protected:
-      void Find(const Pvl &pvl);
+      void Find(const Pvl &pvl, const QList<QPair<QString,QString>> keywords = QList<QPair<QString,QString>>());
       virtual void ReadInit();
       virtual void ReadData(std::istream &is);
       virtual void WriteInit();
