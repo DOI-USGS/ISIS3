@@ -412,6 +412,7 @@ namespace Isis {
 
 
     QStringList namelist; 
+
     // Create a list of existing Stretch names
     if (cvp->isGray()) {
       PvlObject::PvlObjectIterator objIter;
