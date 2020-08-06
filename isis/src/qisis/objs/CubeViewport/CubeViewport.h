@@ -37,6 +37,7 @@ namespace Isis {
   class Projection;
   class Pvl;
   class PvlKeyword;
+  class CubeStretch;
   class Stretch;
   class Tool;
   class UniversalGroundMap;
@@ -174,14 +175,14 @@ namespace Isis {
           const BandInfo &operator=(BandInfo other);
 
           //! @return The Stretch
-          Stretch getStretch() const;
+          CubeStretch getStretch() const;
           //! @param newStretch The new Stretch value
           void setStretch(const Stretch &newStretch);
           //! The band
           int band;
         private:
           //! The Stretch
-          Stretch *stretch;
+          CubeStretch *stretch;
       };
 
       //! @param cube The cube to set the CubeViewport window to
@@ -339,7 +340,7 @@ namespace Isis {
        */
       double grayPixel(int sample, int line);
       //! @return The gray Stretch
-      Stretch grayStretch() const;
+      CubeStretch grayStretch() const;
       //! @return The red Stretch
       Stretch redStretch() const;
       //! @return The green Stretch

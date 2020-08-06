@@ -50,6 +50,7 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "StretchTool.h"
 #include "Tool.h"
 #include "UniversalGroundMap.h"
@@ -1669,7 +1670,7 @@ namespace Isis {
 
 
   //! Return the gray band stretch
-  Stretch CubeViewport::grayStretch() const {
+  CubeStretch CubeViewport::grayStretch() const {
     return p_gray.getStretch();
   }
 
@@ -2405,7 +2406,7 @@ namespace Isis {
 
 
   CubeViewport::BandInfo::BandInfo() : band(1), stretch(NULL) {
-    stretch = new Stretch;
+    stretch = new CubeStretch;
     stretch->SetNull(0.0);
     stretch->SetLis(0.0);
     stretch->SetLrs(0.0);
@@ -2419,7 +2420,7 @@ namespace Isis {
   CubeViewport::BandInfo::BandInfo(const CubeViewport::BandInfo &other) :
     band(other.band) {
     stretch = NULL;
-    stretch = new Stretch(*other.stretch);
+    stretch = new CubeStretch(*other.stretch);
   }
 
 
@@ -2431,7 +2432,7 @@ namespace Isis {
   }
 
 
-  Stretch CubeViewport::BandInfo::getStretch() const {
+  CubeStretch CubeViewport::BandInfo::getStretch() const {
     ASSERT_PTR(stretch);
 
     return *stretch;
@@ -2448,7 +2449,7 @@ namespace Isis {
     ASSERT_PTR(other.stretch);
 
     stretch = NULL;
-    stretch = new Stretch;
+    stretch = new CubeStretch;
     *stretch = *other.stretch;
     band = other.band;
 

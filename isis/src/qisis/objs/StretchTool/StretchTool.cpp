@@ -291,6 +291,16 @@ namespace Isis {
     connect(m_flashButton, SIGNAL(pressed()), this, SLOT(stretchChanged()));
     connect(m_flashButton, SIGNAL(released()), this, SLOT(stretchChanged()));
 
+    // Buttons migrated out of Advanced Stretch Tool
+    QPushButton *saveToCubeButton = new QPushButton("Save"); 
+    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(saveStretchToCube()));
+
+    QPushButton *deleteFromCubeButton = new QPushButton("Delete");
+    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SLOT(deleteFromCube()));
+
+    QPushButton *loadStretchButton = new QPushButton("Load");
+    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SLOT(loadStretchFromCube()));
+
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
     layout->addWidget(m_copyButton);
@@ -301,6 +311,13 @@ namespace Isis {
     layout->addWidget(m_stretchMaxEdit);
     layout->addWidget(advancedButton);
     layout->addWidget(m_flashButton);
+
+    // should only display if gray stretch
+    // Save/Restore strech only supported for Grayscale images. Hide buttons if in RGB.
+    layout->addWidget(saveToCubeButton);
+    layout->addWidget(deleteFromCubeButton);
+    layout->addWidget(loadStretchButton);
+
     layout->addStretch(); // Pushes everything else left in the menu bar
     hbox->setLayout(layout);
 
@@ -352,6 +369,7 @@ namespace Isis {
       }
     }
   }
+
 
   /**
    * Update the streches and corresponding histograms for all the
@@ -415,7 +433,11 @@ namespace Isis {
       StretchBlob stretchBlob(stretchName);
       icube->read(stretchBlob);
       CubeStretch cubeStretch = stretchBlob.getStretch();
-      m_advancedStretch->restoreSavedStretch(cubeStretch);
+      if (m_advancedStretch->isVisible()) {
+        m_advancedStretch->restoreSavedStretch(cubeStretch);
+      }
+      cvp->stretchGray(cubeStretch);
+      emit stretchChanged();
     }
   }
 
@@ -544,7 +566,14 @@ namespace Isis {
         }
       }
 
-      CubeStretch stretch = m_advancedStretch->getGrayCubeStretch();
+      CubeStretch stretch;
+      if (m_advancedStretch->isVisible()) {
+        stretch = m_advancedStretch->getGrayCubeStretch();
+      }
+      else {
+        stretch = cvp->grayStretch(); 
+      }
+
       stretch.setName(text);
       stretch.setBandNumber(cvp->grayBand());
       StretchBlob stretchBlob(stretch);
@@ -915,7 +944,6 @@ namespace Isis {
       m_advancedStretch->updateStretch(cubeViewport());
       m_advancedStretch->show();
     }
-
     updateTool();
   }
 
