@@ -147,8 +147,7 @@ namespace Isis {
       index = 3;
     }
 
-    // Fail by defaulting to Linear. This is correct for non-Advanced Stretch
-
+    // Fail by defaulting to Linear. This is correct for non-Advanced Stretches anyway.
     p_stretchTypeSelection->setCurrentIndex(index);
   }
 

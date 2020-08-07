@@ -432,7 +432,8 @@ namespace Isis {
       int greenBandNumber = cvp->greenBand();
       int blueBandNumber = cvp->blueBand();
 
-      QList<QPair<QString, int>> tempNameList;
+//      QList<QPair<QString, QList<int>> tempNameList;
+      QMap<QString, QList<int>> tempNameMap;
       PvlObject::PvlObjectIterator objIter;
       for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
         if (objIter->name() == "Stretch") {
@@ -441,18 +442,26 @@ namespace Isis {
           if (bandNumber == redBandNumber || bandNumber == greenBandNumber 
               || bandNumber == blueBandNumber) {
             QString tempName = tempKeyword[0]; 
-            QPair<QString, int> tempElt = {tempName, bandNumber};
-            tempNameList.append(tempElt);
-            namelist.append(tempName);
+            if (tempNameMap.contains(tempName)) {
+              tempNameMap[tempName].append(bandNumber);
+            }
+            else
+            {
+              tempNameMap[tempName] = {bandNumber};
+            }
           }
         }
-        // STILL need to do this
-        // how do we deal with multiple of the same name? 
-        // 2 passes through list? 
-        // with band #s visible restriction (and need all 3 to load...
-//        namelist = tempNameList;
-        }
       }
+      QMap<QString, QList<int>>::const_iterator i = tempNameMap.constBegin();
+      while (i != tempNameMap.constEnd()) {
+        qDebug() << i.key() << ": " << i.value();
+        if (i.value().contains(redBandNumber) && i.value().contains(greenBandNumber) &&
+            i.value().contains(blueBandNumber) ){
+          namelist.append(i.key());
+        }
+        ++i;
+      }
+    }
 
     bool ok;
     QString stretchName = QInputDialog::getItem((QWidget*)parent(), tr("Load Stretch"),
@@ -478,32 +487,30 @@ namespace Isis {
         QList<QPair<QString, QString>> keywordValueList;
         keywordValueList.append(keywordValue);
 
+        QPair<QString, QString> keywordValueGreen = {"BandNumber", QString::number(cvp->greenBand())};
+        QList<QPair<QString, QString>> keywordValueListGreen;
+        keywordValueListGreen.append(keywordValueGreen);
+
+        QPair<QString, QString> keywordValueBlue = {"BandNumber", QString::number(cvp->blueBand())};
+        QList<QPair<QString, QString>> keywordValueListBlue;
+        keywordValueListBlue.append(keywordValueBlue);
+
         icube->read(redStretchBlob, keywordValueList);
-
-        QPair<QString, QString> keywordValue2 = {"BandNumber", QString::number(cvp->greenBand())};
-        QList<QPair<QString, QString>> keywordValueList2;
-        keywordValueList2.append(keywordValue2);
-
-        QPair<QString, QString> keywordValue3 = {"BandNumber", QString::number(cvp->blueBand())};
-        QList<QPair<QString, QString>> keywordValueList3;
-        keywordValueList3.append(keywordValue3);
-
-        icube->read(greenStretchBlob, keywordValueList2);
-        icube->read(blueStretchBlob, keywordValueList3);
+        icube->read(greenStretchBlob, keywordValueListGreen);
+        icube->read(blueStretchBlob, keywordValueListBlue);
 
         CubeStretch redStretch = redStretchBlob.getStretch();
         CubeStretch greenStretch = greenStretchBlob.getStretch();
         CubeStretch blueStretch = blueStretchBlob.getStretch();
 
-        qDebug() << "LOADED stretches: ";
         qDebug() << redStretch.Text();
         qDebug() << greenStretch.Text();
         qDebug() << blueStretch.Text();
 
-        // future work
-//        if (m_advancedStretch->isVisible()) {
-//          m_advancedStretch->restoreSavedStretch(cubeStretch);
-//        }
+        // works for RGB?
+        if (m_advancedStretch->isVisible()) {
+          m_advancedStretch->restoreSavedRGB(redStretch, greenStretch, blueStretch);
+        }
 
         cvp->stretchRed(redStretch);
         cvp->stretchGreen(greenStretch);
@@ -626,8 +633,7 @@ namespace Isis {
       }
 
       if (icube->isReadOnly()) {
-        //  ReOpen cube as read/write
-        //  If cube readonly print error
+        //  reOpen cube as read/write
         try {
           cvp->cube()->reopen("rw");
         }
@@ -638,11 +644,11 @@ namespace Isis {
         }
       }
 
-      // If grey, only one stretch to save
+      // If gray, only one stretch to save
       if (cvp->isGray()) {
         CubeStretch stretch;
         if (m_advancedStretch->isVisible()) {
-          stretch = m_advancedStretch->getGrayCubeStretch();
+          stretch = m_advancedStretch->getGrayStretch();
         }
         else {
           stretch = cvp->grayStretch(); 
@@ -653,16 +659,21 @@ namespace Isis {
         stretch.setBandNumber(cvp->grayBand());
         StretchBlob stretchBlob(stretch);
 
-        // need to set overwrite to false so that multiple stretches with the same name can be added
+        //set overwrite to false so that multiple stretches with the same name can be added
         icube->write(stretchBlob, false);
       }
       else {
-        // NEED TO ADD SUPPORT FOR ADVANCED STRETCH TOOL
         CubeStretch redStretch, greenStretch, blueStretch;
-        redStretch = cvp->redStretch();
-        greenStretch = cvp->greenStretch();
-        blueStretch = cvp->blueStretch();
-
+        if (m_advancedStretch->isVisible()) {
+          redStretch = m_advancedStretch->getRedStretch();
+          greenStretch = m_advancedStretch->getGrnStretch();
+          blueStretch = m_advancedStretch->getBluStretch();
+        }
+        else {
+          redStretch = cvp->redStretch();
+          greenStretch = cvp->greenStretch();
+          blueStretch = cvp->blueStretch();
+        }
         redStretch.setName(text);
         redStretch.setBandNumber(cvp->redBand());
         StretchBlob redStretchBlob(redStretch);

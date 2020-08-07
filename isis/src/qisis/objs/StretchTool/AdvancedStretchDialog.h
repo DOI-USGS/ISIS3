@@ -50,11 +50,12 @@ namespace Isis {
       void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
       void restoreSavedStretch(CubeStretch stretch); 
+      void restoreSavedRGB(CubeStretch red, CubeStretch green, CubeStretch blue);
 
-      Stretch getGrayStretch();
-      Stretch getRedStretch();
-      Stretch getGrnStretch();
-      Stretch getBluStretch();
+      CubeStretch getGrayStretch();
+      CubeStretch getRedStretch();
+      CubeStretch getGrnStretch();
+      CubeStretch getBluStretch();
       CubeStretch getGrayCubeStretch();
 
       /**

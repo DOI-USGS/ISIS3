@@ -143,7 +143,29 @@ namespace Isis {
    * @param stretch 
    */
   void AdvancedStretchDialog::restoreSavedStretch(CubeStretch stretch){
-    p_grayStretch->restoreSavedStretch(stretch);
+    // if in gray mode
+    if (p_grayStretch) {
+      p_grayStretch->restoreSavedStretch(stretch); 
+    }
+
+//    if (isRgbMode()) {
+      // maybe just error, in this case + two different functions (need different args)
+//    }
+  }
+
+  void AdvancedStretchDialog::restoreSavedRGB(CubeStretch red, CubeStretch green, CubeStretch blue) {
+    // error if not isRgbMode
+    if (p_redStretch) {
+      p_redStretch->restoreSavedStretch(red); 
+    }
+    
+    if (p_grnStretch) {
+      p_grnStretch->restoreSavedStretch(green); 
+    }
+    
+    if (p_bluStretch) {
+      p_bluStretch->restoreSavedStretch(blue); 
+    }
   }
 
 
@@ -282,23 +304,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrayStretch() {
-    if(p_grayStretch) {
-      return p_grayStretch->getStretch();
-    }
-    else {
-      QString msg = "Gray mode not enabled, cannot get gray stretch";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-  }
-
-
-  /**
-   * This returns the advanced stretch's stretch for gray.
-   *
-   * @return Stretch
-   */
-  CubeStretch AdvancedStretchDialog::getGrayCubeStretch() {
+  CubeStretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
       return p_grayStretch->getCubeStretch();
     }
@@ -314,9 +320,9 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getRedStretch() {
+  CubeStretch AdvancedStretchDialog::getRedStretch() {
     if(p_redStretch) {
-      return p_redStretch->getStretch();
+      return p_redStretch->getCubeStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get red stretch";
@@ -330,9 +336,9 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrnStretch() {
+  CubeStretch AdvancedStretchDialog::getGrnStretch() {
     if(p_grnStretch) {
-      return p_grnStretch->getStretch();
+      return p_grnStretch->getCubeStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get green stretch";
@@ -346,9 +352,9 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getBluStretch() {
+  CubeStretch AdvancedStretchDialog::getBluStretch() {
     if(p_bluStretch) {
-      return p_bluStretch->getStretch();
+      return p_bluStretch->getCubeStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get blue stretch";
