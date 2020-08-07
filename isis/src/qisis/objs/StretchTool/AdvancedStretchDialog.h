@@ -56,7 +56,6 @@ namespace Isis {
       CubeStretch getRedStretch();
       CubeStretch getGrnStretch();
       CubeStretch getBluStretch();
-      CubeStretch getGrayCubeStretch();
 
       /**
        * Returns true if the advanced stretch is enabled

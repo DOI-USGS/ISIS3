@@ -651,8 +651,9 @@ namespace Isis {
         stretch.setBandNumber(cvp->grayBand());
         StretchBlob stretchBlob(stretch);
 
-        //set overwrite to false so that multiple stretches with the same name can be added
-        icube->write(stretchBlob, false);
+        // Overwrite an existing stretch with the same name if it exists. The user was warned
+        // and decided to overwrite.
+        icube->write(stretchBlob);
       }
       else {
         CubeStretch redStretch, greenStretch, blueStretch;
@@ -666,6 +667,7 @@ namespace Isis {
           greenStretch = cvp->greenStretch();
           blueStretch = cvp->blueStretch();
         }
+
         redStretch.setName(text);
         redStretch.setBandNumber(cvp->redBand());
         StretchBlob redStretchBlob(redStretch);

@@ -147,24 +147,29 @@ namespace Isis {
     if (p_grayStretch) {
       p_grayStretch->restoreSavedStretch(stretch); 
     }
-
-//    if (isRgbMode()) {
-      // maybe just error, in this case + two different functions (need different args)
-//    }
+    else {
+      QString msg = "Gray mode not enabled, cannot restore gray stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
   void AdvancedStretchDialog::restoreSavedRGB(CubeStretch red, CubeStretch green, CubeStretch blue) {
-    // error if not isRgbMode
-    if (p_redStretch) {
-      p_redStretch->restoreSavedStretch(red); 
+    if (isRgbMode()) {
+      if (p_redStretch) {
+        p_redStretch->restoreSavedStretch(red); 
+      }
+      
+      if (p_grnStretch) {
+        p_grnStretch->restoreSavedStretch(green); 
+      }
+      
+      if (p_bluStretch) {
+        p_bluStretch->restoreSavedStretch(blue); 
+      }
     }
-    
-    if (p_grnStretch) {
-      p_grnStretch->restoreSavedStretch(green); 
-    }
-    
-    if (p_bluStretch) {
-      p_bluStretch->restoreSavedStretch(blue); 
+    else {
+      QString msg = "RGB mode not enabled, cannot restore RGB stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

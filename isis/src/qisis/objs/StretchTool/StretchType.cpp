@@ -41,7 +41,7 @@ namespace Isis {
 
     p_stretch = new Stretch();
 
-    p_graph = new HistogramWidget(QString("Visible ") + name + QString(" Hist"),
+    p_graph = new HistogramWidget(QString("Visible ") + name ,
                                   color.lighter(110), color.darker(110));
     p_graph->setHistogram(*p_cubeHist);
     p_graph->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
@@ -60,21 +60,26 @@ namespace Isis {
     connect(saveAsButton, SIGNAL(clicked(bool)), this, SLOT(savePairs()));
     p_mainLayout->addWidget(saveAsButton, 3, 0);
 
-    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube..."); 
-    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
-    p_mainLayout->addWidget(saveToCubeButton, 4, 0);
+    // Only display Save/Delete/Restore here for Gray Stretches. For RGB stretches, 
+    // this panel is displayed 3 times, but the Save/Delete/Restore should only be displayed
+    // once.
+    if (name.compare("Gray") == 0) {
+      QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube..."); 
+      connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
+      p_mainLayout->addWidget(saveToCubeButton, 4, 0);
 
-    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
-    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
-    p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
+      QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
+      connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
+      p_mainLayout->addWidget(deleteFromCubeButton, 5, 0);
 
-    QPushButton *loadStretchButton = new QPushButton("Load Saved Stretch from Cube...");
-    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
-    p_mainLayout->addWidget(loadStretchButton, 6, 0);
+      QPushButton *loadStretchButton = new QPushButton("Restore Saved Stretch from Cube...");
+      connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
+      p_mainLayout->addWidget(loadStretchButton, 6, 0);
 
-    QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    sizePolicy.setHeightForWidth(true);
-    p_graph->setSizePolicy(sizePolicy);
+      QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+      sizePolicy.setHeightForWidth(true);
+      p_graph->setSizePolicy(sizePolicy);
+    }
   }
 
 
