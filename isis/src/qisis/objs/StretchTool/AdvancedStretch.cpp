@@ -99,13 +99,8 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretch::getStretch() {
+  CubeStretch AdvancedStretch::getStretch() {
     return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretch();
-  }
-
-
-  CubeStretch AdvancedStretch::getCubeStretch() {
-    return ((StretchType *)p_stretchTypeStack->currentWidget())->getCubeStretch();
   }
 
 

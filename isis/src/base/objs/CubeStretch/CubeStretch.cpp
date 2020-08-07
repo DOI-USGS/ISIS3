@@ -47,7 +47,7 @@ namespace Isis {
 
   // semi-copy constructor
   CubeStretch::CubeStretch(Stretch const& stretch): Stretch(stretch) {
-    m_name = "Default";
+    m_name = "Unknown";
     m_bandNumber = 1;
     m_type = "Default";
   }
@@ -56,7 +56,7 @@ namespace Isis {
 
   // semi-copy constructor
   CubeStretch::CubeStretch(Stretch const& stretch, QString stretchType): Stretch(stretch), m_type(stretchType) {
-    m_name = "unknown";
+    m_name = "Unknown";
     m_bandNumber = 1;
   }
 

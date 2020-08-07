@@ -138,12 +138,11 @@ namespace Isis {
 
 
   /**
-   * Restores a saved stretch from the cube 
+   * Restores a saved grayscale stretch from the cube 
    *  
    * @param stretch 
    */
-  void AdvancedStretchDialog::restoreSavedStretch(CubeStretch stretch){
-    // if in gray mode
+  void AdvancedStretchDialog::restoreGrayStretch(CubeStretch stretch){
     if (p_grayStretch) {
       p_grayStretch->restoreSavedStretch(stretch); 
     }
@@ -153,7 +152,15 @@ namespace Isis {
     }
   }
 
-  void AdvancedStretchDialog::restoreSavedRGB(CubeStretch red, CubeStretch green, CubeStretch blue) {
+
+  /**
+   * Restores a saved RGB stretch from the cube 
+   *  
+   * @param red 
+   * @param green 
+   * @param blue 
+   */
+  void AdvancedStretchDialog::restoreRgbStretch(CubeStretch red, CubeStretch green, CubeStretch blue) {
     if (isRgbMode()) {
       if (p_redStretch) {
         p_redStretch->restoreSavedStretch(red); 
@@ -311,7 +318,7 @@ namespace Isis {
    */
   CubeStretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
-      return p_grayStretch->getCubeStretch();
+      return p_grayStretch->getStretch();
     }
     else {
       QString msg = "Gray mode not enabled, cannot get gray stretch";
@@ -327,7 +334,7 @@ namespace Isis {
    */
   CubeStretch AdvancedStretchDialog::getRedStretch() {
     if(p_redStretch) {
-      return p_redStretch->getCubeStretch();
+      return p_redStretch->getStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get red stretch";
@@ -343,7 +350,7 @@ namespace Isis {
    */
   CubeStretch AdvancedStretchDialog::getGrnStretch() {
     if(p_grnStretch) {
-      return p_grnStretch->getCubeStretch();
+      return p_grnStretch->getStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get green stretch";
@@ -359,7 +366,7 @@ namespace Isis {
    */
   CubeStretch AdvancedStretchDialog::getBluStretch() {
     if(p_bluStretch) {
-      return p_bluStretch->getCubeStretch();
+      return p_bluStretch->getStretch();
     }
     else {
       QString msg = "RGB mode not enabled, cannot get blue stretch";

@@ -36,8 +36,7 @@ namespace Isis {
       AdvancedStretch(Histogram &, const Stretch &,
                       const QString &, const QColor &);
       ~AdvancedStretch();
-      Stretch getStretch();
-      CubeStretch getCubeStretch();
+      CubeStretch getStretch();
       void setStretch(Stretch newStretch);
       void restoreSavedStretch(CubeStretch newStretch);
       void setHistogram(const Histogram &newHist);

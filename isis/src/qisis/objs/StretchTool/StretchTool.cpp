@@ -472,7 +472,7 @@ namespace Isis {
         icube->read(stretchBlob);
         CubeStretch cubeStretch = stretchBlob.getStretch();
         if (m_advancedStretch->isVisible()) {
-          m_advancedStretch->restoreSavedStretch(cubeStretch);
+          m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
         cvp->stretchGray(cubeStretch);
       }
@@ -502,7 +502,7 @@ namespace Isis {
         CubeStretch blueStretch = blueStretchBlob.getStretch();
 
         if (m_advancedStretch->isVisible()) {
-          m_advancedStretch->restoreSavedRGB(redStretch, greenStretch, blueStretch);
+          m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
         }
         cvp->stretchRed(redStretch);
         cvp->stretchGreen(greenStretch);

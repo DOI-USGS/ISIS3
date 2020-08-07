@@ -27,7 +27,6 @@ namespace Isis {
     Label()["Name"] = m_stretch->getName();
     Label() += PvlKeyword("StretchType", m_stretch->getType());
     Label() += PvlKeyword("BandNumber", QString::number(m_stretch->getBandNumber()));
-    Label() += PvlKeyword("Color", "Greyscale");
   }
 
 
