@@ -298,7 +298,7 @@ namespace Isis {
     QPushButton *deleteFromCubeButton = new QPushButton("Delete");
     connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SLOT(deleteFromCube()));
 
-    QPushButton *loadStretchButton = new QPushButton("Load");
+    QPushButton *loadStretchButton = new QPushButton("Restore");
     connect(loadStretchButton, SIGNAL(clicked(bool)), this, SLOT(loadStretchFromCube()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
