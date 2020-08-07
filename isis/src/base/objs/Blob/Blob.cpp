@@ -194,13 +194,11 @@ namespace Isis {
             if (keywords.size() >= 1) {
               found = true;
               for (int i=0; i < keywords.size(); i++) {
-                if (obj.hasKeyword(keywords[i].first) && (keywords[i].second != obj[keywords[i].first])) {
-                  std::cout << "FALSE: " << keywords[i].second << ", " << obj[keywords[i].first] << std::endl;
+                if(obj.hasKeyword(keywords[i].first) && (keywords[i].second != obj[keywords[i].first])) {
                   found = false;
                 }
               }
               if (found) {
-                std::cout << "TRUE: " << obj["BandNumber"][0] << std::endl;
                 p_blobPvl = obj;
                 found = true;
                 break;

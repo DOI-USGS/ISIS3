@@ -27,7 +27,6 @@ namespace Isis {
     Label()["Name"] = m_stretch->getName();
     Label() += PvlKeyword("StretchType", m_stretch->getType());
     Label() += PvlKeyword("BandNumber", QString::number(m_stretch->getBandNumber()));
-    Label() += PvlKeyword("Color", "Greyscale");
   }
 
 
@@ -99,7 +98,6 @@ namespace Isis {
    *  Initializes for writing stretch to cube blob
    */
   void StretchBlob::WriteInit() {
-    std::cout << "In blob: " << p_blobPvl["BandNumber"][0] << ", " << m_stretch->Text() << std::endl;
     p_nbytes = m_stretch->Text().toStdString().size(); 
   }
 
@@ -113,7 +111,6 @@ namespace Isis {
    * @param os output stream to write the stretch data to.
    */
   void StretchBlob::WriteData(std::fstream &os) {
-    std::cout << "In blob write: " << p_blobPvl["BandNumber"][0] << ", " << m_stretch->Text() << std::endl;
     os.write(m_stretch->Text().toStdString().c_str(), p_nbytes);
   }
 

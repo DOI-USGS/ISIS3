@@ -138,12 +138,46 @@ namespace Isis {
 
 
   /**
-   * Restores a saved stretch from the cube 
+   * Restores a saved grayscale stretch from the cube 
    *  
    * @param stretch 
    */
-  void AdvancedStretchDialog::restoreSavedStretch(CubeStretch stretch){
-    p_grayStretch->restoreSavedStretch(stretch);
+  void AdvancedStretchDialog::restoreGrayStretch(CubeStretch stretch){
+    if (p_grayStretch) {
+      p_grayStretch->restoreSavedStretch(stretch); 
+    }
+    else {
+      QString msg = "Gray mode not enabled, cannot restore gray stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Restores a saved RGB stretch from the cube 
+   *  
+   * @param red 
+   * @param green 
+   * @param blue 
+   */
+  void AdvancedStretchDialog::restoreRgbStretch(CubeStretch red, CubeStretch green, CubeStretch blue) {
+    if (isRgbMode()) {
+      if (p_redStretch) {
+        p_redStretch->restoreSavedStretch(red); 
+      }
+      
+      if (p_grnStretch) {
+        p_grnStretch->restoreSavedStretch(green); 
+      }
+      
+      if (p_bluStretch) {
+        p_bluStretch->restoreSavedStretch(blue); 
+      }
+    }
+    else {
+      QString msg = "RGB mode not enabled, cannot restore RGB stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -282,25 +316,9 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrayStretch() {
+  CubeStretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
       return p_grayStretch->getStretch();
-    }
-    else {
-      QString msg = "Gray mode not enabled, cannot get gray stretch";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-  }
-
-
-  /**
-   * This returns the advanced stretch's stretch for gray.
-   *
-   * @return Stretch
-   */
-  CubeStretch AdvancedStretchDialog::getGrayCubeStretch() {
-    if(p_grayStretch) {
-      return p_grayStretch->getCubeStretch();
     }
     else {
       QString msg = "Gray mode not enabled, cannot get gray stretch";
@@ -314,7 +332,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getRedStretch() {
+  CubeStretch AdvancedStretchDialog::getRedStretch() {
     if(p_redStretch) {
       return p_redStretch->getStretch();
     }
@@ -330,7 +348,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrnStretch() {
+  CubeStretch AdvancedStretchDialog::getGrnStretch() {
     if(p_grnStretch) {
       return p_grnStretch->getStretch();
     }
@@ -346,7 +364,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getBluStretch() {
+  CubeStretch AdvancedStretchDialog::getBluStretch() {
     if(p_bluStretch) {
       return p_bluStretch->getStretch();
     }

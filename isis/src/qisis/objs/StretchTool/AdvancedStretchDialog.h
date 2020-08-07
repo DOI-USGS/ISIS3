@@ -49,13 +49,13 @@ namespace Isis {
                           Histogram &grayHist);
       void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
-      void restoreSavedStretch(CubeStretch stretch); 
+      void restoreGrayStretch(CubeStretch stretch); 
+      void restoreRgbStretch(CubeStretch red, CubeStretch green, CubeStretch blue);
 
-      Stretch getGrayStretch();
-      Stretch getRedStretch();
-      Stretch getGrnStretch();
-      Stretch getBluStretch();
-      CubeStretch getGrayCubeStretch();
+      CubeStretch getGrayStretch();
+      CubeStretch getRedStretch();
+      CubeStretch getGrnStretch();
+      CubeStretch getBluStretch();
 
       /**
        * Returns true if the advanced stretch is enabled
