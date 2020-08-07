@@ -175,6 +175,10 @@ namespace Isis {
    *  blob is stored and the pointer is removed from the blob pvl.
    *  
    *  @param pvl The Pvl to be searched
+   *  @param keywords A list of keyword, value pairs to match inside the blob's
+   *  PVL object. Only if all the keyword match is the blob processed. This is used
+   *  when there are multiple blobs with the same name, but different keywords that 
+   *  define the exact blob (see Stretch with a band number)
    */ 
   void Blob::Find(const Pvl &pvl, const QList<QPair<QString,QString>> keywords) {
     bool found = false;
@@ -191,12 +195,10 @@ namespace Isis {
               found = true;
               for (int i=0; i < keywords.size(); i++) {
                 if(obj.hasKeyword(keywords[i].first) && (keywords[i].second != obj[keywords[i].first])) {
-                  std::cout << "FALSE: " << keywords[i].second << ", " << obj[keywords[i].first] << std::endl;
                   found = false;
                 }
               }
               if (found) {
-                std::cout << "TRUE: " << obj["BandNumber"][0] << std::endl;
                 p_blobPvl = obj;
                 found = true;
                 break;

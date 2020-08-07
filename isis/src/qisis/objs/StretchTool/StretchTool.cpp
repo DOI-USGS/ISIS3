@@ -462,6 +462,32 @@ namespace Isis {
         ++i;
       }
     }
+    else {
+      int redBandNumber = cvp->redBand();
+      int greenBandNumber = cvp->greenBand();
+      int blueBandNumber = cvp->blueBand();
+
+      QList<QPair<QString, int>> tempNameList;
+      PvlObject::PvlObjectIterator objIter;
+      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+        if (objIter->name() == "Stretch") {
+          PvlKeyword tempKeyword = objIter->findKeyword("Name");
+          int bandNumber = int(objIter->findKeyword("BandNumber"));
+          if (bandNumber == redBandNumber || bandNumber == greenBandNumber 
+              || bandNumber == blueBandNumber) {
+            QString tempName = tempKeyword[0]; 
+            QPair<QString, int> tempElt = {tempName, bandNumber};
+            tempNameList.append(tempElt);
+            namelist.append(tempName);
+          }
+        }
+        // STILL need to do this
+        // how do we deal with multiple of the same name? 
+        // 2 passes through list? 
+        // with band #s visible restriction (and need all 3 to load...
+//        namelist = tempNameList;
+        }
+      }
 
     bool ok;
     QString stretchName = QInputDialog::getItem((QWidget*)parent(), tr("Load Stretch"),
@@ -503,15 +529,10 @@ namespace Isis {
         CubeStretch greenStretch = greenStretchBlob.getStretch();
         CubeStretch blueStretch = blueStretchBlob.getStretch();
 
-        qDebug() << redStretch.Text();
-        qDebug() << greenStretch.Text();
-        qDebug() << blueStretch.Text();
-
         // works for RGB?
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreSavedRGB(redStretch, greenStretch, blueStretch);
         }
-
         cvp->stretchRed(redStretch);
         cvp->stretchGreen(greenStretch);
         cvp->stretchBlue(blueStretch);
