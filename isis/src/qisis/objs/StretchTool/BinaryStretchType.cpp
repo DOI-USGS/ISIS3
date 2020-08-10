@@ -377,7 +377,12 @@ namespace Isis {
   }
 
 
-  CubeStretch BinaryStretchType::getCubeStretch() {
+  /**
+   * Gets the CubeStretch for this Binary Stretch
+   * 
+   * @return CubeStretch 
+   */
+  CubeStretch BinaryStretchType::getStretch() {
     CubeStretch cubeStretch(*p_stretch, "Binary");
     return cubeStretch;
   }

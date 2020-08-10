@@ -255,13 +255,14 @@ namespace Isis {
     }
   }
 
-  Stretch LinearStretchType::getStretch() {
-    return *p_stretch;
-  }
 
-  CubeStretch LinearStretchType::getCubeStretch() {
+  /**
+   * Returns the CubeStretch for this LinearStretch 
+   *  
+   * @return CubeStretch 
+   */
+  CubeStretch LinearStretchType::getStretch() {
     CubeStretch cubeStretch(*p_stretch, "Linear");
     return cubeStretch;
   }
-
 }

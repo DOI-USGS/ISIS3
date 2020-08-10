@@ -37,7 +37,7 @@ namespace Isis {
                         const QString &name, const QColor &color);
       ~ManualStretchType();
 
-      virtual CubeStretch getCubeStretch();
+      virtual CubeStretch getStretch();
       virtual void setStretch(Stretch);
 
     private slots:

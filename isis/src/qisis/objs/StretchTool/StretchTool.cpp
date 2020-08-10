@@ -347,7 +347,7 @@ namespace Isis {
           }
         }
       }
-      //Otherwise it is in color mode
+      // Otherwise it is in color mode
       else if(!cvp->isGray() &&
               !cvp->redBuffer()->working() &&
               !cvp->greenBuffer()->working() &&
