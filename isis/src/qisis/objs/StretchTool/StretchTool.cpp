@@ -481,21 +481,18 @@ namespace Isis {
         StretchBlob greenStretchBlob(stretchName); 
         StretchBlob blueStretchBlob(stretchName); 
         
-        QPair<QString, QString> keywordValue = {"BandNumber", QString::number(cvp->redBand())};
-        QList<QPair<QString, QString>> keywordValueList;
-        keywordValueList.append(keywordValue);
+        QMap<QString, QString> keywordValueRed;
+        keywordValueRed["BandNumber"] = QString::number(cvp->redBand());
 
-        QPair<QString, QString> keywordValueGreen = {"BandNumber", QString::number(cvp->greenBand())};
-        QList<QPair<QString, QString>> keywordValueListGreen;
-        keywordValueListGreen.append(keywordValueGreen);
+        QMap<QString, QString> keywordValueGreen;
+        keywordValueGreen["BandNumber"] = QString::number(cvp->greenBand());
 
-        QPair<QString, QString> keywordValueBlue = {"BandNumber", QString::number(cvp->blueBand())};
-        QList<QPair<QString, QString>> keywordValueListBlue;
-        keywordValueListBlue.append(keywordValueBlue);
+        QMap<QString, QString> keywordValueBlue;
+        keywordValueBlue["BandNumber"] = QString::number(cvp->blueBand());
 
-        icube->read(redStretchBlob, keywordValueList);
-        icube->read(greenStretchBlob, keywordValueListGreen);
-        icube->read(blueStretchBlob, keywordValueListBlue);
+        icube->read(redStretchBlob, keywordValueRed);
+        icube->read(greenStretchBlob, keywordValueGreen);
+        icube->read(blueStretchBlob, keywordValueBlue);
 
         CubeStretch redStretch = redStretchBlob.getStretch();
         CubeStretch greenStretch = greenStretchBlob.getStretch();
