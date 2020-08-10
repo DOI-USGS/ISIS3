@@ -316,13 +316,11 @@ namespace Isis {
     for(int i = 0; i < size; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
-      ale::Vec3d position(p_coordinate);
-      ale::State currentState(position);
+      ale::State currentState = ale::State(ale::Vec3d(p_coordinate));
       if (p_hasVelocity) {
         currentState.velocity = ale::Vec3d(p_velocity);
       }
       stateCache.push_back(currentState);
-      }
     }
 
     if (m_state != NULL) {
