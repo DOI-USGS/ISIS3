@@ -53,8 +53,8 @@ namespace Isis {
    * @param name Name to use for Stretch 
    * @param type Type of stretch 
    */
-  CubeStretch::CubeStretch(QString name, QString stretchType, int bandNumber) : m_name(name), m_type(stretchType) {
-    m_bandNumber = bandNumber;
+  CubeStretch::CubeStretch(QString name, QString stretchType, int bandNumber) : m_name(name), 
+    m_type(stretchType), m_bandNumber(bandNumber) {
   }
 
 
@@ -69,7 +69,7 @@ namespace Isis {
    * @param Stretch Stretch to construct the CubeStretch from.
    */
   CubeStretch::CubeStretch(Stretch const& stretch): Stretch(stretch) {
-    m_name = "DefaultName";
+    m_name = "DefaultStretch";
     m_bandNumber = 1;
     m_type = "Default";
   }
@@ -86,6 +86,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Check if the CubeStretches are equal
+   * 
+   * @param stretch2 The stretch to compare with
+   * 
+   * @return bool True if stretches are equal. Else, false.
+   */
   bool CubeStretch::operator==(CubeStretch& stretch2) {
     return (getBandNumber() == stretch2.getBandNumber()) && 
            (getName() == stretch2.getName()) &&
