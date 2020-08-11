@@ -75,11 +75,11 @@ namespace Isis {
       QPushButton *loadStretchButton = new QPushButton("Restore Saved Stretch from Cube...");
       connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
       p_mainLayout->addWidget(loadStretchButton, 6, 0);
-    }
 
-    QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    sizePolicy.setHeightForWidth(true);
-    p_graph->setSizePolicy(sizePolicy);
+      QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+      sizePolicy.setHeightForWidth(true);
+      p_graph->setSizePolicy(sizePolicy);
+    }
   }
 
 
