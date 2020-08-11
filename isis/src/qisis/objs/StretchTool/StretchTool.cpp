@@ -410,7 +410,6 @@ namespace Isis {
     Cube* icube = cvp->cube();
     Pvl* lab = icube->label();
 
-
     QStringList namelist; 
 
     // Create a list of existing Stretch names
@@ -462,9 +461,17 @@ namespace Isis {
     }
 
     bool ok;
-    QString stretchName = QInputDialog::getItem((QWidget*)parent(), tr("Load Stretch"),
-                                         tr("Name of Stretch to Load:"), namelist, 0,
-                                         false, &ok);
+    QString stretchName;
+    // Only display load stretch dialog if there are stretches saved to the cube
+    if (namelist.size() >=1) {
+      stretchName = QInputDialog::getItem((QWidget *)parent(), tr("Load Stretch"), 
+                                          tr("Name of Stretch to Load:"), namelist, 0,
+                                          false, &ok);
+    }
+    else {
+      QMessageBox::information((QWidget *)parent(), "Information", 
+                                   "There are no saved stretches to restore.");
+    }
 
     if (ok) {
       if (cvp->isGray()) {
@@ -533,9 +540,18 @@ namespace Isis {
     }
 
     bool ok;
-    QString toDelete = QInputDialog::getItem((QWidget*)parent(), tr("Delete Stretch"),
-                                         tr("Name of Stretch to Delete:"), namelist, 0,
-                                         false, &ok);
+    QString toDelete;
+    // Only display list of stretches to delete if there are stretches saved to the cube
+    if (namelist.size() >= 1) {
+      toDelete = QInputDialog::getItem((QWidget *)parent(), tr("Delete Stretch"), 
+                                       tr("Name of Stretch to Delete:"), namelist, 0,
+                                       false, &ok);
+    }
+    else {
+      QMessageBox::information((QWidget *)parent(), "Information", 
+                               "There are no saved stretches to delete.");
+    }
+
     if (ok) {
       if (icube->isReadOnly()) {
         try {
@@ -588,6 +604,40 @@ namespace Isis {
 
     bool ok;
     QString name; 
+
+    // 
+    // At this time, it is NOT possible to save an RGB stretch with the same band number 
+    // multiple times, if the saved stretch for each is different. If the saved stretch is the same
+    // this is okay.
+    // 
+    // For example, r=1, g=1, b=1, with the same stretch for each is okay
+    //              r=1, g=1, b=2, where the stretches for band 1 are the same, is okay 
+    //              r=1, g=1, b=1, where the the stretches for band 1 are different (red stretch !=
+    //                                                                               green stretch)
+    // 
+    if (!cvp->isGray()) {
+      CubeStretch redStretch, greenStretch, blueStretch;
+      if (m_advancedStretch->isVisible()) {
+        redStretch = m_advancedStretch->getRedStretch();
+        greenStretch = m_advancedStretch->getGrnStretch();
+        blueStretch = m_advancedStretch->getBluStretch();
+      }
+      else {
+        redStretch = cvp->redStretch();
+        greenStretch = cvp->greenStretch();
+        blueStretch = cvp->blueStretch();
+      }
+      int redBand = redStretch.getBandNumber();
+      int greenBand = greenStretch.getBandNumber();
+      int blueBand = blueStretch.getBandNumber();
+      
+      if (((redBand == greenBand) && !(redStretch == greenStretch)) ||
+          ((redBand == blueBand)  && !(redBand == blueBand)) ||
+          ((greenBand == blueBand) && !(greenBand == blueBand))) {
+        QMessageBox::information((QWidget *)parent(), "Error", "Sorry, cannot save RGB stretches which include the same band multiple times, but have different stretches for each"); 
+        return;
+      }
+    }
 
     // "Get the name for the stretch" dialog
     QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
