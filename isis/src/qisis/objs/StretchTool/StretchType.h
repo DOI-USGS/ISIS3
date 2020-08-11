@@ -45,8 +45,7 @@ namespace Isis {
 
       virtual ~StretchType();
 
-      virtual Stretch getStretch();
-      virtual CubeStretch getCubeStretch();
+      virtual CubeStretch getStretch();
       /**
        * Children must re-implement this to update their stretch pairs and GUI
        *   elements appropriately. This could be called with a

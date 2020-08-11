@@ -151,7 +151,13 @@ namespace Isis {
     return stretch;
   }
 
-  CubeStretch ManualStretchType::getCubeStretch() {
+
+/**
+ * Gets the current CubeStretch for this ManualStretch. 
+ *  
+ * @return CubeStretch 
+ */
+  CubeStretch ManualStretchType::getStretch() {
     CubeStretch cubeStretch(*p_stretch, "Manual");
     return cubeStretch;
   }

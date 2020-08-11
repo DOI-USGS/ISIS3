@@ -310,7 +310,13 @@ namespace Isis {
                                p_widthEdit->text().toDouble());
   }
 
-  CubeStretch SawtoothStretchType::getCubeStretch() {
+
+  /**
+   * Gets the CubeStretch for this Sawtooth Stretch.
+   * 
+   * @return CubeStretch 
+   */
+  CubeStretch SawtoothStretchType::getStretch() {
     CubeStretch cubeStretch(*p_stretch, "Sawtooth");
     return cubeStretch;
   }

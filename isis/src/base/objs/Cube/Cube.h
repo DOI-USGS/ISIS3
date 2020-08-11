@@ -28,7 +28,7 @@
 // This is needed for the QVariant macro
 #include <QMetaType>
 #include <QList>
-#include <QPair>
+#include <QMap>
 
 #include <nlohmann/json.hpp>
 
@@ -260,7 +260,7 @@ namespace Isis {
       void reopen(QString access = "r");
 
       void read(Blob &blob, 
-                const QList<QPair<QString,QString>> keywords = QList<QPair<QString,QString>>()) const;
+                const QMap<QString,QString> keywords = QMap<QString,QString>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);

@@ -180,7 +180,7 @@ namespace Isis {
    *  when there are multiple blobs with the same name, but different keywords that 
    *  define the exact blob (see Stretch with a band number)
    */ 
-  void Blob::Find(const Pvl &pvl, const QList<QPair<QString,QString>> keywords) {
+  void Blob::Find(const Pvl &pvl, const QMap<QString, QString> keywords) {
     bool found = false;
     try {
       // Search for the blob name
@@ -191,12 +191,15 @@ namespace Isis {
           QString curName = obj["Name"];
           curName = curName.toUpper();
           if (blobName == curName) {
+
             if (keywords.size() >= 1) {
               found = true;
-              for (int i=0; i < keywords.size(); i++) {
-                if(obj.hasKeyword(keywords[i].first) && (keywords[i].second != obj[keywords[i].first])) {
+              QMap<QString, QString>::const_iterator i = keywords.constBegin();
+              while (i != keywords.constEnd()) {
+                if (obj.hasKeyword(i.key()) && (i.value() != obj[i.key()])) {
                   found = false;
                 }
+                ++i;
               }
               if (found) {
                 p_blobPvl = obj;
@@ -259,7 +262,7 @@ namespace Isis {
    * @throws iException::Io - Unable to open file
    * @throws iException::Pvl - Invalid label format
    */
-  void Blob::Read(const QString &file, const QList<QPair<QString,QString>> keywords) {
+  void Blob::Read(const QString &file, const QMap<QString,QString> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -283,7 +286,7 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const QString &file, const Pvl &pvlLabels, const QList<QPair<QString,QString>> keywords) {
+  void Blob::Read(const QString &file, const Pvl &pvlLabels, const QMap<QString,QString> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -317,7 +320,7 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const Pvl &pvl, std::istream &istm, const QList<QPair<QString,QString>> keywords){
+  void Blob::Read(const Pvl &pvl, std::istream &istm, const QMap<QString,QString> keywords){
     try {
       Find(pvl, keywords);
       ReadInit();

@@ -791,7 +791,7 @@ namespace Isis {
    *
    * @return (type)return description
    */
-  void Cube::read(Blob &blob, const QList<QPair<QString,QString>> keywords) const {
+  void Cube::read(Blob &blob, const QMap<QString,QString> keywords) const {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't read a blob from it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -805,8 +805,6 @@ namespace Isis {
     QMutexLocker locker2(m_ioHandler->dataFileMutex());
     blob.Read(cubeFile.toString(), *label(), keywords);
   }
-  // add optional argument QList<QPair<QString, QString>>, default to empty
-  // or add new function with this signature.
 
 
   /**
