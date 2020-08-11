@@ -196,7 +196,7 @@ namespace Isis {
               found = true;
               QMap<QString, QString>::const_iterator i = keywords.constBegin();
               while (i != keywords.constEnd()) {
-                if(obj.hasKeyword(i.key()) && (i.value() != obj[i.key()])) {
+                if (obj.hasKeyword(i.key()) && (i.value() != obj[i.key()])) {
                   found = false;
                 }
                 ++i;
