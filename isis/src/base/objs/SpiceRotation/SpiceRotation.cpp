@@ -896,7 +896,14 @@ namespace Isis {
 
       for (int i = 0; i < (int) m_orientation->getRotations().size(); i++) {
         std::vector<double> quat = m_orientation->getRotations()[i].toQuaternion();
-        record[0] = quat[0];
+        if (quat[0] < 0) {
+          quat[0] = -1 * quat[0];
+          quat[1] = -1 * quat[1];
+          quat[2] = -1 * quat[2];
+          quat[3] = -1 * quat[3];
+        }
+
+        record[0] = quat[0]; 
         record[1] = quat[1];
         record[2] = quat[2];
         record[3] = quat[3];
