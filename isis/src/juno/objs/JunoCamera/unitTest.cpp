@@ -53,8 +53,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = -45.4762320380959295;
-    double knownLon = 278.270465938390657;
+    double knownLat = -45.4752919757178731;
+    double knownLon = 278.267811512381911;
 
     Cube c("$juno/testData/JNCE_2013282_00M00099_V01_METHANE_0003.cub", "r");
     JunoCamera *cam = (JunoCamera *) CameraFactory::Create(c);
