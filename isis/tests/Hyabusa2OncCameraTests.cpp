@@ -24,6 +24,7 @@ void testCamera(Cube &c, double knownLat, double knownLon,
                 double s2, double l2, 
                 double s3, double l3, 
                 double s4, double l4);
+
 void testLineSamp(Camera *cam, double sample, double line);
 
 class Hayabusa2Cube : public DefaultCube {
