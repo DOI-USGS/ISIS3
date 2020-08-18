@@ -57,7 +57,12 @@ void IsisMain() {
   }
   else {
     hist = new Histogram(*icube, 1, p.Progress());
+
+    if (ui.WasEntered("NBINS")){
+      hist->SetBins(ui.GetInteger("NBINS"));
+    }
   }
+
   // Setup the histogram
 
   // Loop and accumulate histogram
