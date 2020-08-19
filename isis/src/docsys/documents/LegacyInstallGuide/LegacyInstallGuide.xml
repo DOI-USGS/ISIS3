@@ -643,11 +643,12 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       and how to tell what shell a user is using to the UNIX Enviroment Setup section. Fixes #5372.</change>
     <change name="Ian Humphrey" date="2018-04-06">Updated for latest supported Fedora version (Fedora25).</change>
     <change name="Kristin Berry and Adam Goins" date="2018-08-28">Removed references to deprecated Java-based installer and split off into a new Legacy ISIS3 installation instructions page. </change>
+    <change name="Jesse Mapel" date="2020-02-12">Fixed version spacing to be a little more consistant.</change>
   </history>
 
   <bibliography>
-    <title>Installing Legacy Versions of ISIS3</title> 
-    <brief>Downloading and installing ISIS 3 versions 3.5.2.0 and earlier</brief>
+    <title>Installing Legacy Versions of ISIS3</title>
+    <brief>Downloading and installing ISIS versions 3.5.2.0 and earlier</brief>
     <description>
       This document describes how to download and install a
       binary version of ISIS.

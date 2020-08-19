@@ -425,6 +425,10 @@ namespace Isis {
 
       void checkForBinaryPck();
 
+      int cacheSize() {
+        return p_cache.size();
+      }
+
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
       void setEphemerisTimeMemcache();
