@@ -193,8 +193,7 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
       "spk_table_end_time": 100.1,
       "spk_table_original_size": 2,
       "ephemeris_times": [
-        100,
-        100.1
+        100
       ],
       "positions": [
         [0, 20, 0]
