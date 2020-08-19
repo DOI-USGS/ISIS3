@@ -894,8 +894,13 @@ namespace Isis {
       record += t;
       Table table(tableName, record);
 
-      for (int i = 0; i < (int) m_orientation->getRotations().size(); i++) {
-        std::vector<double> quat = m_orientation->getRotations()[i].toQuaternion();
+      std::vector<ale::Rotation> rots = m_orientation->getRotations();
+      std::vector<ale::Vec3d> angularVelocities = m_orientation->getAngularVelocities();
+      for (int i = 0; i < (int) p_cacheTime.size(); i++) {
+        std::vector<double> quat = rots[i].toQuaternion();
+
+        // If the first component is less than zero, multiply the whole quaternion by -1. This 
+        // matches NAIF.
         if (quat[0] < 0) {
           quat[0] = -1 * quat[0];
           quat[1] = -1 * quat[1];
@@ -908,8 +913,8 @@ namespace Isis {
         record[2] = quat[2];
         record[3] = quat[3];
 
-        if (m_orientation->getAngularVelocities().size() > 0) {
-          ale::Vec3d angularVelocity = m_orientation->getAngularVelocities()[i];
+        if (angularVelocities.size() > 0) {
+          ale::Vec3d angularVelocity = angularVelocities[i];
           record[4] = angularVelocity.x;
           record[5] = angularVelocity.y;
           record[6] = angularVelocity.z;
@@ -1734,10 +1739,11 @@ namespace Isis {
     }
 
     // Adjust degree of polynomial on available data
-    if (m_orientation->getRotations().size() == 1) {
+    int size = m_orientation->getRotations().size();
+    if (size == 1) {
       p_degree = 0;
     }
-    else if (m_orientation->getRotations().size() == 2) {
+    else if (size == 2) {
       p_degree = 1;
     }
 
@@ -1753,7 +1759,7 @@ namespace Isis {
     Isis::PolynomialUnivariate function1(p_degree);   //!< Basis function fit to 1st rotation angle
     Isis::PolynomialUnivariate function2(p_degree);   //!< Basis function fit to 2nd rotation angle
     Isis::PolynomialUnivariate function3(p_degree);   //!< Basis function fit to 3rd rotation angle
-    //
+
     LeastSquares *fitAng1 = new LeastSquares(function1);
     LeastSquares *fitAng2 = new LeastSquares(function2);
     LeastSquares *fitAng3 = new LeastSquares(function3);
@@ -1762,7 +1768,7 @@ namespace Isis {
     ComputeBaseTime();
     std::vector<double> time;
 
-    if (m_orientation->getRotations().size() == 1) {
+    if (size == 1) {
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
@@ -1770,8 +1776,8 @@ namespace Isis {
       coeffAng2.push_back(angles[1]);
       coeffAng3.push_back(angles[2]);
     }
-    else if (m_orientation->getRotations().size() == 2) {
-// Load the times and get the corresponding rotation angles
+    else if (size == 2) {
+      // Load the times and get the corresponding rotation angles
       p_degree = 1;
       double t1 = p_cacheTime.at(0);
       SetEphemerisTime(t1);
@@ -2473,8 +2479,7 @@ namespace Isis {
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
-      if (p_fullCacheSize != (int) m_orientation->getRotations().size()) {
-
+      if (p_fullCacheSize != (int) p_cacheTime.size()) {
         QString msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -2486,6 +2491,7 @@ namespace Isis {
 
       // We will treat et as the sclock time and avoid converting back and forth
      std::vector<ale::Rotation> fullRotationCache = m_orientation->getRotations(); 
+     std::vector<ale::Vec3d> angularVelocities = m_orientation->getAngularVelocities();
      for (int r = 0; r < p_fullCacheSize; r++) {
         timeSclkdp[r] = p_cacheTime[r];
         std::vector<double> rotationMatrix = fullRotationCache[r].toRotationMatrix();
@@ -2495,11 +2501,10 @@ namespace Isis {
                             };
         m2q_c(CJ, quats[r]);
         if (p_hasAngularVelocity) {
-          ale::Vec3d angularVelocity = m_orientation->getAngularVelocities()[r];
-//          vequ_c((SpiceDouble *) &p_cacheAv[r][0], avvs[r]);    // FIXME -- what does this do?
-          vequ_c((SpiceDouble *) &angularVelocity.x, avvs[r]); // FIXME
+          ale::Vec3d angularVelocity = angularVelocities[r];
+          vequ_c((SpiceDouble *) &angularVelocity.x, avvs[r]);
         }
-      }
+     }
 
       double cubeStarts = timeSclkdp[0]; //,timsSclkdp[ckBlob.Records()-1] };
       double radTol = 0.000000017453; //.000001 degrees  Make this instrument dependent TODO
@@ -3253,10 +3258,9 @@ namespace Isis {
   void SpiceRotation::setEphemerisTimeMemcache() {
    // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
-    if (m_orientation->getRotations().size() == 1) {
+    if (p_cacheTime.size() == 1) {
       p_CJ = m_orientation->getRotations()[0].toRotationMatrix();
-//      if (p_hasAngularVelocity) {
-      if (m_orientation->getAngularVelocities().size() > 0) {
+      if (p_hasAngularVelocity) {
         ale::Vec3d av = m_orientation->getAngularVelocities()[0]; 
         p_av[0] = av.x;
         p_av[1] = av.y;
@@ -3265,7 +3269,6 @@ namespace Isis {
     }
     // Otherwise determine the interval to interpolate
     else {
-
       p_CJ = m_orientation->interpolateTimeDep(p_et).toRotationMatrix();
 
       if (p_hasAngularVelocity) {
