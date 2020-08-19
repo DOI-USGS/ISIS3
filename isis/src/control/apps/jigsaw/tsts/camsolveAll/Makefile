@@ -23,7 +23,7 @@ commands:
 	  update=yes \
 	  cksolvedegree=3 \
 	  camsolve=all \
-	  bundleout_txt=yes \
+	  bundleout_txt=no \
 	  twist=no > /dev/null;
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
