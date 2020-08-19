@@ -488,8 +488,6 @@ namespace Isis {
                                            J2000 to target) to the target frame*/
       std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant
                                                rotation*/
-      std::vector<std::vector<double> > p_cacheAv;
-      //!< Cached angular velocities for corresponding rotactions in p_cache
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
       bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation
                                                includes angular velocity*/

@@ -731,13 +731,6 @@ namespace Isis {
     // Clear existing matrices from cache
       p_cacheTime.clear();
 
-      // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated
-      //  for functions of degree 0 (framing cameras), so keep the original av.  It is better than
-      //  nothing.
-      if (p_degree > 0 && p_cacheAv.size() > 1) {
-        p_cacheAv.clear(); // FIXME??? 
-      }
-
       // Load the time cache first
       p_minimizeCache = No;
       LoadTimeCache();
@@ -1315,8 +1308,6 @@ namespace Isis {
    * Set the rotation angles (phi, delta, and w) for the current time to define the
    * time-based matrix CJ. This method was created for unitTests and should not
    * be used otherwise.  It only works for cached data with a cache size of 1.
-   *  
-   * // FIXME - MAYBE THIS SHOULD BE IN THE UNITTEST THEN.... (see comment) 
    *  
    * @param[in]  angles The angles defining the rotation (phi, delta, and w) in radians
    * @param[in]  axis3    The rotation axis for the third angle
