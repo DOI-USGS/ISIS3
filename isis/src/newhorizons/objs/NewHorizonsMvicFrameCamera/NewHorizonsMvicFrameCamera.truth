@@ -33,6 +33,6 @@ DeltaSample = ERROR
 DeltaLine = ERROR
 
 For center pixel position ...
-Latitude off by: 36.4971027901168554
-Longitude off by: -4.0083142273843686
+Latitude off by: 36.4971027901241456
+Longitude off by: -4.0083142274035506
 **PROGRAMMER ERROR** Band number out of array bounds in NewHorizonsMvicFrameCamera::SetBand legal bands are [1-9], input was [10].

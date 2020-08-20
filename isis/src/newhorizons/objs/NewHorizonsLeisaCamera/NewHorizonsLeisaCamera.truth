@@ -4367,7 +4367,7 @@ Test forward and backward line/samp to lat/lon delta for Band #256
 
 For center pixel position ...
 Latitude OK
-Longitude OK
+Longitude off by: -0.0000000000004299
 
 The bands of this camera have different gemometry for each band = 1
 
