@@ -181,8 +181,13 @@ namespace Isis {
     p_hasAngularVelocity = rotToCopy.p_hasAngularVelocity;
     m_frameType = rotToCopy.m_frameType;
 
-    m_orientation = new ale::Orientations;
-    *m_orientation = *rotToCopy.m_orientation;
+    if (rotToCopy.m_orientation) {
+      m_orientation = new ale::Orientations;
+      *m_orientation = *rotToCopy.m_orientation; 
+    }
+    else {
+      m_orientation = NULL;
+    }
   }
 
 

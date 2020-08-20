@@ -424,7 +424,10 @@ namespace Isis {
       void checkForBinaryPck();
 
       int cacheSize() {
-        return m_orientation->getRotations().size();
+        if (m_orientation) {
+          return m_orientation->getRotations().size(); 
+        }
+        return 0;
       }
 
     protected:
