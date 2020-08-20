@@ -25,10 +25,10 @@
       <td valign="top">
         <h2>Welcome</h2>
         <p>
-	  This is the home page for ISIS, a digital image processing software 
-	  package. The focus of the software is to manipulate imagery collected 
-	  by current and past NASA and International planetary missions sent 
-	  throughout our Solar System. 
+	  This is the home page for ISIS, a digital image processing software
+	  package. The focus of the software is to manipulate imagery collected
+	  by current and past NASA and International planetary missions sent
+	  throughout our Solar System.
         </p>
         <h2>Announcements</h2>
         <div style="text-align:center;">
@@ -38,6 +38,14 @@
             </script>
           </div>
         </div>
+        <h2>Request for comments</h2>
+        <p>
+          Major changes to how ISIS works are now handled through Requests for Comment (RFCs).
+          These are a venue for the user community to voice their opinions on how they would
+          like the software to work.
+          Currently open RFCs can be found on the
+          <a href="https://github.com/USGS-Astrogeology/ISIS3#requests-for-comment" target="top">ISIS Github</a>.
+        </p>
         <h2>Popular Destinations</h2>
         <ul>
           <li>
@@ -46,7 +54,7 @@
             </a>
           </li>
           <li>
-            <a href="Application/index.html">ISIS 3 Application Table of Contents</a>
+            <a href="Application/index.html">ISIS Application Table of Contents</a>
           </li>
         </ul>
 

@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
+  std::cout << "Cache Size: " << pos.cacheSize() << '\n';
   cout << endl;
 
   // Test table options
@@ -296,11 +297,11 @@ int main(int argc, char *argv[]) {
 
   // Test loading cache from an ALE ISD without velocities
   cout << "Test loading cache from an ALE ISD with velocities" << endl;
-  json aleIsd = {{"SpkTableStartTime"    , -10.0},
-                 {"SpkTableEndTime"      , 10.0},
-                 {"SpkTableOriginalSize" , 3},
-                 {"EphemerisTimes"       , {-10.0, 0.0, 10.0}},
-                 {"Positions"            , {{-10.0, -10.0, -10.0},
+  json aleIsd = {{"spk_table_start_time"    , -10.0},
+                 {"spk_table_end_time"      , 10.0},
+                 {"spk_table_original_size" , 3},
+                 {"ephemeris_times"       , {-10.0, 0.0, 10.0}},
+                 {"positions"            , {{-10.0, -10.0, -10.0},
                                             {0.0,  0.0,  0.0},
                                             {10.0,  10.0,  10.0}}}};
   SpicePosition alePos(-94, 499);
@@ -319,7 +320,7 @@ int main(int argc, char *argv[]) {
   // Test loading cache from an ALE ISD with velocities
   cout << "Test loading cache from an ALE ISD with velocities" << endl;
   json aleVelIsd = aleIsd;
-  aleVelIsd["Velocities"] = {{1.0, 1.0, 1.0},
+  aleVelIsd["velocities"] = {{1.0, 1.0, 1.0},
                              {1.0, 1.0, 1.0},
                              {1.0, 1.0, 1.0}};
   SpicePosition aleVelPos(-94, 499);

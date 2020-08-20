@@ -16,6 +16,7 @@ End_Group
 Group = InstrumentId
   Auto
   InputKey       = P_NAME
+  InputKey       = NAIFNAME
   InputPosition  = FitsLabels
   OutputName     = InstrumentId
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -79,6 +80,7 @@ End_Group
 Group = ExposureDuration
   Auto
   InputKey       = EXPOSURE
+  InputKey       = XPOSURE
   InputPosition  = FitsLabels
   OutputName     = ExposureDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -88,6 +90,7 @@ End_Group
 Group = SpacecraftClockStartCount
   Auto
   InputKey       = P_SCCSC
+  InputKey       = SCCL-BEG
   InputPosition  = FitsLabels
   OutputName     = SpacecraftClockStartCount
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -97,6 +100,7 @@ End_Group
 Group = SpacecraftClockEndCount
   Auto
   InputKey       = P_SCCEC
+  InputKey       = SCCL-END
   InputPosition  = FitsLabels
   OutputName     = SpacecraftClockStartCount
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -116,6 +120,7 @@ End_Group
 #s/c counter at data recorded time
 Group = OnboardDataRecordedTime
   Auto
+  Optional
   InputKey       = P_RECTI
   InputPosition  = FitsExtras
   OutputName     = OnboardDataRecordedTime
@@ -126,6 +131,7 @@ End_Group
 Group = Binning
   Auto
   InputKey       = P_BINN
+  InputKey       = NPIXBIN
   InputPosition  = FitsLabels
   OutputName     = Binning
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -136,6 +142,7 @@ End_Group
 Group = SelectedImageAreaX1
   Auto
   InputKey       = P_OPOSX1
+  InputKey       = ROI_LLX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX1
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -145,6 +152,7 @@ End_Group
 Group = SelectedImageAreaY1
   Auto
   InputKey       = P_OPOSY1
+  InputKey       = ROI_LLY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY1
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -153,7 +161,9 @@ End_Group
 
 Group = SelectedImageAreaX2
   Auto
+  Optional
   InputKey       = P_OPOSX2
+  InputKey       = ROI_URX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX2
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -162,7 +172,9 @@ End_Group
 
 Group = SelectedImageAreaY2
   Auto
+  Optional
   InputKey       = P_OPOSY2
+  InputKey       = ROI_URY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY2
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -171,6 +183,7 @@ End_Group
 
 Group = SelectedImageAreaX3
   Auto
+  Optional
   InputKey       = P_OPOSX3
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX3
@@ -180,6 +193,7 @@ End_Group
 
 Group = SelectedImageAreaY3
   Auto
+  Optional
   InputKey       = P_OPOSY3
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY3
@@ -190,6 +204,7 @@ End_Group
 Group = SelectedImageAreaX4
   Auto
   InputKey       = P_OPOSX4
+  InputKey       = ROI_URX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX4
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -199,6 +214,7 @@ End_Group
 Group = SelectedImageAreaY4
   Auto
   InputKey       = P_OPOSY4
+  InputKey       = ROI_URY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY4
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -217,6 +233,7 @@ End_Group
 Group = OffsetCorrection
   Auto
   InputKey       = OFFSETCR
+  InputKey       = AOFFSET
   InputPosition  = FitsLabels
   OutputName     = OffsetCorrection
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -235,6 +252,7 @@ End_Group
 Group = RadianceConversion
   Auto
   InputKey       = RADIANCE
+  InputKey       = RADCONV
   InputPosition  = FitsLabels
   OutputName     = RadianceConversion
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -262,6 +280,7 @@ End_Group
 Group = L2BFlatFileName
   Auto
   InputKey       = L2BFLTFN
+  InputKey       = FLATFN
   InputPosition  = FitsLabels
   OutputName     = L2BFlatFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -270,6 +289,7 @@ End_Group
 
 Group = L2BSystemEfficiencyFileName
   Auto
+  Optional
   InputKey       = L2BEFCFN
   InputPosition  = FitsLabels
   OutputName     = L2BSystemEfficiencyFileName
@@ -280,6 +300,7 @@ End_Group
 Group = L2CShapeModelFileName
   Auto
   InputKey       = L2CSHPFN
+  InputKey       = SHAPEFN
   InputPosition  = FitsLabels
   OutputName     = L2CShapeModelFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -289,6 +310,7 @@ End_Group
 Group = L2DPhaseFunctionFileName
   Auto
   InputKey       = L2DPHSFN
+  InputKey       = PHASEFN
   InputPosition  = FitsLabels
   OutputName     = L2DPhaseFunctionFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -298,6 +320,7 @@ End_Group
 Group = L2DShapeModelFileName
   Auto
   InputKey       = L2DSHPFN
+  InputKey       = SHAPEFN
   InputPosition  = FitsLabels
   OutputName     = L2DShapeModelFileName
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -307,6 +330,7 @@ End_Group
 # the following image ID is assigned by the onboard image processor:
 Group = ImageID
   Auto
+  Optional
   InputKey       = P_IMGID
   InputPosition  = FitsExtras
   OutputName     = ImageID
@@ -465,20 +489,21 @@ End_Group
 Group = Compression
   Auto
   InputKey       = P_CMPSTY
+  InputKey       = IMGCMPRV
   InputPosition  = FitsLabels
   OutputName     = Compression
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-# Distance from sun to Hayabusa2
-Group = SolarDistance
-  Auto
-  InputKey       = S_DISTRS
-  InputPosition  = FitsLabels
-  OutputName     = SolarDistance
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
+# Distance from sun to Hayabusa2	
+Group = SolarDistance	
+  Auto	
+  InputKey       = S_DISTRS	
+  InputPosition  = FitsLabels	
+  OutputName     = SolarDistance	
+  OutputPosition = (Object, IsisCube, Group, Instrument)	
+  Translation    = (*, *)	
 End_Group
 
 End
