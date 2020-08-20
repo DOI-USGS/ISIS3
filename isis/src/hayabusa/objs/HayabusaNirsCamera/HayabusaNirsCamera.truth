@@ -30,5 +30,5 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
-Latitude off by: 0.0000000017899069
-Longitude off by: 0.0000000040511168
+Latitude OK
+Longitude OK
