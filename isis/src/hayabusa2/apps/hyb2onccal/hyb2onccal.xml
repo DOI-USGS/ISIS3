@@ -5,10 +5,7 @@
 xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Calibrates Hayabusa 2 ONC-T images. Calibration includes bias and dark current correction as
-    well as flat-field correction. No smear or point spread is being currently corrected (lack of
-    models to correct for this currently). Also, since no radiance calibration paramters could not
-    be determined for the individual filters, the output will be DNs (not radiance or I/F).
-    The wide-angle instruments, ONC-W1 and ONC-W2, do not have flat-field correction.
+    well as flat-field correction.
   </brief>
 
   <description>
@@ -77,9 +74,6 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     pixel in the flat-field image.
   </p>
 
-
-
-
   <p>
     <h1><a id="References">References:</a></h1>
     <ol>
@@ -98,7 +92,6 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     </ol>
 
   </p>
-
 
   </description>
 
@@ -176,7 +169,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
            the parameters as needed.
         </description>
         <filter>*.trn</filter>
-        <default><item>/usgs/cpkgs/isis3/datalocal/hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
+        <default><item>$hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
       </parameter>
       
     </group>

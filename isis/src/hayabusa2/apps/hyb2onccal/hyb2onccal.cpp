@@ -272,17 +272,20 @@ namespace Isis {
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
+    // Output units of DN
     QString units = "DN";
+
+    // Output units of radiance
     if (g_calStep == "RADIANCE") {
       // Units of RADIANCE
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
       units = "W / (m**2 micrometer sr)";
     }
-
+    // Output units of I/F
     else if (g_calStep == "IOF") {
-      // Units of I/F
-      // Included this line because we need to convert to radiance before I/F.
+      // Convert to radiance
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
+      // Convert to reflectance
       g_calibrationScale *= (Isis::PI * (g_solarDist * g_solarDist)) / g_solarFlux;
       units = "I over F";
     }
