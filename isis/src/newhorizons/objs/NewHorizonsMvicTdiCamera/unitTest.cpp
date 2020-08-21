@@ -160,14 +160,14 @@ int main(void) {
       cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution() << endl; 
     }
 
-    if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
+    if (abs(cam->UniversalLatitude() - knownLat) < 7E-12) {
       cout << "Latitude OK" << endl;
     }
     else {
       cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if (abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
+    if (abs(cam->UniversalLongitude() - knownLon) < 7E-12) {
       cout << "Longitude OK" << endl;
     }
     else {

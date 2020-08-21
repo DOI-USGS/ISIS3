@@ -145,8 +145,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 66.7031631205835680;
-    double knownLon = 95.7688045622468422;
+    double knownLat = 66.7031631205829569;
+    double knownLon = 95.7688045622462880;
 
     Cube c(testNACFile, "r");
     RosettaOsirisCamera *cam = (RosettaOsirisCamera *) CameraFactory::Create(c);
