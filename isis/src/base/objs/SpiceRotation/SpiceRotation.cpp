@@ -752,6 +752,7 @@ namespace Isis {
       // Load the matrix for the single updated time instance
         SetEphemerisTime(p_cacheTime[0]);
         rotationCache.push_back(ale::Rotation(p_CJ));
+        avCache.push_back(ale::Vec3d(p_av));
       }
     }
     else if (p_source == PolyFunctionOverSpice) {
@@ -911,7 +912,7 @@ namespace Isis {
         record[2] = quat[2];
         record[3] = quat[3];
 
-        if (angularVelocities.size() > 0) {
+        if (angularVelocities.size() > 0 && p_hasAngularVelocity ) {
           ale::Vec3d angularVelocity = angularVelocities[i];
           record[4] = angularVelocity.x;
           record[5] = angularVelocity.y;
