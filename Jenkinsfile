@@ -2,7 +2,7 @@
 
 def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
-def ISIS_VERSION=4.2.0
+def ISIS_VERSION="4.2.0"
 
 for (lbl in labels) {
     def label = lbl 
