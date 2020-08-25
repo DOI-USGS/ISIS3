@@ -38,7 +38,7 @@ for (lbl in labels) {
                      ${condaPath}/bin/conda run -n isis campt -HELP
                   """
                   
-                  svn checkout 
+                  checkout scm
 
                   sh """
                     git checkout dev 
