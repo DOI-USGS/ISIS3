@@ -3,7 +3,9 @@
 def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
-for (label in labels) {
+for (lbl in labels) {
+    label = lbl 
+    
     nodes[label] = {
         stage(label) {
             isisNode(label) {
