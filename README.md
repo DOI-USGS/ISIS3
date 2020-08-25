@@ -350,7 +350,7 @@ This data area contains data that is common between multiple missions such as DE
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
 
-For versions of ISIS prior to ISIS4.1.0, please use `isis3data` instead of `isisdata` in the above command.
+For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in the above command.
 
 ### Partial Download of Mission Specific Data
 
@@ -373,7 +373,7 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 
 ### Mission Specific Data Downloads
 
-For versions of ISIS prior to ISIS4.1.0, please use `isis3data` instead of `isisdata` in all the below rsync commands.
+For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in all the below rsync commands.
 
 **Apollo Mission:**
 
