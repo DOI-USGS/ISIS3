@@ -309,15 +309,19 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA enviro
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area which were closely associated with ISIS applications were moved into version control with the ISIS source code and removed from the data area. Additionally, in ISIS version 4.1.0, environment variables used for the ISIS Data Area, and rsync location for the ISIS Data area were also updated. These changes are summarized in the table below:
+In ISIS version 4.1.0, several files previously stored in the data area which were closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area, and the rsync location for the ISIS Data Area were also updated. 
 
-ISIS version | ISIS Data Environment variable name | ISIS Data layout
+The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
+
+ISIS version | ISIS Data Environment variable name | ISIS Data rsync module
 ---|---|---
 3.x | `$ISIS3DATA` | `isis3data`
 4.0.x | `$ISIS3DATA` | `isis3data`
 4.1.0 | `$ISISDATA` | `isisdata`
 
-To install versions of ISIS prior to 4.1.0, please use, isisdist.astrogeology.usgs.gov::isis3data/data is the data area for ISIS 3
+The ISIS Data rsync module specifies where to rsync the data from, and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
+
+``rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::``**``isis3data``**``/data/`` .
 
 ### Size of the ISIS Data Area
 
@@ -346,6 +350,8 @@ This data area contains data that is common between multiple missions such as DE
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
 
+For versions of ISIS prior to ISIS4.1.0, please use `isis3data` instead of `isisdata` in the above command.
+
 ### Partial Download of Mission Specific Data
 
 There are many missions supported by ISIS. If you are only working with a few missions then you can save disk space by downloading only those specific data areas. If you want to limit the download even further, read the next section about the SPICE Web Service. Otherwise [jump](#Mission-Specific-Data-Downloads) to the mission specific sections.
@@ -366,6 +372,8 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 **WARNING:** Some instruments require mission data to be present for radiometric calibration, which is not supported by the SPICE Web Server, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric calibration programs.
 
 ### Mission Specific Data Downloads
+
+For versions of ISIS prior to ISIS4.1.0, please use `isis3data` instead of `isisdata` in all the below rsync commands.
 
 **Apollo Mission:**
 
