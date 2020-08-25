@@ -1,13 +1,9 @@
 // vim: ft=groovy
 
-def NUM_CORES = 8
-def errors = []
 def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
-for (lbl in labels) {
-    def label = lbl
-
+for (label in labels) {
     nodes[label] = {
         stage(label) {
             isisNode(label) {
@@ -32,8 +28,8 @@ for (lbl in labels) {
                      ${condaPath}/bin/conda config --set ssl_verify false
                      ${condaPath}/bin/conda config --env --add channels conda-forge
                      ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
-
-                     ${condaPath}/bin/conda create -n isis -c usgs-astrogeology isis=3.10
+                     
+                     ${condaPath}/bin/conda create -n isis -c usgs-astrogeology isis
 
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
