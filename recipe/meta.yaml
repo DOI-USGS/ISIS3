@@ -131,7 +131,7 @@ requirements:
   - mysql-connector-c
   - nanoflann
   - nlohmann_json
-  - conda-forge/label/gcc7::nn
+  - nn
   - opencv=3.2.0
   - openssl>=1.0.0,<1.1.0
   - pcl
