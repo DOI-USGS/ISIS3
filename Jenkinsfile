@@ -2,6 +2,7 @@
 
 def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node types we will build on
 def nodes = [:] 
+def ISIS_VERSION=4.2.0
 
 for (lbl in labels) {
     def label = lbl 
@@ -34,7 +35,7 @@ for (lbl in labels) {
                      ${condaPath}/bin/conda create -n isis -c usgs-astrogeology isis
 
                      export ISISROOT=${condaPath}/envs/isis/
-                     ${condaPath}/bin/conda run -n isis campt -HELP
+                     ${condaPath}/bin/conda run -n isis=${ISIS_VERSION} campt -HELP
                   """
                 }
             }
