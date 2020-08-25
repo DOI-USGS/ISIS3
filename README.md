@@ -303,11 +303,23 @@ This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the
 
 Many ISIS applications require ancillary data. For example, calibration applications require flat files to do flat field corrections, and map projection applications require DTMs to accurately compute intersections. Due to its size, this data is stored in a separate directory called the ISIS Data Area. Any location can be used for the ISIS Data Area, the software simply requires that the ISISDATA environment variable is set to its location.
 
-### Structure of the ISIS3 Data Area
+### Structure of the ISIS Data Area
 
 Under the root directory of the ISIS Data Area pointed to by the ISISDATA environment variable are a variety of sub-directories. Each mission supported by ISIS has a sub-directory that contains mission specific processing data such as flat files and mission specific SPICE. There are also data areas used by more generic applications. These sub-directories contain everything from templates to test data.
 
-### Size of the ISIS3 Data Area
+### Versions of the ISIS Data Area
+
+In ISIS version 4.1.0, several files previously stored in the data area which were closely associated with ISIS applications were moved into version control with the ISIS source code and removed from the data area. Additionally, in ISIS version 4.1.0, environment variables used for the ISIS Data Area, and rsync location for the ISIS Data area were also updated. These changes are summarized in the table below:
+
+ISIS version | ISIS Data Environment variable name | ISIS Data layout
+---|---|---
+3.x | `$ISIS3DATA` | `isis3data`
+4.0.x | `$ISIS3DATA` | `isis3data`
+4.1.0 | `$ISISDATA` | `isisdata`
+
+To install versions of ISIS prior to 4.1.0, please use, isisdist.astrogeology.usgs.gov::isis3data/data is the data area for ISIS 3
+
+### Size of the ISIS Data Area
 
 If you plan to work with data from all missions, then the download will require about 520 GB for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a [Web service](#isis-spice-web-service) that can be used in lieu of downloading all of the SPICE files. This reduces the total download size to about 10 GB.
 
@@ -315,14 +327,17 @@ If you plan to work with data from all missions, then the download will require 
 
 The ISIS Data Area is hosted on rsync servers and not through conda channels like the ISIS binaries. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
-To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area:
+To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area, for versions of ISIS 4.1.0 and later:
 
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/ .
 
+For earlier versions, use: 
+
+    cd $ISISDATA
+    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
-
 
 ### Partial Download of ISIS Base Data
 
