@@ -25,7 +25,7 @@ for (lbl in labels) {
                       bash miniconda.sh -b -p ${condaPath}
                     """
                   }
-
+                  
                   sh """
                      ${condaPath}/bin/conda config --set always_yes True
                      ${condaPath}/bin/conda config --set ssl_verify false
@@ -36,6 +36,15 @@ for (lbl in labels) {
 
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
+                  """
+                  
+                  svn checkout 
+
+                  sh """
+                    git checkout dev 
+                    cd recipe 
+                    ${condaPath}/bin/conda install conda-build
+                    ${condaPath}/bin/conda conda build . --no-anaconda-upload  
                   """
                 }
             }
