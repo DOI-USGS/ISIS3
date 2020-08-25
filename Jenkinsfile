@@ -37,15 +37,18 @@ for (lbl in labels) {
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
                   """
-                  
-                  checkout scm
 
-                  sh """
-                    git checkout dev 
-                    cd recipe 
-                    ${condaPath}/bin/conda install conda-build
-                    ${condaPath}/bin/conda build . --no-anaconda-upload  
-                  """
+                  // skip build for centos
+                  if ("${label}" != "centos") {
+                    checkout scm
+
+                    sh """
+                      git checkout dev 
+                      cd recipe 
+                      ${condaPath}/bin/conda install conda-build
+                      ${condaPath}/bin/conda build . --no-anaconda-upload  
+                    """
+                  }
                 }
             }
         }
