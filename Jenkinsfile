@@ -1,0 +1,64 @@
+// vim: ft=groovy
+
+def NUM_CORES = 8
+def errors = []
+def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
+def nodes = [:] 
+
+for (lbl in labels) {
+    def label = lbl
+    def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
+
+    nodes[label] = {
+        stage(label) {
+            isisNode(label) {
+                script {
+                  def condaPath = "/tmp/builds/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true)
+
+                  if ("${env.OS}" == "mac") {
+                  sh """
+                    curl -o miniconda.sh  https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+                    bash miniconda.sh -b -p ${condaPath}
+                    """
+                  }
+                  else {
+                    sh """
+                      curl -o miniconda.sh  https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+                      bash miniconda.sh -b -p ${condaPath}
+                    """
+                  }
+
+                  sh """
+                     ${condaPath}/bin/conda config --set always_yes True
+                     ${condaPath}/bin/conda config --set ssl_verify false
+                     ${condaPath}/bin/conda config --env --add channels conda-forge
+                     ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
+
+                     ${condaPath}/bin/conda create -n isis -c usgs-astrogeology isis=3.10
+
+                     export ISISROOT=${condaPath}/envs/isis/
+                     ${condaPath}/bin/conda run -n isis campt -HELP
+                  """
+                }
+            }
+        }
+    }
+}
+
+// Run the builds in parallel
+node {
+    try {
+        parallel nodes
+
+    } catch(e) {
+        // Report result to GitHub
+        currentBuild.result = "FAILURE"
+        
+        def comment = "Failed during:\n"
+        errors.each {
+            comment += "- ${it}\n"
+        }
+
+        setGithubStatus(comment)
+    }
+}
