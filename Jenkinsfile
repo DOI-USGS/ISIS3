@@ -4,8 +4,8 @@ def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node ty
 def nodes = [:] 
 
 for (lbl in labels) {
-    label = lbl 
-    
+    def label = lbl 
+
     nodes[label] = {
         stage(label) {
             isisNode(label) {
