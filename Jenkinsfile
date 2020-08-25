@@ -7,7 +7,6 @@ def nodes = [:]
 
 for (lbl in labels) {
     def label = lbl
-    def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
 
     nodes[label] = {
         stage(label) {
@@ -15,7 +14,7 @@ for (lbl in labels) {
                 script {
                   def condaPath = "/tmp/builds/" + sh(script: '{ date "+%m/%d/%y|%H:%M:%S:%m"; echo $WORKSPACE; } | md5 | tr -d "\n";', returnStdout: true)
 
-                  if ("${env.OS}" == "mac") {
+                  if ("${label}" == "mac") {
                   sh """
                     curl -o miniconda.sh  https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
                     bash miniconda.sh -b -p ${condaPath}
