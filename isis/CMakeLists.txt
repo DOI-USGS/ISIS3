@@ -428,9 +428,10 @@ EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
 # Install the header files
-install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis)")
 file(GLOB ISIS_INCLUDE_FILES ${CMAKE_BINARY_DIR}/inc/*)
-install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+# install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+install(DIRECTORY ${CMAKE_BINARY_DIR}/inc/ DESTINATION  ${CMAKE_INSTALL_PREFIX}/include/isis)
 
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.
@@ -607,7 +608,7 @@ EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BIN
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md  DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md   DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 
