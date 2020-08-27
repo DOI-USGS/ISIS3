@@ -151,7 +151,7 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ### Changed
 
- - Removed some dev tools form the installation environment.
+ - Removed some dev tools from the installation environment.
 
 ### Fixed
 
@@ -161,7 +161,7 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ### Fixed
 
-- Paths are no longer break findfeature's algorithm parameter.
+- Paths no longer break findfeature's algorithm parameter.
 
 ## [3.7.0] - 2019-04-30
 
