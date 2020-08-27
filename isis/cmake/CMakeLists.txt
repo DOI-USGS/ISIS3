@@ -4,10 +4,10 @@
 message("Setting up post-install behavior...")
 
 # Set up format version numbers for the main shared library on install
-install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_BINARY_DIR}/lib/libisis3${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6.0${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis3.6.0${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis3.6${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis3${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis3${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_BINARY_DIR}/lib/libisis${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION}${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis${VERSION}${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION_MAJOR}.${VERSION_MINOR}${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis${VERSION_MAJOR}.${VERSION_MINOR}${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION_MAJOR}${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND ln -sf libisis${VERSION_MAJOR}${SO} ${CMAKE_INSTALL_PREFIX}/lib/libisis${SO})")
 
 # On OSX, need to correct all the paths encoded in each of the distributed library files so
 #  that they properly find the distruted files using relative paths.
