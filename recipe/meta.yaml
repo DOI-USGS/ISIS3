@@ -32,7 +32,7 @@ package:
 source:
   git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
   git_tag: {{ version }}
-  
+
   # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}.tar.gz'
   # sha256 is the prefered checksum -- you can get it for a file with:
   # `openssl sha256 <file name>`. Simply run this command with the .tar.gz
@@ -157,11 +157,8 @@ requirements:
 # test:
 #
 
-# about:
-#   home: https://developers.google.com/protocol-buffers/
-#   license: BSD 3-Clause
-#   license_file: LICENSE
-#   summary: "Protocol Buffers - Google's data interchange format."
-
-# extra:
-#   recipe-maintainers:
+about:
+  home: https://github.com/USGS-Astrogeology/ISIS3
+  license: CC0-1.0
+  license_file: LICENSE.md
+  summary: "Integrated Software for Imagers and Spectrometers"
