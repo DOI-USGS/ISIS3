@@ -153,9 +153,12 @@ requirements:
   - xorg-libxi
   - zlib
 
-# Add the tests eventually
-# test:
-#
+test:
+  source_files: 
+    - include/isis/Isis.h
+  commands: 
+    - campt -HELP
+
 
 # about:
 #   home: https://developers.google.com/protocol-buffers/
