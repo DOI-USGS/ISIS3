@@ -30,9 +30,9 @@ package:
   version: {{ version }}
 
 source:
-  git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-  git_tag: {{ version }}
-  
+  git_url: 'https://github.com/kelvinrr/ISIS3.git'
+  #git_tag: {{ version }}
+  git_branch: libisis
   # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}.tar.gz'
   # sha256 is the prefered checksum -- you can get it for a file with:
   # `openssl sha256 <file name>`. Simply run this command with the .tar.gz
@@ -154,9 +154,9 @@ requirements:
   - zlib
 
 test:
-  source_files: 
-    - include/isis/Isis.h
-  commands: 
+  commands:
+    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+    - test -e $PREFIX/include/Isis.h
     - campt -HELP
 
 
