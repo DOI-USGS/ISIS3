@@ -71,7 +71,7 @@
       <description>A binary V0001 Control Network converted to the latest PVL network.</description>
       <terminalInterface>
         <commandLine>
-          from=/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net to=PvlNetwork.pvl
+          from=$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net to=PvlNetwork.pvl
         </commandLine>
         <description>
           In this example, we are converting a binary V0001 network from the test data area to a PVL network.

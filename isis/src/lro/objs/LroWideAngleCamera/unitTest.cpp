@@ -33,7 +33,7 @@ using namespace Isis;
 
 // 2013-12-19 We will have new CK kernels with temperature dependence coming
 // that will affect the lat/lon values here.  Also must get a new FK, IK and
-// IAK.  Don;t forget to move the new test cube to $ISISROOT/lro/testData!!!!
+// IAK.  Don't forget to move the new test cube to $ISISROOT/lro/unitTestData!!!!
 
 void TestLineSamp(Camera *cam, double samp, double line);
 
@@ -46,7 +46,7 @@ int main(void) {
 
     // Support different camera model versions thusly...
     Cube cube;
-    cube.open("$lro/testData/wacCameraTest.cub");
+    cube.open("$ISISTESTDATA/isis/src/lro/unitTestData/wacCameraTest.cub");
     int cmVersion = CameraFactory::CameraVersion(cube);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
@@ -59,7 +59,7 @@ int main(void) {
     if (cmVersion == 1) {
      knownLat = -70.69638475050628;
      knownLon =  244.3314992195277;
-     cube.open("$lro/testData/wacCameraTest.cub.cv1");
+     cube.open("$ISISTESTDATA/isis/src/lro/unitTestData/wacCameraTest.cub.cv1");
     }
     else {
       // Version 2 or higher difference caused by new CK and comprehensive IK
@@ -124,7 +124,7 @@ int main(void) {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
     
-    Cube c2("$lro/testData/out.uv.even.cub", "r");
+    Cube c2("$ISISTESTDATA/isis/src/lro/unitTestData/out.uv.even.cub", "r");
     Camera *cam2 = CameraFactory::Create(c2);
     // Test name methods for WAC-UV
     cout << endl << endl << "Testing name methods ..." << endl;
@@ -135,7 +135,7 @@ int main(void) {
     
     // Test exceptions for determining names
     cout << endl << "Testing exceptions ..." << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     LroWideAngleCamera lCam(test);
   }
   catch(IException &e) {

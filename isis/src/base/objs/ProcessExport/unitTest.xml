@@ -31,7 +31,7 @@
     <group name="Files">
       <parameter name="FROM">
         <type>cube</type>
-        <default><item>$base/testData/isisTruth.cub+1</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub+1</item></default>
         <fileMode>input</fileMode>
         <brief>
           Input cube to export
@@ -46,7 +46,7 @@
 
       <parameter name="FROMBAD">
         <type>cube</type>
-        <default><item>$base/testData/isisTruth.cub</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub</item></default>
         <fileMode>input</fileMode>
         <brief>
           Input cube to export

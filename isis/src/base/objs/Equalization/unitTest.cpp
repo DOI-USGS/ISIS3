@@ -17,7 +17,7 @@ using namespace std;
 using namespace Isis;
 
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/testData"), "testData") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/unitTestData"), "unitTestData") << endl;
 }
 
 class TestFunctor {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   tmpFilesToRemove << nonOverlapList;
 
   FileList nonOverlaps(fromList);
-  nonOverlaps.removeOne("$odyssey/testData/I01523019RDR.lev2.cub");
+  nonOverlaps.removeOne("$ISISTESTDATA/isis/src/odyssey/unitTestData/I01523019RDR.lev2.cub");
   nonOverlaps.write(nonOverlapList);
 
   // Default constructor is protected, won't be tested
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
     QString tmpList = "$TEMPORARY/nonMatchingBands.tmp.lst";
     tmpFilesToRemove << tmpList;
     FileList inputs(fromList);
-    inputs.append("$base/testData/isisTruth.cub");
+    inputs.append("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     inputs.write(tmpList);
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
     QString tmpList = "$TEMPORARY/nonMatchingMap.tmp.lst";
     tmpFilesToRemove << tmpList;
     FileList inputs(fromList);
-    inputs.append("$odyssey/testData/I56632006EDR.lev2.cub");
+    inputs.append("$ISISTESTDATA/isis/src/odyssey/unitTestData/I56632006EDR.lev2.cub");
     inputs.write(tmpList);
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }

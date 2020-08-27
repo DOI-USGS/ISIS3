@@ -70,7 +70,7 @@ class MyShape : public DemShape {
 int main() {
   try {
     Preference::Preferences(true);
-    QString inputFile = "$mgs/testData/ab102401.cub";
+    QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();

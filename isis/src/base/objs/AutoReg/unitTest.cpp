@@ -312,11 +312,11 @@ void Doit(Isis::PvlObject &obj) {
     lab.addObject(obj);
     p_ar = AutoRegFactory::Create(lab);
     Cube c;
-    c.open("$base/testData/AutoReg/search_low.cub");
+    c.open("$ISISTESTDATA/isis/src/base/unitTestData/AutoReg/search_low.cub");
     p_ar->SearchChip()->TackCube(75.0, 75.0);
     p_ar->SearchChip()->Load(c);
     Cube d;
-    d.open("$base/testData/AutoReg/pattern.cub");
+    d.open("$ISISTESTDATA/isis/src/base/unitTestData/AutoReg/pattern.cub");
     p_ar->PatternChip()->TackCube(45.0, 45.0);
     p_ar->PatternChip()->Load(d);
   }
