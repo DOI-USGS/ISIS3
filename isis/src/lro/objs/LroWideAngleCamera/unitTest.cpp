@@ -33,7 +33,7 @@ using namespace Isis;
 
 // 2013-12-19 We will have new CK kernels with temperature dependence coming
 // that will affect the lat/lon values here.  Also must get a new FK, IK and
-// IAK.  Don't forget to move the new test cube to $ISISROOT/lro/unitTestData!!!!
+// IAK.  Don't forget to move the new test cube to $ISISTESTDATA/isis/src/lro/unitTestData!
 
 void TestLineSamp(Camera *cam, double samp, double line);
 
