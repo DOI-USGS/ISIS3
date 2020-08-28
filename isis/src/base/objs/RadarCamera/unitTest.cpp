@@ -56,7 +56,7 @@ class MyCamera : public RadarCamera {
 
 int main() {
   Preference::Preferences(true);
-  Cube cube("$mgs/testData/ab102401.lev2.cub", "r");
+  Cube cube("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub", "r");
   MyCamera cam(cube);
 
   cout << "Camera = Framing?   " << (cam.GetCameraType() == Camera::Framing) << endl;

@@ -1,6 +1,6 @@
 *** Blobber unitTest ***
 
-File Source: $base/testData/blobTruth.cub
+File Source: $ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub
 
 ** Test Cube Class access...
 Blob Name:           Blobber

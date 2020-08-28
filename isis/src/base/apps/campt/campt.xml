@@ -64,7 +64,7 @@ xsi:noNamespaceSchemaLocation=
 
     <pre>
 Group = GroundPoint
-  Filename                   = /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
+  Filename                   = $ISISDATA/base/examples/ab102401.cub
   <def>Sample</def>                     = 1.0
   <def>Line</def>                       = 1.0
   <def link="Digital Number">PixelValue</def>                 = 0.0607816

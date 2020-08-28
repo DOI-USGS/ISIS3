@@ -46,7 +46,7 @@ int main(void) {
     double knownLat = 39.04149631568807;
     double knownLon = 175.6356026237572;
 
-    Cube c("$galileo/testData/1213r.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/galileo/unitTestData/1213r.cub", "r");
     SsiCamera *cam = (SsiCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

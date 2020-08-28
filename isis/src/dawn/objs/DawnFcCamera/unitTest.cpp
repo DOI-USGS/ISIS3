@@ -45,7 +45,7 @@ int main(void) {
     double knownLat = 48.3664548995653121;
     double knownLon = 277.9524457902612653;
 
-    Cube c("$dawn/testData/FC21B0001010_09049002212F5D.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/dawn/unitTestData/FC21B0001010_09049002212F5D.cub", "r");
     DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -114,7 +114,7 @@ int main(void) {
     
     // Test exception
     cout << endl << "Testing exceptions ..." << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     DawnFcCamera dCam(test);
   }
   catch(IException &e) {

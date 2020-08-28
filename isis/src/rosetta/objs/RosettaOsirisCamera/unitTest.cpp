@@ -20,8 +20,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  QString testNACFile("$rosetta/testData/n20100710t154539230id20f22.cub");
-  QString testWACFile("$rosetta/testData/W20100710T153440162ID30F13.cub");
+  QString testNACFile("$ISISTESTDATA/isis/src/rosetta/unitTestData/n20100710t154539230id20f22.cub");
+  QString testWACFile("$ISISTESTDATA/isis/src/rosetta/unitTestData/W20100710T153440162ID30F13.cub");
 
   cout << "Unit Test for RosettaOsirisCameraDistortionMap..." << endl;
   try {

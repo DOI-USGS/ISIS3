@@ -46,7 +46,7 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat[2] = {22.79610724064016, -82.44364258830991};
     double knownLon[2] = {225.0055144115362, 75.87598490596933};
-    char files[2][1024] = { "$base/testData/ab102401_ideal.cub", "$base/testData/f319b18_ideal.cub" };
+    char files[2][1024] = { "$ISISTESTDATA/isis/src/base/unitTestData/ab102401_ideal.cub", "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal.cub" };
     Camera *cam;
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {

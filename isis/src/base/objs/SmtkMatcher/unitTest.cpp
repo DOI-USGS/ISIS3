@@ -12,10 +12,10 @@ int main() {
 
   try {
     Cube rhImage;
-    rhImage.open("$mariner10/testData/0027399_clean_equi.cub");
+    rhImage.open("$ISISTESTDATA/isis/src/mariner/unitTestData/0027399_clean_equi.cub");
 
     Cube lhImage;
-    lhImage.open("$mariner10/testData/0166613_clean_equi.cub");
+    lhImage.open("$ISISTESTDATA/isis/src/mariner/unitTestData/0166613_clean_equi.cub");
 
     SmtkMatcher matcher("mar10.def", &lhImage, &rhImage);
     SmtkPoint spnt = matcher.Register(Coordinate(272.813,208.293));

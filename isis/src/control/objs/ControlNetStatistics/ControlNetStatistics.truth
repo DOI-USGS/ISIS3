@@ -1,7 +1,7 @@
 UnitTest for ControlNetStatistics ....
 
-CNET=$base/testData/cnet/cnetbin.net
-Serial File=$base/testData/cnet/serialNum.lis
+CNET=$ISISTESTDATA/isis/src/base/unitTestData/cnet/cnetbin.net
+Serial File=$ISISTESTDATA/isis/src/base/unitTestData/cnet/serialNum.lis
 Group = ControlNetSummary
   TotalImages        = 5
   ImagesInControlNet = 5

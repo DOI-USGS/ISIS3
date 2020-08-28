@@ -45,7 +45,7 @@ int main(void) {
     double knownLat = 36.1707660328875136;
     double knownLon = 345.6570666260113853;
 
-    Cube c("$hayabusa/testData/2392975548_lvl3_0.refl.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/hayabusa/unitTestData/2392975548_lvl3_0.refl.cub", "r");
     HayabusaNirsCamera *cam = (HayabusaNirsCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
