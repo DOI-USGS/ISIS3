@@ -152,9 +152,11 @@ requirements:
   - xorg-libxi
   - zlib
 
-# Add the tests eventually
-# test:
-#
+test:
+  commands:
+    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+    - test -e $PREFIX/include/isis/Isis.h
+
 
 # about:
 #   home: https://developers.google.com/protocol-buffers/
