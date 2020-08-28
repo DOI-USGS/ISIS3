@@ -305,11 +305,11 @@ Many ISIS applications require ancillary data. For example, calibration applicat
 
 ### Structure of the ISIS Data Area
 
-Under the root directory of the ISIS Data Area pointed to by the ISISDATA environment variable are a variety of sub-directories. Each mission supported by ISIS has a sub-directory that contains mission specific processing data such as flat files and mission specific SPICE. There are also data areas used by more generic applications. These sub-directories contain everything from templates to test data.
+Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3DATA environment variable are a variety of sub-directories. Each mission supported by ISIS has a sub-directory that contains mission specific processing data such as flat files and mission specific SPICE. There are also data areas used by more generic applications. These sub-directories contain everything from templates to test data.
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area which were closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area, and the rsync location for the ISIS Data Area were also updated. 
+In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated. 
 
 The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
 
@@ -319,7 +319,7 @@ ISIS version | ISIS Data Environment variable name | ISIS Data rsync module
 4.0.x | `$ISIS3DATA` | `isis3data`
 4.1.0 | `$ISISDATA` | `isisdata`
 
-The ISIS Data rsync module specifies where to rsync the data from, and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
+The ISIS Data rsync module specifies where to rsync the data from and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
 
 ``rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::``**``isis3data``**``/data/`` .
 
@@ -338,7 +338,7 @@ To download all ISIS data, enter the following commands in the location where yo
 
 For earlier versions, use: 
 
-    cd $ISISDATA
+    cd $ISIS3DATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
@@ -373,7 +373,7 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 
 ### Mission Specific Data Downloads
 
-For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in all the below rsync commands.
+For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of `$ISISDATA` and use `isis3data` instead of `isisdata` in all the below rsync commands.
 
 **Apollo Mission:**
 
