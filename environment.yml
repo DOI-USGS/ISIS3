@@ -21,7 +21,7 @@ dependencies:
   - geotiff
   - gmm
   - gmp
-  - gsl
+  - gsl>=2.6
   - hdf5
   - icu
   - jama
