@@ -123,6 +123,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       
       <parameter name="TO">
          <type>cube</type>
+         <pixelType>real</pixelType>
          <fileMode>output</fileMode>
          <brief>Output ISIS3 cube filename</brief>
          <description>
