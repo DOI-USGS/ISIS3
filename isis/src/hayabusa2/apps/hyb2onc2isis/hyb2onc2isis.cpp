@@ -26,29 +26,21 @@ namespace Isis {
 
 void hyb2onc2isis(UserInterface &ui) {
 
-
-
   QString fitsFileName = FileName(ui.GetFileName("FROM")).expanded();  
 
   QString outputCubeFileName = FileName(ui.GetFileName("TO")).expanded();
-
 
   QString target("");
   if (ui.WasEntered("TARGET")) {
     target = ui.GetString("TARGET");
   }
 
-  CubeAttributeOutput &att =
-    ui.GetOutputAttribute("TO");
+  CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
 
-
-
-  // Create a PVL to store the translated labels in
-  hyb2onc2isis(fitsFileName,outputCubeFileName,att,target);
+  hyb2onc2isis(fitsFileName, outputCubeFileName, att, target);
 
   return;
-
-  }
+}
 
 
 Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttributeOutput att, QString target) {
@@ -61,10 +53,6 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   bool distortionCorrection = true;
 
   Cube *outputCube = importFits.SetOutputCube(outputCubeFileName,att);
-
-  // Get the directory where the Hayabusa translation tables are.
-  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["Hayabusa2"] + "/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outputLabel;
@@ -98,6 +86,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
                   "from input file [" + fitsFileName + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
+
   try {
     naifid = fitsLabel.findGroup("FitsLabels").findKeyword("NAIFID")[0];
   }
@@ -114,15 +103,9 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
-  try {
-    naifid = fitsLabel.findGroup("FitsLabels").findKeyword("NAIFID")[0];
+  if (formatType.contains("2a") || formatType.contains("2b")) {
+      distortionCorrection = false;
   }
-  catch(IException &e) {
-    updatedKeywords=false;
-  }
-
-  if (formatType.contains("2a") || formatType.contains("2b"))
-    distortionCorrection = false;
 
   missid = missid.simplified().trimmed();
   if (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0) {
@@ -130,6 +113,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
                   "] does not appear to be a Hayabusa2 label file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
+
   instid = instid.simplified().trimmed();
   if (QString::compare(instid, "Optical Navigation Camera", Qt::CaseInsensitive) != 0) {
     QString msg = "Input file [" + fitsFileName +
@@ -137,12 +121,16 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
-  // Translate the Instrument group
+  // Get the directory where the Hayabusa2 translation tables are.
+  // There were two versions of the FITS files. They need different
+  // translations.
+  QString transDir = "$ISISROOT/appdata/translations/";
 
-  FileName transFile(transDir + "hyb2oncInstrument.trn");
+  // Translate the Instrument group
+  FileName transFile(transDir + "Hayabusa2OncInstrument.trn");
 
   if (updatedKeywords) {
-    transFile = transDir+"hyb2oncInstrumentUpdated.trn";
+    transFile = transDir + "Hayabusa2OncInstrumentUpdated.trn";
   }
   PvlToPvlTranslationManager instrumentXlater (fitsLabel, transFile.expanded());
   instrumentXlater.Auto(outputLabel);
@@ -151,24 +139,25 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   //  Update target if user specifies it
   PvlGroup &instGrp = outputLabel.findGroup("Instrument",Pvl::Traverse);
 
-  //Check for cropped image
-  int ss = instGrp["SelectedImageAreaX1"];
-  int sl = instGrp["SelectedImageAreaY1"];
-  int es = instGrp["SelectedImageAreaX2"];
-  int el = instGrp["SelectedImageAreaY2"];
+  // Check for cropped image and create an AlphaCube if the input is cropped
+  int ss, sl, es, el;
+  ss = instGrp["SelectedImageAreaX1"];
+  sl = instGrp["SelectedImageAreaY1"];
+  // New format contains upper left and lower right corners of the subarea
+  if (updatedKeywords) {
+    es = instGrp["SelectedImageAreaX2"];
+    el = instGrp["SelectedImageAreaY2"];
+  }
+  // Old format contains all four corners of the subarea
+  else {
+    es = instGrp["SelectedImageAreaX4"];
+    el = instGrp["SelectedImageAreaY4"];
+  }
 
   if (ss > 1 || sl >1 || es < N || el < N) {
-
     AlphaCube aCube(N, N, outputCube->sampleCount(), outputCube->lineCount(),
                     ss-0.5, sl - 0.5, es + 0.5, el + 0.5);
     aCube.UpdateGroup(*outputCube);
-
-    instGrp["SelectedImageAreaX1"] = "1";
-    instGrp["SelectedImageAreaY1"] = "1";
-    instGrp["SelectedImageAreaX2"] = QString("%1").arg(N);
-    instGrp["SelectedImageAreaY2"] = QString("%1").arg(N);
-
-
   }
 
   QString labelTarget;
@@ -193,7 +182,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   }
 
 
-  //If the user wants to specify a different target, overwrite this value
+  // If the user wants to specify a different target, overwrite the one from the input file
   if (target !="") {
     instGrp["TargetName"] = target;
   }
@@ -201,12 +190,10 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   outputCube->putGroup(instGrp);
 
   // Translate the BandBin group
-
-  transFile = transDir + "hyb2oncBandBin.trn";
+  transFile = transDir + "Hayabusa2OncBandBin.trn";
   if (updatedKeywords) {
-    transFile = transDir + "hyb2oncBandBinUpdated.trn";
+    transFile = transDir + "Hayabusa2OncBandBinUpdated.trn";
   }
-
 
   PvlToPvlTranslationManager bandBinXlater (fitsLabel, transFile.expanded());
   bandBinXlater.Auto(outputLabel);
@@ -218,10 +205,9 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   outputCube->putGroup(outputLabel.findGroup("BandBin",Pvl::Traverse));
 
   // Translate the Archive group
-
-  transFile = transDir + "hyb2oncArchive.trn";
+  transFile = transDir + "Hayabusa2OncArchive.trn";
   if (updatedKeywords) {
-    transFile = transDir + "hyb2oncArchiveUpdated.trn";
+    transFile = transDir + "Hayabusa2OncArchiveUpdated.trn";
   }
 
   PvlToPvlTranslationManager archiveXlater (fitsLabel, transFile.expanded());
@@ -236,13 +222,12 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   archGrp.addKeyword(yeardoy);
   outputCube->putGroup(archGrp);
 
-
   // Create a Kernels group
   if (updatedKeywords) {
-    transFile = transDir + "hyb2oncKernelsUpdated.trn";
+    transFile = transDir + "Hayabusa2OncKernelsUpdated.trn";
   }
   else {
-    transFile = transDir + "hyb2oncKernels.trn";
+    transFile = transDir + "Hayabusa2OncKernels.trn";
   }
 
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, transFile.expanded());
@@ -260,20 +245,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   importFits.StartProcess();
   importFits.Finalize();
 
-
   return outputLabel;
-
-
   }
-
 }
-
-
-
-
-
-
-
-
-
 

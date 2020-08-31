@@ -14,9 +14,8 @@ Group = ProducerId
 End_Group
 
 Group = L0FileName
-  Auto  
+  Auto
   InputKey       = P_L0NAME
-  InputKey       = L0FILE
   InputPosition  = FitsLabels
   OutputName     = L0FileName
   OutputPosition = (Object, IsisCube, Group, Archive)
@@ -95,7 +94,6 @@ End_Group
 # AMICA calls this one "ImageNumber"
 Group = ImageNumber
   Auto
-  Optional
   InputKey       = P_IMGID
   InputPosition  = FitsExtras
   OutputName     = ImageNumber
