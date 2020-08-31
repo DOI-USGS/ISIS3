@@ -154,6 +154,7 @@ namespace Isis {
    *                          empty QList is provided to this parameter which will propagate all
    *                          tables. Updated unitTest to test this change. References #4433.
    *  @history 2018-07-27 Kaitlyn Lee - Added unsigned/signed integer pixel type handling.
+   *  @history 2020-06-06 Stuart Sides - Closed cube file used to propagte tables.
    */
   class Process {
     protected:

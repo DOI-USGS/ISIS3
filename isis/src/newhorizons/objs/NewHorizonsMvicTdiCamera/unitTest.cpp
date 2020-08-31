@@ -57,7 +57,7 @@ int main(void) {
     double knownLat = -10.1772088449130020;
     double knownLon = 339.7338889883354796;
 
-    Cube c("$newhorizons/testData/mc0_0034942918_0x536_sci_1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/newhorizons/unitTestData/mc0_0034942918_0x536_sci_1.cub", "r");
     NewHorizonsMvicTdiCamera *cam = (NewHorizonsMvicTdiCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -160,14 +160,14 @@ int main(void) {
       cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution() << endl; 
     }
 
-    if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
+    if (abs(cam->UniversalLatitude() - knownLat) < 7E-12) {
       cout << "Latitude OK" << endl;
     }
     else {
       cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if (abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
+    if (abs(cam->UniversalLongitude() - knownLon) < 7E-12) {
       cout << "Longitude OK" << endl;
     }
     else {

@@ -108,6 +108,7 @@ xsi:noNamespaceSchemaLocation=
      <li>ALBEDORANK</li>
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
+     <li><def link="Local Solar Time">LOCALTIME</def></li>
      </ul>
 	The following options are available for Level2 images:
      <ul>
@@ -305,6 +306,16 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2019-02-15">
       Allowed RA and DEC to be exported regardless if the pixel is off body. Fixes #4446.
     </change>
+    <change name="Kaitlyn Lee" date="2020-06-04">
+      Added SPECIALPIXELS parameter to allow users to skip calculations on special pixels, excluding
+      RA and DEC. This changed merged the two process functions, which were created to speed up 
+      the application when copying over DN values. After a few time tests, it doesn't look like the 
+      merge causes the application to run longer. Changed the process function to be a lambda function
+      to get rid of global variables.
+    </change>
+    <change name="Kristin Berry" date="2020-06-10">
+      Added the LOCALTIME parameter to output a band with the local solar time for each pixel. Fixes #3850
+    </change>
   </history>
 
   <category>
@@ -396,6 +407,7 @@ xsi:noNamespaceSchemaLocation=
               <item>NORTHAZIMUTH</item>
               <item>RADEC</item>
               <item>BODYFIXED</item>
+              <item>LOCALTIME</item>
             </exclusions>
           </option>
         </list>
@@ -403,6 +415,15 @@ xsi:noNamespaceSchemaLocation=
     </group>
 
     <group name="Photometry">
+      <parameter name="SPECIALPIXELS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Include special pixels in the ouptut image</brief>
+        <description>
+          If this parameter is true, calculations will be done on special pixels.
+          If this parameter is false, special pixels will be skipped and set to NULL in the output image for all bands selected.
+        </description>
+      </parameter>
       <parameter name="DN">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -718,6 +739,16 @@ xsi:noNamespaceSchemaLocation=
 	   the output cube. The output cube labels will contain "Body Fixed X", "Body Fixed Y",
 	   and "Body Fixed Z" in the BandBin group, in the band sequence of the output file.
 	   Body Fixed Coordinates are in kilometers.
+	 </description>
+       </parameter>
+      <parameter name="LOCALTIME">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create a band with local solar time</brief>
+         <description>
+	   If this parameter is true, the <def>Local Solar Time</def> will be calculated for
+	   every pixel in the output cube. The output cube label will contain "Local Solar Time"
+	   in the BandBin group. Local Solar Time is in hours.
 	 </description>
        </parameter>
     </group>

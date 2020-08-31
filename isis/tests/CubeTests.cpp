@@ -120,8 +120,8 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
 
 
   json isd = json::parse(R"(
-    {"CameraVersion": 2,
-       "NaifKeywords": {
+    {"isis_camera_version": 2,
+       "naif_keywords": {
             "BODY_CODE" : 499,
             "BODY499_RADII" : [3396.19, 3396.19, 3376.2],
             "BODY_FRAME_CODE" : 10014,
@@ -131,75 +131,74 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
             "INS-27002_ITRANSS" : [0.0, 85.0, 0.0],
             "INS-27002_ITRANSL" : [0.0, 0.0, 85.0]
       },
-    "InstrumentPointing": {
-      "TimeDependentFrames": [-85600, -85000, 1],
-      "CkTableStartTime": 100,
-      "CkTableEndTime": 100.1,
-      "CkTableOriginalSize": 2,
-      "EphemerisTimes": [
+    "instrument_pointing": {
+      "time_dependent_frames": [-85600, -85000, 1],
+      "ck_table_start_time": 100,
+      "ck_table_end_time": 100.1,
+      "ck_table_original_size": 2,
+      "ephemeris_times": [
         100,
         100.1
       ],
-      "Quaternions": [
+      "quaternions": [
         [0.0, -0.660435174378928, 0, 0.750883067090392],
         [0.0, -0.660435174378928, 0, 0.750883067090392]
       ],
-      "AngularVelocity": [
+      "angular_velocity": [
         [0, 0, 0],
         [0, 0, 0]
       ],
-      "ConstantFrames": [-85600],
-      "ConstantRotation": [1, 0, 0, 0, 1, 0, 0, 0, 1]
+      "constant_frames": [-85600],
+      "constant_rotation": [1, 0, 0, 0, 1, 0, 0, 0, 1]
     },
-    "BodyRotation": {
-      "TimeDependentFrames": [31006, 1],
-      "CkTableStartTime": 100,
-      "CkTableEndTime": 100.1,
-      "CkTableOriginalSize": 2,
-      "EphemerisTimes": [
+    "body_rotation": {
+      "time_dependent_frames": [31006, 1],
+      "ck_table_start_time": 100,
+      "ck_table_end_time": 100.1,
+      "ck_table_original_size": 2,
+      "ephemeris_times": [
         100,
         100.1
       ],
-      "Quaternions": [
+      "quaternions": [
         [ 0, 0.8509035, 0, 0.525322 ],
         [ 0, 0.8509035, 0, 0.525322 ]
       ],
-      "AngularVelocity": [
+      "angular_velocity": [
         [0, 0, 0],
         [0, 0, 0]
       ],
-      "ConstantFrames": [31001, 31007, 31006],
-      "ConstantRotation": [-0.4480736,  0,  0.8939967, 0,  1,  0, -0.8939967,  0, -0.4480736]
+      "constant_frames": [31001, 31007, 31006],
+      "constant_rotation": [-0.4480736,  0,  0.8939967, 0,  1,  0, -0.8939967,  0, -0.4480736]
     },
-    "InstrumentPosition": {
-      "SpkTableStartTime": 100,
-      "SpkTableEndTime": 100.1,
-      "SpkTableOriginalSize": 2,
-      "EphemerisTimes": [
+    "instrument_position": {
+      "spk_table_start_time": 100,
+      "spk_table_end_time": 100.1,
+      "spk_table_original_size": 2,
+      "ephemeris_times": [
         100,
         100.1
       ],
-      "Positions": [
+      "positions": [
         [1000, 0, 0],
         [1000, 0, 0]
       ],
-      "Velocities": [
+      "velocities": [
         [0, 0, 0],
         [0, 0, 0]
       ]
     },
-    "SunPosition": {
-      "SpkTableStartTime": 100,
-      "SpkTableEndTime": 100.1,
-      "SpkTableOriginalSize": 2,
-      "EphemerisTimes": [
-        100,
-        100.1
+    "sun_position": {
+      "spk_table_start_time": 100,
+      "spk_table_end_time": 100.1,
+      "spk_table_original_size": 2,
+      "ephemeris_times": [
+        100
       ],
-      "Positions": [
+      "positions": [
         [0, 20, 0]
       ],
-      "Velocities": [
+      "velocities": [
         [10,10,10]
       ]
     }

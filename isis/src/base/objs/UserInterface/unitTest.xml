@@ -41,7 +41,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/ISISROOT/testData/base/isisTruth.cub</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub</item></default>
       </parameter>
       <parameter name="TO">
         <type>filename</type>

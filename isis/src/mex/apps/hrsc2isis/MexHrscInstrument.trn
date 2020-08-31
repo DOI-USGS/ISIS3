@@ -1,25 +1,6 @@
-#
-# The group names listed here are the native names used by
-# applications to get the foreign names and values
-#
-# There is only one level of groups the groups are not
-# allowed to be nested
-#
-# The Group names can NOT be repeated.
-#
-# InputGroup is a comma delimited list of objects and/or
-# groups in the foreign label. Traversing this list will
-# lead to the correct level to find the foreign keyword.
-#
-# InputKey is the keyword within the group which holds
-# the information.
-#
-# InputDefault is the value used if there is no value for
-# the keyword
-#
-# Translation is the native and corresponding foreign values.
-# Translation may be repeated as needed.
-#
+# Translations for HRSC Stereo and SRC instrument.
+# ISIS cube label Instrument group
+
 Group = SpacecraftName
   Auto
   InputKey       = INSTRUMENT_HOST_NAME
@@ -31,10 +12,20 @@ End_Group
 
 Group = InstrumentId
   Auto
-  InputKey       = INSTRUMENT_ID
+  InputKey       = DETECTOR_ID
   OutputName     = InstrumentId
   OutputPosition = (Group, Instrument)
-  Translation    = (*, *)
+  Translation    = (HRSC, "MEX_HRSC_HEAD")
+  Translation    = (HRSC, "MEX_HRSC_S2")
+  Translation    = (HRSC, "MEX_HRSC_RED")
+  Translation    = (HRSC, "MEX_HRSC_P2")
+  Translation    = (HRSC, "MEX_HRSC_BLUE")
+  Translation    = (HRSC, "MEX_HRSC_NADIR")
+  Translation    = (HRSC, "MEX_HRSC_GREEN")
+  Translation    = (HRSC, "MEX_HRSC_P1")
+  Translation    = (HRSC, "MEX_HRSC_IR")
+  Translation    = (HRSC, "MEX_HRSC_S1")
+  Translation    = (SRC, "MEX_HRSC_SRC")
 End_Group
 
 Group = StartTime
@@ -86,6 +77,24 @@ Group = TargetName
   Translation    = (Phobos, PHOBOS)
   Translation    = (Deimos, DEIMOS)
   Translation    = (Cal, CAL)
+End_Group
+
+Group = Summing
+  Auto
+  Optional
+  InputKey       = MACROPIXEL_SIZE
+  OutputName     = Summing
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExpousreDuration
+  Auto
+  Optional
+  InputKey       = EXPOSURE_DURATION
+  OutputName     = ExposureDuration
+  OutputPosition = (Group, Instrument)
+  Translation    = (*, *)
 End_Group
 
 Group = FocalPlaneTemperature

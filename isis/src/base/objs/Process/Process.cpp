@@ -308,11 +308,11 @@ namespace Isis {
               << ",nb=" << nb << "]";
       throw IException(IException::Programmer, message.str().c_str(), _FILEINFO_);
     }
-
     QString fname = Application::GetUserInterface().GetFileName(parameter);
     Isis::CubeAttributeOutput &atts = Application::GetUserInterface().GetOutputAttribute(parameter);
     return SetOutputCube(fname, atts, ns, nl, nb);
   }
+
 
   /**
    * Allocates a output cube whose name and size is specified by the programmer.
@@ -350,7 +350,6 @@ namespace Isis {
       cube->setByteOrder(att.byteOrder());
       cube->setFormat(att.fileFormat());
       cube->setLabelsAttached(att.labelAttachment() == AttachedLabel);
-
       if(att.propagatePixelType()) {
         if(InputCubes.size() > 0) {
           cube->setPixelType(InputCubes[0]->pixelType());
@@ -409,7 +408,7 @@ namespace Isis {
 
       // Allocate the cube
       cube->create(fname);
-
+      
       // Transfer labels from the first input cube
       if((p_propagateLabels) && (InputCubes.size() > 0)) {
         Isis::PvlObject &incube =
@@ -468,7 +467,6 @@ namespace Isis {
       delete cube;
       throw;
     }
-
     // Everything is fine so save the cube on the stack
     AddOutputCube(cube);
     return cube;
@@ -629,6 +627,8 @@ namespace Isis {
         }
       }
     }
+    fromCube->close();
+    delete fromCube;
   }
 
   /**

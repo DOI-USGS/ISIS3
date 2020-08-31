@@ -44,10 +44,14 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[2] = { -12.0400820752276996, 47.7445483329470406 };
-    double knownLon[2] = { 355.7272261079595523, 42.9611485167199660 };
+    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406, 
+                            60.8041933170744215, 60.1567063916710580};
+    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660, 
+                           135.3886983694549713, 135.3809757236753057};
 
-    char files[2][1024] = { "$kaguya/testData/MI_VIS.cub", "$kaguya/testData/MI_NIR.cub" };
+    char files[4][1024] = { "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_VIS.cub", "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_NIR.cub", 
+                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MVA_2B2_01_01228N608E1354.cub", 
+                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MNA_2B2_01_01228N602E1354.cub"};
  
     for (unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Cube c(files[i], "r");
@@ -112,7 +116,7 @@ int main(int argc, char *argv[]) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     KaguyaMiCamera kCam(test);
   }
   catch(IException &e) {

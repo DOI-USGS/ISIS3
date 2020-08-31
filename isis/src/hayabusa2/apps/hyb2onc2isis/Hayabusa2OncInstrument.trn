@@ -161,6 +161,7 @@ End_Group
 
 Group = SelectedImageAreaX2
   Auto
+  Optional
   InputKey       = P_OPOSX2
   InputKey       = ROI_URX
   InputPosition  = FitsLabels
@@ -171,6 +172,7 @@ End_Group
 
 Group = SelectedImageAreaY2
   Auto
+  Optional
   InputKey       = P_OPOSY2
   InputKey       = ROI_URY
   InputPosition  = FitsLabels
@@ -201,8 +203,8 @@ End_Group
 
 Group = SelectedImageAreaX4
   Auto
-  Optional
   InputKey       = P_OPOSX4
+  InputKey       = ROI_URX
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaX4
   OutputPosition = (Object, IsisCube, Group, Instrument)
@@ -211,8 +213,8 @@ End_Group
 
 Group = SelectedImageAreaY4
   Auto
-  Optional
   InputKey       = P_OPOSY4
+  InputKey       = ROI_URY
   InputPosition  = FitsLabels
   OutputName     = SelectedImageAreaY4
   OutputPosition = (Object, IsisCube, Group, Instrument)

@@ -735,7 +735,7 @@ int main(int argc, char *argv[]) {
 
     Cube in4;
     try {
-      in4.open("$base/testData/isisTruth.cub");
+      in4.open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     }
     catch (IException &e) {
       e.print();
@@ -776,7 +776,7 @@ int main(int argc, char *argv[]) {
   cerr << endl << "Test creating an ecub" << endl;
   {
     Cube externalData;
-    externalData.setExternalDnData("$base/testData/isisTruth.cub");
+    externalData.setExternalDnData("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     externalData.create("isisTruth_external.ecub");
     externalData.putGroup(PvlGroup("TestGroup"));
     cerr << *externalData.label() << endl;
