@@ -84,6 +84,18 @@ Run the `setisis` command for your build directory:
 ```bash
 setisis .
 ```
+
+The following error is expected and can be ignored:
+
+```
+Warning: Unable to find binaries.
+ Warning: Unable to find initialization scripts in <build directory>.
+          Unable to set up third party, or data directories. (Use -h for help)
+ Warning: Only ISISROOT set.
+ ISISROOT set to: <build directory>
+```
+(Where `<build directory>` is the directory you have run the setisis command in.) 
+
 If this does not work (i.e. `no setisis in PATH`), run the following command to add an alias to your `~/.bashrc`:
 ```bash
 echo -e "alias setisis='. /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh'" >> ~/.bashrc
