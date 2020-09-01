@@ -48,7 +48,7 @@ int main(void) {
   try {
     double knownLat = -83.2598150072595899;
     double knownLon = 353.9497987082821737;
-    Cube c("$lro/testData/M111607830RE_crop.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/lro/unitTestData/M111607830RE_crop.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
@@ -101,8 +101,8 @@ int main(void) {
     // Test name methods
     cout << endl << endl << "Testing name methods ..." << endl;
     QStringList files;
-    files.append("$lro/testData/M111607830RE_crop.cub");
-    files.append("$lro/testData/M1153718003LE.reduced.cub");
+    files.append("$ISISTESTDATA/isis/src/lro/unitTestData/M111607830RE_crop.cub");
+    files.append("$ISISTESTDATA/isis/src/lro/unitTestData/M1153718003LE.reduced.cub");
     
     for (int i = 0; i < files.size(); i++) {
       Cube n(files[i], "r");
@@ -115,7 +115,7 @@ int main(void) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     LroNarrowAngleCamera testCam(test);
   }
   catch(IException &e) {

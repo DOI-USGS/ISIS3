@@ -49,9 +49,9 @@ int main(int argc, char *argv[]) {
     double knownLon[4] = { 355.7272261079595523, 42.9611485167199660, 
                            135.3886983694549713, 135.3809757236753057};
 
-    char files[4][1024] = { "$kaguya/testData/MI_VIS.cub", "$kaguya/testData/MI_NIR.cub", 
-                            "$kaguya/testData/MVA_2B2_01_01228N608E1354.cub", 
-                            "$kaguya/testData/MNA_2B2_01_01228N602E1354.cub"};
+    char files[4][1024] = { "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_VIS.cub", "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_NIR.cub", 
+                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MVA_2B2_01_01228N608E1354.cub", 
+                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MNA_2B2_01_01228N602E1354.cub"};
  
     for (unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Cube c(files[i], "r");
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     KaguyaMiCamera kCam(test);
   }
   catch(IException &e) {

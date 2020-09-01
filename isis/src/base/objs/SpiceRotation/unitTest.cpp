@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
   // Load kernels to allow testing of various SpiceRotation sources
-  FileName f("$base/testData/kernels");
+  FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
   QString dir = f.expanded() + "/";
   QString naif (dir + "naif0007.tls");
   QString mgs(dir + "MGS_SCLKSCET.00045.tsc");
@@ -39,7 +39,8 @@ int main(int argc, char *argv[]) {
   QString mocbc(dir + "moc.bc");
   QString mocbsp(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
-  QString pck(dir + "../../kernels/pck/pck00009.tpc");
+  FileName pckFile("$base/kernels/pck/pck00009.tpc");
+  QString pck(pckFile.expanded());
   QString cgFK(dir + "ROS_V29.TF");
   QString cgCK(dir + "CATT_DV_145_02_______00216.BC");
   //QString mocadd(dir+"mocAddendum.ti");

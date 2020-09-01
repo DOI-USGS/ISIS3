@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Isis::Preference::Preferences(true);
 
-  QString fname = "$base/testData/isisTruth.cub";
+  QString fname = "$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub";
   Isis::Cube cube;
   cube.open(fname);
 

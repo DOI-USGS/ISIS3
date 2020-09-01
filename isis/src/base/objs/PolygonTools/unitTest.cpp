@@ -109,7 +109,7 @@ int main() {
          << endl << endl;
 
     // Create a UniversalGroundMap so we can test the SampleLinePolygon stuff
-    Cube cube(FileName("$base/testData/PolygonTools/unitTest.lbl").expanded(), "r");
+    Cube cube(FileName("$ISISTESTDATA/isis/src/base/unitTestData/PolygonTools/unitTest.lbl").expanded(), "r");
     UniversalGroundMap ugm = UniversalGroundMap(cube);
 
     // Create coordinate sequence for the first of two polygons

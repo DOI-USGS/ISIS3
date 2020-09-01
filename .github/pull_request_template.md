@@ -37,6 +37,7 @@
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.
 - [ ] I have added myself to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document.
+- [ ] I have added any user impacting changes to the [CHANGELOG.md](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) document.
 
 ## Licensing
 This project is mostly composed of free and unencumbered software released into the public domain, and we are unlikely to accept contributions that are not also released into the public domain. Somewhere near the top of each file should have these words:
