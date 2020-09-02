@@ -122,7 +122,9 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("SMITHEDFILTER", filter);
-    PvlObject result = sdg.Direct("Smithed", location, filter, startOffset, endOffset);
+    double smithedPadding = ui.GetDouble("SMITHEDPAD");
+    PvlObject result = sdg.Direct("Smithed", location, filter, smithedPadding + startOffset, 
+                                  smithedPadding + endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);

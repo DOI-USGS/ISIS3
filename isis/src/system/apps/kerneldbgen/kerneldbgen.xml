@@ -159,6 +159,9 @@
     <change name="Jesse Mapel" date="2019-08-13">
       Added the ability to use a list of kernels instead of a location and filters. Fixes #3390.
     </change>
+    <change name="Kristin Berry" date="2020-09-01">
+      Added the ability to add a time-padding specififc to smithed kernels. Fixes #3363.
+    </change>
   </history>
 
   <groups>
@@ -429,7 +432,21 @@
           <item>SMITHEDFILTER</item>
         </exclusions>
       </parameter>
-    </group>
+      <parameter name="SMITHEDPAD">
+        <type>double</type>
+        <brief>
+          Seconds to subtract from the start time and add to the stop time in each smithed kernel.
+        </brief>
+        <description>
+          This parameter is used to add a padding of the provided number of seconds to the start and
+	  stop time of all the smithed kernels. If STARTOFFSET or ENDOFFFSET are also
+	  provided, this padding will be added to all the smithed kernels in addition to those offsets.
+        </description>
+        <default>
+          <item>0.0</item>
+        </default>
+      </parameter>
+      </group>
     <group name="Offset">
       <parameter name="STARTOFFSET">
         <type>double</type>
