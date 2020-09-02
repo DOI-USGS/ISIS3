@@ -8,7 +8,7 @@
 
   <description>
   <p>
-    <b>This is a deprecated. <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> is a newer implementation of kaguyasp2isis, please use <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> instead.</b> 
+    <b>This application is deprecated. <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> is a newer implementation of kaguyasp2isis, please use <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> instead.</b> 
   </p>
   <p>
     This program will import a Kaguya SP (Spectral Profiler) file to a tab delimited text file.
