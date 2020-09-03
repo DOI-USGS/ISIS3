@@ -1,3 +1,4 @@
+#define GUIHELPERS
 #include "Isis.h"
 
 #include <QDockWidget>
@@ -18,6 +19,15 @@
 using namespace std;
 using namespace Isis;
 
+void helperButtonCalcMinMax();
+
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
+  helper ["helperButtonCalcMinMax"] = (void *) helperButtonCalcMinMax;
+  return helper;
+}
+
+
 void IsisMain() {
   Process p;
   Cube *icube = p.SetInputCube("FROM");
@@ -29,7 +39,7 @@ void IsisMain() {
   }
 
   Histogram *hist;
-  if (ui.WasEntered("MINIMUM") && ui.WasEntered("MAXIMUM")){
+  if (ui.WasEntered("MINIMUM") && ui.WasEntered("MAXIMUM")) {
     int nbins = 0;
 
     if (ui.WasEntered("NBINS")){
@@ -71,7 +81,7 @@ void IsisMain() {
   p.Progress()->CheckStatus();
   LineManager line(*icube);
 
-  for(int i = 1; i <= icube->lineCount(); i++) {
+  for (int i = 1; i <= icube->lineCount(); i++) {
     line.SetLine(i);
     icube->read(line);
     hist->AddData(line.DoubleBuffer(), line.size());
@@ -236,3 +246,41 @@ void IsisMain() {
   delete hist;
   p.EndProcess();
 }
+
+
+// Helper function to fill in the auto calculated min/max.
+void helperButtonCalcMinMax() {
+
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Setup a cube for gathering stats from the user requested band
+  QString file = ui.GetFileName("FROM");
+
+  Cube inCube;
+  CubeAttributeInput attrib = ui.GetInputAttribute("FROM");
+  if (attrib.bands().size() != 0) {
+     vector<QString> bands = attrib.bands();
+     inCube.setVirtualBands(bands);
+  }
+
+  inCube.open(file, "r");
+
+  LineManager line(inCube);
+  Statistics cubeStats;
+
+  for (int i = 1; i <= inCube.lineCount(); i++) {
+    line.SetLine(i);
+    inCube.read(line);
+    cubeStats.AddData(line.DoubleBuffer(), line.size());
+  }  
+
+  inCube.close();
+
+  // Write ranges to the GUI
+  ui.Clear("MINIMUM");
+  ui.PutDouble("MINIMUM", cubeStats.Minimum());
+  ui.Clear("MAXIMUM");
+  ui.PutDouble("MAXIMUM", cubeStats.Maximum());
+
+}
+

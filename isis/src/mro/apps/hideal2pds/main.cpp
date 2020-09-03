@@ -184,11 +184,11 @@ void IsisMain() {
 
   updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
-  if (nbits != 8 && nbits != 16) {
-    PvlObject &image = pdsLabel.findObject("IMAGE");
-    image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK",
-                                toString((int)pow(2.0, (double)nbits) - 1)), Pvl::Replace);
-  }
+  
+  // change SAMPLE_BIT_MASK value according to BITS input
+  PvlObject &image = pdsLabel.findObject("IMAGE");
+  image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK", toString((int)pow(2.0, (double)nbits) - 1)),
+                   Pvl::Replace);
 
   Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
@@ -293,7 +293,12 @@ void IsisMain() {
   // Read in the proper keyword types (Real, Enum, String, Integer, etc) for 
   // each PvlKeyword so that the PDS labels have proper format
   PvlFormat *formatter = pdsLabel.format();
-  formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds.typ");
+
+  if( nbits != 8 ) {
+    formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds_16bit.typ");
+  } else {
+    formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds_8bit.typ");
+  }
 
   // Format ordering of keywords/objects/groups/comments in the PDS labels
   pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHiriseIdealPds.pft");
