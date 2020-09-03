@@ -184,6 +184,12 @@ void IsisMain() {
 
   updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
+  if (nbits != 8 && nbits != 16) {
+    PvlObject &image = pdsLabel.findObject("IMAGE");
+    image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK",
+                                toString((int)pow(2.0, (double)nbits) - 1)), Pvl::Replace);
+  }
+
   Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
 
