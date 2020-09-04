@@ -42,11 +42,22 @@
           <td>65536</td>
         </tr>
         <tr border="1">
-          <td>Unsigned Integer/Signed Integer/Real</td>
+          <td>Unsigned Integer</td>
           <td>Minimum DN value in the cube</td>
           <td>Maximum DN value in the cube</td>
           <td>65536</td>
         </tr>
+        <tr border="1">
+          <td>Signed Integer</td>
+          <td>Minimum DN value in the cube</td>
+          <td>Maximum DN value in the cube</td>
+          <td>65536</td>
+        </tr>
+        <tr border="1">
+          <td>Real</td>
+          <td>Minimum DN value in the cube</td>
+          <td>Maximum DN value in the cube</td>
+          <td>65536</td>
       </table>
       <br></br>
       The cube multiplier and base can be found in the header of the cube.
