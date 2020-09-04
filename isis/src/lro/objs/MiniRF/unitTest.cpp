@@ -43,7 +43,7 @@ int main(void) {
     double knownLat = 85.5973879396895398;
     double knownLon = 264.7361454607174664;
 
-    Cube c("$chandrayaan1/testData/FSR_CDR_LV1_01801_0R.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/chandrayaan1/unitTestData/FSR_CDR_LV1_01801_0R.cub", "r");
     Camera *cam = Isis::CameraFactory::Create(c);
     cout << "FileName: " << FileName( c.fileName() ).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -89,7 +89,7 @@ int main(void) {
     cout << endl << "RightAscension = " << cam->RightAscension() << endl;
     cout << "Declination = " << cam->Declination() << endl;
 
-    Cube c2("$lro/testData/LSZ_04970_1CD_XKU_71S272_V1.reduced.cub", "r");
+    Cube c2("$ISISTESTDATA/isis/src/lro/unitTestData/LSZ_04970_1CD_XKU_71S272_V1.reduced.cub", "r");
     Camera *cam2 = CameraFactory::Create(c2);
 
     // Test name methods
@@ -134,7 +134,7 @@ int main(void) {
    // Test a Level-2 image
     cout << endl << "Testing a Level-2 cube: " << endl << endl;
 
-    Cube c3("$lro/testData/LSB_00291_1CD_XIU_89S206_V1_c2m.cub", "r");
+    Cube c3("$ISISTESTDATA/isis/src/lro/unitTestData/LSB_00291_1CD_XIU_89S206_V1_c2m.cub", "r");
 
     Camera *cam3 = CameraFactory::Create(c3);
 

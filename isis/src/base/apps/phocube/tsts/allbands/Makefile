@@ -30,4 +30,6 @@ commands:
 	  morphology=true \
 	  albedo=true \
 	  radec=true \
-	  bodyfixed=true> /dev/null;  
+	  bodyfixed=true \
+	  localtime=true > /dev/null;
+

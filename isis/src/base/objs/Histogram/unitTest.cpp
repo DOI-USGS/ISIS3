@@ -158,9 +158,9 @@ int main(int argc, char *argv[]) {
 
   QList<QString> flist;
   Isis::Progress progress;
-  Isis::FileName netName("$base/testData/enceladus_sp-Jig.net");
+  Isis::FileName netName("$ISISTESTDATA/isis/src/base/unitTestData/enceladus_sp-Jig.net");
   flist.append(netName.expanded());
-  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/*data"), "data").toStdString() << endl;
+  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/*Data"), "data").toStdString() << endl;
 
   Isis::ControlNet net(flist[0], &progress);
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    Isis::FileName cubeFile("$base/testData/isisTruth.cub");
+    Isis::FileName cubeFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    Isis::FileName cubeFile("$base/testData/isisTruth_Signed16Bit.cub");
+    Isis::FileName cubeFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth_Signed16Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    Isis::FileName cubeFile("$base/testData/isisTruth_Unsigned16Bit.cub");
+    Isis::FileName cubeFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth_Unsigned16Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -345,7 +345,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    Isis::FileName cubeFile("$base/testData/isisTruth_8Bit.cub");
+    Isis::FileName cubeFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth_8Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;

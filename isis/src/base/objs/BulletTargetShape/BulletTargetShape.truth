@@ -9,7 +9,7 @@ btCollisionBody pointer is valid?  false
 
 
 Testing load constructor
-Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+Testing with  "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
 
 Target name:  ""
 Maximum distance in kilometers:  0.683956
@@ -17,13 +17,13 @@ btCollisionBody pointer is valid?  true
 
 
 Testing load constructor with cube
-Testing with  "$hayabusa/testData/st_2391934788_v.cub" ...
+Testing with  "$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub" ...
 
 Target shape pointer is valid? false
 
 
 Testing load constructor with other extension
-Testing with  "$base/testData/xmlTestLabel.xml" ...
+Testing with  "$ISISTESTDATA/isis/src/base/unitTestData/xmlTestLabel.xml" ...
 
 Target shape pointer is valid? false
 

@@ -6,8 +6,8 @@ Group = GroundPoint
   Declination                = 67.288137235407 <DEGREE>
   PlanetocentricLatitude     = -85.539935681585 <DEGREE>
   PlanetographicLatitude     = -85.539935681585 <DEGREE>
-  PositiveEast360Longitude   = 27.089555271673 <DEGREE>
-  PositiveEast180Longitude   = 27.089555271673 <DEGREE>
+  PositiveEast360Longitude   = 27.089555271672 <DEGREE>
+  PositiveEast180Longitude   = 27.089555271672 <DEGREE>
   PositiveWest360Longitude   = 332.91044472833 <DEGREE>
   PositiveWest180Longitude   = -27.089555271672 <DEGREE>
   BodyFixedCoordinate        = (120.6493939079, 61.711663528734,
@@ -21,13 +21,13 @@ Group = GroundPoint
   ObliqueSampleResolution    = 187.44583818806 <meters>
 
   # Spacecraft Information
-  SpacecraftPosition         = (216.77599432924, 54.260221515166,
+  SpacecraftPosition         = (216.77599432924, 54.260221515165,
                                 -2462.1104393388) <km>
   SpacecraftAzimuth          = 38.331 <DEGREE>
   SlantDistance              = 731.11938668312 <km>
   TargetCenterDistance       = 2472.2305351357 <km>
   SubSpacecraftLatitude      = -84.813985589411 <DEGREE>
-  SubSpacecraftLongitude     = 14.052715974499 <DEGREE>
+  SubSpacecraftLongitude     = 14.052715974498 <DEGREE>
   SpacecraftAltitude         = 735.29826910549 <km>
   OffNadirAngle              = 3.124 <DEGREE>
   SubSpacecraftGroundAzimuth = 296.906 <DEGREE>
@@ -84,13 +84,13 @@ Group = GroundPoint
   ObliqueSampleResolution    = 187.61662252249 <meters>
 
   # Spacecraft Information
-  SpacecraftPosition         = (216.77599432924, 54.260221515166,
+  SpacecraftPosition         = (216.77599432924, 54.260221515165,
                                 -2462.1104393388) <km>
   SpacecraftAzimuth          = 284.604 <DEGREE>
   SlantDistance              = 733.84767049682 <km>
   TargetCenterDistance       = 2472.2305351357 <km>
   SubSpacecraftLatitude      = -84.813985589411 <DEGREE>
-  SubSpacecraftLongitude     = 14.052715974499 <DEGREE>
+  SubSpacecraftLongitude     = 14.052715974498 <DEGREE>
   SpacecraftAltitude         = 735.29826910549 <km>
   OffNadirAngle              = 0.773 <DEGREE>
   SubSpacecraftGroundAzimuth = 195.221 <DEGREE>

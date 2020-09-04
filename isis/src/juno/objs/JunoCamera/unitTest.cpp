@@ -56,7 +56,7 @@ int main(void) {
     double knownLat = -45.4762320380959295;
     double knownLon = 278.270465938390657;
 
-    Cube c("$juno/testData/JNCE_2013282_00M00099_V01_METHANE_0003.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/juno/unitTestData/JNCE_2013282_00M00099_V01_METHANE_0003.cub", "r");
     JunoCamera *cam = (JunoCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();

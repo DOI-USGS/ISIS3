@@ -1,5 +1,5 @@
-#ifndef campt_h
-#define campt_h
+#ifndef mappt_h
+#define mappt_h
 
 #include "Pvl.h"
 #include "UserInterface.h"

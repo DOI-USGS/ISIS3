@@ -41,16 +41,16 @@ Declination: -16.043606158
 PlanetocentricLatitude: -8.271158614
 PositiveEast360Longitude: 210.202299602
 EphemerisTime: 225787161.551323384
-NorthAzimuth: 359.217580727
-SunAzimuth: 82.539531219
-SpacecraftAzimuth: 251.351022349
+NorthAzimuth: 359.217580725
+SunAzimuth: 82.539531222
+SpacecraftAzimuth: 251.351022345
 OffNadirAngle: -0.287902823
 CelestialNorthClockAngle: 81.991210878
 RaDecResolution: 0.000283854
-BodyFixedCoordinate: -1562.244751303
-BodyFixedCoordinate: -909.332100893
+BodyFixedCoordinate: -1562.244751304
+BodyFixedCoordinate: -909.332100894
 BodyFixedCoordinate: -262.774167442
-LocalRadius: 1826620.868095986
+LocalRadius: 1826620.868096882
 SampleResolution: 15054.295387028
 LineResolution: 15054.295387028
 ObliqueDetectorResolution: 15055.846913180
@@ -65,21 +65,21 @@ Declination: -16.043606158
 PlanetocentricLatitude: -8.271158614
 PositiveEast360Longitude: 210.202299602
 EphemerisTime: 225792161.551323384
-NorthAzimuth: 359.217580727
-SunAzimuth: 82.539531219
-SpacecraftAzimuth: 251.351022349
+NorthAzimuth: 359.217580725
+SunAzimuth: 82.539531222
+SpacecraftAzimuth: 251.351022345
 OffNadirAngle: -0.287902823
 CelestialNorthClockAngle: 81.991210878
 RaDecResolution: 0.000283854
-BodyFixedCoordinate: -1562.244751303
-BodyFixedCoordinate: -909.332100893
+BodyFixedCoordinate: -1562.244751304
+BodyFixedCoordinate: -909.332100894
 BodyFixedCoordinate: -262.774167442
-LocalRadius: 1826620.868095986
+LocalRadius: 1826620.868096882
 SampleResolution: 15054.295387028
 LineResolution: 15054.295387028
 ObliqueDetectorResolution: 15055.846913180
 ObliqueLineResolution: 15055.846913180
 ObliqueSampleResolution: 15055.846913180
 ObliquePixelResolution: 15055.846913180
-Latitude off by: 0.0255589466259298
-Longitude off by: 0.0032366246724109
+Latitude off by: 0.0255589466344581
+Longitude off by: 0.0032366246865934

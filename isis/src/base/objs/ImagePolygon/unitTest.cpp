@@ -26,7 +26,7 @@ int main() {
   */
 
   //   simple MOC image
-  QString inFile = "$mgs/testData/ab102401.cub";
+  QString inFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub";
 
   // Open the cube
   Cube cube;
