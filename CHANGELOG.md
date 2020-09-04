@@ -30,6 +30,10 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+### Fixed
+
+ - Equalizer now reports the correct equation and values used to perform the adjustment. [#3987](https://github.com/USGS-Astrogeology/ISIS3/issues/3987)
+
 ## [4.2.0] - 2020-07-27
 
 ### Added
