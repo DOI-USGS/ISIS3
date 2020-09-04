@@ -248,7 +248,7 @@
     </change>
     <change name="Jesse Mapel" date="2020-09-01">
       Reported formula and variables now match the formula selected by the ADJUST
-      argument.
+      argument. Fixes #3987.
     </change>
   </history>
 
