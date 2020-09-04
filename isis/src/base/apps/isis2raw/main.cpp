@@ -63,11 +63,11 @@ void IsisMain() {
   else if(ui.GetString("BITTYPE") == "32BIT") {
     p.SetOutputType(Isis::Real);
   }
-  
+
   if (ui.GetString("STRETCH") != NONE && ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
-    setRangeAndPixels(ui, p, min, max, NONE);
   }
+  setRangeAndPixels(ui, p, min, max, NONE);
 
   // Set the output endianness
   if(ui.GetString("ENDIAN") == "MSB")
