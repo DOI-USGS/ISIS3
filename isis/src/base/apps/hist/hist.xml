@@ -88,6 +88,9 @@
       Re-added the ability to set number of bins without setting min/max values after the last update. 
       Follow-on to #3881.
     </change>
+    <change name="Stuart Sides" date="2020-09-02">
+      Added GUI helper for filling in computed min/max. Fixed #3880.
+    </change>
   </history>
 
   <oldName>
@@ -138,6 +141,17 @@
         <description>
           Minimum DN value in histogram.  If not entered it will automatically be computed.
         </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonCalcMinMax</function>
+            <brief>Fill in the auto calculated MINIMUM and MAXIMUM for the input cube</brief>
+            <description>
+              This button will calculate what the default MINIMUM and MAXIMUM values would be
+              and fills the respective GUI fields with them.
+            </description>
+            <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
+          </helper>
+        </helpers>
         <lessThan>
           <item>MAXIMUM</item>
         </lessThan>
