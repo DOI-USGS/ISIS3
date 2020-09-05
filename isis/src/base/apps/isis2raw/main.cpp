@@ -45,29 +45,33 @@ void IsisMain() {
   //  for each line.
   double min = -DBL_MAX;
   double max = DBL_MAX;
+  Pixtype pixType = NONE;
   if(ui.GetString("BITTYPE") == "8BIT") {
     p.SetOutputType(Isis::UnsignedByte);
     min = 0.0;
     max = 255.0;
+    pixType = BOTH;
   }
   else if(ui.GetString("BITTYPE") == "S16BIT") {
     p.SetOutputType(Isis::SignedWord);
     min = -32768.0;
     max = 32767.0;
+    pixType = NEG;
   }
   else if(ui.GetString("BITTYPE") == "U16BIT") {
     p.SetOutputType(Isis::UnsignedWord);
     min = 0.0;
     max = 65535.0;
+    pixType = BOTH;
   }
   else if(ui.GetString("BITTYPE") == "32BIT") {
     p.SetOutputType(Isis::Real);
+    pixType = NONE;
   }
-
-  if (ui.GetString("STRETCH") != NONE && ui.GetString("BITTYPE") != "32BIT") {
+  if (ui.GetString("STRETCH") != "NONE" || ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
   }
-  setRangeAndPixels(ui, p, min, max, NONE);
+  setRangeAndPixels(ui, p, min, max, pixType);
 
   // Set the output endianness
   if(ui.GetString("ENDIAN") == "MSB")
