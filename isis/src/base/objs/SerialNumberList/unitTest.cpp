@@ -33,13 +33,13 @@ int main(int argc, char *argv[]) {
     SerialNumberList snl(false);
     cout << endl << endl;
     // add filename, def2filename=false
-    snl.add("$mgs/testData/ab102401.cub");
-    snl.add("$mgs/testData/m0402852.cub");
-    snl.add("$lo/testData/3133_h1.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub");
+    snl.add("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub");
     // add filename, def2filename=true
-    snl.add("$mgs/testData/ab102402.lev2.cub",true);
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102402.lev2.cub",true);
     // Test adding by giving a serial number and filename
-    snl.add("m0402852.cub", "$mgs/testData/m0402852.cub");
+    snl.add("m0402852.cub", "$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub");
 
     cout << "SerialNumberList size = " << snl.size() << endl;
     cout << "SerialNumberList has SerialNumber XYZ?          "
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
   FileName temp("$temporary/templist.txt");
   QFile tempFile(temp.expanded());
   tempFile.open(QIODevice::WriteOnly | QIODevice::Text);
-  tempFile.write("$mgs/testData/ab102401.cub\n");
-  tempFile.write("$mgs/testData/m0402852.cub\n");
+  tempFile.write("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub\n");
+  tempFile.write("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub\n");
   tempFile.close();
 
   Progress p;
@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // Test to make sure all targets being the same works
-    snl.add("$mgs/testData/ab102401.cub", true);
-    snl.add("$base/testData/blobTruth.cub");
-    snl.add("$lo/testData/3133_h1.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub", true);
+    snl.add("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub");
+    snl.add("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub");
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding a duplicate filename
-    snl.add("$mgs/testData/ab102401.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // no inst group, def2filename, no mapping
-    QString filename("$base/testData/isisTruth.cub");
+    QString filename("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     snl.add(filename, true);
   }
   catch(IException &e) {
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // no inst group, no def2filename
-    QString filename("$base/testData/isisTruth.cub");
+    QString filename("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     snl.add(filename, false);
   }
   catch(IException &e) {
@@ -165,9 +165,9 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // Test to make sure all targets being the same works
-    snl.add("sn1", "$mgs/testData/ab102401.cub");
-    snl.add("sn2", "$base/testData/blobTruth.cub");
-    snl.add("sn3", "$lo/testData/3133_h1.cub");
+    snl.add("sn1", "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    snl.add("sn2", "$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub");
+    snl.add("sn3", "$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub");
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // no inst group, def2filename, no mapping
-    QString filename("$base/testData/isisTruth.cub");
+    QString filename("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     snl.add("sn1", filename);
   }
   catch(IException &e) {
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding an unknown sn
-    snlNoTarget.add(QString("Unknown"), QString("$base/testData/blobTruth.cub"));
+    snlNoTarget.add(QString("Unknown"), QString("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -197,9 +197,9 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding a duplicate sn
-    snlNoTarget.add("$mgs/testData/ab102401.cub");
-    QString sn = snlProgress.serialNumber("$mgs/testData/ab102401.cub");
-    snlNoTarget.add(sn, QString("$base/testData/blobTruth.cub"));
+    snlNoTarget.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    QString sn = snlProgress.serialNumber("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    snlNoTarget.add(sn, QString("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding a file without an Instrument group
-    QString filename("$base/testData/isisTruth.cub");
+    QString filename("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     snlNoTarget.add("sn1", filename);
   }
   catch (IException &e) {
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding a file without a SpacecraftName keyword
-    snlNoTarget.add("sn2", QString("$base/testData/isisTruthNoSpacecraftName.cub"));
+    snlNoTarget.add("sn2", QString("$ISISTESTDATA/isis/src/base/unitTestData/isisTruthNoSpacecraftName.cub"));
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // adding a file without an InstrumentId keyword
-    snlNoTarget.add("sn3", QString("$base/testData/isisTruthNoInstrumentId.cub"));
+    snlNoTarget.add("sn3", QString("$ISISTESTDATA/isis/src/base/unitTestData/isisTruthNoInstrumentId.cub"));
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
