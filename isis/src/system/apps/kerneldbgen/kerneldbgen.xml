@@ -435,11 +435,11 @@
       <parameter name="SMITHEDPAD">
         <type>double</type>
         <brief>
-          Seconds to subtract from the start time and add to the stop time in each smithed kernel.
+          Seconds to subtract from the start time and add to the stop time in each segment of each smithed kernel.
         </brief>
         <description>
           This parameter is used to add a padding of the provided number of seconds to the start and
-	  stop time of all the smithed kernels. If STARTOFFSET or ENDOFFFSET are also
+	  stop time of each segment in each smithed kernel. If STARTOFFSET or ENDOFFFSET are also
 	  provided, this padding will be added to all the smithed kernels in addition to those offsets.
         </description>
         <default>

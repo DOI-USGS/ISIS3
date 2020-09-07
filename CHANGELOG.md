@@ -29,6 +29,7 @@ update the Unreleased link so that it compares against the latest release tag.
 -->
 
 ## [Unreleased]
+ - Added an optional parameter to kerneldbgen, SMITHEDPAD, which will add time-padding to each segement of each smithed kernel in the generated kernel database. [#3363](https://github.com/USGS-Astrogeology/ISIS3/issues/3363)
 
 ## [4.2.0] - 2020-07-27
 
