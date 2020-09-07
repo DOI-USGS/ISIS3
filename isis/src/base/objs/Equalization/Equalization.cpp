@@ -105,7 +105,7 @@ namespace Isis {
 
 
   /**
-   * @brief Calculates the image and overlap statistics, and then determines corrective factors if 
+   * @brief Calculates the image and overlap statistics, and then determines corrective factors if
    * possible
    *
    * This method calculates image statistics on a band-by-band basis and calculates overlap
@@ -155,7 +155,7 @@ namespace Isis {
     if (!m_badFiles.isEmpty()) {
       // Make sure we set the results for the already calculated overlap statistics
       setResults();
-  
+
       QString msg;
       // Let user know where to find list of non-overlapping files so they can make corrections.
       msg = "There are input images that do not overlap with enough valid pixels. ";
@@ -199,7 +199,7 @@ namespace Isis {
   /**
    * @brief Calculates the image statistics on a band-by-band basis
    *
-   * This method calculates statistics by band for the input images. Each set of 
+   * This method calculates statistics by band for the input images. Each set of
    * band statistics is used to initialize the OverlapNormalizations that will
    * be used to determine gains and offsets for equalization.
    */
@@ -239,7 +239,7 @@ namespace Isis {
 
   /**
    * @brief Calculates the overlap statistics for each pair of input images
-   * 
+   *
    * This method calculates any overlap statistics that have not been previously
    * calculated for the input images.
    */
@@ -252,7 +252,7 @@ namespace Isis {
     // Find overlapping areas and add them to the set of known overlaps for
     // each band shared amongst cubes
     for (int i = 0; i < m_imageList.size(); i++) {
-      Cube cube1; 
+      Cube cube1;
       cube1.open(m_imageList[i].toString());
 
       for (int j = (i + 1); j < m_imageList.size(); j++) {
@@ -347,23 +347,52 @@ namespace Isis {
     // Add normalization statistics
     for (int img = 0; img < m_imageList.size(); img++) {
       // Format and name information
+      // It is important that the variable names are listed in the same
+      // order as they are added to the PvlKeyword in the for loop.
       PvlGroup norm("Normalization");
-      norm.addComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
-      norm.addComment("BandN = (GAIN, OFFSET, AVERAGE)");
+      switch(m_sType) {
+        case OverlapNormalization::Both:
+          norm.addComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
+          norm.addComment("BandN = (GAIN, OFFSET, AVERAGE)");
+          break;
+        case OverlapNormalization::Gains:
+          norm.addComment("Formula: newDN = oldDN * GAIN + AVERAGE * GAIN");
+          norm.addComment("BandN = (GAIN, AVERAGE)");
+          break;
+        case OverlapNormalization::Offsets:
+          norm.addComment("Formula: newDN = OFFSET + AVERAGE");
+          norm.addComment("BandN = (OFFSET, AVERAGE)");
+          break;
+        case OverlapNormalization::GainsWithoutNormalization:
+          norm.addComment("Formula: newDN = oldDN * GAIN");
+          norm.addComment("BandN = (GAIN)");
+          break;
+      }
       norm += PvlKeyword("FileName", m_imageList[img].original());
 
       if (m_normsSolved) {
         // Band by band statistics
         for (int band = 1; band <= m_maxBand; band++) {
-          QString mult = toString(m_adjustments[img]->getGain(band - 1));
-          QString base = toString(m_adjustments[img]->getOffset(band - 1));
-          QString avg = toString(m_adjustments[img]->getAverage(band - 1));
           QString bandNum = toString(band);
           QString bandStr = "Band" + bandNum;
           PvlKeyword bandStats(bandStr);
-          bandStats += mult;
-          bandStats += base;
-          bandStats += avg;
+          // GAIN
+          if (m_sType == OverlapNormalization::Both ||
+              m_sType == OverlapNormalization::Gains ||
+              m_sType == OverlapNormalization::GainsWithoutNormalization) {
+            bandStats += toString(m_adjustments[img]->getGain(band - 1));
+          }
+          // OFFSET
+          if (m_sType == OverlapNormalization::Both ||
+              m_sType == OverlapNormalization::Offsets) {
+            bandStats += toString(m_adjustments[img]->getOffset(band - 1));
+          }
+          // AVERAGE
+          if (m_sType == OverlapNormalization::Both ||
+              m_sType == OverlapNormalization::Gains ||
+              m_sType == OverlapNormalization::Offsets) {
+            bandStats += toString(m_adjustments[img]->getAverage(band - 1));
+          }
           norm += bandStats;
         }
       }
@@ -401,8 +430,8 @@ namespace Isis {
   /**
    * @brief Imports statistics for applying correction
    *
-   * This method obtains corrective factors from an input statistics pvl file so that 
-   * input images can be equalized. These corrective factors are obtained from Normalization 
+   * This method obtains corrective factors from an input statistics pvl file so that
+   * input images can be equalized. These corrective factors are obtained from Normalization
    * groups within the EqualizationInformation object in the input pvl.
    *
    * @see Equalization::applyCorrection()
@@ -699,7 +728,7 @@ namespace Isis {
     for (unsigned int adj = 0; adj < m_adjustments.size(); adj++) {
       delete m_adjustments[adj];
     }
-    m_adjustments.clear(); 
+    m_adjustments.clear();
   }
 
 
@@ -778,7 +807,7 @@ namespace Isis {
     const PvlGroup &eqGen = eqInfo.findGroup("General");
     m_samplingPercent = eqGen["SamplingPercent"];
     m_mincnt = eqGen["MinCount"];
-    m_wtopt = (eqGen["Weighted"][0] == "true") ? true : false; 
+    m_wtopt = (eqGen["Weighted"][0] == "true") ? true : false;
     m_sType = static_cast<OverlapNormalization::SolutionType>((int)eqGen["SolutionType"]);
     m_lsqMethod = static_cast<LeastSquares::SolveMethod>(eqGen["SolveMethod"][0].toInt());
 
@@ -799,10 +828,10 @@ namespace Isis {
         m_alreadyCalculated[x] = true;
         m_alreadyCalculated[y] = true;
 
-        // Determine which calculated overlaps have valid overlaps 
+        // Determine which calculated overlaps have valid overlaps
         // (i.e. valid pixels > mincount)
         if (oStat["Valid"][0] == "true") {
-          m_doesOverlapList[x] = true; 
+          m_doesOverlapList[x] = true;
           m_doesOverlapList[y] = true;
         }
       }
@@ -821,7 +850,7 @@ namespace Isis {
     for (int o = 0; o < (int) m_overlapStats.size(); o++) {
       OverlapStatistics *oStat = m_overlapStats[o];
 
-      // Calculate the indices - we want to ensure that no matter how the input list of images 
+      // Calculate the indices - we want to ensure that no matter how the input list of images
       // changes (e.g. the order is changed), we always add overlaps that same way.
       // This means ensuring that each overlap has the X overlap statistics associated with
       // the X index and the Y overlap statistics associated with the Y index.
