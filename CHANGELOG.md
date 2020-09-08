@@ -33,6 +33,7 @@ update the Unreleased link so that it compares against the latest release tag.
 ### Fixed
 
  - Equalizer now reports the correct equation and values used to perform the adjustment. [#3987](https://github.com/USGS-Astrogeology/ISIS3/issues/3987)
+ - For Histograms in ISIS, updated the math for calculating what bin data should be placed in and the min/max values of each bin to be more intuitive. In addition, the output of hist and cnethist were changed to display the min/max values of each bin instead of the middle pixel's DN. [#3882](https://github.com/USGS-Astrogeology/ISIS3/issues/3882)
 
 ## [4.2.0] - 2020-07-27
 
