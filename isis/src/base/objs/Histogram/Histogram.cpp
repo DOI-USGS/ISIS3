@@ -50,7 +50,6 @@ namespace Isis {
   Histogram::Histogram(double minimum, double maximum, int nbins) {
 
     SetValidRange(minimum, maximum);
-    //SetBinRange(minimum, maximum);
     SetBins(nbins);
   }
 
@@ -167,20 +166,8 @@ namespace Isis {
 
    rangesFromNet(net,statFunc);
 
-
-   //stretch the domain so that it is an even multiple of binWidth
-   //for some reason Histogram makes the end points of the bin range be at the center of
-   //bins.  Thus the +/-0.5 forces it to point the bin range at the ends of the bins.
-   //SetBinRange(binWidth*( floor(this->ValidMinimum()/binWidth )+0.5),
-   //            binWidth*(ceil( this->ValidMaximum()/binWidth )-0.5) );
-
-
    //Keep an eye on this to see if it breaks anything.  Also, I need to create
    //a dataset to give this constructor for the unit test.
-
-    //tjw:  SetValidRange is moved into SetBinRange
-   //SetValidRange(binWidth*floor(this->ValidMinimum()/binWidth),
-   //              binWidth*ceil(this->ValidMaximum()/binWidth));
 
    //from the domain of the data and the requested bin width calculate the number of bins
    double domain = this->ValidMaximum() - this->ValidMinimum();
@@ -266,7 +253,6 @@ namespace Isis {
     //set up the histogram ranges
 
     SetValidRange(min, max);
-    //SetBinRange(min, max);
   }
 
 
@@ -396,7 +382,7 @@ namespace Isis {
   Histogram::~Histogram() {
   }
 
-  //2015-08-24,  Tyler Wilson:  Added Statistics::SetValidRange call to SetBinRange
+  //2015-08-24,  Tyler Wilson:  Added Statistics::SetValidRange call to SetValidRange
   //So the two functions do not have to be called together when setting
   //up a histogram
 
@@ -462,8 +448,8 @@ namespace Isis {
           index = 0;
         }
         else {
-          index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                              (data[i] - BinRangeStart() ) + 0.5);
+          index = (int) floor( ((double) nbins / (BinRangeEnd() - BinRangeStart())) *
+                              (data[i] - BinRangeStart()) );
         }
         if (index < 0) index = 0;
         if (index >= nbins) index = nbins - 1;
@@ -490,8 +476,8 @@ namespace Isis {
         index = 0;
       }
       else {
-        index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart() ) *
-                            (data - BinRangeStart() ) + 0.5);
+        index = (int) floor( ((double) nbins / (BinRangeEnd() - BinRangeStart())) *
+                              (data - BinRangeStart()) );
       }
       if (index < 0) index = 0;
       if (index >= nbins) index = nbins - 1;
@@ -522,8 +508,8 @@ namespace Isis {
           index = 0;
         }
         else {
-          index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                              (data[i] - BinRangeStart()) + 0.5);
+          index = (int) floor( ((double) nbins / (BinRangeEnd() - BinRangeStart())) *
+                              (data[i] - BinRangeStart()) );
         }
         if (index < 0) index = 0;
         if (index >= nbins) index = nbins - 1;
@@ -591,7 +577,7 @@ namespace Isis {
       }
     }
 
-    return BinMiddle( (int)p_bins.size() - 1);
+    return BinMiddle( (int) p_bins.size() - 1);
   }
 
 
@@ -653,8 +639,8 @@ namespace Isis {
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
-    double binSize = (BinRangeEnd() - BinRangeStart()) / (double)(p_bins.size() - 1);
-    low = BinRangeStart() - binSize / 2.0 + binSize * (double) index;
+    double binSize = (BinRangeEnd() - BinRangeStart()) / (double) p_bins.size();
+    low = BinRangeStart() + binSize * (double) index;
     high = low + binSize;
   }
 
