@@ -55,6 +55,7 @@ ISIS3 Contributors
 - Steven Lambright 
 - Stuart Sides 
 - Summer Stapleton 
+- Timothy Giroux
 - Tracie Sucharski 
 - Travis Addair 
 - Tyler Wilson 
