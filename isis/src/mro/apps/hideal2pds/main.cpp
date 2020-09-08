@@ -184,7 +184,7 @@ void IsisMain() {
 
   updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
-  
+
   // change SAMPLE_BIT_MASK value according to BITS input
   PvlObject &image = pdsLabel.findObject("IMAGE");
   image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK", toString((int)pow(2.0, (double)nbits) - 1)),
