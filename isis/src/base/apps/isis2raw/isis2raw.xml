@@ -74,7 +74,7 @@
     </change>
     <change name="Adam Paquette" date="2020-09-04">
       Updated application logic to not generate a histogram if stretch is None
-      and the output bit type is 32-bit. Also removes duplicate class to checkRange
+      and the output bit type is 32-bit. Also removes duplicate calls to checkRange
       and setRangeAndPixels. Closes #3878 (github).
     </change>
   </history>

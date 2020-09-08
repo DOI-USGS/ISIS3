@@ -68,6 +68,7 @@ void IsisMain() {
     p.SetOutputType(Isis::Real);
     pixType = NONE;
   }
+  
   if (ui.GetString("STRETCH") != "NONE" || ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
   }
