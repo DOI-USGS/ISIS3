@@ -11,6 +11,57 @@
       processed. The <i>stats</i> program generates statistics that will help you find new insights
       in your data to make more accurate predictions and achieve better outcomes.
     </p>
+    <h5>Histogram Computation</h5>
+    <p>
+      Stats uses a histogram to compute the mode and median <def link="DigitalNumber">DN</def> values for a given cube.
+      The minimum, maximum, and number of bins depends on the pixel type of the cube. Here are the minimum, maximum,
+      and number of bins associated with supported pixel types:
+      <table border="1">
+        <tr border="1">
+          <th>Pixel Type</th>
+          <th>Minimum</th>
+          <th>Maximum</th>
+          <th>Number of Bins</th>
+        </tr>
+        <tr border="1">
+          <td>Unsigned Byte</td>
+          <td>0 * cube multiplier + base</td>
+          <td>255 * cube multiplier + base</td>
+          <td>256</td>
+        </tr>
+        <tr border="1">
+          <td>Unsigned Word</td>
+          <td>0 * cube multiplier + base</td>
+          <td>65535 * cube multiplier + base</td>
+          <td>65536</td>
+        </tr>
+        <tr border="1">
+          <td>Signed Word</td>
+          <td>-32768.0 * cube multiplier + base</td>
+          <td>32767.0 * cube multiplier + base</td>
+          <td>65536</td>
+        </tr>
+        <tr border="1">
+          <td>Unsigned Integer</td>
+          <td>Minimum DN value in the cube</td>
+          <td>Maximum DN value in the cube</td>
+          <td>65536</td>
+        </tr>
+        <tr border="1">
+          <td>Signed Integer</td>
+          <td>Minimum DN value in the cube</td>
+          <td>Maximum DN value in the cube</td>
+          <td>65536</td>
+        </tr>
+        <tr border="1">
+          <td>Real</td>
+          <td>Minimum DN value in the cube</td>
+          <td>Maximum DN value in the cube</td>
+          <td>65536</td>
+      </table>
+      <br></br>
+      The cube multiplier and base can be found in the header of the cube.
+    </p>
 
 
     <h4>
@@ -28,23 +79,23 @@
     </p>
 
     <pre>
-Average                 Total pixels
+      Average                 Total pixels
 
-Standard deviation      Valid pixels
+      Standard deviation      Valid pixels
 
-Variance                Over valid maximum pixels
+      Variance                Over valid maximum pixels
 
-Median                  Under valid minimum pixels
+      Median                  Under valid minimum pixels
 
-Mode                    Null pixels
+      Mode                    Null pixels
 
-Skew                    Low representation saturation (LRS) pixels
+      Skew                    Low representation saturation (LRS) pixels
 
-Minimum                 High representation saturation (HRS) pixels
+      Minimum                 High representation saturation (HRS) pixels
 
-Maximum                 Low instrument saturation (LIS) pixels
+      Maximum                 Low instrument saturation (LIS) pixels
 
-Sum                     High instrument saturation (HIS) pixels
+      Sum                     High instrument saturation (HIS) pixels
     </pre>
 
     <p>

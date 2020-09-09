@@ -30,6 +30,18 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+### Changed
+
+ - Isis2raw will now output straight to a 32bit file (no stretch) when stretch is set to None and bittype is set to 32bit. [#3878](https://github.com/USGS-Astrogeology/ISIS3/issues/3878)
+
+### Fixed
+
+ - Equalizer now reports the correct equation and values used to perform the adjustment. [#3987](https://github.com/USGS-Astrogeology/ISIS3/issues/3987)
+ 
+ ### Added
+ 
+ - A Gui Helper gear was added to hist to fill in the minimum and maximum parameters with what would have been automatically calculated. [#3880](https://github.com/USGS-Astrogeology/ISIS3/issues/3880) 
+
 ## [4.2.0] - 2020-07-27
 
 ### Added
