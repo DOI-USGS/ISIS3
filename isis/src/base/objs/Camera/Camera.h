@@ -239,10 +239,10 @@ namespace Isis {
    *                           an error in the original formula, and updated the documention for this
    *                           function.  Fixes #4614.
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
-   *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to 
+   *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to
    *                           prevent a segfault when the distortion map is incomplete. Fixes $5163.
-   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
-   *                           collect the InstrumentId from the original cube label for 
+   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to
+   *                           collect the InstrumentId from the original cube label for
    *                           comparisons related to image imports in ipce. References #5460.
    */
 
@@ -268,6 +268,7 @@ namespace Isis {
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
+      void Slope(double &slope, bool &success);
 
       void GetLocalNormal(double normal[3]);
 
@@ -331,7 +332,7 @@ namespace Isis {
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
-      
+
       QString instrumentId();
 
       QString instrumentNameLong() const;
@@ -502,7 +503,7 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;      //!< A friend class to calculate focal length
       friend class RadarSlantRangeMap;  //!< A friend class to calculate focal length
-      
+
       QString m_instrumentId;        //!< The InstrumentId as it appears on the cube.
 
       QString m_instrumentNameLong;  //!< Full instrument name
@@ -516,10 +517,10 @@ namespace Isis {
       void ringRangeResolution();
       double ComputeAzimuth(const double lat, const double lon);
       bool RawFocalPlanetoImage();
-      // SetImage helper functions: 
-      // bool SetImageNoProjection(const double sample, const double line); 
+      // SetImage helper functions:
+      // bool SetImageNoProjection(const double sample, const double line);
       bool SetImageMapProjection(const double sample, const double line, ShapeModel *shape);
-      bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape); 
+      bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape);
 
 
       double p_focalLength;                  //!< The focal length, in units of millimeters
@@ -586,5 +587,3 @@ namespace Isis {
 };
 
 #endif
-
-

@@ -68,10 +68,10 @@ namespace Isis {
    * @param cube The Pvl label from the cube is used to create the Camera object.
    */
   Camera::Camera(Cube &cube) : Sensor(cube) {
-    
-    m_instrumentId = cube.label()->findGroup("Instrument", 
+
+    m_instrumentId = cube.label()->findGroup("Instrument",
                         PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0];
-    
+
     m_instrumentNameLong = "Unknown";
     m_instrumentNameShort = "Unknown";
     m_spacecraftNameLong = "Unknown";
@@ -208,12 +208,12 @@ namespace Isis {
 
     // The projection is a sky map
     else if (p_projection->IsSky()) {
-      return SetImageSkyMapProjection(sample, line, shape); 
+      return SetImageSkyMapProjection(sample, line, shape);
     }
 
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape); 
+      return SetImageMapProjection(sample, line, shape);
     }
 
     // failure
@@ -225,19 +225,19 @@ namespace Isis {
   /**
    * @brief Sets the sample/line values of the image to get the lat/lon values with
    *        a time offset of deltaT.
-   *  
-   * Warning: The deltaT parameter was added specifically for pixel2map to use for 
-   * the Dawn VIR camera. It is used to adjust the pointing to its location at specific 
-   * times like the times at the beginning, middle, and end of exposure for a specific pixel, 
-   * when the correct deltaT can be determined to achieve these results. 
-   *  
-   * Do not use this verstion of SetImage with a deltaT unless you understand exactly what this 
-   * does.  
-   *  
+   *
+   * Warning: The deltaT parameter was added specifically for pixel2map to use for
+   * the Dawn VIR camera. It is used to adjust the pointing to its location at specific
+   * times like the times at the beginning, middle, and end of exposure for a specific pixel,
+   * when the correct deltaT can be determined to achieve these results.
+   *
+   * Do not use this verstion of SetImage with a deltaT unless you understand exactly what this
+   * does.
+   *
    * @param sample Sample coordinate of the cube.
-   * @param line Line coordinate of the cube. 
-   * @param deltaT seconds from the center exposure time 
-   *  
+   * @param line Line coordinate of the cube.
+   * @param deltaT seconds from the center exposure time
+   *
    * @return @b bool Returns True if the image was set successfully and False if it
    *              was not.
    */
@@ -282,12 +282,12 @@ namespace Isis {
 
     // The projection is a sky map
     else if (p_projection->IsSky()) {
-      return SetImageSkyMapProjection(sample, line, shape); 
+      return SetImageSkyMapProjection(sample, line, shape);
     }
-    
+
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape); 
+      return SetImageMapProjection(sample, line, shape);
     }
 
     // failure
@@ -297,13 +297,13 @@ namespace Isis {
 
 
 /**
- * @brief Sets the sample/line values of the image to get the lat/lon values for a Map Projected 
- * image. 
- *  
+ * @brief Sets the sample/line values of the image to get the lat/lon values for a Map Projected
+ * image.
+ *
  * @param sample Sample coordinate of the cube
  * @param line Line coordinate of the cube
  * @param shape shape of the target
- * 
+ *
  * @return bool Returns True if the image was set successfully and False if it
  *              was not.
  */
@@ -353,18 +353,18 @@ namespace Isis {
       }
     }
     shape->clearSurfacePoint();
-    return false; 
+    return false;
   }
 
 
 /**
- * @brief Sets the sample/line values of the image to get the lat/lon values for a Skymap Projected 
- * image. 
- *  
+ * @brief Sets the sample/line values of the image to get the lat/lon values for a Skymap Projected
+ * image.
+ *
  * @param sample Sample coordinate of the cube
  * @param line Line coordinate of the cube
  * @param shape shape of the target
- * 
+ *
  * @return bool Returns True if the image was set successfully and False if it
  *              was not.
  */
@@ -380,7 +380,7 @@ namespace Isis {
       }
     }
     shape->clearSurfacePoint();
-    return false; 
+    return false;
   }
 
 
@@ -600,10 +600,10 @@ namespace Isis {
 
       if(HasSurfaceIntersection()){
 
-          double thetaRad;          
+          double thetaRad;
           thetaRad = EmissionAngle()*DEG2RAD;
 
-          if (thetaRad < HALFPI) {           
+          if (thetaRad < HALFPI) {
             return DetectorResolution()/cos(thetaRad);
 
           }
@@ -1714,6 +1714,41 @@ namespace Isis {
 
 
   /**
+   * Calculates the slope at the current point
+   * by computing the angle between the local surface normal and the ellipsoid
+   * surface normal. If there is a failure during the process, such as there
+   * not being an intersection, then success will be false and slope will not
+   * be modified.
+   *
+   * @param[out] slope The slope angle in degrees
+   * @param[out] success If the slope was successfully calculated
+   */
+  void Camera::Slope(double &slope, bool &success) {
+    ShapeModel *shapeModel = target()->shape();
+    if ( !shapeModel->hasIntersection()) {
+      success = false;
+      return;
+    }
+    shapeModel->calculateSurfaceNormal();
+    if (!shapeModel->hasNormal()) {
+      success = false;
+      return;
+    }
+    std::vector<double> ellipsoidNormal = shapeModel->normal();
+
+    double localNormal[3];
+    GetLocalNormal(localNormal);
+    if (localNormal[0] == 0.0 && localNormal[1] == 0.0 && localNormal[2] == 0.0) {
+      success = false;
+      return;
+    }
+
+    slope = vsep_c(localNormal, &ellipsoidNormal[0]) * 180.0 / PI;;
+    success = true;
+  }
+
+
+  /**
    * Computes the RaDec range
    *
    * @param minra Minimum right ascension value
@@ -2476,7 +2511,7 @@ namespace Isis {
    * close time) is the maximum value of those ephemeris times. This method must
    * be called before a call to the Spice::createCache() method.  It is called
    * in the LoadCache() method.
-   * 
+   *
    * @returns pair<double, double> A pair containing the start and end ephemeris times
    *
    * @throw iException::Programmer - "Unable to find time range for the
@@ -2522,10 +2557,10 @@ namespace Isis {
    * of lines in the beta cube and adds 1, since we need at least 2 points for
    * interpolation. This method must be called before a call to the
    * Spice::createCache() method.  It is called in the LoadCache() method.
-   * 
+   *
    * @param startTime Starting ephemeris time to cache
    * @param endTime Ending ephemeris time to cache
-   * 
+   *
    * @returns int The  calculated spice cache size
    *
    * @throw iException::Programmer - "A cache has already been created."
@@ -2760,7 +2795,7 @@ namespace Isis {
    * Returns the pixel ifov offsets from center of pixel, which defaults to the
    * (pixel pitch * summing mode ) / 2.  If an instrument has a non-square ifov, it must implement
    * this method to return the offsets from the center of the pixel.
-   * 
+   *
    * @returns QList<QPointF> A list of offsets
    *
    */
@@ -2878,8 +2913,8 @@ namespace Isis {
   CameraSkyMap *Camera::SkyMap() {
     return p_skyMap;
   }
-  
-  
+
+
   /**
    * This method returns the InstrumentId as it appears in the cube.
    *
@@ -3069,7 +3104,7 @@ namespace Isis {
 
   /**
    * Return the exposure duration for the pixel that the camera is set to.
-   * 
+   *
    * @return @b double The exposure duration in seconds for the pixel that the camera is set to.
    */
   double Camera::exposureDuration() const {
@@ -3079,11 +3114,11 @@ namespace Isis {
 
   /**
    * Return the exposure duration for the pixel at the given line, sample and band.
-   * 
+   *
    * @param sample The sample of the desired pixel.
    * @param line The line of the desired pixel.
    * @param band The band of the desired pixel. Defaults to 1.
-   * 
+   *
    * @return @b double The exposure duration for the desired pixel in seconds.
    */
   double Camera::exposureDuration(const double sample, const double line, const int band) const {
@@ -3097,5 +3132,3 @@ namespace Isis {
 
 // end namespace isis
 }
-
-

@@ -3,12 +3,16 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Cube.h"
+#include "Displacement.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
+#include "SurfacePoint.h"
 #include "TProjection.h"
 
 #include <cmath>
@@ -90,6 +94,8 @@ void IsisMain() {
   bool sunAzimuth = false;
   bool spacecraftAzimuth = false;
   bool offnadirAngle = false;
+  bool slope = false;
+  bool slopeAzimuth = false;
   bool subSpacecraftGroundAzimuth = false;
   bool subSolarGroundAzimuth = false;
   bool morphologyRank = false;
@@ -116,6 +122,8 @@ void IsisMain() {
     if ((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
     if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+    if ((slope = ui.GetBoolean("SLOPE"))) nbands++;
+    if ((slopeAzimuth = ui.GetBoolean("SLOPEAZIMUTH"))) nbands++;
     if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
     if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
     if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
@@ -165,11 +173,11 @@ void IsisMain() {
   if (dn) {
     name += bname;
     raBandNum++;
-  } 
+  }
   if (phase) {
     name += "Phase Angle";
     raBandNum++;
-  } 
+  }
   if (emission) {
     name += "Emission Angle";
     raBandNum++;
@@ -230,6 +238,14 @@ void IsisMain() {
     name += "OffNadir Angle";
     raBandNum++;
   }
+  if (slope) {
+    name += "Slope";
+    raBandNum++;
+  }
+  if (slopeAzimuth) {
+    name += "Slope Azimuth";
+    raBandNum++;
+  }
   if (subSpacecraftGroundAzimuth) {
     name += "Sub Spacecraft Ground Azimuth";
     raBandNum++;
@@ -264,13 +280,13 @@ void IsisMain() {
   if (localSolarTime) {
     name += "Local Solar Time";
   }
-  bool specialPixels = ui.GetBoolean("SPECIALPIXELS"); 
+  bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
   /**
    * Computes all the geometric properties for the output buffer. Certain
    * knowledge of the buffers size is assumed below, so ensure the buffer
    * is still of the expected size.
-   * 
+   *
    * @param in  The input cube buffer.
    * @param out The output cube buffer.
    */
@@ -397,6 +413,32 @@ void IsisMain() {
           }
           if (offnadirAngle) {
             out[index] = cam->OffNadirAngle();
+            index += 64 * 64;
+          }
+          if (slope) {
+            double slope;
+            bool success;
+            cam->Slope(slope, success);
+            if (success) {
+              out[index] = slope;
+            }
+            else {
+              out[index] = Isis::Null;
+            }
+            index += 64 * 64;
+          }
+          if (slopeAzimuth) {
+            double localNormal[3];
+            cam->GetLocalNormal(localNormal);
+
+            SurfacePoint groundPoint = cam->GetSurfacePoint();
+            SurfacePoint downSlopePoint(
+                Displacement(groundPoint.GetX().meters() + localNormal[0], Displacement::Meters),
+                Displacement(groundPoint.GetY().meters() + localNormal[1], Displacement::Meters),
+                Displacement(groundPoint.GetZ().meters() + localNormal[2], Displacement::Meters));
+            out[index] = cam->GroundAzimuth(
+                groundPoint.GetLatitude().degrees(), groundPoint.GetLongitude().degrees(),
+                downSlopePoint.GetLatitude().degrees(), downSlopePoint.GetLongitude().degrees());
             index += 64 * 64;
           }
           if (subSpacecraftGroundAzimuth) {
