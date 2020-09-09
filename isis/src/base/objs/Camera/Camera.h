@@ -255,6 +255,7 @@ namespace Isis {
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
+      void Slope(double &slope, bool &success);
 
       void GetLocalNormal(double normal[3]);
 
@@ -576,5 +577,3 @@ namespace Isis {
 };
 
 #endif
-
-
