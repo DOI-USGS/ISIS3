@@ -825,10 +825,10 @@ Group = Mapping
       <parameter name="DIST">
         <type>double</type>
         <brief>
-          Distance from the suface of the target in kilometers. 
+          Distance from the surface of the target in kilometers. 
         </brief>
         <description>
-          Distance from the suface of the target in kilometers.
+          Distance from the surface of the target in kilometers.
         </description>
       </parameter>
     </group>
