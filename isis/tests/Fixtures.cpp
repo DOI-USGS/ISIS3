@@ -215,7 +215,7 @@ namespace Isis {
 
     polyStr = wkt->write(multiPoly);
     polyStrSize = polyStr.size();
-    polyStream = std::istringstream(polyStr);
+    polyStream.str(polyStr);
 
     pvlBlob = Blob("Footprint", "Polygon");
     polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
