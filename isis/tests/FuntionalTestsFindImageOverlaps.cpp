@@ -69,9 +69,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
 
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapDefault) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
 
-  QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/test.txt", "detailed=true", "errors=true"};
+  QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
   UserInterface ui(APP_XML, args);
   FileList images;
   images.append(FileName(cube1->fileName()));
@@ -82,6 +82,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapDefault) {
   // The overlap polygon coordinates are in Lon/Lat order
   ImageOverlapSet overlaps;
   overlaps.ReadImageOverlaps(ui.GetFileName("OVERLAPLIST"));
+  ASSERT_EQ(overlaps.Size(), 3);
   const ImageOverlap *poi;
   const geos::geom::MultiPolygon *mp;
 
@@ -103,4 +104,67 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapDefault) {
   ASSERT_EQ(poi->Size(), 2);
   ASSERT_EQ((*poi)[0], "MGS/688540926:0/MOC-WA/RED");
   ASSERT_EQ((*poi)[1], "MGS/691204200:96/MOC-WA/RED");
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
+
+  lonLatPts = new geos::geom::CoordinateArraySequence();
+  lonLatPts->add(geos::geom::Coordinate(31, 1));
+  lonLatPts->add(geos::geom::Coordinate(31, 9));
+  lonLatPts->add(geos::geom::Coordinate(34, 9));
+  lonLatPts->add(geos::geom::Coordinate(34, 1));
+  lonLatPts->add(geos::geom::Coordinate(31, 1));
+
+  polys = new std::vector<geos::geom::Geometry *>;
+  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
+  polys->push_back(poly->clone());
+  multiPoly = globalFactory->createMultiPolygon(polys);
+
+  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
+
+  std::string polyStr = wkt->write(multiPoly);
+  int polyStrSize = polyStr.size();
+  std::istringstream polyStream(polyStr);
+
+  Blob pvlBlob("Footprint", "Polygon");
+  Pvl pvl;
+  PvlObject polyObject = PvlObject("Polygon");
+  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
+  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
+  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
+  pvl.addObject(polyObject);
+
+  pvlBlob.Read(pvl, polyStream);
+  cube2->write(pvlBlob);
+  cube2->reopen("rw");
+
+  delete wkt;
+
+  QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
+  UserInterface ui(APP_XML, args);
+  FileList images;
+  images.append(FileName(cube1->fileName()));
+  images.append(FileName(cube2->fileName()));
+  findimageoverlaps(images, ui, nullptr);
+
+  // Find all the overlaps between the images in the FROMLIST
+  // The overlap polygon coordinates are in Lon/Lat order
+  ImageOverlapSet overlaps;
+  overlaps.ReadImageOverlaps(ui.GetFileName("OVERLAPLIST"));
+  ASSERT_EQ(overlaps.Size(), 2);
+  const ImageOverlap *poi;
+  const geos::geom::MultiPolygon *mp;
+
+  poi = overlaps[0];
+  mp = poi->Polygon();
+  ASSERT_EQ(mp->getArea(), 26);
+  ASSERT_EQ(poi->Size(), 1);
+  ASSERT_EQ((*poi)[0], "MGS/688540926:0/MOC-WA/RED");
+
+  poi = overlaps[1];
+  mp = poi->Polygon();
+  ASSERT_EQ(mp->getArea(), 24);
+  ASSERT_EQ(poi->Size(), 2);
+  ASSERT_EQ((*poi)[0], "MGS/691204200:96/MOC-WA/RED");
+  ASSERT_EQ((*poi)[1], "MGS/688540926:0/MOC-WA/RED");
 }
