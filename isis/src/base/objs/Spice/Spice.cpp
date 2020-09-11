@@ -89,19 +89,8 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) {  
+  Spice::Spice(Cube &cube, bool noTables) {
     init(*cube.label(), noTables);
-  }
- 
-
-  /**
-   * Constructs a Spice Object
-   *
-   * @param lab Isis Cube Pvl Lavel
-   * @param isd ALE Json ISD
-   */
-  Spice::Spice(Pvl &lab, json isd) {
-    init(lab, true, isd);
   }
 
 
@@ -131,7 +120,6 @@ namespace Isis {
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
-    
     m_solarLongitude = new Longitude;
 
     m_et = NULL;
@@ -163,7 +151,7 @@ namespace Isis {
 
     m_naifKeywords = new PvlObject("NaifKeywords");
     // m_sky = false;
-    
+
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -180,7 +168,7 @@ namespace Isis {
     }
     else {
       *m_endTimePadding = 0.0;
-    }  
+    }
 
     // We should remove this completely in the near future
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
@@ -372,7 +360,7 @@ namespace Isis {
       m_bodyRotation = new SpiceRotation(frameCode);
       *m_bodyFrameCode = frameCode;
     }
-    
+
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
 
     //  Set up for observer/target and light time correction to between s/c
@@ -386,7 +374,6 @@ namespace Isis {
                                                   ltState, targetRadius);
 
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
-    
 
 
     // Check to see if we have nadir pointing that needs to be computed &
@@ -417,13 +404,13 @@ namespace Isis {
         solarLongitude();
       }
     }
-    
+
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
     //  SpacecraftPosition.  The old keywords were in existance before the
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
-    
+
     if (kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
@@ -431,7 +418,7 @@ namespace Isis {
     }
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
-    // with the old keywords should be re-run through spiceinit. 
+    // with the old keywords should be re-run through spiceinit.
     if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
@@ -451,7 +438,6 @@ namespace Isis {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
-    
 
 
     if (kernels["InstrumentPosition"].size() == 0) {
@@ -1377,17 +1363,6 @@ namespace Isis {
   QString Spice::targetName() const {
     return m_target->name();
   }
-  
-  
-  double Spice::sunToBodyDist() const {
-    std::vector<double> sunPosition = m_sunPosition->Coordinate();
-    std::vector<double> bodyRotation = m_bodyRotation->Matrix();
-    
-    double sunPosFromTarget[3];
-    mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
-        
-    return vnorm_c(sunPosFromTarget);  
-  }
 
 
   double Spice::sunToBodyDist() const {
@@ -1460,41 +1435,6 @@ namespace Isis {
 
     if (m_bodyRotation->IsCached()) return;
 
-      ucrss_c(&sunPos[0], &sunVel[0], sunAv);
-      
-      double npole[3];
-      for (int i = 0; i < 3; i++) {
-        npole[i] = bodyRotMat[6+i];
-      }
-      
-      double x[3], y[3], z[3];
-      vequ_c(sunAv, z);
-      ucrss_c(npole, z, x);
-      ucrss_c(z, x, y);
-
-      double trans[3][3];
-      for (int i = 0; i < 3; i++) {
-        trans[0][i] = x[i];
-        trans[1][i] = y[i];
-        trans[2][i] = z[i];
-      }
-
-      double pos[3];
-      mxv_c(trans, &sunPos[0], pos);
-
-      double radius, ls, lat;
-      reclat_c(pos, &radius, &ls, &lat);
-      
-      *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
-      
-      NaifStatus::CheckErrors();
-      m_bodyRotation->SetEphemerisTime(og_time);
-      m_sunPosition->SetEphemerisTime(og_time);
-      return;
-    }
-
-    if (m_bodyRotation->IsCached()) return; 
-    
     double tipm[3][3], npole[3];
     char frameName[32];
     SpiceInt frameCode;
