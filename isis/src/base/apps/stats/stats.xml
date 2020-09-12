@@ -58,6 +58,7 @@
           <td>Minimum DN value in the cube</td>
           <td>Maximum DN value in the cube</td>
           <td>65536</td>
+        </tr>
       </table>
       <br></br>
       The cube multiplier and base can be found in the header of the cube.
