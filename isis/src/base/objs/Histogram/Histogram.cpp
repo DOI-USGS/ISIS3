@@ -663,6 +663,8 @@ namespace Isis {
 
     double low, high;
     BinRange(index, low, high);
+    printf("%f16\n", low);
+    printf("%f16\n", high);
     return (low + high) / 2.0;
   }
 
