@@ -60,14 +60,14 @@ int main(void) {
     qDebug() << "Test for full frame image...";
     double knownLat = 7.1916683215196819;
     double knownLon = 38.6275886424948496;
-    Cube c("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     testCamera(c, knownLat, knownLon);
 
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for subframe image...";
     knownLat = -0.5692959687806523;
     knownLon = 210.4073369962932816;
-    Cube c2("$hayabusa/testData/st_2391934788_v.cub", "r");
+    Cube c2("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub", "r");
     testCamera(c2, knownLat, knownLon);
   }
   catch(IException &e) {

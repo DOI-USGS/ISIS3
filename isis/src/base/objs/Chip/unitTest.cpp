@@ -231,7 +231,7 @@ int main() {
   // Test Load using match chip method
   cout << "\nTest reading with match chip and cube...\n";
   Cube junkCube;
-  junkCube.open("$base/testData/ab102401_ideal.cub");
+  junkCube.open("$ISISTESTDATA/isis/src/base/unitTestData/ab102401_ideal.cub");
   // 4 by 4 chip at samle 1000 line 500
   Chip matchChip(4, 4);
   matchChip.TackCube(1000, 500);
@@ -282,7 +282,7 @@ int main() {
   cout << endl;
   cout << "Generate Errors:" << endl;
   Cube junkCube2;
-  junkCube2.open("$base/testData/f319b18_ideal.cub");
+  junkCube2.open("$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal.cub");
   // 4 by 4 chip at samle 1000 line 500
   matchChip.TackCube(1, 1);
   matchChip.Load(junkCube2);

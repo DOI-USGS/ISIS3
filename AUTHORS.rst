@@ -34,31 +34,49 @@ ISIS3 Contributors
 - Oleg Alexandrov
 - Aaron Curtis
 - Eric Gault
-- Andrew Annex
-- Victor Silva
-- Benoit Seignovert
-- Andrew Stebenne
-- Christopher Austin
-- Curtis Rose
-- David Miller
-- Ella Mae Lee
-- Eric Heyer
-- Ian Humphrey
-- Jai Rideout
-- James Alexander Crough
-- Janet Barrett
-- Jeff Anderson
-- Jeffrey Covington
-- John Bonn
-- Kim Oyama
-- Mackenzie Boyd
-- Marjorie Hahn
-- Mathew Eis
-- Orrin Thomas
-- Sasha Brownsberger
-- Sharmilla Prasad
-- Steven Lambright
-- Travis Addair
+- Eric Hyer 
+- Evin Dunn 
+- Ian Humphrey 
+- Jac Shinaman 
+- Jai Rideout 
+- James Alexander Crough 
+- Janet Barrett 
+- Jason Laura 
+- Jeannie Backer 
+- Jeff Anderson 
+- Jeffrey Covington 
+- Jesse Mapel 
+- John Bonn 
+- Kaitlyn Lee 
+- Kaj E Williams  
+- Kelvin Rodriguez 
+- Ken Edmundson 
+- Kim Oyama  
+- Kris Becker 
+- Kristin Berry 
+- Lauren Adoram-Kershner  
+- Lynn Weller 
+- Mackenzie Boyd 
+- Makayla Shepherd 
+- Marjorie Hahn 
+- Mathew Eis 
+- Michael Aye 
+- Moses Milazzo 
+- Oleg Alexandrov 
+- Orrin Thomas 
+- Peter Giroux 
+- Raad A. Saleh 
+- Ross Beyer 
+- Sasha Brownsberger 
+- Sharmilla Prasad 
+- Steven Lambright 
+- Stuart Sides 
+- Summer Stapleton 
+- Timothy Giroux
+- Tracie Sucharski 
+- Travis Addair 
+- Tyler Wilson 
+- Victor Silva 
 
 -----
 This list was generated from the .zenodo.json file by running python zenodo_to_authors.py.

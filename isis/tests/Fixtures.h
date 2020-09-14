@@ -16,9 +16,19 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
+#include "ImagePolygon.h"
+#include "PolygonTools.h"
+#include "Blob.h"
 #include "ControlNet.h"
 #include "FileList.h"
 #include "FileName.h"
+
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/LinearRing.h"
+#include "geos/geom/Polygon.h"
 
 using json = nlohmann::json;
 
@@ -84,16 +94,21 @@ namespace Isis {
       Cube *cube1;
       Cube *cube2;
       Cube *cube3;
-      
+
       FileName *isdPath1;
       FileName *isdPath2;
-      FileName *isdPath3; 
+      FileName *isdPath3;
 
       FileName *threeImageOverlapFile;
       FileName *twoImageOverlapFile;
 
       FileList *cubeList;
       QString cubeListFile;
+
+      geos::geom::CoordinateSequence *lonLatPts;
+      std::vector<geos::geom::Geometry *> *polys;
+      geos::geom::Polygon *poly;
+      geos::geom::MultiPolygon *multiPoly;
 
       void SetUp() override;
       void TearDown() override;

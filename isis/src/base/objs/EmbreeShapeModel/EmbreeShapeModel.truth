@@ -4,7 +4,7 @@ Embree shape model status:
 Model has intersection?  false
 Model has normal?  false
 
-Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+Testing with  "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
 
 
 Get an instance of the target manager
@@ -79,7 +79,7 @@ Model has normal?  true
 Testing latitude, longitude occlusion
 
 
-Using  "$hayabusa/testData/st_2391934788_v.cub"
+Using  "$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub"
 Intersection inputs:
   Latitude:   0
   Longitude:  282

@@ -57,7 +57,7 @@ int main(void) {
     double knownLat = -10.1772088449130020;
     double knownLon = 339.7338889883354796;
 
-    Cube c("$newhorizons/testData/mc0_0034942918_0x536_sci_1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/newhorizons/unitTestData/mc0_0034942918_0x536_sci_1.cub", "r");
     NewHorizonsMvicTdiCamera *cam = (NewHorizonsMvicTdiCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

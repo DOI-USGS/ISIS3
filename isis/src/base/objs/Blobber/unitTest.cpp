@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
     cout << "*** Blobber unitTest ***\n";
     Preference::Preferences(true);
-    QString fname = "$base/testData/blobTruth.cub";
+    QString fname = "$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub";
     cout << "\nFile Source: " << fname << endl;
 
 // This is assumed to be Hirise cube source

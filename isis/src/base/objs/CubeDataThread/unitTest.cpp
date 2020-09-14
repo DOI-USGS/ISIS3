@@ -16,15 +16,15 @@ using namespace Isis;
 using namespace std;
 
 void IsisMain() {
-  QString testFile = FileName("$base/testData/CubeDataThread/unitTest.cub").expanded();
+  QString testFile = FileName("$ISISTESTDATA/isis/src/base/unitTestData/CubeDataThread/unitTest.cub").expanded();
   QString sysCommand = "cp " + testFile;
   ProgramLauncher::RunSystemCommand(sysCommand + " unitTest2.cub");
   ProgramLauncher::RunSystemCommand(sysCommand + " unitTest3.cub");
 
   CubeDataThread *cubeData = new CubeDataThread();
 
-  int readOnly1 = cubeData->AddCube(FileName("$base/testData/isisTruth.cub"));
-  int readOnly2 = cubeData->AddCube(FileName("$base/testData/blobTruth.cub"));
+  int readOnly1 = cubeData->AddCube(FileName("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub"));
+  int readOnly2 = cubeData->AddCube(FileName("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
   int readWrite1 = cubeData->AddCube(FileName("./unitTest2.cub"));
   int readWrite2 = cubeData->AddCube(FileName("./unitTest3.cub"));
 
