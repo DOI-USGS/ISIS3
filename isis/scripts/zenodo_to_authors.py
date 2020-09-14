@@ -1,5 +1,4 @@
-# Uses the .zenodo.json file to generate an AUTHORS.rst file. 
-# No arguments are necessary if $ISISROOT is set.
+# Uses a .zenodo.json file to generate an AUTHORS.rst file. 
 
 import os
 import argparse
