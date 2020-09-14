@@ -188,7 +188,7 @@
     },
     {
       "name": "Addair, Travis"
-    },
+    }
   ],
   "title": "Integrated Software for Imageers and Spectrometers",
   "description": "A software library and set of tools to support ingestions, processing, and analysis of planetary science data.",
