@@ -136,7 +136,6 @@ namespace Isis {
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
-
   void LineScannerCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
@@ -150,6 +149,35 @@ namespace Isis {
     delete projTestCube;
   }
 
+  void Hayabusa2OncTCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::ifstream cubeLabel("data/hayabusa2Image/hayabusa2OncT.pvl");
+
+    cubeLabel >> label;
+
+    testCube = new Cube();
+    testCube->fromLabel(tempDir.path() + "/hayabusa2OncT.cub", label, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+
+    std::cout<<"After setup"<<std::endl;
+  }
+
+  void Hayabusa2OncTCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
 
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
@@ -185,7 +213,6 @@ namespace Isis {
     network = new ControlNet();
     network->ReadControl("data/threeImageNetwork/controlnetwork.net");
   }
-
 
   void ThreeImageNetwork::TearDown() {
     delete cubeList;

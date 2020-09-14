@@ -38,7 +38,17 @@ using namespace std;
 
 namespace Isis {
 
-  void hyb2onccal(UserInterface &ui) {
+  void hyb2onccal(UserInterface &ui, Pvl *log) {
+    Cube icube;
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      icube.setVirtualBands(inAtt.bands());
+    }
+    icube.open(ui.GetFileName("FROM"));
+    hyb2onccal(&icube, ui, log);
+  }
+
+  void hyb2onccal(Cube *icube, UserInterface &ui, Pvl *log) {
     g_calStep = ui.GetString("UNITS");
 
     const QString hyb2cal_program = "hyb2onccal";
@@ -47,7 +57,6 @@ namespace Isis {
     QString hyb2cal_runtime = Application::DateTime();
 
     ProcessBySample p;
-    Cube *icube = p.SetInputCube("FROM");
 
     // Basic assurances...
     if (icube->bandCount() != 1) {
@@ -268,7 +277,8 @@ namespace Isis {
 
     }  //Finished setting flatfield file
 
-    Cube *ocube  = p.SetOutputCube("TO");
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+                                  icube->sampleCount(), icube->lineCount(), icube->bandCount());
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
@@ -370,7 +380,7 @@ namespace Isis {
 
     // Write Calibration group to output file
     ocube->putGroup(calibrationLog);
-    Application::Log(calibrationLog);
+    log->addGroup(calibrationLog);
     p.EndProcess();
 
   }
