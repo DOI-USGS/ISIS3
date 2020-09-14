@@ -38,7 +38,6 @@ set(MISSION_LIBS
   voyager)
 
 
-
 # Link runISISTests with what we want to test and the GTest and pthread library
 add_executable(runISISTests
                IsisTestMain.cpp

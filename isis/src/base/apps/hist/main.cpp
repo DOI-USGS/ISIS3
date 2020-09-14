@@ -57,7 +57,13 @@ void IsisMain() {
   }
   else {
     hist = new Histogram(*icube, 1, p.Progress());
+
+    if (ui.WasEntered("NBINS")){
+      hist->SetBins(ui.GetInteger("NBINS"));
+    }
   }
+  // Setup the histogram
+
   // Setup the histogram
 
   // Loop and accumulate histogram
@@ -79,26 +85,24 @@ void IsisMain() {
     ofstream fout;
     fout.open(outfile.toLatin1().data());
 
-    fout << "Cube:              " << ui.GetFileName("FROM") << endl;
-    fout << "Band:              " << icube->bandCount() << endl;
-    fout << "Average:           " << hist->Average() << endl;
-    fout << "Std Deviation:     " << hist->StandardDeviation() << endl;
-    fout << "Variance:          " << hist->Variance() << endl;
-    fout << "Median:            " << hist->Median() << endl;
-    fout << "Mode:              " << hist->Mode() << endl;
-    fout << "Skew:              " << hist->Skew() << endl;
-    fout << "Minimum:           " << hist->Minimum() << endl;
-    fout << "Maximum:           " << hist->Maximum() << endl;
+    fout << "Cube:           " << ui.GetFileName("FROM") << endl;
+    fout << "Band:           " << icube->bandCount() << endl;
+    fout << "Average:        " << hist->Average() << endl;
+    fout << "Std Deviation:  " << hist->StandardDeviation() << endl;
+    fout << "Variance:       " << hist->Variance() << endl;
+    fout << "Median:         " << hist->Median() << endl;
+    fout << "Mode:           " << hist->Mode() << endl;
+    fout << "Skew:           " << hist->Skew() << endl;
+    fout << "Minimum:        " << hist->Minimum() << endl;
+    fout << "Maximum:        " << hist->Maximum() << endl;
     fout << endl;
-    fout << "Total Pixels:      " << hist->TotalPixels() << endl;
-    fout << "Valid Pixels:      " << hist->ValidPixels() << endl;
-    fout << "Pixels Below Min:  " << hist->UnderRangePixels() << endl;
-    fout << "Pixels Above Max:  " << hist->OverRangePixels() << endl;
-    fout << "Null Pixels:       " << hist->NullPixels() << endl;
-    fout << "Lis Pixels:        " << hist->LisPixels() << endl;
-    fout << "Lrs Pixels:        " << hist->LrsPixels() << endl;
-    fout << "His Pixels:        " << hist->HisPixels() << endl;
-    fout << "Hrs Pixels:        " << hist->HrsPixels() << endl;
+    fout << "Total Pixels:    " << hist->TotalPixels() << endl;
+    fout << "Valid Pixels:    " << hist->ValidPixels() << endl;
+    fout << "Null Pixels:     " << hist->NullPixels() << endl;
+    fout << "Lis Pixels:      " << hist->LisPixels() << endl;
+    fout << "Lrs Pixels:      " << hist->LrsPixels() << endl;
+    fout << "His Pixels:      " << hist->HisPixels() << endl;
+    fout << "Hrs Pixels:      " << hist->HrsPixels() << endl;
 
     //  Write histogram in tabular format
     fout << endl;
@@ -110,16 +114,13 @@ void IsisMain() {
     double low;
     double high;
 
-    for (int i = 0; i < hist->Bins(); i++) {
-      if (hist->BinCount(i) > 0) {
+    for(int i = 0; i < hist->Bins(); i++) {
+      if(hist->BinCount(i) > 0) {
         total += hist->BinCount(i);
         double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
 
-        hist->BinRange(i, low, high);
-
-        fout << low << ",";
-        fout << high << ",";
+        fout << hist->BinMiddle(i) << ",";
         fout << hist->BinCount(i) << ",";
         fout << total << ",";
         fout << pct << ",";
@@ -166,16 +167,13 @@ void IsisMain() {
     QVector<QPointF> binCountData;
     QVector<QPointF> cumPctData;
     double cumpct = 0.0;
-    double low;
-    double high;
-    for (int i = 0; i < hist->Bins(); i++) {
-      if (hist->BinCount(i) > 0) {
-        hist->BinRange(i, low, high);
-        binCountData.append(QPointF(low, hist->BinCount(i) ) );
+    for(int i = 0; i < hist->Bins(); i++) {
+      if(hist->BinCount(i) > 0) {
+        binCountData.append(QPointF(hist->BinMiddle(i), hist->BinCount(i) ) );
 
-        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.0;
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
-        cumPctData.append(QPointF(low, cumpct) );
+        cumPctData.append(QPointF(hist->BinMiddle(i), cumpct) );
       }
     }
 
@@ -213,6 +211,10 @@ void IsisMain() {
 
     plot->add(histCurve);
     plot->add(cdfCurve);
+//     plot->fillTable();
+
+//     plot->setScale(QwtPlot::yLeft, 0, maxYValue);
+//     plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
 
     QLabel *label = new QLabel("  Average = " + QString::number(hist->Average()) + '\n' +
            "\n  Minimum = " + QString::number(hist->Minimum()) + '\n' +

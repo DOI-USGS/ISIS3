@@ -103,7 +103,7 @@ static int binning(1);         //!< The number of samples/lines which are binned
 static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for LOSSY
 
 static QString g_calStep("IOF");  //!< Which calibrations step should we stop at?
-static double g_calibrationScale = 1.0; //!< Radiance or I/F conversion factor
+static double g_calibrationScale = 1.0; //!< DN, Radiance or I/F conversion factor
 
 // I/F variables
 static double g_solarDist(1.0);
@@ -282,8 +282,7 @@ namespace Isis {
         }
       }
 
-      // I/F or Radiance Conversion (or g_calibrationScale might = 1, 
-      // in which case the output will be in DNs)
+      // DN, Radiance, or I/F Conversion 
       imageOut[i] *= g_calibrationScale;
     }
     return;
