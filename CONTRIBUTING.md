@@ -43,7 +43,7 @@ In the case of an objection being raised in a pull request by another committer,
 committers should seek to arrive at a consensus by way of addressing concerns being expressed
 by discussion, compromise on the proposed change, or withdrawal of the proposed change.
 
-When making a contribution for the first time, please add your name to the Authors.rst file **and** the `.zenodo.json file.` We strongly recommend adding your affiliation and ORCiD to the `zenodo.json` file. These additions only have to happen once.
+When making a contribution for the first time, please add your name to the `.zenodo.json file.` We strongly recommend adding your affiliation and ORCiD to the `zenodo.json` file. These additions only have to happen once.
 
 # Becoming a Committer
 
