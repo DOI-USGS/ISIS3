@@ -46,7 +46,7 @@ int main(void) {
     double knownLat = 61.50040250242506;
     double knownLon = 74.89590535143694;
 
-    Cube c("$chandrayaan1/testData/M3T20090630T083407_V03_RDN.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/chandrayaan1/unitTestData/M3T20090630T083407_V03_RDN.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -105,26 +105,6 @@ int main(void) {
     cout << "RightAscension = " << cam->RightAscension() << endl;
     cout << "Declination = " << cam->Declination() << endl;     
     
-    // Test a Level-2 image
-    cout << endl << "Testing a Level-2 CH1 cube: " << endl << endl; 
-
-    Cube c2("$chandrayaan1/testData/CH1_xBandLvl2.cub", "r");
-    Camera *cam2 = CameraFactory::Create(c2);
-
-    // Just test the center pixel to make sure the Camera still works on Level-2 
-    // images
-    
-    cout << "For a central pixel position ..." << endl;
-    samp = 2000; 
-    line = 2500; 
-
-    if (!cam2->SetImage(samp, line)) {
-      cout << "ERROR" << endl;
-      return 0;
-    }
-    else {
-      cout << "SetImage succeeded." << endl; 
-    }
   }
   catch (IException &e) {
     e.print();

@@ -15,7 +15,7 @@
 #               duplication of paths
 #       FEB 22 2006 - JRS - changed OsType to Platform to avoid conflicts with
 #               internal USGS initIsis.csh script
-#       JUL 12 2006 - Robert Wallace - Add ISIS3TESTDATA environment variable
+#       JUL 12 2006 - Robert Wallace - Add ISISTESTDATA environment variable
 #       AUG 25 2008 - Kris Becker - Changed all references of DYLD_LIBRARY_PATH
 #                       to DYLD_FALLBACK_LIBRARY_PATH.  See
 #                       http://www.osxfaq.com/man/1/dyld.ws.
@@ -39,18 +39,18 @@ if ($?ISISROOT == 0) then
   setenv ISISROOT /usgs/pkgs/isis3/install
 endif
 
-# Initialize the ISIS3DATA environment variable
+# Initialize the ISISDATA environment variable
 if (-d $ISISROOT/../data) then
-  setenv ISIS3DATA $ISISROOT/../data
+  setenv ISISDATA $ISISROOT/../isis_data
 else
-  setenv ISIS3DATA /usgs/cpkgs/isis3/data
+  setenv ISISDATA /usgs/cpkgs/isis3/isis_data
 endif
 
-# Initialize the ISIS3TESTDATA environment variable
+# Initialize the ISISTESTDATA environment variable
 if (-d $ISISROOT/../testData) then
-  setenv ISIS3TESTDATA $ISISROOT/../testData
+  setenv ISISTESTDATA $ISISROOT/../testData
 else
-  setenv ISIS3TESTDATA /usgs/cpkgs/isis3/testData
+  setenv ISISTESTDATA /usgs/cpkgs/isis3/isis_testData
 endif
 
 # Insert ISISROOT/bin in the PATH environment variable if it's not already there

@@ -1,0 +1,128 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+Group = MaximumLatitude
+  Auto
+  Optional
+  InputKey       = MAXIMUM_LATITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = MaximumLatitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = MinimumLatitude
+  Auto
+  Optional
+  InputKey       = MINIMUM_LATITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = MinimumLatitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = WesternmostLongitude
+  Auto
+  Optional
+  InputKey       = WESTERNMOST_LONGITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = WesternmostLongitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = EasternmostLongitude
+  Auto
+  Optional
+  InputKey       = EASTERNMOST_LONGITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = EasternmostLongitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterLongitude
+  Auto
+  Optional
+  InputKey       = CENTER_LONGITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = CenterLongitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = CenterLatitude
+  Auto
+  Optional
+  InputKey       = CENTER_LATITUDE
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = CenterLatitude
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = Minimum
+  Auto
+  InputKey       = MINIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Minimum
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = Maximum
+  Auto
+  InputKey       = MAXIMUM
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Maximum
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = Mean
+  Auto
+  InputKey       = MEAN
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = Mean
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+
+Group = StandardDeviation
+  Auto
+  InputKey       = STANDARD_DEVIATION
+  InputGroup     = IMAGE
+  InputPosition  = IMAGE
+  OutputName     = StandardDeviation
+  OutputPosition = (Group, ImageInfo)
+  Translation    = (*, *)
+End_Group
+End

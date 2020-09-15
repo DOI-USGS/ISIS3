@@ -91,15 +91,12 @@ void IsisMain() {
 }
 
 void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
-
   QString startTime, productId, clockCount;
 
-  // Get the directory where the MOC translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-
   // Transfer the instrument group to the output cube
-  QString transDir = (QString) dataDir["Mgs"];
-  FileName transFile(transDir + "/" + "translations/mocInstrument.trn");
+  QString transDir = "$ISISROOT/appdata/translations/";
+
+  FileName transFile(transDir + "MgsMocInstrument.trn");
 
   // Get the translation manager ready
   Pvl labelPvl(labelFile.expanded());
@@ -196,10 +193,8 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   // Add the instrument specific info to the output file
   ocube->putGroup(inst);
 
-
   // Transfer the archive group to the output cube
-  transDir = (QString) dataDir["Mgs"];
-  FileName transFileArchive(transDir + "/" + "translations/mocArchive.trn");
+  FileName transFileArchive(transDir + "MgsMocArchive.trn");
 
   // Get the translation manager ready for the archive group
   PvlToPvlTranslationManager archiveXlater(labelPvl, transFileArchive.expanded());
@@ -242,7 +237,6 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
     arch += PvlKeyword("DataQualityDesc", str);
   }
 
-
   // New labels (not in the PDS file)
 
   // The ImageNumber is made up of pieces of the StartTime
@@ -261,7 +255,6 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
     arch += PvlKeyword("ImageNumber", imageNumber);
   }
 
-
   // The ImageKeyId is made up of the:
   //   First five digits of the SpacecraftClockCount followed by the
   //   Last five dights of the ProductId
@@ -273,17 +266,11 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   // Add the archive info to the output file
   ocube->putGroup(arch);
 
-
   // Create the BandBin Group and populate it
-  transDir = (QString) dataDir["Mgs"];
-  FileName transFileBandBin(transDir + "/" + "translations/mocBandBin.trn");
+  FileName transFileBandBin(transDir + "MgsMocBandBin.trn");
 
   // Get the translation manager ready for the BandBin group
   PvlToPvlTranslationManager bandBinXlater(labelPvl, transFileBandBin.expanded());
-
-
-
-
 
   PvlGroup bandBin("BandBin");
   QString frameCode;
@@ -319,7 +306,6 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Add the bandbin info to the output file
   ocube->putGroup(bandBin);
-
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");

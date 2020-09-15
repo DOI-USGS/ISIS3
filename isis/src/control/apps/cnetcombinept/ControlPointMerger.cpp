@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.0 $ 
- * $Date: 2014/02/27 18:49:25 $ 
+ * $Revision: 1.0 $
+ * $Date: 2014/02/27 18:49:25 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -35,7 +35,7 @@ namespace Isis {
 
   /**
     * Constructs a ControlPointMerger with a given tolerance.
-    * 
+    *
     * @param image_tolerance The tolerance used to determine if points will be merged.
     */
   ControlPointMerger::ControlPointMerger(const double image_tolerance) :
@@ -50,11 +50,23 @@ namespace Isis {
 
   /**
     * Returns the number of points that have been merged.
-    * 
+    *
     * @return @b int The number of points that have been merged.
     */
   int ControlPointMerger::size() const {
     return ( m_merged.size() );
+  }
+
+
+  /**
+   * Returns a set of the IDs of the merged control points
+   */
+  QSet<QString> ControlPointMerger::mergedPoints() const {
+    QSet<QString> mergedIds;
+    BOOST_FOREACH ( const MeasurePoint &measure, m_merged ) {
+      mergedIds.insert(measure.id());
+    }
+    return mergedIds;
   }
 
 
@@ -69,18 +81,18 @@ namespace Isis {
 
   /**
   * @brief Merges control points that satisfy image coordinate constraints
-  * 
+  *
   * Evaluates a list of candidate points to determine if they should be merged
   * into a source point.  For each candidate point, the image space distance
   * between its measures and the source point's measures on shared images are
   * averaged.  If this average is less than the ControlPointMerger's tolerance
   * the candidate point is merged into the source point.
-  * 
+  *
   * @author 2016-10-25 Kris Becker
-  * 
+  *
   * @param point       Source point to merge candidates into
   * @param candidates  List of point candidates
-  * 
+  *
   * @return @b int     Number of measures merged
   */
   int ControlPointMerger::apply(ControlPoint *point, QList<MeasurePoint> &candidates)  {
@@ -97,7 +109,7 @@ namespace Isis {
           v_processed.append(v_p);
 
           // Compute distance statistics of common measures in two points
-          Statistics stats; 
+          Statistics stats;
           BOOST_FOREACH ( ControlMeasure *m, measures ) {
             if ( v_p->HasSerialNumber( m->GetCubeSerialNumber() ) ) {
               ControlMeasure *c = v_p->GetMeasure( m->GetCubeSerialNumber() );
@@ -125,24 +137,24 @@ namespace Isis {
 
   /**
     * @brief Merges measures from one control point into another.
-    * 
+    *
     * Merges measures on shared images from a candidate point into a source
     * point.  If a reference measure is merged, then its residual and goodness
     * of fit are set to the average and standard deviation of the distance
     * between the source and candidate points' measures.
-    * 
+    *
     * @param source     The source point that measueres are merged into.
     * @param candidate  The candidate point that measures are merged from.
     * @param stats      Statistics object containing the distances between
     *                   measures in the source and candidate points on
     *                   common images.
-    * 
+    *
     * @return @b int    The number of measures merged from the candidate point
     *                   into the source point.
-    * 
+    *
     * @see ControlPointMerger::apply
     */
-  int ControlPointMerger::merge(ControlPoint *source, ControlPoint *candidate, 
+  int ControlPointMerger::merge(ControlPoint *source, ControlPoint *candidate,
                                 const Statistics &stats) {
     int nMerged(0);
     bool setCandidateType = true;
@@ -157,8 +169,8 @@ namespace Isis {
       ControlMeasureLogData data(ControlMeasureLogData::GoodnessOfFit,
                                   goodnessoffit);
 
-      // Consider only valid measures                  
-      QList<ControlMeasure*> measures = candidate->getMeasures(true); 
+      // Consider only valid measures
+      QList<ControlMeasure*> measures = candidate->getMeasures(true);
 
       //Check to see if reference measures for both source/candidate are the same.
       if (source->GetRefMeasure() == candidate->GetRefMeasure()) {
@@ -183,11 +195,11 @@ namespace Isis {
           if (setCandidateType) {
             p_m->SetType(ControlMeasure::Candidate);
           }
-          source->Add( p_m.take() ); 
+          source->Add( p_m.take() );
           nMerged++;
         }
       }
-      // Essentially disables this point meaning this point is already merged 
+      // Essentially disables this point meaning this point is already merged
       // with another
       candidate->SetIgnored(true);
     }
@@ -198,9 +210,9 @@ namespace Isis {
 
   /**
     * Determines if a measure is valid.
-    * 
+    *
     * @param m The measure to check.
-    * 
+    *
     * @return @b bool If the measure is ignored or rejected.
     */
   bool ControlPointMerger::isValid(const ControlMeasure &m) const {
@@ -211,13 +223,13 @@ namespace Isis {
     * Computes the distance, in image, between two measures.
     * Note that this returns the squared distance because that
     * is what the nanoflann library expects.
-    * 
+    *
     * @param source      A measure from the source point.
     * @param candidate   A measure from the candidate point.
-    * 
+    *
     * @return @b double  The squared distance between the measures.
     */
-  inline double ControlPointMerger::image_distance(const ControlMeasure &source, 
+  inline double ControlPointMerger::image_distance(const ControlMeasure &source,
                                                    const ControlMeasure &candidate) const {
     double dx = source.GetSample() - candidate.GetSample();
     double dy = source.GetLine() - candidate.GetLine();

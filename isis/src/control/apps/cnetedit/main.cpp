@@ -260,7 +260,7 @@ void IsisMain() {
 
       // First validate DefFile's keywords and value type
       Pvl defFile(ui.GetFileName("DEFFILE"));
-      Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
+      Pvl pvlTemplate("$ISISROOT/appdata/templates/cnet_validmeasure/validmeasure.def");
       Pvl pvlResults;
       pvlTemplate.validatePvl(defFile, pvlResults);
       if (pvlResults.groups() > 0 || pvlResults.keywords() > 0) {

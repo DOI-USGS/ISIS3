@@ -147,7 +147,7 @@ void IsisMain() {
   // NOTE:
   //   For MOC Wide Angle, cam->focal_length returns the focal length
   //      in pixels, so we must convert from pixels to mm using the PIXEL_SIZE
-  //      of 0.007 mm gotten from $ISIS3DATA/mgs/kernels/ik/moc20.ti.  (The
+  //      of 0.007 mm gotten from $ISISDATA/mgs/kernels/ik/moc20.ti.  (The
   //      PIXEL_PITCH value gotten from cam->PixelPitch is 1.0 since the
   //      focal length used by ISIS in this case is in pixels)
   //      For reference: the MOC WA blue filter pixel size needs an adjustment

@@ -168,7 +168,7 @@ void IsisMain() {
 
   // Translate the keywords from the input cube label that go in the PDS label
   PvlToPvlTranslationManager cubeLab(*(inputCube->label()), 
-                                "$mro/translations/hiriseIdealPdsExportCubeLabel.trn");
+                             "$ISISROOT/appdata/translations/MroHiriseIdealPdsExportCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
   // get original label information
@@ -178,11 +178,18 @@ void IsisMain() {
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
-  PvlToPvlTranslationManager orig(origLabel, "$mro/translations/hirisePdsRdrOriginalLabel.trn");
+  PvlToPvlTranslationManager orig(origLabel, 
+                                 "$ISISROOT/appdata/translations/MroHirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
   updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
+
+  // change SAMPLE_BIT_MASK value according to BITS input
+  PvlObject &image = pdsLabel.findObject("IMAGE");
+  image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK", toString((int)pow(2.0, (double)nbits) - 1)),
+                   Pvl::Replace);
+
   Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
 
@@ -286,10 +293,15 @@ void IsisMain() {
   // Read in the proper keyword types (Real, Enum, String, Integer, etc) for 
   // each PvlKeyword so that the PDS labels have proper format
   PvlFormat *formatter = pdsLabel.format();
-  formatter->add("$mro/templates/labels/hiriseIdealPds.typ");
+
+  if( nbits != 8 ) {
+    formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds_16bit.typ");
+  } else {
+    formatter->add("$ISISROOT/appdata/translations/MroHiriseIdealPds_8bit.typ");
+  }
 
   // Format ordering of keywords/objects/groups/comments in the PDS labels
-  pdsLabel.setFormatTemplate("$mro/templates/labels/hiriseIdealPds.pft");
+  pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHiriseIdealPds.pft");
 
   // image line/byte offsets are calculated and values are updated in the labels
   // now that all translations/additions/modifications to the labels have been

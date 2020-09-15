@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     cerr << setprecision(9);
     cerr << "Unit test for Sensor" << endl;
 
-    Cube dummyCube("$base/testData/isisTruth.cub", "r");
+    Cube dummyCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
 
     Pvl &lab = *dummyCube.label();
     PvlGroup inst("INSTRUMENT");
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     lab.addGroup(inst);
 
     PvlGroup kern("Kernels");
-    FileName f("$base/testData/kernels");
+    FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
     QString dir = f.expanded() + "/";
 
     kern += PvlKeyword("NaifFrameCode", "-94031");
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     kern += PvlKeyword("InstrumentPointing", dir + "moc.bc");
     kern += PvlKeyword("Frame", "");
     kern += PvlKeyword("ShapeModel",
-                        "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
+                        "$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub");
     lab.deleteGroup("Kernels");
     lab.addGroup(kern);
 
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 
     // Testing Set Look Direction
     cerr << "Test SetLookDirection using ShapeModel="
-            "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+            "$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
       spi2.setTime(iTime(t));
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 
     // Test bad look direction
     cerr << "Test bad look direction using "
-            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+            "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
     p[0] = 0.0;
     p[1] = 0.0;
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
     // Test SetUniversalGround
     cerr << "Test SetUniversalGround (lat/lon only) using "
-            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+            "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
     spi2.SetUniversalGround(11.57143551329, 223.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
 
     // Test SetUniversalGround
     cerr << "Test SetUniversalGround (lat/lon/radius) using "
-            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+            "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
     spi2.SetUniversalGround(11.57143551329, 223.328646604, 3400.);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
 
     // Test bad ground point
     cerr << "Test Bad ground point using "
-            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+            "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
     spi2.SetUniversalGround(11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;

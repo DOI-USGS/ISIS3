@@ -18,8 +18,8 @@ void IsisMain() {
   Preference::Preferences(true);
 
   UserInterface &ui = Application::GetUserInterface();
-  ui.PutFileName("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
-  ui.PutFileName("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
+  ui.PutFileName("FROM",  "$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.even.cub");
+  ui.PutFileName("FROM2", "$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.odd.cub");
   ui.PutFileName("TO",    "/work1/out.cub");
   ui.PutString  ("SHAPE", "ELLIPSOID");
 
@@ -53,7 +53,7 @@ void IsisMain() {
 
   ui.Clear("FROM");
   ui.Clear("TO");
-  ui.PutAsString("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
+  ui.PutAsString("FROM", "$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.cub");
   ui.PutFileName("TO", "./out.cub");
   std::cerr << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
@@ -339,7 +339,7 @@ void PipeContinue(void)
   // Pipeline level "continue"
   Pipeline pc1("unitTest6");
 
-  pc1.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc1.SetInputFile(FileName("$ISISTESTDATA/isis/src/mro/unitTestData/PSP_001446_1790_BG12_0.cub"));
   pc1.SetOutputFile("TO");
   pc1.SetContinue(true);
   pc1.KeepTemporaryFiles(false);
@@ -365,7 +365,7 @@ void PipeContinue(void)
   cerr << "\n*** Application level continue option ***\n";
   Pipeline pc2("unitTest7");
 
-  pc2.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc2.SetInputFile(FileName("$ISISTESTDATA/isis/src/mro/unitTestData/PSP_001446_1790_BG12_0.cub"));
   pc2.SetOutputFile("TO");
   pc2.KeepTemporaryFiles(false);
 

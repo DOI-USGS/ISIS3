@@ -25,10 +25,10 @@ int main(int argc, char *argv[]) {
     SerialNumberList snl(false);
 
     // All of these are unique observations (i.e. 4 observation#'s, 4 serial#'s)
-    snl.add("$mgs/testData/ab102401.cub");
-    snl.add("$mgs/testData/m0402852.cub");
-    snl.add("$lo/testData/3133_h1.cub");
-    snl.add("$odyssey/testData/I00824006RDR.lev2.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    snl.add("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub");
+    snl.add("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub");
+    snl.add("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00824006RDR.lev2.cub");
 
     // Testing constructor that takes SerialNumberList
     ObservationNumberList onl(&snl);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Testing observationNumber(QString)
-    cout << "File->ON:" << onl.observationNumber("$mgs/testData/ab102401.cub").toStdString() 
+    cout << "File->ON:" << onl.observationNumber("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").toStdString() 
          << endl;
 
     cout << endl << "SN->File (0): " << FileName(snl.fileName(0)).name().toStdString() << endl;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     FileName temp1("$temporary/temp1list.txt");
     QFile tempFile1(temp1.expanded());
     tempFile1.open(QIODevice::WriteOnly | QIODevice::Text);
-    tempFile1.write("$odyssey/testData/I56632006EDR.lev2.cub\n");
+    tempFile1.write("$ISISTESTDATA/isis/src/odyssey/unitTestData/I56632006EDR.lev2.cub\n");
     tempFile1.close();
 
     onl.remove(temp1.expanded());
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     cout << endl << "Removing a SerialNumberList with one SN that exists in the "
          << "ObservationNumberList" << endl;
     SerialNumberList snlToRemove(false);
-    snlToRemove.add("$mgs/testData/ab102401.cub");
+    snlToRemove.add("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
     onl.remove(&snlToRemove);
     cout << "size            = " << onl.size() << endl;
     cout << "observationSize = " << onl.observationSize() << endl;
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]) {
     // Now, test where one observation has 2SN's
     SerialNumberList snl2(false);
     cout << "Creating an observation list with two observations and three SNs" << endl;
-    snl2.add("$odyssey/testData/I00824006RDR.lev2.cub");
-    snl2.add("$lo/testData/5106_h1.cropped.cub");
-    snl2.add("$lo/testData/5106_h2.cropped.cub"); // Same observation as above
+    snl2.add("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00824006RDR.lev2.cub");
+    snl2.add("$ISISTESTDATA/isis/src/lo/unitTestData/5106_h1.cropped.cub");
+    snl2.add("$ISISTESTDATA/isis/src/lo/unitTestData/5106_h2.cropped.cub"); // Same observation as above
     
     ObservationNumberList onl2(&snl2);
     cout << "size            = " << onl2.size() << endl;
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     // Test remove method on observation with 2 SNs -- Not sure if this is correct?
     cout << "Removing 5106_h2 SN from the list" << endl;
     SerialNumberList snlToRemove2(false);
-    snlToRemove2.add("$lo/testData/5106_h2.cropped.cub");
+    snlToRemove2.add("$ISISTESTDATA/isis/src/lo/unitTestData/5106_h2.cropped.cub");
     onl2.remove(&snlToRemove2);
     cout << "size            = " << onl2.size() << endl;
     cout << "observationSize = " << onl2.observationSize() << endl;
@@ -148,9 +148,9 @@ int main(int argc, char *argv[]) {
   FileName temp("$temporary/templist.txt");
   QFile tempFile(temp.expanded());
   tempFile.open(QIODevice::WriteOnly | QIODevice::Text);
-  tempFile.write("$mgs/testData/ab102401.cub\n");
-  tempFile.write("$mgs/testData/m0402852.cub\n");
-  tempFile.write("$lo/testData/3133_h1.cub\n");
+  tempFile.write("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub\n");
+  tempFile.write("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub\n");
+  tempFile.write("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub\n");
   tempFile.close();
 
   // Test 1st constructor
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // Request an observation number from a file that doesn't exist in the observation list
-    onl.observationNumber("$odyssey/testData/I00824006RDR.lev2.cub");
+    onl.observationNumber("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00824006RDR.lev2.cub");
   }
   catch (IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");

@@ -17,7 +17,7 @@ using namespace std;
 using namespace Isis;
 
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data") << endl;
+  cout << err.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/unitTestData"), "unitTestData") << endl;
 }
 
 class TestFunctor {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   tmpFilesToRemove << nonOverlapList;
 
   FileList nonOverlaps(fromList);
-  nonOverlaps.removeOne("$odyssey/testData/I01523019RDR.lev2.cub");
+  nonOverlaps.removeOne("$ISISTESTDATA/isis/src/odyssey/unitTestData/I01523019RDR.lev2.cub");
   nonOverlaps.write(nonOverlapList);
 
   // Default constructor is protected, won't be tested
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
   results = equalizer.getResults();
   cout << "Results:" << endl;
   for (int i = 0; i < results["NonOverlaps"].size(); i++) {
-    results["NonOverlaps"][i].replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data");
+    results["NonOverlaps"][i].replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/odyssey"), "odyssey");
   }
   cout << results << endl;
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
   cout << "Results:" << endl;
   for (int i = 0; i < results.keywords(); i++) {
     if (results[i].isNamed("FileName")) {
-      results[i].setValue(QString(results[i]).replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/data"), "data"));
+      results[i].setValue(QString(results[i]).replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/odyssey"), "odyssey"));
     }
   }
   cout << results << endl;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
     QString tmpList = "$TEMPORARY/nonMatchingBands.tmp.lst";
     tmpFilesToRemove << tmpList;
     FileList inputs(fromList);
-    inputs.append("$base/testData/isisTruth.cub");
+    inputs.append("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
     inputs.write(tmpList);
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
     QString tmpList = "$TEMPORARY/nonMatchingMap.tmp.lst";
     tmpFilesToRemove << tmpList;
     FileList inputs(fromList);
-    inputs.append("$odyssey/testData/I56632006EDR.lev2.cub");
+    inputs.append("$ISISTESTDATA/isis/src/odyssey/unitTestData/I56632006EDR.lev2.cub");
     inputs.write(tmpList);
     Equalization equalizer(OverlapNormalization::Both, tmpList);
   }

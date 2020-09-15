@@ -40,7 +40,7 @@ void IsisMain() {
 
     Isis::ProcessExportPds4 p;
 
-    QString cubeName = "$tgo/testData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub";
+    QString cubeName = "$ISISTESTDATA/isis/src/tgo/unitTestData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub";
 
     Isis::Cube cub;
     cub.open(cubeName, "r");
@@ -147,7 +147,7 @@ void IsisMain() {
 
     std::cout << std::endl << "Testing exporting a map projected product" << std::endl << std::endl;
 
-    QString projectedName("$base/testData/MarsPlanetaryRadius_45bottom.cub");
+    QString projectedName("$ISISTESTDATA/isis/src/base/unitTestData/MarsPlanetaryRadius_45bottom.cub");
     Cube projectedCube(projectedName);
     ProcessExportPds4 projectedProcess;
     projectedProcess.SetInputCube(&projectedCube);
@@ -203,7 +203,7 @@ void IsisMain() {
     }
     catch(Isis::IException &e) {
       QString message = e.toString();
-      cout << message.replace(QRegExp("file.*base/translations"), "file [base/translations");
+      cout << message.replace(QRegExp("file.*/translations"), "file [translations");
       cout << endl;
       cout << endl;
     }

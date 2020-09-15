@@ -244,7 +244,7 @@ Segment (by file) Summary
         <b>ckwriter</b> on MESSENGER MDIS images that are covered in the kernel:
       <PRE><b>
 ckwriter from=EN0131771668M.cub to=EN0131771668M.bc
-set extra = ls -1t $ISIS3DATA/messenger/kernels/ck/*_mdis_pivot_pvtres.bc | head -1
+set extra = ls -1t $ISISDATA/messenger/kernels/ck/*_mdis_pivot_pvtres.bc | head -1
 spiceinit from=EN0131771668M.cub ck=EN0131771668M.bc extra=$extra        
         </b></PRE>   
         Note that this form of the <b>spiceinit</b> command can only be used on 

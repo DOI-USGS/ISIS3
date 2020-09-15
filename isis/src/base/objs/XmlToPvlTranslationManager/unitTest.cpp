@@ -25,7 +25,7 @@ int main(void) {
   Preference::Preferences(true);
 
   try {
-    FileName fLabel("$base/testData/xmlTestLabel.xml");
+    FileName fLabel("$ISISTESTDATA/isis/src/base/unitTestData/xmlTestLabel.xml");
 
     stringstream trnsStrm;
     
@@ -242,7 +242,7 @@ int main(void) {
             transMgr.Translate("InstrumentIfovWithUnits") << endl << endl;
 
     cout << "Testing file-based constructor" << endl << endl;
-    FileName XmltoPvlFile("$base/testData/XmlToPvlTestLabel.pvl");
+    FileName XmltoPvlFile("$ISISTESTDATA/isis/src/base/unitTestData/XmlToPvlTestLabel.pvl");
     QString XmltoPvlFileString = XmltoPvlFile.toString(); 
     XmlToPvlTranslationManager transMgrFileConstructor(XmltoPvlFileString);
 
@@ -370,7 +370,7 @@ int main(void) {
     }
 
     try {
-      FileName pvlFile("$base/translations/pdsImage.trn");
+      FileName pvlFile("$ISISROOT/appdata/translations/pdsImage.trn");
       stringstream simpleTrans;
       simpleTrans << "Group = Version" << endl;
       simpleTrans << "  Auto" << endl;
@@ -385,7 +385,7 @@ int main(void) {
     }
     catch(IException &e) {
       QString message = e.toString();
-      cout << message.replace(QRegExp("in file.*base/translations"), "in file [base/translations");
+      cout << message.replace(QRegExp("in file.*/translations"), "in file [/translations");
       cout << endl;
       cout << endl;
     }

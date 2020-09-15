@@ -57,7 +57,7 @@ int main(void) {
     // double knownLat = 0.0;
     // double knownLon = 0.0;
 
-    Cube c("$newhorizons/testData/lor_0034821014_0x630_sci_1_v2.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/newhorizons/unitTestData/lor_0034821014_0x630_sci_1_v2.cub", "r");
     NewHorizonsLorriCamera *cam = (NewHorizonsLorriCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

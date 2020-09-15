@@ -178,10 +178,6 @@
               This option interprets the coordinate as sample/line and will
               compute latitude/longitude and x/y
             </description>
-            <inclusions>
-              <item>SAMPLE</item>
-              <item>LINE</item>
-            </inclusions>
             <exclusions>
               <item>LATITUDE</item>
               <item>LONGITUDE</item>
@@ -200,11 +196,6 @@
               This option interprets the coordinate as latitude/longitude and will
               compute sample/line and x/y
             </description>
-            <inclusions>
-              <item>LATITUDE</item>
-              <item>LONGITUDE</item>
-              <item>COORDSYS</item>
-            </inclusions>
             <exclusions>
               <item>SAMPLE</item>
               <item>LINE</item>
@@ -218,10 +209,6 @@
               This option interprets the coordinate as x/y and will
               compute sample/line and latitude/longitude
             </description>
-            <inclusions>
-              <item>X</item>
-              <item>Y</item>
-            </inclusions>
             <exclusions>
               <item>SAMPLE</item>
               <item>LINE</item>
@@ -306,6 +293,75 @@
           This is the y coordinate value used to compute the other coordinate values.  It
            will be a projection Y value in meters.
         </description>
+      </parameter>
+
+      <parameter name = "USECOORDLIST">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Enable coordinate list parameters in the GUI
+        </brief>
+        <description>
+          Selecting this parameter will enable the 'COORDLIST' parameter in the
+          GUI.
+          <p>
+            Note that this parameter is optional when running <i>mappt</i> on the
+            command line.
+          </p>
+        </description>
+        <inclusions>
+          <item>COORDLIST</item>
+          <item>TYPE</item>
+        </inclusions>
+        <exclusions>
+          <item>TYPE</item>
+          <item>SAMPLE</item>
+          <item>X</item>
+          <item>Y</item>
+          <item>LINE</item>
+          <item>LATITUDE</item>
+          <item>LONGITUDE</item>
+        </exclusions>
+      </parameter>
+
+      <parameter name="COORDLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input comma-delimited file of image or ground coordinates
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          An input comma-delimited flatfile of image, ground or projection coordinates.
+          This allows the program to process multiple coordinates in a single run of <i>mappt</i>,
+          and output the results to the specified output file.
+          <p>
+            Expected order for image coordinates: sample, line<br/>
+            Expected order for ground coordinates: latitude, longitude
+            Expected order for projection coordinates: X, Y
+          </p>
+          <p>
+            The "Error" keyword will only appear when using a coordinate list. The value of "Error"
+            will then be NULL unless an error occurs during the processing of a coordinate in the
+            coordinate list. Then, the value of this keyword will be the error message. This allows
+            for <i>mappt</i> to continue processing the remaining coordinates in the coordinate
+            list.
+          </p>
+          <p>
+            For the input of Latitude and Longitude, mappt expects
+            <def>Planetocentric Latitude</def> (within -90 to 90 boundary) and
+            <def>Positive East Longitude</def> (with 0-360 boundary) to find the location in the
+            input camera image.
+          </p>
+        </description>
+        <exclusions>
+          <item>SAMPLE</item>
+          <item>LINE</item>
+          <item>X</item>
+          <item>Y</item>
+          <item>LATITUDE</item>
+          <item>LONGITUDE</item>
+        </exclusions>
       </parameter>
 
       <parameter name="ALLOWOUTSIDE">
@@ -438,7 +494,7 @@
               This helper button will cat out the mapping group of the given mapfile to the session log
                of the application
              </description>
-            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>

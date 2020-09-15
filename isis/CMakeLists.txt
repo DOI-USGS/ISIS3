@@ -10,9 +10,7 @@ cmake_minimum_required(VERSION 3.10)
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# set(CMAKE_FIND_FRAMEWORK LAST)
 set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
-
 set(CMAKE_FIND_FRAMEWORK LAST)
 
 include(AddIsisModule)
@@ -34,6 +32,10 @@ set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
 set(VERSION            "4.1.0")
+string(REPLACE "." ";" VERSION_LIST ${VERSION})
+list(GET VERSION_LIST 0 VERSION_MAJOR)
+list(GET VERSION_LIST 1 VERSION_MINOR)
+
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
@@ -65,12 +67,12 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Specify user options that can be passed in with the initial CMake command.
-option(isis3Data       "Directory containing Isis3Data"                 OFF )
-option(isis3TestData   "Directory containing Isis3TestData"             OFF )
+option(isisData        "Directory containing IsisData"                  OFF )
+option(isisTestData    "Directory containing IsisTestData"              OFF )
 option(testOutputDir   "Directory to store app test output folders"     OFF )
 option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
-option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
+option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               OFF )
@@ -82,25 +84,25 @@ if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
 endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
-if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
- set(isis3Data $ENV{ISIS3DATA})
+if(DEFINED ENV{ISISDATA} AND NOT isisData)
+ set(isisData $ENV{ISISDATA})
 endif()
-if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
- set(isis3TestData $ENV{ISIS3TESTDATA})
-endif()
-
-if(EXISTS ${isis3Data})
- set(ENV{ISIS3DATA} "${isis3Data}")
-else()
- message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
- set(isis3Data OFF)
+if(DEFINED ENV{ISISTESTDATA} AND NOT isisTestData)
+ set(isisTestData $ENV{ISISTESTDATA})
 endif()
 
-if(EXISTS ${isis3TestData})
- set(ENV{ISIS3TESTDATA} "${isis3TestData}")
+if(EXISTS ${isisData})
+ set(ENV{ISISDATA} "${isisData}")
 else()
- message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
- set(isis3TestData OFF)
+ message(WARNING "Isis Data directory ${isisData} not found, unit tests will fail.")
+ set(isisData OFF)
+endif()
+
+if(EXISTS ${isisTestData})
+ set(ENV{ISISTESTDATA} "${isisTestData}")
+else()
+ message(WARNING "IsisTestData directory ${isisTestData} not found, application and module tests will fail.")
+ set(isisTestData OFF)
 endif()
 
 if(${testOutputDir} STREQUAL "OFF")
@@ -124,8 +126,8 @@ message("\tBUILD CORE: ${buildCore}")
 message("\tBUILD MISSIONS: ${buildMissions}")
 message("\tJP2K SUPPORT: ${JP2KFLAG}")
 message("\tPYTHON BINDINGS: ${pybindings}")
-message("\tISIS3DATA: ${isis3Data}")
-message("\tISISTESTDATA: ${isis3TestData}")
+message("\tISISDATA: ${isisData}")
+message("\tISISTESTDATA: ${isisTestData}")
 message("\tTEST OUTPUT DIR: ${testOutputDir}")
 message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
@@ -260,7 +262,7 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
-find_package(ale               REQUIRED)
+find_package(Ale               REQUIRED)
 find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
@@ -391,8 +393,8 @@ if(pybindings)
  file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
  add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
  target_link_libraries(isispy ${ALLLIBS})
- target_link_libraries(isispy isis3)
- set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
+ target_link_libraries(isispy isis)
+ set_target_properties(isispy PROPERTIES LINK_DEPENDS isis INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
  add_dependencies(isispy sipfiles)
 
  install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
@@ -411,7 +413,9 @@ include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
 include_directories(${CMAKE_BINARY_DIR}/inc)
-set(CORE_LIB_NAME isis3)
+set(CORE_LIB_NAME isis)
+message(STATUS "CORE LIB:  ${CORE_LIB_NAME}")
+
 
 # Specify relative library include paths which will be set up on
 #  the installed files.
@@ -423,17 +427,16 @@ endif()
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6.0${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION}${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION_MAJOR}.${VERSION_MINOR}${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis${VERSION_MAJOR}${SO})")
 EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
-install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
 # Install the header files
-install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+install(CODE "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/include/isis)")
 file(GLOB ISIS_INCLUDE_FILES ${CMAKE_BINARY_DIR}/inc/*)
-install(CODE "EXECUTE_PROCESS(COMMAND cp -fv ${ISIS_INCLUDE_FILES} ${CMAKE_INSTALL_PREFIX}/include/isis3)")
+install(DIRECTORY ${CMAKE_BINARY_DIR}/inc/ DESTINATION  ${CMAKE_INSTALL_PREFIX}/include/isis)
 
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.
@@ -446,7 +449,7 @@ endif()
 file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../3rdParty/plugins/\n")
 install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/xml)
 
-#Create the inc directory
+# Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 
 # Create an xml folder in the source directory that we will need later
@@ -456,11 +459,33 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
 # Create the version file
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/version)
 
-# Set up install of the templates folder.
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/templates DESTINATION .)
-
 # Set up install of the make folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# Set up install of appdata folder
+install(DIRECTORY ${CMAKE_BINARY_DIR}/appdata DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# Create the appdata directory with translations directory, images directory, templates directories
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
+                    ${CMAKE_BINARY_DIR}/appdata/templates/apollo
+		    ${CMAKE_BINARY_DIR}/appdata/templates/autoseed
+		    ${CMAKE_BINARY_DIR}/appdata/templates/autoreg
+		    ${CMAKE_BINARY_DIR}/appdata/templates/noproj
+		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetref
+		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
+		    ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
+		    ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
+	            ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
+		    ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
+		    ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
+		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
+		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
+	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
+	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
+		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
+	            ${CMAKE_BINARY_DIR}/appdata/images/icons
+	            ${CMAKE_BINARY_DIR}/appdata/images/targets)
+
 
 # Have CMake process all of the source code and tests.
 add_subdirectory(src objects)
@@ -488,7 +513,91 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
 add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp
   ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.h ${CMAKE_BINARY_DIR}/inc)
-add_dependencies(isis3 incs)
+add_dependencies(isis incs)
+
+# Add custom build target to copy modified translation files to the build/appdata/translations
+## directory.
+add_custom_target(appdata ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/serialnumbers/*.trn ${CMAKE_SOURCE_DIR}/appdata/translations/*.trn
+  ${CMAKE_SOURCE_DIR}/appdata/translations/*.typ ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.typ
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.trn  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.pft
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.def ${CMAKE_SOURCE_DIR}/appdata/translations/*.def
+  ${CMAKE_SOURCE_DIR}/appdata/translations/*.pvl
+  ${CMAKE_BINARY_DIR}/appdata/translations)
+add_dependencies(isis appdata)
+
+# Add custom build targets to copy modified template files to build/appdata/templates
+add_custom_target(apollotemplate ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/src/*/templates/*.def ${CMAKE_BINARY_DIR}/appdata/templates/apollo/)
+add_dependencies(isis apollotemplate)
+
+add_custom_target(autoreg ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoreg/* ${CMAKE_BINARY_DIR}/appdata/templates/autoreg/)
+add_dependencies(isis autoreg)
+
+add_custom_target(autoseed ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/autoseed/* ${CMAKE_BINARY_DIR}/appdata/templates/autoseed/)
+
+add_custom_target(noproj ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/noproj/* ${CMAKE_BINARY_DIR}/appdata/templates/noproj/)
+add_dependencies(isis noproj)
+
+add_custom_target(cnetref ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetref/* ${CMAKE_BINARY_DIR}/appdata/templates/cnetref/)
+add_dependencies(isis cnetref)
+
+add_custom_target(cnetstats ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnetstats/* ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats/)
+add_dependencies(isis cnetstats)
+
+add_custom_target(cnetvalid ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/cnet_validmeasure/* ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure/)
+add_dependencies(isis cnetvalid)
+
+add_custom_target(controlnetworks ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/controlnetworks/* ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks/)
+add_dependencies(isis controlnetworks)
+
+add_custom_target(findfeatures ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/* ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/)
+add_dependencies(isis findfeatures)
+
+add_custom_target(fullcnetdiff ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/fullcnetdiff/* ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff/)
+add_dependencies(isis fullcnetdiff)
+
+add_custom_target(jigsaw ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/jigsaw/* ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw/)
+add_dependencies(isis jigsaw)
+
+add_custom_target(kernels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/kernels/* ${CMAKE_BINARY_DIR}/appdata/templates/kernels/)
+add_dependencies(isis kernels)
+
+add_custom_target(photometry ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/photometry/* ${CMAKE_BINARY_DIR}/appdata/templates/photometry/)
+add_dependencies(isis photometry)
+
+add_custom_target(icons ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/images/icons/* ${CMAKE_SOURCE_DIR}/appdata/images/icons/licenses/*
+  ${CMAKE_BINARY_DIR}/appdata/images/icons)
+add_dependencies(isis icons)
+
+add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/images/targets/* ${CMAKE_BINARY_DIR}/appdata/images/targets)
+add_dependencies(isis targets)
+
+add_custom_target(maps ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/* ${CMAKE_BINARY_DIR}/appdata/templates/maps)
+add_dependencies(isis maps)
+
+add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/* ${CMAKE_BINARY_DIR}/appdata/templates/labels)
+add_dependencies(isis labels)
+
+add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
+add_dependencies(isis hidtmgen)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
@@ -499,12 +608,14 @@ add_custom_target(clean_source COMMAND rm -rf "${CMAKE_BINARY_DIR}/*" "${CMAKE_I
 # Set up a few top level files for installation.
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/IsisPreferences   ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/scripts           ${CMAKE_BINARY_DIR})
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.txt    ${CMAKE_BINARY_DIR})
+EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.md    ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BINARY_DIR})
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.txt  DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md   DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../AUTHORS.rst  DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 

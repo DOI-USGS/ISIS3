@@ -8,35 +8,33 @@ Object = EqualizationInformation
     Weighted        = false
     SolutionType    = 2
     SolveMethod     = 2
-    NonOverlaps     = (/usgs/cpkgs/isis3/data/odyssey/testData/I25685003EDR.c-
-                       rop.proj.reduced.cub,
-                       /usgs/cpkgs/isis3/data/odyssey/testData/I51718010EDR.cr-
-                       op.proj.reduced.cub)
+    NonOverlaps     = (/usgs/cpkgs/isis3/isis_testData/isis/src/odyssey/unitTestData/I25685003EDR.crop.proj.reduced.cub,
+                       /usgs/cpkgs/isis3/isis_testData/isis/src/odyssey/unitTestData/I51718010EDR.crop.proj.reduced.cub)
     HasCorrections  = false
   End_Group
 
   # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
   # BandN = (GAIN, OFFSET, AVERAGE)
   Group = Normalization
-    FileName = $odyssey/testData/I10047011EDR.proj.reduced.cub
+    FileName = $ISISTESTDATA/isis/src/odyssey/unitTestData/I10047011EDR.proj.reduced.cub
   End_Group
 
   # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
   # BandN = (GAIN, OFFSET, AVERAGE)
   Group = Normalization
-    FileName = $odyssey/testData/I25685003EDR.crop.proj.reduced.cub
+    FileName = $ISISTESTDATA/isis/src/odyssey/unitTestData/I25685003EDR.crop.proj.reduced.cub
   End_Group
 
   # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
   # BandN = (GAIN, OFFSET, AVERAGE)
   Group = Normalization
-    FileName = $odyssey/testData/I51718010EDR.crop.proj.reduced.cub
+    FileName = $ISISTESTDATA/isis/src/odyssey/unitTestData/I51718010EDR.crop.proj.reduced.cub
   End_Group
 
   # Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET
   # BandN = (GAIN, OFFSET, AVERAGE)
   Group = Normalization
-    FileName = $odyssey/testData/I56969027EDR.proj.reduced.cub
+    FileName = $ISISTESTDATA/isis/src/odyssey/unitTestData/I56969027EDR.proj.reduced.cub
   End_Group
 End_Object
 

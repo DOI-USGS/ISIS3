@@ -1,0 +1,21 @@
+# Boresight data that goes into ROOT of the PDS label
+Group = BORESIGHT_SAMPLE
+  Auto           = Null
+  InputKey       = BoresightSample
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:BORESIGHT_SAMPLE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+
+Group = BORESIGHT_LINE
+  Auto           = Null
+  InputKey       = BoresightLine
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LO:BORESIGHT_LINE
+  OutputPosition = Root
+  Translation    = (*, *)
+End_Group
+End

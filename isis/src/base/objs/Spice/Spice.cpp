@@ -29,7 +29,7 @@
 
 #include <getSpkAbCorrState.hpp>
 
-#include <ale.h>
+#include <ale/Load.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -89,10 +89,10 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) {  
+  Spice::Spice(Cube &cube, bool noTables) {
     init(*cube.label(), noTables);
   }
- 
+
 
   /**
    * Constructs a Spice Object
@@ -120,8 +120,8 @@ namespace Isis {
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
-    
     m_solarLongitude = new Longitude;
+
     m_et = NULL;
     m_kernels = new QVector<QString>;
 
@@ -151,7 +151,7 @@ namespace Isis {
 
     m_naifKeywords = new PvlObject("NaifKeywords");
     // m_sky = false;
-    
+
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -168,11 +168,11 @@ namespace Isis {
     }
     else {
       *m_endTimePadding = 0.0;
-    }  
+    }
 
-    // We should remove this completely in the near future 
+    // We should remove this completely in the near future
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
-    m_usingAle = false; 
+    m_usingAle = false;
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
@@ -185,7 +185,7 @@ namespace Isis {
           QString msg = "Falling back to ISIS generation of nadir pointing";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-        
+
         if (isd == NULL){
           // try using ALE
           std::ostringstream kernel_pvl;
@@ -194,19 +194,19 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
-        
-        json aleNaifKeywords = isd["NaifKeywords"];
+
+        json aleNaifKeywords = isd["naif_keywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
 
-        // Still need to load clock kernels for now 
+        // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
           load(kernels["SpacecraftClock"], noTables);
         }
-        m_usingAle = true; 
-      } 
+        m_usingAle = true;
+      }
       catch(...) {
         // Backup to stadnard ISIS implementation
         if (noTables) {
@@ -227,12 +227,12 @@ namespace Isis {
         if (kernels.hasKeyword("InstrumentAddendum")) {
           load(kernels["InstrumentAddendum"], noTables);
         }
- 
-        // Still need to load clock kernels for now 
+
+        // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
           load(kernels["SpacecraftClock"], noTables);
-        }       
+        }
 
         // Modified to load extra kernels last to allow overriding default values
         // (2010-04-07) (DAC)
@@ -240,14 +240,14 @@ namespace Isis {
           load(kernels["Extra"], noTables);
         }
       }
-     
-      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
-      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code below has been refactored
       m_target = new Target(this, lab);
 
-      // This should not be here. Consider having spiceinit add the necessary rings kernels to the 
+      // This should not be here. Consider having spiceinit add the necessary rings kernels to the
       // Extra parameter if the user has set the shape model to RingPlane.
       // If Target is Saturn and ShapeModel is RingPlane, load the extra rings pck file
       //  which changes the prime meridian values to report longitudes with respect to
@@ -259,9 +259,9 @@ namespace Isis {
     }
     else {
       *m_naifKeywords = lab.findObject("NaifKeywords");
-      
-      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
-      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
       m_target = new Target(this, lab);
@@ -344,7 +344,7 @@ namespace Isis {
           QString naifTarget = "IAU_" + m_target->name().toUpper();
           namfrm_c(naifTarget.toLatin1().data(), &frameCode);
           if (frameCode == 0) {
-            QString msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
+            QString msg = "Can not find NAIF BODY_FRAME_CODE for target ["
                          + m_target->name() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
@@ -360,10 +360,10 @@ namespace Isis {
       m_bodyRotation = new SpiceRotation(frameCode);
       *m_bodyFrameCode = frameCode;
     }
-    
+
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
 
-    //  Set up for observer/target and light time correction to between s/c 
+    //  Set up for observer/target and light time correction to between s/c
     // and target body.
     LightTimeCorrectionState ltState(*m_ikCode, this);
     ltState.checkSpkKernelsForAberrationCorrection();
@@ -374,13 +374,20 @@ namespace Isis {
                                                   ltState, targetRadius);
 
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
-    
+
 
     // Check to see if we have nadir pointing that needs to be computed &
-    // See if we have table blobs to load 
+    // See if we have table blobs to load
     if (m_usingAle) {
-      m_sunPosition->LoadCache(isd["SunPosition"]);
-      m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      m_sunPosition->LoadCache(isd["sun_position"]);
+      if (m_sunPosition->cacheSize() > 3) {
+        m_sunPosition->Memcache2HermiteCache(0.01);
+      }
+      m_bodyRotation->LoadCache(isd["body_rotation"]);
+      m_bodyRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+      if (m_bodyRotation->cacheSize() > 5) {
+        m_bodyRotation->LoadTimeCache();
+      }
       solarLongitude();
     }
     else if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
@@ -397,13 +404,13 @@ namespace Isis {
         solarLongitude();
       }
     }
-    
+
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
     //  SpacecraftPosition.  The old keywords were in existance before the
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
-    
+
     if (kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
@@ -411,7 +418,7 @@ namespace Isis {
     }
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
-    // with the old keywords should be re-run through spiceinit. 
+    // with the old keywords should be re-run through spiceinit.
     if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
@@ -421,31 +428,38 @@ namespace Isis {
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
     else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
+     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+     if (m_instrumentRotation->cacheSize() > 5) {
+       m_instrumentRotation->LoadTimeCache();
+     }
     }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
-    
+
 
     if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
     }
-    
+
     if (m_usingAle) {
-      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+      m_instrumentPosition->LoadCache(isd["instrument_position"]);
+      if (m_instrumentPosition->cacheSize() > 3) {
+        m_instrumentPosition->Memcache2HermiteCache(0.01);
+      }
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-    
-    
+
+
     NaifStatus::CheckErrors();
-  } 
+  }
 
   /**
    * Loads/furnishes NAIF kernel(s)
@@ -850,9 +864,9 @@ namespace Isis {
     * spacecraft and sun positions.
     *
     * @return @b iTime the currently set ephemeris time
-    *  
-    * @throws IException::Programmer "Unable to retrieve the time Spice::setTime must be called 
-    *         first." 
+    *
+    * @throws IException::Programmer "Unable to retrieve the time Spice::setTime must be called
+    *         first."
     */
   iTime Spice::time() const {
     if (m_et == NULL) {
@@ -901,7 +915,7 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Spice::radii(Distance r[3]) const {
-    for (int i = 0; i < 3; i++) 
+    for (int i = 0; i < 3; i++)
        r[i] =m_target->radii()[i];
   }
 
@@ -953,7 +967,7 @@ namespace Isis {
   }
 
   /**
-   * This returns the NAIF body frame code. It is read from the labels, if it 
+   * This returns the NAIF body frame code. It is read from the labels, if it
    * exists. Otherwise, it's calculated by the init() method.
    *
    * @return @b SpiceInt NAIF body frame code
@@ -966,7 +980,7 @@ namespace Isis {
 
   /**
    * This returns the PvlObject that stores all of the requested Naif data
-   *   and can be a replacement for furnishing text kernels.
+   * and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;
@@ -1015,10 +1029,10 @@ namespace Isis {
 
   /**
    * This converts the spacecraft clock ticks value (clockValue) to an iTime.
-   *  
-   * If the clock ticks value is provided directly, rather than the spacecraft 
-   * clock string, set clockTicks=true.  
-   *  
+   *
+   * If the clock ticks value is provided directly, rather than the spacecraft
+   * clock string, set clockTicks=true.
+   *
    * Use this when possible because naif calls (such as scs2e_c) cannot be
    *   called when not using naif.
    */
@@ -1036,10 +1050,10 @@ namespace Isis {
       SpiceDouble timeOutput;
       NaifStatus::CheckErrors();
       if (clockTicks) {
-        sct2e_c(sclkCode, (SpiceDouble) clockValue.toDouble(), &timeOutput); 
+        sct2e_c(sclkCode, (SpiceDouble) clockValue.toDouble(), &timeOutput);
       }
       else {
-        scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput); 
+        scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput);
       }
       NaifStatus::CheckErrors();
       storedClockTime = timeOutput;
@@ -1274,7 +1288,7 @@ namespace Isis {
 
     SpiceBoolean found;
     SpiceDouble subB[3];
-    
+
     surfpt_c(originB, usB, a, b, c, subB, &found);
 
     SpiceDouble mylon, mylat;
@@ -1309,7 +1323,7 @@ namespace Isis {
     SpiceDouble uuB[3], dist;
     unorm_c(m_uB, uuB, &dist);
     std::vector<Distance> radii = target()->radii();
-    
+
     SpiceDouble a = radii[0].kilometers();
     SpiceDouble b = radii[1].kilometers();
     SpiceDouble c = radii[2].kilometers();
@@ -1349,16 +1363,16 @@ namespace Isis {
   QString Spice::targetName() const {
     return m_target->name();
   }
-  
-  
+
+
   double Spice::sunToBodyDist() const {
     std::vector<double> sunPosition = m_sunPosition->Coordinate();
     std::vector<double> bodyRotation = m_bodyRotation->Matrix();
-    
+
     double sunPosFromTarget[3];
     mxv_c(&bodyRotation[0], &sunPosition[0], sunPosFromTarget);
-        
-    return vnorm_c(sunPosFromTarget);  
+
+    return vnorm_c(sunPosFromTarget);
   }
 
 
@@ -1377,22 +1391,22 @@ namespace Isis {
     }
 
     if (m_usingAle) {
-      double og_time = m_bodyRotation->EphemerisTime();  
+      double og_time = m_bodyRotation->EphemerisTime();
       m_bodyRotation->SetEphemerisTime(et.Et());
       m_sunPosition->SetEphemerisTime(et.Et());
 
-      std::vector<double> bodyRotMat = m_bodyRotation->Matrix(); 
-      std::vector<double> sunPos = m_sunPosition->Coordinate();      
+      std::vector<double> bodyRotMat = m_bodyRotation->Matrix();
+      std::vector<double> sunPos = m_sunPosition->Coordinate();
       std::vector<double> sunVel = m_sunPosition->Velocity();
       double sunAv[3];
 
       ucrss_c(&sunPos[0], &sunVel[0], sunAv);
-      
+
       double npole[3];
       for (int i = 0; i < 3; i++) {
         npole[i] = bodyRotMat[6+i];
       }
-      
+
       double x[3], y[3], z[3];
       vequ_c(sunAv, z);
       ucrss_c(npole, z, x);
@@ -1410,17 +1424,17 @@ namespace Isis {
 
       double radius, ls, lat;
       reclat_c(pos, &radius, &ls, &lat);
-      
+
       *m_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
-      
+
       NaifStatus::CheckErrors();
       m_bodyRotation->SetEphemerisTime(og_time);
       m_sunPosition->SetEphemerisTime(og_time);
       return;
     }
 
-    if (m_bodyRotation->IsCached()) return; 
-    
+    if (m_bodyRotation->IsCached()) return;
+
     double tipm[3][3], npole[3];
     char frameName[32];
     SpiceInt frameCode;
@@ -1540,9 +1554,9 @@ namespace Isis {
 
   /**
    * Returns true if time has been initialized.
-   * 
+   *
    * @author 2016-10-19 Kristin Berry
-   * 
+   *
    * @return @b bool true if time has been set
    */
   bool Spice::isTimeSet(){
@@ -1593,7 +1607,7 @@ namespace Isis {
   SpiceRotation *Spice::instrumentRotation() const {
     return m_instrumentRotation;
   }
-  
+
   bool Spice::isUsingAle(){
     return m_usingAle;
   }

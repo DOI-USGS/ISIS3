@@ -18,30 +18,28 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   p.StartProcess();
 
-  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString transDir = (QString) dataDir["Rolo"];
+  QString transDir = "$ISISROOT/appdata/translations/";
 
-  FileName transFile;
   Pvl inputLabel(labelFile);
   Pvl outputLabel;
   PvlToPvlTranslationManager *translator;
 
   // translate Mapping group
-  transFile = transDir + "/" + "translations/roloMapping.trn";
+  FileName transFile = transDir + "RoloMapping.trn";
   translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate Instrument group
-  transFile = transDir + "/" + "translations/roloInstrument.trn";
+  transFile = transDir +  "RoloInstrument.trn";
   translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate BandBin group
-  transFile = transDir + "/" + "translations/roloBandBin.trn";
+  transFile = transDir + "RoloBandBin.trn";
   translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   outputLabel.findGroup("BandBin").findKeyword("OriginalBand").setUnits(
@@ -56,7 +54,7 @@ void IsisMain() {
   translator = NULL;
 
   // translate Archive group
-  transFile = transDir + "/" + "translations/roloArchive.trn";
+  transFile = transDir + "RoloArchive.trn";
   translator = new PvlToPvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;

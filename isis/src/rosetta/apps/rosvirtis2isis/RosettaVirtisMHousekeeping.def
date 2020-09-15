@@ -1,0 +1,107 @@
+dataSCET, double, {0.0, 1.0, 0.0}
+AcquisitonID, double,  {0.0, 1.0, 0.0}
+NumberOfSubslices, double,  {0.0, 1.0, 0.0}
+FirstSerialNum, double, {0.0, 1.0, 0.0}
+Data Type__Real science/Dummy, int,  {0.0, 1.0, 0.0}
+Data Type__Spectrum type, int, {0.0, 1.0, 0.0}
+Data Type__Shutter state, int, {0.0, 1.0, 0.0}
+Data Type__Compression Mode, int,  {0.0, 1.0, 0.0}
+Data Type__Average/summing mode, int, {0.0, 1.0, 0.0}
+Data Type__Image type, int, {0.0, 1.0, 0.0}
+Spare, double, {0.0, 1.0, 0.0}
+HKDefaultHK, double,  {0.0, 1.0, 0.0}
+V_MODE__V-M operative mode, double, {0.0, 1.0, 0.0} 
+V_MODE__V-H operative mode, double, {0.0, 1.0, 0.0} 
+V_MODE__ME operative mode, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__-M power converter status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__-H power converter status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__-M IFE +5V power status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__-H IFE +5V power status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__ADC power status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__EEPROM +5V power status, double, {0.0, 1.0, 0.0} 
+ME_PWR_STAT__DPU_ID, double, {0.0, 1.0, 0.0} 
+ME_PS_TEMP, double, {0.0, 0.244, 0.0} 
+ME_DPU_TEMP, double, {0.0, 0.244, 0.0}
+ME_DHSU_VOLT, double, {0.0, 0.002442, 0.0} 
+ME_DHSU_CURR, double, {0.0, 0.9768, 0.0}
+EEPROM_VOLT, double, {0.0, 0.002442, 0.0}
+IF_ELECTR_VOLT, double, {0.0, 0.002442, 0.0}
+SPARE, double, {0.0, 1.0, 0.0}  
+M_ME_generalHK, double, {0.0, 1.0, 0.0}   
+M_ECA_STAT__-M ECA status, double, {0.0, 1.0, 0.0}  
+M_ECA_STAT__-M ECA power, double, {0.0, 1.0, 0.0}   
+M_COOL_STAT__-M cooler mode, double, {0.0, 1.0, 0.0}   
+M_COOL_STAT__-M cooler motor drv status, double, {0.0, 1.0, 0.0}   
+M_COOL_STAT__-M CCE +28V power, double, {0.0, 1.0, 0.0}   
+M_COOL_TIP_TEMP, double, {0.0, 9.768e-3, 60.0}
+M_COOL_MOT_VOLT, double, {0.0, 0.004884, 0.0}
+M_COOL_MOT_CURR, double, {0.0, 0.0004884, 0.0}
+M_CCE_SEC_VOLT, double, {0.0, 1.0, 0.0}
+SPARE, double, {0.0, 1.0, 0.0}
+MVIS_HK_reportSCET-1, double, {0.0, 1.0, 0.0}
+M_CCD_VDR_HK, double, {0.0, 7.554E-04, -2.475E+01}
+M_CCD_VDD_HK, double, {0.0, 1.221E-03, -4.0E+01}
+M_+5_VOLT, double, {0.0, 3.061E-04, -1.003E+01}
+M_+12_VOLT, double, {0.0, 6.1528E-04, -2.0162E+01}
+M_-12_VOLT, double, {0.0, 6.1405E-04, -2.0121E+01}
+M_+20_VOLT, double, {0.0, 1.2207E-03, -4.0001E+01}
+M_+21_VOLT, double, {0.0, 1.2207E-03, -4.0001E+01}
+M_CCD_LAMP_VOLT, double, {0.0, 7.6486E-04, -2.5063E+01}
+M_CCD_TEMP_OFFSET, double, {0.0, 1.5274E-04, -5.0051}
+M_CCD_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+M_CCD_TEMP_RES, double, {0.0, 1.5313E-06, -5.0176E-02}
+M_RADIATOR_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+M_LEDGE_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+OM_BASE_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+H_COOLER_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+M_COOLER_TEMP, double, {0.0, 3.0549E-02, -1.001E+03}
+M_CCD_WIN_X1, double, {0.0, 1.0, 0.0}
+M_CCD_WIN_Y1, double, {0.0, 1.0, 0.0}
+M_CCD_WIN_X2, double, {0.0, 1.0, 0.0}
+M_CCD_WIN_Y2, double, {0.0, 1.0, 0.0}
+M_CCD_DELAY, double, {0.0, 1.0E-01 , 0.0}
+M_CCD_EXPO, double, {0.0, 1.0E-01 , 0.0}
+M_MIRROR_SIN_HK, double, {0.0, 2.442E-04 , 0.0}
+M_MIRROR_COS_HK, double, {0.0, 2.442E-04 , 0.0}
+M_VIS_FLAG_ST__CCD scan flag, double, {0.0, 1.0, 0.0}
+M_VIS_FLAG_ST__H/K acquisition flag, double, {0.0, 1.0, 0.0} 
+M_VIS_FLAG_ST__time error flag, double, {0.0, 1.0, 0.0}
+M_VIS_FLAG_ST__word error flag, double, {0.0, 1.0, 0.0} 
+M_VIS_FLAG_ST__VIS checkout ADC latch-up status, double, {0.0, 1.0, 0.0} 
+M_VIS_FLAG_ST__last command to CCD calibration lamp, double, {0.0, 1.0, 0.0} 
+SPARE, double, {0.0, 1.0, 0.0} 
+MIR_HK_reportSCET, double, {0.0, 1.0, 0.0}
+M_IR_VDETCOM_HK, double, {0, 3.061E-04, -1.0028E+01}
+M_IR_VDETADJ_HK, double, {0, 3.061E-04, -1.0028E+01}
+M_IR_VPOS, double, {0, 3.0579E-04, -1.0018E+01}
+M_IR_VDP, double, {0, 3.061E-04, -1.0028E+01}                          
+M_IR_TEMP_OFFSET, double, {0, 1.5305E-04, -5.0151}
+M_IR_TEMP, double, {0, 6.1405E-05, -2.0121}                          
+M_IR_TEMP_RES, double, {0, 7.6525E-07, -2.5076E-02}    
+M_SHUTTER_TEMP, double, {0, 3.0579E-02, -1.002E+03}
+M_GRATING_TEMP, double, {0, 3.0579E-02, -1.002E+03}
+M_SPECT_TEMP, double, {0, 3.0579E-02, -1.002E+03}                          
+M_TELE_TEMP, double, {0, 3.0579E-02, -1.002E+03}
+M_SU_MOTOR_TEMP, double, {0, 3.0579E-02, -1.002E+03}                           
+M_IR_LAMP_VOLT, double, {0, 7.6679E-04, -2.5126E+01}                          
+M_SU_MOTOR_CURR, double, {0, 1.5305E-06, -5.0151E-02}                          
+M_IR_WIN_Y1, double, {0.0, 1.0, 0.0}                        
+M_IR_WIN_Y2, double, {0.0, 1.0, 0.0}                                            
+M_IR_DELAY, double, {0, 1.0E-01 , 0}                          
+M_IR_EXPO, double, {0, 1.0E-01 , 0}
+M_IR_LAMP_SHUTTER__last current value of IR calib. lamp, double, {0, 0 , 9.4E+01}
+M_IR_LAMP_SHUTTER__last command to IR calib. Lamp, double, {0, 0 , 9.4E+01}
+M_IR_LAMP_SHUTTER__last current value of shutter, double, {0, 0 , 4.1E+01}
+M_IR_LAMP_SHUTTER__last command to shutter, double, {0, 0 , 4.1E+01}
+M_IR_FLAG_ST_IRFPA scan flag, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__H/K acquisition flag, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__time, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__IR word error flag, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__scan word error flag, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__IR detector status flag, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__IR detector ADC latch-up status, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__annealing heater last received cmd, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__last cover command direction, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__close position HES1, double, {0.0, 1.0, 0.0}
+M_IR_FLAG_ST__open position HES2, double, {0.0, 1.0, 0.0}
+SPARE, double, {0.0, 1.0, 0.0}

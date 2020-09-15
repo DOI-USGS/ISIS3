@@ -86,7 +86,7 @@
                      the appropriate field in the GUI, clear to blank after the
                      last blob is hit, and then wrap back to the beginning.  
                   </description>
-                  <icon>$ISIS3DATA/base/icons/exec.png</icon>
+		  <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
                </helper>
             </helpers>
           </parameter>

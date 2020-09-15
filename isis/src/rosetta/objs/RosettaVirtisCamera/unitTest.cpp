@@ -60,7 +60,7 @@ int main(void) {
     double knownLon = 9.3721561274843133;
 
     cout << endl << "Teting Level 3 (Calibrated) VIRTIS-M-VIS Cube ..." << endl;
-    Cube visCube("$ISIS3DATA/rosetta/testData/V1_00388238556.cub", "r");
+    Cube visCube("$ISISTESTDATA/isis/src/rosetta/unitTestData/V1_00388238556.cub", "r");
     double lines = 100.0;
     RosettaVirtisCamera *cam = (RosettaVirtisCamera *) CameraFactory::Create(visCube);
     TestCamera(cam, visCube, lines, knownLat, knownLon);
@@ -69,7 +69,7 @@ int main(void) {
     knownLat = 29.1974649731145028;
     knownLon = 346.8749209987247468;
     lines = 67; 
-    Cube irCube("$ISIS3DATA/rosetta/testData/I1_00382172310.cub", "r");
+    Cube irCube("$ISISTESTDATA/isis/src/rosetta/unitTestData/I1_00382172310.cub", "r");
     RosettaVirtisCamera *cam2 = (RosettaVirtisCamera *) CameraFactory::Create(irCube);
     TestCamera(cam2, irCube, lines, knownLat, knownLon);
   }

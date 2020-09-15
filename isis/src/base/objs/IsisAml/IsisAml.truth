@@ -111,7 +111,7 @@ Create the aml object
         brief = Helper 2
         description = This helper buttion will...
         function = myHelper2
-        icon = $ISIS3DATA/base/icons/back.png
+        icon = $ISISROOT/appdata/images/icons/back.png
       count = 
       minimum = 
       minimum inclusive = 
@@ -349,7 +349,7 @@ Create the aml object
         brief = Helper 3
         description = Long Description for Helper 3
         function = myHelper3
-        icon = $ISIS3DATA/base/icons/up.png
+        icon = $ISISROOT/appdata/images/icons/up.png
       count = 
       minimum = 
       minimum inclusive = 
@@ -847,7 +847,7 @@ Create the aml object
         brief = Helper 5
         description = Long Description for Helper 5...
         function = myHelper5
-        icon = $ISIS3DATA/base/icons/link.png
+        icon = $ISISROOT/appdata/images/icons/link.png
       count = 
       minimum = 
       minimum inclusive = 
@@ -1030,7 +1030,7 @@ Parameter information:
         Brief: Helper 2
         Description: This helper buttion will...
         Function: myHelper2
-        Icon: $ISIS3DATA/base/icons/back.png
+        Icon: $ISISROOT/appdata/images/icons/back.png
       List Information:
     Parameter number: 2
       Name: G1P2
@@ -1129,7 +1129,7 @@ Parameter information:
         Brief: Helper 3
         Description: Long Description for Helper 3
         Function: myHelper3
-        Icon: $ISIS3DATA/base/icons/up.png
+        Icon: $ISISROOT/appdata/images/icons/up.png
       List Information:
     Parameter number: 2
       Name: G3P2
@@ -1337,7 +1337,7 @@ Parameter information:
         Brief: Helper 5
         Description: Long Description for Helper 5...
         Function: myHelper5
-        Icon: $ISIS3DATA/base/icons/link.png
+        Icon: $ISISROOT/appdata/images/icons/link.png
       List Information:
     Parameter number: 2
       Name: FR

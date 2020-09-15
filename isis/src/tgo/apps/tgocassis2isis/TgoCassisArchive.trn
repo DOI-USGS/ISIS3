@@ -1,0 +1,509 @@
+# Translates CaSSIS xml labels into the Archive PvlGroup values
+# for the ingested ISIS3 cube labels.
+#
+# The Dependencies keyword specifies a tag or attribute at the same level as
+# the InputKey that uniquely identifies the InputKey.
+#
+# Consider the following translation group and xml
+#
+# Group = CoreSamples
+#   Auto
+#   InputPosition  = (Array_2D_Image, Axis_Array)
+#   Dependencies   = "tag@axis_name|Sample"
+#   InputKey       = elements
+#   OutputName     = CoreSamples
+#   OutputPosition = (Group, Dimensions)
+#   Translation    = (*, *)
+# End_Group
+#
+# <Array_2D_Image>
+#   <Axis_Array>
+#     <axis_name>Line</axis_name>
+#     <sequence_number>1</sequence_number>
+#     <elements>2048</elements>
+#   </Axis_Array>
+#   <Axis_Array>
+#     <axis_name>Sample</axis_name>
+#     <sequence_number>2</sequence_number>
+#     <elements>279</elements>
+#   </Axis_Array>
+# </Array_2D_Image>
+#
+# There are two Axis_Array tags below Array_2D_Image and both of them have an
+# elements tag.  So, the Dependencies keyword specifies to take the value of
+# the elements tag under the second Axis_Array array tag because it also has a
+# axis_name tag with a value of Sample.
+#
+# history 2018-06-17 Jeannie Backer - Added ObservationId.
+
+Group = DataSetId
+  Auto
+  Optional
+  InputPosition  = Identification_Area
+  InputKey       = logical_identifier
+  OutputName     = DataSetId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductVersionId
+  Auto
+  Optional 
+  InputPosition  = Identification_Area
+  InputKey       = version_id
+  OutputName     = ProductVersionId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerId
+  Auto
+  Optional
+  InputPosition  = (Identification_Area, Producer_data)
+  InputKey       = Producer_id
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProducerName
+  Auto
+  Optional
+  InputPosition  = (Identification_Area, Producer_data)
+  InputKey       = Producer_full_name
+  OutputName     = ProducerName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductId
+  Auto
+  Optional
+  InputPosition  = (Identification_Area)
+  InputKey       = Product_Id
+  OutputName     = ProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ProductCreationTime
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, File)
+  InputKey       = creation_date_time
+  OutputName     = ProductCreationTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FileName
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, File)
+  InputKey       = file_name
+  OutputName     = FileName
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ScalingFactor
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputKey       = scaling_factor
+  OutputName     = ScalingFactor
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = Offset
+  Auto
+  Optional
+  InputPosition  = (File_Area_Observational, Array_2D_Image, Element_Array)
+  InputKey       = offset
+  OutputName     = Offset
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PredictMaximumExposureTime
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = PREDICTED_MAXIMUM_EXPOSURE_TIME
+  OutputName     = PredictMaximumExposureTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CassisOffNadirAngle
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = CASSIS_OFF_NADIR_ANGLE
+  OutputName     = CassisOffNadirAngle
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = PredictedRepetitionFrequency
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = PREDICTED_REQUIRED_REPETITION_FREQUENCY
+  OutputName     = PredictedRepetitionFrequency
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = GroundTrackVelocity
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = TGO_GROUND_TRACK_VELOCITY
+  OutputName     = GroundTrackVelocity
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ForwardRotationAngle
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = FORWARD_ROTATION_ANGLE_REQUIRED
+  OutputName     = ForwardRotationAngle
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SpiceMisalignment
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, GEOMETRIC_DATA)
+  InputKey       = SPICE_KERNEL_MISALIGNMENT_PREDICT
+  OutputName     = SpiceMisalignment
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalLength
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, CaSSIS_General) 
+  InputKey       = TELESCOPE_FOCAL_LENGTH
+  OutputName     = FocalLength
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+
+Group = FNumber
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, CaSSIS_General)
+  InputKey       = TELESCOPE_F_NUMBER
+  OutputName     = FNumber
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureTimeCommand
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, IMAGE_COMMAND)
+  InputKey       = T_exp
+  OutputName     = ExposureTimeCommand
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = FrameletNumber
+  Auto
+  Optional
+  InputPosition      = CaSSIS_Header
+  InputKey           = FSW_HEADER
+  InputKeyAttribute  = SequenceCounter
+  OutputName         = FrameletNumber
+  OutputPosition     = (Object, IsisCube, Group, Archive)
+  Translation        = (*, *)
+End_Group
+
+Group = NumberOfFramelets
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, IMAGE_COMMAND)
+  InputKey       = Num_exp
+  OutputName     = NumberOfFramelets
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageFrequency
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, IMAGE_COMMAND)
+  InputKey       = Step_exp
+  OutputName     = ImageFrequency
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = NumberOfWindows
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, IMAGE_COMMAND)
+  InputKey       = Num_win
+  OutputName     = NumberOfWindows
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UniqueIdentifier
+  Auto
+  Optional
+  InputPosition  = (CaSSIS_Header, IMAGE_COMMAND)
+  InputKey       = Unique_Identifier
+  OutputName     = UniqueIdentifier
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = UID
+  Auto
+  Optional
+  InputPosition      = CaSSIS_Header
+  InputKey           = FSW_HEADER
+  InputKeyAttribute  = UID
+  OutputName         = UID
+  OutputPosition     = (Object, IsisCube, Group, Archive)
+  Translation        = (*, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  Optional
+  OutputPosition     = (CaSSIS_Header, IDENTIFICATION_DATA)
+  InputKey           = observation_id
+  OutputName         = ObservationId
+  OutputPosition     = (Object, IsisCube, Group, Archive)
+  Translation        = (*, *)
+End_Group
+
+Group = ExposureTimestamp
+  Auto
+  Optional
+  InputPosition     = CaSSIS_Header
+  InputKey          = FSW_HEADER
+  InputKeyAttribute = ExposureTimestamp
+  OutputName        = ExposureTimestamp
+  OutputPosition    = (Object, IsisCube, Group, Archive)
+  Translation       = (*, *)
+End_Group
+
+Group = ExposureTimePEHK
+  Auto
+  Optional
+  InputPosition       = CaSSIS_Header
+  InputKey            = PEHK_HEADER
+  InputKeyAttribute   = Exposure_Time
+  OutputName          = ExposureTimePEHK
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = PixelsPossiblySaturated
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, DERIVED_HEADER_DATA)
+  InputKey            = PixelsPossiblySaturated
+  OutputName          = PixelsPossiblySaturated
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = IFOV
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = INSTRUMENT_IFOV
+  OutputName          = InstrumentIFOV
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = IFOVUnit
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = INSTRUMENT_IFOV
+  InputKeyAttribute   = Unit
+  OutputName          = InstrumentIFOVUnit
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = FiltersAvailable
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = FILTERS_AVAILABLE
+  OutputName          = FiltersAvailable
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+#Group = FocalLength
+#  Auto
+#  Optional
+#  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+#  InputKey            = TELESCOPE_FOCAL_LENGTH
+#  OutputName          = FocalLength
+#  OutputPosition      = (Object, IsisCube, Group, Archive)
+#  Translation         = (*, *)
+#End_Group
+
+Group = FocalLengthUnit
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = TELESCOPE_FOCAL_LENGTH
+  InputKeyAttribute   = Unit
+  OutputName          = FocalLengthUnit
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+#Group = TelescopFNumber
+#  Auto
+#  Optional
+#  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+#  InputKey            = TELESCOPE_F_NUMBER
+#  OutputName          = TelescopeFNumber
+#  OutputPosition      = (Object, IsisCube, Group, Archive)
+#  Translation         = (*, *)
+#End_Group
+
+Group = TelescopeType
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = TELESCOPE_TYPE
+  OutputName          = TelescopeType
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = DetectorDescription
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_DESC
+  OutputName          = DeteorDescription
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = PixelHeight
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_PIXEL_HEIGHT
+  OutputName          = PixelHeight
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = PixelHeightUnit
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_PIXEL_HEIGHT
+  InputKeyAttribute   = Unit
+  OutputName          = PixelHeight
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = PixelWidth
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_PIXEL_WIDTH
+  OutputName          = PixelWidth
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = PixelWidthUnit
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_PIXEL_WIDTH
+  InputKeyAttribute   = Unit
+  OutputName          = PixelWidthUnit
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = DetectorType
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_TYPE
+  OutputName          = DetectorType
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = ReadNoise
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_READ_NOISE
+  OutputName          = ReadNoise
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = ReadNoiseUnit
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_READ_NOISE
+  InputKeyAttribute   = Unit
+  OutputName          = ReadNoiseUnit
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = MissionPhase
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, DERIVED_HEADER_DATA)
+  InputKey            = MissionPhase
+  OutputName          = MissionPhase
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+Group = SubInstrumentIdentifier
+  Auto
+  Optional
+  InputPosition       = (CaSSIS_Header, CaSSIS_General)
+  InputKey            = DETECTOR_READ_NOISE
+  OutputName          = SubInstrumentIdentifier
+  OutputPosition      = (Object, IsisCube, Group, Archive)
+  Translation         = (*, *)
+End_Group
+
+#    <xs:element name="Sub-Instrument" type="psa:Sub-Instrument"/>
+#    <xs:complexType name="Sub-Instrument">
+#        <xs:sequence>
+#            <xs:element maxOccurs="1" minOccurs="1" name="identifier" type="pds:ASCII_String"/>
+#            <xs:element maxOccurs="1" minOccurs="1" name="name" type="pds:ASCII_String"/>
+#            <xs:element maxOccurs="1" minOccurs="1" name="type" type="pds:ASCII_String"/>
+#        </xs:sequence>
+#    </xs:complexType>
+
+End
+
