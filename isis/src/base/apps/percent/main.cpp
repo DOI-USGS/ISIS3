@@ -6,7 +6,7 @@
 #include "Process.h"
 #include "Pvl.h"
 #include "PvlFormat.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IString.h"
 
 
@@ -32,7 +32,7 @@ void IsisMain() {
   for(int i = 0; i < tokens.size(); i++) {
     double percentage = toDouble(tokens[i]);
     // Obtain the Histogram and the value at the percentage
-    Histogram *hist = icube->histogram();
+    ImageHistogram *hist = icube->histogram();
     double value = hist->Percent(percentage);
     kwPercent += toString(percentage);
     kwValue += toString(value);

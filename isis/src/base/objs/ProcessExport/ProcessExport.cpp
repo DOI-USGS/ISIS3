@@ -30,7 +30,7 @@
 #include "LineManager.h"
 #include "BandManager.h"
 #include "SpecialPixel.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "Stretch.h"
 #include "Application.h"
 #include "EndianSwapper.h"
@@ -388,7 +388,7 @@ namespace Isis {
 
       // Or get the automatic parameters
       else if (strType != "NONE") {
-        Isis::Histogram *hist = InputCubes[i]->histogram(0);
+        Isis::ImageHistogram *hist = InputCubes[i]->histogram(0);
         p_inputMinimum.push_back(hist->Percent(
                                    Application::GetUserInterface().GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(

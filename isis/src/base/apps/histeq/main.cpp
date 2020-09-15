@@ -3,7 +3,7 @@
 #include "SpecialPixel.h"
 #include "Statistics.h"
 #include "Stretch.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 
 using namespace std;
 using namespace Isis;
@@ -25,8 +25,8 @@ void IsisMain() {
   int increment = ui.GetInteger("INCREMENT");
 
   // Histograms from input cubes
-  Histogram *from = icube->histogram();
-  Histogram *match = icube->histogram();
+  ImageHistogram *from = icube->histogram();
+  ImageHistogram *match = icube->histogram();
 
   double fromMin = from->Percent(minimum);
   double fromMax = from->Percent(maximum);

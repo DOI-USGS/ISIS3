@@ -3,7 +3,7 @@
 #include "SpecialPixel.h"
 
 #include "QColor"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "Stretch.h"
 
 using namespace std;
@@ -34,9 +34,9 @@ void IsisMain() {
 
   // Automatic is selected
   if(ui.GetString("MODE") == "AUTOMATIC") {
-    Histogram *redHist = redCube->histogram();
-    Histogram *greenHist = greenCube->histogram();
-    Histogram *blueHist = blueCube->histogram();
+    ImageHistogram *redHist = redCube->histogram();
+    ImageHistogram *greenHist = greenCube->histogram();
+    ImageHistogram *blueHist = blueCube->histogram();
 
     rMin = redHist->Percent(ui.GetDouble("RMINPER"));
     rMax = redHist->Percent(ui.GetDouble("RMAXPER"));

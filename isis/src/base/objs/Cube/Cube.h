@@ -49,7 +49,7 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
-  class Histogram;
+  class ImageHistogram;
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -173,7 +173,7 @@ namespace Isis {
     public:
       Cube();
       Cube(const FileName &fileName, QString access = "r");
-      
+
       virtual ~Cube();
 
       /**
@@ -284,11 +284,11 @@ namespace Isis {
       FileName externalCubeFileName() const;
       virtual QString fileName() const;
       Format format() const;
-      virtual Histogram *histogram(const int &band = 1,
-                                   QString msg = "Gathering histogram");
-      virtual Histogram *histogram(const int &band, const double &validMin,
-                                   const double &validMax,
-                                   QString msg = "Gathering histogram");
+      virtual ImageHistogram *histogram(const int &band = 1,
+                                        QString msg = "Gathering histogram");
+      virtual ImageHistogram *histogram(const int &band, const double &validMin,
+                                        const double &validMax,
+                                        QString msg = "Gathering histogram");
       Pvl *label() const;
       int labelSize(bool actual = false) const;
       int lineCount() const;

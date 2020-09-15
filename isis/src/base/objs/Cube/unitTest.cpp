@@ -11,7 +11,7 @@
 #include "LineManager.h"
 #include "Pvl.h"
 #include "Preference.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
     // Test Histogram object on a single band, 1 by default
     cerr << "Testing histogram method, band 1 ... " << endl;
-    Histogram *bandOneHist = in.histogram();
+    ImageHistogram *bandOneHist = in.histogram();
     cerr << "Average:        " << bandOneHist->Average() << endl;
     cerr << "Standard Dev:   " << bandOneHist->StandardDeviation() << endl;
     cerr << "Mode:           " << bandOneHist->Mode() << endl;
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
 
     // Test histogram object on all bands
     cerr << "Testing histogram method, all bands ... " << endl;
-    Histogram *allBandsHistogram = in.histogram(0);
+    ImageHistogram *allBandsHistogram = in.histogram(0);
     cerr << "Average:        " << allBandsHistogram->Average() << endl;
     cerr << "Standard Dev:   " << allBandsHistogram->StandardDeviation() << endl;
     cerr << "Mode:           " << allBandsHistogram->Mode() << endl;
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    
+
     // Check error for histogram object on a closed cube
     try {
       // out has already been closed
@@ -216,9 +216,9 @@ int main(int argc, char *argv[]) {
     {
       e.print();
     }
-    
+
     cerr << endl;
-    
+
     // Test statistics object on a single band, 1 by default
     cerr << "Testing statistics method, band 1 ... " << endl;
     Statistics *bandOneStats = in.statistics();
@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    
+
     // Check error for statistics object on a closed cube
     try {
       // out has already been closed
@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
     boundaryTestCube.create("IsisCube_boundary");
     Report(boundaryTestCube);
     LineManager boundaryLine(boundaryTestCube);
-    
+
     for(boundaryLine.begin(); !boundaryLine.end(); boundaryLine++) {
       for(int i = 0; i < boundaryLine.size(); i++) {
         boundaryLine[i] = 1.0;
@@ -353,7 +353,7 @@ int main(int argc, char *argv[]) {
     // Read after the bands start in the cube.
     readBrick.SetBasePosition(1, 1, 4);
     boundaryTestCube.read(readBrick);
-    
+
     if (readBrick[0] != 1.0) {
       cerr << "\t\t Value inside cube boundary was not 1.0." << endl;
       return 1;
@@ -461,8 +461,8 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     boundaryTestCube.close();
-    
-    
+
+
     // Test cube where its chunk size is the same as its buffer shape
     cerr << "Testing one line BSQ cube (where chunk dimensions == buffer shape) ... " << endl;
     cerr << "Constructing cube ... " << endl << endl;
@@ -472,7 +472,7 @@ int main(int argc, char *argv[]) {
     bsqOneLineTestCube.create("IsisCube_bsqOneLine");
     Report(bsqOneLineTestCube);
     LineManager oneLine(bsqOneLineTestCube);
-    
+
     // our cube will be 1, 2, 3
     //                  2, 3, 4
     //                  3, 4, 5
@@ -483,10 +483,10 @@ int main(int argc, char *argv[]) {
       bsqOneLineTestCube.write(oneLine);
     }
     bsqOneLineTestCube.close();
-    
+
     // Simulate reading of an S x 1 x B cube
     Brick readLineBrick(3, 1, 1, bsqOneLineTestCube.pixelType());
-    
+
     // Test reading repeated ascending virtual bands
     cerr << "Testing reading ascending repeating virtual bands (1, 2, 2, 3)... " << endl;
     virtualBands.clear();
@@ -501,7 +501,7 @@ int main(int argc, char *argv[]) {
       bsqOneLineTestCube.read(readLineBrick);
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
-          cerr << "Virtual bands accessed incorrectly at brick band " 
+          cerr << "Virtual bands accessed incorrectly at brick band "
                << readLineBrick.Band() << endl;
           return 1;
         }
@@ -509,7 +509,7 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     bsqOneLineTestCube.close();
-    
+
      // Test reading skipped ascending virtual bands
     cerr << "Testing reading skipped ascending virtual bands (1, 3, 3)... " << endl;
     virtualBands.clear();
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
       bsqOneLineTestCube.read(readLineBrick);
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
-          cerr << "Virtual bands accessed incorrectly at virtual band " 
+          cerr << "Virtual bands accessed incorrectly at virtual band "
                << virtualBands[readLineBrick.Band() - 1] << endl;
           return 1;
         }
@@ -531,7 +531,7 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     bsqOneLineTestCube.close();
-    
+
      // Test reading outside boundaries
     cerr << "Testing reading outside of cube boundaries with virtual bands (1, 5)... " << endl;
     virtualBands.clear();
@@ -545,14 +545,14 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick.Band() == 1) {
           if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
-            cerr << "Virtual bands accessed incorrectly at virtual band " 
+            cerr << "Virtual bands accessed incorrectly at virtual band "
                  << virtualBands[readLineBrick.Band() - 1] << endl;
             return 1;
           }
         }
         else {
           if (readLineBrick[i] != Null) {
-            cerr << "Value outside cube boundary at virtual band " 
+            cerr << "Value outside cube boundary at virtual band "
                  << virtualBands[readLineBrick.Band() - 1] << endl;
           }
         }
@@ -560,7 +560,7 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     bsqOneLineTestCube.close();
-    
+
     // Test reading descending bands
     cerr << "Testing reading descending virtual bands (3, 1, 3)... " << endl;
     virtualBands.clear();
@@ -574,7 +574,7 @@ int main(int argc, char *argv[]) {
       bsqOneLineTestCube.read(readLineBrick);
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
-          cerr << "Virtual bands accessed incorrectly at virtual band " 
+          cerr << "Virtual bands accessed incorrectly at virtual band "
                << virtualBands[readLineBrick.Band() - 1] << endl;
           return 1;
         }
@@ -582,8 +582,8 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     bsqOneLineTestCube.close();
-    
-    
+
+
     // Test creating a bsq cube that exceeds 1GB sample size limit to test CubeBsqHandler
     cerr << "Testing creating large BSQ where samples exceed 1GB chunk size limit ... " << endl;
     cerr << "Constructing cube ... " << endl << endl;
@@ -597,10 +597,10 @@ int main(int argc, char *argv[]) {
 
     cerr << endl;
     largebsqTestCube.close();
-    
-    
+
+
     // Test bsq cube that has a linecount > maximum chunk line size to test CubeBsqHandler
-    cerr << "Testing creating BSQ cube where size of sample pixels exceeds cube's lineCount ... " 
+    cerr << "Testing creating BSQ cube where size of sample pixels exceeds cube's lineCount ... "
          << endl;
     cerr << "Constructing cube ... " << endl << endl;
     Cube bsqTestCube;
@@ -609,11 +609,11 @@ int main(int argc, char *argv[]) {
     bsqTestCube.setFormat(Cube::Bsq);
     bsqTestCube.create("IsisCube_bsq");
     Report(bsqTestCube);
-    
+
     cerr << endl;
     bsqTestCube.close();
-    
-    
+
+
     // Check errors
     cerr << "Testing errors ... " << endl;
     try {

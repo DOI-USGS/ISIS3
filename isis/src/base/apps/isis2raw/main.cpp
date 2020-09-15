@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "ProcessExport.h"
 #include "UserInterface.h"
 #include "SpecialPixel.h"
@@ -34,7 +34,7 @@ void IsisMain() {
 
   // Applies the input to output stretch options
   if(ui.GetString("STRETCH") == "LINEAR") {
-//    if(ui.GetString("BITTYPE") != "32BIT")
+   // if(ui.GetString("BITTYPE") != "32BIT")
     p.SetInputRange();
   }
   if(ui.GetString("STRETCH") == "MANUAL") {
@@ -68,7 +68,7 @@ void IsisMain() {
     p.SetOutputType(Isis::Real);
     pixType = NONE;
   }
-  
+
   if (ui.GetString("STRETCH") != "NONE" || ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
   }
@@ -119,7 +119,7 @@ void IsisMain() {
 
 // Validates provided range
 void checkRange(UserInterface &ui, double &min, double &max) {
-  Isis::Histogram *hist = p_cube->histogram(0);
+  Isis::ImageHistogram *hist = p_cube->histogram(0);
 
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {

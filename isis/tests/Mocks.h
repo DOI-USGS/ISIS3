@@ -18,7 +18,7 @@ class MockCube : public Cube {
     MOCK_CONST_METHOD0(bandCount, int());
     MOCK_CONST_METHOD0(fileName, QString());
     MOCK_CONST_METHOD1(physicalBand, int(const int &virtualBand));
-    MOCK_METHOD4(histogram, Histogram*(
+    MOCK_METHOD4(histogram, ImageHistogram*(
           const int &band, const double &validMin,
           const double &validMax,
           QString msg));

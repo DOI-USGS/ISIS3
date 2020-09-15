@@ -17,7 +17,7 @@ void IsisMain() {
   double gsigma = Isis::Application::GetUserInterface().GetDouble("GSIGMA");
 
   for(int i = 0; i < icube->bandCount(); i++) {
-    Histogram hist = *(icube->histogram(i + 1));
+    ImageHistogram hist = *(icube->histogram(i + 1));
     double mean = (hist.Maximum() + hist.Minimum()) / 2.0;
     double stdev = (hist.Maximum() - hist.Minimum()) / (2.0 * gsigma);
     stretch.push_back(new GaussianStretch(hist, mean, stdev));
@@ -36,4 +36,3 @@ void gauss(Buffer &in, Buffer &out) {
     out[i] = stretch[in.Band(i)-1]->Map(in[i]);
   }
 }
-

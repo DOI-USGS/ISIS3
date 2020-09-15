@@ -91,8 +91,8 @@ int main() {
   // test the Parse for when inputs are %'s
   cout << endl << "Testing new Parse that takes %'s for input side of pairs" << endl;
 
-  Histogram temp(0.0, 100.0, 101);
-  Histogram *h = &temp;
+  ImageHistogram temp(0.0, 100.0, 101);
+  ImageHistogram *h = &temp;
   for(double i = 0.0; i <= 100.0; i++) {
     h->AddData(&i, 1);
   }

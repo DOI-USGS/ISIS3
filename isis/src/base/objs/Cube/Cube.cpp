@@ -40,7 +40,7 @@
 #include "CubeTileHandler.h"
 #include "Endian.h"
 #include "FileName.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "Message.h"
@@ -106,7 +106,7 @@ namespace Isis {
    *
    * @param fileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
-   * @param label PVL label object representing the new Cube label  
+   * @param label PVL label object representing the new Cube label
    * @param isd JSON object containing Ale compatible ISD
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
@@ -118,7 +118,7 @@ namespace Isis {
     close();
     open(fileName.toString(), access);
   }
-  
+
   /**
    * Initialize Cube data from a PVL label and JSON ISD.
    *
@@ -132,15 +132,15 @@ namespace Isis {
   void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
     std::ifstream isdStream(isdFile.expanded().toStdString());
     std::ifstream labelStream(labelFile.expanded().toStdString());
-    
+
     Pvl label;
     nlohmann::json isd;
-    
+
     isdStream >> isd;
     labelStream >> label;
-    
+
     fromIsd(fileName, label, isd, access);
-    reopen("rw");  
+    reopen("rw");
   }
 
   //! Destroys the Cube object.
@@ -1381,7 +1381,7 @@ namespace Isis {
    * @throws IsisProgrammerError Band was less than zero or more than the number
    * of bands in the cube.
    */
-  Histogram *Cube::histogram(const int &band, QString msg) {
+  ImageHistogram *Cube::histogram(const int &band, QString msg) {
     return histogram(band, ValidMinimum, ValidMaximum, msg);
   }
 
@@ -1411,7 +1411,7 @@ namespace Isis {
    * @throws ProgrammerError Band was less than zero or more than the number
    * of bands in the cube.
    */
-  Histogram *Cube::histogram(const int &band, const double &validMin,
+  ImageHistogram *Cube::histogram(const int &band, const double &validMin,
                                 const double &validMax, QString msg) {
     // Make sure cube is open
     if ( !isOpen() ) {
@@ -1435,7 +1435,7 @@ namespace Isis {
     }
 
     Progress progress;
-    Histogram *hist = new Histogram(*this, band, &progress);
+    ImageHistogram *hist = new ImageHistogram(*this, band, &progress);
     LineManager line(*this);
 
     // This range is for throwing out data; the default parameters are OK always

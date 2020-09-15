@@ -25,7 +25,7 @@
 #include <QDebug>
 
 #include "Stretch.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IString.h"
 #include "SpecialPixel.h"
 #include "IException.h"
@@ -53,9 +53,9 @@ namespace Isis {
 
   /**
    * Constructs a Stretch object with default mapping of special pixel values to
-   * themselves and a provided name. 
-   *  
-   * @param name Name to use for Stretch 
+   * themselves and a provided name.
+   *
+   * @param name Name to use for Stretch
    */
   Stretch::Stretch(QString name) : Blob(name, "Stretch") {
     p_null = Isis::NULL8;
@@ -251,7 +251,7 @@ namespace Isis {
    *
    * @throws Isis::IException::User - invalid stretch pair
    */
-  void Stretch::Parse(const QString &pairs, const Isis::Histogram *hist) {
+  void Stretch::Parse(const QString &pairs, const Isis::ImageHistogram *hist) {
     // Zero out the stretch arrays
     p_input.clear();
     p_output.clear();
@@ -433,11 +433,11 @@ namespace Isis {
 
 
   /**
-   * Read saved Stretch data from a Cube into this object. 
-   *  
-   * This is called by Blob::Read() and is the actual data reading function 
-   * ultimately called when running something like cube->read(stretch);  
-   * 
+   * Read saved Stretch data from a Cube into this object.
+   *
+   * This is called by Blob::Read() and is the actual data reading function
+   * ultimately called when running something like cube->read(stretch);
+   *
    * @param is input stream containing the saved Stretch information
    */
   void Stretch::ReadData(std::istream &is) {
@@ -475,8 +475,8 @@ namespace Isis {
 
   /**
    * Get the Type of Stretch. This is only used by the AdvancedStretchTool.
-   * 
-   * @return QString Type of Stretch. 
+   *
+   * @return QString Type of Stretch.
    */
   QString Stretch::getType(){
     return p_type;
@@ -485,8 +485,8 @@ namespace Isis {
 
   /**
    * Set the Type of Stretch. This is only used by the AdvancedStretchTool.
-   *  
-   * @param stretchType The type of stretch.  
+   *
+   * @param stretchType The type of stretch.
    */
   void Stretch::setType(QString stretchType){
     // check to see if valid input
@@ -498,16 +498,16 @@ namespace Isis {
    *  Initializes for writing stretch to cube blob
    */
   void Stretch::WriteInit() {
-    p_nbytes = Text().toStdString().size(); 
+    p_nbytes = Text().toStdString().size();
   }
 
 
   /**
-   * Writes the stretch information to a cube. 
-   *  
-   * This is called by Blob::write() and is ultimately the function 
-   * called when running something like cube->write(stretch);  
-   *  
+   * Writes the stretch information to a cube.
+   *
+   * This is called by Blob::write() and is ultimately the function
+   * called when running something like cube->write(stretch);
+   *
    * @param os output stream to write the stretch data to.
    */
   void Stretch::WriteData(std::fstream &os) {
@@ -515,5 +515,3 @@ namespace Isis {
   }
 
 } // end namespace isis
-
-
