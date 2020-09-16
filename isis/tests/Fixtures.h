@@ -98,6 +98,13 @@ namespace Isis {
       void SetUp() override;
       void TearDown() override;
   };
+
+  class Hayabusa2OncW2Cube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
+
 }
 
 #endif
