@@ -77,10 +77,6 @@ namespace Isis {
       void RemoveData(const double *data, const unsigned int count);
 
       void BinRange(const int index, double &low, double &high) const;
-
-    private:
-      //! The array of counts.
-      std::vector<BigInt> p_bins;
   };
 };
 

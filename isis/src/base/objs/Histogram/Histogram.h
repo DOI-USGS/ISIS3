@@ -131,7 +131,10 @@ namespace Isis {
       //void SetBinRange(double binStart, double binEnd);
       void SetValidRange(const double minimum = Isis::ValidMinimum,
                                        const double maximum = Isis::ValidMaximum);
-
+    protected:
+      //! The array of counts.
+      std::vector<BigInt> p_bins;
+      
     private:
       void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
           int nbins = 0, double startSample = Null, double startLine = Null,
@@ -140,8 +143,6 @@ namespace Isis {
       void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
       void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
 
-      //! The array of counts.
-      std::vector<BigInt> p_bins;
       double p_binRangeStart, p_binRangeEnd;
   };
 };
