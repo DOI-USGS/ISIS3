@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "ProcessExport.h"
 #include "UserInterface.h"
 #include "SpecialPixel.h"
@@ -119,7 +119,7 @@ void IsisMain() {
 
 // Validates provided range
 void checkRange(UserInterface &ui, double &min, double &max) {
-  Isis::ImageHistogram *hist = p_cube->histogram(0);
+  Isis::Histogram *hist = p_cube->histogram(0);
 
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {

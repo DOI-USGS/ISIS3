@@ -106,9 +106,9 @@ namespace Isis {
       void SetBins(const int bins);
 
       void Reset();
-      void AddData(const double *data, const unsigned int count);
-      void AddData(const double data);
-      void RemoveData(const double *data, const unsigned int count);
+      virtual void AddData(const double *data, const unsigned int count);
+      virtual void AddData(const double data);
+      virtual void RemoveData(const double *data, const unsigned int count);
 
       double Median() const;
       double Mode() const;
@@ -116,7 +116,7 @@ namespace Isis {
       double Skew() const;
 
       BigInt BinCount(const int index) const;
-      void BinRange(const int index, double &low, double &high) const;
+      virtual void BinRange(const int index, double &low, double &high) const;
       double BinMiddle(const int index) const;
       double BinSize() const;
       int Bins() const;
@@ -134,7 +134,7 @@ namespace Isis {
     protected:
       //! The array of counts.
       std::vector<BigInt> p_bins;
-      
+
     private:
       void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
           int nbins = 0, double startSample = Null, double startLine = Null,

@@ -25,7 +25,7 @@
 #include <QDebug>
 
 #include "Stretch.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "IString.h"
 #include "SpecialPixel.h"
 #include "IException.h"
@@ -251,7 +251,7 @@ namespace Isis {
    *
    * @throws Isis::IException::User - invalid stretch pair
    */
-  void Stretch::Parse(const QString &pairs, const Isis::ImageHistogram *hist) {
+  void Stretch::Parse(const QString &pairs, const Isis::Histogram *hist) {
     // Zero out the stretch arrays
     p_input.clear();
     p_output.clear();

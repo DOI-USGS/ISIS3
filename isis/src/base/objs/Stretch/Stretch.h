@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 #include "Pvl.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "Blob.h"
 
 namespace Isis {
@@ -173,7 +173,7 @@ namespace Isis {
       double Map(const double value) const;
 
       void Parse(const QString &pairs);
-      void Parse(const QString &pairs, const Isis::ImageHistogram *hist);
+      void Parse(const QString &pairs, const Isis::Histogram *hist);
 
       QString Text() const;
 

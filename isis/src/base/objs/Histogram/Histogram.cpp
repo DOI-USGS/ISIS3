@@ -633,6 +633,7 @@ namespace Isis {
    */
   void Histogram::BinRange(const int index,
                            double &low, double &high) const {
+    std::cout << "IN HISTOGRAM BINRANGE" << '\n';
     if ( (index < 0) || (index >= (int)p_bins.size() ) ) {
 
       QString message = Message::ArraySubscriptNotInRange(index);

@@ -1381,7 +1381,7 @@ namespace Isis {
    * @throws IsisProgrammerError Band was less than zero or more than the number
    * of bands in the cube.
    */
-  ImageHistogram *Cube::histogram(const int &band, QString msg) {
+  Histogram *Cube::histogram(const int &band, QString msg) {
     return histogram(band, ValidMinimum, ValidMaximum, msg);
   }
 
@@ -1411,7 +1411,7 @@ namespace Isis {
    * @throws ProgrammerError Band was less than zero or more than the number
    * of bands in the cube.
    */
-  ImageHistogram *Cube::histogram(const int &band, const double &validMin,
+  Histogram *Cube::histogram(const int &band, const double &validMin,
                                 const double &validMax, QString msg) {
     // Make sure cube is open
     if ( !isOpen() ) {
@@ -1435,7 +1435,7 @@ namespace Isis {
     }
 
     Progress progress;
-    ImageHistogram *hist = new ImageHistogram(*this, band, &progress);
+    Histogram *hist = new ImageHistogram(*this, band, &progress);
     LineManager line(*this);
 
     // This range is for throwing out data; the default parameters are OK always

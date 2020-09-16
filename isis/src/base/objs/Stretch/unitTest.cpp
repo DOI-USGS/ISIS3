@@ -6,7 +6,7 @@
 #include "Stretch.h"
 #include "IException.h"
 #include "Preference.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 
 using namespace Isis;
 using namespace std;

@@ -3,7 +3,7 @@
 #include "SpecialPixel.h"
 #include "Statistics.h"
 #include "Stretch.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 
 using namespace std;
 using namespace Isis;
@@ -16,10 +16,10 @@ void IsisMain() {
   // Setup the input and output cubes along with histograms
   ProcessByLine p;
   Cube *mcube = p.SetInputCube("MATCH", Isis::OneBand);
-  ImageHistogram *match = mcube->histogram();
+  Histogram *match = mcube->histogram();
   p.ClearInputCubes();
   Cube *icube = p.SetInputCube("FROM", Isis::OneBand);
-  ImageHistogram *from = icube->histogram();
+  Histogram *from = icube->histogram();
   p.SetOutputCube("TO");
 
   // Histogram specifications

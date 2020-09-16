@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "UserInterface.h"
 #include "Pvl.h"
 #include "Cube.h"
@@ -29,7 +29,7 @@ void IsisMain(){
   A histogram is made from the input cube, as the default min of the
   bit2bit output is at .5% of the data range, and the default max is at 99.5%
   */
-  ImageHistogram* histptr = cubeptr -> histogram();
+  Histogram* histptr = cubeptr -> histogram();
 
   double maxper = histptr -> Percent(ui.GetDouble("MAXPER"));
   double minper = histptr -> Percent(ui.GetDouble("MINPER"));
@@ -70,7 +70,7 @@ void IsisMain(){
 
     p.StartProcess(populate);
 
-    ImageHistogram* ohistptr =  (ocubeptr -> histogram(1,validMin,validMax));
+    Histogram* ohistptr =  (ocubeptr -> histogram(1,validMin,validMax));
     int iLrs = histptr -> LrsPixels();
     int iHrs = histptr -> HrsPixels();
     int iNull = histptr -> NullPixels();

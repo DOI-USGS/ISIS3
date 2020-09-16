@@ -25,7 +25,7 @@
 
 #include "Statistics.h"
 #include "Histogram.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "Stretch.h"
 #include "IException.h"
 #include "Constants.h"

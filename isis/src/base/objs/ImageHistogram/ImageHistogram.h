@@ -72,11 +72,11 @@ namespace Isis {
 
       ~ImageHistogram();
 
-      void AddData(const double *data, const unsigned int count);
-      void AddData(const double data);
-      void RemoveData(const double *data, const unsigned int count);
+      virtual void AddData(const double *data, const unsigned int count);
+      virtual void AddData(const double data);
+      virtual void RemoveData(const double *data, const unsigned int count);
 
-      void BinRange(const int index, double &low, double &high) const;
+      virtual void BinRange(const int index, double &low, double &high) const;
   };
 };
 

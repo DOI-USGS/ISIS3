@@ -11,7 +11,7 @@
 #include "LineManager.h"
 #include "Pvl.h"
 #include "Preference.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
     // Test Histogram object on a single band, 1 by default
     cerr << "Testing histogram method, band 1 ... " << endl;
-    ImageHistogram *bandOneHist = in.histogram();
+    Histogram *bandOneHist = in.histogram();
     cerr << "Average:        " << bandOneHist->Average() << endl;
     cerr << "Standard Dev:   " << bandOneHist->StandardDeviation() << endl;
     cerr << "Mode:           " << bandOneHist->Mode() << endl;
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
 
     // Test histogram object on all bands
     cerr << "Testing histogram method, all bands ... " << endl;
-    ImageHistogram *allBandsHistogram = in.histogram(0);
+    Histogram *allBandsHistogram = in.histogram(0);
     cerr << "Average:        " << allBandsHistogram->Average() << endl;
     cerr << "Standard Dev:   " << allBandsHistogram->StandardDeviation() << endl;
     cerr << "Mode:           " << allBandsHistogram->Mode() << endl;

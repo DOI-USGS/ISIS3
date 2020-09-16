@@ -7,7 +7,7 @@
 #include "CubeAttribute.h"
 #include "Cube.h"
 #include "FileName.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "Pvl.h"
 #include "UserInterface.h"
 
@@ -116,7 +116,7 @@ namespace Isis {
     int bandCount = cube->bandCount();
 
     for (int i = 1; i <= bandCount; i++) {
-      ImageHistogram *stats = cube->histogram(i, validMin, validMax);
+      Histogram *stats = cube->histogram(i, validMin, validMax);
 
       // Construct a label with the results
       PvlGroup results("Results");
