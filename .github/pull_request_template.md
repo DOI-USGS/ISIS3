@@ -36,7 +36,7 @@
 - [ ] I have updated the documentation accordingly.
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.
-- [ ] I have added myself to the [AUTHORS.rst](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/AUTHORS.rst) document.
+- [ ] I have added myself to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document.
 - [ ] I have added any user impacting changes to the [CHANGELOG.md](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) document.
 
 ## Licensing

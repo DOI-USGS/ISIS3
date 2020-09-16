@@ -1,67 +1,64 @@
 ISIS3 Contributors
 ==================
 
-- Aaron Curtis 
-- Adam Goins 
-- Adam Paquette 
-- Andrew Annex 
-- Andrew Stebenne 
-- Austin Sanders 
-- B. Seignovert 
-- Christopher Austin  
-- Christopher Ryan Combs Jr 
-- Cole Neubauer 
-- Curtis Rose 
-- David Miller 
-- Debbie Cook 
-- Ella Mae Lee 
-- Elpitha Howington-Kraus 
+- Jason Laura
+- Jesse Mapel
+- Kristin Berry
+- Kaitlyn Lee
+- Kelvin Rodriguez
+- Stuart Sides
+- Adam Paquette
+- Kaj Williams
+- Austin Sanders
+- Lauren Adoram-Kershner
+- John Shinaman
+- Lynn Weller
+- Evin Dunn
+- Tim Giroux
+- Tracie Sucharski
+- Jeanie Backer
+- Adam Goins
+- Makayla Shepard
+- Christopher Combs
+- Debbie Cook
+- Kris Becker
+- Summer Stapleton
+- Cole Neubauer
+- Tyler Wilson
+- Aaron Giroux
+- Moses Milazzo
+- Ross Beyer
+- Elpitha Howington-Kraus
+- Kenneth Edmundson
+- Raad Saleh
+- Oleg Alexandrov
+- Aaron Curtis
 - Eric Gault
-- Eric Hyer 
-- Evin Dunn 
-- Ian Humphrey 
-- Jac Shinaman 
-- Jai Rideout 
-- James Alexander Crough 
-- Janet Barrett 
-- Jason Laura 
-- Jeannie Backer 
-- Jeff Anderson 
-- Jeffrey Covington 
-- Jesse Mapel 
-- John Bonn 
-- Kaitlyn Lee 
-- Kaj E Williams  
-- Kelvin Rodriguez 
-- Ken Edmundson 
-- Kim Oyama  
-- Kris Becker 
-- Kristin Berry 
-- Lauren Adoram-Kershner  
-- Lynn Weller 
-- Mackenzie Boyd 
-- Makayla Shepherd 
-- Marjorie Hahn 
-- Mathew Eis 
-- Michael Aye 
-- Moses Milazzo 
-- Oleg Alexandrov 
-- Orrin Thomas 
-- Peter Giroux 
-- Raad A. Saleh 
-- Ross Beyer 
-- Sasha Brownsberger 
-- Sharmilla Prasad 
-- Steven Lambright 
-- Stuart Sides 
-- Summer Stapleton 
-- Tracie Sucharski 
-- Travis Addair 
-- Tyler Wilson 
-- Victor Silva 
+- Andrew Annex
+- Victor Silva
+- Benoit Seignovert
+- Andrew Stebenne
+- Christopher Austin
+- Curtis Rose
+- David Miller
+- Ella Mae Lee
+- Eric Heyer
+- Ian Humphrey
+- Jai Rideout
+- James Alexander Crough
+- Janet Barrett
+- Jeff Anderson
+- Jeffrey Covington
+- John Bonn
+- Kim Oyama
+- Mackenzie Boyd
+- Marjorie Hahn
+- Mathew Eis
+- Orrin Thomas
+- Sasha Brownsberger
+- Sharmilla Prasad
+- Steven Lambright
+- Travis Addair
 
 -----
-This list was initially generated using this bash command (additional manual edits are needed):
-
-git log --pretty="- %an %n" | sort | uniq -i >> AUTHORS.rst
-
+This list was generated from the .zenodo.json file by running python zenodo_to_authors.py.
