@@ -40,7 +40,7 @@ TEST_F(Hayabusa2OncW2Cube, FunctionalTestHyb2Pds4GenDefault) {
   
   testCube = new Cube(fileName, "rw");
 
-  QVector<QString> args = {"to=/tmp/output", "PDS4LOGICALIDENTIFIER=Whatever"};
+  QVector<QString> args = {"to="+ tempDir.path() + "/output", "PDS4LOGICALIDENTIFIER=Whatever"};
   UserInterface options(APP_XML, args);
   
   hyb2pds4gen(testCube, options);
