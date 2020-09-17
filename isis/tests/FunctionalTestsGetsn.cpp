@@ -17,18 +17,15 @@
 
 using namespace Isis;
 
-
-static QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
-
 // check for all correct outputs
 TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
-  QString d_APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString expectedSN = "Viking1/VISB/33322515";
   QString expectedON = "Viking1/VISB/33322515";
   QVector<QString> args = { "FILE=TRUE",
                            "SN=TRUE",
                            "OBSERVATION=TRUE"};
-  UserInterface options(d_APP_XML, args);
+  UserInterface options(APP_XML, args);
   Pvl appLog;
 
   getsn( testCube, options, &appLog );
@@ -44,6 +41,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
 // Set sn=false; so all output params are false
 // resulting data should not contain any of the three output types
 TEST_F(DefaultCube, FunctionalTestGetsnAllFalse) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QVector<QString> args = { "SN=FALSE" };
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -60,6 +58,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllFalse) {
 // Test the param DEFAULT=TRUE
 // when no SN can be generated, the SN should default to the file name
 TEST_F(DefaultCube, FunctionalTestGetsnDefaultTrue) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString fileName = "default.cub";
   QVector<QString> args = { "DEFAULT=TRUE" };
   UserInterface options(APP_XML, args);
@@ -77,6 +76,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnDefaultTrue) {
 // Test the param DEFAULT=FALSE
 // when no SN can be generated, the SN should default to "Unknown"
 TEST_F(DefaultCube, FunctionalTestGetsnDefaultFalse) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString fileName = "Unknown";
   QVector<QString> args = {  "DEFAULT=FALSE" };
   UserInterface options(APP_XML, args);
@@ -93,6 +93,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnDefaultFalse) {
 
 // Test flatfile mode gives expected output
 TEST_F(DefaultCube, FunctionalTestGetsnFlat) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString expectedSN = "Viking1/VISB/33322515";
   QFile flatFile(tempDir.path()+"/testOut.txt");
   QVector<QString> args = {
@@ -113,6 +114,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnFlat) {
 
 // Test that append true appends to file
 TEST_F(DefaultCube, FunctionalTestGetsnAppend) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QFile flatFile(tempDir.path()+"testOut.txt");
   QVector<QString> args = {
 			                "FORMAT=FLAT",
@@ -132,6 +134,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAppend) {
 
 // Test that append false overwrites file
 TEST_F(DefaultCube, FunctionalTestGetsnOverwrite) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QFile flatFile(tempDir.path()+"testOut.txt");
   QVector<QString> args = {
 			                "FORMAT=FLAT",
