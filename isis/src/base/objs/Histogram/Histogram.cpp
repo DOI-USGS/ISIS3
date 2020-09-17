@@ -137,9 +137,6 @@ namespace Isis {
 
     //set the ranges
     rangesFromNet(net,statFunc);
-
-    //add all the data to the now setup histogram
-    addMeasureDataFromNet(net,statFunc);
   }
 
 
@@ -162,8 +159,6 @@ namespace Isis {
     }
 
    //get the range of the data
-
-
    rangesFromNet(net,statFunc);
 
    //Keep an eye on this to see if it breaks anything.  Also, I need to create
@@ -173,9 +168,6 @@ namespace Isis {
    double domain = this->ValidMaximum() - this->ValidMinimum();
    int nBins = int ( ceil(domain/binWidth) );
    SetBins(nBins);
-
-   //add all the data to the now setup histogram
-   addMeasureDataFromNet(net,statFunc);
   }
 
 
@@ -202,8 +194,7 @@ namespace Isis {
         const ControlMeasure *measure = point->GetMeasure(j);
 
         if (measure->IsIgnored())  continue;
-
-        AddData((measure->*statFunc)());
+        this->AddData((measure->*statFunc)());
       }
     }
   }

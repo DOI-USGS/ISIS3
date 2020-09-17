@@ -7,6 +7,7 @@
 
 #include "CubePlotCurve.h"
 #include "Histogram.h"
+#include "ImageHistogram.h"
 #include "HistogramItem.h"
 #include "HistogramPlotWindow.h"
 #include "LineManager.h"
@@ -63,10 +64,10 @@ void IsisMain() {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-    hist = new Histogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
+    hist = new ImageHistogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
   }
   else {
-    hist = new Histogram(*icube, 1, p.Progress());
+    hist = new ImageHistogram(*icube, 1, p.Progress());
 
     if (ui.WasEntered("NBINS")){
       hist->SetBins(ui.GetInteger("NBINS"));
@@ -270,7 +271,7 @@ void helperButtonCalcMinMax() {
     line.SetLine(i);
     inCube.read(line);
     cubeStats.AddData(line.DoubleBuffer(), line.size());
-  }  
+  }
 
   inCube.close();
 
@@ -281,4 +282,3 @@ void helperButtonCalcMinMax() {
   ui.PutDouble("MAXIMUM", cubeStats.Maximum());
 
 }
-

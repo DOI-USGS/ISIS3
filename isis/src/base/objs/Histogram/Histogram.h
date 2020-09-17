@@ -135,13 +135,14 @@ namespace Isis {
       //! The array of counts.
       std::vector<BigInt> p_bins;
 
+
+      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+
     private:
       void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
           int nbins = 0, double startSample = Null, double startLine = Null,
           double endSample = Null, double endLine = Null);
-
-      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
-      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
 
       double p_binRangeStart, p_binRangeEnd;
   };

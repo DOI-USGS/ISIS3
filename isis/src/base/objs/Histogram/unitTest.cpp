@@ -2,6 +2,7 @@
 #include <QList>
 #include "QRegularExpression"
 #include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IException.h"
 #include "Preference.h"
 #include "LineManager.h"
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]) {
     // Old unit test begins here
 
     Isis::Preference::Preferences(true);
-    Isis::Histogram h(-10.0, 10.0, 21);
+    Isis::ImageHistogram h(-10.0, 10.0, 21);
     double low, high;
 
     try {
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-      Isis::Histogram g(1.0, 0.0);
+      Isis::ImageHistogram g(1.0, 0.0);
     }
     catch(Isis::IException &e) {
       e.print();
@@ -168,7 +169,7 @@ int main(int argc, char *argv[]) {
 
 
   try {
-    hist1 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,20);
+    hist1 = new Isis::ImageHistogram(net, &Isis::ControlMeasure::GetResidualMagnitude, 20);
     cout << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
     cout << endl;
@@ -194,7 +195,7 @@ int main(int argc, char *argv[]) {
 
 
   try {
-    hist2 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,.01);
+    hist2 = new Isis::ImageHistogram(net, &Isis::ControlMeasure::GetResidualMagnitude, .01);
     cout << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
     cout << "Constructor2:   " << endl;
@@ -226,7 +227,7 @@ int main(int argc, char *argv[]) {
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
-    histcube = new Isis::Histogram(icube, 1);
+    histcube = new Isis::ImageHistogram(icube, 1);
 
     cout << endl;
 
@@ -267,7 +268,7 @@ int main(int argc, char *argv[]) {
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
-    histcube = new Isis::Histogram(icube, 1);
+    histcube = new Isis::ImageHistogram(icube, 1);
 
     cout << endl;
 
@@ -308,7 +309,7 @@ int main(int argc, char *argv[]) {
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
-    histcube = new Isis::Histogram(icube, 1);
+    histcube = new Isis::ImageHistogram(icube, 1);
 
     cout << endl;
 
@@ -349,7 +350,7 @@ int main(int argc, char *argv[]) {
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
-    histcube = new Isis::Histogram(icube, 1);
+    histcube = new Isis::ImageHistogram(icube, 1);
 
     cout << endl;
 
@@ -388,8 +389,8 @@ int main(int argc, char *argv[]) {
   int nbins = 5;
 
   Isis::Histogram *ahist, *bhist;
-  ahist = new Isis::Histogram (low1,high1,nbins);
-  bhist = new Isis::Histogram (low1,high1,nbins);
+  ahist = new Isis::ImageHistogram (low1,high1,nbins);
+  bhist = new Isis::ImageHistogram (low1,high1,nbins);
 
   double a[9];
   a[0] = 1.0;

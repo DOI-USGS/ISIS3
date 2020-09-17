@@ -89,7 +89,10 @@ namespace Isis {
    * @throws The number of Histogram Bins must be greater than 0.
    */
   ImageHistogram::ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins) :
-  Histogram(net, statFunc, bins){
+  Histogram(net, statFunc, bins) {
+
+    //add all the data to the now setup histogram
+    addMeasureDataFromNet(net,statFunc);
   }
 
 
@@ -103,8 +106,10 @@ namespace Isis {
    * @throws The width of Histogram Bins must be greater than 0.
    */
   ImageHistogram::ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const,
-                       double binWidth) :
-  Histogram(net, statFunc, binWidth) {
+                                 double binWidth) : Histogram(net, statFunc, binWidth) {
+
+    //add all the data to the now setup histogram
+    addMeasureDataFromNet(net,statFunc);
   }
 
 
