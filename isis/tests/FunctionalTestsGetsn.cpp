@@ -22,22 +22,22 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
 
 // check for all correct outputs
 TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
+  QString d_APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString expectedSN = "Viking1/VISB/33322515";
   QString expectedON = "Viking1/VISB/33322515";
   QVector<QString> args = { "FILE=TRUE",
                            "SN=TRUE",
                            "OBSERVATION=TRUE"};
-  //UserInterface options(APP_XML, args);
+  UserInterface options(d_APP_XML, args);
   Pvl appLog;
 
   ASSERT_TRUE(1==1);
-  /*getsn( testCube, options, &appLog );
+  getsn( testCube, options, &appLog );
   PvlGroup results = appLog.findGroup("Results");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), testCube->fileName());
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("SerialNumber"), expectedSN);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("ObservationNumber"), expectedON);
-  */
 }
 
 
