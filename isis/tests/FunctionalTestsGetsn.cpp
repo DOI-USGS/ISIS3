@@ -22,16 +22,15 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
 
 // check for all correct outputs
 TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
-  ASSERT_TRUE(1==1);
-  /*
   QString expectedSN = "Viking1/VISB/33322515";
   QString expectedON = "Viking1/VISB/33322515";
   QVector<QString> args = { "FILE=TRUE",
                            "SN=TRUE",
                            "OBSERVATION=TRUE"};
-  UserInterface options(APP_XML, args);
+  //UserInterface options(APP_XML, args);
   Pvl appLog;
 
+  ASSERT_TRUE(1==1);
   /*getsn( testCube, options, &appLog );
   PvlGroup results = appLog.findGroup("Results");
 
