@@ -122,7 +122,6 @@ namespace Isis {
    */
   void ImageHistogram::AddData(const double *data,
                           const unsigned int count) {
-    std::cout << "IN IMAGEHIST ADDDATA LIST" << '\n';
     Statistics::AddData(data, count);
 
     int nbins = p_bins.size();
@@ -150,7 +149,6 @@ namespace Isis {
    * @param data a single observation to be added to the histogram
    */
   void ImageHistogram::AddData(const double data) {
-    std::cout << "IN IMAGEHIST ADDDATA" << '\n';
     Statistics::AddData(data);
 
     int nbins = p_bins.size();
@@ -180,7 +178,6 @@ namespace Isis {
    */
   void ImageHistogram::RemoveData(const double *data,
                              const unsigned int count) {
-    std::cout << "IN IMAGEHIST REMOVEDATA LIST" << '\n';
     Statistics::RemoveData(data, count);
 
     int nbins = p_bins.size();
@@ -215,7 +212,6 @@ namespace Isis {
    */
   void ImageHistogram::BinRange(const int index,
                                 double &low, double &high) const {
-    std::cout << "IN IMAGE HIST BINRANGE" << '\n';
     if ( (index < 0) || (index >= (int)p_bins.size() ) ) {
 
       QString message = Message::ArraySubscriptNotInRange(index);

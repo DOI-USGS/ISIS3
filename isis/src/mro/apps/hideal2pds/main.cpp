@@ -12,7 +12,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "FileName.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "LineManager.h"
 #include "Longitude.h"
 #include "OriginalLabel.h"
@@ -78,7 +78,7 @@ void IsisMain() {
     if (ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
       // Set up a histogram for this band. This call sets the input range
       // by making an initial stats pass to find the data min and max
-      Histogram hist(*inputCube, band, pHist.Progress());
+      ImageHistogram hist(*inputCube, band, pHist.Progress());
 
       // Loop and accumulate histogram
       pHist.Progress()->SetText("Gathering Histogram");

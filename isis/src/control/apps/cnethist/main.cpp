@@ -9,6 +9,7 @@
 #include "FileList.h"
 #include "Process.h"
 #include "Histogram.h"
+#include "ImageHistogram.h"
 #include "UserInterface.h"
 #include "Progress.h"
 #include "LineManager.h"
@@ -92,7 +93,7 @@ void IsisMain() {
     Histogram *hist;
     // Setup the histogram
     try {
-      hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+      hist = new ImageHistogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
     }
     catch (IException &e) {
       QString msg = "The following error was thrown while building a histogram from netfile [" +
