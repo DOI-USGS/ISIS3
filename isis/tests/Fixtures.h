@@ -238,7 +238,7 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
-  
+
   class OsirisRexCube : public DefaultCube {
     protected:
       void setInstrument(QString ikid, QString instrumentId);
@@ -268,43 +268,49 @@ namespace Isis {
     MockRasterGM mockModel;
 
     void SetUp() override;
-};
+  };
 
 
-class CSMCameraFixture : public CSMCubeFixture {
-  protected:
-    Camera *testCam;
+  class CSMCameraFixture : public CSMCubeFixture {
+    protected:
+      Camera *testCam;
 
-    void SetUp() override;
-};
-
-
-class CSMCameraSetFixture : public CSMCameraFixture {
-  protected:
-    csm::Ellipsoid wgs84;
-    csm::ImageCoord imagePt;
-    csm::EcefCoord groundPt;
-    csm::EcefLocus imageLocus;
-
-    void SetUp() override;
-};
+      void SetUp() override;
+  };
 
 
-class CSMCameraDemFixture : public CSMCubeFixture {
-  protected:
-    Camera *testCam;
-    double demRadius;
+  class CSMCameraSetFixture : public CSMCameraFixture {
+    protected:
+      csm::Ellipsoid wgs84;
+      csm::ImageCoord imagePt;
+      csm::EcefCoord groundPt;
+      csm::EcefLocus imageLocus;
 
-    void SetUp() override;
-};
+      void SetUp() override;
+  };
 
-class HistoryBlob : public TempTestingFiles {
-  protected:
-    Blob historyBlob;
-    PvlObject historyPvl;
 
-    void SetUp() override;
-};
+  class CSMCameraDemFixture : public CSMCubeFixture {
+    protected:
+      Camera *testCam;
+      double demRadius;
+
+      void SetUp() override;
+  };
+
+  class HistoryBlob : public TempTestingFiles {
+    protected:
+      Blob historyBlob;
+      PvlObject historyPvl;
+
+      void SetUp() override;
+  };
+
+  class Hayabusa2OncW2Cube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
+  };
+
 }
 
 #endif

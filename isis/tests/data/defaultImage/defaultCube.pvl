@@ -89,6 +89,16 @@ Object = IsisCube
     Status   = Nominal
   End_Group
 End_Object
+Object = History
+  Name      = IsisCube
+  StartByte = 711140
+  Bytes     = 16092
+End_Object
+Object = OriginalLabel
+    Name      = IsisCube
+    StartByte = 705777
+    Bytes     = 5363
+End_Object
 Object = Label
     Bytes = 65536
 End_Object

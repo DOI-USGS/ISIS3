@@ -214,7 +214,6 @@ namespace Isis {
 
   void DefaultCube::SetUp() {
     TempTestingFiles::SetUp();
-
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     std::ifstream projCubeLabel("data/defaultImage/projDefaultCube.pvl");
@@ -268,9 +267,9 @@ namespace Isis {
     LineManager line(*testCube);
     int pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= testCube->lineCount(); i++) { 
+      for (int i = 1; i <= testCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -294,9 +293,9 @@ namespace Isis {
     line = LineManager(*projTestCube);
     pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= projTestCube->lineCount(); i++) { 
+      for (int i = 1; i <= projTestCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -605,7 +604,7 @@ namespace Isis {
   void GalileoSsiCube::SetUp() {
     DefaultCube::SetUp();
 
-    // Change default dims 
+    // Change default dims
     PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
     dim.findKeyword("Samples").setValue("800");
     dim.findKeyword("Lines").setValue("800");
@@ -620,7 +619,7 @@ namespace Isis {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue("-77001");
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-    
+
     std::istringstream iss(R"(
       Group = Instrument
         SpacecraftName            = "Galileo Orbiter"
@@ -678,7 +677,7 @@ namespace Isis {
         INS-77001_BORESIGHT_LINE   = 400.0
       End_Object
     )");
-    
+
     PvlObject newNaifKeywords;
     nk >> newNaifKeywords;
     naifKeywords = newNaifKeywords;
@@ -693,8 +692,8 @@ namespace Isis {
     End_Group
     )");
 
-    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
-    PvlGroup newArchive; 
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive");
+    PvlGroup newArchive;
     ar >> newArchive;
     archive = newArchive;
 
@@ -1056,8 +1055,8 @@ namespace Isis {
 
     FileName newCube(tempDir.path() + "/testing.cub");
 
-    testCube->fromIsd(newCube, label, isd, "rw");    
-    
+    testCube->fromIsd(newCube, label, isd, "rw");
+
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
     kernels["ShapeModel"] = "Null";
@@ -1095,8 +1094,8 @@ namespace Isis {
     bandBin = newBandBin;
 
     json nk;
-    nk["BODY2101955_RADII"] =  {2825, 2675, 254}; 
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0; 
+    nk["BODY2101955_RADII"] =  {2825, 2675, 254};
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0;
     nk["INS"+ikid.toStdString()+"_PIXEL_SIZE"] = 8.5;
     nk["CLOCK_ET_-64_1/0600694569.00000_COMPUTED"] = "8ed6ae8930f3bd41";
     nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.0085, 0.0};
@@ -1105,12 +1104,12 @@ namespace Isis {
     nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, -117.64705882353};
     nk["INS"+ikid.toStdString()+"_CCD_CENTER"] = {511.5, 511.5};
     nk["BODY_FRAME_CODE"] = 2101955;
-    
+
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
     PvlObject newNaifKeywords("NaifKeywords", nk);
     naifKeywords = newNaifKeywords;
 
-    QString fileName = testCube->fileName();  
+    QString fileName = testCube->fileName();
     delete testCube;
     testCube = new Cube(fileName, "rw");
  }
@@ -1285,4 +1284,94 @@ namespace Isis {
     testCube.reset();
   }
 
+  void Hayabusa2OncW2Cube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+      SpacecraftName                  = HAYABUSA-2
+      InstrumentId                    = ONC-W2
+      InstrumentName                  = "Optical Navigation Camera"
+      TargetName                      = Mars
+      StartTime                       = 2015-12-03T07:29:58.232
+      StopTime                        = 2015-12-03T07:29:58.234
+      ExposureDuration                = 0.00272 <seconds>
+      RawSpacecraftClockCount         = 0x3C38845A <1/32 sec>
+      Binning                         = 1
+      SelectedImageAreaX1             = 1
+      SelectedImageAreaY1             = 1
+      SelectedImageAreaX2             = 1024
+      SelectedImageAreaY2             = 1
+      SelectedImageAreaX3             = 1
+      SelectedImageAreaY3             = 1024
+      SelectedImageAreaX4             = 1024
+      SelectedImageAreaY4             = 1024
+      SmearCorrection                 = NON
+      OffsetCorrection                = N/A
+      FlatCorrection                  = NON
+      RadianceConversion              = NON
+      PhotometricCorrection           = NON
+      BandRegistration                = NON
+      L2BFlatFileName                 = N/A
+      L2BSystemEfficiencyFileName     = N/A
+      L2CShapeModelFileName           = N/A
+      L2DPhaseFunctionFileName        = N/A
+      L2DShapeModelFileName           = N/A
+      SubImageCount                   = 1
+      BusLineVoltage                  = 49.28 <V>
+      ONCCurrent                      = 0.52 <V>
+      FLACCurrent                     = 0.00 <V>
+      ONCAETemperature                = 1.53 <degC>
+      ONCTOpticsTemperature           = 19.17 <degC>
+      ONCTCCDTemperature              = -29.62 <degC>
+      ONCTElectricCircuitTemperature  = -11.96 <degC>
+      ONCW1OpticsTemperature          = 1.42 <degC>
+      ONCW1CCDTemperature             = -24.98 <degC>
+      ONCW1ElectricCircuitTemperature = -10.90 <degC>
+      ONCW2OpticsTemperature          = 1.28 <degC>
+      ONCW2CCDTemperature             = -24.67 <degC>
+      ONCW2ElectricCircuitTemperature = -4.12 <degC>
+      FLACTemperature                 = -15.27 <degC>
+    End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+    newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+    inst = newInstGroup;
+
+    PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
+    PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
+    inst += startcc;
+    inst += stopcc;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+
+    json nk;
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 10.44;
+    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.013;
+    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.013, 0.0};
+    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, 0.013};
+    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 76.923076923077, 0.0};
+    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, 76.923076923077};
+    nk["INS"+ikid.toStdString()+"_BORESIGHT_LINE"] = 490.5;
+    nk["INS"+ikid.toStdString()+"_BORESIGHT_SAMPLE"] = 512.5;
+    nk["INS"+ikid.toStdString()+"_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
+    nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
+    nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
+    nk["BODY_CODE"] = 499;
+    nk["BODY_FRAME_CODE"] = 10014;
+    PvlObject newNaifKeywords("NaifKeywords", nk);
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();
+    // need to remove old camera pointer
+    delete testCube;
+    // This is now a Hayabusa cube
+    testCube = new Cube(fileName, "rw");
+  }
 }
