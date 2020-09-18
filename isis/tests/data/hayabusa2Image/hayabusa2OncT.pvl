@@ -2,12 +2,12 @@ Object = IsisCube
   Object = Core
     StartByte   = 65537
     Format      = Tile
-    TileSamples = 1024
-    TileLines   = 1024
+    TileSamples = 2
+    TileLines   = 2
 
     Group = Dimensions
-      Samples = 1024
-      Lines   = 1024
+      Samples = 2
+      Lines   = 2
       Bands   = 1
     End_Group
 
@@ -90,6 +90,17 @@ Object = IsisCube
   Group = Kernels
     NaifFrameCode = -37100
   End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 1024
+    AlphaLines          = 1024
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 2.5
+    AlphaEndingLine     = 2.5
+    BetaSamples         = 2
+    BetaLines           = 2
+  End_Group
 End_Object
 
 Object = Label
@@ -98,13 +109,13 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 2162689
-  Bytes     = 570
+  StartByte = 78473
+  Bytes     = 1178
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
-  StartByte = 2163259
-  Bytes     = 12927
+  StartByte = 65545
+  Bytes     = 12928
 End_Object
 End

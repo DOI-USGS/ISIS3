@@ -57,6 +57,7 @@ namespace Isis {
     QString hyb2cal_runtime = Application::DateTime();
 
     ProcessBySample p;
+    p.SetInputCube(icube);
 
     // Basic assurances...
     if (icube->bandCount() != 1) {

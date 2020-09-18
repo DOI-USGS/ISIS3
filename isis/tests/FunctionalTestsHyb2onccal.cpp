@@ -1,13 +1,10 @@
-// #include <QTemporaryDir>
-
 #include "hyb2onccal.h"
 
 #include "Fixtures.h"
+#include "LineManager.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
-#include "Endian.h"
-#include "PixelType.h"
 
 #include "gtest/gtest.h"
 
@@ -22,7 +19,6 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalIOF) {
   hyb2onccal(testCube, options, &appLog);
 
   PvlGroup calibrationLog = appLog.findGroup("RadiometricCalibration");
-  std::cout<<calibrationLog<<std::endl;
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["Units"], "I over F");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["CalibrationUnits"], "IOF");
@@ -48,6 +44,28 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalIOF) {
   EXPECT_NEAR(calibrationLog["DarkCurrentCoefficients"][0].toDouble(), 0.1, .0000001);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrentCoefficients"][1].toDouble(), 0.52);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrent"], 0.003961313633742128);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path()+"/output.cub", "r");
+  }
+  catch (IException &e) {
+    // Fail test or throw exception?
+    throw IException(IException::User,
+                     "Unable to open the file [" + tempDir.path()+"/output.cub" + "] as a cube.",
+                     _FILEINFO_);
+  }
+
+  LineManager line(outputCube);
+  line.SetLine(1);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 0.13324972987174988, .00000000000000001);
+  EXPECT_NEAR(line[1], 0.12059289216995239, .00000000000000001);
+
+  line.SetLine(2);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 0.12832331657409668, .00000000000000001);
+  EXPECT_NEAR(line[1], 0.11708390712738037, .00000000000000001);
 }
 
 TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalRadiance) {
@@ -57,7 +75,6 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalRadiance) {
   hyb2onccal(testCube, options, &appLog);
 
   PvlGroup calibrationLog = appLog.findGroup("RadiometricCalibration");
-  std::cout<<calibrationLog<<std::endl;
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["Units"], "W / (m**2 micrometer sr)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["CalibrationUnits"], "RADIANCE");
@@ -83,6 +100,28 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalRadiance) {
   EXPECT_NEAR(calibrationLog["DarkCurrentCoefficients"][0].toDouble(), 0.1, .0000001);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrentCoefficients"][1].toDouble(), 0.52);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrent"], 0.003961313633742128);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path()+"/output.cub", "r");
+  }
+  catch (IException &e) {
+    // Fail test or throw exception?
+    throw IException(IException::User,
+                     "Unable to open the file [" + tempDir.path()+"/output.cub" + "] as a cube.",
+                     _FILEINFO_);
+  }
+
+  LineManager line(outputCube);
+  line.SetLine(1);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 5.5233364105224609, .00000000000000001);
+  EXPECT_NEAR(line[1], 4.9986977577209473, .00000000000000001);
+
+  line.SetLine(2);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 5.3191318511962891, .00000000000000001);
+  EXPECT_NEAR(line[1], 4.8532466888427734, .00000000000000001);
 }
 
 TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalDN) {
@@ -92,7 +131,6 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalDN) {
   hyb2onccal(testCube, options, &appLog);
 
   PvlGroup calibrationLog = appLog.findGroup("RadiometricCalibration");
-  std::cout<<calibrationLog<<std::endl;
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["Units"], "DN");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, calibrationLog["CalibrationUnits"], "DN");
@@ -118,4 +156,26 @@ TEST_F(Hayabusa2OncTCube, FunctionalTestHyb2onccalDN) {
   EXPECT_NEAR(calibrationLog["DarkCurrentCoefficients"][0].toDouble(), 0.1, .0000001);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrentCoefficients"][1].toDouble(), 0.52);
   EXPECT_DOUBLE_EQ(calibrationLog["DarkCurrent"], 0.003961313633742128);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path()+"/output.cub", "r");
+  }
+  catch (IException &e) {
+    // Fail test or throw exception?
+    throw IException(IException::User,
+                     "Unable to open the file [" + tempDir.path()+"/output.cub" + "] as a cube.",
+                     _FILEINFO_);
+  }
+
+  LineManager line(outputCube);
+  line.SetLine(1);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 425.73876953125, .00000000000000001);
+  EXPECT_NEAR(line[1], 385.29962158203125, .00000000000000001);
+
+  line.SetLine(2);
+  outputCube.read(line);
+  EXPECT_NEAR(line[0], 409.9986572265625, .00000000000000001);
+  EXPECT_NEAR(line[1], 374.08822631835938, .00000000000000001);
 }

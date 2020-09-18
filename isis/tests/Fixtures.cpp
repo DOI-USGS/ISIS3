@@ -160,15 +160,13 @@ namespace Isis {
     testCube->fromLabel(tempDir.path() + "/hayabusa2OncT.cub", label, "rw");
 
     LineManager line(*testCube);
-    double pixelValue = 0.0;
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for calibration test
     for(line.begin(); !line.end(); line++) {
       for(int i = 0; i < line.size(); i++) {
         line[i] = (double) pixelValue++;
       }
       testCube->write(line);
     }
-
-    std::cout<<"After setup"<<std::endl;
   }
 
   void Hayabusa2OncTCube::TearDown() {
