@@ -44,6 +44,10 @@ update the Unreleased link so that it compares against the latest release tag.
  
  - A Gui Helper gear was added to hist to fill in the minimum and maximum parameters with what would have been automatically calculated. [#3880](https://github.com/USGS-Astrogeology/ISIS3/issues/3880) 
 
+- Added some Python programs (in isis/scripts/) to manage the authoritative .zenodo.json file
+  which contains the ISIS authors, and to generate the AUTHORS.rst file from it.
+
+
 ## [4.2.0] - 2020-07-27
 
 ### Added
