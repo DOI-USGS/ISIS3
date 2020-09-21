@@ -41,10 +41,11 @@ namespace Isis {
 
 
   /**
-   * Create a PolynomialUnivariate object 
-   *  
-   * @param degree The order/degree of the polynomial 
-   * @param coeffs a list of the coefficients  
+   * Create a PolynomialUnivariate object
+   *
+   * @param degree The order/degree of the polynomial
+   * @param coeffs a list of the coefficients in increasing degree. So the first
+   *               element is the constant coefficient.
    */
    PolynomialUnivariate::PolynomialUnivariate(int degree, std::vector<double> coeffs) :
     Isis::Basis1VariableFunction("PolynomialUnivariate", (degree + 1)) {
@@ -124,4 +125,3 @@ namespace Isis {
 
 
 } // end namespace isis
-
