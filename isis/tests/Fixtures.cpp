@@ -149,6 +149,34 @@ namespace Isis {
     delete projTestCube;
   }
 
+  void Hayabusa2OncTSmallCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::ifstream cubeLabel("data/hayabusa2Image/hayabusa2OncTSmall.pvl");
+
+    cubeLabel >> label;
+
+    testCube = new Cube();
+    testCube->fromLabel(tempDir.path() + "/hayabusa2OncTSmall.cub", label, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for the calibration tests
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+  }
+
+  void Hayabusa2OncTSmallCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
+
   void Hayabusa2OncTCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -160,10 +188,10 @@ namespace Isis {
     testCube->fromLabel(tempDir.path() + "/hayabusa2OncT.cub", label, "rw");
 
     LineManager line(*testCube);
-    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for calibration test
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for the calibration tests
     for(line.begin(); !line.end(); line++) {
       for(int i = 0; i < line.size(); i++) {
-        line[i] = (double) pixelValue++;
+        line[i] = (double) pixelValue;
       }
       testCube->write(line);
     }

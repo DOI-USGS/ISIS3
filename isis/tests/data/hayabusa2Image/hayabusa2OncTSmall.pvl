@@ -2,17 +2,17 @@ Object = IsisCube
   Object = Core
     StartByte   = 65537
     Format      = Tile
-    TileSamples = 512
-    TileLines   = 512
+    TileSamples = 2
+    TileLines   = 2
 
     Group = Dimensions
-      Samples = 1024
-      Lines   = 1024
+      Samples = 2
+      Lines   = 2
       Bands   = 1
     End_Group
 
     Group = Pixels
-      Type       = Real
+      Type       = SignedWord
       ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
@@ -66,7 +66,7 @@ Object = IsisCube
     ONCW2ElectricCircuitTemperature = -6.72 <degC>
     FLACTemperature                 = -10.58 <degC>
     Compression                     = LOSSLESS
-    SolarDistance                   = 1.87432e+08 <km>
+    SolarDistance                   = 1.87432D+08 <km>
     DistortionCorrection            = no
   End_Group
 
@@ -91,29 +91,15 @@ Object = IsisCube
     NaifFrameCode = -37100
   End_Group
 
-  Group = RadiometricCalibration
-    SoftwareName            = hyb2onccal
-    SoftwareVersion         = 1.1
-    ProcessDate             = 2020-09-18T13:10:28
-    CalibrationFile         = $hayabusa2/calibration/onc/hyb2oncCalibration00-
-                              02.trn
-    FlatFieldFile           = $hayabusa2/calibration/flatfield/flat_v_norm.cub
-    SensitivityFactor       = 1175.0
-    Bias_Bn                 = (320.66, 0.652, -0.953)
-    Bias_AECorrection       = (0.987, 0.00251)
-    Bias_AETemp             = -1.6
-    Bias_CCDTemp            = -28.59
-    Bias_ECTTemp            = -11.95
-    Bias                    = 310.5920154927201 <DN>
-    Smear_Tvct              = 0.007373
-    Smear_texp              = 0.06560000000000001
-    CalibrationUnits        = IOF
-    RadianceScaleFactor     = 1.0
-    SolarFlux               = 1859.7
-    Units                   = "I over F"
-    LinearityCoefficients   = (1.0073, -2.9285, -3.6434000000000001e-1)
-    DarkCurrentCoefficients = (0.10000000000000001, 0.52)
-    DarkCurrent             = 0.003961313633742128
+  Group = AlphaCube
+    AlphaSamples        = 1024
+    AlphaLines          = 1024
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 2.5
+    AlphaEndingLine     = 2.5
+    BetaSamples         = 2
+    BetaLines           = 2
   End_Group
 End_Object
 
@@ -123,13 +109,13 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 4272769
-  Bytes     = 1256
+  StartByte = 78473
+  Bytes     = 1178
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
-  StartByte = 4259841
+  StartByte = 65545
   Bytes     = 12928
 End_Object
 End
