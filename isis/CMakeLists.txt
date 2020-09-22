@@ -20,6 +20,8 @@ include(InstallThirdParty)
 include(cmake/gtest.cmake)
 include(GoogleTest)
 
+include(CMakePrintHelpers)
+
 #===============================================================================
 #===============================================================================
 # Project information
@@ -307,24 +309,37 @@ set(ALLLIBS "")
 set(ALLINCDIRS "")
 
 # Get all include dir variables
+# These are comming in as lists of paths, so just append them together
 foreach (_variableName ${_variableNames})
    if (_variableName MATCHES ".+_INCLUDE_DIR$")
      list(APPEND ALLINCDIRS "${${_variableName}}")
    elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
      list(APPEND ALLINCDIRS "${${_variableName}}")
-   endif(_variableName MATCHES ".+_INCLUDE_DIR$")
+   endif()
 endforeach()
 
-# get all Library variables
+# Get all Library variables
+# These are comming in as lists of full/path/filenames, so break each element out and
+# split the path and file name off before appending to the lists of libs and lib paths
 foreach (_variableName ${_variableNames})
    get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
+   get_filename_component(LIBNAME "${${_variableName}}" NAME)
+
    if (_variableName MATCHES "^CMAKE+")
    elseif (_variableName MATCHES ".+_LIBRARY$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
+     foreach(ITEM IN LISTS ${_variableName})
+       get_filename_component(LIBDIR ${ITEM} DIRECTORY)
+       get_filename_component(LIBNAME ${ITEM} NAME)
+       list(APPEND ALLLIBDIRS ${LIBDIR})
+       list(APPEND ALLLIBS ${LIBNAME})
+     endforeach()
    elseif (_variableName MATCHES ".+_LIBRARIES$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
+     foreach(ITEM IN LISTS ${_variableName})
+       get_filename_component(LIBDIR ${ITEM} DIRECTORY)
+       get_filename_component(LIBNAME ${ITEM} NAME)
+       list(APPEND ALLLIBDIRS ${LIBDIR})
+       list(APPEND ALLLIBS ${LIBNAME})
+     endforeach()
    endif()
 endforeach()
 
