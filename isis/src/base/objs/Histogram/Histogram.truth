@@ -585,6 +585,27 @@ Data Vector a:
 [ -1.79769e+308 -1.79769e+308 -1.79769e+308 -1.79769e+308 -1.79769e+308 1 2 2 3 ]
 
 
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          9
+Valid pixels:          4
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           1
+Lis pixels:            1
+His pixels:            1
+Lrs pixels:            1
+Hrs pixels:            1
+Out of range pixels:   0
+Minimum:               1
+Maximum:               3
+Valid Minimum:         -10
+Valid Maximum:         10
+Sum:                   8
+Sum Square:            18
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 +++++++++++++++++++ Histogram Members +++++++++++++++++++
 
 Stats Range:            (-10,10)
@@ -592,21 +613,28 @@ Bin Range:              (-10,10)
 Average:               2
 Std Deviation:         0.816497
 Variance:              0.666667
-Median:                0
-Mode:                  0
-Skew:                  7.34847
+Median:                4
+Mode:                  4
+Skew:                  -7.34847
 Percent(0.5):          0
-Percent(99.5):         5
+Percent(99.5):         4
 Minimum:               1
 Maximum:               3
 # Bins:                5
-BinWidth:              5
+BinWidth:              4
 MaxBinCount:           3
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+**********************Data Vector A Histogram**********************
+Bin 0: [-10,-6], Count = 0
+Bin 1: [-6,-2], Count = 0
+Bin 2: [-2,2], Count = 1
+Bin 3: [2,6], Count = 3
+Bin 4: [6,10], Count = 0
+*******************************************************************
+
 Data Vector b:  
 [ -9 -7 -5 -0.5 2.3 5.5 7.1 8.2 8.3 ]
-
 
 
 ++++++++++++++++++ Statistics Counters ++++++++++++++++++
@@ -637,32 +665,32 @@ Bin Range:              (-10,10)
 Average:               1.1
 Std Deviation:         6.76794
 Variance:              45.805
-Median:                0
-Mode:                  -5
-Skew:                  0.487593
-Percent(0.5):          -10
-Percent(99.5):         10
+Median:                4
+Mode:                  8
+Skew:                  -1.28547
+Percent(0.5):          -8
+Percent(99.5):         8
 Minimum:               -9
 Maximum:               8.3
 # Bins:                5
-BinWidth:              5
-MaxBinCount:           2
+BinWidth:              4
+MaxBinCount:           3
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 **********************Data Vector B Histogram**********************
-Bin 0: [-12.5,-7.5], Count = 1
-Bin 1: [-7.5,-2.5], Count = 2
-Bin 2: [-2.5,2.5], Count = 2
-Bin 3: [2.5,7.5], Count = 2
-Bin 4: [7.5,12.5], Count = 2
+Bin 0: [-10,-6], Count = 2
+Bin 1: [-6,-2], Count = 1
+Bin 2: [-2,2], Count = 1
+Bin 3: [2,6], Count = 2
+Bin 4: [6,10], Count = 3
 *******************************************************************
 Removing:  -9,-7,-5
 **********************Data Vector B Histogram**********************
-Bin 0: [-12.5,-7.5], Count = 0
-Bin 1: [-7.5,-2.5], Count = 0
-Bin 2: [-2.5,2.5], Count = 2
-Bin 3: [2.5,7.5], Count = 2
-Bin 4: [7.5,12.5], Count = 2
+Bin 0: [-10,-6], Count = 0
+Bin 1: [-6,-2], Count = 0
+Bin 2: [-2,2], Count = 1
+Bin 3: [2,6], Count = 2
+Bin 4: [6,10], Count = 3
 *******************************************************************
 
 +++++++++++++++++++ Histogram Members +++++++++++++++++++
@@ -672,11 +700,11 @@ Bin Range:              (-10,10)
 Average:               5.15
 Std Deviation:         3.55514
 Variance:              12.639
-Median:                5
-Mode:                  0
-Skew:                  0.126577
+Median:                4
+Mode:                  8
+Skew:                  0.970427
 Percent(0.5):          0
-Percent(99.5):         10
+Percent(99.5):         8
 Minimum:               **PROGRAMMER ERROR** Minimum is invalid since you removed data.
 Changing BinRange for b-vector's histogram...
 
@@ -716,7 +744,7 @@ Percent(99.5):         -1.79769e+308
 Minimum:               -1.79769e+308
 Maximum:               -1.79769e+308
 # Bins:                5
-BinWidth:              2.5
+BinWidth:              2
 MaxBinCount:           0
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

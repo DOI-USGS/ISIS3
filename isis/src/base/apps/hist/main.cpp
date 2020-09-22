@@ -64,13 +64,16 @@ void IsisMain() {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-    hist = new ImageHistogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
+    hist = new Histogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
   }
   else {
-    hist = new ImageHistogram(*icube, 1, p.Progress());
 
     if (ui.WasEntered("NBINS")){
+      hist = new Histogram(*icube, 1, p.Progress());
       hist->SetBins(ui.GetInteger("NBINS"));
+    }
+    else {
+      hist = new ImageHistogram(*icube, 1, p.Progress());
     }
   }
 

@@ -93,7 +93,8 @@ void IsisMain() {
     Histogram *hist;
     // Setup the histogram
     try {
-      hist = new ImageHistogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+      hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+      hist->addMeasureDataFromNet(net, &ControlMeasure::GetResidualMagnitude);
     }
     catch (IException &e) {
       QString msg = "The following error was thrown while building a histogram from netfile [" +

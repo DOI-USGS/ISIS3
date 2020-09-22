@@ -131,12 +131,13 @@ namespace Isis {
       //void SetBinRange(double binStart, double binEnd);
       void SetValidRange(const double minimum = Isis::ValidMinimum,
                                        const double maximum = Isis::ValidMaximum);
+
+      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+      
     protected:
       //! The array of counts.
       std::vector<BigInt> p_bins;
 
-
-      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
       void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
 
     private:

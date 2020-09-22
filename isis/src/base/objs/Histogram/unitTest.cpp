@@ -389,8 +389,8 @@ int main(int argc, char *argv[]) {
   int nbins = 5;
 
   Isis::Histogram *ahist, *bhist;
-  ahist = new Isis::ImageHistogram (low1,high1,nbins);
-  bhist = new Isis::ImageHistogram (low1,high1,nbins);
+  ahist = new Isis::Histogram (low1,high1,nbins);
+  bhist = new Isis::Histogram (low1,high1,nbins);
 
   double a[9];
   a[0] = 1.0;
@@ -431,12 +431,16 @@ int main(int argc, char *argv[]) {
     arrayDisplay(a,9);
     cout << endl;
 
+    statCounters(ahist);
     histogramMembers(ahist);
 
+    cout << "**********************Data Vector A Histogram**********************" << endl;
+    histDisplay(ahist);
+    cout << "*******************************************************************" << endl;
+    cout << endl;
 
     cout << "Data Vector b:  " << endl;
     arrayDisplay(b,9);
-    cout << endl;
     cout << endl;
 
     statCounters(bhist);

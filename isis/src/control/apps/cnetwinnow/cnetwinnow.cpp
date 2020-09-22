@@ -17,7 +17,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "PvlGroup.h"
-#include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IException.h"
 #include "IString.h"
 #include "Progress.h"
@@ -90,7 +90,7 @@ namespace Isis {
       }
     }
     //build a Histogram of the residual Magnitudes from the ControlNet
-    Histogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+    ImageHistogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
 
       //make sure there was some residual data in the control network
     if (hist.ValidPixels() < 1) {

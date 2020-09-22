@@ -92,7 +92,7 @@ namespace Isis {
   Histogram(net, statFunc, bins) {
 
     //add all the data to the now setup histogram
-    addMeasureDataFromNet(net,statFunc);
+    addMeasureDataFromNet(net, statFunc);
   }
 
 
@@ -109,7 +109,7 @@ namespace Isis {
                                  double binWidth) : Histogram(net, statFunc, binWidth) {
 
     //add all the data to the now setup histogram
-    addMeasureDataFromNet(net,statFunc);
+    addMeasureDataFromNet(net, statFunc);
   }
 
 
