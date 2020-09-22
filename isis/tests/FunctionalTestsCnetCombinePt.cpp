@@ -24,8 +24,6 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded();
-
 class CombineNetworks : public TempTestingFiles {
   protected:
     QString firstNetFile;
@@ -136,7 +134,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptDistance) {
                             "cnetlist="+listFile,
                             "imagetol=1",
                             "onet="+distance1NetFile};
-  UserInterface ui1(APP_XML, args1);
+  UserInterface ui1(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args1);
 
   cnetcombinept(ui1);
 
@@ -177,7 +175,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptDistance) {
                             "cnetlist="+listFile,
                             "imagetol=55",
                             "onet="+distance55NetFile};
-  UserInterface ui2(APP_XML, args2);
+  UserInterface ui2(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args2);
 
   cnetcombinept(ui2);
 
@@ -209,7 +207,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptDistance) {
                             "cnetlist="+listFile,
                             "imagetol=200",
                             "onet="+distance200NetFile};
-  UserInterface ui3(APP_XML, args3);
+  UserInterface ui3(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args3);
 
   cnetcombinept(ui3);
 
@@ -235,7 +233,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptLog) {
                            "imagetol=55",
                            "onet="+mergedNetFile,
                            "logfile="+logFileName};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args);
 
   cnetcombinept(ui);
 
@@ -289,7 +287,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptList) {
   QVector<QString> args1 = {"cnetbase="+firstNetFile,
                             "cnetfrom="+secondNetFile,
                             "onet="+specifiedNetFile};
-  UserInterface ui1(APP_XML, args1);
+  UserInterface ui1(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args1);
 
   cnetcombinept(ui1);
 
@@ -303,7 +301,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptList) {
   QVector<QString> args2 = {"cnetbase="+firstNetFile,
                             "cnetlist="+shortListFile,
                             "onet="+listNetFile};
-  UserInterface ui2(APP_XML, args2);
+  UserInterface ui2(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args2);
 
   cnetcombinept(ui2);
 
@@ -332,7 +330,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptNetworkArgs) {
                            "onet="+outNetFile,
                            "networkid="+networkId,
                            "description="+networkDescription};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args);
 
   cnetcombinept(ui);
 
@@ -348,7 +346,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptSNList) {
   QVector<QString> args = {"cnetbase="+firstNetFile,
                            "onet="+outNetFile,
                            "tosn="+outSNFile};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args);
 
   cnetcombinept(ui);
 
@@ -384,7 +382,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptCleanNet) {
                             "imagetol=1",
                             "onet="+cleanNetFile,
                             "cleannet=true"};
-  UserInterface ui1(APP_XML, args1);
+  UserInterface ui1(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args1);
 
   cnetcombinept(ui1);
 
@@ -397,7 +395,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptCleanNet) {
                             "imagetol=1",
                             "onet="+dirtyNetFile,
                             "cleannet=false"};
-  UserInterface ui2(APP_XML, args2);
+  UserInterface ui2(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args2);
 
   cnetcombinept(ui2);
 
@@ -437,7 +435,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptCleanMeasures) {
                             "imagetol=1",
                             "onet="+cleanNetFile,
                             "cleanmeasures=true"};
-  UserInterface ui1(APP_XML, args1);
+  UserInterface ui1(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args1);
 
   cnetcombinept(ui1);
 
@@ -452,7 +450,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptCleanMeasures) {
                             "imagetol=1",
                             "onet="+dirtyNetFile,
                             "cleanmeasures=false"};
-  UserInterface ui2(APP_XML, args2);
+  UserInterface ui2(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args2);
 
   cnetcombinept(ui2);
 
@@ -486,7 +484,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptSetApriori) {
                             "imagetol=1",
                             "onet="+keepAprioriNetFile,
                             "setaprioribest=false"};
-  UserInterface ui1(APP_XML, args1);
+  UserInterface ui1(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args1);
 
   cnetcombinept(ui1);
 
@@ -498,7 +496,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptSetApriori) {
                             "imagetol=1",
                             "onet="+setAprioriNetFile,
                             "setaprioribest=true"};
-  UserInterface ui2(APP_XML, args2);
+  UserInterface ui2(FileName("$ISISROOT/bin/xml/cnetcombinept.xml").expanded(), args2);
 
   cnetcombinept(ui2);
 

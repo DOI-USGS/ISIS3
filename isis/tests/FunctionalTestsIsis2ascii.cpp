@@ -14,12 +14,10 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/isis2ascii.xml").expanded();
-
 TEST_F(SmallCube, FunctionalTestIsis2asciiDefaultParameters) {
   QString outputFile = tempDir.path()+"/output.txt";
   QVector<QString> args = {"to=" + outputFile};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/isis2ascii.xml").expanded(), args);
 
   isis2ascii(testCube, ui);
 
@@ -61,7 +59,7 @@ TEST_F(SmallCube, FunctionalTestIsis2asciiDefaultParameters) {
 TEST_F(SmallCube, FunctionalTestIsis2asciiNoHeader) {
   QString outputFile = tempDir.path()+"/output.txt";
   QVector<QString> args = {"to=" + outputFile, "header=no"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/isis2ascii.xml").expanded(), args);
 
   isis2ascii(testCube, ui);
 
@@ -83,7 +81,7 @@ TEST_F(SmallCube, FunctionalTestIsis2asciiNoHeader) {
 TEST_F(SmallCube, FunctionalTestIsis2asciiCustomDelimiter) {
   QString outputFile = tempDir.path()+"/output.txt";
   QVector<QString> args = {"to=" + outputFile, "delimiter=,"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/isis2ascii.xml").expanded(), args);
 
   isis2ascii(testCube, ui);
 
@@ -106,7 +104,7 @@ TEST_F(SpecialSmallCube, FunctionalTestIsis2asciiSetPixelValues) {
   QVector<QString> args = {"to=" + outputFile, "setpixelvalues=yes",
                            "nullvalue=0", "lrsvalue=0", "lisvalue=0",
                            "hisvalue=255", "hrsvalue=255"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/isis2ascii.xml").expanded(), args);
   isis2ascii(testCube, ui);
 
   CSVReader::CSVAxis csvLine;

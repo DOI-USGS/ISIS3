@@ -32,8 +32,6 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/autoseed.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   Pvl *log = NULL;
   QString defFile = tempDir.path()+"/gridPixels.pvl";
@@ -60,7 +58,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
-  UserInterface autoseedUi(APP_XML, autoseedArgs);
+  UserInterface autoseedUi(FileName("$ISISROOT/bin/xml/autoseed.xml").expanded(), autoseedArgs);
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet);
@@ -97,7 +95,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
-  UserInterface autoseedUi(APP_XML, autoseedArgs);
+  UserInterface autoseedUi(FileName("$ISISROOT/bin/xml/autoseed.xml").expanded(), autoseedArgs);
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet1);
@@ -110,7 +108,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   autoseedArgs.removeAt(0);
   autoseedArgs.replace(1, "onet="+outnet2);
   autoseedArgs.replace(3, "overlaplist="+threeImageOverlapFile->original());
-  autoseedUi = UserInterface(APP_XML, autoseedArgs);
+  autoseedUi = UserInterface(FileName("$ISISROOT/bin/xml/autoseed.xml").expanded(), autoseedArgs);
   autoseed(autoseedUi, serialNumList, &onet, log);
   onet = ControlNet(outnet2);
   ASSERT_EQ(onet.GetNumPoints(), 7);
@@ -128,7 +126,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
                                     "networkid=1",
                                     "pointid=???",
                                     "description=autoseed test network"};
-  UserInterface autoseedUi(APP_XML, autoseedArgs);
+  UserInterface autoseedUi(FileName("$ISISROOT/bin/xml/autoseed.xml").expanded(), autoseedArgs);
 
   // Grid DN
   PvlObject autoseedObject("AutoSeed");

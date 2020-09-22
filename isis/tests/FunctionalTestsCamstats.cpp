@@ -11,11 +11,9 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/camstats.xml").expanded();
-
 TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
   QVector<QString> args = {};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/camstats.xml").expanded(), args);
   Pvl appLog;
 
   camstats(testCube, options, &appLog);
@@ -118,7 +116,7 @@ TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
 
 TEST_F(DefaultCube, FunctionalTestCamstatsAttach) {
   QVector<QString> args = {"attach=true", "linc=100", "sinc=100"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/camstats.xml").expanded(), args);
   Pvl appLog;
 
   camstats(testCube, options, &appLog);
@@ -130,9 +128,9 @@ TEST_F(DefaultCube, FunctionalTestCamstatsAttach) {
 TEST_F(DefaultCube, FunctionalTestCamstatsFlat) {
   QTemporaryFile flatFile;
   flatFile.open();
-  
+
   QVector<QString> args = {"to=" + flatFile.fileName(), "format=flat", "linc=100", "sinc=100"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/camstats.xml").expanded(), args);
   Pvl appLog;
 
   camstats(testCube, options, &appLog);

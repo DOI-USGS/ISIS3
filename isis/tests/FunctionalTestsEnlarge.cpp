@@ -12,11 +12,9 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/enlarge.xml").expanded();
-
 TEST_F(SmallCube, FunctionalTestEnlargeDefaultParameters) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
   enlarge(testCube, options, &appLog);
 
@@ -36,7 +34,7 @@ TEST_F(SmallCube, FunctionalTestEnlargeDefaultParameters) {
 
 TEST_F(SmallCube, FunctionalTestEnlargeScale) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub", "sscale=2", "lscale=4"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
   enlarge(testCube, options, &appLog);
 
@@ -50,7 +48,7 @@ TEST_F(SmallCube, FunctionalTestEnlargeScale) {
 
 TEST_F(SmallCube, FunctionalTestEnlargeTotal) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub", "mode=total", "ons=20", "onl=40"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
   enlarge(testCube, options, &appLog);
 
@@ -64,7 +62,7 @@ TEST_F(SmallCube, FunctionalTestEnlargeTotal) {
 
 TEST_F(SmallCube, FunctionalTestEnlargeSmallDimensions) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub", "mode=total", "ons=10", "onl=1"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
 
   QString message = "Number of output samples/lines must be greater than or equal";
@@ -82,7 +80,7 @@ TEST_F(SmallCube, FunctionalTestEnlargeSmallDimensions) {
 
 TEST_F(SmallCube, FunctionalTestEnlargeNearestNeighbor) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub", "interp=nearestneighbor"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
   enlarge(testCube, options, &appLog);
 
@@ -97,7 +95,7 @@ TEST_F(SmallCube, FunctionalTestEnlargeNearestNeighbor) {
 
 TEST_F(SmallCube, FunctionalTestEnlargeBilinear) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub", "interp=bilinear"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded(), args);
   Pvl appLog;
   enlarge(testCube, options, &appLog);
 

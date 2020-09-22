@@ -26,8 +26,6 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   ImagePolygon fp1;
   fp1.Create(*cube1);
@@ -55,7 +53,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   QString cubeListPath = tempDir.path() + "/cubes.lis";
   cubes.write(cubeListPath);
   QVector<QString> args = {"from="+cubeListPath, "overlapList="+tempDir.path()+"/overlaps.txt"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded(), args);
   Pvl appLog;
 
   try {
@@ -72,7 +70,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
 
   QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded(), args);
   FileList images;
   images.append(FileName(cube1->fileName()));
   images.append(FileName(cube2->fileName()));
@@ -141,7 +139,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
   delete wkt;
 
   QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded(), args);
   FileList images;
   images.append(FileName(cube1->fileName()));
   images.append(FileName(cube2->fileName()));

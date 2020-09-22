@@ -15,11 +15,9 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
-
 TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   QVector<QString> footprintArgs = {};
-  UserInterface footprintUi(APP_XML, footprintArgs);
+  UserInterface footprintUi(FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded(), footprintArgs);
 
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));

@@ -12,15 +12,13 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/kaguyatc2isis.xml").expanded();
-
 TEST(kaguyatc2isisTest, kaguyatc2isisTestDefault) {
   Pvl appLog;
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyatc2isis/TC1S2B0_01_05186N225E0040_mini.lbl", "to="+cubeFileName};
 
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/kaguyatc2isis.xml").expanded(), args);
   try {
     kaguyatc2isis(options, &appLog);
   }

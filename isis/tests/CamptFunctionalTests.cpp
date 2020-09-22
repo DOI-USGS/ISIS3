@@ -13,8 +13,6 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
-
 TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   // set up bad coordinates file
   std::ofstream of;
@@ -26,7 +24,7 @@ TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.pvl",
                            "coordlist=" + tempDir.path()+"/badList.lis",
                            "coordtype=image"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   try {
@@ -47,7 +45,7 @@ TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
 TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
   // configure UserInterface arguments for flat file error
   QVector<QString> args = {"format=flat"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   try {
@@ -65,7 +63,7 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
 
 TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   QVector<QString> args = {};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -143,7 +141,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
   QVector<QString> args = {"sample=25.0", "line=25.0"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -155,7 +153,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetS) {
   QVector<QString> args = {"sample=25.0"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -167,7 +165,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetS) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetL) {
   QVector<QString> args = {"line=25.0"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -179,7 +177,7 @@ TEST_F(DefaultCube, FunctionalTestCamptSetL) {
 
 TEST_F(DefaultCube, FunctionalTestCamptSetGround) {
   QVector<QString> args = {"type=ground", "latitude=10.181441241544", "longitude=255.89292858176"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -195,7 +193,7 @@ TEST_F(DefaultCube, FunctionalTestCamptFlat) {
   QVector<QString> args = {"format=flat",
                            "to="+flatFile.fileName(),
                            "append=false"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -227,7 +225,7 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
   QVector<QString> args = {"coordlist="+tempDir.path()+"/coords.txt",
                            "append=false",
                            "coordtype=image"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);
@@ -252,7 +250,7 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
 
 TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
   QVector<QString> args = {"sample=-1", "line=-1", "allowoutside=true"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/campt.xml").expanded(), args);
   Pvl appLog;
 
   campt(testCube, options, &appLog);

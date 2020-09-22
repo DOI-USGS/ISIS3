@@ -10,15 +10,13 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
-
 TEST(leisa2isisTest, leisa2isisTestDefault) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
    QVector<QString> args = {"from=data/leisa2isis/lsb_0034933739_0x53c_sci_1_cropped.fit", "to=" + cubeFileName };
 
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded(), args);
   try {
    leisa2isis(options, &appLog);
   }

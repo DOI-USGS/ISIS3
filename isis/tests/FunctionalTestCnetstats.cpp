@@ -12,11 +12,9 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsDefault) {
   QVector<QString> args = {};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
 
   QString serialNumList = tempDir.path()+"/cubes.lis";
@@ -74,7 +72,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsImageStats) {
   ASSERT_TRUE(statsFile.open());
 
   QVector<QString> args = {"create_image_stats=yes", "image_stats_file=" + statsFile.fileName()};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
   QString serialNumList = tempDir.path()+"/cubes.lis";
 
@@ -95,7 +93,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointStats) {
   ASSERT_TRUE(statsFile.open());
 
   QVector<QString> args = {"create_point_stats=yes", "point_stats_file=" + statsFile.fileName()};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
   QString serialNumList = tempDir.path() + "/cubes.lis";
 
@@ -134,10 +132,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
   QString serialNumList = tempDir.path()+"/cubes.lis";
 
@@ -178,10 +176,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
   QString serialNumList = tempDir.path()+"/cubes.lis";
 
@@ -193,7 +191,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   while(!stream.atEnd()) {
     QString line = stream.readLine();
     QStringList values = line.split(",");
-    
+
     ASSERT_DOUBLE_EQ(values.size(), 13);
     lineNumber++;
   }
@@ -215,10 +213,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsInvalidDefFile) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetstats.xml").expanded(), args);
   Pvl log;
   QString serialNumList = tempDir.path() + "/cubes.lis";
 

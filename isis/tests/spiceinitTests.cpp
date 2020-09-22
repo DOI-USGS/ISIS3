@@ -18,8 +18,6 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
-
 TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
   std::istringstream labelStrm(R"(
@@ -87,7 +85,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded(), args);
   spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
@@ -178,7 +176,7 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded(), args);
   spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
@@ -291,7 +289,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args(0);
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded(), args);
   spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.group("Kernels");
@@ -397,7 +395,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded(), args);
 
   spiceinit(&testCube, options);
 
@@ -496,7 +494,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
   QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded(), args);
 
   spiceinit(&testCube, options);
 

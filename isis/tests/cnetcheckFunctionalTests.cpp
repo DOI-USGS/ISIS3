@@ -20,11 +20,9 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetcheck.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckCamera) {
   QVector<QString> args = {"fromlist="+cubeListFile, "prefix="+tempDir.path()+"/", "nocube=false", "lowcoverage=false"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetcheck.xml").expanded(), args);
 
   QString cube1Serial = SerialNumber::Compose(*cube1->label());
   QString cube2Serial = SerialNumber::Compose(*cube2->label());
@@ -77,7 +75,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
   }
 
   QVector<QString> args = {"fromlist="+cubeListFile, "prefix="+tempDir.path()+"/", "delimit=comma", "lowcoverage=false", "cnet=test"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetcheck.xml").expanded(), args);
 
   Pvl log;
   cnetcheck(*network, *cubeList, options, &log);
@@ -119,7 +117,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
   cubeList->append(c.expanded());
 
   QVector<QString> args = {"fromlist="+cubeListFile, "prefix="+tempDir.path()+"/", "tolerance=0.95"};
-  UserInterface options(APP_XML, args);
+  UserInterface options(FileName("$ISISROOT/bin/xml/cnetcheck.xml").expanded(), args);
 
   Pvl log;
   cnetcheck(*network, *cubeList, options, &log);

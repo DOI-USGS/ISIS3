@@ -16,13 +16,11 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestCnetwinnowDefault) {
   QString onetPath = tempDir.path()+"/winnowedNetwork.net";
   QVector<QString> args = {"onet="+onetPath,
                            "file_prefix=winnow"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded(), args);
 
   int initialMeasureCount = network->GetNumValidMeasures();
   int initialPointCount = network->GetNumValidPoints();

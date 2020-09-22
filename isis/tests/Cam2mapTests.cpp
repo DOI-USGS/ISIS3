@@ -20,8 +20,6 @@ using namespace Isis;
 using ::testing::Return;
 using ::testing::AtLeast;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
-
 TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   std::istringstream labelStrm(R"(
     Group = Mapping
@@ -51,7 +49,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
 
@@ -109,7 +107,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapMismatch) {
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
   try {
@@ -151,7 +149,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapUserLatlon) {
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=no", "minlon=0",
                            "maxlon=10", "minlat=0", "maxlat=10", "defaultrange=camera",
                            "pixres=map"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
 
@@ -199,7 +197,7 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapMapLatlon) {
 
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=no",
                            "defaultrange=map", "pixres=camera"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
 
@@ -316,7 +314,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -364,7 +362,7 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
 
   QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
 
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -415,7 +413,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
                           "matchmap=yes",
                           "warpalgorithm=forwardpatch",
                           "patchsize=0"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -466,7 +464,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
                           "matchmap=yes",
                           "warpalgorithm=reversepatch",
                           "patchsize=3"};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(), args);
 
   Pvl log;
   MockProcessRubberSheet rs;

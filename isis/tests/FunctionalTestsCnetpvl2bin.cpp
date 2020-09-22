@@ -9,13 +9,11 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetpvl2bin.xml").expanded();
-
 TEST_F(ThreeImageNetwork, FunctionalTestCnetpvl2binDefault) {
   QString binOut = tempDir.path()+"/cnetbin2Network.net";
 
   QVector<QString> args = {"to="+binOut};
-  UserInterface ui(APP_XML, args);
+  UserInterface ui(FileName("$ISISROOT/bin/xml/cnetpvl2bin.xml").expanded(), args);
 
   Progress progress;
   cnetpvl2bin(*network, ui, &progress);
