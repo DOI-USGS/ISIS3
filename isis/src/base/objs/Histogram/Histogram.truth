@@ -1,24 +1,24 @@
-Median:              2
-Mode:                2
-Skew:                0
-Percent(0.5):        1
-Percent(99.5):       3
-Bins:                21
+Median:              2.5
+Mode:                2.5
+Skew:                -1.83712
+Percent(0.5):        1.5
+Percent(99.5):       3.5
+Bins:                20
 BinSize:             1
-BinMiddle:           -10
-BinRange(0,low):     -10.5
-BinRange(0,high):    -9.5
+BinMiddle:           -9.5
+BinRange(0,low):     -10
+BinRange(0,high):    -9
 BinCount(0):         0
-BinRange(20,low):  9.5
-BinRange(20,high): 10.5
+BinRange(20,low):  9
+BinRange(20,high): 10
 BinCount(20):      0
 
 Average:             4
-Median:              5
-Mode:                5
-Skew:                -1.73205
-Percent(0.5):        2
-Percent(99.5):       5
+Median:              5.5
+Mode:                5.5
+Skew:                -2.59808
+Percent(0.5):        2.5
+Percent(99.5):       5.5
 BinCount(0):         0
 BinCount(20):      0
 
@@ -49,16 +49,16 @@ Bin Range:              (0.00973653,0.421463)
 Average:               0.128848
 Std Deviation:         0.0848166
 Variance:              0.00719386
-Median:                0.118086
-Mode:                  0.074746
-Skew:                  0.380683
-Percent(0.5):          0.00973653
-Percent(99.5):         0.421463
+Median:                0.107251
+Mode:                  0.0639111
+Skew:                  0.763918
+Percent(0.5):          0.0205714
+Percent(99.5):         0.410628
 Minimum:               0.00973653
 Maximum:               0.421463
-# Bins:                20
+# Bins:                19
 BinWidth:              0.0216698
-MaxBinCount:           9
+MaxBinCount:           10
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -98,7 +98,7 @@ Percent(0.5):          -1.79769e+308
 Percent(99.5):         -1.79769e+308
 Minimum:               -1.79769e+308
 Maximum:               -1.79769e+308
-# Bins:                20
+# Bins:                19
 BinWidth:              0.00963103
 MaxBinCount:           0
 
@@ -139,14 +139,14 @@ Bin Range:              (0.00973653,0.421463)
 Average:               0.128848
 Std Deviation:         0.0848166
 Variance:              0.00719386
-Median:                0.110158
-Mode:                  0.0699892
-Skew:                  0.661099
-Percent(0.5):          0.00973653
-Percent(99.5):         0.421463
+Median:                0.105137
+Mode:                  0.0247997
+Skew:                  0.838696
+Percent(0.5):          0.0147576
+Percent(99.5):         0.416442
 Minimum:               0.00973653
 Maximum:               0.421463
-# Bins:                42
+# Bins:                41
 BinWidth:              0.0100421
 MaxBinCount:           6
 
@@ -188,7 +188,7 @@ Percent(0.5):          -1.79769e+308
 Percent(99.5):         -1.79769e+308
 Minimum:               -1.79769e+308
 Maximum:               -1.79769e+308
-# Bins:                42
+# Bins:                41
 BinWidth:              0.00446316
 MaxBinCount:           0
 
