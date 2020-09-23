@@ -7,6 +7,7 @@ histTruth.txt.IGNORELINES = Cube
 histTruthNbins.txt.IGNORELINES = Cube
 TEMP = $(OUTPUT)/histTruth.txt
 TEMPNBINS = $(OUTPUT)/histTruthNbins.txt
+TEMPMINMAX = $(OUTPUT)/histTruthMinMax.txt
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -18,3 +19,7 @@ commands:
 	# Test with setting nbins
 	$(APPNAME) from=$(INPUT)/isisTruth.cub nbins=25\
 	  to=$(TEMPNBINS) > /dev/null;
+
+	# Test with a min and max
+	$(APPNAME) from=$(INPUT)/isisTruth.cub\
+          to=$(TEMPMINMAX) minimum=0 maximum=255 nbins=255> /dev/null;

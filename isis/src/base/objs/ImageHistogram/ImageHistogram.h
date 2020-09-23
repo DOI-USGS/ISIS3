@@ -57,7 +57,7 @@ namespace Isis {
    *                            methods into public space.
    */
 
-  class ImageHistogram : public Histogram{
+  class ImageHistogram : public Histogram {
     public:
       ImageHistogram(double minimum, double maximum,
                      int bins = 1024);
@@ -66,10 +66,6 @@ namespace Isis {
                      double endSample = Null, double endLine = Null, int bins = 0,
                      bool addCubeData = false);
 
-      //constuctors that use ControlNetworks to build histograms of ControlMeasure data
-      ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins);
-      ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, double binWidth);
-
       ~ImageHistogram();
 
       virtual void AddData(const double *data, const unsigned int count);
@@ -77,6 +73,11 @@ namespace Isis {
       virtual void RemoveData(const double *data, const unsigned int count);
 
       virtual void BinRange(const int index, double &low, double &high) const;
+
+    private:
+      void InitializeFromCube(Cube &cube, int statsBand,
+          Progress *progress, int nbins, double startSample, double startLine,
+          double endSample, double endLine);
   };
 };
 

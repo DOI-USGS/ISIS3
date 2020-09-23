@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 #include "Pvl.h"
+#include "ImageHistogram.h"
 #include "Histogram.h"
 #include "Blob.h"
 

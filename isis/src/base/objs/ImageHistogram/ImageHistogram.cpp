@@ -22,6 +22,7 @@
  */
 #include "ImageHistogram.h"
 
+#include "Brick.h"
 #include "ControlNet.h"
 #include "ControlMeasure.h"
 
@@ -71,47 +72,162 @@ namespace Isis {
   ImageHistogram::ImageHistogram(Cube &cube, int statsBand, Progress *progress,
       double startSample, double startLine,
       double endSample, double endLine,
-      int bins, bool addCubeData) :
-  Histogram(cube, statsBand, progress,
-                startSample, startLine,
-                endSample, endLine,
-                bins, addCubeData) {
+      int bins, bool addCubeData) {
+    InitializeFromCube(cube, statsBand, progress, bins, startSample, startLine,
+                       endSample, endLine);
+
+    if (addCubeData) {
+      Brick cubeDataBrick((int)(endSample - startSample + 1),
+                          1, 1, cube.pixelType());
+
+      // if band == 0, then we're gathering data for all bands.
+      int startBand = statsBand;
+      int endBand = statsBand;
+
+      if (statsBand == 0) {
+        startBand = 1;
+        endBand = cube.bandCount();
+      }
+
+      if (progress != NULL) {
+        progress->SetText("Gathering histogram");
+        progress->SetMaximumSteps(
+          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1));
+        progress->CheckStatus();
+      }
+
+      for (int band = startBand; band <= endBand; band++) {
+        for (int line = (int)startLine; line <= endLine; line++) {
+          cubeDataBrick.SetBasePosition(qRound(startSample), line, band);
+          cube.read(cubeDataBrick);
+          AddData(cubeDataBrick.DoubleBuffer(), cubeDataBrick.size());
+          if (progress != NULL) {
+            progress->CheckStatus();
+          }
+        }
+      }
+    }
   }
 
+  void ImageHistogram::InitializeFromCube(Cube &cube, int statsBand,
+      Progress *progress, int nbins, double startSample, double startLine,
+      double endSample, double endLine) {
+    // Make sure band is valid, 0 is valid (means all bands)
+    if ( (statsBand < 0) || (statsBand > cube.bandCount() ) ) {
+      string msg = "Cannot gather histogram for band [" + IString(statsBand) +
+          "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
-  /**
-   * Constructs a histogram from a control netowrk
-   *
-   * @param net: Reference to a ControlNetwork used to access all the measures.
-   * @param statFunc: Pointer to a ControlMeasure acessor, the returns of this
-   *    function call will be used to build up the network.
-   * @param bins:  The number of bins to divide the histogram into.
-   * @throws The number of Histogram Bins must be greater than 0.
-   */
-  ImageHistogram::ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins) :
-  Histogram(net, statFunc, bins) {
+    // We need to find the min/max DN value for our histogram bins to be the
+    //   correct size.
+    double minDnValue = Null;
+    double maxDnValue = Null;
 
-    //add all the data to the now setup histogram
-    addMeasureDataFromNet(net, statFunc);
+    if (cube.pixelType() == UnsignedByte) {
+      // If we can discretely store every data point, then we can use the
+      //   possible extent of the data range as our min/max dn values.
+      if (nbins == 0) {
+        minDnValue = 0.0 * cube.multiplier() + cube.base();
+        maxDnValue = 255.0 * cube.multiplier() + cube.base();
+        nbins = 256;
+      }
+    }
+    else if (cube.pixelType() == UnsignedWord) {
+      if (nbins == 0) {
+        minDnValue = 0.0 * cube.multiplier() + cube.base();
+        maxDnValue = 65535.0 * cube.multiplier() + cube.base();
+        nbins = 65536;
+      }
+    }
+    else if (cube.pixelType() == SignedWord) {
+      if (nbins == 0) {
+        minDnValue = -32768.0 * cube.multiplier() + cube.base();
+        maxDnValue = 32767.0 * cube.multiplier() + cube.base();
+        nbins = 65536;
+      }
+    }
+    // 32-bit data covers too big of a range of values to use
+    // the min and max possible values to set our value range.
+    // So, just set the number of bins and then later we will
+    // compute the min and max value in the actual cube.
+    else if (cube.pixelType() == UnsignedInteger ||
+             cube.pixelType() == SignedInteger ||
+             cube.pixelType() == Real) {
+      if (nbins == 0) {
+        nbins = 65536;
+      }
+    }
+    else {
+      IString msg = "Unsupported pixel type";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (startSample == Null)
+      startSample = 1.0;
+
+    if (endSample == Null)
+      endSample = cube.sampleCount();
+
+    if (startLine == Null)
+      startLine = 1.0;
+
+    if (endLine == Null)
+      endLine = cube.lineCount();
+
+    // If we still need our min/max DN values, find them.
+    if (minDnValue == Null || maxDnValue == Null) {
+
+      Brick cubeDataBrick((int)(endSample - startSample + 1),
+                          1, 1, cube.pixelType() );
+      Statistics stats;
+
+      // if band == 0, then we're gathering stats for all bands. I'm really
+      //   not sure that this is correct, a good idea or called from anywhere...
+      //   but I don't have time to track down the use case.
+      int startBand = statsBand;
+      int endBand = statsBand;
+
+      if (statsBand == 0) {
+        startBand = 1;
+        endBand = cube.bandCount();
+      }
+
+      if (progress != NULL) {
+
+        progress->SetText("Computing min/max for histogram");
+        progress->SetMaximumSteps(
+          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1) );
+        progress->CheckStatus();
+      }
+
+      for (int band = startBand; band <= endBand; band++) {
+        for (int line = (int)startLine; line <= endLine; line++) {
+
+          cubeDataBrick.SetBasePosition(qRound(startSample), line, band);
+          cube.read(cubeDataBrick);
+          stats.AddData(cubeDataBrick.DoubleBuffer(), cubeDataBrick.size());
+
+          if (progress != NULL) {
+            progress->CheckStatus();
+          }
+        }
+      }
+
+      if (stats.ValidPixels() == 0) {
+        minDnValue = 0.0;
+        maxDnValue = 1.0;
+      }
+      else {
+        minDnValue = stats.Minimum();
+        maxDnValue = stats.Maximum();
+      }
+    }
+
+    // Set the bins and range
+    SetValidRange(minDnValue, maxDnValue);
+    SetBins(nbins);
   }
-
-
-  /**
-   * Constructs a histogram from a control netowrk
-   *
-   * @param Net:  Reference to a ControlNetwork used to access all the measures.
-   * @param statFunc:  Pointer to a ControlMeasure acessor, the returns of this.
-   *    function call will be used to build up the network.
-   * @param binWidth:  The width of histogram bins.
-   * @throws The width of Histogram Bins must be greater than 0.
-   */
-  ImageHistogram::ImageHistogram(ControlNet &net, double(ControlMeasure::*statFunc)() const,
-                                 double binWidth) : Histogram(net, statFunc, binWidth) {
-
-    //add all the data to the now setup histogram
-    addMeasureDataFromNet(net, statFunc);
-  }
-
 
   //! Destructs a histogram object.
   ImageHistogram::~ImageHistogram() {

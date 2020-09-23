@@ -69,8 +69,7 @@ void IsisMain() {
   else {
 
     if (ui.WasEntered("NBINS")){
-      hist = new Histogram(*icube, 1, p.Progress());
-      hist->SetBins(ui.GetInteger("NBINS"));
+      hist = new ImageHistogram(*icube, 1, p.Progress(), 1, 1, Null, Null, ui.GetInteger("NBINS"));
     }
     else {
       hist = new ImageHistogram(*icube, 1, p.Progress());

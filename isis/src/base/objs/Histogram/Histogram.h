@@ -90,6 +90,7 @@ namespace Isis {
 
   class Histogram : public Statistics {
     public:
+      Histogram() = default;
       Histogram(double minimum, double maximum,
                 int bins = 1024);
       Histogram(Cube &cube, int statsBand, Progress *progress = NULL,
@@ -132,20 +133,14 @@ namespace Isis {
       void SetValidRange(const double minimum = Isis::ValidMinimum,
                                        const double maximum = Isis::ValidMaximum);
 
-      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
-      
     protected:
       //! The array of counts.
       std::vector<BigInt> p_bins;
 
-      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
-
     private:
-      void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
-          int nbins = 0, double startSample = Null, double startLine = Null,
-          double endSample = Null, double endLine = Null);
-
       double p_binRangeStart, p_binRangeEnd;
+      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
   };
 };
 

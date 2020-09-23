@@ -37,7 +37,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
                               UserInterface &ui, Camera *cam);
 void IsisMain() {
   // Get user interface and create a ProcessExportPds object
-  UserInterface &ui = Application::GetUserInterface();  
+  UserInterface &ui = Application::GetUserInterface();
   ProcessExportPds p;
   Process pHist;
   double *band_min, *band_max;
@@ -51,25 +51,25 @@ void IsisMain() {
                            .findGroup("OriginalInstrument")["InstrumentId"][0];
   if (origInstrument != "HIRISE") {
     QString msg = "Input cube must from a HiRISE image. The original "
-                  "InstrumentId = [" + origInstrument 
+                  "InstrumentId = [" + origInstrument
                   + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   QString instrumentId = isisCubeLab->findObject("IsisCube")
                                     .findGroup("Instrument")["InstrumentId"][0];
   if (instrumentId != "IdealCamera") {
-    QString msg = "Input cube must be IdealCamera. InstrumentId = [" 
+    QString msg = "Input cube must be IdealCamera. InstrumentId = ["
                   + instrumentId + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   QString target = isisCubeLab->findObject("IsisCube")
                               .findGroup("Instrument")["TargetName"][0];
   if (target.toUpper() != "MARS") {
-    QString msg = "Input cube must from a HiRise image. The target = [" 
+    QString msg = "Input cube must from a HiRise image. The target = ["
                   + target + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  
+
   band_min = new double[inputCube->bandCount()];
   band_max = new double[inputCube->bandCount()];
 
@@ -137,7 +137,7 @@ void IsisMain() {
       p.SetOutputLrs(LOW_REPR_SATU2);
       p.SetOutputHis(HIGH_INSTR_SATU2);
       p.SetOutputHrs(HIGH_REPR_SATU2);
-      break; 
+      break;
 
     default:
       p.SetOutputType(UnsignedWord);
@@ -167,7 +167,7 @@ void IsisMain() {
   QString isisLabelFile = ui.GetFileName("FROM");
 
   // Translate the keywords from the input cube label that go in the PDS label
-  PvlToPvlTranslationManager cubeLab(*(inputCube->label()), 
+  PvlToPvlTranslationManager cubeLab(*(inputCube->label()),
                              "$ISISROOT/appdata/translations/MroHiriseIdealPdsExportCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
@@ -178,7 +178,7 @@ void IsisMain() {
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
   origLabel.addObject(origLabelObj);
-  PvlToPvlTranslationManager orig(origLabel, 
+  PvlToPvlTranslationManager orig(origLabel,
                                  "$ISISROOT/appdata/translations/MroHirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
@@ -194,14 +194,14 @@ void IsisMain() {
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
 
   // Export each of the spice tables and update table keywords in PDS file
-  // 
+  //
   // *** NOTE ***
   //    This could change the start byte/line values for the tables that have
   //    already been set in the labels by the ExportTable call. This is not
   //    a problem since our tables are detached.  However, it could be a
   //    problem if we decide to allow attached PDS products in the future.
   QString pdsTableFile = "";
-  pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POINTING_TABLE.dat"; 
+  pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POINTING_TABLE.dat";
   Table instRotationTable = cam->instrumentRotation()->Cache("InstrumentPointing");
   p.ExportTable(instRotationTable, pdsTableFile);
   PvlObject isisTableLab = instRotationTable.Label();
@@ -225,9 +225,9 @@ void IsisMain() {
   tableKeyword.setName("CK_TABLE_ORIGINAL_SIZE");
   instPtTabLab += tableKeyword;
 
-  pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POSITION_TABLE.dat"; 
+  pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POSITION_TABLE.dat";
   Table instPositionTable = cam->instrumentPosition()->Cache("InstrumentPosition");
-  p.ExportTable(instPositionTable, pdsTableFile); 
+  p.ExportTable(instPositionTable, pdsTableFile);
   isisTableLab = instPositionTable.Label();
   PvlObject &instPosTabLab = pdsLabel.findObject("INSTRUMENT_POSITION_TABLE");
   tableKeyword = isisTableLab.findKeyword("CacheType");
@@ -243,9 +243,9 @@ void IsisMain() {
   tableKeyword.setName("SPK_TABLE_ORIGINAL_SIZE");
   instPosTabLab += tableKeyword;
 
-  pdsTableFile = outPdsFile.baseName() + "_BODY_ROTATION_TABLE.dat"; 
+  pdsTableFile = outPdsFile.baseName() + "_BODY_ROTATION_TABLE.dat";
   Table bodyRotationTable = cam->bodyRotation()->Cache("BodyRotation");
-  p.ExportTable(bodyRotationTable, pdsTableFile); 
+  p.ExportTable(bodyRotationTable, pdsTableFile);
   isisTableLab = bodyRotationTable.Label();
   PvlObject &bodyRotTabLab = pdsLabel.findObject("BODY_ROTATION_TABLE");
   tableKeyword = isisTableLab.findKeyword("TimeDependentFrames");
@@ -265,16 +265,16 @@ void IsisMain() {
     tableKeyword.setName("SOLAR_LONGITUDE");
   }
   else {
-    tableKeyword = PvlKeyword("SOLAR_LONGITUDE", 
+    tableKeyword = PvlKeyword("SOLAR_LONGITUDE",
                               toString(cam->solarLongitude().force360Domain()
-                                   .positiveEast(Angle::Degrees)), 
+                                   .positiveEast(Angle::Degrees)),
                               "DEGREES");
   }
   bodyRotTabLab += tableKeyword;
 
-  pdsTableFile = outPdsFile.baseName() + "_SUN_POSITION_TABLE.dat"; 
+  pdsTableFile = outPdsFile.baseName() + "_SUN_POSITION_TABLE.dat";
   Table sunPositionTable  = cam->sunPosition()->Cache("SunPosition");
-  p.ExportTable(sunPositionTable, pdsTableFile); 
+  p.ExportTable(sunPositionTable, pdsTableFile);
   isisTableLab = sunPositionTable.Label();
   PvlObject &sunPosTabLab = pdsLabel.findObject("SUN_POSITION_TABLE");
   tableKeyword = isisTableLab.findKeyword("CacheType");
@@ -290,7 +290,7 @@ void IsisMain() {
   tableKeyword.setName("SPK_TABLE_ORIGINAL_SIZE");
   sunPosTabLab += tableKeyword;
 
-  // Read in the proper keyword types (Real, Enum, String, Integer, etc) for 
+  // Read in the proper keyword types (Real, Enum, String, Integer, etc) for
   // each PvlKeyword so that the PDS labels have proper format
   PvlFormat *formatter = pdsLabel.format();
 
@@ -312,25 +312,25 @@ void IsisMain() {
   p.StartProcess(outputStream);
   p.EndProcess();
   outputStream.close();
-  
+
   delete [] band_min;
   delete [] band_max;
 }
 
 /**
- * This method uses a Histogram object to find the minimum and maximum DN 
- * values of the input cube.  These values are used by the Process object 
- * to set the input range. 
- *  
- * @param inputCube Pointer to the inputCube 
- *  
+ * This method uses a Histogram object to find the minimum and maximum DN
+ * values of the input cube.  These values are used by the Process object
+ * to set the input range.
+ *
+ * @param inputCube Pointer to the inputCube
+ *
  * @return A pair whose first value is the minimum DN of the input cube and
  *         second value is the maximum DN of the input cube.
  */
 pair<double, double> inputRange(Cube *inputCube) {
   Process histProcess;
   int band = 1;
-  Histogram hist(*inputCube, band, histProcess.Progress());
+  ImageHistogram hist(*inputCube, band, histProcess.Progress());
 
   // Loop and accumulate histogram
   histProcess.Progress()->SetText("Gathering Histogram to Find Input Range");
@@ -351,24 +351,24 @@ pair<double, double> inputRange(Cube *inputCube) {
 }
 
 /**
- * This method updates the values of the keywords in the IMAGE object of 
- * the pds label file. 
- *  
- * The DESCRIPTION keyword is added. 
- *  
- * If the input cube has an AlphaCube group that indicates a crop has 
- * been performed, SOURCE_LINE_SAMPLES, SOURCE_LINES, FIRST_LINE_SAMPLE, 
- * and FIRST_LINE keywords are added. 
- *  
- * The values for CENTER_FILTER_WAVELENGTH and BAND_WIDTH are updated. 
- *  
- * @param inputCubeLab PvlObject pointer to the input cube labels 
- * @param pdsLabel Pvl of the output PDS labels 
+ * This method updates the values of the keywords in the IMAGE object of
+ * the pds label file.
+ *
+ * The DESCRIPTION keyword is added.
+ *
+ * If the input cube has an AlphaCube group that indicates a crop has
+ * been performed, SOURCE_LINE_SAMPLES, SOURCE_LINES, FIRST_LINE_SAMPLE,
+ * and FIRST_LINE keywords are added.
+ *
+ * The values for CENTER_FILTER_WAVELENGTH and BAND_WIDTH are updated.
+ *
+ * @param inputCubeLab PvlObject pointer to the input cube labels
+ * @param pdsLabel Pvl of the output PDS labels
  */
 void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
   // Add the image description to the IMAGE object in the label of the PDS product
   PvlObject &image = pdsLabel.findObject("IMAGE");
-  image += PvlKeyword("DESCRIPTION", 
+  image += PvlKeyword("DESCRIPTION",
                       "HiRISE mosaicked product, not map projected");
 
   // Add AlphaCube values to the IMAGE object
@@ -446,31 +446,31 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
 
 
 /**
- * This method updates the values of the keywords in the ROOT object of 
- * the pds label file. 
- *  
- * The RATIONALE_DESC keyword is updated if the user entered this 
- * parameter. 
- *  
- * The PRODUCT_VERSION_ID is added based on the user entered parameter. 
- *  
- * The NOT_APPLICABLE_CONSTANT keyword is added. 
- *  
- * The SOFTWARE_NAME keyword is determined and added. 
- *  
- * The SHAPE_MODEL keyword from the Kernels group of the input cube is 
- * added with the path removed. 
- *  
- * The NaifKeywords values are added if the Object exists in the input 
- * cube.  Otherwise, the corresponding values are calculated and added 
- * to the pds labels. These values are added: BODY_FRAME_CODE, 
- * IDEAL_FOCAL_LENGTH, IDEAL_PIXEL_PITCH, IDEAL_TRANSX, IDEAL_TRANSY, 
+ * This method updates the values of the keywords in the ROOT object of
+ * the pds label file.
+ *
+ * The RATIONALE_DESC keyword is updated if the user entered this
+ * parameter.
+ *
+ * The PRODUCT_VERSION_ID is added based on the user entered parameter.
+ *
+ * The NOT_APPLICABLE_CONSTANT keyword is added.
+ *
+ * The SOFTWARE_NAME keyword is determined and added.
+ *
+ * The SHAPE_MODEL keyword from the Kernels group of the input cube is
+ * added with the path removed.
+ *
+ * The NaifKeywords values are added if the Object exists in the input
+ * cube.  Otherwise, the corresponding values are calculated and added
+ * to the pds labels. These values are added: BODY_FRAME_CODE,
+ * IDEAL_FOCAL_LENGTH, IDEAL_PIXEL_PITCH, IDEAL_TRANSX, IDEAL_TRANSY,
  * IDEAL_TRANSS, and IDEAL_TRANSL. The BODY_RADII keyword is split into
- * A_AXIS_RADIUS, B_AXIS_RADIUS, and C_AXIS_RADIUS 
- *  
- * @param inputCubeLab PvlObject pointer to the input cube labels 
- * @param pdsLabel Pvl of the output PDS labels 
- * @param ui UserInterface reference, so that the user entered 
+ * A_AXIS_RADIUS, B_AXIS_RADIUS, and C_AXIS_RADIUS
+ *
+ * @param inputCubeLab PvlObject pointer to the input cube labels
+ * @param pdsLabel Pvl of the output PDS labels
+ * @param ui UserInterface reference, so that the user entered
  *           RATIONALE_DESC and PRODUCT_VERSION_ID parameters can be
  *           read in.
  * @param cam Pointer to the Camera object created from the input cube.
@@ -480,13 +480,13 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   // Replace INSTRUMENT_ID value in the output labels
   PvlKeyword instId("INSTRUMENT_ID", "HIRISE_IDEAL_CAMERA");
   pdsLabel.addKeyword(instId, PvlContainer::Replace);
-  
+
   // Add user-entered keywords to ROOT object in the label of the PDS product
   if(ui.WasEntered("RATIONALE_DESC")) {
     PvlKeyword rationale("RATIONALE_DESC", ui.GetAsString("RATIONALE_DESC"));
     pdsLabel.addKeyword(rationale, PvlContainer::Replace);
   }
-  else if ( !pdsLabel.hasKeyword("RATIONALE_DESC") 
+  else if ( !pdsLabel.hasKeyword("RATIONALE_DESC")
             || QString(pdsLabel["RATIONALE_DESC"]) == "NULL" ){
     QString msg = "Unable to export HiRise product to PDS without "
                   "RationaleDescription value. The input cube value for this "
@@ -515,11 +515,11 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
                  .hasKeyword("ImageJitterCorrected")) {
     jitter = toInt(isisCubeLab->findObject("IsisCube")
                             .findGroup("Instrument")["ImageJitterCorrected"][0]);
-    pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", toString((int)jitter));          
+    pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", toString((int)jitter));
   }
   else {
     pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", "UNK");
-  }                                                                  
+  }
 
   // Add Isis Kernels group keywords to the ROOT object
   QString shapeModel = isisCubeLab->findObject("IsisCube").findGroup("Kernels")
@@ -527,9 +527,9 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   FileName shapeModelFileNoPath(shapeModel);
   pdsLabel += PvlKeyword("SHAPE_MODEL", shapeModelFileNoPath.name());
 
-  // PRODUCT_ID and SOURCE_PRODUCT_ID should be keywords added when creating the 
+  // PRODUCT_ID and SOURCE_PRODUCT_ID should be keywords added when creating the
   // mosaic input cube.
-  
+
   // Add NaifKeywords Object values to the ROOT object
   QString radiiName = "BODY" + QString::number(cam->naifBodyCode()) + "_RADII";
   PvlObject naifKeywordGroup = cam->getStoredNaifKeywords();
@@ -621,12 +621,12 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
 
 /**
  * This method updates the values of the keywords in the Time Parameters
- * Group of the pds label file. 
- *  
- * The PRODUCT_CREATION_TIME keyword is determined and added to the PDS 
- * labels. 
- *  
- * @param pdsLabel Pvl of the output PDS labels 
+ * Group of the pds label file.
+ *
+ * The PRODUCT_CREATION_TIME keyword is determined and added to the PDS
+ * labels.
+ *
+ * @param pdsLabel Pvl of the output PDS labels
  */
 void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel) {
   // Calculate and add PRODUCT_CREATION_TIME to the TIME_PARAMETERS group
@@ -639,5 +639,3 @@ void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel) {
   PvlGroup &timeParam = pdsLabel.findGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 }
-
-

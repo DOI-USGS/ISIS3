@@ -90,7 +90,7 @@ namespace Isis {
       }
     }
     //build a Histogram of the residual Magnitudes from the ControlNet
-    ImageHistogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+    Histogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
 
       //make sure there was some residual data in the control network
     if (hist.ValidPixels() < 1) {
