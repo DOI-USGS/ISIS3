@@ -264,7 +264,7 @@ TEST_F(SpiceRotationKernels, Pck) {
   vector<Angle> prMer = ioRot.pmCoefs();
   EXPECT_EQ(prMer.size(), 3);
   EXPECT_NEAR(prMer[0].degrees(), 200.39, testTolerance);
-  EXPECT_NEAR(prMer[1].degrees(), 203.48895, testTolerance);
+  EXPECT_NEAR(prMer[1].degrees(), 203.4889538, testTolerance);
   EXPECT_NEAR(prMer[2].degrees(), 0.0, testTolerance);
 
   vector<Angle> sysNutPrec0 = ioRot.sysNutPrecConstants();
