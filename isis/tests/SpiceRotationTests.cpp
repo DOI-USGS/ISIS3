@@ -255,13 +255,13 @@ TEST_F(SpiceRotationKernels, Pck) {
   EXPECT_NEAR(poleRa[1].degrees(), -0.009, testTolerance);
   EXPECT_NEAR(poleRa[2].degrees(), 0.0, testTolerance);
 
-  vector<Angle> poleDec = ioRot.poleRaCoefs();
+  vector<Angle> poleDec = ioRot.poleDecCoefs();
   EXPECT_EQ(poleDec.size(), 3);
   EXPECT_NEAR(poleDec[0].degrees(), 64.5, testTolerance);
   EXPECT_NEAR(poleDec[1].degrees(), 0.003, testTolerance);
   EXPECT_NEAR(poleDec[2].degrees(), 0.0, testTolerance);
 
-  vector<Angle> prMer = ioRot.poleRaCoefs();
+  vector<Angle> prMer = ioRot.pmCoefs();
   EXPECT_EQ(prMer.size(), 3);
   EXPECT_NEAR(prMer[0].degrees(), 200.39, testTolerance);
   EXPECT_NEAR(prMer[1].degrees(), 203.48895, testTolerance);
@@ -280,9 +280,9 @@ TEST_F(SpiceRotationKernels, Pck) {
   EXPECT_NEAR(sysNutPrec0[8].degrees(), 146.64, testTolerance);
   EXPECT_NEAR(sysNutPrec0[9].degrees(), 49.24, testTolerance);
   EXPECT_NEAR(sysNutPrec0[10].degrees(), 99.360714, testTolerance);
-  EXPECT_NEAR(sysNutPrec0[11].degrees(), 175.89537, testTolerance);
-  EXPECT_NEAR(sysNutPrec0[12].degrees(), 300.32316, testTolerance);
-  EXPECT_NEAR(sysNutPrec0[13].degrees(), 114.0123, testTolerance);
+  EXPECT_NEAR(sysNutPrec0[11].degrees(), 175.895369, testTolerance);
+  EXPECT_NEAR(sysNutPrec0[12].degrees(), 300.323162, testTolerance);
+  EXPECT_NEAR(sysNutPrec0[13].degrees(), 114.012305, testTolerance);
   EXPECT_NEAR(sysNutPrec0[14].degrees(), 49.511251, testTolerance);
 
   vector<Angle> sysNutPrec1 = ioRot.sysNutPrecCoefs();
