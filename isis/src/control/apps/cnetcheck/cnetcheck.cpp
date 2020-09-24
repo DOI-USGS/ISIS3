@@ -635,7 +635,7 @@ namespace Isis {
 
           // Check the exact measure location
           bool setCamera = false;
-          if (createdCamera) {
+          if (createdCamera && !IsSpecial(measure->GetSample()) && !IsSpecial(measure->GetLine())) {
             setCamera = cam->SetImage(measure->GetSample(), measure->GetLine());
           }
 
