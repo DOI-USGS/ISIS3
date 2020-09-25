@@ -84,6 +84,7 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+      void resetCube();
   };
 
   class Hayabusa2OncTCube : public TempTestingFiles {

@@ -72,7 +72,7 @@ namespace Isis {
       g_filter = bandbin["FilterName"][0];
     }
     catch(IException &e) {
-      QString msg = "Unable to read FilterName keyword in the BandBin group "
+      QString msg = "Unable to read [FilterName] keyword in the BandBin group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -83,7 +83,7 @@ namespace Isis {
       instrument = inst["InstrumentId"][0];
     }
     catch(IException &e) {
-      QString msg = "Unable to read InstrumentId keyword in the Instrument group "
+      QString msg = "Unable to read [InstrumentId] keyword in the Instrument group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -197,9 +197,6 @@ namespace Isis {
 
     if (smearCorrection == "ONBOARD") {
       g_onBoardSmearCorrection = true;
-    }
-    else {
-      qDebug() << icube->fileName();
     }
 
     QString compmode = inst["Compression"];

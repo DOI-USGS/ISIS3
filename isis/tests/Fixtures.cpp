@@ -160,7 +160,7 @@ namespace Isis {
     testCube->fromLabel(tempDir.path() + "/hayabusa2OncTSmall.cub", label, "rw");
 
     LineManager line(*testCube);
-    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for the calibration tests
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 (bias) for the calibration tests
     for(line.begin(); !line.end(); line++) {
       for(int i = 0; i < line.size(); i++) {
         line[i] = (double) pixelValue++;
@@ -177,6 +177,12 @@ namespace Isis {
     delete testCube;
   }
 
+  void Hayabusa2OncTSmallCube::resetCube() {
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+  }
+
   void Hayabusa2OncTCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -188,7 +194,7 @@ namespace Isis {
     testCube->fromLabel(tempDir.path() + "/hayabusa2OncT.cub", label, "rw");
 
     LineManager line(*testCube);
-    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 for the calibration tests
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 (bias) for the calibration tests
     for(line.begin(); !line.end(); line++) {
       for(int i = 0; i < line.size(); i++) {
         line[i] = (double) pixelValue;
