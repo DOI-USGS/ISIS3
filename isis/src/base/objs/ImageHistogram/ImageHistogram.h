@@ -36,25 +36,22 @@ namespace Isis {
   /**
    * @brief Container of a cube histogram
    *
-   * This class is used to accumulate a histogram on double arrays.  In
+   * This class is used to accumulate an image histogram on double arrays.  In
    * particular, it is highly useful for obtaining a histogram on cube data.
    * Parameters which can be computed are the 1) median, 2) mode, and 3) skew.
    * The histogram consists of a fixed set of distinct bins. When an object is
    * created the programmer must provide a minimum and maximum which defines how
-   * data is further placed in the bins.  The minimum is mapped to the left edge
-   * of the first bin [0] and the maximum is mapped to the right edge of the
+   * data is further placed in the bins.  The minimum is mapped to the middle
+   * of the first bin [0] and the maximum is mapped to the middle of the
    * last bin [Bins()-1]. There are a set of methods which return bin information
    * such as 1) count, 2) size, 3) middle value, 4) range, and 5) maximum bin
    * count.
    *
    * @ingroup Statistics
    *
-   * @author 2002-05-13 Jeff Anderson
+   * @author 2020-09-22 Adam Paquette
    *
    * @internal
-   *   @todo This class needs an example.
-   *   @history 2002-05-22 Jeff Anderson moved Reset, AddData, and RemoveData
-   *                            methods into public space.
    */
 
   class ImageHistogram : public Histogram {

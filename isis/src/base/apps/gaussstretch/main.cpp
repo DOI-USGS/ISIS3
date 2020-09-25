@@ -25,8 +25,14 @@ void IsisMain() {
 
   p.StartProcess(gauss);
   for(int i = 0; i < icube->bandCount(); i++) delete stretch[i];
-  stretch.clear();
   p.EndProcess();
+
+  while(!stretch.empty()) {
+      delete stretch.back();
+      stretch.pop_back();
+  }
+
+  stretch.clear();
 }
 
 // Processing routine for the pca with one input cube
