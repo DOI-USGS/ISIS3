@@ -34,7 +34,7 @@ void IsisMain() {
 
   // Applies the input to output stretch options
   if(ui.GetString("STRETCH") == "LINEAR") {
-//    if(ui.GetString("BITTYPE") != "32BIT")
+   // if(ui.GetString("BITTYPE") != "32BIT")
     p.SetInputRange();
   }
   if(ui.GetString("STRETCH") == "MANUAL") {
@@ -68,7 +68,7 @@ void IsisMain() {
     p.SetOutputType(Isis::Real);
     pixType = NONE;
   }
-  
+
   if (ui.GetString("STRETCH") != "NONE" || ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
   }

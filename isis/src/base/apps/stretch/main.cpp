@@ -42,8 +42,9 @@ void IsisMain() {
       pairs = ui.GetString("PAIRS");
   }
 
-  if(ui.GetBoolean("USEPERCENTAGES"))
+  if(ui.GetBoolean("USEPERCENTAGES")) {
     str.Parse(pairs, inCube->histogram());
+  }
   else
     str.Parse(pairs);
 

@@ -17,16 +17,22 @@ void IsisMain() {
   double gsigma = Isis::Application::GetUserInterface().GetDouble("GSIGMA");
 
   for(int i = 0; i < icube->bandCount(); i++) {
-    Histogram hist = *(icube->histogram(i + 1));
-    double mean = (hist.Maximum() + hist.Minimum()) / 2.0;
-    double stdev = (hist.Maximum() - hist.Minimum()) / (2.0 * gsigma);
-    stretch.push_back(new GaussianStretch(hist, mean, stdev));
+    Histogram *hist = icube->histogram(i + 1);
+    double mean = (hist->Maximum() + hist->Minimum()) / 2.0;
+    double stdev = (hist->Maximum() - hist->Minimum()) / (2.0 * gsigma);
+    stretch.push_back(new GaussianStretch(*hist, mean, stdev));
   }
 
   p.StartProcess(gauss);
   for(int i = 0; i < icube->bandCount(); i++) delete stretch[i];
-  stretch.clear();
   p.EndProcess();
+
+  while(!stretch.empty()) {
+      delete stretch.back();
+      stretch.pop_back();
+  }
+
+  stretch.clear();
 }
 
 // Processing routine for the pca with one input cube
@@ -36,4 +42,3 @@ void gauss(Buffer &in, Buffer &out) {
     out[i] = stretch[in.Band(i)-1]->Map(in[i]);
   }
 }
-

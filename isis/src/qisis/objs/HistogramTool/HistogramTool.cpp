@@ -11,6 +11,7 @@
 
 #include "Brick.h"
 #include "CubePlotCurve.h"
+#include "ImageHistogram.h"
 #include "Histogram.h"
 #include "HistogramItem.h"
 #include "HistogramPlotWindow.h"
@@ -189,7 +190,7 @@ namespace Isis {
 
       Cube *cube = activeViewport->cube();
       int band = activeViewport->grayBand();
-      Histogram hist(*cube, band);
+      ImageHistogram hist(*cube, band);
 
       //If the rubber band is a line
       if (rubberBandTool()->currentMode() == RubberBandTool::LineMode) {
@@ -458,4 +459,3 @@ namespace Isis {
     }
   }
 }
-

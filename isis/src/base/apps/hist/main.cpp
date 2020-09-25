@@ -7,6 +7,7 @@
 
 #include "CubePlotCurve.h"
 #include "Histogram.h"
+#include "ImageHistogram.h"
 #include "HistogramItem.h"
 #include "HistogramPlotWindow.h"
 #include "LineManager.h"
@@ -33,7 +34,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
-  if(!ui.WasEntered("TO") && !ui.IsInteractive()) {
+  if (!ui.WasEntered("TO") && !ui.IsInteractive()) {
     QString msg = "The [TO] parameter must be entered";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -66,10 +67,12 @@ void IsisMain() {
     hist = new Histogram(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"), nbins);
   }
   else {
-    hist = new Histogram(*icube, 1, p.Progress());
 
     if (ui.WasEntered("NBINS")){
-      hist->SetBins(ui.GetInteger("NBINS"));
+      hist = new ImageHistogram(*icube, 1, p.Progress(), 1, 1, Null, Null, ui.GetInteger("NBINS"));
+    }
+    else {
+      hist = new ImageHistogram(*icube, 1, p.Progress());
     }
   }
 
@@ -88,46 +91,53 @@ void IsisMain() {
     p.Progress()->CheckStatus();
   }
 
-  if(!ui.IsInteractive() || ui.WasEntered("TO") ) {
+  if (!ui.IsInteractive() || ui.WasEntered("TO") ) {
     // Write the results
     QString outfile = ui.GetFileName("TO");
     ofstream fout;
     fout.open(outfile.toLatin1().data());
 
-    fout << "Cube:           " << ui.GetFileName("FROM") << endl;
-    fout << "Band:           " << icube->bandCount() << endl;
-    fout << "Average:        " << hist->Average() << endl;
-    fout << "Std Deviation:  " << hist->StandardDeviation() << endl;
-    fout << "Variance:       " << hist->Variance() << endl;
-    fout << "Median:         " << hist->Median() << endl;
-    fout << "Mode:           " << hist->Mode() << endl;
-    fout << "Skew:           " << hist->Skew() << endl;
-    fout << "Minimum:        " << hist->Minimum() << endl;
-    fout << "Maximum:        " << hist->Maximum() << endl;
+    fout << "Cube:              " << ui.GetFileName("FROM") << endl;
+    fout << "Band:              " << icube->bandCount() << endl;
+    fout << "Average:           " << hist->Average() << endl;
+    fout << "Std Deviation:     " << hist->StandardDeviation() << endl;
+    fout << "Variance:          " << hist->Variance() << endl;
+    fout << "Median:            " << hist->Median() << endl;
+    fout << "Mode:              " << hist->Mode() << endl;
+    fout << "Skew:              " << hist->Skew() << endl;
+    fout << "Minimum:           " << hist->Minimum() << endl;
+    fout << "Maximum:           " << hist->Maximum() << endl;
     fout << endl;
-    fout << "Total Pixels:    " << hist->TotalPixels() << endl;
-    fout << "Valid Pixels:    " << hist->ValidPixels() << endl;
-    fout << "Null Pixels:     " << hist->NullPixels() << endl;
-    fout << "Lis Pixels:      " << hist->LisPixels() << endl;
-    fout << "Lrs Pixels:      " << hist->LrsPixels() << endl;
-    fout << "His Pixels:      " << hist->HisPixels() << endl;
-    fout << "Hrs Pixels:      " << hist->HrsPixels() << endl;
+    fout << "Total Pixels:      " << hist->TotalPixels() << endl;
+    fout << "Valid Pixels:      " << hist->ValidPixels() << endl;
+    fout << "Pixels Below Min:  " << hist->UnderRangePixels() << endl;
+    fout << "Pixels Above Max:  " << hist->OverRangePixels() << endl;
+    fout << "Null Pixels:       " << hist->NullPixels() << endl;
+    fout << "Lis Pixels:        " << hist->LisPixels() << endl;
+    fout << "Lrs Pixels:        " << hist->LrsPixels() << endl;
+    fout << "His Pixels:        " << hist->HisPixels() << endl;
+    fout << "Hrs Pixels:        " << hist->HrsPixels() << endl;
 
     //  Write histogram in tabular format
     fout << endl;
     fout << endl;
-    fout << "DN,Pixels,CumulativePixels,Percent,CumulativePercent" << endl;
+    fout << "MinInclusive,MaxExclusive,Pixels,CumulativePixels,Percent,CumulativePercent" << endl;
 
     Isis::BigInt total = 0;
     double cumpct = 0.0;
+    double low;
+    double high;
 
-    for(int i = 0; i < hist->Bins(); i++) {
-      if(hist->BinCount(i) > 0) {
+    for (int i = 0; i < hist->Bins(); i++) {
+      if (hist->BinCount(i) > 0) {
         total += hist->BinCount(i);
         double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
         cumpct += pct;
 
-        fout << hist->BinMiddle(i) << ",";
+        hist->BinRange(i, low, high);
+
+        fout << low << ",";
+        fout << high << ",";
         fout << hist->BinCount(i) << ",";
         fout << total << ",";
         fout << pct << ",";
@@ -137,10 +147,10 @@ void IsisMain() {
     fout.close();
   }
   // If we are in gui mode, create a histogram plot
-  if(ui.IsInteractive()) {
+  if (ui.IsInteractive()) {
     // Set the title for the dialog
     QString title;
-    if(ui.WasEntered("TITLE") ) {
+    if (ui.WasEntered("TITLE") ) {
       title = ui.GetString("TITLE");
     }
     else {
@@ -153,19 +163,19 @@ void IsisMain() {
                                                         ui.TheGui());
 
     // Set the xaxis title if they entered one
-    if(ui.WasEntered("XAXIS") ) {
+    if (ui.WasEntered("XAXIS") ) {
       QString xaxis(ui.GetString("XAXIS"));
       plot->setAxisLabel(QwtPlot::xBottom, xaxis.toLatin1().data());
     }
 
     // Set the yLeft axis title if they entered one
-    if(ui.WasEntered("FREQAXIS") ) {
+    if (ui.WasEntered("FREQAXIS") ) {
       QString yaxis(ui.GetString("FREQAXIS"));
       plot->setAxisLabel(QwtPlot::yRight, yaxis.toLatin1().data());
     }
 
     // Set the yRight axis title if they entered one
-    if(ui.WasEntered("PERCENTAXIS") ) {
+    if (ui.WasEntered("PERCENTAXIS") ) {
       QString y2axis(ui.GetString("PERCENTAXIS") );
       plot->setAxisLabel(QwtPlot::yLeft, y2axis.toLatin1().data());
     }
@@ -174,13 +184,16 @@ void IsisMain() {
     QVector<QPointF> binCountData;
     QVector<QPointF> cumPctData;
     double cumpct = 0.0;
-    for(int i = 0; i < hist->Bins(); i++) {
-      if(hist->BinCount(i) > 0) {
-        binCountData.append(QPointF(hist->BinMiddle(i), hist->BinCount(i) ) );
+    double low;
+    double high;
+    for (int i = 0; i < hist->Bins(); i++) {
+      if (hist->BinCount(i) > 0) {
+        hist->BinRange(i, low, high);
+        binCountData.append(QPointF(low, hist->BinCount(i) ) );
 
-        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
+        double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.0;
         cumpct += pct;
-        cumPctData.append(QPointF(hist->BinMiddle(i), cumpct) );
+        cumPctData.append(QPointF(low, cumpct) );
       }
     }
 
@@ -199,21 +212,13 @@ void IsisMain() {
     cdfCurve->setYAxis(QwtPlot::yLeft);
     cdfCurve->setPen(*pen);
 
-    //These are all variables needed in the following for loop.
-    //----------------------------------------------
     QVector<QwtIntervalSample> intervals(binCountData.size() );
-//     double maxYValue = DBL_MIN;
-//     double minYValue = DBL_MAX;
-//     // ---------------------------------------------
-//
-    for(int y = 0; y < binCountData.size(); y++) {
+    for (int y = 0; y < binCountData.size(); y++) {
 
       intervals[y].interval = QwtInterval(binCountData[y].x(),
                                           binCountData[y].x() + hist->BinSize());
 
       intervals[y].value = binCountData[y].y();
-//       if(values[y] > maxYValue) maxYValue = values[y];
-//       if(values[y] < minYValue) minYValue = values[y];
     }
 
     QPen percentagePen(Qt::red);
@@ -226,10 +231,6 @@ void IsisMain() {
 
     plot->add(histCurve);
     plot->add(cdfCurve);
-//     plot->fillTable();
-
-//     plot->setScale(QwtPlot::yLeft, 0, maxYValue);
-//     plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
 
     QLabel *label = new QLabel("  Average = " + QString::number(hist->Average()) + '\n' +
            "\n  Minimum = " + QString::number(hist->Minimum()) + '\n' +
@@ -272,7 +273,7 @@ void helperButtonCalcMinMax() {
     line.SetLine(i);
     inCube.read(line);
     cubeStats.AddData(line.DoubleBuffer(), line.size());
-  }  
+  }
 
   inCube.close();
 
@@ -283,4 +284,3 @@ void helperButtonCalcMinMax() {
   ui.PutDouble("MAXIMUM", cubeStats.Maximum());
 
 }
-
