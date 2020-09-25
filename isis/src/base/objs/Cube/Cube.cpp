@@ -98,6 +98,10 @@ namespace Isis {
       putGroup(*grpIt);
     }
 
+    for (int i = 1; i < label.objects(); i++) {
+      m_label->addObject(label.object(i));
+    }
+    
     close();
     open(fileName.toString(), access);
   }

@@ -25,104 +25,9 @@ void testCamera(Cube &c, double knownLat, double knownLon,
                 double s3, double l3, 
                 double s4, double l4);
 
-void testLineSamp(Camera *cam, double sample, double line);
+void testLineSamp(Camera *cam, double sample, double lne);
 
-class Hayabusa2Cube : public DefaultCube {
-  protected:
-    void setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
-      PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-      kernels.findKeyword("NaifFrameCode").setValue(ikid);    
-      
-      PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-      std::istringstream iss(R"(
-        Group = Instrument
-         SpacecraftName                  = HAYABUSA-2
-         InstrumentId                    = ONC-W2
-         InstrumentName                  = "Optical Navigation Camera"
-         TargetName                      = Mars
-         StartTime                       = 2015-12-03T07:29:58.232
-         StopTime                        = 2015-12-03T07:29:58.234
-         ExposureDuration                = 0.00272 <seconds>
-         RawSpacecraftClockCount         = 0x3C38845A <1/32 sec>
-         Binning                         = 1
-         SelectedImageAreaX1             = 1
-         SelectedImageAreaY1             = 1
-         SelectedImageAreaX2             = 1024
-         SelectedImageAreaY2             = 1
-         SelectedImageAreaX3             = 1
-         SelectedImageAreaY3             = 1024
-         SelectedImageAreaX4             = 1024
-         SelectedImageAreaY4             = 1024
-         SmearCorrection                 = NON
-         OffsetCorrection                = N/A
-         FlatCorrection                  = NON
-         RadianceConversion              = NON
-         PhotometricCorrection           = NON
-         BandRegistration                = NON
-         L2BFlatFileName                 = N/A
-         L2BSystemEfficiencyFileName     = N/A
-         L2CShapeModelFileName           = N/A
-         L2DPhaseFunctionFileName        = N/A
-         L2DShapeModelFileName           = N/A
-         SubImageCount                   = 1
-         BusLineVoltage                  = 49.28 <V>
-         ONCCurrent                      = 0.52 <V>
-         FLACCurrent                     = 0.00 <V>
-         ONCAETemperature                = 1.53 <degC>
-         ONCTOpticsTemperature           = 19.17 <degC>
-         ONCTCCDTemperature              = -29.62 <degC>
-         ONCTElectricCircuitTemperature  = -11.96 <degC>
-         ONCW1OpticsTemperature          = 1.42 <degC>
-         ONCW1CCDTemperature             = -24.98 <degC>
-         ONCW1ElectricCircuitTemperature = -10.90 <degC>
-         ONCW2OpticsTemperature          = 1.28 <degC>
-         ONCW2CCDTemperature             = -24.67 <degC>
-         ONCW2ElectricCircuitTemperature = -4.12 <degC>
-         FLACTemperature                 = -15.27 <degC>
-       End_Group
-      )");
-      
-      PvlGroup newInstGroup; 
-      iss >> newInstGroup; 
-      
-      newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
-      newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
-      inst = newInstGroup;
-
-      PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-      PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
-      inst += startcc;
-      inst += stopcc; 
-
-      PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-      
-      json nk; 
-      nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 10.44;
-      nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.013;
-      nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.013, 0.0};
-      nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, 0.013};
-      nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 76.923076923077, 0.0};
-      nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, 76.923076923077};
-      nk["INS"+ikid.toStdString()+"_BORESIGHT_LINE"] = 490.5;
-      nk["INS"+ikid.toStdString()+"_BORESIGHT_SAMPLE"] = 512.5;
-      nk["INS"+ikid.toStdString()+"_OD_K"] = {1.014, 2.933e-07, -1.384e-13};
-      nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
-      nk["CLOCK_ET-37_33322515_COMPUTED"] = "8ed6ae8930f3bd41";
-      nk["BODY_CODE"] = 499;
-      nk["BODY_FRAME_CODE"] = 10014; 
-      PvlObject newNaifKeywords("NaifKeywords", nk);
-      naifKeywords = newNaifKeywords; 
-
-      QString fileName = testCube->fileName();
-      // need to remove old camera pointer 
-      delete testCube;
-      // This is now a Hayabusa cube
-      testCube = new Cube(fileName, "rw");
-    }
-};
-
-
-TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW1CameraTest) {
+TEST_F(Hayabusa2OncW2Cube, Hayabusa2OncCameraW1CameraTest) {
   setInstrument("-37110", "ONC-W1", "HAYABUSA-2");
   Camera *cam = testCube->camera();
   EXPECT_EQ(cam->CkFrameId(), -37000);
@@ -140,7 +45,7 @@ TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW1CameraTest) {
 }
 
 
-TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW2CameraTest) {
+TEST_F(Hayabusa2OncW2Cube, Hayabusa2OncCameraW2CameraTest) {
   setInstrument("-37120", "ONC-W2", "HAYABUSA-2");
    
   Camera *cam = testCube->camera();
@@ -160,7 +65,7 @@ TEST_F(Hayabusa2Cube, Hayabusa2OncCameraW2CameraTest) {
   
 }
 
-TEST_F(Hayabusa2Cube, Hayabusa2OncCameraTelecopicCameraTest) {
+TEST_F(Hayabusa2OncW2Cube, Hayabusa2OncCameraTelecopicCameraTest) {
   setInstrument("-37100", "ONC-T", "HAYABUSA-2");
 
   Camera *cam = testCube->camera(); 
