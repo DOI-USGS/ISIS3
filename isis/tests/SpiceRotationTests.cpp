@@ -57,7 +57,7 @@ class SpiceRotationKernels : public ::testing::Test {
     kernels.push_back(dir + "moc.bc");
     kernels.push_back(dir + "moc.bsp");
     kernels.push_back(dir + "de405.bsp");
-    kernels.push_back(FileName("$base/kernels/pck/pck00009.tpc").expanded());
+    kernels.push_back(dir + "pck00009.tpc");
     kernels.push_back(dir + "mocSpiceRotationUnitTest.ti");
     kernels.push_back(dir + "ROS_V29.TF");
     kernels.push_back(dir + "CATT_DV_145_02_______00216.BC");
@@ -115,7 +115,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
                                        0.48386242,  0.44041295, -0.75624969}),
                       testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   vector<double> startAV = rot.AngularVelocity();
   EXPECT_PRED_FORMAT3(AssertVectorsNear, startAV,
                       (vector<double>{-1.3817139e-05, -0.0011493844, -0.00067443921}),
@@ -131,7 +131,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
                                        0.63359113,  0.38782749, -0.66944164}),
                       testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   vector<double> midAV = rot.AngularVelocity();
   EXPECT_PRED_FORMAT3(AssertVectorsNear, midAV,
                       (vector<double>{-1.4107831e-05, -0.0011349124, -0.0006662493}),
@@ -162,7 +162,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
 
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.Matrix(), startCJ, testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(), startAV, testTolerance);
 
   // Check middle again
@@ -170,7 +170,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
 
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.Matrix(), midCJ, testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(), midAV, testTolerance);
 
   // Check end again
@@ -178,7 +178,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
 
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.Matrix(), endCJ, testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(), endAV, testTolerance);
 
 
@@ -194,7 +194,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
                                       0.48385863,  0.43958939, -0.75673113}),
                       testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(),
                       (vector<double>{3.9588092e-05, -0.0011571406, -0.00066422493}),
                       testTolerance);
@@ -208,7 +208,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
                                        0.63359432,  0.3880392,  -0.66931593}),
                       testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(),
                       (vector<double>{-2.8366393e-05, -0.0011306014, -0.00067058131}),
                       testTolerance);
@@ -222,7 +222,7 @@ TEST_F(SpiceRotationKernels, FromSpice) {
                                        0.78673052,   0.30824564, -0.53482681}),
                       testTolerance);
 
-  EXPECT_TRUE(rot.HasAngularVelocity());
+  ASSERT_TRUE(rot.HasAngularVelocity());
   EXPECT_PRED_FORMAT3(AssertVectorsNear, rot.AngularVelocity(),
                       (vector<double>{3.8816777e-05, -0.0010934565, -0.00061098396}),
                       testTolerance);
@@ -370,7 +370,7 @@ TEST_F(SpiceRotationIsd, FromALE) {
   SpiceRotation aleQuatAVRot(-94031);
   aleQuatAVRot.LoadCache(isdAv);
 
-  EXPECT_TRUE(aleQuatAVRot.HasAngularVelocity());
+  ASSERT_TRUE(aleQuatAVRot.HasAngularVelocity());
 
   aleQuatAVRot.SetEphemerisTime(0.0);
   EXPECT_PRED_FORMAT3(AssertVectorsNear, aleQuatAVRot.AngularVelocity(),
@@ -600,9 +600,6 @@ TEST_F(SpiceRotationIsd, PolyOverCache) {
                                       1.0,  0.0,  0.0,
                                       0.0, -1.0,  0.0}),
                       testTolerance);
-
-
-  // Convert to a cache and ensure it still matches
 }
 
 
