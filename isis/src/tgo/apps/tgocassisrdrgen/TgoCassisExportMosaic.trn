@@ -307,7 +307,7 @@ End_Group
 Group = ProcessingSoftwareTitle
   Auto
   Optional
-  InputDefault    = ISIS
+  InputDefault    = Geometry_Pipeline 
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:processing_software_title
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Processing_Context)
@@ -317,7 +317,8 @@ End_Group
 Group = ProcessingSoftwareVersion
   Auto
   Optional
-  InputDefault    = 3.8.0
+  InputDefault    = 1.0.1
+  InputKey        = GeometryPipelineVersion
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:processing_software_version
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Processing_Context)
