@@ -29,32 +29,47 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
-  ImagePolygon fp1;
-  fp1.Create(*cube1);
-  cube1->write(fp1);
+  lonLatPts = new geos::geom::CoordinateArraySequence();
+  lonLatPts->add(geos::geom::Coordinate(36, 11));
+  lonLatPts->add(geos::geom::Coordinate(36, 20));
+  lonLatPts->add(geos::geom::Coordinate(40, 20));
+  lonLatPts->add(geos::geom::Coordinate(40, 11));
+  lonLatPts->add(geos::geom::Coordinate(36, 11));
 
-  Cube newCube2;
-  json newIsd2;
-  std::ifstream i(isdPath2->expanded().toStdString());
-  i >> newIsd2;
+  polys = new std::vector<geos::geom::Geometry *>;
+  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
+  polys->push_back(poly->clone());
+  multiPoly = globalFactory->createMultiPolygon(polys);
 
-  newIsd2["instrument_position"]["positions"] = {{1,1,1}, {2,2,2}, {3,3,3}};
-  newCube2.fromIsd(tempDir.path()+"/new2.cub", *cube2->label(), newIsd2, "rw");
+  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
-  ImagePolygon fp2;
-  fp2.Create(newCube2);
-  newCube2.write(fp2);
+  std::string polyStr = wkt->write(multiPoly);
+  int polyStrSize = polyStr.size();
+  std::istringstream polyStream(polyStr);
+
+  Blob pvlBlob("Footprint", "Polygon");
+  Pvl pvl;
+  PvlObject polyObject = PvlObject("Polygon");
+  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
+  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
+  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
+  pvl.addObject(polyObject);
+
+  pvlBlob.Read(pvl, polyStream);
+  cube2->write(pvlBlob);
+  cube2->reopen("rw");
+
+  delete wkt;
 
   FileList cubes;
   cubes.append(cube1->fileName());
-  cubes.append(newCube2.fileName());
+  cubes.append(cube2->fileName());
   cube1->close();
   cube2->close();
-  newCube2.close();
 
   QString cubeListPath = tempDir.path() + "/cubes.lis";
   cubes.write(cubeListPath);
-  QVector<QString> args = {"from="+cubeListPath, "overlapList="+tempDir.path()+"/overlaps.txt"};
+  QVector<QString> args = {"from=" + cubeListPath, "overlapList=" + tempDir.path() + "/overlaps.txt"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
