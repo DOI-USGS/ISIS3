@@ -1,2 +1,2 @@
-$base/testData/ProcessMapMosaic/unitTest_crop.cub
-$base/testData/ProcessMapMosaic/unitTest_nocrop.cub
+$ISISTESTDATA/isis/src/base/unitTestData/ProcessMapMosaic/unitTest_crop.cub
+$ISISTESTDATA/isis/src/base/unitTestData/ProcessMapMosaic/unitTest_nocrop.cub

@@ -45,7 +45,7 @@ int main(void) {
     double knownCenterLat = 20.0891169535276894;
     double knownCenterLon = 40.5399712859002079;
 
-    Cube c("$clementine1/testData/lla4263l.153.lev1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/clementine/unitTestData/lla4263l.153.lev1.cub", "r");
     LwirCamera *cam = (LwirCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

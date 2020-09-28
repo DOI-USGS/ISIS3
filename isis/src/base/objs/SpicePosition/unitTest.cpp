@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
-  FileName f("$base/testData/kernels");
+  FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
   QString dir = f.expanded() + "/";
   QString moc(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
+  std::cout << "Cache Size: " << pos.cacheSize() << '\n';
   cout << endl;
 
   // Test table options

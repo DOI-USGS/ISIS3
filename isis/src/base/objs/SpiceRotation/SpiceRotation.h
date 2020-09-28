@@ -25,17 +25,15 @@
 #include <string>
 #include <vector>
 
-//#include <SpiceUsr.h>
-//#include <SpiceZfc.h>
-//#include <SpiceZmc.h>
-
 #include <nlohmann/json.hpp>
-
+#include <ale/Orientations.h>
 
 #include "Angle.h"
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 #include "Quaternion.h"
+
+
 
 #define J2000Code    1
 
@@ -425,6 +423,13 @@ namespace Isis {
 
       void checkForBinaryPck();
 
+      int cacheSize() {
+        if (m_orientation) {
+          return m_orientation->getRotations().size(); 
+        }
+        return 0;
+      }
+
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
       void setEphemerisTimeMemcache();
@@ -434,16 +439,12 @@ namespace Isis {
       void setEphemerisTimePolyFunctionOverSpice();
       void setEphemerisTimePckPolyFunction();
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
-      std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as
-                                                      rotation matrix from J2000
-                                                      to 1st constant frame (CJ) or
-                                                      coefficients of polynomial
-                                                      fit to rotation angles.*/
       int p_degree;                     //!< Degree of fit polynomial for angles
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
-
+      ale::Orientations *m_orientation; //! Cached orientation information
+                                       
     private:
       // method
       void setFrameType();
@@ -490,8 +491,6 @@ namespace Isis {
                                            J2000 to target) to the target frame*/
       std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant
                                                rotation*/
-      std::vector<std::vector<double> > p_cacheAv;
-      //!< Cached angular velocities for corresponding rotactions in p_cache
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
       bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation
                                                includes angular velocity*/
@@ -599,6 +598,7 @@ namespace Isis {
       static const double m_centScale;
       //! Seconds per day for scaling time in seconds to get target body w
       static const double m_dayScale;
+
   };
 };
 

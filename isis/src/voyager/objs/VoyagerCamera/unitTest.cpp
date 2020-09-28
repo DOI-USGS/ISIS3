@@ -54,7 +54,7 @@ int main(void) {
     double knownLat = -1.03098148697020941;
     double knownLon = 82.0423364316989279;
     
-    Cube c("$voyager1/testData/c1639118.imq.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/voyager/unitTestData/c1639118.imq.cub", "r");
     VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -119,10 +119,10 @@ int main(void) {
     // Test name methods
     cout << endl << "Testing name methods" << endl << endl;
     QList<QString> files;
-    files.append("$voyager1/testData/c1639118.imq.cub"); // Voyager1 NAC
-    files.append("$voyager1/testData/c1639241.cropped.cub"); // Voyager1 WAC
-    files.append("$voyager2/testData/c2065022.cropped.cub"); // Voyager2 NAC
-    files.append("$voyager2/testData/c4397840.cropped.cub"); // Voyager2 WAC
+    files.append("$ISISTESTDATA/isis/src/voyager/unitTestData/c1639118.imq.cub"); // Voyager1 NAC
+    files.append("$ISISTESTDATA/isis/src/voyager/unitTestData/c1639241.cropped.cub"); // Voyager1 WAC
+    files.append("$ISISTESTDATA/isis/src/voyager/unitTestData/c2065022.cropped.cub"); // Voyager2 NAC
+    files.append("$ISISTESTDATA/isis/src/voyager/unitTestData/c4397840.cropped.cub"); // Voyager2 WAC
   
     for (int i = 0; i < files.size(); i++) {
       Cube cu(files[i], "r");
@@ -135,7 +135,7 @@ int main(void) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     VoyagerCamera testCam(test);
   }
   

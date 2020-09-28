@@ -283,7 +283,7 @@ Testing errors ...
 Test creating an ecub
 Object = IsisCube
   Object = Core
-    ^DnFile = $base/testData/isisTruth.cub
+    ^DnFile = $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
   End_Object
 
   Group = TestGroup
@@ -314,7 +314,7 @@ End
 Test reading an ecub
 Object = IsisCube
   Object = Core
-    ^DnFile = $base/testData/isisTruth.cub
+    ^DnFile = $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
   End_Object
 
   Group = TestGroup
