@@ -102,7 +102,7 @@ Group = SpacecraftClockEndCount
   InputKey       = P_SCCEC
   InputKey       = SCCL-END
   InputPosition  = FitsLabels
-  OutputName     = SpacecraftClockStartCount
+  OutputName     = SpacecraftClockEndCount
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group

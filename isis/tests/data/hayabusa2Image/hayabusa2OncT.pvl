@@ -116,20 +116,4 @@ Object = IsisCube
     DarkCurrent             = 0.003961313633742128
   End_Group
 End_Object
-
-Object = Label
-  Bytes = 65536
-End_Object
-
-Object = History
-  Name      = IsisCube
-  StartByte = 4272769
-  Bytes     = 1256
-End_Object
-
-Object = OriginalLabel
-  Name      = IsisCube
-  StartByte = 4259841
-  Bytes     = 12928
-End_Object
 End

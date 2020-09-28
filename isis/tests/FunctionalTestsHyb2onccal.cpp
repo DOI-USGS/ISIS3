@@ -97,6 +97,7 @@ TEST_F(Hayabusa2OncTSmallCube, FunctionalTestHyb2onccalSpecialPixel) {
   line.SetLine(1);
   outputCube.read(line);
   EXPECT_EQ(line[0], Isis::Null);
+  EXPECT_NEAR(line[1], 0.11511217057704926, .00000000000000001);
 }
 
 TEST_F(Hayabusa2OncTSmallCube, FunctionalTestHyb2onccalSmallDN) {
