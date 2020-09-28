@@ -332,10 +332,10 @@ foreach (_variableName ${_variableNames})
       get_filename_component(LIBDIR ${ITEM} DIRECTORY)
       get_filename_component(LIBNAME ${ITEM} NAME)
       # Some library dependencies identified by the find_package commands are not
-      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (i.e., Qt5::Xml). 
+      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (e.g., Qt5::Xml). 
       # Remove the ones that are not libraries or name spaces  (e.g., OPENGL.framework).
       if(LIBNAME MATCHES ".+\.so$|.+\.dylib$|.+\.a$|.+::.+$|.+\.SO$|.+\.DYLIB$|.+\.A$")
-        # For MacOS, .so's are not the same as dylib's, need to add the full path to the .so
+        # For MacOS, .so's are not the same as .dylib's, need to add the full path to the .so
         if((APPLE) AND (LIBNAME MATCHES ".+\.so$|.+\.SO"))
           list(APPEND ALLLIBS "${ITEM}")
         else()
@@ -344,24 +344,6 @@ foreach (_variableName ${_variableNames})
         endif()
       endif()
     endforeach()
-#  elseif (_variableName MATCHES ".+_LIBRARIES$")
-#    foreach(ITEM IN LISTS ${_variableName})
-#      get_filename_component(LIBDIR ${ITEM} DIRECTORY)
-#      get_filename_component(LIBNAME ${ITEM} NAME)
-#      if(APPLE)
-#        if(LIBNAME MATCHES ".+\.so$")
-#          list(APPEND ALLLIBS "${ITEM}")
-#        elseif(LIBNAME MATCHES ".+\.dylib$|.+\.a$|.+::.+$|.+\.DYLIB$|.+\.A$")
-#          list(APPEND ALLLIBDIRS ${LIBDIR})
-#          list(APPEND ALLLIBS ${LIBNAME})
-#        endif()
-#      else()
-#        if(LIBNAME MATCHES ".+\.a$|.+\.so$|.+::.+$|.+\.A$|.+\.SO$")
-#          list(APPEND ALLLIBDIRS ${LIBDIR})
-#          list(APPEND ALLLIBS ${LIBNAME})
-#        endif()
-#      endif()
-#    endforeach()
   endif()
 endforeach()
 
