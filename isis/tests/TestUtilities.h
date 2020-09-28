@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include <string>
+#include <vector>
 
 #include <QString>
 
@@ -38,6 +39,14 @@ namespace Isis {
       const char* group2_expr,
       PvlGroup group1,
       PvlGroup group2);
+
+  ::testing::AssertionResult AssertVectorsNear(
+      const char* vec1_expr,
+      const char* vec2_expr,
+      const char* tolerance_expr,
+      const std::vector<double> &vec1,
+      const std::vector<double> &vec2,
+      double tolerance);
 
 }
 
