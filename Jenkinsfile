@@ -3,7 +3,7 @@
 def NUM_CORES = 8
 def errors = []
 def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
-def nodes = [:] 
+def nodes = [:]
 
 for (lbl in labels) {
     def label = lbl
@@ -58,30 +58,30 @@ for (lbl in labels) {
                                 error stageStatus
                             }
 
-                            // Unit tests
-                            stageStatus = "Running unit tests on ${label}"
-                            try {
-                                loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
-
-                            // App tests
-                            stageStatus = "Running app tests on ${label}"
-                            try {
-                                loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
-
-                            try {
-                                loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
+                            // // Unit tests
+                            // stageStatus = "Running unit tests on ${label}"
+                            // try {
+                            //     loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
+                            //
+                            // // App tests
+                            // stageStatus = "Running app tests on ${label}"
+                            // try {
+                            //     loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
+                            //
+                            // try {
+                            //     loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
 
                             // Gtests
                             stageStatus = "Running gtests on ${label}"
@@ -111,7 +111,7 @@ node {
     } catch(e) {
         // Report result to GitHub
         currentBuild.result = "FAILURE"
-        
+
         def comment = "Failed during:\n"
         errors.each {
             comment += "- ${it}\n"
