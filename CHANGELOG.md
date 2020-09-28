@@ -30,10 +30,6 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
-### Fixed
-
- - Removed the library file names from the full library path and file name before it was added to ALLLIBDIRS for the loader -L flag. [#3886](https://github.com/USGS-Astrogeology/ISIS3/issues/3986)
-
 ### Changed
 
  - Isis2raw will now output straight to a 32bit file (no stretch) when stretch is set to None and bittype is set to 32bit. [#3878](https://github.com/USGS-Astrogeology/ISIS3/issues/3878)
