@@ -65,9 +65,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   cubes.append(cube1->fileName());
   cubes.append(cube2->fileName());
 
-  QString cubeListPath = tempDir.path() + "/newCubes.lis";
-  cubes.write(cubeListPath);
-  QVector<QString> args = {"from=" + cubeListPath, "overlapList=" + tempDir.path() + "/noOverlaps.txt"};
+  QVector<QString> args = {"overlapList=" + tempDir.path() + "/noOverlaps.txt"};
   UserInterface options(FINDIMAGEOVERLAP_XML, args);
   Pvl appLog;
 
