@@ -29,8 +29,6 @@ using namespace Isis;
 static QString FINDIMAGEOVERLAP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
-  // Cube *newCube = new Cube(tempDir.path() + "/newCube.cub", "rw");
-
   lonLatPts = new geos::geom::CoordinateArraySequence();
   lonLatPts->add(geos::geom::Coordinate(36, 11));
   lonLatPts->add(geos::geom::Coordinate(36, 20));
@@ -66,12 +64,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   FileList cubes;
   cubes.append(cube1->fileName());
   cubes.append(cube2->fileName());
-  // cube1->close();
-  // newCube->close();
 
-  // QString cubeListPath = tempDir.path() + "/newCubes.lis";
-  // cubes.write(cubeListPath);
-  QVector<QString> args = {"overlapList=" + tempDir.path() + "/noOverlaps.txt"};
+  QString cubeListPath = tempDir.path() + "/newCubes.lis";
+  cubes.write(cubeListPath);
+  QVector<QString> args = {"from=" + cubeListPath, "overlapList=" + tempDir.path() + "/noOverlaps.txt"};
   UserInterface options(FINDIMAGEOVERLAP_XML, args);
   Pvl appLog;
 
