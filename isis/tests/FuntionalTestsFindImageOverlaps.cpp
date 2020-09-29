@@ -67,14 +67,14 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   cube1->close();
   cube2->close();
 
-  QString cubeListPath = tempDir.path() + "/newCubes.lis";
-  cubes.write(cubeListPath);
-  QVector<QString> args = {"from=" + cubeListPath, "overlapList=" + tempDir.path() + "/overlaps.txt"};
+  // QString cubeListPath = tempDir.path() + "/newCubes.lis";
+  // cubes.write(cubeListPath);
+  QVector<QString> args = {"overlapList=" + tempDir.path() + "/overlaps.txt"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
   try {
-    findimageoverlaps(options, &appLog);
+    findimageoverlaps(cubes, options, &appLog);
     FAIL() << "Expected an IException with message: \"No overlaps were found\".";
   }
   catch(IException &e) {
