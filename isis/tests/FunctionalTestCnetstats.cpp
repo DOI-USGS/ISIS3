@@ -70,7 +70,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsDefault) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsImageStats) {
   // Setup output file
-  QTemporaryFile statsFile;
+  QTemporaryFile statsFile("statsFile");
   ASSERT_TRUE(statsFile.open());
 
   QVector<QString> args = {"create_image_stats=yes", "image_stats_file=" + statsFile.fileName()};
@@ -91,7 +91,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsImageStats) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointStats) {
   // Setup output file
-  QTemporaryFile statsFile;
+  QTemporaryFile statsFile("statsFile");
   ASSERT_TRUE(statsFile.open());
 
   QVector<QString> args = {"create_point_stats=yes", "point_stats_file=" + statsFile.fileName()};
