@@ -8,8 +8,10 @@
 #                                    Line/Sample values in geom:horizontal_display_axis and 
 #				     geom:vertical_display_axis, updated Mission_Area to use cas 
 #				     namespace instead of cassis, removed non-PDS4-compliant 
-#                                    CaSSIS_Header, removed data-type description and moved to code, as it now depends on whether a 2D or 3D image is being exported. 
+#                                    CaSSIS_Header, removed data-type description and moved to code, 
+#                                    as it now depends on whether a 2D or 3D image is being exported. 
 # history 2020-09-22 Kristin Berry - Added stitched browse product LID and UID in Observation_Context
+#                                    and added information about SPICE kernels to labels
 
 Group = LidVid
   Auto
@@ -193,6 +195,16 @@ Group = PhaseAngle
   InputPosition   = (IsisCube, Mosaic)
   OutputName      = geom:phase_angle
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry,geom:Geometry_Orbiter, geom:Illumination_Geometry, geom:Illumination_Specific )
+  Translation     = (*, *)
+End_Group
+
+Group = SmithedMetakernel
+  Auto
+  Optional
+  InputDefault    = em16_cassis.tm
+  OutputName      = geom:spice_kernel_file_name
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:SPICE_Kernel_Files,
+                     geom:SPICE_Kernel_Identification)
   Translation     = (*, *)
 End_Group
 
@@ -531,16 +543,6 @@ Group = SmithedCK
   InputKey        = SmithedCK 
   InputPosition   = (IsisCube, Archive)
   OutputName      = cas:smithedck
-  OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, cas:CASSIS_Data, cas:geometry_information)
-  Translation     = (*, *)
-End_Group
-
-Group = CKKernel
-  Auto
-  Optional
-  InputKey        = CKKernel
-  InputPosition   = (IsisCube, Archive)
-  OutputName      = cas:ckkernel
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, cas:CASSIS_Data, cas:geometry_information)
   Translation     = (*, *)
 End_Group
