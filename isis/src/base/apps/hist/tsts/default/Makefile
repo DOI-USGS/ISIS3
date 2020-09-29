@@ -5,6 +5,7 @@
 APPNAME = hist
 histTruth.txt.IGNORELINES = Cube
 histTruthNbins.txt.IGNORELINES = Cube
+histTruthMinMax.txt.IGNORELINES = Cube
 TEMP = $(OUTPUT)/histTruth.txt
 TEMPNBINS = $(OUTPUT)/histTruthNbins.txt
 TEMPMINMAX = $(OUTPUT)/histTruthMinMax.txt
