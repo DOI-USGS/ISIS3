@@ -86,7 +86,7 @@ for (lbl in labels) {
                             // Gtests
                             stageStatus = "Running gtests on ${label}"
                             try {
-                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -VV"
+                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
