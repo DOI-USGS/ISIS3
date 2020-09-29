@@ -9,6 +9,25 @@
 #				     geom:vertical_display_axis, updated Mission_Area to use cas 
 #				     namespace instead of cassis, removed non-PDS4-compliant 
 #                                    CaSSIS_Header, removed data-type description and moved to code, as it now depends on whether a 2D or 3D image is being exported. 
+# history 2020-09-22 Kristin Berry - Added stitched browse product LID and UID in Observation_Context
+
+Group = LidVid
+  Auto
+  Debug
+  InputKey        = LID
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = lidvid_reference
+  OutputPosition  = (Product_Observational, Reference_List, Internal_Reference)
+  Translation     = (*, *)
+End_Group
+
+Group = LidVidReference
+  Auto
+  InputDefault    = data_to_calibrated_products
+  OutputName      = reference_type
+  OutputPosition  = (Product_Observational, Reference_List, Internal_Reference)
+  Translation     = (*, *)
+End_Group
 
 Group = StartTime
   Auto
@@ -348,8 +367,7 @@ End_Group
 
 Group = ObservationContextIdentifier
   Auto
-  Optional
-  InputKey        = ObservationId
+  InputKey        = UID
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:observation_identifier
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Observation_Context)
