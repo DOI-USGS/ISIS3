@@ -183,6 +183,7 @@ namespace Isis {
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
     std::string polyStr = wkt->write(multiPoly);
+    polys->pop_back();
     int polyStrSize = polyStr.size();
     std::istringstream polyStream(polyStr);
 
@@ -208,12 +209,12 @@ namespace Isis {
     lonLatPts->add(geos::geom::Coordinate(36, 1));
     lonLatPts->add(geos::geom::Coordinate(31, 1));
 
-    polys->pop_back();
     poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
     polys->push_back(poly);
     multiPoly = globalFactory->createMultiPolygon(polys);
 
     polyStr = wkt->write(multiPoly);
+    polys->pop_back();
     polyStrSize = polyStr.size();
     polyStream.str(polyStr);
 
@@ -257,5 +258,8 @@ namespace Isis {
 
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
+
+    delete lonLatPts;
+    delete polys;
   }
 }
