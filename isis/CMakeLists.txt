@@ -20,6 +20,8 @@ include(InstallThirdParty)
 include(cmake/gtest.cmake)
 include(GoogleTest)
 
+include(CMakePrintHelpers)
+
 #===============================================================================
 #===============================================================================
 # Project information
@@ -312,24 +314,37 @@ set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
-   if (_variableName MATCHES ".+_INCLUDE_DIR$")
-     list(APPEND ALLINCDIRS "${${_variableName}}")
-   elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
-     list(APPEND ALLINCDIRS "${${_variableName}}")
-   endif(_variableName MATCHES ".+_INCLUDE_DIR$")
+  if (_variableName MATCHES ".+_INCLUDE_DIR$")
+    list(APPEND ALLINCDIRS "${${_variableName}}")
+  elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
+    list(APPEND ALLINCDIRS "${${_variableName}}")
+  endif()
 endforeach()
 
 # get all Library variables
 foreach (_variableName ${_variableNames})
-   get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
-   if (_variableName MATCHES "^CMAKE+")
-   elseif (_variableName MATCHES ".+_LIBRARY$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
-   elseif (_variableName MATCHES ".+_LIBRARIES$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
-   endif()
+  get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
+  get_filename_component(LIBNAME "${${_variableName}}" NAME)
+
+  if (_variableName MATCHES "^CMAKE+")
+  elseif (_variableName MATCHES ".+_LIBRARY$|.+_LIBRARIES")
+    foreach(ITEM IN LISTS ${_variableName})
+      get_filename_component(LIBDIR ${ITEM} DIRECTORY)
+      get_filename_component(LIBNAME ${ITEM} NAME)
+      # Some library dependencies identified by the find_package commands are not
+      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (e.g., Qt5::Xml). 
+      # Remove the ones that are not libraries or name spaces  (e.g., OPENGL.framework).
+      if(LIBNAME MATCHES ".+\.so$|.+\.dylib$|.+\.a$|.+::.+$|.+\.SO$|.+\.DYLIB$|.+\.A$")
+        # For MacOS, .so's are not the same as .dylib's, need to add the full path to the .so
+        if((APPLE) AND (LIBNAME MATCHES ".+\.so$|.+\.SO"))
+          list(APPEND ALLLIBS "${ITEM}")
+        else()
+          list(APPEND ALLLIBDIRS ${LIBDIR})
+          list(APPEND ALLLIBS ${LIBNAME})
+        endif()
+      endif()
+    endforeach()
+  endif()
 endforeach()
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
