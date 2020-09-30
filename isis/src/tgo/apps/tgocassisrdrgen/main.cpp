@@ -87,24 +87,28 @@ void IsisMain() {
   logicalId += productId[0];
   process.setLogicalId(logicalId);
 
-  // calculate stitched browse LID (lidvid) 
+  // For a mosaic, calculate stitched browse LID (lidvid) 
   // This is as follows: 
   // StartTime of the first framelet, rounded down to the nearest second
-  QString startTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StartTime");
-  startTime = iTime(startTime).UTC(0).toLower().remove("-").remove(":");
+  if (label->findObject("IsisCube").hasGroup("Mosaic")) {
+    QString startTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StartTime"); 
+    startTime = iTime(startTime).UTC(0).toLower().remove("-").remove(":");
 
-  // StopTime of the last framelet, rounded down to the nearest second + 4 seconds
-  QString stopTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StopTime");
-  stopTime = (iTime(iTime(stopTime).UTC(0)) + 4).UTC().toLower().remove("-").remove(":");
+    // StopTime of the last framelet, rounded down to the nearest second + 4 seconds
+    QString stopTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StopTime");
+    stopTime = (iTime(iTime(stopTime).UTC(0)) + 4).UTC().toLower().remove("-").remove(":");
 
-  QString UID = label->findObject("IsisCube").findGroup("Archive").findKeyword("UID");
-  QString filterName = QString(label->findObject("IsisCube").findGroup("BandBin").
-                              findKeyword("FilterName")).toLower();
+    // UID
+    QString UID = label->findObject("IsisCube").findGroup("Archive").findKeyword("UID");
+    // FilterName
+    QString filterName = QString(label->findObject("IsisCube").findGroup("BandBin").
+                                findKeyword("FilterName")).toLower();
 
-  QString lid = QString("urn:esa:psa:em16_tgo_cas:data_calibrated:cas_cal_sc_%1-%2-%3-%4-sti").arg(startTime)
-                        .arg(stopTime).arg(filterName).arg(UID);
+    QString lid = QString("urn:esa:psa:em16_tgo_cas:data_calibrated:cas_cal_sc_%1-%2-%3-%4-sti").arg(startTime)
+                          .arg(stopTime).arg(filterName).arg(UID);
 
-  label->findObject("IsisCube").findGroup("Archive").addKeyword(PvlKeyword("LID", lid));
+    label->findObject("IsisCube").findGroup("Archive").addKeyword(PvlKeyword("LID", lid));
+  }
 
   // Set Title
   if ( ui.WasEntered("TITLE") ) {
