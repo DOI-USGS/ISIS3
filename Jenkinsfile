@@ -1,6 +1,6 @@
 // vim: ft=groovy
 
-def NUM_CORES = 8
+def NUM_CORES = 2
 def errors = []
 def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
 def nodes = [:]
