@@ -1,0 +1,119 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName                  = HAYABUSA-2
+    InstrumentId                    = ONC-T
+    InstrumentName                  = "Optical Navigation Camera"
+    OriginalTargetName              = Ryugu
+    TargetName                      = Ryugu
+    StartTime                       = 2018-10-06T05:05:17.162
+    StopTime                        = 2018-10-06T05:05:17.228
+    ExposureDuration                = 0.0656 <seconds>
+    SpacecraftClockStartCount       = 2/1094885569
+    SpacecraftClockEndCount         = 2/1094885569
+    RawSpacecraftClockCount         = 0x4142A0C1 <1/32 sec>
+    BitDepth                        = 10
+    OnboardDataRecordedTime         = 4142FC15
+    Binning                         = 1
+    SelectedImageAreaX1             = 1
+    SelectedImageAreaY1             = 1
+    SelectedImageAreaX2             = 1024
+    SelectedImageAreaY2             = 1024
+    SmearCorrection                 = NON
+    OffsetCorrection                = N/A
+    FlatCorrection                  = NON
+    RadianceConversion              = NON
+    PhotometricCorrection           = NON
+    BandRegistration                = NON
+    L2BFlatFileName                 = N/A
+    L2BSystemEfficiencyFileName     = N/A
+    L2CShapeModelFileName           = N/A
+    L2DPhaseFunctionFileName        = N/A
+    L2DShapeModelFileName           = N/A
+    ImageID                         = 54874
+    SubImageCount                   = 1
+    BusLineVoltage                  = 49.28 <V>
+    ONCCurrent                      = 0.52 <A>
+    FLACCurrent                     = 0.00 <A>
+    ONCAETemperature                = -1.60 <degC>
+    ONCTOpticsTemperature           = 19.28 <degC>
+    ONCTCCDTemperature              = -28.59 <degC>
+    ONCTElectricCircuitTemperature  = -11.95 <degC>
+    ONCW1OpticsTemperature          = 1.29 <degC>
+    ONCW1CCDTemperature             = -25.28 <degC>
+    ONCW1ElectricCircuitTemperature = -9.38 <degC>
+    ONCW2OpticsTemperature          = 1.33 <degC>
+    ONCW2CCDTemperature             = -25.04 <degC>
+    ONCW2ElectricCircuitTemperature = -6.72 <degC>
+    FLACTemperature                 = -10.58 <degC>
+    Compression                     = LOSSLESS
+    SolarDistance                   = 1.87432e+08 <km>
+    DistortionCorrection            = no
+  End_Group
+
+  Group = Archive
+    ProducerId        = ISAS/JAXA
+    FormatType        = "HAYABUSA2 IMAGE ONC L2a"
+    FormatTypeVersion = 20170307
+    ContentType       = "ONC-T FILTER 550nm NON SMEARCORRECTED"
+    ContentVersion    = 20160307
+    SourceProductId   = hyb2_onc_20181006_050517_tvf_l2a
+    YearDoy           = 2018279
+  End_Group
+
+  Group = BandBin
+    FilterNumber = 3
+    FilterName   = v
+    Center       = 550 <nanometers>
+    Width        = 30 <nanometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -37100
+  End_Group
+
+  Group = RadiometricCalibration
+    SoftwareName            = hyb2onccal
+    SoftwareVersion         = 1.1
+    ProcessDate             = 2020-09-18T13:10:28
+    CalibrationFile         = $hayabusa2/calibration/onc/hyb2oncCalibration00-
+                              02.trn
+    FlatFieldFile           = $hayabusa2/calibration/flatfield/flat_v_norm.cub
+    SensitivityFactor       = 1175.0
+    Bias_Bn                 = (320.66, 0.652, -0.953)
+    Bias_AECorrection       = (0.987, 0.00251)
+    Bias_AETemp             = -1.6
+    Bias_CCDTemp            = -28.59
+    Bias_ECTTemp            = -11.95
+    Bias                    = 310.5920154927201 <DN>
+    Smear_Tvct              = 0.007373
+    Smear_texp              = 0.06560000000000001
+    CalibrationUnits        = IOF
+    RadianceScaleFactor     = 1.0
+    SolarFlux               = 1859.7
+    Units                   = "I over F"
+    LinearityCoefficients   = (1.0073, -2.9285, -3.6434000000000001e-1)
+    DarkCurrentCoefficients = (0.10000000000000001, 0.52)
+    DarkCurrent             = 0.003961313633742128
+  End_Group
+End_Object
+End

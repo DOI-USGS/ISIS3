@@ -38,7 +38,17 @@ using namespace std;
 
 namespace Isis {
 
-  void hyb2onccal(UserInterface &ui) {
+  void hyb2onccal(UserInterface &ui, Pvl *log) {
+    Cube icube;
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      icube.setVirtualBands(inAtt.bands());
+    }
+    icube.open(ui.GetFileName("FROM"));
+    hyb2onccal(&icube, ui, log);
+  }
+
+  void hyb2onccal(Cube *icube, UserInterface &ui, Pvl *log) {
     g_calStep = ui.GetString("UNITS");
 
     const QString hyb2cal_program = "hyb2onccal";
@@ -47,7 +57,7 @@ namespace Isis {
     QString hyb2cal_runtime = Application::DateTime();
 
     ProcessBySample p;
-    Cube *icube = p.SetInputCube("FROM");
+    p.SetInputCube(icube);
 
     // Basic assurances...
     if (icube->bandCount() != 1) {
@@ -62,7 +72,7 @@ namespace Isis {
       g_filter = bandbin["FilterName"][0];
     }
     catch(IException &e) {
-      QString msg = "Unable to read FilterName keyword in the BandBin group "
+      QString msg = "Unable to read [FilterName] keyword in the BandBin group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -73,7 +83,7 @@ namespace Isis {
       instrument = inst["InstrumentId"][0];
     }
     catch(IException &e) {
-      QString msg = "Unable to read InstrumentId keyword in the Instrument group "
+      QString msg = "Unable to read [InstrumentId] keyword in the Instrument group "
                     "from input file [" + icube->fileName() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -188,9 +198,6 @@ namespace Isis {
     if (smearCorrection == "ONBOARD") {
       g_onBoardSmearCorrection = true;
     }
-    else {
-      qDebug() << icube->fileName();
-    }
 
     QString compmode = inst["Compression"];
     // TODO: verify that the compression factor/scale is actually 16 for compressed Hayabusa2 images.
@@ -268,7 +275,8 @@ namespace Isis {
 
     }  //Finished setting flatfield file
 
-    Cube *ocube  = p.SetOutputCube("TO");
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+                                  icube->sampleCount(), icube->lineCount(), icube->bandCount());
     QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
     g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
@@ -281,6 +289,7 @@ namespace Isis {
       g_calibrationScale = 1.0 / (g_texp * g_sensitivity);
       units = "W / (m**2 micrometer sr)";
     }
+
     // Output units of I/F
     else if (g_calStep == "IOF") {
       // Convert to radiance
@@ -369,7 +378,7 @@ namespace Isis {
 
     // Write Calibration group to output file
     ocube->putGroup(calibrationLog);
-    Application::Log(calibrationLog);
+    log->addGroup(calibrationLog);
     p.EndProcess();
 
   }

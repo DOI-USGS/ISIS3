@@ -335,7 +335,6 @@ namespace Isis {
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
-
   void LineScannerCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
@@ -363,6 +362,34 @@ namespace Isis {
     delete testCube;
   }
 
+  void Hayabusa2OncTSmallCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::ifstream cubeLabel("data/hayabusa2Image/hayabusa2OncTSmall.pvl");
+
+    cubeLabel >> label;
+
+    testCube = new Cube();
+    testCube->fromLabel(tempDir.path() + "/hayabusa2OncTSmall.cub", label, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 (bias) for the calibration tests
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+  }
+
+  void Hayabusa2OncTSmallCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
+
 
   void MiniRFCube::SetUp() {
     TempTestingFiles::SetUp();
@@ -371,6 +398,40 @@ namespace Isis {
 
 
   void MiniRFCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
+
+  void Hayabusa2OncTSmallCube::resetCube() {
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+  }
+
+  void Hayabusa2OncTCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::ifstream cubeLabel("data/hayabusa2Image/hayabusa2OncT.pvl");
+
+    cubeLabel >> label;
+
+    testCube = new Cube();
+    testCube->fromLabel(tempDir.path() + "/hayabusa2OncT.cub", label, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 100.0;  // We need pixelValue * 4 > 300 (bias) for the calibration tests
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue;
+      }
+      testCube->write(line);
+    }
+  }
+
+  void Hayabusa2OncTCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
     }

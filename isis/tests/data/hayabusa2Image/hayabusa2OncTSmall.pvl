@@ -1,0 +1,105 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 2
+    TileLines   = 2
+
+    Group = Dimensions
+      Samples = 2
+      Lines   = 2
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName                  = HAYABUSA-2
+    InstrumentId                    = ONC-T
+    InstrumentName                  = "Optical Navigation Camera"
+    OriginalTargetName              = Ryugu
+    TargetName                      = Ryugu
+    StartTime                       = 2018-10-06T05:05:17.162
+    StopTime                        = 2018-10-06T05:05:17.228
+    ExposureDuration                = 0.0656 <seconds>
+    SpacecraftClockStartCount       = 2/1094885569
+    SpacecraftClockEndCount         = 2/1094885569
+    RawSpacecraftClockCount         = 0x4142A0C1 <1/32 sec>
+    BitDepth                        = 10
+    OnboardDataRecordedTime         = 4142FC15
+    Binning                         = 1
+    SelectedImageAreaX1             = 1
+    SelectedImageAreaY1             = 1
+    SelectedImageAreaX2             = 1024
+    SelectedImageAreaY2             = 1024
+    SmearCorrection                 = NON
+    OffsetCorrection                = N/A
+    FlatCorrection                  = NON
+    RadianceConversion              = NON
+    PhotometricCorrection           = NON
+    BandRegistration                = NON
+    L2BFlatFileName                 = N/A
+    L2BSystemEfficiencyFileName     = N/A
+    L2CShapeModelFileName           = N/A
+    L2DPhaseFunctionFileName        = N/A
+    L2DShapeModelFileName           = N/A
+    ImageID                         = 54874
+    SubImageCount                   = 1
+    BusLineVoltage                  = 49.28 <V>
+    ONCCurrent                      = 0.52 <A>
+    FLACCurrent                     = 0.00 <A>
+    ONCAETemperature                = -1.60 <degC>
+    ONCTOpticsTemperature           = 19.28 <degC>
+    ONCTCCDTemperature              = -28.59 <degC>
+    ONCTElectricCircuitTemperature  = -11.95 <degC>
+    ONCW1OpticsTemperature          = 1.29 <degC>
+    ONCW1CCDTemperature             = -25.28 <degC>
+    ONCW1ElectricCircuitTemperature = -9.38 <degC>
+    ONCW2OpticsTemperature          = 1.33 <degC>
+    ONCW2CCDTemperature             = -25.04 <degC>
+    ONCW2ElectricCircuitTemperature = -6.72 <degC>
+    FLACTemperature                 = -10.58 <degC>
+    Compression                     = LOSSLESS
+    SolarDistance                   = 1.87432D+08 <km>
+    DistortionCorrection            = no
+  End_Group
+
+  Group = Archive
+    ProducerId        = ISAS/JAXA
+    FormatType        = "HAYABUSA2 IMAGE ONC L2a"
+    FormatTypeVersion = 20170307
+    ContentType       = "ONC-T FILTER 550nm NON SMEARCORRECTED"
+    ContentVersion    = 20160307
+    SourceProductId   = hyb2_onc_20181006_050517_tvf_l2a
+    YearDoy           = 2018279
+  End_Group
+
+  Group = BandBin
+    FilterNumber = 3
+    FilterName   = v
+    Center       = 550 <nanometers>
+    Width        = 30 <nanometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -37100
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 1024
+    AlphaLines          = 1024
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 2.5
+    AlphaEndingLine     = 2.5
+    BetaSamples         = 2
+    BetaLines           = 2
+  End_Group
+End_Object
+End

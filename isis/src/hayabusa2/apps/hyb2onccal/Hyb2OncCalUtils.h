@@ -221,10 +221,17 @@ namespace Isis {
     }
 
     double smear = 0;
-    for (int j = 0; j < imageIn.size(); j++) {
-      // Left out g_darkCurrent subtraction for now.
-      smear += ((imageIn[j] * pow(2.0, 12 - g_bitDepth) - g_bias) / imageIn.size());
+    int skipCount = 0;
+    for (int i = 0; i < imageIn.size(); i++) {
+      if (!IsSpecial(imageIn[i])) {
+        // Left out g_darkCurrent subtraction for now.
+        smear += (imageIn[i] * pow(2.0, 12 - g_bitDepth) - g_bias);
+      }
+      else {
+        skipCount++;
+      } 
     }
+    smear /= (imageIn.size() - skipCount);
     smear *= g_timeRatio;
 
     // Iterate over the line space
