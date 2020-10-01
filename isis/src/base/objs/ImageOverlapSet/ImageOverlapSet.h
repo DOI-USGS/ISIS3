@@ -97,11 +97,11 @@ namespace Isis {
    *                          undefined behavior caused by unlocking an unlocked mutex.
    *   @history 2017-05-23 Ian Humphrey - Added a tryLock() to FindAllOverlaps to prevent a
    *                           segfault from occuring on OSX with certain data. Fixes #4810.
-   * 
+   *
    */
   class ImageOverlapSet : private QThread {
     public:
-      ImageOverlapSet(bool continueOnError = false);
+      ImageOverlapSet(bool continueOnError = false, bool threadedCalculate = true);
       virtual ~ImageOverlapSet();
 
       void FindImageOverlaps(SerialNumberList &boundaries);

@@ -59,7 +59,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   Pvl appLog;
 
   try {
-    findimageoverlaps(options, &appLog);
+    findimageoverlaps(options, false, &appLog);
     FAIL() << "Expected an IException with message: \"No overlaps were found\".";
   }
   catch(IException &e) {
@@ -76,7 +76,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
   FileList images;
   images.append(FileName(cube1->fileName()));
   images.append(FileName(cube2->fileName()));
-  findimageoverlaps(images, ui, nullptr);
+  findimageoverlaps(images, ui, false, nullptr);
 
   // Find all the overlaps between the images in the FROMLIST
   // The overlap polygon coordinates are in Lon/Lat order
@@ -145,7 +145,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
   FileList images;
   images.append(FileName(cube1->fileName()));
   images.append(FileName(cube2->fileName()));
-  findimageoverlaps(images, ui, nullptr);
+  findimageoverlaps(images, ui, false, nullptr);
 
   // Find all the overlaps between the images in the FROMLIST
   // The overlap polygon coordinates are in Lon/Lat order
