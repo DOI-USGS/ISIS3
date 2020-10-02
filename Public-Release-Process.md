@@ -34,13 +34,16 @@ In this step, we will prepare the local repository to build from as well as upda
 ### Part D: Update the Authors List
 * If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`.
 
-### Part E: Create a Pull Request
+### Part E: Update the Changelog
+* Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for labeling the unreleased changes as being part of this release.
+
+### Part F: Create a Pull Request
 * Make a pull request with your local changes into the `dev` or version branch of the repository.
 
-### Part F: Create or update a Version Branch
+### Part G: Create or update a Version Branch
 Once the PR into `dev` been reviewed and merged:
 
-* If there is already a version branch (ex: 3.10) for this release, after the change from Part B-C is PR'd into `dev`, cherry-pick it into the version branch for your release, and then make a pull request with this change into the version branch. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
+* If there is already a version branch (ex: 3.10) for this release, after the changes from previous setps are PR'd into `dev`, cherry-pick them into the version branch for your release, and then make a pull request with this change into the version branch. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
 
 * If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each then specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on that version branch.
    * To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
