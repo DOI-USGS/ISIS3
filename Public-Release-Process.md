@@ -32,7 +32,7 @@ In this step, we will prepare the local repository to build from as well as upda
  * Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build.
 
 ### Part D: Update the Authors List
-* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py`.
+* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`.
 
 ### Part E: Create a Pull Request
 * Make a pull request with your local changes into the `dev` or version branch of the repository.
