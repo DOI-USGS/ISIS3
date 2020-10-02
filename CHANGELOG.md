@@ -30,6 +30,8 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+## [4.3.0] - 2020-10-02
+
 ### Changed
 
  - Camera models now use the ALE library to interpolate states and orientations. Users will likely see very small changes in sensor ephemerides. These were tested and are within existing interpolation tolerances. [#2370](https://github.com/USGS-Astrogeology/ISIS3/issues/2370)
@@ -48,7 +50,7 @@ update the Unreleased link so that it compares against the latest release tag.
 
   - For Histograms in ISIS, updated the math for calculating what bin data should be placed in and the min/max values of each bin to be more intuitive. In addition, the output of hist and cnethist were changed to display the min/max values of each bin instead of the middle pixel's DN. [#3882](https://github.com/USGS-Astrogeology/ISIS3/issues/3882)
 
- ### Added
+### Added
 
  - A Gui Helper gear was added to hist to fill in the minimum and maximum parameters with what would have been automatically calculated. [#3880](https://github.com/USGS-Astrogeology/ISIS3/issues/3880)
 
@@ -231,7 +233,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.3.0...HEAD
+[4.3.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.1...4.2.0
 [4.1.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.0.1...4.1.0

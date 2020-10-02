@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "4.1.0")
+set(VERSION            "4.3.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -332,7 +332,7 @@ foreach (_variableName ${_variableNames})
       get_filename_component(LIBDIR ${ITEM} DIRECTORY)
       get_filename_component(LIBNAME ${ITEM} NAME)
       # Some library dependencies identified by the find_package commands are not
-      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (e.g., Qt5::Xml). 
+      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (e.g., Qt5::Xml).
       # Remove the ones that are not libraries or name spaces  (e.g., OPENGL.framework).
       if(LIBNAME MATCHES ".+\.so$|.+\.dylib$|.+\.a$|.+::.+$|.+\.SO$|.+\.DYLIB$|.+\.A$")
         # For MacOS, .so's are not the same as .dylib's, need to add the full path to the .so
