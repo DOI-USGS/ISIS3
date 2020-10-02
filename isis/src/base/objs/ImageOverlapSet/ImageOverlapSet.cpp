@@ -33,12 +33,12 @@ namespace Isis {
    *                        addition to logging errors.
    * @see automaticRegistration.doc
    */
-  ImageOverlapSet::ImageOverlapSet(bool continueOnError, bool threadedCalculate) {
+  ImageOverlapSet::ImageOverlapSet(bool continueOnError, bool useThread) {
 
     p_continueAfterError = continueOnError;
     p_writtenSoFar = 0;
     p_calculatedSoFar = -1;
-    p_threadedCalculate = threadedCalculate;
+    p_threadedCalculate = useThread;
     p_snlist = NULL;
   }
 

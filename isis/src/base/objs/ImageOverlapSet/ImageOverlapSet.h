@@ -101,7 +101,7 @@ namespace Isis {
    */
   class ImageOverlapSet : private QThread {
     public:
-      ImageOverlapSet(bool continueOnError = false, bool threadedCalculate = true);
+      ImageOverlapSet(bool continueOnError = false, bool useThread = true);
       virtual ~ImageOverlapSet();
 
       void FindImageOverlaps(SerialNumberList &boundaries);
