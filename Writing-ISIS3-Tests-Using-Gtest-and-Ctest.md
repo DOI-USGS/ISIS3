@@ -1,3 +1,32 @@
+- [Creating a new test suite](#creating-a-new-test-suite)
+- [General Testing Tips](#general-testing-tips)
+  - [Testing exceptions](#testing-exceptions)
+  - [Testing floating point numbers](#testing-floating-point-numbers)
+  - [Test fixtures](#test-fixtures)
+  - [Test parameterization](#test-parameterization)
+- [Test names](#test-names)
+  - [Basic tests](#basic-tests)
+  - [Test fixtures](#test-fixtures-1)
+  - [Parameterized tests](#parameterized-tests)
+- [Refactoring ISIS3 Applications](#refactoring-isis3-applications)
+  - [Creating a basic callable function](#creating-a-basic-callable-function)
+    - [If your application uses `Application::Log()`](#if-your-application-uses-applicationlog)
+  - [Creating a more complex callable function](#creating-a-more-complex-callable-function)
+    - [Separating parameter parsing](#separating-parameter-parsing)
+    - [Separating I/O](#separating-io)
+    - [Process, helper functions, and global variables](#process-helper-functions-and-global-variables)
+- [Helpful documentation](#helpful-documentation)
+- [ISIS App Testing Cookbook](#isis-app-testing-cookbook)
+  - [App Conversion + Gtest PR Checklist](#app-conversion--gtest-pr-checklist)
+  - [Main.cpp Templates](#maincpp-templates)
+    - [Minimum](#minimum)
+    - [Application with Logs](#application-with-logs)
+    - [Application with GuiLogs](#application-with-guilogs)
+    - [Application with GUIHELPERS](#application-with-guihelpers)
+  - [Application.h Template](#applicationh-template)
+  - [GTEST Templates](#gtest-templates)
+
+
 # Creating a new test suite
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`. For example, the tests for the Cube class should be in `CubeTests.cpp`.
 1. Add `#include "gmock/gmock.h"` to the file.
@@ -220,3 +249,182 @@ void IsisMain() {
 * [Advanced gtest](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md) : This document covers a wide range of advanced options for testing tricky logic and customizing test output.
 * [gmock Introduction](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md) : A great introduction to how gmock can be used to remove dependencies from tests.
 * [gmock Matcher List](https://github.com/abseil/googletest/blob/master/googlemock/docs/CheatSheet.md#matchers) : This whole document is helpful for gmock, but these matchers have some nice uses in gtest too.
+
+
+# ISIS App Testing Cookbook 
+
+## App Conversion + Gtest PR Checklist
+
+Things that all new test additions need to have done.  
+
+- [ ]  New .cpp/.h source files added as `<appname>.cpp/<appname>.h` in all lowercase.  
+- [ ]  Contents of main.cpp moved into `<appname>.cpp` with a function named `<appname>` in lower camel case. 
+- [ ]  Main.cpp replaced with call to app function in `<appname>.cpp` 
+- [ ]  New app tests added as `ISIS3/isis/tests/FunctionalTests<appname>.cpp` in upper camel case
+- [ ]  New GTests prefixed with `FunctionalTest<appname>`
+- [ ]  Old Makefile tests removed 
+- [ ]  New tests passing on Jenkins
+
+## Main.cpp Templates 
+
+### Minimum 
+
+This is generally used when no logs are printed and special help GUI functionality is needed.
+```C++
+#include "Isis.h"
+
+#include "Application.h"
+#include "app_func.h" # replace with your new header
+
+using namespace Isis;
+
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+  app_func(ui);
+}
+```
+
+### Application with Logs 
+
+When the application expects to print PVL logs to standard output. Most common case. 
+
+```C++
+#include "Isis.h"
+
+#include "Application.h"
+#include "Pvl.h"
+#include "app_func.h" # replace with your new header
+
+using namespace Isis;
+
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+  Pvl appLog;
+  try {
+    app_func(ui, &appLog);
+  }
+  catch (...) {
+    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+      Application::Log(*grpIt);
+    }
+    throw;
+  }
+ 
+  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+    Application::Log(*grpIt);
+  }
+}
+```
+### Application with GuiLogs 
+
+Logs that are only to be printed to the GUI command line in interactive mode. 
+
+```C++
+#include "Isis.h"
+
+#include "Application.h"
+#include "SessionLog.h"
+#include "app_func.h" # replace with your new header
+
+using namespace Isis;
+
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+  Pvl appLog;
+  
+  app_func(ui);
+  
+  // in this case, output data are in a "Results" group.
+  PvlGroup results = appLog.findGroup("Results");
+  if( ui.WasEntered("TO") && ui.IsInteractive() ) {
+    Application::GuiLog(results);
+  }
+  
+  SessionLog::TheLog().AddResults(results);
+}
+```
+
+### Application with GUIHELPERS
+
+Some apps require a map with specialized GUIHELPERS, these are GUI tools and shouldn't be co-located with the app function. 
+
+```C++
+#define GUIHELPERS
+#include "Isis.h"
+
+#include "Application.h"
+#include "app_func.h" # replace with your new header
+
+using namespace Isis;
+using namespace std;
+
+void helper();
+
+// this map and function definitions are ripped directly from the old main.cpp
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
+  helper ["Helper"] = (void *) helper;  
+  return helper;
+}
+
+void IsisMain() {   // this may change depending on whether logs are needed or not
+  UserInterface &ui = Application::GetUserInterface();
+  app_func(ui);
+}
+
+void helper() {
+	// whatever
+}
+```
+
+## Application.h Template 
+
+This almost never changes between applications. 
+```C++
+#ifndef app_name_h // Change this to your app name in all lower case suffixed with _h (e.g. campt_h, cam2map_h etc.)
+#define app_name_h
+
+#include "Cube.h"
+#include "UserInterface.h"
+
+namespace Isis{
+  extern void app_func(Cube *cube, UserInterface &ui, Pvl *log);
+  extern void app_func(UserInterface &ui, Pvl *log);
+}
+
+#endif
+```
+
+## GTEST Templates 
+
+```C++
+
+#include "Fixtures.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "TestUtilities.h"
+
+#include "app.h"
+
+#include "gtest/gtest.h"
+
+using namespace Isis;
+
+static QString APP_XML = FileName("$ISISROOT/bin/xml/app.xml").expanded();
+
+TEST_F(SomeFixture, FunctionalTestAppName) {
+  QTemporaryDir prefix;
+  QString outCubeFileName = prefix.path() + "/outTemp.cub";
+  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName};
+
+  UserInterface options(APP_XML, args);
+  try {
+    appfoo_func(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+  
+  // Assert some stuff
+}
+```
