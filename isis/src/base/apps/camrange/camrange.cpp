@@ -10,11 +10,11 @@
 using namespace Isis;
 
 namespace Isis {
+  
   void camrange(UserInterface &ui, Pvl *log) {
     Cube *cube = new Cube( ui.GetFileName("FROM"), "r");
     camrange(cube, ui, log);
   }
-
 
   void camrange(Cube *incube, UserInterface &ui, Pvl *log) {
     Process p;
