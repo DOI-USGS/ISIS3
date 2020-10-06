@@ -128,13 +128,13 @@ This step covers how to update the data on the rysnc servers. This is where our 
 **Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc).**
 
 ### Part A: Update the Local Server
-* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers.
+* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers.
 
-* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/```.
+* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/```.
 
 
 ### Part B: Update the Remote Server
-* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
+* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```.
 
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```.
 
