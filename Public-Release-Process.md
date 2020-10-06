@@ -130,14 +130,15 @@ This step covers how to update the data on the rysnc servers. This is where our 
 ### Part A: Update the Local Server
 * Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers.
 
-* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/```.
+* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/```.
 
 
 ### Part B: Update the Remote Server
-* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
+* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/isis_data/```.
 
-* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
+* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/isis_data/```.
 
+The default 
 ## Step 8: Create Internal Builds/Installs for Astro
 
 This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. These commands must be run as isis3mgr for permission purposes.
