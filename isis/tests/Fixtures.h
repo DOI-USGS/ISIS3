@@ -113,6 +113,12 @@ namespace Isis {
       void SetUp() override;
       void TearDown() override;
   };
+
+  class MroCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
 }
 
 #endif

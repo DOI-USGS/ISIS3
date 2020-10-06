@@ -258,4 +258,144 @@ namespace Isis {
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
   }
+
+  void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);    
+    
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName              = "MARS RECONNAISSANCE ORBITER"
+        InstrumentId                = HIRISE
+        TargetName                  = Mars
+        StartTime                   = 2006-11-08T04:49:13.968
+        StopTime                    = 2006-11-08T04:49:17.771
+        ObservationStartCount       = 847428572:42722
+        SpacecraftClockStartCount   = 847428572:52459
+        SpacecraftClockStopCount    = 847428576:39516
+        ReadoutStartCount           = 847428727:63203
+        CalibrationStartTime        = 2006-11-08T04:49:13.952
+        CalibrationStartCount       = 847428572:51413
+        AnalogPowerStartTime        = 2006-11-08T04:48:34.478
+        AnalogPowerStartCount       = 847428533:20297
+        MissionPhaseName            = "PRIMARY SCIENCE PHASE"
+        LineExposureDuration        = 95.0625 <MICROSECONDS>
+        ScanExposureDuration        = 95.0625 <MICROSECONDS>
+        DeltaLineTimerCount         = 337
+        Summing                     = 1
+        Tdi                         = 128
+        FocusPositionCount          = 2020
+        PoweredCpmmFlag             = (On, On, On, On, On, On, On, On, On, On, On,
+                                      On, On, On)
+        CpmmNumber                  = 8
+        CcdId                       = RED5
+        ChannelNumber               = 0
+        LookupTableType             = Stored
+        LookupTableNumber           = 19
+        LookupTableMinimum          = -9998
+        LookupTableMaximum          = -9998
+        LookupTableMedian           = -9998
+        LookupTableKValue           = -9998
+        StimulationLampFlag         = (Off, Off, Off)
+        HeaterControlFlag           = (On, On, On, On, On, On, On, On, On, On, On,
+                                      On, On, On)
+        OptBnchFlexureTemperature   = 19.5881 <C>
+        OptBnchMirrorTemperature    = 19.6748 <C>
+        OptBnchFoldFlatTemperature  = 19.9348 <C>
+        OptBnchFpaTemperature       = 19.5015 <C>
+        OptBnchFpeTemperature       = 19.2415 <C>
+        OptBnchLivingRmTemperature  = 19.4148 <C>
+        OptBnchBoxBeamTemperature   = 19.5881 <C>
+        OptBnchCoverTemperature     = 19.6748 <C>
+        FieldStopTemperature        = 17.9418 <C>
+        FpaPositiveYTemperature     = 18.8082 <C>
+        FpaNegativeYTemperature     = 18.6349 <C>
+        FpeTemperature              = 18.0284 <C>
+        PrimaryMirrorMntTemperature = 19.5015 <C>
+        PrimaryMirrorTemperature    = 19.6748 <C>
+        PrimaryMirrorBafTemperature = 2.39402 <C>
+        MsTrussLeg0ATemperature     = 19.6748 <C>
+        MsTrussLeg0BTemperature     = 19.8482 <C>
+        MsTrussLeg120ATemperature   = 19.3281 <C>
+        MsTrussLeg120BTemperature   = 20.1949 <C>
+        MsTrussLeg240ATemperature   = 20.2816 <C>
+        MsTrussLeg240BTemperature   = 20.7151 <C>
+        BarrelBaffleTemperature     = -13.8299 <C>
+        SunShadeTemperature         = -33.9377 <C>
+        SpiderLeg30Temperature      = 17.5087 <C>
+        SpiderLeg120Temperature     = -9999
+        SpiderLeg240Temperature     = -9999
+        SecMirrorMtrRngTemperature  = 20.6284 <C>
+        SecMirrorTemperature        = 20.455 <C>
+        SecMirrorBaffleTemperature  = -11.1761 <C>
+        IeaTemperature              = 25.4878 <C>
+        FocusMotorTemperature       = 21.4088 <C>
+        IePwsBoardTemperature       = 16.3696 <C>
+        CpmmPwsBoardTemperature     = 17.6224 <C>
+        MechTlmBoardTemperature     = 34.7792 <C>
+        InstContBoardTemperature    = 34.4121 <C>
+        DllLockedFlag               = (YES, YES)
+        DllResetCount               = 0
+        DllLockedOnceFlag           = (YES, YES)
+        DllFrequenceCorrectCount    = 4
+        ADCTimingSetting            = -9999
+        Unlutted                    = TRUE
+      End_Group
+    )");
+    
+    PvlGroup newInstGroup; 
+    iss >> newInstGroup; 
+    
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+    newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+
+    inst = newInstGroup; 
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    
+    PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
+    PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
+    inst += startcc;
+    inst += stopcc;  
+    
+    json nk; 
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 11994.9988;
+    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.012;
+    nk["INS"+ikid.toStdString()+"_TRANSX"] = {-89.496, -1.0e-06, 0.012};
+    nk["INS"+ikid.toStdString()+"_TRANSY"] = {-12.001, -0.012, -1.0e-06};
+    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {-1000.86, -0.0087, -83.333};
+    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {7457.9, 83.3333, -0.0087};
+    nk["INS"+ikid.toStdString()+"_OD_K"] = {-0.0048509, 2.41312e-07, -1.62369e-13};
+    nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
+    nk["CLOCK_ET_-74999_847428572:52459_COMPUTED"] = "8ed6ae8930f3bd41";
+    nk["BODY_CODE"] = 499;
+    nk["BODY_FRAME_CODE"] = 10014; 
+    PvlObject newNaifKeywords("NaifKeywords", nk);
+    naifKeywords = newNaifKeywords; 
+
+    QString fileName = testCube->fileName();
+   
+    std::cout << *(testCube->label()) << std::endl;
+    LineManager line(*testCube);
+    double pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+        for(int i = 0; i < line.size(); i++) {
+          line[i] = (double)(i+1);
+          pixelValue++;
+        }
+        testCube->write(line);
+    }
+    testCube->reopen("rw");
+ 
+// need to remove old camera pointer 
+    delete testCube;
+    // This is now a Hayabusa cube
+    testCube = new Cube(fileName, "rw");
+     
+
+  }
+
+
+
 }
