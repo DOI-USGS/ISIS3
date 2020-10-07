@@ -73,7 +73,7 @@ int main() {
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
-    Cube cube("$ISISDATA/../datalocal/clipper/testData/simulated_clipper_eis_nac_rolling_shutter.cub", "r");
+    Cube cube("$clipper/testData/simulated_clipper_eis_nac_rolling_shutter.cub", "r");
     TestRollingShutterCamera cam(cube);
 
     // test camera type

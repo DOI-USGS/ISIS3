@@ -17,7 +17,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormSubtract) {
   setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
 
   QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path()+"/outTEMP2.cub";
+  QString outCubeFileName = prefix.path()+"/outTEMP.cub";
   QString outStatsFile = prefix.path()+"/stats.csv";  
   QVector<QString> args = {"to="+outCubeFileName, "stats="+outStatsFile, "format=PVL", "mode=subtract", "filter=5"};
   
@@ -35,6 +35,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormSubtract) {
 
   PvlGroup res = stats.findGroup("Results");  
 
+  // check first column, middle column, and last column
   ASSERT_DOUBLE_EQ((double)res[3], -7.3641443519534);
   ASSERT_DOUBLE_EQ((double)res[4], -7.3641443519534);
   ASSERT_DOUBLE_EQ((double)res[5], 0);
@@ -130,7 +131,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormNewVersion) {
   setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
 
   QTemporaryDir prefix;
-  QString tablePath = "/tmp/stats.pvl"; // prefix.path() + "/stats.pvl"; 
+  QString tablePath = prefix.path() + "/stats.pvl"; // prefix.path() + "/stats.pvl"; 
   QString outCubeFileName = prefix.path() + "/outTEMP.cub";
 
   // Generate a Statistics file
