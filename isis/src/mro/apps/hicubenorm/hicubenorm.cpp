@@ -52,7 +52,6 @@ namespace Isis {
 
     void hicubenorm(UserInterface &ui) {
         Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
-        std::cout << cube->fileName() << std::endl;
         hicubenorm(cube, ui);
     }
 
@@ -185,7 +184,6 @@ namespace Isis {
             }
         }
 
-        std::cout << "ending things" << std::endl;
         // Cleanup
         p.EndProcess();
         stddev.clear();
@@ -325,7 +323,7 @@ namespace Isis {
     //*******************************************************
     void PVLIn(const Isis::FileName &filename) {
     Pvl pvlFileIn;
-    pvlFileIn.read(filename.name());
+    pvlFileIn.read(filename.expanded());
     PvlGroup results = pvlFileIn.findGroup("Results");
     PvlObject::PvlKeywordIterator itr = results.begin();
 

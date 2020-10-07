@@ -376,24 +376,19 @@ namespace Isis {
 
     QString fileName = testCube->fileName();
    
-    std::cout << *(testCube->label()) << std::endl;
     LineManager line(*testCube);
-    double pixelValue = 1;
     for(line.begin(); !line.end(); line++) {
         for(int i = 0; i < line.size(); i++) {
           line[i] = (double)(i+1);
-          pixelValue++;
         }
         testCube->write(line);
     }
     testCube->reopen("rw");
  
-// need to remove old camera pointer 
+    // need to remove old camera pointer 
     delete testCube;
     // This is now a Hayabusa cube
     testCube = new Cube(fileName, "rw");
-     
-
   }
 
 
