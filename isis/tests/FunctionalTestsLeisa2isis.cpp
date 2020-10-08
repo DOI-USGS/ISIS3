@@ -88,3 +88,112 @@ TEST(leisa2isisTest, leisa2isisTestDefault) {
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98901);
   ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
 }
+
+
+TEST(leisa2isisTest, leisa2isisTestJan2015Format) {
+   Pvl appLog;
+   QTemporaryDir prefix;
+   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
+   QString errFileName = prefix.path() + "/leisa2isisTEMPerr.cub";
+   QString qualityFileName = prefix.path() + "/leisa2isisTEMPqual.cub";
+   QVector<QString> args = {"from=data/leisa2isis/jan2015_format.fit",
+                            "to=" + cubeFileName,
+                            "quality=" + qualityFileName,
+                            "errormap=" + errFileName};
+
+  UserInterface options(dAPP_XML, args);
+  try {
+   leisa2isis(options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube errCube(errFileName);
+  Cube qualityCube(qualityFileName);
+  Pvl *isisErrLabel = errCube.label();
+  Pvl *isisQualityLabel = qualityCube.label();
+
+  // Quality file dimensions:
+  PvlGroup &qualDimensions = isisQualityLabel->findGroup("Dimensions", Pvl::Traverse);
+  ASSERT_EQ(int(qualDimensions["Samples"]), 25);
+  ASSERT_EQ(int(qualDimensions["Lines"]), 1);
+  ASSERT_EQ(int(qualDimensions["Bands"]), 3);
+
+  // Error file dimensions:
+  PvlGroup &errDimensions = isisErrLabel->findGroup("Dimensions", Pvl::Traverse);
+  ASSERT_EQ(int(errDimensions["Samples"]), 25);
+  ASSERT_EQ(int(errDimensions["Lines"]), 1);
+  ASSERT_EQ(int(errDimensions["Bands"]), 3);
+
+  // Quality File Pixels Group
+  PvlGroup &qualPixels = isisQualityLabel->findGroup("Pixels", Pvl::Traverse);
+  ASSERT_EQ(qualPixels["Type"][0].toStdString(), "SigndWord");
+  ASSERT_EQ(qualPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(double(qualPixels["Base"]), 0.0);
+  ASSERT_EQ(double(qualPixels["Multiplier"]), 1.0);
+
+
+  // Quality File Pixels Group
+  PvlGroup &errPixels = isisErrLabel->findGroup("Pixels", Pvl::Traverse);
+  ASSERT_EQ(errPixels["Type"][0].toStdString(), "Real");
+  ASSERT_EQ(errPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(double(errPixels["Base"]), 0.0);
+  ASSERT_EQ(double(errPixels["Multiplier"]), 1.0);
+}
+
+
+
+TEST(leisa2isisTest, leisa2isisTestCalib) {
+   Pvl appLog;
+   QTemporaryDir prefix;
+   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
+   QString errFileName = prefix.path() + "/leisa2isisTEMPerr.cub";
+   QString qualityFileName = prefix.path() + "/leisa2isisTEMPqual.cub";
+   QVector<QString> args = {"from=data/leisa2isis/calib.fit",
+                            "to=" + cubeFileName,
+                            "quality=" + qualityFileName,
+                            "errormap=" + errFileName};
+
+  UserInterface options(dAPP_XML, args);
+  try {
+   leisa2isis(options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube errCube(errFileName);
+  Cube qualityCube(qualityFileName);
+  Pvl *isisErrLabel = errCube.label();
+  Pvl *isisQualityLabel = qualityCube.label();
+
+  // Quality file dimensions:
+  PvlGroup &qualDimensions = isisQualityLabel->findGroup("Dimensions", Pvl::Traverse);
+  ASSERT_EQ(int(qualDimensions["Samples"]), 25);
+  ASSERT_EQ(int(qualDimensions["Lines"]), 1);
+  ASSERT_EQ(int(qualDimensions["Bands"]), 3);
+
+  // Error file dimensions:
+  PvlGroup &errDimensions = isisErrLabel->findGroup("Dimensions", Pvl::Traverse);
+  ASSERT_EQ(int(errDimensions["Samples"]), 25);
+  ASSERT_EQ(int(errDimensions["Lines"]), 1);
+  ASSERT_EQ(int(errDimensions["Bands"]), 3);
+
+  // Quality File Pixels Group
+  PvlGroup &qualPixels = isisQualityLabel->findGroup("Pixels", Pvl::Traverse);
+  ASSERT_EQ(qualPixels["Type"][0].toStdString(), "SigndWord");
+  ASSERT_EQ(qualPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(double(qualPixels["Base"]), 0.0);
+  ASSERT_EQ(double(qualPixels["Multiplier"]), 1.0);
+
+
+  // Quality File Pixels Group
+  PvlGroup &errPixels = isisErrLabel->findGroup("Pixels", Pvl::Traverse);
+  ASSERT_EQ(errPixels["Type"][0].toStdString(), "Real");
+  ASSERT_EQ(errPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(double(errPixels["Base"]), 0.0);
+  ASSERT_EQ(double(errPixels["Multiplier"]), 1.0);
+}
