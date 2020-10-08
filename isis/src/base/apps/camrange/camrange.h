@@ -11,5 +11,3 @@ namespace Isis {
 }
 
 #endif
-
-

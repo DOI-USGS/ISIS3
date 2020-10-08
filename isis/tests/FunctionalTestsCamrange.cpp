@@ -32,7 +32,6 @@ TEST_F(DefaultCube, FunctionalTestCamrangeMeta) {
   EXPECT_EQ( (double) pixelResolution.findKeyword("Highest"), 18.840630601657 );
 }
 
-
 TEST_F(DefaultCube, FunctionalTestCamrangeUniversalGround) {
   QVector<QString> args = { "FROM=" + testCube->fileName() };
   UserInterface options(APP_XML, args);
@@ -91,15 +90,15 @@ TEST_F(DefaultCube, FunctionalTestCamrangeCardinals) {
 }
 
 TEST_F(DefaultCube, FunctionalTestCamrangeWriteTo) {
-  QFile outFile(tempDir.path()+"outFile.txt"); 
+  QFile outFile(tempDir.path()+"outFile.txt");
   QVector<QString> args = { "FROM=" + testCube->fileName(),
                             "TO="   + outFile.fileName() };
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
-  int sizeBefore = outFile.size(); 
+  int sizeBefore = outFile.size();
   camrange(options, &appLog);
-  int sizeAfter = outFile.size(); 
+  int sizeAfter = outFile.size();
 
   EXPECT_TRUE( sizeBefore < sizeAfter );
 }
