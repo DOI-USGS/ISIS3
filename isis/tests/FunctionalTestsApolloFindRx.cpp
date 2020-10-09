@@ -55,10 +55,6 @@ TEST_F(SmallCube, FunctionalTestApolloFindRxDefault) {
   lab->findObject("IsisCube").addGroup(reseaus);
   lab->findObject("IsisCube").addGroup(instGroup);
 
-  PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-  inst.findKeyword("SpacecraftName").setValue("APOLLO 15");
-  inst.findKeyword("InstrumentId").setValue("METRIC"); 
-  
   QTemporaryDir prefix;
   QVector<QString> args = {"tolerance=0.125"};
 
