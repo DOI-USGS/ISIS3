@@ -43,7 +43,8 @@ namespace Isis {
     // We will be processing by line
     ProcessByLine p;
     p.SetInputCube(icube);
-    p.SetOutputCube("TO");
+    p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+                    icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
     QString mode = ui.GetString("MODE");
 
@@ -78,6 +79,9 @@ namespace Isis {
     }
     else if (bval == "LRS") {
       bkgndValue = Lrs;
+    }
+    else if (bval == "NULL") {
+      bkgndValue = Null;
     }
     else if (bval == "DN") {
       bkgndValue = ui.GetDouble("BKGNDDNVALUE");
@@ -122,7 +126,7 @@ namespace Isis {
        * @param out Mosaic cube
        */
       auto imageGrid = [&](Buffer &in, Buffer &out)->void {
-        for (int samp = 1; samp <= in.size(); samp ++) {
+        for (int samp = 1; samp <= in.size(); samp++) {
           if (useImageAsBkgn)
             out[samp - 1] = in[samp - 1];
           else 
@@ -425,17 +429,17 @@ namespace Isis {
   bool imageDrawLine(int line, int baseLine, int lineWidth, int lineInc) {
     bool drawLine = false;
 
-    for (int y = line - lineWidth; y <= line + lineWidth; y ++) {
+    for (int y = line - lineWidth; y <= line + lineWidth; y++) {
       drawLine = drawLine || (y % lineInc == baseLine % lineInc);
     }
-
+    // std::cout<<"Line: "<<line << " drawline: " << drawLine<<std::endl;
     return drawLine;
   }
 
   bool imageDrawSample(int sample, int baseSample, int lineWidth, int sampleInc) {
     bool drawSamp = false;
 
-    for (int x = sample - lineWidth; x <= sample + lineWidth; x ++) {
+    for (int x = sample - lineWidth; x <= sample + lineWidth; x++) {
       drawSamp = drawSamp || (x % sampleInc == baseSample % sampleInc);
     }
 
