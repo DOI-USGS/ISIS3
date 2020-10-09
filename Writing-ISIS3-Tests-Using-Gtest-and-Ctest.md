@@ -361,7 +361,7 @@ Some apps require a map with specialized GUIHELPERS, these are GUI tools and sho
 #include "Isis.h"
 
 #include "Application.h"
-#include "app_func.h" # replace with your new header
+#include "app_func.h" // replace with your new header
 
 using namespace Isis;
 using namespace std;
@@ -397,7 +397,7 @@ This almost never changes between applications.
 
 namespace Isis{
   extern void app_func(Cube *cube, UserInterface &ui, Pvl *log);
-  extern void app_func(UserInterface &ui, Pvl *log);
+  extern void app_func(UserInterface &ui, Pvl *log=nullptr);
 }
 
 #endif
