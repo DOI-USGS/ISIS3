@@ -250,7 +250,7 @@ namespace Isis {
       PvlGroup extensionLabel = importFits.fitsImageLabel(5);
       importFits.SetOrganization(ProcessImport::BIL);
       importFits.setProcessFileStructure(5);
-      Cube *output = importFits.SetOutputCube("ERRORMAP");
+      Cube *output = importFits.SetOutputCube("ERRORMAP", ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl origLabel;
@@ -269,7 +269,7 @@ namespace Isis {
       PvlGroup extensionLabel = importFits.fitsImageLabel(6);
       importFits.SetOrganization(ProcessImport::BIL);
       importFits.setProcessFileStructure(6);
-      Cube *output = importFits.SetOutputCube("QUALITY");
+      Cube *output = importFits.SetOutputCube("QUALITY", ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl origLabel;
