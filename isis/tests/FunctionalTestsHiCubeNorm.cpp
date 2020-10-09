@@ -54,8 +54,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormSubtract) {
   ASSERT_DOUBLE_EQ((double)res[9630], 1204);
   ASSERT_DOUBLE_EQ((double)res[9631], 1204);
 
-  Cube oCube(outCubeFileName, "r"); 
-  oCube.reopen("rw");
+  Cube oCube(outCubeFileName, "rw"); 
 
   Histogram *oCubeStats = oCube.histogram();
   
@@ -84,8 +83,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormDivide) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r"); 
-  oCube.reopen("rw");
+  Cube oCube(outCubeFileName, "rw"); 
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -113,8 +111,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormAverage) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r"); 
-  oCube.reopen("rw");
+  Cube oCube(outCubeFileName, "rw"); 
 
   Histogram *oCubeStats = oCube.histogram();
   
@@ -162,8 +159,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormNewVersion) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r"); 
-  oCube.reopen("rw");
+  Cube oCube(outCubeFileName, "rw"); 
 
   Histogram *oCubeStats = oCube.histogram();
   
@@ -203,8 +199,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormPreserve) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r"); 
-  oCube.reopen("rw");
+  Cube oCube(outCubeFileName, "rw"); 
 
   Histogram *oCubeStats = oCube.histogram();
 
