@@ -11,7 +11,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apollofindrx.xml").expanded();
 
-TEST_F(SmallCube, FunctionalTestApolloFineRxDefault) {
+TEST_F(SmallCube, FunctionalTestApolloFindRxDefault) {
   PvlGroup reseaus("Reseaus");
   PvlKeyword samples = PvlKeyword("Sample", "2");
   samples += "4"; 
@@ -59,11 +59,8 @@ TEST_F(SmallCube, FunctionalTestApolloFineRxDefault) {
   inst.findKeyword("SpacecraftName").setValue("APOLLO 15");
   inst.findKeyword("InstrumentId").setValue("METRIC"); 
   
-  std::cout << *lab << std::endl;
-
   QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path() + "/outTemp.cub";
-  QVector<QString> args = {"to="+outCubeFileName, "tolerance=0.125"};
+  QVector<QString> args = {"tolerance=0.125"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -72,6 +69,29 @@ TEST_F(SmallCube, FunctionalTestApolloFineRxDefault) {
   catch (IException &e) {
     FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
   }
+
+  Pvl newLab = *testCube->label();
+
+  PvlGroup newReseaus = newLab.findObject("IsisCube").findGroup("Reseaus");
+  PvlKeyword testKeyword = newReseaus.findKeyword("Line");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "-98.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "-205.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "-212.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "-446.0");
+   
+  testKeyword = newReseaus.findKeyword("Sample");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "-98.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "-205.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "-321.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "-446.0");
   
+  testKeyword = newReseaus.findKeyword("Valid");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "1");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "1");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "1");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "1");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, newReseaus.findKeyword("Status"), "Refined");
+
   // Assert some stuff
 }

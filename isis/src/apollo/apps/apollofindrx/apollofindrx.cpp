@@ -34,12 +34,10 @@ namespace Isis {
 
     void apollofindrx(UserInterface &ui) {
         Cube *cube = new Cube(ui.GetFileName("FROM"), "rw");
-        std::cout << cube->fileName() << std::endl;
         apollofindrx(cube, ui);
     }
 
     void apollofindrx(Cube *cube, UserInterface &ui) {
-        std::cout << "I'm, in" << std::endl;
         // Import cube data & PVL information
 
         tolerance = ui.GetDouble("TOLERANCE");
@@ -162,16 +160,18 @@ namespace Isis {
             throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        // Record apollofindrx history to the cube
-        // create a History Blob with value found in the History PvlObject's Name keyword
-        PvlObject &histObj = cube->label()->findObject("History");
-        Isis::History histBlob( (QString)histObj["Name"] );
-        // read cube's History PvlObject data into the History Blob
-        cube->read(histBlob);
-        // add apollofindrx History PvlObject into the History Blob and write to cube
-        histBlob.AddEntry();
-        cube->write(histBlob);
-        cube->close();
+        if (cube->label()->hasObject("History")) {
+            PvlObject histObj = cube->label()->findObject("History");
+            // Record apollofindrx history to the cube
+            // create a History Blob with value found in the History PvlObject's Name keyword
+            Isis::History histBlob( (QString)histObj["Name"] );
+            // read cube's History PvlObject data into the History Blob
+            cube->read(histBlob);
+            // add apollofindrx History PvlObject into the History Blob and write to cube
+            histBlob.AddEntry();
+            cube->write(histBlob);
+            cube->close();
+        }
     }
 
     bool Walk() {
