@@ -164,6 +164,14 @@ void IsisMain() {
 }
 ```
 
+Wherever Application::log is called with some pvl group (here called `pvlgroup`), in the app func replace with: 
+
+```C++
+if (log){ 
+  log->addGroup(pvlgroup);
+}
+```
+
 ## Creating a more complex callable function
 
 The basic interface that we've created so far is simply a mirror of the application command line interface. In order to further improve the testability of the application, we should break the application down into functional components.
