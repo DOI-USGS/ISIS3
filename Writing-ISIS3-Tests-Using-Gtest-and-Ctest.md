@@ -396,7 +396,7 @@ This almost never changes between applications.
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void app_func(Cube *cube, UserInterface &ui, Pvl *log);
+  extern void app_func(Cube *cube, UserInterface &ui, Pvl *log=nullptr);
   extern void app_func(UserInterface &ui, Pvl *log=nullptr);
 }
 
