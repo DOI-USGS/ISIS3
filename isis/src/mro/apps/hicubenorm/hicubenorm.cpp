@@ -163,7 +163,7 @@ namespace Isis {
             
             Isis::CubeAttributeOutput atts;
             if (ui.WasEntered("FROM")) {
-                atts = ui.GetOutputAttribute("FROM");
+                atts = ui.GetOutputAttribute("TO");
             }
 
             FileName outFileName = ui.GetFileName("TO");
