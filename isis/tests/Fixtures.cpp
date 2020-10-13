@@ -168,64 +168,27 @@ namespace Isis {
     cube1 = new Cube();
     cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, *isdPath1, "rw");
 
-    lonLatPts = new geos::geom::CoordinateArraySequence();
-    lonLatPts->add(geos::geom::Coordinate(30, 0));
-    lonLatPts->add(geos::geom::Coordinate(30, 10));
-    lonLatPts->add(geos::geom::Coordinate(35, 10));
-    lonLatPts->add(geos::geom::Coordinate(35, 0));
-    lonLatPts->add(geos::geom::Coordinate(30, 0));
-
-    polys = new std::vector<geos::geom::Geometry *>;
-    poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-    polys->push_back(poly->clone());
-    multiPoly = globalFactory->createMultiPolygon(polys);
-
-    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-    std::string polyStr = wkt->write(multiPoly);
-    int polyStrSize = polyStr.size();
-    std::istringstream polyStream(polyStr);
-
-    Blob pvlBlob("Footprint", "Polygon");
-    Pvl pvl;
-    PvlObject polyObject = PvlObject("Polygon");
-    polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-    polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-    polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-    pvl.addObject(polyObject);
-
-    pvlBlob.Read(pvl, polyStream);
-    cube1->write(pvlBlob);
+    ImagePolygon poly;
+    coords = {{30, 0},
+              {30, 10},
+              {35, 10},
+              {35, 0},
+              {30, 0}};
+    poly.Create(coords);
+    cube1->write(poly);
     cube1->reopen("rw");
 
     cube2 = new Cube();
     cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
 
-    lonLatPts = new geos::geom::CoordinateArraySequence();
-    lonLatPts->add(geos::geom::Coordinate(31, 1));
-    lonLatPts->add(geos::geom::Coordinate(31, 11));
-    lonLatPts->add(geos::geom::Coordinate(36, 11));
-    lonLatPts->add(geos::geom::Coordinate(36, 1));
-    lonLatPts->add(geos::geom::Coordinate(31, 1));
-
-    polys->pop_back();
-    poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-    polys->push_back(poly);
-    multiPoly = globalFactory->createMultiPolygon(polys);
-
-    polyStr = wkt->write(multiPoly);
-    polyStrSize = polyStr.size();
-    polyStream.str(polyStr);
-
-    pvlBlob = Blob("Footprint", "Polygon");
-    polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-    pvl.addObject(polyObject);
-
-    pvlBlob.Read(pvl, polyStream);
-    cube2->write(pvlBlob);
+    coords = {{31, 1},
+              {31, 11},
+              {36, 11},
+              {36, 1},
+              {31, 1}};
+    poly.Create(coords);
+    cube2->write(poly);
     cube2->reopen("rw");
-
-    delete wkt;
 
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
