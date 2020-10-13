@@ -1,5 +1,5 @@
 ---
-name: 🗏 Documentation Issue
+name: :book: Documentation Issue
 about: Report issues or problems with documentation.
 
 ---
