@@ -161,11 +161,7 @@ namespace Isis {
             }
             }
             
-            Isis::CubeAttributeOutput atts;
-            if (ui.WasEntered("FROM")) {
-                atts = ui.GetOutputAttribute("TO");
-            }
-
+            Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
             FileName outFileName = ui.GetFileName("TO");
         
             // Setup the output file and apply the coefficients by either
