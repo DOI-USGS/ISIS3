@@ -82,8 +82,6 @@ namespace Isis {
         totalSamples = icube->sampleCount();
         totalLines   = icube->lineCount();
         totalBands   = icube->bandCount();
-        Isis::CubeAttributeOutput &atts = ui.GetOutputAttribute("TO");
-        FileName outFileName = ui.GetFileName("TO");
 
         channel = icube->group("Instrument")["ChannelNumber"];
         
@@ -162,6 +160,14 @@ namespace Isis {
                 }
             }
             }
+            
+            Isis::CubeAttributeOutput atts;
+            if (ui.WasEntered("FROM")) {
+                atts = ui.GetOutputAttribute("FROM");
+            }
+
+            FileName outFileName = ui.GetFileName("TO");
+        
             // Setup the output file and apply the coefficients by either
             // subtracting or multipling them
             p.SetOutputCube(outFileName.expanded(), atts, totalSamples, totalLines, totalBands);
