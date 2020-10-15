@@ -81,10 +81,16 @@ namespace Isis {
    *                            #1673.
    *   @history 2018-07-27 Jesse Mapel - Added support for initializing a histogram from
    *                           signed and unsigned word cubes. References #971.
+   *   @history 2020-06-11 Kaitlyn Lee - Changed how to detemine which bin a pixel/measure falls
+   *                           into in AddData(). Changed how the bin range is calculated in
+   *                           BinRange(). The math for these functions were incorrect and not
+   *                           intuitive. These changes were made alongside changes made
+   *                           to cnethist and hist.
    */
 
   class Histogram : public Statistics {
     public:
+      Histogram() = default;
       Histogram(double minimum, double maximum,
                 int bins = 1024);
       Histogram(Cube &cube, int statsBand, Progress *progress = NULL,
@@ -101,9 +107,9 @@ namespace Isis {
       void SetBins(const int bins);
 
       void Reset();
-      void AddData(const double *data, const unsigned int count);
-      void AddData(const double data);
-      void RemoveData(const double *data, const unsigned int count);
+      virtual void AddData(const double *data, const unsigned int count);
+      virtual void AddData(const double data);
+      virtual void RemoveData(const double *data, const unsigned int count);
 
       double Median() const;
       double Mode() const;
@@ -111,7 +117,7 @@ namespace Isis {
       double Skew() const;
 
       BigInt BinCount(const int index) const;
-      void BinRange(const int index, double &low, double &high) const;
+      virtual void BinRange(const int index, double &low, double &high) const;
       double BinMiddle(const int index) const;
       double BinSize() const;
       int Bins() const;
@@ -127,17 +133,14 @@ namespace Isis {
       void SetValidRange(const double minimum = Isis::ValidMinimum,
                                        const double maximum = Isis::ValidMaximum);
 
-    private:
-      void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
-          int nbins = 0, double startSample = Null, double startLine = Null,
-          double endSample = Null, double endLine = Null);
-
-      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
-      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
-
+    protected:
       //! The array of counts.
       std::vector<BigInt> p_bins;
+
+    private:
       double p_binRangeStart, p_binRangeEnd;
+      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
   };
 };
 

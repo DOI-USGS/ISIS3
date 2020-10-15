@@ -105,14 +105,17 @@ namespace Isis {
       FileList *cubeList;
       QString cubeListFile;
 
-      geos::geom::CoordinateSequence *lonLatPts;
-      std::vector<geos::geom::Geometry *> *polys;
-      geos::geom::Polygon *poly;
-      geos::geom::MultiPolygon *multiPoly;
+      std::vector<std::vector<double>> coords;
 
       void SetUp() override;
       void TearDown() override;
   };
+
+  class MroCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
 }
 
 #endif
