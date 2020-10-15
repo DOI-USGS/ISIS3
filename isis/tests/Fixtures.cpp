@@ -107,18 +107,16 @@ namespace Isis {
 
 
   void DefaultCube::TearDown() {
-    std::cout << "in tear down" << std::endl;
     if (testCube->isOpen()) {
       testCube->close();
     }
-    std::cout << "closing proj" << std::endl;
+    
     if (projTestCube->isOpen()) {
       projTestCube->close();
     }
-    std::cout << "before delete" << std::endl;
+    
     delete testCube;
     delete projTestCube;
-    std::cout << "after delete" << std::endl;
   }
 
   void LineScannerCube::SetUp() {
