@@ -20,7 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "IsisDebug.h"
+//#include "IsisDebug.h"
 
 #include <QDebug>
 #include <QString>
@@ -218,7 +218,7 @@ namespace Isis {
         m_units->resize(m_values.size());
       }
 
-      ASSERT(i < (int) m_units->size());
+      //ASSERT(i < (int) m_units->size());
 
       (*m_units)[i] = units;
     }

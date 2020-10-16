@@ -21,7 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "IsisDebug.h"
+//#include "IsisDebug.h"
 #include "IException.h"
 
 #include <stdlib.h>
@@ -34,7 +34,7 @@
 
 #include <QList>
 
-#include "Application.h"
+//#include "Application.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -506,7 +506,7 @@ namespace Isis {
       bool exceptionIsBlank = true;
       PvlGroup errGroup("Error");
 
-      errGroup += PvlKeyword("Program", Application::Name());
+      //errGroup += PvlKeyword("Program", Application::Name());
 
       if (exception.m_errorType != Unknown) {
         errGroup += PvlKeyword("Class",
@@ -686,7 +686,8 @@ namespace Isis {
    *
    * @return an IException representing a current stack trace
    */
-  IException IException::createStackTrace() {
+   /*
+    IException IException::createStackTrace() {
     vector<string> theStack;
     StackTrace::GetStackTrace(&theStack);
     QString message;
@@ -702,6 +703,7 @@ namespace Isis {
 
     return result;
   }
+  */
 
 
   /**
@@ -791,4 +793,3 @@ namespace Isis {
     }
   }
 }
-
