@@ -81,7 +81,6 @@ namespace Isis {
       IString lskFileName = "";
       if (ui.WasEntered("LSK")) {
         lskFileName = ui.GetFileName("LSK");
-        std::cout << lskFileName << std::endl;
       }
       else {
         FileName lskFile("$base/kernels/lsk/naif????.tls");
@@ -91,7 +90,6 @@ namespace Isis {
       IString sclkFileName = "";
       if (ui.WasEntered("SCLK")) {
         sclkFileName = ui.GetFileName("SCLK");
-        std::cout << sclkFileName << std::endl;
       }
       else {
         FileName sclkFile("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");

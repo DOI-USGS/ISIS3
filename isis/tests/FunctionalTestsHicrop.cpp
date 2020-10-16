@@ -56,7 +56,6 @@ TEST_F(MroCube, FunctionalTestHicropCropByCk) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)oCubeInstrument.findKeyword("StopTime"), "2008-05-17T09:37:31.0666673");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)oCubeInstrument.findKeyword("SpacecraftClockStartCount"), "895484264:57342");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)oCubeInstrument.findKeyword("SpacecraftClockStopCount"), "895484272:12777");
-  std::cout << "DONE" << std::endl;
 }
 
 
