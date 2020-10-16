@@ -5,7 +5,7 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
+//#include "IsisDebug.h"
 #include "IException.h"
 
 #include <stdlib.h>
@@ -18,7 +18,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QList>
 
-#include "Application.h"
+//#include "Application.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -490,7 +490,7 @@ namespace Isis {
       bool exceptionIsBlank = true;
       PvlGroup errGroup("Error");
 
-      errGroup += PvlKeyword("Program", Application::Name());
+      //errGroup += PvlKeyword("Program", Application::Name());
 
       if (exception.m_errorType != Unknown) {
         errGroup += PvlKeyword("Class",
@@ -670,7 +670,8 @@ namespace Isis {
    *
    * @return an IException representing a current stack trace
    */
-  IException IException::createStackTrace() {
+   /*
+    IException IException::createStackTrace() {
     vector<string> theStack;
     StackTrace::GetStackTrace(&theStack);
     QString message;
@@ -686,6 +687,7 @@ namespace Isis {
 
     return result;
   }
+  */
 
 
   /**
@@ -775,4 +777,3 @@ namespace Isis {
     }
   }
 }
-
