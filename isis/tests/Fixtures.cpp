@@ -13,7 +13,7 @@ namespace Isis {
     TempTestingFiles::SetUp();
 
     testCube = new Cube();
-    testCube->setDimensions(10, 10, 10);
+    testCube->setDimensions(100, 100, 10);
     testCube->create(tempDir.path() + "/small.cub");
 
     LineManager line(*testCube);
@@ -36,6 +36,37 @@ namespace Isis {
       delete testCube;
     }
   }
+
+
+  void LargeCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(1000, 1000, 10);
+    testCube->create(tempDir.path() + "/large.cub");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = pixelValue;
+      }
+
+      pixelValue++;
+      testCube->write(line);
+    }
+  }
+
+  void LargeCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
 
   void SpecialSmallCube::SetUp() {
     TempTestingFiles::SetUp();

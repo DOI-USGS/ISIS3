@@ -192,7 +192,7 @@ namespace Isis {
                 fitChip.SetValue(s, l, fit);
             }
         }
-
+        
         if (bestFit == Isis::Null || bestFit > tolerance) return false;
 
         GoodnessOfFit = bestFit;

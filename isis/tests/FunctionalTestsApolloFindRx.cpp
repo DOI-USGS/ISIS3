@@ -11,27 +11,28 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apollofindrx.xml").expanded();
 
-TEST_F(SmallCube, FunctionalTestApolloFindRxDefault) {
-  PvlGroup reseaus("Reseaus");
-  PvlKeyword samples = PvlKeyword("Sample", "2");
-  samples += "4"; 
-  samples += "6"; 
-  samples += "8";
+TEST_F(LargeCube, FunctionalTestApolloFindRxDefault) {
 
-  PvlKeyword lines = PvlKeyword("Line", "2");
-  lines += "4"; 
-  lines += "6"; 
-  lines += "8";
+  PvlGroup reseaus("Reseaus");
+  PvlKeyword samples = PvlKeyword("Sample", "200");
+  samples += "400"; 
+  samples += "600"; 
+  samples += "800"; 
+
+  PvlKeyword lines = PvlKeyword("Line", "200");
+  lines += "400"; 
+  lines += "600"; 
+  lines += "800"; 
 
   PvlKeyword types = PvlKeyword("Type", "5");
   types += "5"; 
   types += "5"; 
-  types += "5";
+  types += "5"; 
 
   PvlKeyword valid = PvlKeyword("Valid", "1");
   valid += "1"; 
   valid += "1"; 
-  valid += "1";
+  valid += "1"; 
 
   reseaus += lines; 
   reseaus += samples; 
@@ -54,9 +55,11 @@ TEST_F(SmallCube, FunctionalTestApolloFindRxDefault) {
   Pvl *lab = testCube->label();
   lab->findObject("IsisCube").addGroup(reseaus);
   lab->findObject("IsisCube").addGroup(instGroup);
-
+  
+  testCube->reopen("r");
+  
   QTemporaryDir prefix;
-  QVector<QString> args = {"tolerance=0.125"};
+  QVector<QString> args = {"tolerance=0.5", "patternsize=101", "deltax=2", "deltay=2"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -70,22 +73,22 @@ TEST_F(SmallCube, FunctionalTestApolloFindRxDefault) {
 
   PvlGroup newReseaus = newLab.findObject("IsisCube").findGroup("Reseaus");
   PvlKeyword testKeyword = newReseaus.findKeyword("Line");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "-98.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "-205.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "-212.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "-446.0");
+  EXPECT_NEAR(testKeyword[0].toDouble(), 198.8, 0.0001);
+  EXPECT_NEAR(testKeyword[1].toDouble(), 388.8, 0.0001);
+  EXPECT_NEAR(testKeyword[2].toDouble(), 580.8, 0.0001);
+  EXPECT_NEAR(testKeyword[3].toDouble(), 744.8, 0.0001);
    
   testKeyword = newReseaus.findKeyword("Sample");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "-98.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "-205.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "-321.0");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "-446.0");
+  EXPECT_NEAR(testKeyword[0].toDouble(), 198.8, 0.0001);
+  EXPECT_NEAR(testKeyword[1].toDouble(), 388.8, 0.0001);
+  EXPECT_NEAR(testKeyword[2].toDouble(), 569.8, 0.0001);
+  EXPECT_NEAR(testKeyword[3].toDouble(), 742.8, 0.0001);
   
   testKeyword = newReseaus.findKeyword("Valid");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[0], "1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[1], "1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[2], "1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, testKeyword[3], "1");
+  EXPECT_EQ(testKeyword[0].toInt(), 1);
+  EXPECT_EQ(testKeyword[1].toInt(), 1);
+  EXPECT_EQ(testKeyword[2].toInt(), 1);
+  EXPECT_EQ(testKeyword[3].toInt(), 1);
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, newReseaus.findKeyword("Status"), "Refined");
 
