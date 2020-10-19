@@ -83,16 +83,10 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
-    PvlObject cubeLabel = label.findObject("IsisCube");
-    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-    close();
-
-    setDimensions(dimensions["Samples"],
-                          dimensions["Lines"],
-                          dimensions["Bands"]);
-
+    initCoreFromLabel(label);
     create(fileName.expanded());
 
+    PvlObject cubeLabel = label.findObject("IsisCube");
     for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
       putGroup(*grpIt);
     }

@@ -15,10 +15,8 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/grid.xml").expanded();
 
-// Can't create camera model?
-TEST_F(SmallCube, FunctionalTestGridGrid) {
-  // QVector<QString> args = {"to=" + tempDir.path()+"/output.cub"};
-  QVector<QString> args = {"to=/Users/kdlee/output.cub"};
+TEST_F(DefaultCube, FunctionalTestGridGround) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
   grid(testCube, options, &appLog);
@@ -28,22 +26,23 @@ TEST_F(SmallCube, FunctionalTestGridGrid) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
+  // Check beginning and end of gridline
   LineManager line(outputCube);
-  line.SetLine(1);
+  line.SetLine(579);
   outputCube.read(line);
-  EXPECT_NEAR(line[0], 5.5233364105224609, .00000000000000001);
-  EXPECT_NEAR(line[1], 4.9986977577209473, .00000000000000001);
+  EXPECT_EQ(line[0], Isis::Hrs);
+
+  line.SetLine(1056);
+  outputCube.read(line);
+  EXPECT_EQ(line[247], Isis::Hrs);
 }
 
 TEST_F(SmallCube, FunctionalTestGridImage) {
   // The default linc and sinc are 10 and our image size is 10x10, so make linc and sinc smaller
-  // than 10 to see grid.
+  // than 10 to see the grid.
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -54,10 +53,7 @@ TEST_F(SmallCube, FunctionalTestGridImage) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
   LineManager line(outputCube);
@@ -89,18 +85,15 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
   LineManager line(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { // 1 based
+  for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { // 0 based
+    for (int j = 0; j < line.size(); j++) { 
       if (i % 5 == 1 || j % 5 == 0 ) {
         EXPECT_EQ(line[j], Isis::Lrs);
       }
@@ -119,18 +112,15 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
   line = LineManager(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { // 1 based
+  for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { // 0 based
+    for (int j = 0; j < line.size(); j++) { 
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_EQ(line[j], Isis::Null);
       }
@@ -149,18 +139,15 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
   line = LineManager(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { // 1 based
+  for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { // 0 based
+    for (int j = 0; j < line.size(); j++) { 
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_DOUBLE_EQ(line[j], 0.0);
       }
@@ -179,24 +166,181 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
   catch (IException &e) {
-    // Fail test or throw exception?
-    throw IException(IException::User,
-                     "Unable to open the file [" + tempDir.path() + "/output.cub" + "] as a cube.",
-                     _FILEINFO_);
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
   line = LineManager(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { // 1 based
+  for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { // 0 based
+    for (int j = 0; j < line.size(); j++) { 
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_EQ(line[j], Isis::Hrs);
       }
       else {
         EXPECT_DOUBLE_EQ(line[j], 0.0);
       }
+    }
+  }
+  outputCube.close();
+}
+
+TEST_F(DefaultCube, FunctionalTestGridMosaic) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  grid(projTestCube, options, &appLog);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path() + "/output.cub", "r");
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
+  }
+
+  LineManager line(outputCube);
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
+    line.SetLine(i);
+    outputCube.read(line);
+
+    for (int j = 0; j < line.size(); j++) {
+      // Check that the grid lines are HRS, the other pixels are not HRS
+      if (i == 1 || j == 0 || j == 5) {
+        EXPECT_EQ(line[j], Isis::Hrs);
+      }
+      else {
+        EXPECT_NE(line[j], Isis::Hrs);
+      }
+    }
+  }
+  outputCube.close();
+}
+
+TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
+  setInstrument("-98901", "LEISA", "NEW HORIZONS");
+
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  grid(testCube, options, &appLog);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path() + "/output.cub", "r");
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
+  }
+
+  // No pixels are part of the grid
+  LineManager line(outputCube);
+  double pixelValue = 0.0;
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
+    line.SetLine(i);
+    outputCube.read(line);
+
+    for (int j = 0; j < line.size(); j++) {
+      EXPECT_DOUBLE_EQ(line[j], pixelValue);
+      pixelValue++;
+    }
+  }
+  outputCube.close();
+}
+
+TEST_F(DefaultCube, FunctionalTestGridExtend) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "extendgrid=true"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  grid(testCube, options, &appLog);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path() + "/output.cub", "r");
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
+  }
+
+  // Check beginning and end of gridline
+  LineManager line(outputCube);
+  line.SetLine(579);
+  outputCube.read(line);
+  EXPECT_EQ(line[0], Isis::Hrs);
+
+  line.SetLine(1056);
+  outputCube.read(line);
+  EXPECT_EQ(line[247], Isis::Hrs);
+}
+
+TEST_F(DefaultCube, FunctionalTestGrid8bit) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "outline=yes", "linewidth=3", "linevalue=dn", "dnvalue=255"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  grid(testCube, options, &appLog);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path() + "/output.cub", "r");
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
+  }
+
+  // Check beginning and end of gridline
+  LineManager line(outputCube);
+  line.SetLine(579);
+  outputCube.read(line);
+  EXPECT_EQ(line[0], Isis::Hrs);
+
+  line.SetLine(1056);
+  outputCube.read(line);
+  EXPECT_EQ(line[247], Isis::Hrs);
+}
+
+TEST_F(DefaultCube, FunctionalTestGridWorld) {
+  PvlGroup &mapping = projTestCube->label()->findObject("IsisCube").findGroup("Mapping");
+  mapping.findKeyword("MinimumLatitude").setValue("-90.0");
+  mapping.findKeyword("MaximumLatitude").setValue("90.0");
+  mapping.findKeyword("MinimumLongitude").setValue("0.0");
+  mapping.findKeyword("MaximumLongitude").setValue("360.0");
+  mapping.findKeyword("UpperLeftCornerY").setValue("5400000.0");
+  QString fileName = projTestCube->fileName();
+  LineManager line(*projTestCube);
+  for(line.begin(); !line.end(); line++) {
+    for(int i = 0; i < line.size(); i++) {
+      line[i] = (double)(i + 1);
+    }
+    projTestCube->write(line);
+  }
+  projTestCube->reopen("rw");
+
+  // need to remove old camera pointer 
+  delete projTestCube;
+  // Cube now has new mapping group
+  projTestCube = new Cube(fileName, "rw");
+
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "ticks=true", "diagonal=true", "loninc=45", "latinc=45"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  grid(projTestCube, options, &appLog);
+
+  Cube outputCube;
+  try {
+    outputCube.open(tempDir.path() + "/output.cub", "r");
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open output image: " << e.what() << std::endl;
+  }
+
+  line = LineManager(outputCube);
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
+    line.SetLine(i);
+    outputCube.read(line);
+
+    for (int j = 0; j < line.size(); j++) {
+      EXPECT_DOUBLE_EQ(line[j], j + 1);
     }
   }
   outputCube.close();

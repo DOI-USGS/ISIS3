@@ -100,8 +100,28 @@ namespace Isis {
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
 
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      testCube->write(line);
+    }
+
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      projTestCube->write(line);
+    }
   }
 
 
@@ -391,6 +411,89 @@ namespace Isis {
     testCube = new Cube(fileName, "rw");
   }
 
+  void NewHorizonsCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+    PvlObject &isisCube = testCube->label()->findObject("IsisCube");
+
+    label = Pvl();
+    label.addObject(isisCube);
 
 
+    PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);
+
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions"); 
+    dim.findKeyword("Samples").setValue("10");
+    dim.findKeyword("Lines").setValue("10");
+    dim.findKeyword("Bands").setValue("2");
+
+    PvlGroup &pixels = label.findObject("IsisCube").findObject("Core").findGroup("Pixels"); 
+    pixels.findKeyword("Type").setValue("Real");
+
+    PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "NEW HORIZONS"
+        InstrumentId              = LEISA
+        TargetName                = Jupiter
+        SpacecraftClockStartCount = 1/0034933739:00000
+        ExposureDuration          = 0.349
+        StartTime                 = 2007-02-28T01:57:01.3882862
+        StopTime                  = 2007-02-28T02:04:53.3882861
+        FrameRate                 = 2.86533 <Hz>
+      End_Group
+    )");
+    
+    PvlGroup newInstGroup; 
+    iss >> newInstGroup;     
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+    newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+
+    inst = newInstGroup; 
+    
+    PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
+    PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
+    inst += startcc;
+    inst += stopcc;
+
+    PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        Center       = (2.4892, 1.2204)
+        Width        = (0.011228, 0.005505)
+        OriginalBand = (1, 200)
+      End_Group
+    )");
+    
+    PvlGroup newBandBin; 
+    bss >> newBandBin;   
+    bandBin = newBandBin; 
+
+    json nk; 
+    nk["BODY599_RADII"] = {71492.0, 71492.0, 66854.0};
+    nk["BODY_FRAME_CODE"] = 10015; 
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 657.5;
+    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.04;
+    nk["CLOCK_ET_-98_1/0034933739:00000_COMPUTED"] = "1cb525ddeaedaa41";
+    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.04, 0.0};
+    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.04, 0.0, 0.04};
+    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 25.0, 0.0};
+    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {-1.0, 0.0, 25.0};
+    PvlObject newNaifKeywords("NaifKeywords", nk);
+    isd["naif_keywords"] = nk;
+
+    QString fileName = tempDir.path() + "/leisa.cub";
+    delete testCube;
+    testCube = new Cube();
+    testCube->fromIsd(tempDir.path() + "/leisa.cub", label, isd, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+  }
 }
