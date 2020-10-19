@@ -13,7 +13,7 @@ namespace Isis {
     TempTestingFiles::SetUp();
 
     testCube = new Cube();
-    testCube->setDimensions(100, 100, 10);
+    testCube->setDimensions(10, 10, 10);
     testCube->create(tempDir.path() + "/small.cub");
 
     LineManager line(*testCube);
