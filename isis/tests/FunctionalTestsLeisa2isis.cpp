@@ -13,7 +13,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
 
-TEST(leisa2isisTest, leisa2isisTestDefault) {
+TEST(Leisa2Isis, Leisa2IsisTestDefault) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
@@ -100,7 +100,7 @@ TEST(leisa2isisTest, leisa2isisTestDefault) {
 }
 
 
-TEST(leisa2isisTest, leisa2isisTestJan2015Format) {
+TEST(Leisa2Isis, Leisa2IsisTestJan2015Format) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
@@ -173,7 +173,7 @@ TEST(leisa2isisTest, leisa2isisTestJan2015Format) {
 }
 
 
-TEST(leisa2isisTest, leisa2isisTestCalib) {
+TEST(Leisa2Isis, Leisa2IsisTestCalib) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
@@ -245,7 +245,7 @@ TEST(leisa2isisTest, leisa2isisTestCalib) {
 }
 
 
-TEST(leisa2isisTest, leisa2isisTestRaw) {
+TEST(Leisa2Isis, Leisa2IsisTestRaw) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
@@ -322,7 +322,7 @@ TEST(leisa2isisTest, leisa2isisTestRaw) {
  }
 
 
-TEST(leisa2isisTest, leisa2isisTestRawErrormapFail) {
+TEST(Leisa2Isis, Leisa2IsisTestRawErrormapFail) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
@@ -339,7 +339,7 @@ TEST(leisa2isisTest, leisa2isisTestRawErrormapFail) {
  }
 
 
-TEST(leisa2isisTest, leisa2isisTestRawQualityFail) {
+TEST(Leisa2Isis, Leisa2IsisTestRawQualityFail) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
@@ -356,7 +356,7 @@ TEST(leisa2isisTest, leisa2isisTestRawQualityFail) {
    ASSERT_ANY_THROW(leisa2isis(options, &appLog));
 }
 
-TEST(leisa2isisTest, leisa2isisTestQualityReplacement) {
+TEST(Leisa2Isis, Leisa2IsisTestQualityReplacement) {
    Pvl appLog;
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
