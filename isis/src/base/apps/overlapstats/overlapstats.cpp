@@ -15,7 +15,6 @@
 #include "Progress.h"
 
 using namespace std;
-using namespace Isis;
 
 namespace Isis {
   bool full = false;
