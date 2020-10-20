@@ -38,6 +38,37 @@ namespace Isis {
     }
   }
 
+
+  void LargeCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(1000, 1000, 10);
+    testCube->create(tempDir.path() + "/large.cub");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = pixelValue;
+      }
+
+      pixelValue++;
+      testCube->write(line);
+    }
+  }
+
+  void LargeCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+
   void SpecialSmallCube::SetUp() {
     TempTestingFiles::SetUp();
 

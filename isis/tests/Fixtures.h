@@ -51,6 +51,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class LargeCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class SpecialSmallCube : public TempTestingFiles {
     protected:
       Cube *testCube;
