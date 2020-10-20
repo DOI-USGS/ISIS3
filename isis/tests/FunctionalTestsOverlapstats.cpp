@@ -16,7 +16,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/overlapstats.xml").expanded
 
 TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsBadCubeList) {
   QString badCubeList = tempDir.path() + "/badcubes.lis";
-  QString overlapsPath = "/home/tgiroux/Desktop/ols/overlaps_literal.lis";
+  QString overlapsPath = tempDir.path() + "/overlaps.lis";
   FileList cubes;
 
   // badCubeList only contains cube1, overlaps has cube1 and cube2
@@ -50,34 +50,14 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsBadCubeList) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsDefault) {
   // fill points so cube3 contributes to overlaps
-  lonLatPts = new geos::geom::CoordinateArraySequence();
-  lonLatPts->add(geos::geom::Coordinate(30, 0));
-  lonLatPts->add(geos::geom::Coordinate(30, 10));
-  lonLatPts->add(geos::geom::Coordinate(35, 10));
-  lonLatPts->add(geos::geom::Coordinate(35, 0));
-  lonLatPts->add(geos::geom::Coordinate(30, 0));
-
-  polys = new std::vector<geos::geom::Geometry *>;
-  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-  polys->push_back(poly->clone());
-  multiPoly = globalFactory->createMultiPolygon(polys);
-
-  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-  std::string polyStr = wkt->write(multiPoly);
-  int polyStrSize = polyStr.size();
-  std::istringstream polyStream(polyStr);
-
-  Blob pvlBlob("Footprint", "Polygon");
-  Pvl pvl;
-  PvlObject polyObject = PvlObject("Polygon");
-  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-  pvl.addObject(polyObject);
-
-  pvlBlob.Read(pvl, polyStream);
-  cube3->write(pvlBlob);
+  ImagePolygon poly;
+  coords = {{30, 0},
+            {30, 10},
+            {35, 10},
+            {35, 0},
+            {30, 0}};
+  poly.Create(coords);
+  cube3->write(poly);
   cube3->reopen("rw");
 
   FileList cubes;
@@ -126,34 +106,14 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsDefault) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsFull) {
   // write points so that cube2 is a full overlap of cube1
-  lonLatPts = new geos::geom::CoordinateArraySequence();
-  lonLatPts->add(geos::geom::Coordinate(31, 1));
-  lonLatPts->add(geos::geom::Coordinate(31, 9));
-  lonLatPts->add(geos::geom::Coordinate(34, 9));
-  lonLatPts->add(geos::geom::Coordinate(34, 1));
-  lonLatPts->add(geos::geom::Coordinate(31, 1));
-
-  polys = new std::vector<geos::geom::Geometry *>;
-  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-  polys->push_back(poly->clone());
-  multiPoly = globalFactory->createMultiPolygon(polys);
-
-  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-  std::string polyStr = wkt->write(multiPoly);
-  int polyStrSize = polyStr.size();
-  std::istringstream polyStream(polyStr);
-
-  Blob pvlBlob("Footprint", "Polygon");
-  Pvl pvl;
-  PvlObject polyObject = PvlObject("Polygon");
-  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-  pvl.addObject(polyObject);
-
-  pvlBlob.Read(pvl, polyStream);
-  cube2->write(pvlBlob);
+  ImagePolygon poly;
+  coords = {{31, 1},
+            {31, 9},
+            {34, 9},
+            {34, 1},
+            {31, 1}};
+  poly.Create(coords);
+  cube2->write(poly);
   cube2->reopen("rw");
 
   FileList cubes;
@@ -199,35 +159,15 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsFull) {
 
 
 TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsNoOverlap) {
-  // create footprint for cube3 that has no overlap with cubes 1 and 2
-  lonLatPts = new geos::geom::CoordinateArraySequence();
-  lonLatPts->add(geos::geom::Coordinate(50, 50));
-  lonLatPts->add(geos::geom::Coordinate(50, 40));
-  lonLatPts->add(geos::geom::Coordinate(40, 40));
-  lonLatPts->add(geos::geom::Coordinate(40, 50));
-  lonLatPts->add(geos::geom::Coordinate(50, 50));
-
-  polys = new std::vector<geos::geom::Geometry *>;
-  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-  polys->push_back(poly->clone());
-  multiPoly = globalFactory->createMultiPolygon(polys);
-
-  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-  std::string polyStr = wkt->write(multiPoly);
-  int polyStrSize = polyStr.size();
-  std::istringstream polyStream(polyStr);
-
-  Blob pvlBlob("Footprint", "Polygon");
-  Pvl pvl;
-  PvlObject polyObject = PvlObject("Polygon");
-  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-  pvl.addObject(polyObject);
-
-  pvlBlob.Read(pvl, polyStream);
-  cube3->write(pvlBlob);
+// create footprint for cube3 that has no overlap with cubes 1 and 2
+  ImagePolygon poly;
+  coords = {{50, 50},
+            {50, 40},
+            {40, 40},
+            {40, 50},
+            {50, 50}};
+  poly.Create(coords);
+  cube3->write(poly);
   cube3->reopen("rw");
 
   FileList cubes;
