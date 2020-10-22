@@ -197,9 +197,12 @@ namespace Isis {
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
 
+        std::cout << "testing naif keywords" << std::endl;
         json aleNaifKeywords = isd["naif_keywords"];
+        std::cout << aleNaifKeywords << std::endl;
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
 
+        std::cout << kernels << std::endl;
         // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
@@ -208,6 +211,8 @@ namespace Isis {
         m_usingAle = true;
       }
       catch(...) {
+
+        std::cout << "spiceing" <<std::endl;
         // Backup to stadnard ISIS implementation
         if (noTables) {
           load(kernels["TargetPosition"], noTables);

@@ -121,6 +121,26 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class StereoPair : public TempTestingFiles {
+    protected: 
+      
+      Cube *cube1; 
+      Cube *cube2;
+      
+      FileName *isdPath1;
+      FileName *isdPath2; 
+
+      FileList *cubeList; 
+      QString cubeListFile;
+
+      ControlNet *network; 
+      QString cnetPath; 
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class MroCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";

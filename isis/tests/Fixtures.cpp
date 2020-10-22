@@ -255,6 +255,45 @@ namespace Isis {
   }
   
 
+  void StereoPair::SetUp() {
+      cube1 = new Cube();
+      cube2 = new Cube();
+
+      FileName labelPath1 = FileName("data/stereoPair/stereoImage1.pvl");
+      FileName labelPath2 = FileName("data/stereoPair/stereoImage2.pvl");
+
+      isdPath1 = new FileName("data/stereoPair/stereoImage1.isd");
+      isdPath2 = new FileName("data/stereoPair/stereoImage2.isd");
+
+      cube1->fromIsd(tempDir.path() + "/stereoPair1.cub", labelPath1, *isdPath1, "rw");    
+      cube2->fromIsd(tempDir.path() + "/stereoPair2.cub", labelPath2, *isdPath2, "rw");    
+
+      cubeList = new FileList();
+      cubeList->append(cube1->fileName());
+      cubeList->append(cube2->fileName());
+
+      cubeListFile = tempDir.path() + "/cubes.lis";
+      cubeList->write(cubeListFile);
+
+      cnetPath = "data/stereoPair/stereoPair.net";
+      network = new ControlNet();
+      network->ReadControl(cnetPath);
+  }
+
+
+  void StereoPair::TearDown() {
+    delete cubeList;
+    delete network;
+
+    delete cube1;
+    delete cube2;
+
+    delete isdPath1;
+    delete isdPath2;
+
+  }
+
+
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);    
@@ -406,7 +445,5 @@ namespace Isis {
       FAIL() << "Failed to create Jitter file" << std::endl;
     }
   }
-
-
 
 }

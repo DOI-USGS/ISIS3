@@ -692,7 +692,9 @@ namespace Isis {
    *                           mode. Fixes #4483.
    */
   bool BundleAdjust::solveCholesky() {
+    std::cout << "1" << std::endl;
     emit(statusBarUpdate("Solving"));
+    std::cout << 2 << std::endl;
     try {
 
       // throw error if a frame camera is included AND
@@ -3062,8 +3064,12 @@ namespace Isis {
     std::ostringstream ostr;
     ostr << summaryGroup << std::endl;
     m_iterationSummary += QString::fromStdString( ostr.str() );
-    if (m_printSummary) {
+    
+    if (m_printSummary && iApp != NULL) {
       Application::Log(summaryGroup);
+    }
+    else {
+      std::cout << summaryGroup << std::endl;
     }
   }
 
@@ -3110,7 +3116,7 @@ namespace Isis {
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
-    if (QCoreApplication::applicationName() != "ipce") {
+    if (iApp != NULL && QCoreApplication::applicationName() != "ipce") {
       printf("%s", status.toStdString().c_str());
     }
   }
