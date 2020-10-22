@@ -256,23 +256,23 @@ namespace Isis {
   
 
   void StereoPair::SetUp() {
-      cube1 = new Cube();
-      cube2 = new Cube();
+      FileName labelPathL = FileName("data/stereoPair/stereoImageL.pvl");
+      FileName labelPathR = FileName("data/stereoPair/stereoImageR.pvl");
 
-      FileName labelPath1 = FileName("data/stereoPair/stereoImage1.pvl");
-      FileName labelPath2 = FileName("data/stereoPair/stereoImage2.pvl");
+      isdPathL = new FileName("data/stereoPair/stereoImageL.isd");
+      isdPathR = new FileName("data/stereoPair/stereoImageR.isd");
 
-      isdPath1 = new FileName("data/stereoPair/stereoImage1.isd");
-      isdPath2 = new FileName("data/stereoPair/stereoImage2.isd");
+      cubeL = new Cube();
+      cubeR = new Cube();
 
-      cube1->fromIsd(tempDir.path() + "/stereoPair1.cub", labelPath1, *isdPath1, "rw");    
-      cube2->fromIsd(tempDir.path() + "/stereoPair2.cub", labelPath2, *isdPath2, "rw");    
+      cubeL->fromIsd(tempDir.path() + "/stereoPairL.cub", labelPathL, *isdPathL, "rw");    
+      cubeR->fromIsd(tempDir.path() + "/stereoPairR.cub", labelPathR, *isdPathR, "rw");    
 
       cubeList = new FileList();
-      cubeList->append(cube1->fileName());
-      cubeList->append(cube2->fileName());
+      cubeList->append(cubeL->fileName());
+      cubeList->append(cubeR->fileName());
 
-      cubeListFile = tempDir.path() + "/cubes.lis";
+      cubeListFile = "/tmp/cubes.lis";
       cubeList->write(cubeListFile);
 
       cnetPath = "data/stereoPair/stereoPair.net";
@@ -285,11 +285,11 @@ namespace Isis {
     delete cubeList;
     delete network;
 
-    delete cube1;
-    delete cube2;
+    delete cubeL;
+    delete cubeR;
 
-    delete isdPath1;
-    delete isdPath2;
+    delete isdPathL;
+    delete isdPathR;
 
   }
 

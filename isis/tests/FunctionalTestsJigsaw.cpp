@@ -15,12 +15,10 @@ TEST_F(StereoPair, FunctionalTestJigsawCamSolveAll) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
-                           "observations=yes", "update=yes", "Cksolvedegree=3", "OUTLIER_REJECTION=yes", 
-                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "Residuals_csv=off",  "SIGMA0=999"};
+                           "observations=yes", "update=yes", "Cksolvedegree=3", 
+                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "Residuals_csv=off"};
 
   UserInterface options(APP_XML, args);
-    
-  std::cout <<  cube1->camera() << " " << cube2->camera() << std::endl;
   
   Pvl log; 
   try {

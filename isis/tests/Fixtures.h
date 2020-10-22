@@ -125,11 +125,11 @@ namespace Isis {
   class StereoPair : public TempTestingFiles {
     protected: 
       
-      Cube *cube1; 
-      Cube *cube2;
+      Cube *cubeL; 
+      Cube *cubeR;
       
-      FileName *isdPath1;
-      FileName *isdPath2; 
+      FileName *isdPathL;
+      FileName *isdPathR; 
 
       FileList *cubeList; 
       QString cubeListFile;

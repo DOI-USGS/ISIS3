@@ -14,8 +14,8 @@ Object = IsisCube
     Group = Pixels
       Type       = UnsignedByte
       ByteOrder  = Lsb
-      Base       = -9.42146931057111e-04
-      Multiplier = 3.97955010858611e-04
+      Base       = -0.002228955450199
+      Multiplier = 3.78045314654209e-04
     End_Group
   End_Object
 
@@ -24,9 +24,9 @@ Object = IsisCube
     InstrumentHostName          = "LUNAR RECONNAISSANCE ORBITER"
     InstrumentHostId            = LRO
     InstrumentName              = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE
-                                   CAMERA RIGHT"
-    InstrumentId                = NACR
-    FrameId                     = RIGHT
+                                   CAMERA LEFT"
+    InstrumentId                = NACL
+    FrameId                     = LEFT
     TargetName                  = MOON
     MissionPhaseName            = COMMISSIONING
     PrerollTime                 = 2009-07-13T12:46:39.792
@@ -37,21 +37,21 @@ Object = IsisCube
     SpacecraftClockStopCount    = 1/269182052:18324
     LineExposureDuration        = 0.986133 <ms>
     TemperatureSCS              = 1.43 <degC>
-    TemperatureFPA              = 17.33 <degC>
-    TemperatureFPGA             = -13.28 <degC>
-    TemperatureTelescope        = 6.36 <degC>
+    TemperatureFPA              = 16.69 <degC>
+    TemperatureFPGA             = -15.20 <degC>
+    TemperatureTelescope        = 11.51 <degC>
     SpatialSumming              = 1
     SampleFirstPixel            = 0
     TemperatureSCSRaw           = 2879
-    TemperatureFPARaw           = 2133
-    TemperatureFPGARaw          = 3449
-    TemperatureTelescopeRaw     = 2654
+    TemperatureFPARaw           = 2163
+    TemperatureFPGARaw          = 3509
+    TemperatureTelescopeRaw     = 2410
   End_Group
 
   Group = Archive
     DataSetId               = LRO-L-LROC-2-EDR-V1.0
-    OriginalProductId       = nacr00000ad9
-    ProductId               = M102128467RE
+    OriginalProductId       = nacl00000ad9
+    ProductId               = M102128467LE
     ProducerId              = LRO_LROC_TEAM
     ProducerInstitutionName = "ARIZONA STATE UNIVERSITY"
     ProductVersionId        = v1.1
@@ -60,9 +60,9 @@ Object = IsisCube
     RationaleDescription    = "TARGET OF OPPORTUNITY"
     DataQualityId           = 0
     LineExposureCode        = 76
-    DACResetLevel           = 188
-    ChannelAOffset          = 54
-    ChannelBOffset          = 110
+    DACResetLevel           = 198
+    ChannelAOffset          = 29
+    ChannelBOffset          = 94
     CompandCode             = 0
     LineCode                = 51
     BTerms                  = (0, 8, 25, 59, 128)
@@ -79,8 +79,8 @@ Object = IsisCube
   End_Group
 
   Group = Kernels
-    NaifFrameCode             = -85610
-    LeapSecond                = $base/kernels/lsk/naif0010.tls
+    NaifFrameCode             = -85600
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
     TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
                                  $lro/kernels/pck/moon_080317.tf,
                                  $lro/kernels/pck/moon_assoc_me.tf)
@@ -88,31 +88,33 @@ Object = IsisCube
                                  $lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
                                  $lro/kernels/tspk/de421.bsp)
     InstrumentPointing        = (Table,
-                                 $lro/kernels/ck/moc42_2009194_2009195_v03.bc,
-                                 $lro/kernels/fk/lro_frames_beta.tf)
-    Instrument                = $lro/kernels/ik/lro_lroc_v16.ti
+                                 $lro/kernels/ck/lrolc_2009181_2009213_v10.bc,
+                                 $lro/kernels/ck/moc42r_2009181_2009213_v14.bc,
+                                 $lro/kernels/fk/lro_frames_2014049_v01.tf)
+    Instrument                = $lro/kernels/ik/lro_lroc_v18.ti
     SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2020287_v00.tsc
-    InstrumentPosition        = (Table, $lro/kernels/spk/LRO_CO_20110119.bsp)
-    InstrumentAddendum        = $lro/kernels/iak/lro_instrumentAddendum_v03.ti
+    InstrumentPosition        = (Table,
+                                 $lro/kernels/spk/fdf29r_2009182_2009213_v01.b-
+                                 sp)
+    InstrumentAddendum        = $lro/kernels/iak/lro_instrumentAddendum_v04.ti
     ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
                                 _pad.cub
-    InstrumentPositionQuality = Smithed
+    InstrumentPositionQuality = Reconstructed
     InstrumentPointingQuality = Reconstructed
     CameraVersion             = 2
+    Source                    = ale
   End_Group
 
   Group = Radiometry
-    EvenDarkColumns           = (5026, 5028, 5030, 5032, 5034, 5036, 5038,
-                                 5040, 5042, 5044, 5046)
-    OddDarkColumns            = (5027, 5029, 5031, 5033, 5035, 5037, 5039,
-                                 5041, 5043, 5045, 5047)
-    DarkFile                  = /usgs/cpkgs/isis3/data/lro/calibration/NACR_A-
-                                verageDarks.0005.cub
-    NonlinearOffset           = /usgs/cpkgs/isis3/data/lro/calibration/NACR_L-
+    EvenDarkColumns           = (16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36)
+    OddDarkColumns            = (17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37)
+    DarkFile                  = /usgs/cpkgs/isis3/data/lro/calibration/NACL_A-
+                                verageDarks.0004.cub
+    NonlinearOffset           = /usgs/cpkgs/isis3/data/lro/calibration/NACL_L-
                                 inearizationOffsets.0004.cub
-    LinearizationCoefficients = /usgs/cpkgs/isis3/data/lro/calibration/NACR_L-
+    LinearizationCoefficients = /usgs/cpkgs/isis3/data/lro/calibration/NACL_L-
                                 inearizationCoefficients.0003.txt
-    FlatFile                  = /usgs/cpkgs/isis3/data/lro/calibration/NACR_F-
+    FlatFile                  = /usgs/cpkgs/isis3/data/lro/calibration/NACL_F-
                                 latfield.0005.cub
     RadiometricType           = IOF
     ResponsivityValue         = 15453.0
@@ -126,23 +128,19 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 264527873
-  Bytes               = 33280
-  Records             = 520
+  StartByte           = 264634298
+  Bytes               = 32192
+  Records             = 503
   ByteOrder           = Lsb
-  TimeDependentFrames = (-85000, 1)
-  ConstantFrames      = (-85610, -85000)
-  ConstantRotation    = (-0.99999906485837, 2.74323174363629e-05,
-                         0.0013673075179611, 1.224605208642e-16,
-                         -0.99979879836311, 0.020058982817714,
-                         0.0013675826778345, 0.020058964059724,
-                         0.99979786340963)
+  TimeDependentFrames = (-85600, -85000, 1)
   CkTableStartTime    = 300761266.98986
   CkTableEndTime      = 300761318.72142
-  CkTableOriginalSize = 52225
+  CkTableOriginalSize = 816
+  FrameTypeCode       = 3
   Description         = "Created by spiceinit"
-  Kernels             = ($lro/kernels/ck/moc42_2009194_2009195_v03.bc,
-                         $lro/kernels/fk/lro_frames_beta.tf)
+  Kernels             = ($lro/kernels/ck/lrolc_2009181_2009213_v10.bc,
+                         $lro/kernels/ck/moc42r_2009181_2009213_v14.bc,
+                         $lro/kernels/fk/lro_frames_2014049_v01.tf)
 
   Group = Field
     Name = J2000Q0
@@ -195,16 +193,16 @@ End_Object
 
 Object = Table
   Name                 = InstrumentPosition
-  StartByte            = 264561153
-  Bytes                = 1120
-  Records              = 20
+  StartByte            = 264666490
+  Bytes                = 1344
+  Records              = 24
   ByteOrder            = Lsb
   CacheType            = HermiteSpline
   SpkTableStartTime    = 300761266.98986
   SpkTableEndTime      = 300761318.72142
-  SpkTableOriginalSize = 52225.0
+  SpkTableOriginalSize = 816.0
   Description          = "Created by spiceinit"
-  Kernels              = $lro/kernels/spk/LRO_CO_20110119.bsp
+  Kernels              = $lro/kernels/spk/fdf29r_2009182_2009213_v01.bsp
 
   Group = Field
     Name = J2000X
@@ -251,27 +249,28 @@ End_Object
 
 Object = Table
   Name                = BodyRotation
-  StartByte           = 264562273
+  StartByte           = 264562217
   Bytes               = 128
   Records             = 2
   ByteOrder           = Lsb
   TimeDependentFrames = (31006, 1)
   ConstantFrames      = (31001, 31007, 31006)
   ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
-                         3.80869618671387e-04, 3.29286000210947e-04,
+                         3.80869618671388e-04, 3.29286000210947e-04,
                          0.99999994578431, -1.45444093783627e-06,
                          -3.80869119096078e-04, 1.57985578682691e-06,
                          0.99999992746811)
   CkTableStartTime    = 300761266.98986
   CkTableEndTime      = 300761318.72142
-  CkTableOriginalSize = 2
+  CkTableOriginalSize = 816
+  FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
                          $lro/kernels/tspk/de421.bsp,
                          $base/kernels/pck/pck00009.tpc,
                          $lro/kernels/pck/moon_080317.tf,
                          $lro/kernels/pck/moon_assoc_me.tf)
-  SolarLongitude      = 170.82808329141
+  SolarLongitude      = 170.82918027346
 
   Group = Field
     Name = J2000Q0
@@ -324,14 +323,14 @@ End_Object
 
 Object = Table
   Name                 = SunPosition
-  StartByte            = 264562401
-  Bytes                = 112
-  Records              = 2
+  StartByte            = 264562345
+  Bytes                = 56
+  Records              = 1
   ByteOrder            = Lsb
   CacheType            = Linear
-  SpkTableStartTime    = 300761266.98986
-  SpkTableEndTime      = 300761318.72142
-  SpkTableOriginalSize = 2.0
+  SpkTableStartTime    = 300761292.85564
+  SpkTableEndTime      = 300761292.85564
+  SpkTableOriginalSize = 1.0
   Description          = "Created by spiceinit"
   Kernels              = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
                           $lro/kernels/tspk/de421.bsp)
@@ -379,78 +378,72 @@ Object = Table
   End_Group
 End_Object
 
-Object = Table
-  Name      = CameraStatistics
-  StartByte = 264562513
-  Bytes     = 624
-  Records   = 12
-  ByteOrder = Lsb
-
-  Group = Field
-    Name = Name
-    Type = Text
-    Size = 20
-  End_Group
-
-  Group = Field
-    Name = Minimum
-    Type = Double
-    Size = 1
-  End_Group
-
-  Group = Field
-    Name = Maximum
-    Type = Double
-    Size = 1
-  End_Group
-
-  Group = Field
-    Name = Average
-    Type = Double
-    Size = 1
-  End_Group
-
-  Group = Field
-    Name = StandardDeviation
-    Type = Double
-    Size = 1
-  End_Group
-End_Object
-
 Object = History
   Name      = IsisCube
-  StartByte = 264613488
-  Bytes     = 18497
-End_Object
-
-Object = NaifKeywords
-  BODY301_RADII                           = (1737.4, 1737.4, 1737.4)
-  BODY_FRAME_CODE                         = 31001
-  INS-85610_FOCAL_LENGTH                  = 701.57
-  INS-85610_PIXEL_PITCH                   = 0.007
-  INS-85610_CONSTANT_TIME_OFFSET          = 0.0
-  INS-85610_ADDITIONAL_PREROLL            = 1024.0
-  INS-85610_ADDITIVE_LINE_ERROR           = 0.0
-  INS-85610_MULTIPLI_LINE_ERROR           = 0.0045
-  CLOCK_ET_-85_1/269181999:50462_COMPUTED = 9cbbf9b140edb141
-  INS-85610_TRANSX                        = (0.0, 0.0, -0.007)
-  INS-85610_TRANSY                        = (0.0, -0.007, 0.0)
-  INS-85610_ITRANSS                       = (0.0, 0.0, -142.8571)
-  INS-85610_ITRANSL                       = (0.0, -142.8571, 0.0)
-  INS-85610_BORESIGHT_SAMPLE              = 2568.0
-  INS-85610_BORESIGHT_LINE                = 0.0
-  INS-85610_OD_K                          = 1.83e-05
-End_Object
-
-Object = Polygon
-  Name      = Footprint
-  StartByte = 264563137
-  Bytes     = 45977
+  StartByte = 264667834
+  Bytes     = 21818
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
-  StartByte = 264609114
-  Bytes     = 4374
+  StartByte = 264609058
+  Bytes     = 4373
+End_Object
+
+Object = NaifKeywords
+  BODY301_LONG_AXIS                       = 0
+  BODY301_NUT_PREC_DEC                    = (1.5419, 0.0239, -0.0278, 0.0068,
+                                             0, -0.0029, 0.0009, 0, 0, 0.0008)
+  BODY301_NUT_PREC_PM                     = (3.561, 0.1208, -0.0642, 0.0158,
+                                             0.0252, -0.0066, -0.0047, -0.0046,
+                                             0.0028, 0.0052)
+  BODY301_NUT_PREC_RA                     = (-3.8787, -0.1204, 0.07, -0.0172,
+                                             0, 0.0072, 0, 0, 0, -0.0052)
+  BODY301_PM                              = (38.3213, 13.1764, -1.4e-12)
+  BODY301_POLE_DEC                        = (66.5392, 0.013, 0)
+  BODY301_POLE_RA                         = (269.995, 0.0031, 0)
+  BODY301_RADII                           = (1737.4, 1737.4, 1737.4)
+  BODY_CODE                               = 301
+  BODY_FRAME_CODE                         = 10020
+  CK_-85600_SCLK                          = -85
+  CK_-85600_SPK                           = -85
+  FRAME_-85600_CENTER                     = -85
+  FRAME_-85600_CLASS                      = 3
+  FRAME_-85600_CLASS_ID                   = -85600
+  FRAME_-85600_NAME                       = LRO_LROCNACL
+  INS-85600_ADDITIONAL_PREROLL            = 1024
+  INS-85600_ADDITIVE_LINE_ERROR           = 0
+  INS-85600_BORESIGHT                     = (0, 0, 1)
+  INS-85600_BORESIGHT_LINE                = 0
+  INS-85600_BORESIGHT_SAMPLE              = 2548
+  INS-85600_CCD_CENTER                    = (2532.5, 1)
+  INS-85600_CK_FRAME_ID                   = -85000
+  INS-85600_CK_REFERENCE_ID               = 1
+  INS-85600_CONSTANT_TIME_OFFSET          = 0
+  INS-85600_F/RATIO                       = 3.577
+  INS-85600_FOCAL_LENGTH                  = 699.62
+  INS-85600_FOV_BOUNDARY_CORNERS          = (4.9738e-6, -0.025336, 1,
+                                             4.9747e-6, -0.024943, 1,
+                                             5.0027e-6, 0, 1, 4.975e-6)
+  INS-85600_FOV_FRAME                     = LRO_LROCNACL
+  INS-85600_FOV_SHAPE                     = POLYGON
+  INS-85600_IFOV                          = 1.00054e-5
+  INS-85600_ITRANSL                       = (0, 142.857, 0)
+  INS-85600_ITRANSS                       = (0, 0, 142.857)
+  INS-85600_LIGHTTIME_CORRECTION          = NONE
+  INS-85600_LT_SURFACE_CORRECT            = TRUE
+  INS-85600_MULTIPLI_LINE_ERROR           = 0.0045
+  INS-85600_OD_K                          = 1.81e-5
+  INS-85600_PIXEL_LINES                   = 1
+  INS-85600_PIXEL_PITCH                   = 0.007
+  INS-85600_PIXEL_SAMPLES                 = 5064
+  INS-85600_PIXEL_SIZE                    = (0.007, 0.007)
+  INS-85600_PLATFORM_ID                   = -85000
+  INS-85600_SWAP_OBSERVER_TARGET          = TRUE
+  INS-85600_TRANSX                        = (0, 0, 0.007)
+  INS-85600_TRANSY                        = (0, 0.007, 0)
+  INS-85600_WAVELENGTH_RANGE              = (400, 760)
+  TKFRAME_-85600_RELATIVE                 = LRO_SC_BUS
+  CLOCK_ET_-85_1/269181999:50462_COMPUTED = 9cbbf9b140edb141
 End_Object
 End
