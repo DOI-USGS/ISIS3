@@ -1,5 +1,3 @@
-#include "jigsaw.h"
-
 #include <iostream>
 
 #include <QDir>
@@ -24,6 +22,7 @@
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 #include "Table.h"
+#include "jigsaw.h"
 
 using namespace std;
 
