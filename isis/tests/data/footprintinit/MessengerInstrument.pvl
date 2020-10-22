@@ -1,0 +1,51 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = Messenger
+    InstrumentName        = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
+    InstrumentId          = MDIS-NAC
+    TargetName            = Mercury
+    OriginalTargetName    = MERCURY
+    StartTime             = 2008-01-14T18:08:45.072261
+    StopTime              = 2008-01-14T18:08:45.086261
+    SpacecraftClockCount  = 1/0108821505:976000
+    MissionPhaseName      = "MERCURY 1 FLYBY"
+    ExposureDuration      = 14 <MS>
+    ExposureType          = AUTO
+    DetectorTemperature   = -42.28 <DEGC>
+    FocalPlaneTemperature = -31.84 <DEGC>
+    FilterTemperature     = N/A
+    OpticsTemperature     = -32.99 <DEGC>
+    AttitudeQuality       = Ok
+    FilterWheelPosition   = 17268
+    PivotPosition         = -6490
+    FpuBinningMode        = 0
+    PixelBinningMode      = 0
+    SubFrameMode          = 0
+    JailBars              = 0
+    DpuId                 = DPU-A
+    PivotAngle            = -17.825317382812 <Degrees>
+    Unlutted              = 1
+    LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
+  End_Group
+End_Object
+End

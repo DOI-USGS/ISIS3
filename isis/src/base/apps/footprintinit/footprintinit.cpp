@@ -81,7 +81,7 @@ namespace Isis {
       poly.Create(*cube, sinc, linc, 1, 1, 0, 0, 1, precision);
     }
     catch (IException &e) {
-      QString msg = "Cannot generate polygon for [" + ui.GetFileName("FROM") + "]";
+      QString msg = "Cannot generate polygon for [" + cube->fileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 

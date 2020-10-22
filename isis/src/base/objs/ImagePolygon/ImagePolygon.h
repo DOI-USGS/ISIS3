@@ -237,6 +237,10 @@ namespace Isis {
         return p_lineinc;
       }
 
+      std::string toString() const {
+        return p_polyStr;
+      }
+
     protected:
       void ReadData(std::istream &is);
       void WriteInit();
