@@ -692,9 +692,7 @@ namespace Isis {
    *                           mode. Fixes #4483.
    */
   bool BundleAdjust::solveCholesky() {
-    std::cout << "1" << std::endl;
     emit(statusBarUpdate("Solving"));
-    std::cout << 2 << std::endl;
     try {
 
       // throw error if a frame camera is included AND
