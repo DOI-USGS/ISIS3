@@ -51,7 +51,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitBoundary) {
   label.findObject("IsisCube").findGroup("Kernels")["ShapeModel"] = "$base/dems/MSGR_DEM_USG_EQ_I_V02_prep.cub";
 
   Cube *footprintCube = new Cube();
-  footprintCube->fromIsd("/Users/acpaquette/Desktop/footprintCube.cub", label, isd, "rw");
+  footprintCube->fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
 
   try {
     footprintinit(footprintCube, footprintUi);
