@@ -51,6 +51,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class LargeCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class SpecialSmallCube : public TempTestingFiles {
     protected:
       Cube *testCube;
@@ -105,10 +115,7 @@ namespace Isis {
       FileList *cubeList;
       QString cubeListFile;
 
-      geos::geom::CoordinateSequence *lonLatPts;
-      std::vector<geos::geom::Geometry *> *polys;
-      geos::geom::Polygon *poly;
-      geos::geom::MultiPolygon *multiPoly;
+      std::vector<std::vector<double>> coords;
 
       void SetUp() override;
       void TearDown() override;
@@ -125,6 +132,16 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+  };
+
+  class MroCube : public DefaultCube {
+    protected:
+      QString ckPath = "data/mroKernels/mroCK.bc";
+      QString sclkPath = "data/mroKernels/mroSCLK.tsc";
+      QString lskPath = "data/mroKernels/mroLSK.tls";
+      QString jitterPath; 
+
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
   };
 }
 
