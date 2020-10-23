@@ -15,6 +15,7 @@
 
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
+  * [RFC6 - BLOB Redesign](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC6:-BLOB-Redesign)
 
 
 # Archived RFCs
