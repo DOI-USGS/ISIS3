@@ -1,3 +1,5 @@
+#include <QTextStream>
+
 #include "Fixtures.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
@@ -24,7 +26,6 @@ namespace Isis {
       }
       testCube->write(line);
     }
-
   }
 
   void SmallCube::TearDown() {
@@ -36,6 +37,37 @@ namespace Isis {
       delete testCube;
     }
   }
+
+
+  void LargeCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(1000, 1000, 10);
+    testCube->create(tempDir.path() + "/large.cub");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = pixelValue;
+      }
+
+      pixelValue++;
+      testCube->write(line);
+    }
+  }
+
+  void LargeCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
 
   void SpecialSmallCube::SetUp() {
     TempTestingFiles::SetUp();
@@ -129,11 +161,11 @@ namespace Isis {
     if (testCube->isOpen()) {
       testCube->close();
     }
-
+    
     if (projTestCube->isOpen()) {
       projTestCube->close();
     }
-
+    
     delete testCube;
     delete projTestCube;
   }
@@ -188,64 +220,27 @@ namespace Isis {
     cube1 = new Cube();
     cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, *isdPath1, "rw");
 
-    lonLatPts = new geos::geom::CoordinateArraySequence();
-    lonLatPts->add(geos::geom::Coordinate(30, 0));
-    lonLatPts->add(geos::geom::Coordinate(30, 10));
-    lonLatPts->add(geos::geom::Coordinate(35, 10));
-    lonLatPts->add(geos::geom::Coordinate(35, 0));
-    lonLatPts->add(geos::geom::Coordinate(30, 0));
-
-    polys = new std::vector<geos::geom::Geometry *>;
-    poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-    polys->push_back(poly->clone());
-    multiPoly = globalFactory->createMultiPolygon(polys);
-
-    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-    std::string polyStr = wkt->write(multiPoly);
-    int polyStrSize = polyStr.size();
-    std::istringstream polyStream(polyStr);
-
-    Blob pvlBlob("Footprint", "Polygon");
-    Pvl pvl;
-    PvlObject polyObject = PvlObject("Polygon");
-    polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-    polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-    polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-    pvl.addObject(polyObject);
-
-    pvlBlob.Read(pvl, polyStream);
-    cube1->write(pvlBlob);
+    ImagePolygon poly;
+    coords = {{30, 0},
+              {30, 10},
+              {35, 10},
+              {35, 0},
+              {30, 0}};
+    poly.Create(coords);
+    cube1->write(poly);
     cube1->reopen("rw");
 
     cube2 = new Cube();
     cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
 
-    lonLatPts = new geos::geom::CoordinateArraySequence();
-    lonLatPts->add(geos::geom::Coordinate(31, 1));
-    lonLatPts->add(geos::geom::Coordinate(31, 11));
-    lonLatPts->add(geos::geom::Coordinate(36, 11));
-    lonLatPts->add(geos::geom::Coordinate(36, 1));
-    lonLatPts->add(geos::geom::Coordinate(31, 1));
-
-    polys->pop_back();
-    poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-    polys->push_back(poly);
-    multiPoly = globalFactory->createMultiPolygon(polys);
-
-    polyStr = wkt->write(multiPoly);
-    polyStrSize = polyStr.size();
-    polyStream.str(polyStr);
-
-    pvlBlob = Blob("Footprint", "Polygon");
-    polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-    pvl.addObject(polyObject);
-
-    pvlBlob.Read(pvl, polyStream);
-    cube2->write(pvlBlob);
+    coords = {{31, 1},
+              {31, 11},
+              {36, 11},
+              {36, 1},
+              {31, 1}};
+    poly.Create(coords);
+    cube2->write(poly);
     cube2->reopen("rw");
-
-    delete wkt;
 
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
@@ -278,6 +273,7 @@ namespace Isis {
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
   }
+  
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
@@ -289,12 +285,12 @@ namespace Isis {
         SpacecraftName              = "MARS RECONNAISSANCE ORBITER"
         InstrumentId                = HIRISE
         TargetName                  = Mars
-        StartTime                   = 2006-11-08T04:49:13.968
-        StopTime                    = 2006-11-08T04:49:17.771
-        ObservationStartCount       = 847428572:42722
-        SpacecraftClockStartCount   = 847428572:52459
-        SpacecraftClockStopCount    = 847428576:39516
-        ReadoutStartCount           = 847428727:63203
+        StartTime                   = 2008-05-17T09:37:24.7300819
+        StopTime                    = 2008-05-17T09:37:31.0666673
+        ObservationStartCount       = 895484264:44383
+        SpacecraftClockStartCount   = 895484264:57342
+        SpacecraftClockStopCount    = 895484272:12777
+        ReadoutStartCount           = 895484659:31935
         CalibrationStartTime        = 2006-11-08T04:49:13.952
         CalibrationStartCount       = 847428572:51413
         AnalogPowerStartTime        = 2006-11-08T04:48:34.478
@@ -367,7 +363,6 @@ namespace Isis {
     PvlGroup newInstGroup; 
     iss >> newInstGroup; 
     
-
     newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
     newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
 
@@ -404,11 +399,32 @@ namespace Isis {
         testCube->write(line);
     }
     testCube->reopen("rw");
- 
+  
     // need to remove old camera pointer 
     delete testCube;
     // This is now a MRO cube
+
     testCube = new Cube(fileName, "rw");
+
+    // create a jitter file 
+    QString jitter = R"(# Sample                 Line                   ET
+-0.18     -0.07     264289109.96933
+-0.11     -0.04     264289109.97
+-0.05     -0.02     264289109.98
+1.5     0.6     264289110.06
+    )"; 
+    
+    jitterPath = tempDir.path() + "/jitter.txt"; 
+    QFile jitterFile(jitterPath); 
+    
+    if (jitterFile.open(QIODevice::WriteOnly)) {
+      QTextStream out(&jitterFile); 
+      out << jitter;
+      jitterFile.close(); 
+    }
+    else { 
+      FAIL() << "Failed to create Jitter file" << std::endl;
+    }
   }
 
   void NewHorizonsCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
