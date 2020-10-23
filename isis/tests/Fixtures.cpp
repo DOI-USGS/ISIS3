@@ -3,6 +3,7 @@
 #include "Fixtures.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
+#include "ControlNet.h"
 
 namespace Isis {
 
@@ -306,6 +307,9 @@ namespace Isis {
 
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
+
+    ControlNet inputNet("data/apolloNetwork/apolloNet.pvl");
+    inputNet.Write(tempDir.path() + "/apolloNet.net");
   }
 
   void ApolloNetwork::TearDown() {
