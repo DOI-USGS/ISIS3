@@ -1,6 +1,6 @@
 - Feature/Process Name: BLOB Redesign
 - Start Date: October 23, 2020
-- RFC PR: (empty until a PR is opened)
+- RFC PR: [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
 - Issue: (link or create and link and associated issue for discussion)
 - Author: Jesse Mapel, Adam Paquette, & Austin Sanders
 
