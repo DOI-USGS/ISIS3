@@ -148,6 +148,14 @@ namespace Isis {
         gp += PvlKeyword("Status", "Camera pointing NOT updated");
       }
       if (log) {
+        Pvl summary;
+        std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
+        iss >> summary; 
+        
+        for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
+          log->addGroup(*grpIt);
+        }
+        
         log->addGroup(gp);
       }
       delete bundleSolution;

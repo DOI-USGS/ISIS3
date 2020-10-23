@@ -122,12 +122,15 @@ namespace Isis {
   };
 
 
-  class StereoPair : public TempTestingFiles {
+  class ObservationPair : public TempTestingFiles {
     protected: 
       
       Cube *cubeL; 
       Cube *cubeR;
-      
+
+      QString cubeLPath; 
+      QString cubeRPath; 
+
       FileName *isdPathL;
       FileName *isdPathR; 
 

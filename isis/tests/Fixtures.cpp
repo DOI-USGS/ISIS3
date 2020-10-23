@@ -255,7 +255,7 @@ namespace Isis {
   }
   
 
-  void StereoPair::SetUp() {
+  void ObservationPair::SetUp() {
       FileName labelPathL = FileName("data/stereoPair/stereoImageL.pvl");
       FileName labelPathR = FileName("data/stereoPair/stereoImageR.pvl");
 
@@ -265,14 +265,17 @@ namespace Isis {
       cubeL = new Cube();
       cubeR = new Cube();
 
-      cubeL->fromIsd(tempDir.path() + "/stereoPairL.cub", labelPathL, *isdPathL, "rw");    
-      cubeR->fromIsd(tempDir.path() + "/stereoPairR.cub", labelPathR, *isdPathR, "rw");    
+      cubeLPath = tempDir.path() + "/stereoPairL.cub";
+      cubeRPath = tempDir.path() + "/stereoPairR.cub"; 
+
+      cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");    
+      cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");    
 
       cubeList = new FileList();
       cubeList->append(cubeL->fileName());
       cubeList->append(cubeR->fileName());
 
-      cubeListFile = "/tmp/cubes.lis";
+      cubeListFile = tempDir.path() + "/cubes.lis";
       cubeList->write(cubeListFile);
 
       cnetPath = "data/stereoPair/stereoPair.net";
@@ -281,7 +284,7 @@ namespace Isis {
   }
 
 
-  void StereoPair::TearDown() {
+  void ObservationPair::TearDown() {
     delete cubeList;
     delete network;
 
