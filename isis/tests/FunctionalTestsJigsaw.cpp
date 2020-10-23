@@ -101,6 +101,4 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   EXPECT_NEAR(a3.at(1), -0.00813174, 0.0001);
   EXPECT_NEAR(a3.at(2), 0.000123724, 0.0001);
   EXPECT_NEAR(a3.at(3), 0.0,         0.0001);
-
-
 }
