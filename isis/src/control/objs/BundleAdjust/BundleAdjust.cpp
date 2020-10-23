@@ -1,5 +1,5 @@
 #include "BundleAdjust.h"
-
+ ~
 // std lib
 #include <iomanip>
 #include <iostream>
@@ -3115,6 +3115,9 @@ namespace Isis {
    */
   void BundleAdjust::outputBundleStatus(QString status) {
     if (iApp != NULL && QCoreApplication::applicationName() != "ipce") {
+      printf("%s", status.toStdString().c_str());
+    }
+    else (iApp == NULL) { // in function call
       printf("%s", status.toStdString().c_str());
     }
   }
