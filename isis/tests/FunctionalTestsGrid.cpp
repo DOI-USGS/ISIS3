@@ -18,8 +18,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/grid.xml").expanded();
 TEST_F(DefaultCube, FunctionalTestGridGround) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -45,8 +44,7 @@ TEST_F(SmallCube, FunctionalTestGridImage) {
   // than 10 to see the grid.
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -77,8 +75,7 @@ TEST_F(SmallCube, FunctionalTestGridImage) {
 TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=hrs", "linevalue=lrs"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -106,7 +103,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
 
   args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=lrs", "linevalue=null"};
   options = UserInterface(APP_XML, args);
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
@@ -133,7 +130,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
 
   args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=null", "linevalue=dn", "dnvalue=0"};
   options = UserInterface(APP_XML, args);
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
@@ -160,7 +157,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
 
   args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=DN", "bkgnddnvalue=0"};
   options = UserInterface(APP_XML, args);
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
@@ -189,8 +186,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
 TEST_F(DefaultCube, FunctionalTestGridMosaic) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(projTestCube, options, &appLog);
+  grid(projTestCube, options);
 
   Cube outputCube;
   try {
@@ -223,8 +219,7 @@ TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
 
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -252,8 +247,7 @@ TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
 TEST_F(DefaultCube, FunctionalTestGridExtend) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "extendgrid=true"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -274,11 +268,11 @@ TEST_F(DefaultCube, FunctionalTestGridExtend) {
   EXPECT_EQ(line[247], Isis::Hrs);
 }
 
+// Tests setting the dnvalue to the maximum of the pixel type.
 TEST_F(DefaultCube, FunctionalTestGrid8bit) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "outline=yes", "linewidth=3", "linevalue=dn", "dnvalue=255"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(testCube, options, &appLog);
+  grid(testCube, options);
 
   Cube outputCube;
   try {
@@ -299,6 +293,7 @@ TEST_F(DefaultCube, FunctionalTestGrid8bit) {
   EXPECT_EQ(line[247], Isis::Hrs);
 }
 
+// Tests that we can set the lat/lon to the min/max.
 TEST_F(DefaultCube, FunctionalTestGridWorld) {
   PvlGroup &mapping = projTestCube->label()->findObject("IsisCube").findGroup("Mapping");
   mapping.findKeyword("MinimumLatitude").setValue("-90.0");
@@ -318,13 +313,13 @@ TEST_F(DefaultCube, FunctionalTestGridWorld) {
 
   // need to remove old camera pointer 
   delete projTestCube;
+
   // Cube now has new mapping group
   projTestCube = new Cube(fileName, "rw");
 
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "ticks=true", "diagonal=true", "loninc=45", "latinc=45"};
   UserInterface options(APP_XML, args);
-  Pvl appLog;
-  grid(projTestCube, options, &appLog);
+  grid(projTestCube, options);
 
   Cube outputCube;
   try {

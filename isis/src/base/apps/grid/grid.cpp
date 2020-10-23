@@ -29,17 +29,17 @@ namespace Isis {
                        bool latGrid = true);
 
 
-  void grid(UserInterface &ui, Pvl *log) {
+  void grid(UserInterface &ui) {
     Cube icube;
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
     icube.open(ui.GetFileName("FROM"));
-    grid(&icube, ui, log);
+    grid(&icube, ui);
   }
 
-  void grid(Cube *icube, UserInterface &ui, Pvl *log) {
+  void grid(Cube *icube, UserInterface &ui) {
     // We will be processing by line
     ProcessByLine p;
     p.SetInputCube(icube);
