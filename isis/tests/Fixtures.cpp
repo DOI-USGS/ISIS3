@@ -256,17 +256,17 @@ namespace Isis {
   
 
   void ObservationPair::SetUp() {
-      FileName labelPathL = FileName("data/stereoPair/stereoImageL.pvl");
-      FileName labelPathR = FileName("data/stereoPair/stereoImageR.pvl");
+      FileName labelPathL = FileName("data/observationPair/stereoImageL.pvl");
+      FileName labelPathR = FileName("data/observationPair/stereoImageR.pvl");
 
-      isdPathL = new FileName("data/stereoPair/stereoImageL.isd");
-      isdPathR = new FileName("data/stereoPair/stereoImageR.isd");
+      isdPathL = new FileName("data/observationPair/stereoImageL.isd");
+      isdPathR = new FileName("data/observationPair/stereoImageR.isd");
 
       cubeL = new Cube();
       cubeR = new Cube();
 
-      cubeLPath = tempDir.path() + "/stereoPairL.cub";
-      cubeRPath = tempDir.path() + "/stereoPairR.cub"; 
+      cubeLPath = tempDir.path() + "/observationPairL.cub";
+      cubeRPath = tempDir.path() + "/observationPairR.cub";
 
       cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");    
       cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");    
@@ -278,7 +278,7 @@ namespace Isis {
       cubeListFile = tempDir.path() + "/cubes.lis";
       cubeList->write(cubeListFile);
 
-      cnetPath = "data/stereoPair/stereoPair.net";
+      cnetPath = "data/observationPair/stereoPair.net";
       network = new ControlNet();
       network->ReadControl(cnetPath);
   }
@@ -288,8 +288,13 @@ namespace Isis {
     delete cubeList;
     delete network;
 
-    delete cubeL;
-    delete cubeR;
+    if (cubeL) {
+      delete cubeL;
+    }
+    
+    if (cubeR) {
+      delete cubeR;
+    }
 
     delete isdPathL;
     delete isdPathR;
