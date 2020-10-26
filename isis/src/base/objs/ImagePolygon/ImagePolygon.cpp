@@ -271,7 +271,22 @@ namespace Isis {
       p_gMap->Camera()->IgnoreElevationModel(false);
   }
 
+  void ImagePolygon::Create(std::vector<std::vector<double>> polyCoordinates) {
+    p_pts = new geos::geom::CoordinateArraySequence();
 
+    for (std::vector<double> coord : polyCoordinates) {
+      p_pts->add(geos::geom::Coordinate(coord[0], coord[1]));
+    }
+
+    std::vector<geos::geom::Geometry *> *polys = new std::vector<geos::geom::Geometry *>;
+    geos::geom::Polygon *poly = globalFactory->createPolygon(globalFactory->createLinearRing(p_pts), nullptr);
+    polys->push_back(poly->clone());
+    p_polygons = globalFactory->createMultiPolygon(polys);
+
+    delete polys;
+
+    Fix360Poly();
+  }
   /**
   * Finds the next point on the image using a left hand rule walking algorithm. To
   * initiate the walk pass it the same point for both currentPoint and lastPoint.

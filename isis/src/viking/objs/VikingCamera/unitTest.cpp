@@ -55,7 +55,7 @@ int main(void) {
     double knownLat[1] = { -24.2744713106319 };
     double knownLon[1] = { 180.6234120834806 };
     QList<QString> files;
-    files.append("$viking2/testData/f348b26.cub"); // Viking2 VISB
+    files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f348b26.cub"); // Viking2 VISB
 
     for (int i = 0; i < files.size(); i++) {
       Cube c(files[i], "r");
@@ -125,9 +125,9 @@ int main(void) {
     
     // Test the name methods
     cout << endl << "Testing name methods:" << endl << endl;
-    files.append("$viking1/testData/f006a03.cropped.cub"); // Viking1 VISA
-    files.append("$viking1/testData/f387a06.cropped.cub"); // Viking1 VISB
-    files.append("$viking2/testData/f004b33.cropped.cub"); // Viking2 VISA
+    files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f006a03.cropped.cub"); // Viking1 VISA
+    files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f387a06.cropped.cub"); // Viking1 VISB
+    files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f004b33.cropped.cub"); // Viking2 VISA
     for (int i = 0; i < files.size(); i++) {
       Cube c(files[i], "r");
       VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
@@ -139,7 +139,7 @@ int main(void) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     VikingCamera vCam(test);
   }
   catch(IException &e) {

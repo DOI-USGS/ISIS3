@@ -11,12 +11,12 @@
     The raw image may be output into an 8-bit, 16-bit unsigned, 16-bit signed
     or 32-bit raw image.  This raw image can be in BSQ, BIL, or BIP format, and
     can include or exclude Null, LRS, LIS, HIS, and/or HRS specific DN values.
-    If no special pixel parameters are selected, then Low Saturation values and 
+    If no special pixel parameters are selected, then Low Saturation values and
     Null values are set to black and High Saturation values are set to white.
-    To ensure acceptable contrast in the output file, the user may select from 
+    To ensure acceptable contrast in the output file, the user may select from
     three stretch options are given 1) no stretch 2) linear, and 3) manual.
-    A custom maximum and minimum DN value can be specified for all output 
-    bittypes.  For example, if a range of 0 to 1023 is selected in a 16-bit 
+    A custom maximum and minimum DN value can be specified for all output
+    bittypes.  For example, if a range of 0 to 1023 is selected in a 16-bit
     unsigned raw image, the DNs are stretched to an effective 10-bit format.
   </description>
 
@@ -57,7 +57,7 @@
       Fixed problem where the valid data range overlapped the null value.
     </change>
     <change name="Christopher Austin" date ="2007-12-17">
-      Created options to ouput BIL and BIP formats, making BSQ the default, as 
+      Created options to ouput BIL and BIP formats, making BSQ the default, as
       well as added preserve special pixel (NULL) option.
     </change>
     <change name="Christopher Austin" date="2008-06-10">
@@ -71,6 +71,11 @@
       Modified to fix an error when inputing OMIN and OMAX values for a 32-bit
       output image. OMIN and OMAX are now calculated based on the stretch if 32-bit
       is chosen and the OMIN and OMAX fields are left blank. Fixes #2194.
+    </change>
+    <change name="Adam Paquette" date="2020-09-04">
+      Updated application logic to not generate a histogram if stretch is None
+      and the output bit type is 32-bit. Also removes duplicate calls to checkRange
+      and setRangeAndPixels. Closes #3878 (github).
     </change>
   </history>
 
@@ -173,15 +178,15 @@
           The minimum output DN value including special pixels.
         </brief>
         <description>
-          If a value is provided, the value will be the minimum DN used (including special 
-          pixels). If left blank and the BITTYPE is not 32BIT, the minimum DN value 
-          will default to the smallest value possible for the provided 
+          If a value is provided, the value will be the minimum DN used (including special
+          pixels). If left blank and the BITTYPE is not 32BIT, the minimum DN value
+          will default to the smallest value possible for the provided
           BITTYPE. If the BITTYPE is 32BIT and OMIN is left blank, the value
-          of OMIN will depend on the STRETCH type chosen. If LINEAR is 
-          chosen, the value for OMIN will be the DN value at the value 
-          entered for MINPERCENT on the data. If MANUAL is chosen, the OMIN 
-          will equal to the value of MINIMUM. If NONE is chosen, the value 
-          will default to the smallest value possible for 32 bit data. 
+          of OMIN will depend on the STRETCH type chosen. If LINEAR is
+          chosen, the value for OMIN will be the DN value at the value
+          entered for MINPERCENT on the data. If MANUAL is chosen, the OMIN
+          will equal to the value of MINIMUM. If NONE is chosen, the value
+          will default to the smallest value possible for 32 bit data.
         </description>
         <internalDefault>
           Refer to Documentation
@@ -193,14 +198,14 @@
           The maximum output DN value including special pixels.
         </brief>
         <description>
-          If a value is provided, the value will be the maximum DN used (including special 
-          pixels). If left blank and the BITTYPE is not 32BIT, the maximum DN value 
-          will default to the largest value possible for the provided 
+          If a value is provided, the value will be the maximum DN used (including special
+          pixels). If left blank and the BITTYPE is not 32BIT, the maximum DN value
+          will default to the largest value possible for the provided
           BITTYPE. If the BITTYPE is 32BIT and OMAX is left blank, the value
-          of OMAX will depend on the STRETCH type chosen. If LINEAR is 
-          chosen, the value for OMAX will be the DN value at the value 
-          entered for MAXPERCENT on the data. If MANUAL is chosen, the OMIN 
-          will equal to the value of MAXIMUM. If NONE is chosen, the value 
+          of OMAX will depend on the STRETCH type chosen. If LINEAR is
+          chosen, the value for OMAX will be the DN value at the value
+          entered for MAXPERCENT on the data. If MANUAL is chosen, the OMIN
+          will equal to the value of MAXIMUM. If NONE is chosen, the value
           will default to the largest value possible for 32 bit data.
         </description>
         <internalDefault>
@@ -212,7 +217,7 @@
         <default><item>true</item></default>
         <brief>Dedicates the minimum DN value for null pixels.</brief>
         <description>
-          If set to true, the minimum value of the raw output data will be 
+          If set to true, the minimum value of the raw output data will be
           reserved for null pixels.  The actual value used for null pixels will
           be denoted in the print.prt file and displayed onscreen.
         </description>
@@ -403,7 +408,7 @@
         </default>
         <brief>Storage order of output file.</brief>
         <description>
-          Sets the storage order of the raw ouput file to BSQ, BIL, or 
+          Sets the storage order of the raw ouput file to BSQ, BIL, or
           BIP.
         </description>
         <list>

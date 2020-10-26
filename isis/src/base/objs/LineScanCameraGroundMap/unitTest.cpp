@@ -12,7 +12,7 @@ int main() {
   cerr << "This class is mostly tested by the applications and the individual Camera models." << endl;
 
   //create a camera for the test cube
-  QString inputFile = "$base/testData/LRONAC_M139722912RE_cropped.cub";
+  QString inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/LRONAC_M139722912RE_cropped.cub";
   CameraPointInfo campt;  
   campt.SetCube(inputFile);
 

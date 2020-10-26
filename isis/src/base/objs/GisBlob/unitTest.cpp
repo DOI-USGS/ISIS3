@@ -27,7 +27,7 @@ int main() {
     Preference::Preferences(true);
     qDebug() << "";
     qDebug() << "Testing GisBlob's constructor from cube...";
-    QString inputFile = "$messenger/testData/EW0211286081G.lev1.cub";
+    QString inputFile = "$ISISTESTDATA/isis/src/messenger/unitTestData/EW0211286081G.lev1.cub";
     Cube cube;
     cube.open(inputFile);
     GisBlob cubeBlob(cube);

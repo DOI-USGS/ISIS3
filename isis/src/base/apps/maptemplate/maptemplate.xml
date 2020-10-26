@@ -825,11 +825,10 @@ Group = Mapping
       <parameter name="DIST">
         <type>double</type>
         <brief>
-          Distance from the center of the Target
+          Distance from the center of the target in kilometers. 
         </brief>
         <description>
-          Distance from the center of the Target: value should be greater
-	  than the target radius.
+          Distance from the center of the target in kilometers: value should be greater than the target radius.
         </description>
       </parameter>
     </group>

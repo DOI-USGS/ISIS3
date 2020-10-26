@@ -16,9 +16,19 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
+#include "ImagePolygon.h"
+#include "PolygonTools.h"
+#include "Blob.h"
 #include "ControlNet.h"
 #include "FileList.h"
 #include "FileName.h"
+
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/LinearRing.h"
+#include "geos/geom/Polygon.h"
 
 using json = nlohmann::json;
 
@@ -40,6 +50,16 @@ namespace Isis {
       void SetUp() override;
       void TearDown() override;
   };
+
+
+  class LargeCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 
   class SpecialSmallCube : public TempTestingFiles {
     protected:
@@ -84,10 +104,10 @@ namespace Isis {
       Cube *cube1;
       Cube *cube2;
       Cube *cube3;
-      
+
       FileName *isdPath1;
       FileName *isdPath2;
-      FileName *isdPath3; 
+      FileName *isdPath3;
 
       FileName *threeImageOverlapFile;
       FileName *twoImageOverlapFile;
@@ -95,9 +115,22 @@ namespace Isis {
       FileList *cubeList;
       QString cubeListFile;
 
+      std::vector<std::vector<double>> coords;
+
       void SetUp() override;
       void TearDown() override;
   };
+
+  class MroCube : public DefaultCube {
+    protected:
+      QString ckPath = "data/mroKernels/mroCK.bc";
+      QString sclkPath = "data/mroKernels/mroSCLK.tsc";
+      QString lskPath = "data/mroKernels/mroLSK.tls";
+      QString jitterPath; 
+
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
 }
 
 #endif

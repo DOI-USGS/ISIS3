@@ -110,4 +110,43 @@ namespace Isis {
     return ::testing::AssertionSuccess();
   }
 
+
+  /**
+   * Asserts that two vectors are within a given tolerance of each other.
+   * If the vectors are not the same size, then they are not assumed to be equal.
+   * The difference between two vectors is the maximum elementwise difference,
+   * the infinity norm.
+   */
+  ::testing::AssertionResult AssertVectorsNear(
+      const char* vec1_expr,
+      const char* vec2_expr,
+      const char* tolerance_expr,
+      const std::vector<double> &vec1,
+      const std::vector<double> &vec2,
+      double tolerance) {
+    if (vec1.size() != vec2.size()) {
+      return ::testing::AssertionFailure() << "Vector " << vec1_expr
+          << " and Vector " << vec2_expr << " have different sizes "
+          << vec1.size() << " and " << vec2.size() << ".";
+    }
+    std::vector<size_t> differences;
+    for (size_t i = 0; i < vec1.size(); i++) {
+      if (abs(vec1[i] - vec2[i]) > tolerance) {
+        differences.push_back(i);
+      }
+    }
+    if (differences.empty()) {
+      return ::testing::AssertionSuccess();
+    }
+    ::testing::AssertionResult failure = ::testing::AssertionFailure()
+        << "Vector " << vec1_expr << " and Vector " << vec2_expr
+        << " differ by more than tolerance " << tolerance_expr
+        << " which evaluates to " << tolerance << ".\n";
+    for (size_t &index : differences) {
+      failure = failure << " Index: " << index << " values: "
+          << vec1[index] << " and " << vec2[index] << ".\n";
+    }
+    return failure;
+  }
+
 }

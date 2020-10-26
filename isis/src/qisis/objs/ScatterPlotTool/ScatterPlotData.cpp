@@ -35,7 +35,7 @@ namespace Isis {
     int endLine = qRound(lineRange.maxValue());
     ASSERT(xCube->lineCount() == yCube->lineCount());
 
-    Histogram *xCubeHist = new Histogram(*xCube, xCubeBand, NULL,
+    ImageHistogram *xCubeHist = new ImageHistogram(*xCube, xCubeBand, NULL,
         sampleRange.minValue(), lineRange.minValue(),
         sampleRange.maxValue(), lineRange.maxValue(),
         xBinCount, true);
@@ -43,7 +43,7 @@ namespace Isis {
     m_xCubeMax = xCubeHist->Maximum();
 
 
-    Histogram *yCubeHist = new Histogram(*yCube, yCubeBand, NULL,
+    ImageHistogram *yCubeHist = new ImageHistogram(*yCube, yCubeBand, NULL,
         sampleRange.minValue(), lineRange.minValue(),
         sampleRange.maxValue(), lineRange.maxValue(),
         yBinCount, true);
@@ -485,4 +485,3 @@ namespace Isis {
     return indices;
   }
 }
-
