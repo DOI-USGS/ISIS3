@@ -89,9 +89,8 @@ namespace Isis {
       Pvl map(ui.GetFileName("MAP"));
       PvlGroup &mapGroup = map.findGroup("MAPPING");
 
-      Pvl cubeLab(ui.GetFileName("FROM"));
       // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
-      mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+      mapGroup = Target::radiiGroup(*(cube->label()), mapGroup);
       // add/replace the rest of the keywords
       mapGroup.addKeyword( PvlKeyword("LatitudeType", "Planetocentric"),
                            PvlContainer::Replace );
@@ -128,7 +127,7 @@ namespace Isis {
             delete xyPoly;
             e.print(); // This should be a NAIF error
             QString msg = "Cannot calculate XY for [";
-            msg += ui.GetFileName("FROM") + "]";
+            msg += cube->fileName() + "]";
             throw IException(e, IException::User, msg, _FILEINFO_);
           }
         }
