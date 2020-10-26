@@ -96,16 +96,11 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
     FAIL() << file.errorString().toStdString();
   }
   
-  QString header1 = "Image,rms,rms,rms,X,X,X,X,X,Y,Y,Y,Y,Y,Z,Z,Z,Z,Z,RA(t0),RA(t0),RA(t0),RA(t0),RA(t0),RA(t1),RA(t1),RA(t1),RA(t1),RA(t1),RA(t2),RA(t2),RA(t2),RA(t2),RA(t2),RA(t3),RA(t3),RA(t3),RA(t3),RA(t3),DEC(t0),DEC(t0),DEC(t0),DEC(t0),DEC(t0),DEC(t1),DEC(t1),DEC(t1),DEC(t1),DEC(t1),DEC(t2),DEC(t2),DEC(t2),DEC(t2),DEC(t2),DEC(t3),DEC(t3),DEC(t3),DEC(t3),DEC(t3),TWIST(t0),TWIST(t0),TWIST(t0),TWIST(t0),TWIST(t0),TWIST(t1),TWIST(t1),TWIST(t1),TWIST(t1),TWIST(t1),TWIST(t2),TWIST(t2),TWIST(t2),TWIST(t2),TWIST(t2),TWIST(t3),TWIST(t3),TWIST(t3),TWIST(t3),TWIST(t3),";
-  QString header2 = "Filename,sample res,line res,total res,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,Initial,Correction,Final,Apriori Sigma,Adj Sigma,"; 
-  
+  // skip the first two lines, we don't want to compare the header. 
+  file.readLine();
+  file.readLine(); 
+
   QString line = file.readLine();
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, line.trimmed(), header1); 
-  
-  line = file.readLine();
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, line.trimmed(), header2); 
-  
-  line = file.readLine();
   QStringList elems = line.split(","); 
   
   // RA(t0) final
