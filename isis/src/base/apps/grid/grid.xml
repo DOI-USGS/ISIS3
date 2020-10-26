@@ -173,6 +173,9 @@
     <change name="Jesse Mapel" date="2017-06-26">
       Added a flag to extend the grid past the longitude domain boundary. Fixes #2185. 
     </change>
+    <change name="Kaitlyn Lee" date="2020-10-26">
+      Converted application and tests for Gtest conversion.  
+    </change>
   </history>
 
   <groups>
