@@ -21,7 +21,6 @@ and one of the following headings:
 If the heading does not yet exist under Unreleased, then add it as a 3rd heading,
 with three #.
 
-
 When preparing for a public release add a new 2nd heading, with two #, under
 Unreleased with the version number and the release date, in year-month-day
 format. Then, add a link for the new version at the bottom of this document and
