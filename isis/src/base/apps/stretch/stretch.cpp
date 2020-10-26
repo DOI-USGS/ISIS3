@@ -15,6 +15,10 @@ namespace Isis {
 
   void stretch(UserInterface &ui, Pvl *log) {
     Cube *cubeFile = new Cube(ui.GetFileName("FROM"), "r");
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      cubeFile->setVirtualBands(inAtt.bands());
+    }
     stretch(cubeFile, ui, log);
   }
 

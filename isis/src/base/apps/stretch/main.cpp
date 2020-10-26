@@ -11,8 +11,16 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl results;
-  stretch(ui, &results);
+  try{
+      stretch(ui, &results);
+  }
+  catch(...){
+      for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
+          Application::Log(results.group(resultIndex));
+      }
+      throw;
+  }
   for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
-    Application::Log(results.group(resultIndex));
+      Application::Log(results.group(resultIndex));
   }
 }
