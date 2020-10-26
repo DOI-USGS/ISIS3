@@ -256,11 +256,11 @@ namespace Isis {
   
 
   void ObservationPair::SetUp() {
-      FileName labelPathL = FileName("data/observationPair/stereoImageL.pvl");
-      FileName labelPathR = FileName("data/observationPair/stereoImageR.pvl");
+      FileName labelPathL = FileName("data/observationPair/observationImageL.pvl");
+      FileName labelPathR = FileName("data/observationPair/observationImageR.pvl");
 
-      isdPathL = new FileName("data/observationPair/stereoImageL.isd");
-      isdPathR = new FileName("data/observationPair/stereoImageR.isd");
+      isdPathL = new FileName("data/observationPair/observationImageL.isd");
+      isdPathR = new FileName("data/observationPair/observationImageR.isd");
 
       cubeL = new Cube();
       cubeR = new Cube();
@@ -278,7 +278,7 @@ namespace Isis {
       cubeListFile = tempDir.path() + "/cubes.lis";
       cubeList->write(cubeListFile);
 
-      cnetPath = "data/observationPair/stereoPair.net";
+      cnetPath = "data/observationPair/observationPair.net";
       network = new ControlNet();
       network->ReadControl(cnetPath);
   }
