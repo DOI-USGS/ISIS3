@@ -1,15 +1,17 @@
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "TestUtilities.h"
 #include "ControlNet.h"
 #include "Statistics.h"
 
 #include "jigsaw.h"
 
-#include "gtest/gtest.h"
+#include "TestUtilities.h"
+#include "Fixtures.h"
+#include "gmock/gmock.h"
 
 using namespace Isis;
+using namespace testing; 
+
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/jigsaw.xml").expanded();
 
@@ -143,4 +145,43 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   // DEC(t3) final
   EXPECT_NEAR(elems.at(56).toDouble(), 0.365717165,          0.00001); 
   
+}
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
+  // delete to remove old camera for when cam is updated
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
+                           "camsolve=None", "spsolve=None"};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    std::cout << "running" << std::endl;
+    jigsaw(options, &log);
+    FAIL() << "Should throw" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+  }
+}
+
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
+  // delete to remove old camera for when cam is updated
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet=lolfake.net", "onet=doesnotmatter"};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+  }
 }

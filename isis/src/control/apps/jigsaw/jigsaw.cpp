@@ -53,7 +53,6 @@ namespace Isis {
     QString cubeList = ui.GetFileName("FROMLIST");
 
     // retrieve settings from jigsaw gui
-
     BundleSettingsQsp settings = bundleSettings(ui);
     settings->setCubeList(cubeList);
     BundleAdjust *bundleAdjustment = NULL;
@@ -72,7 +71,6 @@ namespace Isis {
     catch (IException &e) {
       throw;
     }
-
 
     // Bundle adjust the network
     try {
@@ -103,7 +101,7 @@ namespace Isis {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
       PvlGroup gp("JigsawResults");
-
+    std::cout << "running" << std::endl;
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
