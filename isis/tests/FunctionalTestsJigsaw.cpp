@@ -185,6 +185,7 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
   }
 }
 
+
 TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
@@ -202,5 +203,39 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Input Target parameters file missing main Target object"));
+  } 
+}
+
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  
+  std::istringstream iss(R"(
+    Object = Target
+    Group = "NAME"
+       Name=Enceladus
+    EndGroup
+    END_OBJECT
+  )"); 
+  
+  QString tbsolvepath = "/tmp/tbsolve.pvl";
+  Pvl tbsolve; 
+  iss >> tbsolve; 
+  tbsolve.write(tbsolvepath);
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "SOLVETARGETBODY=TRUE", "tbparameters="+tbsolvepath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Must solve for at least one target body option"));
   } 
 }
