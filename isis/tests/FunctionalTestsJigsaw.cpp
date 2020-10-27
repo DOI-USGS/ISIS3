@@ -170,7 +170,6 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
 
 
 TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
-  // delete to remove old camera for when cam is updated
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet=lolfake.net", "onet=doesnotmatter"};
 
   UserInterface options(APP_XML, args);
@@ -182,6 +181,26 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+    EXPECT_THAT(e.what(), HasSubstr("Unable to open"));
   }
+}
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "SOLVETARGETBODY=TRUE", "tbparameters="+cubeRPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Input Target parameters file missing main Target object"));
+  } 
 }
