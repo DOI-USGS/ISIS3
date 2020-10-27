@@ -276,6 +276,10 @@ namespace Isis {
   
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+    // force real DNs
+    testCube->close();
+    testCube->setPixelType(PixelType::Real);
+    testCube->open(testCube->fileName(),"rw");
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);    
     
@@ -433,7 +437,6 @@ namespace Isis {
     label = Pvl();
     label.addObject(isisCube);
 
-
     PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
 
@@ -511,5 +514,6 @@ namespace Isis {
       }
       testCube->write(line);
     }
+
   }
 }
