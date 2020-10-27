@@ -255,6 +255,53 @@ namespace Isis {
   }
   
 
+  void ObservationPair::SetUp() {
+      FileName labelPathL = FileName("data/observationPair/observationImageL.pvl");
+      FileName labelPathR = FileName("data/observationPair/observationImageR.pvl");
+
+      isdPathL = new FileName("data/observationPair/observationImageL.isd");
+      isdPathR = new FileName("data/observationPair/observationImageR.isd");
+
+      cubeL = new Cube();
+      cubeR = new Cube();
+
+      cubeLPath = tempDir.path() + "/observationPairL.cub";
+      cubeRPath = tempDir.path() + "/observationPairR.cub";
+
+      cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");    
+      cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");    
+
+      cubeList = new FileList();
+      cubeList->append(cubeL->fileName());
+      cubeList->append(cubeR->fileName());
+
+      cubeListFile = tempDir.path() + "/cubes.lis";
+      cubeList->write(cubeListFile);
+
+      cnetPath = "data/observationPair/observationPair.net";
+      network = new ControlNet();
+      network->ReadControl(cnetPath);
+  }
+
+
+  void ObservationPair::TearDown() {
+    delete cubeList;
+    delete network;
+
+    if (cubeL) {
+      delete cubeL;
+    }
+    
+    if (cubeR) {
+      delete cubeR;
+    }
+
+    delete isdPathL;
+    delete isdPathR;
+
+  }
+
+
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);    
@@ -406,7 +453,5 @@ namespace Isis {
       FAIL() << "Failed to create Jitter file" << std::endl;
     }
   }
-
-
 
 }
