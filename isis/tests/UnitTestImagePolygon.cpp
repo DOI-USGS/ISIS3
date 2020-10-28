@@ -3,6 +3,7 @@
 #include "PolygonTools.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
+#include "Pvl.h"
 #include "geos/geom/MultiPolygon.h"
 #include "geos/geom/CoordinateArraySequence.h"
 
@@ -218,6 +219,74 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
   std::vector<double> lats = {-42.323638, -42.323638, -42.323638, -43.312974,
                               -43.643248, -43.643248, -43.643083, -42.653746,
                               -42.323638};
+
+  for (auto poly : *(poly.Polys())) {
+    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
+    for (int i = 0; i < coordArray.getSize(); i++) {
+      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
+    }
+  }
+
+  footprintCube.close();
+}
+
+TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
+  Pvl footprintLabel;
+
+  std::ifstream isdFile("data/footprintinit/outlier.isd");
+  std::ifstream cubeLabel("data/footprintinit/MessengerInstrument.pvl");
+
+  isdFile >> isd;
+  cubeLabel >> footprintLabel;
+
+  PvlObject core = footprintLabel.findObject("IsisCube").findObject("Core");
+  PvlGroup instrument = footprintLabel.findObject("IsisCube").findGroup("Instrument");
+
+  instrument["SpacecraftClockCount"] = "1/0215651170:929000";
+
+  PvlObject isisCube = label.findObject("IsisCube");
+
+  isisCube.deleteObject("Core");
+  isisCube.addObject(core);
+  isisCube.deleteGroup("Instrument");
+  isisCube.addGroup(instrument);
+
+  PvlKeyword number("Number", "9");
+  isisCube.findGroup("BandBin").addKeyword(number);
+
+  isisCube.findGroup("Kernels")["CameraVersion"] = "2";
+  isisCube.findGroup("Kernels")["NaifFrameCode"] = "-236800";
+  isisCube.findGroup("Kernels")["SpacecraftClock"] = "$messenger/kernels/sclk/messenger_2548.tsc";
+  isisCube.findGroup("Kernels")["ShapeModel"] = "Null";
+
+  label.deleteObject("IsisCube");
+  label.addObject(isisCube);
+
+  Cube footprintCube;
+  // footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
+  footprintCube.fromIsd("/Users/acpaquette/Desktop/footprintCube.cub", label, isd, "rw");
+
+  ImagePolygon poly;
+  poly.Emission(89);
+  poly.Incidence(89);
+  try {
+    poly.Create(footprintCube, 200, 200);
+  }
+  catch(IException &e) {
+    std::cout << e.what() << '\n';
+    QString msg = "Cannot create polygon for [" + footprintCube.fileName() + "]";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+  std::vector<double> lons = {269.520359, 269.450334, 269.116332, 268.488713,
+                              268.081499, 236.714330, 213.246253, 203.074333,
+                              208.633919, 224.744265, 242.007758, 256.524583,
+                              269.520359};
+  std::vector<double> lats = {5.845377, -32.123188, -48.643335, -62.120850,
+                              -66.796093, -62.950610, -51.024263, -39.134800,
+                              -15.146478, -9.173929, -2.744727, 2.159646,
+                              5.845377};
 
   for (auto poly : *(poly.Polys())) {
     geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
