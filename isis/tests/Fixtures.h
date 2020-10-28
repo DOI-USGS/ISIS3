@@ -125,10 +125,11 @@ namespace Isis {
     protected:
       Cube *cube1, *cube2, *cube3, *cube4, *cube5, *cube6, *cube7; 
       FileName *isdFile1, *isdFile2, *isdFile3, *isdFile4, *isdFile5, *isdFile6, *isdFile7, 
-           *cubeLabel, *label1, *label2, *label3, *label4, *label5, *label6, *label7;
+               *cubeLabel, *label1, *label2, *label3, *label4, *label5, *label6, *label7;
 
       FileList *cubeList;
       QString cubeListFile;
+      QString controlNetPath;
 
       void SetUp() override;
       void TearDown() override;
