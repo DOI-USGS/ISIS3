@@ -1,7 +1,10 @@
+#include <QtMath>
+
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "ControlNet.h"
 #include "Statistics.h"
+#include "CSVReader.h"
 
 #include "jigsaw.h"
 
@@ -147,41 +150,74 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   
 }
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
-  // delete to remove old camera for when cam is updated
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   QTemporaryDir prefix;
+  
+  QString heldlistpath = prefix.path() + "/heldlist.lis"; 
+  FileList heldList; 
+  heldList.append(cube6->fileName());
+  heldList.write(heldlistpath); 
+
   QString outCnetFileName = prefix.path() + "/outTemp.net";
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
-                           "camsolve=None", "spsolve=None"};
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "heldlist="+heldlistpath,  
+                           "radius=yes", "errorpropagation=yes", "spsolve=position", "Spacecraft_position_sigma=1000", 
+                           "Residuals_csv=off", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
   
   Pvl log; 
-  
   try {
-    std::cout << "running" << std::endl;
     jigsaw(options, &log);
-    FAIL() << "Should throw" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
   }
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
+                               false, 0, ',', false, true);
+
+  csvLine = header.getRow(7);
+
+  // assert corrections are very small 
+  // X Correction
+  EXPECT_LE(std::abs(csvLine[5].toDouble()), 1e-10); 
+  // Y Correction
+  EXPECT_LE(std::abs(csvLine[10].toDouble()), 1e-10); 
+  // Z Correction
+  EXPECT_LE(std::abs(csvLine[15].toDouble()), 1e-10); 
+  // RA Correction
+  EXPECT_LE(std::abs(csvLine[20].toDouble()), 1e-10); 
+  // DEC Correction
+  EXPECT_LE(std::abs(csvLine[25].toDouble()), 1e-10); 
+  // TWIST Correction
+  EXPECT_LE(std::abs(csvLine[30].toDouble()), 1e-10); 
 }
 
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
-  // delete to remove old camera for when cam is updated
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet=lolfake.net", "onet=doesnotmatter"};
+TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
+  QTemporaryDir prefix;
+  
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
+                           ""
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
   
   Pvl log; 
-  
   try {
     jigsaw(options, &log);
-    FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
   }
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
+                               false, 0, ',', false, true);
+
+ 
 }

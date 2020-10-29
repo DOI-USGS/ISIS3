@@ -121,8 +121,6 @@ namespace Isis {
       void TearDown() override;
   };
 
-<<<<<<< HEAD
-
   class ObservationPair : public TempTestingFiles {
     protected: 
       
@@ -153,6 +151,9 @@ namespace Isis {
 
       FileList *cubeList;
       QString cubeListFile;
+
+      ControlNet *network; 
+      QString cnetPath;
 
       void SetUp() override;
       void TearDown() override;
