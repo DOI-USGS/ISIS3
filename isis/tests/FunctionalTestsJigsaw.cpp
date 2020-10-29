@@ -197,16 +197,40 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
 }
 
 
-TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
+TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   QTemporaryDir prefix;
+  QString newNetworkPath = prefix.path()+"/badMeasures.net";
+
+  // grab random points and add error to a single measure 
+  ControlPoint *point = network->GetPoint("AS15_000031985");
+  ControlMeasure *measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:01:40.346");
+  measure->SetResidual(9999999, 9999999);
+  // measure->SetSampleResidual(9999999);
+
+  point = network->GetPoint("AS15_000033079");
+  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:02:27.179");
+  measure->SetResidual(9999999, 9999999);
+  // measure->SetSampleResidual(9999999); 
+
+  point = network->GetPoint("AS15_SocetPAN_03");
+  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:02:03.751");
+  measure->SetResidual(9999999, 9999999);
+  // measure->SetSampleResidual(9999999); 
+
+  point = network->GetPoint("AS15_Tie03");
+  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:00:53.547");
+  measure->SetResidual(9999999, 9999999);
+  // measure->SetSampleResidual(9999999); 
+  network->Write(newNetworkPath); 
   
-  QString outCnetFileName = prefix.path() + "/outTemp.net";
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
-                           ""
+  QString outCnetFileName = "/tmp/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+newNetworkPath, "onet="+outCnetFileName,
+                           "Radius=yes", "Errorpropagation=yes", "Spsolve=position","Spacecraft_position_sigma=1000.0",
+                           "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2",
                            "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
-  
+
   Pvl log; 
   try {
     jigsaw(options, &log);
@@ -219,5 +243,5 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
                                false, 0, ',', false, true);
 
- 
+   
 }
