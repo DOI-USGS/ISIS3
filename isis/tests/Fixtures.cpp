@@ -123,7 +123,6 @@ namespace Isis {
     TempTestingFiles::SetUp();
 
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
-    std::ifstream isdFile1("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     std::ifstream projCubeLabel("data/defaultImage/projDefaultCube.pvl");
 
