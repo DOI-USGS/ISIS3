@@ -130,6 +130,28 @@ namespace Isis {
       FileList *cubeList;
       QString cubeListFile;
       QString controlNetPath;
+      
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class ObservationPair : public TempTestingFiles {
+    protected: 
+      
+      Cube *cubeL; 
+      Cube *cubeR;
+
+      QString cubeLPath; 
+      QString cubeRPath; 
+
+      FileName *isdPathL;
+      FileName *isdPathR; 
+
+      FileList *cubeList; 
+      QString cubeListFile;
+
+      ControlNet *network; 
+      QString cnetPath; 
 
       void SetUp() override;
       void TearDown() override;
