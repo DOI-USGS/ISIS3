@@ -148,7 +148,6 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
 }
 
 TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
-  // delete to remove old camera for when cam is updated
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
@@ -159,7 +158,6 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
   Pvl log; 
   
   try {
-    std::cout << "running" << std::endl;
     jigsaw(options, &log);
     FAIL() << "Should throw" << std::endl;
   }
@@ -219,7 +217,7 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
     END_OBJECT
   )"); 
   
-  QString tbsolvepath = "/tmp/tbsolve.pvl";
+  QString tbsolvepath = prefix.path() + "/tbsolve.pvl";
   Pvl tbsolve; 
   iss >> tbsolve; 
   tbsolve.write(tbsolvepath);
