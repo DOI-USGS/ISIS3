@@ -167,23 +167,6 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
 }
 
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorNoNet) {
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet=lolfake.net", "onet=doesnotmatter"};
-
-  UserInterface options(APP_XML, args);
-  
-  Pvl log; 
-  
-  try {
-    jigsaw(options, &log);
-    FAIL() << "Should throw an exception" << std::endl;
-  }
-  catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("Unable to open"));
-  }
-}
-
-
 TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
