@@ -207,8 +207,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
   compareCsvLine(line.getRow(970), "AS15_test01,/tmp/qt_temp-l7wTTZ/cube3.cub,APOLLO15/METRIC/1971-07-31T14:01:40.346,     -5.04180936,    -34.53366079,   3115.51026031,   1134.42313078,     -3.07166949,      1.44947401,      3.39648765", 2);
 
   // Test output network size
-  ControlNet inputNet("$ISISROOT/../isis/tests/data/apolloNetwork/apollo.net");
-
+  ControlNet inputNet(controlNetPath);
   EXPECT_EQ(outputNet.GetNumPoints(), inputNet.GetNumPoints());
   EXPECT_EQ(outputNet.GetNumMeasures(), inputNet.GetNumMeasures());
 
