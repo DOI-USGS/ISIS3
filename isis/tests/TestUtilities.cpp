@@ -149,23 +149,4 @@ namespace Isis {
     return failure;
   }
 
-  // Check to see if a QString contains only numeric values.
-  bool isNumeric(QString str){
-    QRegExp re("-*\\d*.*\\d*");  
-    return re.exactMatch(str);
-  }
-
-
-  // Compares CSV lines
-  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex) { 
-    QStringList compareMe = headerStr.split(",");
-    for (int i=initialIndex; i<compareMe.size(); i++) {
-      if (isNumeric(compareMe[i].trimmed())) {
-        EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), 0.000001);
-      }
-      else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), compareMe[i].toStdString()); 
-      }
-    }
-  };
 }
