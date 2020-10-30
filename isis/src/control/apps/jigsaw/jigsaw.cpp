@@ -53,7 +53,6 @@ namespace Isis {
     QString cubeList = ui.GetFileName("FROMLIST");
 
     // retrieve settings from jigsaw gui
-
     BundleSettingsQsp settings = bundleSettings(ui);
     settings->setCubeList(cubeList);
     BundleAdjust *bundleAdjustment = NULL;
@@ -72,7 +71,6 @@ namespace Isis {
     catch (IException &e) {
       throw;
     }
-
 
     // Bundle adjust the network
     try {
@@ -103,7 +101,6 @@ namespace Isis {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
       PvlGroup gp("JigsawResults");
-
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
@@ -148,6 +145,14 @@ namespace Isis {
         gp += PvlKeyword("Status", "Camera pointing NOT updated");
       }
       if (log) {
+        Pvl summary;
+        std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
+        iss >> summary; 
+        
+        for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
+          log->addGroup(*grpIt);
+        }
+        
         log->addGroup(gp);
       }
       delete bundleSolution;
