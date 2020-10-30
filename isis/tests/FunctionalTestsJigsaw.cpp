@@ -105,13 +105,6 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
     EXPECT_NEAR(sp.GetLonSigmaDistance().meters(), csvLine[9].toDouble(), 0.000001);
     EXPECT_NEAR(sp.GetLocalRadiusSigma().meters(), csvLine[10].toDouble(), 0.000001);
 
-    EXPECT_NEAR(sp.LatitudeToMeters(sp.GetLatitude().planetocentric(Angle::Radians)) - 
-                originalSP.LatitudeToMeters(originalSP.GetLatitude().planetocentric(Angle::Radians)),
-                csvLine[11].toDouble(), 1000.0); // FIXME
-    EXPECT_NEAR(sp.LongitudeToMeters(sp.GetLongitude().positiveEast(Angle::Radians)) - 
-                originalSP.LongitudeToMeters(originalSP.GetLongitude().positiveEast(Angle::Radians)),
-                csvLine[12].toDouble(), 1000.0); // FIXME
-
     EXPECT_NEAR(sp.GetLocalRadius().meters() - originalSP.GetLocalRadius().meters(), csvLine[13].toDouble(), 0.000001);
 
     EXPECT_NEAR(sp.GetX().kilometers(), csvLine[14].toDouble(), 0.000001);
