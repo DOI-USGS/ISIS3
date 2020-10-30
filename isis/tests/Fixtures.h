@@ -152,7 +152,7 @@ namespace Isis {
       FileList *cubeList;
       QString cubeListFile;
 
-      ControlNet *inputNet; 
+      ControlNet *network; 
       QString controlNetPath;
 
       void SetUp() override;
