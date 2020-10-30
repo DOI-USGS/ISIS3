@@ -123,7 +123,6 @@ namespace Isis {
     TempTestingFiles::SetUp();
 
     std::ifstream isdFile("data/defaultImage/defaultCube.isd");
-    std::ifstream isdFile1("data/defaultImage/defaultCube.isd");
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     std::ifstream projCubeLabel("data/defaultImage/projDefaultCube.pvl");
 
@@ -308,9 +307,9 @@ namespace Isis {
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
-    ControlNet inputNet("data/apolloNetwork/apolloNet.pvl");
+    network = new ControlNet("data/apolloNetwork/apolloNet.pvl");
     controlNetPath = tempDir.path() + "/apolloNet.net";
-    inputNet.Write(controlNetPath);
+    network->Write(controlNetPath);
   }
 
   void ApolloNetwork::TearDown() {

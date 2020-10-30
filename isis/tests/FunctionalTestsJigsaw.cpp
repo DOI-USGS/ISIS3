@@ -160,7 +160,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   heldList.write(heldlistpath); 
 
   QString outCnetFileName = prefix.path() + "/outTemp.net";
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "heldlist="+heldlistpath,  
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, "heldlist="+heldlistpath,  
                            "radius=yes", "errorpropagation=yes", "spsolve=position", "Spacecraft_position_sigma=1000", 
                            "Residuals_csv=off", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
                            "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
@@ -211,15 +211,15 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
                           "APOLLO15/METRIC/1971-07-31T14:02:27.179", 
                           "APOLLO15/METRIC/1971-07-31T14:02:03.751", 
                           "APOLLO15/METRIC/1971-07-31T14:00:53.547"};
-
+  
   for (int i = 0; i < pid.size(); i++) {
     // grab random points and add error to a single measure 
-    ControlPoint *point = network->GetPoint(pid[i]);
+    ControlPoint *point = inputNet->GetPoint(pid[i]);
     ControlMeasure *measure = point->GetMeasure(mid[i]);
     measure->SetCoordinate(measure->GetLine()+50, measure->GetLine()+50); 
   }
 
-  network->Write(newNetworkPath); 
+  inputNet->Write(newNetworkPath); 
   
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+newNetworkPath, "onet="+outCnetFileName,
@@ -252,14 +252,12 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
                                          {2.24641, 4.39168, 0.560941, 2.844}}; 
 
   for (int i = 0; i < pid.size(); i++) {
-    // grab random points and add error to a single measure 
-    ControlPoint *point = network->GetPoint(pid[i]);
+    ControlPoint *point = inputNet->GetPoint(pid[i]);
     QList<ControlMeasure*> measures = point->getMeasures();
     for (int j = 0; j < measures.size(); j++ ) {
       EXPECT_NEAR(measures.at(j)->GetResidualMagnitude(), mresiduals[i][j], 0.0001); 
     }
   }
-
 
   QFile bo(prefix.path()+"/bundleout.txt");
   QString contents; 
@@ -285,7 +283,8 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
 
   EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
- }
+}
+
 
  TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
   QTemporaryDir prefix;
@@ -293,6 +292,9 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
                            "camsolve=None", "spsolve=None"}; 
   
+  UserInterface options(APP_XML, args); 
+  Pvl log; 
+
   try {
     jigsaw(options, &log);
     FAIL() << "Should throw" << std::endl;
