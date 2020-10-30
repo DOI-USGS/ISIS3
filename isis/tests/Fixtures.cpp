@@ -436,6 +436,7 @@ namespace Isis {
 
     PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
+    kernels["ShapeModel"] = "Null";
 
     PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions"); 
     dim.findKeyword("Samples").setValue("10");
@@ -466,11 +467,6 @@ namespace Isis {
     newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
 
     inst = newInstGroup; 
-    
-    PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
-    PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
-    inst += startcc;
-    inst += stopcc;
 
     PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
     std::istringstream bss(R"(
@@ -485,23 +481,30 @@ namespace Isis {
     bss >> newBandBin;   
     bandBin = newBandBin; 
 
-    json nk; 
-    nk["BODY599_RADII"] = {71492.0, 71492.0, 66854.0};
-    nk["BODY_FRAME_CODE"] = 10015; 
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 657.5;
-    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.04;
-    nk["CLOCK_ET_-98_1/0034933739:00000_COMPUTED"] = "1cb525ddeaedaa41";
-    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.04, 0.0};
-    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.04, 0.0, 0.04};
-    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 25.0, 0.0};
-    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {-1.0, 0.0, 25.0};
-    PvlObject newNaifKeywords("NaifKeywords", nk);
-    isd["naif_keywords"] = nk;
+    std::istringstream alphaSS(R"(
+      Group = AlphaCube
+        AlphaSamples        = 256
+        AlphaLines          = 1354
+        AlphaStartingSample = 0.5
+        AlphaStartingLine   = 229.5
+        AlphaEndingSample   = 100.5
+        AlphaEndingLine     = 329.5
+        BetaSamples         = 100
+        BetaLines           = 100
+      End_Group
+    )");
+    
+    PvlGroup alphaGroup; 
+    alphaSS >> alphaGroup;
+    label.findObject("IsisCube").addGroup(alphaGroup);
+
+    std::ifstream isdFile("data/leisa/nh_leisa.isd");
+    isdFile >> isd;
 
     QString fileName = tempDir.path() + "/leisa.cub";
     delete testCube;
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/leisa.cub", label, isd, "rw");
+    testCube->fromIsd(fileName, label, isd, "rw");
 
     LineManager line(*testCube);
     double pixelValue = 0.0;

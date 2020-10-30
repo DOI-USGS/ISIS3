@@ -37,6 +37,8 @@ TEST_F(DefaultCube, FunctionalTestGridGround) {
   line.SetLine(1056);
   outputCube.read(line);
   EXPECT_EQ(line[247], Isis::Hrs);
+
+  outputCube.close();
 }
 
 TEST_F(SmallCube, FunctionalTestGridImage) {
@@ -70,9 +72,10 @@ TEST_F(SmallCube, FunctionalTestGridImage) {
       pixelValue++;
     }
   }
+  outputCube.close();
 }
 
-TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
+TEST_F(SmallCube, FunctionalTestGridHrsLrs) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=hrs", "linevalue=lrs"};
   UserInterface options(APP_XML, args);
   grid(testCube, options);
@@ -100,11 +103,14 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     }
   }
   outputCube.close();
+}
 
-  args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=lrs", "linevalue=null"};
-  options = UserInterface(APP_XML, args);
+TEST_F(SmallCube, FunctionalTestGridLrsNull) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=lrs", "linevalue=null"};
+  UserInterface options(APP_XML, args);
   grid(testCube, options);
 
+  Cube outputCube;
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
@@ -112,7 +118,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
-  line = LineManager(outputCube);
+  LineManager line(outputCube);
   for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
@@ -127,11 +133,14 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     }
   }
   outputCube.close();
+}
 
-  args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=null", "linevalue=dn", "dnvalue=0"};
-  options = UserInterface(APP_XML, args);
+TEST_F(SmallCube, FunctionalTestGridNullDn) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=null", "linevalue=dn", "dnvalue=0"};
+  UserInterface options(APP_XML, args);
   grid(testCube, options);
 
+  Cube outputCube;
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
@@ -139,7 +148,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
-  line = LineManager(outputCube);
+  LineManager line(outputCube);
   for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
@@ -154,11 +163,14 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     }
   }
   outputCube.close();
+}
 
-  args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=DN", "bkgnddnvalue=0"};
-  options = UserInterface(APP_XML, args);
+TEST_F(SmallCube, FunctionalTestGridDnHrs) {
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "mode=image", "linc=5", "sinc=5", "bkgndvalue=DN", "bkgnddnvalue=0"};
+  UserInterface options(APP_XML, args);
   grid(testCube, options);
 
+  Cube outputCube;
   try {
     outputCube.open(tempDir.path() + "/output.cub", "r");
   }
@@ -166,7 +178,7 @@ TEST_F(SmallCube, FunctionalTestGridSetBkgndAndLine) {
     FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
-  line = LineManager(outputCube);
+  LineManager line(outputCube);
   for (int i = 1; i <= outputCube.lineCount(); i++) { 
     line.SetLine(i);
     outputCube.read(line);
@@ -217,7 +229,7 @@ TEST_F(DefaultCube, FunctionalTestGridMosaic) {
 TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
   setInstrument("-98901", "LEISA", "NEW HORIZONS");
 
-  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub"};
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "loninc=2", "latinc=1", "baselat=0", "baselon=353"};
   UserInterface options(APP_XML, args);
   grid(testCube, options);
 
@@ -229,18 +241,22 @@ TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
     FAIL() << "Unable to open output image: " << e.what() << std::endl;
   }
 
-  // No pixels are part of the grid
+   // Check beginning and end of vertical and horizontal grid lines of band one
   LineManager line(outputCube);
-  double pixelValue = 0.0;
-  for (int i = 1; i <= outputCube.lineCount(); i++) {
-    line.SetLine(i);
-    outputCube.read(line);
+  line.SetLine(1);
+  outputCube.read(line);
+  EXPECT_EQ(line[2], Isis::Hrs);
+  line.SetLine(2);
+  outputCube.read(line);
+  EXPECT_EQ(line[0], Isis::Hrs);
 
-    for (int j = 0; j < line.size(); j++) {
-      EXPECT_DOUBLE_EQ(line[j], pixelValue);
-      pixelValue++;
-    }
-  }
+  line.SetLine(1);
+  outputCube.read(line);
+  EXPECT_EQ(line[9], Isis::Hrs);
+  line.SetLine(9);
+  outputCube.read(line);
+  EXPECT_EQ(line[2], Isis::Hrs);
+
   outputCube.close();
 }
 
@@ -266,6 +282,8 @@ TEST_F(DefaultCube, FunctionalTestGridExtend) {
   line.SetLine(1056);
   outputCube.read(line);
   EXPECT_EQ(line[247], Isis::Hrs);
+
+  outputCube.close();
 }
 
 // Tests setting the dnvalue to the maximum of the pixel type.
@@ -291,6 +309,8 @@ TEST_F(DefaultCube, FunctionalTestGrid8bit) {
   line.SetLine(1056);
   outputCube.read(line);
   EXPECT_EQ(line[247], Isis::Hrs);
+
+  outputCube.close();
 }
 
 // Tests that we can set the lat/lon to the min/max.
@@ -317,7 +337,7 @@ TEST_F(DefaultCube, FunctionalTestGridWorld) {
   // Cube now has new mapping group
   projTestCube = new Cube(fileName, "rw");
 
-  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "ticks=true", "diagonal=true", "loninc=45", "latinc=45"};
+  QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "ticks=true", "diagonal=true", "loninc=45"};
   UserInterface options(APP_XML, args);
   grid(projTestCube, options);
 
