@@ -1,6 +1,6 @@
 # vim: ft=dockerfile:
 
-FROM continuumio/miniconda3
+FROM usgsastro/miniconda3
 
 RUN conda update conda && \
     conda install python=3.6 && \
