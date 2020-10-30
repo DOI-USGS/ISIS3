@@ -200,34 +200,32 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
 TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   QTemporaryDir prefix;
   QString newNetworkPath = prefix.path()+"/badMeasures.net";
+  
+  QVector<QString> pid = {"AS15_000031985", 
+                          "AS15_000033079", 
+                          "AS15_SocetPAN_03", 
+                          "AS15_Tie03"};
+ 
+  QVector<QString> mid = {"APOLLO15/METRIC/1971-07-31T14:01:40.346", 
+                          "APOLLO15/METRIC/1971-07-31T14:02:27.179", 
+                          "APOLLO15/METRIC/1971-07-31T14:02:03.751", 
+                          "APOLLO15/METRIC/1971-07-31T14:00:53.547"};
 
-  // grab random points and add error to a single measure 
-  ControlPoint *point = network->GetPoint("AS15_000031985");
-  ControlMeasure *measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:01:40.346");
-  measure->SetResidual(9999999, 9999999);
-  // measure->SetSampleResidual(9999999);
+  for (int i = 0; i < pid.size(); i++) {
+    // grab random points and add error to a single measure 
+    ControlPoint *point = network->GetPoint(pid[i]);
+    ControlMeasure *measure = point->GetMeasure(mid[i]);
+    measure->SetCoordinate(measure->GetLine()+50, measure->GetLine()+50); 
+  }
 
-  point = network->GetPoint("AS15_000033079");
-  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:02:27.179");
-  measure->SetResidual(9999999, 9999999);
-  // measure->SetSampleResidual(9999999); 
-
-  point = network->GetPoint("AS15_SocetPAN_03");
-  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:02:03.751");
-  measure->SetResidual(9999999, 9999999);
-  // measure->SetSampleResidual(9999999); 
-
-  point = network->GetPoint("AS15_Tie03");
-  measure = point->GetMeasure("APOLLO15/METRIC/1971-07-31T14:00:53.547");
-  measure->SetResidual(9999999, 9999999);
-  // measure->SetSampleResidual(9999999); 
   network->Write(newNetworkPath); 
   
-  QString outCnetFileName = "/tmp/outTemp.net";
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+newNetworkPath, "onet="+outCnetFileName,
                            "Radius=yes", "Errorpropagation=yes", "Spsolve=position","Spacecraft_position_sigma=1000.0",
-                           "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2",
-                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                           "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2", 
+                           "Model1=huber", "Max_model1_c_quantile=0.6", "Model2=chen", "Max_model2_c_quantile=0.98", "Sigma0=1e-3", 
+                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
 
@@ -243,5 +241,48 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
                                false, 0, ',', false, true);
 
-   
+  ControlNet onet; 
+  onet.ReadControl(outCnetFileName);
+ 
+  QVector<double> presiduals = {};
+  QVector<QVector<double>> mresiduals = {{1.27975, 1.54281, 1.8778, 1.30159}, 
+                                         {2.25115, 2.33559, 0.547574, 3.16777}, 
+                                         {1.15396, 0.69243, 1.03005, 0.848934}, 
+                                         {2.24641, 4.39168, 0.560941, 2.844}}; 
+
+  for (int i = 0; i < pid.size(); i++) {
+    // grab random points and add error to a single measure 
+    ControlPoint *point = network->GetPoint(pid[i]);
+    QList<ControlMeasure*> measures = point->getMeasures();
+    for (int j = 0; j < measures.size(); j++ ) {
+      EXPECT_NEAR(measures.at(j)->GetResidualMagnitude(), mresiduals[i][j], 0.0001); 
+    }
+  }
+
+
+  QFile bo(prefix.path()+"/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[31].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
+  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
+  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
+  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
+  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
+
+  EXPECT_THAT(lines[37].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
+  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
+  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
+  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
+  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
+
+  EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
+
 }
