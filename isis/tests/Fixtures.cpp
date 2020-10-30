@@ -259,21 +259,21 @@ namespace Isis {
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();
     
-    isdFile1 = new FileName("data/apolloNetwork/Sub4-AS15-M-0583_msk.isd");
-    isdFile2 = new FileName("data/apolloNetwork/Sub4-AS15-M-0584_msk.isd");
-    isdFile3 = new FileName("data/apolloNetwork/Sub4-AS15-M-0585_msk.isd");
-    isdFile4 = new FileName("data/apolloNetwork/Sub4-AS15-M-0586_msk.isd");
-    isdFile5 = new FileName("data/apolloNetwork/Sub4-AS15-M-0587_msk.isd");
-    isdFile6 = new FileName("data/apolloNetwork/Sub4-AS15-M-1423.isd");
-    isdFile7 = new FileName("data/apolloNetwork/Sub4-AS15-M-1537.isd");
+    isdFile1 = new FileName("data/apolloNetwork/apolloImage1.isd");
+    isdFile2 = new FileName("data/apolloNetwork/apolloImage2.isd");
+    isdFile3 = new FileName("data/apolloNetwork/apolloImage3.isd");
+    isdFile4 = new FileName("data/apolloNetwork/apolloImage4.isd");
+    isdFile5 = new FileName("data/apolloNetwork/apolloImage5.isd");
+    isdFile6 = new FileName("data/apolloNetwork/apolloImage6.isd");
+    isdFile7 = new FileName("data/apolloNetwork/apolloImage7.isd");
 
-    label1 = new FileName("data/apolloNetwork/Sub4-AS15-M-0583_msk.pvl");
-    label2 = new FileName("data/apolloNetwork/Sub4-AS15-M-0584_msk.pvl");
-    label3 = new FileName("data/apolloNetwork/Sub4-AS15-M-0585_msk.pvl");
-    label4 = new FileName("data/apolloNetwork/Sub4-AS15-M-0586_msk.pvl");
-    label5 = new FileName("data/apolloNetwork/Sub4-AS15-M-0587_msk.pvl");
-    label6 = new FileName("data/apolloNetwork/Sub4-AS15-M-1423.pvl");
-    label7 = new FileName("data/apolloNetwork/Sub4-AS15-M-1537.pvl");
+    label1 = new FileName("data/apolloNetwork/apolloImage1.pvl");
+    label2 = new FileName("data/apolloNetwork/apolloImage2.pvl");
+    label3 = new FileName("data/apolloNetwork/apolloImage3.pvl");
+    label4 = new FileName("data/apolloNetwork/apolloImage4.pvl");
+    label5 = new FileName("data/apolloNetwork/apolloImage5.pvl");
+    label6 = new FileName("data/apolloNetwork/apolloImage6.pvl");
+    label7 = new FileName("data/apolloNetwork/apolloImage7.pvl");
 
     cube1 = new Cube();
     cube1->fromIsd(tempDir.path() + "/cube1.cub", *label1, *isdFile1, "rw");
@@ -308,9 +308,9 @@ namespace Isis {
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
-    network = new ControlNet("data/apolloNetwork/apolloNet.pvl");
-    cnetPath = tempDir.path() + "/apolloNet.net"; 
-    network->Write(cnetPath);
+    ControlNet inputNet("data/apolloNetwork/apolloNet.pvl");
+    controlNetPath = tempDir.path() + "/apolloNet.net";
+    inputNet.Write(controlNetPath);
   }
 
   void ApolloNetwork::TearDown() {
@@ -342,23 +342,65 @@ namespace Isis {
       cube1->close();
     }
 
-    delete isdFile1;
-    delete isdFile2;
-    delete isdFile3;
-    delete isdFile4;
-    delete isdFile5;
-    delete isdFile6;
-    delete isdFile7;
+    if (isdFile1) {
+      delete isdFile1; 
+    }
 
-    delete cube1;
-    delete cube2;
-    delete cube3;
-    delete cube4;
-    delete cube5;
-    delete cube6;
-    delete cube7;
+    if (isdFile2) {
+      delete isdFile2;
+    }
 
-    delete cubeList;
+    if (isdFile3) {
+      delete isdFile3; 
+    }
+
+    if (isdFile4) {
+      delete isdFile4; 
+    }
+
+    if (isdFile5) {
+      delete isdFile5; 
+    }
+
+    if (isdFile6) {
+      delete isdFile6; 
+    }
+
+    if (isdFile7) {
+      delete isdFile7; 
+    }
+
+    if (cube1) {
+      delete cube1; 
+    }
+
+    if (cube2) {
+      delete cube2; 
+    }
+
+    if (cube3) {
+      delete cube3; 
+    }
+
+    if (cube4) {
+      delete cube4; 
+    }
+
+    if (cube5) {
+      delete cube5; 
+    }
+
+    if (cube6) {
+      delete cube6; 
+    }
+
+    if (cube7) {
+      delete cube7; 
+    }
+
+    if (cubeList) {
+      delete cubeList; 
+    }
   }
 
   void ObservationPair::SetUp() {

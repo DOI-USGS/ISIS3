@@ -168,6 +168,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   UserInterface options(APP_XML, args);
   
   Pvl log; 
+  
   try {
     jigsaw(options, &log);
   }
@@ -284,5 +285,74 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
 
   EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
+ }
 
+ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
+                           "camsolve=None", "spsolve=None"}; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Must either solve for camera pointing or spacecraft position"));
+  }
+}
+
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "SOLVETARGETBODY=TRUE", "tbparameters="+cubeRPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Input Target parameters file missing main Target object"));
+  } 
+}
+
+
+TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  
+  std::istringstream iss(R"(
+    Object = Target
+    Group = "NAME"
+       Name=Enceladus
+    EndGroup
+    END_OBJECT
+  )"); 
+  
+  QString tbsolvepath = prefix.path() + "/tbsolve.pvl";
+  Pvl tbsolve; 
+  iss >> tbsolve; 
+  tbsolve.write(tbsolvepath);
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, "SOLVETARGETBODY=TRUE", "tbparameters="+tbsolvepath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Must solve for at least one target body option"));
+  } 
 }
