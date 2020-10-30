@@ -101,7 +101,6 @@ namespace Isis {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
       PvlGroup gp("JigsawResults");
-    std::cout << "running" << std::endl;
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
