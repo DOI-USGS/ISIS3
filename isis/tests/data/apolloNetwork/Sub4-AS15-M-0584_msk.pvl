@@ -1,0 +1,415 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1145
+    TileLines   = 1145
+
+    Group = Dimensions
+      Samples = 5725
+      Lines   = 5725
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = -1671.7674324126
+      Multiplier = 177.76755448292
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName     = "APOLLO 15"
+    InstrumentId       = METRIC
+    TargetName         = MOON
+    Original_StartTime = APOLLO15/METRIC/1971-07-31T14:01:17.982
+    Original_StartTime = 1971-07-31T14:01:17.982
+    StartTime          = 1971-07-31T14:01:16.947
+  End_Group
+
+  Group = BandBin
+    FilterName = CLEAR
+    FilterId   = 1
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -915240
+    LeapSecond                = $base/kernels/lsk/naif0010.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $base/kernels/pck/lunar_de403_1950-2199_pa.bp-
+                                 c, $base/kernels/fk/lunarMeanEarth001.tf)
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = (Table,
+                                 $apollo15/kernels/ck/AS15_M_REV22_v2.bc,
+                                 $apollo15/kernels/fk/apollo15_v2.0001.tf)
+    Instrument                = $apollo15/kernels/ik/apollo15_metric_v2.0001.-
+                                ti
+    SpacecraftClock           = $apollo15/kernels/sclk/apollo15.0001.tsc
+    InstrumentPosition        = (Table,
+                                 $apollo15/kernels/spk/AS15_M_REV22_v2.bsp)
+    InstrumentAddendum        = $apollo15/kernels/iak/apollo15MetricAddendum0-
+                                02.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 22900
+    AlphaLines          = 22900
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 22900.5
+    AlphaEndingLine     = 22900.5
+    BetaSamples         = 5725
+    BetaLines           = 5725
+  End_Group
+
+  Group = Reseaus
+    Sample   = (1422.62, 1422.62, 1422.62, 1422.62, 1422.62, 1422.62, 1422.62,
+                1422.62, 1422.62, 1422.62, 1422.62, 3428.38, 3428.38, 3428.38,
+                3428.38, 3428.38, 3428.38, 3428.38, 3428.38, 3428.38, 3428.38,
+                3428.38, 5434.2, 5434.2, 5434.2, 5434.2, 5434.2, 5434.2,
+                5434.2, 5434.2, 5434.2, 5434.2, 5434.2, 7439.68, 7439.68,
+                7439.68, 7439.68, 7439.68, 7439.68, 7439.68, 7439.68, 7439.68,
+                7439.68, 7439.68, 9444.78, 9444.78, 9444.78, 9444.78, 9444.78,
+                9444.78, 9444.78, 9444.78, 9444.78, 9444.78, 9444.78, 11450.0,
+                11450.0, 11450.0, 11450.0, 11450.0, 11450.0, 11450.0, 11450.0,
+                11450.0, 11450.0, 11450.0, 13455.3, 13455.3, 13455.3, 13455.3,
+                13455.3, 13455.3, 13455.3, 13455.3, 13455.3, 13455.3, 13455.3,
+                15460.7, 15460.7, 15460.7, 15460.7, 15460.7, 15460.7, 15460.7,
+                15460.7, 15460.7, 15460.7, 15460.7, 17466.1, 17466.1, 17466.1,
+                17466.1, 17466.1, 17466.1, 17466.1, 17466.1, 17466.1, 17466.1,
+                17466.1, 19472.1, 19472.1, 19472.1, 19472.1, 19472.1, 19472.1,
+                19472.1, 19472.1, 19472.1, 19472.1, 19472.1, 21477.7, 21477.7,
+                21477.7, 21477.7, 21477.7, 21477.7, 21477.7, 21477.7, 21477.7,
+                21477.7, 21477.7)
+    Line     = (21476.5, 19466.3, 17466.0, 15460.7, 13455.4, 11450.0, 9444.32,
+                7438.86, 5433.14, 3427.88, 1422.52, 21476.5, 19466.3, 17466.0,
+                15460.7, 13455.4, 11450.0, 9444.32, 7438.86, 5433.14, 3427.88,
+                1422.52, 21476.5, 19466.3, 17466.0, 15460.7, 13455.4, 11450.0,
+                9444.32, 7438.86, 5433.14, 3427.88, 1422.52, 21476.5, 19466.3,
+                17466.0, 15460.7, 13455.4, 11450.0, 9444.32, 7438.86, 5433.14,
+                3427.88, 1422.52, 21476.5, 19466.3, 17466.0, 15460.7, 13455.4,
+                11450.0, 9444.32, 7438.86, 5433.14, 3427.88, 1422.52, 21476.5,
+                19466.3, 17466.0, 15460.7, 13455.4, 11450.0, 9444.32, 7438.86,
+                5433.14, 3427.88, 1422.52, 21476.5, 19466.3, 17466.0, 15460.7,
+                13455.4, 11450.0, 9444.32, 7438.86, 5433.14, 3427.88, 1422.52,
+                21476.5, 19466.3, 17466.0, 15460.7, 13455.4, 11450.0, 9444.32,
+                7438.86, 5433.14, 3427.88, 1422.52, 21476.5, 19466.3, 17466.0,
+                15460.7, 13455.4, 11450.0, 9444.32, 7438.86, 5433.14, 3427.88,
+                1422.52, 21476.5, 19466.3, 17466.0, 15460.7, 13455.4, 11450.0,
+                9444.32, 7438.86, 5433.14, 3427.88, 1422.52, 21476.5, 19466.3,
+                17466.0, 15460.7, 13455.4, 11450.0, 9444.32, 7438.86, 5433.14,
+                3427.88, 1422.52)
+    Type     = (5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)
+    Valid    = (1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1,
+                1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    Template = $apollo15/reseaus/METRIC_TEMPLATE.cub
+    Master   = $apollo15/reseaus/METRIC_MASTER.pvl
+    Status   = Removed
+  End_Group
+
+  Group = Code
+    StartTime                 = 1971-07-31T14:01:17.982
+    SpacecraftAltitude        = 102167 <meters>
+    ExposureDuration          = 13.7 <milliseconds>
+    ForwardMotionCompensation = False
+    Column1                   = (1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0,
+                                 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1,
+                                 1, 1)
+    Column2                   = (1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0,
+                                 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1,
+                                 0, 1)
+    Column3                   = (1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0,
+                                 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 1)
+    Column4                   = (1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0,
+                                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 1)
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 32841162
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-915240, 1400015, 1)
+  CkTableStartTime    = -896911081.86972
+  CkTableEndTime      = -896911081.86972
+  CkTableOriginalSize = 1
+  Description         = "Created by spiceinit"
+  Kernels             = ($apollo15/kernels/ck/AS15_M_REV22_v2.bc,
+                         $apollo15/kernels/fk/apollo15_v2.0001.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 32841226
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -896911081.86972
+  SpkTableEndTime      = -896911081.86972
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $apollo15/kernels/spk/AS15_M_REV22_v2.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 32841282
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (310002, 1)
+  ConstantFrames      = (310001, 310003, 310000, 310002)
+  ConstantRotation    = (0.99999987852709, -3.09789127116553e-04,
+                         3.83375135592436e-04, 3.09789421617701e-04,
+                         0.999999952015, -7.08797549693787e-07,
+                         -3.83374897618408e-04, 8.27563025111877e-07,
+                         0.9999999265115)
+  CkTableStartTime    = -896911081.86972
+  CkTableEndTime      = -896911081.86972
+  CkTableOriginalSize = 1
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $base/kernels/pck/lunar_de403_1950-2199_pa.bpc,
+                         $base/kernels/fk/lunarMeanEarth001.tf)
+  SolarLongitude      = 171.71902392955
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 32841346
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -896911081.86972
+  SpkTableEndTime      = -896911081.86972
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de405.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 32841402
+  Bytes     = 115723
+End_Object
+
+Object = NaifKeywords
+  BODY301_RADII           = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE         = 310001
+  INS-915240_FOCAL_LENGTH = 76.054
+  INS-915240_PIXEL_PITCH  = 0.005
+  INS-915240_TRANSX       = (0.0, -0.005, 0.0)
+  INS-915240_TRANSY       = (0.0, 0.0, 0.005)
+  INS-915240_ITRANSS      = (0.0, -200.0, 0.0)
+  INS-915240_ITRANSL      = (0.0, 0.0, 200.0)
+  INS-915240_PP           = (-0.006, -0.002)
+  INS-915240_OD_K         = (-1.3361854e-06, 5.2261757e-10, -5.0728336e-14)
+  INS-915240_DECENTER     = (-5.4958195e-07, -4.608942e-11, 2.965907)
+End_Object
+End
