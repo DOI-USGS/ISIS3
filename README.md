@@ -114,6 +114,27 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
         for Anaconda 3.4 and up - conda activate isis
         prior to Anaconda 3.4 - source activate isis
 
+### Installation with Docker
+The ISIS production Dockerfile automates the conda installation process above.
+You can either build the Dockerfile yourself or use the
+[usgsastro/isis](https://hub.docker.com/repository/docker/usgsastro/isis) 
+image from DockerHub.
+
+#### To build the Dockerfile
+1. Download [the production Docker file](./docker/production.dockerfile)
+2. Build the Dockerfile
+  ```
+  docker build -t isis -f production.dockerfile .
+  ```
+3. Run the Dockerfile
+  ```
+  docker run -it isis bash
+  ```
+
+#### Run run the prebuilt image
+```
+docker run -it usgsastro/isis bash
+```
 
 ### Practical Usage with other conda packages
 
