@@ -38,12 +38,7 @@ In this step, we will prepare the local repository to build from as well as upda
 * Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for labeling the unreleased changes as being part of this release.
 
 ### Part F: Create a Pull Request
-* Make a pull request with your local changes into the `dev` or version branch of the repository.
-
-### Part G: Create or update a Version Branch
-Once the PR into `dev` been reviewed and merged:
-
-* If there is already a version branch (ex: 3.10) for this release, after the changes from previous setps are PR'd into `dev`, cherry-pick them into the version branch for your release, and then make a pull request with this change into the version branch. Make sure any other changes needed for the release have also been cherry-picked into this branch. 
+* Make a pull request with your local changes into the version (i.e., the version number created above) branch of the repository.
 
 * If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each then specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on that version branch.
    * To create a new branch, first prepare your local repo by pulling down the merged changes you made earlier (e.g. `git pull upstream dev`)
@@ -153,7 +148,7 @@ This step covers creating the builds and the installation environments of ISIS f
     * For a standard release, the environment should be named `isisX.Y.Z`.
     * For a release candidate, the environment should be named `isisX.Y.Z-RC#`.
     * For a custom build, the environment should be named `isisX.Y.Z-<custom-label>`.
-    * For the step which sets up the data and testData areas, make sure to use the new isis_data and isis_testData directories, i.e.: `python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=/usgs/cpkgs/isis3/isis_data  --test-dir=/usgs/cpkgs/isis3/isis_testData`
+    * For the step which sets up the data and testData areas, make sure to use the new isis_data and isis_testData directories, i.e.: `python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=/usgs/cpkgs/isis3/isis_data  --test-dir=/usgs/cpkgs/isis3/isis_testData`
 
 
 * Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
@@ -166,11 +161,12 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 
 ### Part A: Build the documentation
 
+* Perform a local build (not a conda build) using the instructions available [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
 * setisis to the build directory from [Step 2 Part A](#Part_A:_Setup_Repository).
 * Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code.
 
 ### Part B: Upload the documentation
-* In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc```.
+* In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc``` as the isis3mgr user.
 
 ## Step 10: Communicate Availability of Build
 
@@ -182,7 +178,7 @@ This step will will communicate that a new version of ISIS is available.
 ```
 ## How to install or update to <X.Y.Z>
 
-Installation instructions of ISIS3 can be found in the README on our [github page ](https://github.com/USGS-Astrogeology/ISIS3).
+Installation instructions of ISIS can be found in the README on our [github page ](https://github.com/USGS-Astrogeology/ISIS3).
 
 If you already have a version of ISIS 3.6.0 or later installed in an anaconda environment, you can update to <X.Y.Z> by activating your existing isis conda environment and running `conda update isis3` .
 
@@ -223,20 +219,6 @@ There are some important considerations to keep in mind when using this release 
 ```
 
 ### Part B: Internal Announcement
-
- * Create a new topic under the [ASC Internal](https://astrodiscuss.usgs.gov/c/asc-internal) category on [astrodiscuss](https://astrodiscuss.usgs.gov/).
-
-Use the previous template, but with the following additional information about how to use the build internally: 
-
-```
-## How to get access to ISIS X.XX.XX at the ASC 
-
-The new process proposed in the internal [RFC](https://astrodiscuss.usgs.gov/t/internal-rfc-distribution-of-isis3-at-asc/52/26) is now in full effect. Please review the process of using anaconda environments to activate ISIS [here](https://astrodiscuss.usgs.gov/t/using-the-asc-conda-environment-for-isisx-y-z/106). 
-
-With conda installed, run the following commands: 
-
-    conda activate isisX.XX.X
-```
 
 * Send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability.
     * Your e-mail can simply be a link to the external announcement.
