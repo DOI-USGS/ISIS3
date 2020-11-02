@@ -5,7 +5,7 @@
 #include "Pvl.h"
 
 namespace Isis {
-  extern void chan1m32isis(UserInterface &ui);
+  extern Pvl chan1m32isis(UserInterface &ui);
 }
 
 #endif

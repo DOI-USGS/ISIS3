@@ -6,5 +6,8 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  chan1m32isis(ui);
+  Pvl results = chan1m32isis(ui);
+  for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
+    Application::Log(results.group(resultIndex));
+  }
 }

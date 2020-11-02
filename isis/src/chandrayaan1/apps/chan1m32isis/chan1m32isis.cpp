@@ -44,12 +44,13 @@ namespace Isis {
   Table *g_utcTable;
   PvlGroup g_results("Results");
 
-  void chan1m32isis(UserInterface &ui) {
-    //g_results.clear();
+  Pvl chan1m32isis(UserInterface &ui) {
+    Pvl log;
     importImage("TO", (ProcessImportPds::PdsFileType)(ProcessImportPds::Rdn|ProcessImportPds::L0), ui);
-    //Application::Log(g_results);
+    log.addGroup(g_results);
     importImage("LOC", ProcessImportPds::Loc, ui);
     importImage("OBS", ProcessImportPds::Obs, ui);
+    return log;
   }
 
   void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType) {
