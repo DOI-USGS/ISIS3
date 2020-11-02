@@ -307,9 +307,9 @@ namespace Isis {
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
-    ControlNet inputNet("data/apolloNetwork/apolloNet.pvl");
+    network = new ControlNet("data/apolloNetwork/apolloNet.pvl");
     controlNetPath = tempDir.path() + "/apolloNet.net";
-    inputNet.Write(controlNetPath);
+    network->Write(controlNetPath);
   }
 
   void ApolloNetwork::TearDown() {
