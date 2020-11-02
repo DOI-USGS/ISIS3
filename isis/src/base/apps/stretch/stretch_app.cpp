@@ -6,7 +6,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 
-#include "stretch.h"
+#include "stretch_app.h"
 
 namespace Isis {
   void stretchProcess(Buffer &in, Buffer &out);
@@ -14,11 +14,12 @@ namespace Isis {
   Statistics stats;
 
   void stretch(UserInterface &ui, Pvl *log) {
-    Cube *cubeFile = new Cube(ui.GetFileName("FROM"), "r");
+    Cube *cubeFile = new Cube();
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
+    cubeFile->open(ui.GetFileName("FROM"), "r");
     stretch(cubeFile, ui, log);
   }
 
