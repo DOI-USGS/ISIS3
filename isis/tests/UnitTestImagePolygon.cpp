@@ -4,6 +4,7 @@
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
+#include "geos/geom/Point.h"
 #include "geos/geom/MultiPolygon.h"
 #include "geos/geom/CoordinateArraySequence.h"
 
@@ -13,70 +14,58 @@
 
 using namespace Isis;
 
-TEST(ImagePolygon, UnitTestImagePolygonDefaultParams) {
-  //   simple MOC image
-  QString inFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub";
-
-  // Open the cube
-  Cube cube;
-  cube.open(inFile, "r");
-
+TEST_F(DefaultCube, UnitTestImagePolygonDefaultParams) {
   ImagePolygon poly;
   try {
-    poly.Create(cube, 1000, 1000);
+    poly.Create(*testCube);
   }
   catch(IException &e) {
-    QString msg = "Cannot create polygon for [" + cube.fileName() + "]";
+    QString msg = "Cannot create polygon for [" + testCube->fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  ASSERT_EQ(4517, poly.numVertices());
 
-  std::vector<double> lons = {223.817465, 233.818051, 236.053039, 219.688243, 223.817465};
-  std::vector<double> lats = {34.457676, 33.787158, 10.767127, 11.745635, 34.457676};
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
-      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
-    }
+  std::vector<double> lons = {255.645377, 256.146301, 256.146301, 255.645377, 255.645377};
+  std::vector<double> lats = {9.928429, 9.928429, 10.434929, 10.434929, 9.928429};
+
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  cube.close();
+  EXPECT_NEAR(255.895201, centroid->getX(), 1e-6);
+  EXPECT_NEAR(10.182391, centroid->getY(), 1e-6);
 }
 
-TEST(ImagePolygon, UnitTestImagePolygonSubPoly) {
-  //   simple MOC image
-  QString inFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub";
-
-  // Open the cube
-  Cube cube;
-  cube.open(inFile, "r");
-
+TEST_F(DefaultCube, UnitTestImagePolygonSubPoly) {
   ImagePolygon poly;
   try {
-    poly.Create(cube, 100, 100, 384, 640, 385);
+    poly.Create(*testCube, 100, 100, 384, 640, 385);
   }
   catch(IException &e) {
-    QString msg = "Cannot create polygon for [" + cube.fileName() + "]";
+    QString msg = "Cannot create polygon for [" + testCube->fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  ASSERT_EQ(19, poly.numVertices());
 
-  std::vector<double> lons = {225.657872, 227.226450, 230.300664, 234.551660,
-                              235.675005, 235.991430, 228.952508, 226.483092,
-                              225.530322, 225.638213, 225.657872};
-  std::vector<double> lats = {15.202335, 15.113528, 14.906305, 14.543820,
-                              11.594707, 10.770232, 11.308501, 11.457097,
-                              11.514591, 14.378682, 15.202335};
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
-      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
-    }
+  std::vector<double> lons = {255.894656, 256.081313, 256.081313, 255.894656, 255.894656};
+  std::vector<double> lats = {10.039260, 10.039260, 10.213952, 10.213952, 10.039260};
+
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  cube.close();
+  EXPECT_NEAR(255.987979, centroid->getX(), 1e-6);
+  EXPECT_NEAR(10.126704, centroid->getY(), 1e-6);
 }
 
 TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
@@ -94,68 +83,49 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
     QString msg = "Cannot create polygon for [" + crossCube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  ASSERT_EQ(40, poly.numVertices());
 
-  std::vector<double> lons = {0.000000, 12.467474, 21.544208, 27.693862,
-                              32.115185, 35.471466, 38.127194, 40.290139,
-                              40.345196, 37.640935, 34.997561, 32.400527,
-                              29.817102, 27.267075, 24.742958, 22.241039,
-                              19.755910, 17.283211, 14.791622, 13.394818,
-                              9.905657, 5.816117, 0.912785, 0.000000, 0.000000,
-                              0.000000, 286.909525, 333.822499, 357.984300,
-                              360.000000, 360.000000, 360.000000, 354.859847,
-                              347.059511, 336.340528, 317.180139, 308.824543,
-                              307.775655, 305.511096, 304.451965, 302.574302,
-                              300.053776, 298.105128, 295.343612, 293.012482,
-                              289.800680, 286.909525};
-  std::vector<double> lats = {76.431862, 74.583621, 72.204590, 69.854646,
-                              67.580179, 65.391246, 63.285144, 61.263799,
-                              61.191906, 60.607862, 60.004081, 59.382798,
-                              58.753608, 58.125676, 57.465212, 56.781693,
-                              56.080041, 55.364106, 54.625251, 54.208706,
-                              55.744385, 57.248327, 58.695391, 58.897164,
-                              71.056008, 76.431862, 72.459546, 77.858556,
-                              76.730680, 76.431862, 71.056008, 58.897164,
-                              60.033405, 61.142862, 61.738642, 60.284299,
-                              60.256669, 61.708251, 62.900241, 64.355582,
-                              65.678283, 66.807752, 68.054877, 69.175840,
-                              70.327896, 71.379534, 72.459546};
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  geos::geom::CoordinateArraySequence outputCoordArray = geos::geom::CoordinateArraySequence();
+  std::vector<double> lons = {0.000000, 360.000000, 360.000000, 0.000000, 0.000000};
+  std::vector<double> lats = {54.208706, 54.208706, 77.858556, 77.858556, 54.208706};
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      outputCoordArray.add(coordArray.getAt(i));
-    }
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  for (int i = 0; i < outputCoordArray.getSize(); i++) {
-    EXPECT_NEAR(lons[i], outputCoordArray.getAt(i).x, 1e-6);
-    EXPECT_NEAR(lats[i], outputCoordArray.getAt(i).y, 1e-6);
-  }
+  EXPECT_NEAR(214.397933, centroid->getX(), 1e-6);
+  EXPECT_NEAR(67.471761, centroid->getY(), 1e-6);
 }
 
 TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
   Pvl footprintLabel;
 
   std::ifstream isdFile("data/footprintinit/boundary.isd");
-  std::ifstream cubeLabel("data/footprintinit/MessengerInstrument.pvl");
 
   isdFile >> isd;
-  cubeLabel >> footprintLabel;
 
-  PvlObject core = footprintLabel.findObject("IsisCube").findObject("Core");
-  PvlGroup instrument = footprintLabel.findObject("IsisCube").findGroup("Instrument");
+  PvlObject &core = label.findObject("IsisCube").findObject("Core");
+  PvlGroup &instrument = label.findObject("IsisCube").findGroup("Instrument");
+  PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
 
-  label.findObject("IsisCube").deleteObject("Core");
-  label.findObject("IsisCube").addObject(core);
-  label.findObject("IsisCube").deleteGroup("Instrument");
-  label.findObject("IsisCube").addGroup(instrument);
+  core.findGroup("Dimensions")["Samples"] = "1024";
+  core.findGroup("Dimensions")["Lines"] = "1024";
+  instrument["SpacecraftName"] = "Messenger";
+  instrument["InstrumentId"] = "MDIS-NAC";
+  instrument["TargetName"] = "Mercury";
+  instrument["SpacecraftClockCount"] = "1/0108821505:976000";
+  instrument.addKeyword(PvlKeyword("ExposureDuration", "14", "MS"), Pvl::Replace);
+  instrument.addKeyword(PvlKeyword("FpuBinningMode", "0"));
+  instrument.addKeyword(PvlKeyword("PixelBinningMode", "0"));
 
-  label.findObject("IsisCube").findGroup("Kernels")["CameraVersion"] = "2";
-  label.findObject("IsisCube").findGroup("Kernels")["NaifFrameCode"] = "-236820";
-  label.findObject("IsisCube").findGroup("Kernels")["SpacecraftClock"] = "$messenger/kernels/sclk/messenger_2548.tsc";
-  label.findObject("IsisCube").findGroup("Kernels")["ShapeModel"] = "$base/dems/MSGR_DEM_USG_EQ_I_V02_prep.cub";
+  kernels["CameraVersion"] = "2";
+  kernels["NaifFrameCode"] = "-236820";
+  kernels["SpacecraftClock"] = "$messenger/kernels/sclk/messenger_2548.tsc";
+  kernels["ShapeModel"] = "$base/dems/MSGR_DEM_USG_EQ_I_V02_prep.cub";
 
   Cube footprintCube;
   footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
@@ -168,21 +138,24 @@ TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
     QString msg = "Cannot create polygon for [" + footprintCube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  footprintCube.close();
 
-  std::vector<double> lons = {222.276316, 222.252869, 257.336775, 262.514561,
-                              236.625120, 222.276316};
-  std::vector<double> lats = {19.812114, 26.058469, 25.620629, 13.155262,
-                              12.939325, 19.812114};
+  ASSERT_EQ(6, poly.numVertices());
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
-      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
-    }
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
+
+  std::vector<double> lons = {222.252869, 262.514561, 262.514561, 222.252869, 222.252869};
+  std::vector<double> lats = {12.939325, 12.939325, 26.058469, 26.058469, 12.939325};
+
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  footprintCube.close();
+  EXPECT_NEAR(242.543845, centroid->getX(), 1e-6);
+  EXPECT_NEAR(19.733747, centroid->getY(), 1e-6);
 }
 
 TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
@@ -192,8 +165,8 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
   cubeLabel >> footprintLabel;
 
   Cube footprintCube;
-  FileName footprintCube2(tempDir.path() + "footprintCube.cub");
-  footprintCube.fromLabel(footprintCube2, footprintLabel, "rw");
+  FileName footprintFile(tempDir.path() + "footprintCube.cub");
+  footprintCube.fromLabel(footprintFile, footprintLabel, "rw");
 
   LineManager line(footprintCube);
   double pixelValue = 1.0;
@@ -206,95 +179,90 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
 
   ImagePolygon poly;
   try {
-    poly.Create(footprintCube, 3000, 3000);
+    poly.Create(footprintCube);
   }
   catch(IException &e) {
     QString msg = "Cannot create polygon for [" + footprintCube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  footprintCube.close();
 
-  std::vector<double> lons = {347.895055, 349.247803, 349.699169, 349.699395,
-                              349.699244, 348.346422, 347.895055, 347.895055,
-                              347.895055};
-  std::vector<double> lats = {-42.323638, -42.323638, -42.323638, -43.312974,
-                              -43.643248, -43.643248, -43.643083, -42.653746,
-                              -42.323638};
+  ASSERT_EQ(16005, poly.numVertices());
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
-      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
-    }
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
+
+  std::vector<double> lons = {347.895055, 349.699395, 349.699395, 347.895055, 347.895055};
+  std::vector<double> lats = {-43.643248, -43.643248, -42.323638, -42.323638, -43.643248};
+
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  footprintCube.close();
+  EXPECT_NEAR(348.797225, centroid->getX(), 1e-6);
+  EXPECT_NEAR(-42.983442, centroid->getY(), 1e-6);
 }
 
 TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
   Pvl footprintLabel;
 
   std::ifstream isdFile("data/footprintinit/outlier.isd");
-  std::ifstream cubeLabel("data/footprintinit/MessengerInstrument.pvl");
 
   isdFile >> isd;
-  cubeLabel >> footprintLabel;
 
-  PvlObject core = footprintLabel.findObject("IsisCube").findObject("Core");
-  PvlGroup instrument = footprintLabel.findObject("IsisCube").findGroup("Instrument");
+  PvlObject &core = label.findObject("IsisCube").findObject("Core");
+  PvlGroup &instrument = label.findObject("IsisCube").findGroup("Instrument");
+  PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
 
+  core.findGroup("Dimensions")["Samples"] = "1024";
+  core.findGroup("Dimensions")["Lines"] = "1024";
+  instrument["SpacecraftName"] = "Messenger";
+  instrument["InstrumentId"] = "MDIS-NAC";
+  instrument["TargetName"] = "Mercury";
   instrument["SpacecraftClockCount"] = "1/0215651170:929000";
-
-  PvlObject isisCube = label.findObject("IsisCube");
-
-  isisCube.deleteObject("Core");
-  isisCube.addObject(core);
-  isisCube.deleteGroup("Instrument");
-  isisCube.addGroup(instrument);
+  instrument.addKeyword(PvlKeyword("ExposureDuration", "14", "MS"), Pvl::Replace);
+  instrument.addKeyword(PvlKeyword("FpuBinningMode", "0"));
+  instrument.addKeyword(PvlKeyword("PixelBinningMode", "0"));
 
   PvlKeyword number("Number", "9");
-  isisCube.findGroup("BandBin").addKeyword(number);
+  label.findObject("IsisCube").findGroup("BandBin").addKeyword(number);
 
-  isisCube.findGroup("Kernels")["CameraVersion"] = "2";
-  isisCube.findGroup("Kernels")["NaifFrameCode"] = "-236800";
-  isisCube.findGroup("Kernels")["SpacecraftClock"] = "$messenger/kernels/sclk/messenger_2548.tsc";
-  isisCube.findGroup("Kernels")["ShapeModel"] = "Null";
-
-  label.deleteObject("IsisCube");
-  label.addObject(isisCube);
+  kernels["CameraVersion"] = "2";
+  kernels["NaifFrameCode"] = "-236800";
+  kernels["SpacecraftClock"] = "$messenger/kernels/sclk/messenger_2548.tsc";
+  kernels["ShapeModel"] = "Null";
 
   Cube footprintCube;
-  // footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
-  footprintCube.fromIsd("/Users/acpaquette/Desktop/footprintCube.cub", label, isd, "rw");
+  footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
 
   ImagePolygon poly;
   poly.Emission(89);
   poly.Incidence(89);
   try {
-    poly.Create(footprintCube, 200, 200);
+    poly.Create(footprintCube, 10, 10);
   }
   catch(IException &e) {
-    std::cout << e.what() << '\n';
     QString msg = "Cannot create polygon for [" + footprintCube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  footprintCube.close();
+  
+  ASSERT_EQ(234, poly.numVertices());
 
-  std::vector<double> lons = {269.520359, 269.450334, 269.116332, 268.488713,
-                              268.081499, 236.714330, 213.246253, 203.074333,
-                              208.633919, 224.744265, 242.007758, 256.524583,
-                              269.520359};
-  std::vector<double> lats = {5.845377, -32.123188, -48.643335, -62.120850,
-                              -66.796093, -62.950610, -51.024263, -39.134800,
-                              -15.146478, -9.173929, -2.744727, 2.159646,
-                              5.845377};
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  for (auto poly : *(poly.Polys())) {
-    geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-    for (int i = 0; i < coordArray.getSize(); i++) {
-      EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
-      EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
-    }
+  std::vector<double> lons = {194.815844, 269.631838, 269.631838, 194.815844, 194.815844};
+  std::vector<double> lats = {-66.783492, -66.783492, 5.718545, 5.718545, -66.783492};
+
+  geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  for (int i = 0; i < coordArray.getSize(); i++) {
+    EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
+    EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  footprintCube.close();
+  EXPECT_NEAR(239.768831, centroid->getX(), 1e-6);
+  EXPECT_NEAR(-32.260171, centroid->getY(), 1e-6);
 }
