@@ -482,7 +482,6 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   }
 }
 
-
 TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   // delete to remove old camera for when cam is updated
   delete cubeL;

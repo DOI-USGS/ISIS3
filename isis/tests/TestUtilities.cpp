@@ -169,6 +169,7 @@ namespace Isis {
     }
   };
 
+
   // Compares CSV lines
   void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex,
                       double tolerance) { 
