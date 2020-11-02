@@ -7,9 +7,11 @@
 #include "TestUtilities.h"
 #include "Histogram.h"
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/chan1m32isis.xml").expanded();
 
@@ -542,9 +544,15 @@ TEST(Chan1m32Isis, Chan1m32IsisTestL0) {
 TEST(Chan1m32Isis, Chan1m32IsisTestBadFile) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/chan1m32isisTEMP.cub";
-  QVector<QString> args = {"from=data/chan1m32isis/badFile/bad.file",
+  QVector<QString> args = {"from=data/apollo2isis/AS15-M-1450_cropped.lbl",
                            "to=" + cubeFileName };
 
   UserInterface options(APP_XML, args);
-  ASSERT_THROW(chan1m32isis(options), IException);
+  try{
+    chan1m32isis(options);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e){
+    EXPECT_THAT(e.what(), HasSubstr("PVL Keyword [PRODUCT_TYPE] does not exist in [Object = Root] in file"));
+  }
 }
