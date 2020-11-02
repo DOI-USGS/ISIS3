@@ -65,7 +65,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
   // Check for the correct header output format and csv file structure for the points.csv file
   CSVReader::CSVAxis csvLine;
   CSVReader line = CSVReader(pointsOutput,
-                               false, 0, ',', false, true);
+                             false, 0, ',', false, true);
 
   int numColumns = line.columns();
   int numRows = line.rows();
@@ -222,6 +222,266 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
     EXPECT_EQ(outputType.toStdString(), inputType.toStdString());
   }
 }
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
+  // Bundle Lat / Lat Bundleout
+  QVector<QString> args = {"radius=yes",
+                           "errorpropagation=yes",
+                           "spsolve=position",
+                           "spacecraft_position_sigma=1000.0",
+                           "camsolve=angles",
+                           "twist=yes",
+                           "camera_angles_sigma=2.",
+                           "update=no",
+                           "control_point_coordinate_type_bundle=LAT",
+                           "control_point_coordinate_type_reports=LAT",
+                           "cnet="+controlNetPath,
+                           "fromlist="+tempDir.path() + "/cubes.lis",
+                           "onet="+tempDir.path()+"/latlat_out.net",
+                           "file_prefix="+tempDir.path()+"/latlat"};
+
+  UserInterface ui(APP_XML, args);
+
+
+  jigsaw(ui);
+
+  QString bundleoutPath = tempDir.path() + "/latlat_bundleout.txt";
+
+
+  QFile bundleFile(bundleoutPath);
+  QString bundleOut; 
+  if (bundleFile.open(QIODevice::ReadOnly)) {
+     bundleOut = bundleFile.read(bundleFile.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open latlat_bundleout.txt" << std::endl;
+  }
+  bundleFile.close();
+  QStringList lines = bundleOut.split("\n");
+
+  EXPECT_THAT(lines[24].toStdString(), HasSubstr("LATITUDINAL")); 
+  EXPECT_THAT(lines[57].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("RADIUS"));
+
+  EXPECT_THAT(lines[244].toStdString(), HasSubstr("Latitude"));
+  EXPECT_THAT(lines[248].toStdString(), HasSubstr("Longitude"));
+  EXPECT_THAT(lines[252].toStdString(), HasSubstr("Radius"));
+
+  EXPECT_THAT(lines[667].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("LONGITUDE"));
+
+
+  // Rectangular Bundle, Latitudinal output
+  QVector<QString> args3 = {"radius=yes",
+                           "errorpropagation=yes",
+                           "spsolve=position",
+                           "spacecraft_position_sigma=1000.0",
+                           "camsolve=angles",
+                           "twist=yes",
+                           "camera_angles_sigma=2.",
+                           "update=no",
+                           "bundleout=no",
+                           "control_point_coordinate_type_bundle=RECT",
+                           "control_point_coordinate_type_reports=LAT",
+                           "cnet="+controlNetPath,
+                           "fromlist="+tempDir.path() + "/cubes.lis",
+                           "onet="+tempDir.path()+"/rectlat_out.net",
+                           "file_prefix="+tempDir.path()+"/rectlat"};
+
+  UserInterface ui3(APP_XML, args3);
+  jigsaw(ui3);
+
+  // Compare newtwork and images.csv against the latitude, latitude bundle
+
+  // Compare network against the latitude/latitude network
+  ControlNet latLatNet(tempDir.path()+"/latlat_out.net");
+  ControlNet rectLatNet(tempDir.path()+"/rectlat_out.net");
+  QString latLatImagesOutput = tempDir.path()+"/latlat_bundleout_images.csv";
+  QString rectLatImagesOutput = tempDir.path()+"/rectlat_bundleout_images.csv";
+
+  QList<ControlPoint*> latLatPoints = latLatNet.GetPoints();
+
+  for (int i=0; i < latLatPoints.length(); i++) {
+    ControlPoint* latLatPoint = latLatPoints[i];
+    ControlPoint* rectLatPoint;
+    EXPECT_NO_THROW({
+        rectLatPoint = rectLatNet.GetPoint(latLatPoint->GetId());
+    }
+    ) << "Point in latitude/latitude bundle not found in rectangular/latitude bundle.";
+
+    EXPECT_EQ(latLatPoint->GetPointTypeString(), rectLatPoint->GetPointTypeString());
+    EXPECT_EQ(latLatPoint->GetNumMeasures(), rectLatPoint->GetNumMeasures());
+    EXPECT_EQ(latLatPoint->GetNumberOfRejectedMeasures(), rectLatPoint->GetNumberOfRejectedMeasures());
+    EXPECT_NEAR(latLatPoint->GetResidualRms(), rectLatPoint->GetResidualRms(), 0.1);
+  }
+
+  // Check for match between lat/lat csv and rect/lat csv.
+  CSVReader latLatReader = CSVReader(latLatImagesOutput, false, 0, ',', false, true);
+  CSVReader rectLatReader = CSVReader(rectLatImagesOutput, false, 0, ',', false, true);
+
+  // Skip the header (lines 1-2) as this was tested previously
+  for (int i=2; i < latLatReader.rows(); i++) {
+    compareCsvLine(latLatReader.getRow(i), rectLatReader.getRow(i), 0, 0.2); // Large tolerance noted.
+  }
+
+
+  // Rectangular bundle, rectangular report
+  QVector<QString> args2 = {"radius=yes",
+                           "errorpropagation=yes",
+                           "spsolve=position",
+                           "spacecraft_position_sigma=1000.0",
+                           "camsolve=angles",
+                           "twist=yes",
+                           "camera_angles_sigma=2.",
+                           "update=no",
+                           "control_point_coordinate_type_bundle=RECT",
+                           "control_point_coordinate_type_reports=RECT",
+                           "cnet="+controlNetPath,
+                           "fromlist="+tempDir.path() + "/cubes.lis",
+                           "onet="+tempDir.path()+"/rectrect_out.net",
+                           "file_prefix="+tempDir.path()+"/rectrect"};
+
+  UserInterface ui2(APP_XML, args2);
+  jigsaw(ui2);
+
+  QString bundleoutPath2 = tempDir.path() + "/rectrect_bundleout.txt";
+
+  QFile bundleFile2(bundleoutPath2);
+  QString bundleOut2;
+  if (bundleFile2.open(QIODevice::ReadOnly)) {
+     bundleOut2 = bundleFile2.read(bundleFile2.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open rectrect_bundleout.txt" << std::endl;
+  }
+  bundleFile2.close();
+  lines = bundleOut2.split("\n");
+
+  EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
+  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+
+  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+
+  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+
+
+  // Compare newtwork and images.csv against the rectangular, latitude bundle
+
+  // Compare network against the rect/lat network
+  ControlNet rectRectNet(tempDir.path()+"/rectlat_out.net");
+  QString rectRectImagesOutput = tempDir.path()+"/rectrect_bundleout_images.csv";
+
+  QList<ControlPoint*> rectLatPoints = rectLatNet.GetPoints();
+
+  for (int i=0; i < rectLatPoints.length(); i++) {
+    ControlPoint* rectLatPoint = rectLatPoints[i];
+    ControlPoint* rectRectPoint;
+    EXPECT_NO_THROW({
+        rectRectPoint = rectRectNet.GetPoint(rectLatPoint->GetId());
+    }
+    ) << "Point in rectangular/latitude bundle net not found in rectangular/rectangular bundle net.";
+
+    EXPECT_EQ(rectLatPoint->GetPointTypeString(), rectRectPoint->GetPointTypeString());
+    EXPECT_EQ(rectLatPoint->GetNumMeasures(), rectRectPoint->GetNumMeasures());
+    EXPECT_EQ(rectLatPoint->GetNumberOfRejectedMeasures(), rectRectPoint->GetNumberOfRejectedMeasures());
+    EXPECT_NEAR(rectLatPoint->GetResidualRms(), rectRectPoint->GetResidualRms(), 0.1);
+  }
+
+  // Check for match between lat/lat csv and rect/lat csv.
+  CSVReader rectRectReader = CSVReader(rectRectImagesOutput, false, 0, ',', false, true);
+
+  // Skip the header (lines 1-2) as this was tested previously
+  for (int i=2; i < rectRectReader.rows(); i++) {
+    compareCsvLine(rectLatReader.getRow(i), rectRectReader.getRow(i), 0);
+  }
+
+  // Latitudinal Bundle, Rectangular output
+  QVector<QString> args4 = {"radius=yes",
+                           "errorpropagation=yes",
+                           "spsolve=position",
+                           "spacecraft_position_sigma=1000.0",
+                           "camsolve=angles",
+                           "twist=yes",
+                           "camera_angles_sigma=2.",
+                           "update=no",
+                           "bundleout=no",
+                           "control_point_coordinate_type_bundle=LAT",
+                           "control_point_coordinate_type_reports=RECT",
+                           "cnet="+controlNetPath,
+                           "fromlist="+tempDir.path() + "/cubes.lis",
+                           "onet="+tempDir.path()+"/apollo_out.net",
+                           "file_prefix="+tempDir.path()+"/latrect"};
+
+  UserInterface ui4(APP_XML, args4);
+  jigsaw(ui4);
+
+
+  QString bundleoutPath4 = tempDir.path() + "/rectrect_bundleout.txt";
+
+  QFile bundleFile4(bundleoutPath4);
+  QString bundleOut4;
+  if (bundleFile4.open(QIODevice::ReadOnly)) {
+     bundleOut4 = bundleFile4.read(bundleFile2.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open rectrect_bundleout.txt" << std::endl;
+  }
+  bundleFile4.close();
+  lines = bundleOut4.split("\n");
+
+  EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
+  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+
+  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+
+  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  
+  bundleFile4.close();
+
+  // Compare newtwork and images.csv against the latitude, latitude bundle
+
+  // Compare network against the lat/lat network
+  ControlNet latRectNet(tempDir.path()+"/rectlat_out.net");
+  QString latRectImagesOutput = tempDir.path()+"/rectrect_bundleout_images.csv";
+
+  QList<ControlPoint*> latRectPoints = latRectNet.GetPoints();
+
+  for (int i=0; i < latRectPoints.length(); i++) {
+    ControlPoint* latRectPoint = latRectPoints[i];
+    ControlPoint* latLatPoint;
+    EXPECT_NO_THROW({
+        latLatPoint = latLatNet.GetPoint(latRectPoint->GetId());
+    }
+    ) << "Point in rectangular/latitude bundle net not found in rectangular/rectangular bundle net.";
+
+    EXPECT_EQ(latLatPoint->GetPointTypeString(), latRectPoint->GetPointTypeString());
+    EXPECT_EQ(latLatPoint->GetNumMeasures(), latRectPoint->GetNumMeasures());
+    EXPECT_EQ(latLatPoint->GetNumberOfRejectedMeasures(), latRectPoint->GetNumberOfRejectedMeasures());
+    EXPECT_NEAR(latLatPoint->GetResidualRms(), latRectPoint->GetResidualRms(), 0.1);
+  }
+
+  // Check for match between lat/lat csv and lat/rect csv.
+  CSVReader latRectReader = CSVReader(latRectImagesOutput, false, 0, ',', false, true);
+
+  // Skip the header (lines 1-2) as the header was tested in the apollo test
+  for (int i=2; i < latRectReader.rows(); i++) {
+    compareCsvLine(latRectReader.getRow(i), latLatReader.getRow(i), 0, 0.2);
+  }
+}
+
 
 TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   // delete to remove old camera for when cam is updated
