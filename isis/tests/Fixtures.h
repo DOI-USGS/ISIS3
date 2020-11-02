@@ -51,6 +51,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class LargeCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class SpecialSmallCube : public TempTestingFiles {
     protected:
       Cube *testCube;
@@ -111,11 +121,51 @@ namespace Isis {
       void TearDown() override;
   };
 
-  class MroCube : public DefaultCube {
+  class ApolloNetwork: public TempTestingFiles {
     protected:
-      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+      Cube *cube1, *cube2, *cube3, *cube4, *cube5, *cube6, *cube7; 
+      FileName *isdFile1, *isdFile2, *isdFile3, *isdFile4, *isdFile5, *isdFile6, *isdFile7,
+               *cubeLabel, *label1, *label2, *label3, *label4, *label5, *label6, *label7;
+
+      FileList *cubeList;
+      QString cubeListFile;
+      QString controlNetPath;
+      
+      void SetUp() override;
+      void TearDown() override;
   };
 
+  class ObservationPair : public TempTestingFiles {
+    protected: 
+      
+      Cube *cubeL; 
+      Cube *cubeR;
+
+      QString cubeLPath; 
+      QString cubeRPath; 
+
+      FileName *isdPathL;
+      FileName *isdPathR; 
+
+      FileList *cubeList; 
+      QString cubeListFile;
+
+      ControlNet *network; 
+      QString cnetPath; 
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MroCube : public DefaultCube {
+    protected:
+      QString ckPath = "data/mroKernels/mroCK.bc";
+      QString sclkPath = "data/mroKernels/mroSCLK.tsc";
+      QString lskPath = "data/mroKernels/mroLSK.tls";
+      QString jitterPath; 
+
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
 }
 
 #endif
