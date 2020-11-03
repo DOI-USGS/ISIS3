@@ -1273,20 +1273,25 @@ namespace Isis {
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
    */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, UserInterface *ui) {
-    CubeAttributeOutput att;
-    if (!ui) {
-      att = Application::GetUserInterface().GetOutputAttribute(parameter);
-    }
-    else {
-      att = ui->GetOutputAttribute(parameter);
-    }
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
+    CubeAttributeOutput &att =
+      Application::GetUserInterface().GetOutputAttribute(parameter);
 
     SetAttributes(att);
 
     return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
 
+
+  /**
+   * Create the output file.
+   *
+  */
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, UserInterface &ui){
+    CubeAttributeOutput &att = ui.GetOutputAttribute(parameter);
+    SetAttributes(att);
+    return Isis::Process::SetOutputCube(ui.GetFileName(parameter), att, p_ns, p_nl, p_nb);
+  }
 
   /**
    * Create the output file. Note that all the appropiate calls to at least
