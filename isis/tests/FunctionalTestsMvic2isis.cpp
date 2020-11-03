@@ -1,4 +1,5 @@
 #include <QTemporaryDir>
+#include <memory>
 
 #include "mvic2isis.h"
 #include "Fixtures.h"
@@ -6,6 +7,8 @@
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 #include "Histogram.h"
+#include "Endian.h"
+#include "PixelType.h"
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -35,21 +38,19 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   catch (IException &e) {
     FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  Pvl *isisLabel = cube->label();
 
   // Dimensions Group
-  PvlGroup &dimensions = isisLabel->findGroup("Dimensions", Pvl::Traverse);
-  ASSERT_EQ(int(dimensions["Samples"]), 1);
-  ASSERT_EQ(int(dimensions["Lines"]), 3);
-  ASSERT_EQ(int(dimensions["Bands"]), 1);
+  ASSERT_EQ(cube->sampleCount(), 1);
+  ASSERT_EQ(cube->lineCount(), 3);
+  ASSERT_EQ(cube->bandCount(), 1);
 
   // Pixels Group
-  PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "Real");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
-  ASSERT_EQ(double(pixels["Base"]), 0.0);
-  ASSERT_EQ(double(pixels["Multiplier"]), 1.0);
+  ASSERT_EQ(cube->pixelType(), PixelType::Real);
+  ASSERT_EQ(cube->byteOrder(), ByteOrder::Lsb);
+  ASSERT_EQ(cube->base(), 0.0);
+  ASSERT_EQ(cube->multiplier(), 1.0);
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -108,40 +109,33 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   ASSERT_EQ(double(radiometricCalibration["PlutoPivotWavelength"]), 8.86E-5);
   ASSERT_EQ(double(radiometricCalibration["CharonPivotWavelength"]), 8.86E-5);
 
-  Histogram *hist = cube.histogram();
+  std::unique_ptr<Histogram> hist (cube->histogram());
 
   ASSERT_DOUBLE_EQ(hist->Average(), 0.34910885492960614);
   ASSERT_DOUBLE_EQ(hist->Sum(), 1.0473265647888184);
   ASSERT_EQ(hist->ValidPixels(), 3);
   ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 0.6046742741102703);
 
-  delete hist;
-
-  cube.close();
-
+  cube->close();
   try {
-    cube.open(undistortedCubeName);
+    cube->open(undistortedCubeName);
   } catch(IException &e) {
-    cube.close();
     FAIL() << "Unable to open undistorted output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
   }
-  cube.close();
 
+  cube->close();
   try {
-    cube.open(errorCubeName);
+    cube->open(errorCubeName);
   } catch(IException &e) {
-    cube.close();
     FAIL() << "Unable to open error output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
   }
-  cube.close();
 
+  cube->close();
   try {
-    cube.open(qualityCubeName);
+    cube->open(qualityCubeName);
   } catch(IException &e) {
-    cube.close();
     FAIL() << "Unable to open quality output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
   }
-  cube.close();
 }
 
 TEST_F(TempTestingFiles, Mvic2IsisTestPanMode) {
@@ -156,8 +150,8 @@ TEST_F(TempTestingFiles, Mvic2IsisTestPanMode) {
   catch (IException &e) {
     FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -195,14 +189,12 @@ TEST_F(TempTestingFiles, Mvic2IsisTestPanMode) {
   ASSERT_EQ(double(radiometricCalibration["PlutoPivotWavelength"]), 6.64E-5);
   ASSERT_EQ(double(radiometricCalibration["CharonPivotWavelength"]), 6.51E-5);
 
-  Histogram *hist = cube.histogram();
+  std::unique_ptr<Histogram> hist (cube->histogram());
 
   ASSERT_DOUBLE_EQ(hist->Average(), 1.391881783803304);
   ASSERT_DOUBLE_EQ(hist->Sum(), 4.1756453514099121);
   ASSERT_EQ(hist->ValidPixels(), 3);
   ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 0.60270249191923053);
-
-  delete hist;
 }
 
 TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
@@ -217,8 +209,8 @@ TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
   catch (IException &e) {
     FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -256,14 +248,12 @@ TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
   ASSERT_EQ(double(radiometricCalibration["CharonPivotWavelength"]), 6.51E-5);
   ASSERT_EQ(radiometricCalibration["FlatFile"][0].toStdString(), "mfr_flat_20070130.fits");
 
-  Histogram *hist = cube.histogram();
+  std::unique_ptr<Histogram> hist (cube->histogram());
 
   ASSERT_DOUBLE_EQ(hist->Average(), 83.167997894287112);
   ASSERT_DOUBLE_EQ(hist->Sum(), 2079.1999473571777);
   ASSERT_EQ(hist->ValidPixels(), 25);
   ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 284.39166235335574);
-
-  delete hist;
 }
 
 TEST_F(TempTestingFiles, Mvic2IsisTestUncalibrated) {
@@ -279,8 +269,8 @@ TEST_F(TempTestingFiles, Mvic2IsisTestUncalibrated) {
   catch (IException &e) {
     FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -299,14 +289,12 @@ TEST_F(TempTestingFiles, Mvic2IsisTestUncalibrated) {
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98907);
   ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
 
-  Histogram *hist = cube.histogram();
+  std::unique_ptr<Histogram> hist (cube->histogram());
 
   ASSERT_DOUBLE_EQ(hist->Average(), 83);
   ASSERT_DOUBLE_EQ(hist->Sum(), 249);
   ASSERT_EQ(hist->ValidPixels(), 3);
   ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 2);
-
-  delete hist;
 
   args.pop_front();
   args.push_back("undistorted="+tempDir.path()+"/undistorted.cub");
