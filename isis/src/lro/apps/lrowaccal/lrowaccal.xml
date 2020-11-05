@@ -15,7 +15,7 @@
     </p>
 
     <p>
-      Corrections are  applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
+      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
     </p>
 
     <h3>Dark Correction:</h3>
@@ -149,6 +149,34 @@
       </pre>
       If TEMPRATUREFILE is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
     </p>
+
+    <p>
+      The DN level in an uncalibrated image is the sum of the true signal from the scene, 
+      the bias, the dark current, and random noise in all 3 components. The random noise in
+      the true signal and dark current is called shot noise and the random noise in the bias
+      is called read noise. The true signal, bias, and dark current are defined as mean
+      values so that if the random noise were averaged down to insignificance by taking a 
+      very large number of images and averaging them, the resulting image would be the true 
+      scene, bias, and dark current with no systematic error. That implies the statistical 
+      distribution of the random noise has an average of zero, and therefore the random noise
+      has both positive and negative values, except for the trivial case of zero random noise.
+      The random noise is both additive and subtractive to the signal by definition.
+    </p>
+
+    <p>
+      Let's look at the case of a calibrated image for which the true signal is zero, a dark 
+      image. In calibration, the mean bias and dark current are subtracted, but the random 
+      noise cannot be subtracted, because only the statistical distribution of the random 
+      noise can be known in advance, not the specific value for that pixel for that image. 
+      Because the random noise values are both positive and negative, when the true signal 
+      is zero the calibrated image should have both positive and negative values. If it had 
+      only positive values, the mean would be positive and therefore it would have a 
+      systematic error, since the true signal is zero. It is not possible to eliminate the 
+      random noise entirely, but it is defined as both additive and subtractive to the signal 
+      to minimize the systematic error in the calibrated image. That forces calibrated dark 
+      images to have both positive and negative values.
+    </p>
+
   </description>
 
   <category>
