@@ -29,6 +29,7 @@ update the Unreleased link so that it compares against the latest release tag.
 -->
 
 ## [Unreleased]
+ - Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images.
 
 ## [4.3.0] - 2020-10-02
 
