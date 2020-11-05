@@ -11,6 +11,7 @@
 #include "gmock/gmock.h"
 
 using namespace Isis;
+using testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetextract.xml").expanded();
 
@@ -26,17 +27,37 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveBadinputs) {
   try {
     cnetextract( *network, options, &appLog );
     FAIL() << "Should not have been able to extract a new network with no fromlist set" << std::endl;
-  } catch(...) {}
-
-  args.pop_front();
-  args.push_front("fromlist=" + cubeListFile);
-  args.remove(3);
+  } catch(IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("To create a [TOLIST] the [FROMLIST] parameter must be provided."));
+  }
 
   // Test no onet
+  args.pop_front();
+  args.push_front("fromlist=" + cubeListFile);
+  QString onet = args.takeAt(3);
+
+  options = UserInterface(APP_XML, args);
+
   try {
     cnetextract( *network, options, &appLog );
     FAIL() << "Should not have been able to extract a new network with no onet set" << std::endl;
-  } catch(...) {}
+  } catch(IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Parameter [ONET] has no value."));
+  }
+
+  // Test no filter
+  args.pop_front();
+  args.pop_back();
+  args.push_back(onet);
+
+  options = UserInterface(APP_XML, args);
+
+  try {
+    cnetextract( *network, options, &appLog );
+    FAIL() << "Should not have been able to extract a new network with no filter" << std::endl;
+  } catch(IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("At least one filter must be selected"));
+  }
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoIgnore) {
