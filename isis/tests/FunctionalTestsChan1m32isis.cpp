@@ -391,7 +391,7 @@ TEST(Chan1m32Isis, Chan1m32IsisTestL0) {
 TEST(Chan1m32Isis, Chan1m32IsisTestBadFile) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/chan1m32isisTEMP.cub";
-  QVector<QString> args = {"from=data/apollo2isis/AS15-M-1450_cropped.lbl",
+  QVector<QString> args = {"from=data/kaguyatc2isis/TC1S2B0_01_05186N225E0040_mini.lbl",
                            "to=" + cubeFileName };
 
   UserInterface options(APP_XML, args);
