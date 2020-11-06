@@ -101,7 +101,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
   }
 
   // Spot check a few points for hard-coded values
-  // A few "Free" points:
+// A few "Free" points:
   compareCsvLine(line.getRow(30), "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097049,1735.93990498,270.686673,265.71814949,500.96936636,860.25757782,-1823.63225092,-677.74580607,1573.65050902,169.59077233,712.98695579");
   compareCsvLine(line.getRow(185), "AS15_000055107,FREE,2,0,2.22,24.26598395,6.7584199,1735.27498642,303.08880622,295.63583269,562.91702785,876.14340919,-1869.62256482,-708.50507503,1570.96622125,186.17020478,713.15150216");
   compareCsvLine(line.getRow(396), "AS15_Tie14,FREE,4,0,0.76,23.34007345,4.52764905,1737.15233677,245.96408206,251.30256849,443.11511364,1022.0802375,-1897.32803894,-372.27333324,1590.02287604,125.90958875,688.23852718");
@@ -346,7 +346,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   
   QString heldlistpath = prefix.path() + "/heldlist.lis"; 
   FileList heldList; 
-  heldList.append(cube6->fileName());
+  heldList.append(cubes[5]->fileName());
   heldList.write(heldlistpath); 
 
   QString outCnetFileName = prefix.path() + "/outTemp.net";
@@ -549,3 +549,254 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
   } 
 }
 
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawPoleRaDecW0WdotMeanRadius) {
+  QTemporaryDir prefix;
+  QString tbParamsPath = prefix.path() + "/tbparams.pvl";
+
+  std::istringstream tbPvlStr(R"(Object = Target
+  Group = "NAME"
+    Name=Moon
+  EndGroup
+  Group = "POLERIGHTASCENSION"
+    Ra=position
+    RaValue=269.9949
+    RaSigma=0.0
+    RaVelocityValue=0.0031
+    RaVelocitySigma=0.0
+    RaAccelerationValue=0.0
+    RaAccelerationSigma=1.0
+  EndGroup
+  Group = "POLEDECLINATION"
+    Dec=position
+    DecValue=66.5392
+    DecSigma=0.0
+    DecVelocityValue=0.0130
+    DecVelocitySigma=0.0
+    DecAccelerationValue=0.0
+    DecAccelerationSigma=1.0
+  EndGroup
+  Group = "PRIME MERIDIAN"
+    Pm=velocity
+    PmValue=38.32132
+    PmSigma=0.0
+    PmVelocityValue=13.17635815
+    PmVelocitySigma=0.0
+    PmAccelerationValue=0.0
+    PmAccelerationSigma=1.0
+  EndGroup
+  Group = "RADII"
+    RadiiSolveOption=mean
+    RadiusAValue=1737400
+    RadiusASigma=0.0
+    RadiusBValue=1737400
+    RadiusBSigma=0.0
+    RadiusCValue=1737400
+    RadiusCSigma=0.0
+    MeanRadiusValue=1737400
+    MeanRadiusSigma=0.0
+  EndGroup
+EndObject
+End)");
+
+  Pvl tbParams; 
+  tbPvlStr >> tbParams; 
+  tbParams.write(tbParamsPath);
+
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  for(int i = 0; i < cubes.size(); i++) {
+      Pvl *label = cubes[i]->label();
+      // get body rotation
+      PvlObject &br = label->object(4);
+      std::cout << br << std::endl;
+      PvlKeyword ra("PoleRa");
+      ra+= "269.9949";
+      ra+= "0.036";
+      ra+= "0.0"; 
+
+      PvlKeyword dec("PoleDec");
+      dec += "66.5392";
+      dec += "0.0130";
+      dec += "0.0"; 
+
+      PvlKeyword pm("PrimeMeridian");
+      pm += "38.3213";
+      pm += "13.17635815";
+      pm += "1.4E-12";
+
+      PvlKeyword &ft = br.findKeyword("FrameTypeCode");
+      ft.setValue("2");
+
+      br.addKeyword(ra);
+      br.addKeyword(dec);
+      br.addKeyword(pm);
+      cubes[i]->close();
+      delete cubes[i];
+      cubes[i] = nullptr;
+  }
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
+                          "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix=/tmp/", "tbparameters="+tbParamsPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Failed to bundle: " << e.what() << std::endl;
+  } 
+
+  QFile bo("/tmp/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  
+  // check residual stats 
+  EXPECT_THAT(lines[132].toStdString(), HasSubstr("minimum: -178.872"));
+  EXPECT_THAT(lines[133].toStdString(), HasSubstr("Quartile 1:   -9.638"));
+  EXPECT_THAT(lines[134].toStdString(), HasSubstr("Median:   +1.377"));
+  EXPECT_THAT(lines[135].toStdString(), HasSubstr("Quartile 3:   +9.449"));
+  EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
+
+}
+
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawPoleRaDecW0WdotTriaxial) {
+  QTemporaryDir prefix;
+  QString tbParamsPath = prefix.path() + "/tbparams.pvl";
+
+  std::istringstream tbPvlStr(R"(Object = Target
+  Group = "NAME"
+    Name=Moon
+  EndGroup
+  Group = "POLERIGHTASCENSION"
+    Ra=position
+    RaValue=269.9949
+    RaSigma=0.0
+    RaVelocityValue=0.0031
+    RaVelocitySigma=0.0
+    RaAccelerationValue=0.0
+    RaAccelerationSigma=1.0
+  EndGroup
+  Group = "POLEDECLINATION"
+    Dec=position
+    DecValue=66.5392
+    DecSigma=0.0
+    DecVelocityValue=0.0130
+    DecVelocitySigma=0.0
+    DecAccelerationValue=0.0
+    DecAccelerationSigma=1.0
+  EndGroup
+  Group = "PRIME MERIDIAN"
+    Pm=velocity
+    PmValue=38.32132
+    PmSigma=0.0
+    PmVelocityValue=13.17635815
+    PmVelocitySigma=0.0
+    PmAccelerationValue=0.0
+    PmAccelerationSigma=1.0
+  EndGroup
+  Group = "RADII"
+    RadiiSolveOption=triaxial
+    RadiusAValue=1737400
+    RadiusASigma=0.0
+    RadiusBValue=1737400
+    RadiusBSigma=0.0
+    RadiusCValue=1737400
+    RadiusCSigma=0.0
+    MeanRadiusValue=1737400
+    MeanRadiusSigma=0.0
+  EndGroup
+EndObject
+End)");
+
+  Pvl tbParams; 
+  tbPvlStr >> tbParams; 
+  tbParams.write(tbParamsPath);
+
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  for(int i = 0; i < cubes.size(); i++) {
+      Pvl *label = cubes[i]->label();
+      // get body rotation
+      PvlObject &br = label->object(4);
+      std::cout << br << std::endl;
+      PvlKeyword ra("PoleRa");
+      ra+= "269.9949";
+      ra+= "0.036";
+      ra+= "0.0"; 
+
+      PvlKeyword dec("PoleDec");
+      dec += "66.5392";
+      dec += "0.0130";
+      dec += "0.0"; 
+
+      PvlKeyword pm("PrimeMeridian");
+      pm += "38.3213";
+      pm += "13.17635815";
+      pm += "1.4E-12";
+
+      PvlKeyword &ft = br.findKeyword("FrameTypeCode");
+      ft.setValue("2");
+
+      br.addKeyword(ra);
+      br.addKeyword(dec);
+      br.addKeyword(pm);
+      cubes[i]->close();
+      delete cubes[i];
+      cubes[i] = nullptr;
+  }
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
+                          "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix=/tmp/", "tbparameters="+tbParamsPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Failed to bundle: " << e.what() << std::endl;
+  } 
+
+
+  QFile bo("/tmp/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIXIAL"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  
+  // check residual stats 
+  EXPECT_THAT(lines[132].toStdString(), HasSubstr("minimum: -178.872"));
+  EXPECT_THAT(lines[133].toStdString(), HasSubstr("Quartile 1:   -9.638"));
+  EXPECT_THAT(lines[134].toStdString(), HasSubstr("Median:   +1.377"));
+  EXPECT_THAT(lines[135].toStdString(), HasSubstr("Quartile 3:   +9.449"));
+  EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
+}
