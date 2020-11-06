@@ -160,7 +160,6 @@
       scene, bias, and dark current with no systematic error. That implies the statistical 
       distribution of the random noise has an average of zero, and therefore the random noise
       has both positive and negative values, except for the trivial case of zero random noise.
-      The random noise is both additive and subtractive to the signal by definition.
     </p>
 
     <p>
@@ -172,11 +171,10 @@
       is zero the calibrated image should have both positive and negative values. If it had 
       only positive values, the mean would be positive and therefore it would have a 
       systematic error, since the true signal is zero. It is not possible to eliminate the 
-      random noise entirely, but it is defined as both additive and subtractive to the signal 
-      to minimize the systematic error in the calibrated image. That forces calibrated dark 
-      images to have both positive and negative values.
+      random noise entirely, but it is defined as centered around zero to minimize the 
+      systematic error in the calibrated image. That forces calibrated dark images to have 
+      both positive and negative values.
     </p>
-
   </description>
 
   <category>
