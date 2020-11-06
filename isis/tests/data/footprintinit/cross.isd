@@ -1,0 +1,196 @@
+{
+ "isis_camera_version": 1,
+ "image_lines": 1056,
+ "image_samples": 1204,
+ "name_platform": "VIKING_ORBITER_1",
+ "name_sensor": "VIKING_ORBITER_1",
+ "reference_height": {
+   "maxheight": 1000,
+   "minheight": -1000,
+   "unit": "m"
+ },
+ "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+ "center_ephemeris_time": -640610543.3039811,
+ "radii": {
+   "semimajor": 3396.19,
+   "semiminor": 3376.2,
+   "unit": "km"
+ },
+ "body_rotation": {
+   "time_dependent_frames": [
+     10014,
+     1
+   ],
+   "ck_table_start_time": -640610539.3135462,
+   "ck_table_end_time": -640610539.3135462,
+   "ck_table_original_size": 1,
+   "ephemeris_times": [
+     -640610539.3135462
+   ],
+   "quaternions": [
+     [
+       0.6399500186009819,
+       0.02909449034347086,
+       -0.316808355181968,
+       0.699464045116797
+     ]
+   ],
+   "angular_velocities": [
+     [
+       3.162650401195274e-05,
+       -2.8774909340576003e-05,
+       5.653363870850288e-05
+     ]
+   ],
+   "reference_frame": 1
+ },
+ "instrument_pointing": {
+   "time_dependent_frames": [
+     -27000,
+     1
+   ],
+   "ck_table_start_time": -640610539.3135462,
+   "ck_table_end_time": -640610539.3135462,
+   "ck_table_original_size": 1,
+   "ephemeris_times": [
+     -640610539.3135462
+   ],
+   "quaternions": [
+     [
+       0.7779125137849731,
+       0.4455998434889792,
+       0.3298364906725608,
+       -0.29580532415788446
+     ]
+   ],
+   "angular_velocities": [
+     [
+       0.0,
+       0.0,
+       0.0
+     ]
+   ],
+   "reference_frame": 1,
+   "constant_frames": [
+     -27001,
+     -27000
+   ],
+   "constant_rotation": [
+     0.004613063344148405,
+     0.9999131472584901,
+     0.012345751747229076,
+     -0.9999893510154811,
+     0.004614345054711422,
+     -7.533494143986252e-05,
+     -0.0001322959569151896,
+     -0.012345272752652951,
+     0.9999237854648937
+   ]
+ },
+ "naif_keywords": {
+   "BODY_CODE": 499,
+   "BODY499_RADII": [
+     3396.19,
+     3396.19,
+     3376.2
+   ],
+   "BODY_FRAME_CODE": 10014,
+   "CLOCK_ET_-27999_48677568_COMPUTED": "0041ab777817c3c1",
+   "INS-27001_TRANSX": [
+     0.0,
+     0.011764705882353,
+     0.0
+   ],
+   "INS-27001_TRANSY": [
+     0.0,
+     0.0,
+     0.011764705882353
+   ],
+   "INS-27001_ITRANSS": [
+     0.0,
+     85.0,
+     0.0
+   ],
+   "INS-27001_ITRANSL": [
+     0.0,
+     0.0,
+     85.0
+   ]
+ },
+ "detector_sample_summing": 1,
+ "detector_line_summing": 1,
+ "focal_length_model": {
+   "focal_length": null
+ },
+ "detector_center": {
+   "line": null,
+   "sample": null
+ },
+ "starting_detector_line": 0,
+ "starting_detector_sample": 0,
+ "focal2pixel_lines": [
+   0.0,
+   0.0,
+   85.0
+ ],
+ "focal2pixel_samples": [
+   0.0,
+   85.0,
+   0.0
+ ],
+ "optical_distortion": {
+   "radial": {
+     "coefficients": [
+       0.0,
+       0.0,
+       0.0
+     ]
+   }
+ },
+ "instrument_position": {
+   "spk_table_start_time": -640610539.3135462,
+   "spk_table_end_time": -640610539.3135462,
+   "spk_table_original_size": 1,
+   "ephemeris_times": [
+     -640610539.3135462
+   ],
+   "positions": [
+     [
+       27454.234936193734,
+       -19170.119956391824,
+       -11372.519923147436
+     ]
+   ],
+   "velocities": [
+     [
+       0.41531505304586924,
+       0.2168011212733388,
+       -0.3324424970611249
+     ]
+   ],
+   "reference_frame": 1
+ },
+ "sun_position": {
+   "spk_table_start_time": -640610539.3135462,
+   "spk_table_end_time": -640610539.3135462,
+   "spk_table_original_size": 1,
+   "ephemeris_times": [
+     -640610539.3135462
+   ],
+   "positions": [
+     [
+       -38045803.81914984,
+       -207868081.65935105,
+       -94310302.91436069
+     ]
+   ],
+   "velocities": [
+     [
+       22.973752722045408,
+       -5.265499246746651,
+       -3.0372198696983976
+     ]
+   ],
+   "reference_frame": 1
+ }
+}

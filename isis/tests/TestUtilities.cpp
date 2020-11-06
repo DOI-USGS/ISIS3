@@ -168,4 +168,18 @@ namespace Isis {
       }
     }
   };
+
+
+  // Compares CSV lines
+  void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex,
+                      double tolerance) { 
+    for (int i=initialIndex; i < csvLine.dim(); i++) {
+      if (isNumeric(QString(csvLine[i].trimmed()))) {
+        EXPECT_NEAR(csvLine[i].toDouble(), csvLine2[i].toDouble(), tolerance);
+      }
+      else{
+        EXPECT_EQ(QString(csvLine[i]).toStdString(), csvLine2[i].toStdString()); 
+      }
+    }
+  };
 }
