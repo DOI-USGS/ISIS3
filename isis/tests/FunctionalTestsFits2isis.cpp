@@ -29,8 +29,8 @@ TEST(Fits2Isis, Fits2IsisTestDefault) {
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
-  ASSERT_EQ(cube.sampleCount(), 200);
-  ASSERT_EQ(cube.lineCount(), 25);
+  ASSERT_EQ(cube.sampleCount(), 25);
+  ASSERT_EQ(cube.lineCount(), 10);
   ASSERT_EQ(cube.bandCount(), 3);
 
     // Pixels group
@@ -46,23 +46,22 @@ TEST(Fits2Isis, Fits2IsisTestDefault) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  ASSERT_NEAR(hist->Average(), 0.811103, .000001);
-  ASSERT_NEAR(hist->Sum(), 4055.5169, .0001);
-  ASSERT_EQ(hist->ValidPixels(), 5000);
-  ASSERT_NEAR(hist->StandardDeviation(), 20.1912, .0001);
+  ASSERT_NEAR(hist->Average(), 0.07489, .000001);
+  ASSERT_NEAR(hist->Sum(), 18.7225, .0001);
+  ASSERT_EQ(hist->ValidPixels(), 250);
+  ASSERT_NEAR(hist->StandardDeviation(), 0.8402, .0001);
 }
 
 
 TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
   QTemporaryDir prefix;
-  QString dAPP_XML = FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded();
   QString cubeFileName = prefix.path() + "/fits2isisTEMP.cub";
   QVector<QString> args = {"from=data/fits2isis/organization.fits",
                            "to=" + cubeFileName,
                            "organization=bsq",
                            "imagenumber=1"};
 
-  UserInterface options(dAPP_XML, args);
+  UserInterface options(APP_XML, args);
   try {
    fits2isis(options);
   }
@@ -73,7 +72,7 @@ TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
   // Dimensions Group
-  ASSERT_EQ(cube.sampleCount(), 256);
+  ASSERT_EQ(cube.sampleCount(), 25);
   ASSERT_EQ(cube.lineCount(), 10);
   ASSERT_EQ(cube.bandCount(), 2);
 
@@ -89,22 +88,22 @@ TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  ASSERT_NEAR(hist->Average(), 2.45129, .00001);
-  ASSERT_NEAR(hist->Sum(), 6275.2976, .0001);
-  ASSERT_EQ(hist->ValidPixels(), 2560);
-  ASSERT_NEAR(hist->StandardDeviation(), 0.0245064, .0000001);
+  ASSERT_NEAR(hist->Average(), 2.45598, .00001);
+  ASSERT_NEAR(hist->Sum(), 613.9962, .0001);
+  ASSERT_EQ(hist->ValidPixels(), 250);
+  ASSERT_NEAR(hist->StandardDeviation(), 0.0242603, .0000001);
 }
 
 TEST(Fits2Isis, Fits2IsisOrganizationBil) {
   QTemporaryDir prefix;
-  QString dAPP_XML = FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded();
+  QString APP_XML = FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded();
   QString cubeFileName = prefix.path() + "/fits2isisTEMP.cub";
   QVector<QString> args = {"from=data/fits2isis/organization.fits",
                            "to=" + cubeFileName,
-                           "organization=bsq",
+                           "organization=bil",
                            "imagenumber=1"};
 
-  UserInterface options(dAPP_XML, args);
+  UserInterface options(APP_XML, args);
   try {
    fits2isis(options);
   }
@@ -116,7 +115,7 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
-  ASSERT_EQ(cube.sampleCount(), 256);
+  ASSERT_EQ(cube.sampleCount(), 25);
   ASSERT_EQ(cube.lineCount(), 10);
   ASSERT_EQ(cube.bandCount(), 2);
 
@@ -132,8 +131,8 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  ASSERT_NEAR(hist->Average(), 2.45129, .00001);
-  ASSERT_NEAR(hist->Sum(), 6275.2976, .0001);
-  ASSERT_EQ(hist->ValidPixels(), 2560);
-  ASSERT_NEAR(hist->StandardDeviation(), 0.0245064, .0000001);
+  ASSERT_NEAR(hist->Average(), 2.45598, .00001);
+  ASSERT_NEAR(hist->Sum(), 613.9962, .0001);
+  ASSERT_EQ(hist->ValidPixels(), 250);
+  ASSERT_NEAR(hist->StandardDeviation(), 0.0242603, .0000001);
 }
