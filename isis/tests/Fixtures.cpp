@@ -367,27 +367,6 @@ namespace Isis {
 
   }
 
-<<<<<<< HEAD
-  void RadarNetwork::SetUp() {
-    TempTestingFiles::SetUp();
-
-    labelPath1 = new FileName("data/radar/radar1.pvl"); 
-    isdPath1 = new FileName("data/radar/radar1.isd");
-
-    cube1Path = new FileName(tempDir.path() + "/radar1.cub");
-    
-    cube1 = new Cube(); 
-    cube1->fromIsd(cube1Path->expanded(), *labelPath1, *isdPath1, "rw"); 
-  
-  }
-
-  void RadarNetwork::TearDown() {
-    delete cube1; 
-    delete labelPath1; 
-    delete isdPath1; 
-  }
-
-=======
   void MroCube::SetUp() { 
     DefaultCube::SetUp(); 
 
@@ -405,7 +384,6 @@ namespace Isis {
 
     testCube->fromIsd(newCube, label, isd, "rw"); 
   } 
->>>>>>> a5ce95ba04475ef139f47a79a444fb968e419ebf
 
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
@@ -560,11 +538,7 @@ namespace Isis {
     }
   }
 
-<<<<<<< HEAD
-
-
-
-=======
+  
   void NewHorizonsCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlObject &isisCube = testCube->label()->findObject("IsisCube");
 
@@ -652,5 +626,4 @@ namespace Isis {
       testCube->write(line);
     }
   }
->>>>>>> a5ce95ba04475ef139f47a79a444fb968e419ebf
 }

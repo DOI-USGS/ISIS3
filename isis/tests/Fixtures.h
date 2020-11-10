@@ -175,17 +175,6 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
   };
 
-  class RadarNetwork : public TempTestingFiles  {
-    protected:
-      FileName *labelPath1;
-      FileName *isdPath1;
-      FileName *cube1Path; 
-
-      Cube *cube1; 
-
-      void SetUp() override;
-      void TearDown() override;
-  };
 }
 
 #endif
