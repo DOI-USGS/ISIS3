@@ -468,15 +468,28 @@ namespace Isis {
 
   }
 
+  void MroCube::SetUp() { 
+    DefaultCube::SetUp(); 
+
+    // force real DNs
+    QString fname = testCube->fileName();
+
+    PvlObject &core = label.findObject("IsisCube").findObject("Core"); 
+    PvlGroup &pixels = core.findGroup("Pixels"); 
+    pixels.findKeyword("Type").setValue("Real"); 
+
+    delete testCube; 
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw"); 
+  } 
+
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
-    // force real DNs
-    testCube->close();
-    testCube->setPixelType(PixelType::Real);
-    testCube->open(testCube->fileName(),"rw");
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);    
-    
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
     std::istringstream iss(R"(
       Group = Instrument
@@ -596,6 +609,7 @@ namespace Isis {
         }
         testCube->write(line);
     }
+    std::cout << "reopeing" << std::endl;
     testCube->reopen("rw");
   
     // need to remove old camera pointer 
