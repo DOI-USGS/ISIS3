@@ -85,11 +85,14 @@ namespace Isis {
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
     PvlObject cubeLabel = label.findObject("IsisCube");
     PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    PvlGroup pixels = cubeLabel.findObject("Core").findGroup("Pixels");
     close();
 
     setDimensions(dimensions["Samples"],
-                          dimensions["Lines"],
-                          dimensions["Bands"]);
+                  dimensions["Lines"],
+                  dimensions["Bands"]);
+    setBaseMultiplier(pixels["Base"],
+                      pixels["Multiplier"]);
 
     create(fileName.expanded());
 
