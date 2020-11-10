@@ -257,53 +257,22 @@ namespace Isis {
 
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();
-    
-    isdFile1 = new FileName("data/apolloNetwork/apolloImage1.isd");
-    isdFile2 = new FileName("data/apolloNetwork/apolloImage2.isd");
-    isdFile3 = new FileName("data/apolloNetwork/apolloImage3.isd");
-    isdFile4 = new FileName("data/apolloNetwork/apolloImage4.isd");
-    isdFile5 = new FileName("data/apolloNetwork/apolloImage5.isd");
-    isdFile6 = new FileName("data/apolloNetwork/apolloImage6.isd");
-    isdFile7 = new FileName("data/apolloNetwork/apolloImage7.isd");
 
-    label1 = new FileName("data/apolloNetwork/apolloImage1.pvl");
-    label2 = new FileName("data/apolloNetwork/apolloImage2.pvl");
-    label3 = new FileName("data/apolloNetwork/apolloImage3.pvl");
-    label4 = new FileName("data/apolloNetwork/apolloImage4.pvl");
-    label5 = new FileName("data/apolloNetwork/apolloImage5.pvl");
-    label6 = new FileName("data/apolloNetwork/apolloImage6.pvl");
-    label7 = new FileName("data/apolloNetwork/apolloImage7.pvl");
-
-    cube1 = new Cube();
-    cube1->fromIsd(tempDir.path() + "/cube1.cub", *label1, *isdFile1, "rw");
-
-    cube2 = new Cube();
-    cube2->fromIsd(tempDir.path() + "/cube2.cub", *label2, *isdFile2, "rw");
-
-    cube3 = new Cube();
-    cube3->fromIsd(tempDir.path() + "/cube3.cub", *label3, *isdFile3, "rw");
-
-    cube4 = new Cube();
-    cube4->fromIsd(tempDir.path() + "/cube4.cub", *label4, *isdFile4, "rw");
-
-    cube5 = new Cube();
-    cube5->fromIsd(tempDir.path() + "/cube5.cub", *label5, *isdFile5, "rw");
-
-    cube6 = new Cube();
-    cube6->fromIsd(tempDir.path() + "/cube6.cub", *label6, *isdFile6, "rw");
-
-    cube7 = new Cube();
-    cube7->fromIsd(tempDir.path() + "/cube7.cub", *label7, *isdFile7, "rw");
+    isdFiles.fill(nullptr, 7);
+    labelFiles.fill(nullptr, 7);
+    cubes.fill(nullptr, 7);
 
     cubeList = new FileList();
-    cubeList->append(cube1->fileName());
-    cubeList->append(cube2->fileName());
-    cubeList->append(cube3->fileName());
-    cubeList->append(cube4->fileName());
-    cubeList->append(cube5->fileName());
-    cubeList->append(cube6->fileName());
-    cubeList->append(cube7->fileName());
-
+    
+    for(int i = 0; i < isdFiles.size(); i++) {
+      int n = i+1; // filenames use 1 based indexing 
+      isdFiles[i] = new FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".isd");     
+      labelFiles[i] = new FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".pvl");
+      cubes[i] = new Cube();
+      cubes[i]->fromIsd(tempDir.path() + "/cube"+QString::number(n)+".cub", *labelFiles[i], *isdFiles[i], "rw");
+      cubeList->append(cubes[i]->fileName());
+    }
+    
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
@@ -313,89 +282,19 @@ namespace Isis {
   }
 
   void ApolloNetwork::TearDown() {
-    if (cube1->isOpen()) {
-      cube1->close();
-    }
+    for(int i = 0; i < cubes.size(); i++) {
+      if(cubes[i] && cubes[i]->isOpen()) {
+        cubes[i]->close();
+      }
 
-    if (cube2->isOpen()) {
-      cube1->close();
-    }
+      if(isdFiles[i]) {
+        delete isdFiles[i];
+      }
 
-    if (cube3->isOpen()) {
-      cube1->close();
-    }
-
-    if (cube4->isOpen()) {
-      cube1->close();
-    }
-
-    if (cube5->isOpen()) {
-      cube1->close();
-    }
-
-    if (cube6->isOpen()) {
-      cube1->close();
-    }
-
-    if (cube7->isOpen()) {
-      cube1->close();
-    }
-
-    if (isdFile1) {
-      delete isdFile1; 
-    }
-
-    if (isdFile2) {
-      delete isdFile2;
-    }
-
-    if (isdFile3) {
-      delete isdFile3; 
-    }
-
-    if (isdFile4) {
-      delete isdFile4; 
-    }
-
-    if (isdFile5) {
-      delete isdFile5; 
-    }
-
-    if (isdFile6) {
-      delete isdFile6; 
-    }
-
-    if (isdFile7) {
-      delete isdFile7; 
-    }
-
-    if (cube1) {
-      delete cube1; 
-    }
-
-    if (cube2) {
-      delete cube2; 
-    }
-
-    if (cube3) {
-      delete cube3; 
-    }
-
-    if (cube4) {
-      delete cube4; 
-    }
-
-    if (cube5) {
-      delete cube5; 
-    }
-
-    if (cube6) {
-      delete cube6; 
-    }
-
-    if (cube7) {
-      delete cube7; 
-    }
+      if(labelFiles[i]) {
+        delete labelFiles[i];
+      }
+    } 
 
     if (cubeList) {
       delete cubeList; 
@@ -447,6 +346,26 @@ namespace Isis {
     delete isdPathR;
 
   }
+
+  void RadarNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    labelPath1 = new FileName("data/radar/radar1.pvl"); 
+    isdPath1 = new FileName("data/radar/radar1.isd");
+
+    cube1Path = new FileName(tempDir.path() + "/radar1.cub");
+    
+    cube1 = new Cube(); 
+    cube1->fromIsd(cube1Path->expanded(), *labelPath1, *isdPath1, "rw"); 
+  
+  }
+
+  void RadarNetwork::TearDown() {
+    delete cube1; 
+    delete labelPath1; 
+    delete isdPath1; 
+  }
+
 
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
@@ -600,4 +519,8 @@ namespace Isis {
       FAIL() << "Failed to create Jitter file" << std::endl;
     }
   }
+
+
+
+
 }

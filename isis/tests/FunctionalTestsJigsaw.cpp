@@ -1037,7 +1037,6 @@ End)");
     FAIL() << "Failed to bundle: " << e.what() << std::endl;
   } 
 
-
   QFile bo("/tmp/bundleout.txt");
   QString contents; 
   if (bo.open(QIODevice::ReadOnly)) {
@@ -1058,4 +1057,9 @@ End)");
   EXPECT_THAT(lines[134].toStdString(), HasSubstr("Median:   +1.377"));
   EXPECT_THAT(lines[135].toStdString(), HasSubstr("Quartile 3:   +9.449"));
   EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
+}
+
+TEST_F(RadarNetwork, FunctionalTestJigsawRadar) {
+   
+
 }
