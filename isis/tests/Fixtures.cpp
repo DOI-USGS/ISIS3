@@ -609,7 +609,7 @@ namespace Isis {
         }
         testCube->write(line);
     }
-    std::cout << "reopeing" << std::endl;
+    
     testCube->reopen("rw");
   
     // need to remove old camera pointer 
@@ -726,4 +726,66 @@ namespace Isis {
       testCube->write(line);
     }
   }
+
+
+  void ApolloCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(22900, 22900, 1);
+    testCube->create(tempDir.path() + "/large.cub");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = pixelValue;
+      }
+
+      pixelValue++;
+      testCube->write(line);
+    }
+
+    PvlGroup reseaus("Reseaus");
+    PvlKeyword samples = PvlKeyword("Sample", "200");
+    samples += "400"; 
+    samples += "600"; 
+
+    PvlKeyword lines = PvlKeyword("Line", "200");
+    lines += "400"; 
+    lines += "600"; 
+
+    PvlKeyword types = PvlKeyword("Type", "5");
+    types += "5"; 
+    types += "5"; 
+
+    PvlKeyword valid = PvlKeyword("Valid", "1");
+    valid += "1"; 
+    valid += "1"; 
+
+    reseaus += lines; 
+    reseaus += samples; 
+    reseaus += types;
+    reseaus += valid; 
+    reseaus += PvlKeyword("Status", "Nominal");
+    
+    std::istringstream instStr (R"(
+      Group = Instrument
+          SpacecraftName = "APOLLO 15"
+          InstrumentId   = METRIC
+          TargetName     = MOON
+          StartTime      = 1971-08-01T14:58:03.78
+      End_Group
+    )");
+    
+    PvlGroup instGroup; 
+    instStr >> instGroup; 
+    
+    Pvl *lab = testCube->label();
+    lab->findObject("IsisCube").addGroup(reseaus);
+    lab->findObject("IsisCube").addGroup(instGroup);
+    
+    testCube->reopen("r");
+  }
+
 }
