@@ -159,6 +159,14 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class DemCube : public DefaultCube {
+    protected:
+      Cube *demCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class MroCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
