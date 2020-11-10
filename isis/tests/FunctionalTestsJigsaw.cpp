@@ -647,6 +647,50 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
 }
 
 
+TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
+  QTemporaryDir prefix;
+  
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,  
+                           "radius=yes", "errorpropagation=yes", "outlier_rejection=True", "spsolve=position", "Spacecraft_position_sigma=1000", 
+                           "Residuals_csv=on", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
+                           "Output_csv=off", "imagescsv=on", "file_prefix=/tmp/"};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
+  }
+
+  QString residualsCsv = "/tmp/residuals.csv";
+  QFile bo(residualsCsv);
+
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+  
+  int nRejectedCsv = 0; 
+  QStringList lines = contents.split("\n");
+  for (int i = 0; i < lines.size(); i++) {
+    if (lines[i].right(1).trimmed() == "*") { 
+       nRejectedCsv++; 
+    }
+  }
+  
+  ASSERT_EQ(nRejectedCsv, 51);
+}
+
+
+
 TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
   QTemporaryDir prefix;
   QString newNetworkPath = prefix.path()+"/badMeasures.net";
@@ -898,7 +942,7 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
-                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix=/tmp/", "tbparameters="+tbParamsPath};
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
   
@@ -1059,7 +1103,3 @@ End)");
   EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
 }
 
-TEST_F(RadarNetwork, FunctionalTestJigsawRadar) {
-   
-
-}
