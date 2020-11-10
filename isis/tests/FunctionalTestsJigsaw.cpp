@@ -654,7 +654,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,  
                            "radius=yes", "errorpropagation=yes", "outlier_rejection=True", "spsolve=position", "Spacecraft_position_sigma=1000", 
                            "Residuals_csv=on", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
-                           "Output_csv=off", "imagescsv=on", "file_prefix=/tmp/"};
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
 
   UserInterface options(APP_XML, args);
   
@@ -667,7 +667,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
     FAIL() << "Unable to bundle: " << e.what() << std::endl;
   }
 
-  QString residualsCsv = "/tmp/residuals.csv";
+  QString residualsCsv = prefix.path() + "/residuals.csv";
   QFile bo(residualsCsv);
 
   QString contents; 
@@ -955,7 +955,7 @@ End)");
     FAIL() << "Failed to bundle: " << e.what() << std::endl;
   } 
 
-  QFile bo("/tmp/bundleout.txt");
+  QFile bo(prefix.path() + "/bundleout.txt");
   QString contents; 
   if (bo.open(QIODevice::ReadOnly)) {
     contents = bo.read(bo.size()); 
@@ -1068,7 +1068,7 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
-                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix=/tmp/", "tbparameters="+tbParamsPath};
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
   
@@ -1081,7 +1081,7 @@ End)");
     FAIL() << "Failed to bundle: " << e.what() << std::endl;
   } 
 
-  QFile bo("/tmp/bundleout.txt");
+  QFile bo(prefix.path() + "/bundleout.txt");
   QString contents; 
   if (bo.open(QIODevice::ReadOnly)) {
     contents = bo.read(bo.size()); 
