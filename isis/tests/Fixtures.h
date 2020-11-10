@@ -166,6 +166,12 @@ namespace Isis {
       QString lskPath = "data/mroKernels/mroLSK.tls";
       QString jitterPath; 
 
+      void SetUp() override;
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
+  class NewHorizonsCube : public DefaultCube {
+    protected:
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
   };
 
