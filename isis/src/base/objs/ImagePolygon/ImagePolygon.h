@@ -173,7 +173,7 @@ namespace Isis {
       void Create(Cube &cube, int sinc = 1, int linc = 1,
           int ss = 1, int sl = 1, int ns = 0, int nl = 0, int band = 1,
           bool increasePrecision = false);
-          
+
       void Create(std::vector<std::vector<double>> polyCoordinates);
 
       Camera * initCube(Cube &cube, int ss = 1, int sl = 1,
@@ -235,6 +235,10 @@ namespace Isis {
       //!  Return the line increment used the create this polygon
       int getLinc() const {
         return p_lineinc;
+      }
+
+      int numVertices() const {
+        return p_pts->size();
       }
 
     protected:
@@ -307,4 +311,3 @@ namespace Isis {
 };
 
 #endif
-

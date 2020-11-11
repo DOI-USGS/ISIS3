@@ -3,6 +3,7 @@
 #include "Fixtures.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
+#include "ControlNet.h"
 
 namespace Isis {
 
@@ -132,8 +133,28 @@ namespace Isis {
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
 
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      testCube->write(line);
+    }
+
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      projTestCube->write(line);
+    }
   }
 
 
@@ -253,12 +274,222 @@ namespace Isis {
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
   }
-  
+
+  void ApolloNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+    
+    isdFile1 = new FileName("data/apolloNetwork/apolloImage1.isd");
+    isdFile2 = new FileName("data/apolloNetwork/apolloImage2.isd");
+    isdFile3 = new FileName("data/apolloNetwork/apolloImage3.isd");
+    isdFile4 = new FileName("data/apolloNetwork/apolloImage4.isd");
+    isdFile5 = new FileName("data/apolloNetwork/apolloImage5.isd");
+    isdFile6 = new FileName("data/apolloNetwork/apolloImage6.isd");
+    isdFile7 = new FileName("data/apolloNetwork/apolloImage7.isd");
+
+    label1 = new FileName("data/apolloNetwork/apolloImage1.pvl");
+    label2 = new FileName("data/apolloNetwork/apolloImage2.pvl");
+    label3 = new FileName("data/apolloNetwork/apolloImage3.pvl");
+    label4 = new FileName("data/apolloNetwork/apolloImage4.pvl");
+    label5 = new FileName("data/apolloNetwork/apolloImage5.pvl");
+    label6 = new FileName("data/apolloNetwork/apolloImage6.pvl");
+    label7 = new FileName("data/apolloNetwork/apolloImage7.pvl");
+
+    cube1 = new Cube();
+    cube1->fromIsd(tempDir.path() + "/cube1.cub", *label1, *isdFile1, "rw");
+
+    cube2 = new Cube();
+    cube2->fromIsd(tempDir.path() + "/cube2.cub", *label2, *isdFile2, "rw");
+
+    cube3 = new Cube();
+    cube3->fromIsd(tempDir.path() + "/cube3.cub", *label3, *isdFile3, "rw");
+
+    cube4 = new Cube();
+    cube4->fromIsd(tempDir.path() + "/cube4.cub", *label4, *isdFile4, "rw");
+
+    cube5 = new Cube();
+    cube5->fromIsd(tempDir.path() + "/cube5.cub", *label5, *isdFile5, "rw");
+
+    cube6 = new Cube();
+    cube6->fromIsd(tempDir.path() + "/cube6.cub", *label6, *isdFile6, "rw");
+
+    cube7 = new Cube();
+    cube7->fromIsd(tempDir.path() + "/cube7.cub", *label7, *isdFile7, "rw");
+
+    cubeList = new FileList();
+    cubeList->append(cube1->fileName());
+    cubeList->append(cube2->fileName());
+    cubeList->append(cube3->fileName());
+    cubeList->append(cube4->fileName());
+    cubeList->append(cube5->fileName());
+    cubeList->append(cube6->fileName());
+    cubeList->append(cube7->fileName());
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/apolloNetwork/apolloNet.pvl");
+    controlNetPath = tempDir.path() + "/apolloNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void ApolloNetwork::TearDown() {
+    if (cube1->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube2->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube3->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube4->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube5->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube6->isOpen()) {
+      cube1->close();
+    }
+
+    if (cube7->isOpen()) {
+      cube1->close();
+    }
+
+    if (isdFile1) {
+      delete isdFile1; 
+    }
+
+    if (isdFile2) {
+      delete isdFile2;
+    }
+
+    if (isdFile3) {
+      delete isdFile3; 
+    }
+
+    if (isdFile4) {
+      delete isdFile4; 
+    }
+
+    if (isdFile5) {
+      delete isdFile5; 
+    }
+
+    if (isdFile6) {
+      delete isdFile6; 
+    }
+
+    if (isdFile7) {
+      delete isdFile7; 
+    }
+
+    if (cube1) {
+      delete cube1; 
+    }
+
+    if (cube2) {
+      delete cube2; 
+    }
+
+    if (cube3) {
+      delete cube3; 
+    }
+
+    if (cube4) {
+      delete cube4; 
+    }
+
+    if (cube5) {
+      delete cube5; 
+    }
+
+    if (cube6) {
+      delete cube6; 
+    }
+
+    if (cube7) {
+      delete cube7; 
+    }
+
+    if (cubeList) {
+      delete cubeList; 
+    }
+  }
+
+  void ObservationPair::SetUp() {
+      FileName labelPathL = FileName("data/observationPair/observationImageL.pvl");
+      FileName labelPathR = FileName("data/observationPair/observationImageR.pvl");
+
+      isdPathL = new FileName("data/observationPair/observationImageL.isd");
+      isdPathR = new FileName("data/observationPair/observationImageR.isd");
+
+      cubeL = new Cube();
+      cubeR = new Cube();
+
+      cubeLPath = tempDir.path() + "/observationPairL.cub";
+      cubeRPath = tempDir.path() + "/observationPairR.cub";
+
+      cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");    
+      cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");    
+
+      cubeList = new FileList();
+      cubeList->append(cubeL->fileName());
+      cubeList->append(cubeR->fileName());
+
+      cubeListFile = tempDir.path() + "/cubes.lis";
+      cubeList->write(cubeListFile);
+
+      cnetPath = "data/observationPair/observationPair.net";
+      network = new ControlNet();
+      network->ReadControl(cnetPath);
+  }
+
+
+  void ObservationPair::TearDown() {
+    delete cubeList;
+    delete network;
+
+    if (cubeL) {
+      delete cubeL;
+    }
+    
+    if (cubeR) {
+      delete cubeR;
+    }
+
+    delete isdPathL;
+    delete isdPathR;
+
+  }
+
+  void MroCube::SetUp() { 
+    DefaultCube::SetUp(); 
+
+    // force real DNs
+    QString fname = testCube->fileName();
+
+    PvlObject &core = label.findObject("IsisCube").findObject("Core"); 
+    PvlGroup &pixels = core.findGroup("Pixels"); 
+    pixels.findKeyword("Type").setValue("Real"); 
+
+    delete testCube; 
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw"); 
+  } 
+
 
   void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);    
-    
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
     std::istringstream iss(R"(
       Group = Instrument
@@ -378,6 +609,7 @@ namespace Isis {
         }
         testCube->write(line);
     }
+    std::cout << "reopeing" << std::endl;
     testCube->reopen("rw");
   
     // need to remove old camera pointer 
@@ -407,6 +639,91 @@ namespace Isis {
     }
   }
 
+  void NewHorizonsCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
+    PvlObject &isisCube = testCube->label()->findObject("IsisCube");
 
+    label = Pvl();
+    label.addObject(isisCube);
 
+    PvlGroup &kernels = label.findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);
+    kernels["ShapeModel"] = "Null";
+
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions"); 
+    dim.findKeyword("Samples").setValue("10");
+    dim.findKeyword("Lines").setValue("10");
+    dim.findKeyword("Bands").setValue("2");
+
+    PvlGroup &pixels = label.findObject("IsisCube").findObject("Core").findGroup("Pixels"); 
+    pixels.findKeyword("Type").setValue("Real");
+
+    PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "NEW HORIZONS"
+        InstrumentId              = LEISA
+        TargetName                = Jupiter
+        SpacecraftClockStartCount = 1/0034933739:00000
+        ExposureDuration          = 0.349
+        StartTime                 = 2007-02-28T01:57:01.3882862
+        StopTime                  = 2007-02-28T02:04:53.3882861
+        FrameRate                 = 2.86533 <Hz>
+      End_Group
+    )");
+    
+    PvlGroup newInstGroup; 
+    iss >> newInstGroup;     
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+    newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+
+    inst = newInstGroup; 
+
+    PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        Center       = (2.4892, 1.2204)
+        Width        = (0.011228, 0.005505)
+        OriginalBand = (1, 200)
+      End_Group
+    )");
+    
+    PvlGroup newBandBin; 
+    bss >> newBandBin;   
+    bandBin = newBandBin; 
+
+    std::istringstream alphaSS(R"(
+      Group = AlphaCube
+        AlphaSamples        = 256
+        AlphaLines          = 1354
+        AlphaStartingSample = 0.5
+        AlphaStartingLine   = 229.5
+        AlphaEndingSample   = 100.5
+        AlphaEndingLine     = 329.5
+        BetaSamples         = 100
+        BetaLines           = 100
+      End_Group
+    )");
+    
+    PvlGroup alphaGroup; 
+    alphaSS >> alphaGroup;
+    label.findObject("IsisCube").addGroup(alphaGroup);
+
+    std::ifstream isdFile("data/leisa/nh_leisa.isd");
+    isdFile >> isd;
+
+    QString fileName = tempDir.path() + "/leisa.cub";
+    delete testCube;
+    testCube = new Cube();
+    testCube->fromIsd(fileName, label, isd, "rw");
+
+    LineManager line(*testCube);
+    double pixelValue = 0.0;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) pixelValue++;
+      }
+      testCube->write(line);
+    }
+  }
 }
