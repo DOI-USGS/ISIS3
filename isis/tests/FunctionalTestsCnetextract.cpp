@@ -15,7 +15,7 @@ using testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetextract.xml").expanded();
 
-TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveBadinputs) {
+TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoFromlist) {
   QVector<QString> args = {"prefix=" + tempDir.path() + "/",
                            "tolist=" + tempDir.path() + "/newList.lis",
                            "onet=" + tempDir.path() + "/newNet.net",
@@ -23,20 +23,21 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveBadinputs) {
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
-  // Test no fromlist
   try {
     cnetextract( *network, options, &appLog );
     FAIL() << "Should not have been able to extract a new network with no fromlist set" << std::endl;
   } catch(IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("To create a [TOLIST] the [FROMLIST] parameter must be provided."));
   }
+}
 
-  // Test no onet
-  args.pop_front();
-  args.push_front("fromlist=" + cubeListFile);
-  QString onet = args.takeAt(3);
-
-  options = UserInterface(APP_XML, args);
+TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoOnet) {
+  QVector<QString> args = {"fromlist=" + cubeListFile,
+                           "prefix=" + tempDir.path() + "/",
+                           "tolist=" + tempDir.path() + "/newList.lis",
+                           "noignore=true"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
 
   try {
     cnetextract( *network, options, &appLog );
@@ -44,13 +45,15 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveBadinputs) {
   } catch(IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Parameter [ONET] has no value."));
   }
+}
 
-  // Test no filter
-  args.pop_front();
-  args.pop_back();
-  args.push_back(onet);
-
-  options = UserInterface(APP_XML, args);
+TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoFilter) {
+  QVector<QString> args = {"fromlist=" + cubeListFile,
+                           "prefix=" + tempDir.path() + "/",
+                           "tolist=" + tempDir.path() + "/newList.lis",
+                           "onet=" + tempDir.path() + "/newNet.net"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
 
   try {
     cnetextract( *network, options, &appLog );
