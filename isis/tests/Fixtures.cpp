@@ -278,18 +278,16 @@ namespace Isis {
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();
 
-    isdFiles.fill(nullptr, 7);
-    labelFiles.fill(nullptr, 7);
     cubes.fill(nullptr, 7);
 
     cubeList = new FileList();
     
-    for(int i = 0; i < isdFiles.size(); i++) {
+    for(int i = 0; i < cubes.size(); i++) {
       int n = i+1; // filenames use 1 based indexing 
-      isdFiles[i] = new FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".isd");     
-      labelFiles[i] = new FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".pvl");
+      isdFiles.push_back(FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".isd"));     
+      labelFiles.push_back(FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".pvl"));
       cubes[i] = new Cube();
-      cubes[i]->fromIsd(tempDir.path() + "/cube"+QString::number(n)+".cub", *labelFiles[i], *isdFiles[i], "rw");
+      cubes[i]->fromIsd(tempDir.path() + "/cube"+QString::number(n)+".cub", labelFiles[i], isdFiles[i], "rw");
       cubeList->append(cubes[i]->fileName());
     }
     
@@ -304,15 +302,7 @@ namespace Isis {
   void ApolloNetwork::TearDown() {
     for(int i = 0; i < cubes.size(); i++) {
       if(cubes[i] && cubes[i]->isOpen()) {
-        cubes[i]->close();
-      }
-
-      if(isdFiles[i]) {
-        delete isdFiles[i];
-      }
-
-      if(labelFiles[i]) {
-        delete labelFiles[i];
+        delete cubes[i];
       }
     } 
 
@@ -508,7 +498,6 @@ namespace Isis {
         }
         testCube->write(line);
     }
-    std::cout << "reopeing" << std::endl;
     testCube->reopen("rw");
   
     // need to remove old camera pointer 

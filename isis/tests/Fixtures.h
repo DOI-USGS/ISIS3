@@ -145,8 +145,8 @@ namespace Isis {
   
   class ApolloNetwork : public TempTestingFiles {
     protected:
-      QVector<FileName*> isdFiles; 
-      QVector<FileName*> labelFiles; 
+      QVector<FileName> isdFiles; 
+      QVector<FileName> labelFiles; 
       QVector<Cube*> cubes;
 
       FileList *cubeList;

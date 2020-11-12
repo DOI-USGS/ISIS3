@@ -912,7 +912,6 @@ End)");
       Pvl *label = cubes[i]->label();
       // get body rotation
       PvlObject &br = label->object(4);
-      std::cout << br << std::endl;
       PvlKeyword ra("PoleRa");
       ra+= "269.9949";
       ra+= "0.036";
@@ -969,12 +968,47 @@ End)");
   EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
   
-  // check residual stats 
-  EXPECT_THAT(lines[132].toStdString(), HasSubstr("minimum: -178.872"));
-  EXPECT_THAT(lines[133].toStdString(), HasSubstr("Quartile 1:   -9.638"));
-  EXPECT_THAT(lines[134].toStdString(), HasSubstr("Median:   +1.377"));
-  EXPECT_THAT(lines[135].toStdString(), HasSubstr("Quartile 3:   +9.449"));
-  EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
+  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
+  EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 2.65243903, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 272.64733903, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00167495, 0.0001);
+
+  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
+  EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1.17580491, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 67.71500491, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00068524, 0.0001);
+
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
+  EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -383.36347956, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), -345.04215956, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 1.55731615, 0.0001);
+
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
+  EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -0.03669501, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 13.13966314, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.00015007, 0.0001);
+
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "MeanRadius");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -1.67807036, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1735.72192964, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.07865419, 0.0001);
 
 }
 
@@ -1038,7 +1072,6 @@ End)");
       Pvl *label = cubes[i]->label();
       // get body rotation
       PvlObject &br = label->object(4);
-      std::cout << br << std::endl;
       PvlKeyword ra("PoleRa");
       ra+= "269.9949";
       ra+= "0.036";
@@ -1092,14 +1125,66 @@ End)");
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIXIAL"));
+  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIAXIAL"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
-  
-  // check residual stats 
-  EXPECT_THAT(lines[132].toStdString(), HasSubstr("minimum: -178.872"));
-  EXPECT_THAT(lines[133].toStdString(), HasSubstr("Quartile 1:   -9.638"));
-  EXPECT_THAT(lines[134].toStdString(), HasSubstr("Median:   +1.377"));
-  EXPECT_THAT(lines[135].toStdString(), HasSubstr("Quartile 3:   +9.449"));
-  EXPECT_THAT(lines[136].toStdString(), HasSubstr("maximum: +175.731"));
+
+  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
+  EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 2.95997958, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 272.95487958, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00199725, 0.0001);
+
+  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
+  EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1.16195781, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 67.70115781, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00149539, 0.0001);
+
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
+  EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -291.78617547, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), -253.4648554, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 2.00568417, 0.0001);
+
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
+  EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -0.02785056, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 13.14850759, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.00019333, 0.0001);
+
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusA");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), 6.87282091, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1744.27282091, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 1.23289971, 0.0001);
+
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusB");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), 2.34406319, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1739.74406319, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 12.52974045, 0.0001);
+
+  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusC");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -37.55670044, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1699.84329956, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 5.34723296, 0.0001);
+
 }
 
