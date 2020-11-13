@@ -388,6 +388,7 @@ TEST_F(MroCube, FunctionalTestHicropInstrumentError) {
 
   try {
      hicrop(testCube, options, logs);
+     FAIL() << "Exepected Error thrown";
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Input cube has invalid InstrumentId"));;
@@ -409,6 +410,7 @@ TEST_F(MroCube, FunctionalTestHicropStartStopTimeError) {
 
   try {
      hicrop(testCube, options, logs);
+     FAIL() << "Exepected Error thrown";
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Invalid start/stop times"));;
@@ -430,6 +432,7 @@ TEST_F(MroCube, FunctionalTestHicropCkRangeError) {
 
   try {
      hicrop(testCube, options, logs);
+     FAIL() << "Exepected Error thrown";
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("These times fall outside of the given CK file's time coverage"));;
