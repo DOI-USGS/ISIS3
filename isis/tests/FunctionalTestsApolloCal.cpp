@@ -29,12 +29,10 @@ TEST_F(ApolloCube, FunctionalTestApolloCalDefault) {
 
   Cube oCube(outCubeFileName, "r"); 
 
-  Histogram *oCubeStats = oCube.histogram();
+  std::unique_ptr<Histogram> oCubeStats(oCube.histogram());
   
   EXPECT_NEAR(oCubeStats->Average(), -124.188,          0.001); 
   EXPECT_NEAR(oCubeStats->Sum(), -65125546242.836,   0.001); 
   EXPECT_NEAR(oCubeStats->ValidPixels(), 524410000,     0.001);  
   EXPECT_NEAR(oCubeStats->StandardDeviation(), 1056.736, 0.001);  
-
-  delete oCubeStats;
 }
