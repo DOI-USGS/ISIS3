@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "UserInterface.h"
 
-#include "stretch.h"
+#include "stretch_app.h"
 
 using namespace std;
 using namespace Isis;

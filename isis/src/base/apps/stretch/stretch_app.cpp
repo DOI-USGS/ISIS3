@@ -6,7 +6,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 
-#include "stretch.h"
+#include "stretch_app.h"
 
 namespace Isis {
   void stretchProcess(Buffer &in, Buffer &out);
@@ -19,12 +19,6 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
-    stretch(cubeFile, ui, log);
-  }
-
-  void stretch(Cube *inCube, UserInterface &ui, Pvl *log) {
-    ProcessByLine p;
-    p.SetInputCube(inCube);
 
     QString pairs;
 
@@ -47,6 +41,13 @@ namespace Isis {
       if(ui.WasEntered("PAIRS"))
         pairs = ui.GetString("PAIRS");
     }
+
+    stretch(cubeFile, pairs, ui, log);
+  }
+
+  void stretch(Cube *inCube, QString &pairs, UserInterface &ui, Pvl *log) {
+    ProcessByLine p;
+    p.SetInputCube(inCube);
 
     if(ui.GetBoolean("USEPERCENTAGES")) {
       str.Parse(pairs, inCube->histogram());
