@@ -1,15 +1,9 @@
 #include "ckwriter.h"
+
 #include "Fixtures.h"
 #include "Pvl.h"
-#include "iTime.h"
 #include "TextFile.h"
 #include "TestUtilities.h"
-#include "SpicePosition.h"
-#include "NaifStatus.h"
-
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
