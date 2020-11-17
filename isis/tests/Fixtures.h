@@ -175,6 +175,10 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
   };
 
+  class ApolloCube : public LargeCube { 
+    protected: 
+      void SetUp() override; 
+  };
 }
 
 #endif
