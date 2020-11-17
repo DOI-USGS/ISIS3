@@ -121,7 +121,7 @@ namespace Isis {
   void DemCube::SetUp() {
     DefaultCube::SetUp();
 
-    std::ifstream cubeLabel("data/defaultImage/mola.pvl");
+    std::ifstream cubeLabel("data/defaultImage/demCube.pvl");
 
     Pvl demLabel;
     cubeLabel >> demLabel;
