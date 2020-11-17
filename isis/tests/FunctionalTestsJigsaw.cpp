@@ -1,28 +1,14 @@
-#include <iostream>
+#include <QtMath>
 
 #include <QFile>
-#include <QHash>
-#include <QSet>
-#include <QString>
-#include <QStringList>
-#include <QTextStream>
 
-#include "jigsaw.h"
-#include "Angle.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
-#include "ControlMeasure.h"
-#include "Distance.h"
-#include "FileName.h"
-#include "Latitude.h"
-#include "Longitude.h"
-#include "SurfacePoint.h"
-#include "gmock/gmock.h"
-#include "UserInterface.h"
-#include "CSVReader.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Statistics.h"
+#include "CSVReader.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "ControlPoint.h"
 
 #include "jigsaw.h"
 
@@ -115,7 +101,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
   }
 
   // Spot check a few points for hard-coded values
-  // A few "Free" points:
+// A few "Free" points:
   compareCsvLine(line.getRow(30), "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097049,1735.93990498,270.686673,265.71814949,500.96936636,860.25757782,-1823.63225092,-677.74580607,1573.65050902,169.59077233,712.98695579");
   compareCsvLine(line.getRow(185), "AS15_000055107,FREE,2,0,2.22,24.26598395,6.7584199,1735.27498642,303.08880622,295.63583269,562.91702785,876.14340919,-1869.62256482,-708.50507503,1570.96622125,186.17020478,713.15150216");
   compareCsvLine(line.getRow(396), "AS15_Tie14,FREE,4,0,0.76,23.34007345,4.52764905,1737.15233677,245.96408206,251.30256849,443.11511364,1022.0802375,-1897.32803894,-372.27333324,1590.02287604,125.90958875,688.23852718");
@@ -211,7 +197,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
 
   for (int i=0; i < inputPoints.length(); i++) {
     ControlPoint* inputPoint = inputPoints[i];
-    ControlPoint* outputPoint;
+    ControlPoint* outputPoint = nullptr;
     EXPECT_NO_THROW({
         outputPoint = outputNet.GetPoint(inputPoint->GetId());
     }
@@ -613,16 +599,195 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   EXPECT_NEAR(elems.at(56).toDouble(), 0.365717165,          0.00001); 
 }
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawHeldList) {
   QTemporaryDir prefix;
+  
+  QString heldlistpath = prefix.path() + "/heldlist.lis"; 
+  FileList heldList; 
+  heldList.append(cubes[5]->fileName());
+  heldList.write(heldlistpath); 
+
   QString outCnetFileName = prefix.path() + "/outTemp.net";
-  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
-                           "camsolve=None", "spsolve=None"};
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, "heldlist="+heldlistpath,  
+                           "radius=yes", "errorpropagation=yes", "spsolve=position", "Spacecraft_position_sigma=1000", 
+                           "Residuals_csv=off", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
   
   Pvl log; 
   
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
+  }
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
+                               false, 0, ',', false, true);
+
+  csvLine = header.getRow(7);
+
+  // assert corrections are very small 
+  // X Correction
+  EXPECT_LE(std::abs(csvLine[5].toDouble()), 1e-10); 
+  // Y Correction
+  EXPECT_LE(std::abs(csvLine[10].toDouble()), 1e-10); 
+  // Z Correction
+  EXPECT_LE(std::abs(csvLine[15].toDouble()), 1e-10); 
+  // RA Correction
+  EXPECT_LE(std::abs(csvLine[20].toDouble()), 1e-10); 
+  // DEC Correction
+  EXPECT_LE(std::abs(csvLine[25].toDouble()), 1e-10); 
+  // TWIST Correction
+  EXPECT_LE(std::abs(csvLine[30].toDouble()), 1e-10); 
+}
+
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
+  QTemporaryDir prefix;
+  
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,  
+                           "radius=yes", "errorpropagation=yes", "outlier_rejection=True", "spsolve=position", "Spacecraft_position_sigma=1000", 
+                           "Residuals_csv=on", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2", 
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
+  }
+
+  QString residualsCsv = prefix.path() + "/residuals.csv";
+  QFile bo(residualsCsv);
+
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+  
+  int nRejectedCsv = 0; 
+  QStringList lines = contents.split("\n");
+  for (int i = 0; i < lines.size(); i++) {
+    if (lines[i].right(1).trimmed() == "*") { 
+       nRejectedCsv++; 
+    }
+  }
+  
+  ASSERT_EQ(nRejectedCsv, 51);
+}
+
+
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
+  QTemporaryDir prefix;
+  QString newNetworkPath = prefix.path()+"/badMeasures.net";
+  
+  QVector<QString> pid = {"AS15_000031985", 
+                          "AS15_000033079", 
+                          "AS15_SocetPAN_03", 
+                          "AS15_Tie03"};
+ 
+  QVector<QString> mid = {"APOLLO15/METRIC/1971-07-31T14:01:40.346", 
+                          "APOLLO15/METRIC/1971-07-31T14:02:27.179", 
+                          "APOLLO15/METRIC/1971-07-31T14:02:03.751", 
+                          "APOLLO15/METRIC/1971-07-31T14:00:53.547"};
+  
+  for (int i = 0; i < pid.size(); i++) {
+    // grab random points and add error to a single measure 
+    ControlPoint *point = network->GetPoint(pid[i]);
+    ControlMeasure *measure = point->GetMeasure(mid[i]);
+    measure->SetCoordinate(measure->GetLine()+50, measure->GetLine()+50); 
+  }
+
+  network->Write(newNetworkPath); 
+  
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+newNetworkPath, "onet="+outCnetFileName,
+                           "Radius=yes", "Errorpropagation=yes", "Spsolve=position","Spacecraft_position_sigma=1000.0",
+                           "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2", 
+                           "Model1=huber", "Max_model1_c_quantile=0.6", "Model2=chen", "Max_model2_c_quantile=0.98", "Sigma0=1e-3", 
+                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+
+  UserInterface options(APP_XML, args);
+
+  Pvl log; 
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
+  }
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(prefix.path()+"/bundleout_images.csv",
+                               false, 0, ',', false, true);
+
+  ControlNet onet; 
+  onet.ReadControl(outCnetFileName);
+ 
+  QVector<double> presiduals = {};
+  QVector<QVector<double>> mresiduals = {{1.27975, 1.54281, 1.8778, 1.30159}, 
+                                         {2.25115, 2.33559, 0.547574, 3.16777}, 
+                                         {1.15396, 0.69243, 1.03005, 0.848934}, 
+                                         {2.24641, 4.39168, 0.560941, 2.844}}; 
+
+  for (int i = 0; i < pid.size(); i++) {
+    ControlPoint *point = network->GetPoint(pid[i]);
+    QList<ControlMeasure*> measures = point->getMeasures();
+    for (int j = 0; j < measures.size(); j++ ) {
+      EXPECT_NEAR(measures.at(j)->GetResidualMagnitude(), mresiduals[i][j], 0.0001); 
+    }
+  }
+
+  QFile bo(prefix.path()+"/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[31].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
+  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
+  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
+  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
+  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
+
+  EXPECT_THAT(lines[37].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
+  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
+  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
+  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
+  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
+
+  EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
+}
+
+
+ TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName, 
+                           "camsolve=None", "spsolve=None"}; 
+  
+  UserInterface options(APP_XML, args); 
+  Pvl log; 
+
   try {
     jigsaw(options, &log);
     FAIL() << "Should throw" << std::endl;
@@ -685,5 +850,341 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Must solve for at least one target body option"));
   } 
+}
+
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawPoleRaDecW0WdotMeanRadius) {
+  QTemporaryDir prefix;
+  QString tbParamsPath = prefix.path() + "/tbparams.pvl";
+
+  std::istringstream tbPvlStr(R"(Object = Target
+  Group = "NAME"
+    Name=Moon
+  EndGroup
+  Group = "POLERIGHTASCENSION"
+    Ra=position
+    RaValue=269.9949
+    RaSigma=0.0
+    RaVelocityValue=0.0031
+    RaVelocitySigma=0.0
+    RaAccelerationValue=0.0
+    RaAccelerationSigma=1.0
+  EndGroup
+  Group = "POLEDECLINATION"
+    Dec=position
+    DecValue=66.5392
+    DecSigma=0.0
+    DecVelocityValue=0.0130
+    DecVelocitySigma=0.0
+    DecAccelerationValue=0.0
+    DecAccelerationSigma=1.0
+  EndGroup
+  Group = "PRIME MERIDIAN"
+    Pm=velocity
+    PmValue=38.32132
+    PmSigma=0.0
+    PmVelocityValue=13.17635815
+    PmVelocitySigma=0.0
+    PmAccelerationValue=0.0
+    PmAccelerationSigma=1.0
+  EndGroup
+  Group = "RADII"
+    RadiiSolveOption=mean
+    RadiusAValue=1737400
+    RadiusASigma=0.0
+    RadiusBValue=1737400
+    RadiusBSigma=0.0
+    RadiusCValue=1737400
+    RadiusCSigma=0.0
+    MeanRadiusValue=1737400
+    MeanRadiusSigma=0.0
+  EndGroup
+EndObject
+End)");
+
+  Pvl tbParams; 
+  tbPvlStr >> tbParams; 
+  tbParams.write(tbParamsPath);
+
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  for(int i = 0; i < cubes.size(); i++) {
+      Pvl *label = cubes[i]->label();
+      // get body rotation
+      PvlObject &br = label->object(4);
+      PvlKeyword ra("PoleRa");
+      ra+= "269.9949";
+      ra+= "0.036";
+      ra+= "0.0"; 
+
+      PvlKeyword dec("PoleDec");
+      dec += "66.5392";
+      dec += "0.0130";
+      dec += "0.0"; 
+
+      PvlKeyword pm("PrimeMeridian");
+      pm += "38.3213";
+      pm += "13.17635815";
+      pm += "1.4E-12";
+
+      PvlKeyword &ft = br.findKeyword("FrameTypeCode");
+      ft.setValue("2");
+
+      br.addKeyword(ra);
+      br.addKeyword(dec);
+      br.addKeyword(pm);
+      cubes[i]->close();
+      delete cubes[i];
+      cubes[i] = nullptr;
+  }
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
+                          "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Failed to bundle: " << e.what() << std::endl;
+  } 
+
+  QFile bo(prefix.path() + "/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  
+  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
+  EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 2.65243903, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 272.64733903, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00167495, 0.0001);
+
+  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
+  EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1.17580491, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 67.71500491, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00068524, 0.0001);
+
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
+  EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -383.36347956, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), -345.04215956, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 1.55731615, 0.0001);
+
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
+  EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -0.03669501, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 13.13966314, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.00015007, 0.0001);
+
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "MeanRadius");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -1.67807036, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1735.72192964, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.07865419, 0.0001);
+
+}
+
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawPoleRaDecW0WdotTriaxial) {
+  QTemporaryDir prefix;
+  QString tbParamsPath = prefix.path() + "/tbparams.pvl";
+
+  std::istringstream tbPvlStr(R"(Object = Target
+  Group = "NAME"
+    Name=Moon
+  EndGroup
+  Group = "POLERIGHTASCENSION"
+    Ra=position
+    RaValue=269.9949
+    RaSigma=0.0
+    RaVelocityValue=0.0031
+    RaVelocitySigma=0.0
+    RaAccelerationValue=0.0
+    RaAccelerationSigma=1.0
+  EndGroup
+  Group = "POLEDECLINATION"
+    Dec=position
+    DecValue=66.5392
+    DecSigma=0.0
+    DecVelocityValue=0.0130
+    DecVelocitySigma=0.0
+    DecAccelerationValue=0.0
+    DecAccelerationSigma=1.0
+  EndGroup
+  Group = "PRIME MERIDIAN"
+    Pm=velocity
+    PmValue=38.32132
+    PmSigma=0.0
+    PmVelocityValue=13.17635815
+    PmVelocitySigma=0.0
+    PmAccelerationValue=0.0
+    PmAccelerationSigma=1.0
+  EndGroup
+  Group = "RADII"
+    RadiiSolveOption=triaxial
+    RadiusAValue=1737400
+    RadiusASigma=0.0
+    RadiusBValue=1737400
+    RadiusBSigma=0.0
+    RadiusCValue=1737400
+    RadiusCSigma=0.0
+    MeanRadiusValue=1737400
+    MeanRadiusSigma=0.0
+  EndGroup
+EndObject
+End)");
+
+  Pvl tbParams; 
+  tbPvlStr >> tbParams; 
+  tbParams.write(tbParamsPath);
+
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  for(int i = 0; i < cubes.size(); i++) {
+      Pvl *label = cubes[i]->label();
+      // get body rotation
+      PvlObject &br = label->object(4);
+      PvlKeyword ra("PoleRa");
+      ra+= "269.9949";
+      ra+= "0.036";
+      ra+= "0.0"; 
+
+      PvlKeyword dec("PoleDec");
+      dec += "66.5392";
+      dec += "0.0130";
+      dec += "0.0"; 
+
+      PvlKeyword pm("PrimeMeridian");
+      pm += "38.3213";
+      pm += "13.17635815";
+      pm += "1.4E-12";
+
+      PvlKeyword &ft = br.findKeyword("FrameTypeCode");
+      ft.setValue("2");
+
+      br.addKeyword(ra);
+      br.addKeyword(dec);
+      br.addKeyword(pm);
+      cubes[i]->close();
+      delete cubes[i];
+      cubes[i] = nullptr;
+  }
+
+  // just use isdPath for a valid PVL file without the wanted groups
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName, 
+                          "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes", 
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+
+  UserInterface options(APP_XML, args);
+  
+  Pvl log; 
+  
+  try {
+    jigsaw(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "Failed to bundle: " << e.what() << std::endl;
+  } 
+
+  QFile bo(prefix.path() + "/bundleout.txt");
+  QString contents; 
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size()); 
+  }
+  else { 
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIAXIAL"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+
+  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
+  EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 2.95997958, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 272.95487958, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00199725, 0.0001);
+
+  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
+  EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1.16195781, 0.0001);
+  EXPECT_NEAR(columns[4].toDouble(), 67.70115781, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
+  EXPECT_NEAR(columns[6].toDouble(), 0.00149539, 0.0001);
+
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
+  EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -291.78617547, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), -253.4648554, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 2.00568417, 0.0001);
+
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
+  EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -0.02785056, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 13.14850759, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 0.00019333, 0.0001);
+
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusA");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), 6.87282091, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1744.27282091, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 1.23289971, 0.0001);
+
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusB");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), 2.34406319, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1739.74406319, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 12.52974045, 0.0001);
+
+  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusC");
+  EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
+  EXPECT_NEAR(columns[2].toDouble(), -37.55670044, 0.0001);
+  EXPECT_NEAR(columns[3].toDouble(), 1699.84329956, 0.0001);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
+  EXPECT_NEAR(columns[5].toDouble(), 5.34723296, 0.0001);
+
 }
 
