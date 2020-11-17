@@ -143,11 +143,11 @@ namespace Isis {
       void TearDown() override;
   };
   
-  class ApolloNetwork: public TempTestingFiles {
+  class ApolloNetwork : public TempTestingFiles {
     protected:
-      Cube *cube1, *cube2, *cube3, *cube4, *cube5, *cube6, *cube7; 
-      FileName *isdFile1, *isdFile2, *isdFile3, *isdFile4, *isdFile5, *isdFile6, *isdFile7, 
-           *cubeLabel, *label1, *label2, *label3, *label4, *label5, *label6, *label7;
+      QVector<FileName> isdFiles; 
+      QVector<FileName> labelFiles; 
+      QVector<Cube*> cubes;
 
       FileList *cubeList;
       QString cubeListFile;
@@ -174,7 +174,18 @@ namespace Isis {
       QString lskPath = "data/mroKernels/mroLSK.tls";
       QString jitterPath; 
 
+      void SetUp() override;
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
+  class NewHorizonsCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+  };
+
+  class ApolloCube : public LargeCube { 
+    protected: 
+      void SetUp() override; 
   };
 }
 

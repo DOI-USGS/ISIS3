@@ -83,19 +83,10 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
-    PvlObject cubeLabel = label.findObject("IsisCube");
-    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-    PvlGroup pixels = cubeLabel.findObject("Core").findGroup("Pixels");
-    close();
-
-    setDimensions(dimensions["Samples"],
-                  dimensions["Lines"],
-                  dimensions["Bands"]);
-    setBaseMultiplier(pixels["Base"],
-                      pixels["Multiplier"]);
-
+    initCoreFromLabel(label);
     create(fileName.expanded());
 
+    PvlObject cubeLabel = label.findObject("IsisCube");
     for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
       putGroup(*grpIt);
     }
@@ -148,12 +139,12 @@ namespace Isis {
                  fileName.baseName().toStdString().c_str(), 153);
     }
 
-    Pvl label; 
+    Pvl label;
     nlohmann::json isd;
 
     try {
-      labelStream >> label; 
-    } 
+      labelStream >> label;
+    }
     catch (std::exception &ex) {
       QString msg = QString("Failed to open label file, %1, %2").arg(labelFile.expanded()).arg(ex.what());
       throw IException(IException::Io, msg,
