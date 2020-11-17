@@ -116,8 +116,8 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
 
   // Dimensions Group
   ASSERT_EQ(cube.sampleCount(), 25);
-  ASSERT_EQ(cube.lineCount(), 10);
-  ASSERT_EQ(cube.bandCount(), 2);
+  ASSERT_EQ(cube.lineCount(), 2);
+  ASSERT_EQ(cube.bandCount(), 10);
 
     // Pixels group
   ASSERT_EQ(PixelTypeName(cube.pixelType()), "Real");
@@ -131,8 +131,8 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  ASSERT_NEAR(hist->Average(), 2.45598, .00001);
-  ASSERT_NEAR(hist->Sum(), 613.9962, .0001);
-  ASSERT_EQ(hist->ValidPixels(), 250);
-  ASSERT_NEAR(hist->StandardDeviation(), 0.0242603, .0000001);
+  ASSERT_NEAR(hist->Average(), 1.25258, .00001);
+  ASSERT_NEAR(hist->Sum(), 62.6292, .0001);
+  ASSERT_EQ(hist->ValidPixels(), 50);
+  ASSERT_NEAR(hist->StandardDeviation(), 1.253938, .000001);
 }
