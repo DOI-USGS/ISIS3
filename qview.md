@@ -43,6 +43,8 @@ The mouse is used to draw circles, ellipses, rectangles, rotated rectangles, pol
     - Planer Kilometers - Displays the distance between the endpoints of the line in kilometers. This option is only available if there is a camera model available for the image and at least one of the points is on the surface of the target body defined in the cube label. The distance is calculated using the angle between the right ascension and declination of the two endpoints, and the slant range distance from the spacecraft to the point on the target surface. An isosceles triangle is assumed between the first point, the spacecraft, and the second point. The reported distance is the length of the base of the triangle. 
 <!--- INSERT EQUATION HERE --->
 
+An example of using the Measure Tool to measure the Planar Kilometer distance of a volcanic plume above Io is shown below: 
+
 ![image](https://user-images.githubusercontent.com/22879031/99570570-5d75de80-298f-11eb-977c-ddfcc97d7876.png)
 
 ###
