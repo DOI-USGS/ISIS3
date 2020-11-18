@@ -17,7 +17,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/socetlinescankeywords.xml")
 
 TEST_F(MroCube, FunctionalTestSocetLineScanKeywordsHirise) {
   setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
-  std::cout << *testCube->label() << std::endl;
+  
   QTemporaryDir prefix;
   testCube->reopen("rw");  
   QString outFileName ="/tmp/outTEMP.txt";
