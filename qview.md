@@ -26,7 +26,7 @@ Find
 Image Edit
 
 ###
-Measure [[https://github.com/USGS-Astrogeology/ISIS3/blob/dev/isis/appdata/images/icons/add.png|alt=measuretool]]
+Measure [[https://github.com/USGS-Astrogeology/ISIS3/blob/dev/isis/appdata/images/icons/measure.png|alt=measuretool]]
 
 Displays user defined measurements of area, length, and angle on an image. There are two controls in the top toolbar for the measure tool. A combo box to choose the what shape is drawn, and a combo box to define the units of the values displayed (e.g., meters, kilometers, or pixels).
 
