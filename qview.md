@@ -44,7 +44,7 @@ The mouse is used to draw circles, ellipses, rectangles, rotated rectangles, pol
 
 ![planareq]
 
-![planareq2]
+![planareq1]
 
 An example of using the Measure Tool to measure the Planar Kilometer distance of a volcanic plume above Io is shown below: 
 
@@ -81,4 +81,5 @@ Stereo
 Match
 
 [planareq]: http://chart.apis.google.com/chart?cht=tx&chl=\theta=\arccos{(\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)})}
-[planareq2]: http://chart.apis.google.com/chart?cht=tx&chl=d_{mesaured}=d_{slant}2\sin{\frac{\theta}{2}}
+
+[planareq1]: http://chart.apis.google.com/chart?cht=tx&chl=d_{mesaured}=d_{slant}2\sin{\frac{\theta}{2}}
