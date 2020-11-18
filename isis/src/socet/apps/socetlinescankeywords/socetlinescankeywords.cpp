@@ -62,9 +62,9 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   // Initialize the camera
   p.SetInputCube(input);
   Pvl *cubeHeader = input->label();
-  std::cout << "making cam" << std::endl; 
+  
   Camera *cam = input->camera();
-  std::cout << "made cam" << std::endl;
+  
   CameraDetectorMap *detectorMap = cam->DetectorMap();
   CameraFocalPlaneMap *focalMap = cam->FocalPlaneMap();
   CameraDistortionMap *distortionMap = cam->DistortionMap();
