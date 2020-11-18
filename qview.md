@@ -44,15 +44,6 @@ The mouse is used to draw circles, ellipses, rectangles, rotated rectangles, pol
 <!--- INSERT EQUATION HERE --->
 ![planareq]
 
-<!--- double ra2 = cvp->camera()->RightAscension() * DEG2RAD; 
-      double dec2 = cvp->camera()->Declination()* DEG2RAD; 
-
-       double dRA = (ra1 - ra2);
-
-       double angle = acos(sin(dec1)*sin(dec2) + cos(dec1)*cos(dec2)*cos(dRA));
-      double half_angle = angle/2.0;
-      double length = slantDist * sin(half_angle) * 2.0; --->
-
 An example of using the Measure Tool to measure the Planar Kilometer distance of a volcanic plume above Io is shown below: 
 
 ![image](https://user-images.githubusercontent.com/22879031/99570570-5d75de80-298f-11eb-977c-ddfcc97d7876.png)
@@ -87,4 +78,8 @@ Stereo
 ####
 Match
 
-[planareq]: http://chart.apis.google.com/chart?cht=tx&chl=m=\arccos{(\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)})}
+ble angle = acos(sin(dec1)*sin(dec2) + cos(dec1)*cos(dec2)*cos(dRA));
+      double half_angle = angle/2.0;
+      double length = slantDist * sin(half_angle) * 2.0;
+[planareq]: http://chart.apis.google.com/chart?cht=tx&chl=\theta=\arccos{(\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)})}
+[planareq2]: http://chart.apis.google.com/chart?cht=tx&chl=\d_{mesaure}=\d_{slant}2\sin{\theta\2}
