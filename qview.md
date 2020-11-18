@@ -3,7 +3,7 @@ This program will display cubes and allow for interactive analysis.
 
 ## Tools
 There are several analysis tools located on the right side vertical toolbar. Activating one of these tools will
-add controls specific to that tool to the top toolbar.
+add controls specific to that tool to the top toolbar. Only one tool can be active at a time, but some are persistent even when not active. For example, the zoom tool's shortcut keystrokes remain available when other tools are active.
 
 <!--- INSERT IMAGE OF THE SIDE TOOLBAR. --->
 
