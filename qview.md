@@ -42,6 +42,16 @@ The mouse is used to draw circles, ellipses, rectangles, rotated rectangles, pol
     - Pixels - Display the distance between the endpoints of the line in pixels. This option is always available for any cube. The distance is calculated using the Pythagorean theorem.
     - Planer Kilometers - Displays the distance between the endpoints of the line in kilometers. This option is only available if there is a camera model available for the image and at least one of the points is on the surface of the target body defined in the cube label. The distance is calculated using the angle between the right ascension and declination of the two endpoints, and the slant range distance from the spacecraft to the point on the target surface. An isosceles triangle is assumed between the first point, the spacecraft, and the second point. The reported distance is the length of the base of the triangle. 
 <!--- INSERT EQUATION HERE --->
+![planareq]
+
+<!--- double ra2 = cvp->camera()->RightAscension() * DEG2RAD; 
+      double dec2 = cvp->camera()->Declination()* DEG2RAD; 
+
+       double dRA = (ra1 - ra2);
+
+       double angle = acos(sin(dec1)*sin(dec2) + cos(dec1)*cos(dec2)*cos(dRA));
+      double half_angle = angle/2.0;
+      double length = slantDist * sin(half_angle) * 2.0; --->
 
 An example of using the Measure Tool to measure the Planar Kilometer distance of a volcanic plume above Io is shown below: 
 
@@ -77,3 +87,4 @@ Stereo
 ####
 Match
 
+[planareq]: http://chart.apis.google.com/chart?cht=tx&chl=m=\arccos{\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)}
