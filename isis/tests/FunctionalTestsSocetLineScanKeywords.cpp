@@ -128,3 +128,26 @@ TEST_F(DefaultCube, FunctionalTestSocetLineScanKeywordsLev2) {
   }
 }
 
+
+TEST_F(DefaultCube, FunctionalTestSocetLineScanKeywordsNoBlob) {
+  QTemporaryDir prefix;
+  testCube->reopen("rw");  
+  QString outFileName ="/tmp/outTEMP.txt";
+  QVector<QString> args = {"to="+outFileName};
+
+  // trick it into thinking that spice is not attached 
+  Pvl *oglabel = testCube->label(); 
+  PvlGroup &kernels = oglabel->findGroup("Kernels", Pvl::Traverse);
+  PvlKeyword &name = kernels.findKeyword("InstrumentPointing");
+  name.setValue("NotATable");
+
+  UserInterface options(APP_XML, args);
+  
+  try {
+    socetlinescankeywords(testCube, options);
+    FAIL() << "Should Fail"; 
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Input image does not contain needed SPICE blobs...run spiceinit with attach=yes"));; 
+  }
+}
