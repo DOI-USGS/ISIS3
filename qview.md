@@ -87,4 +87,4 @@ Stereo
 ####
 Match
 
-[planareq]: http://chart.apis.google.com/chart?cht=tx&chl=m=\arccos{\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)}
+[planareq]: http://chart.apis.google.com/chart?cht=tx&chl=m=\arccos{(\sin{(dec_1)}\sin{(dec_2)}+\cos{(dec_1)}\cos{(dec_2)}\cos{(RA_1-RA_2)})}
