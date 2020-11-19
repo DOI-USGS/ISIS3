@@ -29,7 +29,6 @@ void hicolormos(UserInterface &ui) {
 }
 
 
-//functions in the code
 void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   // Make a temporary list file for automos
   FileName tempFile = FileName::createTempFile("$TEMPORARY/hicolormos.temp.lis");
