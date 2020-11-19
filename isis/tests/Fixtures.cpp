@@ -356,9 +356,9 @@ namespace Isis {
     delete isdPathR;
   }
 
-  void MroCube::SetUp() { 
-    DefaultCube::SetUp(); 
-
+  void MroCtxCube::SetUp() {
+    DefaultCube::SetUp();
+    
     // force real DNs
     QString fname = testCube->fileName();
 
@@ -372,12 +372,8 @@ namespace Isis {
     FileName newCube(tempDir.path() + "/testing.cub");
 
     testCube->fromIsd(newCube, label, isd, "rw"); 
-  } 
-
-
-  void MroCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-    kernels.findKeyword("NaifFrameCode").setValue(ikid);    
+    kernels.findKeyword("NaifFrameCode").setValue("-74999");    
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
     std::istringstream iss(R"(
       Group = Instrument
@@ -462,8 +458,8 @@ namespace Isis {
     PvlGroup newInstGroup; 
     iss >> newInstGroup; 
     
-    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
-    newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
+    newInstGroup.findKeyword("InstrumentId").setValue("HIRISE");
+    newInstGroup.findKeyword("SpacecraftName").setValue("MARS RECONNAISSANCE ORBITER");
 
     inst = newInstGroup; 
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
@@ -474,14 +470,13 @@ namespace Isis {
     inst += stopcc;  
     
     json nk; 
-    // ikid="-74605";
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 11994.9988;
-    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.012;
+    nk["INS-74999_FOCAL_LENGTH"] = 11994.9988;
+    nk["INS-74999_PIXEL_PITCH"] = 0.012;
     nk["INS-74605_TRANSX"] = {-89.496, -1.0e-06, 0.012};
     nk["INS-74605_TRANSY"] = {-12.001, -0.012, -1.0e-06};
     nk["INS-74605_ITRANSS"] = {-1000.86, -0.0087, -83.333};
     nk["INS-74605_ITRANSL"] = {7457.9, 83.3333, -0.0087};
-    nk["INS"+ikid.toStdString()+"_OD_K"] = {-0.0048509, 2.41312e-07, -1.62369e-13};
+    nk["INS-74999_OD_K"] = {-0.0048509, 2.41312e-07, -1.62369e-13};
     nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
     nk["CLOCK_ET_-74999_895484264:57342_COMPUTED"] = "8ed6ae8930f3bd41";
     
