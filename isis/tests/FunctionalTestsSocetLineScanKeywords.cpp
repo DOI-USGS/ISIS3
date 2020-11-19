@@ -16,10 +16,8 @@ using namespace testing;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/socetlinescankeywords.xml").expanded();
 
 TEST_F(MroCtxCube, FunctionalTestSocetLineScanKeywordsHirise) {
-  
-  QTemporaryDir prefix;
   testCube->reopen("rw");  
-  QString outFileName = prefix.path() + "/outTEMP.txt";
+  QString outFileName = tempDir.path() + "/outTEMP.txt";
   QVector<QString> args = {"to="+outFileName};
 
   UserInterface options(APP_XML, args);
@@ -111,9 +109,8 @@ TEST_F(MroCtxCube, FunctionalTestSocetLineScanKeywordsHirise) {
 
 
 TEST_F(DefaultCube, FunctionalTestSocetLineScanKeywordsLev2) {
-  QTemporaryDir prefix;
   testCube->reopen("rw");  
-  QString outFileName =prefix.path() + "/outTEMP.txt";
+  QString outFileName =tempDir.path() + "/outTEMP.txt";
   QVector<QString> args = {"to="+outFileName};
 
   UserInterface options(APP_XML, args);
@@ -129,9 +126,8 @@ TEST_F(DefaultCube, FunctionalTestSocetLineScanKeywordsLev2) {
 
 
 TEST_F(DefaultCube, FunctionalTestSocetLineScanKeywordsNoBlob) {
-  QTemporaryDir prefix;
   testCube->reopen("rw");  
-  QString outFileName = prefix.path() + "/outTEMP.txt";
+  QString outFileName = tempDir.path() + "/outTEMP.txt";
   QVector<QString> args = {"to="+outFileName};
 
   // trick it into thinking that spice is not attached 
