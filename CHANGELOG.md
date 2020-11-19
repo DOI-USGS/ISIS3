@@ -29,6 +29,7 @@ update the Unreleased link so that it compares against the latest release tag.
 -->
 
 ## [Unreleased]
+ - Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images.
 
 
 - Fixed so required files are reported instead of continuing without them. [#4038](https://github.com/USGS-Astrogeology/ISIS3/issues/4038)
