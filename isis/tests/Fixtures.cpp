@@ -120,17 +120,17 @@ namespace Isis {
 
   void DemCube::SetUp() {
     DefaultCube::SetUp();
+    testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
+    testCube->reopen("rw");
 
     std::ifstream cubeLabel("data/defaultImage/demCube.pvl");
 
     Pvl demLabel;
     cubeLabel >> demLabel;
-
-    testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
-    testCube->reopen("rw");
+    demLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels")["Type"] = "Real";
 
     demCube = new Cube();
-    demCube->fromLabel("/Users/acpaquette/Desktop/demCube.cub", demLabel, "rw");
+    demCube->fromLabel(tempDir.path() + "/demCube.cub", demLabel, "rw");
 
     TableField minRadius("MinimumRadius", TableField::Double);
     TableField maxRadius("MaximumRadius", TableField::Double);

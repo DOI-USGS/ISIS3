@@ -57,7 +57,7 @@ TEST_F(DemCube, FunctionalTestShadowMatch) {
 TEST_F(DemCube, FunctionalTestShadowTime) {
   QVector<QString> shadowArgs = {"to=" + tempDir.path() + "/shadow.cub",
                                  "sunpositionsource=time",
-                                 "time=1977-07-09T20:05:53"};
+                                 "time=1977-07-09T15:05:53"};
   PvlGroup kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
   shadowArgs.push_back("spk=" + kernels["TargetPosition"][2]);
 
@@ -67,30 +67,30 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
 
   PvlGroup shadowStats = appLog.findGroup("ShadowStatistics");
   EXPECT_EQ(int(shadowStats["NumComputedAzimuthElevations"]), 10000);
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageAzimuth"]), 160.49588925112);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumAzimuth"]), 160.28225890102);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumAzimuth"]), 160.73288099702);
+  EXPECT_DOUBLE_EQ(double(shadowStats["AverageAzimuth"]), 141.60048536348);
+  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumAzimuth"]), 141.18641687989);
+  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumAzimuth"]), 142.02798316054);
 
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageElevation"]), 90.0);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumElevation"]), 90.0);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumElevation"]), 90.0);
+  EXPECT_DOUBLE_EQ(double(shadowStats["AverageElevation"]), 54.723733952308997);
+  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumElevation"]), 54.185416336220001);
+  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumElevation"]), 55.260883777776002);
 
-  EXPECT_EQ(int(shadowStats["NumRays"]), 5390);
-  EXPECT_EQ(int(shadowStats["NumRayDemIntersections"]), 5390);
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageRayDemIntersectionsPerRay"]), 1.0);
-  EXPECT_EQ(int(shadowStats["NumLightedPixels"]), 5390);
-  EXPECT_EQ(int(shadowStats["NumShadowedPixels"]), 0);
+  EXPECT_EQ(int(shadowStats["NumRays"]), 9409);
+  EXPECT_EQ(int(shadowStats["NumRayDemIntersections"]), 9926);
+  EXPECT_DOUBLE_EQ(double(shadowStats["AverageRayDemIntersectionsPerRay"]), 1.0549473907960001);
+  EXPECT_EQ(int(shadowStats["NumLightedPixels"]), 9305);
+  EXPECT_EQ(int(shadowStats["NumShadowedPixels"]), 104);
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
-  EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
+  EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 104);
 
   Cube shadowCube(shadowUi.GetFileName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.000870291594, 1e-11);
-  EXPECT_NEAR(hist->Sum(), 4.6908716925004397, 1e-11);
-  ASSERT_EQ(hist->ValidPixels(), 5390);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0010127201089759406, 1e-11);
+  EXPECT_NEAR(hist->Average(), 0.57758065374995482, 1e-11);
+  EXPECT_NEAR(hist->Sum(), 5374.3879831433296, 1e-11);
+  ASSERT_EQ(hist->ValidPixels(), 9305);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0026649128709642098, 1e-11);
 }
 
 TEST_F(DemCube, FunctionalTestShadowNoShadow) {
