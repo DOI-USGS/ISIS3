@@ -30,7 +30,7 @@ namespace Isis {
     protected:
       // prepare data for writing
       void WriteInit();
-      void WriteData(std::fstream &os);
+      void ReadData(std::istream &stream);
 
     private:
       std::string m_string;
