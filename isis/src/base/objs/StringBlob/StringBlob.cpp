@@ -1,7 +1,6 @@
 /**
  */
 #include <string>
-#include <QByteArray>
 #include "StringBlob.h"
 #include "Application.h"
 
@@ -61,7 +60,7 @@ namespace Isis {
    *
    * @throws IException::Io - Error reading data from stream
    */
-  void Blob::ReadData(std::istream &stream) {
+  void StringBlob::ReadData(std::istream &stream) {
     // Read the binary data
     if (p_buffer != NULL) delete [] p_buffer;
     p_buffer = new char[p_nbytes];
@@ -80,6 +79,6 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    m_string = QByteArray(p_buffer, p_nbytes);
+    m_string = std::string(p_buffer, p_nbytes);
   }
 }

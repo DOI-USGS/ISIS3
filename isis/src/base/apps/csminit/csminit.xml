@@ -55,11 +55,13 @@
     <group name="Target Specification">
       <parameter name="TARGETNAME">
         <type>string</type>
+        <internalDefault>none</internalDefault>
         <brief>
           The name of the body observed by the image.
         </brief>
         <description>
-          The name of the body observed by the image.
+          The name of the body observed by the image. If not entered, then the
+          target already listed on the label will be used.
         </description>
       </parameter>
 
