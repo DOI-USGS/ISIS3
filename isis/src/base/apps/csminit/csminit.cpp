@@ -142,11 +142,11 @@ void csminit(UserInterface &ui, Pvl *log) {
     // Popualte the Archive group with useful information
     PvlGroup &archiveGroup = label->findGroup("Archive", Pvl::Traverse);
     archiveGroup += PvlKeyword("CSMPlatformID", 
-                               "FAKE");//QString::fromStdString(model->getPlatformIdentifier()));
+                               QString::fromStdString(model->getPlatformIdentifier()));
     archiveGroup += PvlKeyword("CSMInstrumentId", 
-                               "Fun test");//QString::fromStdString(model->getSensorIdentifier()));
+                               QString::fromStdString(model->getSensorIdentifier()));
     archiveGroup += PvlKeyword("ReferenceTime", 
-                               "Thanksgiving");//QString::fromStdString(model->getReferenceDateAndTime()));
+                               QString::fromStdString(model->getReferenceDateAndTime()));
 
     // Update existing Kernels Group or create new one and add shapemodel if provided
     PvlGroup &kernelsGroup = label->findGroup("Kernels", Pvl::Traverse); 
@@ -162,8 +162,8 @@ void csminit(UserInterface &ui, Pvl *log) {
     // Add the CSM string to the Blob.
     StringBlob csmStateBlob(modelState, "CSMState");
     PvlObject &blobLabel = csmStateBlob.Label();
-    blobLabel += PvlKeyword("ModelName", "ModelPumpkin");//QString::fromStdString(model->getModelName()));
-    blobLabel += PvlKeyword("PluginName", "TurkeyPlugin");//QString::fromStdString(plugin->getPluginName()));
+    blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
+    blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
 
     // Write CSM State blob to cube
     cube->write(csmStateBlob);
