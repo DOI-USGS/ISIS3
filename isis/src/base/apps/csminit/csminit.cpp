@@ -3,6 +3,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <QLibrary>
 
 #include "csm/Isd.h"
 #include "csm/Model.h"
@@ -28,11 +29,18 @@ namespace Isis {
    * @param ui The Application UI
    * @param(out) log The Pvl that attempted models will be logged to
    */
-
-
-void csminit(UserInterface &ui, Pvl *log) {
+  void csminit(UserInterface &ui, Pvl *log) {
+    //TESTING LOAD USGSCSM
+    QLibrary usgscsm("/Users/jmapel/miniconda3/envs/isis4_build/lib/libusgscsm.dylib");
+    if (usgscsm.load()) {
+      std::cout << "Successfully loaded usgscsm" << std::endl;
+    }
+    else {
+      std::cout << "Failed to load usgscsm" << std::endl;
+    }
+    //END TESTING
     QString isdFilePath = ui.GetFileName("ISD");
-    
+
     QList<QStringList> possibleModels;
     for (const csm::Plugin * plugin : csm::Plugin::getList()) {
       QString pluginName = QString::fromStdString(plugin->getPluginName());
@@ -83,6 +91,7 @@ void csminit(UserInterface &ui, Pvl *log) {
         }
       }
       throw IException(IException::User, message, _FILEINFO_);
+      // std::cout << "No model found" << std::endl;
     }
 
     // If we are here, then we have exactly 1 model
@@ -108,6 +117,7 @@ void csminit(UserInterface &ui, Pvl *log) {
     }
 
     string modelState = model->getModelState();
+    // string modelState = "TestModel\nThis is the test model state.";
 
     // We are not processing the image data, so this process object is just for
     // managing the Cube in memory and adding history
@@ -129,27 +139,50 @@ void csminit(UserInterface &ui, Pvl *log) {
       // no operation, continue
     }
 
-    cube->deleteBlob("String", "CSMState");
-    
-    Pvl *label = cube->label();
-
     // Add the TargetName to the instrument group, if specified:
     if (ui.WasEntered("TARGETNAME")) {
-      PvlGroup &instrumentGroup = label->findGroup("Instrument", Pvl::Traverse); 
-      instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME")); 
+      if (!cube->hasGroup("Instrument")) {
+        cube->putGroup(PvlGroup("Instrument"));
+      }
+      PvlGroup &instrumentGroup = cube->group("Instrument");
+      if (instrumentGroup.hasKeyword("TargetName")) {
+        instrumentGroup.deleteKeyword("TargetName");
+      }
+      instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
     }
 
     // Popualte the Archive group with useful information
-    PvlGroup &archiveGroup = label->findGroup("Archive", Pvl::Traverse);
-    archiveGroup += PvlKeyword("CSMPlatformID", 
+    if (!cube->hasGroup("Archive")) {
+      cube->putGroup(PvlGroup("Archive"));
+    }
+    PvlGroup &archiveGroup = cube->group("Archive");
+    if (archiveGroup.hasKeyword("CSMPlatformID")) {
+      archiveGroup.deleteKeyword("CSMPlatformID");
+    }
+    archiveGroup += PvlKeyword("CSMPlatformID",
+                              //  "TestPlatformID");
                                QString::fromStdString(model->getPlatformIdentifier()));
-    archiveGroup += PvlKeyword("CSMInstrumentId", 
+    if (archiveGroup.hasKeyword("CSMInstrumentId")) {
+      archiveGroup.deleteKeyword("CSMInstrumentId");
+    }
+    archiveGroup += PvlKeyword("CSMInstrumentId",
+                              //  "TestInstrumentID");
                                QString::fromStdString(model->getSensorIdentifier()));
-    archiveGroup += PvlKeyword("ReferenceTime", 
+    if (archiveGroup.hasKeyword("ReferenceTime")) {
+      archiveGroup.deleteKeyword("ReferenceTime");
+    }
+    archiveGroup += PvlKeyword("ReferenceTime",
+                              //  "TestReferenceTime");
                                QString::fromStdString(model->getReferenceDateAndTime()));
 
     // Update existing Kernels Group or create new one and add shapemodel if provided
-    PvlGroup &kernelsGroup = label->findGroup("Kernels", Pvl::Traverse); 
+    if (!cube->hasGroup("Kernels")) {
+      cube->putGroup(PvlGroup("Kernels"));
+    }
+    PvlGroup &kernelsGroup = cube->group("Kernels");
+    if (kernelsGroup.hasKeyword("ShapeModel")) {
+      kernelsGroup.deleteKeyword("ShapeModel");
+    }
     if (ui.WasEntered("SHAPEMODEL")) {
       // TODO validate the shapemodel
       kernelsGroup += PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL"));
@@ -158,11 +191,15 @@ void csminit(UserInterface &ui, Pvl *log) {
       kernelsGroup += PvlKeyword("ShapeModel", "Ellipsoid");
     }
 
+    cube->deleteBlob("String", "CSMState");
+
     // Create our CSM State blob as a string
     // Add the CSM string to the Blob.
     StringBlob csmStateBlob(modelState, "CSMState");
     PvlObject &blobLabel = csmStateBlob.Label();
+    // blobLabel += PvlKeyword("ModelName", "TestModelName");
     blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
+    // blobLabel += PvlKeyword("PluginName", "TestPluginName");
     blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
 
     // Write CSM State blob to cube
