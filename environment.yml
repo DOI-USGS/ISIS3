@@ -13,7 +13,7 @@ dependencies:
   - bzip2
   - cmake >=3.15
   - cspice
-  - csm==3.0.3
+  - csm>=3.0.3,<3.0.4
   - curl
   - doxygen
   - eigen
