@@ -13,7 +13,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicolormos.xml").expanded();
 
-TEST_F(MroCtxCube, FunctionalTestsHicolormosDefault) {
+TEST_F(MroHiriseCube, FunctionalTestsHicolormosDefault) {
   QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
   QVector<QString> args = {"to="+outCubeFileName};
   
