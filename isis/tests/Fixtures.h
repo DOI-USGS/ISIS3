@@ -164,6 +164,7 @@ namespace Isis {
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
+      Cube dejitteredCube; 
       QString jitterPath; 
 
       void SetUp() override;

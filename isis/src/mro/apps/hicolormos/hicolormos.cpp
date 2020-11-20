@@ -24,8 +24,13 @@ namespace Isis {
 
 void hicolormos(UserInterface &ui) {
   Cube from1(ui.GetFileName("FROM1"), "r");
-  Cube from2(ui.GetFileName("FROM2"), "r");
-  hicolormos(&from1, &from2, ui);
+  if (ui.WasEntered("FROM2")) {
+    Cube from2(ui.GetFileName("FROM2"), "r");
+    hicolormos(&from1, &from2, ui);
+  } 
+  else {
+    hicolormos(&from1, nullptr, ui);
+  }
 }
 
 
@@ -46,24 +51,8 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   // Prep for second image if we have one
   Pvl from2lab;
   PvlGroup from2Mosaic("Mosaic");
-  if(ui.WasEntered("FROM2") && !from2) {
-    QString from2path = ui.GetFileName("FROM2");
-    
-    //Add from2 file to the temporary automos input list
-    tf.PutLine(from2path + "\n");
-    from2lab.read(from2->fileName());
-
-    // Test the observation ID between from1 and from2
-    if((QString)from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"] !=
-        (QString)from2lab.findGroup("Archive", Pvl::Traverse)["ObservationId"]) {
-      QString msg = "Images not from the same observation";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
-    from2->open(ui.GetFileName("FROM2"), "r");
-  }
-  else if (from2) {
+  
+  if (from2) {
     from2lab = *from2->label(); 
     tf.PutLine(from2->fileName() + "\n");
 
@@ -75,14 +64,14 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
     }
 
     from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
-
   }
   
   tf.Close();  // Close list remember to delete
 
   // Make the source product ID (from1 mosaic group)
   PvlKeyword sourceProductId = from1Mosaic["SourceProductId"];
-  if(ui.WasEntered("FROM2")) {
+  
+  if(from2) {
     // Add source product Id for from2
     PvlKeyword from2SPI =  from2Mosaic["SourceProductId"];
     for(int i = 0; i < (int)from2SPI.size(); i++) {
@@ -96,7 +85,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   double maxLat = proj->MaximumLatitude();
   double minLon = proj->MinimumLongitude();
   double maxLon = proj->MaximumLongitude();
-  if(ui.WasEntered("FROM2")) {
+  if(from2) {
     TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
     if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
     if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
@@ -137,7 +126,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
     CsunAzimuth = cam->SunAzimuth();
     runXY = false;
   }
-  else if(ui.WasEntered("FROM2") || from2) {
+  else if(from2) {
     Camera *cam = from2->camera();
     if(cam->SetUniversalGround(avgLat, avgLon)) {
       Cemiss = cam->EmissionAngle();
@@ -166,7 +155,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
     double endX = proj->XCoord();
     double startY = proj->YCoord();
 
-    if(ui.WasEntered("FROM2")) {
+    if(from2) {
       TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
       proj->SetWorld(0.5, 0.5);
       if(proj->XCoord() < startX) startX = proj->XCoord();
@@ -193,7 +182,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
     }
-    else if(ui.WasEntered("FROM2") || from2) {
+    else if(from2) {
       Camera *cam = from2->camera();
       if(cam->SetImage(sample, line)) {
         Cemiss = cam->EmissionAngle();
@@ -221,7 +210,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   QString startClk = from1Mosaic["SpacecraftClockStartCount"];
   QString stopClk = from1Mosaic["SpacecraftClockStopCount"];
 
-  if(ui.WasEntered("FROM2")) {
+  if(from2) {
     if((QString)from2Mosaic["StartTime"] < startTime) startTime = (QString)from2Mosaic["StartTime"];
     if((QString)from2Mosaic["StopTime"] > stopTime) stopTime = (QString)from2Mosaic["StopTime"];
     if((QString)from2Mosaic["SpacecraftClockStartCount"] < startClk) startClk = (QString)from2Mosaic["SpacecraftClockStartCount"];
@@ -232,7 +221,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   PvlKeyword cpmmTdiFlag = from1Mosaic["cpmmTdiFlag"];
   PvlKeyword cpmmSummingFlag = from1Mosaic["cpmmSummingFlag"];
   PvlKeyword specialProcessingFlag = from1Mosaic["SpecialProcessingFlag"];
-  if(ui.WasEntered("FROM2")) {
+  if(from2) {
     for(int i = 0; i < 14; i++) {
       if(! from2Mosaic["cpmmTdiFlag"].isNull(i)) {
         cpmmTdiFlag[i] = from2Mosaic["cpmmTdiFlag"][i];
