@@ -356,7 +356,7 @@ namespace Isis {
     delete isdPathR;
   }
 
-  void MroCtxCube::SetUp() {
+  void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
      
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
