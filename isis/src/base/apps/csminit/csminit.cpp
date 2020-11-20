@@ -1,20 +1,22 @@
 #include "csminit.h"
 
-#include "QList.h"
-#include "QString.h"
-#include "QStringList.h"
+#include <QList>
+#include <QString>
+#include <QStringList>
 
-#include "Isd.h"
-#include "Model.h"
-#include "NitfIsd.h"
-#include "Plugin.h"
+#include "csm/Isd.h"
+#include "csm/Model.h"
+#include "csm/NitfIsd.h"
+#include "csm/Plugin.h"
 
+#include "Blob.h"
 #include "Cube.h"
 #include "IException.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "StringBlob.h"
 
 using namespace std;
 
@@ -26,11 +28,13 @@ namespace Isis {
    * @param ui The Application UI
    * @param(out) log The Pvl that attempted models will be logged to
    */
-  void csminit(UserInterface &ui, Pvl *log) {
-    QString isdFilePath = ui.GetFileName("ISD").expanded();
 
+
+void csminit(UserInterface &ui, Pvl *log) {
+    QString isdFilePath = ui.GetFileName("ISD");
+    
     QList<QStringList> possibleModels;
-    for (const Plugin * plugin : csm::Plugin::getList()) {
+    for (const csm::Plugin * plugin : csm::Plugin::getList()) {
       QString pluginName = QString::fromStdString(plugin->getPluginName());
       if (ui.WasEntered("PLUGINNAME") && pluginName != ui.GetString("PLUGINNAME")) {
         continue;
@@ -42,14 +46,14 @@ namespace Isis {
           continue;
         }
 
-        Isd fileIsd(isdFilePath.toStdString());
+        csm::Isd fileIsd(isdFilePath.toStdString());
         if (plugin->canModelBeConstructedFromISD(fileIsd, modelName.toStdString())) {
           QStringList modelSpec = {pluginName, modelName, QString::fromStdString(fileIsd.format())};
           possibleModels.append(modelSpec);
           continue; // If the file ISD works, don't check the others
         }
 
-        Nitf21Isd nitf21Isd(isdFilePath.toStdString());
+        csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
         if (plugin->canModelBeConstructedFromISD(nitf21Isd, modelName.toStdString())) {
           QStringList modelSpec = {pluginName, modelName, QString::fromStdString(nitf21Isd.format())};
           possibleModels.append(modelSpec);
@@ -71,7 +75,7 @@ namespace Isis {
     if (possibleModels.empty()) {
       QString message = "No loaded model could be created from the ISD [" + isdFilePath + "]."
                         "Loaded plugin & model names:\n";
-      for (const Plugin * plugin : csm::Plugin::getList()) {
+      for (const csm::Plugin * plugin : csm::Plugin::getList()) {
         QString pluginName = QString::fromStdString(plugin->getPluginName());
         for (size_t modelIndex = 0; modelIndex < plugin->getNumModels(); modelIndex++) {
           QString modelName = QString::fromStdString(plugin->getModelName(modelIndex));
@@ -88,10 +92,10 @@ namespace Isis {
                         "when it should have 3 elements.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    const Plugin *plugin = Plugin::findPlugin(modelSpec[0].toStdString());
-    Model *model;
-    Isd fileIsd(isdFilePath.toStdString());
-    Nitf21Isd nitf21Isd(isdFilePath.toStdString());
+    const csm::Plugin *plugin = csm::Plugin::findPlugin(modelSpec[0].toStdString());
+    csm::Model *model;
+    csm::Isd fileIsd(isdFilePath.toStdString());
+    csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
     if (modelSpec[2] == QString::fromStdString(fileIsd.format())) {
       model = plugin->constructModelFromISD(fileIsd, modelSpec[1].toStdString());
     }
@@ -116,7 +120,7 @@ namespace Isis {
     // Maybe just do spiceinit clean-up routine instead
     try {
       cube->camera();
-      QString message = "Input cube [" + ui.GetFileName("FROM").expanded() + "]. "
+      QString message = "Input cube [" + ui.GetFileName("FROM") + "]. "
                         "Already has an ISIS camera model associated with it. CSM "
                         "models cannot be added to cubes with an ISIS camera model.";
       throw IException(IException::Programmer, message, _FILEINFO_);
@@ -126,28 +130,43 @@ namespace Isis {
     }
 
     cube->deleteBlob("String", "CSMState");
-    cube->deleteGroup("Instrument");
-    cube->deleteGroup("Kernels");
+    
+    Pvl *label = cube->label();
 
-    PvlGroup instrumentGroup("Instrument");
-    instrumentGroup += PvlKeyword("SpacecraftName", QString::fromStdString(model->getPlatformIdentifier()));
-    instrumentGroup += PvlKeyword("InstrumentId", QString::fromStdString(model->getSensorIdentifier()));
-    instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
-    instrumentGroup += PvlKeyword("ReferenceTime", QString::fromStdString(model->getReferenceDateAndTime()));
-    cube->putGroup(instrumentGroup);
+    // Add the TargetName to the instrument group, if specified:
+    if (ui.WasEntered("TARGETNAME")) {
+      PvlGroup &instrumentGroup = label->findGroup("Instrument", Pvl::Traverse); 
+      instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME")); 
+    }
 
-    PvlGroup kernelsGroup("Kernels");
+    // Popualte the Archive group with useful information
+    PvlGroup &archiveGroup = label->findGroup("Archive", Pvl::Traverse);
+    archiveGroup += PvlKeyword("CSMPlatformID", 
+                               "FAKE");//QString::fromStdString(model->getPlatformIdentifier()));
+    archiveGroup += PvlKeyword("CSMInstrumentId", 
+                               "Fun test");//QString::fromStdString(model->getSensorIdentifier()));
+    archiveGroup += PvlKeyword("ReferenceTime", 
+                               "Thanksgiving");//QString::fromStdString(model->getReferenceDateAndTime()));
+
+    // Update existing Kernels Group or create new one and add shapemodel if provided
+    PvlGroup &kernelsGroup = label->findGroup("Kernels", Pvl::Traverse); 
     if (ui.WasEntered("SHAPEMODEL")) {
       // TODO validate the shapemodel
-      kernelsGroup += PvlKeyword("ShapeModel", ui.WasEntered());
+      kernelsGroup += PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL"));
     }
     else {
       kernelsGroup += PvlKeyword("ShapeModel", "Ellipsoid");
     }
 
-    // Create our CSM State blob
+    // Create our CSM State blob as a string
+    // Add the CSM string to the Blob.
+    StringBlob csmStateBlob(modelState, "CSMState");
+    PvlObject &blobLabel = csmStateBlob.Label();
+    blobLabel += PvlKeyword("ModelName", "ModelPumpkin");//QString::fromStdString(model->getModelName()));
+    blobLabel += PvlKeyword("PluginName", "TurkeyPlugin");//QString::fromStdString(plugin->getPluginName()));
 
     // Write CSM State blob to cube
+    cube->write(csmStateBlob);
 
     p.WriteHistory(*cube);
   }
