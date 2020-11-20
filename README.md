@@ -136,6 +136,17 @@ image from DockerHub.
 docker run -it usgsastro/isis bash
 ```
 
+#### Usage with the ISIS data area
+Usually you'll want to mount an external directory containing the ISIS data.
+The data is not included in the Docker image.
+
+```
+docker run -v /my/data/dir:/opt/conda/data -v /my/testdata/dir:/opt/conda/testData -it usgsastro/isis bash
+```
+
+Then [download the data](#the-isis-data-area) into /my/data/dir to make it accessible inside your
+container.
+
 ### Practical Usage with other conda packages
 
 If you don't use conda for anything else on your computer, you can
