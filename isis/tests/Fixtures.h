@@ -13,6 +13,7 @@
 
 #include "Cube.h"
 #include "IException.h"
+#include "OriginalLabel.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
