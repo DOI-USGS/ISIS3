@@ -1,4 +1,3 @@
-#include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
