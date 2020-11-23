@@ -43,7 +43,7 @@ namespace Isis {
         pairs = ui.GetString("PAIRS");
     }
 
-    stretch(inCube, pairs, ui, log);
+    stretch(cubeFile, pairs, ui, log);
   }
 
   void stretch(Cube *inCube, QString &pairs, UserInterface &ui, Pvl *log) {
