@@ -290,7 +290,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
 
   for (int i=0; i < latLatPoints.length(); i++) {
     ControlPoint* latLatPoint = latLatPoints[i];
-    ControlPoint* rectLatPoint;
+    ControlPoint *rectLatPoint = nullptr;
     EXPECT_NO_THROW({
         rectLatPoint = rectLatNet.GetPoint(latLatPoint->GetId());
     }
@@ -368,7 +368,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
 
   for (int i=0; i < rectLatPoints.length(); i++) {
     ControlPoint* rectLatPoint = rectLatPoints[i];
-    ControlPoint* rectRectPoint;
+    ControlPoint* rectRectPoint = nullptr;
     EXPECT_NO_THROW({
         rectRectPoint = rectRectNet.GetPoint(rectLatPoint->GetId());
     }
@@ -447,7 +447,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
 
   for (int i=0; i < latRectPoints.length(); i++) {
     ControlPoint* latRectPoint = latRectPoints[i];
-    ControlPoint* latLatPoint;
+    ControlPoint *latLatPoint = nullptr;
     EXPECT_NO_THROW({
         latLatPoint = latLatNet.GetPoint(latRectPoint->GetId());
     }
