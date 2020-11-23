@@ -5,7 +5,7 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void lronac2pds(UserInterface &ui, Pvl *log=nullptr);
+  extern void lronac2pds(UserInterface &ui);
 }
 
 #endif

@@ -31,7 +31,7 @@ namespace Isis {
 
   QString g_productVersionId = "N/A";
 
-  void lronac2pds(UserInterface &ui, Pvl *applog) {
+  void lronac2pds(UserInterface &ui) {
       ResetGlobals();
 
       g_productVersionId = ui.GetString("VERSIONIDSTRING");
