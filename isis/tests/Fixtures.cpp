@@ -118,6 +118,72 @@ namespace Isis {
     }
   }
 
+  void DemCube::SetUp() {
+    DefaultCube::SetUp();
+    testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
+    testCube->reopen("rw");
+
+    std::ifstream cubeLabel("data/defaultImage/demCube.pvl");
+
+    Pvl demLabel;
+    cubeLabel >> demLabel;
+    demLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels")["Type"] = "Real";
+
+    demCube = new Cube();
+    demCube->fromLabel(tempDir.path() + "/demCube.cub", demLabel, "rw");
+
+    TableField minRadius("MinimumRadius", TableField::Double);
+    TableField maxRadius("MaximumRadius", TableField::Double);
+
+    TableRecord record;
+    record += minRadius;
+    record += maxRadius;
+
+    Table shapeModelStatistics("ShapeModelStatistics", record);
+
+    record[0] = 3376.2;
+    record[1] = 3396.19;
+    shapeModelStatistics += record;
+
+    demCube->write(shapeModelStatistics);
+
+    int xCenter = int(demCube->lineCount()/2);
+    int yCenter = int(demCube->sampleCount()/2);
+    double radius = std::min(xCenter, yCenter);
+    double depth = 30;
+    double pointRadius;
+
+    LineManager line(*demCube);
+    double pixelValue;
+    double base = demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"];
+    double xPos = 0.0;
+
+    for(line.begin(); !line.end(); line++) {
+      for(int yPos = 0; yPos < line.size(); yPos++) {
+        pointRadius = pow(pow((xPos - xCenter), 2) + pow((yPos - yCenter), 2), 0.5);
+        if (pointRadius < radius) {
+          pixelValue = ((sin(((M_PI*pointRadius)/(2*radius))) * depth) + depth) + base;
+        }
+        else {
+          pixelValue = base + (depth * 2);
+        }
+        line[yPos] = (double) pixelValue;
+      }
+      xPos++;
+      demCube->write(line);
+    }
+
+    demCube->reopen("rw");
+  }
+
+  void DemCube::TearDown() {
+    if (demCube->isOpen()) {
+      demCube->close();
+    }
+
+    delete demCube;
+  }
+
 
   void DefaultCube::SetUp() {
     TempTestingFiles::SetUp();

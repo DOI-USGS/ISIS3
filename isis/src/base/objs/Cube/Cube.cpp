@@ -139,12 +139,12 @@ namespace Isis {
                  fileName.baseName().toStdString().c_str(), 153);
     }
 
-    Pvl label; 
+    Pvl label;
     nlohmann::json isd;
 
     try {
-      labelStream >> label; 
-    } 
+      labelStream >> label;
+    }
     catch (std::exception &ex) {
       QString msg = QString("Failed to open label file, %1, %2").arg(labelFile.expanded()).arg(ex.what());
       throw IException(IException::Io, msg,
