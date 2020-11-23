@@ -39,6 +39,12 @@ namespace Isis {
       std::cout << "Failed to load usgscsm" << std::endl;
     }
     //END TESTING
+    // We are not processing the image data, so this process object is just for
+    // managing the Cube in memory and adding history
+    Process p;
+    // Get the cube here so that we check early if it doesn't exist
+    Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
+
     QString isdFilePath = ui.GetFileName("ISD");
 
     QList<QStringList> possibleModels;
@@ -118,11 +124,6 @@ namespace Isis {
 
     string modelState = model->getModelState();
     // string modelState = "TestModel\nThis is the test model state.";
-
-    // We are not processing the image data, so this process object is just for
-    // managing the Cube in memory and adding history
-    Process p;
-    Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
     // Really should be
     // if (cube->camera()->type() == ISIS)
