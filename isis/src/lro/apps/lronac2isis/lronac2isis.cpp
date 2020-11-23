@@ -7,14 +7,18 @@
 #include "OriginalLabel.h"
 #include "History.h"
 #include "LineManager.h"
+#include "Application.h"
+
 #include <vector>
+
+#include "lronac2isis.h"
 
 #define MAX_INPUT_VALUE 4095
 
 using namespace std;
 
 namespace Isis {
-  
+
   void ResetGlobals();
   void Import(Buffer &buf);
   void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube);
@@ -27,21 +31,17 @@ namespace Isis {
   void lronac2isis(UserInterface &ui) {
     // Initialize variables
     ResetGlobals();
-  
     //Check that the file comes from the right camera
-    UserInterface &ui = Application::GetUserInterface();
     FileName inFile = ui.GetFileName("FROM");
     QString id;
     try {
       Pvl lab(inFile.expanded());
-  
       if(lab.hasKeyword("DATA_SET_ID"))
         id = (QString) lab.findKeyword("DATA_SET_ID");
       else {
         QString msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
-  
       //Checks if in file is rdr
       bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
       if(projected) {
@@ -49,17 +49,17 @@ namespace Isis {
         msg += " Use pds2isis.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-  
+      
       // Store the decompanding information
       PvlKeyword xtermKeyword = lab.findKeyword("LRO:XTERM"),
                  mtermKeyword = lab.findKeyword("LRO:MTERM"),
                  btermKeyword = lab.findKeyword("LRO:BTERM");
-  
+
       if(mtermKeyword.size() != xtermKeyword.size() || btermKeyword.size() != xtermKeyword.size()) {
         QString msg = "The decompanding terms do not have the same dimensions";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-  
+      
       for(int i = 0; i < xtermKeyword.size(); i++) {
         g_xterm.push_back(toDouble(xtermKeyword[i]));
         g_mterm.push_back(toDouble(mtermKeyword[i]));
@@ -67,7 +67,6 @@ namespace Isis {
       }
   
       double versionId = toDouble(lab.findKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
-  
       if(lab.findKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
         g_flip = true;
       else
@@ -91,7 +90,6 @@ namespace Isis {
     Pvl pdsLab;
     ProcessImportPds p;
     p.SetPdsFile(inFile.expanded(), "", pdsLab);
-  
     // Set the output bit type to Real
     CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
   
@@ -103,7 +101,6 @@ namespace Isis {
     g_ocube->setDimensions(p.Samples(), p.Lines(), p.Bands());
     g_ocube->setPixelType(Isis::Real);
     g_ocube->create(ui.GetFileName("TO"));
-  
     // Do 8 bit to 12 bit conversion
     // And if NAC-R, flip the frame
     p.StartProcess(Import);
@@ -111,16 +108,17 @@ namespace Isis {
     // Then translate the labels
     TranslateLrocNacLabels(inFile, g_ocube);
     p.EndProcess();
-  
+
     // Add History
-    History history("IsisCube");
-    history.AddEntry();
-    g_ocube->write(history);
-  
+    if (iApp) { 
+        History history("IsisCube");
+        history.AddEntry();
+        g_ocube->write(history);
+    }
+
     // Add original label
     OriginalLabel origLabel(pdsLab);
     g_ocube->write(origLabel);
-  
     g_ocube->close();
     delete g_ocube;
   }
