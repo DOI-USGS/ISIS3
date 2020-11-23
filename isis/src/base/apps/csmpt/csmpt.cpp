@@ -43,12 +43,12 @@ namespace Isis {
     // managing the Cube in memory and adding history
     Process p;
     // Get the cube here so that we check early if it doesn't exist
-    Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
+    Cube cube(ui.GetFileName("FROM"));
 
     StringBlob stateBlob("String", "CSMState");
 
     try {
-      cube->read(stateBlob);
+      cube.read(stateBlob);
     }
     catch(IException &e) {
       QString message = "Could not read CSM state string from input cube [" +
@@ -67,6 +67,14 @@ namespace Isis {
     QString modelName = stateLabel.findKeyword("ModelName");
 
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
+    if (!plugin) {
+      QString message = "Could not find plugin [" + pluginName + "] to instantiate "
+                        "model from. Loaded plugins:\n";
+      for (const csm::Plugin * plugin : csm::Plugin::getList()) {
+        message += QString::fromStdString(plugin->getPluginName()) + "\n";
+      }
+      throw IException(IException::User, message, _FILEINFO_);
+    }
     if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateBlob.string())) {
       QString message = "Plugin [" + pluginName + "] cannot construct model [" +
                          modelName + "] from state string [" +
