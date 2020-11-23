@@ -27,6 +27,10 @@ namespace Isis {
       StringBlob(std::string str, QString name);
       ~StringBlob();
 
+      std::string string() {
+        return m_string;
+      }
+
     protected:
       // prepare data for writing
       void WriteInit();

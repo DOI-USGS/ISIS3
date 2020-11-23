@@ -125,10 +125,7 @@ namespace Isis {
     string modelState = model->getModelState();
     // string modelState = "TestModel\nThis is the test model state.";
 
-    // Really should be
-    // if (cube->camera()->type() == ISIS)
-    //
-    // Maybe just do spiceinit clean-up routine instead
+    // TODO Just do spiceinit clean-up routine instead
     try {
       cube->camera();
       QString message = "Input cube [" + ui.GetFileName("FROM") + "]. "
@@ -205,6 +202,8 @@ namespace Isis {
 
     // Write CSM State blob to cube
     cube->write(csmStateBlob);
+
+    // TODO attempt to get the CSM Model from the cube
 
     p.WriteHistory(*cube);
   }
