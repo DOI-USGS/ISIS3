@@ -484,6 +484,7 @@ namespace Isis {
       vector<QString> paramValue;
 
       getNextParameter(currArgument, paramName, paramValue);
+
       // we now have a name,value pair
       if (paramName[0] == '-') {
         paramName = paramName.toUpper();
@@ -520,6 +521,7 @@ namespace Isis {
         }
 
         evaluateOption(paramName, realValue);
+
         continue;
       }
 
@@ -530,6 +532,7 @@ namespace Isis {
       catch (IException &e) {
         throw IException(e, IException::User, "Invalid command line", _FILEINFO_);
       }
+
     }
 
     // Can't use the batchlist with the gui, save, last or restore option

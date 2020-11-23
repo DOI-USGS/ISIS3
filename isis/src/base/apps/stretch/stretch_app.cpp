@@ -14,11 +14,12 @@ namespace Isis {
   Statistics stats;
 
   void stretch(UserInterface &ui, Pvl *log) {
-    Cube *cubeFile = new Cube(ui.GetFileName("FROM"), "r");
+    Cube *cubeFile = new Cube();
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
+    cubeFile->open(ui.GetFileName("FROM"), "r");
 
     QString pairs;
 
@@ -42,7 +43,7 @@ namespace Isis {
         pairs = ui.GetString("PAIRS");
     }
 
-    stretch(cubeFile, pairs, ui, log);
+    stretch(inCube, pairs, ui, log);
   }
 
   void stretch(Cube *inCube, QString &pairs, UserInterface &ui, Pvl *log) {
