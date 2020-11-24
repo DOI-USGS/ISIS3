@@ -11,6 +11,8 @@
 #include "csm/Plugin.h"
 
 #include "Blob.h"
+#include "Camera.h"
+#include "CameraFactory.h"
 #include "Cube.h"
 #include "IException.h"
 #include "Process.h"
@@ -30,20 +32,22 @@ namespace Isis {
    * @param(out) log The Pvl that attempted models will be logged to
    */
   void csminit(UserInterface &ui, Pvl *log) {
-    //TESTING LOAD USGSCSM
-    QLibrary usgscsm("/Users/jmapel/miniconda3/envs/isis4_build/lib/libusgscsm.dylib");
-    if (usgscsm.load()) {
-      std::cout << "Successfully loaded usgscsm" << std::endl;
-    }
-    else {
-      std::cout << "Failed to load usgscsm" << std::endl;
-    }
-    //END TESTING
     // We are not processing the image data, so this process object is just for
     // managing the Cube in memory and adding history
     Process p;
     // Get the cube here so that we check early if it doesn't exist
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
+
+    // TESTING
+    // We have to call this to get the plugin list loaded right now
+    try {
+      Camera *cam = CameraFactory::Create(*cube);
+      delete cam;
+    }
+    catch(...) {
+      // Noop
+    }
+    // END TESTING
 
     QString isdFilePath = ui.GetFileName("ISD");
 
