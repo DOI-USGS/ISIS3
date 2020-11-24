@@ -9,12 +9,9 @@
 
 #include <QDebug>
 #include <QString>
-
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-
-
 
 #include "BasisFunction.h"
 #include "IException.h"

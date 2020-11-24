@@ -1,0 +1,89 @@
+Object = catlab
+  IsisVersion       = "4.3.0  | 2020-11-19"
+  ProgramVersion    = 2010-07-26
+  ProgramPath       = /home/arsanders/isis3/ISIS3/build/bin
+  ExecutionDateTime = 2020-11-19T15:49:56
+  HostName          = Unknown
+  UserName          = arsanders
+  Description       = "Outputs the label from a cube"
+
+  Group = UserParameters
+    FROM   = dtm/DTM_Zumba_1m_forPDS_lowres.cub
+    APPEND = TRUE
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.0
+    CpuTime     = 00:00:00.1
+  End_Group
+End_Object
+
+
+Object = catlab
+  IsisVersion       = "4.3.0  | 2020-11-19"
+  ProgramVersion    = 2010-07-26
+  ProgramPath       = /home/arsanders/isis3/ISIS3/build/bin
+  ExecutionDateTime = 2020-11-19T15:50:18
+  HostName          = Unknown
+  UserName          = arsanders
+  Description       = "Outputs the label from a cube"
+
+  Group = UserParameters
+    FROM   = dtm/Polar_Crater_1_1m_ngate_edited2_forPDS_lowres.cub
+    APPEND = TRUE
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.0
+    CpuTime     = 00:00:00.1
+  End_Group
+End_Object
+
+
+Object = hidtmgen
+  IsisVersion       = "4.3.0  | 2020-11-19"
+  ProgramVersion    = 2016-08-19
+  ProgramPath       = /home/arsanders/isis3/ISIS3/build/bin
+  ExecutionDateTime = 2020-11-19T16:12:40
+  HostName          = Unknown
+  UserName          = arsanders
+  Description       = "Generates PDS products from a DTM and/or orthorectified
+                       images."
+
+  Group = UserParameters
+    DEFAULTNAMES            = true
+    OUTPUTDIR               = out/
+    DTM                     = dtm/DTM_Zumba_1m_forPDS_lowres.cub
+    ORTHOFROMLIST           = equi/orthoInputList.txt
+    ORTHOSEQUENCENUMBERLIST = equi/sequenceNumbers.txt
+    PARAMSPVL               = equi/params.pvl
+    ENDIAN                  = LSB
+    NULL                    = true
+    LRS                     = false
+    LIS                     = false
+    HIS                     = false
+    HRS                     = false
+    DTMBITTYPE              = 32BIT
+    ORTHOBITTYPE            = 8BIT
+  End_Group
+
+  Group = Error
+    Program = hidtmgen
+    Code    = 1
+    Message = "hidtmgen: Unable to HiRISE generate pds products"
+    File    = hidtmgen.cpp
+    Line    = 343
+  End_Group
+
+  Group = Error
+    Program = hidtmgen
+    Class   = "I/O ERROR"
+    Code    = 4
+    Message = "Unable to open
+               [data/hidtmgen/ortho/PSP_002118_1510_1m_o_forPDS_cropped.cub]"
+    File    = Cube.cpp
+    Line    = 2208
+  End_Group
+End_Object
+
+
