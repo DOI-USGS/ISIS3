@@ -1,5 +1,6 @@
 #include <iostream>
 #include <QTemporaryFile>
+#include <QRegularExpression>
 
 #include "spiceinit.h"
 
@@ -188,7 +189,12 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[0], "Table");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[1], "$mro/kernels/ck/mro_crm_psp_110223_101128.bc");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[2], "$mro/kernels/ck/mro_sc_psp_110222_110228.bc");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[3], "$mro/kernels/fk/mro_v16.tf");
+  // Use a regex to match the versin # for the frame kernel because this sometimes updates
+  // when new MRO spice is released.
+  QRegularExpression fkRegex("mro_v\\d\\d\\.tf");
+  EXPECT_TRUE(fkRegex.match(instrumentPointing[3]).hasMatch()) << "Frame kernel ["
+      << instrumentPointing[3].toStdString() << "] doesn't match regex ["
+      << fkRegex.pattern().toStdString() << "].";
 }
 
 
