@@ -118,6 +118,72 @@ namespace Isis {
     }
   }
 
+  void DemCube::SetUp() {
+    DefaultCube::SetUp();
+    testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
+    testCube->reopen("rw");
+
+    std::ifstream cubeLabel("data/defaultImage/demCube.pvl");
+
+    Pvl demLabel;
+    cubeLabel >> demLabel;
+    demLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels")["Type"] = "Real";
+
+    demCube = new Cube();
+    demCube->fromLabel(tempDir.path() + "/demCube.cub", demLabel, "rw");
+
+    TableField minRadius("MinimumRadius", TableField::Double);
+    TableField maxRadius("MaximumRadius", TableField::Double);
+
+    TableRecord record;
+    record += minRadius;
+    record += maxRadius;
+
+    Table shapeModelStatistics("ShapeModelStatistics", record);
+
+    record[0] = 3376.2;
+    record[1] = 3396.19;
+    shapeModelStatistics += record;
+
+    demCube->write(shapeModelStatistics);
+
+    int xCenter = int(demCube->lineCount()/2);
+    int yCenter = int(demCube->sampleCount()/2);
+    double radius = std::min(xCenter, yCenter);
+    double depth = 30;
+    double pointRadius;
+
+    LineManager line(*demCube);
+    double pixelValue;
+    double base = demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"];
+    double xPos = 0.0;
+
+    for(line.begin(); !line.end(); line++) {
+      for(int yPos = 0; yPos < line.size(); yPos++) {
+        pointRadius = pow(pow((xPos - xCenter), 2) + pow((yPos - yCenter), 2), 0.5);
+        if (pointRadius < radius) {
+          pixelValue = ((sin(((M_PI*pointRadius)/(2*radius))) * depth) + depth) + base;
+        }
+        else {
+          pixelValue = base + (depth * 2);
+        }
+        line[yPos] = (double) pixelValue;
+      }
+      xPos++;
+      demCube->write(line);
+    }
+
+    demCube->reopen("rw");
+  }
+
+  void DemCube::TearDown() {
+    if (demCube->isOpen()) {
+      demCube->close();
+    }
+
+    delete demCube;
+  }
+
 
   void DefaultCube::SetUp() {
     TempTestingFiles::SetUp();
@@ -162,11 +228,11 @@ namespace Isis {
     if (testCube->isOpen()) {
       testCube->close();
     }
-    
+
     if (projTestCube->isOpen()) {
       projTestCube->close();
     }
-    
+
     delete testCube;
     delete projTestCube;
   }
@@ -281,16 +347,16 @@ namespace Isis {
     cubes.fill(nullptr, 7);
 
     cubeList = new FileList();
-    
+
     for(int i = 0; i < cubes.size(); i++) {
-      int n = i+1; // filenames use 1 based indexing 
-      isdFiles.push_back(FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".isd"));     
+      int n = i+1; // filenames use 1 based indexing
+      isdFiles.push_back(FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".isd"));
       labelFiles.push_back(FileName("data/apolloNetwork/apolloImage"+QString::number(n)+".pvl"));
       cubes[i] = new Cube();
       cubes[i]->fromIsd(tempDir.path() + "/cube"+QString::number(n)+".cub", labelFiles[i], isdFiles[i], "rw");
       cubeList->append(cubes[i]->fileName());
     }
-    
+
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
@@ -304,10 +370,10 @@ namespace Isis {
       if(cubes[i] && cubes[i]->isOpen()) {
         delete cubes[i];
       }
-    } 
+    }
 
     if (cubeList) {
-      delete cubeList; 
+      delete cubeList;
     }
   }
 
@@ -321,11 +387,16 @@ namespace Isis {
       cubeL = new Cube();
       cubeR = new Cube();
 
-      cubeLPath = tempDir.path() + "/observationPairL.cub";
+      cubeLPath = tempDir.path() + "observationPairL.cub";
       cubeRPath = tempDir.path() + "/observationPairR.cub";
 
-      cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");    
-      cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");    
+      cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");
+      Pvl originalPdsLabL("data/observationPair/observationImageLOriginalLabel.pvl");
+      OriginalLabel origLabel(originalPdsLabL);
+      cubeL->write(origLabel);
+      cubeL->reopen("rw");
+
+      cubeR->fromIsd(cubeRPath, labelPathR, *isdPathR, "rw");
 
       cubeList = new FileList();
       cubeList->append(cubeL->fileName());
@@ -347,7 +418,7 @@ namespace Isis {
     if (cubeL) {
       delete cubeL;
     }
-    
+
     if (cubeR) {
       delete cubeR;
     }
@@ -358,24 +429,23 @@ namespace Isis {
 
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
-     
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
 
     // force real DNs
     QString fname = testCube->fileName();
 
-    PvlObject &core = label.findObject("IsisCube").findObject("Core"); 
-    PvlGroup &pixels = core.findGroup("Pixels"); 
-    pixels.findKeyword("Type").setValue("Real"); 
+    PvlObject &core = label.findObject("IsisCube").findObject("Core");
+    PvlGroup &pixels = core.findGroup("Pixels");
+    pixels.findKeyword("Type").setValue("Real");
 
-    delete testCube; 
+    delete testCube;
     testCube = new Cube();
 
     FileName newCube(tempDir.path() + "/testing.cub");
 
-    testCube->fromIsd(newCube, label, isd, "rw"); 
+    testCube->fromIsd(newCube, label, isd, "rw");
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-    kernels.findKeyword("NaifFrameCode").setValue("-74999");    
+    kernels.findKeyword("NaifFrameCode").setValue("-74999");
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
     std::istringstream iss(R"(
       Group = Instrument
@@ -456,22 +526,22 @@ namespace Isis {
         Unlutted                    = TRUE
       End_Group
     )");
-    
-    PvlGroup newInstGroup; 
-    iss >> newInstGroup; 
-    
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+
     newInstGroup.findKeyword("InstrumentId").setValue("HIRISE");
     newInstGroup.findKeyword("SpacecraftName").setValue("MARS RECONNAISSANCE ORBITER");
 
-    inst = newInstGroup; 
+    inst = newInstGroup;
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-    
+
     PvlKeyword startcc("SpacecraftClockStartCount", "33322515");
     PvlKeyword stopcc("SpaceCraftClockStopCount", "33322516");
     inst += startcc;
-    inst += stopcc;  
-    
-    json nk; 
+    inst += stopcc;
+
+    json nk;
     nk["INS-74999_FOCAL_LENGTH"] = 11994.9988;
     nk["INS-74999_PIXEL_PITCH"] = 0.012;
     nk["INS-74605_TRANSX"] = {-89.496, -1.0e-06, 0.012};
@@ -481,14 +551,14 @@ namespace Isis {
     nk["INS-74999_OD_K"] = {-0.0048509, 2.41312e-07, -1.62369e-13};
     nk["BODY499_RADII"] = {3396.19, 3396.19, 3376.2};
     nk["CLOCK_ET_-74999_895484264:57342_COMPUTED"] = "8ed6ae8930f3bd41";
-    
+
     nk["BODY_CODE"] = 499;
-    nk["BODY_FRAME_CODE"] = 10014; 
+    nk["BODY_FRAME_CODE"] = 10014;
     PvlObject newNaifKeywords("NaifKeywords", nk);
-    naifKeywords = newNaifKeywords; 
+    naifKeywords = newNaifKeywords;
 
     QString fileName = testCube->fileName();
-   
+
     LineManager line(*testCube);
     for(line.begin(); !line.end(); line++) {
         for(int i = 0; i < line.size(); i++) {
@@ -497,35 +567,35 @@ namespace Isis {
         testCube->write(line);
     }
     testCube->reopen("rw");
-  
-    // need to remove old camera pointer 
+
+    // need to remove old camera pointer
     delete testCube;
     // This is now a MRO cube
 
     testCube = new Cube(fileName, "rw");
 
-    // create a jitter file 
+    // create a jitter file
     QString jitter = R"(# Sample                 Line                   ET
 -0.18     -0.07     264289109.96933
 -0.11     -0.04     264289109.97
 -0.05     -0.02     264289109.98
 1.5     0.6     264289110.06
-    )"; 
-    
-    jitterPath = tempDir.path() + "/jitter.txt"; 
-    QFile jitterFile(jitterPath); 
-    
+    )";
+
+    jitterPath = tempDir.path() + "/jitter.txt";
+    QFile jitterFile(jitterPath);
+
     if (jitterFile.open(QIODevice::WriteOnly)) {
-      QTextStream out(&jitterFile); 
+      QTextStream out(&jitterFile);
       out << jitter;
-      jitterFile.close(); 
+      jitterFile.close();
     }
-    else { 
+    else {
       FAIL() << "Failed to create Jitter file" << std::endl;
     }
   }
 
-  
+
   void NewHorizonsCube::setInstrument(QString ikid, QString instrumentId, QString spacecraftName) {
     PvlObject &isisCube = testCube->label()->findObject("IsisCube");
 
@@ -536,12 +606,12 @@ namespace Isis {
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
     kernels["ShapeModel"] = "Null";
 
-    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions"); 
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
     dim.findKeyword("Samples").setValue("10");
     dim.findKeyword("Lines").setValue("10");
     dim.findKeyword("Bands").setValue("2");
 
-    PvlGroup &pixels = label.findObject("IsisCube").findObject("Core").findGroup("Pixels"); 
+    PvlGroup &pixels = label.findObject("IsisCube").findObject("Core").findGroup("Pixels");
     pixels.findKeyword("Type").setValue("Real");
 
     PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");
@@ -557,14 +627,14 @@ namespace Isis {
         FrameRate                 = 2.86533 <Hz>
       End_Group
     )");
-    
-    PvlGroup newInstGroup; 
-    iss >> newInstGroup;     
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
 
     newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
     newInstGroup.findKeyword("SpacecraftName").setValue(spacecraftName);
 
-    inst = newInstGroup; 
+    inst = newInstGroup;
 
     PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
     std::istringstream bss(R"(
@@ -574,10 +644,10 @@ namespace Isis {
         OriginalBand = (1, 200)
       End_Group
     )");
-    
-    PvlGroup newBandBin; 
-    bss >> newBandBin;   
-    bandBin = newBandBin; 
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
 
     std::istringstream alphaSS(R"(
       Group = AlphaCube
@@ -591,8 +661,8 @@ namespace Isis {
         BetaLines           = 100
       End_Group
     )");
-    
-    PvlGroup alphaGroup; 
+
+    PvlGroup alphaGroup;
     alphaSS >> alphaGroup;
     label.findObject("IsisCube").addGroup(alphaGroup);
 
@@ -635,27 +705,27 @@ namespace Isis {
 
     PvlGroup reseaus("Reseaus");
     PvlKeyword samples = PvlKeyword("Sample", "200");
-    samples += "400"; 
-    samples += "600"; 
+    samples += "400";
+    samples += "600";
 
     PvlKeyword lines = PvlKeyword("Line", "200");
-    lines += "400"; 
-    lines += "600"; 
+    lines += "400";
+    lines += "600";
 
     PvlKeyword types = PvlKeyword("Type", "5");
-    types += "5"; 
-    types += "5"; 
+    types += "5";
+    types += "5";
 
     PvlKeyword valid = PvlKeyword("Valid", "1");
-    valid += "1"; 
-    valid += "1"; 
+    valid += "1";
+    valid += "1";
 
-    reseaus += lines; 
-    reseaus += samples; 
+    reseaus += lines;
+    reseaus += samples;
     reseaus += types;
-    reseaus += valid; 
+    reseaus += valid;
     reseaus += PvlKeyword("Status", "Nominal");
-    
+
     std::istringstream instStr (R"(
       Group = Instrument
           SpacecraftName = "APOLLO 15"
@@ -664,14 +734,14 @@ namespace Isis {
           StartTime      = 1971-08-01T14:58:03.78
       End_Group
     )");
-    
-    PvlGroup instGroup; 
-    instStr >> instGroup; 
-    
+
+    PvlGroup instGroup;
+    instStr >> instGroup;
+
     Pvl *lab = testCube->label();
     lab->findObject("IsisCube").addGroup(reseaus);
     lab->findObject("IsisCube").addGroup(instGroup);
-    
+
     testCube->reopen("r");
   }
 
