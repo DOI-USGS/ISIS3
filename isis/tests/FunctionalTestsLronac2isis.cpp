@@ -23,7 +23,7 @@ TEST(Lronac2isisTests, Lro2isisNacLFull) {
   ASSERT_TRUE(prefix.isValid());
 
   QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=/Users/kelvin/nacl00015d79_cropped.img", "to="+cubeFileName};
+  QVector<QString> args = {"from=data/lronac/nacl.img", "to="+cubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
@@ -89,7 +89,7 @@ TEST(Lronac2isisTests, Lro2isisNacR) {
   ASSERT_TRUE(prefix.isValid());
 
   QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=/Users/kelvin/nacrfull_cropped.img", "to="+cubeFileName};
+  QVector<QString> args = {"from=data/lronac/nacr.img", "to="+cubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
@@ -154,8 +154,8 @@ TEST(Lronac2isisTests, Lro2isisLabelFail) {
   QTemporaryDir prefix; 
   ASSERT_TRUE(prefix.isValid());
 
-  QString badLabelPath = "/tmp/badLabel.img"; 
-  Pvl lab("/Users/kelvin/nacrfull_cropped.img");
+  QString badLabelPath = prefix.path() + "/badLabel.img"; 
+  Pvl lab("data/lronac/nacr.img");
   PvlKeyword &bterm = lab.findKeyword("LRO:BTERM");
   bterm.setValue("fake");
   lab.write(badLabelPath);
