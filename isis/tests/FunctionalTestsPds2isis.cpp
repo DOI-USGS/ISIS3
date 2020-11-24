@@ -347,6 +347,4 @@ TEST(Pds2Isis, Pds2isisTestNIMSQub) {
   ASSERT_EQ((int)dimensions["Lines"], 46);
   ASSERT_EQ((int)dimensions["Samples"], 1);
   ASSERT_EQ((int)dimensions["Bands"], 12);
-
-
 }
