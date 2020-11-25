@@ -7,7 +7,7 @@
 
   <description>
     <p>
-      This program searches takes an ISD or state string and attempts to create
+      This program takes an ISD or state string and attempts to create
       a valid CSM Model from the loaded CSM Libraries. Then, it attaches the
       state string from the CSM Model to the cube for later use. If there are
       multiple valid CSM Models that can be instantiated, then this program
@@ -21,7 +21,7 @@
   </category>
 
   <history>
-    <change name="Jesse Mapel" date="2020-1-18">
+    <change name="Jesse Mapel" date="2020-11-18">
       Original Version
     </change>
   </history>
