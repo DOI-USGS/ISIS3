@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="csminit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Attach a CSM Model state to a cube
+  </brief>
+
+  <description>
+    <p>
+      This program takes an ISD or state string and attempts to create
+      a valid CSM Model from the loaded CSM Libraries. Then, it attaches the
+      state string from the CSM Model to the cube for later use. If there are
+      multiple valid CSM Models that can be instantiated, then this program
+      will error and the user will have to re-run it with a specific model
+      and/or plugin name.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2020-11-18">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input cube that the state string will be attached to.
+        </brief>
+        <description>
+          The input cube that the state string will be attached to.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+
+      <parameter name="ISD">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The ISD file that will be used.
+        </brief>
+        <description>
+          The ISD file that will be used to create the model state string.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Target Specification">
+      <parameter name="TARGETNAME">
+        <type>string</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The name of the body observed by the image.
+        </brief>
+        <description>
+          The name of the body observed by the image. If not entered, then the
+          target already listed on the label will be used.
+        </description>
+      </parameter>
+
+      <parameter name="SHAPEMODEL">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The shapemodel to represent the surface of the observed body.
+        </brief>
+        <description>
+          The shapemodel to represent the surface of the observed body. If none
+          is entered, then a bi-axial ellipsoid is used. The radii are defined
+          by the CSM Model.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Model Specification">
+      <parameter name="PLUGINNAME">
+        <type>string</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The name of the plugin to use.
+        </brief>
+        <description>
+          The name of the plugin to use. The loaded CSM Libraries will be
+          searched for a plugin that has this name. If no such plugin is found
+          an error will be returned.
+        </description>
+      </parameter>
+
+      <parameter name="MODELNAME">
+        <type>string</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The name of the model to use.
+        </brief>
+        <description>
+          The name of the model to use. The loaded CSM Libraries will be
+          searched for a model that has this name. If no such model is found an
+          error will be returned.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>
