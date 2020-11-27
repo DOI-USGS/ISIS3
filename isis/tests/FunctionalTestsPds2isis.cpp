@@ -5,6 +5,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "Histogram.h"
 
 #include "gtest/gtest.h"
 
@@ -48,13 +49,27 @@ TEST(Pds2Isis, Pds2isisTestDefault) {
   ASSERT_EQ(archive["TargetName"][0].toStdString(), "MARS");
   ASSERT_EQ(archive["MissionPhaseName"][0].toStdString(), "AB-1");
   ASSERT_EQ(archive["RationaleDescription"][0].toStdString(), "OLYMPUS MONS SPECIAL RED WIDE ANGLE");
+
+
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 81.5828125, .00001);
+  ASSERT_EQ(hist->Sum(), 261065);
+  ASSERT_EQ(hist->ValidPixels(), 3200);
+  ASSERT_NEAR(hist->StandardDeviation(), 30.5674, .0001);
 }
 
 
 TEST(Pds2Isis, Pds2isisTestBandBin) {
   Pvl appLog;
   QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/pds2isis_out.cub";
+  // QString cubeFileName = prefix.path() + "/pds2isis_out.cub";
+  QString cubeFileName = "/home/tgiroux/Desktop/pds2isis_bandbin_out.cub";
   QVector<QString> args = { "from=data/pds2isis/gaspra_nims_hires_radiance_cropped.lbl",
                             "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
@@ -70,9 +85,9 @@ TEST(Pds2Isis, Pds2isisTestBandBin) {
   Pvl *outLabel = outCube.label();
 
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
-  ASSERT_EQ((int)dimensions["Samples"], 1);
-  ASSERT_EQ((int)dimensions["Lines"], 66);
-  ASSERT_EQ((int)dimensions["Bands"], 17);
+  ASSERT_EQ((int)dimensions["Samples"], 100);
+  ASSERT_EQ((int)dimensions["Lines"], 3);
+  ASSERT_EQ((int)dimensions["Bands"], 3);
 
   bool ok = false;
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
@@ -129,6 +144,18 @@ TEST(Pds2Isis, Pds2isisTestBandBin) {
   ASSERT_EQ(bandbin["FilterNumber"][14].toInt(&ok, 10), 15);
   ASSERT_EQ(bandbin["FilterNumber"][15].toInt(&ok, 10), 16);
   ASSERT_EQ(bandbin["FilterNumber"][16].toInt(&ok, 10), 17);
+
+  std::unique_ptr<Histogram> hist (outCube.histogram(0));
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 0.205984, 1e-3);
+  ASSERT_NEAR(hist->Sum(), 185.386, 1e-3);
+  ASSERT_EQ(hist->ValidPixels(), 900);
+  ASSERT_NEAR(hist->StandardDeviation(), 0.606295, 1e-3);
 }
 
 
@@ -168,6 +195,17 @@ TEST(Pds2Isis, Pds2isisTestOffset) {
   ASSERT_EQ((double)mapping["PixelResolution"], 7580.84);
   ASSERT_EQ((double)mapping["Scale"], 4.0);
 
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 1.7375e+06, 10);
+  ASSERT_NEAR(hist->Sum(), 2.50026e+09, 1e3);
+  ASSERT_EQ(hist->ValidPixels(), 1439);
+  ASSERT_NEAR(hist->StandardDeviation(), 9187.96, .0001);
 }
 
 TEST(Pds2Isis, Pds2isisTestProjection) {
@@ -205,6 +243,18 @@ TEST(Pds2Isis, Pds2isisTestProjection) {
   ASSERT_EQ((double)mapping["UpperLeftCornerY"], -3053025.0);
   ASSERT_EQ((double)mapping["PixelResolution"], 75.0);
   ASSERT_EQ((double)mapping["Scale"], 1407.4);
+
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 67.7978515625, .00001);
+  ASSERT_EQ(hist->Sum(), 69425);
+  ASSERT_EQ(hist->ValidPixels(), 1024);
+  ASSERT_NEAR(hist->StandardDeviation(), 26.0079, .0001);
 }
 
 TEST(Pds2Isis, Pds2isisTestSpecialPixels) {
@@ -278,7 +328,7 @@ TEST(Pds2Isis, Pds2isisTestBIL) {
   Pvl appLog;
   QTemporaryDir prefix;
   QVector<QString> args;
-  QString cubeFileName = "/home/tgiroux/Desktop/pds2isis_BIL_out.cub";
+  QString cubeFileName = prefix.path() + "/pds2isis_BIL_out.cub";
 
   args = { "from=data/pds2isis/BILtestData_cropped.LBL",
            "to=" + cubeFileName};
@@ -297,13 +347,25 @@ TEST(Pds2Isis, Pds2isisTestBIL) {
   ASSERT_EQ((int)dimensions["Lines"], 1);
   ASSERT_EQ((int)dimensions["Samples"], 304);
   ASSERT_EQ((int)dimensions["Bands"], 1);
+
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 6.35692e+31, 1e25);
+  ASSERT_NEAR(hist->Sum(), 1.9325e+34, 1e29);
+  ASSERT_EQ(hist->ValidPixels(), 304);
+  ASSERT_NEAR(hist->StandardDeviation(), 1.08618e+33, 1e28);
 }
 
 TEST(Pds2Isis, Pds2isisTestBIP) {
   Pvl appLog;
   QTemporaryDir prefix;
   QVector<QString> args;
-  QString cubeFileName = "/home/tgiroux/Desktop/pds2isis_BIP_out.cub";
+  QString cubeFileName = prefix.path() + "/pds2isis_BIP_out.cub";
 
   args = { "from=data/pds2isis/BIPtestData_cropped.LBL",
            "to=" + cubeFileName};
@@ -322,13 +384,25 @@ TEST(Pds2Isis, Pds2isisTestBIP) {
   ASSERT_EQ((int)dimensions["Lines"], 1);
   ASSERT_EQ((int)dimensions["Samples"], 304);
   ASSERT_EQ((int)dimensions["Bands"], 1);
+
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 6.35692e+31, 1e25);
+  ASSERT_NEAR(hist->Sum(), 1.9325e+34, 1e29);
+  ASSERT_EQ(hist->ValidPixels(), 304);
+  ASSERT_NEAR(hist->StandardDeviation(), 1.08618e+33, 1e28);
 }
 
 TEST(Pds2Isis, Pds2isisTestNIMSQub) {
   Pvl appLog;
   QTemporaryDir prefix;
   QVector<QString> args;
-  QString cubeFileName = "/home/tgiroux/Desktop/pds2isis_QUB_out.cub";
+  QString cubeFileName = prefix.path() + "/pds2isis_QUB_out.cub";
 
   args = { "from=data/pds2isis/30i001ci_cropped.qub",
            "to=" + cubeFileName};
@@ -347,4 +421,16 @@ TEST(Pds2Isis, Pds2isisTestNIMSQub) {
   ASSERT_EQ((int)dimensions["Lines"], 46);
   ASSERT_EQ((int)dimensions["Samples"], 1);
   ASSERT_EQ((int)dimensions["Bands"], 12);
+
+  std::unique_ptr<Histogram> hist (outCube.histogram());
+
+  std::cout << hist->Average() << std::endl;
+  std::cout << hist->Sum() << std::endl;
+  std::cout << hist->ValidPixels() << std::endl;
+  std::cout << hist->StandardDeviation() << std::endl;
+
+  ASSERT_NEAR(hist->Average(), 1.64693e+30, 1e25);
+  ASSERT_NEAR(hist->Sum(), 7.57588e+31, 1e26);
+  ASSERT_EQ(hist->ValidPixels(), 46);
+  ASSERT_NEAR(hist->StandardDeviation(), 1.117e+31, 1e26);
 }

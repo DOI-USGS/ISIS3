@@ -1,4 +1,4 @@
-PDS_VERSION_ID                = PDS3
+pDS_VERSION_ID                = PDS3
 DD_VERSION_ID                 = "PDSCAT1R82"
 LABEL_REVISION_NOTE           = "LABEL VERSION 0"
 
@@ -9,7 +9,7 @@ FILE_RECORDS                  = 10
 
 /* Pointers to Data Objects */
 ^HEADER                       = "gaspra_nims_hires_radiance_cropped.fit"
-^SPECTRAL_QUBE                = ("gaspra_nims_hires_radiance_cropped.fit", 3)
+^SPECTRAL_QUBE                = ("gaspra_nims_hires_radiance_cropped.fit",3)
 
 /* Identification Data Elements */
 DATA_SET_ID                   = "GO-A-NIMS-4-GASPRACUBE-V1.0"
@@ -70,7 +70,7 @@ OBJECT = SPECTRAL_QUBE
   AXIS_NAME = (SAMPLE, LINE, BAND)
   ISIS_STRUCTURE_VERSION = "2.1"
   /* Core Description */
-  CORE_ITEMS = (1, 66, 17)
+  CORE_ITEMS = (100, 3, 3)
   CORE_NAME = "CALIBRATED SPECTRAL RADIANCE"
   CORE_ITEM_BYTES = 4
   CORE_ITEM_TYPE = IEEE_REAL
@@ -117,8 +117,8 @@ OBJECT                        = EXTENSION_WAVELENGTH_HEADER
 END_OBJECT                    = EXTENSION_WAVELENGTH_HEADER
 
 OBJECT                        = EXTENSION_WAVELENGTH_IMAGE
-  LINE_SAMPLES                = 66
-  LINES                       = 1
+  LINE_SAMPLES                = 100
+  LINES                       = 66
   BANDS                       = 17
   SAMPLE_BITS                 = 32
   SAMPLE_TYPE                 = "IEEE_REAL"
@@ -138,8 +138,8 @@ OBJECT                        = EXTENSION_ERROR_HEADER
 END_OBJECT                    = EXTENSION_ERROR_HEADER
 
 OBJECT                        = EXTENSION_ERROR_IMAGE
-  LINE_SAMPLES                = 66
-  LINES                       = 1
+  LINE_SAMPLES                = 100
+  LINES                       = 66
   BANDS                       = 17
   SAMPLE_BITS                 = 32
   SAMPLE_TYPE                 = "IEEE_REAL"
