@@ -52,12 +52,6 @@ TEST(Pds2Isis, Pds2isisTestDefault) {
 
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 81.5828125, .00001);
   ASSERT_EQ(hist->Sum(), 261065);
   ASSERT_EQ(hist->ValidPixels(), 3200);
@@ -146,12 +140,6 @@ TEST(Pds2Isis, Pds2isisTestBandBin) {
   ASSERT_EQ(bandbin["FilterNumber"][16].toInt(&ok, 10), 17);
 
   std::unique_ptr<Histogram> hist (outCube.histogram(0));
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 0.205984, 1e-3);
   ASSERT_NEAR(hist->Sum(), 185.386, 1e-3);
   ASSERT_EQ(hist->ValidPixels(), 900);
@@ -196,12 +184,6 @@ TEST(Pds2Isis, Pds2isisTestOffset) {
   ASSERT_EQ((double)mapping["Scale"], 4.0);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 1.7375e+06, 10);
   ASSERT_NEAR(hist->Sum(), 2.50026e+09, 1e3);
   ASSERT_EQ(hist->ValidPixels(), 1439);
@@ -245,12 +227,6 @@ TEST(Pds2Isis, Pds2isisTestProjection) {
   ASSERT_EQ((double)mapping["Scale"], 1407.4);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 67.7978515625, .00001);
   ASSERT_EQ(hist->Sum(), 69425);
   ASSERT_EQ(hist->ValidPixels(), 1024);
@@ -349,12 +325,6 @@ TEST(Pds2Isis, Pds2isisTestBIL) {
   ASSERT_EQ((int)dimensions["Bands"], 1);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 6.35692e+31, 1e25);
   ASSERT_NEAR(hist->Sum(), 1.9325e+34, 1e29);
   ASSERT_EQ(hist->ValidPixels(), 304);
@@ -386,12 +356,6 @@ TEST(Pds2Isis, Pds2isisTestBIP) {
   ASSERT_EQ((int)dimensions["Bands"], 1);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 6.35692e+31, 1e25);
   ASSERT_NEAR(hist->Sum(), 1.9325e+34, 1e29);
   ASSERT_EQ(hist->ValidPixels(), 304);
@@ -423,12 +387,6 @@ TEST(Pds2Isis, Pds2isisTestNIMSQub) {
   ASSERT_EQ((int)dimensions["Bands"], 12);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-
-  std::cout << hist->Average() << std::endl;
-  std::cout << hist->Sum() << std::endl;
-  std::cout << hist->ValidPixels() << std::endl;
-  std::cout << hist->StandardDeviation() << std::endl;
-
   ASSERT_NEAR(hist->Average(), 1.64693e+30, 1e25);
   ASSERT_NEAR(hist->Sum(), 7.57588e+31, 1e26);
   ASSERT_EQ(hist->ValidPixels(), 46);
