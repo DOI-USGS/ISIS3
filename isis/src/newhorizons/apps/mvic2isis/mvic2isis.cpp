@@ -131,7 +131,7 @@ namespace Isis {
       importFits.SetDataSuffixBytes(bytesPerPix * 12);
       importFits.setProcessFileStructure(1);
 
-      Cube *outputError = importFits.SetOutputCube("UNDISTORTED", ui);
+      Cube *outputError = importFits.SetOutputCube("UNDISTORTED", &ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl pvlError;
@@ -156,7 +156,7 @@ namespace Isis {
       importFits.SetDataSuffixBytes(bytesPerPix * 12);
       importFits.setProcessFileStructure(2);
 
-      Cube *outputError = importFits.SetOutputCube("ERROR", ui);
+      Cube *outputError = importFits.SetOutputCube("ERROR", &ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl pvlError;
@@ -181,7 +181,7 @@ namespace Isis {
       importFits.SetDataSuffixBytes(bytesPerPix * 12);
       importFits.setProcessFileStructure(3);
 
-      Cube *outputError = importFits.SetOutputCube("QUALITY", ui);
+      Cube *outputError = importFits.SetOutputCube("QUALITY", &ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl pvlError;
