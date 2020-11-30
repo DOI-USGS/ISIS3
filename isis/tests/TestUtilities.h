@@ -14,6 +14,8 @@
 #include "Pvl.h"
 #include "PvlObject.h"
 
+#include "CSVReader.h"
+
 namespace Isis {
 
   ::testing::AssertionResult AssertIExceptionMessage(
@@ -48,6 +50,10 @@ namespace Isis {
       const std::vector<double> &vec2,
       double tolerance);
 
+  bool isNumeric(QString str);
+  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex=0);
+  void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex=0,
+                      double tolerance = 0.000001);
 }
 
 #endif

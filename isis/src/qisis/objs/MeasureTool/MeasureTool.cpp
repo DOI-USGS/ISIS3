@@ -28,6 +28,7 @@
 #include "TProjection.h"
 #include "SurfacePoint.h"
 #include "ToolPad.h"
+#include "Constants.h"
 
 namespace Isis {
   /**
@@ -65,6 +66,7 @@ namespace Isis {
     m_tableWin->addToTable(false, "Kilometer\nArea", "Kilometer Area");
     m_tableWin->addToTable(false, "Meter\nArea", "Meter Area");
     m_tableWin->addToTable(false, "Pixel\nArea", "Pixel Area");
+    m_tableWin->addToTable(false, "Planar \nDistance", "Planar Kilometer Distance");
     m_tableWin->addToTable(false, "Segments Sum\nkm", "Segments Sum", -1, Qt::Horizontal, "Sum of Segment lengths in kilometers");
     m_tableWin->addToTable(false, "Segment Number", "Segment Number", -1, Qt::Horizontal, "Segment number of a segmented line");
     m_tableWin->addToTable(false, "Path", "Path");
@@ -136,6 +138,7 @@ namespace Isis {
       RubberBandComboBox::Polygon |
       RubberBandComboBox::SegmentedLine, // options
       RubberBandComboBox::Line // default
+                                                
     );
 
     m_distLineEdit = new QLineEdit(hbox);
@@ -185,8 +188,17 @@ namespace Isis {
     m_unitsComboBox->clear();
     m_showAllSegments->setEnabled(false);
 
-    if (rubberBandTool()->currentMode() == RubberBandTool::LineMode ||
-        rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::LineMode) {
+      m_unitsComboBox->addItem("km");
+      m_unitsComboBox->addItem("m");
+      m_unitsComboBox->addItem("pixels");
+      m_unitsComboBox->addItem("planar km");
+
+      if (miComboUnit < 0 || miComboUnit > 3) {   // default && error checking
+        miComboUnit = 2;
+      }
+    }
+    else if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
 
       if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
         m_showAllSegments->setEnabled(true);
@@ -411,6 +423,13 @@ namespace Isis {
       m_tableWin->table()->item(row, AreaMIndex)->setText("N/A");
     }
 
+    if (m_kmPlanarDist != Null) {
+      m_tableWin->table()->item(row, PlanarDistanceIndex)->setText(QString::number(m_kmPlanarDist));
+    }
+    else {
+      m_tableWin->table()->item(row, PlanarDistanceIndex)->setText("N/A");
+    }
+
     m_tableWin->table()->item(row, PathIndex)->setText(m_path);
     m_tableWin->table()->item(row, FileNameIndex)->setText(m_fname);
   }
@@ -517,22 +536,23 @@ namespace Isis {
    */
   void MeasureTool::initData(void) {
     // Initialize the class data
-    m_startSamp = Null;
-    m_endSamp   = Null;
-    m_startLine = Null;
-    m_endLine   = Null;
-    m_kmDist    = Null;
-    m_mDist     = Null;
-    m_pixDist   = Null;
-    m_startLon  = Null;
-    m_startLat  = Null;
-    m_endLon    = Null;
-    m_endLat    = Null;
-    m_radAngle  = Null;
-    m_degAngle  = Null;
-    m_pixArea   = Null;
-    m_kmArea    = Null;
-    m_mArea     = Null;
+    m_startSamp    = Null;
+    m_endSamp      = Null;
+    m_startLine    = Null;
+    m_endLine      = Null;
+    m_kmDist       = Null;
+    m_mDist        = Null;
+    m_pixDist      = Null;
+    m_startLon     = Null;
+    m_startLat     = Null;
+    m_endLon       = Null;
+    m_endLat       = Null;
+    m_radAngle     = Null;
+    m_degAngle     = Null;
+    m_pixArea      = Null;
+    m_kmArea       = Null;
+    m_mArea        = Null;
+    m_kmPlanarDist = Null;
   }
 
 
@@ -683,6 +703,7 @@ namespace Isis {
 
     m_mDist   = Null;
     m_kmDist  = Null;
+    m_kmPlanarDist = Null;
     double radius = Null;
     TProjection *tproj = NULL;
     RingPlaneProjection *rproj = NULL;
@@ -704,6 +725,7 @@ namespace Isis {
         if (cvp->projection()->SetWorld(m_startSamp, m_startLine)) {
           // If our projection is sky, the lat & lons are switched
           if (cvp->projection()->IsSky()) {
+
             tproj = (TProjection *) cvp->projection();
             m_startLat = tproj->UniversalLatitude();
             m_startLon = tproj->UniversalLongitude();
@@ -786,6 +808,40 @@ namespace Isis {
 
     m_mDist = distance.meters();
     m_kmDist = distance.kilometers();
+
+    if (cvp->camera() != NULL) {
+
+      // Make sure start line or end line setimage succeeds, otherwise fail. 
+      bool statusStart = cvp->camera()->SetImage(m_startSamp, m_startLine);
+      double slantDist = 0;
+      if (statusStart) {
+        slantDist = cvp->camera()->SlantDistance();
+      }
+
+      double ra1 = cvp->camera()->RightAscension() * DEG2RAD;
+      double dec1 = cvp->camera()->Declination()* DEG2RAD; 
+
+      bool statusEnd = cvp->camera()->SetImage(m_endSamp, m_endLine);
+      if ((!statusStart)&&statusEnd) {
+        slantDist = cvp->camera()->SlantDistance();
+      }
+      
+      // Cannot calculate a planar distance with no point on the target.       
+      if (!(statusStart||statusEnd)) {
+        return;
+      }
+
+      double ra2 = cvp->camera()->RightAscension() * DEG2RAD; 
+      double dec2 = cvp->camera()->Declination()* DEG2RAD; 
+
+      double dRA = (ra1 - ra2);
+
+      double angle = acos(sin(dec1)*sin(dec2) + cos(dec1)*cos(dec2)*cos(dRA));
+      double half_angle = angle/2.0;
+      double length = slantDist * sin(half_angle) * 2.0;
+
+      m_kmPlanarDist = length;
+    }
   }
 
 
@@ -808,6 +864,14 @@ namespace Isis {
         else {
           m_distLineEdit->setText(QString::number(m_mDist));
         }
+      }
+      else if (m_unitsComboBox->currentIndex() == 3) {
+        if (m_kmPlanarDist == Null) {
+          m_distLineEdit->setText("N/A");
+        }
+        else {
+          m_distLineEdit->setText(QString::number(m_kmPlanarDist));
+        } 
       }
       else {
         m_distLineEdit->setText(QString::number(m_pixDist));
