@@ -32,7 +32,7 @@ namespace Isis {
   p.SetPdsFile(label, labelFile);
   QFile::remove(fn);
 
-  Cube *ocube = p.SetOutputCube("TO");
+  Cube *ocube = p.SetOutputCube("TO", ui);
 
   // Get user entered special pixel ranges
   if(ui.GetBoolean("SETNULLRANGE")) {
