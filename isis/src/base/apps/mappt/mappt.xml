@@ -311,7 +311,6 @@
         </description>
         <inclusions>
           <item>COORDLIST</item>
-          <item>TYPE</item>
         </inclusions>
         <exclusions>
           <item>TYPE</item>
