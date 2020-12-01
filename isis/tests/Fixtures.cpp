@@ -739,4 +739,16 @@ namespace Isis {
     testCube->reopen("r");
   }
 
+  void RingsCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    ring1 = new Cube("data/rings/rings1proj.cub", "r");
+    ring2 = new Cube("data/rings/rings2proj.cub", "r");
+
+    cubeListPath = tempDir.path() + "/filelist.txt";
+    cubeFileList.append("data/rings/rings1proj.cub");
+    cubeFileList.append("data/rings/rings2proj.cub");
+    cubeFileList.write(cubeListPath);
+  }
+
 }

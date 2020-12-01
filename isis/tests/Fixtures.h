@@ -187,6 +187,18 @@ namespace Isis {
     protected:
       void SetUp() override;
   };
+
+  class RingsCube : public TempTestingFiles {
+    protected:
+
+      // pixtures of Saturn's rings
+      Cube *ring1;
+      Cube *ring2;
+      FileList cubeFileList;
+      QString cubeListPath;
+
+      void SetUp() override;
+  };
 }
 
 #endif
