@@ -38,6 +38,7 @@ class CSMPluginFixture : public TempTestingFiles {
         isdPath = tempDir.path() + "/default.json";
         std::ofstream file(isdPath.toStdString());
         file << isd;
+        file.flush();
 //        std::ifstream cubeLabel("/scratch/csm2020-3/ISIS3/build/CTXTestLabel.pvl");
 //        cubeLabel >> label;
         testCube = new Cube("/scratch/csm2020-3/jesse_test_data/test_data/F02_036648_2021_XN_22N022W.cub");
@@ -129,6 +130,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   isdPath = tempDir.path() + "/multimodel.json";
   std::ofstream file(isdPath.toStdString());
   file << isd;
+  file.flush();
 
   QVector<QString> args = {
     "from="+testCube->fileName(),
