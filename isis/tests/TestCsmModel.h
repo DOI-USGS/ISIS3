@@ -7,6 +7,8 @@
 #include "csm/Model.h"
 #include "csm/Version.h"
 
+#include <nlohmann/json.hpp>
+
 class TestCsmModel : public csm::Model {
  public:
    TestCsmModel();
