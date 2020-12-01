@@ -13,6 +13,7 @@
 
 #include "Cube.h"
 #include "IException.h"
+#include "OriginalLabel.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
@@ -120,64 +121,73 @@ namespace Isis {
       void SetUp() override;
       void TearDown() override;
   };
-  
+
   class ObservationPair : public TempTestingFiles {
-    protected: 
-      
-      Cube *cubeL; 
+    protected:
+
+      Cube *cubeL;
       Cube *cubeR;
 
-      QString cubeLPath; 
-      QString cubeRPath; 
+      QString cubeLPath;
+      QString cubeRPath;
 
       FileName *isdPathL;
-      FileName *isdPathR; 
+      FileName *isdPathR;
 
-      FileList *cubeList; 
+      FileList *cubeList;
       QString cubeListFile;
 
-      ControlNet *network; 
-      QString cnetPath; 
-     
+      ControlNet *network;
+      QString cnetPath;
+
       void SetUp() override;
       void TearDown() override;
   };
-  
+
   class ApolloNetwork : public TempTestingFiles {
     protected:
-      QVector<FileName> isdFiles; 
-      QVector<FileName> labelFiles; 
+      QVector<FileName> isdFiles;
+      QVector<FileName> labelFiles;
       QVector<Cube*> cubes;
 
       FileList *cubeList;
       QString cubeListFile;
 
-      ControlNet *network; 
+      ControlNet *network;
       QString controlNetPath;
 
       void SetUp() override;
       void TearDown() override;
   };
 
-  class MroCtxCube : public DefaultCube {
+  class DemCube : public DefaultCube {
+    protected:
+      Cube *demCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
+      Cube dejitteredCube; 
       QString jitterPath; 
 
       void SetUp() override;
-      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
   class NewHorizonsCube : public DefaultCube {
     protected:
-      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
-  class ApolloCube : public LargeCube { 
-    protected: 
-      void SetUp() override; 
+  class ApolloCube : public LargeCube {
+    protected:
+      void SetUp() override;
   };
 }
 

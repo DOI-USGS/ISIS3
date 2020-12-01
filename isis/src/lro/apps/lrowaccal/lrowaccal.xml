@@ -184,7 +184,7 @@
     </p>
 
     <p>
-      Negative reported DNs are possible when E < -1 * TrueDN. These are
+      Negative reported DNs are possible when E &lt; -1 * TrueDN. These are
       pixels in a very dark image that happen to have a strongly negative
       random noise value.
     </p>

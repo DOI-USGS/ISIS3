@@ -240,7 +240,7 @@ const char* versionedFiles[] = {"tttt??????", "tttt??????.tmp", "tttt_?.tmp", "?
                                 "tt{MMM}tt{dd}yy{yy}.tmp", "tt{d}tt{MMM}.tmp", "tt{d}tt{MMMM}.tmp",
                                 "tt{dd}.tmp", "tttt{dd}.tmp", "$TEMPORARY/{MMM}-{dd}-{yy}_v???.tmp"};
 
-INSTANTIATE_TEST_CASE_P(FileName, FileName_Fixture_Versioned, ::testing::ValuesIn(versionedFiles));
+INSTANTIATE_TEST_SUITE_P(FileName, FileName_Fixture_Versioned, ::testing::ValuesIn(versionedFiles));
 
 TEST_P(FileName_Fixture_NotVersioned, IsVersioned) {
   FileName file(GetParam());
@@ -252,4 +252,4 @@ const char* notVersionedFiles[] = {"tttt"};
 //TODO These actually throw errors so they cannot be checked like this
 //"tttt{}.tmp", "ttttt{}.tmp", "??tttt??", "tttt{aaaa}.tmp"};
 
-INSTANTIATE_TEST_CASE_P(FileName, FileName_Fixture_NotVersioned, ::testing::ValuesIn(notVersionedFiles));
+INSTANTIATE_TEST_SUITE_P(FileName, FileName_Fixture_NotVersioned, ::testing::ValuesIn(notVersionedFiles));
