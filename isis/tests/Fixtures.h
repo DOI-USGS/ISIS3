@@ -168,12 +168,13 @@ namespace Isis {
       void TearDown() override;
   };
 
-  class MroCtxCube : public DefaultCube {
+  class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
-      QString jitterPath;
+      Cube dejitteredCube; 
+      QString jitterPath; 
 
       void SetUp() override;
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);

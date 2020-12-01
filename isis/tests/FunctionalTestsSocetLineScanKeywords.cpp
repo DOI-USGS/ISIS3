@@ -15,7 +15,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/socetlinescankeywords.xml").expanded();
 
-TEST_F(MroCtxCube, FunctionalTestSocetLineScanKeywordsHirise) {
+TEST_F(MroHiriseCube, FunctionalTestSocetLineScanKeywordsHirise) {
   testCube->reopen("rw");  
   QString outFileName = tempDir.path() + "/outTEMP.txt";
   QVector<QString> args = {"to="+outFileName};
