@@ -36,14 +36,11 @@ namespace Isis {
       }
 
       // open all the cube and place in vector clist
-
       for(int i = 0; i < flist.size(); i++) {
         Cube *c = new Cube();
         clist.push_back(c);
         c->open(flist[i].toString());
       }
-
-
 
       // run the compair function here.  This will conpair the
       // labels of the first cube to the labels of each following cube.
@@ -230,7 +227,6 @@ namespace Isis {
         }
       }
 
-
       // Get the blob of original labels from first image in list
       OriginalLabel org;
       clist[0]->read(org);
@@ -251,7 +247,6 @@ namespace Isis {
       ProgramLauncher::RunIsisProgram("automos", parameters);
 
       // write out new information to new group mosaic
-
       PvlGroup mos("Mosaic");
       mos += PvlKeyword("ProductId ", ProdId);
       mos += PvlKeyword(sourceProductId);
