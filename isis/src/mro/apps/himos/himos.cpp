@@ -18,7 +18,7 @@ using namespace std;
 
 namespace Isis {
   //functions in the code
-  void CompareLabels(Pvl &match, Pvl &comp);
+  static void CompareLabels(Pvl &match, Pvl &comp);
 
 
   void himos(UserInterface &ui) {
@@ -286,7 +286,7 @@ namespace Isis {
   } // end of isis main
 
   //Function to compare label - CompareLabels
-  void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
+  static void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
     // test of the ObservationId
     PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
     PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
