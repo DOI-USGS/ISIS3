@@ -19,9 +19,9 @@ using namespace std;
 
 namespace Isis {
 
-  void ResetGlobals();
-  void Import(Buffer &buf);
-  void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube);
+  static void ResetGlobals();
+  static void Import(Buffer &buf);
+  static void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube);
   
   // Global variables for processing functions
   Cube *g_ocube;

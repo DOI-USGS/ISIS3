@@ -19,11 +19,11 @@
 using namespace std;
 
 namespace Isis {
-  void ResetGlobals ();
-  void ProcessImage ( Buffer &in, Buffer &out );
-  QString MD5Checksum ( QString filename );
-  void OutputLabel ( std::ofstream &fout, Cube* cube );
-  void CopyData ( std::ifstream &fin, std::ofstream &fout );
+  static void ResetGlobals ();
+  static void ProcessImage ( Buffer &in, Buffer &out );
+  static QString MD5Checksum ( QString filename );
+  static void OutputLabel ( std::ofstream &fout, Cube* cube );
+  static void CopyData ( std::ifstream &fin, std::ofstream &fout );
 
   QString g_md5Checksum;
 
