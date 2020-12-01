@@ -1,5 +1,5 @@
-#ifndef TestCsmModel_h
-#define TestCsmModel_h
+#ifndef AlternativeTestCsmModel_h
+#define AlternativeTestCsmModel_h
 
 #include <string>
 
@@ -7,10 +7,10 @@
 #include "csm/Model.h"
 #include "csm/Version.h"
 
-class TestCsmModel : public csm::Model {
+class AlternativeTestCsmModel : public csm::Model {
  public:
-   TestCsmModel();
-   ~TestCsmModel();
+   AlternativeTestCsmModel();
+   ~AlternativeTestCsmModel();
 
    std::string getFamily() const;
    csm::Version getVersion() const;

@@ -2,6 +2,7 @@
 
 #include "TestCsmPlugin.h"
 #include "TestCsmModel.h"
+#include "AlternativeTestCsmModel.h"
 
 // Static Instance of itself
 const TestCsmPlugin TestCsmPlugin::m_registeredPlugin;
@@ -33,7 +34,12 @@ size_t TestCsmPlugin::getNumModels() const {
 }
 
 std::string TestCsmPlugin::getModelName(size_t modelIndex) const {
-  return "TestModelName";
+  if (modelIndex == 0) {
+    return "TestModelName"; 
+  }
+  else {
+    return "AlternativeTestCsmModelName";
+  }
 }
 
 std::string TestCsmPlugin::getModelFamily(size_t modelIndex) const {
@@ -105,6 +111,8 @@ csm::Model* TestCsmPlugin::constructModelFromState(
       const std::string& modelState,
       csm::WarningList* warnings) const {
   TestCsmModel *model = new TestCsmModel();
+  model->replaceModelState(modelState);
+  // Left simple because this isn't needed by current tests.
   return model;
 }
 
@@ -114,6 +122,12 @@ csm::Model* TestCsmPlugin::constructModelFromISD(
     csm::WarningList* ) const {
   if (modelName == "TestModelName") {
     TestCsmModel *model = new TestCsmModel();
+    model->replaceModelState(model->constructStateFromIsd(imageSupportData));
+    return model;
+  }
+  else if (modelName == "AlternativeTestCsmModelName") {
+    AlternativeTestCsmModel *model = new AlternativeTestCsmModel();
+    model->replaceModelState(model->constructStateFromIsd(imageSupportData));
     return model;
   }
   else {
