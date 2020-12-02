@@ -286,7 +286,7 @@ namespace Isis {
   } // end of isis main
 
   //Function to compare label - CompareLabels
-  static void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
+  void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
     // test of the ObservationId
     PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
     PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
