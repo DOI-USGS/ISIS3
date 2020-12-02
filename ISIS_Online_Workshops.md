@@ -57,15 +57,15 @@ Notes
     Data](Locating_and_Ingesting_Image_Data) : Overview of finding image
     data and importing it into ISIS3
   - [ISIS Cube
-    Format](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html)
+    Format](https://USGS-Astrogeology.github.io/ISIS3/ISIS_Cube_Format.html)
     : Understanding the ISIS3 image cube format
   - [Understanding Bit Types](Understanding_Bit_Types) : Introduction to
     image data bit types
   - [Core Base and
-    Multiplier](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html)
+    Multiplier](https://USGS-Astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html)
     : Understanding core base and multiplier ISIS3 cube attributes
   - [Special
-    Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html)
+    Pixels](https://USGS-Astrogeology.github.io/ISIS3/Special_Pixels.html)
     : Understanding what special pixels are and how they are used in
     ISIS3
 
@@ -74,10 +74,10 @@ Notes
 ## General Image Processing [¶](#General-Image-Processing-)
 
   - [The Power of Spatial
-    Filters](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
+    Filters](https://USGS-Astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html)
     : Introduction to spatial filters
   - [Removing Striping Noise from Image
-    Data](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html)
+    Data](https://USGS-Astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html)
     : General destriping procedure
   - [GeneralUtility- **fx**](General_Utility) : Apply arithmetic
     operations with the
@@ -144,7 +144,7 @@ Notes
 
   - [Demonstrations of ISIS3 Interactive Tools](ISIS_Demo)
   - [Example ISIS
-    Demos](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html)
+    Demos](https://USGS-Astrogeology.github.io/ISIS3/Example_ISIS_Demos.html)
 	
 ## Workshops [¶](#Workshops-)
   - [ISIS Training 2016](ISIS_Training_2016)
