@@ -19,7 +19,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apollopanstitcher.xml").expanded();
 
-TEST_F(TempTestingFiles, FunctionalTestsApollopanstitcherDefault) {
+TEST_F(TempTestingFiles, FunctionalTestsApolloPanStitcherDefault) {
   QVector<QString> args = {"file_base=$ISISTESTDATA/isis/src/apollo/apps/apollopanstitcher/tsts/default/input/AS15_P_0177R10",
                            "to=" + tempDir.path() + "/reduced8.cub",
                            "microns=50"};
