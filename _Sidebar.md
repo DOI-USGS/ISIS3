@@ -36,15 +36,15 @@
 ### Fundamentals
 * [Introduction to ISIS](https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS)
 * [Locating and Ingesting Image Data](https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data)
-* [ISIS Cube Format](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html)
+* [ISIS Cube Format](https://USGS-Astrogeology.github.io/ISIS3/ISIS_Cube_Format.html)
 * [Understanding Bit Types](https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types)
-* [Core Base and Multiplier](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html)
-* [Special Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html)
+* [Core Base and Multiplier](https://USGS-Astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html)
+* [Special Pixels](https://USGS-Astrogeology.github.io/ISIS3/Special_Pixels.html)
 * [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ)
 
 ### General Image Processing
-* [The Power of Spatial Filters](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
-* [Removing Striping Noise from Image Data](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html)
+* [The Power of Spatial Filters](https://USGS-Astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html)
+* [Removing Striping Noise from Image Data](https://USGS-Astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html)
 * [GeneralUtility-fx](https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility)
 
 ### Cartography
@@ -79,7 +79,7 @@
 
 ### Demonstration Material
 * [Demonstrations of ISIS3 Interactive Tools](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo)
-* [Example ISIS Demos](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html)
+* [Example ISIS Demos](https://USGS-Astrogeology.github.io/ISIS3/Example_ISIS_Demos.html)
 
 ### Workshops
 * [ISIS Training 2016](ISIS_Training_2016)
