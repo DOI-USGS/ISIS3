@@ -52,16 +52,16 @@ $(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved
 				<ul>
 				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
 				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
 				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/Special_Pixels.html">Special Pixels</a></li>
 				</ul>
 				<h3>
 				General Image Processing</h3>
 				<ul>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
 				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
 				</ul>
 				<h3>
@@ -125,7 +125,7 @@ $(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved
 				Demonstration Material</h3>
 				<ul>
 				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
-				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
 				</ul>
 				<h3>Workshops</h3>
 				<ul>
@@ -337,8 +337,8 @@ $(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved
           <img alt="Filter_Comparison.jpg" src="attachments/thumbnail/883/300.png"/>
          </a>
         </p>
-        <pre>This image shows a portion of the original image data (upper left), 
-and the results of three different filters applied to the original: 
+        <pre>This image shows a portion of the original image data (upper left),
+and the results of three different filters applied to the original:
 low pass (upper right), high pass (lower left), and sharpen (lower right)
 </pre>
         <p>
@@ -361,11 +361,11 @@ low pass (upper right), high pass (lower left), and sharpen (lower right)
           <img alt="Boxcar_explaination.jpg" src="attachments/thumbnail/893/300.png"/>
          </a>
         </p>
-        <pre>A filter processes each pixel in the image. The output pixel will be 
-at the same location as the pixel of the center of the box car. The 
-filter calculates the new output value of that pixel using all the 
-input pixels in the box car. The animation (linked below) illustrates 
-the movement of the filter application through the input image, and 
+        <pre>A filter processes each pixel in the image. The output pixel will be
+at the same location as the pixel of the center of the box car. The
+filter calculates the new output value of that pixel using all the
+input pixels in the box car. The animation (linked below) illustrates
+the movement of the filter application through the input image, and
 where the box car neighborhood is located.
 </pre>
         <p>
@@ -555,7 +555,7 @@ where the box car neighborhood is located.
         <p>
          Example for filling-in NULL pixels:
         </p>
-        <pre>lowpass from=input_with_nulls.cub to=output_fill.cub samples=3 lines=3 filter=outside null=yes hrs=no his=no 
+        <pre>lowpass from=input_with_nulls.cub to=output_fill.cub samples=3 lines=3 filter=outside null=yes hrs=no his=no
         lrs=no replacement=center
 </pre>
         <ul>
@@ -822,7 +822,7 @@ where the box car neighborhood is located.
           <img alt="Striping_Noise_Sample.jpg" src="attachments/thumbnail/931/200.png"/>
          </a>
         </p>
-        <pre>Striping Noise Example This Lunar Orbiter image contains horizontal striping noise 
+        <pre>Striping Noise Example This Lunar Orbiter image contains horizontal striping noise
 due to the scanning, output, and transmission phases of its collection
 </pre>
         <a name="Related-ISIS-Applications">
@@ -905,7 +905,7 @@ due to the scanning, output, and transmission phases of its collection
          </a>
         </p>
         <pre>Striping Close-up: Enlarged view to show the height of the striping. The blocks in the
-scale bar along the left side of the image measure a 3 pixel by 3 pixel area. The 
+scale bar along the left side of the image measure a 3 pixel by 3 pixel area. The
 stripes are roughly 7 to 10 pixels high.
 </pre>
         <p>
