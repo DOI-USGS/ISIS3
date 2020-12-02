@@ -25,6 +25,7 @@ class CSMPluginFixture : public TempTestingFiles {
       Cube *testCube;
       Pvl label;
       QString isdPath;
+      QString filename;
 
       void SetUp() override {
         TempTestingFiles::SetUp();
@@ -39,10 +40,14 @@ class CSMPluginFixture : public TempTestingFiles {
         std::ofstream file(isdPath.toStdString());
         file << isd;
         file.flush();
-//        std::ifstream cubeLabel("/scratch/csm2020-3/ISIS3/build/CTXTestLabel.pvl");
-//        cubeLabel >> label;
-        testCube = new Cube("/scratch/csm2020-3/jesse_test_data/test_data/F02_036648_2021_XN_22N022W.cub");
-//        testCube->fromLabel(tempDir.path() + "/default.cub", label, "rw");
+
+        std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
+        cubeLabel >> label;
+        testCube = new Cube();
+        filename = tempDir.path() + "/csminitCube.cub";
+        testCube->fromLabel(filename, label, "rw");
+        testCube->close();
+
         plugin = new TestCsmPlugin();
         csm::PluginList pluginList = plugin->getList();
         bool alreadyFound = false;
@@ -54,6 +59,8 @@ class CSMPluginFixture : public TempTestingFiles {
               plugin->removePlugin(loadedPlugin->getPluginName());
             }
             else {
+              // Sometimes end up with mulitple copies of the same plugin. If so, remove it so 
+              // it doesn't get considered "2 plugins" by csminit, which causes it to fail.
               alreadyFound = true;
             }
           }
@@ -64,39 +71,52 @@ class CSMPluginFixture : public TempTestingFiles {
         if (plugin) {
           plugin->removePlugin(plugin->getPluginName());
           delete plugin;
+          plugin = NULL;
+        }
+        if (testCube) {
+          if (testCube->isOpen()) {
+            testCube->close();
+          }
+          delete testCube;
+          testCube = NULL;
         }
       }
 };
 
 TEST_F(CSMPluginFixture, CSMInitDefault) {
+  // Run csminit with defaults for everything besides FROM and ISD
   QVector<QString> args = {
-    "from="+testCube->fileName(),
+    "from="+filename,
     "isd="+isdPath
   };
 
   UserInterface options(APP_XML, args);
   csminit(options);
 
+  testCube->open(filename);
+
   // Get a model and a state string
   StringBlob stateString("","CSMState");
   testCube->read(stateString);
 
+  // Verify contents of the StringBlob's PVL label
   PvlObject blobPvl = stateString.Label(); 
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Better test for state string
+  // Intent is just to make sure the state string exists and is a "reasonable" length
   EXPECT_GT(stateString.string().length(), 20);
 
-  // check blob label ModelName and Plugin Name 
+  // Check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
 }
 
 TEST_F(CSMPluginFixture, CSMinitRunTwice) {
-  // Run csminit twice in a row.
+  // Run csminit twice in a row with the same options each time. Verify that end result is 
+  // as if csminit were only run once. 
   QVector<QString> args = {
-    "from="+testCube->fileName(),
+    "from="+filename,
     "isd="+isdPath};
 
   UserInterface options(APP_XML, args);
@@ -104,62 +124,74 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   csminit(options);
   csminit(options);
 
+  testCube->open(filename);
+
   StringBlob stateString("", "CSMState");
-  Cube cub("/scratch/csm2020-3/jesse_test_data/test_data/F02_036648_2021_XN_22N022W.cub");
-  cub.read(stateString);
-  PvlObject blobPvl = stateString.Label(); 
+  testCube->read(stateString);
+  PvlObject blobPvl = stateString.Label();
+
+  // Verify contents of the StringBlob's PVL label
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Better test for state string
+  // Intent is just to make sure the state string exists and is a "reasonable" length
   EXPECT_GT(stateString.string().length(), 20);
 
-  // check blob label ModelName and Plugin Name 
+  // Check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
 }
 
 TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
-  // Create a test ISD that works for 2 models
+  // Test csminit when multiple possible models can be created. First, verify that this will fail
+  // without specifying the MODELNAME, then specify the MODELNAME and check the results. 
+
+  // Create a test ISD could work for 2 models
   json isd;
   isd["name"] = "test_isd";
   isd["test_param_one"] = "value_one";
   isd["test_param_two"] = "value_two";
   isd["test_param_three"] = "value_three";
 
-  isdPath = tempDir.path() + "/multimodel.json";
+  QString isdPath = tempDir.path() + "/multimodel.json";
   std::ofstream file(isdPath.toStdString());
   file << isd;
   file.flush();
 
   QVector<QString> args = {
-    "from="+testCube->fileName(),
+    "from="+filename,
     "isd="+isdPath};
 
   UserInterface options(APP_XML, args);
 
+  // If there are two possible models, csminit will fail and prompt the user to specify the model
+  // and/or plugin name. 
   EXPECT_ANY_THROW(csminit(options));
 
+  // Re-run with the model name specified
   args = {
-    "from="+testCube->fileName(),
+    "from="+filename,
     "isd="+isdPath,
     "modelName=AlternativeTestCsmModelName"};
   
   UserInterface betterOptions(APP_XML, args);
   csminit(betterOptions);
 
+  testCube->open(filename);
   StringBlob stateString("", "CSMState");
   testCube->read(stateString);
   PvlObject blobPvl = stateString.Label(); 
+
+  // Check blobPvl contents
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Better test for state string
+  // Intent is to check that the state string exists and is a "reasonable" length
   EXPECT_GT(stateString.string().length(), 20);
 
   // check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
-  EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
+  EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "AlternativeTestCsmModelName");
 }
 
 
@@ -173,12 +205,14 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
   isdPath = tempDir.path() + "/failing.json";
   std::ofstream file(isdPath.toStdString());
   file << isd;
+  file.flush();
 
   QVector<QString> args = {
-    "from="+testCube->fileName(),
+    "from="+filename,
     "isd="+isdPath};
 
   UserInterface options(APP_XML, args);
-
+  
+  // Expect a failure due to being unable to construct any model from the isd
   EXPECT_ANY_THROW(csminit(options));
 }
