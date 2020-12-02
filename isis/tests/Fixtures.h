@@ -115,10 +115,12 @@ namespace Isis {
 
       FileList *cubeList;
       QString cubeListFile;
+      QString twoCubeListFile;
 
       std::vector<std::vector<double>> coords;
 
       void SetUp() override;
+      void AddFeatures();
       void TearDown() override;
   };
 
