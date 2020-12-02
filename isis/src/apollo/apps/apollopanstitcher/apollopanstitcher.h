@@ -5,7 +5,7 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void apolloPanSticher(UserInterface &ui);
+  extern void apolloPanStitcher(UserInterface &ui);
 }
 
 #endif

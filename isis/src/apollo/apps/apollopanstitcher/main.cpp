@@ -10,5 +10,5 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  apolloPanSticher(ui);
+  apolloPanStitcher(ui);
 }

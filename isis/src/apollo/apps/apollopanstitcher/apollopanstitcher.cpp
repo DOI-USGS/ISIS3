@@ -71,7 +71,7 @@ typedef struct TRANS2d3p { //2d 3 parameter transformation
 }TRANS2d3p;
 
 namespace Isis {
-  void apolloPanSticher(UserInterface &ui) {
+  void apolloPanStitcher(UserInterface &ui) {
     Chip patternS,searchS; //scaled pattern and search chips
     Cube  *panC[8], //panoramic image
            outputC, //outputC
@@ -721,7 +721,7 @@ namespace Isis {
     outputC.create(tempString);
     outputC.close();  //closing the output cube so that it can be opened by the mosaic process
     ProcessMosaic mosaic;
-    mosaic.SetOutputCube("TO");
+    mosaic.SetOutputCube("TO", ui);
     mosaic.SetBandBinMatch(false);
 
 
