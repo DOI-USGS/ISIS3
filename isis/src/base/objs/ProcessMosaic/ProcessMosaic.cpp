@@ -723,7 +723,6 @@ namespace Isis {
     // (e.g., "TO") and the cube size from an input cube
     Cube *cube = new Cube;
     try {
-      QString fname = Application::GetUserInterface().GetFileName(psParameter);
       cube->open(fname, "rw");
     }
     catch (IException &) {
