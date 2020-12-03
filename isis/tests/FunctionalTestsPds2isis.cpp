@@ -62,8 +62,7 @@ TEST(Pds2Isis, Pds2isisTestDefault) {
 TEST(Pds2Isis, Pds2isisTestBandBin) {
   Pvl appLog;
   QTemporaryDir prefix;
-  // QString cubeFileName = prefix.path() + "/pds2isis_out.cub";
-  QString cubeFileName = "/home/tgiroux/Desktop/pds2isis_bandbin_out.cub";
+  QString cubeFileName = prefix.path() + "/pds2isis_out.cub";
   QVector<QString> args = { "from=data/pds2isis/gaspra_nims_hires_radiance_cropped.lbl",
                             "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
