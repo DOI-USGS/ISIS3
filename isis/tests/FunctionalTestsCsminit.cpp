@@ -41,7 +41,7 @@ class CSMPluginFixture : public TempTestingFiles {
         file << isd;
         file.flush();
 
-        std::ifstream cubeLabel("/scratch/csm2020-3/ISIS3/isis/tests/data/threeImageNetwork/cube1.pvl");
+        std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
         cubeLabel >> label;
         testCube = new Cube();
         filename = tempDir.path() + "/csminitCube.cub";
