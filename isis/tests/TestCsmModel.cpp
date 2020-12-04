@@ -1,6 +1,11 @@
 #include "TestCsmModel.h"
+#include <fstream>
+#include <iostream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 TestCsmModel::TestCsmModel() {
+  m_modelState = "TestCsmModel_ModelState";
 };
 
 TestCsmModel::~TestCsmModel() {
@@ -60,10 +65,28 @@ std::string TestCsmModel::getReferenceDateAndTime() const {
 }
 
 std::string TestCsmModel::getModelState() const {
-  return "TestCsmModel_ModelState";
+  return m_modelState;
 }
 
 void TestCsmModel::replaceModelState(const std::string& argState) {
-  // do nothing for test...
+  m_modelState = argState;
 }
+
+std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
+  std::string filename = isd.filename();
+  std::ifstream isdFile(filename);
+
+  if (isdFile.fail()) {
+    std::cout << "Could not open file: " << filename << std::endl;
+  }
+
+  json parsedIsd;
+  isdFile >> parsedIsd;
+  json state;
+  state["name"] = parsedIsd.at("name");
+  state["test_param_one"] = parsedIsd.at("test_param_one");
+  state["test_param_two"] = parsedIsd.at("test_param_two");
+  return state.dump();
+}
+
 
