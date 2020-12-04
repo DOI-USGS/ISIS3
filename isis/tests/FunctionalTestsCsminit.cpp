@@ -49,8 +49,7 @@ class CSMPluginFixture : public TempTestingFiles {
         testCube->close();
         
         // There should only be one plugin, so get the first one
-        std::list<const csm::Plugin*> plugins = csm::Plugin::getList();
-        plugin = plugins.front();
+        plugin = csm::Plugin::findPlugin("TestCsmPlugin");
       }
 
       void TearDown() override {
@@ -90,7 +89,7 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // Check blob label ModelName and Plugin Name 
-  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
+  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(modelName, "TestCsmModelName");
 }
 
@@ -126,7 +125,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // Check blob label ModelName and Plugin Name 
-  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
+  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
 }
 
@@ -179,7 +178,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // check blob label ModelName and Plugin Name 
-  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
+  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "AlternativeTestCsmModelName");
 }
 
