@@ -21,58 +21,39 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
 
 class CSMPluginFixture : public TempTestingFiles {
   protected:
-      TestCsmPlugin *plugin;
-      Cube *testCube;
-      Pvl label;
-      QString isdPath;
-      QString filename;
+    const csm::Plugin *plugin;
+    Cube *testCube;
+    Pvl label;
+    QString isdPath;
+    QString filename;
 
-      void SetUp() override {
-        TempTestingFiles::SetUp();
+    void SetUp() override {
+      TempTestingFiles::SetUp();
 
-        // Create and populate default test ISD
-        json isd;
-        isd["name"] = "test_isd";
-        isd["test_param_one"] = "value_one";
-        isd["test_param_two"] = "value_two";
+      // Create and populate default test ISD
+      json isd;
+      isd["name"] = "test_isd";
+      isd["test_param_one"] = "value_one";
+      isd["test_param_two"] = "value_two";
 
         isdPath = tempDir.path() + "/default.json";
         std::ofstream file(isdPath.toStdString());
         file << isd;
         file.flush();
 
-        std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
+        std::ifstream cubeLabel("/scratch/csm2020-3/ISIS3/isis/tests/data/threeImageNetwork/cube1.pvl");
         cubeLabel >> label;
         testCube = new Cube();
         filename = tempDir.path() + "/csminitCube.cub";
         testCube->fromLabel(filename, label, "rw");
         testCube->close();
-
-        plugin = new TestCsmPlugin();
-        csm::PluginList pluginList = plugin->getList();
-        bool alreadyFound = false;
-        for (auto const& loadedPlugin : pluginList) {
-          if (loadedPlugin) {
-            if ( (loadedPlugin->getPluginName() != "TestCsmPlugin") || alreadyFound) {
-              // Note: documentation says explicitly not to do this, but I'm doing it
-              // anyway for testing. See pg. 39 API documentation version 3.0.3
-              plugin->removePlugin(loadedPlugin->getPluginName());
-            }
-            else {
-              // Sometimes end up with mulitple copies of the same plugin. If so, remove it so 
-              // it doesn't get considered "2 plugins" by csminit, which causes it to fail.
-              alreadyFound = true;
-            }
-          }
-        }
+        
+        // There should only be one plugin, so get the first one
+        std::list<const csm::Plugin*> plugins = csm::Plugin::getList();
+        plugin = plugins.front();
       }
 
       void TearDown() override {
-        if (plugin) {
-          plugin->removePlugin(plugin->getPluginName());
-          delete plugin;
-          plugin = NULL;
-        }
         if (testCube) {
           if (testCube->isOpen()) {
             testCube->close();
@@ -104,12 +85,13 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Intent is just to make sure the state string exists and is a "reasonable" length
-  EXPECT_GT(stateString.string().length(), 20);
+  // Check that the plugin can create a model from the state string
+  std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // Check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
-  EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
+  EXPECT_EQ(modelName, "TestCsmModelName");
 }
 
 TEST_F(CSMPluginFixture, CSMinitRunTwice) {
@@ -129,13 +111,19 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   StringBlob stateString("", "CSMState");
   testCube->read(stateString);
   PvlObject blobPvl = stateString.Label();
+  
+  // Make sure there is only one CSMState Blob on the label
+  PvlObject *label = testCube->label();
+  label->deleteObject("String");
+  EXPECT_FALSE(label->hasObject("String"));
 
   // Verify contents of the StringBlob's PVL label
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Intent is just to make sure the state string exists and is a "reasonable" length
-  EXPECT_GT(stateString.string().length(), 20);
+  // Check that the plugin can create a model from the state string
+  std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // Check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
@@ -186,8 +174,9 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
   EXPECT_EQ(stateString.Type().toStdString(), "String"); 
 
-  // Intent is to check that the state string exists and is a "reasonable" length
-  EXPECT_GT(stateString.string().length(), 20);
+  // Check that the plugin can create a model from the state string
+  std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
   // check blob label ModelName and Plugin Name 
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), "TestCsmPlugin");
