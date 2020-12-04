@@ -268,7 +268,7 @@ namespace Isis {
       // definitions for this method are the only ones that are allowed for
       // ProcessMosaic objects and child objects, unless redifined in the
       // child class
-      Isis::Cube *SetOutputCube(const QString &psParameter,  UserInterface *ui=nullptr);
+      Isis::Cube *SetOutputCube(const QString &psParameter);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
 

@@ -68,7 +68,7 @@ namespace Isis {
     if(ui.WasEntered("HRS"))
       str.SetHrs(StringToPixel(ui.GetString("HRS")));
 
-    p.SetOutputCube("TO", &ui);
+    p.SetOutputCube("TO");
 
     // Start the processing
     p.StartProcess(stretchProcess);

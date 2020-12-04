@@ -240,9 +240,9 @@ namespace Isis {
       virtual void SetInputCube(Isis::Cube *inCube);
 
 
-      virtual Isis::Cube *SetOutputCube(const QString &parameter, UserInterface *ui=nullptr);
+      virtual Isis::Cube *SetOutputCube(const QString &parameter);
       virtual Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
-                                const int nlines, const int nbands = 1, UserInterface *ui=nullptr);
+                                const int nlines, const int nbands = 1);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,

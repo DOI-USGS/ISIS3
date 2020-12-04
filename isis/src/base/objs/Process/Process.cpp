@@ -263,7 +263,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  Isis::Cube *Process::SetOutputCube(const QString &parameter, UserInterface *ui) {
+  Isis::Cube *Process::SetOutputCube(const QString &parameter) {
     // Make sure we have an input cube to get a default size from
     if(InputCubes.size() == 0) {
       QString message = "No input images have been selected ... therefore";
@@ -274,7 +274,7 @@ namespace Isis {
     int nl = InputCubes[0]->lineCount();
     int ns = InputCubes[0]->sampleCount();
     int nb = InputCubes[0]->bandCount();
-    return SetOutputCube(parameter, ns, nl, nb, ui);
+    return SetOutputCube(parameter, ns, nl, nb);
   }
 
   /**
@@ -300,7 +300,7 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   Isis::Cube *Process::SetOutputCube(const QString &parameter, const int ns,
-                                     const int nl, const int nb, UserInterface *ui) {
+                                     const int nl, const int nb) {
     // Make sure we have good dimensions
     if((ns <= 0) || (nl <= 0) || (nb <= 0)) {
       ostringstream message;
@@ -310,16 +310,10 @@ namespace Isis {
     }
     QString fname;
     Isis::CubeAttributeOutput atts;
-    if(ui==nullptr){
-        fname = Application::GetUserInterface().GetFileName(parameter);
-        atts = Application::GetUserInterface().GetOutputAttribute(parameter);
-    }
-    else{
-        fname = ui->GetFileName(parameter);
-        atts = ui->GetOutputAttribute(parameter);
-    }
+    fname = Application::GetUserInterface().GetFileName(parameter);
+    atts = Application::GetUserInterface().GetOutputAttribute(parameter);
     return SetOutputCube(fname, atts, ns, nl, nb);
-  }
+}
 
 
   /**

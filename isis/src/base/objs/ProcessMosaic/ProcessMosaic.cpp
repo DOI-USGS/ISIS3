@@ -706,7 +706,7 @@ namespace Isis {
    *
    * @throws IException::Message
    */
-  Cube *ProcessMosaic::SetOutputCube(const QString &psParameter,  UserInterface *ui) {
+  Cube *ProcessMosaic::SetOutputCube(const QString &psParameter) {
 
     // Make sure there is only one output cube
     if (OutputCubes.size() > 0) {

@@ -35,10 +35,10 @@ TEST_F(SpecialSmallCube, FunctionalTestStretchDefault) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  ASSERT_DOUBLE_EQ(oCubeStats->Average(), 505.25);
-  ASSERT_DOUBLE_EQ(oCubeStats->Sum(), 50525);
-  ASSERT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);
-  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 302.16673352386897);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 505.25);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 50525);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 302.16673352386897);
 }
 
 // case 2, changes other special pixels to other special pixels
@@ -63,10 +63,10 @@ TEST_F(SpecialSmallCube, FunctionalTestStretchSwitchSpecial) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  ASSERT_DOUBLE_EQ(oCubeStats->Average(), 230.5);
-  ASSERT_DOUBLE_EQ(oCubeStats->Sum(), 11525);
-  ASSERT_DOUBLE_EQ(oCubeStats->ValidPixels(), 50);
-  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 14.577379737113251);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 230.5);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 11525);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 50);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 14.577379737113251);
 }
 // case 3, also scrambles, but testing user interface, do not convert, seems to
 // do same thing as case 2
