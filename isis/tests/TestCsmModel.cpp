@@ -4,8 +4,26 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModelName";
+const std::vector<std::string> TestCsmModel::PARAM_NAMES = {
+  "test_param_one",
+  "test_param_two"
+};
+const std::vector<std::string> TestCsmModel::PARAM_UNITS = {
+  "m",
+  "rad"
+};
+const std::vector<csm::param::Type> TestCsmModel::PARAM_TYPES = {
+  csm::param::FICTITIOUS,
+  csm::param::REAL
+};
+const std::vector<csm::SharingCriteria> TestCsmModel::PARAM_SHARING_CRITERIA = {
+  csm::SharingCriteria(),
+  csm::SharingCriteria()
+};
+
 TestCsmModel::TestCsmModel() {
-  m_modelState = "TestCsmModel_ModelState";
+  m_param_values.resize(TestCsmModel::PARAM_NAMES.size(), 0.0);
 };
 
 TestCsmModel::~TestCsmModel() {
@@ -20,7 +38,7 @@ csm::Version TestCsmModel::getVersion() const {
 }
 
 std::string TestCsmModel::getModelName() const {
-  return "TestCsmModelName";
+  return TestCsmModel::SENSOR_MODEL_NAME;
 }
 
 std::string TestCsmModel::getPedigree() const {
@@ -65,11 +83,19 @@ std::string TestCsmModel::getReferenceDateAndTime() const {
 }
 
 std::string TestCsmModel::getModelState() const {
-  return m_modelState;
+  json state;
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[TestCsmModel::PARAM_NAMES[param_index]] = m_param_values[param_index];
+  }
+  return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 void TestCsmModel::replaceModelState(const std::string& argState) {
-  m_modelState = argState;
+  // Get the JSON substring
+  json state = json::parse(argState.substr(argState.find("\n") + 1));
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    m_param_values[param_index] = state.at(TestCsmModel::PARAM_NAMES[param_index]);
+  }
 }
 
 std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
@@ -82,11 +108,119 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
 
   json parsedIsd;
   isdFile >> parsedIsd;
+  // Only extract the first 2 parameters from the file
   json state;
-  state["name"] = parsedIsd.at("name");
-  state["test_param_one"] = parsedIsd.at("test_param_one");
-  state["test_param_two"] = parsedIsd.at("test_param_two");
-  return state.dump();
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[TestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(TestCsmModel::PARAM_NAMES[param_index]);
+  }
+  return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
+}
+
+
+csm::EcefCoord TestCsmModel::getReferencePoint() const {
+  return csm::EcefCoord(0.0, 0.0, 0.0);
+}
+
+void TestCsmModel::setReferencePoint(const csm::EcefCoord& groundPt) {
+  // do nothing for test
+}
+
+int TestCsmModel::getNumParameters() const {
+  return m_param_values.size();
+}
+
+std::string TestCsmModel::getParameterName(int index) const {
+  return TestCsmModel::PARAM_NAMES[index];
+}
+
+
+std::string TestCsmModel::getParameterUnits(int index) const {
+  return TestCsmModel::PARAM_UNITS[index];
+}
+
+bool TestCsmModel::hasShareableParameters() const {
+  return false;
+}
+
+bool TestCsmModel::isParameterShareable(int index) const {
+  return false;
+}
+
+csm::SharingCriteria TestCsmModel::getParameterSharingCriteria(int index) const {
+  return TestCsmModel::PARAM_SHARING_CRITERIA[index];
+}
+
+double TestCsmModel::getParameterValue(int index) const {
+  return m_param_values[index];
+}
+
+void TestCsmModel::setParameterValue(int index, double value) {
+  m_param_values[index] = value;
+}
+
+csm::param::Type TestCsmModel::getParameterType(int index) const {
+  return TestCsmModel::PARAM_TYPES[index];
+}
+
+void TestCsmModel::setParameterType(int index, csm::param::Type pType) {
+  // do nothing for test
+}
+
+double TestCsmModel::getParameterCovariance(int index1,
+                                            int index2) const {
+  // default to identity covariance matrix
+  if (index1 == index2) {
+    return 1.0;
+  }
+  return 0.0;
+                              }
+void TestCsmModel::setParameterCovariance(int index1,
+                                          int index2,
+                                          double covariance) {
+  // do nothing for test
+}
+
+int TestCsmModel::getNumGeometricCorrectionSwitches() const {
+  return 0;
+}
+
+std::string TestCsmModel::getGeometricCorrectionName(int index) const {
+  throw csm::Error(csm::Error::INDEX_OUT_OF_RANGE, "Index out of range.",
+                   "TestCsmModel::getGeometricCorrectionName");
+}
+
+void TestCsmModel::setGeometricCorrectionSwitch(int index,
+                                  bool value,
+                                  csm::param::Type pType) {
+  throw csm::Error(csm::Error::INDEX_OUT_OF_RANGE, "Index out of range.",
+                  "TestCsmModel::setGeometricCorrectionSwitch");
+}
+
+bool TestCsmModel::getGeometricCorrectionSwitch(int index) const {
+  throw csm::Error(csm::Error::INDEX_OUT_OF_RANGE, "Index out of range.",
+                   "TestCsmModel::getGeometricCorrectionSwitch");
+}
+
+std::vector<double> TestCsmModel::getCrossCovarianceMatrix(
+      const csm::GeometricModel& comparisonModel,
+      csm::param::Set pSet,
+      const csm::GeometricModel::GeometricModelList& otherModels) const {
+  const std::vector<int>& rowIndices = getParameterSetIndices(pSet);
+  size_t numRows = rowIndices.size();
+  const std::vector<int>& colIndices = comparisonModel.getParameterSetIndices(pSet);
+  size_t numCols = colIndices.size();
+  std::vector<double> covariance(numRows * numCols, 0.0);
+
+  if (&comparisonModel == this) {
+    for (size_t rowIndex = 0; rowIndex <  numRows; numRows++) {
+      for (size_t colIndex = 0; colIndex < numCols; colIndex++) {
+        covariance[rowIndex * numCols + colIndex] = getParameterCovariance(rowIndices[rowIndex],
+                                                                           colIndices[colIndex]);
+      }
+    }
+  }
+
+  return covariance;
 }
 
 
