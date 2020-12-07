@@ -39,7 +39,7 @@ csm::Version AlternativeTestCsmModel::getVersion() const {
 }
 
 std::string AlternativeTestCsmModel::getModelName() const {
-  return "AlternativeTestCsmModelName";
+  return AlternativeTestCsmModel::SENSOR_MODEL_NAME;
 }
 
 std::string AlternativeTestCsmModel::getPedigree() const {
