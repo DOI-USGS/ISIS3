@@ -6,10 +6,10 @@ using json = nlohmann::json;
 
 const std::string AlternativeTestCsmModel::SENSOR_MODEL_NAME = "AlternativeTestCsmModelName";
 const std::vector<std::string> AlternativeTestCsmModel::PARAM_NAMES = {
-  "TestParam1",
-  "TestParam2",
-  "TestParam3",
-  "TestParam4"
+  "test_param_one",
+  "test_param_two",
+  "test_param_three",
+  "test_param_four"
 };
 const std::vector<std::string> AlternativeTestCsmModel::PARAM_UNITS = {
   "m",
@@ -92,33 +92,35 @@ std::string AlternativeTestCsmModel::getReferenceDateAndTime() const {
 
 std::string AlternativeTestCsmModel::getModelState() const {
   json state;
-  state["test_param_one"] = m_param_values[0];
-  state["test_param_two"] = m_param_values[1];
-  state["test_param_three"] = m_param_values[2];
-  state["test_param_four"] = m_param_values[3];
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[AlternativeTestCsmModel::PARAM_NAMES[param_index]] = m_param_values[param_index];
+  }
   return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 void AlternativeTestCsmModel::replaceModelState(const std::string& argState) {
   // Get the JSON substring
   json state = json::parse(argState.substr(argState.find("\n") + 1));
-  m_param_values[0] = state.at("test_param_one");
-  m_param_values[1] = state.at("test_param_two");
-  m_param_values[2] = state.at("test_param_three");
-  m_param_values[3] = state.at("test_param_four");
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    m_param_values[param_index] = state.at(AlternativeTestCsmModel::PARAM_NAMES[param_index]);
+  }
 }
 
 std::string AlternativeTestCsmModel::constructStateFromIsd(const csm::Isd isd){
   std::string filename = isd.filename();
   std::ifstream isdFile(filename);
+
+  if (isdFile.fail()) {
+    std::cout << "Could not open file: " << filename << std::endl;
+  }
+
   json parsedIsd;
   isdFile >> parsedIsd;
 
   json state;
-  state["test_param_one"] = parsedIsd.at("test_param_one");
-  state["test_param_two"] = parsedIsd.at("test_param_two");
-  state["test_param_three"] = parsedIsd.at("test_param_three");
-  state["test_param_four"] = parsedIsd.at("test_param_four");
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[AlternativeTestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(AlternativeTestCsmModel::PARAM_NAMES[param_index]);
+  }
   return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 

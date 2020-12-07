@@ -6,8 +6,8 @@ using json = nlohmann::json;
 
 const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModelName";
 const std::vector<std::string> TestCsmModel::PARAM_NAMES = {
-  "TestParam1",
-  "TestParam2"
+  "test_param_one",
+  "test_param_two"
 };
 const std::vector<std::string> TestCsmModel::PARAM_UNITS = {
   "m",
@@ -84,16 +84,18 @@ std::string TestCsmModel::getReferenceDateAndTime() const {
 
 std::string TestCsmModel::getModelState() const {
   json state;
-  state["test_param_one"] = m_param_values[0];
-  state["test_param_two"] = m_param_values[1];
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[TestCsmModel::PARAM_NAMES[param_index]] = m_param_values[param_index];
+  }
   return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 void TestCsmModel::replaceModelState(const std::string& argState) {
   // Get the JSON substring
   json state = json::parse(argState.substr(argState.find("\n") + 1));
-  m_param_values[0] = state.at("test_param_one");
-  m_param_values[1] = state.at("test_param_two");
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    m_param_values[param_index] = state.at(TestCsmModel::PARAM_NAMES[param_index]);
+  }
 }
 
 std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
@@ -108,8 +110,9 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
   isdFile >> parsedIsd;
   // Only extract the first 2 parameters from the file
   json state;
-  state["test_param_one"] = parsedIsd.at("test_param_one");
-  state["test_param_two"] = parsedIsd.at("test_param_two");
+  for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
+    state[TestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(TestCsmModel::PARAM_NAMES[param_index]);
+  }
   return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
