@@ -11,6 +11,8 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QStringList>
 
+#include "csm/csm.h"
+#include "csm/GeometricModel.h"
 #include "csm/Isd.h"
 #include "csm/Model.h"
 #include "csm/NitfIsd.h"
@@ -44,7 +46,6 @@ namespace Isis {
     // Get the cube here so that we check early if it doesn't exist
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
-    // TESTING
     // We have to call this to get the plugin list loaded right now
     try {
       Camera *cam = CameraFactory::Create(*cube);
@@ -53,7 +54,6 @@ namespace Isis {
     catch(...) {
       // Noop
     }
-    // END TESTING
 
     QString isdFilePath = ui.GetFileName("ISD");
 
@@ -107,7 +107,6 @@ namespace Isis {
         }
       }
       throw IException(IException::User, message, _FILEINFO_);
-      // std::cout << "No model found" << std::endl;
     }
 
     // If we are here, then we have exactly 1 model
@@ -133,7 +132,6 @@ namespace Isis {
     }
 
     string modelState = model->getModelState();
-    // string modelState = "TestModel\nThis is the test model state.";
 
     // TODO Just do spiceinit clean-up routine instead
     try {
@@ -159,29 +157,51 @@ namespace Isis {
       instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
     }
 
-    // Popualte the Archive group with useful information
-    if (!cube->hasGroup("Archive")) {
-      cube->putGroup(PvlGroup("Archive"));
+    // Popualte the CsmInfo group with useful information
+    cube->deleteGroup("CsmInfo");
+    PvlGroup infoGroup("CsmInfo");
+    infoGroup += PvlKeyword("CSMPlatformID",
+                            QString::fromStdString(model->getPlatformIdentifier()));
+    infoGroup += PvlKeyword("CSMInstrumentId",
+                            QString::fromStdString(model->getSensorIdentifier()));
+    infoGroup += PvlKeyword("ReferenceTime",
+                            QString::fromStdString(model->getReferenceDateAndTime()));
+    csm::GeometricModel *modelWithParams = dynamic_cast<csm::GeometricModel*>(model);
+    if (modelWithParams) {
+      PvlKeyword paramNames("ModelParameterNames");
+      PvlKeyword paramUnits("ModelParameterUnits");
+      PvlKeyword paramTypes("ModelParameterTypes");
+      for (const csm::GeometricModel::Parameter &param : modelWithParams->getParameters()) {
+        paramNames += QString::fromStdString(param.name);
+        paramUnits += QString::fromStdString(param.units);
+        switch (param.type) {
+        case csm::param::NONE:
+          paramTypes += "NONE";
+          break;
+
+        case csm::param::FICTITIOUS:
+          paramTypes += "FICTITIOUS";
+          break;
+
+        case csm::param::REAL:
+          paramTypes += "REAL";
+          break;
+
+        case csm::param::FIXED:
+          paramTypes += "FIXED";
+          break;
+
+        default:
+          paramTypes += "UNKNOWN";
+          break;
+        }
+      }
+
+      infoGroup += paramNames;
+      infoGroup += paramUnits;
+      infoGroup += paramTypes;
     }
-    PvlGroup &archiveGroup = cube->group("Archive");
-    if (archiveGroup.hasKeyword("CSMPlatformID")) {
-      archiveGroup.deleteKeyword("CSMPlatformID");
-    }
-    archiveGroup += PvlKeyword("CSMPlatformID",
-                              //  "TestPlatformID");
-                               QString::fromStdString(model->getPlatformIdentifier()));
-    if (archiveGroup.hasKeyword("CSMInstrumentId")) {
-      archiveGroup.deleteKeyword("CSMInstrumentId");
-    }
-    archiveGroup += PvlKeyword("CSMInstrumentId",
-                              //  "TestInstrumentID");
-                               QString::fromStdString(model->getSensorIdentifier()));
-    if (archiveGroup.hasKeyword("ReferenceTime")) {
-      archiveGroup.deleteKeyword("ReferenceTime");
-    }
-    archiveGroup += PvlKeyword("ReferenceTime",
-                              //  "TestReferenceTime");
-                               QString::fromStdString(model->getReferenceDateAndTime()));
+    cube->putGroup(infoGroup);
 
     // Update existing Kernels Group or create new one and add shapemodel if provided
     if (!cube->hasGroup("Kernels")) {
