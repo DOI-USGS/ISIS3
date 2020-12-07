@@ -1,5 +1,5 @@
-#ifndef NoCam2Map_h
-#define NoCam2Map_h
+#ifndef nocam2map_h
+#define nocam2map_h
 
 #include "Transform.h"
 #include "UserInterface.h"
