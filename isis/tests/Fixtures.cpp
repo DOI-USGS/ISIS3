@@ -296,7 +296,6 @@ namespace Isis {
               {30, 0}};
     poly.Create(coords);
     cube1->write(poly);
-    cube1->reopen("rw");
 
     cube2 = new Cube();
     cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
@@ -308,7 +307,6 @@ namespace Isis {
               {31, 1}};
     poly.Create(coords);
     cube2->write(poly);
-    cube2->reopen("rw");
 
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");

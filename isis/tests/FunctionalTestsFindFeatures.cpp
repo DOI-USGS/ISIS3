@@ -73,6 +73,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesGeomMatch) {
   SurfacePoint sp = pt->GetAdjustedSurfacePoint();
   Latitude lat = sp.GetLatitude();
   Longitude lon = sp.GetLongitude();
+  // Empty lat/lons because we're matching on a fixture with no geometry info
   ASSERT_EQ(lat.toString(), "");
   ASSERT_EQ(lon.toString(), "");
 }
