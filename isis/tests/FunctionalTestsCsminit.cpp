@@ -7,6 +7,7 @@
 #include "TestCsmPlugin.h"
 #include "Fixtures.h"
 #include "TestUtilities.h"
+#include "TestCsmModel.h"
 #include "StringBlob.h"
 #include "FileName.h"
 
@@ -26,6 +27,7 @@ class CSMPluginFixture : public TempTestingFiles {
     Pvl label;
     QString isdPath;
     QString filename;
+    TestCsmModel model;
 
     void SetUp() override {
       TempTestingFiles::SetUp();
@@ -47,8 +49,7 @@ class CSMPluginFixture : public TempTestingFiles {
         filename = tempDir.path() + "/csminitCube.cub";
         testCube->fromLabel(filename, label, "rw");
         testCube->close();
-        
-        // There should only be one plugin, so get the first one
+
         plugin = csm::Plugin::findPlugin("TestCsmPlugin");
       }
 
@@ -80,22 +81,32 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   testCube->read(stateString);
 
   // Verify contents of the StringBlob's PVL label
-  PvlObject blobPvl = stateString.Label(); 
+  PvlObject blobPvl = stateString.Label();
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String"); 
+  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
-  // Check blob label ModelName and Plugin Name 
+  // Check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
-  EXPECT_EQ(modelName, "TestCsmModelName");
+  EXPECT_EQ(modelName, model.getModelName());
+
+  // Check the CsmInfo group
+  ASSERT_TRUE(testCube->hasGroup("CsmInfo"));
+  PvlGroup &infoGroup = testCube->group("CsmInfo");
+  ASSERT_TRUE(infoGroup.hasKeyword("CSMPlatformID"));
+  EXPECT_EQ(infoGroup["CSMPlatformID"][0].toStdString(), model.getPlatformIdentifier());
+  ASSERT_TRUE(infoGroup.hasKeyword("CSMInstrumentId"));
+  EXPECT_EQ(infoGroup["CSMInstrumentId"][0].toStdString(), model.getSensorIdentifier());
+  ASSERT_TRUE(infoGroup.hasKeyword("ReferenceTime"));
+  EXPECT_EQ(infoGroup["ReferenceTime"][0].toStdString(), model.getReferenceDateAndTime());
 }
 
 TEST_F(CSMPluginFixture, CSMinitRunTwice) {
-  // Run csminit twice in a row with the same options each time. Verify that end result is 
-  // as if csminit were only run once. 
+  // Run csminit twice in a row with the same options each time. Verify that end result is
+  // as if csminit were only run once.
   QVector<QString> args = {
     "from="+filename,
     "isd="+isdPath};
@@ -110,7 +121,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   StringBlob stateString("", "CSMState");
   testCube->read(stateString);
   PvlObject blobPvl = stateString.Label();
-  
+
   // Make sure there is only one CSMState Blob on the label
   PvlObject *label = testCube->label();
   label->deleteObject("String");
@@ -118,20 +129,20 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
 
   // Verify contents of the StringBlob's PVL label
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String"); 
+  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
-  // Check blob label ModelName and Plugin Name 
+  // Check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "TestCsmModelName");
 }
 
 TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   // Test csminit when multiple possible models can be created. First, verify that this will fail
-  // without specifying the MODELNAME, then specify the MODELNAME and check the results. 
+  // without specifying the MODELNAME, then specify the MODELNAME and check the results.
 
   // Create a test ISD could work for 2 models
   json isd;
@@ -152,7 +163,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   UserInterface options(APP_XML, args);
 
   // If there are two possible models, csminit will fail and prompt the user to specify the model
-  // and/or plugin name. 
+  // and/or plugin name.
   EXPECT_ANY_THROW(csminit(options));
 
   // Re-run with the model name specified
@@ -160,24 +171,24 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
     "from="+filename,
     "isd="+isdPath,
     "modelName=AlternativeTestCsmModelName"};
-  
+
   UserInterface betterOptions(APP_XML, args);
   csminit(betterOptions);
 
   testCube->open(filename);
   StringBlob stateString("", "CSMState");
   testCube->read(stateString);
-  PvlObject blobPvl = stateString.Label(); 
+  PvlObject blobPvl = stateString.Label();
 
   // Check blobPvl contents
   EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String"); 
+  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
 
-  // check blob label ModelName and Plugin Name 
+  // check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(QString(blobPvl.findKeyword("ModelName")).toStdString(), "AlternativeTestCsmModelName");
 }
@@ -200,7 +211,7 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
     "isd="+isdPath};
 
   UserInterface options(APP_XML, args);
-  
+
   // Expect a failure due to being unable to construct any model from the isd
   EXPECT_ANY_THROW(csminit(options));
 }
