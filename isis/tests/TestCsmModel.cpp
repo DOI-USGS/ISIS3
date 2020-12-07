@@ -7,31 +7,22 @@ using json = nlohmann::json;
 const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModelName";
 const std::vector<std::string> TestCsmModel::PARAM_NAMES = {
   "TestParam1",
-  "TestParam2",
-  "TestParam3",
-  "TestParam4"
+  "TestParam2"
 };
 const std::vector<std::string> TestCsmModel::PARAM_UNITS = {
   "m",
-  "rad",
-  "K",
-  "unitless"
+  "rad"
 };
 const std::vector<csm::param::Type> TestCsmModel::PARAM_TYPES = {
   csm::param::FICTITIOUS,
-  csm::param::REAL,
-  csm::param::FIXED,
-  csm::param::NONE
+  csm::param::REAL
 };
 const std::vector<csm::SharingCriteria> TestCsmModel::PARAM_SHARING_CRITERIA = {
-  csm::SharingCriteria(),
-  csm::SharingCriteria(),
   csm::SharingCriteria(),
   csm::SharingCriteria()
 };
 
 TestCsmModel::TestCsmModel() {
-  m_modelState = "TestCsmModel_ModelState";
   m_param_values.resize(TestCsmModel::PARAM_NAMES.size(), 0.0);
 };
 
@@ -92,11 +83,17 @@ std::string TestCsmModel::getReferenceDateAndTime() const {
 }
 
 std::string TestCsmModel::getModelState() const {
-  return m_modelState;
+  json state;
+  state["test_param_one"] = m_param_values[0];
+  state["test_param_two"] = m_param_values[1];
+  return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 void TestCsmModel::replaceModelState(const std::string& argState) {
-  m_modelState = argState;
+  // Get the JSON substring
+  json state = json::parse(argState.substr(argState.find("\n") + 1));
+  m_param_values[0] = state.at("test_param_one");
+  m_param_values[1] = state.at("test_param_two");
 }
 
 std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
@@ -109,11 +106,11 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
 
   json parsedIsd;
   isdFile >> parsedIsd;
+  // Only extract the first 2 parameters from the file
   json state;
-  state["name"] = parsedIsd.at("name");
   state["test_param_one"] = parsedIsd.at("test_param_one");
   state["test_param_two"] = parsedIsd.at("test_param_two");
-  return state.dump();
+  return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 

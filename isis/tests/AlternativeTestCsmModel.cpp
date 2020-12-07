@@ -4,26 +4,33 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-const std::string AlternativeTestCsmModel::SENSOR_MODEL_NAME = "TestCsmModelName";
+const std::string AlternativeTestCsmModel::SENSOR_MODEL_NAME = "AlternativeTestCsmModelName";
 const std::vector<std::string> AlternativeTestCsmModel::PARAM_NAMES = {
   "TestParam1",
-  "TestParam2"
+  "TestParam2",
+  "TestParam3",
+  "TestParam4"
 };
 const std::vector<std::string> AlternativeTestCsmModel::PARAM_UNITS = {
   "m",
-  "rad"
+  "rad",
+  "K",
+  "unitless"
 };
 const std::vector<csm::param::Type> AlternativeTestCsmModel::PARAM_TYPES = {
   csm::param::FICTITIOUS,
-  csm::param::REAL
+  csm::param::REAL,
+  csm::param::FIXED,
+  csm::param::NONE
 };
 const std::vector<csm::SharingCriteria> AlternativeTestCsmModel::PARAM_SHARING_CRITERIA = {
+  csm::SharingCriteria(),
+  csm::SharingCriteria(),
   csm::SharingCriteria(),
   csm::SharingCriteria()
 };
 
 AlternativeTestCsmModel::AlternativeTestCsmModel() {
-  m_modelState = "AlternativeTestCsmModel_ModelState";
   m_param_values.resize(AlternativeTestCsmModel::PARAM_NAMES.size(), 0.0);
 };
 
@@ -84,11 +91,21 @@ std::string AlternativeTestCsmModel::getReferenceDateAndTime() const {
 }
 
 std::string AlternativeTestCsmModel::getModelState() const {
-  return m_modelState;
+  json state;
+  state["test_param_one"] = m_param_values[0];
+  state["test_param_two"] = m_param_values[1];
+  state["test_param_three"] = m_param_values[2];
+  state["test_param_four"] = m_param_values[3];
+  return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 void AlternativeTestCsmModel::replaceModelState(const std::string& argState) {
-  m_modelState = argState;
+  // Get the JSON substring
+  json state = json::parse(argState.substr(argState.find("\n") + 1));
+  m_param_values[0] = state.at("test_param_one");
+  m_param_values[1] = state.at("test_param_two");
+  m_param_values[2] = state.at("test_param_three");
+  m_param_values[3] = state.at("test_param_four");
 }
 
 std::string AlternativeTestCsmModel::constructStateFromIsd(const csm::Isd isd){
@@ -98,11 +115,11 @@ std::string AlternativeTestCsmModel::constructStateFromIsd(const csm::Isd isd){
   isdFile >> parsedIsd;
 
   json state;
-  state["name"] = parsedIsd.at("name");
   state["test_param_one"] = parsedIsd.at("test_param_one");
   state["test_param_two"] = parsedIsd.at("test_param_two");
   state["test_param_three"] = parsedIsd.at("test_param_three");
-  return state.dump();
+  state["test_param_four"] = parsedIsd.at("test_param_four");
+  return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 csm::EcefCoord AlternativeTestCsmModel::getReferencePoint() const {

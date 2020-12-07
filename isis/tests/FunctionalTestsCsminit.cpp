@@ -37,9 +37,8 @@ class CSMPluginFixture : public TempTestingFiles {
 
       // Create and populate test ISDs
       json isd;
-      isd["name"] = "test_isd";
-      isd["test_param_one"] = "value_one";
-      isd["test_param_two"] = "value_two";
+      isd["test_param_one"] = 1.0;
+      isd["test_param_two"] = 2.0;
 
       isdPath = tempDir.path() + "/default.json";
       std::ofstream file(isdPath.toStdString());
@@ -47,10 +46,10 @@ class CSMPluginFixture : public TempTestingFiles {
       file.flush();
 
       json altIsd;
-      altIsd["name"] = "test_isd";
-      altIsd["test_param_one"] = "value_one";
-      altIsd["test_param_two"] = "value_two";
-      altIsd["test_param_three"] = "value_three";
+      altIsd["test_param_one"] = 1.0;
+      altIsd["test_param_two"] = 2.0;
+      altIsd["test_param_three"] = 3.0;
+      altIsd["test_param_four"] = 4.0;
 
       altIsdPath = tempDir.path() + "/alternate.json";
       std::ofstream altFile(altIsdPath.toStdString());
@@ -101,7 +100,7 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
 
   // Check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
@@ -117,20 +116,17 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   ASSERT_TRUE(infoGroup.hasKeyword("ReferenceTime"));
   EXPECT_EQ(infoGroup["ReferenceTime"][0].toStdString(), model.getReferenceDateAndTime());
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterNames"));
-  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 3);
-  ASSERT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), TestCsmModel::PARAM_NAMES[0]);
-  ASSERT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), TestCsmModel::PARAM_NAMES[1]);
-  ASSERT_EQ(infoGroup["ModelParameterNames"][2].toStdString(), TestCsmModel::PARAM_NAMES[2]);
+  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 2);
+  EXPECT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), TestCsmModel::PARAM_NAMES[0]);
+  EXPECT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), TestCsmModel::PARAM_NAMES[1]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterUnits"));
-  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 3);
-  ASSERT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), TestCsmModel::PARAM_UNITS[0]);
-  ASSERT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), TestCsmModel::PARAM_UNITS[1]);
-  ASSERT_EQ(infoGroup["ModelParameterUnits"][2].toStdString(), TestCsmModel::PARAM_UNITS[2]);
+  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 2);
+  EXPECT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), TestCsmModel::PARAM_UNITS[0]);
+  EXPECT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), TestCsmModel::PARAM_UNITS[1]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterTypes"));
-  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 3);
-  ASSERT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
-  ASSERT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
-  ASSERT_EQ(infoGroup["ModelParameterTypes"][2].toStdString(), "FIXED");
+  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 2);
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
 }
 
 TEST_F(CSMPluginFixture, CSMinitRunTwice) {
@@ -169,7 +165,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
 
   // Make sure there is only one CSMState Blob on the label
   PvlObject *label = testCube->label();
@@ -216,7 +212,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(stateString.string(), modelName));
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
 
   // check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
@@ -232,17 +228,20 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   ASSERT_TRUE(infoGroup.hasKeyword("ReferenceTime"));
   EXPECT_EQ(infoGroup["ReferenceTime"][0].toStdString(), altModel.getReferenceDateAndTime());
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterNames"));
-  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 2);
-  ASSERT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), AlternativeTestCsmModel::PARAM_NAMES[0]);
-  ASSERT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), AlternativeTestCsmModel::PARAM_NAMES[1]);
+  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 3);
+  EXPECT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), AlternativeTestCsmModel::PARAM_NAMES[0]);
+  EXPECT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), AlternativeTestCsmModel::PARAM_NAMES[1]);
+  EXPECT_EQ(infoGroup["ModelParameterNames"][2].toStdString(), AlternativeTestCsmModel::PARAM_NAMES[2]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterUnits"));
-  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 2);
-  ASSERT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), AlternativeTestCsmModel::PARAM_UNITS[0]);
-  ASSERT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), AlternativeTestCsmModel::PARAM_UNITS[1]);
+  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 3);
+  EXPECT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), AlternativeTestCsmModel::PARAM_UNITS[0]);
+  EXPECT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), AlternativeTestCsmModel::PARAM_UNITS[1]);
+  EXPECT_EQ(infoGroup["ModelParameterUnits"][2].toStdString(), AlternativeTestCsmModel::PARAM_UNITS[2]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterTypes"));
-  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 2);
-  ASSERT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
-  ASSERT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
+  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 3);
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][2].toStdString(), "FIXED");
 }
 
 

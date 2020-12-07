@@ -68,7 +68,6 @@ class TestCsmModel : public csm::GeometricModel {
           const csm::GeometricModel::GeometricModelList& otherModels = GeometricModel::GeometricModelList()) const;
 
   private:
-    std::string m_modelState;
     std::vector<double> m_param_values;
 };
 #endif
