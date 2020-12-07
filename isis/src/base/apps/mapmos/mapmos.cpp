@@ -31,7 +31,7 @@ namespace Isis {
     m.SetTrackFlag(bTrack);
 
     // Gets the input file along with attributes
-    QString sInputFile = ui.GetAsString("FROM");
+    QString sInputFile = inCube->fileName();
 
     ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay( ui.GetString("PRIORITY") );
 
@@ -99,7 +99,7 @@ namespace Isis {
     if(!m.StartProcess(sInputFile)) {
       // Logs the cube if it falls outside of the given mosaic
       PvlGroup outsiders("Outside");
-      outsiders += PvlKeyword("File", ui.GetFileName("FROM"));
+      outsiders += PvlKeyword("File", sInputFile);
       log->addGroup(outsiders);
     }
     else {
