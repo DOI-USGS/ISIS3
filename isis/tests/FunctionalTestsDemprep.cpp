@@ -164,3 +164,62 @@ TEST(Demprep, DemprepSpecialPixels){
   ASSERT_EQ(hist->HrsPixels(), 0);
   ASSERT_NEAR(hist->StandardDeviation(), 22217.85549, .00001);
 }
+
+
+TEST(Demprep, DemprepSouthPole){
+  Pvl appLog;
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/padded.cub";
+  QVector<QString> args = {"from=data/demprep/ulcn2005_lpo_npole.cub", "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+   demprep(options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube cube(cubeFileName);
+  ASSERT_EQ(cube.sampleCount(), 250);
+  ASSERT_EQ(cube.lineCount(), 251);
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  std::unique_ptr<Histogram> hist (cube.histogram());
+
+  ASSERT_NEAR(double(hist->Average()), 1737016.52267, .00001);
+  ASSERT_EQ(hist->Sum(), 108997786798);
+  ASSERT_EQ(hist->ValidPixels(), 62750);
+  ASSERT_EQ(hist->NullPixels(), 0);
+  ASSERT_NEAR(hist->StandardDeviation(), 449.297, .001);
+}
+
+
+
+TEST(Demprep, DemprepNorthPole){
+  Pvl appLog;
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/padded.cub";
+  QVector<QString> args = {"from=data/demprep/ulcn2005_lpo_npole.cub", "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+   demprep(options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube cube(cubeFileName);
+  ASSERT_EQ(cube.sampleCount(), 250);
+  ASSERT_EQ(cube.lineCount(), 251);
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  std::unique_ptr<Histogram> hist (cube.histogram());
+
+  ASSERT_NEAR(double(hist->Average()), 1737016.52267, .00001);
+  ASSERT_DOUBLE_EQ(hist->Sum(), 108997786798);
+  ASSERT_EQ(hist->ValidPixels(), 62750);
+  ASSERT_EQ(hist->NullPixels(), 0);
+  ASSERT_NEAR(hist->StandardDeviation(), 449.297, .001);
+}
