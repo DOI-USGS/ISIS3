@@ -427,8 +427,9 @@ namespace Isis {
     delete isdPathR;
   }
 
-  void MroCtxCube::SetUp() {
+  void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
+    dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
 
     // force real DNs
     QString fname = testCube->fileName();
@@ -742,6 +743,18 @@ namespace Isis {
     lab->findObject("IsisCube").addGroup(instGroup);
 
     testCube->reopen("r");
+  }
+
+  void RingsCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    ring1 = new Cube("data/rings/rings1proj.cub", "r");
+    ring2 = new Cube("data/rings/rings2proj.cub", "r");
+
+    cubeListPath = tempDir.path() + "/filelist.txt";
+    cubeFileList.append("data/rings/rings1proj.cub");
+    cubeFileList.append("data/rings/rings2proj.cub");
+    cubeFileList.write(cubeListPath);
   }
 
 }
