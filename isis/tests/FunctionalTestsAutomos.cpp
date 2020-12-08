@@ -24,6 +24,8 @@ TEST_F(DefaultCube, FunctionalTestAutomosDefault) {
 
   automos(options, &appLog);
 
+  EXPECT_TRUE(appLog.hasGroup("ImageLocation"));
+
   Cube mos(outPath);
   Pvl label = *mos.label();
 
@@ -69,9 +71,8 @@ TEST_F(DefaultCube, FunctionalTestAutomosSetRanges) {
                            "matchbandbin=false", "matchdem=true"};
 
   UserInterface options(APP_XML, args);
-  Pvl appLog;
 
-  automos(options, &appLog);
+  automos(options);
 
   Cube mos(outPath);
   Pvl label = *mos.label();
@@ -108,9 +109,8 @@ TEST_F(DefaultCube, FunctionalTestAutomosPriority) {
                            "priority=average", "highsat=true", "lowsat=true", "null=true"};
 
   UserInterface options(APP_XML, args);
-  Pvl appLog;
 
-  automos(options, &appLog);
+  automos(options);
 
   Cube mos(outPath);
   Pvl label = *mos.label();
@@ -154,9 +154,8 @@ TEST_F(DefaultCube, FunctionalTestAutomosBandSelect) {
                            "priority=band", "number=1", "criteria=lesser"};
 
   UserInterface options(APP_XML, args);
-  Pvl appLog;
 
-  automos(options, &appLog);
+  automos(options);
 
   Cube mos(outPath);
   Pvl label = *mos.label();
