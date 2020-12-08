@@ -278,6 +278,38 @@ namespace Isis {
   }
 
   /**
+   * Allocates a user-specified output cube whose size matches the first input
+   * cube.
+   *
+   * @return Cube*
+   *
+   * @param parameter User specified output file. For example, "TO" is a popular
+   *                  user parameter. If the user specified TO=output.cub, then
+   *                  this routine would allocate the file output.cub with size
+   *                  specified by the first opened input cube. The output pixel
+   *                  type will be propagated from the first loaded input cube or
+   *                  will use the value in the application XML file for
+   *                  pixelType.
+   *
+   * @param ui A user interface used to get the attributes needed for SetOutputCube.
+   *
+   * @throws Isis::iException::Message
+   */
+  Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, UserInterface *ui) {
+    // Make sure we have an input cube to get a default size from
+    if(InputCubes.size() == 0) {
+      QString message = "No input images have been selected ... therefore";
+      message += "the output image size can not be determined";
+      throw IException(IException::Programmer, message, _FILEINFO_);
+    }
+
+    int nl = InputCubes[0]->lineCount();
+    int ns = InputCubes[0]->sampleCount();
+    int nb = InputCubes[0]->bandCount();
+    return SetOutputCubeStretch(parameter, ns, nl, nb, ui);
+  }
+
+  /**
    * Allocates a user specified output cube whose size is specified by the
    * programmer.
    *
@@ -315,6 +347,52 @@ namespace Isis {
     return SetOutputCube(fname, atts, ns, nl, nb);
 }
 
+/**
+ * Allocates a user specified output cube whose size is specified by the
+ * programmer.
+ *
+ * @return Cube*
+ *
+ * @param parameter User specified output file. For example, "TO" is a popular
+ *                  user parameter. If the user specified TO=output.cub, then
+ *                  this routine would allocate the file output.cub with size
+ *                  specified by the first opened input cube. The output pixel
+ *                  type will be propagated from the first loaded input cube or
+ *                  will use the value in the application XML file for
+ *                  pixelType.
+ *
+ * @param ns Number of samples to allocate
+ *
+ * @param nl Number of lines to allocate
+ *
+ * @param nb Number of bands to allocate
+ *
+ * @param ui A user interface used to get the attributes needed. If null, the
+ *           user interface will be obtained from the application.
+ *
+ * @throws Isis::iException::Message
+ */
+Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns,
+                                   const int nl, const int nb, UserInterface *ui) {
+  // Make sure we have good dimensions
+  if((ns <= 0) || (nl <= 0) || (nb <= 0)) {
+    ostringstream message;
+    message << "Invalid cube size specifications [ns=" << ns << ",nl=" << nl
+            << ",nb=" << nb << "]";
+    throw IException(IException::Programmer, message.str().c_str(), _FILEINFO_);
+  }
+  QString fname;
+  Isis::CubeAttributeOutput atts;
+  if(ui==nullptr){
+    fname = Application::GetUserInterface().GetFileName(parameter);
+    atts = Application::GetUserInterface().GetOutputAttribute(parameter);
+  }
+  else{
+    fname = ui->GetFileName(parameter);
+    atts = ui->GetOutputAttribute(parameter);
+  }
+  return SetOutputCube(fname, atts, ns, nl, nb);
+}
 
   /**
    * Allocates a output cube whose name and size is specified by the programmer.
