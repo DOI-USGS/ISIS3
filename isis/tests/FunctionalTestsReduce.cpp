@@ -26,9 +26,8 @@ TEST_F(LargeCube, FunctionalTestReduceDefault) {
                           };
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    reduce(options, &log);
+    reduce(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -60,9 +59,8 @@ TEST_F(LargeCube, FunctionalTestReduceAverageScale1) {
                           };
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    reduce(options, &log);
+    reduce(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -94,9 +92,8 @@ TEST_F(LargeCube, FunctionalTestReduceAverageScale2) {
                           };
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    reduce(options, &log);
+    reduce(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -128,9 +125,8 @@ TEST_F(LargeCube, FunctionalTestReduceNearestNeighbor) {
                           };
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    reduce(options, &log);
+    reduce(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -170,9 +166,8 @@ TEST_F(LargeCube, FunctionalTestReduceRoundOff) {
                           };
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    reduce(options, &log);
+    reduce(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -204,10 +199,9 @@ TEST_F(LargeCube, FunctionalTestReduceError) {
                             "onl=100"
                           };
 
-  Pvl log;
   UserInterface options(APP_XML, args);
   try{
-    reduce(options, &log);
+    reduce(options);
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e){
