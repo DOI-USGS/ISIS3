@@ -9,6 +9,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "FileName.h"
 
@@ -511,4 +512,35 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   ASSERT_EQ(kernels["EndPadding"].size(), 1);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"][0], "0.5");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"].unit(0), "seconds");
+}
+
+TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  StringBlob testBlob("test string", "CSMState");
+  testCube->write(testBlob);
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  spiceinit(testCube, options);
+
+  EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
+  EXPECT_ANY_THROW(testCube->read(testBlob));
+}
+
+TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  StringBlob testBlob("test string", "CSMState");
+  testCube->write(testBlob);
+
+  // Mangle the cube so that spiceinit failes
+  testCube->deleteGroup("Instrument");
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  ASSERT_ANY_THROW(spiceinit(testCube, options));
+
+  EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
+  EXPECT_NO_THROW(testCube->read(testBlob));
 }

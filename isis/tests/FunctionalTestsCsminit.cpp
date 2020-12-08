@@ -1,5 +1,4 @@
 #include "csminit.h"
-#include "spiceinit.h"
 
 #include <QString>
 #include <iostream>
@@ -127,6 +126,11 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 2);
   EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
   EXPECT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
+
+  // Check the Kernels group
+  ASSERT_TRUE(testCube->hasGroup("Kernels"));
+  PvlGroup &kernGroup = testCube->group("Kernels");
+  EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
 }
 
 TEST_F(CSMPluginFixture, CSMinitRunTwice) {
@@ -176,6 +180,13 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   ASSERT_TRUE(testCube->hasGroup("CsmInfo"));
   testCube->deleteGroup("CsmInfo");
   ASSERT_FALSE(testCube->hasGroup("CsmInfo"));
+
+  // Check that there is only one ShapeModel
+  ASSERT_TRUE(testCube->hasGroup("Kernels"));
+  PvlGroup &kernGroup = testCube->group("Kernels");
+  EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
+  kernGroup.deleteKeyword("ShapeModel");
+  EXPECT_FALSE(kernGroup.hasKeyword("ShapeModel"));
 }
 
 TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
@@ -265,4 +276,69 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
 
   // Expect a failure due to being unable to construct any model from the isd
   EXPECT_ANY_THROW(csminit(options));
+}
+
+
+// This test uses the DefaultCube fixture because it has already has attached
+// spice data that csminit should remove.
+TEST_F(DefaultCube, CSMinitSpiceCleanup) {
+  // Create an ISD
+  json isd;
+  isd["test_param_one"] = 1.0;
+  isd["test_param_two"] = 2.0;
+
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+testCube->fileName(),
+    "isd="+isdPath};
+  QString cubeFile = testCube->fileName();
+
+  UserInterface options(APP_XML, args);
+
+  testCube->close();
+  csminit(options);
+  Cube outputCube(cubeFile);
+
+  EXPECT_FALSE(outputCube.hasTable("InstrumentPointing"));
+  EXPECT_FALSE(outputCube.hasTable("InstrumentPosition"));
+  EXPECT_FALSE(outputCube.hasTable("BodyRotation"));
+  EXPECT_FALSE(outputCube.hasTable("SunPosition"));
+  EXPECT_FALSE(outputCube.hasTable("CameraStatistics"));
+  ASSERT_TRUE(outputCube.hasGroup("Kernels"));
+  EXPECT_EQ(outputCube.group("Kernels").keywords(), 2);
+}
+
+
+// This test uses the DefaultCube fixture because it has already has attached
+// spice data that csminit should not remove on a failure.
+TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
+  // Create an ISD that will result in no successful models
+  json isd;
+  isd["name"] = "failing_isd";
+  isd["test_param_one"] = "value_one";
+  isd["test_param_does_not_exist"] = "failing_value";
+
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+testCube->fileName(),
+    "isd="+isdPath};
+  QString cubeFile = testCube->fileName();
+
+  UserInterface options(APP_XML, args);
+
+  testCube->close();
+  // Expect a failure due to being unable to construct any model from the isd
+  EXPECT_ANY_THROW(csminit(options));
+  Cube outputCube(cubeFile);
+
+  // The cube should still be intact and we should still be able to get a camera
+  EXPECT_NO_THROW(outputCube.camera());
 }
