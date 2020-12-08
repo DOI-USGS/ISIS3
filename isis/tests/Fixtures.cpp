@@ -358,13 +358,6 @@ namespace Isis {
     network->ReadControl("data/threeImageNetwork/controlnetwork.net");
   }
 
-  void ThreeImageNetwork::AddFeatures() {
-    Portal iportal(5, 5, cube1->pixelType());
-    iportal.SetPosition(5, 5, 0);
-    cube1->read(iportal);
-    cube1->write(iportal);
-  }
-
   void ThreeImageNetwork::TearDown() {
     delete cubeList;
     delete network;
