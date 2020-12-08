@@ -88,7 +88,7 @@ namespace Isis{
           }
           //Otherwise throw an error
           else {
-            QString msg = "Cannot fine wavelength table [" + tableFile.expanded() + "]";
+            QString msg = "Cannot find wavelength table [" + tableFile.expanded() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
