@@ -15,14 +15,13 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/mimap2isis.xml").expanded();
 
 TEST(FunctionalTestsMiMap2Isis, Default) {
-   Pvl appLog;
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
-   QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName };
+   QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
-   mimap2isis(options, &appLog);
+   mimap2isis(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to ingest MI MAP image: " << e.toString().toStdString().c_str() << std::endl;
@@ -319,3 +318,229 @@ TEST(FunctionalTestsMiMap2Isis, Default) {
   EXPECT_DOUBLE_EQ(mapping.findKeyword("Scale"), 2048.0);
 }
 
+TEST(FunctionalTestsMiMap2Isis, L3C) {
+   QTemporaryDir prefix;
+   QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
+   QVector<QString> args = {"from=data/mimap2isis/MIA_3C5_03_01351S791E0024SC_cropped.img", "to=" + cubeFileName};
+
+  UserInterface options(APP_XML, args);
+  try {
+   mimap2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest MI MAP image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  // Archive Group
+  PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("SoftwareName"), "RGC_TC_MI_PLUS");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("SoftwareVersion"), "4.0.0");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProcessVersionId"), "L3C");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProductCreationTime"), "2014-11-15T12:08:44");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProgramStartTime"), "2014-11-13T04:40:05");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProducerId"), "LISM");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProductSetId"), "MI_Level3C5");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ProductVersionId"), "03");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("RegisteredProduct"), "Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("Level2AFileName"), "MV52A0_02NL01351_003_0029.img");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("SpiceMetakernelFileName"), "RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_100h_02_LongCK_DS_V02_de421_131210.mk");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DataSetId"), "MI_L3C");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageValueType"), "REFLECTANCE");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageUnit"), "ND");
+
+  int i;
+  for (i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0);
+    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767);
+  }
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[0].toDouble(), 20866);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[1].toDouble(), 31905);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[2].toDouble(), 32710);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[3].toDouble(), 32352);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[4].toDouble(), 32589);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[5].toDouble(), 32644);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[6].toDouble(), 32670);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[7].toDouble(), 32720);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[8].toDouble(), 32673);
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[0].toDouble(), 6);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[1].toDouble(), 14);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[2].toDouble(), 12);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[3].toDouble(), 18);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[4].toDouble(), 23);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[5].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[6].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[7].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[8].toDouble(), 11);
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[0].toDouble(), 5313.7);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[1].toDouble(), 9108.2);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[2].toDouble(), 9735.2);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[3].toDouble(), 9950.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[4].toDouble(), 10454.1);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[5].toDouble(), 9948.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[6].toDouble(), 10312.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[7].toDouble(), 11676.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneAverageDn")[8].toDouble(), 13360.7);
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[0].toDouble(), 2756.2);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[1].toDouble(), 4579.0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[2].toDouble(), 5173.3);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[3].toDouble(), 4877.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[4].toDouble(), 5046.1);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[5].toDouble(), 5216.4);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[6].toDouble(), 5294.5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[7].toDouble(), 5561.1);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneStdevDn")[8].toDouble(), 5645.0);
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[0].toDouble(), 4834);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[1].toDouble(), 8614);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[2].toDouble(), 8969);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[3].toDouble(), 9179);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[4].toDouble(), 9650);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[5].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[6].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[7].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[8].toDouble(), 13310);
+
+  for (i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0);
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 500);
+  }
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[0].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[1].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[2].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[3].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[4].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[5].toDouble(), 6);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[6].toDouble(), 5);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[7].toDouble(), 2);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[8].toDouble(), 0);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidType")[0], "SATURATION");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidType")[1], "MINUS");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidType")[2], "DUMMY_DEFECT");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidType")[3], "OTHER");
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("InvalidValue")[0].toDouble(), -20000);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("InvalidValue")[1].toDouble(), -21000);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("InvalidValue")[2].toDouble(), -22000);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("InvalidValue")[3].toDouble(), -23000);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[0], "(100, 0, 0, 7)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[1], "(2956, 0, 0, 622)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[2], "(11715, 0, 0, 6064)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[3], "(7400, 0, 0, 2574)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[4], "(0, 0, 0, 0)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[5], "(19830, 2905, 0, 59224)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[6], "(22289, 890, 0, 61386)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[7], "(33821, 135, 0, 112625)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("InvalidPixels")[8], "(51843, 162, 0, 209314)");
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsValue"), -30000);
+
+  for (i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 1642126);
+  }
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[0], "MIN_DRK_01313_01398_L___003.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[1], "MIV_DRK_01226_01571_L___002.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FtFileName"), "MIV_FTF_PRFLT_N___v01.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[0], "MIN_FLT_01226_01571_L___003.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[1], "MIV_FLT_01226_01571_L___002.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("EfficFileName")[0], "MIV_EFF_PRFLT_N___v01.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("EfficFileName")[1], "MIN_EFF_PRFLT_N___v01.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[0], "MIN_NLT_PRFLT_N___v01.csv");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[1], "MIV_NLT_PRFLT_N___v01.csv");
+  
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[0].toDouble(), 1.470593, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[1].toDouble(), 2.204781, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[2].toDouble(), 2.244315, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[3].toDouble(), 2.734361, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[4].toDouble(), 1.885889, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[5].toDouble(), 3.04924, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[6].toDouble(), 3.312096, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[7].toDouble(), 4.788256, .000001);
+  EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[8].toDouble(), 7.969085, .000001);
+
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[0].toDouble(), 0.002353311);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[1].toDouble(), 0.002450451);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[2].toDouble(), 0.003549924);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[3].toDouble(), 0.003886012);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[4].toDouble(), 0.004316842);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[5].toDouble(), 0.004316842);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[6].toDouble(), 0.004893535);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[7].toDouble(), 0.007400877);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[8].toDouble(), 0.01218292);
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("StandardGeometry")[0].toDouble(), 30.0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("StandardGeometry")[1].toDouble(), 0.0);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("StandardGeometry")[2].toDouble(), 30.0);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrId"), "LISM ORIGINAL");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[0], "(1.0, -0.019, 0.000242, -1.46e-06, 0.05678, 1.913, 0.0643, 0.2448, 0.0, 0.0, 0.0, 0.06797, 1.3, -0.0144, 0.2441, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[1], "(1.0, -0.019, 0.000242, -1.46e-06, 0.06921, 1.487, -0.0382, 0.2122, 0.0, 0.0, 0.0, 0.08916, 0.997, -0.2526, 0.1986, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[2], "(1.0, -0.019, 0.000242, -1.46e-06, 0.05908, 1.43, 0.056, 0.227, 0.0, 0.0, 0.0, 0.09298, 0.918, -0.2251, 0.198, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[3], "(1.0, -0.019, 0.000242, -1.46e-06, 0.05345, 1.413, 0.1263, 0.2409, 0.0, 0.0, 0.0, 0.08705, 0.883, -0.1655, 0.2052, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[4], "(1.0, -0.019, 0.000242, -1.46e-06, 0.05096, 1.377, 0.0736, 0.2383, 0.0, 0.0, 0.0, 0.09746, 0.889, -0.2248, 0.1933, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[5], "(1.0, -0.019, 0.000242, -1.46e-06, 0.05096, 1.377, 0.0736, 0.2383, 0.0, 0.0, 0.0, 0.09746, 0.889, -0.2248, 0.1933, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[6], "(1.0, -0.019, 0.000242, -1.46e-06, 0.03968, 1.335, 0.1809, 0.2632, 0.0, 0.0, 0.0, 0.09486, 0.843, -0.2059, 0.1958, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[7], "(1.0, -0.019, 0.000242, -1.46e-06, 0.06407, 1.103, -0.0062, 0.2168, 0.0, 0.0, 0.0, 0.11201, 0.773, -0.3129, 0.175, -0.00265, 0.00174, -0.000381)");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("PhotoCorrCoef")[8], "(1.0, -0.019, 0.000242, -1.46e-06, 0.09175, 0.954, 0.0111, 0.1967, 0.0, 0.0, 0.0, 0.12374, 0.692, -0.2914, 0.1648, -0.00265, 0.00174, -0.000381)");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ResamplingMethod"), "Bi-Linear");
+
+  for (i = 0; i < 5; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35);
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023);
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3);
+  }
+  for (i = 5; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200);
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095);
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10);
+  }
+
+  EXPECT_DOUBLE_EQ(archive.findKeyword("FtValidMinimum"), -2);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RadianceSaturationThreshold"), 425.971);
+  EXPECT_DOUBLE_EQ(archive.findKeyword("RefSaturationThreshold"), 0.65534);
+
+  // BandBin Group
+  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  for (i = 0; i < 5; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1));
+  }
+  for (i = 5; i < 9; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4));
+  }
+
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[0].toDouble(), 414.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[1].toDouble(), 749.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[2].toDouble(), 901.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[3].toDouble(), 950.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[4].toDouble(), 1001.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[5].toDouble(), 1000.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[6].toDouble(), 1049.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[7].toDouble(), 1248.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[8].toDouble(), 1548.0);
+
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[0].toDouble(), 20.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[1].toDouble(), 12.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[2].toDouble(), 21.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[3].toDouble(), 30.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[4].toDouble(), 42.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[5].toDouble(), 27.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[6].toDouble(), 28.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[7].toDouble(), 33.0);
+  EXPECT_DOUBLE_EQ(bandbin.findKeyword("Width")[8].toDouble(), 48.0);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("BaseBand"), "MV5");
+}

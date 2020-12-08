@@ -98,7 +98,7 @@ namespace Isis {
   }
 
   //  Check for and log any change from the default projection offsets and multipliers
-  if (p.GetProjectionOffsetChange()) {
+  if (log && p.GetProjectionOffsetChange()) {
     PvlGroup results = p.GetProjectionOffsetGroup();
     results.setName("Results");
     results[0].addComment("Projection offsets and multipliers have been changed from");
