@@ -279,6 +279,8 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
 }
 
 
+// This test uses the DefaultCube fixture because it has already has attached
+// spice data that csminit should remove.
 TEST_F(DefaultCube, CSMinitSpiceCleanup) {
   // Create an ISD
   json isd;
@@ -311,7 +313,9 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 }
 
 
-TEST_F(DefaultCube, CSMinitSpiceCleanupFailure) {
+// This test uses the DefaultCube fixture because it has already has attached
+// spice data that csminit should not remove on a failure.
+TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
   isd["name"] = "failing_isd";
