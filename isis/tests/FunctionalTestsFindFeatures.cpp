@@ -11,6 +11,7 @@
 #include "ControlPoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "SerialNumber.h"
 
 #include "gmock/gmock.h"
 
@@ -33,12 +34,11 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesDefault) {
                            "onet=" + tempDir.path() + "/network.net",
                            "networkid=new",
                            "pointid=test_network_????",
+                           "target=MARS",
                            "description=new",
                            "debug=false"};
   UserInterface options(APP_XML, args);
-  Pvl log;
-
-  findfeatures(options, &log);
+  findfeatures(options);
   ControlNet network(options.GetFileName("ONET"));
 
   ASSERT_EQ(network.GetNetworkId(), "new");
@@ -63,19 +63,41 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesGeomMatch) {
                            "pointid=test_network_????",
                            "description=new",
                            "geomsource=match",
+                           "target=MARS",
+                           "nettype=ground",
                            "debug=false"};
   UserInterface options(APP_XML, args);
-  Pvl log;
 
-  findfeatures(options, &log);
+  findfeatures(options);
   ControlNet network(options.GetFileName("ONET"));
+
+  //Control point with a single measure
   ControlPoint *pt = network.GetPoint("test_network_0001");
-  SurfacePoint sp = pt->GetAdjustedSurfacePoint();
+  ControlMeasure *cm = pt->GetMeasure(SerialNumber::Compose(*cube2));
+  EXPECT_DOUBLE_EQ(cm->GetSample(), 60.719512939453125);
+  EXPECT_DOUBLE_EQ(cm->GetLine(), 31.866861343383789);
+  SurfacePoint sp = pt->GetAprioriSurfacePoint();
   Latitude lat = sp.GetLatitude();
   Longitude lon = sp.GetLongitude();
-  // Empty lat/lons because we're matching on a fixture with no geometry info
-  ASSERT_EQ(lat.toString(), "");
-  ASSERT_EQ(lon.toString(), "");
+  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.02581190071853327);
+  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0012615643288328212);
+
+
+  // Control point with two measures
+  pt = network.GetPoint("test_network_0018");
+  cm = pt->GetMeasure(SerialNumber::Compose(*cube2));
+  EXPECT_DOUBLE_EQ(cm->GetSample(), 143.62646484375);
+  EXPECT_DOUBLE_EQ(cm->GetLine(), 69.777481079101562);
+
+  cm = pt->GetMeasure(SerialNumber::Compose(*cube1));
+  EXPECT_DOUBLE_EQ(cm->GetSample(), 383.62646484375);
+  EXPECT_DOUBLE_EQ(cm->GetLine(), 81.777481079101562);
+
+  sp = pt->GetAprioriSurfacePoint();
+  lat = sp.GetLatitude();
+  lon = sp.GetLongitude();
+  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.028914626182060754);
+  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459825362942221);
 }
 
 
@@ -94,11 +116,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMultiAlgo) {
                            "networkid=new",
                            "pointid=test_network_????",
                            "description=new",
+                           "target=MARS",
                            "debug=false"};
   UserInterface options(APP_XML, args);
-  Pvl log;
-
-  findfeatures(options, &log);
+  findfeatures(options);
   ControlNet network(options.GetFileName("ONET"));
 
   ASSERT_EQ(network.GetNetworkId(), "new");
@@ -122,12 +143,11 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
                            "pointid=test_network_????",
                            "pointindex=100",
                            "description=new",
+                           "target=MARS",
                            "debug=false"};
 
   UserInterface options(APP_XML, args);
-  Pvl log;
-
-  findfeatures(options, &log);
+  findfeatures(options);
   ControlNet network(options.GetFileName("ONET"));
 
   ASSERT_EQ(network.GetNetworkId(), "new");
@@ -141,10 +161,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
 TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorListspecNoAlg) {
   QVector<QString> args = {"listspec=yes"};
   UserInterface options(APP_XML, args);
-  Pvl log;
-
   try {
-    findfeatures(options, &log);
+    findfeatures(options);
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
@@ -157,10 +175,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorInputNoAlg) {
   QVector<QString> args = {"match=" + tempDir.path() + "/cube3.cub",
                            "from=" + tempDir.path() + "/cube2.cub"};
   UserInterface options(APP_XML, args);
-  Pvl log;
-
   try {
-    findfeatures(options, &log);
+    findfeatures(options);
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
@@ -173,10 +189,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorNoInput) {
   QVector<QString> args = {"match=" + tempDir.path() + "/cube3.cub",
                            "algorithm=surf/surf"};
   UserInterface options(APP_XML, args);
-  Pvl log;
-
   try {
-    findfeatures(options, &log);
+    findfeatures(options);
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
@@ -205,9 +219,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorNoMatch) {
                            "debug=false"};
 
   UserInterface options(APP_XML, args);
-  Pvl log;
   try {
-    findfeatures(options, &log);
+    findfeatures(options);
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
