@@ -101,45 +101,6 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisArgb) {
   ASSERT_NEAR(hist->StandardDeviation(), 97.569786532996, .0001);
 }
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffRgb) {
-  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
-  QVector<QString> args = {"from=data/stdFormatImages/rgb.tif", "to="+outCubeFileName, };
-  
-  UserInterface options(APP_XML, args);
-  try {
-    std2isis(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to translate image: " << e.what() << std::endl;
-  }
-  
-  Cube outCube(outCubeFileName);
-  Pvl *outLabel = outCube.label();
-  
-  PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
-  ASSERT_EQ((int)dimensions["Samples"], 256);
-  ASSERT_EQ((int)dimensions["Lines"], 192);
-  ASSERT_EQ((int)dimensions["Bands"], 3);
-
-  PvlGroup pixels = outLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "Real");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
-  ASSERT_EQ((double)pixels["Base"], 0.0);
-  ASSERT_EQ((double)pixels["Multiplier"], 1.0);
-
-  PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
-  ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
-  ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
-
-  std::unique_ptr<Histogram> hist (outCube.histogram());
-  ASSERT_NEAR(hist->Average(), 88.4844970703125, .00001);
-  ASSERT_EQ(hist->Sum(), 4349190);
-  ASSERT_EQ(hist->ValidPixels(), 49152);
-  ASSERT_NEAR(hist->StandardDeviation(), 64.032045970490174, .0001);
-}
-
 
 TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffGrayscale) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
