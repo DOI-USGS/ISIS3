@@ -413,7 +413,7 @@ namespace Isis {
     c_args = (char**)malloc(sizeof(char*)*args.size());
 
     for (int i = 0; i < args.size(); i++) {
-      c_args[i] = (char*)malloc(sizeof(char)*args[i].size());
+      c_args[i] = (char*)malloc(sizeof(char)*args[i].size()+1);
       strcpy(c_args[i], args[i].toLatin1().data());
     }
 
