@@ -515,6 +515,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
 }
 
 TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
+  // Add stuff from csminit
   testCube->putGroup(PvlGroup("CsmInfo"));
   StringBlob testBlob("test string", "CSMState");
   testCube->write(testBlob);
@@ -525,4 +526,21 @@ TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
 
   EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
   EXPECT_ANY_THROW(testCube->read(testBlob));
+}
+
+TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  StringBlob testBlob("test string", "CSMState");
+  testCube->write(testBlob);
+
+  // Mangle the cube so that spiceinit failes
+  testCube->deleteGroup("Instrument");
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  ASSERT_ANY_THROW(spiceinit(testCube, options));
+
+  EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
+  EXPECT_NO_THROW(testCube->read(testBlob));
 }
