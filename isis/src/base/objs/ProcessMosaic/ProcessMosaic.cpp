@@ -707,6 +707,11 @@ namespace Isis {
    * @throws IException::Message
    */
   Cube *ProcessMosaic::SetOutputCube(const QString &psParameter) {
+    return SetOutputCube(psParameter, Application::GetUserInterface());
+  }
+
+  Cube *ProcessMosaic::SetOutputCube(const QString &psParameter, UserInterface &ui) {
+    QString fname = ui.GetFileName(psParameter);
 
     // Make sure there is only one output cube
     if (OutputCubes.size() > 0) {
@@ -718,7 +723,6 @@ namespace Isis {
     // (e.g., "TO") and the cube size from an input cube
     Cube *cube = new Cube;
     try {
-      QString fname = Application::GetUserInterface().GetFileName(psParameter);
       cube->open(fname, "rw");
     }
     catch (IException &) {
