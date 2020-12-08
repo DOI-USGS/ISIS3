@@ -1,4 +1,4 @@
-#ifndef findfeatures_h // Change this to your app name in all lower case suffixed with _h (e.g. campt_h, cam2map_h etc.)
+#ifndef findfeatures_h
 #define findfeatures_h
 
 #include "UserInterface.h"
