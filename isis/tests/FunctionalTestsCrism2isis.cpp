@@ -13,6 +13,7 @@
 #include "gtest/gtest.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/crism2isis.xml").expanded();
 
@@ -70,7 +71,6 @@ TEST(Crism2isis, Crism2IsisTestDdr) {
   ASSERT_EQ(int(archive["ProductVersionId"]), 1);
 
   // BandBin Group
-  // Check size, first, 2 middle, and last values? Enough?
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   ASSERT_EQ(bandbin["OriginalBand"].size(), 14);
 
@@ -181,4 +181,121 @@ TEST(Crism2isis, Crism2IsisTestTrdr) {
   ASSERT_EQ(archive["ProductType"][0].toStdString(), "TARGETED_RDR" );
   ASSERT_EQ(archive["ProductCreationTime"][0].toStdString(), "2011-06-08T10:52:30" );
   ASSERT_EQ(int(archive["ProductVersionId"]), 3);
+}
+
+
+TEST(Crism2isis, Crism2IsisTestMrral) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/crism2isisTEMP.cub";
+
+  QVector<QString> args = {"from=data/crism2isis/T0897_MRRAL_05S113_0256_1_cropped.LBL",
+                           "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+    crism2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest CRISM image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  // Dimensions Group
+  ASSERT_EQ(cube.sampleCount(), 1279);
+  ASSERT_EQ(cube.lineCount(), 10);
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  // Archive Group
+  PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
+  ASSERT_EQ(archive["DataSetId"][0].toStdString(), "MRO-M-CRISM-5-RDR-MULTISPECTRAL-V1.0" );
+  ASSERT_EQ(archive["ProductId"][0].toStdString(), "T0897_MRRAL_05S113_0256_1");
+  ASSERT_EQ(archive["ProductType"][0].toStdString(), "MAP_PROJECTED_MULTISPECTRAL_RDR" );
+  ASSERT_EQ(archive["ProductCreationTime"][0].toStdString(), "2008-03-25T23:01:30.319000" );
+  ASSERT_EQ(int(archive["ProductVersionId"]), 1);
+
+  // BandBin Group
+  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  ASSERT_EQ(bandbin["OriginalBand"].size(), 72);
+  ASSERT_EQ(bandbin["Width"].size(), 72);
+  ASSERT_EQ(bandbin["Width"][0], " 410.12");
+  ASSERT_EQ(bandbin["Width"][35], " 1625.00");
+  ASSERT_EQ(bandbin["Width"][71], " 3923.47");
+}
+
+
+TEST(Crism2isis, Crism2IsisTestErrorNoWavelength) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/crism2isisTEMP.cub";
+
+  QVector<QString> args = {"from=data/crism2isis/T0897_MRRAL_05S113_0256_1_cropped_badwv.lbl",
+                           "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+    crism2isis(options);
+    FAIL() << "Should throw an exception." <<std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("**I/O ERROR** Cannot find wavelength table"));
+  }
+
+}
+
+
+TEST(Crism2isis, Crism2IsisTestErrorUnsupported) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/crism2isisTEMP.cub";
+
+  QVector<QString> args = {"from=data/crism2isis/CDR410000000000_AT0300020L_2.LBL",
+                           "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+    crism2isis(options);
+    FAIL() << "Should throw an exception." <<std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Unsupported CRISM file type, supported "
+                                    "types are: DDR, MRDR, and TRDR"));
+  }
+
+}
+
+
+TEST(Crism2isis, Crism2IsisTestErrorNoPid) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/crism2isisTEMP.cub";
+
+  QVector<QString> args = {"from=data/crism2isis/t1865_mrrde_70n185_0256_1_cropped_no_pid.lbl",
+                           "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+    crism2isis(options);
+    FAIL() << "Should throw an exception." <<std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Could not find label PRODUCT_ID, invalid MRDR"));
+  }
+
+}
+
+
+TEST(Crism2isis, Crism2IsisTestErrorNoProdType) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/crism2isisTEMP.cub";
+
+  QVector<QString> args = {"from=data/crism2isis/t1865_mrrde_70n185_0256_1_cropped_no_prod_type.lbl",
+                           "to=" + cubeFileName };
+
+  UserInterface options(APP_XML, args);
+  try {
+    crism2isis(options);
+    FAIL() << "Should throw an exception." <<std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR"));
+  }
+
 }
