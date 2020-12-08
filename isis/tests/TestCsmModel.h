@@ -9,6 +9,12 @@
 
 #include <nlohmann/json.hpp>
 
+/**
+ * A Test CSM (Community Sensor Model) Sensor Model used to test 
+ * CSM sensor model support in ISIS. 
+ * 
+ * @author 2020-12-08 Kristin Berry
+ */
 class TestCsmModel : public csm::GeometricModel {
   public:
     // Static variables that describe the model
@@ -68,6 +74,6 @@ class TestCsmModel : public csm::GeometricModel {
           const csm::GeometricModel::GeometricModelList& otherModels = GeometricModel::GeometricModelList()) const;
 
   private:
-    std::vector<double> m_param_values;
+    std::vector<double> m_param_values; //! Parameter values associated with the sensor model
 };
 #endif

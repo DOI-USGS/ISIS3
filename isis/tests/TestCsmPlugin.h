@@ -9,6 +9,11 @@
 
 #include <nlohmann/json.hpp>
 
+/**
+ * Test Community Sensor Model (CSM) plugin class.
+ * 
+ * @author 2020-12-08 Kristin Berry
+ */
 class TestCsmPlugin : public csm::Plugin {
  public:
   TestCsmPlugin();
@@ -63,8 +68,7 @@ class TestCsmPlugin : public csm::Plugin {
       csm::WarningList* warnings = NULL) const;
 
   private:
-    static const TestCsmPlugin m_registeredPlugin;
-
+    static const TestCsmPlugin m_registeredPlugin; //! static instance of plugin
 };
 
 #endif 
