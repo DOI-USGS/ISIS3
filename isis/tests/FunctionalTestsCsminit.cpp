@@ -54,7 +54,7 @@ class CSMPluginFixture : public TempTestingFiles {
       std::ofstream altFile(altIsdPath.toStdString());
       altFile << altIsd;
       altFile.flush();
-      std::ifstream cubeLabel("/data/threeImageNetwork/cube1.pvl");
+      std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
       testCube = new Cube();
       filename = tempDir.path() + "/csminitCube.cub";
@@ -317,7 +317,6 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
-  isd["model_name"] = "failing_isd";
   isd["test_param_one"] = "value_one";
   isd["test_param_does_not_exist"] = "failing_value";
 

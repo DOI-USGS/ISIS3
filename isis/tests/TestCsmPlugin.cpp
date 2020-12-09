@@ -3,8 +3,6 @@
 #include "TestCsmPlugin.h"
 #include "TestCsmModel.h"
 #include "AlternativeTestCsmModel.h"
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 // Static Instance of itself
 const TestCsmPlugin TestCsmPlugin::m_registeredPlugin;
