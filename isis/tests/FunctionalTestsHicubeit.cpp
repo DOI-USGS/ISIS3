@@ -22,10 +22,9 @@ TEST(Hicubeit, Default) {
                             "RE= data/hicubeit/RE.cub",
                             "TO=" + outFileName };
   UserInterface options(APP_XML, args);
-  Pvl appLog;
 
   try {
-    hicubeit(options, &appLog);
+    hicubeit(options);
   }
   catch (IException &e) {
     FAIL() << e.toString().toStdString().c_str() << std::endl;

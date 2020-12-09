@@ -11,7 +11,7 @@ using namespace std;
 
 namespace Isis {
 
-  void hicubeit(UserInterface &ui, Pvl *log) {
+  void hicubeit(UserInterface &ui) {
     QString redFile = ui.GetFileName("RED");
     QString irFile  = ui.GetFileName("IR");
     QString bgFile  = ui.GetFileName("BG");
