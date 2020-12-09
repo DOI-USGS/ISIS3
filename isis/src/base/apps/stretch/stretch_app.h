@@ -9,8 +9,6 @@ namespace Isis {
   extern void stretch(UserInterface &ui, Pvl *log=nullptr);
 
   extern void stretch(Cube *inCube, QString &pairs, UserInterface &ui, Pvl *log=nullptr);
-
-  //extern void stretch(Cube *inCube, UserInterface &ui, Pvl *log);
 }
 
 #endif

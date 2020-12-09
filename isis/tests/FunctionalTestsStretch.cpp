@@ -17,14 +17,12 @@ static QString STRETCH_XML = FileName("$ISISROOT/bin/xml/stretch.xml").expanded(
 TEST_F(SpecialSmallCube, FunctionalTestStretchDefault) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
-  //QVector<QString> args = {"to="+outCubeFileName, "pairs=0:255 255:0", "null=500", "lis=700", "lrs=800", "his=900", "hrs=1000"};
   QVector<QString> args = {"to="+outCubeFileName, "null=500", "lis=700", "lrs=800", "his=900", "hrs=1000"};
   QString pairs = "0:255 255:0";
 
   UserInterface options(STRETCH_XML, args);
   Pvl log;
   try {
-    //appfoo_func(options);
     stretch(testCube, pairs, options, &log);
   }
   catch (IException &e) {
@@ -45,14 +43,12 @@ TEST_F(SpecialSmallCube, FunctionalTestStretchDefault) {
 TEST_F(SpecialSmallCube, FunctionalTestStretchSwitchSpecial) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
-  //QVector<QString> args = {"to="+outCubeFileName, "pairs=0:255 255:0", "null=hrs", "lis=NULL", "lrs=Lis", "his=lRs", "hrs=HiS"};
   QVector<QString> args = {"to="+outCubeFileName, "null=hrs", "lis=NULL", "lrs=Lis", "his=lRs", "hrs=HiS"};
   QString pairs = "0:255 255:0";
 
   UserInterface options(STRETCH_XML, args);
   Pvl log;
   try {
-    //appfoo_func(options);
     stretch(testCube, pairs, options, &log);
   }
   catch (IException &e) {
