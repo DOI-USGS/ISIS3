@@ -237,8 +237,8 @@ std::string TestCsmPlugin::convertISDToModelState(
 std::string TestCsmPlugin::getModelNameFromModelState(
     const std::string& modelState,
     csm::WarningList* warnings) const {
-  auto state = json::parse(modelState);
-  std::string name = state.value<std::string>("model_name", "");
+
+  std::string name = modelState.substr(0, modelState.find("\n"));
 
   if (name == "") {
     csm::Error::ErrorType aErrorType = csm::Error::INVALID_SENSOR_MODEL_STATE;
@@ -263,21 +263,23 @@ csm::Model* TestCsmPlugin::constructModelFromState(
       const std::string& modelState,
       csm::WarningList* warnings) const {
 
-  try {
+  std::string modelName = getModelNameFromModelState(modelState, warnings);
+  if (modelName == TestCsmModel::SENSOR_MODEL_NAME) {
     TestCsmModel *model = new TestCsmModel(); 
     model->replaceModelState(modelState);
     return model;
   }
-  catch (...) {
+  else if (modelName == AlternativeTestCsmModel::SENSOR_MODEL_NAME) {
     AlternativeTestCsmModel *model = new AlternativeTestCsmModel(); 
     model->replaceModelState(modelState);
     return model;
   }
-
-  csm::Error::ErrorType errorType = csm::Error::SENSOR_MODEL_NOT_SUPPORTED;
-  std::string msg = "TstCsmPlugin failed to construct model from State";
-  std::string func = "TestCsmPlugin::constructModelFromState";
-  throw csm::Error(errorType, msg, func);
+  else {
+    csm::Error::ErrorType errorType = csm::Error::SENSOR_MODEL_NOT_SUPPORTED;
+    std::string msg = "TstCsmPlugin failed to construct model from State";
+    std::string func = "TestCsmPlugin::constructModelFromState";
+    throw csm::Error(errorType, msg, func);
+  }
 }
 
 

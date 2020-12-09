@@ -36,7 +36,6 @@ class CSMPluginFixture : public TempTestingFiles {
 
       // Create and populate test ISDs
       json isd;
-      isd["model_name"] = "TestCsmModel";
       isd["test_param_one"] = 1.0;
       isd["test_param_two"] = 2.0;
 
@@ -46,7 +45,6 @@ class CSMPluginFixture : public TempTestingFiles {
       file.flush();
 
       json altIsd;
-      isd["model_name"] = "AlternativeTestCsmModel";
       altIsd["test_param_one"] = 1.0;
       altIsd["test_param_two"] = 2.0;
       altIsd["test_param_three"] = 3.0;
