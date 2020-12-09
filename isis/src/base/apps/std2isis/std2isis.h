@@ -1,7 +1,6 @@
 #ifndef std2isis_h 
 #define std2isis_h
 
-#include "Cube.h"
 #include "UserInterface.h"
 
 namespace Isis {

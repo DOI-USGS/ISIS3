@@ -24,7 +24,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/std2isis.xml").expanded();
 TEST_F(TempTestingFiles, FunctionalTestsStd2IsisDefault) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   
-  QVector<QString> args = {"from=data/stdFormatImages/rgb.png", "to="+outCubeFileName, };
+  QVector<QString> args = {"from=data/stdFormatImages/rgb.png", "to="+outCubeFileName};
   
   UserInterface options(APP_XML, args);
   try {
