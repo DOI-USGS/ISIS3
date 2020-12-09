@@ -224,7 +224,7 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
 
   json parsedIsd;
   isdFile >> parsedIsd;
-  // Only extract the first 3 parameters from the file
+  // Only extract the first 2 parameters from the file
   json state;
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
     state[TestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(TestCsmModel::PARAM_NAMES[param_index]);

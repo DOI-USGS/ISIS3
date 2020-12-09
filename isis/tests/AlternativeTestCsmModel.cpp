@@ -238,7 +238,6 @@ std::string AlternativeTestCsmModel::constructStateFromIsd(const csm::Isd isd){
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
     state[AlternativeTestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(AlternativeTestCsmModel::PARAM_NAMES[param_index]);
   }
-  std::cout << AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump() << std::endl; 
   return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
