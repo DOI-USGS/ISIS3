@@ -3,9 +3,17 @@
 #include "TestCsmPlugin.h"
 #include "TestCsmModel.h"
 #include "AlternativeTestCsmModel.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 // Static Instance of itself
 const TestCsmPlugin TestCsmPlugin::m_registeredPlugin;
+
+// Declaration of static variables
+const std::string TestCsmPlugin::PLUGIN_NAME = "TestCsmPlugin";
+const std::string TestCsmPlugin::MANUFACTURER_NAME = "TestCsmPluginCreator";
+const std::string TestCsmPlugin::RELEASE_DATE = "20201208";
+const int TestCsmPlugin::N_SENSOR_MODELS = 2;
 
 /**
  * Default constructor
@@ -27,7 +35,7 @@ TestCsmPlugin::~TestCsmPlugin() {}
  * @return std::string name of the plugin
  */
 std::string TestCsmPlugin::getPluginName() const {
-  return "TestCsmPlugin";
+  return TestCsmPlugin::PLUGIN_NAME;
 }
 
 
@@ -37,7 +45,7 @@ std::string TestCsmPlugin::getPluginName() const {
  * @return std::string the name of the manufacturer of the plugin
  */
 std::string TestCsmPlugin::getManufacturer() const {
-  return "TestCsmPluginCreator";
+  return TestCsmPlugin::MANUFACTURER_NAME;
 }
 
 
@@ -47,7 +55,7 @@ std::string TestCsmPlugin::getManufacturer() const {
  * @return std::string release date
  */
 std::string TestCsmPlugin::getReleaseDate() const {
-  return "TestDate";
+  return TestCsmPlugin::RELEASE_DATE;
 }
 
 
@@ -67,7 +75,7 @@ csm::Version TestCsmPlugin::getCsmVersion() const {
  * @return size_t Number of sensor models in the plugin
  */
 size_t TestCsmPlugin::getNumModels() const {
-  return 2;
+  return TestCsmPlugin::N_SENSOR_MODELS;
 }
 
 
@@ -79,12 +87,10 @@ size_t TestCsmPlugin::getNumModels() const {
  * @return std::string model name
  */
 std::string TestCsmPlugin::getModelName(size_t modelIndex) const {
-  if (modelIndex == 0) {
-    return "TestModelName"; 
-  }
-  else {
-    return "AlternativeTestCsmModelName";
-  }
+  std::vector<std::string> supportedModelNames = {
+    TestCsmModel::SENSOR_MODEL_NAME,
+    AlternativeTestCsmModel::SENSOR_MODEL_NAME};
+  return supportedModelNames[modelIndex];
 }
 
 
@@ -108,7 +114,7 @@ std::string TestCsmPlugin::getModelFamily(size_t modelIndex) const {
  * @return csm::Version the version of the csm sensor model
  */
 csm::Version TestCsmPlugin::getModelVersion(const std::string& modelName) const { 
-  return csm::Version(3,0,3);
+  return csm::Version(1,0,0);
 }
 
 
@@ -183,6 +189,20 @@ bool TestCsmPlugin::canISDBeConvertedToModelState(
     const csm::Isd& imageSupportData,
     const std::string& modelName,
     csm::WarningList* warnings) const{
+  try {
+    convertISDToModelState(imageSupportData, modelName, warnings);
+  } 
+  catch (std::exception &e) {
+    if (warnings) {
+      std::string msg = "Could not create model [";
+      msg += modelName;
+      msg += "] state with error [";
+      msg += e.what();
+      msg += "]";
+      std::cout << msg << std::endl; 
+    }
+    return false;
+  }
   return true;
 }
 
@@ -200,7 +220,10 @@ std::string TestCsmPlugin::convertISDToModelState(
     const csm::Isd& imageSupportData,
     const std::string& modelName,
     csm::WarningList* warnings) const {
-  return "ISDConvertedtoModelState";
+  csm::Model *model =
+    constructModelFromISD(imageSupportData, modelName, warnings);
+  return model->getModelState();
+  // TODO: make sure it works!
 }
 
 
@@ -215,7 +238,18 @@ std::string TestCsmPlugin::convertISDToModelState(
 std::string TestCsmPlugin::getModelNameFromModelState(
     const std::string& modelState,
     csm::WarningList* warnings) const {
-  return "TestModelNameFromModelState";
+  auto state = json::parse(modelState);
+  std::string name = state.value<std::string>("model_name", "");
+
+  if (name == "") {
+    csm::Error::ErrorType aErrorType = csm::Error::INVALID_SENSOR_MODEL_STATE;
+    std::string aMessage = "No model_name key in the model state object.";
+    std::string aFunction = "TestCsmPlugin::getModelNameFromModelState";
+    csm::Error csmErr(aErrorType, aMessage, aFunction);
+    throw(csmErr);
+  }
+  return name;
+  // TODO: make sure it works
 }
 
 
@@ -230,10 +264,22 @@ std::string TestCsmPlugin::getModelNameFromModelState(
 csm::Model* TestCsmPlugin::constructModelFromState(
       const std::string& modelState,
       csm::WarningList* warnings) const {
-  TestCsmModel *model = new TestCsmModel();
-  model->replaceModelState(modelState);
-  // Left simple because this isn't needed by current tests.
-  return model;
+
+  try {
+    TestCsmModel *model = new TestCsmModel(); 
+    model->replaceModelState(modelState);
+    return model;
+  }
+  catch (...) {
+    AlternativeTestCsmModel *model = new AlternativeTestCsmModel(); 
+    model->replaceModelState(modelState);
+    return model;
+  }
+
+  csm::Error::ErrorType errorType = csm::Error::SENSOR_MODEL_NOT_SUPPORTED;
+  std::string msg = "TstCsmPlugin failed to construct model from State";
+  std::string func = "TestCsmPlugin::constructModelFromState";
+  throw csm::Error(errorType, msg, func);
 }
 
 
@@ -249,12 +295,12 @@ csm::Model* TestCsmPlugin::constructModelFromISD(
     const csm::Isd& imageSupportData,
     const std::string& modelName,
     csm::WarningList* ) const {
-  if (modelName == "TestModelName") {
+  if (modelName == TestCsmModel::SENSOR_MODEL_NAME) {
     TestCsmModel *model = new TestCsmModel();
     model->replaceModelState(model->constructStateFromIsd(imageSupportData));
     return model;
   }
-  else if (modelName == "AlternativeTestCsmModelName") {
+  else if (modelName == AlternativeTestCsmModel::SENSOR_MODEL_NAME) {
     AlternativeTestCsmModel *model = new AlternativeTestCsmModel();
     model->replaceModelState(model->constructStateFromIsd(imageSupportData));
     return model;

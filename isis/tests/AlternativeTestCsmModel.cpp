@@ -6,7 +6,7 @@ using json = nlohmann::json;
 
 
 // Sensor model Name
-const std::string AlternativeTestCsmModel::SENSOR_MODEL_NAME = "AlternativeTestCsmModelName";
+const std::string AlternativeTestCsmModel::SENSOR_MODEL_NAME = "AlternativeTestCsmModel";
 
 // Sensor model Parameter names
 const std::vector<std::string> AlternativeTestCsmModel::PARAM_NAMES = {
@@ -238,6 +238,7 @@ std::string AlternativeTestCsmModel::constructStateFromIsd(const csm::Isd isd){
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
     state[AlternativeTestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(AlternativeTestCsmModel::PARAM_NAMES[param_index]);
   }
+  std::cout << AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump() << std::endl; 
   return AlternativeTestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
