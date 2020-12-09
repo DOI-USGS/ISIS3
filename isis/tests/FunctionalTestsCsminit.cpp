@@ -36,6 +36,7 @@ class CSMPluginFixture : public TempTestingFiles {
 
       // Create and populate test ISDs
       json isd;
+      isd["model_name"] = "TestCsmModel";
       isd["test_param_one"] = 1.0;
       isd["test_param_two"] = 2.0;
 
@@ -45,6 +46,7 @@ class CSMPluginFixture : public TempTestingFiles {
       file.flush();
 
       json altIsd;
+      isd["model_name"] = "AlternativeTestCsmModel";
       altIsd["test_param_one"] = 1.0;
       altIsd["test_param_two"] = 2.0;
       altIsd["test_param_three"] = 3.0;
@@ -54,7 +56,6 @@ class CSMPluginFixture : public TempTestingFiles {
       std::ofstream altFile(altIsdPath.toStdString());
       altFile << altIsd;
       altFile.flush();
-
       std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
       testCube = new Cube();
@@ -147,7 +148,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   QVector<QString> altArgs = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModelName"};
+    "modelName=AlternativeTestCsmModel"};
 
   UserInterface altOptions(APP_XML, altArgs);
 
@@ -207,7 +208,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   args = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModelName"};
+    "modelName=AlternativeTestCsmModel"};
 
   UserInterface betterOptions(APP_XML, args);
   csminit(betterOptions);
@@ -318,7 +319,7 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
-  isd["name"] = "failing_isd";
+  isd["model_name"] = "failing_isd";
   isd["test_param_one"] = "value_one";
   isd["test_param_does_not_exist"] = "failing_value";
 
