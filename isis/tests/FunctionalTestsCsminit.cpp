@@ -54,14 +54,14 @@ class CSMPluginFixture : public TempTestingFiles {
       std::ofstream altFile(altIsdPath.toStdString());
       altFile << altIsd;
       altFile.flush();
-      std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
+      std::ifstream cubeLabel("/data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
       testCube = new Cube();
       filename = tempDir.path() + "/csminitCube.cub";
       testCube->fromLabel(filename, label, "rw");
       testCube->close();
 
-      plugin = csm::Plugin::findPlugin("TestCsmPlugin");
+      plugin = csm::Plugin::findPlugin(TestCsmPlugin::PLUGIN_NAME);
     }
 
     void TearDown() override {
