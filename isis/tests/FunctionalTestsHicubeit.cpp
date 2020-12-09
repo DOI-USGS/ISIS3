@@ -44,9 +44,22 @@ TEST(Hicubeit, Default) {
   EXPECT_EQ(int(dimensions["Lines"]), 10);
   EXPECT_EQ(int(dimensions["Bands"]), 3);
 
-  std::unique_ptr<Histogram> hist (outCube.histogram());
-  EXPECT_NEAR(hist->Average(), 0.960096, .00001);
-  EXPECT_NEAR(hist->Sum(), 9831.38, .01);
-  EXPECT_EQ(hist->ValidPixels(), 10240);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0626452, .00001);
+  std::unique_ptr<Histogram> histA (outCube.histogram(0));
+  EXPECT_NEAR(histA->Average(), 1.01418, .00001);
+  EXPECT_NEAR(histA->Sum(), 51915.7, .1);
+  EXPECT_EQ(histA->ValidPixels(), 51190);
+  EXPECT_NEAR(histA->StandardDeviation(), 0.0966599, .00001);
+
+  std::unique_ptr<Histogram> histB (outCube.histogram(1));
+  EXPECT_NEAR(histB->Average(), 0.960096, .00001);
+  EXPECT_NEAR(histB->Sum(), 9831.38, .1);
+  EXPECT_EQ(histB->ValidPixels(), 10240);
+  EXPECT_NEAR(histB->StandardDeviation(), 0.0626452, .00001);
+
+  std::unique_ptr<Histogram> histC (outCube.histogram(2));
+  EXPECT_NEAR(histC->Average(), 1.03663, .00001);
+  EXPECT_NEAR(histC->Sum(), 21230.1, .1);
+  EXPECT_EQ(histC->ValidPixels(), 20480);
+  EXPECT_NEAR(histC->StandardDeviation(), 0.112095, .00001);
 }
+
