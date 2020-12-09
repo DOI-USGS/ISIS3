@@ -133,18 +133,6 @@ namespace Isis {
 
     string modelState = model->getModelState();
 
-    // TODO Just do spiceinit clean-up routine instead
-    try {
-      cube->camera();
-      QString message = "Input cube [" + ui.GetFileName("FROM") + "]. "
-                        "Already has an ISIS camera model associated with it. CSM "
-                        "models cannot be added to cubes with an ISIS camera model.";
-      throw IException(IException::Programmer, message, _FILEINFO_);
-    }
-    catch(IException &e) {
-      // no operation, continue
-    }
-
     // Add the TargetName to the instrument group, if specified:
     if (ui.WasEntered("TARGETNAME")) {
       if (!cube->hasGroup("Instrument")) {
@@ -208,15 +196,93 @@ namespace Isis {
       cube->putGroup(PvlGroup("Kernels"));
     }
     PvlGroup &kernelsGroup = cube->group("Kernels");
-    if (kernelsGroup.hasKeyword("ShapeModel")) {
-      kernelsGroup.deleteKeyword("ShapeModel");
-    }
+
     if (ui.WasEntered("SHAPEMODEL")) {
       // TODO validate the shapemodel
-      kernelsGroup += PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL"));
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL")), Pvl::Replace);
     }
     else {
-      kernelsGroup += PvlKeyword("ShapeModel", "Ellipsoid");
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Ellipsoid"), Pvl::Replace);
+    }
+
+    // Get rid of keywords from spiceinit
+    if (kernelsGroup.hasKeyword("LeapSecond")) {
+      kernelsGroup.deleteKeyword("LeapSecond");
+    }
+    if (kernelsGroup.hasKeyword("TargetAttitudeShape")) {
+      kernelsGroup.deleteKeyword("TargetAttitudeShape");
+    }
+    if (kernelsGroup.hasKeyword("TargetPosition")) {
+      kernelsGroup.deleteKeyword("TargetPosition");
+    }
+    if (kernelsGroup.hasKeyword("InstrumentPointing")) {
+      kernelsGroup.deleteKeyword("InstrumentPointing");
+    }
+    if (kernelsGroup.hasKeyword("InstrumentPointingQuality")) {
+      kernelsGroup.deleteKeyword("InstrumentPointingQuality");
+    }
+    if (kernelsGroup.hasKeyword("Instrument")) {
+      kernelsGroup.deleteKeyword("Instrument");
+    }
+    if (kernelsGroup.hasKeyword("SpacecraftClock")) {
+      kernelsGroup.deleteKeyword("SpacecraftClock");
+    }
+    if (kernelsGroup.hasKeyword("InstrumentPositionQuality")) {
+      kernelsGroup.deleteKeyword("InstrumentPositionQuality");
+    }
+    if (kernelsGroup.hasKeyword("InstrumentPosition")) {
+      kernelsGroup.deleteKeyword("InstrumentPosition");
+    }
+    if (kernelsGroup.hasKeyword("InstrumentAddendum")) {
+      kernelsGroup.deleteKeyword("InstrumentAddendum");
+    }
+    if (kernelsGroup.hasKeyword("EXTRA")) {
+      kernelsGroup.deleteKeyword("EXTRA");
+    }
+    if (kernelsGroup.hasKeyword("Source")) {
+      kernelsGroup.deleteKeyword("Source");
+    }
+    if (kernelsGroup.hasKeyword("SpacecraftPointing")) {
+      kernelsGroup.deleteKeyword("SpacecraftPointing");
+    }
+    if (kernelsGroup.hasKeyword("SpacecraftPosition")) {
+      kernelsGroup.deleteKeyword("SpacecraftPosition");
+    }
+    if (kernelsGroup.hasKeyword("CameraVersion")) {
+      kernelsGroup.deleteKeyword("CameraVersion");
+    }
+    if (kernelsGroup.hasKeyword("ElevationModel")) {
+      kernelsGroup.deleteKeyword("ElevationModel");
+    }
+    if (kernelsGroup.hasKeyword("Frame")) {
+      kernelsGroup.deleteKeyword("Frame");
+    }
+    if (kernelsGroup.hasKeyword("StartPadding")) {
+      kernelsGroup.deleteKeyword("StartPadding");
+    }
+    if (kernelsGroup.hasKeyword("EndPadding")) {
+      kernelsGroup.deleteKeyword("EndPadding");
+    }
+    if (kernelsGroup.hasKeyword("RayTraceEngine")) {
+      kernelsGroup.deleteKeyword("RayTraceEngine");
+    }
+    if (kernelsGroup.hasKeyword("OnError")) {
+      kernelsGroup.deleteKeyword("OnError");
+    }
+    if (kernelsGroup.hasKeyword("Tolerance")) {
+      kernelsGroup.deleteKeyword("Tolerance");
+    }
+
+    // Remove tables from spiceinit
+    cube->deleteBlob("Table", "InstrumentPointing");
+    cube->deleteBlob("Table", "InstrumentPosition");
+    cube->deleteBlob("Table", "BodyRotation");
+    cube->deleteBlob("Table", "SunPosition");
+    cube->deleteBlob("Table", "CameraStatistics");
+    cube->deleteBlob("Polygon", "Footprint");
+
+    if (cube->label()->hasObject("NaifKeywords")) {
+      cube->label()->deleteObject("NaifKeywords");
     }
 
     cube->deleteBlob("String", "CSMState");
@@ -225,9 +291,7 @@ namespace Isis {
     // Add the CSM string to the Blob.
     StringBlob csmStateBlob(modelState, "CSMState");
     PvlObject &blobLabel = csmStateBlob.Label();
-    // blobLabel += PvlKeyword("ModelName", "TestModelName");
     blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
-    // blobLabel += PvlKeyword("PluginName", "TestPluginName");
     blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
 
     // Write CSM State blob to cube
