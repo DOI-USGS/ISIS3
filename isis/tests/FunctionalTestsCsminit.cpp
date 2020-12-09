@@ -54,7 +54,6 @@ class CSMPluginFixture : public TempTestingFiles {
       std::ofstream altFile(altIsdPath.toStdString());
       altFile << altIsd;
       altFile.flush();
-
       std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
       testCube = new Cube();
@@ -62,7 +61,7 @@ class CSMPluginFixture : public TempTestingFiles {
       testCube->fromLabel(filename, label, "rw");
       testCube->close();
 
-      plugin = csm::Plugin::findPlugin("TestCsmPlugin");
+      plugin = csm::Plugin::findPlugin(TestCsmPlugin::PLUGIN_NAME);
     }
 
     void TearDown() override {
@@ -147,7 +146,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   QVector<QString> altArgs = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModelName"};
+    "modelName=AlternativeTestCsmModel"};
 
   UserInterface altOptions(APP_XML, altArgs);
 
@@ -207,7 +206,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   args = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModelName"};
+    "modelName=AlternativeTestCsmModel"};
 
   UserInterface betterOptions(APP_XML, args);
   csminit(betterOptions);
@@ -318,7 +317,6 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
-  isd["name"] = "failing_isd";
   isd["test_param_one"] = "value_one";
   isd["test_param_does_not_exist"] = "failing_value";
 

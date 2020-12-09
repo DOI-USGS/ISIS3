@@ -5,7 +5,7 @@
 using json = nlohmann::json;
 
 // Sensor model Name
-const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModelName";
+const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModel";
 
 // Sensor model Parameter names
 const std::vector<std::string> TestCsmModel::PARAM_NAMES = {

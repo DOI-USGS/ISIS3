@@ -16,6 +16,12 @@
  */
 class TestCsmPlugin : public csm::Plugin {
  public:
+  // Static variables that describe the plugin
+  static const std::string PLUGIN_NAME;
+  static const std::string MANUFACTURER_NAME;
+  static const std::string RELEASE_DATE;
+  static const int N_SENSOR_MODELS;
+
   TestCsmPlugin();
   ~TestCsmPlugin();
 
