@@ -151,7 +151,10 @@ int main(int argc, char *argv[]) {
     printXml(copySettings);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
-    boss = boss;
+    {
+      BundleObservationSolveSettings &tboss = boss;
+      boss = tboss;
+    }
     printXml(boss);
 
     qDebug() << "Testing assignment operator to create a new settings object...";
@@ -386,7 +389,10 @@ int main(int argc, char *argv[]) {
     qDebug() << "serial number = " << bi2->serialNumber();
     qDebug() << "file name     = " << bi2->fileName();
     qDebug() << "Testing assignment operator to set this equal to itself...";
-    bi = bi;
+    {
+      BundleImage &tbi = bi;
+      bi = tbi;
+    }
     qDebug() << "serial number = " << bi.serialNumber();
     qDebug() << "file name     = " << bi.fileName();
     qDebug() << "Testing assignment operator to create a new object...";
@@ -430,7 +436,10 @@ int main(int argc, char *argv[]) {
                              bundleTargetBody);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
-    bo2 = bo2;
+    {
+      BundleObservation &tbo2 = bo2;
+      bo2 = tbo2;
+    }
     qDebug() << "Testing assignment operator to create a new object...";
     bo = bo2;
     qDebug() << "Testing copy constructor...";
@@ -1102,7 +1111,10 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     bundleMeasureRejected.setRejected(true);
 
     // Test self-assignment
-    bundleMeasure = bundleMeasure;
+    {
+      BundleMeasure &tbundleMeasure = bundleMeasure;
+      bundleMeasure = tbundleMeasure;
+    }
 
     qDebug() << "";
     // Verify state and copies
@@ -1394,7 +1406,10 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     qDebug() << "Test assignment operator";
     qDebug() << "";
     qDebug() << "Self assignment";
-    btb3 = btb3;
+    {
+      BundleTargetBody &tbtb3 = btb3;
+      btb3 = tbtb3;
+    }
     qDebug().noquote() << btb3.formatBundleOutputString(true);
     qDebug() << "Assignment to other";
     btb3 = btb1;

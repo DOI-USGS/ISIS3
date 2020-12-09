@@ -1,0 +1,250 @@
+PDS_VERSION_ID                 = PDS3                                         
+LABEL_REVISION_NOTE            = "2009-01-26, S. Lundeen,                     
+                                  2011-01-07, S. Lundeen"                     
+DATA_SET_ID                    = "CH1-ORB-L-M3-4-L1B-RADIANCE-V2.0"           
+PRODUCT_ID                     = "M3G20081118T222604_V02_RDN"                 
+RECORD_TYPE                    = UNDEFINED                                    
+                                                                              
+MISSION_ID                     = "CH1"                                        
+MISSION_NAME                   = "CHANDRAYAAN-1"                              
+INSTRUMENT_HOST_ID             = "CH1-ORB"                                    
+INSTRUMENT_HOST_NAME           = "CHANDRAYAAN-1 ORBITER"                      
+INSTRUMENT_NAME                = "MOON MINERALOGY MAPPER"                     
+INSTRUMENT_ID                  = M3                                           
+TARGET_NAME                    = "MOON"                                       
+TARGET_TYPE                    = "SATELLITE"                                  
+MISSION_PHASE_NAME             = "PRIMARY MISSION"                            
+PRODUCT_TYPE                   = CALIBRATED_IMAGE                             
+PRODUCT_CREATION_TIME          = 2010-12-23T07:32:00                          
+START_TIME                     = 2008-11-18T22:26:04                          
+STOP_TIME                      = 2008-11-18T22:28:04                          
+SPACECRAFT_CLOCK_START_COUNT   = "2/599338.975"                               
+SPACECRAFT_CLOCK_STOP_COUNT    = "2/599459.153"                               
+ORBIT_NUMBER                   =  00141                                       
+PRODUCT_VERSION_TYPE           = "ACTUAL"                                     
+PRODUCT_VERSION_ID             = "2.0"                                        
+SOURCE_PRODUCT_ID              = "M3G20081118T222604_V01_L0.IMG"              
+                                                                              
+PRODUCER_INSTITUTION_NAME      = "JET PROPULSION LABORATORY"                  
+SOFTWARE_NAME                  = "m3g_l1b_v04.exe"                            
+SOFTWARE_VERSION_ID            = "04"                                         
+DESCRIPTION                    = "M3 Level 1B data product which contains     
+pixel located, radiometrically-calibrated data."                              
+                                                                              
+/* Calibrated Image Instrument and Observation Parameters */                  
+                                                                              
+SOLAR_DISTANCE                 = 0.988788923392 <AU>                          
+INSTRUMENT_MODE_ID             = "GLOBAL"                                     
+DETECTOR_TEMPERATURE           = 160.71                                       
+CH1:SWATH_WIDTH                = 304 <PIXELS>                                 
+CH1:SWATH_LENGTH               = 1182 <LINES>                                 
+CH1:SPACECRAFT_YAW_DIRECTION   = "FORWARD"                                    
+CH1:ORBIT_LIMB_DIRECTION       = "DESCENDING"                                 
+SPACECRAFT_ORIENTATION         = (0.770443460000,-0.229314980000,             
+                                  0.000000000000)                             
+
+/* Spectral calibration parameters and radiometric gain factor data */        
+                                                                              
+CH1:SPECTRAL_CALIBRATION_FILE_NAME      = "M3G20081211_RDN_SPC.TAB"           
+CH1:RAD_GAIN_FACTOR_FILE_NAME           = "M3G20081211_RDN_GAIN.TAB"          
+CH1:GLOBAL_BANDPASS_FILE_NAME           = "M3G20081211_RDN_BPF.IMG"           
+                                                                              
+/* Description of Radiance-corrected image file */                            
+                                                                              
+^IMAGE    = "M3G20081118T222604_V02_RDN_cropped.IMG"                            
+OBJECT          = IMAGE                                                    
+  RECORD_TYPE   = FIXED_LENGTH                                                
+  RECORD_BYTES  = 3125
+  FILE_RECORDS  = 1                                                        
+                                                                              
+    LINES                    = 1                                           
+    LINE_SAMPLES             = 304                                            
+    SAMPLE_TYPE              = PC_REAL                                        
+    SAMPLE_BITS              = 32                                             
+    UNIT                     = "W/(m^2 um sr)"                                
+    BANDS                    = 1                                             
+    BAND_STORAGE_TYPE        = SAMPLE_INTERLEAVED                               
+    LINE_DISPLAY_DIRECTION   = DOWN                                           
+    SAMPLE_DISPLAY_DIRECTION = RIGHT                                          
+                                                                              
+END_OBJECT = IMAGE                                                         
+END
+                                                                              
+                                                                              
+/* Description of Radiance-corrected header file */                           
+                                                                              
+OBJECT              = RDN_HDR_FILE                                            
+  ^RDN_ENVI_HEADER  = "M3G20081118T222604_V02_RDN.HDR"                        
+  RECORD_TYPE       = VARIABLE_LENGTH                                         
+  FILE_RECORDS      = 0                                                    
+                                                                              
+  OBJECT               = RDN_ENVI_HEADER                                      
+    INTERCHANGE_FORMAT = "ASCII"                                              
+    BYTES              = 31502                                                
+    HEADER_TYPE        = ENVI                                                 
+    DESCRIPTION = "Header file for compatibility with the commercial software 
+                   package ENVI."                                             
+  END_OBJECT = RDN_ENVI_HEADER                                                
+                                                                              
+END_OBJECT = RDN_HDR_FILE                                                     
+                                                                              
+/* Description of selenolocation data file */                                 
+                                                                              
+OBJECT          = LOC_FILE                                                    
+  ^LOC_IMAGE    = "M3G20081118T222604_V02_LOC.IMG"                            
+  RECORD_TYPE   = FIXED_LENGTH                                                
+  RECORD_BYTES  = 7296                                                        
+  FILE_RECORDS  = 0                                                        
+                                                                              
+  OBJECT                     = LOC_IMAGE                                      
+    LINES                    = 1182 /* (same as RDN image) */                 
+    LINE_SAMPLES             = 304 /* (same as RDN image) */                  
+    SAMPLE_TYPE              = PC_REAL                                        
+    SAMPLE_BITS              = 64                                             
+    BANDS                    = 0                                              
+    BAND_STORAGE_TYPE        = SAMPLE_INTERLEAVED                               
+    BAND_NAME                = ("Longitude",                                  
+                                "Latitude",                                   
+                                "Radius")                                     
+    LINE_DISPLAY_DIRECTION   = DOWN                                           
+    SAMPLE_DISPLAY_DIRECTION = RIGHT                                          
+  END_OBJECT                 = LOC_IMAGE                                      
+                                                                              
+END_OBJECT = LOC_FILE                                                         
+                                                                              
+/* Description of selenolocation header file */                               
+                                                                              
+OBJECT              = LOC_HDR_FILE                                            
+  ^LOC_ENVI_HEADER  = "M3G20081118T222604_V02_LOC.HDR"                        
+  RECORD_TYPE       = VARIABLE_LENGTH                                         
+  FILE_RECORDS      = 0                                                      
+                                                                              
+  OBJECT               = LOC_ENVI_HEADER                                      
+    INTERCHANGE_FORMAT = "ASCII"                                              
+    BYTES              = 372                                                  
+    HEADER_TYPE        = ENVI                                                 
+    DESCRIPTION        = "Header file for compatibility with the commercial   
+                          software package ENVI."                             
+  END_OBJECT = LOC_ENVI_HEADER                                                
+                                                                              
+END_OBJECT = LOC_HDR_FILE                                                     
+                                                                              
+/* Description of observation geometry data file */                           
+                                                                              
+OBJECT          = OBS_FILE                                                    
+  ^OBS_IMAGE    = "M3G20081118T222604_V02_OBS.IMG"                            
+  RECORD_TYPE   = FIXED_LENGTH                                                
+  RECORD_BYTES  = 12160                                                       
+  FILE_RECORDS  = 0                                                        
+                                                                              
+  OBJECT                     = OBS_IMAGE                                      
+    LINES                    = 1182 /* (same as RDN image) */                 
+    LINE_SAMPLES             = 304 /* (same as RDN image) */                  
+    SAMPLE_TYPE              = PC_REAL                                        
+    SAMPLE_BITS              = 32                                             
+    BANDS                    = 10                                             
+    BAND_STORAGE_TYPE        = SAMPLE_INTERLEAVED                               
+    BAND_NAME                = ("To-Sun AZM",                                 
+                                "To-Sun Zenith",                              
+                                "To-Inst AZM",                                
+                                "To-Inst Zenith",                             
+                                "Phase-angle",                                
+                                "To-Sun Path Length",                         
+                                "To-Inst Path Length",                        
+                                "Facet Slope",                                
+                                "Facet Aspect",                               
+                                "Facet Cos i")                                
+    LINE_DISPLAY_DIRECTION   = DOWN                                           
+    SAMPLE_DISPLAY_DIRECTION = RIGHT                                          
+  END_OBJECT = OBS_IMAGE                                                      
+                                                                              
+END_OBJECT = OBS_FILE                                                         
+                                                                              
+/* Description of observation geometry header file */                         
+                                                                              
+OBJECT              = OBS_HDR_FILE                                            
+  ^OBS_ENVI_HEADER  = "M3G20081118T222604_V02_OBS.HDR"                        
+  RECORD_TYPE       = VARIABLE_LENGTH                                         
+  FILE_RECORDS      = 0                                                      
+                                                                              
+  OBJECT               = OBS_ENVI_HEADER                                      
+    INTERCHANGE_FORMAT = "ASCII"                                              
+    BYTES              = 707                                                  
+    HEADER_TYPE        = ENVI                                                 
+    DESCRIPTION        = "Header file for compatibility with the commercial   
+                          software package ENVI."                             
+  END_OBJECT           = OBS_ENVI_HEADER                                      
+                                                                              
+END_OBJECT = OBS_HDR_FILE                                                     
+                                                                              
+/* Description of UTC timing data file */                                     
+                                                                              
+OBJECT            = UTC_FILE                                                  
+  ^UTC_TIME_TABLE = "M3G20081118T222604_V02_TIM.TAB"                          
+  RECORD_TYPE     = FIXED_LENGTH                                              
+  RECORD_BYTES    = 57                                                        
+  FILE_RECORDS    = 0 /* (same as RDN image) */                            
+                                                                              
+  OBJECT                 = UTC_TIME_TABLE                                     
+    NAME                 = "UTC OBSERVATION TIMING DATA"                      
+    INTERCHANGE_FORMAT   = "ASCII"                                            
+    ROWS                 = 1182 /* (same as RDN image) */                     
+    COLUMNS              = 4                                                  
+    ROW_BYTES            = 57                                                 
+    OBJECT                 = COLUMN                                           
+      COLUMN_NUMBER      = 1                                                  
+      NAME               = "LINE NUMBER"                                      
+      DATA_TYPE          = ASCII_INTEGER                                      
+      START_BYTE         = 1                                                  
+      BYTES              = 6                                                  
+      FORMAT             = "I6"                                               
+      DESCRIPTION        = "Record number for each RDN image line"            
+    END_OBJECT             = COLUMN                                           
+                                                                              
+    OBJECT                 = COLUMN                                           
+      COLUMN_NUMBER      = 2                                                  
+      NAME               = "UTC_TIME"                                         
+      DATA_TYPE          = TIME                                               
+      START_BYTE         = 8                                                  
+      BYTES              = 26                                                 
+      FORMAT             = "A26"                                              
+      DESCRIPTION        = "UTC Time for the middle of the integration period 
+                            for each RDN image line expressed as              
+                            YYYY-MM-DDTHH:MM:SS.SSSSSS"                       
+    END_OBJECT             = COLUMN                                           
+                                                                              
+    OBJECT                 = COLUMN                                           
+      COLUMN_NUMBER      = 3                                                  
+      NAME               = "YEAR"                                             
+      DATA_TYPE          = CHARACTER                                          
+      START_BYTE         = 35                                                 
+      BYTES              = 4                                                  
+      FORMAT             = "I4"                                               
+      DESCRIPTION        = "Decimal Day of Year (DDOY) Year reference         
+                            extracted from the earliest time of each RDN      
+                            image line"                                       
+    END_OBJECT             = COLUMN                                           
+                                                                              
+    OBJECT                 = COLUMN                                           
+      COLUMN_NUMBER      = 4                                                  
+      NAME               = "DDOY"                                             
+      DATA_TYPE          = DATE                                               
+      START_BYTE         = 40                                                 
+      BYTES              = 16                                                 
+      FORMAT             = "F16.12"                                           
+      DESCRIPTION        = "Decimal Day of Year represented as the number of  
+                            days elapsed since 00:00 UTC of January 1 of the  
+                            year associated with the time stamp of the first  
+                            line of the RDN image file. DDOY is expressed     
+                            using seventeen characters where 1-3 = three      
+                            characters that contain the integer number of     
+                            days; 4 = a decimal point; 5-16 = twelve charact- 
+                            ers after the decimal for the fractional part of  
+                            the day of year value."                           
+    END_OBJECT             = COLUMN                                           
+                                                                              
+  END_OBJECT = UTC_TIME_TABLE                                                 
+                                                                              
+END_OBJECT = UTC_FILE                                                         
+                                                                              
+END                                                                           

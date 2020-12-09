@@ -373,7 +373,7 @@ TEST_P(PositionSolveOptionStrings, OptionToString) {
     BundleObservationSolveSettings::instrumentPositionSolveOptionToString(GetParam().first));
 }
 
-INSTANTIATE_TEST_CASE_P(BundleObservationSolveSettings, PointingSolveOptionStrings, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, PointingSolveOptionStrings, ::testing::Values(
   qMakePair(BundleObservationSolveSettings::NoPointingFactors, QString("None")),
   qMakePair(BundleObservationSolveSettings::AnglesOnly, QString("AnglesOnly")),
   qMakePair(BundleObservationSolveSettings::AnglesVelocity, QString("AnglesAndVelocity")),
@@ -382,7 +382,7 @@ INSTANTIATE_TEST_CASE_P(BundleObservationSolveSettings, PointingSolveOptionStrin
   qMakePair(BundleObservationSolveSettings::AllPointingCoefficients,
             QString("AllPolynomialCoefficients"))));
 
-INSTANTIATE_TEST_CASE_P(BundleObservationSolveSettings, PositionSolveOptionStrings, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, PositionSolveOptionStrings, ::testing::Values(
   qMakePair(BundleObservationSolveSettings::NoPositionFactors, QString("None")),
   qMakePair(BundleObservationSolveSettings::PositionOnly, QString("PositionOnly")),
   qMakePair(BundleObservationSolveSettings::PositionVelocity, QString("PositionAndVelocity")),

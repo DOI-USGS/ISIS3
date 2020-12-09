@@ -108,37 +108,15 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
 
-  lonLatPts = new geos::geom::CoordinateArraySequence();
-  lonLatPts->add(geos::geom::Coordinate(31, 1));
-  lonLatPts->add(geos::geom::Coordinate(31, 9));
-  lonLatPts->add(geos::geom::Coordinate(34, 9));
-  lonLatPts->add(geos::geom::Coordinate(34, 1));
-  lonLatPts->add(geos::geom::Coordinate(31, 1));
-
-  polys = new std::vector<geos::geom::Geometry *>;
-  poly = globalFactory->createPolygon(globalFactory->createLinearRing(lonLatPts), nullptr);
-  polys->push_back(poly->clone());
-  multiPoly = globalFactory->createMultiPolygon(polys);
-
-  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-  std::string polyStr = wkt->write(multiPoly);
-  int polyStrSize = polyStr.size();
-  std::istringstream polyStream(polyStr);
-
-  Blob pvlBlob("Footprint", "Polygon");
-  Pvl pvl;
-  PvlObject polyObject = PvlObject("Polygon");
-  polyObject.addKeyword(PvlKeyword("Name", "Footprint"));
-  polyObject.addKeyword(PvlKeyword("StartByte", "1"));
-  polyObject.addKeyword(PvlKeyword("Bytes", toString(polyStrSize)));
-  pvl.addObject(polyObject);
-
-  pvlBlob.Read(pvl, polyStream);
-  cube2->write(pvlBlob);
+  ImagePolygon poly;
+  coords = {{31, 1},
+            {31, 9},
+            {34, 9},
+            {34, 1},
+            {31, 1}};
+  poly.Create(coords);
+  cube2->write(poly);
   cube2->reopen("rw");
-
-  delete wkt;
 
   QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
   UserInterface ui(APP_XML, args);
