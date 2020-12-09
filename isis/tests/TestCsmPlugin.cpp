@@ -223,7 +223,6 @@ std::string TestCsmPlugin::convertISDToModelState(
   csm::Model *model =
     constructModelFromISD(imageSupportData, modelName, warnings);
   return model->getModelState();
-  // TODO: make sure it works!
 }
 
 
@@ -249,7 +248,6 @@ std::string TestCsmPlugin::getModelNameFromModelState(
     throw(csmErr);
   }
   return name;
-  // TODO: make sure it works
 }
 
 
