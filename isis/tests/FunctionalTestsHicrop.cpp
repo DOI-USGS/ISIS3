@@ -13,9 +13,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicrop.xml").expanded();
 
-TEST_F(MroCube, FunctionalTestHicropCropByCk) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
-  
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByCk) {
   // make the image stretch outside of the CK time ranges 
   PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
   inst.findKeyword("DeltaLineTimerCount").setValue("99999");   
@@ -59,9 +57,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByCk) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByLine) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
-  
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByLine) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
   
@@ -101,8 +97,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByLine) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByTimes) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByTimes) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -143,8 +138,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByTimes) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByJitterDefault) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterDefault) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -185,8 +179,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByJitterDefault) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByJitterZero) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZero) {
   
   QTemporaryDir prefix;
 
@@ -248,8 +241,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByJitterZero) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByJitterZeroSample) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZeroSample) {
   
   QTemporaryDir prefix;
 
@@ -311,8 +303,7 @@ TEST_F(MroCube, FunctionalTestHicropCropByJitterZeroSample) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCropByJitterZeroLine) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZeroLine) {
   
   QTemporaryDir prefix;
 
@@ -374,9 +365,11 @@ TEST_F(MroCube, FunctionalTestHicropCropByJitterZeroLine) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropInstrumentError) {
-  setInstrument("-74999", "NOT_HIRISE", "MARS RECONNAISSANCE ORBITER");
-  
+TEST_F(MroHiriseCube, FunctionalTestHicropInstrumentError) {
+  PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument"); 
+  PvlKeyword &instrumentName = inst.findKeyword("InstrumentId");
+  instrumentName.setValue("NoHiriseLmao");
+
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
   
@@ -396,8 +389,7 @@ TEST_F(MroCube, FunctionalTestHicropInstrumentError) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropStartStopTimeError) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropStartStopTimeError) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -418,8 +410,7 @@ TEST_F(MroCube, FunctionalTestHicropStartStopTimeError) {
 }
 
 
-TEST_F(MroCube, FunctionalTestHicropCkRangeError) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestHicropCkRangeError) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
