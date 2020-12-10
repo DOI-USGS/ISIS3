@@ -111,8 +111,8 @@ namespace Isis {
 
 
   /**
-   * Reads the appropriate plugin file for the ISIS cameras, and scans the 
-   * directories specified in IsisPreferences for CSM cameras. 
+   * Reads the appropriate plugin file for the ISIS cameras, and scans the
+   * directories specified in IsisPreferences for CSM cameras.
    */
   void CameraFactory::initPlugin() {
 
@@ -129,7 +129,7 @@ namespace Isis {
 
     // Find the CSM plugins by searching the directories identified in the Preferences.
     // Load the found libraries. This causes the static instance(s) to be constructed,
-    // and thus registering the model with the csm Plugin class. 
+    // and thus registering the model with the csm Plugin class.
     Preference &p = Preference::Preferences();
     PvlGroup &grp = p.findGroup("Plugins", Isis::Pvl::Traverse);
     for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
@@ -139,17 +139,9 @@ namespace Isis {
       while (csmLib.hasNext()) {
         QString csmLibName = csmLib.next();
         QLibrary csmDynamicLib(csmLibName);
-
-        bool loadedOk = csmDynamicLib.load();
-
-        if (!loadedOk) {
-          std::cout << "Unloadable library " << csmLibName << std::endl;
-        }
+        csmDynamicLib.load();
       }
     }
-
-    PluginList csmPluginList = csm::Plugin::getList();
-    std::cout << "csm plugin list size " << csmPluginList.size() << std::endl; 
   }
 
 

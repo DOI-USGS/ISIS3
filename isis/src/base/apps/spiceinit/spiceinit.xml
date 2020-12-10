@@ -295,6 +295,9 @@
       derived from bundle adjustment can be used alongside CKs derived from bundle adjustment.
       Fixes #3669.
     </change>
+    <change name="Jesse Mapel" date="2020-12-10">
+      Modified to remove state string and model information from the csminit application.
+    </change>
   </history>
 
   <oldName>
