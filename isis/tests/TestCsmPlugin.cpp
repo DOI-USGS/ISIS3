@@ -29,7 +29,7 @@ TestCsmPlugin::~TestCsmPlugin() {}
 
 /**
  * Gets the name of the plugin.
- *  
+ *
  * @return std::string name of the plugin
  */
 std::string TestCsmPlugin::getPluginName() const {
@@ -39,7 +39,7 @@ std::string TestCsmPlugin::getPluginName() const {
 
 /**
  * Gets the name of the manufacturer of the plugin.
- * 
+ *
  * @return std::string the name of the manufacturer of the plugin
  */
 std::string TestCsmPlugin::getManufacturer() const {
@@ -49,7 +49,7 @@ std::string TestCsmPlugin::getManufacturer() const {
 
 /**
  * Gets the release date of the plugin.
- * 
+ *
  * @return std::string release date
  */
 std::string TestCsmPlugin::getReleaseDate() const {
@@ -59,7 +59,7 @@ std::string TestCsmPlugin::getReleaseDate() const {
 
 /**
  * Returns the version of CSM the Plugin uses.
- * 
+ *
  * @return csm::Version CSM version plugin uses
  */
 csm::Version TestCsmPlugin::getCsmVersion() const {
@@ -68,8 +68,8 @@ csm::Version TestCsmPlugin::getCsmVersion() const {
 
 
 /**
- * Returns the number of sensor models in the plugin 
- *  
+ * Returns the number of sensor models in the plugin
+ *
  * @return size_t Number of sensor models in the plugin
  */
 size_t TestCsmPlugin::getNumModels() const {
@@ -79,9 +79,9 @@ size_t TestCsmPlugin::getNumModels() const {
 
 /**
  * Returns the model name at the given index.
- * 
+ *
  * @param modelIndex The index number for the sensor model
- * 
+ *
  * @return std::string model name
  */
 std::string TestCsmPlugin::getModelName(size_t modelIndex) const {
@@ -94,9 +94,9 @@ std::string TestCsmPlugin::getModelName(size_t modelIndex) const {
 
 /**
  * Returns the sensor model family at the given index.
- * 
+ *
  * @param modelIndex the index number for the sensor model family
- * 
+ *
  * @return std::string sensor model family
  */
 std::string TestCsmPlugin::getModelFamily(size_t modelIndex) const {
@@ -106,23 +106,23 @@ std::string TestCsmPlugin::getModelFamily(size_t modelIndex) const {
 
 /**
  * Returns the CSM sensor model version for a given model.
- * 
+ *
  * @param modelName the model name
- * 
+ *
  * @return csm::Version the version of the csm sensor model
  */
-csm::Version TestCsmPlugin::getModelVersion(const std::string& modelName) const { 
+csm::Version TestCsmPlugin::getModelVersion(const std::string& modelName) const {
   return csm::Version(1,0,0);
 }
 
 
 /**
  * Tests if the sensor model can be created from a given state.
- * 
+ *
  * @param modelName the model name
  * @param modelState the model state
  * @param warnings the warning list
- * 
+ *
  * @return bool if the model can be constructed from the state
  */
 bool TestCsmPlugin::canModelBeConstructedFromState(const std::string& modelName,
@@ -133,25 +133,20 @@ bool TestCsmPlugin::canModelBeConstructedFromState(const std::string& modelName,
     return static_cast<bool>(model);
   }
   catch (std::exception &e) {
-    std::string msg = "Could not create model [";
-    msg += modelName;
-    msg += "] with error [";
-    msg += e.what();
-    msg += "]";
-    std::cout << msg << std::endl;
+    // No op
   }
   return false;
 }
 
 
 /**
- * Checks to see if the CSM sensor model can be constructed from 
- * a given ISD. 
- *  
+ * Checks to see if the CSM sensor model can be constructed from
+ * a given ISD.
+ *
  * @param imageSupportData isd for the image
  * @param modelName name of the sensor model
  * @param warnings warnings list
- * 
+ *
  * @return bool true if the model can be constructed from the isd
  */
 bool TestCsmPlugin::canModelBeConstructedFromISD(
@@ -163,12 +158,7 @@ bool TestCsmPlugin::canModelBeConstructedFromISD(
         constructModelFromISD(imageSupportData, modelName, warnings);
     return static_cast<bool>(model);
   } catch (std::exception &e) {
-    std::string msg = "Could not create model [";
-    msg += modelName;
-    msg += "] with error [";
-    msg += e.what();
-    msg += "]";
-    std::cout << msg << std::endl;
+    // no op
   }
   return false;
 }
@@ -176,11 +166,11 @@ bool TestCsmPlugin::canModelBeConstructedFromISD(
 
 /**
  * True if the ISD can be converted to a state.
- * 
+ *
  * @param imageSupportData the image support data
  * @param modelName the name of the model
  * @param warnings the warnings list
- * 
+ *
  * @return bool true if the ISD can be converted to a state.
  */
 bool TestCsmPlugin::canISDBeConvertedToModelState(
@@ -189,16 +179,9 @@ bool TestCsmPlugin::canISDBeConvertedToModelState(
     csm::WarningList* warnings) const{
   try {
     convertISDToModelState(imageSupportData, modelName, warnings);
-  } 
+  }
   catch (std::exception &e) {
-    if (warnings) {
-      std::string msg = "Could not create model [";
-      msg += modelName;
-      msg += "] state with error [";
-      msg += e.what();
-      msg += "]";
-      std::cout << msg << std::endl; 
-    }
+    // no op
     return false;
   }
   return true;
@@ -207,11 +190,11 @@ bool TestCsmPlugin::canISDBeConvertedToModelState(
 
 /**
  * Conver an ISD (Image Support Data) to a model state.
- * 
+ *
  * @param imageSupportData The ISD
  * @param modelName The name of the model.
  * @param warnings The warnings list.
- * 
+ *
  * @return std::string the model state converted from the ISD
  */
 std::string TestCsmPlugin::convertISDToModelState(
@@ -226,10 +209,10 @@ std::string TestCsmPlugin::convertISDToModelState(
 
 /**
  * Extracts and returns the model name from the model state.
- * 
+ *
  * @param modelState State of the sensor model
  * @param warnings The warnings list
- * 
+ *
  * @return std::string The sensor model name
  */
 std::string TestCsmPlugin::getModelNameFromModelState(
@@ -251,10 +234,10 @@ std::string TestCsmPlugin::getModelNameFromModelState(
 
 /**
  * Creates and returns a sensor model from a state string.
- * 
+ *
  * @param modelState State of the sensor model
  * @param warnings The csm warnings list
- * 
+ *
  * @return csm::Model* The constructed sensor model
  */
 csm::Model* TestCsmPlugin::constructModelFromState(
@@ -263,12 +246,12 @@ csm::Model* TestCsmPlugin::constructModelFromState(
 
   std::string modelName = getModelNameFromModelState(modelState, warnings);
   if (modelName == TestCsmModel::SENSOR_MODEL_NAME) {
-    TestCsmModel *model = new TestCsmModel(); 
+    TestCsmModel *model = new TestCsmModel();
     model->replaceModelState(modelState);
     return model;
   }
   else if (modelName == AlternativeTestCsmModel::SENSOR_MODEL_NAME) {
-    AlternativeTestCsmModel *model = new AlternativeTestCsmModel(); 
+    AlternativeTestCsmModel *model = new AlternativeTestCsmModel();
     model->replaceModelState(modelState);
     return model;
   }
@@ -283,10 +266,10 @@ csm::Model* TestCsmPlugin::constructModelFromState(
 
 /**
  * Constructs and returns a sensor model from an ISD.
- * 
+ *
  * @param imageSupportData The image support data for an image
  * @param modelName The sensor model name
- * 
+ *
  * @return csm::Model* the model constructed from the ISD
  */
 csm::Model* TestCsmPlugin::constructModelFromISD(

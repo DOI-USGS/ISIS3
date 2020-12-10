@@ -146,7 +146,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   QVector<QString> altArgs = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModel"};
+    "modelName="+QString::fromStdString(AlternativeTestCsmModel::SENSOR_MODEL_NAME)};
 
   UserInterface altOptions(APP_XML, altArgs);
 
@@ -206,7 +206,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   args = {
     "from="+filename,
     "isd="+altIsdPath,
-    "modelName=AlternativeTestCsmModel"};
+    "modelName="+QString::fromStdString(AlternativeTestCsmModel::SENSOR_MODEL_NAME)};
 
   UserInterface betterOptions(APP_XML, args);
   csminit(betterOptions);

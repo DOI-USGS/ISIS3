@@ -30,6 +30,10 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+### Added
+
+ - Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
+
 
 - Fixed so required files are reported instead of continuing without them. [#4038](https://github.com/USGS-Astrogeology/ISIS3/issues/4038)
 

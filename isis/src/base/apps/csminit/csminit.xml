@@ -2,17 +2,33 @@
 
 <application name="csminit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Attach a CSM Model state to a cube
+    Attach a CSM model state to a cube.
   </brief>
 
   <description>
     <p>
-      This program takes an ISD or state string and attempts to create
-      a valid CSM Model from the loaded CSM Libraries. Then, it attaches the
-      state string from the CSM Model to the cube for later use. If there are
-      multiple valid CSM Models that can be instantiated, then this program
-      will error and the user will have to re-run it with a specific model
-      and/or plugin name.
+      This program takes Instrument Support Data (ISD) and attempts to create a
+      valid Community Sensor Model (CSM) state string using modesl from the
+      loaded CSM Libraries. If a single state string can be created, it is
+      attached to the cube in the CSMState BLOB for later use. If there are
+      multiple models that create valid state strings, then this program will
+      error and return a list of possible models. The user will then have to
+      re-run this program using the PLUGINNAME and/or MODELNAME parameters to
+      select a specific model.
+    </p>
+    <p>
+      Information about the CSM model will also be added to the CsmInfo group on
+      the cube label. These are just for users to reference and are not used
+      programmatically.
+    </p>
+    <p>
+      This program can be run on any Cube file, but if the Cube has spice data
+      from spiceinit then it will be removed so that there is no ambiguity
+      between the ISIS and CSM model.
+    </p>
+    <p>
+      See the Plugins group in the IsisPreferences file for information about
+      how to load CSM Libraries for use with this and other ISIS applications.
     </p>
   </description>
 
@@ -35,7 +51,9 @@
           The input cube that the state string will be attached to.
         </brief>
         <description>
-          The input cube that the state string will be attached to.
+          The input cube that the state string will be attached to. Any kernels
+          specified in the kernels group and any attached SPICE tables will be
+          removed when the model state is attached.
         </description>
         <filter>*.cub</filter>
       </parameter>
@@ -44,10 +62,11 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          The ISD file that will be used.
+          The Instrument Support Data (ISD) file that will be used.
         </brief>
         <description>
-          The ISD file that will be used to create the model state string.
+          The Instrument Support Data (ISD) file that will be used to create the
+          model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
         </description>
       </parameter>
     </group>
@@ -74,7 +93,7 @@
         <description>
           The shapemodel to represent the surface of the observed body. If none
           is entered, then a bi-axial ellipsoid is used. The radii are defined
-          by the CSM Model.
+          by the CSM model.
         </description>
       </parameter>
     </group>
