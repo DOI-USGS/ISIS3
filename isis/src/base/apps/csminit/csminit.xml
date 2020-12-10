@@ -7,18 +7,19 @@
 
   <description>
     <p>
-      This program takes an ISD and attempts to create a valid CSM model from
-      the loaded CSM Libraries. If a single model can be created, its state
-      string is attached to the cube in the CSMState BLOB for later use. If
-      there are multiple valid CSM Models that can be instantiated, then this
-      program will error and return a list of possible models. The user will
-      then have to re-run it using the PLUGINNAME and/or MODELNAME parameters
-      to select a specific model.
+      This program takes Instrument Support Data (ISD) and attempts to create a
+      valid Community Sensor Model (CSM) state string using modesl from the
+      loaded CSM Libraries. If a single state string can be created, it is
+      attached to the cube in the CSMState BLOB for later use. If there are
+      multiple models that create valid state strings, then this program will
+      error and return a list of possible models. The user will then have to
+      re-run this program using the PLUGINNAME and/or MODELNAME parameters to
+      select a specific model.
     </p>
     <p>
-      Various pieces of information about the CSM model will also be added to
-      the CsmInfo group on the cube label. These are just for users to reference
-      and are not used programmatically.
+      Information about the CSM model will also be added to the CsmInfo group on
+      the cube label. These are just for users to reference and are not used
+      programmatically.
     </p>
     <p>
       This program can be run on any Cube file, but if the Cube has spice data
@@ -61,11 +62,11 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          The ISD file that will be used.
+          The Instrument Support Data (ISD) file that will be used.
         </brief>
         <description>
-          The ISD file that will be used to create the model state string. The
-          ISD can be just a filename ISD or a NITF2.1 ISD.
+          The Instrument Support Data (ISD) file that will be used to create the
+          model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
         </description>
       </parameter>
     </group>
