@@ -2,9 +2,12 @@
 #define nocam2map_h
 
 #include "Transform.h"
+#include "UserInterface.h"
 
-namespace Isis {
-
+namespace Isis {  
+  extern void nocam2map(Cube *cube, UserInterface &ui, Pvl *log=nullptr);
+  extern void nocam2map(UserInterface &ui, Pvl *log=nullptr);
+  
   class Cube;
   class LeastSquares;
   class TProjection;
@@ -13,10 +16,10 @@ namespace Isis {
    *
    * @internal
    */
-  class nocam2map : public Isis::Transform {
+  class NoCam2Map : public Isis::Transform {
     public:
       // constructor
-      nocam2map(Isis::LeastSquares sample, Isis::LeastSquares line, Isis::TProjection *outmap,
+      NoCam2Map(Isis::LeastSquares sample, Isis::LeastSquares line, Isis::TProjection *outmap,
                 Isis::Cube *latCube, Isis::Cube *lonCube,
                 bool isOcentric , bool isPosEast,
                 double tolerance, int iterations,
@@ -24,7 +27,7 @@ namespace Isis {
                 const int outputSamples, const int outputLines);
   
       // destructor
-      ~nocam2map() {};
+      ~NoCam2Map() {};
   
       // Implementations for parent's pure virtual members
       bool Xform(double &inSample, double &inLine,
