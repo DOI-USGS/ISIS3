@@ -244,6 +244,9 @@ namespace Isis {
    *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
    *                           collect the InstrumentId from the original cube label for 
    *                           comparisons related to image imports in ipce. References #5460.
+   *   @history 2020-12-02 Victor Silva - Added nexttoward expression to GetLocalnormal surrounding
+   *   												 points code. In the detector map, the cast to int is rounding incorrectly
+   *   												 and mapping to the next/previous framelet. Fixes #4018
    */
 
   class Camera : public Sensor {
