@@ -129,12 +129,12 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMultiAlgo) {
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
   // Tests that decreasing maxpoints decreases output points + tests pointindex
-  QVector<QString> args = { "algorithm=brisk/brisk",
+  QVector<QString> args1 = { "algorithm=brisk/brisk",
                            "match=" + tempDir.path() + "/cube3.cub",
                            "fromlist=" + twoCubeListFile,
                            "tolist=" + tempDir.path() + "/toList.txt",
                            "tonotmatched=" + tempDir.path() + "/unmatched.txt",
-                           "maxpoints=1000",
+                           "maxpoints=5000",
                            "epitolerance=1.0",
                            "ratio=.65",
                            "hmgtolerance=3.0",
@@ -146,15 +146,36 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
                            "target=MARS",
                            "debug=false"};
 
-  UserInterface options(APP_XML, args);
-  findfeatures(options);
-  ControlNet network(options.GetFileName("ONET"));
 
-  ASSERT_EQ(network.GetNetworkId(), "new");
-  ASSERT_EQ(network.Description().toStdString(), "brisk/brisk/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  QVector<QString> args2 = { "algorithm=brisk/brisk",
+                           "match=" + tempDir.path() + "/cube3.cub",
+                           "fromlist=" + twoCubeListFile,
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "maxpoints=1000",
+                           "epitolerance=1.0",
+                           "ratio=.65",
+                           "hmgtolerance=3.0",
+                           "onet=" + tempDir.path() + "/network2.net",
+                           "networkid=new",
+                           "pointid=test_network_????",
+                           "pointindex=100",
+                           "description=new",
+                           "target=MARS",
+                           "debug=false"};
 
-  ASSERT_TRUE(network.ContainsPoint("test_network_0100"));
-  ASSERT_EQ(network.GetNumPoints(), 22);
+  UserInterface options1(APP_XML, args1);
+  UserInterface options2(APP_XML, args2);
+  findfeatures(options1);
+  findfeatures(options2);
+  ControlNet network1(options1.GetFileName("ONET"));
+  ControlNet network2(options2.GetFileName("ONET"));
+
+  ASSERT_EQ(network1.GetNetworkId(), "new");
+  ASSERT_EQ(network1.Description().toStdString(), "brisk/brisk/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+
+  ASSERT_TRUE(network1.ContainsPoint("test_network_0100"));
+  ASSERT_GT(network1.GetNumPoints(), network2.GetNumPoints());
 }
 
 
