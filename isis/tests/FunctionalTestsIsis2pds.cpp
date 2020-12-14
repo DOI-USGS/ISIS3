@@ -2,6 +2,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "XmlToPvlTranslationManager.h"
 
 #include "isis2pds.h"
 
@@ -50,7 +51,6 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefault) {
   EXPECT_EQ(QString(imageObject["CORE_LOW_INSTR_SATURATION"]), "16#FF7FFFFD#");
   EXPECT_EQ(QString(imageObject["CORE_HIGH_REPR_SATURATION"]), "16#FF7FFFFF#");
   EXPECT_EQ(QString(imageObject["CORE_HIGH_INSTR_SATURATION"]), "16#FF7FFFFE#");
-
 
 }
 
@@ -392,5 +392,44 @@ TEST(isis2pdsTest, FunctionalTestIsis2pdsOffset) {
   EXPECT_DOUBLE_EQ(double(projectionObject["WESTERNMOST_LONGITUDE"]), 0.0);
   EXPECT_DOUBLE_EQ(double(projectionObject["LINE_PROJECTION_OFFSET"]), 119.5);
   EXPECT_DOUBLE_EQ(double(projectionObject["SAMPLE_PROJECTION_OFFSET"]), 239.5);
+
+}
+
+TEST(isis2pdsTest, FunctionalTestIsis2pdsPds4) {
+  QTemporaryDir prefix;
+  QString outputFile = prefix.path() + "/outTemp.img";
+  QVector<QString> args = {"from=data/isis2pds/dawnEqui1.cub",
+                          "to=" + outputFile,
+                          "pdsversion=pds4"
+                          };
+
+  UserInterface options(APP_XML, args);
+  try {
+    isis2pds(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+
+  FileName xmlTransFile(prefix.path() + "/outTemp.xml");
+  XmlToPvlTranslationManager outputLabel(xmlTransFile, "data/isis2pds/isis2pds4.trn");
+
+  EXPECT_EQ(outputLabel.Translate("Target_Name"), "Vesta");
+  EXPECT_EQ(outputLabel.Translate("Target_Type"), "Asteroid");
+  EXPECT_EQ(outputLabel.Translate("Filter_Number"), "1");
+  EXPECT_EQ(outputLabel.Translate("Bandwidth"), "0.0140");
+  EXPECT_EQ(outputLabel.Translate("Wavelength"), "1.021");
+  EXPECT_EQ(outputLabel.Translate("West_Bound_Coord"), "0.0048031106755032");
+  EXPECT_EQ(outputLabel.Translate("East_Bound_Coord"), "359.97220491712");
+  EXPECT_EQ(outputLabel.Translate("North_Bound_Coord"), "-1.1656354932701");
+  EXPECT_EQ(outputLabel.Translate("South_Bound_Coord"), "-12.077278860826");
+  EXPECT_EQ(outputLabel.Translate("Pixel_Resolution"), "162.67302420122");
+  EXPECT_EQ(outputLabel.Translate("Pixel_Scale"), "30.884440468611");
+  EXPECT_EQ(outputLabel.Translate("Upperleft_x"), "-14640.57217811");
+  EXPECT_EQ(outputLabel.Translate("Upperleft_y"), "-5856.2288712439");
+  EXPECT_EQ(outputLabel.Translate("Latitude_type"), "Planetocentric");
+  EXPECT_EQ(outputLabel.Translate("Semi_major_radius"), "289000.0");
+  EXPECT_EQ(outputLabel.Translate("Polar_radius"), "229000.0");
+  EXPECT_EQ(outputLabel.Translate("Longitude_direction"), "Positive East");
 
 }
