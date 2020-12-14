@@ -35,7 +35,7 @@ namespace Isis {
 
     ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay( ui.GetString("PRIORITY") );
 
-    if (overlay == ProcessMapMosaic::UseBandPlacementCriteria) {
+    if (overlay == ProcessMosaic::UseBandPlacementCriteria) {
       if(ui.GetString("TYPE") == "BANDNUMBER") {
         m.SetBandNumber(ui.GetInteger("NUMBER"));
       }

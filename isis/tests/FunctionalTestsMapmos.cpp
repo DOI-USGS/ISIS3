@@ -24,6 +24,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmosOntop) {
   QVector<QString> *cube1args = new QVector<QString>(args);
   QVector<QString> *cube2args = new QVector<QString>(args);
   QVector<QString> *cube3args = new QVector<QString>(args);
+
+  std::cout << cube1map->fileName() << std::endl;
+
   cube1args->append("FROM=" + cube1map->fileName());
   cube1args->append("create=true");
   cube2args->append("FROM=" + cube2map->fileName());
@@ -353,4 +356,28 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmosMatchDEM) {
   EXPECT_EQ(int(dimensions["Samples"]), 552);
   EXPECT_EQ(int(dimensions["Lines"]), 677);
   EXPECT_EQ(int(dimensions["Bands"]), 1);
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestMapmosAppLog) {
+  QTemporaryDir prefix;
+  QString mosPath = prefix.path() + "/mosaic.cub";
+  QVector<QString> args = { "MOSAIC=" + mosPath,
+                            "create=true",
+                            "track=false",
+                            "priority=ONTOP" };
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+  QString fromPath = cube1map->fileName();
+
+  try {
+    mapmos(cube1map, options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  PvlGroup location = appLog.findGroup("ImageLocation");
+  EXPECT_EQ(location["File"][0], fromPath);
+  EXPECT_EQ(int(location["StartSample"]), 6);
+  EXPECT_EQ(int(location["StartLine"]), 194);
 }
