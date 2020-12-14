@@ -25,8 +25,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmosOntop) {
   QVector<QString> *cube2args = new QVector<QString>(args);
   QVector<QString> *cube3args = new QVector<QString>(args);
 
-  std::cout << cube1map->fileName() << std::endl;
-
   cube1args->append("FROM=" + cube1map->fileName());
   cube1args->append("create=true");
   cube2args->append("FROM=" + cube2map->fileName());
