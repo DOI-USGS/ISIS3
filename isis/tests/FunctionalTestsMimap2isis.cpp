@@ -544,3 +544,33 @@ TEST(FunctionalTestsMiMap2Isis, L3C) {
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("BaseBand"), "MV5");
 }
+
+TEST(FunctionalTestsMiMap2Isis, SpecialPixels) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
+  QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName, 
+                            "setnullrange=yes", "nullmin=-31000", "nullmax=-20000", "sethrsrange=yes", 
+                            "hrsmin=-19000", "hrsmax=-10000", "setlrsrange=yes", "lrsmin=-9000", "lrsmax=0",
+                            "setlisrange=yes", "lismin=1000", "lismax=10000", "sethisrange=yes", "hismin=11000", "hismax=20000"};
+
+  UserInterface options(APP_XML, args);
+  try {
+   mimap2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest MI MAP image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube outCube(cubeFileName);
+  std::unique_ptr<Histogram> hist(outCube.histogram());
+  
+  EXPECT_EQ(hist->LrsPixels(), 2);
+  EXPECT_EQ(hist->HrsPixels(), 5);
+  EXPECT_EQ(hist->NullPixels(), 4);
+  EXPECT_EQ(hist->LisPixels(), 4);
+  EXPECT_EQ(hist->HisPixels(), 4);
+  EXPECT_NEAR(hist->Average(), 0.459313, .00001);
+  EXPECT_NEAR(hist->Sum(), 2.75588, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 6);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.153348, .0001);
+}
