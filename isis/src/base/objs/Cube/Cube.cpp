@@ -83,16 +83,10 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
-    PvlObject cubeLabel = label.findObject("IsisCube");
-    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
-    close();
-
-    setDimensions(dimensions["Samples"],
-                          dimensions["Lines"],
-                          dimensions["Bands"]);
-
+    initCoreFromLabel(label);
     create(fileName.expanded());
 
+    PvlObject cubeLabel = label.findObject("IsisCube");
     for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
       putGroup(*grpIt);
     }
@@ -133,11 +127,39 @@ namespace Isis {
     std::ifstream isdStream(isdFile.expanded().toStdString());
     std::ifstream labelStream(labelFile.expanded().toStdString());
 
+    if (isdStream.fail()) {
+      QString msg = QString("failed to open isd stream: %1").arg(isdFile.expanded());
+      throw IException(IException::Io, msg,
+                 isdFile.baseName().toStdString().c_str(), 153);
+    }
+
+    if (labelStream.fail()) {
+      QString msg = "failed to open file stream";
+      throw IException(IException::Io, msg,
+                 fileName.baseName().toStdString().c_str(), 153);
+    }
+
     Pvl label;
     nlohmann::json isd;
 
-    isdStream >> isd;
-    labelStream >> label;
+    try {
+      labelStream >> label;
+    }
+    catch (std::exception &ex) {
+      QString msg = QString("Failed to open label file, %1, %2").arg(labelFile.expanded()).arg(ex.what());
+      throw IException(IException::Io, msg,
+                 fileName.baseName().toStdString().c_str(), 153);
+    }
+
+
+    try {
+      isdStream >> isd;
+    }
+    catch (std::exception &ex) {
+      QString msg = QString("Failed to open ISD file, %1, %2").arg(isdFile.expanded()).arg(ex.what());
+      throw IException(IException::Io, msg,
+                 fileName.baseName().toStdString().c_str(), 145);
+    }
 
     fromIsd(fileName, label, isd, access);
     reopen("rw");

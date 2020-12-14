@@ -13,6 +13,7 @@
 
 #include "Cube.h"
 #include "IException.h"
+#include "OriginalLabel.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
@@ -121,16 +122,85 @@ namespace Isis {
       void TearDown() override;
   };
 
-  class MroCube : public DefaultCube {
+  class ObservationPair : public TempTestingFiles {
+    protected:
+
+      Cube *cubeL;
+      Cube *cubeR;
+
+      QString cubeLPath;
+      QString cubeRPath;
+
+      FileName *isdPathL;
+      FileName *isdPathR;
+
+      FileList *cubeList;
+      QString cubeListFile;
+
+      ControlNet *network;
+      QString cnetPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class ApolloNetwork : public TempTestingFiles {
+    protected:
+      QVector<FileName> isdFiles;
+      QVector<FileName> labelFiles;
+      QVector<Cube*> cubes;
+
+      FileList *cubeList;
+      QString cubeListFile;
+
+      ControlNet *network;
+      QString controlNetPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class DemCube : public DefaultCube {
+    protected:
+      Cube *demCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
+      Cube dejitteredCube; 
       QString jitterPath; 
 
-      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName); 
+      void SetUp() override;
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
+  class NewHorizonsCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
+  };
+
+  class ApolloCube : public LargeCube {
+    protected:
+      void SetUp() override;
+  };
+
+  class RingsCube : public TempTestingFiles {
+    protected:
+
+      // pixtures of Saturn's rings
+      Cube *ring1;
+      Cube *ring2;
+      FileList cubeFileList;
+      QString cubeListPath;
+
+      void SetUp() override;
+  };
 }
 
 #endif
