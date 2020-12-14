@@ -13,7 +13,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicrop.xml").expanded();
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByCk) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByCk) {
   // make the image stretch outside of the CK time ranges 
   PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
   inst.findKeyword("DeltaLineTimerCount").setValue("99999");   
@@ -57,7 +57,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByCk) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByLine) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByLine) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
   
@@ -97,7 +97,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByLine) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByTimes) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByTimes) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -138,7 +138,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByTimes) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterDefault) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterDefault) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -179,7 +179,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterDefault) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZero) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZero) {
   
   QTemporaryDir prefix;
 
@@ -241,7 +241,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZero) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZeroSample) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZeroSample) {
   
   QTemporaryDir prefix;
 
@@ -303,7 +303,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZeroSample) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZeroLine) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCropByJitterZeroLine) {
   
   QTemporaryDir prefix;
 
@@ -365,7 +365,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropCropByJitterZeroLine) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropInstrumentError) {
+TEST_F(MroHiriseCube, FunctionalTestHicropInstrumentError) {
   PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument"); 
   PvlKeyword &instrumentName = inst.findKeyword("InstrumentId");
   instrumentName.setValue("NoHiriseLmao");
@@ -389,7 +389,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropInstrumentError) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropStartStopTimeError) {
+TEST_F(MroHiriseCube, FunctionalTestHicropStartStopTimeError) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";
@@ -410,7 +410,7 @@ TEST_F(MroCtxCube, FunctionalTestHicropStartStopTimeError) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestHicropCkRangeError) {
+TEST_F(MroHiriseCube, FunctionalTestHicropCkRangeError) {
   
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTemp.cub";

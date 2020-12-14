@@ -13,7 +13,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicubenorm.xml").expanded();
 
-TEST_F(MroCtxCube, FunctionalTestsHiCubeNormSubtract) {
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormSubtract) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
   QString outStatsFile = prefix.path()+"/stats.csv";  
@@ -65,7 +65,7 @@ TEST_F(MroCtxCube, FunctionalTestsHiCubeNormSubtract) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestsHiCubeNormDivide) {
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormDivide) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -93,7 +93,7 @@ TEST_F(MroCtxCube, FunctionalTestsHiCubeNormDivide) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestsHiCubeNormAverage) {
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormAverage) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTEMP.cub";
@@ -120,7 +120,7 @@ TEST_F(MroCtxCube, FunctionalTestsHiCubeNormAverage) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestsHiCubeNormNewVersion) {
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormNewVersion) {
 
   QTemporaryDir prefix;
   QString tablePath = prefix.path() + "/stats.pvl"; // prefix.path() + "/stats.pvl"; 
@@ -167,7 +167,7 @@ TEST_F(MroCtxCube, FunctionalTestsHiCubeNormNewVersion) {
 }
 
 
-TEST_F(MroCtxCube, FunctionalTestsHiCubeNormPreserve) {
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormPreserve) {
 
   // force a 2D gradiant vs the default 1D gradiant 
   LineManager line(*testCube);
