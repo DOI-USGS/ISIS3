@@ -180,3 +180,63 @@ TEST_F(SmallCube, FunctionalTestsBandNormByNumber) {
   ASSERT_EQ(oCubeStats->ValidPixels(), 100);  
   ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 29.011491975882016);
 }
+
+
+TEST_F(SmallCube, FunctionalTestsBandNormByBandAvg) {
+  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
+  QString pencilPath = "/tmp/pencil.txt";
+
+  QVector<QString> args = {"to="+outCubeFileName, "AVERAGE=Band"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    bandnorm(testCube, options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to process image: " << e.what() << std::endl;
+  }
+  
+  Cube oCube(outCubeFileName);
+  std::unique_ptr<Histogram> oCubeStats(oCube.histogram(1));
+  EXPECT_NEAR(oCubeStats->Average(), 1, 0.0001); 
+  EXPECT_NEAR(oCubeStats->Sum(), 100.0, 0.0001); 
+  ASSERT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);  
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.586090, 0.0001);
+
+  // double check to see that other bands were not changed
+  oCubeStats.reset(oCube.histogram(2));
+  EXPECT_NEAR(oCubeStats->Average(), 0.96763754, 0.0001); 
+  EXPECT_NEAR(oCubeStats->Sum(), 96.76375418, 0.0001); 
+  EXPECT_EQ(oCubeStats->ValidPixels(), 100);  
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.1877766488, 0.0001);
+}
+
+
+TEST_F(SmallCube, FunctionalTestsBandNormByCubeAvg) {
+  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
+  QString pencilPath = "/tmp/pencil.txt";
+
+  QVector<QString> args = {"to="+outCubeFileName, "AVERAGE=Cube"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    bandnorm(testCube, options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to process image: " << e.what() << std::endl;
+  }
+  
+  Cube oCube(outCubeFileName);
+  std::unique_ptr<Histogram> oCubeStats(oCube.histogram(1));
+  EXPECT_NEAR(oCubeStats->Average(), 0.099099099056329576, 0.0001); 
+  EXPECT_NEAR(oCubeStats->Sum(), 9.9099099056329578, 0.0001); 
+  ASSERT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);  
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.05808106515551998, 0.0001);
+
+  // double check to see that other bands were not changed
+  oCubeStats.reset(oCube.histogram(2));
+  EXPECT_NEAR(oCubeStats->Average(), 0.29929929912090303, 0.0001); 
+  EXPECT_NEAR(oCubeStats->Sum(), 29.929929912090302, 0.0001); 
+  EXPECT_EQ(oCubeStats->ValidPixels(), 100);  
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.058081065874528971, 0.0001);
+}

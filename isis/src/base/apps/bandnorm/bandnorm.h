@@ -2,6 +2,7 @@
 #define std2isis_h
 
 #include "UserInterface.h"
+#include "Cube.h"
 
 namespace Isis {
   extern void bandnorm(Cube *icube, UserInterface &ui);
