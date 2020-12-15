@@ -25,7 +25,7 @@ namespace Isis{
 
     CubeAttributeInput cai;
     Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
-    camstats(icube, ui, log);
+    isis2pds(icube, ui, log);
 
     p.EndProcess();
   }
