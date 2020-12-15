@@ -3,13 +3,14 @@
 #include "Cube.h"
 #include "ExportDescription.h"
 #include "FileName.h"
+#include "isis2pds.h"
 #include "Process.h"
 #include "ProcessExportPds.h"
 #include "ProcessExportPds4.h"
 #include "Pvl.h"
 #include "PvlKeyword.h"
 #include "PvlToXmlTranslationManager.h"
-#include "isis2pds.h"
+
 
 using namespace std;
 namespace Isis{
@@ -18,22 +19,24 @@ namespace Isis{
 
   void setRangeAndPixels(UserInterface &ui, ProcessExport &p,
                          double &min, double &max, Pixtype ptype);
-  void isis2pds(UserInterface &ui, Pvl *log) {
 
-    // Check if input file is indeed, a cube
-    if (ui.GetFileName("FROM").right(3) != "cub") {
-      QString msg = "Input file [" + ui.GetFileName("FROM") +
-                  "] does not appear to be a cube";
-      throw  IException(IException::User, msg, _FILEINFO_);
-    }
+  void isis2pds(UserInterface &ui, Pvl *log){
+    Process p;
+
+    CubeAttributeInput cai;
+    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
+    camstats(icube, ui, log);
+
+    p.EndProcess();
+  }
+
+  void isis2pds(Cube *icube, UserInterface &ui, Pvl *log) {
 
     if (ui.GetString("PDSVERSION") == "PDS3") {
       // Set the processing object
       ProcessExportPds p;
-
       // Setup the input cube
-      CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-      p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+      p.SetInputCube(icube);
 
       if (ui.GetString("STRETCH") == "LINEAR") {
         if (ui.GetString("BITTYPE") != "32BIT") {
@@ -123,8 +126,7 @@ namespace Isis{
       // Setup the process and set the input cube
       ProcessExportPds4 process;
 
-      CubeAttributeInput &att = ui.GetInputAttribute("FROM");
-      Cube *icube = process.SetInputCube(ui.GetFileName("FROM"), att);
+      process.SetInputCube(icube);
 
       PvlObject *label= icube->label();
       if (!label->hasObject("IsisCube")) {
