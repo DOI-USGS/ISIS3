@@ -22,7 +22,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefault) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -65,7 +65,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefaultMSB) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -105,7 +105,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinear8bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -144,7 +144,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinears16bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -185,7 +185,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinearu16bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -220,7 +220,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManual8bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -259,7 +259,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManuals16bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -301,7 +301,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManualu16bit) {
 
   UserInterface options(APP_XML, args);
   try {
-    isis2pds(options);
+    isis2pds(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
