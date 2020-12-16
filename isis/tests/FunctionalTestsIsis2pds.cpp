@@ -12,7 +12,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isis2pds.xml").expanded();
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsDefault) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsDefault) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -33,13 +33,13 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefault) {
 
   EXPECT_EQ(QString(outputLabel["PDS_VERSION_ID"]), "PDS3");
   EXPECT_EQ(QString(outputLabel["RECORD_TYPE"]), "UNDEFINED");
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 806);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 807);
-  EXPECT_EQ(QString(outputLabel["CHECKSUM"]), "ede3d3b685b4e137ba4cb2521329a75e");
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 809);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 810);
+  EXPECT_EQ(QString(outputLabel["CHECKSUM"]), "5656e616c61d8fa7ed568ff88632f044");
 
-  EXPECT_EQ(int(imageObject["LINES"]), 10);
-  EXPECT_EQ(int(imageObject["LINE_SAMPLES"]), 10);
-  EXPECT_EQ(int(imageObject["BANDS"]), 10);
+  EXPECT_EQ(int(imageObject["LINES"]), 1056);
+  EXPECT_EQ(int(imageObject["LINE_SAMPLES"]), 1204);
+  EXPECT_EQ(int(imageObject["BANDS"]), 1);
   EXPECT_EQ(QString(imageObject["BAND_STORAGE_TYPE"]), "BAND_SEQUENTIAL");
   EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), 0.0);
   EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.0);
@@ -54,7 +54,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefault) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsDefaultMSB) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsDefaultMSB) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -74,8 +74,8 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefaultMSB) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 692);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 693);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 695);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 696);
 
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 8);
   EXPECT_EQ(QString(imageObject["SAMPLE_BIT_MASK"]), "2#11111111#");
@@ -88,7 +88,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsDefaultMSB) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsLinear8bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsLinear8bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -114,12 +114,12 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinear8bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 697);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 698);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 700);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 701);
 
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 8);
-  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -0.012);
-  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 0.004);
+  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), 11.776);
+  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 0.40799999999999997);
   EXPECT_EQ(int(imageObject["CORE_LOW_REPR_SATURATION"]), 1);
   EXPECT_EQ(int(imageObject["CORE_LOW_INSTR_SATURATION"]), 2);
   EXPECT_EQ(int(imageObject["CORE_HIGH_REPR_SATURATION"]), 255);
@@ -127,7 +127,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinear8bit) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsLinears16bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsLinears16bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -153,11 +153,11 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinears16bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 743);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 744);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 745);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 746);
 
-  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), 0.49996947962765);
-  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.52601861742713e-05);
+  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), 127.49923699068999);
+  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 0.00038150465435678302);
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 16);
   EXPECT_EQ(QString(imageObject["SAMPLE_BIT_MASK"]), "2#1111111111111111#");
   EXPECT_EQ(QString(imageObject["SAMPLE_TYPE"]), "LSB_INTEGER");
@@ -168,7 +168,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinears16bit) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsLinearu16bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsLinearu16bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -194,11 +194,11 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinearu16bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 739);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 740);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 735);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 736);
 
-  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -4.5780558522814e-05);
-  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.5260186174271301e-05);
+  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), 2.9886006409278001);
+  EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 0.0037997863573935998);
   EXPECT_EQ(QString(imageObject["SAMPLE_TYPE"]), "LSB_UNSIGNED_INTEGER");
   EXPECT_EQ(int(imageObject["CORE_LOW_REPR_SATURATION"]), 1);
   EXPECT_EQ(int(imageObject["CORE_LOW_INSTR_SATURATION"]), 2);
@@ -207,7 +207,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsLinearu16bit) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsManual8bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsManual8bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -229,8 +229,8 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManual8bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 715);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 716);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 718);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 719);
 
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 8);
   EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -1.003937007874);
@@ -242,7 +242,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManual8bit) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsManuals16bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsManuals16bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -268,8 +268,8 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManuals16bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 738);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 739);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 741);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 742);
 
   EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -2.5001526018641);
   EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.0000763009309);
@@ -284,7 +284,7 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManuals16bit) {
 
 }
 
-TEST_F(SmallCube, FunctionalTestIsis2pdsManualu16bit) {
+TEST_F(DefaultCube, FunctionalTestIsis2pdsManualu16bit) {
   QTemporaryDir prefix;
   QString outputFile = prefix.path() + "/outTemp.img";
   QVector<QString> args = {"from=" + testCube->fileName(),
@@ -310,8 +310,8 @@ TEST_F(SmallCube, FunctionalTestIsis2pdsManualu16bit) {
   Pvl outputLabel(options.GetFileName("TO"));
   PvlObject imageObject = outputLabel.findObject("IMAGE");
 
-  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 730);
-  EXPECT_EQ(int(outputLabel["^IMAGE"]), 731);
+  EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 733);
+  EXPECT_EQ(int(outputLabel["^IMAGE"]), 734);
 
   EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -3.0002289027926);
   EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.0000763009309);

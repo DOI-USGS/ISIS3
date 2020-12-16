@@ -37,8 +37,7 @@ namespace Isis{
       ProcessExportPds p;
 
       // Setup the input cube
-      CubeAttributeInput inputAtt;
-      p.SetInputCube(icube->fileName(), inputAtt);
+      p.SetInputCube(icube);
 
       if (ui.GetString("STRETCH") == "LINEAR") {
         if (ui.GetString("BITTYPE") != "32BIT") {
@@ -128,8 +127,7 @@ namespace Isis{
       // Setup the process and set the input cube
       ProcessExportPds4 process;
 
-      CubeAttributeInput att;
-      process.SetInputCube(icube->fileName(), att);
+      process.SetInputCube(icube);
 
       PvlObject *label= icube->label();
       if (!label->hasObject("IsisCube")) {
