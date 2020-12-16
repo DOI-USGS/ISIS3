@@ -27,7 +27,7 @@ namespace Isis{
       icube.setVirtualBands(inAtt.bands());
     }
     icube.open(ui.GetFileName("FROM"));
-    isis2pds(&icube, ui);
+    isis2pds(&icube, ui, log);
   }
 
   void isis2pds(Cube *icube, UserInterface &ui, Pvl *log) {
