@@ -176,79 +176,16 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNir) {
 TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisProj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/MVA_2B2_01_01229N603E1343_cropped", "to="+cubeFileName};
+  QVector<QString> args = {"from=data/kaguyami2isis/3C5_label.pvl", "to="+cubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
     kaguyami2isis(options);
+    FAIL() << "Should not have been able to ingest: " << args[0].toStdString().c_str() << std::endl;
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
+    EXPECT_THAT(e.what(), HasSubstr("Unsupported projected file"));
   }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  EXPECT_EQ(cube.sampleCount(), 962);
-  EXPECT_EQ(cube.lineCount(), 20);
-  EXPECT_EQ(cube.bandCount(), 2);
-
-  // Pixels group
-  EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
-  EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
-  EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["MissionName"][0].toStdString(), "SELENE");
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "KAGUYA");
-  EXPECT_EQ(inst["InstrumentName"][0].toStdString(), "Multiband Imager Visible");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "MI-VIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2008-01-18T03:39:08.172914");
-  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2008-01-18T03:39:20.639874");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "884662744.189");
-  EXPECT_EQ(inst["SpacecraftClockStopCount"][0].toStdString(), "884662756.656");
-  EXPECT_DOUBLE_EQ(inst["LineExposureDuration"], 5.3268);
-  EXPECT_EQ(inst["LineExposureDuration"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["LineSamplingInterval"], 13);
-  EXPECT_EQ(inst["LineSamplingInterval"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["CorrectedSamplingInterval"], 12.999959);
-  EXPECT_EQ(inst["CorrectedSamplingInterval"].unit(), "msec");
-
-  // Archive Group
-  PvlGroup &arch = isisLabel->findGroup("Archive", Pvl::Traverse);
-
-  EXPECT_EQ(arch["DataSetId"][0].toStdString(), "MI-VIS_Level2B");
-  EXPECT_EQ(arch["ProductSetId"][0].toStdString(), "MI-VIS_Level2B2");
-
-  // Bandbin Group
-  PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  std::istringstream bandBinStream(R"(
-  Group = BandBin
-    FilterName = (MV1, MV2, MV3, MV4, MV5)
-    Center     = (414.0, 749.0, 901.0, 950.0, 1001.0) <nm>
-    Width      = (20.0, 12.0, 21.0, 30.0, 42.0) <nm>
-    BaseBand   = MV5
-  End_Group
-  )");
-  PvlGroup bandBinTruth;
-  bandBinStream >> bandBinTruth;
-  AssertPvlGroupEqual("resultingBandBin", "truthBandBin", bandBin, bandBinTruth);
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kern["NaifCkCode"]), -131330);
-  EXPECT_EQ(int(kern["NaifFrameCode"]), -131332);
-
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_DOUBLE_EQ(hist->Average(), 1.5483986486486674);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 29791.190000000359);
-  EXPECT_EQ(hist->ValidPixels(), 19240);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 29.752051838770626);
 }
 
 TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNullRange) {
