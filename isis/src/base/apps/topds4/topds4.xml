@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="topds4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    dummy 
+  </brief>
+
+  <description>
+    dummy
+  </description>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeffrey Covington" date="2015-01-15">
+      Removed unreachable code.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+  	      This is the input cube that will be cropped.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TEMPLATE">
+        <fileMode>input</fileMode>
+        <brief>
+          Input template
+        </brief>
+        <description>
+          Input template
+        </description>
+        <filter>
+          *
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>file</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PDS4 label
+        </brief>
+        <description>
+          The.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>
