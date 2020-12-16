@@ -1,6 +1,3 @@
-#define GUIHELPERS
-
-#include "Isis.h"
 
 #include <sys/resource.h>
 
@@ -20,6 +17,7 @@
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "UserInterface.h"
+#include "Application.h"
 #include "IException.h"
 #include "iTime.h"
 
@@ -200,16 +198,10 @@ namespace Isis {
 
 
   void pointreg(UserInterface &ui, Pvl *appLog) {
-    ControlNet inNet(ui.GetFileName("CNET"));
-    pointreg(inNet, ui, appLog);
-  }
-
-  void pointreg(ControlNet inNet, UserInterface &ui, Pvl *appLog) {
     // Initialize variables
     ar = NULL;
     validator = NULL;
     cubeMgr = NULL;
-    files = NULL;
     falsePositives = NULL;
 
     ignored = 0;
@@ -266,6 +258,7 @@ namespace Isis {
     //  Allow for library files, etc
     unsigned int maxOpenFiles = limit.rlim_cur * .60;
 
+
     cubeMgr = new CubeManager;
     cubeMgr->SetNumOpenCubes(maxOpenFiles);
 
@@ -297,6 +290,7 @@ namespace Isis {
     // ControlNet containing the refined measurements
     int i = 0;
     while (i < outNet.GetNumPoints()) {
+
       progress.CheckStatus();
 
       ControlPoint * outPoint = outNet.GetPoint(i);
@@ -373,6 +367,9 @@ namespace Isis {
         "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
         "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
       os << Null << endl;
+
+      // Create a ControlNet from the original input file
+      ControlNet inNet(ui.GetFileName("CNET"));
 
       for (int i = 0; i < outNet.GetNumPoints(); i++) {
 
