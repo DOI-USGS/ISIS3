@@ -21,13 +21,13 @@ namespace Isis{
                          double &min, double &max, Pixtype ptype);
 
   void isis2pds(UserInterface &ui, Pvl *log){
-    Process p;
-
-    CubeAttributeInput cai;
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
-    isis2pds(icube, ui, log);
-
-    p.EndProcess();
+    Cube icube;
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      icube.setVirtualBands(inAtt.bands());
+    }
+    icube.open(ui.GetFileName("FROM"));
+    isis2pds(&icube, ui);
   }
 
   void isis2pds(Cube *icube, UserInterface &ui, Pvl *log) {
