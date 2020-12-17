@@ -190,6 +190,117 @@ namespace Isis {
     return cube;
   }
 
+
+  /**
+   * Opens an input cube specified by the programmer and verifies requirements
+   * are met.
+   *
+   * @param cube Programmer specified work file. For example
+   *
+   * @param att  The cube attributes to use when opening the input cube.
+   *
+   * @param requirements  Same as requirements on SetInputCube. See that method
+   *                      for more details. Defaults to 0
+   *
+   *
+   * @throws Isis::iException::Message
+   */
+  void Process::SetInputCube(Cube *cube, 
+                                    int requirements) {
+    // Test for same size or one in all dimensions
+    if(requirements & Isis::AllMatchOrOne) {
+      if(InputCubes.size() > 0) {
+        if(cube->lineCount() != 1) {
+          if(cube->lineCount() != InputCubes[0]->lineCount()) {
+            QString message = "The number of lines in the secondary input cubes must match";
+            message += " the primary input cube or be exactly one";
+            throw IException(IException::User, message, _FILEINFO_);
+          }
+        }
+
+        if(cube->sampleCount() != 1) {
+          if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
+            QString message = "The number of samples in the secondary input cubes must match";
+            message += " the primary input cube or be exactly one";
+            throw IException(IException::User, message, _FILEINFO_);
+          }
+        }
+        if(cube->bandCount() != 1) {
+          if(cube->bandCount() != InputCubes[0]->bandCount()) {
+            QString message = "The number of bands in the secondary input cubes must match";
+            message += " the primary input cube or be exactly one";
+            throw IException(IException::User, message, _FILEINFO_);
+          }
+        }
+
+        // Do not do a spatial match if this flag was set
+        requirements = requirements & !Isis::SpatialMatch;
+      }
+    }
+
+    // Test for size match if requested
+    if(requirements & Isis::SizeMatch) {
+      if(InputCubes.size() > 0) {
+        if(cube->lineCount() != InputCubes[0]->lineCount()) {
+          QString message = "The number of lines in the input cubes must match";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+        if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
+          QString message = "The number of samples in the input cubes must match";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+        if(cube->bandCount() != InputCubes[0]->bandCount()) {
+          QString message = "The number of bands in the input cubes must match";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+      }
+    }
+
+    // Test for spatial match if requested
+    if(requirements & Isis::SpatialMatch) {
+      if(InputCubes.size() > 0) {
+        if(cube->lineCount() != InputCubes[0]->lineCount()) {
+          QString message = "The number of lines in the input cubes must match";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+        if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
+          QString message = "The number of samples in the input cubes must match";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+      }
+    }
+
+    // Test for one band
+    if(requirements & Isis::OneBand) {
+      if(cube->bandCount() != 1) {
+        QString message = "Input cube [" + cube->fileName() + "] must have one band";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+    }
+
+    // Test for same bands or one band
+    if(requirements & Isis::BandMatchOrOne) {
+      if(cube->bandCount() != 1) {
+        if(InputCubes.size() > 0) {
+          if(cube->bandCount() != InputCubes[0]->bandCount()) {
+            QString message = "The number of bands in the secondary input cubes must match";
+            message += " the primary input cube or be exactly one";
+            throw IException(IException::User, message, _FILEINFO_);
+          }
+        }
+      }
+    }
+
+    if(cube != NULL && cube->isOpen()) {
+      AddInputCube(cube, false);
+    }
+    else {
+      QString message = "Input cube does not exist";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+  }
+
+
   /**
    * Set the InputCube vector to an opened Cube which was dynamically allocated.
    * This is used if there already exists a valid opened cube
