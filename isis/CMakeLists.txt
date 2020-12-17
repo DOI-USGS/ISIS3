@@ -293,6 +293,7 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+find_package(Inja              REQUIRED)
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
