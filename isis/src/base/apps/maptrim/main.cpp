@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include "Pvl.h"
-#include "maptrim.h" # replace with your new header
+#include "maptrim.h" 
 
 using namespace Isis;
 
