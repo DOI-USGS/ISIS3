@@ -4,9 +4,9 @@
 #include "UserInterface.h"
 
 namespace Isis{
-    void CamInfo(UserInterface &ui);
+    void caminfo(UserInterface &ui);
 
-    void CamInfo(Cube incube, UserInterface &ui);
+    void caminfo(Cube *incube, UserInterface &ui);
 }
 
 #endif

@@ -1,9 +1,8 @@
-#include "Isis.h"
-
 #include <cstdio>
 #include <QString>
 #include <iostream>
 
+#include "Application.h"
 #include "CameraStatistics.h"
 #include "CamTools.h"
 #include "FileName.h"
@@ -20,11 +19,14 @@
 #include "Pvl.h"
 #include "SerialNumber.h"
 #include "Statistics.h"
+#include "UserInterface.h"
 
 #include <QList>
 #include <QPair>
 
 #include "caminfo.h"
+
+using namespace std;
 
 namespace Isis{
     QPair<QString, QString> MakePair(QString key, QString val);
@@ -140,7 +142,7 @@ namespace Isis{
       const QString delim = ",";
 
       // Output the result
-      std::fstream outFile;
+      fstream outFile;
       QString sOutFile = ui.GetAsString("TO");
       bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
       if(appending)
@@ -190,8 +192,23 @@ namespace Isis{
       outFile.close();
     }
 
+    void caminfo(UserInterface &ui){
+        Cube *cubeFile = new Cube();
+        CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+        if (inAtt.bands().size() != 0) {
+            cubeFile->setVirtualBands(inAtt.bands());
+        }
+        cubeFile->open(ui.GetFileName("FROM"), "r");
 
-    void CamInfo(UserInterface &ui){
+        caminfo(cubeFile, ui);
+        // use ui to getfile, open as cube, then pass cube into there in the other
+        // put all that other stuff into this one
+        // like stretch
+
+        // set input cube as cube pointer directly
+    }
+
+    void caminfo(Cube *incube, UserInterface &ui){
         const QString caminfo_program  = "caminfo";
 
         QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
@@ -206,12 +223,18 @@ namespace Isis{
         // if true then run spiceinit, xml default is FALSE
         // spiceinit will use system kernels
         if(ui.GetBoolean("SPICE")) {
+          // close cube, run spiceinit, open cube
+          QString cubeName = incube->fileName();
+          CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+          incube->close();
           QString parameters = "FROM=" + in.expanded();
           ProgramLauncher::RunIsisProgram("spiceinit", parameters);
-        }
+          if (inAtt.bands().size() != 0) {
+              incube->setVirtualBands(inAtt.bands());
+          }
+          incube->open(cubeName, "r");
 
-        Process p;
-        Cube *incube = p.SetInputCube("FROM");
+        }
 
         if (incube->hasGroup("Mapping")) {
           QString msg = "Caminfo expects a level 1 input cube. For more information, see:\n"
@@ -438,9 +461,5 @@ namespace Isis{
           delete bandGeom;
           bandGeom = NULL;
         }
-    }
-
-    void CamInfo(Cube incube, UserInterface &ui){
-
     }
 }
