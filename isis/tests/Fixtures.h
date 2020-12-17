@@ -101,6 +101,7 @@ namespace Isis {
     protected:
 
       ControlNet *network;
+      QString networkFile;
 
       Cube *cube1;
       Cube *cube2;
