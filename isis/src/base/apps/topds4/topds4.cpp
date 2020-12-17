@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <inja.h>
+#include <inja.hpp>
 
 #include "topds4.h"
 
