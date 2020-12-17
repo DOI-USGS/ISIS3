@@ -96,7 +96,6 @@ TEST_F(LineScannerCube, FunctionalTestsCamDevDefault) {
     stddev += oCubeStats->StandardDeviation();
   }
   
-  std::cout << average << " " << sum << " " << stddev << " " << validPixels << std::endl;
   EXPECT_NEAR(average/oCube.bandCount(), -3.3918738393628582e+306, 0.0000001); 
   EXPECT_NEAR(sum/oCube.bandCount(), 112847425994.19986, 0.0000001);
   EXPECT_NEAR(stddev/oCube.bandCount(),-3.3918738393628582e+306, 0.0000001);
