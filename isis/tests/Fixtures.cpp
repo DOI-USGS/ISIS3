@@ -312,21 +312,6 @@ namespace Isis {
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
 
-    // Populate cubes
-    LineManager line(*cube1);
-    double pixelValue = 0.0;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = pixelValue++;
-      }
-      cube1->write(line);
-      cube2->write(line);
-      cube3->write(line);
-    }
-    cube1->reopen("rw");
-    cube2->reopen("rw");
-    cube3->reopen("rw");
-
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
     cubeList->append(cube2->fileName());
