@@ -25,7 +25,7 @@ TEST_F(LineScannerCube, FunctionalTestsCamDevDefault) {
   
   testCube->reopen("r");
 
-  QString outCubeFileName = "/tmp/outTEMP.cub";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
 
   QVector<QString> args = {"to="+outCubeFileName, 
   	"dn=yes",
