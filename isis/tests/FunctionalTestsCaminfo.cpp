@@ -56,20 +56,33 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault1) {
 
     Pvl pvlobject = Pvl(outCubeFileName);
 
-    if (pvlobject.hasKeyword("Camstats"))
-    {
-            PvlGroup group = pvlobject.findGroup("Camstats");
-            EXPECT_NEAR(group.findKeyword("MinimumLatitude"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MaximumLatitude"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MinimumLongitude"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MaximumLongitude"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MinimumPhase"), 10000, 0.000001 );
-            EXPECT_NEAR(group.findKeyword("MaximumPhase"), 10000, 0.000001 );
-    }
+    EXPECT_TRUE(pvlobject.hasKeyword("Camstats"));
+    PvlGroup group = pvlobject.findGroup("Camstats");
 
-    PvlGroup group = pvlobject.findGroup("");
+    EXPECT_NEAR(group.findKeyword("MinimumLatitude"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumLatitude"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MinimumLongitude"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumLongitude"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MinimumPhase"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumPhase"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MinimumEmission"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumEmission"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MinimumIncidence"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("MaximumIncidence"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("LocalTimeMinimum"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("LocalTimeMaximum"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("ObliqueResolutionMinimum"), 10000, 0.000001 );
+    EXPECT_NEAR(group.findKeyword("ObliqueResolutionMaximum"), 10000, 0.000001 );
+
+    EXPECT_TRUE(pvlobject.hasKeyword("IsisLabel"));
+    EXPECT_TRUE(pvlobject.hasKeyword("Parameters"));
+    EXPECT_TRUE(pvlobject.hasKeyword("OriginalLabel"));
+
+    EXPECT_TRUE(pvlobject.hasKeyword("Statistics"));
+    group = pvlobject.findGroup("Statistics");
+    
 
 
 
