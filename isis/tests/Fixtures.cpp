@@ -321,7 +321,6 @@ namespace Isis {
       }
       cube1->write(line);
     }
-    cube1->reopen("rw");
 
     for(line2.begin(); !line2.end(); line2++) {
       for(int i = 0; i < line.size(); i++) {
@@ -330,7 +329,6 @@ namespace Isis {
       }
       cube2->write(line2);
     }
-    cube2->reopen("rw");
 
     for(line3.begin(); !line3.end(); line3++) {
       for(int i = 0; i < line3.size(); i++) {
@@ -339,6 +337,9 @@ namespace Isis {
       }
       cube3->write(line3);
     }
+
+    cube1->reopen("rw");
+    cube2->reopen("rw");
     cube3->reopen("rw");
 
     cubeList = new FileList();
