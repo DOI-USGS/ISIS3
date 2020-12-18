@@ -32,8 +32,9 @@ TEST_F(DefaultCube, FunctionalTestMapTrimDefault){
                             "maxlon=6"
                           };
   UserInterface options(APP_XML, args);
+  Pvl appLog;
   try{
-    maptrim(options);
+    maptrim(options, &appLog);
   }
   catch (IException &e){
     FAIL() << "Unable to open image: " << e.what() << std::endl;
@@ -130,6 +131,8 @@ TEST_F(DefaultCube, FunctionalTestMapTrimDefault){
   EXPECT_EQ(hist->Sum(), 1170);
   EXPECT_EQ(hist->ValidPixels(), 9);
   EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 80.367904041352233);
+
+  EXPECT_TRUE(appLog.hasGroup("Mapping"));
 }
 
 
