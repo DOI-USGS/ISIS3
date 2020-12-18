@@ -16,12 +16,12 @@
 using namespace std;
 namespace Isis{
 
-  void trim(Buffer &in, Buffer &out);
-  void getSize(Buffer &in);
+  static void trim(Buffer &in, Buffer &out);
+  static void getSize(Buffer &in);
 
-  double slat, elat, slon, elon;
-  int smallestLine, biggestLine, smallestSample, biggestSample;
-  TProjection *proj;
+  static double slat, elat, slon, elon;
+  static int smallestLine, biggestLine, smallestSample, biggestSample;
+  static TProjection *proj;
 
   void maptrim(UserInterface &ui, Pvl *log) {
     // Get the projection
