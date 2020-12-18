@@ -225,6 +225,7 @@ namespace Isis {
       }
       projTestCube->write(line);
     }
+    projTestCube->reopen("rw");
   }
 
 
