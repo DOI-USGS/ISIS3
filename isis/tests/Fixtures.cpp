@@ -295,7 +295,6 @@ namespace Isis {
               {30, 0}};
     poly.Create(coords);
     cube1->write(poly);
-    cube1->reopen("rw");
 
     cube2 = new Cube();
     cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
@@ -307,10 +306,40 @@ namespace Isis {
               {31, 1}};
     poly.Create(coords);
     cube2->write(poly);
-    cube2->reopen("rw");
 
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
+
+    LineManager line(*cube1);
+    LineManager line2(*cube2);
+    LineManager line3(*cube3);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube1->write(line);
+    }
+    cube1->reopen("rw");
+
+    for(line2.begin(); !line2.end(); line2++) {
+      for(int i = 0; i < line.size(); i++) {
+        line2[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube2->write(line2);
+    }
+    cube2->reopen("rw");
+
+    for(line3.begin(); !line3.end(); line3++) {
+      for(int i = 0; i < line3.size(); i++) {
+        line3[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube3->write(line3);
+    }
+    cube3->reopen("rw");
 
     cubeList = new FileList();
     cubeList->append(cube1->fileName());

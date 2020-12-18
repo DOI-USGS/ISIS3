@@ -35,7 +35,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregDefault) {
   PvlGroup points = log.findGroup("Points");
   PvlGroup measures = log.findGroup("Measures");
   EXPECT_EQ(int(points["Total"]), 16);
-  EXPECT_EQ(int(measures["Registered"]), 24);
+  EXPECT_EQ(int(measures["Registered"]), 3);
   
   // Check flatFile
   QFile flatFile(flatFilePath);
@@ -73,8 +73,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregFailOptions) {
   // Check app log
   PvlGroup points = log.findGroup("Points");
   PvlGroup measures = log.findGroup("Measures");
-  EXPECT_EQ(int(points["Total"]), 15);
-  EXPECT_EQ(int(measures["Registered"]), 24);
+  EXPECT_EQ(int(points["Total"]), 3);
+  EXPECT_EQ(int(measures["Registered"]), 3);
   
   // Check flatFile
   QFile flatFile(flatFilePath);
@@ -82,8 +82,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregFailOptions) {
 
   // Check output control network
   ControlNet outNet(outNetPath);
-  EXPECT_EQ(int(outNet.GetNumPoints()), 15);
-  EXPECT_EQ(int(outNet.GetNumMeasures()), 39);
+  EXPECT_EQ(int(outNet.GetNumPoints()), 3);
+  EXPECT_EQ(int(outNet.GetNumMeasures()), 6);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsA) {
@@ -153,8 +153,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsB) {
   PvlGroup measures = log.findGroup("Measures");
   PvlGroup surface= log.findGroup("SurfaceModelFailures");
   EXPECT_EQ(int(points["Total"]), 16);
-  EXPECT_EQ(int(measures["Registered"]), 24);
-  EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 1);
+  EXPECT_EQ(int(measures["Registered"]), 3);
+  EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 15);
   
   // Check flatFile
   QFile flatFile(flatFilePath);
@@ -163,7 +163,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsB) {
   // Check output control network
   ControlNet outNet(outNetPath);
   EXPECT_EQ(int(outNet.GetNumPoints()), 16);
-  EXPECT_EQ(int(outNet.GetNumMeasures()), 40);
+  EXPECT_EQ(int(outNet.GetNumMeasures()), 19);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsC) {
@@ -192,9 +192,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsC) {
   PvlGroup points = log.findGroup("Points");
   PvlGroup measures = log.findGroup("Measures");
   PvlGroup surface= log.findGroup("SurfaceModelFailures");
-  EXPECT_EQ(int(points["Total"]), 15);
-  EXPECT_EQ(int(measures["Registered"]), 24);
-  EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 1);
+  EXPECT_EQ(int(points["Total"]), 3);
+  EXPECT_EQ(int(measures["Registered"]), 3);
+  EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 15);
   
   // Check flatFile
   QFile flatFile(flatFilePath);
@@ -202,8 +202,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsC) {
 
   // Check output control network
   ControlNet outNet(outNetPath);
-  EXPECT_EQ(int(outNet.GetNumPoints()), 15);
-  EXPECT_EQ(int(outNet.GetNumMeasures()), 39);
+  EXPECT_EQ(int(outNet.GetNumPoints()), 3);
+  EXPECT_EQ(int(outNet.GetNumMeasures()), 9);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestPointregRegisterOptionsIgnored) {
@@ -261,8 +261,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregRegisterOptionsValid) {
   PvlGroup points = log.findGroup("Points");
   PvlGroup measures = log.findGroup("Measures");
 
-  EXPECT_EQ(int(points["Total"]), 15);
-  EXPECT_EQ(int(measures["Registered"]), 24);
+  EXPECT_EQ(int(points["Total"]), 3);
+  EXPECT_EQ(int(measures["Registered"]), 3);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestPointregValidation) {
@@ -297,10 +297,10 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregValidation) {
   PvlGroup valid = log.findGroup("ValidationStatistics");
 
   EXPECT_EQ(int(points["Total"]), 16);
-  EXPECT_EQ(int(measures["Registered"]), 24);
-  EXPECT_EQ(int(valid["Total"]), 24);
+  EXPECT_EQ(int(measures["Registered"]), 3);
+  EXPECT_EQ(int(valid["Total"]), 3);
   
-  QFile falsePos(falsePosPath);  // Should be populated
+  QFile falsePos(falsePosPath);  // Should be empty
 
   EXPECT_TRUE(falsePos.size() > 140);  // 140 is the size of the empty table due to column names
 }
