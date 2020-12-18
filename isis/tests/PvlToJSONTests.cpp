@@ -58,7 +58,6 @@ TEST(PvlToJSONTest, KeywordUnitConversion) {
   json testJson2 = pvlKeywordToJSON(testKey2);
   json testJson3 = pvlKeywordToJSON(testKey3);
 
-
   EXPECT_EQ(testJson1["Units"], testKey1.unit(0).toStdString());
   EXPECT_EQ(testJson2["Units"][0], testKey2.unit(0).toStdString());
   EXPECT_EQ(testJson2["Units"][1], testKey2.unit(1).toStdString());
@@ -78,6 +77,22 @@ TEST(PvlToJSONTest, GroupConversion) {
 
   EXPECT_TRUE(testJson.contains(testKey1.name().toStdString()));
   EXPECT_TRUE(testJson.contains(testKey2.name().toStdString()));
+}
+
+
+TEST(PvlToJSONTest, GroupRepeatedKeysConversion) {
+  PvlKeyword testKey1("TestKey2", "1");
+  PvlKeyword testKey2(testKey1.name(), "2");
+  PvlGroup testGroup("TestGroup");
+  testGroup += testKey1;
+  testGroup += testKey2;
+
+  json testJson = pvlGroupToJSON(testGroup);
+
+  EXPECT_TRUE(testJson.contains(testKey2.name().toStdString()));
+  EXPECT_EQ(testJson[testKey1.name().toStdString()].size(), 2);
+  EXPECT_EQ(testJson[testKey1.name().toStdString()][0]["Value"], testKey1[0].toStdString());
+  EXPECT_EQ(testJson[testKey2.name().toStdString()][1]["Value"], testKey2[0].toStdString());
 }
 
 
@@ -118,7 +133,7 @@ TEST(PvlToJSONTest, ObjectConversion) {
 }
 
 
-TEST(PvlToJSONTest, NestedObjectConversion) {
+TEST(PvlToJSONTest, ObjectNestedConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   PvlKeyword testKey3("TestKey3", "hello world");
@@ -135,6 +150,26 @@ TEST(PvlToJSONTest, NestedObjectConversion) {
   EXPECT_TRUE(testJson.contains(testObject1.name().toStdString()));
   EXPECT_TRUE(testJson[testObject1.name().toStdString()].contains(testKey1.name().toStdString()));
   EXPECT_TRUE(testJson[testObject1.name().toStdString()].contains(testKey2.name().toStdString()));
+}
+
+
+TEST(PvlToJSONTest, ObjectRepeatedConversion) {
+  PvlKeyword testKey1("TestKey1", "A");
+  PvlKeyword testKey2("TestKey2", "1");
+  PvlGroup testGroup(testKey1.name());
+  testGroup += testKey2;
+  PvlObject testObject("TestObject");
+  testObject += testGroup;
+  testObject += testKey1;
+  testObject += testKey2;
+
+  json testJson = pvlObjectToJSON(testObject);
+
+  EXPECT_TRUE(testJson.contains(testKey1.name().toStdString()));
+  EXPECT_TRUE(testJson.contains(testKey2.name().toStdString()));
+  EXPECT_EQ(testJson[testKey1.name().toStdString()].size(), 2);
+  EXPECT_TRUE(testJson[testKey1.name().toStdString()][0].contains("Value"));
+  EXPECT_TRUE(testJson[testKey1.name().toStdString()][1].contains(testKey2.name().toStdString()));
 }
 
 
@@ -177,23 +212,4 @@ TEST(PvlToJSONTest, PvlConversion) {
   EXPECT_TRUE(testJson.contains(testGroup.name().toStdString()));
   EXPECT_TRUE(testJson.contains(testObject.name().toStdString()));
   EXPECT_TRUE(testJson.contains(testKey4.name().toStdString()));
-}
-
-
-TEST(PvlToJSONTest, PvlVCommentConversion) {
-  Pvl testPvl1;
-  testPvl1.addComment("Test comment");
-  Pvl testPvl2;
-  testPvl2.addComment("First Comment");
-  testPvl2.addComment("Second Comment");
-  Pvl testPvl3;
-
-  json testJson1 = pvlToJSON(testPvl1);
-  json testJson2 = pvlToJSON(testPvl2);
-  json testJson3 = pvlToJSON(testPvl3);
-
-  EXPECT_EQ(testJson1["Comment"], testPvl1.comment(0).toStdString());
-  EXPECT_EQ(testJson2["Comment"][0], testPvl2.comment(0).toStdString());
-  EXPECT_EQ(testJson2["Comment"][1], testPvl2.comment(1).toStdString());
-  EXPECT_FALSE(testJson3.contains("Comment"));
 }
