@@ -4,7 +4,7 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "PvlToJSONConverter.h"
+#include "PvlToJSON.h"
 
 #include <nlohmann/json.hpp>
 

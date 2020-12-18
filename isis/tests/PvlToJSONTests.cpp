@@ -1,6 +1,6 @@
 #include <nlohmann/json.hpp>
 
-#include "PvlToJSONConverter.h"
+#include "PvlToJSON.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -12,7 +12,7 @@ using json = nlohmann::json;
 using namespace Isis;
 
 
-TEST(PvlToJSONConverterTest, KeywordConversion) {
+TEST(PvlToJSONTest, KeywordConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   testKey2 += "2";
@@ -26,7 +26,7 @@ TEST(PvlToJSONConverterTest, KeywordConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, KeywordCommentConversion) {
+TEST(PvlToJSONTest, KeywordCommentConversion) {
   PvlKeyword testKey1("TestKey1", "This keyword has 1 comment");
   testKey1.addComment("Test comment");
   PvlKeyword testKey2("TestKey2", "This keyword has multiple comments");
@@ -45,7 +45,7 @@ TEST(PvlToJSONConverterTest, KeywordCommentConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, KeywordUnitConversion) {
+TEST(PvlToJSONTest, KeywordUnitConversion) {
   PvlKeyword testKey1("TestKey1", "1", "m");
   PvlKeyword testKey2("TestKey2", "2", "m");
   testKey2.addValue("Hello World");
@@ -67,7 +67,7 @@ TEST(PvlToJSONConverterTest, KeywordUnitConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, GroupConversion) {
+TEST(PvlToJSONTest, GroupConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   PvlGroup testGroup("TestGroup");
@@ -81,7 +81,7 @@ TEST(PvlToJSONConverterTest, GroupConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, GroupCommentConversion) {
+TEST(PvlToJSONTest, GroupCommentConversion) {
   PvlGroup testGroup1("TestGroup1");
   testGroup1.addComment("Test comment");
   PvlGroup testGroup2("TestGroup2");
@@ -100,7 +100,7 @@ TEST(PvlToJSONConverterTest, GroupCommentConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, ObjectConversion) {
+TEST(PvlToJSONTest, ObjectConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   PvlKeyword testKey3("TestKey3", "hello world");
@@ -118,7 +118,7 @@ TEST(PvlToJSONConverterTest, ObjectConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, NestedObjectConversion) {
+TEST(PvlToJSONTest, NestedObjectConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   PvlKeyword testKey3("TestKey3", "hello world");
@@ -138,7 +138,7 @@ TEST(PvlToJSONConverterTest, NestedObjectConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, ObjectCommentConversion) {
+TEST(PvlToJSONTest, ObjectCommentConversion) {
   PvlObject testObject1("TestObject1");
   testObject1.addComment("Test comment");
   PvlObject testObject2("TestObject2");
@@ -157,7 +157,7 @@ TEST(PvlToJSONConverterTest, ObjectCommentConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, PvlConversion) {
+TEST(PvlToJSONTest, PvlConversion) {
   PvlKeyword testKey1("TestKey1", "A");
   PvlKeyword testKey2("TestKey2", "1");
   PvlKeyword testKey3("TestKey3", "hello world");
@@ -180,7 +180,7 @@ TEST(PvlToJSONConverterTest, PvlConversion) {
 }
 
 
-TEST(PvlToJSONConverterTest, PvlVCommentConversion) {
+TEST(PvlToJSONTest, PvlVCommentConversion) {
   Pvl testPvl1;
   testPvl1.addComment("Test comment");
   Pvl testPvl2;
