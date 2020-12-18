@@ -1,6 +1,10 @@
 #include <QTextStream>
 
+#include "CubeAttribute.h"
+#include "FileName.h"
+
 #include "Fixtures.h"
+#include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
 #include "ControlNet.h"
@@ -277,6 +281,10 @@ namespace Isis {
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
     FileName labelPath3("data/threeImageNetwork/cube3.pvl");
 
+    FileName mappedLabelPath1("data/threeImageNetwork/cube1map.pvl");
+    FileName mappedLabelPath2("data/threeImageNetwork/cube2map.pvl");
+    FileName mappedLabelPath3("data/threeImageNetwork/cube3map.pvl");
+
     isdPath1 = new FileName("data/threeImageNetwork/cube1.isd");
     isdPath2 = new FileName("data/threeImageNetwork/cube2.isd");
     isdPath3 = new FileName("data/threeImageNetwork/cube3.isd");
@@ -345,6 +353,9 @@ namespace Isis {
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
     cubeList->append(cube2->fileName());
+
+    twoCubeListFile = tempDir.path() + "/2cubes.lis";
+    cubeList->write(twoCubeListFile);
     cubeList->append(cube3->fileName());
 
     cubeListFile = tempDir.path() + "/cubes.lis";
@@ -357,6 +368,14 @@ namespace Isis {
   }
 
 
+    cube1map = new Cube();
+    cube2map = new Cube();
+    cube3map = new Cube();
+    cube1map->fromIsd(tempDir.path() + "/cube1map.cub", mappedLabelPath1, *isdPath1, "rw");
+    cube2map->fromIsd(tempDir.path() + "/cube2map.cub", mappedLabelPath2, *isdPath2, "rw");
+    cube3map->fromIsd(tempDir.path() + "/cube3map.cub", mappedLabelPath3, *isdPath3, "rw");
+  }
+
   void ThreeImageNetwork::TearDown() {
     delete cubeList;
     delete network;
@@ -364,6 +383,10 @@ namespace Isis {
     delete cube1;
     delete cube2;
     delete cube3;
+
+    delete cube1map;
+    delete cube2map;
+    delete cube3map;
 
     delete isdPath1;
     delete isdPath2;

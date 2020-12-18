@@ -1,0 +1,143 @@
+PDS_VERSION_ID                 = PDS3
+LABEL_REVISION_NOTE            = "2006-12-20 D. Humm (APL) v0;
+                                  2007-01-02 D. Humm, version 1
+                                  based on FFC data modified by
+                                  S. Murchie and recalculated by
+                                  S. Pelkey;
+                                  2007-05-21 D. Humm v2, based on
+                                  v1 production-like IR TRDR" 
+
+/*( NOTE: Comments in this label that are delimited with parentheses,     )*/
+/*( for example:                                                          )*/
+        /*( comment )*/
+/*( are notes to the data provider. These comments should be removed      )*/
+/*( from the final label.  Comments without parentheses, for example:     )*/
+        /* comment */
+/*( are intended to be part of the final label.                           )*/
+
+/* Level 4 CDR (Calibration Data Record) Identification */
+
+DATA_SET_ID                    = "MRO-M-CRISM-4/6-CDR-V1.0"
+PRODUCT_ID                     = "CDR410000000000_AT0300020L_2"
+
+                               /*( CDR4Ptttttttttt_pprbeeewsn_v           )*/
+                               /*( P = partition of sclk time             )*/
+                               /*( tttttttttt = s/c start or mean time    )*/
+                               /*( pp = calib. type from SIS table 2-8    )*/
+                               /*( r = frame rate identifier, 0-4         )*/
+                               /*( b = binning identifier, 0-3            )*/
+                               /*( eee = exposure time parameter, 0-480   )*/
+                               /*( w = wavelength filter, 0-3             )*/
+                               /*( s = side: 1 or 2, or 0 if N/A          )*/
+                               /*( n = sensor ID: S, L, or J              )*/
+                               /*( v = version                            )*/
+
+PRODUCT_TYPE                   = CDR
+SPACECRAFT_ID                  = MRO
+INSTRUMENT_ID                  = CRISM
+START_TIME                     = 1980-01-01T00:00:00
+STOP_TIME                      = NULL
+SPACECRAFT_CLOCK_START_COUNT   = "1/0000000000" 
+SPACECRAFT_CLOCK_STOP_COUNT    = NULL 
+OBSERVATION_TIME               = NULL
+PRODUCT_CREATION_TIME          = 2007-05-21T22:06:00
+
+OBSERVATION_TYPE               = NULL 
+OBSERVATION_ID                 = NULL 
+MRO:OBSERVATION_NUMBER         = NULL 
+MRO:ACTIVITY_ID                = NULL 
+SOURCE_PRODUCT_ID              = NULL
+MRO:SENSOR_ID                  = "L" 
+PRODUCT_VERSION_ID             = "2" 
+
+/* CDR Instrument and Observation Parameters */
+
+SAMPLING_MODE_ID               = "MULTISPEC" 
+MRO:WAVELENGTH_FILE_NAME       = "CDR410803692813_WA0300020L_3.IMG"
+MRO:DETECTOR_TEMPERATURE       = NULL 
+MRO:OPTICAL_BENCH_TEMPERATURE  = NULL 
+MRO:SPECTROMETER_HOUSING_TEMP  = NULL 
+MRO:SPHERE_TEMPERATURE         = NULL 
+MRO:FPE_TEMPERATURE            = NULL 
+SHUTTER_MODE_ID                = "OPEN" 
+LIGHT_SOURCE_NAME              = "NONE" 
+MRO:CALIBRATION_LAMP_STATUS    = "OFF" 
+MRO:CALIBRATION_LAMP_LEVEL     = 0 
+MRO:FRAME_RATE                 = NULL
+PIXEL_AVERAGING_WIDTH          = 10  /*( pixel bin size, across track )    */
+MRO:EXPOSURE_PARAMETER         = NULL
+MRO:WAVELENGTH_FILTER          = "2" 
+
+/* This Level 4 CDR label describes one calibration data file. The file   */
+/* is a mutiple-band, multiple-frame image file derived from ground data. */
+/* It consists of a binary image followed by a list of row numbers        */
+/* corresponding to the wavelength filter.                                */
+
+/* The AT or atmospheric transmission CDR was calculated by Shannon       */
+/* Pelkey of Brown University from CRISM observations of Olympus Mons.    */
+
+/* This file is used within CAT to estimate the amount of gas             */
+/* transmission in CRISM data, and remove it as a multiplicative factor.  */
+/* Data in this file were derived from file MSW000032DC_01_IF254L_TRRQ.IMG*/
+/* created by Dave Humm as a special version of TRR1 processing           */
+/* of the Olympus Mons CRISM scan acquired on day 2006-331.  Over areas   */
+/* spatially-uniform in the cross-track direction, we calculated a median */
+/* of 38 lines of data from top of volcano (21.1 km elevation) and a      */
+/* median of 26 lines from  base of volcano (-2.2 km elevation). Sample   */
+/* by sample, the high elevation data were scaled to match low elevation  */
+/* data at 2.2435 microns. The low elevation data were then divided by    */
+/* the high elevation data to get the transmission spectrum in this file, */
+/* which has been binned and/or spectrally subsampled as necessary.       */
+
+/* Description of CDR IMAGE file */
+
+OBJECT                         = FILE
+  ^IMAGE                       = "CDR410000000000_AT0300020L_2.IMG"
+
+  /* offset is in file records, which is just (imgbands*imglines) + 1 */
+  ^ROWNUM_TABLE = ("CDR410000000000_AT0300020L_2.IMG", 71 )
+
+  RECORD_TYPE   = FIXED_LENGTH 
+  RECORD_BYTES =  256 /* one row now, not one frame to save space in table */
+  FILE_RECORDS =  71  /* compute by ROUND ((imgbands * imglines *          */
+                      /*                    line_samples * samplebits/8 +  */
+                      /*                    tablerows * tablerowbytes) /   */
+                      /*                    record_bytes + 0.5 )           */
+  OBJECT                       = IMAGE
+    LINES                      = 1
+    LINE_SAMPLES               =  64
+    SAMPLE_TYPE                = PC_REAL
+    SAMPLE_BITS                = 32
+    BANDS                      =  70
+    BAND_NAME                  = NULL
+    BAND_STORAGE_TYPE          = LINE_INTERLEAVED
+    DESCRIPTION                = "Atmospheric transmission"
+  END_OBJECT                   = IMAGE
+
+  /* be sure to pad this object to a full record (2560/bin bytes here)      */
+  OBJECT = ROWNUM_TABLE 
+    NAME               = "SELECTED ROWS FROM DETECTOR" 
+    INTERCHANGE_FORMAT = "BINARY" 
+    ROWS               =  70
+    COLUMNS            = 1
+    ROW_BYTES          = 2
+    DESCRIPTION   = "The detector is subsampled in the spectral direction
+                     by selecting specific rows to be downlinked.  This
+                     table provides a list of the rows selected for all
+                     frames in this multidimensional image cube."
+
+    OBJECT = COLUMN
+      NAME          = DETECTOR_ROW_NUMBER
+      DATA_TYPE     = MSB_UNSIGNED_INTEGER
+      BIT_MASK      = 2#0000000111111111#
+      START_BYTE    = 1
+      BYTES         = 2
+      DESCRIPTION   = "Detector row number from which the data was taken."
+    END_OBJECT = COLUMN
+
+  END_OBJECT = ROWNUM_TABLE
+
+END_OBJECT                     = FILE
+
+END
+

@@ -107,6 +107,10 @@ namespace Isis {
       Cube *cube2;
       Cube *cube3;
 
+      Cube *cube1map;
+      Cube *cube2map;
+      Cube *cube3map;
+
       FileName *isdPath1;
       FileName *isdPath2;
       FileName *isdPath3;
@@ -116,10 +120,12 @@ namespace Isis {
 
       FileList *cubeList;
       QString cubeListFile;
+      QString twoCubeListFile;
 
       std::vector<std::vector<double>> coords;
 
       void SetUp() override;
+      void AddFeatures();
       void TearDown() override;
   };
 
