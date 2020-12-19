@@ -1,5 +1,5 @@
-#ifndef std2isis_h 
-#define std2isis_h
+#ifndef bandnorm_h 
+#define bandnorm_h
 
 #include "UserInterface.h"
 #include "Cube.h"

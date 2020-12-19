@@ -49,10 +49,10 @@ TEST_F(DefaultCube, FunctionalTestAutomosDefault) {
 
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
 
-  EXPECT_NEAR(oCubeStats->Average(),           -1.7976931348623149e+308,    0.001);
-  EXPECT_NEAR(oCubeStats->Sum(),               0,  0.000001);
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       0,     0.000001);
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), -1.7976931348623149e+308, 0.001);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 123.5);
+  EXPECT_EQ(oCubeStats->Sum(), 4446);
+  EXPECT_EQ(oCubeStats->ValidPixels(), 36);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 79.757668686375951);
 }
 
 
@@ -135,10 +135,10 @@ TEST_F(DefaultCube, FunctionalTestAutomosPriority) {
 
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
 
-  EXPECT_NEAR(oCubeStats->Average(),           -1.7976931348623149e+308,    0.001);
-  EXPECT_NEAR(oCubeStats->Sum(),               0,  0.000001);
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       0,     0.000001);
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), -1.7976931348623149e+308, 0.001);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 123.5);
+  EXPECT_EQ(oCubeStats->Sum(), 4446);
+  EXPECT_EQ(oCubeStats->ValidPixels(), 36);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 79.757668686375951);
 }
 
 
@@ -179,8 +179,8 @@ TEST_F(DefaultCube, FunctionalTestAutomosBandSelect) {
 
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
 
-  EXPECT_NEAR(oCubeStats->Average(),           -1.7976931348623149e+308,    0.001);
-  EXPECT_NEAR(oCubeStats->Sum(),               0,  0.000001);
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       0,     0.000001);
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), -1.7976931348623149e+308, 0.001);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 123.5);
+  EXPECT_EQ(oCubeStats->Sum(), 4446);
+  EXPECT_EQ(oCubeStats->ValidPixels(), 36);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 79.757668686375951);
 }
