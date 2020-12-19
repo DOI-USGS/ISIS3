@@ -365,8 +365,6 @@ namespace Isis {
 
     network = new ControlNet();
     network->ReadControl(networkFile);
-  }
-
 
     cube1map = new Cube();
     cube2map = new Cube();
