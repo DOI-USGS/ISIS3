@@ -15,6 +15,5 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   cam2cam(ui);
-//  Application::Log(results);
 }
 
