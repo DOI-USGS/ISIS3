@@ -1,3 +1,4 @@
+#include "Cube.h"
 #include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -53,11 +54,13 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault1) {
         FAIL() << "Unable to open image: " << e.what() << std::endl;
     }
 
+    Cube outCube(outCubeFileName);
+    //Cube outCube(outCubeFileName, "r");
+    Pvl *pvlobject = outCube.label();
+    //Pvl pvlobject = Pvl(outCubeFileName);
 
-    Pvl pvlobject = Pvl(outCubeFileName);
-
-    EXPECT_TRUE(pvlobject.hasKeyword("Camstats"));
-    PvlGroup group = pvlobject.findGroup("Camstats");
+    EXPECT_TRUE(pvlobject->hasKeyword("Camstats"));
+    PvlGroup group = pvlobject->findGroup("Camstats");
 
     EXPECT_NEAR(group.findKeyword("MinimumLatitude"), 10000, 0.000001 );
     EXPECT_NEAR(group.findKeyword("MaximumLatitude"), 10000, 0.000001 );
@@ -76,13 +79,17 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault1) {
     EXPECT_NEAR(group.findKeyword("ObliqueResolutionMinimum"), 10000, 0.000001 );
     EXPECT_NEAR(group.findKeyword("ObliqueResolutionMaximum"), 10000, 0.000001 );
 
-    EXPECT_TRUE(pvlobject.hasKeyword("IsisLabel"));
-    EXPECT_TRUE(pvlobject.hasKeyword("Parameters"));
-    EXPECT_TRUE(pvlobject.hasKeyword("OriginalLabel"));
+    EXPECT_TRUE(pvlobject->hasKeyword("IsisLabel"));
+    EXPECT_TRUE(pvlobject->hasKeyword("Parameters"));
+    EXPECT_TRUE(pvlobject->hasKeyword("OriginalLabel"));
 
-    EXPECT_TRUE(pvlobject.hasKeyword("Statistics"));
-    group = pvlobject.findGroup("Statistics");
-    
+    EXPECT_TRUE(pvlobject->hasKeyword("Statistics"));
+    group = pvlobject->findGroup("Statistics");
+    // check stats
+        // use functions in cube class to get comparison values,
+        // compare those to the file
+
+
 
 
 
@@ -104,11 +111,11 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault1) {
         // that gives stats for cube, use that to get comparison values for cube
 
     // geometry
-        // going to have to take values like caminfo
+        // check values like caminfo
 
     // POLYGON
         // check everything except gis Footprint
-        // check that it is there, don't try to match it
+        // make sure gisFootprint is there, don't try to match it
 
     // Mapping  see if it exists
 
