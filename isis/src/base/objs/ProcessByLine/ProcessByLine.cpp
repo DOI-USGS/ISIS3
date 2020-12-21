@@ -94,9 +94,9 @@ namespace Isis {
    *
    * @param inCube - Pointer to input Cube
    */
-  void ProcessByLine::SetInputCube(Isis::Cube *inCube) {
-    Process::SetInputCube(inCube);
-  }
+  // void ProcessByLine::SetInputCube(Isis::Cube *inCube, const int requirements) {
+  //   Process::SetInputCube(inCube, re);
+  // }
 
 
   void ProcessByLine::SetBricks(IOCubes cn) {

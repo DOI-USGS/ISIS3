@@ -489,9 +489,9 @@ namespace Isis {
       }
     };
 
-    p.SetInputCube("FROM", OneBand);
-    Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
-                                  icube->lineCount(), nbands);
+    p.SetInputCube(icube, OneBand);
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),  
+                                  icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     p.StartProcess(phocube);
 

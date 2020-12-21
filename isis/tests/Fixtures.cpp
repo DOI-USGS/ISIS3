@@ -223,6 +223,30 @@ namespace Isis {
     }
   }
 
+  void DefaultCube::resizeCube(int samples, int lines, int bands) {
+    label = Pvl();
+    PvlObject &isisCube = testCube->label()->findObject("IsisCube");
+    label.addObject(isisCube);
+
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue(QString::number(samples));
+    dim.findKeyword("Lines").setValue(QString::number(lines));
+    dim.findKeyword("Bands").setValue(QString::number(bands));
+
+    delete testCube;
+    testCube = new Cube();
+    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      testCube->write(line);
+    } 
+  }
 
   void DefaultCube::TearDown() {
     if (testCube->isOpen()) {

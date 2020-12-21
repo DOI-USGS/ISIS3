@@ -82,6 +82,7 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+      void resizeCube(int samples, int lines, int bands);
   };
 
   class LineScannerCube : public TempTestingFiles {
