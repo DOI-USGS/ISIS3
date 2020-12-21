@@ -295,6 +295,10 @@
       derived from bundle adjustment can be used alongside CKs derived from bundle adjustment.
       Fixes #3669.
     </change>
+    <change name="Kaitlyn Lee" date="2020-12-21">
+      Updated shape model keyword in the kernels group when shape=user and web=true with the user
+      specified model. Fixes #1986
+    </change>
   </history>
 
   <oldName>
