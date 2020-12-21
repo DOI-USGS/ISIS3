@@ -658,8 +658,8 @@ namespace Isis {
       }
     }
     
-    if (QString(ui.GetString("SHAPE")).toLower() == "user") {
-      kernelsGroup["ShapeModel"] = ui.GetAsString("MODEL");
+    if (ui.GetString("SHAPE") == "USER") {
+      kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
     }
 
     icube->putGroup(kernelsGroup);
