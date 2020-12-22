@@ -260,6 +260,7 @@ namespace Isis {
                          "Unable to initialize camera model",
                          _FILEINFO_);
     }
+    p.WriteHistory(*icube);
     p.EndProcess();
   }
 
@@ -574,8 +575,6 @@ namespace Isis {
           }
         }
       }
-
-      p.WriteHistory(*icube);
     }
     catch(IException &) {
       icube->putGroup(originalKernels);
