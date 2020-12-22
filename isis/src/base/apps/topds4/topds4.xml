@@ -36,6 +36,7 @@
       </parameter>
 
       <parameter name="TEMPLATE">
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           Input template
@@ -43,13 +44,10 @@
         <description>
           Input template
         </description>
-        <filter>
-          *
-        </filter>
       </parameter>
 
       <parameter name="TO">
-        <type>file</type>
+        <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
           Output PDS4 label
