@@ -341,6 +341,7 @@ namespace Isis {
     delete twoImageOverlapFile;
   }
 
+
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();
 

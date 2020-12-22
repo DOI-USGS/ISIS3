@@ -10,130 +10,234 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/app.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/caminfo.xml").expanded();
 
-// removed boundary test because default tests check for polygon
 
 TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
-    QTemporaryDir prefix;
-    QString outCubeFileName = prefix.path() + "/outTemp.cub";
-    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+    QString outFileName = tempDir.path() + "/outTemp.csv";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
         "FORMAT=flat", "APPEND=false", "STATISTICS=true", "CAMSTATS=true",
         "GEOMETRY=true", "spice=true"};
 
     UserInterface options(APP_XML, args);
     try {
-        caminfo(options);
+       caminfo(options);
     }
     catch (IException &e) {
         FAIL() << "Unable to open image: " << e.what() << std::endl;
     }
 
-    Cube oCube(outCubeFileName, "r");
+    CSVReader::CSVAxis csvLine;
+    // Access the "Header" information first
+    CSVReader header = CSVReader(outFileName,
+                                 false, 0, ',', false, true);
 
-    // csv test
-        // run with csv, and without
-        // make sure values in csv match those in pvl
-
-    // to run without csv, set FORMAT=PVL
-    // any other value gives csv
+    // Validate the header information is correct
+    csvLine = header.getRow(1);
+    ASSERT_EQ(csvLine[0], "caminfo");
+    ASSERT_EQ(csvLine[2], "Viking1/VISB/33322515");
+    ASSERT_EQ(csvLine[3], "default.cub");
+    ASSERT_EQ(csvLine[4].toInt(), 1056);
+    ASSERT_EQ(csvLine[5].toInt(), 1204);
+    ASSERT_EQ(csvLine[6].toInt(), 1);
+    ASSERT_DOUBLE_EQ(csvLine[7].toDouble(), 9.928647808629);
+    ASSERT_DOUBLE_EQ(csvLine[8].toDouble(), 10.434709827388);
+    ASSERT_DOUBLE_EQ(csvLine[9].toDouble(), 255.64554860056);
+    ASSERT_DOUBLE_EQ(csvLine[10].toDouble(), 256.14606965798);
+    ASSERT_DOUBLE_EQ(csvLine[11].toDouble(), 18.840683405214);
+    ASSERT_DOUBLE_EQ(csvLine[12].toDouble(), 18.985953933844);
+    ASSERT_DOUBLE_EQ(csvLine[13].toDouble(), 79.756143324179);
+    ASSERT_DOUBLE_EQ(csvLine[14].toDouble(), 81.304900825912);
+    ASSERT_DOUBLE_EQ(csvLine[15].toDouble(), 10.798462192382);
+    ASSERT_DOUBLE_EQ(csvLine[16].toDouble(), 13.50263114771);
+    ASSERT_DOUBLE_EQ(csvLine[17].toDouble(), 69.941096000691);
+    ASSERT_DOUBLE_EQ(csvLine[18].toDouble(), 70.311945037864);
+    ASSERT_DOUBLE_EQ(csvLine[19].toDouble(), 7.7698055343487);
+    ASSERT_DOUBLE_EQ(csvLine[20].toDouble(), 7.803173604843);
+    ASSERT_DOUBLE_EQ(csvLine[21].toDouble(), 19.180671075411);
+    ASSERT_DOUBLE_EQ(csvLine[22].toDouble(), 19.525658781648);
+    ASSERT_DOUBLE_EQ(csvLine[23].toDouble(), -1.79769313486231e+308);
+    ASSERT_DOUBLE_EQ(csvLine[24].toDouble(), -1.79769313486231e+308);
+    ASSERT_DOUBLE_EQ(csvLine[25].toDouble(), -1.79769313486231e+308);
+    ASSERT_DOUBLE_EQ(csvLine[26].toDouble(), -1.79769313486231e+308);
+    ASSERT_DOUBLE_EQ(csvLine[27].toDouble(), 0.0);
+    ASSERT_DOUBLE_EQ(csvLine[28].toDouble(), 0.0);
+    ASSERT_DOUBLE_EQ(csvLine[29].toDouble(), 0.0);
+    ASSERT_DOUBLE_EQ(csvLine[30].toDouble(), 0.0);
+    ASSERT_DOUBLE_EQ(csvLine[31].toDouble(), 100);
+    ASSERT_EQ(csvLine[32].toInt(), 1271424);
+    ASSERT_DOUBLE_EQ(csvLine[33].toDouble(), 1);
+    ASSERT_DOUBLE_EQ(csvLine[34].toDouble(), 1);
+    ASSERT_DOUBLE_EQ(csvLine[35].toDouble(), 1);
+    ASSERT_EQ(csvLine[36].toStdString(), "MARS");
+    ASSERT_EQ(csvLine[37].toStdString(), "1977-07-09T20:05:51.5549999");
+    ASSERT_EQ(csvLine[38].toStdString(), "1977-07-09T20:05:51.5549999");
+    ASSERT_DOUBLE_EQ(csvLine[39].toDouble(), 528.0);
+    ASSERT_DOUBLE_EQ(csvLine[40].toDouble(), 602.0);
+    ASSERT_DOUBLE_EQ(csvLine[41].toDouble(), 10.181441189059);
+    ASSERT_DOUBLE_EQ(csvLine[42].toDouble(), 255.89292858638001);
+    ASSERT_DOUBLE_EQ(csvLine[43].toDouble(), 3412288.6566562001);
+    ASSERT_DOUBLE_EQ(csvLine[44].toDouble(), 310.20703346939001);
+    ASSERT_DOUBLE_EQ(csvLine[45].toDouble(), -46.327247017379);
+    ASSERT_DOUBLE_EQ(csvLine[46].toDouble(), 255.64554860056);
+    ASSERT_DOUBLE_EQ(csvLine[47].toDouble(), 10.086794148631);
+    ASSERT_DOUBLE_EQ(csvLine[48].toDouble(), 255.96651410281);
+    ASSERT_DOUBLE_EQ(csvLine[49].toDouble(), 9.928647808629);
+    ASSERT_DOUBLE_EQ(csvLine[50].toDouble(), 256.14606965798);
+    ASSERT_DOUBLE_EQ(csvLine[51].toDouble(), 10.279980555851);
+    ASSERT_DOUBLE_EQ(csvLine[52].toDouble(), 255.82316032959);
+    ASSERT_DOUBLE_EQ(csvLine[53].toDouble(), 10.434709827388);
+    ASSERT_DOUBLE_EQ(csvLine[54].toDouble(), 80.528382053153);
+    ASSERT_DOUBLE_EQ(csvLine[55].toDouble(), 12.13356433166);
+    ASSERT_DOUBLE_EQ(csvLine[56].toDouble(), 70.127983086993);
+    ASSERT_DOUBLE_EQ(csvLine[57].toDouble(), 332.65918485196);
+    ASSERT_DOUBLE_EQ(csvLine[58].toDouble(), 9.9273765164008);
+    ASSERT_DOUBLE_EQ(csvLine[59].toDouble(), 294.73518831328);
+    ASSERT_DOUBLE_EQ(csvLine[60].toDouble(), 7.7862975334032);
+    ASSERT_DOUBLE_EQ(csvLine[61].toDouble(), 4160.7294345949);
+    ASSERT_DOUBLE_EQ(csvLine[62].toDouble(), 762.37204489156);
+    ASSERT_DOUBLE_EQ(csvLine[63].toDouble(), 18.904248476287);
+    ASSERT_DOUBLE_EQ(csvLine[64].toDouble(), 18.904248476287);
+    ASSERT_DOUBLE_EQ(csvLine[65].toDouble(), 18.904248476287);
+    ASSERT_DOUBLE_EQ(csvLine[66].toDouble(), 18.913336801664);
+    ASSERT_DOUBLE_EQ(csvLine[67].toDouble(), 92.033828011827);
+    ASSERT_DOUBLE_EQ(csvLine[68].toDouble(), 118.87356332432);
+    ASSERT_DOUBLE_EQ(csvLine[69].toDouble(), -22.740326163641);
+    ASSERT_DOUBLE_EQ(csvLine[70].toDouble(), 319.09846558533);
+    ASSERT_DOUBLE_EQ(csvLine[71].toDouble(), 240.08514371127);
+    ASSERT_DOUBLE_EQ(csvLine[72].toDouble(), 267.53187323573);
+    ASSERT_DOUBLE_EQ(csvLine[73].toDouble(), 10.078847382918);
+    ASSERT_DOUBLE_EQ(csvLine[74].toDouble(), 253.65422317887);
+    ASSERT_DOUBLE_EQ(csvLine[75].toDouble(), 0.0092584293412006);
+    ASSERT_DOUBLE_EQ(csvLine[76].toDouble(), -0.21479478952768);
+    ASSERT_DOUBLE_EQ(csvLine[77].toDouble(), 1.3359751259293);
+    ASSERT_DOUBLE_EQ(csvLine[78].toDouble(), 2.4227562244446);
+    ASSERT_EQ(csvLine[79].toStdString(), "FALSE");
+    ASSERT_EQ(csvLine[80].toStdString(), "FALSE");
+    ASSERT_EQ(csvLine[81].toStdString(), "FALSE");
+    ASSERT_DOUBLE_EQ(csvLine[82].toDouble(), 19.336214228383);
+    ASSERT_DOUBLE_EQ(csvLine[83].toDouble(), 19.336214228383);
+    ASSERT_DOUBLE_EQ(csvLine[84].toDouble(), 19.336214228383);
+    ASSERT_DOUBLE_EQ(csvLine[85].toDouble(), 19.336214228383);
 }
 
-TEST_F(DefaultCube, FunctionalTestCaminfoDefault1) {
-    QTemporaryDir prefix;
-    QString outCubeFileName = prefix.path() + "/outTemp.cub";
-    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+
+TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
+    QString outFileName = tempDir.path() + "/outTemp.csv";
+    QVector<QString> args = {"to="+outFileName,
         "ISISLABEL=true", "ORIGINAL=true", "STATISTICS=true", "CAMSTATS=true",
         "POLYGON=true", "polysinc=100", "polylinc=100"};
 
     UserInterface options(APP_XML, args);
     try {
-        caminfo(options);
+        caminfo(testCube, options);
     }
     catch (IException &e) {
         FAIL() << "Unable to open image: " << e.what() << std::endl;
     }
 
-    Cube outCube(outCubeFileName);
-    //Cube outCube(outCubeFileName, "r");
-    Pvl *pvlobject = outCube.label();
-    //Pvl pvlobject = Pvl(outCubeFileName);
+    Pvl pvlobject = Pvl(outFileName);
 
-    EXPECT_TRUE(pvlobject->hasKeyword("Camstats"));
-    PvlGroup group = pvlobject->findGroup("Camstats");
+    EXPECT_TRUE(pvlobject.hasObject("Caminfo"));
+    PvlObject camobj = pvlobject.findObject("Caminfo");
+    PvlObject camstats = camobj.findObject("Camstats");
+    
+    EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLongitude"), 256.14606952525, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756143590222, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 69.941096124192, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 70.311944975377, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMinimum"), 7.7698055422189, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.000001 );
 
-    EXPECT_NEAR(group.findKeyword("MinimumLatitude"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumLatitude"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MinimumLongitude"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumLongitude"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumResolution"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MinimumPhase"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumPhase"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MinimumEmission"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumEmission"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MinimumIncidence"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("MaximumIncidence"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("LocalTimeMinimum"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("LocalTimeMaximum"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("ObliqueResolutionMinimum"), 10000, 0.000001 );
-    EXPECT_NEAR(group.findKeyword("ObliqueResolutionMaximum"), 10000, 0.000001 );
+    EXPECT_TRUE(camobj.hasObject("IsisLabel"));
+    EXPECT_TRUE(camobj.hasObject("Parameters"));
+    EXPECT_FALSE(camobj.hasObject("OriginalLabel"));
+   
+    PvlObject statistics = camobj.findObject("Statistics");
 
-    EXPECT_TRUE(pvlobject->hasKeyword("IsisLabel"));
-    EXPECT_TRUE(pvlobject->hasKeyword("Parameters"));
-    EXPECT_TRUE(pvlobject->hasKeyword("OriginalLabel"));
-
-    EXPECT_TRUE(pvlobject->hasKeyword("Statistics"));
-    group = pvlobject->findGroup("Statistics");
-    // check stats
-        // use functions in cube class to get comparison values,
-        // compare those to the file
-
-
-
-
-
-    // open output file in pvl object
-    // find this camstats object, check those values are near the expected
-    //      values with a tolerance +/- 10^-6
-    // EXPECT_NEAR(value, expected_value, tolerance)
-    // check with all camstats values
-    // test one object to take the values
-    // put in something random for expected_value (something not close)
-    // when running test, it'll say what the actual value is
-    // plug it into expected value
-    // check isislabel object is there
-    //  check that parameter object is there exactly like IsisLabel
-    // check original label exists
-
-    // check stats
-        // for this object, don't hard code values, cube class has a function
-        // that gives stats for cube, use that to get comparison values for cube
-
-    // geometry
-        // check values like caminfo
-
-    // POLYGON
-        // check everything except gis Footprint
-        // make sure gisFootprint is there, don't try to match it
-
-    // Mapping  see if it exists
-
-    // for the next tests, see what is different from this one, and check those
-    // diff in arg and inputs
-
-    // csv test
-        // run with, and without
-        // make sure values in csv match those in pvl
-
+    EXPECT_NEAR(statistics.findKeyword("MeanValue"), 127.49950846428, 0.000001);
+    EXPECT_NEAR(statistics.findKeyword("StandardDeviation"), 73.322672255332, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("MinimumValue"), 1.0, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("MaximumValue"), 254, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("PercentHIS"), 0, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("PercentHRS"), 0, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("PercentLIS"), 0, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("PercentLRS"), 0, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("PercentNull"), 0.39208006141146, 0.000001 );
+    EXPECT_NEAR(statistics.findKeyword("TotalPixels"), 1271424, 0.000001 );
+    
+    PvlObject geometry = camobj.findObject("Geometry");
+ 
+    ASSERT_DOUBLE_EQ(geometry.findKeyword("BandsUsed"), 1);
+    ASSERT_DOUBLE_EQ(geometry.findKeyword("ReferenceBand"), 1);
+    ASSERT_DOUBLE_EQ(geometry.findKeyword("OriginalBand"), 1);
+    ASSERT_EQ(geometry.findKeyword("Target")[0].toStdString(), "MARS");
+    ASSERT_EQ(geometry.findKeyword("StartTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
+    ASSERT_EQ(geometry.findKeyword("EndTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
+    ASSERT_DOUBLE_EQ(geometry.findKeyword("CenterLine"), 528.0);
+    ASSERT_DOUBLE_EQ(geometry.findKeyword("CenterSample"), 602.0);
+    ASSERT_NEAR(geometry.findKeyword("CenterLatitude"), 10.181441241544, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("CenterLongitude"), 255.89292858176, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("CenterRadius"), 3412288.6569794999, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("RightAscension"), 310.20703346939001, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("Declination"), -46.327247017379, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("UpperLeftLongitude"), 255.64554860056, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("UpperLeftLatitude"), 10.086794148631, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LowerLeftLongitude"), 255.96651410281, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LowerLeftLatitude"), 9.928647808629, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LowerRightLongitude"), 256.14606965798, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LowerRightLatitude"), 10.279980555851, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("UpperRightLongitude"), 255.82316032959, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("UpperRightLatitude"), 10.434709827388, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("PhaseAngle"), 80.528382053153, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("EmissionAngle"), 12.13356433166, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("IncidenceAngle"), 70.127983086993, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("NorthAzimuth"), 332.65918485196, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("OffNadir"), 9.9273765164008, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LocalTime"), 7.7862975334032, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("TargetCenterDistance"), 4160.7294345949, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SlantDistance"), 762.37204489156, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SampleResolution"), 18.904248476287, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("LineResolution"), 18.904248476287, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("PixelResolution"), 18.904248476287, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("MeanGroundResolution"), 18.913336801664, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSolarAzimuth"), 92.033828011827, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSolarGroundAzimuth"), 118.87356332432, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSolarLatitude"), -22.740326163641, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSolarLongitude"), 319.09846558533, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftAzimuth"), 240.08514371127, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftGroundAzimuth"), 267.53187323573, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftLatitude"), 10.078847382918, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftLongitude"), 253.65422317887, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ParallaxX"), 0.0092584293412006, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ParallaxY"), -0.21479478952768, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ShadowX"), 1.3359751259293, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ShadowY"), 2.4227562244446, 0.0001);
+    ASSERT_EQ(geometry.findKeyword("HasLongitudeBoundary")[0].toStdString(), "FALSE");
+    ASSERT_EQ(geometry.findKeyword("HasNorthPole")[0].toStdString(), "FALSE");
+    ASSERT_EQ(geometry.findKeyword("HasSouthPole")[0].toStdString(), "FALSE");
+    ASSERT_NEAR(geometry.findKeyword("ObliqueSampleResolution"), 19.336214228383, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ObliqueLineResolution"), 19.336214228383, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ObliquePixelResolution"), 19.336214228383, 0.0001);
+    ASSERT_NEAR(geometry.findKeyword("ObliqueDetectorResolution"), 19.336214228383, 0.0001);
 }
 
-TEST_F(DefaultCube, FunctionalTestCaminfoDefault2) {
-    QTemporaryDir prefix;
-    QString outCubeFileName = prefix.path() + "/outTemp.cub";
-    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
-        "ISISLABEL=true", "ORIGINAL=true", "STATISTICS=true", "CAMSTATS=true",
-        "POLYGON=true"};
+
+TEST_F(DefaultCube, FunctionalTestCaminfoPoly) {
+    QString outFileName = tempDir.path() + "/outTemp.pvl";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
+        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=false", "CAMSTATS=false",
+        "POLYGON=true", "inctype=vertices", "numvertices=3"};
 
     UserInterface options(APP_XML, args);
     try {
@@ -143,15 +247,28 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault2) {
         FAIL() << "Unable to open image: " << e.what() << std::endl;
     }
 
-    // Assert some stuff
+    Pvl pvlobject = Pvl(outFileName);
+    PvlObject camobj = pvlobject.findObject("Caminfo");
+    PvlObject poly = camobj.findObject("Polygon");
+
+    EXPECT_NEAR(poly.findKeyword("CentroidLine"), 533.58306993138, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidSample"), 608.16401376754, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidLatitude"), 10.182403056571, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidLongitude"), 255.8955754569, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidRadius"), 3412286.6660398, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("SurfaceArea"), 486.66203306014, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("GlobalCoverage"), 3.33e-04, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("SampleIncrement"), 1506, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("LineIncrement"),1506, 0.000001 );
+    EXPECT_TRUE(poly.hasKeyword("GisFootprint"));
 }
 
-TEST_F(DefaultCube, FunctionalTestCaminfoDefault3) {
-    QTemporaryDir prefix;
-    QString outCubeFileName = prefix.path() + "/outTemp.cub";
-    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
-        "ISISLABEL=true", "ORIGINAL=true", "STATISTICS=true", "CAMSTATS=true",
-        "POLYGON=true", "INCTYPE=VERTICES"};
+
+TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
+    QString outFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
+        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=true", "CAMSTATS=true",
+        "POLYGON=true", "LINC=25", "SINC=25", "POLYSINC=100", "POLYLINC=100"};
 
     UserInterface options(APP_XML, args);
     try {
@@ -161,21 +278,37 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault3) {
         FAIL() << "Unable to open image: " << e.what() << std::endl;
     }
 
-    // Assert some stuff
+    Pvl pvlobject = Pvl(outFileName);
+    PvlObject camobj = pvlobject.findObject("Caminfo");
+    PvlObject poly = camobj.findObject("Polygon");
+
+    EXPECT_NEAR(poly.findKeyword("CentroidLine"), 532.66229285950999, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidSample"), 607.53672501072003, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidLatitude"), 10.182356969859001, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidLongitude"), 255.89519621875999, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("CentroidRadius"), 3412287.9074047999, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("SurfaceArea"), 488.62348528983, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("GlobalCoverage"), 3.33e-04, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("SampleIncrement"), 100, 0.000001 );
+    EXPECT_NEAR(poly.findKeyword("LineIncrement"), 100, 0.000001 );
+    EXPECT_TRUE(poly.hasKeyword("GisFootprint"));
+
+    PvlObject camstats = camobj.findObject("Camstats");
+    
+    EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLongitude"), 256.14606952525, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756145388578005, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 69.941096124192, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 70.311944975377, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMinimum"), 7.7698055422189, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.000001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.000001 );
 }
 
-
-// minirf tests use radar 1 and radar 2
-// radar pvl   radar isd
-// create a radar fixture
-
-// grab cubes already there, and use the crop app
-// crop a small area of the cube to crop to like a 10x10 cube
-// use path to data
-
-
-// under tests there is a data directory
-// put the cropped cube in a minirf folder
-// pass this cube in as a template
-// remember all paths are relative to the test directory
-// see line 126 in fixtures.cpp

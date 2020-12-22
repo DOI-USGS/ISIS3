@@ -29,22 +29,22 @@
 using namespace std;
 
 namespace Isis{
-    QPair<QString, QString> MakePair(QString key, QString val);
-    void GeneratePVLOutput(Cube *incube,
+    static QPair<QString, QString> MakePair(QString key, QString val);
+    static void GeneratePVLOutput(Cube *incube,
                            QList< QPair<QString, QString> > *general,
                            QList< QPair<QString, QString> > *camstats,
                            QList< QPair<QString, QString> > *statistics,
-                           BandGeometry *bandGeom);
-    void GenerateCSVOutput(Cube *incube,
+                           BandGeometry *bandGeom, UserInterface &ui);
+    static void GenerateCSVOutput(Cube *incube,
                            QList< QPair<QString, QString> > *general,
                            QList< QPair<QString, QString> > *camstats,
                            QList< QPair<QString, QString> > *statistics,
-                           BandGeometry *bandGeom);
+                           BandGeometry *bandGeom, UserInterface &ui);
 
     /**
      * Convience method for gracefully staying in 80 characters
      */
-    QPair<QString, QString> MakePair(QString key, QString val) {
+    static QPair<QString, QString> MakePair(QString key, QString val) {
       return QPair<QString, QString>(key, val);
     }
 
@@ -52,12 +52,11 @@ namespace Isis{
     /**
      * Get the output in PVL format
      */
-    void GeneratePVLOutput(Cube *incube,
+    static void GeneratePVLOutput(Cube *incube,
                            QList< QPair<QString, QString> > *general,
                            QList< QPair<QString, QString> > *camstats,
                            QList< QPair<QString, QString> > *statistics,
-                           BandGeometry *bandGeom) {
-      UserInterface &ui = Application::GetUserInterface();
+                           BandGeometry *bandGeom, UserInterface &ui) {
 
       // Add some common/general things
       PvlObject params("Caminfo");
@@ -82,7 +81,7 @@ namespace Isis{
       }
 
       // Add the orginal label blob
-      if(ui.GetBoolean("ORIGINALLABEL")) {
+      if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
         OriginalLabel orig;
         incube->read(orig);
         Pvl p = orig.ReturnLabels();
@@ -129,13 +128,12 @@ namespace Isis{
      * Get the output in CSV Format. If CSV format is chosen only
      * CamStats, Stats, Geometry are info are recorded.
      */
-    void GenerateCSVOutput(Cube *incube,
+    static void GenerateCSVOutput(Cube *incube,
                            QList< QPair<QString, QString> > *general,
                            QList< QPair<QString, QString> > *camstats,
                            QList< QPair<QString, QString> > *statistics,
-                           BandGeometry *bandGeom) {
-      UserInterface &ui = Application::GetUserInterface();
-
+                           BandGeometry *bandGeom, UserInterface &ui) {
+      
       // Create the vars for holding the info
       QString keys;
       QString values;
@@ -192,30 +190,25 @@ namespace Isis{
       outFile.close();
     }
 
-    void caminfo(UserInterface &ui){
-        Cube *cubeFile = new Cube();
+    void caminfo(UserInterface &ui) { 
+        Cube cubeFile;
         CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
         if (inAtt.bands().size() != 0) {
-            cubeFile->setVirtualBands(inAtt.bands());
+            cubeFile.setVirtualBands(inAtt.bands());
         }
-        cubeFile->open(ui.GetFileName("FROM"), "r");
 
-        caminfo(cubeFile, ui);
-        // use ui to getfile, open as cube, then pass cube into there in the other
-        // put all that other stuff into this one
-        // like stretch
-
-        // set input cube as cube pointer directly
+        std::cout <<ui.GetFileName("FROM")  << std::endl;
+        cubeFile.open(ui.GetFileName("FROM"), "r");
+        std::cout << "donsies" << std::endl;
+        caminfo(&cubeFile, ui);
     }
+
 
     void caminfo(Cube *incube, UserInterface &ui){
         const QString caminfo_program  = "caminfo";
 
         QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
         BandGeometry *bandGeom = NULL;
-
-        // Get input filename
-        FileName in = ui.GetFileName("FROM");
 
         // Get the format
         QString sFormat = ui.GetAsString("FORMAT");
@@ -227,13 +220,13 @@ namespace Isis{
           QString cubeName = incube->fileName();
           CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
           incube->close();
-          QString parameters = "FROM=" + in.expanded();
+          QString parameters = "FROM=" + cubeName;
           ProgramLauncher::RunIsisProgram("spiceinit", parameters);
           if (inAtt.bands().size() != 0) {
               incube->setVirtualBands(inAtt.bands());
           }
+          std::cout << cubeName << std::endl;
           incube->open(cubeName, "r");
-
         }
 
         if (incube->hasGroup("Mapping")) {
@@ -248,7 +241,7 @@ namespace Isis{
         general->append(MakePair("IsisVersion", Application::Version()));
         general->append(MakePair("RunDate",     iTime::CurrentGMT()));
         general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
-        general->append(MakePair("From",        in.baseName() + ".cub"));
+        general->append(MakePair("From",        FileName(incube->fileName()).baseName() + ".cub"));
         general->append(MakePair("Lines",       toString(incube->lineCount())));
         general->append(MakePair("Samples",     toString(incube->sampleCount())));
         general->append(MakePair("Bands",       toString(incube->bandCount())));
@@ -259,7 +252,7 @@ namespace Isis{
         if(ui.GetBoolean("CAMSTATS")) {
           camstats = new QList< QPair<QString, QString> >;
 
-          QString filename = ui.GetAsString("FROM");
+          QString filename = incube->fileName();
           int sinc = ui.GetInteger("SINC");
           int linc = ui.GetInteger("LINC");
           CameraStatistics stats(filename, sinc, linc);
@@ -382,7 +375,7 @@ namespace Isis{
           if (getFootBlob) {
             // Need to read history to obtain parameters that were used to
             // create the footprint
-            History hist("IsisCube", in.expanded());
+            History hist("IsisCube", incube->fileName());
             Pvl pvl = hist.ReturnHist();
             PvlObject::PvlObjectIterator objIter;
             bool found = false;
@@ -442,10 +435,10 @@ namespace Isis{
         }
 
         if(sFormat.toUpper() == "PVL")
-          GeneratePVLOutput(incube, general, camstats, statistics, bandGeom);
+          GeneratePVLOutput(incube, general, camstats, statistics, bandGeom, ui);
         else
-          GenerateCSVOutput(incube, general, camstats, statistics, bandGeom);
-
+          GenerateCSVOutput(incube, general, camstats, statistics, bandGeom, ui);
+        
         // Clean the data
         delete general;
         general = NULL;
