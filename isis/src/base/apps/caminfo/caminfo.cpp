@@ -133,7 +133,7 @@ namespace Isis{
                            QList< QPair<QString, QString> > *camstats,
                            QList< QPair<QString, QString> > *statistics,
                            BandGeometry *bandGeom, UserInterface &ui) {
-      
+
       // Create the vars for holding the info
       QString keys;
       QString values;
@@ -190,16 +190,14 @@ namespace Isis{
       outFile.close();
     }
 
-    void caminfo(UserInterface &ui) { 
+    void caminfo(UserInterface &ui) {
         Cube cubeFile;
         CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
         if (inAtt.bands().size() != 0) {
             cubeFile.setVirtualBands(inAtt.bands());
         }
 
-        std::cout <<ui.GetFileName("FROM")  << std::endl;
         cubeFile.open(ui.GetFileName("FROM"), "r");
-        std::cout << "donsies" << std::endl;
         caminfo(&cubeFile, ui);
     }
 
@@ -225,7 +223,6 @@ namespace Isis{
           if (inAtt.bands().size() != 0) {
               incube->setVirtualBands(inAtt.bands());
           }
-          std::cout << cubeName << std::endl;
           incube->open(cubeName, "r");
         }
 
@@ -438,7 +435,7 @@ namespace Isis{
           GeneratePVLOutput(incube, general, camstats, statistics, bandGeom, ui);
         else
           GenerateCSVOutput(incube, general, camstats, statistics, bandGeom, ui);
-        
+
         // Clean the data
         delete general;
         general = NULL;
