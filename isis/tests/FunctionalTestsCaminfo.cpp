@@ -40,85 +40,85 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
     ASSERT_EQ(csvLine[4].toInt(), 1056);
     ASSERT_EQ(csvLine[5].toInt(), 1204);
     ASSERT_EQ(csvLine[6].toInt(), 1);
-    ASSERT_DOUBLE_EQ(csvLine[7].toDouble(), 9.928647808629);
-    ASSERT_DOUBLE_EQ(csvLine[8].toDouble(), 10.434709827388);
-    ASSERT_DOUBLE_EQ(csvLine[9].toDouble(), 255.64554860056);
-    ASSERT_DOUBLE_EQ(csvLine[10].toDouble(), 256.14606965798);
-    ASSERT_DOUBLE_EQ(csvLine[11].toDouble(), 18.840683405214);
-    ASSERT_DOUBLE_EQ(csvLine[12].toDouble(), 18.985953933844);
-    ASSERT_DOUBLE_EQ(csvLine[13].toDouble(), 79.756143324179);
-    ASSERT_DOUBLE_EQ(csvLine[14].toDouble(), 81.304900825912);
-    ASSERT_DOUBLE_EQ(csvLine[15].toDouble(), 10.798462192382);
-    ASSERT_DOUBLE_EQ(csvLine[16].toDouble(), 13.50263114771);
-    ASSERT_DOUBLE_EQ(csvLine[17].toDouble(), 69.941096000691);
-    ASSERT_DOUBLE_EQ(csvLine[18].toDouble(), 70.311945037864);
-    ASSERT_DOUBLE_EQ(csvLine[19].toDouble(), 7.7698055343487);
-    ASSERT_DOUBLE_EQ(csvLine[20].toDouble(), 7.803173604843);
-    ASSERT_DOUBLE_EQ(csvLine[21].toDouble(), 19.180671075411);
-    ASSERT_DOUBLE_EQ(csvLine[22].toDouble(), 19.525658781648);
-    ASSERT_DOUBLE_EQ(csvLine[23].toDouble(), -1.79769313486231e+308);
-    ASSERT_DOUBLE_EQ(csvLine[24].toDouble(), -1.79769313486231e+308);
-    ASSERT_DOUBLE_EQ(csvLine[25].toDouble(), -1.79769313486231e+308);
-    ASSERT_DOUBLE_EQ(csvLine[26].toDouble(), -1.79769313486231e+308);
-    ASSERT_DOUBLE_EQ(csvLine[27].toDouble(), 0.0);
-    ASSERT_DOUBLE_EQ(csvLine[28].toDouble(), 0.0);
-    ASSERT_DOUBLE_EQ(csvLine[29].toDouble(), 0.0);
-    ASSERT_DOUBLE_EQ(csvLine[30].toDouble(), 0.0);
-    ASSERT_DOUBLE_EQ(csvLine[31].toDouble(), 100);
+    EXPECT_NEAR(csvLine[7].toDouble(), 9.928647808629, 0.000001);
+    EXPECT_NEAR(csvLine[8].toDouble(), 10.434709827388, 0.000001);
+    EXPECT_NEAR(csvLine[9].toDouble(), 255.64554860056, 0.000001);
+    EXPECT_NEAR(csvLine[10].toDouble(), 256.14606965798, 0.000001);
+    EXPECT_NEAR(csvLine[11].toDouble(), 18.840683405214, 0.000001);
+    EXPECT_NEAR(csvLine[12].toDouble(), 18.985953933844, 0.000001);
+    EXPECT_NEAR(csvLine[13].toDouble(), 79.756143324179, 0.000001);
+    EXPECT_NEAR(csvLine[14].toDouble(), 81.304900825912, 0.000001);
+    EXPECT_NEAR(csvLine[15].toDouble(), 10.798462192382, 0.000001);
+    EXPECT_NEAR(csvLine[16].toDouble(), 13.50263114771, 0.000001);
+    EXPECT_NEAR(csvLine[17].toDouble(), 69.941096000691, 0.000001);
+    EXPECT_NEAR(csvLine[18].toDouble(), 70.311945037864, 0.000001);
+    EXPECT_NEAR(csvLine[19].toDouble(), 7.7698055343487, 0.000001);
+    EXPECT_NEAR(csvLine[20].toDouble(), 7.803173604843, 0.000001);
+    EXPECT_NEAR(csvLine[21].toDouble(), 19.180671075411, 0.000001);
+    EXPECT_NEAR(csvLine[22].toDouble(), 19.525658781648, 0.000001);
+    EXPECT_NEAR(csvLine[23].toDouble(), -1.79769313486231e+308, 0.000001);
+    EXPECT_NEAR(csvLine[24].toDouble(), -1.79769313486231e+308, 0.000001);
+    EXPECT_NEAR(csvLine[25].toDouble(), -1.79769313486231e+308, 0.000001);
+    EXPECT_NEAR(csvLine[26].toDouble(), -1.79769313486231e+308, 0.000001);
+    EXPECT_NEAR(csvLine[27].toDouble(), 0.0, 0.000001);
+    EXPECT_NEAR(csvLine[28].toDouble(), 0.0, 0.000001);
+    EXPECT_NEAR(csvLine[29].toDouble(), 0.0, 0.000001);
+    EXPECT_NEAR(csvLine[30].toDouble(), 0.0, 0.000001);
+    EXPECT_NEAR(csvLine[31].toDouble(), 100, 0.000001);
     ASSERT_EQ(csvLine[32].toInt(), 1271424);
-    ASSERT_DOUBLE_EQ(csvLine[33].toDouble(), 1);
-    ASSERT_DOUBLE_EQ(csvLine[34].toDouble(), 1);
-    ASSERT_DOUBLE_EQ(csvLine[35].toDouble(), 1);
+    EXPECT_NEAR(csvLine[33].toDouble(), 1, 0.000001);
+    EXPECT_NEAR(csvLine[34].toDouble(), 1, 0.000001);
+    EXPECT_NEAR(csvLine[35].toDouble(), 1, 0.000001);
     ASSERT_EQ(csvLine[36].toStdString(), "MARS");
     ASSERT_EQ(csvLine[37].toStdString(), "1977-07-09T20:05:51.5549999");
     ASSERT_EQ(csvLine[38].toStdString(), "1977-07-09T20:05:51.5549999");
-    ASSERT_DOUBLE_EQ(csvLine[39].toDouble(), 528.0);
-    ASSERT_DOUBLE_EQ(csvLine[40].toDouble(), 602.0);
-    ASSERT_DOUBLE_EQ(csvLine[41].toDouble(), 10.181441189059);
-    ASSERT_DOUBLE_EQ(csvLine[42].toDouble(), 255.89292858638001);
-    ASSERT_DOUBLE_EQ(csvLine[43].toDouble(), 3412288.6566562001);
-    ASSERT_DOUBLE_EQ(csvLine[44].toDouble(), 310.20703346939001);
-    ASSERT_DOUBLE_EQ(csvLine[45].toDouble(), -46.327247017379);
-    ASSERT_DOUBLE_EQ(csvLine[46].toDouble(), 255.64554860056);
-    ASSERT_DOUBLE_EQ(csvLine[47].toDouble(), 10.086794148631);
-    ASSERT_DOUBLE_EQ(csvLine[48].toDouble(), 255.96651410281);
-    ASSERT_DOUBLE_EQ(csvLine[49].toDouble(), 9.928647808629);
-    ASSERT_DOUBLE_EQ(csvLine[50].toDouble(), 256.14606965798);
-    ASSERT_DOUBLE_EQ(csvLine[51].toDouble(), 10.279980555851);
-    ASSERT_DOUBLE_EQ(csvLine[52].toDouble(), 255.82316032959);
-    ASSERT_DOUBLE_EQ(csvLine[53].toDouble(), 10.434709827388);
-    ASSERT_DOUBLE_EQ(csvLine[54].toDouble(), 80.528382053153);
-    ASSERT_DOUBLE_EQ(csvLine[55].toDouble(), 12.13356433166);
-    ASSERT_DOUBLE_EQ(csvLine[56].toDouble(), 70.127983086993);
-    ASSERT_DOUBLE_EQ(csvLine[57].toDouble(), 332.65918485196);
-    ASSERT_DOUBLE_EQ(csvLine[58].toDouble(), 9.9273765164008);
-    ASSERT_DOUBLE_EQ(csvLine[59].toDouble(), 294.73518831328);
-    ASSERT_DOUBLE_EQ(csvLine[60].toDouble(), 7.7862975334032);
-    ASSERT_DOUBLE_EQ(csvLine[61].toDouble(), 4160.7294345949);
-    ASSERT_DOUBLE_EQ(csvLine[62].toDouble(), 762.37204489156);
-    ASSERT_DOUBLE_EQ(csvLine[63].toDouble(), 18.904248476287);
-    ASSERT_DOUBLE_EQ(csvLine[64].toDouble(), 18.904248476287);
-    ASSERT_DOUBLE_EQ(csvLine[65].toDouble(), 18.904248476287);
-    ASSERT_DOUBLE_EQ(csvLine[66].toDouble(), 18.913336801664);
-    ASSERT_DOUBLE_EQ(csvLine[67].toDouble(), 92.033828011827);
-    ASSERT_DOUBLE_EQ(csvLine[68].toDouble(), 118.87356332432);
-    ASSERT_DOUBLE_EQ(csvLine[69].toDouble(), -22.740326163641);
-    ASSERT_DOUBLE_EQ(csvLine[70].toDouble(), 319.09846558533);
-    ASSERT_DOUBLE_EQ(csvLine[71].toDouble(), 240.08514371127);
-    ASSERT_DOUBLE_EQ(csvLine[72].toDouble(), 267.53187323573);
-    ASSERT_DOUBLE_EQ(csvLine[73].toDouble(), 10.078847382918);
-    ASSERT_DOUBLE_EQ(csvLine[74].toDouble(), 253.65422317887);
-    ASSERT_DOUBLE_EQ(csvLine[75].toDouble(), 0.0092584293412006);
-    ASSERT_DOUBLE_EQ(csvLine[76].toDouble(), -0.21479478952768);
-    ASSERT_DOUBLE_EQ(csvLine[77].toDouble(), 1.3359751259293);
-    ASSERT_DOUBLE_EQ(csvLine[78].toDouble(), 2.4227562244446);
+    EXPECT_NEAR(csvLine[39].toDouble(), 528.0, 0.000001);
+    EXPECT_NEAR(csvLine[40].toDouble(), 602.0, 0.000001);
+    EXPECT_NEAR(csvLine[41].toDouble(), 10.181441189059, 0.000001);
+    EXPECT_NEAR(csvLine[42].toDouble(), 255.89292858638001, 0.000001);
+    EXPECT_NEAR(csvLine[43].toDouble(), 3412288.6566562001, 0.000001);
+    EXPECT_NEAR(csvLine[44].toDouble(), 310.20703346939001, 0.000001);
+    EXPECT_NEAR(csvLine[45].toDouble(), -46.327247017379, 0.000001);
+    EXPECT_NEAR(csvLine[46].toDouble(), 255.64554860056, 0.000001);
+    EXPECT_NEAR(csvLine[47].toDouble(), 10.086794148631, 0.000001);
+    EXPECT_NEAR(csvLine[48].toDouble(), 255.96651410281, 0.000001);
+    EXPECT_NEAR(csvLine[49].toDouble(), 9.928647808629, 0.000001);
+    EXPECT_NEAR(csvLine[50].toDouble(), 256.14606965798, 0.000001);
+    EXPECT_NEAR(csvLine[51].toDouble(), 10.279980555851, 0.000001);
+    EXPECT_NEAR(csvLine[52].toDouble(), 255.82316032959, 0.000001);
+    EXPECT_NEAR(csvLine[53].toDouble(), 10.434709827388, 0.000001);
+    EXPECT_NEAR(csvLine[54].toDouble(), 80.528382053153, 0.000001);
+    EXPECT_NEAR(csvLine[55].toDouble(), 12.13356433166, 0.000001);
+    EXPECT_NEAR(csvLine[56].toDouble(), 70.127983086993, 0.000001);
+    EXPECT_NEAR(csvLine[57].toDouble(), 332.65918485196, 0.000001);
+    EXPECT_NEAR(csvLine[58].toDouble(), 9.9273765164008, 0.000001);
+    EXPECT_NEAR(csvLine[59].toDouble(), 294.73518831328, 0.000001);
+    EXPECT_NEAR(csvLine[60].toDouble(), 7.7862975334032, 0.000001);
+    EXPECT_NEAR(csvLine[61].toDouble(), 4160.7294345949, 0.000001);
+    EXPECT_NEAR(csvLine[62].toDouble(), 762.37204489156, 0.000001);
+    EXPECT_NEAR(csvLine[63].toDouble(), 18.904248476287, 0.000001);
+    EXPECT_NEAR(csvLine[64].toDouble(), 18.904248476287, 0.000001);
+    EXPECT_NEAR(csvLine[65].toDouble(), 18.904248476287, 0.000001);
+    EXPECT_NEAR(csvLine[66].toDouble(), 18.913336801664, 0.000001);
+    EXPECT_NEAR(csvLine[67].toDouble(), 92.033828011827, 0.000001);
+    EXPECT_NEAR(csvLine[68].toDouble(), 118.87356332432, 0.000001);
+    EXPECT_NEAR(csvLine[69].toDouble(), -22.740326163641, 0.000001);
+    EXPECT_NEAR(csvLine[70].toDouble(), 319.09846558533, 0.000001);
+    EXPECT_NEAR(csvLine[71].toDouble(), 240.08514371127, 0.000001);
+    EXPECT_NEAR(csvLine[72].toDouble(), 267.53187323573, 0.000001);
+    EXPECT_NEAR(csvLine[73].toDouble(), 10.078847382918, 0.000001);
+    EXPECT_NEAR(csvLine[74].toDouble(), 253.65422317887, 0.000001);
+    EXPECT_NEAR(csvLine[75].toDouble(), 0.0092584293412006, 0.000001);
+    EXPECT_NEAR(csvLine[76].toDouble(), -0.21479478952768, 0.000001);
+    EXPECT_NEAR(csvLine[77].toDouble(), 1.3359751259293, 0.000001);
+    EXPECT_NEAR(csvLine[78].toDouble(), 2.4227562244446, 0.000001);
     ASSERT_EQ(csvLine[79].toStdString(), "FALSE");
     ASSERT_EQ(csvLine[80].toStdString(), "FALSE");
     ASSERT_EQ(csvLine[81].toStdString(), "FALSE");
-    ASSERT_DOUBLE_EQ(csvLine[82].toDouble(), 19.336214228383);
-    ASSERT_DOUBLE_EQ(csvLine[83].toDouble(), 19.336214228383);
-    ASSERT_DOUBLE_EQ(csvLine[84].toDouble(), 19.336214228383);
-    ASSERT_DOUBLE_EQ(csvLine[85].toDouble(), 19.336214228383);
+    EXPECT_NEAR(csvLine[82].toDouble(), 19.336214228383, 0.000001);
+    EXPECT_NEAR(csvLine[83].toDouble(), 19.336214228383, 0.000001);
+    EXPECT_NEAR(csvLine[84].toDouble(), 19.336214228383, 0.000001);
+    EXPECT_NEAR(csvLine[85].toDouble(), 19.336214228383, 0.000001);
 }
 
 
@@ -141,7 +141,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_TRUE(pvlobject.hasObject("Caminfo"));
     PvlObject camobj = pvlobject.findObject("Caminfo");
     PvlObject camstats = camobj.findObject("Camstats");
-    
+
     EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.000001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.000001 );
     EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.000001 );
@@ -161,7 +161,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_TRUE(camobj.hasObject("IsisLabel"));
     EXPECT_TRUE(camobj.hasObject("Parameters"));
     EXPECT_FALSE(camobj.hasObject("OriginalLabel"));
-   
+
     PvlObject statistics = camobj.findObject("Statistics");
 
     EXPECT_NEAR(statistics.findKeyword("MeanValue"), 127.49950846428, 0.000001);
@@ -174,9 +174,9 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(statistics.findKeyword("PercentLRS"), 0, 0.000001 );
     EXPECT_NEAR(statistics.findKeyword("PercentNull"), 0.39208006141146, 0.000001 );
     EXPECT_NEAR(statistics.findKeyword("TotalPixels"), 1271424, 0.000001 );
-    
+
     PvlObject geometry = camobj.findObject("Geometry");
- 
+
     ASSERT_DOUBLE_EQ(geometry.findKeyword("BandsUsed"), 1);
     ASSERT_DOUBLE_EQ(geometry.findKeyword("ReferenceBand"), 1);
     ASSERT_DOUBLE_EQ(geometry.findKeyword("OriginalBand"), 1);
@@ -294,7 +294,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     EXPECT_TRUE(poly.hasKeyword("GisFootprint"));
 
     PvlObject camstats = camobj.findObject("Camstats");
-    
+
     EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.000001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.000001 );
     EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.000001 );
@@ -311,4 +311,3 @@ TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.000001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.000001 );
 }
-
