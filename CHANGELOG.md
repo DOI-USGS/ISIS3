@@ -48,6 +48,7 @@ update the Unreleased link so that it compares against the latest release tag.
  - The isis3VarInit script is now just called isisVarInit and allows for more robust paths. [#3945](https://github.com/USGS-Astrogeology/ISIS3/pull/3945)
  - Isis2raw will now output straight to a 32bit file (no stretch) when stretch is set to None and bittype is set to 32bit. [#3878](https://github.com/USGS-Astrogeology/ISIS3/issues/3878)
  - Findimageoverlaps can now have calculations and writes happen at the same time or sequentially. [#4047](https://github.com/USGS-Astrogeology/ISIS3/pull/4047)
+ - IsisPreferences has had the default path to Osirisrex updated to point to new kernels released by NAIF [#4060](https://github.com/USGS-Astrogeology/ISIS3/issues/4060) 
 
 ### Fixed
 
