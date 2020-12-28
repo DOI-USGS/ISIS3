@@ -299,6 +299,10 @@
       Updated shape model keyword in the kernels group when shape=user and web=true with the user
       specified model. Fixes #1986
     </change>
+    <change name="Kaitlyn Lee" date="2020-12-22">
+      Moved writeHistory() call to main function because a history entry was only being written
+      to the cube when using a data area for kernels (not using the web service). Fixes #4040.
+    </change>
   </history>
 
   <oldName>
