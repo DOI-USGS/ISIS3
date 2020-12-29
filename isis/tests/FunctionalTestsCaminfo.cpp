@@ -34,12 +34,12 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
 
     // Validate the header information is correct
     csvLine = header.getRow(1);
-    ASSERT_EQ(csvLine[0], "caminfo");
-    ASSERT_EQ(csvLine[2], "Viking1/VISB/33322515");
-    ASSERT_EQ(csvLine[3], "default.cub");
-    ASSERT_EQ(csvLine[4].toInt(), 1056);
-    ASSERT_EQ(csvLine[5].toInt(), 1204);
-    ASSERT_EQ(csvLine[6].toInt(), 1);
+    EXPECT_EQ(csvLine[0], "caminfo");
+    EXPECT_EQ(csvLine[2], "Viking1/VISB/33322515");
+    EXPECT_EQ(csvLine[3], "default.cub");
+    EXPECT_EQ(csvLine[4].toInt(), 1056);
+    EXPECT_EQ(csvLine[5].toInt(), 1204);
+    EXPECT_EQ(csvLine[6].toInt(), 1);
     EXPECT_NEAR(csvLine[7].toDouble(), 9.928647808629, 0.000001);
     EXPECT_NEAR(csvLine[8].toDouble(), 10.434709827388, 0.000001);
     EXPECT_NEAR(csvLine[9].toDouble(), 255.64554860056, 0.000001);
@@ -69,9 +69,9 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
     EXPECT_NEAR(csvLine[33].toDouble(), 1, 0.000001);
     EXPECT_NEAR(csvLine[34].toDouble(), 1, 0.000001);
     EXPECT_NEAR(csvLine[35].toDouble(), 1, 0.000001);
-    ASSERT_EQ(csvLine[36].toStdString(), "MARS");
-    ASSERT_EQ(csvLine[37].toStdString(), "1977-07-09T20:05:51.5549999");
-    ASSERT_EQ(csvLine[38].toStdString(), "1977-07-09T20:05:51.5549999");
+    EXPECT_EQ(csvLine[36].toStdString(), "MARS");
+    EXPECT_EQ(csvLine[37].toStdString(), "1977-07-09T20:05:51.5549999");
+    EXPECT_EQ(csvLine[38].toStdString(), "1977-07-09T20:05:51.5549999");
     EXPECT_NEAR(csvLine[39].toDouble(), 528.0, 0.000001);
     EXPECT_NEAR(csvLine[40].toDouble(), 602.0, 0.000001);
     EXPECT_NEAR(csvLine[41].toDouble(), 10.181441189059, 0.000001);
@@ -112,9 +112,9 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
     EXPECT_NEAR(csvLine[76].toDouble(), -0.21479478952768, 0.000001);
     EXPECT_NEAR(csvLine[77].toDouble(), 1.3359751259293, 0.000001);
     EXPECT_NEAR(csvLine[78].toDouble(), 2.4227562244446, 0.000001);
-    ASSERT_EQ(csvLine[79].toStdString(), "FALSE");
-    ASSERT_EQ(csvLine[80].toStdString(), "FALSE");
-    ASSERT_EQ(csvLine[81].toStdString(), "FALSE");
+    EXPECT_EQ(csvLine[79].toStdString(), "FALSE");
+    EXPECT_EQ(csvLine[80].toStdString(), "FALSE");
+    EXPECT_EQ(csvLine[81].toStdString(), "FALSE");
     EXPECT_NEAR(csvLine[82].toDouble(), 19.336214228383, 0.000001);
     EXPECT_NEAR(csvLine[83].toDouble(), 19.336214228383, 0.000001);
     EXPECT_NEAR(csvLine[84].toDouble(), 19.336214228383, 0.000001);
@@ -138,8 +138,9 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
 
     Pvl pvlobject = Pvl(outFileName);
 
-    EXPECT_TRUE(pvlobject.hasObject("Caminfo"));
+    ASSERT_TRUE(pvlobject.hasObject("Caminfo"));
     PvlObject camobj = pvlobject.findObject("Caminfo");
+    ASSERT_TRUE(camobj.hasObject("Camstats"));
     PvlObject camstats = camobj.findObject("Camstats");
 
     EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.000001 );
@@ -162,6 +163,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_TRUE(camobj.hasObject("Parameters"));
     EXPECT_FALSE(camobj.hasObject("OriginalLabel"));
 
+    ASSERT_TRUE(camobj.hasObject("Statistics"));
     PvlObject statistics = camobj.findObject("Statistics");
 
     EXPECT_NEAR(statistics.findKeyword("MeanValue"), 127.49950846428, 0.000001);
@@ -175,61 +177,62 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(statistics.findKeyword("PercentNull"), 0.39208006141146, 0.000001 );
     EXPECT_NEAR(statistics.findKeyword("TotalPixels"), 1271424, 0.000001 );
 
+    ASSERT_TRUE(camobj.hasObject("Geometry"));
     PvlObject geometry = camobj.findObject("Geometry");
 
-    ASSERT_DOUBLE_EQ(geometry.findKeyword("BandsUsed"), 1);
-    ASSERT_DOUBLE_EQ(geometry.findKeyword("ReferenceBand"), 1);
-    ASSERT_DOUBLE_EQ(geometry.findKeyword("OriginalBand"), 1);
-    ASSERT_EQ(geometry.findKeyword("Target")[0].toStdString(), "MARS");
-    ASSERT_EQ(geometry.findKeyword("StartTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
-    ASSERT_EQ(geometry.findKeyword("EndTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
-    ASSERT_DOUBLE_EQ(geometry.findKeyword("CenterLine"), 528.0);
-    ASSERT_DOUBLE_EQ(geometry.findKeyword("CenterSample"), 602.0);
-    ASSERT_NEAR(geometry.findKeyword("CenterLatitude"), 10.181441241544, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("CenterLongitude"), 255.89292858176, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("CenterRadius"), 3412288.6569794999, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("RightAscension"), 310.20703346939001, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("Declination"), -46.327247017379, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("UpperLeftLongitude"), 255.64554860056, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("UpperLeftLatitude"), 10.086794148631, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LowerLeftLongitude"), 255.96651410281, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LowerLeftLatitude"), 9.928647808629, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LowerRightLongitude"), 256.14606965798, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LowerRightLatitude"), 10.279980555851, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("UpperRightLongitude"), 255.82316032959, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("UpperRightLatitude"), 10.434709827388, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("PhaseAngle"), 80.528382053153, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("EmissionAngle"), 12.13356433166, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("IncidenceAngle"), 70.127983086993, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("NorthAzimuth"), 332.65918485196, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("OffNadir"), 9.9273765164008, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LocalTime"), 7.7862975334032, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("TargetCenterDistance"), 4160.7294345949, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SlantDistance"), 762.37204489156, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SampleResolution"), 18.904248476287, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("LineResolution"), 18.904248476287, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("PixelResolution"), 18.904248476287, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("MeanGroundResolution"), 18.913336801664, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSolarAzimuth"), 92.033828011827, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSolarGroundAzimuth"), 118.87356332432, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSolarLatitude"), -22.740326163641, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSolarLongitude"), 319.09846558533, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftAzimuth"), 240.08514371127, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftGroundAzimuth"), 267.53187323573, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftLatitude"), 10.078847382918, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("SubSpacecraftLongitude"), 253.65422317887, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ParallaxX"), 0.0092584293412006, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ParallaxY"), -0.21479478952768, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ShadowX"), 1.3359751259293, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ShadowY"), 2.4227562244446, 0.0001);
-    ASSERT_EQ(geometry.findKeyword("HasLongitudeBoundary")[0].toStdString(), "FALSE");
-    ASSERT_EQ(geometry.findKeyword("HasNorthPole")[0].toStdString(), "FALSE");
-    ASSERT_EQ(geometry.findKeyword("HasSouthPole")[0].toStdString(), "FALSE");
-    ASSERT_NEAR(geometry.findKeyword("ObliqueSampleResolution"), 19.336214228383, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ObliqueLineResolution"), 19.336214228383, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ObliquePixelResolution"), 19.336214228383, 0.0001);
-    ASSERT_NEAR(geometry.findKeyword("ObliqueDetectorResolution"), 19.336214228383, 0.0001);
+    EXPECT_DOUBLE_EQ(geometry.findKeyword("BandsUsed"), 1);
+    EXPECT_DOUBLE_EQ(geometry.findKeyword("ReferenceBand"), 1);
+    EXPECT_DOUBLE_EQ(geometry.findKeyword("OriginalBand"), 1);
+    EXPECT_EQ(geometry.findKeyword("Target")[0].toStdString(), "MARS");
+    EXPECT_EQ(geometry.findKeyword("StartTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
+    EXPECT_EQ(geometry.findKeyword("EndTime")[0].toStdString(), "1977-07-09T20:05:51.5549999");
+    EXPECT_DOUBLE_EQ(geometry.findKeyword("CenterLine"), 528.0);
+    EXPECT_DOUBLE_EQ(geometry.findKeyword("CenterSample"), 602.0);
+    EXPECT_NEAR(geometry.findKeyword("CenterLatitude"), 10.181441241544, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("CenterLongitude"), 255.89292858176, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("CenterRadius"), 3412288.6569794999, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("RightAscension"), 310.20703346939001, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("Declination"), -46.327247017379, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("UpperLeftLongitude"), 255.64554860056, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("UpperLeftLatitude"), 10.086794148631, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LowerLeftLongitude"), 255.96651410281, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LowerLeftLatitude"), 9.928647808629, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LowerRightLongitude"), 256.14606965798, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LowerRightLatitude"), 10.279980555851, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("UpperRightLongitude"), 255.82316032959, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("UpperRightLatitude"), 10.434709827388, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("PhaseAngle"), 80.528382053153, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("EmissionAngle"), 12.13356433166, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("IncidenceAngle"), 70.127983086993, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("NorthAzimuth"), 332.65918485196, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("OffNadir"), 9.9273765164008, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LocalTime"), 7.7862975334032, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("TargetCenterDistance"), 4160.7294345949, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SlantDistance"), 762.37204489156, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SampleResolution"), 18.904248476287, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("LineResolution"), 18.904248476287, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("PixelResolution"), 18.904248476287, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("MeanGroundResolution"), 18.913336801664, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSolarAzimuth"), 92.033828011827, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSolarGroundAzimuth"), 118.87356332432, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSolarLatitude"), -22.740326163641, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSolarLongitude"), 319.09846558533, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSpacecraftAzimuth"), 240.08514371127, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSpacecraftGroundAzimuth"), 267.53187323573, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSpacecraftLatitude"), 10.078847382918, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SubSpacecraftLongitude"), 253.65422317887, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ParallaxX"), 0.0092584293412006, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ParallaxY"), -0.21479478952768, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ShadowX"), 1.3359751259293, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ShadowY"), 2.4227562244446, 0.0001);
+    EXPECT_EQ(geometry.findKeyword("HasLongitudeBoundary")[0].toStdString(), "FALSE");
+    EXPECT_EQ(geometry.findKeyword("HasNorthPole")[0].toStdString(), "FALSE");
+    EXPECT_EQ(geometry.findKeyword("HasSouthPole")[0].toStdString(), "FALSE");
+    EXPECT_NEAR(geometry.findKeyword("ObliqueSampleResolution"), 19.336214228383, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ObliqueLineResolution"), 19.336214228383, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ObliquePixelResolution"), 19.336214228383, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("ObliqueDetectorResolution"), 19.336214228383, 0.0001);
 }
 
 
