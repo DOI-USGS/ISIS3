@@ -32,7 +32,7 @@ for (lbl in labels) {
                      ${condaPath}/bin/conda config --env --add channels conda-forge
                      ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
                      
-                     ${condaPath}/bin/conda create -n isis -c usgs-astrogeology isis=${ISIS_VERSION}
+                     ${condaPath}/bin/conda create -n isis -c acpaquette/label/reconfig isis=${ISIS_VERSION}
 
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
