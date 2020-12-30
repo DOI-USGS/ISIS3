@@ -37,7 +37,7 @@ dependencies:
   - mysql
   - mysql-connector-c
   - nanoflann
-  - nlohmann_json
+  - nlohmann_json>=3.9.1
   - ninja==1.7.2
   - nn
   - opencv=3.2
