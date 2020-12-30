@@ -94,23 +94,26 @@
       </blockquote>
 
       <blockquote>
-      <b>Solving for the target body radii (triaxial or mean) is irrelavent and
+      <b>Solving for the target body radii (triaxial or mean) is NOT possible and
       likely increases error in the solve.</b>
       <p>
-        When solving for target body radii both the mean and triaxial solve options
-        are redundantly solving for the target body radii. The radii solve is part of
-        the sequence of equations that the <b>jigsaw</b> uses to compute various partial
-        derivatives to populate the solve matrix. The radii solve is being applied
-        to the target body separately and the partials from this separate application
-        are being added to the solve matrix. This is adding additional computation time
-        to <b>jigsaw</b> and creating additional uncertainty/error in the bundle adjust. We
-        advise this radii solve to be avoided.
+        With the current jigsaw implementation, it is NOT possible to individually
+        solve for either the mean or triaxial radii as seperate calculations in
+        the bundle adjustment. More specifically, the target body radii has no
+        effect when solving for individual points and thus cannot be solved for in the bundle.
+        A local radii solve is already part of the sequence of equations that <b>jigsaw</b>
+        uses to compute various partial derivatives to populate the solve matrix.
+        A seperate mean or triaxial radii solve can be applied to the target body
+        and the partials from this separate application are added to the
+        solve matrix. This option adds additional computation time to <b>jigsaw</b>
+        and creates additional uncertainty/error in the bundle adjust. We advise
+        the mean and triaxial radii solve be avoided.
       </p>
       <p>
-        If you are trying to generate a spheroid from a control network their are
+        If you are trying to generate a spheroid from a control network there are
         other programs that can do this for you. An easier but more naive method
-        is ingesting the <i>OUTPUT_CSV</i> from your network and generating radii
-        information from those points.
+        is ingesting the <i>OUTPUT_CSV</i> from your network, gather local radii
+        information from those points, then generate a sphereiod from those local radii.
       </p>
       </blockquote>
 
