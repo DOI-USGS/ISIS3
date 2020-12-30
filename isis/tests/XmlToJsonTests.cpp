@@ -25,9 +25,15 @@ TEST(XmlToJson, TestXMLParsingEverything) {
       <First>
        <A>A1</A>
        <A>A2</A>
-       <A>A3</A>
+       <A>
+         <B>b1</B>
+         <B>b2</B>
+         <C>notlist</C>
+       </A>
        <ten>10</ten>
        <ten>TEN</ten>
+       <oddball>notrepeated</oddball>
+       <A>A3</A>
       </First>
       <First>
         <tweleve>12</tweleve>
@@ -55,8 +61,6 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   QDomDocument xmlDocument("TestDocument");
   xmlDocument.setContent(xmlInput);
   ordered_json result = xmlToJson(xmlDocument);
-
-  std::cout << result.dump(4) << std::endl;
 
   // Test deeply nested value retrieval (uncomplicated)
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2B"], "TagLevel2BValue");

@@ -74,9 +74,7 @@ ordered_json xmlToJson(QDomDocument& doc) {
  * @param output The JSON object to add the converted QDomElement to.
  */
 void addLastChildNodeToJson(QDomElement& element, ordered_json& output){
-//  std::cout << "passed in:" << output.dump(4) << std::endl;
-  if (!output.is_array()) {
-    if (element.hasAttributes()) {
+  if (element.hasAttributes()) {
     // If there are attributes, add them
     ordered_json tempArea;
     QDomNamedNodeMap attrMap = element.attributes();
@@ -86,26 +84,12 @@ void addLastChildNodeToJson(QDomElement& element, ordered_json& output){
     }
     tempArea["#text"] = element.text().toStdString();
     output[element.tagName().toStdString()] = tempArea;
-    }
-    else {
-      // just add element and its value
-      output[element.tagName().toStdString()] = element.text().toStdString();
-//      std::cout << "returning: " << output.dump(4) << std::endl;
-    }
   }
   else {
-//    std::cout << "we're here" << std::endl;
-//    std::cout << "output size: " << output.size() << std::endl;
-    ordered_json objout;
-    objout[element.tagName().toStdString()] = element.text().toStdString(); 
-    output += objout;
-//    std::cout << "here's the one: " << output.dump() << std::endl;
+    // just add element and its value
+    output[element.tagName().toStdString()] = element.text().toStdString();
   }
 }
-
-//ordered_json convertXmlListToJson(QDomElement& element, ordered_json& output) {
-//
-//}
 
 
 /**
@@ -120,37 +104,30 @@ void addLastChildNodeToJson(QDomElement& element, ordered_json& output){
 ordered_json convertXmlToJson(QDomElement& element, ordered_json& output) {
   int i = 0;
   while (!element.isNull()) {
-    if (element.hasChildNodes() ) {//&& !output.contains(element.tagName().toStdString())) {
+    if (element.hasChildNodes()) {
       QDomElement next = element.firstChildElement();
-      if (next.isNull()) {
-        addLastChildNodeToJson(element, output);
+      if (next.isNull()){
+        if (!output.contains(element.tagName().toStdString())){
+          addLastChildNodeToJson(element, output);
+        }
+        else {
+          output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], element.text().toStdString()};
+        }
       }
       else {
-//        std::cout << element.tagName().toStdString() << std::endl;
         // If there is already an element with this tag name, add it to a list rather than 
         // overwriting
         if (output.contains(element.tagName().toStdString())) {
-          std::cout << "being identified: " << element.tagName().toStdString() << std::endl;
           // if it's a list already, append, else make it a list
           if (output[element.tagName().toStdString()].is_array()) {
-//            std::cout << "it's already a list!" << std::endl;
-//            std::cout << output[element.tagName().toStdString()] << std::endl;
-            //convertXmlToJson(next, output[element.tagName().toStdString()]);
             ordered_json temporaryJson;
             convertXmlToJson(next, temporaryJson);
             output[element.tagName().toStdString()].push_back(temporaryJson);
           }
           else {
-/*            std::cout << "it's not a list!" << std::endl;
-            std::cout <<  element.tagName().toStdString() << std::endl;
-            std::cout << output[element.tagName().toStdString()] << std::endl;
-            std::cout << "DONE";*/
-            //output[element.tagName().toStdString()] = { output[element.tagName().toStdString()], convertXmlToJson(next, output[element.tagName().toStdString()]) }; 
             ordered_json temporaryJson;
             convertXmlToJson(next, temporaryJson);
             output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], temporaryJson};
-
-//            output[element.tagName().toStdString()].push_back(convertXmlToJson(next, output[element.tagName().toStdString()]));
            }
         }
         else {
@@ -171,8 +148,8 @@ ordered_json convertXmlToJson(QDomElement& element, ordered_json& output) {
             output[element.tagName().toStdString()] = convertXmlToJson(next, output[element.tagName().toStdString()]);
           }
         }
+        }
       }
-    }
     element = element.nextSiblingElement();
     i++;
   }
