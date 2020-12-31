@@ -80,7 +80,7 @@ option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
-# conda env as the install directory
+# conda env as the install directory.
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
@@ -293,7 +293,8 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
-find_package(Inja              REQUIRED)
+find_package(inja              REQUIRED)
+
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -347,6 +348,9 @@ foreach (_variableName ${_variableNames})
     endforeach()
   endif()
 endforeach()
+
+# add target based linkages to ALLLIBS variable
+list(APPEND ALLLIBS pantor::inja)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)

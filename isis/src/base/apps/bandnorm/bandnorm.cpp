@@ -24,9 +24,9 @@ namespace Isis {
   static vector<double> normalizer;
   
   // function prototypes
-  void getStats(Buffer &in);
-  void normalize(Buffer &in, Buffer &out);
-  void Tokenize(const QString &str,
+  static void getStats(Buffer &in);
+  static void normalize(Buffer &in, Buffer &out);
+  static void Tokenize(const QString &str,
                 vector<QString> & tokens,
                 const QString &delimiters = " ");
   
