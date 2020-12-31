@@ -55,7 +55,7 @@ requirements:
 
   host:
   - armadillo
-  - ale >=0.8.1
+  - ale >=0.8.5
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
@@ -105,7 +105,7 @@ requirements:
   - zlib
 
   run:
-  - ale >=0.8.1
+  - ale >=0.8.5
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
