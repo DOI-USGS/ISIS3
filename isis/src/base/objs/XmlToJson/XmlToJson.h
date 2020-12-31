@@ -19,9 +19,7 @@ nlohmann::ordered_json xmlToJson(QDomDocument& doc);
 
 // These are not intended to be used directly, helper functions
 nlohmann::ordered_json convertXmlToJson(QDomElement& node, nlohmann::ordered_json& output);
-void addLastChildNodeToJson(QDomElement& e, nlohmann::ordered_json& output);
-nlohmann::ordered_json createLastChildNode(QDomElement& element);
-//nlohmann::ordered_json convertXmlListToJson(QDomElement& element, ordered_json& output)
+nlohmann::ordered_json convertLastChildNodeToJson(QDomElement& element);
 }
 
 #endif

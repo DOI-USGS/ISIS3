@@ -12,7 +12,7 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   <TagLevel1A>
     <TagLevel2A>TagLevel2AValue</TagLevel2A>
     <TagLevel2B>TagLevel2BValue</TagLevel2B>
-    <TagLevel2Extra atrribute="cheese" />
+    <TagLevel2Extra attr="justAnAttribute" />
     <TagLevel2ExtraExtra />
     <TagLevel2C>
       <TagLevel3>
@@ -35,15 +35,14 @@ TEST(XmlToJson, TestXMLParsingEverything) {
        <ten>10</ten>
        <ten>TEN</ten>
        <oddball>notrepeated</oddball>
-       <A>A3</A>
       </First>
       <First>
         <tweleve>12</tweleve>
         <thirteen>13</thirteen>
       </First>
       <First>
-        <fourteen>12</fourteen>
-        <fifteen>13</fifteen>
+        <fourteen>14</fourteen>
+        <fifteen>15</fifteen>
       </First>
       <Second>
           <A attributeA="A" attributeB="B" attributeC="C">ElementValue</A>
@@ -64,6 +63,7 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   xmlDocument.setContent(xmlInput);
   ordered_json result = xmlToJson(xmlDocument);
   std::cout << result.dump(4) << std::endl;
+
   // Test deeply nested value retrieval (uncomplicated)
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2B"], "TagLevel2BValue");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2C"]["TagLevel3"]["TagLevel4A"], "TagLevel4AValue");
@@ -73,13 +73,34 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["@attributeTag2D"], "Attribute value");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["#text"], "TagLevel2DValue");
 
-  // Test list creation for repeated tag at same level
+  // Test no-text value cases <tag /> and <tag attributeName="attributeValue" /> 
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2ExtraExtra"], nullptr);
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2Extra"]["@attr"], "justAnAttribute");
+
+  // Test list creation for repeated tags at the same level
+  
+  // Case A: <a><b>bcontents</b></a> <a><c>cContents</c></a> JSON: a: [ {b: bcontents}, {c: cContents} ]
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][1]["tweleve"], "12");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][1]["thirteen"], "13");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][2]["fourteen"], "14");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][2]["fifteen"], "15");
+
+  // Case B: <z><a>aContents1</a><a>aContents2</a></a> JSON: z: {a: [aContents1, aContents2] }
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][0], "A1");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][1], "A2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["oddball"], "notrepeated");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["B"][0], "b1");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["B"][1], "b2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["C"], "notlist");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["ten"][0], "10");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["ten"][1], "TEN");
 
   // Test many attributes at one level
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeA"], "A");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeB"], "B");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeC"], "C");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["#text"], "ElementValue");
+
 
   // Test multiple attributes at multiple levels
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["@otherattr"], "firstLetter");
