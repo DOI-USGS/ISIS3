@@ -12,6 +12,8 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   <TagLevel1A>
     <TagLevel2A>TagLevel2AValue</TagLevel2A>
     <TagLevel2B>TagLevel2BValue</TagLevel2B>
+    <TagLevel2Extra atrribute="cheese" />
+    <TagLevel2ExtraExtra />
     <TagLevel2C>
       <TagLevel3>
         <TagLevel4A>TagLevel4AValue</TagLevel4A>
@@ -61,7 +63,7 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   QDomDocument xmlDocument("TestDocument");
   xmlDocument.setContent(xmlInput);
   ordered_json result = xmlToJson(xmlDocument);
-
+  std::cout << result.dump(4) << std::endl;
   // Test deeply nested value retrieval (uncomplicated)
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2B"], "TagLevel2BValue");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2C"]["TagLevel3"]["TagLevel4A"], "TagLevel4AValue");
@@ -72,7 +74,6 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["#text"], "TagLevel2DValue");
 
   // Test list creation for repeated tag at same level
-  // This is borken
 
   // Test many attributes at one level
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeA"], "A");
@@ -92,4 +93,4 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["AnotherLevel"]["Gamma"]["#text"], "GammaValue");
 }
 
-// also need to test copied tags at a higher level than base
+

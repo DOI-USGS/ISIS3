@@ -92,6 +92,55 @@ void addLastChildNodeToJson(QDomElement& element, ordered_json& output){
 }
 
 
+// creates a "normal" last child node. Used for the following situations: 
+//  
+// XML: <tag>value</tag>
+//  JSON: {tag: value}
+// 
+//  XML: <tag attributeName="attributeValue">textValue</tag>
+//  JSON: {tag: {@attributeName: "attributeValue, "#text":textValue } }
+//
+//  XML: <tag attributeName="attributeValue" />
+//  JSON: {tag: {@attributeName: "attributeValue"} }
+// 
+//  XML: <tag />
+//  JSON: tag: null
+// 
+ordered_json createLastChildNode(QDomElement& element){
+  ordered_json newJson;
+
+  if (element.hasAttributes()) {
+    // If there are attributes, add them
+    // <tag attributeName="attributeValue">textValue</tag>
+    ordered_json attributeSection;
+    QDomNamedNodeMap attrMap = element.attributes();
+    for (int i=0; i < attrMap.size(); i++) {
+      QDomAttr attr = attrMap.item(i).toAttr(); 
+      attributeSection["@"+attr.name().toStdString()] = attr.value().toStdString();
+    }
+    // If there is no textValue, don't include it
+    // <tag attributeName="attributeValue" />
+    if (!element.text().isEmpty()) {
+      attributeSection["#text"] = element.text().toStdString(); 
+    }
+    newJson[element.tagName().toStdString()] = attributeSection;
+    return newJson;
+  }
+  else {
+    // Just add element and its value
+    // <tag>value</tag>
+    if (!element.text().isEmpty()) {
+      newJson[element.tagName().toStdString()] = element.text().toStdString();
+    }
+    else {
+      // <tag /> no value case
+      newJson[element.tagName().toStdString()];
+    }
+    return newJson;
+  }
+  return newJson;
+}
+
 /**
  * Not intended to be used directly. Intended to be used by xmlToJson to convert 
  * an input XML document to JSON. 
@@ -108,7 +157,12 @@ ordered_json convertXmlToJson(QDomElement& element, ordered_json& output) {
       QDomElement next = element.firstChildElement();
       if (next.isNull()){
         if (!output.contains(element.tagName().toStdString())){
-          addLastChildNodeToJson(element, output);
+//          std::cout << "COMPARE ME: " << std::endl;
+//          std::cout << createLastChildNode(element).dump() << std::endl;
+//          std::cout << output.dump() << std::endl << std::endl;
+          //addLastChildNodeToJson(element, output);
+//          std::cout << output.dump() << std::endl << std::endl;
+          output.update(createLastChildNode(element));
         }
         else {
           output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], element.text().toStdString()};
@@ -150,6 +204,9 @@ ordered_json convertXmlToJson(QDomElement& element, ordered_json& output) {
         }
         }
       }
+    else {
+      output.update(createLastChildNode(element));
+    }
     element = element.nextSiblingElement();
     i++;
   }
