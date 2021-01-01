@@ -53,10 +53,10 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
         #Activate the environment
         #Depending on your version of Anaconda use one of the following:
 
-        #Anaconda 3.4 and up:
+        #Anaconda 3.4 and up (conda>=4.6):
         conda activate isis
 
-        #Prior to Anaconda 3.4:
+        #Prior to Anaconda 3.4 (conda<4.6):
         source activate isis
 
         #Add the following channels to the environment
@@ -77,15 +77,21 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
         conda config --env --add channels usgs-astrogeology
 
+        # If you have followed conda-forges advice to set `channel_priority=strict`,
+        # you need to set it to flexible for the install:
+        conda config --set channel_priority flexible
+
 
 6.  The environment is now ready to download ISIS and its dependencies:
 
-        conda install -c usgs-astrogeology isis
+        # To install e.g. version 4.3
+        conda install isis=4.3
 
     If you would like to work with our latest ISIS version 3, rather than updating
     to ISIS 4, instead run:
 
-	    conda install -c usgs-astrogeology isis=3.10.0
+	    # This will find the latest 3.x.y release
+        conda install isis=3
 
 
 7.  Finally, setup the environment variables:
@@ -110,7 +116,14 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
         python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area"). Now everytime the isis environment is activated, $ISISROOT, $ISISDATA, and $ISISTESTDATA will be set to the values passed to isisVarInit.py. This does not happen retroactively, so re-activate the isis envionment with one of the following commands:
+
+    For the newer version we also support automatic copying of the init files to other conda environment. If you require this, call the script with the optional switch `--init-other-envs`:
+
+        python @CONDA_PREFIX/scripts/isisVarInit.py --init-other-envs
+
+    If you rather want to copy the files manually, see the instructions in the next section.
+
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area"). Now everytime the ISIS environment is activated, $ISISROOT, $ISISDATA, and $ISISTESTDATA will be set to the values passed to isisVarInit.py. This does not happen retroactively, so re-activate the isis envionment with one of the following commands:
 
         for Anaconda 3.4 and up - conda activate isis
         prior to Anaconda 3.4 - source activate isis
