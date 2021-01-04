@@ -28,7 +28,7 @@
           Input cube
         </brief>
         <description>
-  	      This is the input cube that will be cropped.
+          This is the input cube that will be cropped.
         </description>
         <filter>
           *.cub
@@ -56,6 +56,34 @@
           The.
         </description>
       </parameter>
+    </group>
+
+    <group name="Other">
+      <parameter name="MAINLABEL">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>
+          Use the main cube label as input data
+        </brief>
+        <description>
+          Use the main input cube label as a source of data to replace template elements with.
+        </description>
+      </parameter>
+
+      <parameter name="ORIGINALLABEL">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Use the original label as input data
+        </brief>
+        <description>
+          Use the original label attached to the input cube as a source of data 
+          to replace template elements with. This is the label that was saved when
+          the cube was first ingested into ISIS as a cube.
+        </description>
+      </parameter>
+
+
     </group>
   </groups>
 </application>
