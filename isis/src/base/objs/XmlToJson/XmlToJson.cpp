@@ -22,8 +22,8 @@ namespace Isis {
 /**
  * Converts an XML file to a json object. 
  *  
- * Here are some details: 
- *  
+ * Please see other functions for details about how XML elements are 
+ * converted to corresponding json elements.
  * 
  * @param xmlFile Path to an XML file.
  * 
@@ -124,7 +124,18 @@ ordered_json convertLastChildNodeToJson(QDomElement& element){
 /**
  * Not intended to be used directly. Intended to be used by xmlToJson to convert 
  * an input XML document to JSON. 
- * 
+ *  
+ * This function does the following conversions: 
+ *  
+ * XML: <a><b>val1</b><c>val2</c></a> 
+ * JSON: a : {b: val1, c: val2}
+ *  
+ * XML: <a> <first>value1</first> </a> <a> <second>value2</second></a>
+ * JSON: a: [ {first:value1, second:value2} ]
+ *  
+ * XML: <a>val1</a><a>val2</a> 
+ * JSON: a:[val1, val2]
+ *  
  * @param element A QDomElement representing the whole or some subset of a QDomDocument
  * @param output A JSON object constructed from XML input.
  * 
@@ -133,62 +144,63 @@ ordered_json convertLastChildNodeToJson(QDomElement& element){
 ordered_json convertXmlToJson(QDomElement& element, ordered_json& output) {
   int i = 0;
   while (!element.isNull()) {
-    if (element.hasChildNodes()) {
-      QDomElement next = element.firstChildElement();
-      if (next.isNull()){
-        if (!output.contains(element.tagName().toStdString())){
-          output.update(convertLastChildNodeToJson(element));
+    QDomElement next = element.firstChildElement();
+    if (next.isNull()){
+      ordered_json converted = convertLastChildNodeToJson(element);
+      // Simple case with no repeated tags at the same level
+      if (!output.contains(element.tagName().toStdString())){
+        output.update(converted);
+      }
+      else {
+        // There is a repeated tag at the same level in the XML, i.e: <a>val1</a><a>val2</a>. 
+        // Translated json goal: a:[val1, val2]
+        // If the converted json has an array already, append, else make it an array  
+        if (output[element.tagName().toStdString()].is_array()) {
+          output[element.tagName().toStdString()].push_back(converted[element.tagName().toStdString()]);
         }
         else {
-          // if it's an array already, append, else make it an array <a>val1</a><a>val2</a> --> a:[val1, val2]
-          if (output[element.tagName().toStdString()].is_array()) {
-            output[element.tagName().toStdString()].push_back(element.text().toStdString());
-          }
-          else {
-            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], element.text().toStdString()};
-          }
+          output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], converted[element.tagName().toStdString()]};
+        }
+      }
+    }
+    else {
+      // If there is already an element with this tag name at any level besides the same one,
+      // add it to a list rather than 
+      // overwriting. This is the following situation:
+      // XML: <a> <first>value1</first> </a> <a> <second>value2</second></a>
+      // JSON: a: [ {first:value1, second:value2} ]
+      if (output.contains(element.tagName().toStdString())) {
+        
+        // If it's an array already, append, else make it an array
+        if (output[element.tagName().toStdString()].is_array()) {
+          ordered_json temporaryJson;
+          convertXmlToJson(next, temporaryJson);
+          output[element.tagName().toStdString()].push_back(temporaryJson);
+        }
+        else {
+          ordered_json temporaryJson;
+          convertXmlToJson(next, temporaryJson);
+          output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], temporaryJson};
         }
       }
       else {
-        // If there is already an element with this tag name, add it to a list rather than 
-        // overwriting
-        if (output.contains(element.tagName().toStdString())) {
-
-          // if it's an array already, append, else make it an array
-          if (output[element.tagName().toStdString()].is_array()) {
-            ordered_json temporaryJson;
-            convertXmlToJson(next, temporaryJson);
-            output[element.tagName().toStdString()].push_back(temporaryJson);
+        if (element.hasAttributes()) {
+          // If there are attributes, add them
+          ordered_json tempArea;
+          QDomNamedNodeMap attrMap = element.attributes();
+          for (int i=0; i < attrMap.size(); i++) {
+            QDomAttr attr = attrMap.item(i).toAttr(); 
+            tempArea["@"+attr.name().toStdString()] = attr.value().toStdString();
           }
-          else {
-            ordered_json temporaryJson;
-            convertXmlToJson(next, temporaryJson);
-            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()], temporaryJson};
-           }
+          tempArea.update(
+              convertXmlToJson(next, output[element.tagName().toStdString()]));
+          output[element.tagName().toStdString()] = tempArea;
         }
         else {
-          if (element.hasAttributes()) {
-            // If there are attributes, add them
-            ordered_json tempArea;
-            QDomNamedNodeMap attrMap = element.attributes();
-            for (int i=0; i < attrMap.size(); i++) {
-              QDomAttr attr = attrMap.item(i).toAttr(); 
-              tempArea["@"+attr.name().toStdString()] = attr.value().toStdString();
-            }
-            tempArea.update(
-                convertXmlToJson(next, output[element.tagName().toStdString()]));
-            output[element.tagName().toStdString()] = tempArea;
-          }
-          else {
             // Otherwise, just add element and its value
-            output[element.tagName().toStdString()] = convertXmlToJson(next, output[element.tagName().toStdString()]);
-          }
-        }
+          output[element.tagName().toStdString()] = convertXmlToJson(next, output[element.tagName().toStdString()]);
         }
       }
-    else {
-      // <tag attribute="value" /> case and <tag /> case only
-      output.update(convertLastChildNodeToJson(element));
     }
     element = element.nextSiblingElement();
     i++;
