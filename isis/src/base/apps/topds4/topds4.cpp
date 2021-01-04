@@ -1,7 +1,10 @@
 #include <fstream>
 #include <iostream>
+#include <time.h>
 
 #include <inja/inja.hpp>
+
+#include "md5wrapper.h"
 
 #include "topds4.h"
 
@@ -24,7 +27,6 @@ namespace Isis {
     return topds4(icube, ui);
   }
 
-
   PvlGroup topds4(Cube *icube, UserInterface &ui) {
 
     Process p;
@@ -36,15 +38,15 @@ namespace Isis {
     Pvl &cubeLabel = *icube->label();
 
     // Add the input cube PVL label to template engine data
-    // *** TODO: make sure this label is inside a unique JSON element so nothing in it can 
+    // *** TODO: make sure this label is inside a unique JSON element so nothing in it can
     // conflict with other data sources
     if (ui.GetBoolean("MAINLABEL")) {
       dataSource["MainLabel"].update(pvlToJSON(cubeLabel));
     }
-    
+
     // Add the original label (from an ingestion app) to the template engine data
     // Wrap it in an OriginalLabel so existing elements don't get overwritten
-    // *** TODO: make sure this label is inside a unique JSON element so nothing in it can 
+    // *** TODO: make sure this label is inside a unique JSON element so nothing in it can
     // conflict with other data sources
     if (ui.GetBoolean("ORIGINALLABEL")) {
       if (cubeLabel.hasObject("OriginalLabel")) {
@@ -58,13 +60,41 @@ namespace Isis {
         // get the xml label and add it to the template data
       }
     }
-    
+
     std::cout << "=================================" << std::endl;
     std::cout << dataSource.dump(4) << std::endl;
     std::cout << "=================================" << std::endl;
 
-    Environment env;
     std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
+
+    Environment env;
+    // Call back functions
+    /**
+     * Renders to the current UTC time formatted as YYYY-MM-DDTHH:MM:SS
+     */
+    env.add_callback("currentTime", 0, [](Arguments& args) {
+      time_t startTime = time(NULL);
+      struct tm *tmbuf = gmtime(&startTime);
+      char timestr[80];
+      strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
+      return string(timestr);
+    });
+
+    /**
+     * Renders to the filename of the output img
+     */
+    env.add_callback("imageFileName", 0, [icube](Arguments& args) {
+      QString cubeFilename = icube->fileName().split("/").back();
+      return (cubeFilename.split(".")[0] + ".img").toStdString();
+    });
+
+    /**
+     * Renders to the MD5 hash for the input cube
+     */
+    env.add_callback("md5Hash", 0, [icube](Arguments& args) {
+      md5wrapper md5;
+      return md5.getHashFromFile(icube->fileName()).toStdString();
+    });
     std::string result = env.render_file(inputTemplate, dataSource);
 
     std::ofstream outFile(ui.GetFileName("TO").toStdString());
