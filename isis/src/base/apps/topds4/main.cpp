@@ -7,6 +7,19 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  PvlGroup results = topds4(ui);
-  Application::Log(results);
+  Pvl appLog;
+
+  try {
+    topds4(ui, &appLog);
+  }
+  catch (...) {
+    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+      Application::Log(*grpIt);
+    }
+    throw;
+  }
+
+  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
+    Application::Log(*grpIt);
+  }
 }

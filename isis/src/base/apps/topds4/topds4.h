@@ -11,8 +11,8 @@
 #include "UserInterface.h"
 
 namespace Isis {
-  extern PvlGroup topds4(Cube* cube, UserInterface &ui);
-  extern PvlGroup topds4(UserInterface &ui);
+  extern void topds4(Cube* cube, UserInterface &ui, Pvl *log=nullptr);
+  extern void topds4(UserInterface &ui, Pvl *log=nullptr);
 }
 
 #endif
