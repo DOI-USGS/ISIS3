@@ -66,7 +66,7 @@ TEST(XmlToJson, XmlNoTextValueNoAttribute) {
 }
 
 // XML:  <tag><a>value</a><b>otherValue</b></tag>
-// JSON: {tag: a:value, b:otherValue}
+// JSON: {tag: {a:value, b:otherValue}}
 TEST(XmlToJson, XmlNestedTags) {
  QString xmlInput = R"(<OuterTag>
       <TagLevel1>
@@ -90,7 +90,7 @@ TEST(XmlToJson, XmlNestedTags) {
 }
 
 // XML: <tag><a>value</a><a>otherValue</a></tag>
-// JSON: {tag: a: [value, otherValue]}
+// JSON: {tag: {a: [value, otherValue]}}
 TEST(XmlToJson, TestRepeatedTagNoChildren){
   QString xmlInput = R"(<Tag>
      <A>A1</A>
@@ -122,7 +122,7 @@ TEST(XmlToJson, TestRepeatedTagNoChildren){
 }
 
 // XML: <tag><a><b>value</b></a><a><c>otherValue</c></a></tag>
-// JSON: {tag: a: [{b: value}, {c: otherValue}]}
+// JSON: {tag: { a: [{b: value}, {c: otherValue}]} }
 TEST(XmlToJson, TestRepeatedTagWithChildren){
   QString xmlInput = R"(<Tag>
       <a><b>value</b></a>
