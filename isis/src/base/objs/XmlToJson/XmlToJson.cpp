@@ -177,7 +177,6 @@ namespace Isis {
         }
         else {
           if (element.hasAttributes()) {
-            // If there are attributes, add them
             json tempArea;
             QDomNamedNodeMap attrMap = element.attributes();
             for (int j=0; j < attrMap.size(); j++) {
@@ -189,7 +188,8 @@ namespace Isis {
             output[element.tagName().toStdString()] = tempArea;
           }
           else {
-            output[element.tagName().toStdString()] = convertXmlToJson(next, output[element.tagName().toStdString()]);
+            output[element.tagName().toStdString()] = 
+              convertXmlToJson(next, output[element.tagName().toStdString()]);
           }
         }
       }
