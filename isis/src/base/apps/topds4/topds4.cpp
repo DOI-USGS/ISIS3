@@ -54,7 +54,6 @@ namespace Isis {
     std::cout << dataSource.dump(4) << std::endl;
     std::cout << "=================================" << std::endl;
 
-    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
 
     Environment env;
     // Call back functions
@@ -84,6 +83,8 @@ namespace Isis {
       md5wrapper md5;
       return md5.getHashFromFile(icube->fileName()).toStdString();
     });
+
+    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
 
     std::string result = env.render_file(inputTemplate, dataSource);
 
