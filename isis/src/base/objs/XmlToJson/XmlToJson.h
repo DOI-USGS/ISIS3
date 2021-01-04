@@ -13,13 +13,8 @@ find files of those names at the top level of this repository. **/
 #include <nlohmann/json.hpp>
 
 namespace Isis {
-
-nlohmann::ordered_json xmlToJson(QString xmlFile);
-nlohmann::ordered_json xmlToJson(QDomDocument& doc);
-
-// These are not intended to be used directly, helper functions
-nlohmann::ordered_json convertXmlToJson(QDomElement& node, nlohmann::ordered_json& output);
-nlohmann::ordered_json convertLastChildNodeToJson(QDomElement& element);
+  nlohmann::json xmlToJson(QString xmlFile);
+  nlohmann::json xmlToJson(QDomDocument& doc);
 }
 
 #endif

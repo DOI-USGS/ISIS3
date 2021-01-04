@@ -27,11 +27,15 @@ TEST(XmlToJson, TestXMLParsingEverything) {
       <First>
        <A>A1</A>
        <A>A2</A>
+       <A attribute="value"/>
+       <A attr="val">zoom</A>
        <A>
          <B>b1</B>
          <B>b2</B>
          <C>notlist</C>
        </A>
+       <A>A3</A>
+       <A />
        <ten>10</ten>
        <ten>TEN</ten>
        <oddball>notrepeated</oddball>
@@ -86,12 +90,19 @@ TEST(XmlToJson, TestXMLParsingEverything) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][2]["fifteen"], "15");
 
   // Case B: <z><a>aContents1</a><a>aContents2</a></a> JSON: z: {a: [aContents1, aContents2] }
+  // including lots of possible combinations
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][0], "A1");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][1], "A2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["@attribute"], "value");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["@attr"], "val");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["#text"], "zoom");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][5], "A3");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][6], nullptr);
+
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["oddball"], "notrepeated");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["B"][0], "b1");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["B"][1], "b2");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["C"], "notlist");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][4]["B"][0], "b1");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][4]["B"][1], "b2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][4]["C"], "notlist");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["ten"][0], "10");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["ten"][1], "TEN");
 
