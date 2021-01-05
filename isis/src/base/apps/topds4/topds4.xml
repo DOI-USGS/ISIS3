@@ -2,20 +2,28 @@
 
 <application name="topds4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    dummy
+    Convert from ISIS3 cube to PDS 4 format using template XML files
   </brief>
 
   <description>
-    dummy
+    <p>
+      Writes a PDS4 compatible label file and image file. The contents of the label file are 
+      generated useing the template file specified by the TEMPLATE parameter.
+    </p>
+    <p>
+      The image file is generated from the input ISIS cube specified by the FROM parameter.
+      The format of the output image file can be either an ISIS cube or a raw binary file containing
+      only the image DNs (i.e., no header or trailing data).
+    </p>
   </description>
 
   <category>
-    <categoryItem>Trim and Mask</categoryItem>
+    <categoryItem>Import and Export</categoryItem>
   </category>
 
   <history>
-    <change name="Jeffrey Covington" date="2015-01-15">
-      Removed unreachable code.
+    <change name="Stuart Sides" date="2021-01-03">
+      Original version
     </change>
   </history>
 
@@ -28,7 +36,7 @@
           Input cube
         </brief>
         <description>
-          This is the input cube that will be cropped.
+          This is the input cube that will be converted to PDS4 format.
         </description>
         <filter>
           *.cub
@@ -42,7 +50,10 @@
           Input template
         </brief>
         <description>
-          Input template
+          The file name of the input template. This file contains "inja" compatible 
+          template syntax inside of a PDS4 XML label. The data used to replace the 
+          template elements comes from the ISIS cube label, the original label 
+          (PDS3, FITS, PDS4), and other input PVL, XML, or JSON files.
         </description>
       </parameter>
 
@@ -53,9 +64,26 @@
           Output PDS4 label
         </brief>
         <description>
-          The.
+          The output file name of the PDS4 label. The output image name will be derived from this
+          parameter by removing the last extension and adding .cub
         </description>
       </parameter>
+
+      <parameter name="DATA">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output JSON data
+        </brief>
+        <description>
+          The output file name to store the template data source. This is a dump of the JSON data used
+          by the template engine to fill in the template elements. It is a combination of the ISIS
+          main cube lable, the original lable, and any other data sources supplied. The purpose of this
+          parameter is for debugging the templates.
+        </description>
+      </parameter>
+
     </group>
   </groups>
 </application>

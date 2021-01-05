@@ -389,63 +389,63 @@
     </Observation_Area>
     <File_Area_Observational>
         <File>
-            <file_name>20190612T090019S776_map_L0pan.fits</file_name>
-            <creation_date_time>2020-01-17T19:16:18.256Z</creation_date_time>
-            <file_size unit="byte">4443840</file_size>
+            <file_name>{{imageFileName()}}</file_name>
+            <creation_date_time>{{currentTime()}}</creation_date_time>
+            <file_size unit="byte">{{outputFileSize()}}</file_size>
         </File>
         <Header>
             <offset unit="byte">0</offset>
-            <object_length unit="byte">17280</object_length>
-            <parsing_standard_id>FITS 3.0</parsing_standard_id>
+            <object_length unit="byte">{{ int(MainLabel.IsisCube.Core.StartByte.Value) - 2}}</object_length>
+            <parsing_standard_id>ISIS3</parsing_standard_id>
         </Header>
         <Array_2D_Image>
             <local_identifier>Active Area</local_identifier>
-            <offset unit="byte">17280</offset>
+            <offset unit="byte">{{ int(MainLabel.IsisCube.Core.Pixels.Multiplier.Value) - 1}}</offset>
             <axes>2</axes>
             <axis_index_order>Last Index Fastest</axis_index_order>
             <description>OCAMS image 1024 by 1024 pixel active array.</description>
             <Element_Array>
                 <data_type>UnsignedMSB2</data_type>
                 <unit>DN</unit>
-                <scaling_factor>1</scaling_factor>
-                <value_offset>32768</value_offset>
+                <scaling_factor>{{MainLabel.IsisCube.Core.Pixels.Multiplier.Value}}</scaling_factor>
+                <value_offset>{{MainLabel.IsisCube.Core.Pixels.Base.Value}}</value_offset>
             </Element_Array>
             <Axis_Array>
                 <axis_name>Line</axis_name>
-                <elements>1024</elements>
+                <elements>{{MainLabel.IsisCube.Core.Dimensions.Lines.Value}}</elements>
                 <sequence_number>1</sequence_number>
             </Axis_Array>
             <Axis_Array>
                 <axis_name>Sample</axis_name>
-                <elements>1024</elements>
+                <elements>{{MainLabel.IsisCube.Core.Dimensions.Samples.Value}}</elements>
                 <sequence_number>2</sequence_number>
             </Axis_Array>
         </Array_2D_Image>
         <Header>
-            <offset unit="byte">2116800</offset>
-            <object_length unit="byte">2880</object_length>
-            <parsing_standard_id>FITS 3.0</parsing_standard_id>
+            <offset unit="byte">0</offset>
+            <object_length unit="byte">TBD</object_length>
+            <parsing_standard_id>ISIS3</parsing_standard_id>
         </Header>
         <Array_2D_Image>
             <local_identifier>Active Array and Extended Pixel Regions</local_identifier>
-            <offset unit="byte">2119680</offset>
+            <offset unit="byte">TBD</offset>
             <axes>2</axes>
             <axis_index_order>Last Index Fastest</axis_index_order>
             <description>OCAMS 1044 sample by 1112 line extended pixel array. The extended pixel array contains the detector overscan and dark pixels.</description>
             <Element_Array>
                 <data_type>UnsignedMSB2</data_type>
                 <unit>DN</unit>
-                <scaling_factor>1</scaling_factor>
-                <value_offset>32768</value_offset>
+                <scaling_factor>TBD</scaling_factor>
+                <value_offset>TBD</value_offset>
             </Element_Array>
             <Axis_Array>
                 <axis_name>Line</axis_name>
-                <elements>{{MainLabel.IsisCube.Core.Dimensions.Lines.Value}} </elements>
+                <elements>TBD</elements>
                 <sequence_number>1</sequence_number>
             </Axis_Array>
             <Axis_Array>
                 <axis_name>Sample</axis_name>
-                <elements>1112{{MainLabel.IsisCube.Core.Dimensions.Samples.Value}}</elements>
+                <elements>TBD</elements>
                 <sequence_number>2</sequence_number>
             </Axis_Array>
         </Array_2D_Image>
