@@ -3,15 +3,16 @@
 #include <time.h>
 
 #include <inja/inja.hpp>
-
-#include "md5wrapper.h"
-#include "QFile.h"
-
-#include "topds4.h"
+#include <nlohmann/json.hpp>
+#include <QFile>
 
 #include "FileName.h"
+#include "md5wrapper.h"
 #include "OriginalLabel.h"
 #include "PvlToJSON.h"
+#include "XmlToJson.h"
+
+#include "topds4.h"
 
 using namespace std;
 using namespace inja;
@@ -52,6 +53,33 @@ namespace Isis {
     }
     else if (cubeLabel.hasObject("OriginalXmlLabel")) {
       // get the xml label and add it to the template data
+    }
+
+    // Add any extra files to the template engine data
+    if (ui.WasEntered("EXTRAPVL")) {
+      vector<QString> extraPvlFiles;
+      ui.GetFileName("EXTRAPVL", extraPvlFiles);
+      for (QString pvlFile : extraPvlFiles) {
+        Pvl extraPvl(pvlFile);
+        dataSource["ExtraPvl"].update(pvlToJSON(extraPvl));
+      }
+    }
+    if (ui.WasEntered("EXTRAXML")) {
+      vector<QString> extraXmlFiles;
+      ui.GetFileName("EXTRAXML", extraXmlFiles);
+      for (QString xmlFile : extraXmlFiles) {
+        dataSource["ExtraXml"].update(xmlToJson(xmlFile));
+      }
+    }
+    if (ui.WasEntered("EXTRAJSON")) {
+      vector<QString> extraJsonFiles;
+      ui.GetFileName("EXTRAJSON", extraJsonFiles);
+      for (QString jsonFile : extraJsonFiles) {
+        ifstream extraJsonStream(jsonFile.toStdString());
+        json extraJson;
+        extraJsonStream >> extraJson;
+        dataSource["ExtraJson"].update(extraJson);
+      }
     }
 
     Environment env;
