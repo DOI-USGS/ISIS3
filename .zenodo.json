@@ -25,6 +25,11 @@
       "name": "Austin, Christopher"
     },
     {
+      "affiliation": "Laboratory for Atmospheric and Space Physic (LASP), University of Colorado Boulder",
+      "name": "Aye, Michael Aye",
+      "orcid": "https://orcid.org/0000-0002-4088-1928"
+    },
+    {
       "name": "Backer, Jeanie"
     },
     {
@@ -40,7 +45,7 @@
     {
       "name": "Beyer, Ross",
       "affiliation": "SETI Institute and NASA Ames Research Center",
-      "orcid": "0000-0003-4503-3335"
+      "orcid": "https://orcid.org/0000-0003-4503-3335"
     },
     {
       "name": "Bonn, John"
