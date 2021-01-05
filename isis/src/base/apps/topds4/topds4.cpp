@@ -5,6 +5,7 @@
 #include <inja/inja.hpp>
 
 #include "md5wrapper.h"
+#include "QFile.h"
 
 #include "topds4.h"
 
@@ -30,6 +31,9 @@ namespace Isis {
     Process p;
     p.SetInputCube(icube);
 
+    // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
+    QString outputFile = ui.GetFileName("TO");
+
     json dataSource;
 
     Pvl &cubeLabel = *icube->label();
@@ -50,13 +54,8 @@ namespace Isis {
       // get the xml label and add it to the template data
     }
 
-    std::cout << "=============Data================" << std::endl;
-    std::cout << dataSource.dump(4) << std::endl;
-    std::cout << "=================================" << std::endl;
-
-
     Environment env;
-    // Call back functions
+    // Template engine call back functions
     /**
      * Renders to the current UTC time formatted as YYYY-MM-DDTHH:MM:SS
      */
@@ -77,6 +76,14 @@ namespace Isis {
     });
 
     /**
+     * Renders to the final file size in bytes of the output cube or img
+     */
+    env.add_callback("outputFileSize", 0, [outputFile](Arguments& args) {
+      FileName cubeFilename = outputFile;
+        return QFile(outputFile).size();
+    });
+
+    /**
      * Renders to the MD5 hash for the input cube
      */
     env.add_callback("md5Hash", 0, [icube](Arguments& args) {
@@ -85,12 +92,17 @@ namespace Isis {
     });
 
     std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
-
     std::string result = env.render_file(inputTemplate, dataSource);
 
     std::ofstream outFile(ui.GetFileName("TO").toStdString());
     outFile << result;
     outFile.close();
+
+    if (ui.WasEntered("DATA")) {
+      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+      jsonDataFile << dataSource.dump(4);
+      jsonDataFile.close();
+    }
 
     std::cout << "============Result===============" << std::endl;
     std::cout << result << std::endl;
