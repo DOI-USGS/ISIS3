@@ -30,6 +30,8 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+- added new switch `--init-other-envs` to scripts/isisVarInit.py for copying the needed init-files to other conda envs.
+
 ### Added
 
 - Added warning to ocams2isis about the model being out of date. [#4200](https://github.com/USGS-Astrogeology/ISIS3/issues/4200)
