@@ -61,16 +61,48 @@ namespace Isis {
       ui.GetFileName("EXTRAPVL", extraPvlFiles);
       for (QString pvlFile : extraPvlFiles) {
         Pvl extraPvl(pvlFile);
-        dataSource["ExtraPvl"].update(pvlToJSON(extraPvl));
+        json extraJson = pvlToJSON(extraPvl);
+        // Notify users of duplicate keys that will be overwritten
+        if (log) {
+          for (auto& element : extraJson.items()) {
+            if (dataSource["ExtraPvl"].contains(element.key())) {
+              PvlGroup duplicateWarnings("Warning");
+              QString message = "Duplicate key [" + QString::fromStdString(element.key())
+                              + "] in extra Pvl file [" + pvlFile + "]. "
+                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "] will be overwritten.";
+              duplicateWarnings += PvlKeyword("Duplicate", message);
+              log->addGroup(duplicateWarnings);
+            }
+          }
+        }
+        dataSource["ExtraPvl"].update(extraJson);
       }
     }
+
     if (ui.WasEntered("EXTRAXML")) {
       vector<QString> extraXmlFiles;
       ui.GetFileName("EXTRAXML", extraXmlFiles);
       for (QString xmlFile : extraXmlFiles) {
-        dataSource["ExtraXml"].update(xmlToJson(xmlFile));
+        // Notify users of duplicate keys that will be overwritten
+        json extraJson = xmlToJson(xmlFile);
+        if (log) {
+          for (auto& element : extraJson.items()) {
+            if (dataSource["ExtraXml"].contains(element.key())) {
+              PvlGroup duplicateWarnings("Warning");
+              QString message = "Duplicate element [" + QString::fromStdString(element.key())
+                              + "] in extra xml file [" + xmlFile + "]. "
+                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "] will be overwritten.";
+              duplicateWarnings += PvlKeyword("Duplicate", message);
+              log->addGroup(duplicateWarnings);
+            }
+          }
+        }
+        dataSource["ExtraXml"].update(extraJson);
       }
     }
+
     if (ui.WasEntered("EXTRAJSON")) {
       vector<QString> extraJsonFiles;
       ui.GetFileName("EXTRAJSON", extraJsonFiles);
@@ -78,6 +110,19 @@ namespace Isis {
         ifstream extraJsonStream(jsonFile.toStdString());
         json extraJson;
         extraJsonStream >> extraJson;
+        if (log) {
+          for (auto& element : extraJson.items()) {
+            if (dataSource["ExtraJson"].contains(element.key())) {
+              PvlGroup duplicateWarnings("Warning");
+              QString message = "Duplicate key [" + QString::fromStdString(element.key())
+                              + "] in extra json file [" + jsonFile + "]. "
+                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "] will be overwritten.";
+              duplicateWarnings += PvlKeyword("Duplicate", message);
+              log->addGroup(duplicateWarnings);
+            }
+          }
+        }
         dataSource["ExtraJson"].update(extraJson);
       }
     }

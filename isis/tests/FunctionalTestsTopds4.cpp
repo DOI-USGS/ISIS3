@@ -139,8 +139,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraPvl) {
                            "to=" + renderedFile,
                            "extrapvl=(" + pvlFile1 + "," + pvlfile2 + ")"};
   UserInterface options(APP_XML, args);
+  Pvl log;
 
-  topds4(testCube, options);
+  topds4(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -151,6 +152,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraPvl) {
   EXPECT_EQ(testKey2[0].toStdString(), line);
   std::getline(renderedStream, line);
   EXPECT_EQ(safeKey[0].toStdString(), line);
+
+  // The duplicate key should generate a warning
+  EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
 TEST_F(SmallCube, FunctionalTestTopds4ExtraJson) {
@@ -213,8 +217,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraJson) {
                            "to=" + renderedFile,
                            "extrajson=(" + jsonFile1 + "," + jsonFile2 + ")"};
   UserInterface options(APP_XML, args);
+  Pvl log;
 
-  topds4(testCube, options);
+  topds4(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -225,6 +230,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraJson) {
   EXPECT_EQ(testJson2["AdditionalValue"], line);
   std::getline(renderedStream, line);
   EXPECT_EQ(testJson1["SafeValue"], line);
+
+  // The duplicate key should generate a warning
+  EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
 TEST_F(SmallCube, FunctionalTestTopds4ExtraXml) {
@@ -285,8 +293,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraXml) {
                            "to=" + renderedFile,
                            "extraxml=(" + xmlFile1 + "," + xmlFile2 + ", " + xmlFile3 + ")"};
   UserInterface options(APP_XML, args);
+  Pvl log;
 
-  topds4(testCube, options);
+  topds4(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -295,6 +304,9 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraXml) {
   EXPECT_EQ("b", line);
   std::getline(renderedStream, line);
   EXPECT_EQ("10", line);
+
+  // The duplicate key should generate a warning
+  EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
 TEST_F(SmallCube, FunctionalTestTopds4CurrentTime) {
