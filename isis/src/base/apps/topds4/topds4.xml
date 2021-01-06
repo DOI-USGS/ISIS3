@@ -7,7 +7,7 @@
 
   <description>
     <p>
-      Writes a PDS4 compatible label file and image file. The contents of the label file are 
+      Writes a PDS4 compatible label file and image file. The contents of the label file are
       generated useing the template file specified by the TEMPLATE parameter.
     </p>
     <p>
@@ -50,9 +50,9 @@
           Input template
         </brief>
         <description>
-          The file name of the input template. This file contains "inja" compatible 
-          template syntax inside of a PDS4 XML label. The data used to replace the 
-          template elements comes from the ISIS cube label, the original label 
+          The file name of the input template. This file contains "inja" compatible
+          template syntax inside of a PDS4 XML label. The data used to replace the
+          template elements comes from the ISIS cube label, the original label
           (PDS3, FITS, PDS4), and other input PVL, XML, or JSON files.
         </description>
       </parameter>
@@ -68,7 +68,9 @@
           parameter by removing the last extension and adding .cub
         </description>
       </parameter>
+    </group>
 
+    <group name="Data">
       <parameter name="DATA">
         <type>filename</type>
         <internalDefault>None</internalDefault>
@@ -84,6 +86,47 @@
         </description>
       </parameter>
 
+      <parameter name="EXTRAPVL">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra PVL data
+        </brief>
+        <description>
+          The PVL data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraPvl. If multiple PVL files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
+
+      <parameter name="EXTRAXML">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra XML data
+        </brief>
+        <description>
+          The XML data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraXml. If multiple XML files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
+
+      <parameter name="EXTRAJSON">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra JSON data
+        </brief>
+        <description>
+          The JSON data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraJson. If multiple JSON files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
     </group>
   </groups>
 </application>
