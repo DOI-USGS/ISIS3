@@ -19,31 +19,40 @@ TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
   UserInterface options(APP_XML, args);
   cubeatt(options);
 
-  // Test the label
   Cube outputCube(cubePath);
+
+  // Check attributes: pixel type, storage format, label format, storage order, pixel range, bands
+  EXPECT_EQ(outputCube.pixelType(), PixelType::UnsignedByte);
+  EXPECT_EQ(outputCube.format(), Cube::Format::Tile);
+  EXPECT_TRUE(outputCube.labelsAttached());
+  EXPECT_EQ(outputCube.byteOrder(), ByteOrder::Lsb);
+  // Setting the pixel range modifies the base/multiplier, so check those.
+  EXPECT_NE(outputCube.base(), 0);
+  EXPECT_NE(outputCube.multiplier(), 1);
+  EXPECT_EQ(outputCube.bandCount(), 10);  
   Pvl *label = outputCube.label();
-  PvlGroup &pixelGroup = label->findObject("IsisCube").findObject("Core").findGroup("Pixels");
-  EXPECT_EQ(QString(pixelGroup["Type"]).toStdString(), "UnsignedByte");
-  EXPECT_NEAR(pixelGroup["Base"][0].toDouble(), -0.003952569, 0.00001);
-  EXPECT_NEAR(pixelGroup["Multiplier"][0].toDouble(), 0.003952569, 0.00001);
 
   // Test the DNs
 }
 
 TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
   QString cubePath = tempDir.path() + "/NoChangeCubeatt.cub";
-  QVector<QString> args = {"from=" + testCube->fileName() + "+1", "to=" + cubePath};
+  QVector<QString> args = {"from=" + testCube->fileName(), "to=" + cubePath};
   UserInterface options(APP_XML, args);
   cubeatt(options);
 
-  // Test the label
   Cube outputCube(cubePath);
-  Pvl *label = outputCube.label();
-  PvlGroup &pixelGroup = label->findObject("IsisCube").findObject("Core").findGroup("Pixels");
-  EXPECT_EQ(QString(pixelGroup["Type"]).toStdString(), "Real");
-  EXPECT_EQ(pixelGroup["Base"][0].toDouble(), 0);
-  EXPECT_EQ(pixelGroup["Multiplier"][0].toDouble(), 1);
 
+  // Check attributes: pixel type, storage format, label format, storage order, pixel range, bands
+  EXPECT_EQ(outputCube.pixelType(), PixelType::Real);
+  EXPECT_EQ(outputCube.format(), Cube::Format::Tile);
+  EXPECT_TRUE(outputCube.labelsAttached());
+  EXPECT_EQ(outputCube.byteOrder(), ByteOrder::Lsb);
+  // Setting the pixel range modifies the base/multiplier, so check those.
+  EXPECT_EQ(outputCube.base(), 0);
+  EXPECT_EQ(outputCube.multiplier(), 1);
+  EXPECT_EQ(outputCube.bandCount(), 10);  
+ 
   // Test that DNs match in the input and output cubes
 }
 
@@ -56,13 +65,16 @@ TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
   UserInterface options(APP_XML, args);
   cubeatt(options);
 
-  // Test the label
   Cube outputCube(cubePath);
-  Pvl *label = outputCube.label();
-  PvlGroup &dimensionsGroup = label->findObject("IsisCube").findObject("Core").findGroup("Dimensions");
-
-  // Test the label
-  EXPECT_EQ(QString(dimensionsGroup["Bands"]).toInt(), 9);
+  // Check attributes: pixel type, storage format, label format, storage order, pixel range, bands
+  EXPECT_EQ(outputCube.pixelType(), PixelType::Real);
+  EXPECT_EQ(outputCube.format(), Cube::Format::Tile);
+  EXPECT_TRUE(outputCube.labelsAttached());
+  EXPECT_EQ(outputCube.byteOrder(), ByteOrder::Lsb);
+  // Setting the pixel range modifies the base/multiplier, so check those.
+  EXPECT_EQ(outputCube.base(), 0);
+  EXPECT_EQ(outputCube.multiplier(), 1);
+  EXPECT_EQ(outputCube.bandCount(), 9);  
 
   // Test DNs
   // Test to see if bands were moved around as appropriate

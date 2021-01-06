@@ -32,9 +32,7 @@ namespace Isis {
     ProcessByLine p;
 
     // Should we propagate tables
-    if(propTables) {
-      p.PropagateTables(false);
-    }
+    p.PropagateTables(propTables);
 
     // Setup the input and output cubes
     p.SetInputCube(icube);

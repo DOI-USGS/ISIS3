@@ -37,8 +37,11 @@ namespace Isis {
 
     // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
 
-    // Need a better solution for this!
-    QString outputCubePath = outputFile+".cub";
+    // Name for output image
+    FileName outputFileName(outputFile);
+    QString path(outputFileName.originalPath());
+    QString name(outputFileName.baseName());
+    QString outputCubePath = path + "/" + name + ".cub";
 
     CubeAttributeOutput outputAttributes("+bsq");
     cubeatt(icube, outputCubePath, outputAttributes);
