@@ -6,7 +6,7 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis {
-  void cubeatt_process(Buffer &in, Buffer &out);
+  void cubeattProcess(Buffer &in, Buffer &out);
 
   void cubeatt(UserInterface &ui) {
     Cube icube;
@@ -18,26 +18,36 @@ namespace Isis {
     cubeatt(&icube, ui);
   }
 
+
   void cubeatt(Cube *icube, UserInterface &ui) {
+    bool propTables = ui.GetBoolean("PROPTABLES");
+    QString outputFileName = ui.GetFileName("TO");
+    CubeAttributeOutput outputAttributes= ui.GetOutputAttribute("TO");
+    cubeatt(icube, outputFileName, outputAttributes, propTables);
+  }
+
+
+  void cubeatt(Cube *icube, QString outputCubePath, CubeAttributeOutput outAttributes, bool propTables) {
     // We will be processing by line
     ProcessByLine p;
 
     // Should we propagate tables
-    if(ui.GetBoolean("PROPTABLES")) {
+    if(propTables) {
       p.PropagateTables(false);
     }
 
     // Setup the input and output cubes
     p.SetInputCube(icube);
-    p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+    p.SetOutputCube(outputCubePath, outAttributes, 
                     icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
-    p.StartProcess(cubeatt_process);
+    p.StartProcess(cubeattProcess);
     p.EndProcess();
   }
 
+
   // Line processing routine
-  void cubeatt_process(Buffer &in, Buffer &out) {
+  void cubeattProcess(Buffer &in, Buffer &out) {
     // Loop and copy pixels in the line.
     for(int i = 0; i < in.size(); i++) {
       out[i] = in[i];

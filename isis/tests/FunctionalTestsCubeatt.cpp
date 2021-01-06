@@ -26,7 +26,7 @@ TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
   EXPECT_NEAR(pixelGroup["Base"][0].toDouble(), -0.003952569, 0.00001);
   EXPECT_NEAR(pixelGroup["Multiplier"][0].toDouble(), 0.003952569, 0.00001);
 
-  // Test the DNs? 
+  // Test the DNs
 }
 
 TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
@@ -43,7 +43,7 @@ TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
   EXPECT_EQ(pixelGroup["Base"][0].toDouble(), 0);
   EXPECT_EQ(pixelGroup["Multiplier"][0].toDouble(), 1);
 
-  // Test DNs
+  // Test that DNs match in the input and output cubes
 }
 
 
@@ -63,7 +63,7 @@ TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
   EXPECT_EQ(QString(dimensionsGroup["Bands"]).toInt(), 9);
 
   // Test DNs
-
+  // Test to see if bands were moved around as appropriate
 }
 
 

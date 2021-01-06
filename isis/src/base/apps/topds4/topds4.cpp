@@ -5,10 +5,12 @@
 #include <inja/inja.hpp>
 
 #include "md5wrapper.h"
-#include "QFile.h"
+#include <QFile>
 
 #include "topds4.h"
+#include "cubeatt.h"
 
+#include "CubeAttribute.h"
 #include "FileName.h"
 #include "OriginalLabel.h"
 #include "PvlToJSON.h"
@@ -31,8 +33,16 @@ namespace Isis {
     Process p;
     p.SetInputCube(icube);
 
-    // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
     QString outputFile = ui.GetFileName("TO");
+
+    // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
+
+    // Need a better solution for this.
+    QString outputCubePath = outputFile+".cub";
+
+    CubeAttributeOutput outputAttributes("+bsq");
+    cubeatt(icube, outputCubePath, outputAttributes);
+
 
     json dataSource;
 
