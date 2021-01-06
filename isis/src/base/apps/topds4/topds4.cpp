@@ -69,7 +69,7 @@ namespace Isis {
               PvlGroup duplicateWarnings("Warning");
               QString message = "Duplicate key [" + QString::fromStdString(element.key())
                               + "] in extra Pvl file [" + pvlFile + "]. "
-                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "Previous value [" + QString::fromStdString(dataSource["ExtraPvl"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
               log->addGroup(duplicateWarnings);
@@ -92,7 +92,7 @@ namespace Isis {
               PvlGroup duplicateWarnings("Warning");
               QString message = "Duplicate element [" + QString::fromStdString(element.key())
                               + "] in extra xml file [" + xmlFile + "]. "
-                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "Previous value [" + QString::fromStdString(dataSource["ExtraXml"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
               log->addGroup(duplicateWarnings);
@@ -116,7 +116,7 @@ namespace Isis {
               PvlGroup duplicateWarnings("Warning");
               QString message = "Duplicate key [" + QString::fromStdString(element.key())
                               + "] in extra json file [" + jsonFile + "]. "
-                              + "Previous value [" + QString::fromStdString(element.value().dump())
+                              + "Previous value [" + QString::fromStdString(dataSource["ExtraJson"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
               log->addGroup(duplicateWarnings);
