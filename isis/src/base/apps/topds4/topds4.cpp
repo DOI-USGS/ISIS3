@@ -37,12 +37,11 @@ namespace Isis {
 
     // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
 
-    // Need a better solution for this.
+    // Need a better solution for this!
     QString outputCubePath = outputFile+".cub";
 
     CubeAttributeOutput outputAttributes("+bsq");
     cubeatt(icube, outputCubePath, outputAttributes);
-
 
     json dataSource;
 

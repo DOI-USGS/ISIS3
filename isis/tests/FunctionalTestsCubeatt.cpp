@@ -13,7 +13,8 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/cubeatt.xml").expanded();
 
 // Tests setting output attributes: bit type and range
 TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
-  QString cubePath = "/scratch/without.cub+8bit+0.0:1.0";
+  QString cubePath = tempDir.path() + "/bitTypeCubeatt.cub+8bit+0.0:1.0";
+
   QVector<QString> args = {"from=" + testCube->fileName(), "to=" + cubePath};
   UserInterface options(APP_XML, args);
   cubeatt(options);
@@ -30,7 +31,7 @@ TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
 }
 
 TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
-  QString cubePath = "/scratch/without.cub";
+  QString cubePath = tempDir.path() + "/NoChangeCubeatt.cub";
   QVector<QString> args = {"from=" + testCube->fileName() + "+1", "to=" + cubePath};
   UserInterface options(APP_XML, args);
   cubeatt(options);
@@ -49,7 +50,8 @@ TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
 
 
 TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
-  QString cubePath = "/scratch/bands.cub";
+  QString cubePath = tempDir.path() + "/VirtualBandsCubeatt.cub";
+
   QVector<QString> args = {"from=" + testCube->fileName() + "+3,2,4,2,1,5,7,6,4", "to=" + cubePath};
   UserInterface options(APP_XML, args);
   cubeatt(options);
