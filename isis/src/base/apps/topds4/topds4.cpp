@@ -38,9 +38,8 @@ namespace Isis {
     Process p;
     p.SetInputCube(icube);
 
+    // Setup the output file so that we can use it in callbacks
     QString outputFile = ui.GetFileName("TO");
-
-    // NEED TO WRITE AND CLOSE THE OUTPUT FILE BEFORE RENDERING SO THE FILE SIZE CALLBACK CAN GET THE FINAL FILE SIZE
 
     // Name for output image
     FileName outputFileName(outputFile);
@@ -157,27 +156,26 @@ namespace Isis {
     });
 
     /**
-     * Renders to the filename of the output img
+     * Renders to the filename of the output image file
      */
-    env.add_callback("imageFileName", 0, [icube](Arguments& args) {
-      QString cubeFilename = icube->fileName().split("/").back();
-      return (cubeFilename.split(".")[0] + ".img").toStdString();
+    env.add_callback("imageFileName", 0, [outputCubePath](Arguments& args) {
+      return outputCubePath.split("/").back().toStdString();
     });
 
     /**
-     * Renders to the final file size in bytes of the output cube or img
+     * Renders to the final file size in bytes of the output image file
      */
     env.add_callback("outputFileSize", 0, [outputFile](Arguments& args) {
       FileName cubeFilename = outputFile;
-        return QFile(outputFile).size();
+      return QFile(outputFile).size();
     });
 
     /**
-     * Renders to the MD5 hash for the input cube
+     * Renders to the MD5 hash for the output image file
      */
-    env.add_callback("md5Hash", 0, [icube](Arguments& args) {
+    env.add_callback("md5Hash", 0, [outputCubePath](Arguments& args) {
       md5wrapper md5;
-      return md5.getHashFromFile(icube->fileName()).toStdString();
+      return md5.getHashFromFile(outputCubePath).toStdString();
     });
 
     std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
@@ -192,9 +190,5 @@ namespace Isis {
       jsonDataFile << dataSource.dump(4);
       jsonDataFile.close();
     }
-
-    std::cout << "============Result===============" << std::endl;
-    std::cout << result << std::endl;
-    std::cout << "=================================" << std::endl;
   }
 }

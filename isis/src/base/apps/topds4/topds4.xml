@@ -12,8 +12,8 @@
     </p>
     <p>
       The image file is generated from the input ISIS cube specified by the FROM parameter.
-      The format of the output image file can be either an ISIS cube or a raw binary file containing
-      only the image DNs (i.e., no header or trailing data).
+      The output image file will a copy of the input ISIS cube with the image data stored in
+      Band Sequential format.
     </p>
   </description>
 
@@ -65,7 +65,7 @@
         </brief>
         <description>
           The output file name of the PDS4 label. The output image name will be derived from this
-          parameter by removing the last extension and adding .cub
+          parameter by removing the last extension and adding .cub.
         </description>
       </parameter>
     </group>

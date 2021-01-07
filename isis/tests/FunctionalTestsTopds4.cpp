@@ -355,12 +355,13 @@ TEST_F(SmallCube, FunctionalTestTopds4ImageFileName) {
   renderedStream.open(renderedFile.toStdString());
   std::string line;
   std::getline(renderedStream, line);
-  EXPECT_EQ("small.img", line);
+  EXPECT_EQ("current_time.cub", line);
 }
 
 TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
   QString templateFile = tempDir.path()+"/current_time.tpl";
   QString renderedFile = tempDir.path()+"/current_time.txt";
+  QString renderedCube = tempDir.path()+"/current_time.cub";
   std::ofstream of;
   of.open(templateFile.toStdString());
   of << "{{md5Hash()}}";
@@ -375,5 +376,5 @@ TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
   std::string line;
   std::getline(renderedStream, line);
   md5wrapper md5;
-  EXPECT_EQ(md5.getHashFromFile(testCube->fileName()).toStdString(), line);
+  EXPECT_EQ(md5.getHashFromFile(renderedCube).toStdString(), line);
 }
