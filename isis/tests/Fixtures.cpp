@@ -50,7 +50,7 @@ namespace Isis {
     bandBin += originalBand;
     cubeLabel.addGroup(bandBin);
     testCube->close();
-    testCube->open(path);
+    testCube->open(path, "rw");
   }
 
   void SmallCube::TearDown() {

@@ -14,7 +14,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/cubeatt.xml").expanded();
 
 // Tests setting output attributes: bit type and range
 TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
-  QString cubePath = tempDir.path() + "/bitTypeCubeatt.cub+8bit+0:1";
+  QString cubePath = tempDir.path() + "/bitTypeCubeatt.cub+8bit+0.0:1.0";
 
   QVector<QString> args = {"from=" + testCube->fileName(), "to=" + cubePath};
   UserInterface options(APP_XML, args);
