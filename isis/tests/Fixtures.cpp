@@ -21,7 +21,8 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->setDimensions(10, 10, 10);
-    testCube->create(tempDir.path() + "/small.cub");
+    QString path = tempDir.path() + "/small.cub";
+    testCube->create(path);
 
     LineManager line(*testCube);
     double pixelValue = 0.0;
@@ -31,6 +32,25 @@ namespace Isis {
       }
       testCube->write(line);
     }
+
+    // Add a BandBin group to the cube label
+    Pvl *label = testCube->label();
+    PvlObject& cubeLabel = label->findObject("IsisCube");
+    PvlGroup bandBin("BandBin");
+    PvlKeyword originalBand("OriginalBand", "1");
+    originalBand += "2";
+    originalBand += "3";
+    originalBand += "4";
+    originalBand += "5";
+    originalBand += "6";
+    originalBand += "7";
+    originalBand += "8";
+    originalBand += "9";
+    originalBand += "10";
+    bandBin += originalBand;
+    cubeLabel.addGroup(bandBin);
+    testCube->close();
+    testCube->open(path, "rw");
   }
 
   void SmallCube::TearDown() {
