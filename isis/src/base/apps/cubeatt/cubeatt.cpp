@@ -44,6 +44,16 @@ namespace Isis {
     p.EndProcess();
   }
 
+  // Allows specification of both input and output attributes
+  void cubeatt(QString inputCubePath, CubeAttributeInput inAtt, QString outputCubePath, CubeAttributeOutput outputAttributes, bool propTables) {
+    Cube icube;
+    if (inAtt.bands().size() != 0) {
+      icube.setVirtualBands(inAtt.bands());
+    }
+    icube.open(inputCubePath);
+    cubeatt(&icube, outputCubePath, outputAttributes, propTables);
+  }
+
   // Line processing routine
   void cubeattProcess(Buffer &in, Buffer &out) {
     // Loop and copy pixels in the line.
