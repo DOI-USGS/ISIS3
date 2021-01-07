@@ -107,7 +107,6 @@ TEST_F(SmallCube, FunctionalTestCubeattInputCube) {
   cubeatt(testCube, options);
   Cube outputCube(outputCubePath);
 
-  // Check attributes: pixel type, storage format, label format, storage order, pixel range, bands
   EXPECT_EQ(outputCube.pixelType(), PixelType::UnsignedByte);
   // Setting the pixel range modifies the base/multiplier, so check those.
   EXPECT_NE(outputCube.base(), 0);
@@ -128,7 +127,6 @@ TEST_F(SmallCube, FunctionalTestCubeattInputCubeOutputPath) {
   cubeatt(testCube, outputCubePath, attributeOutput);
   Cube outputCube(outputCubePath);
 
-  // Check attributes: pixel type, storage format, label format, storage order, pixel range, bands
   // Setting the pixel range modifies the base/multiplier, so check those.
   EXPECT_NE(outputCube.base(), 0);
   EXPECT_NE(outputCube.multiplier(), 1);
@@ -155,8 +153,6 @@ TEST_F(SmallCube, FunctionalTestCubeattInputAndOutputAttributes) {
   EXPECT_LE(outputStats->Maximum(), 300);
   EXPECT_EQ(outputCube.bandCount(), 3);  
 
-  // Do need to check the label for this one, since outputCube.physicalBand() will not work
-  // in this context:
   Pvl *label = outputCube.label();
   PvlGroup bandBin = label->findObject("IsisCube").findGroup("BandBin");
   EXPECT_EQ(QString(bandBin["OriginalBand"][0]), "3");
