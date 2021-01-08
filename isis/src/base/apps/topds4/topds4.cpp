@@ -5,16 +5,15 @@
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
 
-#include "md5wrapper.h"
+#include <QDomDocument>
 #include <QFile>
 
-#include "topds4.h"
 #include "cubeatt.h"
-
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "md5wrapper.h"
 #include "OriginalLabel.h"
+#include "OriginalXmlLabel.h"
 #include "PvlToJSON.h"
 #include "XmlToJson.h"
 
@@ -67,7 +66,10 @@ namespace Isis {
       dataSource["OriginalLabel"].update(pvlToJSON(origLabel));
     }
     else if (cubeLabel.hasObject("OriginalXmlLabel")) {
-      // get the xml label and add it to the template data
+      OriginalXmlLabel origXmlBlob;
+      icube->read(origXmlBlob);
+      QDomDocument doc = origXmlBlob.ReturnLabels();
+      dataSource["OriginalLabel"].update(xmlToJson(doc));
     }
 
     // Add any extra files to the template engine data
@@ -165,9 +167,9 @@ namespace Isis {
     /**
      * Renders to the final file size in bytes of the output image file
      */
-    env.add_callback("outputFileSize", 0, [outputFile](Arguments& args) {
-      FileName cubeFilename = outputFile;
-      return QFile(outputFile).size();
+    env.add_callback("outputFileSize", 0, [outputCubePath](Arguments& args) {
+      FileName cubeFileName = outputCubePath;
+      return QFile(cubeFileName.expanded()).size();
     });
 
     /**
