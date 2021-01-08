@@ -158,7 +158,6 @@ namespace Isis {
             json repeatedArray;
             repeatedArray.push_back(output[element.tagName().toStdString()]);
             output[element.tagName().toStdString()] = repeatedArray;
-//            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
           }
           output[element.tagName().toStdString()].push_back(converted[element.tagName().toStdString()]);
         }
@@ -177,7 +176,6 @@ namespace Isis {
             json repeatedArray;
             repeatedArray.push_back(output[element.tagName().toStdString()]);
             output[element.tagName().toStdString()] = repeatedArray;
-//            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
           }
           output[element.tagName().toStdString()].push_back(temporaryJson);
         }
