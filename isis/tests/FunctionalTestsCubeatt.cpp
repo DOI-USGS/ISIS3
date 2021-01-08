@@ -34,6 +34,7 @@ TEST_F(SmallCube, FunctionalTestCubeattBitttypeAndRange) {
   EXPECT_FLOAT_EQ(outputStats->Maximum(), 1.0);
 }
 
+
 TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
   QString cubePath = tempDir.path() + "/NoChangeCubeatt.cub";
   QVector<QString> args = {"from=" + testCube->fileName(), "to=" + cubePath};
@@ -59,7 +60,6 @@ TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
   EXPECT_DOUBLE_EQ(outputStats->Maximum(), inputStats->Maximum());
   EXPECT_DOUBLE_EQ(outputStats->Average(), inputStats->Average());
 }
-
 
 
 TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
@@ -98,3 +98,69 @@ TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
 }
 
 
+// Test using an already open cube as input and ui
+TEST_F(SmallCube, FunctionalTestCubeattInputCube) {
+  QString outputCubePath = tempDir.path() + "/bitTypeCubeatt.cub+8bit+0.0:1.0";
+  QVector<QString> args = {"from=" + testCube->fileName(), "to=" + outputCubePath};
+  UserInterface options(APP_XML, args);
+
+  cubeatt(testCube, options);
+  Cube outputCube(outputCubePath);
+
+  EXPECT_EQ(outputCube.pixelType(), PixelType::UnsignedByte);
+  // Setting the pixel range modifies the base/multiplier, so check those.
+  EXPECT_NE(outputCube.base(), 0);
+  EXPECT_NE(outputCube.multiplier(), 1);
+
+  // Test the DNs
+  Statistics *outputStats = outputCube.statistics();
+  EXPECT_FLOAT_EQ(outputStats->Minimum(), 0.0);
+  EXPECT_FLOAT_EQ(outputStats->Maximum(), 1.0);
+}
+
+
+// Test using an already open cube as input and specifying an output path and output attributes
+TEST_F(SmallCube, FunctionalTestCubeattInputCubeOutputPath) {
+  QString outputCubePath = tempDir.path() + "/bitTypeCubeatt.cub";
+  CubeAttributeOutput attributeOutput("+8bit+0.0:1.0");
+
+  cubeatt(testCube, outputCubePath, attributeOutput);
+  Cube outputCube(outputCubePath);
+
+  // Setting the pixel range modifies the base/multiplier, so check those.
+  EXPECT_NE(outputCube.base(), 0);
+  EXPECT_NE(outputCube.multiplier(), 1);
+
+  // Test the DNs
+  Statistics *outputStats = outputCube.statistics();
+  EXPECT_FLOAT_EQ(outputStats->Minimum(), 0.0);
+  EXPECT_FLOAT_EQ(outputStats->Maximum(), 1.0);
+}
+
+// Test using the input/output paths and cube attribute input and output passed in directly
+TEST_F(SmallCube, FunctionalTestCubeattInputAndOutputAttributes) {
+  QString inputCubePath = testCube->fileName();
+  CubeAttributeInput attributeInput("+3,2,4");
+  QString outputCubePath = tempDir.path() + "/bitTypeAndVirtualBandsCubeatt.cub";
+  CubeAttributeOutput attributeOutput("+200:300");
+
+  cubeatt(inputCubePath, attributeInput, outputCubePath, attributeOutput);
+
+  Cube outputCube(outputCubePath);
+
+  Statistics *outputStats = outputCube.statistics();
+  EXPECT_GE(outputStats->Minimum(), 200);
+  EXPECT_LE(outputStats->Maximum(), 300);
+  EXPECT_EQ(outputCube.bandCount(), 3);  
+
+  Pvl *label = outputCube.label();
+  PvlGroup bandBin = label->findObject("IsisCube").findGroup("BandBin");
+  EXPECT_EQ(QString(bandBin["OriginalBand"][0]), "3");
+  EXPECT_EQ(QString(bandBin["OriginalBand"][1]), "2");
+  EXPECT_EQ(QString(bandBin["OriginalBand"][2]), "4");
+
+  // Test that DNs for each band have moved appropriately
+  EXPECT_DOUBLE_EQ(outputCube.statistics(1)->Average(), testCube->statistics(3)->Average());
+  EXPECT_DOUBLE_EQ(outputCube.statistics(2)->Average(), testCube->statistics(2)->Average());
+  EXPECT_DOUBLE_EQ(outputCube.statistics(3)->Average(), testCube->statistics(4)->Average());
+}

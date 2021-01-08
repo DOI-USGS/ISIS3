@@ -7,6 +7,7 @@
 
 namespace Isis{
   extern void cubeatt(Cube *icube, QString outputCubePath, CubeAttributeOutput outputAttributes, bool propTables=false);
+  extern void cubeatt(QString inputCubePath, CubeAttributeInput inputAttributes, QString outputCubePath, CubeAttributeOutput outputAttributes, bool propTables=false);
   extern void cubeatt(Cube *icube, UserInterface &ui);
   extern void cubeatt(UserInterface &ui);
 }
