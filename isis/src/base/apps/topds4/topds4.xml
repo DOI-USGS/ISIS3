@@ -16,12 +16,13 @@
       Band Sequential format.
     </p>
     <p>
-      This application uses the <a href=https://pantor.github.io/inja/>Inja templating engine</a>
+      This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
       to render the template file. The input data from the cube and extra data sources
       is converted to JSON and then it is accessed via the Inja templating syntax.
-      See the <a href=https://pantor.github.io/inja/>Inja documentation</a> for the full template
+      See the <a href="https://pantor.github.io/inja">Inja documentation</a> for the full template
       syntax. The data from the label of the input cube is accessible under "MainLabel",
-      the data from the original label of the input cube is accessible under "OriginalLabel",
+      the data from the original PVL or XML based label of the input cube is accessible 
+      under "OriginalLabel",
       and the extra data is accessible under "ExtraPvl", "ExtraXml", and "ExtraJson".
     </p>
   </description>

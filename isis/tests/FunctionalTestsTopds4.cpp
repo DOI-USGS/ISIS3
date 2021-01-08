@@ -8,6 +8,7 @@
 #include "Fixtures.h"
 #include "md5wrapper.h"
 #include "OriginalLabel.h"
+#include "OriginalXmlLabel.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -81,6 +82,35 @@ TEST_F(SmallCube, FunctionalTestTopds4NoOriginalLabel) {
   UserInterface options(APP_XML, args);
 
   EXPECT_ANY_THROW(topds4(testCube, options));
+}
+
+TEST_F(SmallCube, FunctionalTestTopds4OriginalXmlLabel) {
+
+  QString labelFileName = tempDir.path()+"/originallabel.xml";
+  std::ofstream ofxml;
+  ofxml.open(labelFileName.toStdString());
+  ofxml << R"(<Outside> <name>Something</name> </Outside>)";
+  ofxml.close();
+  OriginalXmlLabel origLabel;
+  origLabel.readFromXmlFile(labelFileName);
+  testCube->write(origLabel);
+
+  QString templateFile = tempDir.path()+"/test_result.tpl";
+  QString renderedFile = tempDir.path()+"/test_result.txt";
+  std::ofstream of;
+  of.open(templateFile.toStdString());
+  of << "{{OriginalLabel.Outside.name}}";
+  of.close();
+  QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
+  UserInterface options(APP_XML, args);
+
+  topds4(testCube, options);
+
+  std::ifstream renderedStream;
+  renderedStream.open(renderedFile.toStdString());
+  std::string line;
+  std::getline(renderedStream, line);
+  EXPECT_EQ("Something", line);
 }
 
 TEST_F(SmallCube, FunctionalTestTopds4ExtraPvl) {
@@ -378,3 +408,23 @@ TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
   md5wrapper md5;
   EXPECT_EQ(md5.getHashFromFile(renderedCube).toStdString(), line);
 }
+
+TEST_F(SmallCube, FunctionalTestTopds4OutputFileSize) {
+  QString templateFile = tempDir.path()+"/file_size.tpl";
+  QString renderedFile = tempDir.path()+"/file_size.txt";
+  std::ofstream of;
+  of.open(templateFile.toStdString());
+  of << "{{outputFileSize()}}";
+  of.close();
+  QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
+  UserInterface options(APP_XML, args);
+
+  topds4(testCube, options);
+
+  std::ifstream renderedStream;
+  renderedStream.open(renderedFile.toStdString());
+  std::string line;
+  std::getline(renderedStream, line);
+  EXPECT_EQ("69536", line);
+}
+
