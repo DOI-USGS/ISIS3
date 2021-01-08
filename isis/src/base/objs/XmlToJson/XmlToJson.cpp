@@ -155,7 +155,10 @@ namespace Isis {
           // Translated json goal: a:[val1, val2]
           // If the converted json has an array already, append, else make it an array
           if (!output[element.tagName().toStdString()].is_array()) {
-            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
+            json repeatedArray;
+            repeatedArray.push_back(output[element.tagName().toStdString()]);
+            output[element.tagName().toStdString()] = repeatedArray;
+//            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
           }
           output[element.tagName().toStdString()].push_back(converted[element.tagName().toStdString()]);
         }
@@ -171,7 +174,10 @@ namespace Isis {
           json temporaryJson;
           convertXmlToJson(next, temporaryJson);
           if (!output[element.tagName().toStdString()].is_array()) {
-            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
+            json repeatedArray;
+            repeatedArray.push_back(output[element.tagName().toStdString()]);
+            output[element.tagName().toStdString()] = repeatedArray;
+//            output[element.tagName().toStdString()] = {output[element.tagName().toStdString()]};
           }
           output[element.tagName().toStdString()].push_back(temporaryJson);
         }
