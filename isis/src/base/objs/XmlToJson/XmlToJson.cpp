@@ -131,7 +131,7 @@ namespace Isis {
    * JSON: a : {b: val1, c: val2}
    *  
    * XML: <a> <first>value1</first> </a> <a> <second>value2</second></a>
-   * JSON: a: [ {first:value1, second:value2} ]
+   * JSON: a: [ {first:value1}, {second:value2} ]
    *  
    * XML: <a>val1</a><a>val2</a> 
    * JSON: a:[val1, val2]
