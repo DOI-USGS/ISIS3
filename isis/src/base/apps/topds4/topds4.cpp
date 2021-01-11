@@ -14,6 +14,7 @@
 #include "md5wrapper.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
+#include "Process.h"
 #include "PvlToJSON.h"
 #include "XmlToJson.h"
 
@@ -29,6 +30,10 @@ namespace Isis {
   void topds4(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();
     icube->open(ui.GetFileName("FROM"));
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      icube->setVirtualBands(inAtt.bands());
+    }
     topds4(icube, ui);
   }
 

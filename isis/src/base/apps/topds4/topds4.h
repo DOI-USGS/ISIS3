@@ -3,11 +3,6 @@
 
 #include "Cube.h"
 #include "Pvl.h"
-#include "Process.h"
-#include "SpecialPixel.h"
-#include "LineManager.h"
-#include "FileName.h"
-#include "IException.h"
 #include "UserInterface.h"
 
 namespace Isis {
