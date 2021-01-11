@@ -12,7 +12,7 @@
     </p>
     <p>
       The image file is generated from the input ISIS cube specified by the FROM parameter.
-      The output image file will a copy of the input ISIS cube with the image data stored in
+      The output image file will be a copy of the input ISIS cube with the image data stored in
       Band Sequential format.
     </p>
     <p>
