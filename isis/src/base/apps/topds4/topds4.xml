@@ -2,7 +2,7 @@
 
 <application name="topds4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Convert from ISIS3 cube to PDS 4 format using template XML files
+    Convert from ISIS cube to PDS 4 format using template XML files
   </brief>
 
   <description>
