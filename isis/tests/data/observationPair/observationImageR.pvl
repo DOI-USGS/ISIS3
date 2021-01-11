@@ -92,7 +92,7 @@ Object = IsisCube
                                  $lro/kernels/ck/moc42r_2009181_2009213_v14.bc,
                                  $lro/kernels/fk/lro_frames_2014049_v01.tf)
     Instrument                = $lro/kernels/ik/lro_lroc_v18.ti
-    SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2020287_v00.tsc
+    SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2020358_v00.tsc
     InstrumentPosition        = (Table,
                                  $lro/kernels/spk/fdf29r_2009182_2009213_v01.b-
                                  sp)
@@ -383,7 +383,7 @@ End_Object
 Object = History
   Name      = IsisCube
   StartByte = 264667140
-  Bytes     = 21067
+  Bytes     = 21996
 End_Object
 
 Object = OriginalLabel

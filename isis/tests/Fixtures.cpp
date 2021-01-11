@@ -245,6 +245,7 @@ namespace Isis {
       }
       projTestCube->write(line);
     }
+    projTestCube->reopen("rw");
   }
 
 
@@ -381,8 +382,10 @@ namespace Isis {
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
+    networkFile = "data/threeImageNetwork/controlnetwork.net";
+
     network = new ControlNet();
-    network->ReadControl("data/threeImageNetwork/controlnetwork.net");
+    network->ReadControl(networkFile);
 
     cube1map = new Cube();
     cube2map = new Cube();
@@ -411,6 +414,7 @@ namespace Isis {
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
   }
+
 
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();

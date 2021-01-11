@@ -54,6 +54,19 @@ namespace Isis {
 
     // retrieve settings from jigsaw gui
     BundleSettingsQsp settings = bundleSettings(ui);
+    if(settings->bundleTargetBody()) {
+      if(settings->bundleTargetBody()->solveTriaxialRadii() ||
+         settings->bundleTargetBody()->solveMeanRadius()) {
+        PvlGroup radiusSolveWarning("RadiusSolveWarning");
+        radiusSolveWarning.addKeyword(PvlKeyword("Warning", "The radii solve is currently \
+                                                   under review and is likely resulting \
+                                                   in addition error in the bundle adjust. \
+                                                   We recommend that you do not solve for radii at this moment."));
+         if(log) {
+           log->PvlObject::addGroup(radiusSolveWarning);
+         }
+      }
+    }
     settings->setCubeList(cubeList);
     BundleAdjust *bundleAdjustment = NULL;
     try {
@@ -147,12 +160,12 @@ namespace Isis {
       if (log) {
         Pvl summary;
         std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
-        iss >> summary; 
-        
+        iss >> summary;
+
         for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
           log->addGroup(*grpIt);
         }
-        
+
         log->addGroup(gp);
       }
       delete bundleSolution;

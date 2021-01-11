@@ -32,17 +32,18 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ### Added
 
+- Added warning to ocams2isis about the model being out of date. [#4200](https://github.com/USGS-Astrogeology/ISIS3/issues/4200)
 - Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images. [#3860](https://github.com/USGS-Astrogeology/ISIS3/issues/3860)
 - Update qview MeasureTool to add an option to calculate distances using RA/DEC and update qview to show DEC/RA rather than LAT/LON in lower-right corner [#3371](https://github.com/USGS-Astrogeology/ISIS3/issues/3371)
-- Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant 
-ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or 
-JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. 
-[#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
+- Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
+- Updated spiceinit so that a user can specify a shape model and use the spice web service without any errors. [#1986](https://github.com/USGS-Astrogeology/ISIS3/issues/1986) 
 
 ### Fixed
 
 - Fixed lrowaccal so required SPICE files are reported instead of continuing without them. [#4038](https://github.com/USGS-Astrogeology/ISIS3/issues/4038)
 - Fixed not being able to enable USECOORDLIST argument in mappt. [#4150](https://github.com/USGS-Astrogeology/ISIS3/issues/4150)
+- Fixed history entry not being added to a cube when running spiceinit with web=true. [4040](https://github.com/USGS-Astrogeology/ISIS3/issues/4040)
+- Updated wavelength and bandbin values in translation files for the TGO CaSSIS BandBin group. [4147](https://github.com/USGS-Astrogeology/ISIS3/issues/4147)
 
 ## [4.3.0] - 2020-10-02
 
