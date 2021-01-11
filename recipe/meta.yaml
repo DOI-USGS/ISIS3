@@ -46,12 +46,10 @@ build:
 requirements:
   build:
   - cmake >=3.15
-  - doxygen
   - make
   - ninja==1.7.2
   - openssl>=1.0.0,<1.1.0
   - libprotobuf=3.9.1
-  - xalan-c
 
   host:
   - armadillo
