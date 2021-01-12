@@ -8,7 +8,6 @@
 #include "Cube.h"
 #include "ExportDescription.h"
 #include "FileName.h"
-#include "iTime.h"
 #include "Process.h"
 #include "ProcessExportPds4.h"
 #include "Pvl.h"
@@ -86,29 +85,6 @@ void IsisMain() {
   targetGroup.addKeyword(productId);  
   logicalId += productId[0];
   process.setLogicalId(logicalId);
-
-  // For a mosaic, calculate stitched browse LID (lidvid) 
-  // This is as follows: 
-  // StartTime of the first framelet, rounded down to the nearest second
-  if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    QString startTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StartTime"); 
-    startTime = iTime(startTime).UTC(0).toLower().remove("-").remove(":");
-
-    // StopTime of the last framelet, rounded down to the nearest second + 4 seconds
-    QString stopTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StopTime");
-    stopTime = (iTime(iTime(stopTime).UTC(0)) + 4).UTC().toLower().remove("-").remove(":");
-
-    // UID
-    QString UID = label->findObject("IsisCube").findGroup("Archive").findKeyword("UID");
-    // FilterName
-    QString filterName = QString(label->findObject("IsisCube").findGroup("BandBin").
-                                findKeyword("FilterName")).toLower();
-
-    QString lid = QString("urn:esa:psa:em16_tgo_cas:data_calibrated:cas_cal_sc_%1-%2-%3-%4-sti").arg(startTime)
-                          .arg(stopTime).arg(filterName).arg(UID);
-
-    label->findObject("IsisCube").findGroup("Archive").addKeyword(PvlKeyword("LID", lid));
-  }
 
   // Set Title
   if ( ui.WasEntered("TITLE") ) {

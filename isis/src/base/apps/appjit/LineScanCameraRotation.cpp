@@ -5,8 +5,6 @@
 #include <cmath>
 #include <iomanip>
 
-#include<ale/Rotation.h>
-
 #include "Cube.h"
 #include "LineScanCameraRotation.h"
 #include "Quaternion.h"
@@ -123,7 +121,6 @@ namespace Isis {
     SpiceRotation *prot = p_spi->bodyRotation();
     SpiceRotation *crot = p_spi->instrumentRotation();
 
-    std::vector<ale::Rotation> rotationCache;
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {
       double et = *i;
 
@@ -158,23 +155,8 @@ namespace Isis {
 
       // Put CI into parent cache to use the parent class methods on it
       mxmt_c((SpiceDouble( *)[3]) &CI[0], (SpiceDouble( *)[3]) &IB[0], (SpiceDouble( *)[3]) &CI[0]);
-      rotationCache.push_back(ale::Rotation(CI));
+      p_cache.push_back(CI);
     }
-
-    if (m_orientation) {
-      delete m_orientation;
-      m_orientation = NULL;
-    }
-
-    if (ConstantRotation().size() > 1) {
-      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, std::vector<ale::Vec3d>(),
-                                            ale::Rotation(ConstantMatrix()), ConstantFrameChain(), TimeFrameChain());
-    }
-    else {
-      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, std::vector<ale::Vec3d>(),
-                                            ale::Rotation(1,0,0,0), ConstantFrameChain(), TimeFrameChain());
-    }
-
     p_cachesLoaded = true;
     SetSource(Memcache);
 
@@ -202,6 +184,9 @@ namespace Isis {
       QString msg = "A LineScanCameraRotation cache has not been loaded yet";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    // Clear existing matrices from cache
+    p_cache.clear();
 
     // Create polynomials fit to angles & use to reload cache
     Isis::PolynomialUnivariate function1(p_degree);
@@ -233,7 +218,6 @@ namespace Isis {
     std::vector<double> CJ;
     CJ.resize(9);
 
-    std::vector<ale::Rotation> rotationCache;
     for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
       double et = p_cacheTime.at(pos);
       rtime = (et - GetBaseTime()) / GetTimeScale();
@@ -258,21 +242,7 @@ namespace Isis {
       mxm_c((SpiceDouble( *)[3]) & (p_cacheIB.at(pos))[0], (SpiceDouble( *)[3]) & (prot->Matrix())[0], IJ);
       mxm_c(CI, IJ, (SpiceDouble( *)[3]) &CJ[0]);
 
-      rotationCache.push_back(ale::Rotation(CJ));
-    }
-
-    if (m_orientation) {
-      delete m_orientation;
-      m_orientation = NULL;
-    }
-
-    if (ConstantRotation().size() > 1) {
-      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, std::vector<ale::Vec3d>(),
-                                            ale::Rotation(ConstantMatrix()), ConstantFrameChain(), TimeFrameChain());
-    }
-    else {
-      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, std::vector<ale::Vec3d>(),
-                                            ale::Rotation(1,0,0,0), ConstantFrameChain(), TimeFrameChain());
+      p_cache.push_back(CJ);   // J2000 to constant frame
     }
 
     // Set source to cache to get updated values

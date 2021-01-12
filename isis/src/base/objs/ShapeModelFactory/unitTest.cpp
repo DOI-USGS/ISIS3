@@ -53,9 +53,9 @@ int main() {
     PvlGroup inst2("Instrument");
     inst2 += PvlKeyword("TargetName", "Mars");
     PvlGroup kern1("Kernels");
-    FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
+    FileName f("$base/testData/kernels");
     FileName f2("$base/dems");
-    FileName f3("$ISISTESTDATA/isis/src/mgs/unitTestData");
+    FileName f3("$mgs/testData");
     QString dir = f.expanded() + "/";
     QString dir2 = f2.expanded() + "/";
     QString dir3 = f3.expanded() + "/";
@@ -145,7 +145,7 @@ int main() {
     // Test ShapeModel keyword with DSK
     cout << endl << "  Testing DSK file..." << endl;
     PvlGroup kern7 = kern1;
-    FileName f7("$ISISTESTDATA/isis/src/base/unitTestData");
+    FileName f7("$base/testData");
     QString dir7 = f7.expanded() + "/";
     kern7 += PvlKeyword("ShapeModel", dir7 + "hay_a_amica_5_itokawashape_v1_0_64q.bds");
     Pvl lab7;
@@ -192,7 +192,7 @@ int main() {
 
     // Test demshape with ShapeModel keyword
     cout << endl << "  Testing DEM shape..." << endl;
-    QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub";
+    QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();
@@ -208,7 +208,7 @@ int main() {
 
     // Test ellipsoid shape (ShapeModel = Null)
     cout << endl << "  Testing Ellipsoid shape..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/galileo/unitTestData/1213r.cub";
+    inputFile = "$galileo/testData/1213r.cub";
     cube.open(inputFile);
     c = cube.camera();
     radii = c->target()->radii();

@@ -1,2 +1,0 @@
-data/hidtmgen/ortho/ESP_042252_1930_3-BAND_COLOR_2m_o_cropped.cub
-data/hidtmgen/ortho/ESP_042252_1930_3-BAND_COLOR_50cm_o_cropped.cub

@@ -371,21 +371,17 @@ namespace Isis {
    *       </group>
    *  @endcode
    */
-  void ProcessExport::SetInputRange(){
-    SetInputRange(Application::GetUserInterface());
-  }
-
-  void ProcessExport::SetInputRange(UserInterface &ui) {
+  void ProcessExport::SetInputRange() {
     p_inputMinimum.clear();
     p_inputMiddle.clear();
     p_inputMaximum.clear();
 
     for (unsigned int i = 0; i < InputCubes.size(); i++) {
       // Get the manual stretch parameters if needed
-      QString strType = ui.GetString("STRETCH");
+      QString strType = Application::GetUserInterface().GetString("STRETCH");
       if (strType == "MANUAL") {
-        p_inputMinimum.push_back(ui.GetDouble("MINIMUM"));
-        p_inputMaximum.push_back(ui.GetDouble("MAXIMUM"));
+        p_inputMinimum.push_back(Application::GetUserInterface().GetDouble("MINIMUM"));
+        p_inputMaximum.push_back(Application::GetUserInterface().GetDouble("MAXIMUM"));
 
         p_inputMiddle.push_back(Isis::NULL8);
       }
@@ -394,14 +390,14 @@ namespace Isis {
       else if (strType != "NONE") {
         Isis::Histogram *hist = InputCubes[i]->histogram(0);
         p_inputMinimum.push_back(hist->Percent(
-                                   ui.GetDouble("MINPERCENT")));
+                                   Application::GetUserInterface().GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(
-                                    ui.GetDouble("MAXPERCENT")));
+                                   Application::GetUserInterface().GetDouble("MAXPERCENT")));
         p_inputMiddle.push_back(Isis::NULL8);
-        ui.Clear("MINIMUM");
-        ui.Clear("MAXIMUM");
-        ui.PutDouble("MINIMUM", p_inputMinimum[i]);
-        ui.PutDouble("MAXIMUM", p_inputMaximum[i]);
+        Application::GetUserInterface().Clear("MINIMUM");
+        Application::GetUserInterface().Clear("MAXIMUM");
+        Application::GetUserInterface().PutDouble("MINIMUM", p_inputMinimum[i]);
+        Application::GetUserInterface().PutDouble("MAXIMUM", p_inputMaximum[i]);
 
         if (strType == "PIECEWISE") {
           p_inputMiddle[i] = hist->Median();
@@ -421,7 +417,6 @@ namespace Isis {
       }
     }
   }
-
 
 
    bool ProcessExport::HasInputRange() const {

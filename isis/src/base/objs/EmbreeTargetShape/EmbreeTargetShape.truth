@@ -121,7 +121,7 @@ Scene bounds:
   Maximum distance:  0
 
 
-Testing with  "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+Testing with  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
 
 
 Loading shapefile

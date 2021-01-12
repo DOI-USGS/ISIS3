@@ -55,7 +55,7 @@ int main(void) {
     double knownLat = 4.14667346682538351; // 4.14700320539339717;
     double knownLon = 322.757314935797012; // 322.7582512383878;
 
-    Cube c("$ISISTESTDATA/isis/src/tgo/unitTestData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
+    Cube c("$tgo/testData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
     TgoCassisCamera *cam = (TgoCassisCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "Instrument Rotation Frame: " << cam->instrumentRotation()->Frame();

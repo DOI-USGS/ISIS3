@@ -1,0 +1,8 @@
+APPNAME = mapmos
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+	$(APPNAME) FROM=$(INPUT)/input.cub MOSAIC=$(OUTPUT)/mosaic.cub \
+	CREATE=YES TRACK=YES MINLAT=-75 MAXLAT=-72 MINLON=0 MAXLON=720 \
+	HIGHSATURATION=TRUE LOWSATURATION=TRUE NULL=TRUE > /dev/null;

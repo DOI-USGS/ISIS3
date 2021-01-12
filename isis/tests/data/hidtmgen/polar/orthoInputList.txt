@@ -1,2 +1,0 @@
-data/hidtmgen/ortho/PSP_009404_2635_RED_NLstretch_1m_o_forPDS_cropped.cub
-data/hidtmgen/ortho/PSP_009404_2635_RED_NLstretch_25cm_o_forPDS_cropped.cub

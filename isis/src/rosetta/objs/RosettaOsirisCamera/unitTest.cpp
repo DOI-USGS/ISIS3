@@ -20,8 +20,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  QString testNACFile("$ISISTESTDATA/isis/src/rosetta/unitTestData/n20100710t154539230id20f22.cub");
-  QString testWACFile("$ISISTESTDATA/isis/src/rosetta/unitTestData/W20100710T153440162ID30F13.cub");
+  QString testNACFile("$rosetta/testData/n20100710t154539230id20f22.cub");
+  QString testWACFile("$rosetta/testData/W20100710T153440162ID30F13.cub");
 
   cout << "Unit Test for RosettaOsirisCameraDistortionMap..." << endl;
   try {
@@ -145,8 +145,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 66.7031631205829569;
-    double knownLon = 95.7688045622462880;
+    double knownLat = 66.7031631205835680;
+    double knownLon = 95.7688045622468422;
 
     Cube c(testNACFile, "r");
     RosettaOsirisCamera *cam = (RosettaOsirisCamera *) CameraFactory::Create(c);

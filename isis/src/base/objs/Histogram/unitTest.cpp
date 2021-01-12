@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     // Old unit test begins here
 
     Isis::Preference::Preferences(true);
-    Isis::Histogram h(-10.0, 10.0, 20);
+    Isis::Histogram h(-10.0, 10.0, 21);
     double low, high;
 
     try {
@@ -59,10 +59,10 @@ int main(int argc, char *argv[]) {
       cout << "BinRange(0,low):     " << low << endl;
       cout << "BinRange(0,high):    " << high << endl;
       cout << "BinCount(0):         " << h.BinCount(0) << endl;
-      h.BinRange(19, low, high);
+      h.BinRange(20, low, high);
       cout << "BinRange(20,low):  " << low << endl;
       cout << "BinRange(20,high): " << high << endl;
-      cout << "BinCount(20):      " << h.BinCount(19) << endl;
+      cout << "BinCount(20):      " << h.BinCount(20) << endl;
       cout << endl;
 
       h.RemoveData(a, 3);
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
       cout << "Percent(0.5):        " << h.Percent(0.5) << endl;
       cout << "Percent(99.5):       " << h.Percent(99.5) << endl;
       cout << "BinCount(0):         " << h.BinCount(0) << endl;
-      cout << "BinCount(20):      " << h.BinCount(19) << endl;
+      cout << "BinCount(20):      " << h.BinCount(20) << endl;
       cout << endl;
     }
     catch(Isis::IException &e) {
@@ -158,9 +158,9 @@ int main(int argc, char *argv[]) {
 
   QList<QString> flist;
   Isis::Progress progress;
-  Isis::FileName netName("$ISISTESTDATA/isis/src/base/unitTestData/enceladus_sp-Jig.net");
+  Isis::FileName netName("$base/testData/enceladus_sp-Jig.net");
   flist.append(netName.expanded());
-  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/*Data"), "data").toStdString() << endl;
+  cout << netName.toString().replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/*data"), "data").toStdString() << endl;
 
   Isis::ControlNet net(flist[0], &progress);
 
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
 
 
   try {
-    hist1 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude, 19);
+    hist1 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,20);
     cout << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
     cout << endl;
@@ -194,13 +194,14 @@ int main(int argc, char *argv[]) {
 
 
   try {
-    hist2 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude, .01);
+    hist2 = new Isis::Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,.01);
     cout << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
     cout << "Constructor2:   " << endl;
     cout << "Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,double binwidth)" << endl;
     cout << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+
     histogramMembers(hist2);
     statCounters(hist2);
     cout << "Resetting bin range to (0.1469787,0.3299682)" << endl;
@@ -216,6 +217,170 @@ int main(int argc, char *argv[]) {
   }
   catch (Isis::IException &e) {
     e.print();
+  }
+
+
+  try {
+
+    Isis::FileName cubeFile("$base/testData/isisTruth.cub");
+    Isis::Cube icube;
+    icube.open(cubeFile.expanded());
+    Isis::Histogram *histcube;
+    histcube = new Isis::Histogram(icube, 1);
+
+    cout << endl;
+
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+    cout << "Constructor3:   " << endl;
+    cout << "Histogram(icube,1) Real" << endl;
+    cout << endl;
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+
+    Isis::LineManager lm(icube);
+
+    for (int i=1; i <= icube.lineCount(); i++) {
+      lm.SetLine(i);
+      icube.read(lm);
+      histcube->AddData(lm.DoubleBuffer(),lm.size());
+    }
+
+    histogramMembers(histcube);
+    statCounters(histcube);
+    cout << "Resetting bin range to (70,110)" << endl;
+    histcube ->SetValidRange(70,110);
+    histogramMembers(histcube);
+    statCounters(histcube);
+    delete(histcube);
+    cout << endl;
+
+  }
+  catch (Isis::IException &e) {
+
+    e.print();
+
+  }
+
+
+  try {
+
+    Isis::FileName cubeFile("$base/testData/isisTruth_Signed16Bit.cub");
+    Isis::Cube icube;
+    icube.open(cubeFile.expanded());
+    Isis::Histogram *histcube;
+    histcube = new Isis::Histogram(icube, 1);
+
+    cout << endl;
+
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+    cout << "Constructor3:   " << endl;
+    cout << "Histogram(icube,1) SignedWord" << endl;
+    cout << endl;
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+
+    Isis::LineManager lm(icube);
+
+    for (int i=1; i <= icube.lineCount(); i++) {
+      lm.SetLine(i);
+      icube.read(lm);
+      histcube->AddData(lm.DoubleBuffer(),lm.size());
+    }
+
+    histogramMembers(histcube);
+    statCounters(histcube);
+    cout << "Resetting bin range to (70,110)" << endl;
+    histcube ->SetValidRange(70,110);
+    histogramMembers(histcube);
+    statCounters(histcube);
+    delete(histcube);
+    cout << endl;
+
+  }
+  catch (Isis::IException &e) {
+
+    e.print();
+
+  }
+
+
+  try {
+
+    Isis::FileName cubeFile("$base/testData/isisTruth_Unsigned16Bit.cub");
+    Isis::Cube icube;
+    icube.open(cubeFile.expanded());
+    Isis::Histogram *histcube;
+    histcube = new Isis::Histogram(icube, 1);
+
+    cout << endl;
+
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+    cout << "Constructor3:   " << endl;
+    cout << "Histogram(icube,1) UnsignedWord" << endl;
+    cout << endl;
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+
+    Isis::LineManager lm(icube);
+
+    for (int i=1; i <= icube.lineCount(); i++) {
+      lm.SetLine(i);
+      icube.read(lm);
+      histcube->AddData(lm.DoubleBuffer(),lm.size());
+    }
+
+    histogramMembers(histcube);
+    statCounters(histcube);
+    cout << "Resetting bin range to (70,110)" << endl;
+    histcube ->SetValidRange(70,110);
+    histogramMembers(histcube);
+    statCounters(histcube);
+    delete(histcube);
+    cout << endl;
+
+  }
+  catch (Isis::IException &e) {
+
+    e.print();
+
+  }
+
+
+  try {
+
+    Isis::FileName cubeFile("$base/testData/isisTruth_8Bit.cub");
+    Isis::Cube icube;
+    icube.open(cubeFile.expanded());
+    Isis::Histogram *histcube;
+    histcube = new Isis::Histogram(icube, 1);
+
+    cout << endl;
+
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+    cout << "Constructor3:   " << endl;
+    cout << "Histogram(icube,1) UnsignedByte" << endl;
+    cout << endl;
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+
+    Isis::LineManager lm(icube);
+
+    for (int i=1; i <= icube.lineCount(); i++) {
+      lm.SetLine(i);
+      icube.read(lm);
+      histcube->AddData(lm.DoubleBuffer(),lm.size());
+    }
+
+    histogramMembers(histcube);
+    statCounters(histcube);
+    cout << "Resetting bin range to (70,110)" << endl;
+    histcube ->SetValidRange(70,110);
+    histogramMembers(histcube);
+    statCounters(histcube);
+    delete(histcube);
+    cout << endl;
+
+  }
+  catch (Isis::IException &e) {
+
+    e.print();
+
   }
 
   double low1  = -10;
@@ -265,16 +430,12 @@ int main(int argc, char *argv[]) {
     arrayDisplay(a,9);
     cout << endl;
 
-    statCounters(ahist);
     histogramMembers(ahist);
 
-    cout << "**********************Data Vector A Histogram**********************" << endl;
-    histDisplay(ahist);
-    cout << "*******************************************************************" << endl;
-    cout << endl;
 
     cout << "Data Vector b:  " << endl;
     arrayDisplay(b,9);
+    cout << endl;
     cout << endl;
 
     statCounters(bhist);

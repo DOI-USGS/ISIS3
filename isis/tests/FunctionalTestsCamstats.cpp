@@ -107,7 +107,7 @@ TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMinimum"), 3410663.3374636001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMaximum"), 3413492.0662691998, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusAverage"), 3412205.8144924999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 648.5763070953, 1e-5);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 648.5763070953, 1e-8);
 
   group = appLog.findGroup("NorthAzimuth");
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMinimum"), 312.299406589, 1e-8);
@@ -130,7 +130,7 @@ TEST_F(DefaultCube, FunctionalTestCamstatsAttach) {
 TEST_F(DefaultCube, FunctionalTestCamstatsFlat) {
   QTemporaryFile flatFile;
   flatFile.open();
-
+  
   QVector<QString> args = {"to=" + flatFile.fileName(), "format=flat", "linc=100", "sinc=100"};
   UserInterface options(APP_XML, args);
   Pvl appLog;

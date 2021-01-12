@@ -83,8 +83,8 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
-Latitude OK
-Longitude OK
+Latitude off by: -0.6341295293990541
+Longitude off by: -0.1227893986467734
 
 FileName: CM_1515945709_1.ir.cub
 CK Frame: -82371
@@ -141,8 +141,8 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
-Latitude OK
-Longitude OK
+Latitude off by: 0.0229595838205015
+Longitude off by: 0.0098872441018614
 
 FileName: C1465336166_1.ir.cub
 CK Frame: -82371

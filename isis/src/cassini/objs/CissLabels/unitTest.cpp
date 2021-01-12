@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << "Unit test for CissLabels" << endl << endl;
 
-    Pvl p1("$ISISTESTDATA/isis/src/cassini/unitTestData/W1294561261_1.c2i.nospice.cub");
-    Pvl p2("$ISISTESTDATA/isis/src/cassini/unitTestData/N1355543510_1.c2i.nospice.cub");
-    Pvl p3("$ISISTESTDATA/isis/src/cassini/unitTestData/N1536363784_1.c2i.spice.cub");
-    Pvl p4("$ISISTESTDATA/isis/src/cassini/unitTestData/N1313633704_1.c2i.nospice.cub");
+    Pvl p1("$cassini/testData/W1294561261_1.c2i.nospice.cub");
+    Pvl p2("$cassini/testData/N1355543510_1.c2i.nospice.cub");
+    Pvl p3("$cassini/testData/N1536363784_1.c2i.spice.cub");
+    Pvl p4("$cassini/testData/N1313633704_1.c2i.nospice.cub");
     CissLabels lab1(p1);
     CissLabels lab2(p2);
     CissLabels lab3(p3);

@@ -66,7 +66,7 @@ int main() {
     printBasicInfo(geomLatLon, 
                    "Construct Geometry from Lat/Lon");
 
-    QString inputFile = "$ISISTESTDATA/isis/src/messenger/unitTestData/EW0211286081G.lev1.cub";
+    QString inputFile = "$messenger/testData/EW0211286081G.lev1.cub";
     Cube cube;
     cube.open(inputFile);
     GisGeometry geomCube(cube);
@@ -88,7 +88,7 @@ int main() {
                    "Construct Geometry from WKB GIS source");
 
 
-    GisGeometry geomGisIsisCube("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0213634118G.lev1.cub",
+    GisGeometry geomGisIsisCube("$messenger/testData/EW0213634118G.lev1.cub",
                                 GisGeometry::IsisCube);
     printBasicInfo(geomGisIsisCube, 
                    "Construct Geometry from IsisCube GIS source");

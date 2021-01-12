@@ -36,7 +36,7 @@ void IsisMain() {
   cerr << endl;
   try {
     ProgramLauncher::RunIsisProgram("chocolatelab",
-                                    "from=$ISISTESTDATA/isis/src/base/unitTestData/ab102401_ideal.cub");
+                                    "from=$base/testData/ab102401_ideal.cub");
   }
   catch(IException &e) {
     e.print();

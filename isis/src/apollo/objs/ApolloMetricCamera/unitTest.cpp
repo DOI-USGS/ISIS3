@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     double knownLat = 12.5300329125960879;
     double knownLon = 67.7259113746637524;
 
-    Cube c(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/AS15-M-0533.cropped.cub").expanded(), "r");
+    Cube c(FileName("$apollo15/testData/AS15-M-0533.cropped.cub").expanded(), "r");
     ApolloMetricCamera *cam = (ApolloMetricCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -113,9 +113,9 @@ int main(int argc, char **argv) {
 
     // Test name methods
     QList<QString> files;
-    files.append("$ISISTESTDATA/isis/src/apollo/unitTestData/AS15-M-0533.cropped.cub");
-    files.append("$ISISTESTDATA/isis/src/apollo/unitTestData/AS16-M-0533.reduced.cub");
-    files.append("$ISISTESTDATA/isis/src/apollo/unitTestData/AS17-M-0543.reduced.cub");
+    files.append("$apollo15/testData/AS15-M-0533.cropped.cub");
+    files.append("$apollo16/testData/AS16-M-0533.reduced.cub");
+    files.append("$apollo17/testData/AS17-M-0543.reduced.cub");
 
     cout << endl << endl << "Testing name methods ..." << endl;
     for (int i = 0; i < files.size(); i++) {
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 
     // Test exception
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
     ApolloMetricCamera mCam(test);
   }
   catch(IException &e) {

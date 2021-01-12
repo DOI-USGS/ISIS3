@@ -43,8 +43,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    char files[2][1024] = { "$ISISTESTDATA/isis/src/mariner/unitTestData/27265.cub",
-                            "$ISISTESTDATA/isis/src/mariner/unitTestData/166474.cub"
+    char files[2][1024] = { "$mariner10/testData/27265.cub",
+                            "$mariner10/testData/166474.cub"
                           };
 
     double knownLat[2] = { -21.1110851813477538,
@@ -139,7 +139,7 @@ int main(void) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
     Mariner10Camera mCam(test);
   }
   catch(IException &e) {

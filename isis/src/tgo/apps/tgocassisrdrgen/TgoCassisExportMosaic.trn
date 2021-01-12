@@ -8,28 +8,7 @@
 #                                    Line/Sample values in geom:horizontal_display_axis and 
 #				     geom:vertical_display_axis, updated Mission_Area to use cas 
 #				     namespace instead of cassis, removed non-PDS4-compliant 
-#                                    CaSSIS_Header, removed data-type description and moved to code, 
-#                                    as it now depends on whether a 2D or 3D image is being exported. 
-# history 2020-09-22 Kristin Berry - Added stitched browse product LID and UID in Observation_Context
-#                                    and added information about SPICE kernels to labels
-
-Group = LidVid
-  Auto
-  Debug
-  InputKey        = LID
-  InputPosition   = (IsisCube, Archive)
-  OutputName      = lidvid_reference
-  OutputPosition  = (Product_Observational, Reference_List, Internal_Reference)
-  Translation     = (*, *)
-End_Group
-
-Group = LidVidReference
-  Auto
-  InputDefault    = data_to_calibrated_products
-  OutputName      = reference_type
-  OutputPosition  = (Product_Observational, Reference_List, Internal_Reference)
-  Translation     = (*, *)
-End_Group
+#                                    CaSSIS_Header, removed data-type description and moved to code, as it now depends on whether a 2D or 3D image is being exported. 
 
 Group = StartTime
   Auto
@@ -198,16 +177,6 @@ Group = PhaseAngle
   Translation     = (*, *)
 End_Group
 
-Group = SmithedMetakernel
-  Auto
-  Optional
-  InputDefault    = em16_cassis.tm
-  OutputName      = geom:spice_kernel_file_name
-  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:SPICE_Kernel_Files,
-                     geom:SPICE_Kernel_Identification)
-  Translation     = (*, *)
-End_Group
-
 # Investigation Area
 Group = MissionName
   Auto
@@ -338,7 +307,7 @@ End_Group
 Group = ProcessingSoftwareTitle
   Auto
   Optional
-  InputDefault    = Geometry_Pipeline 
+  InputDefault    = ISIS
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:processing_software_title
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Processing_Context)
@@ -348,8 +317,7 @@ End_Group
 Group = ProcessingSoftwareVersion
   Auto
   Optional
-  InputDefault    = 1.0.1
-  InputKey        = GeometryPipelineVersion
+  InputDefault    = 3.8.0
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:processing_software_version
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Processing_Context)
@@ -379,7 +347,8 @@ End_Group
 
 Group = ObservationContextIdentifier
   Auto
-  InputKey        = UID
+  Optional
+  InputKey        = ObservationId
   InputPosition   = (IsisCube, Archive)
   OutputName      = psa:observation_identifier
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, psa:Observation_Context)
@@ -543,6 +512,16 @@ Group = SmithedCK
   InputKey        = SmithedCK 
   InputPosition   = (IsisCube, Archive)
   OutputName      = cas:smithedck
+  OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, cas:CASSIS_Data, cas:geometry_information)
+  Translation     = (*, *)
+End_Group
+
+Group = CKKernel
+  Auto
+  Optional
+  InputKey        = CKKernel
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = cas:ckkernel
   OutputPosition  = (Product_Observational, Observation_Area, Mission_Area, cas:CASSIS_Data, cas:geometry_information)
   Translation     = (*, *)
 End_Group

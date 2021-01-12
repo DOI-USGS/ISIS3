@@ -188,12 +188,6 @@ namespace Isis {
     ProcessByBrick::StartProcess(funct);
   }
 
-  void ProcessByLine::StartProcess(std::function<void(Buffer &in, Buffer &out)> funct ) {
-    VerifyCubes(InputOutput);
-    SetBricks(InputOutput);
-    ProcessByBrick::StartProcess(funct);
-  }
-
 
   /**
    * This method invokes the process by line operation over exactly one input

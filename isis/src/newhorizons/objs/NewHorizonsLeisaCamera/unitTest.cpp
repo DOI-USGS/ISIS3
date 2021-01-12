@@ -42,10 +42,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables. -- in progress
-    double knownLat = 12.5782232447537528;
-    double knownLon = 23.5337593470257218; 
+    double knownLat = 12.5782232447537350;
+    double knownLon = 23.5337593470261517; 
 
-    Cube c("$ISISTESTDATA/isis/src/newhorizons/unitTestData/lsb_0034933739_0x53c_sci_1.cub", "r");
+    Cube c("$newhorizons/testData/lsb_0034933739_0x53c_sci_1.cub", "r");
     NewHorizonsLeisaCamera *cam = (NewHorizonsLeisaCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

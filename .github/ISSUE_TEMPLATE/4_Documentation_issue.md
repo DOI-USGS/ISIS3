@@ -1,5 +1,5 @@
 ---
-name: "\U0001F4D6 Documentation issue"
+name: ⛔ Documentation Issue
 about: Report issues or problems with documentation.
 
 ---

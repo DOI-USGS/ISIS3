@@ -4,7 +4,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale >=0.8.5
+  - ale >=0.8.1
   - boost=1.68.0
   - armadillo
   - blas
@@ -21,7 +21,7 @@ dependencies:
   - geotiff
   - gmm
   - gmp
-  - gsl>=2.6
+  - gsl
   - hdf5
   - icu
   - jama

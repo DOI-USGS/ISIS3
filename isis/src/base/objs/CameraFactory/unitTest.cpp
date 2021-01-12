@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
   cerr << "Unit test for CameraFactory" << endl;
   cerr << "Testing missing Instrument Group ..." << endl;
-  Cube dummyCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
+  Cube dummyCube("$base/testData/isisTruth.cub", "r");
   Pvl &lab = *dummyCube.label();
   doit(dummyCube);
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   // Create a new label from the same cube and add keywords to match cameras added to the plugin
   // file above
   cerr << "Testing that newest camera version is read from plugin ..." << endl;
-  Cube dummyCube2("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
+  Cube dummyCube2("$base/testData/isisTruth.cub", "r");
   Pvl &lab2 = *dummyCube2.label();
   lab2.addGroup(PvlGroup("Kernels"));
   lab2.addGroup(PvlGroup("Instrument"));

@@ -139,7 +139,6 @@ namespace Isis {
         AreaKmIndex,//!< Area in kilometers index
         AreaMIndex,//!< Area in meters index
         AreaPixIndex,//!< Area in pixels index
-        PlanarDistanceIndex,//!< Planar distance in kilometers
         SegmentsSumIndex,//!< Segment lengths in kilometers
         SegmentNumberIndex, //!< Segment number
         PathIndex,//!< FileName path index
@@ -162,8 +161,6 @@ namespace Isis {
       double m_kmArea;//!< area in kilometers
       double m_mArea;//!< area in meters
       double m_pixArea;//!< area in pixels
-      double m_kmPlanarDist; //!< distance estimate used when at least one point is on the body (km)
-
 
       QList<double> m_distanceSegments;
       QList<double> m_pixDistSegments;

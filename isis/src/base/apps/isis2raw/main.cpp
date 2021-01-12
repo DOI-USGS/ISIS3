@@ -34,45 +34,42 @@ void IsisMain() {
 
   // Applies the input to output stretch options
   if(ui.GetString("STRETCH") == "LINEAR") {
-   // if(ui.GetString("BITTYPE") != "32BIT")
+//    if(ui.GetString("BITTYPE") != "32BIT")
     p.SetInputRange();
   }
-  if(ui.GetString("STRETCH") == "MANUAL") {
+  if(ui.GetString("STRETCH") == "MANUAL")
     p.SetInputRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"));
-  }
 
   //  Determine bit size, output range, and calculate number of bytes to write
   //  for each line.
   double min = -DBL_MAX;
   double max = DBL_MAX;
-  Pixtype pixType = NONE;
   if(ui.GetString("BITTYPE") == "8BIT") {
     p.SetOutputType(Isis::UnsignedByte);
     min = 0.0;
     max = 255.0;
-    pixType = BOTH;
+    checkRange(ui, min, max);
+    setRangeAndPixels(ui, p, min, max, BOTH);
   }
   else if(ui.GetString("BITTYPE") == "S16BIT") {
     p.SetOutputType(Isis::SignedWord);
     min = -32768.0;
     max = 32767.0;
-    pixType = NEG;
+    checkRange(ui, min, max);
+    setRangeAndPixels(ui, p, min, max, NEG);
   }
   else if(ui.GetString("BITTYPE") == "U16BIT") {
     p.SetOutputType(Isis::UnsignedWord);
     min = 0.0;
     max = 65535.0;
-    pixType = BOTH;
+    checkRange(ui, min, max);
+    setRangeAndPixels(ui, p, min, max, BOTH);
   }
   else if(ui.GetString("BITTYPE") == "32BIT") {
     p.SetOutputType(Isis::Real);
-    pixType = NONE;
-  }
-
-  if (ui.GetString("STRETCH") != "NONE" || ui.GetString("BITTYPE") != "32BIT") {
     checkRange(ui, min, max);
+    setRangeAndPixels(ui, p, min, max, NONE);
   }
-  setRangeAndPixels(ui, p, min, max, pixType);
 
   // Set the output endianness
   if(ui.GetString("ENDIAN") == "MSB")
@@ -120,7 +117,7 @@ void IsisMain() {
 // Validates provided range
 void checkRange(UserInterface &ui, double &min, double &max) {
   Isis::Histogram *hist = p_cube->histogram(0);
-
+  
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {
       QString message = "OMIN [" + toString(min) + "] is too small for the provided BITTYPE [";
@@ -139,7 +136,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
       min = ui.GetDouble("MINIMUM");
     }
   }
-
+    
   if(ui.WasEntered("OMAX")) {
     if(ui.GetDouble("OMAX") > max) {
       QString message = "OMAX [" + toString(max) + "] is too large for the provided BITTYPE [";

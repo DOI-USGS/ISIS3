@@ -18,4 +18,4 @@ QPair<QString, Isis::ByteOrder> noOrder("None", Isis::ByteOrder::NoByteOrder);
 QPair<QString, Isis::ByteOrder> lsb("Lsb", Isis::ByteOrder::Lsb);
 QPair<QString, Isis::ByteOrder> msb("Msb", Isis::ByteOrder::Msb);
 
-INSTANTIATE_TEST_SUITE_P(Endian, ConversionTest, ::testing::Values(noOrder, lsb, msb));
+INSTANTIATE_TEST_CASE_P(Endian, ConversionTest, ::testing::Values(noOrder, lsb, msb));

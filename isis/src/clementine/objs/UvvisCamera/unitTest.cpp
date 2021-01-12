@@ -50,7 +50,7 @@ int main(void) {
     double knownLat = -78.5596210979503127;
     double knownLon = 126.7917803447135014;
 
-    Cube c("$ISISTESTDATA/isis/src/clementine/unitTestData/lub0428b.cub", "r");
+    Cube c("$clementine1/testData/lub0428b.cub", "r");
     UvvisCamera *cam = (UvvisCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

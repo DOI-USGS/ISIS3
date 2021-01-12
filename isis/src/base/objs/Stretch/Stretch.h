@@ -25,7 +25,6 @@
 #include <vector>
 #include <string>
 #include "Pvl.h"
-#include "ImageHistogram.h"
 #include "Histogram.h"
 
 namespace Isis {
@@ -69,7 +68,7 @@ namespace Isis {
    *               input side is a perentage.  Fixed Input and Output getters
    *               to check both sides of boundry condition for valid data
    *  @history 2020-02-27 Kristin Berry - Updated to inherit from Blob so Stretches can be
-   *               saved and restored from cubes.
+   *               saved and restored from cubes. 
    */
   class Stretch {
     private:
@@ -194,3 +193,4 @@ namespace Isis {
 };
 
 #endif
+

@@ -68,9 +68,9 @@ void IsisMain() {
   CubeAttributeInput atts0;
 
   QStringList vimsCubes;
-  vimsCubes << "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1540484927_1_001.ir.cub"
-            << "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1540484927_1_002.ir.cub"
-            << "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1540484927_1_003.ir.cub";
+  vimsCubes << "$Cassini/testData/CM_1540484927_1_001.ir.cub"
+            << "$Cassini/testData/CM_1540484927_1_002.ir.cub"
+            << "$Cassini/testData/CM_1540484927_1_003.ir.cub";
 
   std::vector<double> vimsSamps, vimsLines, vect;
   Pvl vimsPvl;

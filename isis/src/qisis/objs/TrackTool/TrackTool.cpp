@@ -180,14 +180,8 @@ namespace Isis {
           TProjection *tproj = (TProjection *) cvp->projection();
           double lat = tproj->Latitude();
           double lon = tproj->Longitude();
-          if (cvp->projection()->IsSky()) {
-            p_latLabel->setText(QString("DEC %1").arg(lat));
-            p_lonLabel->setText(QString("RA %1").arg(lon));
-          }
-          else {
-            p_latLabel->setText(QString("Lat %1").arg(lat));
-            p_lonLabel->setText(QString("Lon %1").arg(lon));
-          }
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
         }
         else { // RingPlane TODO write out radius azimuth instead of lat/lon
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();

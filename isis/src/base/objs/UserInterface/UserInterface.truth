@@ -10,7 +10,7 @@ TO:      biscuit
 GUI:     0
 
 Testing No Arguments (Defaults)
-FROM:    $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
+FROM:    /ISISROOT/testData/base/isisTruth.cub
 TO:      $temporary/junk.dat
 GUI:     0
 
@@ -41,12 +41,12 @@ TO:
 GUI:     0
 
 Testing Escaped Array \(
-FROM:    $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
+FROM:    /ISISROOT/testData/base/isisTruth.cub
 TO:      
  >> (escaped, argument)
 
 Testing Escaped Array \\(
-FROM:    $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
+FROM:    /ISISROOT/testData/base/isisTruth.cub
 TO:      
  >> \(escaped, argument)
 
@@ -186,7 +186,7 @@ Testing -ERRLIST=value
 ./unitTest 
 
 Testing -HELP Priority (invalid parameters present)
-FROM         = $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub
+FROM         = /ISISROOT/testData/base/isisTruth.cub
 TO           = $temporary/junk.dat
 TESTONE      = 0
 TESTTWO      = 1

@@ -17,12 +17,12 @@ int main(int argc, char *argv[]) {
   QVector<Cube *> cubes;
 
   // Read Cubes Into Memory
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub"));
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub"));
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub+1"));
-  cubes.push_back(CubeManager::Open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub+1"));
+  cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub"));
+  cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub"));
+  cubes.push_back(CubeManager::Open("$base/testData/blobTruth.cub"));
+  cubes.push_back(CubeManager::Open("$base/testData/blobTruth.cub"));
+  cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub+1"));
+  cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub+1"));
 
   // Print Cube FileNames To Verify We Have Correct Ones
   cout << "Verify proper cubes have been read" << endl;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   CubeManager::CleanUp("unmanagedCube.cub");
 
   // Clean up one of the managed cubes
-  CubeManager::CleanUp("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub");
+  CubeManager::CleanUp("$base/testData/blobTruth.cub");
 
   // Print Cube FileNames to verify that we have cleaned blobTruth cubes correctly
   cout << "Verify blobTruth cubes have been cleaned" << endl;
@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
   // Create a CubeManager instance (implicitly test destructor)
   QVector<Cube *> cubes2;
   CubeManager mgr;
-  cubes2.push_back(mgr.OpenCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub"));
-  cubes2.push_back(mgr.OpenCube("$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub"));
+  cubes2.push_back(mgr.OpenCube("$base/testData/isisTruth.cub"));
+  cubes2.push_back(mgr.OpenCube("$base/testData/blobTruth.cub"));
 
   // Test setting an opened cube limit
   mgr.SetNumOpenCubes(2);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // This will test the cleanup in OpenCube(const QString &)
-  cubes2.push_back(mgr.OpenCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth2.cub"));
+  cubes2.push_back(mgr.OpenCube("$base/testData/isisTruth2.cub"));
   // we pop the front because OpenCube should dequeue and clean 1 item to enforce limit
   cubes2.pop_front();
   cout << "Opened isisTruth2.cub." << endl;

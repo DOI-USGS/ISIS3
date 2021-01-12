@@ -3062,12 +3062,8 @@ namespace Isis {
     std::ostringstream ostr;
     ostr << summaryGroup << std::endl;
     m_iterationSummary += QString::fromStdString( ostr.str() );
-    
-    if (m_printSummary && iApp != NULL) {
+    if (m_printSummary) {
       Application::Log(summaryGroup);
-    }
-    else {
-      std::cout << summaryGroup << std::endl;
     }
   }
 
@@ -3114,10 +3110,7 @@ namespace Isis {
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
-    if (iApp == NULL) { // in a function call
-      printf("%s", status.toStdString().c_str());
-    }
-    else if (QCoreApplication::applicationName() != "ipce") {
+    if (QCoreApplication::applicationName() != "ipce") {
       printf("%s", status.toStdString().c_str());
     }
   }

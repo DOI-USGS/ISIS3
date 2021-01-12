@@ -170,9 +170,7 @@ TEST(Displacement, UninitializedComparison)
 {
   try
   {
-    if (Isis::Displacement() > Isis::Displacement()) {
-      FAIL() << "Expected an error";
-    }
+    Isis::Displacement() > Isis::Displacement();
   }
   catch(Isis::IException &e)
   {
@@ -188,9 +186,7 @@ TEST(Displacement, UninitializedComparison)
 
   try
   {
-    if (Isis::Displacement() < Isis::Displacement()) {
-      FAIL() << "Expected an error";
-    }
+    Isis::Displacement() < Isis::Displacement();
   }
   catch(Isis::IException &e)
   {

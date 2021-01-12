@@ -31,3 +31,20 @@ endif()
 if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
   set(CMAKE_INSTALL_SO_NO_EXE "0")
 endif()
+
+if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  EXECUTE_PROCESS(COMMAND cp -f /scratch/isiscmake/isis/lib/libisis3.so /scratch/isiscmake/isis/build/lib/libisis3.5.0.so)
+endif()
+
+if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  EXECUTE_PROCESS(COMMAND ln -sf libisis3.5.0.so /scratch/isiscmake/isis/build/lib/libisis3.5.so)
+endif()
+
+if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  EXECUTE_PROCESS(COMMAND ln -sf libisis3.5.so /scratch/isiscmake/isis/build/lib/libisis3.so)
+endif()
+
+if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  EXECUTE_PROCESS(COMMAND ln -sf libisis3.so /scratch/isiscmake/isis/build/lib/libisis.so)
+endif()
+

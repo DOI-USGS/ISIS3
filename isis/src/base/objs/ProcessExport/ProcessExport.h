@@ -36,7 +36,6 @@
 #include "EndianSwapper.h"
 #include "SpecialPixel.h"
 #include "Stretch.h"
-#include "UserInterface.h"
 
 namespace Isis {
   /**
@@ -119,8 +118,8 @@ namespace Isis {
    *                          method
    *  @todo 2005-02-09 Jeff Anderson - add coded example to class file and
    *                          implementation examples
-   *  @history 2018-09-28 Kaitlyn Lee - Added (char) cast to fix implicit conversion. Split up
-   *                          "-(short)32768" into two lines. Fixes build warnings on MacOS 10.13.
+   *  @history 2018-09-28 Kaitlyn Lee - Added (char) cast to fix implicit conversion. Split up 
+   *                          "-(short)32768" into two lines. Fixes build warnings on MacOS 10.13. 
    *                          Updated code up to standards. References #5520.
    */
   class ProcessExport : public Isis::Process {
@@ -154,7 +153,6 @@ namespace Isis {
       double OutputHrs();
       bool HasInputRange() const;
       void SetInputRange();
-      void SetInputRange(UserInterface &ui);
       void SetInputRange(const double minimum, const double maximum);
       void SetInputRange(const double minimum, const double maximum, const int index);
       void SetInputRange(const double minimum, const double middle,

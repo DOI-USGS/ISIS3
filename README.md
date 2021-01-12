@@ -4,20 +4,19 @@
 [![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2563341.svg)](https://doi.org/10.5281/zenodo.2563341)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3697216.svg)](https://doi.org/10.5281/zenodo.3697216)
 
 ## Table of Contents
 
 * [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
 * [Installation](README.md#Installation)
-* [Citing ISIS](README.md#Citing-ISIS)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
 
 ## Requests for Comment
-The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](https://astrodiscuss.usgs.gov).
+The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](astrodiscuss.usgs.gov).
 
 Current open RFCs:
   * [Migration of ISIS Data to Git](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC4---Migration-of-ISIS-Data-to-Git)
@@ -90,25 +89,16 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 7.  Finally, setup the environment variables:
 
-    To use the default values for: `$ISISROOT, $ISISDATA, $ISISTESTDATA`, run the ISIS variable initialization script with default arguments.
-
-    To do this, for versions of ISIS 4.2.0 and earlier, use: 
-
-        python $CONDA_PREFIX/scripts/isis3VarInit.py
-
-    For versions of ISIS after 4.2.0, use:
+        #Execute the ISIS variable initialization script with default arguments.
+        #This script prepares default values for:  $ISISROOT, $ISISDATA, $ISISTESTDATA
 
         python $CONDA_PREFIX/scripts/isisVarInit.py
 
+
     Executing this script with no arguments will result in $ISISDATA=$CONDA\_PREFIX/data, and $ISISTESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
 
-    For ISIS 4.2.0 and earlier, use: 
-
-        python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
-
-    For versions of ISIS after 4.2.0, use: 
-
         python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
+
 
     More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area"). Now everytime the isis environment is activated, $ISISROOT, $ISISDATA, and $ISISTESTDATA will be set to the values passed to isisVarInit.py. This does not happen retroactively, so re-activate the isis envionment with one of the following commands:
 
@@ -294,36 +284,17 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
 
-## Citing ISIS
-This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org) (See 'Which DOI Should I Use in Citations?') to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
-
 ## The ISIS Data Area
 
 ### Ancillary Data
 
 Many ISIS applications require ancillary data. For example, calibration applications require flat files to do flat field corrections, and map projection applications require DTMs to accurately compute intersections. Due to its size, this data is stored in a separate directory called the ISIS Data Area. Any location can be used for the ISIS Data Area, the software simply requires that the ISISDATA environment variable is set to its location.
 
-### Structure of the ISIS Data Area
+### Structure of the ISIS3 Data Area
 
-Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3DATA environment variable are a variety of sub-directories. Each mission supported by ISIS has a sub-directory that contains mission specific processing data such as flat files and mission specific SPICE. There are also data areas used by more generic applications. These sub-directories contain everything from templates to test data.
+Under the root directory of the ISIS Data Area pointed to by the ISISDATA environment variable are a variety of sub-directories. Each mission supported by ISIS has a sub-directory that contains mission specific processing data such as flat files and mission specific SPICE. There are also data areas used by more generic applications. These sub-directories contain everything from templates to test data.
 
-### Versions of the ISIS Data Area
-
-In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated. 
-
-The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
-
-ISIS version | ISIS Data Environment variable name | ISIS Data rsync module
----|---|---
-3.x | `$ISIS3DATA` | `isis3data`
-4.0.x | `$ISIS3DATA` | `isis3data`
-4.1.0 | `$ISISDATA` | `isisdata`
-
-The ISIS Data rsync module specifies where to rsync the data from and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
-
-``rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::``**``isis3data``**``/data/`` .
-
-### Size of the ISIS Data Area
+### Size of the ISIS3 Data Area
 
 If you plan to work with data from all missions, then the download will require about 520 GB for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a [Web service](#isis-spice-web-service) that can be used in lieu of downloading all of the SPICE files. This reduces the total download size to about 10 GB.
 
@@ -331,17 +302,14 @@ If you plan to work with data from all missions, then the download will require 
 
 The ISIS Data Area is hosted on rsync servers and not through conda channels like the ISIS binaries. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
-To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area, for versions of ISIS 4.1.0 and later:
+To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area:
 
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/ .
 
-For earlier versions, use: 
-
-    cd $ISIS3DATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
+
 
 ### Partial Download of ISIS Base Data
 
@@ -349,8 +317,6 @@ This data area contains data that is common between multiple missions such as DE
 
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
-
-For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in the above command.
 
 ### Partial Download of Mission Specific Data
 
@@ -372,8 +338,6 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 **WARNING:** Some instruments require mission data to be present for radiometric calibration, which is not supported by the SPICE Web Server, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric calibration programs.
 
 ### Mission Specific Data Downloads
-
-For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of `$ISISDATA` and use `isis3data` instead of `isisdata` in all the below rsync commands.
 
 **Apollo Mission:**
 

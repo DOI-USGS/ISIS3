@@ -41,7 +41,7 @@ int main() {
     InterestOperator *iop = InterestOperatorFactory::Create(pvl);
 
     Cube c;
-    c.open("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub");
+    c.open("$mgs/testData/ab102401.cub");
 
     //iop->Operate(c, 100, 350);
     UniversalGroundMap univGrndMap(c);

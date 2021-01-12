@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "  Maximum distance: " << defaultShape.maximumSceneDistance();
     qDebug() << endl;
 
-    QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
+    QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Testing with " << dskfile << "...";
     qDebug() << endl;
 

@@ -208,7 +208,6 @@ namespace Isis {
         m_usingAle = true;
       }
       catch(...) {
-
         // Backup to stadnard ISIS implementation
         if (noTables) {
           load(kernels["TargetPosition"], noTables);
