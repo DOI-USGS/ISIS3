@@ -1192,9 +1192,9 @@ namespace Isis {
 
         QRgb *rgb = (QRgb *) p_image->scanLine(y);
 
-        Stretch redStretch = p_red.getStretch();
-        Stretch greenStretch = p_green.getStretch();
-        Stretch blueStretch = p_blue.getStretch();
+        CubeStretch redStretch = p_red.getStretch();
+        CubeStretch greenStretch = p_green.getStretch();
+        CubeStretch blueStretch = p_blue.getStretch();
 
         for(int x = dataArea.left(); x <= dataArea.right(); x++) {
           int bufferLeft = p_grayBuffer->bufferXYRect().left();
@@ -1270,9 +1270,9 @@ namespace Isis {
 
           QRgb *rgb = (QRgb *) p_image->scanLine(y);
 
-          Stretch redStretch = p_red.getStretch();
-          Stretch greenStretch = p_green.getStretch();
-          Stretch blueStretch = p_blue.getStretch();
+          CubeStretch redStretch = p_red.getStretch();
+          CubeStretch greenStretch = p_green.getStretch();
+          CubeStretch blueStretch = p_blue.getStretch();
 
           for(int x = dataArea.left(); x <= dataArea.right(); x++) {
             int redPix = (int)(redStretch.Map(redLine[ x - p_redBuffer->bufferXYRect().left()]) + 0.5);
@@ -1676,19 +1676,19 @@ namespace Isis {
 
 
   //! Return the red band stretch
-  Stretch CubeViewport::redStretch() const {
+  CubeStretch CubeViewport::redStretch() const {
     return p_red.getStretch();
   };
 
 
   //! Return the green band stretch
-  Stretch CubeViewport::greenStretch() const {
+  CubeStretch CubeViewport::greenStretch() const {
     return p_green.getStretch();
   };
 
 
   //! Return the blue band stretch
-  Stretch CubeViewport::blueStretch() const {
+  CubeStretch CubeViewport::blueStretch() const {
     return p_blue.getStretch();
   };
 

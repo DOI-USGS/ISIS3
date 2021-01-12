@@ -192,7 +192,7 @@ namespace Isis {
           curName = curName.toUpper();
           if (blobName == curName) {
 
-            if (keywords.size() >= 1) {
+            if (!keywords.empty()){
               found = true;
               QMap<QString, QString>::const_iterator i = keywords.constBegin();
               while (i != keywords.constEnd()) {
