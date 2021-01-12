@@ -349,7 +349,7 @@ Test translating units with a non-existant config
 **I/O ERROR** Failed to read unit translation config file [not a file].
 **I/O ERROR** Unable to open [not a file].
 Test translating units with a bad config
-**ERROR** Failed to load unit translation config file [$ISISTESTDATA/isis/src/tgo/unitTestData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub].
+**ERROR** Failed to load unit translation config file [$tgo/testData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub].
 **PROGRAMMER ERROR** No PDS4 standard specified for for [Instrument].
 Test adding a history to an empty label
 **PROGRAMMER ERROR** Could not find Identification_Area element to add modification history under.

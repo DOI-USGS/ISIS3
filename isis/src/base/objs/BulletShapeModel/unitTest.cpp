@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
 
-    QString itokawaCubeFile("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub");
-    QString itokawaDskFile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
+    QString itokawaCubeFile("$hayabusa/testData/st_2391934788_v.cub");
+    QString itokawaDskFile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
 
     qDebug() << "Unit test for BulletShapeModel";
     qDebug() << "";

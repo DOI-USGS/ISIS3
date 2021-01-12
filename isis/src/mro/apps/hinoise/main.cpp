@@ -682,9 +682,10 @@ void GetValuesFromHistogram(QString psHistFile, double & pdLisPer, double & pdMa
   iStartIndex++;
   for (int i=iStartIndex; i<iRows; i++) {
     csvArr = histFile.getRow(i);
-    double dCurrCumPer = IString(csvArr[5]).ToDouble();
+    double dCurrCumPer = IString(csvArr[4]).ToDouble();
     if (dCurrCumPer > dCumPer) {
-      pdMaxDN = (IString(csvArr[0]).ToDouble() + IString(csvArr[1]).ToDouble()) / 2.0;
+      pdMaxDN = IString(csvArr[0]).ToDouble();
     }
   }
 }
+

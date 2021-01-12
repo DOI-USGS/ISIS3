@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "UnitTest for Camera Statistics" << endl;
     Cube cube;
-    cube.open("$ISISTESTDATA/isis/src/clementine/unitTestData/lna1391h.cub");
+    cube.open("$Clementine1/testData/lna1391h.cub");
     Camera *cam = cube.camera();
     cout << setprecision(6);
 

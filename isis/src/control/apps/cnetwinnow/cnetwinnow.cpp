@@ -17,7 +17,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "PvlGroup.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "IException.h"
 #include "IString.h"
 #include "Progress.h"

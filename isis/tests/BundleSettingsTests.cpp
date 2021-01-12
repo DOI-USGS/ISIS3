@@ -362,7 +362,7 @@ TEST_P(BoolTest, saveSolveOptions) {
   );
 }
 
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       BoolTest,
       ::testing::Bool()
@@ -411,7 +411,7 @@ TEST_P(BoolTest, saveCoordinateTypes) {
   );
 }
 
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       CoordinateTypeTest,
       ::testing::Values(SurfacePoint::Latitudinal, SurfacePoint::Rectangular)
@@ -631,7 +631,7 @@ TEST_P(ConvergenceCriteriaTest, saveConvergenceCriteria) {
   );
 }
 
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       ConvergenceCriteriaTest,
       ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections)

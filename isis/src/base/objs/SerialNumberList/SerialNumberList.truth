@@ -132,11 +132,11 @@ Creating SerialNumberList(QString, bool, Progress=NULL)
 
 
 **USER ERROR** FileName [.../isisTruth.cub] can not be added to serial number list.
-**USER ERROR** Unable to find Instrument or Mapping group in $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub for comparing target.
+**USER ERROR** Unable to find Instrument or Mapping group in $base/testData/isisTruth.cub for comparing target.
 
 
 **USER ERROR** FileName [.../isisTruth.cub] can not be added to serial number list.
-**USER ERROR** Unable to find Instrument group in $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub for comparing target.
+**USER ERROR** Unable to find Instrument group in $base/testData/isisTruth.cub for comparing target.
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../blobTruth.cub] can not be added to serial number list.
@@ -144,7 +144,7 @@ Creating SerialNumberList(QString, bool, Progress=NULL)
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../isisTruth.cub] can not be added to serial number list.
-**USER ERROR** Unable to find Instrument or Mapping group in $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub for comparing target.
+**USER ERROR** Unable to find Instrument or Mapping group in $base/testData/isisTruth.cub for comparing target.
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../blobTruth.cub] can not be added to serial number list.
@@ -156,15 +156,15 @@ Creating SerialNumberList(QString, bool, Progress=NULL)
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../isisTruth.cub] can not be added to serial number list.
-**USER ERROR** Unable to find Instrument group in $ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub needed for performing bundle adjustment.
+**USER ERROR** Unable to find Instrument group in $base/testData/isisTruth.cub needed for performing bundle adjustment.
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../isisTruthNoSpacecraftName.cub] can not be added to serial number list.
-**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $ISISTESTDATA/isis/src/base/unitTestData/isisTruthNoSpacecraftName.cub needed for performing bundle adjustment.
+**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $base/testData/isisTruthNoSpacecraftName.cub needed for performing bundle adjustment.
 
 
 **USER ERROR** [SerialNumber, FileName] = [.../isisTruthNoInstrumentId.cub] can not be added to serial number list.
-**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $ISISTESTDATA/isis/src/base/unitTestData/isisTruthNoInstrumentId.cub needed for performing bundle adjustment.
+**USER ERROR** Unable to find SpacecraftName or InstrumentId keywords in $base/testData/isisTruthNoInstrumentId.cub needed for performing bundle adjustment.
 
 
 **PROGRAMMER ERROR** Unable to get the FileName. The given serial number [Nonsense] does not exist in the list.

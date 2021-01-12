@@ -30,7 +30,7 @@ QString stripPath(QString input) {
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub";
+  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   if (--argc == 1) { inputFile = argv[1]; }
 
   cout << "\n\nTesting Kernels class using file " << inputFile << "\n";

@@ -1,6 +1,6 @@
 
 
-Testing Kernels class using file $ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub
+Testing Kernels class using file $mgs/testData/ab102401.lev2.cub
 
 List of kernels found - Total: 9
 $base/kernels/spk/de405.bsp

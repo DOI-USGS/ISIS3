@@ -33,12 +33,12 @@ namespace Isis {
    *                        addition to logging errors.
    * @see automaticRegistration.doc
    */
-  ImageOverlapSet::ImageOverlapSet(bool continueOnError, bool useThread) {
+  ImageOverlapSet::ImageOverlapSet(bool continueOnError) {
 
     p_continueAfterError = continueOnError;
     p_writtenSoFar = 0;
     p_calculatedSoFar = -1;
-    p_threadedCalculate = useThread;
+    p_threadedCalculate = false;
     p_snlist = NULL;
   }
 
@@ -180,6 +180,9 @@ namespace Isis {
     p_calculatedSoFar = -1;
 
     p_snlist = &boundaries;
+
+    // This will enable using mutexes and spawning threads where necessary.
+    p_threadedCalculate = true;
 
     FindImageOverlaps(boundaries);
 

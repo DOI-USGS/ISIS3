@@ -29,10 +29,10 @@ int main(int argc, char *argv[]) {
   cout << SerialNumber::Compose(p) << endl;
 
   Cube cube;
-  cube.open("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub");
+  cube.open("$base/testData/isisTruth.cub");
   cout << SerialNumber::Compose(cube, true) << endl;
 
-  FileName file("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cub");
+  FileName file("$lo/testData/3133_h1.cub");
   Pvl p1(file.expanded());
 
   cout << SerialNumber::Compose(p1) << endl;

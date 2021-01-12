@@ -28,8 +28,7 @@ void IsisMain() {
     cout << "Testing PDS file containing an ^IMAGE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("$ISISTESTDATA/isis/src/mer/unitTestData/mer.img", 
-                 "$ISISTESTDATA/isis/src/mer/unitTestData/mer.img", plab);
+    p.SetPdsFile("$mer/testData/mer.img", "$mer/testData/mer.img", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     p.EndProcess();
@@ -58,7 +57,7 @@ void IsisMain() {
     cout << "Testing PDS file containing a ^QUBE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("$ISISTESTDATA/isis/src/mer/unitTestData/mer.lab", "", plab);
+    p.SetPdsFile("$mer/testData/mer.lab", "", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     p.OmitOriginalLabel();
@@ -93,8 +92,8 @@ void IsisMain() {
     cout << "Testing Isis2 file" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("$ISISTESTDATA/isis/src/clementine/unitTestData/clemuvvis_Isis2.cub",
-                 "$ISISTESTDATA/isis/src/clementine/unitTestData/clemuvvis_Isis2.cub", plab);
+    p.SetPdsFile("$clementine1/testData/clemuvvis_Isis2.cub",
+                 "$clementine1/testData/clemuvvis_Isis2.cub", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     Isis::Pvl ilab;
@@ -154,7 +153,7 @@ void IsisMain() {
     cout << "Testing file with invalid Pds label" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("$ISISTESTDATA/isis/src/galileo/unitTestData/1213r.img", "$ISISTESTDATA/isis/src/galileo/unitTestData/1213r.img", plab);
+    p.SetPdsFile("$galileo/testData/1213r.img", "$galileo/testData/1213r.img", plab);
   }
   catch (Isis::IException &e) {
     ReportError(e.toString());
@@ -166,7 +165,7 @@ void IsisMain() {
     cout << "Test that defaults for projection offsets are changed and can be returned" << endl;
     Isis::ProcessImportPds p;
     Pvl plab;
-    p.SetPdsFile("$ISISTESTDATA/isis/src/base/unitTestData/ff17.lbl", "$ISISTESTDATA/isis/src/base/unitTestData/ff17.img", plab);
+    p.SetPdsFile("$base/testData/ff17.lbl", "$base/testData/ff17.img", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     Pvl proj;

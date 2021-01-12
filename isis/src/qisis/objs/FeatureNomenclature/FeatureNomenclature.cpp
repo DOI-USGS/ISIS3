@@ -37,7 +37,7 @@ namespace Isis {
 
     m_request = new QNetworkRequest;
     m_request->setUrl(
-        QUrl("https://planetarynames.wr.usgs.gov/SearchResults"));
+        QUrl("https://planetarynames.wr.usgs.gov/nomenclature/SearchResults"));
     m_request->setRawHeader("User-Agent",
                             "Mozilla/5.0 (X11; Linux i686; rv:6.0) "
                             "Gecko/20100101 Firefox/6.0");

@@ -212,10 +212,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing assignment operator=...";
-    {
-      Statistics &tstats = s;
-      s = tstats;
-    }
+    s = s;
     qDebug() << "Average:             " << s.Average();
     qDebug() << "Variance:            " << s.Variance();
     qDebug() << "Rms:                 " << s.Rms();

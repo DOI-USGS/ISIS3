@@ -14,7 +14,7 @@ Model has normal?  false
 ----====       Construct shape model from cube       ====----
 
 
-Using:  "$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub"
+Using:  "$hayabusa/testData/st_2391934788_v.cub"
 Bullet shape model status:
   Name:  "Bullet"
   Tolerance:  0.001

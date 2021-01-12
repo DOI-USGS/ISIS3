@@ -5,7 +5,7 @@ InstrumentNameShort: Unknown
 SpacecraftNameLong: Unknown
 SpacecraftNameShort: Unknown
 
-Camera* from: $ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub
+Camera* from: $mgs/testData/ab102401.lev2.cub
 Pixel Ifov: 
 -0.014 , -0.014
 0.014 , -0.014
@@ -281,7 +281,7 @@ Line = 702
 
 /---------- Test Polar Boundary Conditions
 
-Camera* from: $ISISTESTDATA/isis/src/clementine/unitTestData/lub5992r.292.lev1.phot.cub
+Camera* from: $clementine1/testData/lub5992r.292.lev1.phot.cub
 Pixel Ifov: 
 -0.0115 , -0.0115
 0.0115 , -0.0115
@@ -324,7 +324,7 @@ Line = 144
 /---------- Test Local Photometric Angles...
 
 Flat DEM Surface...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_flat.cub
+Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -334,7 +334,7 @@ Emission = 59.59
 Incidence = 2.835
 
 45 Degree DEM Surface Facing Left...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45left.cub
+Camera* from: $base/testData/f319b18_ideal_45left.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -344,7 +344,7 @@ Emission = 60.94
 Incidence = 46.41
 
 45 Degree DEM Surface Facing Top...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45top.cub
+Camera* from: $base/testData/f319b18_ideal_45top.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -354,7 +354,7 @@ Emission = 17.41
 Incidence = 42.49
 
 45 Degree DEM Surface Facing Right...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45right.cub
+Camera* from: $base/testData/f319b18_ideal_45right.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -364,7 +364,7 @@ Emission = 76.84
 Incidence = 44.07
 
 45 Degree DEM Surface Facing Bottom...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45bottom.cub
+Camera* from: $base/testData/f319b18_ideal_45bottom.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -374,7 +374,7 @@ Emission = 103.8
 Incidence = 47.67
 
 80 Degree DEM Surface Facing Left...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80left.cub
+Camera* from: $base/testData/f319b18_ideal_80left.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -384,7 +384,7 @@ Emission = 74.77
 Incidence = 81.75
 
 80 Degree DEM Surface Facing Top...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80top.cub
+Camera* from: $base/testData/f319b18_ideal_80top.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -394,7 +394,7 @@ Emission = 23.84
 Incidence = 77.87
 
 80 Degree DEM Surface Facing Right...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80right.cub
+Camera* from: $base/testData/f319b18_ideal_80right.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -404,7 +404,7 @@ Emission = 95.57
 Incidence = 79.42
 
 80 Degree DEM Surface Facing Bottom...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80bottom.cub
+Camera* from: $base/testData/f319b18_ideal_80bottom.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): Yes
@@ -414,7 +414,7 @@ Emission = 138.2
 Incidence = 82.91
 
 Point Does Not Intersect DEM...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_flat.cub
+Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 1
 Line = 1
 SetImage (sample, line): No
@@ -422,7 +422,7 @@ Normal = 0, 0, 0
 Angles could not be calculated.
 
 Cube with Ellipsoidal Shape Model...
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/CM_1515945709_1.ir.cub
+Camera* from: $base/testData/CM_1515945709_1.ir.cub
 Sample = 20
 Line = 20
 SetImage (sample, line): Yes
@@ -433,7 +433,7 @@ Incidence = 59.11
 
 
 Testing non-square pixel Ifov using Hires vims cube
-Camera* from: $ISISTESTDATA/isis/src/base/unitTestData/CM_1515945709_1.ir.cub
+Camera* from: $base/testData/CM_1515945709_1.ir.cub
 Pixel Ifov: 
 -0.0515 , -0.1
 -0.05046 , -0.1

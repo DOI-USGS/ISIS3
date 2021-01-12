@@ -58,7 +58,7 @@ int main(void) {
     qDebug() << "Test for Telecopic Camera...";
     double knownLat = -54.63487131147738;
     double knownLon = 40.43436155430055;
-    Cube c("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
+    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
     testCamera(c, knownLat, knownLon);
 
     qDebug() << "";
@@ -66,7 +66,7 @@ int main(void) {
     qDebug() << "Test for W1 Camera...";
     knownLat = -50.11857108654684;
     knownLon = 91.03535388676204;
-    Cube w1("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
+    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
     testCamera(w1, knownLat, knownLon);
 
     qDebug() << "";
@@ -74,7 +74,7 @@ int main(void) {
     qDebug() << "Test for W2 Camera...";
     knownLat = 25.38911363842043;
     knownLon = 90.86547761107917;
-    Cube w2("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
+    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
     testCamera(w2, knownLat, knownLon);
 
   }

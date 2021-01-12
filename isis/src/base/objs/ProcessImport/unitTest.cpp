@@ -29,7 +29,7 @@ void IsisMain() {
   Preference::Preferences(true);
 
   ProcessImport p;
-  p.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.dat");
+  p.SetInputFile("$base/testData/isisTruth.dat");
   p.SetBase(0.0);
   p.SetMultiplier(1.0);
   p.SetDataHeaderBytes(0);
@@ -58,7 +58,7 @@ void IsisMain() {
 
 
   ProcessImport core_cub;
-  core_cub.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/30i001ci.qub");
+  core_cub.SetInputFile("$base/testData/30i001ci.qub");
   QString coreFile = Application::GetUserInterface().GetFileName("CORE_CUBE");
   core_cub.SetVAXConvert(true);
   core_cub.SetPixelType(Isis::Real);
@@ -83,7 +83,7 @@ void IsisMain() {
   ProcessImport suffix_cub;
 
 
-  suffix_cub.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/30i001ci.qub");
+  suffix_cub.SetInputFile("$base/testData/30i001ci.qub");
   QString suffixFile = Application::GetUserInterface().GetFileName("SUFFIX_CUBE");
   suffix_cub.SetVAXConvert(true);
   suffix_cub.SetPixelType(Isis::Real);
@@ -180,7 +180,7 @@ void IsisMain() {
   cout << "Testing ProcessBil()" << endl;
   ProcessImport p3;
 
-  p3.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.dat");
+  p3.SetInputFile("$base/testData/isisTruth.dat");
   p3.SetBase(0.0);
   p3.SetMultiplier(1.0);
   p3.SetDataHeaderBytes(0);
@@ -198,7 +198,7 @@ void IsisMain() {
 
   cout << endl << "Testing ProcessBip()" << endl;
   ProcessImport p4;
-  p4.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.dat");
+  p4.SetInputFile("$base/testData/isisTruth.dat");
   p4.SetBase(0.0);
   p4.SetMultiplier(1.0);
   p4.SetDataHeaderBytes(0);

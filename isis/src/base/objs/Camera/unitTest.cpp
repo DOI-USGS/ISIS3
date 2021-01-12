@@ -87,7 +87,7 @@ class MyCamera : public Camera {
 int main() {
   try {
     Preference::Preferences(true);
-    QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub";
+    QString inputFile = "$mgs/testData/ab102401.lev2.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = NULL;
@@ -318,7 +318,7 @@ int main() {
     cout << "Line = " << c->Line() << endl << endl;
 
     cout << endl << "/---------- Test Polar Boundary Conditions" << endl;
-    inputFile = "$ISISTESTDATA/isis/src/clementine/unitTestData/lub5992r.292.lev1.phot.cub";
+    inputFile = "$clementine1/testData/lub5992r.292.lev1.phot.cub";
     cube.close();
     cube.open(inputFile);
     pvl = *cube.label();
@@ -391,7 +391,7 @@ int main() {
     cube.close();
     cout << endl << "/---------- Test Local Photometric Angles..." << endl << endl;
     cout << "Flat DEM Surface..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_flat.cub";
+    inputFile = "$base/testData/f319b18_ideal_flat.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam3 = CameraFactory::Create(cube);
@@ -422,7 +422,7 @@ int main() {
     delete cam3;
 
     cout << endl << "45 Degree DEM Surface Facing Left..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45left.cub";
+    inputFile = "$base/testData/f319b18_ideal_45left.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam4 = CameraFactory::Create(cube);
@@ -448,7 +448,7 @@ int main() {
     delete cam4;
 
     cout << endl << "45 Degree DEM Surface Facing Top..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45top.cub";
+    inputFile = "$base/testData/f319b18_ideal_45top.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam5 = CameraFactory::Create(cube);
@@ -474,7 +474,7 @@ int main() {
     delete cam5;
 
     cout << endl << "45 Degree DEM Surface Facing Right..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45right.cub";
+    inputFile = "$base/testData/f319b18_ideal_45right.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam6 = CameraFactory::Create(cube);
@@ -500,7 +500,7 @@ int main() {
     delete cam6;
 
     cout << endl << "45 Degree DEM Surface Facing Bottom..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_45bottom.cub";
+    inputFile = "$base/testData/f319b18_ideal_45bottom.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam7 = CameraFactory::Create(cube);
@@ -526,7 +526,7 @@ int main() {
     delete cam7;
 
     cout << endl << "80 Degree DEM Surface Facing Left..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80left.cub";
+    inputFile = "$base/testData/f319b18_ideal_80left.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam8 = CameraFactory::Create(cube);
@@ -552,7 +552,7 @@ int main() {
     delete cam8;
 
     cout << endl << "80 Degree DEM Surface Facing Top..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80top.cub";
+    inputFile = "$base/testData/f319b18_ideal_80top.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam9 = CameraFactory::Create(cube);
@@ -578,7 +578,7 @@ int main() {
     delete cam9;
 
     cout << endl << "80 Degree DEM Surface Facing Right..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80right.cub";
+    inputFile = "$base/testData/f319b18_ideal_80right.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam10 = CameraFactory::Create(cube);
@@ -604,7 +604,7 @@ int main() {
     delete cam10;
 
     cout << endl << "80 Degree DEM Surface Facing Bottom..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_80bottom.cub";
+    inputFile = "$base/testData/f319b18_ideal_80bottom.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam11 = CameraFactory::Create(cube);
@@ -630,7 +630,7 @@ int main() {
     delete cam11;
 
     cout << endl << "Point Does Not Intersect DEM..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/f319b18_ideal_flat.cub";
+    inputFile = "$base/testData/f319b18_ideal_flat.cub";
     cube.open(inputFile);
     pvl = *cube.label();
     Camera *cam12 = CameraFactory::Create(cube);
@@ -658,7 +658,7 @@ int main() {
     //  Test PixelIfov for Vims which sets the field of view if it in hires mode.  The Ifov is
     //  rectangular instead of square.
     cout << endl << "Cube with Ellipsoidal Shape Model..." << endl;
-    inputFile = "$ISISTESTDATA/isis/src/base/unitTestData/CM_1515945709_1.ir.cub";
+    inputFile = "$base/testData/CM_1515945709_1.ir.cub";
     cube.open(inputFile);
     Camera *cam13 = CameraFactory::Create(cube);
     cube.close();

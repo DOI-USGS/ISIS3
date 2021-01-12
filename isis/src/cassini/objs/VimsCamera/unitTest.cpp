@@ -77,24 +77,24 @@ int main(void) {
     //      pixels' centers intersect with the ground.
     //      However, right around the bottom of pixel, samp:3 line:4 and top of samp:3 line:5 there
     //      are some intersections, which means we can get lat/lon, but we cannot back project.          
-    char files[5][1024] = { "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1515951157_1.ir.cub",
-                            "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1514390782_1.ir.cub",
-                            "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1514390782_1.vis.cub",
-                            "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1515945709_1.ir.cub",
-                            "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1515945709_1.vis.cub"
+    char files[5][1024] = { "$cassini/testData/CM_1515951157_1.ir.cub",
+                            "$cassini/testData/CM_1514390782_1.ir.cub",
+                            "$cassini/testData/CM_1514390782_1.vis.cub",
+                            "$cassini/testData/CM_1515945709_1.ir.cub",
+                            "$cassini/testData/CM_1515945709_1.vis.cub"
                           };
 
     double knownLat[5] = { -0.4635396765968510,
                            -34.8446732028169848,
-                           -41.4357957282659370,
+                           -40.8016661988669753,
                            -42.7683454790732966,
-                           -37.4139298028795153
+                           -37.4368893866915258
                          };
     double knownLon[5] = { 198.1302329741679102,
                            123.5608203785339327,
-                           131.7215892768255969,
+                           131.8443786754731661,
                            202.6731689530125493,
-                           213.5977879626166782
+                           213.5879007185106673    
                          };
 
     vector< pair <int, int > > corners;
@@ -188,7 +188,7 @@ int main(void) {
 
     //  Test C1465336166_1.ir.cub
     //string file = "/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub";
-    Cube c("$ISISTESTDATA/isis/src/cassini/unitTestData/C1465336166_1.ir.cub", "r");
+    Cube c("$cassini/testData/C1465336166_1.ir.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

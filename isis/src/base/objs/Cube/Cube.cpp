@@ -40,7 +40,7 @@
 #include "CubeTileHandler.h"
 #include "Endian.h"
 #include "FileName.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "Message.h"
@@ -83,10 +83,16 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
-    initCoreFromLabel(label);
+    PvlObject cubeLabel = label.findObject("IsisCube");
+    PvlGroup dimensions = cubeLabel.findObject("Core").findGroup("Dimensions");
+    close();
+
+    setDimensions(dimensions["Samples"],
+                          dimensions["Lines"],
+                          dimensions["Bands"]);
+
     create(fileName.expanded());
 
-    PvlObject cubeLabel = label.findObject("IsisCube");
     for (auto grpIt = cubeLabel.beginGroup(); grpIt!= cubeLabel.endGroup(); grpIt++) {
       putGroup(*grpIt);
     }
@@ -100,7 +106,7 @@ namespace Isis {
    *
    * @param fileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
-   * @param label PVL label object representing the new Cube label
+   * @param label PVL label object representing the new Cube label  
    * @param isd JSON object containing Ale compatible ISD
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
@@ -112,7 +118,7 @@ namespace Isis {
     close();
     open(fileName.toString(), access);
   }
-
+  
   /**
    * Initialize Cube data from a PVL label and JSON ISD.
    *
@@ -126,43 +132,15 @@ namespace Isis {
   void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
     std::ifstream isdStream(isdFile.expanded().toStdString());
     std::ifstream labelStream(labelFile.expanded().toStdString());
-
-    if (isdStream.fail()) {
-      QString msg = QString("failed to open isd stream: %1").arg(isdFile.expanded());
-      throw IException(IException::Io, msg,
-                 isdFile.baseName().toStdString().c_str(), 153);
-    }
-
-    if (labelStream.fail()) {
-      QString msg = "failed to open file stream";
-      throw IException(IException::Io, msg,
-                 fileName.baseName().toStdString().c_str(), 153);
-    }
-
+    
     Pvl label;
     nlohmann::json isd;
-
-    try {
-      labelStream >> label;
-    }
-    catch (std::exception &ex) {
-      QString msg = QString("Failed to open label file, %1, %2").arg(labelFile.expanded()).arg(ex.what());
-      throw IException(IException::Io, msg,
-                 fileName.baseName().toStdString().c_str(), 153);
-    }
-
-
-    try {
-      isdStream >> isd;
-    }
-    catch (std::exception &ex) {
-      QString msg = QString("Failed to open ISD file, %1, %2").arg(isdFile.expanded()).arg(ex.what());
-      throw IException(IException::Io, msg,
-                 fileName.baseName().toStdString().c_str(), 145);
-    }
-
+    
+    isdStream >> isd;
+    labelStream >> label;
+    
     fromIsd(fileName, label, isd, access);
-    reopen("rw");
+    reopen("rw");  
   }
 
   //! Destroys the Cube object.
@@ -1458,7 +1436,7 @@ namespace Isis {
     }
 
     Progress progress;
-    Histogram *hist = new ImageHistogram(*this, band, &progress);
+    Histogram *hist = new Histogram(*this, band, &progress);
     LineManager line(*this);
 
     // This range is for throwing out data; the default parameters are OK always

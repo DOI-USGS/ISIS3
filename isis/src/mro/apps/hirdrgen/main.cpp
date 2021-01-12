@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "iTime.h"
 #include "IString.h"
 #include "JP2Encoder.h"
@@ -61,7 +61,7 @@ void IsisMain() {
     if (ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
       // Set up a histogram for this band. This call sets the input range
       // by making an initial stats pass to find the data min and max
-      ImageHistogram hist(*icube, band, pHist.Progress());
+      Histogram hist(*icube, band, pHist.Progress());
 
       // Loop and accumulate histogram
       pHist.Progress()->SetText("Gathering Histogram");

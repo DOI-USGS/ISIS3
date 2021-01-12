@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
 
     Cube leftCube;
-    leftCube.open("$ISISTESTDATA/isis/src/mariner/unitTestData/0027399_clean_equi.cub");
+    leftCube.open("$mariner10/testData/0027399_clean_equi.cub");
     Cube rightCube;
-    rightCube.open("$ISISTESTDATA/isis/src/mariner/unitTestData/0166613_clean_equi.cub");
+    rightCube.open("$mariner10/testData/0166613_clean_equi.cub");
 
     leftCube.camera()->SetImage(1054.19, 624.194);
     rightCube.camera()->SetImage(1052.19, 624.194);

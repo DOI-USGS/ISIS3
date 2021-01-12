@@ -3,13 +3,10 @@
 <application name="kaguyasp2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Imports a Kaguya SP (Spectral Profiler) file (deprecated)
+    Imports a Kaguya SP (Spectral Profiler) file
   </brief>
 
   <description>
-  <p>
-    <b>This application is deprecated. <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> is a newer implementation of kaguyasp2isis, please use <a href="../kaguyasp2ascii/kaguyasp2ascii.html" target="_blank">kaguyasp2ascii</a> instead.</b> 
-  </p>
   <p>
     This program will import a Kaguya SP (Spectral Profiler) file to a tab delimited text file.
     The text file will contain one record for each wavelength in the SP file. There are 296
@@ -38,13 +35,8 @@
   </history>
 
   <category>
-    <missionItem>Kaguya</missionItem>
+    <categoryItem>Utility</categoryItem>
   </category>
-  <seeAlso>
-    <applications>
-      <item>kaguyasp2ascii</item>
-    </applications>
-   </seeAlso>
 
   <groups>
     <group name="Files">

@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Model name: " << defaultModel.name();
     outputModelStatus(defaultModel);
 
-    QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
+    QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Testing with " << dskfile << "...";
     qDebug() << endl;
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     EmbreeTargetManager *manager = EmbreeTargetManager::getInstance();
     qDebug() << "Create an EmbreeShapeModel from a string";
     qDebug() << "";
-    QString itokawaCubeFile("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub");
+    QString itokawaCubeFile("$hayabusa/testData/st_2391934788_v.cub");
     Cube itokawaCube(itokawaCubeFile);
     Camera *itokawaCamera = itokawaCube.camera();
     Target *itokawaTarget = itokawaCamera->target();

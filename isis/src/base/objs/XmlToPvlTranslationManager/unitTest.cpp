@@ -25,7 +25,7 @@ int main(void) {
   Preference::Preferences(true);
 
   try {
-    FileName fLabel("$ISISTESTDATA/isis/src/base/unitTestData/xmlTestLabel.xml");
+    FileName fLabel("$base/testData/xmlTestLabel.xml");
 
     stringstream trnsStrm;
     
@@ -242,7 +242,7 @@ int main(void) {
             transMgr.Translate("InstrumentIfovWithUnits") << endl << endl;
 
     cout << "Testing file-based constructor" << endl << endl;
-    FileName XmltoPvlFile("$ISISTESTDATA/isis/src/base/unitTestData/XmlToPvlTestLabel.pvl");
+    FileName XmltoPvlFile("$base/testData/XmlToPvlTestLabel.pvl");
     QString XmltoPvlFileString = XmltoPvlFile.toString(); 
     XmlToPvlTranslationManager transMgrFileConstructor(XmltoPvlFileString);
 

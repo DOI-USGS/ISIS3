@@ -85,7 +85,7 @@ int main() {
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
-    Cube cube("$ISISTESTDATA/isis/src/base/unitTestData/ab102401_ideal.cub", "r");
+    Cube cube("$base/testData/ab102401_ideal.cub", "r");
     MyCamera cam(cube);
 
     // test camera type

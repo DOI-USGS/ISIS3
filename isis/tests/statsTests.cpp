@@ -6,7 +6,7 @@
 
 #include "Cube.h"
 #include "FileName.h"
-#include "ImageHistogram.h"
+#include "Histogram.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 
@@ -48,13 +48,13 @@ class stats_MockHist : public ::testing::Test {
     void SetUp() override {
       mockCube = nullptr;
 
-      ImageHistogram *testBand1Stats = new ImageHistogram(-10, 10, 21);
+      Histogram *testBand1Stats = new Histogram(-10, 10, 21);
       for (int val = -10; val <=10; val++) {
         testBand1Stats->AddData(val);
       }
       testBand1Stats->AddData(0.0);
 
-      ImageHistogram *testBand2Stats = new ImageHistogram(-10, 10, 21);
+      Histogram *testBand2Stats = new Histogram(-10, 10, 21);
       testBand2Stats->AddData(Null);
       testBand2Stats->AddData(Lrs);
       testBand2Stats->AddData(Lis);
@@ -146,7 +146,7 @@ TEST_F(stats_MockHist, TestStats) {
 }
 
 TEST(stats, ValidMinimum) {
-  ImageHistogram *testStats = new ImageHistogram(-1000,1000);
+  Histogram *testStats = new Histogram(-1000,1000);
 
   MockCube *mockCube = new MockCube();
   EXPECT_CALL(*mockCube, bandCount())
@@ -173,7 +173,7 @@ TEST(stats, ValidMinimum) {
 }
 
 TEST(stats, ValidMaximum) {
-  ImageHistogram *testStats = new ImageHistogram(-1000,1000);
+  Histogram *testStats = new Histogram(-1000,1000);
 
   MockCube *mockCube = new MockCube();
   EXPECT_CALL(*mockCube, bandCount())

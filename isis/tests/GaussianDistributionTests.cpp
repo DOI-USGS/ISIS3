@@ -62,6 +62,6 @@ QPair <double, double> pos2point5(2.5, 99.379033467422431);
 QPair <double, double> pos3(3.0, 99.865010196837048);
 
 
-INSTANTIATE_TEST_SUITE_P(GaussianDistribution, DoubleTest, ::testing::Values(neg3, neg2point5, 
-                         neg2, neg1point5, neg1, negpoint5, zero, pospoint5, pos1, pos1point5, 
-                         pos2, pos2point5, pos3));
+INSTANTIATE_TEST_CASE_P(GaussianDistribution, DoubleTest, ::testing::Values(neg3, neg2point5, 
+                        neg2, neg1point5, neg1, negpoint5, zero, pospoint5, pos1, pos1point5, 
+                        pos2, pos2point5, pos3));

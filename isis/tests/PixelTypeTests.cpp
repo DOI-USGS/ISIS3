@@ -28,7 +28,7 @@ TEST_P(PixelEnum, TestEnum) {
   EXPECT_EQ(PixelTypeEnumeration(GetParam().first), GetParam().second);
 }
 
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelSize, ::testing::Values(
+INSTANTIATE_TEST_CASE_P(PixelType, PixelSize, ::testing::Values(
   qMakePair(PixelType::None, 0),
   qMakePair(PixelType::UnsignedByte, 1),
   qMakePair(PixelType::SignedByte, 1),
@@ -39,7 +39,7 @@ INSTANTIATE_TEST_SUITE_P(PixelType, PixelSize, ::testing::Values(
   qMakePair(PixelType::Real, 4),
   qMakePair(PixelType::Double, 8)));
 
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelName, ::testing::Values(
+INSTANTIATE_TEST_CASE_P(PixelType, PixelName, ::testing::Values(
   qMakePair(PixelType::None, QString("None")),
   qMakePair(PixelType::UnsignedByte, QString("UnsignedByte")),
   qMakePair(PixelType::SignedByte, QString("SignedByte")),
@@ -50,7 +50,7 @@ INSTANTIATE_TEST_SUITE_P(PixelType, PixelName, ::testing::Values(
   qMakePair(PixelType::Real, QString("Real")),
   qMakePair(PixelType::Double, QString("Double"))));
 
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelEnum, ::testing::Values(
+INSTANTIATE_TEST_CASE_P(PixelType, PixelEnum, ::testing::Values(
   qMakePair(QString("None"), 0),
   qMakePair(QString("UnsignedByte"), 1),
   qMakePair(QString("SignedByte"), 2),

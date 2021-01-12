@@ -539,7 +539,7 @@ void IsisMain() {
   }
   catch (IException &e) {
     QString message = e.toString();
-    qDebug().noquote() << message.replace(QRegExp("cube.*base/unitTestData"), "cube [base/unitTestData");
+    qDebug().noquote() << message.replace(QRegExp("cube.*base/testData"), "cube [base/testData");
     p.EndProcess();
     qDebug() << "";
   }

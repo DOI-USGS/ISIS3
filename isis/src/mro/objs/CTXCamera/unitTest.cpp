@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat[3] = { -22.00026732942671, -15.08829558278137, -40.6918887505667115 };
     double knownLon[3] = { 307.9160921848336, 309.8677351454377, 102.4181750964207964 };
-    char files[3][1024] = { "$ISISTESTDATA/isis/src/mro/unitTestData/ctx_pmoi_i_00003.bottom.cub",
-                            "$ISISTESTDATA/isis/src/mro/unitTestData/ctx_pmoi_i_00003.top.cub",
-                            "$ISISTESTDATA/isis/src/mro/unitTestData/G02_019106_1390_XN_41S257W.cub" };
+    char files[3][1024] = { "$mro/testData/ctx_pmoi_i_00003.bottom.cub",
+                            "$mro/testData/ctx_pmoi_i_00003.top.cub",
+                            "$mro/testData/G02_019106_1390_XN_41S257W.cub" };
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Cube c(files[i], "r");

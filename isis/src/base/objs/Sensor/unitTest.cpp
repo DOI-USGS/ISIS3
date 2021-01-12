@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     cerr << setprecision(9);
     cerr << "Unit test for Sensor" << endl;
 
-    Cube dummyCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
+    Cube dummyCube("$base/testData/isisTruth.cub", "r");
 
     Pvl &lab = *dummyCube.label();
     PvlGroup inst("INSTRUMENT");
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     lab.addGroup(inst);
 
     PvlGroup kern("Kernels");
-    FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
+    FileName f("$base/testData/kernels");
     QString dir = f.expanded() + "/";
 
     kern += PvlKeyword("NaifFrameCode", "-94031");

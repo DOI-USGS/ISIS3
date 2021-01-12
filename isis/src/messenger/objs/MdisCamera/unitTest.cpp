@@ -50,7 +50,7 @@ int main(void) {
     double knownLat =  -0.1799382527687776;
     double knownLon = 225.0254441224830941;
 
-    Cube c("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0089570936I.cub", "r");
+    Cube c("$messenger/testData/EW0089570936I.cub", "r");
     MdisCamera *cam = (MdisCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -114,8 +114,8 @@ int main(void) {
     // Testing name methods
     cout << endl << endl << "Testing name methods ..." << endl;
     QList<QString> files;
-    files.append("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0089570936I.cub");
-    files.append("$ISISTESTDATA/isis/src/messenger/unitTestData/DN0163645629M_DE_0.reduced.cub");
+    files.append("$messenger/testData/EW0089570936I.cub");
+    files.append("$messenger/testData/DN0163645629M_DE_0.reduced.cub");
     
     for (int i = 0; i < files.size(); i++) {
       Cube m(files[i], "r");

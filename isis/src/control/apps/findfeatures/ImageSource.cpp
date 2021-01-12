@@ -42,7 +42,6 @@
 #include "FileName.h"
 #include "GenericTransform.h"
 #include "Histogram.h"
-#include "ImageHistogram.h"
 #include "IException.h"
 #include "ImageSource.h"
 #include "IString.h"
@@ -381,7 +380,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
 }
 
 Histogram *ImageSource::getHistogram(Cube &cube) const {
-  QScopedPointer<Histogram> hist(new ImageHistogram(cube, 1));
+  QScopedPointer<Histogram> hist(new Histogram(cube, 1));
   LineManager line(cube);
 
   for(int i = 1; i <= cube.lineCount(); i++) {

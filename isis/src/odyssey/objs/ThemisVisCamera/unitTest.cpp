@@ -55,7 +55,7 @@ int main(void) {
     double knownCenterLat =  48.515167642355;
     double knownCenterLon = 332.03690329802;
 
-    Cube evenCube("$ISISTESTDATA/isis/src/odyssey/unitTestData/V14093008RDR.even.cub", "r");
+    Cube evenCube("$odyssey/testData/V14093008RDR.even.cub", "r");
 //    Cube evenCube("./V14093008RDR.even.cub", "r");
     Camera *evenCam = CameraFactory::Create(evenCube);
     qDebug() << "FileName: " << FileName(evenCube.fileName()).name();
@@ -115,7 +115,7 @@ int main(void) {
     qDebug() << "";
     qDebug() << "";
     qDebug() << "";
-    Cube oddCube("$ISISTESTDATA/isis/src/odyssey/unitTestData/V14093008RDR.odd.cub", "r");
+    Cube oddCube("$odyssey/testData/V14093008RDR.odd.cub", "r");
     Camera *oddCam = CameraFactory::Create(oddCube);
     qDebug()<< "FileName: " << FileName(oddCube.fileName()).name();
     qDebug()<< "CK Frame: " << oddCam->instrumentRotation()->Frame();
@@ -183,7 +183,7 @@ int main(void) {
     
     qDebug() << "Testing errors";
     try {
-      Cube irCube("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.cub", "r");
+      Cube irCube("$odyssey/testData/I00831002RDR.cub", "r");
       ThemisVisCamera irImage(irCube);
     } 
     catch (IException &e) {

@@ -108,13 +108,13 @@ int main(int argc, char *argv[]) {
   cout << setprecision(10);
   cout << "Unit test for Isis::Spice" << endl;
 
-  Cube dummyCube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
+  Cube dummyCube("$base/testData/isisTruth.cub", "r");
 
   PvlGroup instrumentGroup("Instrument");
   instrumentGroup += PvlKeyword("TargetName", "Mard");
 
   PvlGroup kernelsGroup("Kernels");
-  FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
+  FileName f("$base/testData/kernels");
   QString dir = f.expanded() + "/";
   kernelsGroup += PvlKeyword("NaifFrameCode", "-94031");
   kernelsGroup += PvlKeyword("LeapSecond", dir + "naif0007.tls");

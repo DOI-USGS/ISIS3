@@ -127,10 +127,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing assignment operator=...";
-    {
-      BundleResults &r = results;
-      results = r;
-    }
+    results = results;
     printXml(results);
 
     BundleResults assignmentOpResults;

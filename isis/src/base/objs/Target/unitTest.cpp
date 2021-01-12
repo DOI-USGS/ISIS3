@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
   // These are not part of the Target class funtionality except to test missing body code
   PvlGroup kern1("Kernels");
-  FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
+  FileName f("$base/testData/kernels");
   FileName f2("$base/dems");
   QString dir = f.expanded() + "/";
   QString dir2 = f2.expanded() + "/";
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
   lab1.addGroup(kern1);
 
   // Create a Spice object to test radii
-  Cube tmp("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
+  Cube tmp("$base/testData/isisTruth.cub", "r");
   *tmp.label() = lab1;
   Spice spi(tmp);
 

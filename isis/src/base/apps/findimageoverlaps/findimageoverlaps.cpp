@@ -11,13 +11,13 @@ using namespace std;
 
 namespace Isis {
 
-  void findimageoverlaps(UserInterface &ui, bool useThread, Pvl *log) {
+  void findimageoverlaps(UserInterface &ui, Pvl *log) {
     FileList images(ui.GetFileName("FROMLIST"));
 
-    findimageoverlaps(images, ui, useThread, log);
+    findimageoverlaps(images, ui, log);
   }
 
-  void findimageoverlaps(FileList &images, UserInterface &ui, bool useThread, Pvl *log) {
+  void findimageoverlaps(FileList &images, UserInterface &ui, Pvl *log) {
     // list of sns/filenames sorted by serial number
     SerialNumberList serialNumbers(true);
 
@@ -47,7 +47,7 @@ namespace Isis {
     }
 
     // Now we want the ImageOverlapSet to calculate our overlaps
-    ImageOverlapSet overlaps(true, useThread);
+    ImageOverlapSet overlaps(true);
 
     // Use multi-threading to create the overlaps
     overlaps.FindImageOverlaps(serialNumbers,

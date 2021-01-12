@@ -238,15 +238,11 @@ namespace Isis {
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
       virtual void SetInputCube(Isis::Cube *inCube);
-      virtual void SetInputCube(Cube *cube, 
-                                    int requirements);
+
 
       virtual Isis::Cube *SetOutputCube(const QString &parameter);
-      virtual Isis::Cube *SetOutputCubeStretch(const QString &parameter, UserInterface *ui=nullptr);
       virtual Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
                                 const int nlines, const int nbands = 1);
-      virtual Isis::Cube *SetOutputCubeStretch(const QString &parameter, const int nsamps,
-                                const int nlines, const int nbands = 1, UserInterface *ui=nullptr);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,

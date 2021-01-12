@@ -394,10 +394,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing assignment operator=...";
-    {
-      StatCumProbDistDynCalc &c = copyStats;
-      copyStats = c;
-    }
+    copyStats = copyStats;
     qDebug() << "Min = " << copyStats.min();
     qDebug() << "Max = " << copyStats.max();
     qDebug() << "";

@@ -6,9 +6,9 @@
 #include "UserInterface.h"
 
 namespace Isis {
-  extern void findimageoverlaps(UserInterface &ui, bool useThread=true, Pvl *log=nullptr);
+  extern void findimageoverlaps(UserInterface &ui, Pvl *log=nullptr);
 
-  extern void findimageoverlaps(FileList &images, UserInterface &ui, bool useThread=true, Pvl *log=nullptr);
+  extern void findimageoverlaps(FileList &images, UserInterface &ui, Pvl *log=nullptr);
 }
 
 #endif

@@ -20,7 +20,7 @@
     resolution.  The following is an example of the output given when campt is ran:
     <pre>
 Group = GroundPoint
-  Filename                   = $ISISDATA/base/examples/ab102401.cub
+  Filename                   = /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
   Sample                     = 1.0
   Line                       = 1.0
   PixelValue     
