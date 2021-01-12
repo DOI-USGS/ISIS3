@@ -43,10 +43,10 @@ int main() {
     AutoReg *ar = AutoRegFactory::Create(pvl);
 
     Cube p;
-    p.open("$messenger/testData/EW0131770376G.equi.cub");
+    p.open("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0131770376G.equi.cub");
 
     Cube s;
-    s.open("$messenger/testData/EW0131770381F.equi.cub");
+    s.open("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0131770381F.equi.cub");
 
     ar->SearchChip()->TackCube(512.0, 512.0);
     ar->SearchChip()->Load(s);

@@ -159,7 +159,11 @@ int main(int argc, char *argv[]) {
     printXml<BundleSettings>(copySettings);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
-    settings = settings;
+    {
+      BundleSettings &s = settings;
+      settings = s;
+    }
+
     printXml<BundleSettings>(settings);
 
     qDebug() << "Testing assignment operator to create a new settings object...";

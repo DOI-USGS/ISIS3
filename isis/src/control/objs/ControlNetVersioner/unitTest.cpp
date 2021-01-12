@@ -32,70 +32,70 @@ int main(int argc, char *argv[]) {
   cout << "Test ControlNetVersioner";
 
   // No target                                                  
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", 
               testProgress, false); // no print network here because the datetimes will change
 
   // Really odd keywords with target                            
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
               testProgress);               
 
   // Another set of odd keywords                                
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net", 
               testProgress);               
 
   // Binary V1                                                  
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
               testProgress);           
 
   // Corrupted (based off of oldNetwork2.net)                   
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net", 
               testProgress);              
 
   // Binary V2                                                  
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
               testProgress, 
               false);    
 
   // Network with rejected jigsaw points                        
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl", 
               testProgress, 
               true, 
               true);   
 
   // Network full of weird test cases (based on PvlNetwork4)    
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", 
               testProgress,
               false, 
               false);
 
   // Test Network 1 created for code coverage.
-  TestNetwork("$control/testData/PvlNet_TestNetwork1_V2.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork1_V2.net", 
               testProgress, 
               false, 
               false); 
 
   // Test Network 2 created for code coverage.
-  TestNetwork("$control/testData/PvlNet_TestNetwork2_V3.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork2_V3.net", 
               testProgress, 
               false, 
               false); 
 
   // Re-test each version without progress
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
               0, 
               false);
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
               0, 
               false);
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
               0, 
               false);
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", 
               0, 
               false);
 
   cout << endl << "Test writing from ControlNet objects" << endl << endl;
-  QString cnetv2 = "$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net";
+  QString cnetv2 = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net";
   ControlNet *binaryV2Net = new ControlNet(cnetv2,testProgress);
   ControlNetVersioner *binV2Versioner = new ControlNetVersioner(binaryV2Net);
   binV2Versioner->write("./binaryV2tmp.net");
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
   binV2Versioner = NULL;
 
   cout << endl << "Test reading version 1 protobuf network" << endl << endl;
-  QString cnetv1 = "$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net";
+  QString cnetv1 = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net";
   ControlNetVersioner *binV1Versioner = new ControlNetVersioner(FileName(cnetv1), testProgress);
   cout << "Take all of the control points and delete them." << endl;
   int pointsTaken = 0;
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
   binV1Versioner = NULL;
 
   cout << endl << "Test reading version 5 protobuf network" << endl << endl;
-  QString cnetv5 = "$control/testData/unitTest_ControlNetVersioner_ProtoNetwork3_ProtoV0005.net";
+  QString cnetv5 = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork3_ProtoV0005.net";
   ControlNetVersioner *binV5Versioner = new ControlNetVersioner(FileName(cnetv5), testProgress);
   delete binV5Versioner;
   binV5Versioner = NULL;
@@ -148,54 +148,54 @@ int main(int argc, char *argv[]) {
   cout << endl << "Test reading a PVL file with missing header information" << endl << endl;
   QString badCnetName = "";
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net";
     ControlNetVersioner invalidVersionerV1(badCnetName);
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/testData"), "file [control/testData");
+    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net";
     ControlNetVersioner invalidVersionerV2(badCnetName);
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/testData"), "file [control/testData");
+    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net";
     ControlNetVersioner invalidVersionerV3(badCnetName);
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/testData"), "file [control/testData");
+    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net";
     ControlNetVersioner invalidVersionerV4(badCnetName);
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/testData"), "file [control/testData");
+    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net";
     ControlNetVersioner invalidVersionerV5(badCnetName);
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/testData"), "file [control/testData");
+    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
 
   cout << endl << "Test reading a protobuf file with a bad version number" << endl << endl;
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_ProtoNetwork_BadVersion.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork_BadVersion.net";
     ControlNetVersioner invalidVersioner(badCnetName);
   }
   catch (IException &e) {
@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
 
   cout << endl << "Test reading a protobuf file with no version number" << endl << endl;
   try {
-    badCnetName = "$control/testData/unitTest_ControlNetVersioner_ProtoNetwork_NoVersion.net";
+    badCnetName = "$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork_NoVersion.net";
     ControlNetVersioner invalidVersioner(badCnetName);
 
   }

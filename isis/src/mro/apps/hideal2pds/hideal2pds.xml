@@ -59,6 +59,9 @@
     <change name="Tyler Wilson" date="2019-02-08">
       Added an option to control the output bits.  min = 8, max =16, default = 10.  Fixes #5527.
     </change>
+    <change name="Timothy Giroux" date="2020-09-08">
+      Output label now has the correct SAMPLE_BIT_MASK value according to bits input. Fixes #3978. 
+    </change>
   </history>
 
   <groups>

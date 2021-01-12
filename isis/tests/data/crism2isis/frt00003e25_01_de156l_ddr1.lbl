@@ -1,0 +1,122 @@
+PDS_VERSION_ID               = PDS3
+LABEL_REVISION_NOTE          = "2004-11-22, S. Slavney (GEO);
+                                2006-04-05, S. Murchie (JHU/APL);"
+
+/* DDR Identification */
+
+DATA_SET_ID                  = "MRO-M-CRISM-6-DDR-V1.0"
+PRODUCT_ID                   = "FRT00003E25_01_DE156L_DDR1"
+/* cccnnnnnnnn_xx_ooaaas_DDRv            */
+/* ccc = Class Type                      */
+/* nnnnnnnn = Observation ID (hex)       */
+/* xx = counter this observation (hex)   */
+/* ooaaa = obs type, macro number        */
+/* s = sensor ID (S or L)                */
+/* v = version number                    */
+
+INSTRUMENT_HOST_NAME         = "MARS RECONNAISSANCE ORBITER"
+SPACECRAFT_ID                = MRO
+INSTRUMENT_NAME              = "COMPACT RECONNAISSANCE IMAGING
+                                SPECTROMETER FOR MARS"
+INSTRUMENT_ID                = CRISM
+TARGET_NAME                  = MARS
+PRODUCT_TYPE                 = DDR
+PRODUCT_CREATION_TIME        = 2007-04-04T22:49:30
+START_TIME                   = 2007-01-13T05:59:08.707
+STOP_TIME                    = 2007-01-13T05:59:12.442
+SPACECRAFT_CLOCK_START_COUNT = "2/853135167:38571"
+SPACECRAFT_CLOCK_STOP_COUNT  = "2/853135171:21163"
+
+ORBIT_NUMBER                 = 0
+OBSERVATION_TYPE             = "FRT"
+OBSERVATION_ID               = "16#00003E25#"
+MRO:OBSERVATION_NUMBER       = 16#01#
+MRO:ACTIVITY_ID              = "DE156"
+MRO:SENSOR_ID                = "L"
+PRODUCT_VERSION_ID           = "1"
+SOURCE_PRODUCT_ID            = {
+      "MRO_SCLKSCET.00019.65536.tsc",
+      "mro_v08.tf",
+      "MRO_CRISM_FK_0000_000_N_1.TF",
+      "MRO_CRISM_IK_0000_000_N_1.TI",
+      "naif0008.tls",
+      "pck00008.tpc",
+      "mro_sc_psp_070102_070108.bc",
+      "mro_sc_psp_070109_070115.bc",
+      "mro_sc_psp_070116_070122.bc",
+      "spck_2007_003_r_1.bc",
+      "spck_2007_004_r_1.bc",
+      "spck_2007_005_r_1.bc",
+      "spck_2007_006_r_1.bc",
+      "spck_2007_007_r_1.bc",
+      "spck_2007_008_r_1.bc",
+      "spck_2007_009_r_1.bc",
+      "spck_2007_010_r_1.bc",
+      "spck_2007_011_r_1.bc",
+      "spck_2007_012_r_1.bc",
+      "spck_2007_013_r_1.bc",
+      "spck_2007_014_r_1.bc",
+      "spck_2007_015_r_1.bc",
+      "spck_2007_016_r_1.bc",
+      "de410.bsp",
+      "mro_cruise.bsp",
+      "mro_ab.bsp",
+      "mro_psp.bsp",
+      "mro_psp_rec.bsp"
+}
+
+PRODUCER_INSTITUTION_NAME    = "APPLIED PHYSICS LABORATORY"
+SOFTWARE_NAME                = "crism_ddr"
+SOFTWARE_VERSION_ID          = "1.9"
+
+/* DDR Instrument and Observation Parameters */
+
+TARGET_CENTER_DISTANCE       = 3685.385923 <KM>
+                               /* distance to Mars center at first frame */
+SOLAR_DISTANCE               = 224176057.672459 <KM>
+SOLAR_LONGITUDE              = 165.927858 <DEGREES>
+MRO:FRAME_RATE               = 3.75 <HZ>
+PIXEL_AVERAGING_WIDTH        = 10
+MRO:INSTRUMENT_POINTING_MODE = "DYNAMIC POINTING"
+SCAN_MODE_ID                 = "LONG"
+
+
+/* This DDR label describes one data file:                               */
+/* 1. A multiple-band backplane image file with wavelength-independent,  */
+/* spatial pixel-dependent geometric and timing information.             */
+
+/* See the CRISM Data Products SIS for more detailed description.        */
+
+OBJECT                       = FILE
+  ^IMAGE                     = "FRT00003E25_01_DE156L_DDR1.IMG"
+  RECORD_TYPE                = FIXED_LENGTH
+  RECORD_BYTES               = 256
+  FILE_RECORDS               = 210
+
+  OBJECT                     = IMAGE
+    LINES                    = 15
+    LINE_SAMPLES             = 64
+    SAMPLE_TYPE              = PC_REAL
+    SAMPLE_BITS              = 32
+    BANDS                    = 14
+    BAND_STORAGE_TYPE        = BAND_SEQUENTIAL
+    BAND_NAME                = ("INA at areoid, deg",
+                                "EMA at areoid, deg",
+                                "Phase angle, deg",
+                                "Latitude, areocentric, deg N",
+                                "Longitude, areocentric, deg E",
+                                "INA at surface from MOLA, deg",
+                                "EMA at surface from MOLA, deg",
+                                "Slope magnitude from MOLA, deg",
+                                "MOLA slope azimuth, deg clkwise from N",
+                                "Elevation, meters relative to MOLA",
+                                "Thermal inertia, J m^-2 K^-1 s^-0.5",
+                                "Bolometic albedo",
+                                "Local solar time, hours",
+                                "Spare")
+
+  END_OBJECT                 = IMAGE
+
+END_OBJECT                   = FILE
+
+END

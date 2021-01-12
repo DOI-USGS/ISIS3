@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     cout << "UnitTest for Universal Ground Map" << endl;
 
     cout << "  Testing Camera Model..." << endl;
-    Cube c("$viking2/testData/f348b26.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/viking/unitTestData/f348b26.cub", "r");
     UniversalGroundMap ugm(c);
     cout << setprecision(9);
 
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     }
 
     cout << "  Testing Camera Model and Projection..." << endl;
-    Cube c3("$mgs/testData/m0402852.cub", "r");
+    Cube c3("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub", "r");
     UniversalGroundMap ugm3(c3);
     cout << "Is Projection? = " << ugm3.HasProjection() << endl << endl;
 

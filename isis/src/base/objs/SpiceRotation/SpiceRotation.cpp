@@ -9,12 +9,9 @@
 
 #include <QDebug>
 #include <QString>
-
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-
-
 
 #include "BasisFunction.h"
 #include "IException.h"
@@ -73,6 +70,7 @@ namespace Isis {
     p_fullCacheSize = 0;
     m_frameType = UNKNOWN;
     m_tOrientationAvailable = false;
+    m_orientation = NULL;
   }
 
 
@@ -112,6 +110,7 @@ namespace Isis {
     p_fullCacheSize = 0;
     m_frameType = DYN;
     m_tOrientationAvailable = false;
+    m_orientation = NULL;
 
     // Determine the axis for the velocity vector
     QString key = "INS" + toString(frameCode) + "_TRANSX";
@@ -140,8 +139,6 @@ namespace Isis {
    */
   SpiceRotation::SpiceRotation(const SpiceRotation &rotToCopy) {
     p_cacheTime = rotToCopy.p_cacheTime;
-    p_cache = rotToCopy.p_cache;
-    p_cacheAv = rotToCopy.p_cacheAv;
     p_av = rotToCopy.p_av;
     p_degree = rotToCopy.p_degree;
     p_axis1 = rotToCopy.p_axis1;
@@ -181,6 +178,13 @@ namespace Isis {
     p_hasAngularVelocity = rotToCopy.p_hasAngularVelocity;
     m_frameType = rotToCopy.m_frameType;
 
+    if (rotToCopy.m_orientation) {
+      m_orientation = new ale::Orientations;
+      *m_orientation = *rotToCopy.m_orientation; 
+    }
+    else {
+      m_orientation = NULL;
+    }
   }
 
 
@@ -188,6 +192,10 @@ namespace Isis {
    * Destructor for SpiceRotation object.
    */
   SpiceRotation::~SpiceRotation() {
+    if (m_orientation) {
+      delete m_orientation;
+      m_orientation = NULL;
+    }
   }
 
 
@@ -280,7 +288,7 @@ namespace Isis {
     }
 
     // Set the quaternion for this rotation
-//   p_quaternion.Set ( p_CJ );
+//    p_quaternion.Set ( p_CJ );
   }
 
 
@@ -300,7 +308,7 @@ namespace Isis {
    * @return @b bool Indicates whether this rotation is cached.
    */
   bool SpiceRotation::IsCached() const {
-    return (p_cache.size() > 0);
+    return (m_orientation != NULL);
   }
 
 
@@ -361,6 +369,11 @@ namespace Isis {
     p_fullCacheEndTime = endTime;
     p_fullCacheSize = size;
 
+    if (m_orientation != NULL) { 
+      delete m_orientation;
+      m_orientation = NULL;
+    }
+
     // Make sure the constant frame is loaded.  This method also does the frame trace.
     if (p_timeFrames.size() == 0) InitConstantRotation(startTime);
 
@@ -373,12 +386,29 @@ namespace Isis {
     int cacheSize = p_cacheTime.size();
 
     // Loop and load the cache
+    std::vector<ale::Rotation> rotationCache;
+    std::vector< std::vector<double> > cache;
+    std::vector<ale::Vec3d> avCache;
     for (int i = 0; i < cacheSize; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
-      p_cache.push_back(p_CJ);
-      if (p_hasAngularVelocity) p_cacheAv.push_back(p_av);
+      rotationCache.push_back(ale::Rotation(p_CJ));
+      cache.push_back(p_CJ);
+
+      if (p_hasAngularVelocity) {
+        avCache.push_back(ale::Vec3d(p_av));
+      }
     }
+
+    if (p_TC.size() > 1) {
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                            ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+    }
+    else {
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                            ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
+    }
+
     p_source = Memcache;
 
     // Downsize already loaded caches (both time and quats)
@@ -422,11 +452,14 @@ namespace Isis {
 
     p_timeFrames.clear();
     p_TC.clear();
-    p_cache.clear();
     p_cacheTime.clear();
-    p_cacheAv.clear();
     p_hasAngularVelocity = false;
     m_frameType = CK;
+    
+    if (m_orientation) {
+      delete m_orientation;
+      m_orientation = NULL;
+    }
 
     // Load the full cache time information from the label if available
     p_fullCacheStartTime = isdRot["ck_table_start_time"].get<double>();
@@ -435,32 +468,39 @@ namespace Isis {
     p_cacheTime = isdRot["ephemeris_times"].get<std::vector<double>>();
     p_timeFrames = isdRot["time_dependent_frames"].get<std::vector<int>>();
 
+    std::vector<ale::Rotation> rotationCache;
     for (auto it = isdRot["quaternions"].begin(); it != isdRot["quaternions"].end(); it++) {
-        std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
-        Quaternion q(quat);
-        std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ);
+      std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
+      Quaternion q(quat);
+      std::vector<double> CJ = q.ToMatrix();
+      rotationCache.push_back(ale::Rotation(CJ));
     }
 
+    std::vector<ale::Vec3d> avCache;
     if (isdRot["angular_velocities"].size() != 0) {
       for (auto it = isdRot["angular_velocities"].begin(); it != isdRot["angular_velocities"].end(); it++) {
-          std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
-          p_cacheAv.push_back(av);
+        std::vector<double> av = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+        avCache.push_back(ale::Vec3d(av));
       }
       p_hasAngularVelocity = true;
     }
 
     bool hasConstantFrames = isdRot.find("constant_frames") != isdRot.end();
 
+
     if (hasConstantFrames) {
       p_constantFrames = isdRot["constant_frames"].get<std::vector<int>>();
-      p_TC = isdRot["constant_rotation"].get<std::vector<double>>();
-
+      p_TC = isdRot["constant_rotation"].get<std::vector<double>>(); 
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                          ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
     }
     else {
       p_TC.resize(9);
       ident_c((SpiceDouble( *)[3]) &p_TC[0]);
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                          ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
     }
+
 
     p_source = Memcache;
     SetEphemerisTime(p_cacheTime[0]);
@@ -495,10 +535,14 @@ namespace Isis {
     // Clear any existing cached data to make it reentrant (KJB 2011-07-20).
     p_timeFrames.clear();
     p_TC.clear();
-    p_cache.clear();
     p_cacheTime.clear();
-    p_cacheAv.clear();
+
     p_hasAngularVelocity = false;
+
+    if (m_orientation) {
+      delete m_orientation;
+      m_orientation = NULL;
+    }
 
     // Load the constant and time-based frame traces and the constant rotation
     if (table.Label().hasKeyword("TimeDependentFrames")) {
@@ -559,6 +603,9 @@ namespace Isis {
     // establish the type of cache and then use the appropriate loop.
 
     // list table of quaternion and time
+
+    std::vector<ale::Rotation> rotationCache;
+    std::vector<ale::Vec3d> avCache;
     if (recFields == 5) {
       for (int r = 0; r < table.Records(); r++) {
         TableRecord &rec = table[r];
@@ -575,8 +622,17 @@ namespace Isis {
 
         Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ);
+        rotationCache.push_back(ale::Rotation(CJ));
+
         p_cacheTime.push_back((double)rec[4]);
+      }
+      if (p_TC.size() > 1) {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+      }
+      else {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
       }
       p_source = Memcache;
     }
@@ -599,16 +655,24 @@ namespace Isis {
 
         Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
-        p_cache.push_back(CJ);
+        rotationCache.push_back(ale::Rotation(CJ));
 
         std::vector<double> av;
         av.push_back((double)rec[4]);
         av.push_back((double)rec[5]);
         av.push_back((double)rec[6]);
-        p_cacheAv.push_back(av);
-
+        avCache.push_back(ale::Vec3d(av));
         p_cacheTime.push_back((double)rec[7]);
         p_hasAngularVelocity = true;
+      }
+
+      if (p_TC.size() > 1) {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+      }
+      else {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
       }
       p_source = Memcache;
     }
@@ -638,7 +702,9 @@ namespace Isis {
       SetPolynomial(coeffAng1, coeffAng2, coeffAng3);
       p_source = PolyFunction;
       if (degree > 0)  p_hasAngularVelocity = true;
-      if (degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
+      if (degree == 0  && m_orientation->getAngularVelocities().size() > 0) {
+        p_hasAngularVelocity = true;
+      }
     }
     else  {
       QString msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
@@ -661,15 +727,11 @@ namespace Isis {
     double et = p_et;
     p_et = -DBL_MAX;
 
+    std::vector<ale::Rotation> rotationCache;
+    std::vector<ale::Vec3d> avCache;
     if (p_source == PolyFunction) {
     // Clear existing matrices from cache
       p_cacheTime.clear();
-      p_cache.clear();
-
-      // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated
-      //  for functions of degree 0 (framing cameras), so keep the original av.  It is better than
-      //  nothing.
-      if (p_degree > 0 && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
       // Load the time cache first
       p_minimizeCache = No;
@@ -679,25 +741,23 @@ namespace Isis {
       // Load the matrix and av caches
         for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
           SetEphemerisTime(p_cacheTime.at(pos));
-          p_cache.push_back(p_CJ);
-          p_cacheAv.push_back(p_av);
+          rotationCache.push_back(ale::Rotation(p_CJ));
+          avCache.push_back(ale::Vec3d(p_av));
         }
       }
       else {
       // Load the matrix for the single updated time instance
         SetEphemerisTime(p_cacheTime[0]);
-        p_cache.push_back(p_CJ);
+        rotationCache.push_back(ale::Rotation(p_CJ));
+        avCache.push_back(ale::Vec3d(p_av));
       }
     }
     else if (p_source == PolyFunctionOverSpice) {
       SpiceRotation tempRot(*this);
-
       std::vector<double>::size_type maxSize = p_fullCacheSize;
 
       // Clear the existing caches
-      p_cache.clear();
       p_cacheTime.clear();
-      p_cacheAv.clear();
 
       // Reload the time cache first
       p_minimizeCache = No;
@@ -705,13 +765,30 @@ namespace Isis {
 
       for (std::vector<double>::size_type pos = 0; pos < maxSize; pos++) {
         tempRot.SetEphemerisTime(p_cacheTime.at(pos));
-        p_cache.push_back(tempRot.TimeBasedMatrix());
-        if (p_hasAngularVelocity) p_cacheAv.push_back(tempRot.AngularVelocity());
+        std::vector<double> CJ = tempRot.TimeBasedMatrix();
+        rotationCache.push_back(ale::Rotation(CJ));
+        if (p_hasAngularVelocity){
+          avCache.push_back(ale::Vec3d(tempRot.AngularVelocity()));
+        }
       }
     }
     else { //(p_source < PolyFunction)
       QString msg = "The SpiceRotation has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (m_orientation) {
+      delete m_orientation; 
+      m_orientation = NULL;
+    }
+
+    if (p_TC.size() > 1) {
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                            ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+    }
+    else {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
     }
 
     // Set source to cache and reset current et
@@ -813,18 +890,30 @@ namespace Isis {
       record += t;
       Table table(tableName, record);
 
-      for (int i = 0; i < (int)p_cache.size(); i++) {
-        Quaternion q(p_cache[i]);
-        std::vector<double> v = q.GetQuaternion();
-        record[0] = v[0];
-        record[1] = v[1];
-        record[2] = v[2];
-        record[3] = v[3];
+      std::vector<ale::Rotation> rots = m_orientation->getRotations();
+      std::vector<ale::Vec3d> angularVelocities = m_orientation->getAngularVelocities();
+      for (int i = 0; i < (int) p_cacheTime.size(); i++) {
+        std::vector<double> quat = rots[i].toQuaternion();
 
-        if (p_hasAngularVelocity) {
-          record[4] = p_cacheAv[i][0];
-          record[5] = p_cacheAv[i][1];
-          record[6] = p_cacheAv[i][2];
+        // If the first component is less than zero, multiply the whole quaternion by -1. This 
+        // matches NAIF.
+        if (quat[0] < 0) {
+          quat[0] = -1 * quat[0];
+          quat[1] = -1 * quat[1];
+          quat[2] = -1 * quat[2];
+          quat[3] = -1 * quat[3];
+        }
+
+        record[0] = quat[0]; 
+        record[1] = quat[1];
+        record[2] = quat[2];
+        record[3] = quat[3];
+
+        if (angularVelocities.size() > 0 && p_hasAngularVelocity ) {
+          ale::Vec3d angularVelocity = angularVelocities[i];
+          record[4] = angularVelocity.x;
+          record[5] = angularVelocity.y;
+          record[6] = angularVelocity.z;
         }
 
         record[timePos] = p_cacheTime[i];
@@ -1222,7 +1311,7 @@ namespace Isis {
    * Set the rotation angles (phi, delta, and w) for the current time to define the
    * time-based matrix CJ. This method was created for unitTests and should not
    * be used otherwise.  It only works for cached data with a cache size of 1.
-   *
+   *  
    * @param[in]  angles The angles defining the rotation (phi, delta, and w) in radians
    * @param[in]  axis3    The rotation axis for the third angle
    * @param[in]  axis2    The rotation axis for the second angle
@@ -1230,7 +1319,22 @@ namespace Isis {
    */
   void SpiceRotation::SetAngles(std::vector<double> angles, int axis3, int axis2, int axis1) {
     eul2m_c(angles[2], angles[1], angles[0], axis3, axis2, axis1, (SpiceDouble (*)[3]) &(p_CJ[0]));
-    p_cache[0] = p_CJ;
+
+    if (m_orientation) {
+      delete m_orientation;
+      m_orientation = NULL;
+    }
+    std::vector<ale::Rotation> rotationCache;
+    rotationCache.push_back(ale::Rotation(p_CJ));
+    if (p_TC.size() > 1) {
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime,  std::vector<ale::Vec3d>(),
+                                            ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+    }
+    else {
+      m_orientation = new ale::Orientations(rotationCache, p_cacheTime,  std::vector<ale::Vec3d>(),
+                                            ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
+    }
+
     // Reset to get the new values
     p_et = -DBL_MAX;
     SetEphemerisTime(p_et);
@@ -1629,10 +1733,11 @@ namespace Isis {
     }
 
     // Adjust degree of polynomial on available data
-    if (p_cache.size() == 1) {
+    int size = m_orientation->getRotations().size();
+    if (size == 1) {
       p_degree = 0;
     }
-    else if (p_cache.size() == 2) {
+    else if (size == 2) {
       p_degree = 1;
     }
 
@@ -1648,7 +1753,7 @@ namespace Isis {
     Isis::PolynomialUnivariate function1(p_degree);   //!< Basis function fit to 1st rotation angle
     Isis::PolynomialUnivariate function2(p_degree);   //!< Basis function fit to 2nd rotation angle
     Isis::PolynomialUnivariate function3(p_degree);   //!< Basis function fit to 3rd rotation angle
-    //
+
     LeastSquares *fitAng1 = new LeastSquares(function1);
     LeastSquares *fitAng2 = new LeastSquares(function2);
     LeastSquares *fitAng3 = new LeastSquares(function3);
@@ -1657,7 +1762,7 @@ namespace Isis {
     ComputeBaseTime();
     std::vector<double> time;
 
-    if (p_cache.size() == 1) {
+    if (size == 1) {
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
@@ -1665,8 +1770,8 @@ namespace Isis {
       coeffAng2.push_back(angles[1]);
       coeffAng3.push_back(angles[2]);
     }
-    else if (p_cache.size() == 2) {
-// Load the times and get the corresponding rotation angles
+    else if (size == 2) {
+      // Load the times and get the corresponding rotation angles
       p_degree = 1;
       double t1 = p_cacheTime.at(0);
       SetEphemerisTime(t1);
@@ -2368,8 +2473,7 @@ namespace Isis {
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
-      if (p_fullCacheSize != (int) p_cache.size()) {
-
+      if (p_fullCacheSize != (int) p_cacheTime.size()) {
         QString msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -2377,20 +2481,24 @@ namespace Isis {
 
       SpiceDouble timeSclkdp[p_fullCacheSize];
       SpiceDouble quats[p_fullCacheSize][4];
-      double avvs[p_fullCacheSize][3];// Angular velocity vector
+      double avvs[p_fullCacheSize][3]; // Angular velocity vector
 
       // We will treat et as the sclock time and avoid converting back and forth
+     std::vector<ale::Rotation> fullRotationCache = m_orientation->getRotations(); 
+     std::vector<ale::Vec3d> angularVelocities = m_orientation->getAngularVelocities();
      for (int r = 0; r < p_fullCacheSize; r++) {
         timeSclkdp[r] = p_cacheTime[r];
-        SpiceDouble CJ[9] = { p_cache[r][0], p_cache[r][1], p_cache[r][2],
-                              p_cache[r][3], p_cache[r][4], p_cache[r][5],
-                              p_cache[r][6], p_cache[r][7], p_cache[r][8]
+        std::vector<double> rotationMatrix = fullRotationCache[r].toRotationMatrix();
+        SpiceDouble CJ[9] = { rotationMatrix[0], rotationMatrix[1], rotationMatrix[2],
+                              rotationMatrix[3], rotationMatrix[4], rotationMatrix[5],
+                              rotationMatrix[6], rotationMatrix[7], rotationMatrix[8]
                             };
         m2q_c(CJ, quats[r]);
         if (p_hasAngularVelocity) {
-          vequ_c((SpiceDouble *) &p_cacheAv[r][0], avvs[r]);
+          ale::Vec3d angularVelocity = angularVelocities[r];
+          vequ_c((SpiceDouble *) &angularVelocity.x, avvs[r]);
         }
-      }
+     }
 
       double cubeStarts = timeSclkdp[0]; //,timsSclkdp[ckBlob.Records()-1] };
       double radTol = 0.000000017453; //.000001 degrees  Make this instrument dependent TODO
@@ -2405,10 +2513,16 @@ namespace Isis {
 
       // Clear full cache and load with downsized version
       p_cacheTime.clear();
-      p_cache.clear();
-      p_cacheAv.clear();
       std::vector<double> av;
       av.resize(3);
+
+      if (m_orientation) {
+        delete m_orientation;
+        m_orientation = NULL;
+      }
+
+      std::vector<ale::Rotation> rotationCache;
+      std::vector<ale::Vec3d> avCache;
 
       for (int r = 0; r < sizOut; r++) {
         SpiceDouble et;
@@ -2417,11 +2531,19 @@ namespace Isis {
         p_cacheTime.push_back(et);
         std::vector<double> CJ(9);
         q2m_c(quats[r], (SpiceDouble( *)[3]) &CJ[0]);
-        p_cache.push_back(CJ);
+        rotationCache.push_back(CJ);
         vequ_c(avvs[r], (SpiceDouble *) &av[0]);
-        p_cacheAv.push_back(av);
+        avCache.push_back(av);
       }
 
+      if (p_TC.size() > 1 ) {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache, 
+                                              ale::Rotation(p_TC), p_constantFrames, p_timeFrames);
+      }
+      else {
+        m_orientation = new ale::Orientations(rotationCache, p_cacheTime,  std::vector<ale::Vec3d>(),
+                                            ale::Rotation(1,0,0,0), p_constantFrames, p_timeFrames);
+      }
       timeLoaded = true;
       p_minimizeCache = Done;
     }
@@ -2998,7 +3120,9 @@ namespace Isis {
    std::vector<double> SpiceRotation::Extrapolate(double timeEt) {
     NaifStatus::CheckErrors();
 
-    if (!p_hasAngularVelocity) return p_CJ;
+    if (!p_hasAngularVelocity){
+      return p_CJ;
+    }
 
     double diffTime = timeEt - p_et;
     std::vector<double> CJ(9, 0.0);
@@ -3126,54 +3250,26 @@ namespace Isis {
    * @see SpiceRotation::SetEphemerisTime
    */
   void SpiceRotation::setEphemerisTimeMemcache() {
-    // If the cache has only one rotation, set it
+   // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
-    if (p_cache.size() == 1) {
-      p_CJ = p_cache[0];
+    if (p_cacheTime.size() == 1) {
+      p_CJ = m_orientation->getRotations()[0].toRotationMatrix();
       if (p_hasAngularVelocity) {
-        p_av = p_cacheAv[0];
+        ale::Vec3d av = m_orientation->getAngularVelocities()[0]; 
+        p_av[0] = av.x;
+        p_av[1] = av.y;
+        p_av[2] = av.z;
       }
     }
     // Otherwise determine the interval to interpolate
     else {
-      std::vector<double>::iterator pos;
-      pos = upper_bound(p_cacheTime.begin(), p_cacheTime.end(), p_et);
-
-      int cacheIndex;
-
-      if (pos != p_cacheTime.end()) {
-        cacheIndex = distance(p_cacheTime.begin(), pos);
-        cacheIndex--;
-      }
-      else {
-        cacheIndex = p_cacheTime.size() - 2;
-      }
-
-      if (cacheIndex < 0) cacheIndex = 0;
-
-      // Interpolate the rotation
-      double mult = (p_et - p_cacheTime[cacheIndex]) /
-                    (p_cacheTime[cacheIndex+1] - p_cacheTime[cacheIndex]);
-      /*        Quaternion Q2 (p_cache[cacheIndex+1]);
-               Quaternion Q1 (p_cache[cacheIndex]);*/
-      std::vector<double> CJ2(p_cache[cacheIndex+1]);
-      std::vector<double> CJ1(p_cache[cacheIndex]);
-      SpiceDouble J2J1[3][3];
-      mtxm_c((SpiceDouble( *)[3]) &CJ2[0], (SpiceDouble( *)[3]) &CJ1[0], J2J1);
-      SpiceDouble axis[3];
-      SpiceDouble angle;
-      raxisa_c(J2J1, axis, &angle);
-      SpiceDouble delta[3][3];
-      axisar_c(axis, angle * (SpiceDouble)mult, delta);
-      mxmt_c((SpiceDouble *) &CJ1[0], delta, (SpiceDouble( *) [3]) &p_CJ[0]);
+      p_CJ = m_orientation->interpolateTimeDep(p_et).toRotationMatrix();
 
       if (p_hasAngularVelocity) {
-        double v1[3], v2[3]; // Vectors surrounding desired time
-        vequ_c((SpiceDouble *) &p_cacheAv[cacheIndex][0], v1);
-        vequ_c((SpiceDouble *) &p_cacheAv[cacheIndex+1][0], v2);
-        vscl_c((1. - mult), v1, v1);
-        vscl_c(mult, v2, v2);
-        vadd_c(v1, v2, (SpiceDouble *) &p_av[0]);
+        ale::Vec3d av = m_orientation->interpolateAV(p_et);
+        p_av[0] = av.x;
+        p_av[1] = av.y;
+        p_av[2] = av.z;
       }
     }
     NaifStatus::CheckErrors();
@@ -3347,10 +3443,15 @@ namespace Isis {
            (SpiceDouble( *)[3]) &p_CJ[0]);
 
    if (p_hasAngularVelocity) {
-     if ( p_degree == 0)
-       p_av = p_cacheAv[0];
-     else
+     if ( p_degree == 0){
+       ale::Vec3d av = m_orientation->getAngularVelocities()[0];
+       p_av[0] = av.x;
+       p_av[1] = av.y;
+       p_av[2] = av.z;
+     }
+       else {
        ComputeAv();
+     }
    }
    NaifStatus::CheckErrors();
   }

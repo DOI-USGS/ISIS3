@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "New maximum cache size: " << manager->maxCacheSize();
     qDebug() << "";
 
-    QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
+    QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Create a target shape for " << dskfile;
     EmbreeTargetShape *managedTargetShape = manager->create(dskfile);
     qDebug() << "Target shape status:";
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Create a new target shape for the same file";
-    QString copyDSKFile = "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds";
+    QString copyDSKFile = "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds";
     EmbreeTargetShape *copyTargetShape = manager->create(copyDSKFile);
     qDebug() << "Target shape status:";
     qDebug() << "  Number of polygons: " << copyTargetShape->numberOfPolygons();

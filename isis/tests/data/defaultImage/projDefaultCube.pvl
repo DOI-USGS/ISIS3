@@ -34,7 +34,7 @@ Object = IsisCube
   Group = Archive
     DataSetId       = VO1/VO2-M-VIS-2-EDR-V2.0
     ProductId       = 387A06
-    MissonPhaseName = EXTENDED_MISSION
+    MissionPhaseName = EXTENDED_MISSION
     ImageNumber     = 33322515
     OrbitNumber     = 387
   End_Group

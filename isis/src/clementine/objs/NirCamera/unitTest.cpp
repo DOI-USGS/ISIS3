@@ -45,7 +45,7 @@ int main(void) {
     double knownLat = -19.7219163803538891;
     double knownLon = 60.6698682107287581;
 
-    Cube c("$clementine1/testData/lna1391h.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/clementine/unitTestData/lna1391h.cub", "r");
     NirCamera *cam = (NirCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
