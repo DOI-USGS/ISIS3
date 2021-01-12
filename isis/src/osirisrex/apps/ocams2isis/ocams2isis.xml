@@ -10,6 +10,16 @@
       This program will import FITS (Flexible Image Transport System) formatted files from the
       OSIRIS-REx MapCam, SamCam, and PolyCam instruments into the ISIS format.
     </p>
+    <p>
+      The following issues were found by the OSIRIS-REx Image Processing Working Group and have been fixed in their version but are not yet available in the public version:
+      <ul>
+        <li>Focal position dependent distortion for the PolyCam model is not implemented</li>
+        <li>The current distortion is out of date, software changes are needed to use the OpenCV based distortion in the latest IKs</li>
+        <li>The Struct SPK is not being used which accounts for the positions of the instruments relative to the center of the spacecraft. From the struct kernel docs this will result in an error of about a meter.</li>
+        <li>Only specific sites have DSKs available. Software changes are required to load multiple DSKs at the same time. It is recommended that you only work within the extents of the DSK you are using. Use the dskbrief utility to view the lat/lon extents of your DSK file.</li>
+      </ul>
+      Based on these issues, it is recommended that users don't attempt to do sub-meter or color processing with this version of the software.
+    </p>
   </description>
 
   <history>
@@ -29,7 +39,7 @@
       Updated to translate PolyCam kernels separately from other cameras. Fixes #5128
     </change>
     <change name="Jeannie Backer" date="2017-08-25">
-      Reverted code to only deal with a single kernels translation file for all instruments. Added 
+      Reverted code to only deal with a single kernels translation file for all instruments. Added
       PolyCamFocusPositionNaifId keyoword to kernels translation file. References #5127
     </change>
   </history>

@@ -52,19 +52,19 @@ int main(void) {
     double knownLat = 18.1052476112276679;
     double knownLon = 6.3330663560966673;
 
-    Cube cubeTL(FileName("$apollo15/testData/TL.cub").expanded(), "r");
+    Cube cubeTL(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/TL.cub").expanded(), "r");
     ApolloPanoramicCamera *camTL = (ApolloPanoramicCamera *) CameraFactory::Create(cubeTL);
 
-    Cube cubeBL(FileName("$apollo15/testData/BL.cub").expanded(), "r");
+    Cube cubeBL(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/BL.cub").expanded(), "r");
     ApolloPanoramicCamera *camBL = (ApolloPanoramicCamera *) CameraFactory::Create(cubeBL);
 
-    Cube cubeM(FileName("$apollo15/testData/M.cub").expanded(), "r");
+    Cube cubeM(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/M.cub").expanded(), "r");
     ApolloPanoramicCamera *camM = (ApolloPanoramicCamera *) CameraFactory::Create(cubeM);
 
-    Cube cubeTR(FileName("$apollo15/testData/TR.cub").expanded(), "r");
+    Cube cubeTR(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/TR.cub").expanded(), "r");
     ApolloPanoramicCamera *camTR = (ApolloPanoramicCamera *) CameraFactory::Create(cubeTR);
 
-    Cube cubeBR(FileName("$apollo15/testData/BR.cub").expanded(), "r");
+    Cube cubeBR(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/BR.cub").expanded(), "r");
     ApolloPanoramicCamera *camBR = (ApolloPanoramicCamera *) CameraFactory::Create(cubeBR);
 
     cout << "FileName: " << FileName(cubeTL.fileName()).name() << endl;
@@ -124,7 +124,7 @@ int main(void) {
     
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     ApolloPanoramicCamera pCam(test);
     
   }

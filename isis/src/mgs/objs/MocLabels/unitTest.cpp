@@ -13,7 +13,7 @@ int main() {
   try {
     cout << "Unit test for MocLabels" << endl;
     cout << "MocWideAngleCamera cub test..." << endl;
-    Cube c1("$mgs/testData/ab102401.cub", "r");
+    Cube c1("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub", "r");
     MocLabels lab1(c1);
 
     cout << "NarrowAngle?  " << lab1.NarrowAngle() << endl;
@@ -36,7 +36,7 @@ int main() {
     cout << "Offset = " << lab1.Offset() << endl << endl;
 
     cout << "MocNarrowAngleCamera cub test..." << endl;
-    Cube c2("$mgs/testData/fha00491.lev1.cub", "r");
+    Cube c2("$ISISTESTDATA/isis/src/mgs/unitTestData/fha00491.lev1.cub", "r");
     MocLabels lab2(c2);
 
     cout << "NarrowAngle?  " << lab2.NarrowAngle() << endl;

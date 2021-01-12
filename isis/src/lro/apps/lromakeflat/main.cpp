@@ -48,6 +48,7 @@
 
 #include "FileList.h"
 #include "Histogram.h"
+#include "ImageHistogram.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
@@ -347,7 +348,7 @@ void getCubeListNormalization(Matrix2d &matrix, int cubeWidth, int frameHeight, 
         string err = "This percentage will yield less than 1 line. This is not enough to normalize. \n";
         throw IException(IException::User, err, _FILEINFO_);
       }
-      Histogram hist = Histogram(tmp, 1, &g_prog, startSample, startLine, endSample, endLine, 0, true);
+      Histogram hist = ImageHistogram(tmp, 1, &g_prog, startSample, startLine, endSample, endLine, 0, true);
       int frame = cubeLine/frameLineCount;
       double normalizationAverage = hist.Average();
       matrix[listIndex][frame] = normalizationAverage;

@@ -394,7 +394,7 @@ namespace Isis {
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
    *
-   * @param args QVector of arguments 
+   * @param args QVector of arguments
    *
    * @throws Isis::IException::User - Invalid value for reserve parameter
    * @throws Isis::IException::User - Invalid command line
@@ -405,22 +405,22 @@ namespace Isis {
    */
   void UserInterface::loadCommandLine(QVector<QString> &args, bool ignoreAppName) {
     char **c_args;
-    
+
     if (ignoreAppName) {
       args.prepend("someapp");
     }
 
     c_args = (char**)malloc(sizeof(char*)*args.size());
-    
-    for (size_t i = 0; i < args.size(); i++) {
-      c_args[i] = (char*)malloc(sizeof(char)*args[i].size());
+
+    for (int i = 0; i < args.size(); i++) {
+      c_args[i] = (char*)malloc(sizeof(char)*args[i].size()+1);
       strcpy(c_args[i], args[i].toLatin1().data());
     }
 
     loadCommandLine(args.size(), c_args);
-  }  
-    
-    
+  }
+
+
   /**
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
@@ -484,6 +484,7 @@ namespace Isis {
       vector<QString> paramValue;
 
       getNextParameter(currArgument, paramName, paramValue);
+
       // we now have a name,value pair
       if (paramName[0] == '-') {
         paramName = paramName.toUpper();
@@ -520,6 +521,7 @@ namespace Isis {
         }
 
         evaluateOption(paramName, realValue);
+
         continue;
       }
 
@@ -530,6 +532,7 @@ namespace Isis {
       catch (IException &e) {
         throw IException(e, IException::User, "Invalid command line", _FILEINFO_);
       }
+
     }
 
     // Can't use the batchlist with the gui, save, last or restore option

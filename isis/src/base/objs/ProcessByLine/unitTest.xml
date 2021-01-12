@@ -38,7 +38,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>$base/testData/isisTruth.cub</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub</item></default>
       </parameter>
       <parameter name="FROM2">
         <type>cube</type>
@@ -52,7 +52,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>$base/testData/isisTruth.cub+1</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub+1</item></default>
       </parameter>
       <parameter name="TO">
         <type>cube</type>

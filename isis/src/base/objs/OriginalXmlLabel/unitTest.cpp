@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   OriginalXmlLabel testLabel;
-  FileName labelFileName("$base/testData/xmlTestLabel.xml");
+  FileName labelFileName("$ISISTESTDATA/isis/src/base/unitTestData/xmlTestLabel.xml");
 
   cout << "Ingesting label file into check object." << endl << endl;
   QDomDocument checkDoc = parseXmlFile(labelFileName);

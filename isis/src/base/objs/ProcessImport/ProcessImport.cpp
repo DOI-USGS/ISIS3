@@ -40,6 +40,7 @@
 #include "Pvl.h"
 #include "PvlTokenizer.h"
 #include "SpecialPixel.h"
+#include "UserInterface.h"
 
 #define EXPONENT_MASK ((char) 0x7F)
 
@@ -1201,10 +1202,10 @@ namespace Isis {
 
 
   /**
-   * Given a CubeAttributeOutput object, set min/max to propagate if 
-   * propagating min/max attributes was requested and set the pixel 
-   * type to propagate if pixel type propagation was requested.  
-   * 
+   * Given a CubeAttributeOutput object, set min/max to propagate if
+   * propagating min/max attributes was requested and set the pixel
+   * type to propagate if pixel type propagation was requested.
+   *
    * @param parameter The parameter name that holds the output file name.
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
@@ -1263,7 +1264,7 @@ namespace Isis {
 
 
   /**
-   * Create the output file. Note that all the appropiate calls to at least
+   * Create the output file. Note that all the appropriate calls to at least
    * SetDimensions and SetPixelType should be made prior to calling this method.
    *
    * @param parameter The parameter name that holds the output file name.
@@ -1281,6 +1282,16 @@ namespace Isis {
     return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
 
+
+  /**
+   * Create the output file.
+   *
+  */
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, UserInterface &ui){
+    CubeAttributeOutput &att = ui.GetOutputAttribute(parameter);
+    SetAttributes(att);
+    return Isis::Process::SetOutputCube(ui.GetFileName(parameter), att, p_ns, p_nl, p_nb);
+  }
 
   /**
    * Create the output file. Note that all the appropiate calls to at least
@@ -1992,7 +2003,7 @@ namespace Isis {
               break;
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
-              break;            
+              break;
           case Isis::UnsignedInteger:
             (*out)[samp] = (double)swapper.Uint32_t(&in[bufferIndex]);
             break;

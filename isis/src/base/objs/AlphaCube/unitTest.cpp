@@ -80,7 +80,7 @@ int main() {
   cout << endl;
 
   try {
-    Cube cube("$base/testData/isisTruth.cub", "r");
+    Cube cube("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub", "r");
     Pvl &lab = *cube.label();
     lab.clear();
     lab.addObject(PvlObject("IsisCube"));
