@@ -80,7 +80,7 @@ option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
-# conda env as the install directory
+# conda env as the install directory.
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
@@ -293,6 +293,8 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+find_package(inja              REQUIRED)
+
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -346,6 +348,9 @@ foreach (_variableName ${_variableNames})
     endforeach()
   endif()
 endforeach()
+
+# add target based linkages to ALLLIBS variable
+list(APPEND ALLLIBS pantor::inja)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -496,6 +501,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
 		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
 		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
 	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
+	            ${CMAKE_BINARY_DIR}/appdata/templates/topds4
 	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
 		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
 	            ${CMAKE_BINARY_DIR}/appdata/images/icons
@@ -613,6 +619,10 @@ add_dependencies(isis labels)
 add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
+
+add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
+add_dependencies(isis topds4)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

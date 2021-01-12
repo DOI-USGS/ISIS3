@@ -26,6 +26,7 @@ dependencies:
   - gsl
   - hdf5
   - icu
+  - inja
   - jama
   - jpeg==9b
   - kakadu==1
