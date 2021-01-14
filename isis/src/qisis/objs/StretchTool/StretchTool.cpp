@@ -627,10 +627,11 @@ namespace Isis {
         greenStretch = cvp->greenStretch();
         blueStretch = cvp->blueStretch();
       }
-      int redBand = redStretch.getBandNumber();
-      int greenBand = greenStretch.getBandNumber();
-      int blueBand = blueStretch.getBandNumber();
-      
+
+      int redBand = cvp->redBand();
+      int greenBand = cvp->greenBand(); 
+      int blueBand = cvp->blueBand();
+
       if (((redBand == greenBand) && !(redStretch == greenStretch)) ||
           ((redBand == blueBand)  && !(redBand == blueBand)) ||
           ((greenBand == blueBand) && !(greenBand == blueBand))) {

@@ -193,23 +193,31 @@ namespace Isis {
           if (blobName == curName) {
             // If there are keywords supplied, check that those match, too!
             if (!keywords.empty()){
+              bool keywordFound = true;
               for (PvlKeyword keyword : keywords) {
                 if (obj.hasKeyword(keyword.name())) {
                   PvlKeyword blobKeyword = obj.findKeyword(keyword.name());
                   if (blobKeyword == keyword && !blobKeyword.isEquivalent(keyword[0])) {
-                    found = false;
+                    keywordFound = false;
                     break;
                   }
                 }
                 else {
-                  found = false;
+                  keywordFound = false;
                   break;
                 }
               }
+              if (keywordFound) {
+                p_blobPvl = obj;
+                found = true;
+                break;
+              }
             }
-            p_blobPvl = obj;
-            found = true;
-            break;
+            else {
+              p_blobPvl = obj;
+              found = true;
+              break;
+            }
           }
           else {
             if (p_type == "OriginalLabel" && curName == "ORIGINALLABEL") {
