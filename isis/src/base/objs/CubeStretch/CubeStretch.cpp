@@ -10,28 +10,6 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
 
   /**
-   * Default constructor
-   */
-  CubeStretch::CubeStretch() {
-    m_name = "DefaultStretch";
-    m_type = "Default";
-    m_bandNumber = 1;
-  }
-
-
-  /**
-   * Constructs a Stretch object with default mapping of special pixel values to
-   * themselves and a provided name.
-   *  
-   * @param name Name to use for CubeStretch 
-   */
-  CubeStretch::CubeStretch(QString name) : m_name(name) {
-    m_type = "Default";
-    m_bandNumber = 1;
-  }
-
-
-  /**
    * Constructs a CubeStretch object with default mapping of special pixel values to
    * themselves and a provided name, and a provided stretch type
    *  

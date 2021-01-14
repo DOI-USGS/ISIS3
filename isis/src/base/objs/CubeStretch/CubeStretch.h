@@ -25,9 +25,7 @@ namespace Isis {
    */
   class CubeStretch : public Stretch { 
     public: 
-      CubeStretch();
-      CubeStretch(QString name);
-      CubeStretch(QString name, QString stretchType, int bandNumber=1);
+      CubeStretch(QString name="DefaultStretch", QString stretchType="Default", int bandNumber = 1);
       ~CubeStretch();
 
       CubeStretch(Stretch const& stretch);

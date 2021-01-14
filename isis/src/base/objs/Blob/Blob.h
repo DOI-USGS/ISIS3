@@ -79,19 +79,19 @@ namespace Isis {
       int Size() const;
       PvlObject &Label();
 
-      void Read(const QString &file, const QMap<QString,QString> 
-                keywords=QMap<QString,QString>());
+      void Read(const QString &file, const std::vector<PvlKeyword>
+                keywords=std::vector<PvlKeyword>());
       void Read(const QString &file, const Pvl &pvlLabels, 
-                const QMap<QString,QString> keywords = QMap<QString,QString>());
+                const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
       virtual void Read(const Pvl &pvl, std::istream &is, 
-                        const QMap<QString,QString> keywords = QMap<QString,QString>());
+                        const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
 
       void Write(const QString &file);
       void Write(Pvl &pvl, std::fstream &stm,
                  const QString &detachedFileName = "", bool overwrite=true);
 
     protected:
-      void Find(const Pvl &pvl, const QMap<QString,QString> keywords = QMap<QString,QString>());
+      void Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
       virtual void ReadInit();
       virtual void ReadData(std::istream &is);
       virtual void WriteInit();

@@ -180,7 +180,7 @@ namespace Isis {
    *  when there are multiple blobs with the same name, but different keywords that 
    *  define the exact blob (see Stretch with a band number)
    */ 
-  void Blob::Find(const Pvl &pvl, const QMap<QString, QString> keywords) {
+  void Blob::Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords) {
     bool found = false;
     try {
       // Search for the blob name
@@ -191,27 +191,25 @@ namespace Isis {
           QString curName = obj["Name"];
           curName = curName.toUpper();
           if (blobName == curName) {
-
+            // If there are keywords supplied, check that those match, too!
             if (!keywords.empty()){
-              found = true;
-              QMap<QString, QString>::const_iterator i = keywords.constBegin();
-              while (i != keywords.constEnd()) {
-                if (obj.hasKeyword(i.key()) && (i.value() != obj[i.key()])) {
-                  found = false;
+              for (PvlKeyword keyword : keywords) {
+                if (obj.hasKeyword(keyword.name())) {
+                  PvlKeyword blobKeyword = obj.findKeyword(keyword.name());
+                  if (blobKeyword == keyword && !blobKeyword.isEquivalent(keyword[0])) {
+                    found = false;
+                    break;
+                  }
                 }
-                ++i;
-              }
-              if (found) {
-                p_blobPvl = obj;
-                found = true;
-                break;
+                else {
+                  found = false;
+                  break;
+                }
               }
             }
-            else {
-              p_blobPvl = obj;
-              found = true;
-              break;
-            }
+            p_blobPvl = obj;
+            found = true;
+            break;
           }
           else {
             if (p_type == "OriginalLabel" && curName == "ORIGINALLABEL") {
@@ -262,7 +260,7 @@ namespace Isis {
    * @throws iException::Io - Unable to open file
    * @throws iException::Pvl - Invalid label format
    */
-  void Blob::Read(const QString &file, const QMap<QString,QString> keywords) {
+  void Blob::Read(const QString &file, const std::vector<PvlKeyword> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -286,7 +284,7 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const QString &file, const Pvl &pvlLabels, const QMap<QString,QString> keywords) {
+  void Blob::Read(const QString &file, const Pvl &pvlLabels, const std::vector<PvlKeyword> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -320,7 +318,7 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const Pvl &pvl, std::istream &istm, const QMap<QString,QString> keywords){
+  void Blob::Read(const Pvl &pvl, std::istream &istm, const std::vector<PvlKeyword> keywords){
     try {
       Find(pvl, keywords);
       ReadInit();

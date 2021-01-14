@@ -8,12 +8,16 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <istream>
+#include <fstream>
+#include <QString>
+
 #include "Blob.h"
 #include "CubeStretch.h"
 
 namespace Isis {
   /**
-   * @brief Blob to store stretch information for a cube.
+   * @brief Blob to store stretch information for a cube, on a cube.
    *
    * @ingroup Utility
    *
@@ -37,7 +41,7 @@ namespace Isis {
       void WriteData(std::fstream &os);
 
     private:
-      CubeStretch *m_stretch; //! Stretch associated with the blob
+      CubeStretch m_stretch; //! Stretch associated with the blob
   };
 };
 

@@ -29,6 +29,14 @@ TEST(CubeStretch, ConstructorAllArge) {
   EXPECT_EQ(cubeStretch.getBandNumber(), 99);
 }
 
+TEST(CubeStretch, CopyConstructor) {
+  Isis::CubeStretch cubeStretch("name", "type", 99);
+  Isis::CubeStretch copyStretch(cubeStretch);
+  EXPECT_STREQ(cubeStretch.getName().toLatin1().data(), copyStretch.getName().toLatin1().data());
+  EXPECT_STREQ(cubeStretch.getType().toLatin1().data(), copyStretch.getType().toLatin1().data());
+  EXPECT_EQ(cubeStretch.getBandNumber(), copyStretch.getBandNumber());
+}
+
 TEST(CubeStretch, Equality) {
   Isis::CubeStretch cubeStretch99("name", "type", 99);
   Isis::CubeStretch cubeStretch9("name", "type", 9);
