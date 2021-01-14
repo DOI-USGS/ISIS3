@@ -17,8 +17,7 @@ namespace Isis {
   /**
    * Default constructor
    */
-  StretchBlob::StretchBlob() : Blob("CubeStretch", "Stretch") {
-    CubeStretch m_stretch;
+  StretchBlob::StretchBlob() : Blob("CubeStretch", "Stretch"), m_stretch() {
   }
 
 
@@ -37,8 +36,7 @@ namespace Isis {
    *
    * @param name Name to use for Stretch
    */
-  StretchBlob::StretchBlob(QString name) : Blob(name, "Stretch") {
-    CubeStretch m_stretch(name);
+  StretchBlob::StretchBlob(QString name) : Blob(name, "Stretch"), m_stretch(name) {
   }
 
 
