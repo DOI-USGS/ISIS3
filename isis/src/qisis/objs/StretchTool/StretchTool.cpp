@@ -488,19 +488,6 @@ namespace Isis {
         StretchBlob greenStretchBlob(stretchName); 
         StretchBlob blueStretchBlob(stretchName); 
         
-/*        QMap<QString, QString> keywordValueRed;
-        keywordValueRed["BandNumber"] = QString::number(cvp->redBand());
-
-        QMap<QString, QString> keywordValueGreen;
-        keywordValueGreen["BandNumber"] = QString::number(cvp->greenBand());
-
-        QMap<QString, QString> keywordValueBlue;
-        keywordValueBlue["BandNumber"] = QString::number(cvp->blueBand());
-
-        icube->read(redStretchBlob, keywordValueRed);
-        icube->read(greenStretchBlob, keywordValueGreen);
-        icube->read(blueStretchBlob, keywordValueBlue);*/
-
         std::vector<PvlKeyword> keywordValueRed;
         keywordValueRed.push_back(PvlKeyword("BandNumber",  QString::number(cvp->redBand())));
 
