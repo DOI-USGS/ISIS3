@@ -20,6 +20,8 @@ include(InstallThirdParty)
 include(cmake/gtest.cmake)
 include(GoogleTest)
 
+include(CMakePrintHelpers)
+
 #===============================================================================
 #===============================================================================
 # Project information
@@ -31,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "4.1.0")
+set(VERSION            "4.3.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -78,7 +80,7 @@ option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
-# conda env as the install directory
+# conda env as the install directory.
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
@@ -291,6 +293,8 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+find_package(inja              REQUIRED)
+
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -312,25 +316,41 @@ set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
-   if (_variableName MATCHES ".+_INCLUDE_DIR$")
-     list(APPEND ALLINCDIRS "${${_variableName}}")
-   elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
-     list(APPEND ALLINCDIRS "${${_variableName}}")
-   endif(_variableName MATCHES ".+_INCLUDE_DIR$")
+  if (_variableName MATCHES ".+_INCLUDE_DIR$")
+    list(APPEND ALLINCDIRS "${${_variableName}}")
+  elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
+    list(APPEND ALLINCDIRS "${${_variableName}}")
+  endif()
 endforeach()
 
 # get all Library variables
 foreach (_variableName ${_variableNames})
-   get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
-   if (_variableName MATCHES "^CMAKE+")
-   elseif (_variableName MATCHES ".+_LIBRARY$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
-   elseif (_variableName MATCHES ".+_LIBRARIES$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
-   endif()
+  get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
+  get_filename_component(LIBNAME "${${_variableName}}" NAME)
+
+  if (_variableName MATCHES "^CMAKE+")
+  elseif (_variableName MATCHES ".+_LIBRARY$|.+_LIBRARIES")
+    foreach(ITEM IN LISTS ${_variableName})
+      get_filename_component(LIBDIR ${ITEM} DIRECTORY)
+      get_filename_component(LIBNAME ${ITEM} NAME)
+      # Some library dependencies identified by the find_package commands are not
+      # libraries (i.e., *.so,*.dylib,*.a) or name spaces (e.g., Qt5::Xml).
+      # Remove the ones that are not libraries or name spaces  (e.g., OPENGL.framework).
+      if(LIBNAME MATCHES ".+\.so$|.+\.dylib$|.+\.a$|.+::.+$|.+\.SO$|.+\.DYLIB$|.+\.A$")
+        # For MacOS, .so's are not the same as .dylib's, need to add the full path to the .so
+        if((APPLE) AND (LIBNAME MATCHES ".+\.so$|.+\.SO"))
+          list(APPEND ALLLIBS "${ITEM}")
+        else()
+          list(APPEND ALLLIBDIRS ${LIBDIR})
+          list(APPEND ALLLIBS ${LIBNAME})
+        endif()
+      endif()
+    endforeach()
+  endif()
 endforeach()
+
+# add target based linkages to ALLLIBS variable
+list(APPEND ALLLIBS pantor::inja)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -481,6 +501,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
 		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
 		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
 	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
+	            ${CMAKE_BINARY_DIR}/appdata/templates/topds4
 	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
 		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
 	            ${CMAKE_BINARY_DIR}/appdata/images/icons
@@ -598,6 +619,10 @@ add_dependencies(isis labels)
 add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
+
+add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
+add_dependencies(isis topds4)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

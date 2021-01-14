@@ -1,0 +1,190 @@
+PDS_VERSION_ID                 = PDS3
+RECORD_TYPE                    = UNDEFINED
+FILE_NAME                      = MIA_3C5_03_01351S791E0024SC.img
+PRODUCT_ID                     = MIA_3C5_03_01351S791E0024SC
+DATA_FORMAT                    = PDS
+^GEOMETRIC_DATA_ALTITUDE       = 12628 <BYTES>
+^IMAGE                         = 10186 <BYTES>
+SOFTWARE_NAME                  = RGC_TC_MI_PLUS
+SOFTWARE_VERSION               = 4.0.0
+PROCESS_VERSION_ID             = L3C
+PRODUCT_CREATION_TIME          = 2014-11-15T12:08:44
+PROGRAM_START_TIME             = 2014-11-13T04:40:05
+PRODUCER_ID                    = LISM
+PRODUCT_SET_ID                 = MI_Level3C5
+PRODUCT_VERSION_ID             = "03"
+REGISTERED_PRODUCT             = Y
+LEVEL2A_FILE_NAME              = MV52A0_02NL01351_003_0029.img
+LEVEL2C_FILE_NAME              = MV5_2C5_03_01351S791E0024.img
+SPICE_METAKERNEL_FILE_NAME = RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_100h_02_LongCK_DS_V02_de421_131210.mk
+MISSION_NAME                   = SELENE
+SPACECRAFT_NAME                = SELENE-M
+DATA_SET_ID                    = MI_L3C
+INSTRUMENT_NAME                = "Multiband Imager"
+INSTRUMENT_ID                  = MI
+MISSION_PHASE_NAME             = Nominal
+REVOLUTION_NUMBER              = 1351
+STRIP_SEQUENCE_NUMBER          = 3
+SCENE_SEQUENCE_NUMBER          = 29
+TARGET_NAME                    = MOON
+OBSERVATION_MODE_ID            = NORMAL
+SENSOR_DESCRIPTION             = "MI is a multiband push-broom imaging camera consisting of VIS(V) and NIR(N) sensors (each has nadir-directed optics of f number 65 mm and F ratio 3.7). Detector pixel sizes in micron are 13(V) and 40(N)."
+SENSOR_DESCRIPTION2            = "Physical band arrangement [from satellite -x to +x] are VIS1>VIS2>VIS5>VIS4>VIS3 and NIR3>NIR4>NIR1>NIR2. Parallax between nearest band sets [degree] are 2.7 for VIS and 2.6 for NIR. Sampling time [msec] are 13 for VIS and 39 for NIR."
+DETECTOR_STATUS                = {SP:ON, TC1:OFF, MN:ON, MV:ON, TC2:OFF}
+EXPOSURE_MODE_ID               = LONG
+LINE_EXPOSURE_DURATION         = (5.3268, 26.4296) <msec>
+CORRECTED_SC_CLOCK_START_COUNT = 885517735.789331 <sec>
+CORRECTED_SC_CLOCK_STOP_COUNT  = 885517747.151281 <sec>
+CORRECTED_START_TIME           = 2008-01-28T01:09:00.152227
+CORRECTED_STOP_TIME            = 2008-01-28T01:09:11.514177
+CORRECTED_SAMPLING_INTERVAL    = (12.999942, 38.999826) <msec>
+LOCATION_FLAG                  = D
+ROLL_CANT                      = NO
+SCENE_CENTER_LATITUDE          = -79.114009 <deg>
+SCENE_CENTER_LONGITUDE         = 2.37264 <deg>
+INCIDENCE_ANGLE                = 84.777 <deg>
+EMISSION_ANGLE                 = 0.929 <deg>
+PHASE_ANGLE                    = 84.406 <deg>
+SOLAR_AZIMUTH_ANGLE            = 295.177 <deg>
+MOON_SUN_DISTANCE              = 147470176 <km>
+FOCAL_PLANE_TEMPERATURE = (20.97, 20.97, 20.97, 20.97, 20.97, 17.39, 17.39,
+                          17.39, 17.39) <degC>
+TELESCOPE_TEMPERATURE = (17.99, 17.99, 17.99, 17.99, 17.99, 17.65, 17.65,
+                        17.65, 17.65) <degC>
+SATELLITE_MOVING_DIRECTION     = "-1"
+FILTER_NAME                    = (MV1, MV2, MV3, MV4, MV5, MN1, MN2, MN3, MN4)
+CENTER_FILTER_WAVELENGTH = (414.0, 749.0, 901.0, 950.0, 1001.0, 1000.0, 1049.0,
+                           1248.0, 1548.0) <nm>
+BANDWIDTH = (20.0, 12.0, 21.0, 30.0, 42.0, 27.0, 28.0, 33.0, 48.0) <nm>
+BASE_BAND                      = MV5
+SPACECRAFT_ALTITUDE            = 100.334 <km>
+SPACECRAFT_GROUND_SPEED        = 1.542 <km/sec>
+Object = GEOMETRIC_DATA_ALTITUDE
+  BINNING_START_PIXEL_POSITION = (1, 1)
+  BINNING_INTERVAL             = 1
+  LINES                        = 1215
+  LINE_SAMPLES                 = 6420
+  SAMPLE_TYPE                  = IEEE_REAL
+  SAMPLE_BITS                  = 32
+  UNIT                         = km
+End_Object = GEOMETRIC_DATA_ALTITUDE
+Object = IMAGE
+  BANDS                          = 9
+  BAND_STORAGE_TYPE              = "BAND SEQUENTIAL"
+  LINES                          = 5
+  LINE_SAMPLES                   = 5
+  SAMPLE_TYPE                    = MSB_INTEGER
+  SAMPLE_BITS                    = 16
+  IMAGE_VALUE_TYPE               = REFLECTANCE
+  UNIT                           = ND
+  SCALING_FACTOR                 = 2e-05
+  OFFSET                         = 0.0
+  MIN_FOR_STATISTICAL_EVALUATION = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+  MAX_FOR_STATISTICAL_EVALUATION = (32767, 32767, 32767, 32767, 32767, 32767,
+                                   32767, 32767, 32767)
+  SCENE_MAXIMUM_DN = (20866, 31905, 32710, 32352, 32589, 32644, 32670, 32720,
+                     32673)
+  SCENE_MINIMUM_DN               = (6, 14, 12, 18, 23, 0, 0, 0, 11)
+  SCENE_AVERAGE_DN = (5313.7, 9108.2, 9735.2, 9950.5, 10454.1, 9948.5, 10312.5,
+                     11676.5, 13360.7)
+  SCENE_STDEV_DN = (2756.2, 4579.0, 5173.3, 4877.5, 5046.1, 5216.4, 5294.5,
+                   5561.1, 5645.0)
+  SCENE_MODE_DN = (4834, 8614, 8969, 9179, 9650, 0, 0, 0, 13310)
+  SHADOWED_AREA_MINIMUM          = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+  SHADOWED_AREA_MAXIMUM = (500, 500, 500, 500, 500, 500, 500, 500, 500)
+  SHADOWED_AREA_PERCENTAGE       = (1, 0, 1, 0, 0, 6, 5, 2, 0)
+  INVALID_TYPE                   = (SATURATION, MINUS, DUMMY_DEFECT, OTHER)
+  INVALID_VALUE                  = (-20000, -21000, -22000, -23000)
+  INVALID_PIXELS = ((100, 0, 0, 7), (2956, 0, 0, 622), (11715, 0, 0, 6064),
+                   (7400, 0, 0, 2574), (0, 0, 0, 0), (19830, 2905, 0, 59224),
+                   (22289, 890, 0, 61386), (33821, 135, 0, 112625), (51843,
+                   162, 0, 209314))
+  OUT_OF_IMAGE_BOUNDS_VALUE      = -30000
+  OUT_OF_IMAGE_BOUNDS_PIXELS = (1642126, 1642126, 1642126, 1642126, 1642126,
+                               1642126, 1642126, 1642126, 1642126)
+End_Object = IMAGE
+Object = IMAGE_MAP_PROJECTION
+  MAP_PROJECTION_TYPE          = "Simple Cylindrical"
+  COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
+  COORDINATE_SYSTEM_NAME       = PLANETOCENTRIC
+  A_AXIS_RADIUS                = 1737.4 <km>
+  B_AXIS_RADIUS                = 1737.4 <km>
+  C_AXIS_RADIUS                = 1737.4 <km>
+  FIRST_STANDARD_PARALLEL      = N/A
+  SECOND_STANDARD_PARALLEL     = N/A
+  POSITIVE_LONGITUDE_DIRECTION = EAST
+  CENTER_LATITUDE              = 0.0 <deg>
+  CENTER_LONGITUDE             = 0.0 <deg>
+  REFERENCE_LATITUDE           = N/A
+  REFERENCE_LONGITUDE          = N/A
+  LINE_FIRST_PIXEL             = 1
+  LINE_LAST_PIXEL              = 1215
+  SAMPLE_FIRST_PIXEL           = 1
+  SAMPLE_LAST_PIXEL            = 6420
+  MAP_PROJECTION_ROTATION      = 0.0 <deg>
+  MAP_RESOLUTION               = 2048.0 <pixel/deg>
+  MAP_SCALE                    = 0.01480632 <km/pixel>
+  MAXIMUM_LATITUDE             = -78.81201172 <deg>
+  MINIMUM_LATITUDE             = -79.40478516 <deg>
+  EASTERNMOST_LONGITUDE        = 3.89208984 <deg>
+  WESTERNMOST_LONGITUDE        = 0.7578125 <deg>
+  LINE_PROJECTION_OFFSET       = -161407.0 <pixel>
+  SAMPLE_PROJECTION_OFFSET     = 1552.0 <pixel>
+End_Object = IMAGE_MAP_PROJECTION
+Object = PROCESSING_PARAMETERS
+  DARK_FILE_NAME = {MIN_DRK_01313_01398_L___003.csv,
+                   MIV_DRK_01226_01571_L___002.csv}
+  FT_FILE_NAME                  = MIV_FTF_PRFLT_N___v01.csv
+  FLAT_FILE_NAME = {MIN_FLT_01226_01571_L___003.csv,
+                   MIV_FLT_01226_01571_L___002.csv}
+  EFFIC_FILE_NAME = {MIV_EFF_PRFLT_N___v01.csv, MIN_EFF_PRFLT_N___v01.csv}
+  NONLIN_FILE_NAME = {MIN_NLT_PRFLT_N___v01.csv, MIV_NLT_PRFLT_N___v01.csv}
+  RAD_CNV_COEF = (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085) <W/m**2/micron/sr>
+  REF_CNV_COEF = (0.002353311, 0.002450451, 0.003549924, 0.003886012,
+                 0.004316842, 0.004316842, 0.004893535, 0.007400877,
+                 0.01218292) <1/(W/m**2/micron/sr)>
+  STANDARD_GEOMETRY             = (30.0, 0.0, 30.0)
+  PHOTO_CORR_ID                 = "LISM ORIGINAL"
+  PHOTO_CORR_COEF = ((1.0, -0.019, 0.000242, -1.46e-06, 0.05678, 1.913, 0.0643,
+                    0.2448, 0.0, 0.0, 0.0, 0.06797, 1.3, -0.0144, 0.2441,
+                    -0.00265, 0.00174, -0.000381), (1.0, -0.019, 0.000242,
+                    -1.46e-06, 0.06921, 1.487, -0.0382, 0.2122, 0.0, 0.0, 0.0,
+                    0.08916, 0.997, -0.2526, 0.1986, -0.00265, 0.00174,
+                    -0.000381), (1.0, -0.019, 0.000242, -1.46e-06, 0.05908,
+                    1.43, 0.056, 0.227, 0.0, 0.0, 0.0, 0.09298, 0.918, -0.2251,
+                    0.198, -0.00265, 0.00174, -0.000381), (1.0, -0.019,
+                    0.000242, -1.46e-06, 0.05345, 1.413, 0.1263, 0.2409, 0.0,
+                    0.0, 0.0, 0.08705, 0.883, -0.1655, 0.2052, -0.00265,
+                    0.00174, -0.000381), (1.0, -0.019, 0.000242, -1.46e-06,
+                    0.05096, 1.377, 0.0736, 0.2383, 0.0, 0.0, 0.0, 0.09746,
+                    0.889, -0.2248, 0.1933, -0.00265, 0.00174, -0.000381),
+                    (1.0, -0.019, 0.000242, -1.46e-06, 0.05096, 1.377, 0.0736,
+                    0.2383, 0.0, 0.0, 0.0, 0.09746, 0.889, -0.2248, 0.1933,
+                    -0.00265, 0.00174, -0.000381), (1.0, -0.019, 0.000242,
+                    -1.46e-06, 0.03968, 1.335, 0.1809, 0.2632, 0.0, 0.0, 0.0,
+                    0.09486, 0.843, -0.2059, 0.1958, -0.00265, 0.00174,
+                    -0.000381), (1.0, -0.019, 0.000242, -1.46e-06, 0.06407,
+                    1.103, -0.0062, 0.2168, 0.0, 0.0, 0.0, 0.11201, 0.773,
+                    -0.3129, 0.175, -0.00265, 0.00174, -0.000381), (1.0,
+                    -0.019, 0.000242, -1.46e-06, 0.09175, 0.954, 0.0111,
+                    0.1967, 0.0, 0.0, 0.0, 0.12374, 0.692, -0.2914, 0.1648,
+                    -0.00265, 0.00174, -0.000381))
+  INTERPOLATED_DETECTOR_ELEMENT = (N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A)
+  RESAMPLING_METHOD             = Bi-Linear
+  L2A_DEAD_PIXEL_THRESHOLD      = (35, 35, 35, 35, 35, 200, 200, 200, 200)
+  L2A_SATURATION_THRESHOLD = (1023, 1023, 1023, 1023, 1023, 4095, 4095, 4095,
+                             4095)
+  DARK_VALID_MINIMUM            = (-3, -3, -3, -3, -3, -10, -10, -10, -10)
+  FT_VALID_MINIMUM              = -2
+  RADIANCE_SATURATION_THRESHOLD = 425.971 <W/m**2/micron/sr>
+  REF_SATURATION_THRESHOLD      = 0.65534 <ND>
+End_Object = PROCESSING_PARAMETERS
+END
+Ôg[RHd
+Òÿ¿®mH"˝˘¡¶äm^.134í∑T°Hü˜P™èÆ–ÙÂÄ¿cÒc’ï$
+±
+=	«	E	Ê∂Ü›Ãª©ñG#ﬁΩûwO'ˇzl\K8‰@lóN	Ç	∂	Í
+
+3⁄Å(—K…H»HªL›m˝} √eûBÊä6ﬁå:Ë¨|<¸ªß-÷™∫≤ìvYÖh,Ò∏$
+ÕènÀ∑èhs€`fj©–FπÂıÂL≥≈ g®ÂÌÙBjçü±Wué†≤jhÄ©—}gÖ∂ÊN;XzùÓ˙ÙÔxîôû¢@DIM˚ˆÈ¯¿ÆöÜq

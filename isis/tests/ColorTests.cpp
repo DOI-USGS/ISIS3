@@ -68,20 +68,19 @@ namespace Isis{
     EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(GetParam()));
   }
 
-
-  INSTANTIATE_TEST_CASE_P (Color,
+  INSTANTIATE_TEST_SUITE_P (Color,
                            QStringQColorPair,
                            ::testing::Values(std::make_pair(QString("#000000ff"), QColor(0, 0, 0)),
-                                            std::make_pair(QString("#00000000"), QColor(0, 0, 0, 0)),
-                                            std::make_pair(QString("#ff000000"), QColor(255, 0, 0, 0)),
-                                            std::make_pair(QString("#00ff0000"), QColor(0, 255, 0, 0)),
-                                            std::make_pair(QString("#0000ff00"), QColor(0, 0, 255, 0)),
-                                            std::make_pair(QString("#000000ff"), QColor(0, 0, 0, 255)),
-                                            std::make_pair(QString("#ffffffff"), QColor(255, 255, 255, 255)),
-                                            std::make_pair(QString("#0a141e28"), QColor(10, 20, 30, 40))));
+                                             std::make_pair(QString("#00000000"), QColor(0, 0, 0, 0)),
+                                             std::make_pair(QString("#ff000000"), QColor(255, 0, 0, 0)),
+                                             std::make_pair(QString("#00ff0000"), QColor(0, 255, 0, 0)),
+                                             std::make_pair(QString("#0000ff00"), QColor(0, 0, 255, 0)),
+                                             std::make_pair(QString("#000000ff"), QColor(0, 0, 0, 255)),
+                                             std::make_pair(QString("#ffffffff"), QColor(255, 255, 255, 255)),
+                                             std::make_pair(QString("#0a141e28"), QColor(10, 20, 30, 40))));
 
 
-  INSTANTIATE_TEST_CASE_P (Color,
+  INSTANTIATE_TEST_SUITE_P (Color,
                            InvalidColorString,
                            ::testing::Values(QString("#rrggbbaa"),
                                             QString(" 00112233"),

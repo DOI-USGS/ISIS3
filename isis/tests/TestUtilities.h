@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include <string>
+#include <vector>
 
 #include <QString>
 
@@ -12,6 +13,8 @@
 
 #include "Pvl.h"
 #include "PvlObject.h"
+
+#include "CSVReader.h"
 
 namespace Isis {
 
@@ -39,6 +42,18 @@ namespace Isis {
       PvlGroup group1,
       PvlGroup group2);
 
+  ::testing::AssertionResult AssertVectorsNear(
+      const char* vec1_expr,
+      const char* vec2_expr,
+      const char* tolerance_expr,
+      const std::vector<double> &vec1,
+      const std::vector<double> &vec2,
+      double tolerance);
+
+  bool isNumeric(QString str);
+  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex=0);
+  void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex=0,
+                      double tolerance = 0.000001);
 }
 
 #endif

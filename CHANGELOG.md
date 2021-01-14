@@ -30,6 +30,49 @@ update the Unreleased link so that it compares against the latest release tag.
 
 ## [Unreleased]
 
+### Added
+
+- Added warning to ocams2isis about the model being out of date. [#4200](https://github.com/USGS-Astrogeology/ISIS3/issues/4200)
+- Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images. [#3860](https://github.com/USGS-Astrogeology/ISIS3/issues/3860)
+- Update qview MeasureTool to add an option to calculate distances using RA/DEC and update qview to show DEC/RA rather than LAT/LON in lower-right corner [#3371](https://github.com/USGS-Astrogeology/ISIS3/issues/3371)
+- Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
+- Updated spiceinit so that a user can specify a shape model and use the spice web service without any errors. [#1986](https://github.com/USGS-Astrogeology/ISIS3/issues/1986) 
+
+### Fixed
+
+- Fixed lrowaccal so required SPICE files are reported instead of continuing without them. [#4038](https://github.com/USGS-Astrogeology/ISIS3/issues/4038)
+- Fixed not being able to enable USECOORDLIST argument in mappt. [#4150](https://github.com/USGS-Astrogeology/ISIS3/issues/4150)
+- Fixed history entry not being added to a cube when running spiceinit with web=true. [4040](https://github.com/USGS-Astrogeology/ISIS3/issues/4040)
+- Updated wavelength and bandbin values in translation files for the TGO CaSSIS BandBin group. [4147](https://github.com/USGS-Astrogeology/ISIS3/issues/4147)
+
+## [4.3.0] - 2020-10-02
+
+### Changed
+
+ - Camera models now use the ALE library to interpolate states and orientations. Users will likely see very small changes in sensor ephemerides. These were tested and are within existing interpolation tolerances. [#2370](https://github.com/USGS-Astrogeology/ISIS3/issues/2370)
+ - The isis3VarInit script is now just called isisVarInit and allows for more robust paths. [#3945](https://github.com/USGS-Astrogeology/ISIS3/pull/3945)
+ - Isis2raw will now output straight to a 32bit file (no stretch) when stretch is set to None and bittype is set to 32bit. [#3878](https://github.com/USGS-Astrogeology/ISIS3/issues/3878)
+ - Findimageoverlaps can now have calculations and writes happen at the same time or sequentially. [#4047](https://github.com/USGS-Astrogeology/ISIS3/pull/4047)
+
+### Fixed
+
+ - Fixed some line scan images using the incorrect state interpolation. [#3928](https://github.com/USGS-Astrogeology/ISIS3/issues/3928)
+ - The ISIS library now has the correct version suffix. [#3365](https://github.com/USGS-Astrogeology/ISIS3/issues/3365)
+ - Equalizer now reports the correct equation and values used to perform the adjustment. [#3987](https://github.com/USGS-Astrogeology/ISIS3/issues/3987)
+ - Map2cam now works correctly when specifying bands for input cubes. [#3856](https://github.com/USGS-Astrogeology/ISIS3/issues/3856)
+
+ - mro/hideal2pds app now writes the correct SAMPLE_BIT_MASK values to the output label. [#3978](https://github.com/USGS-Astrogeology/ISIS3/issues/3978)
+
+ - For Histograms in ISIS, updated the math for calculating what bin data should be placed in and the min/max values of each bin to be more intuitive. In addition, the output of hist and cnethist were changed to display the min/max values of each bin instead of the middle pixel's DN. [#3882](https://github.com/USGS-Astrogeology/ISIS3/issues/3882)
+
+### Added
+
+ - A Gui Helper gear was added to hist to fill in the minimum and maximum parameters with what would have been automatically calculated. [#3880](https://github.com/USGS-Astrogeology/ISIS3/issues/3880)
+
+- Added some Python programs (in isis/scripts/) to manage the authoritative .zenodo.json file
+  which contains the ISIS authors, and to generate the AUTHORS.rst file from it.
+
+
 ## [4.2.0] - 2020-07-27
 
 ### Added
@@ -205,7 +248,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.3.0...HEAD
+[4.3.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.1...4.2.0
 [4.1.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.0.1...4.1.0

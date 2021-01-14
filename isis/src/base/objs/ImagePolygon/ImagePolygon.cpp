@@ -271,7 +271,22 @@ namespace Isis {
       p_gMap->Camera()->IgnoreElevationModel(false);
   }
 
+  void ImagePolygon::Create(std::vector<std::vector<double>> polyCoordinates) {
+    p_pts = new geos::geom::CoordinateArraySequence();
 
+    for (std::vector<double> coord : polyCoordinates) {
+      p_pts->add(geos::geom::Coordinate(coord[0], coord[1]));
+    }
+
+    std::vector<geos::geom::Geometry *> *polys = new std::vector<geos::geom::Geometry *>;
+    geos::geom::Polygon *poly = globalFactory->createPolygon(globalFactory->createLinearRing(p_pts), nullptr);
+    polys->push_back(poly->clone());
+    p_polygons = globalFactory->createMultiPolygon(polys);
+
+    delete polys;
+
+    Fix360Poly();
+  }
   /**
   * Finds the next point on the image using a left hand rule walking algorithm. To
   * initiate the walk pass it the same point for both currentPoint and lastPoint.
@@ -528,12 +543,12 @@ namespace Isis {
    */
   double ImagePolygon::validSampleDim() {
     double result = 0.0;
-    
+
     calcImageBorderCoordinates();
     if (m_rightCoord && m_leftCoord)
       result = m_rightCoord->x - m_leftCoord->x + 1;
 
-    return result; 
+    return result;
   }
 
 
@@ -543,7 +558,7 @@ namespace Isis {
    */
   double ImagePolygon::validLineDim() {
     double result = 0.0;
-    
+
     calcImageBorderCoordinates();
     if (m_topCoord && m_botCoord)
       result = m_botCoord->y - m_topCoord->y + 1;
@@ -1347,6 +1362,16 @@ namespace Isis {
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
     p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
+
+    p_pts = new geos::geom::CoordinateArraySequence;
+
+    for (auto poly : *p_polygons) {
+      geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
+      for (int i = 0; i < coordArray.getSize(); i++) {
+        p_pts->add(geos::geom::Coordinate(coordArray.getAt(i)));
+      }
+    }
+
     delete wkt;
   }
 
@@ -1587,4 +1612,3 @@ namespace Isis {
 
 
 } // end namespace isis
-
