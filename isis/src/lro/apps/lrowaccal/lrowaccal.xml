@@ -15,7 +15,7 @@
     </p>
 
     <p>
-      Corrections are  applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
+      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
     </p>
 
     <h3>Dark Correction:</h3>
@@ -149,6 +149,54 @@
       </pre>
       If TEMPRATUREFILE is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
     </p>
+
+    <p>
+      The DN level in an uncalibrated image is the sum of the true signal from the scene, 
+      the bias, the dark current, and random noise in all 3 components. The random noise in
+      the true signal and dark current is called shot noise and the random noise in the bias
+      is called read noise. The true signal, bias, and dark current are defined as mean
+      values so that if the random noise were averaged down to insignificance by taking a 
+      very large number of images and averaging them, the resulting image would be the true 
+      scene, bias, and dark current with no systematic error. That implies the statistical 
+      distribution of the random noise has an average of zero, and therefore the random noise
+      has both positive and negative values, except for the trivial case of zero random noise.
+    </p>
+
+    <p>
+      The calibration equation is:
+      <pre>  reportedDN = ObservedDN - MeanBias - DarkCurrent </pre>
+
+        Where:
+        <pre>
+   ObservedDN = TrueDN + E
+   E is a randomly sampled value from (mu, sigma^2) and mu=0
+   TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.</pre>
+     </p>
+
+    <p>
+      Let's look at the case of a calibrated image for which the true signal
+      is zero, a dark image. In calibration the mean bias and dark current are
+      subtracted. The random noise term is then randomly sampled from a known
+      distribution with a mean of zero. Since the distribution has a mean of
+      zero, values for the random noise can be positive or negative.
+      Therefore, the addition of random noise to a pixel with true signal near
+      zero can result in negative DN values.
+    </p>
+
+    <p>
+      Negative reported DNs are possible when E &lt; -1 * TrueDN. These are
+      pixels in a very dark image that happen to have a strongly negative
+      random noise value.
+    </p>
+
+    <p>
+      Note: ObservedDN and TrueDN both must be greater than or equal to zero.
+      For ObservedDN, it's because the hardware is not able to report negative
+      DN values . For TrueDN, it's because radiance and reflectivity cannot be
+      negative. The dimmest target is one that is completely dark, and for
+      that target TrueDN = 0.
+    </p>
+
   </description>
 
   <category>

@@ -53,9 +53,9 @@ int main(void) {
     double knownLon[3] = { 13.55999413494297, 12.5149409284581896, 23.4631767915001923 };
     
     QList<QString> files;
-    files.append("$lo/testData/3083_med_tohi.cub");
-    files.append("$lo/testData/4008_med_res.cropped.cub");
-    files.append("$lo/testData/5072_med_res.cropped.cub");
+    files.append("$ISISTESTDATA/isis/src/lo/unitTestData/3083_med_tohi.cub");
+    files.append("$ISISTESTDATA/isis/src/lo/unitTestData/4008_med_res.cropped.cub");
+    files.append("$ISISTESTDATA/isis/src/lo/unitTestData/5072_med_res.cropped.cub");
     
     for (int i = 0; i < files.size(); i++) {
       Cube c(files[i], "r");
@@ -132,7 +132,7 @@ int main(void) {
     
      // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
-    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");
     LoMediumCamera lmc(test);
   }
   catch(IException &e) {

@@ -1,0 +1,209 @@
+{
+  "creators": [
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Laura, Jason",
+      "orcid": ""
+    },
+    {
+      "name": "Addair, Travis"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Adoram-Kershner, Lauren"
+    },
+    {
+      "name": "Alexandrov, Oleg"
+    },
+    {
+      "name": "Anderson, Jeff"
+    },
+    {
+      "name": "Annex, Andrew"
+    },
+    {
+      "name": "Austin, Christopher"
+    },
+    {
+      "name": "Backer, Jeanie"
+    },
+    {
+      "name": "Barrett, Janet"
+    },
+    {
+      "name": "Becker, Kris"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Berry, Kristin"
+    },
+    {
+      "name": "Beyer, Ross",
+      "affiliation": "SETI Institute and NASA Ames Research Center",
+      "orcid": "0000-0003-4503-3335"
+    },
+    {
+      "name": "Bonn, John"
+    },
+    {
+      "name": "Boyd, Mackenzie"
+    },
+    {
+      "name": "Brownsberger, Sasha"
+    },
+    {
+      "name": "Combs, Christopher"
+    },
+    {
+      "name": "Cook, Debbie"
+    },
+    {
+      "name": "Covington, Jeffrey"
+    },
+    {
+      "name": "Crough, James Alexander"
+    },
+    {
+      "name": "Curtis, Aaron"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Dunn, Evin"
+    },
+    {
+      "name": "Edmundson, Kenneth"
+    },
+    {
+      "name": "Eis, Mathew"
+    },
+    {
+      "name": "Gault, Eric"
+    },
+    {
+      "name": "Giroux, Aaron"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Giroux, Tim"
+    },
+    {
+      "name": "Goins, Adam"
+    },
+    {
+      "name": "Hahn, Marjorie"
+    },
+    {
+      "name": "Heyer, Eric"
+    },
+    {
+      "name": "Howington-Kraus, Elpitha"
+    },
+    {
+      "name": "Humphrey, Ian"
+    },
+    {
+      "name": "Lambright, Steven"
+    },
+    {
+      "name": "Lee, Ella Mae"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Lee, Kaitlyn"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Leggett, Rebecca"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Mapel, Jesse"
+    },
+    {
+      "name": "Milazzo, Moses"
+    },
+    {
+      "name": "Miller, David"
+    },
+    {
+      "name": "Neubauer, Cole"
+    },
+    {
+      "name": "Oyama, Kim"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Paquette, Adam"
+    },
+    {
+      "name": "Prasad, Sharmilla"
+    },
+    {
+      "name": "Rideout, Jai"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Rodriguez, Kelvin"
+    },
+    {
+      "name": "Rose, Curtis"
+    },
+    {
+      "name": "Saleh, Raad"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Sanders, Austin"
+    },
+    {
+      "name": "Seignovert, Benoit"
+    },
+    {
+      "name": "Shepard, Makayla"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Shinaman, John"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Sides, Stuart",
+      "orcid": ""
+    },
+    {
+      "name": "Silva, Victor"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Stamile, Amy"
+    },
+    {
+      "name": "Stapleton, Summer"
+    },
+    {
+      "name": "Stebenne, Andrew"
+    },
+    {
+      "name": "Sucharski, Tracie"
+    },
+    {
+      "name": "Thomas, Orrin"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Weller, Lynn"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Williams, Kaj"
+    },
+    {
+      "name": "Wilson, Tyler"
+    }
+  ],
+  "title": "Integrated Software for Imagers and Spectrometers",
+  "description": "A software library and set of tools to support ingestion, processing, and analysis of planetary science data.",
+  "license": "cc-zero",
+  "access_right": "open",
+  "upload_type": "software"
+}

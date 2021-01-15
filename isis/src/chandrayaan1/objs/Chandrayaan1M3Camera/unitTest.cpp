@@ -46,7 +46,7 @@ int main(void) {
     double knownLat = 61.50040250242506;
     double knownLon = 74.89590535143694;
 
-    Cube c("$chandrayaan1/testData/M3T20090630T083407_V03_RDN.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/chandrayaan1/unitTestData/M3T20090630T083407_V03_RDN.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

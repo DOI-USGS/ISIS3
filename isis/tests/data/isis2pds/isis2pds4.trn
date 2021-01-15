@@ -1,0 +1,143 @@
+Group = Target_Name
+  InputPosition  = (Observation_Area, Target_Identification)
+  InputKey       = name
+  OutputName     = Target_Name
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Target_Type
+  InputPosition  = (Observation_Area, Target_Identification)
+  InputKey       = type
+  OutputName     = Target_Type
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Filter_Number
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter )
+  InputKey       = img:filter_number
+  OutputName     = Filter_Number
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Bandwidth
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter )
+  InputKey       = img:bandwidth
+  OutputName     = Bandwidth
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Wavelength
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter )
+  InputKey       = img:center_filter_wavelength
+  OutputName     = Wavelength
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = West_Bound_Coord
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  InputKey       = cart:west_bounding_coordinate
+  OutputName     = West_Bound_Coord
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = East_Bound_Coord
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  InputKey       = cart:east_bounding_coordinate
+  OutputName     = East_Bound_Coord
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = North_Bound_Coord
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  InputKey       = cart:north_bounding_coordinate
+  OutputName     = North_Bound_Coord
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = South_Bound_Coord
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Domain, cart:Bounding_Coordinates)
+  InputKey       = cart:south_bounding_coordinate
+  OutputName     = South_Bound_Coord
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Projection_Name
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection)
+  InputKey       = cart:map_projection_name
+  OutputName     = Projection_Name
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Pixel_Resolution
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information, cart:Coordinate_Representation)
+  InputKey       = cart:pixel_resolution_x
+  OutputName     = Pixel_Resolution
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Pixel_Scale
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information, cart:Coordinate_Representation)
+  InputKey       = cart:pixel_scale_x
+  OutputName     = Pixel_Scale
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Upperleft_x
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Geo_Transformation)
+  InputKey       = cart:upperleft_corner_x
+  OutputName     = Upperleft_x
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Upperleft_y
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Geo_Transformation)
+  InputKey       = cart:upperleft_corner_y
+  OutputName     = Upperleft_y
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Latitude_type
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  InputKey       = cart:latitude_type
+  OutputName     = Latitude_type
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Semi_major_radius
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  InputKey       = cart:semi_major_radius
+  OutputName     = Semi_major_radius
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Polar_radius
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  InputKey       = cart:polar_radius
+  OutputName     = Polar_radius
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group
+
+Group = Longitude_direction
+  InputPosition  = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Geodetic_Model)
+  InputKey       = cart:longitude_direction
+  OutputName     = Longitude_direction
+  OutputPosition = (Group, Image)
+  Translation    = (*, *)
+End_Group

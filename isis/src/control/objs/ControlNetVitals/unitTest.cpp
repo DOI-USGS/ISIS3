@@ -28,7 +28,7 @@ int main() {
 
     qDebug() << "Loading Network";
 
-    QString testNetFile("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net");
+    QString testNetFile("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net");
     ControlNet *testNet = new ControlNet(testNetFile);
 
     qDebug() << "Calculating Network Vitals";

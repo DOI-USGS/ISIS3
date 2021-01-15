@@ -32,6 +32,7 @@
 #include "Process.h"
 #include "PvlToPvlTranslationManager.h"
 #include "SpecialPixel.h"
+#include "UserInterface.h"
 
 namespace Isis {
   /**
@@ -199,6 +200,7 @@ namespace Isis {
 
       using Isis::Process::SetOutputCube;  // make parent functions visable
       Isis::Cube *SetOutputCube(const QString &parameter);
+      Isis::Cube *SetOutputCube(const QString &parameter, UserInterface &ui);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
 

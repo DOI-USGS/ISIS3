@@ -12,7 +12,7 @@ World name:  "TestWorld"
 World size:  0
 
 
-Adding  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
+Adding  "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
 
 World size:  1
 

@@ -374,6 +374,12 @@ namespace Isis {
         identificationAreaNode.insertAfter(aliasListNode, identificationAreaNode.firstChildElement("product_class"));
       }
 
+      // Put Reference list in correct place: 
+      QDomElement referenceListNode = m_domDoc->documentElement().firstChildElement("Reference_List");
+      if ( !referenceListNode.isNull() && !identificationAreaNode.isNull() ) {
+         m_domDoc->documentElement().insertAfter(referenceListNode, obsAreaNode);
+      }
+
       QDomElement fileAreaObservationalNode = m_domDoc->documentElement().firstChildElement("File_Area_Observational");
       QDomElement array2DImageNode = fileAreaObservationalNode.firstChildElement("Array_2D_Image");
       if ( !array2DImageNode.isNull() ) {

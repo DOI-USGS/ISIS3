@@ -47,7 +47,7 @@ int main(void) {
     double knownLat = -87.59000574363817;
     double knownLon =  19.99808691873470;
 
-    Cube c("$mro/testData/P12_005911_3396_MA_00N009W.cropped.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/mro/unitTestData/P12_005911_3396_MA_00N009W.cropped.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

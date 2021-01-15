@@ -42,10 +42,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 36.1707660310976067;
-    double knownLon = 345.6570666219602685;
+    double knownLat = 36.1707660328875136;
+    double knownLon = 345.6570666260113853;
 
-    Cube c("$hayabusa/testData/2392975548_lvl3_0.refl.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/hayabusa/unitTestData/2392975548_lvl3_0.refl.cub", "r");
     HayabusaNirsCamera *cam = (HayabusaNirsCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
