@@ -481,7 +481,11 @@ namespace Isis {
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
-        cvp->stretchGray(cubeStretch);
+        // Get the current cube stretche and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch grayOriginal = cvp->grayStretch();
+        grayOriginal.CopyPairs(cubeStretch);
+        cvp->stretchGray(grayOriginal);
       }
       else {
         StretchBlob redStretchBlob(stretchName); 
@@ -508,9 +512,20 @@ namespace Isis {
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
         }
-        cvp->stretchRed(redStretch);
-        cvp->stretchGreen(greenStretch);
-        cvp->stretchBlue(blueStretch);
+
+        // Get the current cube stretches and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch redOriginal = cvp->redStretch();
+        CubeStretch greenOriginal = cvp->greenStretch();
+        CubeStretch blueOriginal = cvp->blueStretch();
+
+        redOriginal.CopyPairs(redStretch);
+        greenOriginal.CopyPairs(greenStretch);
+        blueOriginal.CopyPairs(blueStretch);
+
+        cvp->stretchRed(redOriginal);
+        cvp->stretchGreen(greenOriginal);
+        cvp->stretchBlue(blueOriginal);
       }
       emit stretchChanged();
     }
