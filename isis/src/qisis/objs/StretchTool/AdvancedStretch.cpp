@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "IString.h"
 #include "IException.h"
 #include "StretchType.h"
@@ -98,7 +99,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretch::getStretch() {
+  CubeStretch AdvancedStretch::getStretch() {
     return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretch();
   }
 
@@ -125,28 +126,24 @@ namespace Isis {
    *  
    * @param newStretch saved stretch to restore
    */
-  void AdvancedStretch::restoreSavedStretch(Stretch newStretch) {
-    QString stretchTypeName = newStretch.getType(); 
-
+  void AdvancedStretch::restoreSavedStretch(CubeStretch newStretch) { 
+    QString stretchTypeName = newStretch.getType();
     int index = 0;
-    if (stretchTypeName.compare("LinearStretch") == 0 ) {
+    if (stretchTypeName.compare("Linear") == 0 ) {
       index = 0; 
     }
-    else if (stretchTypeName.compare("SawtoothStretch") == 0 ) {
+    else if (stretchTypeName.compare("Sawtooth") == 0 ) {
       index = 1; 
     }
-    else if (stretchTypeName.compare("BinaryStretch") == 0) {
+    else if (stretchTypeName.compare("Binary") == 0) {
       index = 2; 
     }
-    else if (stretchTypeName.compare("ManualStretch") == 0) {
+    else if (stretchTypeName.compare("Manual") == 0) {
       index = 3;
     }
-    // Fail by defaulting to Linear
 
+    // Fail by defaulting to Linear. This is correct for non-Advanced Stretches anyway.
     p_stretchTypeSelection->setCurrentIndex(index);
-    StretchType *stretchType = (StretchType *)
-                               p_stretchTypeStack->currentWidget();
-    stretchType->setStretch(newStretch);
   }
 
 

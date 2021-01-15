@@ -813,7 +813,7 @@ namespace Isis {
    *
    * @return (type)return description
    */
-  void Cube::read(Blob &blob) const {
+  void Cube::read(Blob &blob, const std::vector<PvlKeyword> keywords) const {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't read a blob from it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -825,7 +825,7 @@ namespace Isis {
 
     QMutexLocker locker(m_mutex);
     QMutexLocker locker2(m_ioHandler->dataFileMutex());
-    blob.Read(cubeFile.toString(), *label());
+    blob.Read(cubeFile.toString(), *label(), keywords);
   }
 
 
@@ -852,7 +852,7 @@ namespace Isis {
    *
    * @param blob data to be written
    */
-  void Cube::write(Blob &blob) {
+  void Cube::write(Blob &blob, bool overwrite) {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't write a blob to it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -888,7 +888,8 @@ namespace Isis {
         stream.seekp(maxbyte, ios::beg);
       }
 
-      blob.Write(*m_label, stream);
+      // Use default argument of "" for detached stream
+      blob.Write(*m_label, stream, "", overwrite);
     }
 
     // Write a detached blob

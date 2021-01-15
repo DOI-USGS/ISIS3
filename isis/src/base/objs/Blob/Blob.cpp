@@ -175,8 +175,12 @@ namespace Isis {
    *  blob is stored and the pointer is removed from the blob pvl.
    *  
    *  @param pvl The Pvl to be searched
+   *  @param keywords A list of keyword, value pairs to match inside the blob's
+   *  PVL object. Only if all the keyword match is the blob processed. This is used
+   *  when there are multiple blobs with the same name, but different keywords that 
+   *  define the exact blob (see Stretch with a band number)
    */ 
-  void Blob::Find(const Pvl &pvl) {
+  void Blob::Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords) {
     bool found = false;
     try {
       // Search for the blob name
@@ -187,9 +191,33 @@ namespace Isis {
           QString curName = obj["Name"];
           curName = curName.toUpper();
           if (blobName == curName) {
-            p_blobPvl = obj;
-            found = true;
-            break;
+            // If there are keywords supplied, check that those match, too!
+            if (!keywords.empty()){
+              bool keywordFound = true;
+              for (PvlKeyword keyword : keywords) {
+                if (obj.hasKeyword(keyword.name())) {
+                  PvlKeyword blobKeyword = obj.findKeyword(keyword.name());
+                  if (blobKeyword == keyword && !blobKeyword.isEquivalent(keyword[0])) {
+                    keywordFound = false;
+                    break;
+                  }
+                }
+                else {
+                  keywordFound = false;
+                  break;
+                }
+              }
+              if (keywordFound) {
+                p_blobPvl = obj;
+                found = true;
+                break;
+              }
+            }
+            else {
+              p_blobPvl = obj;
+              found = true;
+              break;
+            }
           }
           else {
             if (p_type == "OriginalLabel" && curName == "ORIGINALLABEL") {
@@ -240,7 +268,7 @@ namespace Isis {
    * @throws iException::Io - Unable to open file
    * @throws iException::Pvl - Invalid label format
    */
-  void Blob::Read(const QString &file) {
+  void Blob::Read(const QString &file, const std::vector<PvlKeyword> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -253,8 +281,7 @@ namespace Isis {
       QString msg = "Invalid " + p_type + " label format";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-
-    Read(file, pvl);
+    Read(file, pvl, keywords);
   }
 
   /**
@@ -265,8 +292,7 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const QString &file, const Pvl &pvlLabels) {
-
+  void Blob::Read(const QString &file, const Pvl &pvlLabels, const std::vector<PvlKeyword> keywords) {
     // Expand the filename
     QString temp(FileName(file).expanded());
 
@@ -280,7 +306,7 @@ namespace Isis {
 
     try {
       // Check pvl and read from the stream
-      Read(pvlLabels, istm);
+      Read(pvlLabels, istm, keywords);
     }
     catch (IException &e) {
       istm.close();
@@ -300,9 +326,9 @@ namespace Isis {
    *
    * @throws iException::Io - Unable to open file
    */
-  void Blob::Read(const Pvl &pvl, std::istream &istm) {
+  void Blob::Read(const Pvl &pvl, std::istream &istm, const std::vector<PvlKeyword> keywords){
     try {
-      Find(pvl);
+      Find(pvl, keywords);
       ReadInit();
       if (p_detached != "") {
         fstream dstm;
@@ -322,6 +348,7 @@ namespace Isis {
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
+
 
  /**
   * This virtual method for classes that inherit Blob. It is not defined in 
@@ -416,7 +443,7 @@ namespace Isis {
    * the name of the file
    */
   void Blob::Write(Pvl &pvl, std::fstream &stm,
-                   const QString &detachedFileName) {
+                   const QString &detachedFileName, bool overwrite) {
     // Handle 64-bit I/O
     WriteInit();
 
@@ -434,45 +461,50 @@ namespace Isis {
       p_blobPvl += PvlKeyword("^" + p_type, detachedFileName);
     }
 
-    // See if the blob is already in the file
+
     p_blobPvl["StartByte"] = toString((BigInt)sbyte);
     p_blobPvl["Bytes"] = toString(p_nbytes);
 
-    bool found = false;
-    for (int i = 0; i < pvl.objects(); i++) {
-      if (pvl.object(i).name() == p_blobPvl.name()) {
-        PvlObject &obj = pvl.object(i);
-        if ((QString)obj["Name"] == (QString)p_blobPvl["Name"]) {
-          found = true;
+    
+    // See if the blob is already in the file
+    bool found = false; 
+    if (overwrite) {
 
-          BigInt oldSbyte = obj["StartByte"];
-          int oldNbytes = (int) obj["Bytes"];
+      for (int i = 0; i < pvl.objects(); i++) {
+        if (pvl.object(i).name() == p_blobPvl.name()) {
+          PvlObject &obj = pvl.object(i);
+          if ((QString)obj["Name"] == (QString)p_blobPvl["Name"]) {
+            found = true;
 
-          // Does it fit in the old space
-          if (p_nbytes <= oldNbytes) {
-            p_blobPvl["StartByte"] = obj["StartByte"];
-            sbyte = oldSbyte;
+            BigInt oldSbyte = obj["StartByte"];
+            int oldNbytes = (int) obj["Bytes"];
+
+            // Does it fit in the old space
+            if (p_nbytes <= oldNbytes) {
+              p_blobPvl["StartByte"] = obj["StartByte"];
+              sbyte = oldSbyte;
+            }
+
+            // Was the old space at the end of the file
+            else if (((oldSbyte + oldNbytes) == eofbyte) &&
+                    (eofbyte >= sbyte)) {
+              p_blobPvl["StartByte"] = obj["StartByte"];
+              sbyte = oldSbyte;
+            }
+
+            // Put it at the requested position/end of the file
+            else {
+              // Leave this here for clarity
+            }
+
+            obj = p_blobPvl;
           }
-
-          // Was the old space at the end of the file
-          else if (((oldSbyte + oldNbytes) == eofbyte) &&
-                  (eofbyte >= sbyte)) {
-            p_blobPvl["StartByte"] = obj["StartByte"];
-            sbyte = oldSbyte;
-          }
-
-          // Put it at the requested position/end of the file
-          else {
-            // Leave this here for clarity
-          }
-
-          obj = p_blobPvl;
         }
       }
     }
 
-    // Didn't find the same blob so add it to the labels
-    if (!found) {
+    // Didn't find the same blob, or don't want to overwrite, so add it to the labels
+    if (!found || !overwrite) {
       pvl.addObject(p_blobPvl);
     }
 
