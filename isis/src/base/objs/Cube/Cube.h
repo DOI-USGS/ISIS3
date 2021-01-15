@@ -34,6 +34,7 @@
 
 #include "Endian.h"
 #include "PixelType.h"
+#include "PvlKeyword.h"
 
 class QFile;
 class QMutex;
@@ -260,7 +261,7 @@ namespace Isis {
       void reopen(QString access = "r");
 
       void read(Blob &blob, 
-                const QMap<QString,QString> keywords = QMap<QString,QString>()) const;
+                const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);

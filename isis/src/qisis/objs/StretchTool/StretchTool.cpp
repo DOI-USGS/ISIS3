@@ -481,21 +481,25 @@ namespace Isis {
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
-        cvp->stretchGray(cubeStretch);
+        // Get the current cube stretche and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch grayOriginal = cvp->grayStretch();
+        grayOriginal.CopyPairs(cubeStretch);
+        cvp->stretchGray(grayOriginal);
       }
       else {
         StretchBlob redStretchBlob(stretchName); 
         StretchBlob greenStretchBlob(stretchName); 
         StretchBlob blueStretchBlob(stretchName); 
         
-        QMap<QString, QString> keywordValueRed;
-        keywordValueRed["BandNumber"] = QString::number(cvp->redBand());
+        std::vector<PvlKeyword> keywordValueRed;
+        keywordValueRed.push_back(PvlKeyword("BandNumber",  QString::number(cvp->redBand())));
 
-        QMap<QString, QString> keywordValueGreen;
-        keywordValueGreen["BandNumber"] = QString::number(cvp->greenBand());
+        std::vector<PvlKeyword> keywordValueGreen;
+        keywordValueGreen.push_back(PvlKeyword("BandNumber", QString::number(cvp->greenBand())));
 
-        QMap<QString, QString> keywordValueBlue;
-        keywordValueBlue["BandNumber"] = QString::number(cvp->blueBand());
+        std::vector<PvlKeyword> keywordValueBlue;
+        keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
 
         icube->read(redStretchBlob, keywordValueRed);
         icube->read(greenStretchBlob, keywordValueGreen);
@@ -508,9 +512,20 @@ namespace Isis {
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
         }
-        cvp->stretchRed(redStretch);
-        cvp->stretchGreen(greenStretch);
-        cvp->stretchBlue(blueStretch);
+
+        // Get the current cube stretches and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch redOriginal = cvp->redStretch();
+        CubeStretch greenOriginal = cvp->greenStretch();
+        CubeStretch blueOriginal = cvp->blueStretch();
+
+        redOriginal.CopyPairs(redStretch);
+        greenOriginal.CopyPairs(greenStretch);
+        blueOriginal.CopyPairs(blueStretch);
+
+        cvp->stretchRed(redOriginal);
+        cvp->stretchGreen(greenOriginal);
+        cvp->stretchBlue(blueOriginal);
       }
       emit stretchChanged();
     }
@@ -627,10 +642,11 @@ namespace Isis {
         greenStretch = cvp->greenStretch();
         blueStretch = cvp->blueStretch();
       }
-      int redBand = redStretch.getBandNumber();
-      int greenBand = greenStretch.getBandNumber();
-      int blueBand = blueStretch.getBandNumber();
-      
+
+      int redBand = cvp->redBand();
+      int greenBand = cvp->greenBand(); 
+      int blueBand = cvp->blueBand();
+
       if (((redBand == greenBand) && !(redStretch == greenStretch)) ||
           ((redBand == blueBand)  && !(redBand == blueBand)) ||
           ((greenBand == blueBand) && !(greenBand == blueBand))) {

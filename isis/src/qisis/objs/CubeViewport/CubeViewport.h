@@ -342,11 +342,11 @@ namespace Isis {
       //! @return The gray Stretch
       CubeStretch grayStretch() const;
       //! @return The red Stretch
-      Stretch redStretch() const;
+      CubeStretch redStretch() const;
       //! @return The green Stretch
-      Stretch greenStretch() const;
+      CubeStretch greenStretch() const;
       //! @return The blue Strech
-      Stretch blueStretch() const;
+      CubeStretch blueStretch() const;
 
       //! @return The cube associated with viewport
       Cube *cube() const {

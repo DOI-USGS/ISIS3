@@ -1,25 +1,10 @@
-/**
- * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iostream>
 #include <fstream>
 
@@ -32,19 +17,17 @@ namespace Isis {
   /**
    * Default constructor
    */
-  StretchBlob::StretchBlob() : Blob("CubeStretch", "Stretch") {
-    m_stretch = new CubeStretch();
+  StretchBlob::StretchBlob() : Blob("CubeStretch", "Stretch"), m_stretch() {
   }
 
 
   /**
-   * Default constructor
+   * Construct a StretchBlob from a CubeStretch.
    */
-  StretchBlob::StretchBlob(CubeStretch stretch) : Blob("CubeStretch", "Stretch"){
-    m_stretch = new CubeStretch(stretch);
-    Label()["Name"] = m_stretch->getName();
-    Label() += PvlKeyword("StretchType", m_stretch->getType());
-    Label() += PvlKeyword("BandNumber", QString::number(m_stretch->getBandNumber()));
+  StretchBlob::StretchBlob(CubeStretch stretch) : Blob("CubeStretch", "Stretch"), m_stretch(stretch){
+    p_blobPvl["Name"] = m_stretch.getName();
+    p_blobPvl += PvlKeyword("StretchType", m_stretch.getType());
+    p_blobPvl += PvlKeyword("BandNumber", QString::number(m_stretch.getBandNumber()));
   }
 
 
@@ -53,8 +36,7 @@ namespace Isis {
    *
    * @param name Name to use for Stretch
    */
-  StretchBlob::StretchBlob(QString name) : Blob(name, "Stretch") {
-    m_stretch = new CubeStretch(name);
+  StretchBlob::StretchBlob(QString name) : Blob(name, "Stretch"), m_stretch(name) {
   }
 
 
@@ -62,13 +44,11 @@ namespace Isis {
    * Default Destructor
    */
   StretchBlob::~StretchBlob() {
-    m_stretch = NULL;
-    delete m_stretch;
   }
 
 
   CubeStretch StretchBlob::getStretch() {
-    return *m_stretch;
+    return m_stretch;
   }
 
   /**
@@ -81,14 +61,14 @@ namespace Isis {
    */
   void StretchBlob::ReadData(std::istream &is) {
     // Set the Stretch Type
-     m_stretch->setType(p_blobPvl["StretchType"][0]);
-     m_stretch->setBandNumber(p_blobPvl["BandNumber"][0].toInt());
+     m_stretch.setType(p_blobPvl["StretchType"][0]);
+     m_stretch.setBandNumber(p_blobPvl["BandNumber"][0].toInt());
 
      // Read in the Stretch Pairs
      streampos sbyte = p_startByte - 1;
      is.seekg(sbyte, std::ios::beg);
      if (!is.good()) {
-       QString msg = "Error preparing to read data from " + m_stretch->getType() +
+       QString msg = "Error preparing to read data from " + m_stretch.getType() +
                     " [" + p_blobName + "]";
        throw IException(IException::Io, msg, _FILEINFO_);
      }
@@ -100,7 +80,7 @@ namespace Isis {
 
      // Read buffer data into a QString so we can call Parse()
      std::string stringFromBuffer(buf);
-     m_stretch->Parse(QString::fromStdString(stringFromBuffer));
+     m_stretch.Parse(QString::fromStdString(stringFromBuffer));
 
      delete [] buf;
 
@@ -116,7 +96,7 @@ namespace Isis {
    *  Initializes for writing stretch to cube blob
    */
   void StretchBlob::WriteInit() {
-    p_nbytes = m_stretch->Text().toStdString().size(); 
+    p_nbytes = m_stretch.Text().toStdString().size(); 
   }
 
 
@@ -129,7 +109,7 @@ namespace Isis {
    * @param os output stream to write the stretch data to.
    */
   void StretchBlob::WriteData(std::fstream &os) {
-    os.write(m_stretch->Text().toStdString().c_str(), p_nbytes);
+    os.write(m_stretch.Text().toStdString().c_str(), p_nbytes);
   }
 
 } // end namespace isis

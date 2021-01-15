@@ -791,7 +791,7 @@ namespace Isis {
    *
    * @return (type)return description
    */
-  void Cube::read(Blob &blob, const QMap<QString,QString> keywords) const {
+  void Cube::read(Blob &blob, const std::vector<PvlKeyword> keywords) const {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't read a blob from it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
