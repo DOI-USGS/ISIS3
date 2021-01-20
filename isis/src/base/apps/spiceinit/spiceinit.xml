@@ -297,6 +297,7 @@
     </change>
     <change name="Jesse Mapel" date="2020-12-10">
       Modified to remove state string and model information from the csminit application.
+    </change>
     <change name="Kaitlyn Lee" date="2020-12-21">
       Updated shape model keyword in the kernels group when shape=user and web=true with the user
       specified model. Fixes #1986
