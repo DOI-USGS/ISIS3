@@ -255,16 +255,14 @@ namespace Isis {
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
 
-      if (!kernelSuccess)
+      if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
                          _FILEINFO_);
-      else {
-        // Remove csminit data from the cube after successful run
-        icube->deleteGroup("CsmInfo");
-        icube->deleteBlob("String","CSMState");
       }
     }
+    icube->deleteGroup("CsmInfo");
+    icube->deleteBlob("String","CSMState");
     p.EndProcess();
   }
 
@@ -700,9 +698,5 @@ namespace Isis {
 
     delete sunPosTable;
     sunPosTable = NULL;
-
-    // Remove csminit data from the cube after successful run
-    icube->deleteGroup("CsmInfo");
-    icube->deleteBlob("String","CSMState");
   }
 }

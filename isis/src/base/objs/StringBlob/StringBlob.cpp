@@ -12,7 +12,7 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 namespace Isis {
   /**
-   * Constructor for creating an string blob with no arguments
+   * Constructor for creating a string blob with no arguments
    */
   StringBlob::StringBlob() : Isis::Blob("IsisCube", "String") {
     m_string = "";

@@ -139,13 +139,10 @@ namespace Isis {
         cube->putGroup(PvlGroup("Instrument"));
       }
       PvlGroup &instrumentGroup = cube->group("Instrument");
-      if (instrumentGroup.hasKeyword("TargetName")) {
-        instrumentGroup.deleteKeyword("TargetName");
-      }
-      instrumentGroup += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
+      instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
     }
 
-    // Popualte the CsmInfo group with useful information
+    // Populate the CsmInfo group with useful information
     cube->deleteGroup("CsmInfo");
     PvlGroup infoGroup("CsmInfo");
     infoGroup += PvlKeyword("CSMPlatformID",
@@ -163,25 +160,25 @@ namespace Isis {
         paramNames += QString::fromStdString(param.name);
         paramUnits += QString::fromStdString(param.units);
         switch (param.type) {
-        case csm::param::NONE:
-          paramTypes += "NONE";
-          break;
+          case csm::param::NONE:
+            paramTypes += "NONE";
+            break;
 
-        case csm::param::FICTITIOUS:
-          paramTypes += "FICTITIOUS";
-          break;
-
-        case csm::param::REAL:
-          paramTypes += "REAL";
-          break;
-
-        case csm::param::FIXED:
-          paramTypes += "FIXED";
-          break;
-
-        default:
-          paramTypes += "UNKNOWN";
-          break;
+          case csm::param::FICTITIOUS:
+            paramTypes += "FICTITIOUS";
+            break;
+        
+          case csm::param::REAL:
+            paramTypes += "REAL";
+            break;
+        
+          case csm::param::FIXED:
+            paramTypes += "FIXED";
+            break;
+        
+          default:
+            paramTypes += "UNKNOWN";
+            break;
         }
       }
 

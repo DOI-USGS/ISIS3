@@ -393,7 +393,7 @@ double AlternativeTestCsmModel::getParameterCovariance(int index1,
     return 1.0;
   }
   return 0.0;
-                              }
+}
 
 /**
  * Does nothing. Minimal implementation for testing.

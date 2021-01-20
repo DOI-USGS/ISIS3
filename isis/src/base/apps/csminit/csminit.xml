@@ -8,7 +8,7 @@
   <description>
     <p>
       This program takes Instrument Support Data (ISD) and attempts to create a
-      valid Community Sensor Model (CSM) state string using modesl from the
+      valid Community Sensor Model (CSM) state string using models from the
       loaded CSM Libraries. If a single state string can be created, it is
       attached to the cube in the CSMState BLOB for later use. If there are
       multiple models that create valid state strings, then this program will

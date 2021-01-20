@@ -10,7 +10,7 @@
 /**
  * An alternative Test CSM (Community Sensor Model) Sensor Model used to test 
  * CSM sensor model support in ISIS. This can be used to help test situations 
- * where multiple potential sensor models can be constructued, or to make sure 
+ * where multiple potential sensor models can be constructed, or to make sure 
  * that specific sensor model requirements are being met.  
  * 
  * @author 2020-12-08 Kristin Berry

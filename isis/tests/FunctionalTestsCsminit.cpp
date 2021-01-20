@@ -200,7 +200,12 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
 
   // If there are two possible models, csminit will fail and prompt the user to specify the model
   // and/or plugin name.
-  EXPECT_ANY_THROW(csminit(options));
+  try {
+    csminit(options);
+  } 
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Multiple models can be created from the ISD")); 
+  }
 
   // Re-run with the model name specified
   args = {
@@ -274,7 +279,12 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
   UserInterface options(APP_XML, args);
 
   // Expect a failure due to being unable to construct any model from the isd
-  EXPECT_ANY_THROW(csminit(options));
+  try {
+    csminit(options);
+  } 
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("No loaded model could be created from the ISD")); 
+  }
 }
 
 
