@@ -1,6 +1,10 @@
 #include <QTextStream>
 
+#include "CubeAttribute.h"
+#include "FileName.h"
+
 #include "Fixtures.h"
+#include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
 #include "ControlNet.h"
@@ -17,7 +21,8 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->setDimensions(10, 10, 10);
-    testCube->create(tempDir.path() + "/small.cub");
+    QString path = tempDir.path() + "/small.cub";
+    testCube->create(path);
 
     LineManager line(*testCube);
     double pixelValue = 0.0;
@@ -27,6 +32,25 @@ namespace Isis {
       }
       testCube->write(line);
     }
+
+    // Add a BandBin group to the cube label
+    Pvl *label = testCube->label();
+    PvlObject& cubeLabel = label->findObject("IsisCube");
+    PvlGroup bandBin("BandBin");
+    PvlKeyword originalBand("OriginalBand", "1");
+    originalBand += "2";
+    originalBand += "3";
+    originalBand += "4";
+    originalBand += "5";
+    originalBand += "6";
+    originalBand += "7";
+    originalBand += "8";
+    originalBand += "9";
+    originalBand += "10";
+    bandBin += originalBand;
+    cubeLabel.addGroup(bandBin);
+    testCube->close();
+    testCube->open(path, "rw");
   }
 
   void SmallCube::TearDown() {
@@ -221,6 +245,7 @@ namespace Isis {
       }
       projTestCube->write(line);
     }
+    projTestCube->reopen("rw");
   }
 
 
@@ -277,6 +302,10 @@ namespace Isis {
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
     FileName labelPath3("data/threeImageNetwork/cube3.pvl");
 
+    FileName mappedLabelPath1("data/threeImageNetwork/cube1map.pvl");
+    FileName mappedLabelPath2("data/threeImageNetwork/cube2map.pvl");
+    FileName mappedLabelPath3("data/threeImageNetwork/cube3map.pvl");
+
     isdPath1 = new FileName("data/threeImageNetwork/cube1.isd");
     isdPath2 = new FileName("data/threeImageNetwork/cube2.isd");
     isdPath3 = new FileName("data/threeImageNetwork/cube3.isd");
@@ -295,7 +324,6 @@ namespace Isis {
               {30, 0}};
     poly.Create(coords);
     cube1->write(poly);
-    cube1->reopen("rw");
 
     cube2 = new Cube();
     cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, *isdPath2, "rw");
@@ -307,23 +335,65 @@ namespace Isis {
               {31, 1}};
     poly.Create(coords);
     cube2->write(poly);
-    cube2->reopen("rw");
 
     cube3 = new Cube();
     cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, *isdPath3, "rw");
 
+    LineManager line(*cube1);
+    LineManager line2(*cube2);
+    LineManager line3(*cube3);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube1->write(line);
+    }
+
+    for(line2.begin(); !line2.end(); line2++) {
+      for(int i = 0; i < line.size(); i++) {
+        line2[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube2->write(line2);
+    }
+
+    for(line3.begin(); !line3.end(); line3++) {
+      for(int i = 0; i < line3.size(); i++) {
+        line3[i] = (double) (pixelValue %255);
+        pixelValue++;
+      }
+      cube3->write(line3);
+    }
+
+    cube1->reopen("rw");
+    cube2->reopen("rw");
+    cube3->reopen("rw");
+
     cubeList = new FileList();
     cubeList->append(cube1->fileName());
     cubeList->append(cube2->fileName());
+
+    twoCubeListFile = tempDir.path() + "/2cubes.lis";
+    cubeList->write(twoCubeListFile);
     cubeList->append(cube3->fileName());
 
     cubeListFile = tempDir.path() + "/cubes.lis";
     cubeList->write(cubeListFile);
 
-    network = new ControlNet();
-    network->ReadControl("data/threeImageNetwork/controlnetwork.net");
-  }
+    networkFile = "data/threeImageNetwork/controlnetwork.net";
 
+    network = new ControlNet();
+    network->ReadControl(networkFile);
+
+    cube1map = new Cube();
+    cube2map = new Cube();
+    cube3map = new Cube();
+    cube1map->fromIsd(tempDir.path() + "/cube1map.cub", mappedLabelPath1, *isdPath1, "rw");
+    cube2map->fromIsd(tempDir.path() + "/cube2map.cub", mappedLabelPath2, *isdPath2, "rw");
+    cube3map->fromIsd(tempDir.path() + "/cube3map.cub", mappedLabelPath3, *isdPath3, "rw");
+  }
 
   void ThreeImageNetwork::TearDown() {
     delete cubeList;
@@ -333,6 +403,10 @@ namespace Isis {
     delete cube2;
     delete cube3;
 
+    delete cube1map;
+    delete cube2map;
+    delete cube3map;
+
     delete isdPath1;
     delete isdPath2;
     delete isdPath3;
@@ -340,6 +414,7 @@ namespace Isis {
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
   }
+
 
   void ApolloNetwork::SetUp() {
     TempTestingFiles::SetUp();

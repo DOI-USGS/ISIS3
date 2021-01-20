@@ -27,11 +27,14 @@
 
 // This is needed for the QVariant macro
 #include <QMetaType>
+#include <QList>
+#include <QMap>
 
 #include <nlohmann/json.hpp>
 
 #include "Endian.h"
 #include "PixelType.h"
+#include "PvlKeyword.h"
 
 class QFile;
 class QMutex;
@@ -257,9 +260,10 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob) const;
+      void read(Blob &blob, 
+                const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
-      void write(Blob &blob);
+      void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);

@@ -23,6 +23,9 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
+  QString error_message = "WARNING: This camera model is out of date. See ocam2isis documentation for details.";
+  std::cerr << error_message << std::endl;
+
   ProcessImportFits importFits;
 
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));

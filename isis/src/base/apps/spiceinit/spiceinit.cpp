@@ -263,6 +263,7 @@ namespace Isis {
     }
     icube->deleteGroup("CsmInfo");
     icube->deleteBlob("String","CSMState");
+    p.WriteHistory(*icube);
     p.EndProcess();
   }
 
@@ -577,8 +578,6 @@ namespace Isis {
           }
         }
       }
-
-      p.WriteHistory(*icube);
     }
     catch(IException &) {
       icube->putGroup(originalKernels);
@@ -615,11 +614,7 @@ namespace Isis {
     QString shape     = QString(ui.GetString("SHAPE")).toLower();
 
     if (shape == "user") {
-      shape = QString(ui.GetAsString("MODEL"));
-
-      // Test for valid labels with mapping group at least
-      Pvl shapeTest(shape);
-      shapeTest.findGroup("Mapping", Pvl::Traverse);
+      shape = "ellipsoid";
     }
 
     double startPad = ui.GetDouble("STARTPAD");
@@ -640,7 +635,6 @@ namespace Isis {
     connectionProgress.CheckStatus();
 
     PvlGroup kernelsGroup = client.kernelsGroup();
-    PvlGroup logGrp = client.applicationLog();
     PvlObject naifKeywords = client.naifKeywordsObject();
     Table *pointingTable = client.pointingTable();
     Table *positionTable = client.positionTable();
@@ -665,12 +659,17 @@ namespace Isis {
         continue;
       }
     }
-
-    if (log) {
-      log->addGroup(logGrp);
+    
+    if (ui.GetString("SHAPE") == "USER") {
+      kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
     }
 
     icube->putGroup(kernelsGroup);
+
+    if (log) {
+      log->addGroup(kernelsGroup);
+    }
+
     icube->label()->addObject(naifKeywords);
 
     icube->write(*pointingTable);
