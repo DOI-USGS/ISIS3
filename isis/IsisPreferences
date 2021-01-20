@@ -169,6 +169,21 @@ Group = Performance
 EndGroup
 
 ########################################################
+#
+# Indicate where ISIS should search for Community
+# Sensor Model (CSM) plugins. The value of this keyword
+# should be a list of paths, that contain CSM plugin
+# libraries.
+#
+########################################################
+
+Group = Plugins
+  CSMDirectory = ("$ISISROOT/lib/isis/csm3.0.3/", -
+                  "$ISISROOT/csmlibs/3.0.3/", -
+                  "$HOME/.Isis/csm3.0.3/")
+EndGroup
+
+########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
 # should be left to the Isis administrator
