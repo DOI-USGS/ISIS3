@@ -295,7 +295,7 @@ namespace Isis {
     public:
       // constructors
       Spice(Cube &cube);
-      Spice(Cube &cube, bool noTables);
+//      Spice(Cube &cube, bool noTables); NO LONGER USED
       Spice(Pvl &lab, nlohmann::json);
 
       // destructor
@@ -442,6 +442,8 @@ namespace Isis {
 
       bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned 
                             from ALE */
+      bool m_usingSpice; /**< Indicate whether to populate spice-releated member variables with
+                            values */
   };
 }
 

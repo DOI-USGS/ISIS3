@@ -76,11 +76,17 @@ namespace Isis {
    */
 
   // TODO: DOCUMENT EVERYTHING
-  Spice::Spice(Cube &cube) {
-    Pvl &lab = *cube.label();
+  Spice::Spice(Cube &cube) {  //, bool csm=false
+    if (cube.hasGroup("CsmInfo")) {
+      m_usingSpice = false;
+      // set member variables to NULL
+      return;
+    }
+    m_usingSpice = true;
+    Pvl &lab = *cube.label(); 
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-    bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    init(lab, !hasTables);
+    bool hasTables = (kernels["TargetPosition"][0] == "Table"); 
+    init(lab, !hasTables); 
   }
 
   /**
@@ -89,10 +95,11 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) {
-    init(*cube.label(), noTables);
-  }
-
+// NO LONGER USED
+//  Spice::Spice(Cube &cube, bool noTables) {
+//    init(*cube.label(), noTables); 
+//  }
+//
 
   /**
    * Constructs a Spice Object
@@ -457,10 +464,9 @@ namespace Isis {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-
-
     NaifStatus::CheckErrors();
   }
+
 
   /**
    * Loads/furnishes NAIF kernel(s)
@@ -496,111 +502,113 @@ namespace Isis {
    * Destroys the Spice object
    */
   Spice::~Spice() {
-    NaifStatus::CheckErrors();
+    if (m_usingSpice) {
+      NaifStatus::CheckErrors(); 
 
-    if (m_solarLongitude != NULL) {
-      delete m_solarLongitude;
-      m_solarLongitude = NULL;
+      if (m_solarLongitude != NULL) {
+        delete m_solarLongitude;
+        m_solarLongitude = NULL;
+      }
+
+      if (m_et != NULL) {
+        delete m_et;
+        m_et = NULL;
+      }
+
+      if (m_startTime != NULL) {
+        delete m_startTime;
+        m_startTime = NULL;
+      }
+
+      if (m_endTime != NULL) {
+        delete m_endTime;
+        m_endTime = NULL;
+      }
+
+      if (m_cacheSize != NULL) {
+        delete m_cacheSize;
+        m_cacheSize = NULL;
+      }
+
+      if (m_startTimePadding != NULL) {
+        delete m_startTimePadding;
+        m_startTimePadding = NULL;
+      }
+
+      if (m_endTimePadding != NULL) {
+        delete m_endTimePadding;
+        m_endTimePadding = NULL;
+      }
+
+      if (m_instrumentPosition != NULL) {
+        delete m_instrumentPosition;
+        m_instrumentPosition = NULL;
+      }
+
+      if (m_instrumentRotation != NULL) {
+        delete m_instrumentRotation;
+        m_instrumentRotation = NULL;
+      }
+
+      if (m_sunPosition != NULL) {
+        delete m_sunPosition;
+        m_sunPosition = NULL;
+      }
+
+      if (m_bodyRotation != NULL) {
+        delete m_bodyRotation;
+        m_bodyRotation = NULL;
+      }
+
+      if (m_spkCode != NULL) {
+        delete m_spkCode;
+        m_spkCode = NULL;
+      }
+
+      if (m_ckCode != NULL) {
+        delete m_ckCode;
+        m_ckCode = NULL;
+      }
+
+      if (m_ikCode != NULL) {
+        delete m_ikCode;
+        m_ikCode = NULL;
+      }
+
+      if (m_sclkCode != NULL) {
+        delete m_sclkCode;
+        m_sclkCode = NULL;
+      }
+
+      if (m_spkBodyCode != NULL) {
+        delete m_spkBodyCode;
+        m_spkBodyCode = NULL;
+      }
+
+      if (m_bodyFrameCode != NULL) {
+        delete m_bodyFrameCode;
+        m_bodyFrameCode = NULL;
+      }
+
+      if (m_target != NULL) {
+        delete m_target;
+        m_target = NULL;
+      }
+
+      // Unload the kernels (TODO: Can this be done faster)
+      for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
+        FileName file(m_kernels->at(i));
+        QString fileName = file.expanded();
+        unload_c(fileName.toLatin1().data());
+      }
+
+      if (m_kernels != NULL) {
+        delete m_kernels;
+        m_kernels = NULL;
+      }
+
+      NaifStatus::CheckErrors();
     }
-
-    if (m_et != NULL) {
-      delete m_et;
-      m_et = NULL;
-    }
-
-    if (m_startTime != NULL) {
-      delete m_startTime;
-      m_startTime = NULL;
-    }
-
-    if (m_endTime != NULL) {
-      delete m_endTime;
-      m_endTime = NULL;
-    }
-
-    if (m_cacheSize != NULL) {
-      delete m_cacheSize;
-      m_cacheSize = NULL;
-    }
-
-    if (m_startTimePadding != NULL) {
-      delete m_startTimePadding;
-      m_startTimePadding = NULL;
-    }
-
-    if (m_endTimePadding != NULL) {
-      delete m_endTimePadding;
-      m_endTimePadding = NULL;
-    }
-
-    if (m_instrumentPosition != NULL) {
-      delete m_instrumentPosition;
-      m_instrumentPosition = NULL;
-    }
-
-    if (m_instrumentRotation != NULL) {
-      delete m_instrumentRotation;
-      m_instrumentRotation = NULL;
-    }
-
-    if (m_sunPosition != NULL) {
-      delete m_sunPosition;
-      m_sunPosition = NULL;
-    }
-
-    if (m_bodyRotation != NULL) {
-      delete m_bodyRotation;
-      m_bodyRotation = NULL;
-    }
-
-    if (m_spkCode != NULL) {
-      delete m_spkCode;
-      m_spkCode = NULL;
-    }
-
-    if (m_ckCode != NULL) {
-      delete m_ckCode;
-      m_ckCode = NULL;
-    }
-
-    if (m_ikCode != NULL) {
-      delete m_ikCode;
-      m_ikCode = NULL;
-    }
-
-    if (m_sclkCode != NULL) {
-      delete m_sclkCode;
-      m_sclkCode = NULL;
-    }
-
-    if (m_spkBodyCode != NULL) {
-      delete m_spkBodyCode;
-      m_spkBodyCode = NULL;
-    }
-
-    if (m_bodyFrameCode != NULL) {
-      delete m_bodyFrameCode;
-      m_bodyFrameCode = NULL;
-    }
-
-    if (m_target != NULL) {
-      delete m_target;
-      m_target = NULL;
-    }
-
-    // Unload the kernels (TODO: Can this be done faster)
-    for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
-      FileName file(m_kernels->at(i));
-      QString fileName = file.expanded();
-      unload_c(fileName.toLatin1().data());
-    }
-
-    if (m_kernels != NULL) {
-      delete m_kernels;
-      m_kernels = NULL;
-    }
-
-    NaifStatus::CheckErrors();
   }
 
   /**
@@ -987,6 +995,7 @@ namespace Isis {
     return *m_naifKeywords;
   }
 
+
   /**
    * Virtual method that returns the pixel resolution of the sensor in
    * meters/pix.
@@ -994,7 +1003,7 @@ namespace Isis {
    * @return @b double Resolution value of 1.0
    */
   double Spice::resolution() {
-    return 1.;
+    return 1.0;
   };
 
 
