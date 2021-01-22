@@ -30,10 +30,16 @@
 #include "CameraFactory.h"
 
 #include "Camera.h"
+#include "CSMCamera.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Plugin.h"
 #include "Preference.h"
+#include "StringBlob.h"
+
+#include "csm/csm.h"
+#include "csm/Model.h"
+#include "csm/Plugin.h"
 
 using namespace csm;
 using namespace std;
@@ -58,52 +64,60 @@ namespace Isis {
     initPlugin();
 
     try {
-      // First get the spacecraft and instrument and combine them
-      Pvl &lab = *cube.label();
-      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
-      QString spacecraft = (QString) inst["SpacecraftName"];
-      QString name = (QString) inst["InstrumentId"];
-      spacecraft = spacecraft.toUpper();
-      name = name.toUpper();
-      QString group = spacecraft + "/" + name;
-      group = group.remove(" ");
-
-      PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
-      // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
-      if (!kerns.hasKeyword("CameraVersion")) {
-        kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
+      // Is there a CSM blob on the cube? 
+      if (cube.hasGroup("CsmInfo")) {
+        // Create ISIS CSM Camera Model
+        return new CSMCamera(cube);
       }
-
-      int cameraOriginalVersion = (int)kerns["CameraVersion"];
-      int cameraNewestVersion = CameraVersion(cube);
-
-      if (cameraOriginalVersion != cameraNewestVersion) {
-        string msg = "The camera model used to create a camera for this cube is out of date, " \
-                     "please re-run spiceinit on the file or process with an old Isis version " \
-                     "that has the correct camera model.";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+      else {
+        // First get the spacecraft and instrument and combine them
+        Pvl &lab = *cube.label();
+        PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
+        QString spacecraft = (QString) inst["SpacecraftName"];
+        QString name = (QString) inst["InstrumentId"];
+        spacecraft = spacecraft.toUpper();
+        name = name.toUpper();
+        QString group = spacecraft + "/" + name;
+        group = group.remove(" ");
+       
+        PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
+        // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
+        if (!kerns.hasKeyword("CameraVersion")) {
+          kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
+        }
+       
+        int cameraOriginalVersion = (int)kerns["CameraVersion"];
+        int cameraNewestVersion = CameraVersion(cube);
+       
+        if (cameraOriginalVersion != cameraNewestVersion) {
+          string msg = "The camera model used to create a camera for this cube is out of date, " \
+                       "please re-run spiceinit on the file or process with an old Isis version " \
+                       "that has the correct camera model.";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+       
+        // See if we have a camera model plugin
+        QFunctionPointer ptr;
+        try {
+          ptr = m_cameraPlugin.GetPlugin(group);
+        }
+        catch(IException &e) {
+          QString msg = "Unsupported camera model, unable to find plugin for ";
+          msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
+          msg += name + "]";
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
+       
+        // Now cast that pointer in the proper way
+        Camera * (*plugin)(Isis::Cube &cube);
+        plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
+       
+        // Create the camera as requested
+        return (*plugin)(cube);
       }
-
-      // See if we have a camera model plugin
-      QFunctionPointer ptr;
-      try {
-        ptr = m_cameraPlugin.GetPlugin(group);
-      }
-      catch(IException &e) {
-        QString msg = "Unsupported camera model, unable to find plugin for ";
-        msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
-        msg += name + "]";
-        throw IException(e, IException::Unknown, msg, _FILEINFO_);
-      }
-
-      // Now cast that pointer in the proper way
-      Camera * (*plugin)(Isis::Cube &cube);
-      plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
-
-      // Create the projection as requested
-      return (*plugin)(cube);
     }
     catch(IException &e) {
+      // Message only makes sense for ISIS-style camera model
       string message = "Unable to initialize camera model from group [Instrument]";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }

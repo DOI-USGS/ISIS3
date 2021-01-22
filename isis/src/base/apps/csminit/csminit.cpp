@@ -74,14 +74,14 @@ namespace Isis {
         if (plugin->canModelBeConstructedFromISD(fileIsd, modelName.toStdString())) {
           QStringList modelSpec = {pluginName, modelName, QString::fromStdString(fileIsd.format())};
           possibleModels.append(modelSpec);
-          continue; // If the file ISD works, don't check the others
+          continue; // If the file ISD works, don't check the other ISD formats
         }
 
         csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
         if (plugin->canModelBeConstructedFromISD(nitf21Isd, modelName.toStdString())) {
           QStringList modelSpec = {pluginName, modelName, QString::fromStdString(nitf21Isd.format())};
           possibleModels.append(modelSpec);
-          continue; // If the NITF 2.1 ISD works, don't check the others
+          continue; // If the NITF 2.1 ISD works, don't check the other ISD formats
         }
       }
     }
@@ -152,7 +152,9 @@ namespace Isis {
     infoGroup += PvlKeyword("ReferenceTime",
                             QString::fromStdString(model->getReferenceDateAndTime()));
     csm::GeometricModel *modelWithParams = dynamic_cast<csm::GeometricModel*>(model);
-    if (modelWithParams) {
+
+    // TEMPORARY WORK AROUND 
+    if (false&&modelWithParams) {
       PvlKeyword paramNames("ModelParameterNames");
       PvlKeyword paramUnits("ModelParameterUnits");
       PvlKeyword paramTypes("ModelParameterTypes");
