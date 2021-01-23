@@ -5,6 +5,7 @@
  */
 
 #include "Camera.h"
+#include "Target.h"
 
 #include <QList>
 #include <QPointF>
@@ -64,10 +65,15 @@ namespace Isis {
 
       virtual QList<QPointF> PixelIfovOffsets();
 
-    private:
+      virtual Target *target() const;
+
+      virtual bool SetImage(const double sample, const double line);
+
+      private:
       double m_pixelPitchX;
       double m_pixelPitchY;
       csm::Model *m_model; //! CSM sensor model
+      Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
   };
 };
 #endif

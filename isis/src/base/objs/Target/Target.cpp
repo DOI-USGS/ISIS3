@@ -58,7 +58,7 @@ namespace Isis {
     m_systemCode = new SpiceInt;
     m_radii.resize(3, Distance());
 
-      m_spice = spice;
+    m_spice = spice;
 
     // If we get this far, we know we have a kernels group.  Spice requires it.
     PvlGroup &kernels = lab.findGroup("Kernels", Pvl::Traverse);
@@ -603,9 +603,21 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Target::setRadii(std::vector<Distance> radii) {
+    if (m_radii.size() == 0) {
+      m_radii.resize(3, Distance()); 
+    }
     m_radii[0] = radii[0];
     m_radii[1] = radii[1];
     m_radii[2] = radii[2];
+  }
+
+
+  // set the Target Name
+  void Target::setName(QString name) {
+    if (m_name == NULL) {
+      m_name = new QString;
+    }
+    *m_name = name; 
   }
 
 

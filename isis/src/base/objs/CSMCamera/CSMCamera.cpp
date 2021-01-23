@@ -56,8 +56,36 @@ namespace Isis {
     m_pixelPitchX = 10; // dummy value
     m_pixelPitchY = 10; // dummy value
 
-    std::cout << "Hello World!" << std::endl;
+    m_target = new Target();
+
+    Pvl *label = cube.label();
+    PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
+    QString targetName = inst["TargetName"][0];
+    m_target->setName(targetName);
+
+    // get radii from CSM 
+    std::vector<Distance> radii;
+    radii.push_back(Distance());
+    radii.push_back(Distance());
+    radii.push_back(Distance());
+    m_target->setRadii(radii);
+
+    // set shape
+    m_target->setShapeEllipsoid();
+
     return;
+  }
+
+
+  bool CSMCamera::SetImage(const double sample, const double line) {
+    std::cout << "Hello World!" << std::endl;
+    return false;
+  }
+
+
+  // Return the target
+  Target *CSMCamera::target() const {
+    return m_target;
   }
 
 
