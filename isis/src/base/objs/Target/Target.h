@@ -93,6 +93,8 @@ namespace Isis {
       void restoreShape();
       void setShapeEllipsoid();
       void setRadii(std::vector<Distance> radii);
+      void setName(QString name);
+
       ShapeModel *shape() const;
       Spice *spice() const;
 

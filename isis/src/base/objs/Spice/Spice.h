@@ -323,7 +323,7 @@ namespace Isis {
       void subSpacecraftPoint(double &lat, double &lon);
       void subSolarPoint(double &lat, double &lon);
 
-      Target *target() const;
+      virtual Target *target() const;
       QString targetName() const;
 
       iTime getClockTime(QString clockValue,
