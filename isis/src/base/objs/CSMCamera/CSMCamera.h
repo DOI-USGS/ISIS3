@@ -69,11 +69,18 @@ namespace Isis {
 
       virtual bool SetImage(const double sample, const double line);
 
+      virtual double LineResolution();
+      virtual double SampleResolution();
+      virtual double PixelResolution();
+      virtual double ObliqueLineResolution();
+      virtual double ObliqueSampleResolution();
+      virtual double ObliquePixelResolution();
+
       private:
-      double m_pixelPitchX;
-      double m_pixelPitchY;
-      csm::RasterGM *m_model; //! CSM sensor model
-      Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
+        double m_pixelPitchX;
+        double m_pixelPitchY;
+        csm::RasterGM *m_model; //! CSM sensor model
+        Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
   };
 };
 #endif
