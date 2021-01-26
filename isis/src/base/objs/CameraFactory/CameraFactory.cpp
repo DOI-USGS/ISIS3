@@ -65,6 +65,8 @@ namespace Isis {
 
     try {
       // Is there a CSM blob on the cube? 
+      // Key off of the CSM state blob, rather than the info group
+      // hasBlob() add to Cube!
       if (cube.hasGroup("CsmInfo")) {
         // Create ISIS CSM Camera Model
         return new CSMCamera(cube);

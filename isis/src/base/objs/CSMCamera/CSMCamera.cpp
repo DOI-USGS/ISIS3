@@ -3,8 +3,6 @@
  */
 
 #include "CSMCamera.h"
-//#include "VimsGroundMap.h"
-//#include "VimsSkyMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 
@@ -39,7 +37,6 @@ namespace Isis {
    *
    */
   CSMCamera::CSMCamera(Cube &cube) : Camera(cube) {
-    std::cout << "Set the names" << std::endl;
     StringBlob stateString("","CSMState");
     cube.read(stateString);
     PvlObject &blobLabel = stateString.Label();
@@ -52,8 +49,7 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    std::cout << "instrument name, spacecraft name: " << m_instrumentNameLong << ", " << m_spacecraftNameLong << std::endl;
-    m_pixelPitchX = 10; // dummy value
+    m_pixelPitchX = 10; // dummy value no way to get from CSM
     m_pixelPitchY = 10; // dummy value
 
     m_target = new Target();
@@ -65,6 +61,8 @@ namespace Isis {
 
     // get radii from CSM -- add correct radii
     std::vector<Distance> radii;
+
+    // get ellipsoid, cast to settable elllipsoid? 
     radii.push_back(Distance());
     radii.push_back(Distance());
     radii.push_back(Distance());
@@ -72,7 +70,6 @@ namespace Isis {
 
     // set shape
     m_target->setShapeEllipsoid();
-//    std::cout << m_model->getModelState() << std::endl;
     return;
   }
 
@@ -87,14 +84,14 @@ namespace Isis {
 //        double parentSample = p_alphaCube->AlphaSample(sample);
 //        double parentLine = p_alphaCube->AlphaLine(line);
 //        bool success = false;
-        double height = 10.0;
 
+        double height = 10.0;
         csm::ImageCoord imagePt(line, sample);
 
         // do image to ground with csm
         csm::EcefCoord result = m_model->imageToGround(imagePt, height);
-        // put result in whatever stateful place ISIS needs it to be? 
 
+        // Set X, Y, Z in surface point
         double naifValues[3] = {result.x, result.y, result.z};
         target()->shape()->surfaceIntersection()->FromNaifArray(naifValues);
 
@@ -108,8 +105,6 @@ namespace Isis {
         // (1) how to get lat/lon
         // (2) which variables to store in
 
-
-        std::cout << "Hello result: " << result.x << ", " << result.y << ", " << result.z << std::endl;
         // fill in whatever stuff ISIS needs from this
 //    }
 //    else {
@@ -121,6 +116,33 @@ namespace Isis {
     return true;
   }
 
+  double CSMCamera::LineResolution() {
+    // Camera version uses detectorMap
+    return m_pixelPitchX;
+  }
+
+  double CSMCamera::SampleResolution() {
+    // Camera version uses detectorMap
+    return m_pixelPitchY;
+  }
+
+ double CSMCamera::PixelResolution() {
+    // Camera version uses detectorMap
+    return m_pixelPitchY;
+  }
+
+  double CSMCamera::ObliqueLineResolution() {
+    return 10.0;
+  }
+
+  double CSMCamera::ObliqueSampleResolution() {
+    return 10.0;
+  }
+
+
+  double CSMCamera::ObliquePixelResolution() {
+    return 10.0;
+  }
 
   // Return the target
   Target *CSMCamera::target() const {
@@ -137,9 +159,10 @@ namespace Isis {
    *                          to be a user parameter evenually?  Might be dependent on resolution.
    */
    QList<QPointF> CSMCamera::PixelIfovOffsets() {
+     // throw error 
 
      QList<QPointF> offsets;
-
+  
      //  Create 100 pts on each edge of pixel
      int npts = 100;
 
@@ -163,6 +186,7 @@ namespace Isis {
      return offsets;
    }
 }
+
 
 // Plugin
 /**

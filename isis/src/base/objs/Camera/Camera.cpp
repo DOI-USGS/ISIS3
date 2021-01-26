@@ -643,8 +643,7 @@ namespace Isis {
    * @return @b double The sample resolution
    */
   double Camera::SampleResolution() {
-
-    return DetectorResolution() * p_detectorMap->SampleScaleFactor();
+    return DetectorResolution() * p_detectorMap->SampleScaleFactor(); 
   }
 
   /**
@@ -654,8 +653,7 @@ namespace Isis {
    * @return @b double The sample resolution
    */
   double Camera::ObliqueSampleResolution() {
-
-    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor(); 
   }
 
 
@@ -665,7 +663,7 @@ namespace Isis {
    * @return @b double The line resolution
    */
   double Camera::LineResolution() {
-    return DetectorResolution() * p_detectorMap->LineScaleFactor();
+    return DetectorResolution() * p_detectorMap->LineScaleFactor(); 
   }
 
 
@@ -677,8 +675,7 @@ namespace Isis {
    * @return @b double The line resolution
    */
   double Camera::ObliqueLineResolution() {
-
-    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor(); 
   }
 
 

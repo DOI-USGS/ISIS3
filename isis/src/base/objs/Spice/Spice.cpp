@@ -1310,6 +1310,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+
   /**
    * Returns the sub-solar latitude/longitude in universal coordinates (0-360
    * positive east, ocentric)

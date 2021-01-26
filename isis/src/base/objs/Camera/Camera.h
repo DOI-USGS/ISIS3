@@ -286,15 +286,15 @@ namespace Isis {
                      double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
-      double PixelResolution();
-      double LineResolution();
-      double SampleResolution();
+      virtual double PixelResolution();
+      virtual double LineResolution();
+      virtual double SampleResolution();
       double DetectorResolution();
 
       double ObliqueDetectorResolution();
-      double ObliqueSampleResolution();
-      double ObliqueLineResolution();
-      double ObliquePixelResolution();
+      virtual double ObliqueSampleResolution();
+      virtual double ObliqueLineResolution();
+      virtual double ObliquePixelResolution();
 
 
       virtual double resolution();
