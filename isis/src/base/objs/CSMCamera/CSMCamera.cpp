@@ -45,7 +45,7 @@ namespace Isis {
     PvlObject &blobLabel = stateString.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
-    m_model = plugin->constructModelFromState(stateString.string());
+    m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.string()));
 
     m_instrumentNameLong = QString::fromStdString(m_model->getSensorIdentifier());
     m_instrumentNameShort = QString::fromStdString(m_model->getSensorIdentifier());
@@ -63,7 +63,7 @@ namespace Isis {
     QString targetName = inst["TargetName"][0];
     m_target->setName(targetName);
 
-    // get radii from CSM 
+    // get radii from CSM -- add correct radii
     std::vector<Distance> radii;
     radii.push_back(Distance());
     radii.push_back(Distance());
@@ -72,14 +72,53 @@ namespace Isis {
 
     // set shape
     m_target->setShapeEllipsoid();
-
+//    std::cout << m_model->getModelState() << std::endl;
     return;
   }
 
 
   bool CSMCamera::SetImage(const double sample, const double line) {
+// move to protected? 
+//    p_childSample = sample;
+//    p_childLine = line;
+//    p_pointComputed = true;
+
+//    if (p_projection == NULL || p_ignoreProjection) {    
+//        double parentSample = p_alphaCube->AlphaSample(sample);
+//        double parentLine = p_alphaCube->AlphaLine(line);
+//        bool success = false;
+        double height = 10.0;
+
+        csm::ImageCoord imagePt(line, sample);
+
+        // do image to ground with csm
+        csm::EcefCoord result = m_model->imageToGround(imagePt, height);
+        // put result in whatever stateful place ISIS needs it to be? 
+
+        double naifValues[3] = {result.x, result.y, result.z};
+        target()->shape()->surfaceIntersection()->FromNaifArray(naifValues);
+
+        // check set of coordinate:
+        double test[3];
+        Coordinate(test);
+        std::cout << "TEST:  " << test[0] << ", "  << test[1] << ", " << test[2] << std::endl;
+        std::cout << "UniversalLatitude: " << UniversalLatitude() << std::endl; 
+
+            // get a lat, lon and store in variables
+        // (1) how to get lat/lon
+        // (2) which variables to store in
+
+
+        std::cout << "Hello result: " << result.x << ", " << result.y << ", " << result.z << std::endl;
+        // fill in whatever stuff ISIS needs from this
+//    }
+//    else {
+        // handle projected case
+//    }
+
     std::cout << "Hello World!" << std::endl;
-    return false;
+    // how to do this -- csm returns the _closest pixel_ to the intersection
+    return true;
   }
 
 
