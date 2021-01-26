@@ -11,7 +11,7 @@
 #include <QPointF>
 
 #include "csm/csm.h"
-#include "csm/Model.h"
+#include "csm/RasterGM.h"
 
 namespace Isis {
   class CSMCamera : public Camera {
@@ -72,7 +72,7 @@ namespace Isis {
       private:
       double m_pixelPitchX;
       double m_pixelPitchY;
-      csm::Model *m_model; //! CSM sensor model
+      csm::RasterGM *m_model; //! CSM sensor model
       Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
   };
 };
