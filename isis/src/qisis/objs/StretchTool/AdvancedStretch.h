@@ -14,6 +14,7 @@ namespace Isis {
   class CubeViewport;
   class Histogram;
   class Stretch;
+  class CubeStretch;
 
   /**
    * @brief Advanced Stretch Dialog
@@ -35,17 +36,17 @@ namespace Isis {
       AdvancedStretch(Histogram &, const Stretch &,
                       const QString &, const QColor &);
       ~AdvancedStretch();
-      Stretch getStretch();
+      CubeStretch getStretch();
       void setStretch(Stretch newStretch);
-      void restoreSavedStretch(Stretch newStretch);
+      void restoreSavedStretch(CubeStretch newStretch);
       void setHistogram(const Histogram &newHist);
 
     signals:
       //! Emitted when a new stretch is available
       void stretchChanged();
       void saveToCube();
-      void deleteFromCube(); 
-      void loadStretch(); 
+      void deleteFromCube();
+      void loadStretch();
 
     private:
       QStackedWidget *p_stretchTypeStack; //!< StretchType's
