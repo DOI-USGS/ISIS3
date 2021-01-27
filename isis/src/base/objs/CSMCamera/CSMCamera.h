@@ -7,6 +7,8 @@
 #include "Camera.h"
 #include "Target.h"
 
+#include <vector>
+
 #include <QList>
 #include <QPointF>
 
@@ -76,9 +78,10 @@ namespace Isis {
       virtual double ObliqueSampleResolution();
       virtual double ObliquePixelResolution();
 
+      virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
+      virtual std::vector<double> ImagePartials();
+
       private:
-        double m_pixelPitchX;
-        double m_pixelPitchY;
         csm::RasterGM *m_model; //! CSM sensor model
         Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
   };
