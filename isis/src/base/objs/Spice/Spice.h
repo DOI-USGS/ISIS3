@@ -389,7 +389,7 @@ namespace Isis {
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-
+      virtual Target *setTarget(Pvl label);
 
     private:
       // Don't allow copies
@@ -397,6 +397,8 @@ namespace Isis {
       Spice &operator=(const Spice &other);
   
       void init(Pvl &pvl, bool noTables, nlohmann::json isd = NULL);
+      void csmInit(Cube &cube, Pvl label);
+      void defaultInit();
 
       void load(PvlKeyword &key, bool notab);
       void computeSolarLongitude(iTime et);
@@ -442,8 +444,6 @@ namespace Isis {
 
       bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned 
                             from ALE */
-      bool m_usingSpice; /**< Indicate whether to populate spice-releated member variables with
-                            values */
   };
 }
 

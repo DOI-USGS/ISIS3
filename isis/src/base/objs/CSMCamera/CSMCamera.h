@@ -7,6 +7,8 @@
 #include "Camera.h"
 #include "Target.h"
 
+#include <vector>
+
 #include <QList>
 #include <QPointF>
 
@@ -65,8 +67,6 @@ namespace Isis {
 
       virtual QList<QPointF> PixelIfovOffsets();
 
-      virtual Target *target() const;
-
       virtual bool SetImage(const double sample, const double line);
 
       virtual double LineResolution();
@@ -79,17 +79,23 @@ namespace Isis {
       virtual double parentLine();
       virtual double parentSample();
 
-      std::vector<double> sensorPositionBodyFixed();
-      std::vector<double> sensorPositionBodyFixed(double line, double sample);
-
       void subSpacecraftPoint(double &lat, double &lon);
       void subSpacecraftPoint(double &lat, double &lon, double line, double sample);
+
+    protected:
+      virtual Target *setTarget(Pvl label);
+
+      std::vector<double> sensorPositionBodyFixed();
+      std::vector<double> sensorPositionBodyFixed(double line, double sample);
 
     private:
       double m_pixelPitchX;
       double m_pixelPitchY;
       csm::RasterGM *m_model; //! CSM sensor model
-      Target *m_target; //! Target body (i.e. Mars, Earth) Overriding SPICE Target for CSM.
+
+      virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
+      virtual std::vector<double> ImagePartials();
+
   };
 };
 #endif
