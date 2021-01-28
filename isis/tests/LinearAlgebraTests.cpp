@@ -5,20 +5,20 @@
 
 using namespace Isis;
 
-TEST(LinearAlgebraTest, PsuedoinverseInvertible) {
+TEST(LinearAlgebraTest, pseudoinverseInvertible) {
   LinearAlgebra::Matrix mat(2,2);
   mat(0,0) = 1.0;
   mat(0,1) = 2.0;
   mat(1,0) = 3.0;
   mat(1,1) = 4.0;
 
-  LinearAlgebra::Matrix inverse = LinearAlgebra::psuedoinverse(mat);
+  LinearAlgebra::Matrix inverse = LinearAlgebra::pseudoinverse(mat);
 
   EXPECT_TRUE(LinearAlgebra::isIdentity(LinearAlgebra::multiply(inverse, mat)));
   EXPECT_TRUE(LinearAlgebra::isIdentity(LinearAlgebra::multiply(mat, inverse)));
 }
 
-TEST(LinearAlgebraTest, PsuedoinverseRightInverse) {
+TEST(LinearAlgebraTest, pseudoinverseRightInverse) {
   LinearAlgebra::Matrix mat(2,3);
   mat(0,0) = 1.0;
   mat(0,1) = 2.0;
@@ -27,12 +27,12 @@ TEST(LinearAlgebraTest, PsuedoinverseRightInverse) {
   mat(1,1) = 5.0;
   mat(1,2) = 6.0;
 
-  LinearAlgebra::Matrix inverse = LinearAlgebra::psuedoinverse(mat);
+  LinearAlgebra::Matrix inverse = LinearAlgebra::pseudoinverse(mat);
 
   EXPECT_TRUE(LinearAlgebra::isIdentity(LinearAlgebra::multiply(mat, inverse)));
 }
 
-TEST(LinearAlgebraTest, PsuedoinverseLeftInverse) {
+TEST(LinearAlgebraTest, pseudoinverseLeftInverse) {
   LinearAlgebra::Matrix mat(3,2);
   mat(0,0) = 1.0;
   mat(0,1) = 2.0;
@@ -41,12 +41,12 @@ TEST(LinearAlgebraTest, PsuedoinverseLeftInverse) {
   mat(2,0) = 5.0;
   mat(2,1) = 6.0;
 
-  LinearAlgebra::Matrix inverse = LinearAlgebra::psuedoinverse(mat);
+  LinearAlgebra::Matrix inverse = LinearAlgebra::pseudoinverse(mat);
 
   EXPECT_TRUE(LinearAlgebra::isIdentity(LinearAlgebra::multiply(inverse, mat)));
 }
 
-TEST(LinearAlgebraTest, PsuedoinverseSingular) {
+TEST(LinearAlgebraTest, pseudoinverseSingular) {
   LinearAlgebra::Matrix mat(3,2);
   mat(0,0) = 1.0;
   mat(0,1) = 2.0;
@@ -55,9 +55,9 @@ TEST(LinearAlgebraTest, PsuedoinverseSingular) {
   mat(2,0) = 4.0;
   mat(2,1) = 6.0;
 
-  LinearAlgebra::Matrix inverse = LinearAlgebra::psuedoinverse(mat);
+  LinearAlgebra::Matrix inverse = LinearAlgebra::pseudoinverse(mat);
 
-  // Checks based on properties of the psuedoinverse
+  // Checks based on properties of the pseudoinverse
   // M is the matrix
   // M^+ is the psuedo inverse of M
   // M^T is the transpose of M

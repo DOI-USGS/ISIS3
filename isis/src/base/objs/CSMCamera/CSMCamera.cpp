@@ -232,7 +232,7 @@ namespace Isis {
     groundMatrix(1,1) = groundPartials[4];
     groundMatrix(1,2) = groundPartials[5];
 
-    LinearAlgebra::Matrix imageMatrix = LinearAlgebra::psuedoinverse(groundMatrix);
+    LinearAlgebra::Matrix imageMatrix = LinearAlgebra::pseudoinverse(groundMatrix);
 
     vector<double> imagePartials = {imageMatrix(0,0),
                                     imageMatrix(0,1),

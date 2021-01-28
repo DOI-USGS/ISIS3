@@ -346,13 +346,13 @@ namespace Isis {
 
 
   /**
-   * Returns the psuedoinverse of a matrix.
+   * Returns the pseudoinverse of a matrix.
    *
-   * @param matrix The matrix to compute the psuedoinverse of.
+   * @param matrix The matrix to compute the pseudoinverse of.
    *
-   * @return @b LinearAlgebra::Matrix The psuedoinverse matrix.
+   * @return @b LinearAlgebra::Matrix The pseudoinverse matrix.
    */
-  LinearAlgebra::Matrix LinearAlgebra::psuedoinverse(const Matrix &matrix) {
+  LinearAlgebra::Matrix LinearAlgebra::pseudoinverse(const Matrix &matrix) {
     // Copy values into Armadillo matrix
     arma::mat arMat(matrix.size1(), matrix.size2());
     for (int i = 0; i < matrix.size1(); i++) {
