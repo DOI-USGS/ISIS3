@@ -320,7 +320,7 @@ namespace Isis {
       iTime cacheStartTime() const;
       iTime cacheEndTime() const;
 
-      void subSpacecraftPoint(double &lat, double &lon);
+      virtual void subSpacecraftPoint(double &lat, double &lon);
       void subSolarPoint(double &lat, double &lon);
 
       virtual Target *target() const;
