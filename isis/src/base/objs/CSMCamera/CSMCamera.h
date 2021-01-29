@@ -69,6 +69,11 @@ namespace Isis {
 
       virtual bool SetImage(const double sample, const double line);
 
+      virtual bool SetGround(Latitude latitude, Longitude longitude);
+      virtual bool SetGround(const SurfacePoint &surfacePt);
+      virtual bool SetUniversalGround(const double latitude, const double longitude);
+      virtual bool SetUniversalGround(const double latitude, const double longitude, double radius);
+
       virtual double LineResolution();
       virtual double SampleResolution();
       virtual double PixelResolution();
@@ -89,9 +94,10 @@ namespace Isis {
       std::vector<double> sensorPositionBodyFixed(double line, double sample);
 
     private:
-      double m_pixelPitchX;
-      double m_pixelPitchY;
       csm::RasterGM *m_model; //! CSM sensor model
+
+      void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel);
+      void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample);
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();

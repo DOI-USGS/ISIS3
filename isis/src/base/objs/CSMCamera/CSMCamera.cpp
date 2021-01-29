@@ -30,6 +30,8 @@
 #include "SpecialPixel.h"
 #include "StringBlob.h"
 
+#include "csm/Warning.h"
+#include "csm/Error.h"
 #include "csm/Plugin.h"
 #include "csm/Ellipsoid.h"
 #include "csm/SettableEllipsoid.h"
@@ -59,18 +61,41 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    return;
+    if (m_target) {
+      delete m_target;
+      m_target = nullptr;
+    }
+
+    m_target = setTarget(*cube.label());
+
+    std::cout << "Target status" << std::endl;
+    if (target()) {
+      std::cout << "Target name: " << target()->name() << std::endl;
+      std::vector<Distance> targetRad = target()->radii();
+      std::cout << "Target radii: " << targetRad[0].meters() << ", " << targetRad[1].meters() << ", " << targetRad[2].meters() << std::endl;
+      std::cout << "Shape status" << std::endl;
+      if (target()->shape()) {
+        std::cout << "Target name: " << target()->shape()->name() << std::endl;
+        std::cout << "Target is DEM?: " << target()->shape()->name() << std::endl;
+      }
+      else {
+        std::cout << "Shape Uninitialized" << std::endl;
+      }
+    }
+    else {
+      std::cout << "Target Uninitialized" << std::endl;
+    }
   }
 
 
   bool CSMCamera::SetImage(const double sample, const double line) {
 
-// move to protected? 
+// move to protected?
     p_childSample = sample;
     p_childLine = line;
 //    p_pointComputed = true;
 
-//    if (p_projection == NULL || p_ignoreProjection) {    
+//    if (p_projection == NULL || p_ignoreProjection) {
         double parentSample = p_alphaCube->AlphaSample(sample);
         double parentLine = p_alphaCube->AlphaLine(line);
 //        bool success = false;
@@ -88,8 +113,8 @@ namespace Isis {
         // check set of coordinate:
         double test[3];
         Coordinate(test);
-        std::cout << "TEST:  " << test[0] << ", "  << test[1] << ", " << test[2] << std::endl;
-        std::cout << "UniversalLatitude: " << UniversalLatitude() << std::endl;
+        // std::cout << "TEST:  " << test[0] << ", "  << test[1] << ", " << test[2] << std::endl;
+        // std::cout << "UniversalLatitude: " << UniversalLatitude() << std::endl;
 
             // get a lat, lon and store in variables
         // (1) how to get lat/lon
@@ -101,13 +126,124 @@ namespace Isis {
         // handle projected case
 //    }
 
-    std::cout << "Hello World!" << std::endl;
+    // std::cout << "Hello World!" << std::endl;
     // how to do this -- csm returns the _closest pixel_ to the intersection
     return true;
   }
 
-  // Dummy model resolution values for now.
-  // We should compute these
+
+  bool CSMCamera::SetUniversalGround(const double latitude, const double longitude) {
+    return SetGround(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees));
+  }
+
+
+  bool CSMCamera::SetUniversalGround(const double latitude, const double longitude, double radius) {
+    return SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees), Distance(radius, Distance::Meters)));
+  }
+
+
+  bool CSMCamera::SetGround(Latitude latitude, Longitude longitude) {
+    std::cout << "Lat lon set ground" << std::endl;
+    ShapeModel *shape = target()->shape();
+    Distance localRadius;
+
+    if (shape->name() != "Plane") { // this is the normal behavior
+      localRadius = LocalRadius(latitude, longitude);
+    }
+    else {
+      localRadius = Distance(latitude.degrees(),Distance::Kilometers);
+      latitude = Latitude(0.,Angle::Degrees);
+    }
+
+      if (!localRadius.isValid()) {
+      target()->shape()->clearSurfacePoint();
+      return false;
+    }
+
+    // std::cout << "Lat: " << latitude.degrees() << std::endl;
+    // std::cout << "Lon: " << longitude.degrees() << std::endl;
+    // std::cout << "Rad: " << localRadius.meters() << std::endl;
+
+    return SetGround(SurfacePoint(latitude, longitude, localRadius));
+  }
+
+
+  bool CSMCamera::SetGround(const SurfacePoint & surfacePt) {
+    std::cout << "surface point set ground" << std::endl;
+    std::cout << "Lat: " << surfacePt.GetLatitude().degrees() << std::endl;
+    std::cout << "Lon: " << surfacePt.GetLongitude().degrees() << std::endl;
+    std::cout << "Rad: " << surfacePt.GetLocalRadius().meters() << std::endl;
+    ShapeModel *shape = target()->shape();
+    if (!surfacePt.Valid()) {
+      shape->clearSurfacePoint();
+      return false;
+    }
+
+    bool validBackProject = true;
+
+    // Back project through the CSM model
+    csm::ImageCoord imagePt;
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
+    csm::EcefCoord groundPt(surfacePt.GetX().meters(), surfacePt.GetY().meters(), surfacePt.GetZ().meters());
+    std::cout << "Ground point: " << groundPt.x << ", " << groundPt.y << ", " << groundPt.z << std::endl;
+    try {
+      imagePt = m_model->groundToImage(groundPt, 0.01, &achievedPrecision, &warnings);
+    }
+    catch (csm::Error &e) {
+      std::cout << "Errored with error: " << e.getMessage() << std::endl;
+      validBackProject = false;
+    }
+    if (achievedPrecision > 0.01) {
+      std::cout << "Failed to achieve precision of 0.1. Precision: " << achievedPrecision << std::endl;
+      validBackProject = false;
+    }
+    if (!warnings.empty()) {
+      for (csm::Warning warning : warnings) {
+        if (warning.getWarning() == csm::Warning::IMAGE_COORD_OUT_OF_BOUNDS){
+          std::cout << "Failed to back project warning." << std::endl;
+          validBackProject = false;
+        }
+      }
+    }
+
+    // Check for occlusion
+    double line, sample;
+    csmToIsisPixel(imagePt, line, sample);
+    shape->clearSurfacePoint();
+    shape->intersectSurface(surfacePt,
+                            sensorPositionBodyFixed(line, sample),
+                            true);
+    if (!shape->hasIntersection()) {
+      std::cout << "Back projection occluded" << std::endl;
+      validBackProject = false;
+    }
+
+    // If the back projection was successful, then save it
+    if (validBackProject) {
+      std::cout << "Successfully back projects to : " << line << ", " << sample << std::endl;
+      p_childSample = p_alphaCube->BetaSample(sample);
+      p_childLine = p_alphaCube->BetaLine(line);
+      p_pointComputed = true;
+      shape->setHasIntersection(true);
+      return true;
+    }
+
+    // Otherwise reset
+    shape->clearSurfacePoint();
+    return false;
+  }
+
+  void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) {
+    csmPixel.line = line - 0.5;
+    csmPixel.samp = sample - 0.5;
+  }
+  void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) {
+    line = csmPixel.line + 0.5;
+    sample = csmPixel.samp + 0.5;
+  }
+
+
   double CSMCamera::LineResolution() {
     vector<double> imagePartials = ImagePartials();
     return sqrt(imagePartials[0]*imagePartials[0] +
@@ -154,7 +290,7 @@ namespace Isis {
   }
 
   double CSMCamera::parentSample() {
-    return p_alphaCube->AlphaSample(Sample());      
+    return p_alphaCube->AlphaSample(Sample());
   }
 
 
@@ -163,11 +299,12 @@ namespace Isis {
   std::vector<double> CSMCamera::sensorPositionBodyFixed(){
     return sensorPositionBodyFixed(parentLine(), parentSample());
   }
-  
+
 
   // stateless version
   std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample){
-    csm::ImageCoord imagePt(line, sample);
+    csm::ImageCoord imagePt;
+    isisToCsmPixel(line, sample, imagePt);
     csm::EcefCoord sensorPosition =  m_model->getSensorPosition(imagePt);
     std::vector<double> result {sensorPosition.x, sensorPosition.y, sensorPosition.z};
     return result;
@@ -186,7 +323,7 @@ namespace Isis {
   void CSMCamera::subSpacecraftPoint(double &lat, double &lon, double line, double sample) {
     // Get s/c position from CSM because it is vector from center of body to that
     vector<double> sensorPosition = sensorPositionBodyFixed(line, sample);
-    SurfacePoint surfacePoint(Displacement(sensorPosition[0], Displacement::Meters), Displacement(sensorPosition[1], Displacement::Meters), Displacement(sensorPosition[2], Displacement::Meters)); // Be careful -- what are the units actually? 
+    SurfacePoint surfacePoint(Displacement(sensorPosition[0], Displacement::Meters), Displacement(sensorPosition[1], Displacement::Meters), Displacement(sensorPosition[2], Displacement::Meters)); // Be careful -- what are the units actually?
     lat = surfacePoint.GetLatitude().degrees();
     lon = surfacePoint.GetLongitude().degrees();
   }
@@ -257,7 +394,7 @@ namespace Isis {
     groundMatrix(1,1) = groundPartials[4];
     groundMatrix(1,2) = groundPartials[5];
 
-    LinearAlgebra::Matrix imageMatrix = LinearAlgebra::psuedoinverse(groundMatrix);
+    LinearAlgebra::Matrix imageMatrix = LinearAlgebra::pseudoinverse(groundMatrix);
 
     vector<double> imagePartials = {imageMatrix(0,0),
                                     imageMatrix(0,1),
@@ -269,7 +406,7 @@ namespace Isis {
   }
 
   // CSMCamera(cube) -> Camera(cube) -> Sensor(cube) -> Spice(cube)
-  // Spice::init() creates a Target in such a way that requires spice data / tables, so 
+  // Spice::init() creates a Target in such a way that requires spice data / tables, so
   // this works around that.
   Target *CSMCamera::setTarget(Pvl label) {
     std::cout << "running set target" << std::endl;
@@ -277,7 +414,7 @@ namespace Isis {
     PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
     QString targetName = inst["TargetName"][0];
     target->setName(targetName);
-  
+
     // get radii from CSM
     csm::SettableEllipsoid *ellipsoidModel = dynamic_cast<csm::SettableEllipsoid*>(m_model);
     if (!ellipsoidModel) {
@@ -290,8 +427,8 @@ namespace Isis {
                                  Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
                                  Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
     target->setRadii(radii);
-    
-    // TODO: Set it to the appropriate shape model (might not be an ellipse) 
+
+    // TODO: Set it to the appropriate shape model (might not be an ellipse)
     target->setShapeEllipsoid();
     return target;
   }

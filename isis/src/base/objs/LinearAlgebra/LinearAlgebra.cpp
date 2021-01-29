@@ -36,6 +36,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
+// Armadillo
+#include <armadillo>
+
 // other Isis library
 #include "Angle.h"
 #include "Constants.h"
@@ -343,36 +346,32 @@ namespace Isis {
 
 
   /**
-   * Returns the psuedoinverse of a matrix. Throws an error if the given matrix
-   * is not left or right invertible.
+   * Returns the pseudoinverse of a matrix.
    *
-   * @param matrix The matrix to compute the psuedoinverse of.
+   * @param matrix The matrix to compute the pseudoinverse of.
    *
-   * @return @b LinearAlgebra::Matrix The psuedoinverse matrix.
-   *
-   * @throw IException::Programmer "Unable to invert the given matrix."
+   * @return @b LinearAlgebra::Matrix The pseudoinverse matrix.
    */
-  LinearAlgebra::Matrix LinearAlgebra::psuedoinverse(const Matrix &matrix) {
-    try {
-      // For square matrices, the psuedoinverse is just the inverse
-      if (matrix.size1() == matrix.size2()) {
-        return inverse(matrix);
-      }
-      // If there are more rows than columns compute a left inverse
-      // (M^T * M)^-1 * M^T
-      else if (matrix.size1() > matrix.size2()) {
-        return multiply(inverse(multiply(transpose(matrix), matrix)), transpose(matrix));
-      }
-      // Otherwise, more columns than rows, compute a right inverse
-      // M^T * (M * M^T)^-1
-      else {
-        return multiply(transpose(matrix), inverse(multiply(matrix, transpose(matrix))));
+  LinearAlgebra::Matrix LinearAlgebra::pseudoinverse(const Matrix &matrix) {
+    // Copy values into Armadillo matrix
+    arma::mat arMat(matrix.size1(), matrix.size2());
+    for (size_t i = 0; i < matrix.size1(); i++) {
+      for (size_t j = 0; j < matrix.size2(); j++) {
+        arMat(i, j) = matrix(i, j);
       }
     }
-    catch (IException &e) {
-      QString msg = "Unable to compute the psuedoinverse of the given matrix.";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+
+    arma::mat invArMat = arma::pinv(arMat);
+
+    // Copy values back to Boost matrix
+    LinearAlgebra::Matrix inverse(invArMat.n_rows, invArMat.n_cols);
+    for (size_t i = 0; i < invArMat.n_rows; i++) {
+      for (size_t j = 0; j < invArMat.n_cols; j++) {
+        inverse(i, j) = invArMat(i, j);
+      }
     }
+
+    return inverse;
   }
 
 

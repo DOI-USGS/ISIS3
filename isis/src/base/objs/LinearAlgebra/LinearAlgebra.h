@@ -163,7 +163,7 @@ namespace Isis {
       static Matrix identity(int size);
       static Matrix transpose(const Matrix &matrix);
       static Matrix inverse(const Matrix &matrix);
-      static Matrix psuedoinverse(const Matrix &matrix);
+      static Matrix pseudoinverse(const Matrix &matrix);
       static Matrix zeroMatrix(int rows, int columns);
       static Vector zeroVector(int size);
 
