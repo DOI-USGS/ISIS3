@@ -125,7 +125,7 @@ namespace Isis {
   void Spice::defaultInit() {
     m_solarLongitude = new Longitude;
 
-    m_et = NULL;
+    m_et = nullptr;
     m_kernels = new QVector<QString>;
 
     m_startTime = new iTime;
@@ -138,13 +138,21 @@ namespace Isis {
     m_endTimePadding = new SpiceDouble;
     *m_endTimePadding = 0;
 
-    m_instrumentPosition = NULL;
-    m_instrumentRotation = NULL;
+    m_instrumentPosition = nullptr;
+    m_instrumentRotation = nullptr;
 
-    m_sunPosition = NULL;
-    m_bodyRotation = NULL;
+    m_sunPosition = nullptr;
+    m_bodyRotation = nullptr;
 
     m_allowDownsizing = false;
+
+    m_spkCode = nullptr;
+    m_ckCode = nullptr;
+    m_ikCode = nullptr;
+    m_sclkCode = nullptr;
+    m_spkBodyCode = nullptr;
+    m_bodyFrameCode = nullptr;
+    m_target = nullptr;
   }
 
 

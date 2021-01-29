@@ -132,6 +132,16 @@ namespace Isis {
   }
 
 
+  bool CSMCamera::SetUniversalGround(const double latitude, const double longitude) {
+    return SetGround(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees));
+  }
+
+
+  bool CSMCamera::SetUniversalGround(const double latitude, const double longitude, double radius) {
+    return SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees), Distance(radius, Distance::Meters)));
+  }
+
+
   bool CSMCamera::SetGround(Latitude latitude, Longitude longitude) {
     std::cout << "Lat lon set ground" << std::endl;
     ShapeModel *shape = target()->shape();

@@ -71,6 +71,8 @@ namespace Isis {
 
       virtual bool SetGround(Latitude latitude, Longitude longitude);
       virtual bool SetGround(const SurfacePoint &surfacePt);
+      virtual bool SetUniversalGround(const double latitude, const double longitude);
+      virtual bool SetUniversalGround(const double latitude, const double longitude, double radius);
 
       virtual double LineResolution();
       virtual double SampleResolution();
