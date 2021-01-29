@@ -201,7 +201,7 @@ namespace Isis {
       kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL")), Pvl::Replace);
     }
     else {
-      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Ellipsoid"), Pvl::Replace);
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Null"), Pvl::Replace);
     }
 
     // Get rid of keywords from spiceinit
