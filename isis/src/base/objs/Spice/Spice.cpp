@@ -76,18 +76,20 @@ namespace Isis {
    */
 
   // TODO: DOCUMENT EVERYTHING
-  Spice::Spice(Cube &cube) {  //, bool csm=false
+  Spice::Spice(Cube &cube) {
+    Pvl &lab = *cube.label();
+    // TODO: update to check to see if it has a state string
     if (cube.hasGroup("CsmInfo")) {
-      m_usingSpice = false;
-      // set member variables to NULL
-      return;
+      csmInit(cube, lab);
     }
-    m_usingSpice = true;
-    Pvl &lab = *cube.label(); 
-    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-    bool hasTables = (kernels["TargetPosition"][0] == "Table"); 
-    init(lab, !hasTables); 
+    else {
+      PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
+      bool hasTables = (kernels["TargetPosition"][0] == "Table");
+      // BONUS TODO: update to pull out separate init methods
+      init(lab, !hasTables); 
+    }
   }
+
 
   /**
    * Constructs a Spice object.
@@ -111,6 +113,40 @@ namespace Isis {
     init(lab, true, isd);
   }
 
+
+  // TODO: docs
+  void Spice::csmInit(Cube &cube, Pvl label) {
+    defaultInit();
+    m_target = setTarget(label);
+  }
+
+
+  void Spice::defaultInit() {
+    m_solarLongitude = new Longitude;
+    
+    m_et = NULL;
+    m_kernels = new QVector<QString>;
+    
+    m_startTime = new iTime;
+    m_endTime = new iTime;
+    m_cacheSize = new SpiceDouble;
+    *m_cacheSize = 0;
+    
+    m_startTimePadding = new SpiceDouble;
+    *m_startTimePadding = 0;
+    m_endTimePadding = new SpiceDouble;
+    *m_endTimePadding = 0;
+    
+    m_instrumentPosition = NULL;
+    m_instrumentRotation = NULL;
+    
+    m_sunPosition = NULL;
+    m_bodyRotation = NULL;
+    
+    m_allowDownsizing = false;
+  }
+
+
   /**
    * Initialization of Spice object.
    *
@@ -127,27 +163,7 @@ namespace Isis {
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
-    m_solarLongitude = new Longitude;
-
-    m_et = NULL;
-    m_kernels = new QVector<QString>;
-
-    m_startTime = new iTime;
-    m_endTime = new iTime;
-    m_cacheSize = new SpiceDouble;
-    *m_cacheSize = 0;
-
-    m_startTimePadding = new SpiceDouble;
-    *m_startTimePadding = 0;
-    m_endTimePadding = new SpiceDouble;
-    *m_endTimePadding = 0;
-
-    m_instrumentPosition = NULL;
-    m_instrumentRotation = NULL;
-    m_sunPosition = NULL;
-    m_bodyRotation = NULL;
-
-    m_allowDownsizing = false;
+    defaultInit();
 
     m_spkCode = new SpiceInt;
     m_ckCode = new SpiceInt;
@@ -181,6 +197,7 @@ namespace Isis {
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
     m_usingAle = false;
 
+
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
@@ -197,16 +214,16 @@ namespace Isis {
           // try using ALE
           std::ostringstream kernel_pvl;
           kernel_pvl << kernels;
-
+          
           json props;
           props["kernels"] = kernel_pvl.str();
-
+          
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
-
+        
         // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
@@ -215,8 +232,7 @@ namespace Isis {
         m_usingAle = true;
       }
       catch(...) {
-
-        // Backup to stadnard ISIS implementation
+        // Backup to standard ISIS implementation
         if (noTables) {
           load(kernels["TargetPosition"], noTables);
           load(kernels["InstrumentPosition"], noTables);
@@ -253,7 +269,7 @@ namespace Isis {
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code below has been refactored
-      m_target = new Target(this, lab);
+      m_target = setTarget(lab);
 
       // This should not be here. Consider having spiceinit add the necessary rings kernels to the
       // Extra parameter if the user has set the shape model to RingPlane.
@@ -272,10 +288,9 @@ namespace Isis {
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
-      m_target = new Target(this, lab);
 
+      m_target = setTarget(lab);
     }
-
 
     // Get NAIF ik, spk, sclk, and ck codes
     //
@@ -314,8 +329,9 @@ namespace Isis {
       // m_target doesn't have the getDouble method so Spice gets the radii for it
       m_target->setRadii(radii);
     }
+    
     *m_spkBodyCode = m_target->naifBodyCode();
-
+    
     // Override them if they exist in the labels
     if (kernels.hasKeyword("NaifSpkCode")) {
       *m_spkCode = (int) kernels["NaifSpkCode"];
@@ -468,6 +484,12 @@ namespace Isis {
   }
 
 
+  // New function to set m_target
+  Target *Spice::setTarget(Pvl label) {
+    return new Target(this, label);
+  }
+
+
   /**
    * Loads/furnishes NAIF kernel(s)
    *
@@ -502,113 +524,110 @@ namespace Isis {
    * Destroys the Spice object
    */
   Spice::~Spice() {
-    if (m_usingSpice) {
-      NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors(); 
 
-      if (m_solarLongitude != NULL) {
-        delete m_solarLongitude;
-        m_solarLongitude = NULL;
-      }
-
-      if (m_et != NULL) {
-        delete m_et;
-        m_et = NULL;
-      }
-
-      if (m_startTime != NULL) {
-        delete m_startTime;
-        m_startTime = NULL;
-      }
-
-      if (m_endTime != NULL) {
-        delete m_endTime;
-        m_endTime = NULL;
-      }
-
-      if (m_cacheSize != NULL) {
-        delete m_cacheSize;
-        m_cacheSize = NULL;
-      }
-
-      if (m_startTimePadding != NULL) {
-        delete m_startTimePadding;
-        m_startTimePadding = NULL;
-      }
-
-      if (m_endTimePadding != NULL) {
-        delete m_endTimePadding;
-        m_endTimePadding = NULL;
-      }
-
-      if (m_instrumentPosition != NULL) {
-        delete m_instrumentPosition;
-        m_instrumentPosition = NULL;
-      }
-
-      if (m_instrumentRotation != NULL) {
-        delete m_instrumentRotation;
-        m_instrumentRotation = NULL;
-      }
-
-      if (m_sunPosition != NULL) {
-        delete m_sunPosition;
-        m_sunPosition = NULL;
-      }
-
-      if (m_bodyRotation != NULL) {
-        delete m_bodyRotation;
-        m_bodyRotation = NULL;
-      }
-
-      if (m_spkCode != NULL) {
-        delete m_spkCode;
-        m_spkCode = NULL;
-      }
-
-      if (m_ckCode != NULL) {
-        delete m_ckCode;
-        m_ckCode = NULL;
-      }
-
-      if (m_ikCode != NULL) {
-        delete m_ikCode;
-        m_ikCode = NULL;
-      }
-
-      if (m_sclkCode != NULL) {
-        delete m_sclkCode;
-        m_sclkCode = NULL;
-      }
-
-      if (m_spkBodyCode != NULL) {
-        delete m_spkBodyCode;
-        m_spkBodyCode = NULL;
-      }
-
-      if (m_bodyFrameCode != NULL) {
-        delete m_bodyFrameCode;
-        m_bodyFrameCode = NULL;
-      }
-
-      if (m_target != NULL) {
-        delete m_target;
-        m_target = NULL;
-      }
-
-      // Unload the kernels (TODO: Can this be done faster)
-      for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
-        FileName file(m_kernels->at(i));
-        QString fileName = file.expanded();
-        unload_c(fileName.toLatin1().data());
-      }
-
-      if (m_kernels != NULL) {
-        delete m_kernels;
-        m_kernels = NULL;
-      }
-
-      NaifStatus::CheckErrors();
+    if (m_solarLongitude != NULL) {
+      delete m_solarLongitude;
+      m_solarLongitude = NULL;
     }
+
+    if (m_et != NULL) {
+      delete m_et;
+      m_et = NULL;
+    }
+
+    if (m_startTime != NULL) {
+      delete m_startTime;
+      m_startTime = NULL;
+    }
+
+    if (m_endTime != NULL) {
+      delete m_endTime;
+      m_endTime = NULL;
+    }
+
+    if (m_cacheSize != NULL) {
+      delete m_cacheSize;
+      m_cacheSize = NULL;
+    }
+
+    if (m_startTimePadding != NULL) {
+      delete m_startTimePadding;
+      m_startTimePadding = NULL;
+    }
+
+    if (m_endTimePadding != NULL) {
+      delete m_endTimePadding;
+      m_endTimePadding = NULL;
+    }
+
+    if (m_instrumentPosition != NULL) {
+      delete m_instrumentPosition;
+      m_instrumentPosition = NULL;
+    }
+
+    if (m_instrumentRotation != NULL) {
+      delete m_instrumentRotation;
+      m_instrumentRotation = NULL;
+    }
+
+    if (m_sunPosition != NULL) {
+      delete m_sunPosition;
+      m_sunPosition = NULL;
+    }
+
+    if (m_bodyRotation != NULL) {
+      delete m_bodyRotation;
+      m_bodyRotation = NULL;
+    }
+
+    if (m_spkCode != NULL) {
+      delete m_spkCode;
+      m_spkCode = NULL;
+    }
+
+    if (m_ckCode != NULL) {
+      delete m_ckCode;
+      m_ckCode = NULL;
+    }
+
+    if (m_ikCode != NULL) {
+      delete m_ikCode;
+      m_ikCode = NULL;
+    }
+
+    if (m_sclkCode != NULL) {
+      delete m_sclkCode;
+      m_sclkCode = NULL;
+    }
+
+    if (m_spkBodyCode != NULL) {
+      delete m_spkBodyCode;
+      m_spkBodyCode = NULL;
+    }
+
+    if (m_bodyFrameCode != NULL) {
+      delete m_bodyFrameCode;
+      m_bodyFrameCode = NULL;
+    }
+
+    if (m_target != NULL) {
+      delete m_target;
+      m_target = NULL;
+    }
+
+    // Unload the kernels (TODO: Can this be done faster)
+    for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
+      FileName file(m_kernels->at(i));
+      QString fileName = file.expanded();
+      unload_c(fileName.toLatin1().data());
+    }
+
+    if (m_kernels != NULL) {
+      delete m_kernels;
+      m_kernels = NULL;
+    }
+    NaifStatus::CheckErrors();
   }
 
   /**

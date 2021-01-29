@@ -23,6 +23,8 @@
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
@@ -57,45 +59,24 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    m_target = new Target();
-
-    Pvl *label = cube.label();
-    PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
-    QString targetName = inst["TargetName"][0];
-    m_target->setName(targetName);
-
-    // get radii from CSM
-    csm::SettableEllipsoid *ellipsoidModel = dynamic_cast<csm::SettableEllipsoid*>(m_model);
-    if (!ellipsoidModel) {
-      // TODO is there a fallback we can do here?
-      QString msg = "Failed to get ellipsoid from CSM Model.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    csm::Ellipsoid targetEllipsoid = ellipsoidModel->getEllipsoid();
-    std::vector<Distance> radii {Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
-                                 Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
-                                 Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
-    m_target->setRadii(radii);
-
-    // set shape
-    m_target->setShapeEllipsoid();
     return;
   }
 
 
   bool CSMCamera::SetImage(const double sample, const double line) {
-// move to protected?
-//    p_childSample = sample;
-//    p_childLine = line;
+
+// move to protected? 
+    p_childSample = sample;
+    p_childLine = line;
 //    p_pointComputed = true;
 
-//    if (p_projection == NULL || p_ignoreProjection) {
-//        double parentSample = p_alphaCube->AlphaSample(sample);
-//        double parentLine = p_alphaCube->AlphaLine(line);
+//    if (p_projection == NULL || p_ignoreProjection) {    
+        double parentSample = p_alphaCube->AlphaSample(sample);
+        double parentLine = p_alphaCube->AlphaLine(line);
 //        bool success = false;
 
         double height = 10.0;
-        csm::ImageCoord imagePt(line, sample);
+        csm::ImageCoord imagePt(parentLine, parentSample);
 
         // do image to ground with csm
         csm::EcefCoord result = m_model->imageToGround(imagePt, height);
@@ -167,10 +148,54 @@ namespace Isis {
     return PixelResolution();
   }
 
-  // Return the target
-  Target *CSMCamera::target() const {
-    return m_target;
+
+  double CSMCamera::parentLine() {
+    return p_alphaCube->AlphaLine(Line());
   }
+
+  double CSMCamera::parentSample() {
+    return p_alphaCube->AlphaSample(Sample());      
+  }
+
+
+  // Broke sensorPosition call out to separate function in preparation for in the future separating the corresponding
+  // call out of Spice::subSpacecraft to decrease repeated code and just override this function.
+  std::vector<double> CSMCamera::sensorPositionBodyFixed(){
+    return sensorPositionBodyFixed(parentLine(), parentSample());
+  }
+  
+
+  // stateless version
+  std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample){
+    csm::ImageCoord imagePt(line, sample);
+    csm::EcefCoord sensorPosition =  m_model->getSensorPosition(imagePt);
+    std::vector<double> result {sensorPosition.x, sensorPosition.y, sensorPosition.z};
+    return result;
+  }
+
+
+  // Override the subSpacecraftPoint function in Spice because it requires m_bodyRotation and m_instrumentPosition to
+  // exist, and does a rotation from J2000 to body-fixed. Since CSM already operates in body-fixed coordinates
+  // such a rotation is not necessary.
+  void CSMCamera::subSpacecraftPoint(double &lat, double &lon) {
+    subSpacecraftPoint(lat, lon, parentLine(), parentSample());
+  }
+
+
+  // stateless version
+  void CSMCamera::subSpacecraftPoint(double &lat, double &lon, double line, double sample) {
+    // Get s/c position from CSM because it is vector from center of body to that
+    vector<double> sensorPosition = sensorPositionBodyFixed(line, sample);
+    SurfacePoint surfacePoint(Displacement(sensorPosition[0], Displacement::Meters), Displacement(sensorPosition[1], Displacement::Meters), Displacement(sensorPosition[2], Displacement::Meters)); // Be careful -- what are the units actually? 
+    lat = surfacePoint.GetLatitude().degrees();
+    lon = surfacePoint.GetLongitude().degrees();
+  }
+
+
+  // Need to override because Camera::SetGround(SurfacePoint) calls the GroundMap which we don't have
+  //bool CSMCamera::SetGround(){
+//    return false;
+//  }
 
 
   /**
@@ -242,8 +267,35 @@ namespace Isis {
                                     imageMatrix(2,1)};
     return imagePartials;
   }
-}
 
+  // CSMCamera(cube) -> Camera(cube) -> Sensor(cube) -> Spice(cube)
+  // Spice::init() creates a Target in such a way that requires spice data / tables, so 
+  // this works around that.
+  Target *CSMCamera::setTarget(Pvl label) {
+    std::cout << "running set target" << std::endl;
+    Target *target = new Target();
+    PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
+    QString targetName = inst["TargetName"][0];
+    target->setName(targetName);
+  
+    // get radii from CSM
+    csm::SettableEllipsoid *ellipsoidModel = dynamic_cast<csm::SettableEllipsoid*>(m_model);
+    if (!ellipsoidModel) {
+      // TODO is there a fallback we can do here?
+      QString msg = "Failed to get ellipsoid from CSM Model.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    csm::Ellipsoid targetEllipsoid = ellipsoidModel->getEllipsoid();
+    std::vector<Distance> radii {Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
+                                 Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
+                                 Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
+    target->setRadii(radii);
+    
+    // TODO: Set it to the appropriate shape model (might not be an ellipse) 
+    target->setShapeEllipsoid();
+    return target;
+  }
+}
 
 // Plugin
 /**

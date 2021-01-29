@@ -510,6 +510,9 @@ namespace Isis {
       QString m_spacecraftNameLong;  //!< Full spacecraft name
       QString m_spacecraftNameShort; //!< Shortened spacecraft name
 
+      double p_childSample;                  //!< Sample value for child
+      double p_childLine;                    //!< Line value for child
+      AlphaCube *p_alphaCube;                //!< A pointer to the AlphaCube
 
     private:
       void GroundRangeResolution();
@@ -567,9 +570,7 @@ namespace Isis {
       /** Flag showing if ring range was computed successfully.*/
       bool p_ringRangeComputed;
 
-      AlphaCube *p_alphaCube;                //!< A pointer to the AlphaCube
-      double p_childSample;                  //!< Sample value for child
-      double p_childLine;                    //!< Line value for child
+
       int p_childBand;                       //!< Band value for child
       CameraDistortionMap *p_distortionMap;  //!< A pointer to the DistortionMap
       CameraFocalPlaneMap *p_focalPlaneMap;  //!< A pointer to the FocalPlaneMap
