@@ -86,7 +86,7 @@ namespace Isis {
       PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
       bool hasTables = (kernels["TargetPosition"][0] == "Table");
       // BONUS TODO: update to pull out separate init methods
-      init(lab, !hasTables); 
+      init(lab, !hasTables);
     }
   }
 
@@ -99,7 +99,7 @@ namespace Isis {
    */
 // NO LONGER USED
 //  Spice::Spice(Cube &cube, bool noTables) {
-//    init(*cube.label(), noTables); 
+//    init(*cube.label(), noTables);
 //  }
 //
 
@@ -118,31 +118,32 @@ namespace Isis {
   void Spice::csmInit(Cube &cube, Pvl label) {
     defaultInit();
     m_target = setTarget(label);
+    NaifStatus::CheckErrors();
   }
 
 
   void Spice::defaultInit() {
     m_solarLongitude = new Longitude;
-    
+
     m_et = NULL;
     m_kernels = new QVector<QString>;
-    
+
     m_startTime = new iTime;
     m_endTime = new iTime;
     m_cacheSize = new SpiceDouble;
     *m_cacheSize = 0;
-    
+
     m_startTimePadding = new SpiceDouble;
     *m_startTimePadding = 0;
     m_endTimePadding = new SpiceDouble;
     *m_endTimePadding = 0;
-    
+
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
-    
+
     m_sunPosition = NULL;
     m_bodyRotation = NULL;
-    
+
     m_allowDownsizing = false;
   }
 
@@ -214,16 +215,16 @@ namespace Isis {
           // try using ALE
           std::ostringstream kernel_pvl;
           kernel_pvl << kernels;
-          
+
           json props;
           props["kernels"] = kernel_pvl.str();
-          
+
           isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
-        
+
         // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
@@ -329,9 +330,9 @@ namespace Isis {
       // m_target doesn't have the getDouble method so Spice gets the radii for it
       m_target->setRadii(radii);
     }
-    
+
     *m_spkBodyCode = m_target->naifBodyCode();
-    
+
     // Override them if they exist in the labels
     if (kernels.hasKeyword("NaifSpkCode")) {
       *m_spkCode = (int) kernels["NaifSpkCode"];
@@ -524,7 +525,7 @@ namespace Isis {
    * Destroys the Spice object
    */
   Spice::~Spice() {
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
 
     if (m_solarLongitude != NULL) {
       delete m_solarLongitude;

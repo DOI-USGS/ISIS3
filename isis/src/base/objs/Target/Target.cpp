@@ -97,6 +97,7 @@ namespace Isis {
       SpiceChar naifBuf[40];
       SpiceBoolean found;
       bodc2n_c((SpiceInt) *m_systemCode, sizeof(naifBuf), naifBuf, &found);
+      NaifStatus::CheckErrors();
       string s(naifBuf);
       (*m_systemName).append(s.c_str());
 
@@ -202,23 +203,23 @@ namespace Isis {
           return code;
         }
         // getInteger automatically calls Spice::readValue which looks in the NaifKeywords
-        else if (lab.hasObject("NaifKeywords") 
+        else if (lab.hasObject("NaifKeywords")
                  && lab.findObject("NaifKeywords").hasKeyword("BODY_CODE") ) {
           code = int(lab.findObject("NaifKeywords").findKeyword("BODY_CODE"));
           return code;
         }
         else {
-          throw IException(e, 
-                           IException::Unknown, 
-                           "BODY_CODE not found for this Target.", 
+          throw IException(e,
+                           IException::Unknown,
+                           "BODY_CODE not found for this Target.",
                            _FILEINFO_);
         }
       }
       catch (IException &e2) {
         e.append(e2);
-        throw IException(e, 
-                         IException::Unknown, 
-                         "Unable to look up NAIF body code for this Target.", 
+        throw IException(e,
+                         IException::Unknown,
+                         "Unable to look up NAIF body code for this Target.",
                            _FILEINFO_);
       }
     }
@@ -249,18 +250,18 @@ namespace Isis {
 
 
   /**
-   * This method returns a Mapping group containing  TargetName, 
-   * EquatorialRadius, and PolarRadius in addition to all of the keywords 
+   * This method returns a Mapping group containing  TargetName,
+   * EquatorialRadius, and PolarRadius in addition to all of the keywords
    * that are in the given mapGroup.
    *
    * @param cubeLab Pvl labels for the image.
-   * @param mapGroup A const reference to a PvlGroup that contains 
+   * @param mapGroup A const reference to a PvlGroup that contains
    *                 mapping parameters for the projection.
    *
-   * @return PvlGroup The Mapping Group for the projection including the 
+   * @return PvlGroup The Mapping Group for the projection including the
    *                 keywords TargetName, EquatorialRadius, and
    *                 PolarRadius.
-   *  
+   *
    */
   PvlGroup Target::radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup) {
     PvlGroup mapping = mapGroup;
@@ -268,11 +269,11 @@ namespace Isis {
     // Check to see if the mapGroup already has the target radii.
     // If BOTH radii are already in the mapGroup then just return the given
     // mapping group as is.
-    if (mapping.hasKeyword("EquatorialRadius") 
+    if (mapping.hasKeyword("EquatorialRadius")
         && mapping.hasKeyword("PolarRadius")) {
       return mapping;
     }
- 
+
     // If radii values are not in the given mapping group, we will get the target from the mapping
     // group or cube label and attempt to use NAIF routines to find the radii.
     QString target = "";
@@ -295,7 +296,7 @@ namespace Isis {
 
       // target name still not found, throw error
       if (target.isEmpty()) {
-        throw IException(IException::Unknown, 
+        throw IException(IException::Unknown,
                          "Unable to find a TargetName keyword in the given PVL.",
                          _FILEINFO_);
       }
@@ -305,7 +306,7 @@ namespace Isis {
       // radii in the NaifKeywords object of the labels
       PvlGroup radii = Target::radiiGroup(target);
 
-      // Successfully found radii using target name. 
+      // Successfully found radii using target name.
       // Copy the EquatorialRadius and PolorRadius and we are done.
       mapping.addKeyword( radii.findKeyword("EquatorialRadius"), PvlContainer::Replace );
       mapping.addKeyword( radii.findKeyword("PolarRadius"),      PvlContainer::Replace );
@@ -314,17 +315,17 @@ namespace Isis {
     catch (IException &e) {
       // If all previous attempts fail, look for the radii using the body frame
       // code in the NaifKeywords object.
-      // Note: We will only look in the given label for the values after SPICELIB 
+      // Note: We will only look in the given label for the values after SPICELIB
       // routines have failed, to preserve backwards compatibility (since this
       // label check is new).
       if (cubeLab.hasObject("NaifKeywords")) {
 
         PvlObject naifKeywords = cubeLab.findObject("NaifKeywords");
-        
+
         // Try using the target bodycode_RADII keyword in the NaifKeywords PVL object
-        
+
         try {
-          
+
           SpiceInt bodyCode = 0;
           try {
             // Try using the target bodycode_RADII keyword in the NaifKeywords PVL object
@@ -360,7 +361,7 @@ namespace Isis {
                                              "meters"),
                                   PvlContainer::Replace);
               mapping.addKeyword( PvlKeyword("PolarRadius",
-                                             toString(toDouble(radii[2]) * 1000.0), 
+                                             toString(toDouble(radii[2]) * 1000.0),
                                              "meters"),
                                   PvlContainer::Replace);
               return mapping;
@@ -378,16 +379,16 @@ namespace Isis {
 
 
   /**
-   * Creates a Pvl Group with keywords TargetName, EquitorialRadius, and 
-   * PolarRadius. The values for the radii will be retrieved from the most 
-   * recent Target Attitude and Shape Naif kernel available in the Isis data 
-   * area. 
+   * Creates a Pvl Group with keywords TargetName, EquitorialRadius, and
+   * PolarRadius. The values for the radii will be retrieved from the most
+   * recent Target Attitude and Shape Naif kernel available in the Isis data
+   * area.
    *
    * @param target The name of the body for which the radii will be retrieved.
    *
    * @throw IException::Io - "Could not convert target name to NAIF code."
-   *  
-   * @return PvlGroup Group named "Mapping" with keywords TargetName, 
+   *
+   * @return PvlGroup Group named "Mapping" with keywords TargetName,
    *             EquatorialRadius, and PolarRadius.
    */
   PvlGroup Target::radiiGroup(QString target) {
@@ -411,7 +412,7 @@ namespace Isis {
         bodyCode = lookupNaifBodyCode(target);
       }
       catch (IException &e) {
-        QString msg = "Unable to find target radii for given target [" 
+        QString msg = "Unable to find target radii for given target ["
                       + target + "].";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -428,15 +429,15 @@ namespace Isis {
 
 
   /**
-   * Convenience method called by the public radii() methods to 
-   * compute the target radii using a body code recognized by NAIF. 
-   *  
-   * The PVL group contains only the EquatorialRadius and PolarRadius 
-   * keywords. This group does not contain the Target keyword. 
-   *  
-   * @param bodyFrameCode A recognized NAIF code that represents the target body. 
-   *  
-   * @return PvlGroup containing EquatorialRadius and PolarRadius keywords. 
+   * Convenience method called by the public radii() methods to
+   * compute the target radii using a body code recognized by NAIF.
+   *
+   * The PVL group contains only the EquatorialRadius and PolarRadius
+   * keywords. This group does not contain the Target keyword.
+   *
+   * @param bodyFrameCode A recognized NAIF code that represents the target body.
+   *
+   * @return PvlGroup containing EquatorialRadius and PolarRadius keywords.
    */
   PvlGroup Target::radiiGroup(int bodyCode) {
 
@@ -453,19 +454,19 @@ namespace Isis {
       furnsh_c(kernName.toLatin1().data());
       pckLoaded = true;
     }
-    
+
     // Get the radii from NAIF
     SpiceInt n;
     SpiceDouble radii[3];
     bodvar_c(bodyCode, "RADII", &n, radii);
-    
+
     try {
       NaifStatus::CheckErrors();
     }
     catch (IException &e) {
       QString msg = "Unable to find radii for target code [" + toString(bodyCode)
                     + "]. Target code was not found in furnished kernels.";
-    
+
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -604,7 +605,7 @@ namespace Isis {
    */
   void Target::setRadii(std::vector<Distance> radii) {
     if (m_radii.size() == 0) {
-      m_radii.resize(3, Distance()); 
+      m_radii.resize(3, Distance());
     }
     m_radii[0] = radii[0];
     m_radii[1] = radii[1];
@@ -617,12 +618,12 @@ namespace Isis {
     if (m_name == NULL) {
       m_name = new QString;
     }
-    *m_name = name; 
+    *m_name = name;
   }
 
 
   /**
-   * Return the shape 
+   * Return the shape
    */
   ShapeModel *Target::shape() const {
     return m_shape;
@@ -630,7 +631,7 @@ namespace Isis {
 
 
   /**
-   * Return the spice object  
+   * Return the spice object
    */
   Spice *Target::spice() const {
     return m_spice;
