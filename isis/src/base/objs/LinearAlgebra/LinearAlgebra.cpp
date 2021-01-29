@@ -355,8 +355,8 @@ namespace Isis {
   LinearAlgebra::Matrix LinearAlgebra::pseudoinverse(const Matrix &matrix) {
     // Copy values into Armadillo matrix
     arma::mat arMat(matrix.size1(), matrix.size2());
-    for (int i = 0; i < matrix.size1(); i++) {
-      for (int j = 0; j < matrix.size2(); j++) {
+    for (size_t i = 0; i < matrix.size1(); i++) {
+      for (size_t j = 0; j < matrix.size2(); j++) {
         arMat(i, j) = matrix(i, j);
       }
     }
@@ -365,8 +365,8 @@ namespace Isis {
 
     // Copy values back to Boost matrix
     LinearAlgebra::Matrix inverse(invArMat.n_rows, invArMat.n_cols);
-    for (int i = 0; i < invArMat.n_rows; i++) {
-      for (int j = 0; j < invArMat.n_cols; j++) {
+    for (size_t i = 0; i < invArMat.n_rows; i++) {
+      for (size_t j = 0; j < invArMat.n_cols; j++) {
         inverse(i, j) = invArMat(i, j);
       }
     }
