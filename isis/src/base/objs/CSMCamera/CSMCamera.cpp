@@ -88,44 +88,50 @@ namespace Isis {
   }
 
 
+  // TODO make this an iterative technique that updates the locus each iteration
   bool CSMCamera::SetImage(const double sample, const double line) {
+    csm::ImageCoord imagePt;
+    isisToCsmPixel(p_alphaCube->AlphaLine(line), p_alphaCube->AlphaSample(sample), imagePt);
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
 
-// move to protected?
+    csm::EcefLocus imageLocus;
+    try {
+      imageLocus = m_model->imageToRemoteImagingLocus(imagePt,
+                                                      0.001,
+                                                      &achievedPrecision,
+                                                      &warnings);
+    }
+    catch (csm::Error &e) {
+      return false;
+    }
+
+    // Check for issues on the CSM end
+    if (achievedPrecision > 0.001) {
+      return false;
+    }
+    if (!warnings.empty()) {
+      for (csm::Warning warning : warnings) {
+        if (warning.getWarning() == csm::Warning::IMAGE_COORD_OUT_OF_BOUNDS){
+          return false;
+        }
+      }
+    }
+
+    // ISIS sensors work in Kilometers, CSM works in meters
+    std::vector<double> obsPosition = {imageLocus.point.x / 1000.0,
+                                       imageLocus.point.y / 1000.0,
+                                       imageLocus.point.z / 1000.0};
+    std::vector<double> locusVec = {imageLocus.direction.x,
+                                    imageLocus.direction.y,
+                                    imageLocus.direction.z};
+    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
+      return false;
+    }
+
+    // If we are here then everything went well so save the pixel and return true
     p_childSample = sample;
     p_childLine = line;
-//    p_pointComputed = true;
-
-//    if (p_projection == NULL || p_ignoreProjection) {
-        double parentSample = p_alphaCube->AlphaSample(sample);
-        double parentLine = p_alphaCube->AlphaLine(line);
-//        bool success = false;
-
-        double height = 10.0;
-        csm::ImageCoord imagePt(parentLine, parentSample);
-
-        // do image to ground with csm
-        csm::EcefCoord result = m_model->imageToGround(imagePt, height);
-
-        target()->shape()->setSurfacePoint(csmToIsisGround(result));
-
-        // check set of coordinate:
-        double test[3];
-        Coordinate(test);
-        // std::cout << "TEST:  " << test[0] << ", "  << test[1] << ", " << test[2] << std::endl;
-        // std::cout << "UniversalLatitude: " << UniversalLatitude() << std::endl;
-
-            // get a lat, lon and store in variables
-        // (1) how to get lat/lon
-        // (2) which variables to store in
-
-        // fill in whatever stuff ISIS needs from this
-//    }
-//    else {
-        // handle projected case
-//    }
-
-    // std::cout << "Hello World!" << std::endl;
-    // how to do this -- csm returns the _closest pixel_ to the intersection
     return true;
   }
 
