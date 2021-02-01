@@ -98,6 +98,8 @@ namespace Isis {
 
       void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel);
       void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample);
+      csm::EcefCoord isisToCsmGround(const SurfacePoint &groundPt);
+      SurfacePoint csmToIsisGround(const csm::EcefCoord &groundPt);
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();

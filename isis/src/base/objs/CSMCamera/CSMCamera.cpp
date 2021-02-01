@@ -88,46 +88,50 @@ namespace Isis {
   }
 
 
+  // TODO make this an iterative technique that updates the locus each iteration
   bool CSMCamera::SetImage(const double sample, const double line) {
+    csm::ImageCoord imagePt;
+    isisToCsmPixel(p_alphaCube->AlphaLine(line), p_alphaCube->AlphaSample(sample), imagePt);
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
 
-// move to protected?
+    csm::EcefLocus imageLocus;
+    try {
+      imageLocus = m_model->imageToRemoteImagingLocus(imagePt,
+                                                      0.001,
+                                                      &achievedPrecision,
+                                                      &warnings);
+    }
+    catch (csm::Error &e) {
+      return false;
+    }
+
+    // Check for issues on the CSM end
+    if (achievedPrecision > 0.001) {
+      return false;
+    }
+    if (!warnings.empty()) {
+      for (csm::Warning warning : warnings) {
+        if (warning.getWarning() == csm::Warning::IMAGE_COORD_OUT_OF_BOUNDS){
+          return false;
+        }
+      }
+    }
+
+    // ISIS sensors work in Kilometers, CSM works in meters
+    std::vector<double> obsPosition = {imageLocus.point.x / 1000.0,
+                                       imageLocus.point.y / 1000.0,
+                                       imageLocus.point.z / 1000.0};
+    std::vector<double> locusVec = {imageLocus.direction.x,
+                                    imageLocus.direction.y,
+                                    imageLocus.direction.z};
+    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
+      return false;
+    }
+
+    // If we are here then everything went well so save the pixel and return true
     p_childSample = sample;
     p_childLine = line;
-//    p_pointComputed = true;
-
-//    if (p_projection == NULL || p_ignoreProjection) {
-        double parentSample = p_alphaCube->AlphaSample(sample);
-        double parentLine = p_alphaCube->AlphaLine(line);
-//        bool success = false;
-
-        double height = 10.0;
-        csm::ImageCoord imagePt(parentLine, parentSample);
-
-        // do image to ground with csm
-        csm::EcefCoord result = m_model->imageToGround(imagePt, height);
-
-        // Set X, Y, Z in surface point
-        double naifValues[3] = {result.x, result.y, result.z};
-        target()->shape()->surfaceIntersection()->FromNaifArray(naifValues);
-
-        // check set of coordinate:
-        double test[3];
-        Coordinate(test);
-        // std::cout << "TEST:  " << test[0] << ", "  << test[1] << ", " << test[2] << std::endl;
-        // std::cout << "UniversalLatitude: " << UniversalLatitude() << std::endl;
-
-            // get a lat, lon and store in variables
-        // (1) how to get lat/lon
-        // (2) which variables to store in
-
-        // fill in whatever stuff ISIS needs from this
-//    }
-//    else {
-        // handle projected case
-//    }
-
-    // std::cout << "Hello World!" << std::endl;
-    // how to do this -- csm returns the _closest pixel_ to the intersection
     return true;
   }
 
@@ -143,7 +147,6 @@ namespace Isis {
 
 
   bool CSMCamera::SetGround(Latitude latitude, Longitude longitude) {
-    std::cout << "Lat lon set ground" << std::endl;
     ShapeModel *shape = target()->shape();
     Distance localRadius;
 
@@ -160,19 +163,11 @@ namespace Isis {
       return false;
     }
 
-    // std::cout << "Lat: " << latitude.degrees() << std::endl;
-    // std::cout << "Lon: " << longitude.degrees() << std::endl;
-    // std::cout << "Rad: " << localRadius.meters() << std::endl;
-
     return SetGround(SurfacePoint(latitude, longitude, localRadius));
   }
 
 
   bool CSMCamera::SetGround(const SurfacePoint & surfacePt) {
-    std::cout << "surface point set ground" << std::endl;
-    std::cout << "Lat: " << surfacePt.GetLatitude().degrees() << std::endl;
-    std::cout << "Lon: " << surfacePt.GetLongitude().degrees() << std::endl;
-    std::cout << "Rad: " << surfacePt.GetLocalRadius().meters() << std::endl;
     ShapeModel *shape = target()->shape();
     if (!surfacePt.Valid()) {
       shape->clearSurfacePoint();
@@ -185,23 +180,19 @@ namespace Isis {
     csm::ImageCoord imagePt;
     double achievedPrecision = 0;
     csm::WarningList warnings;
-    csm::EcefCoord groundPt(surfacePt.GetX().meters(), surfacePt.GetY().meters(), surfacePt.GetZ().meters());
-    std::cout << "Ground point: " << groundPt.x << ", " << groundPt.y << ", " << groundPt.z << std::endl;
+    csm::EcefCoord groundPt = isisToCsmGround(surfacePt);
     try {
       imagePt = m_model->groundToImage(groundPt, 0.01, &achievedPrecision, &warnings);
     }
     catch (csm::Error &e) {
-      std::cout << "Errored with error: " << e.getMessage() << std::endl;
       validBackProject = false;
     }
     if (achievedPrecision > 0.01) {
-      std::cout << "Failed to achieve precision of 0.1. Precision: " << achievedPrecision << std::endl;
       validBackProject = false;
     }
     if (!warnings.empty()) {
       for (csm::Warning warning : warnings) {
         if (warning.getWarning() == csm::Warning::IMAGE_COORD_OUT_OF_BOUNDS){
-          std::cout << "Failed to back project warning." << std::endl;
           validBackProject = false;
         }
       }
@@ -215,13 +206,11 @@ namespace Isis {
                             sensorPositionBodyFixed(line, sample),
                             true);
     if (!shape->hasIntersection()) {
-      std::cout << "Back projection occluded" << std::endl;
       validBackProject = false;
     }
 
     // If the back projection was successful, then save it
     if (validBackProject) {
-      std::cout << "Successfully back projects to : " << line << ", " << sample << std::endl;
       p_childSample = p_alphaCube->BetaSample(sample);
       p_childLine = p_alphaCube->BetaLine(line);
       p_pointComputed = true;
@@ -234,15 +223,6 @@ namespace Isis {
     return false;
   }
 
-  void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) {
-    csmPixel.line = line - 0.5;
-    csmPixel.samp = sample - 0.5;
-  }
-  void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) {
-    line = csmPixel.line + 0.5;
-    sample = csmPixel.samp + 0.5;
-  }
-
 
   double CSMCamera::LineResolution() {
     vector<double> imagePartials = ImagePartials();
@@ -251,12 +231,14 @@ namespace Isis {
                 imagePartials[4]*imagePartials[4]);
   }
 
+
   double CSMCamera::SampleResolution() {
     vector<double> imagePartials = ImagePartials();
     return sqrt(imagePartials[1]*imagePartials[1] +
                 imagePartials[3]*imagePartials[3] +
                 imagePartials[5]*imagePartials[5]);
   }
+
 
   double CSMCamera::PixelResolution() {
     // Redo the line and sample resolution calculations because it avoids
@@ -271,9 +253,11 @@ namespace Isis {
     return (sampRes + lineRes) / 2.0;
   }
 
+
   double CSMCamera::ObliqueLineResolution() {
     return LineResolution();
   }
+
 
   double CSMCamera::ObliqueSampleResolution() {
     return SampleResolution();
@@ -288,6 +272,7 @@ namespace Isis {
   double CSMCamera::parentLine() {
     return p_alphaCube->AlphaLine(Line());
   }
+
 
   double CSMCamera::parentSample() {
     return p_alphaCube->AlphaSample(Sample());
@@ -329,19 +314,11 @@ namespace Isis {
   }
 
 
-  // Need to override because Camera::SetGround(SurfacePoint) calls the GroundMap which we don't have
-  //bool CSMCamera::SetGround(){
-//    return false;
-//  }
-
-
   /**
    * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or
    * square, depending on the sampling mode.  The first vertex is the top left.
    *
-   * @internal
-   *   @history 2013-08-09 Tracie Sucharski - Add more vertices along each edge.  This might need
-   *                          to be a user parameter evenually?  Might be dependent on resolution.
+   * The CSM API does not support this type of internal information about the sensor.
    */
    QList<QPointF> CSMCamera::PixelIfovOffsets() {
      QString msg = "Pixel Field of View is not computable for a CSM camera model.";
@@ -378,9 +355,7 @@ namespace Isis {
   * z WRT sample
   */
   vector<double> CSMCamera::ImagePartials(SurfacePoint groundPoint) {
-    csm::EcefCoord groundCoord(groundPoint.GetX().meters(),
-                               groundPoint.GetY().meters(),
-                               groundPoint.GetZ().meters());
+    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
     vector<double> groundPartials = m_model->computeGroundPartials(groundCoord);
 
     // Jacobian format is
@@ -409,7 +384,6 @@ namespace Isis {
   // Spice::init() creates a Target in such a way that requires spice data / tables, so
   // this works around that.
   Target *CSMCamera::setTarget(Pvl label) {
-    std::cout << "running set target" << std::endl;
     Target *target = new Target();
     PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
     QString targetName = inst["TargetName"][0];
@@ -431,6 +405,54 @@ namespace Isis {
     // TODO: Set it to the appropriate shape model (might not be an ellipse)
     target->setShapeEllipsoid();
     return target;
+  }
+
+
+  /**
+   * Convert an ISIS pixel coordinate to a CSM pixel coordinate.
+   * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
+   * function accounts for that and wraps the coordinate in a csm::ImageCoord.
+   */
+  void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) {
+    csmPixel.line = line - 0.5;
+    csmPixel.samp = sample - 0.5;
+  }
+
+
+  /**
+   * Convert a CSM pixel coordinate to an ISIS pixel coordinate.
+   * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
+   * function accounts for that and unpacks the csm::ImageCoord.
+   */
+  void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) {
+    line = csmPixel.line + 0.5;
+    sample = csmPixel.samp + 0.5;
+  }
+
+
+  /**
+   * Convert an ISIS ground point into a CSM ground point.
+   * ISIS ground points can be created from and converted to many different
+   * units and coordinate systems. CSM ground points are always rectangular,
+   * body-fixed coordinates in meters.
+   */
+  csm::EcefCoord CSMCamera::isisToCsmGround(const SurfacePoint &groundPt) {
+    return csm::EcefCoord(groundPt.GetX().meters(),
+                          groundPt.GetY().meters(),
+                          groundPt.GetZ().meters());
+  }
+
+
+  /**
+   * Convert a CSM ground point into an ISIS ground point.
+   * ISIS ground points can be created from and converted to many different
+   * units and coordinate systems. CSM ground points are always rectangular,
+   * body-fixed coordinates in meters.
+   */
+  SurfacePoint CSMCamera::csmToIsisGround(const csm::EcefCoord &groundPt) {
+    return SurfacePoint(Displacement(groundPt.x, Displacement::Meters),
+                        Displacement(groundPt.y, Displacement::Meters),
+                        Displacement(groundPt.z, Displacement::Meters));
   }
 }
 
