@@ -64,14 +64,16 @@ namespace Isis {
     initPlugin();
 
     try {
-      // Is there a CSM blob on the cube? 
+      // Is there a CSM blob on the cube?
       // Key off of the CSM state blob, rather than the info group
       // hasBlob() add to Cube!
       if (cube.hasGroup("CsmInfo")) {
+        std::cout << "Creating CSM Camera" << std::endl;
         // Create ISIS CSM Camera Model
         return new CSMCamera(cube);
       }
       else {
+        std::cout << "Creating ISIS Camera" << std::endl;
         // First get the spacecraft and instrument and combine them
         Pvl &lab = *cube.label();
         PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
@@ -81,23 +83,23 @@ namespace Isis {
         name = name.toUpper();
         QString group = spacecraft + "/" + name;
         group = group.remove(" ");
-       
+
         PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
         // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
         if (!kerns.hasKeyword("CameraVersion")) {
           kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
         }
-       
+
         int cameraOriginalVersion = (int)kerns["CameraVersion"];
         int cameraNewestVersion = CameraVersion(cube);
-       
+
         if (cameraOriginalVersion != cameraNewestVersion) {
           string msg = "The camera model used to create a camera for this cube is out of date, " \
                        "please re-run spiceinit on the file or process with an old Isis version " \
                        "that has the correct camera model.";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
-       
+
         // See if we have a camera model plugin
         QFunctionPointer ptr;
         try {
@@ -109,11 +111,11 @@ namespace Isis {
           msg += name + "]";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
-       
+
         // Now cast that pointer in the proper way
         Camera * (*plugin)(Isis::Cube &cube);
         plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
-       
+
         // Create the camera as requested
         return (*plugin)(cube);
       }

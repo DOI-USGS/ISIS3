@@ -88,7 +88,7 @@ namespace Isis {
       void subSpacecraftPoint(double &lat, double &lon, double line, double sample);
 
     protected:
-      virtual Target *setTarget(Pvl label);
+      void setTarget(Pvl label);
 
       std::vector<double> sensorPositionBodyFixed();
       std::vector<double> sensorPositionBodyFixed(double line, double sample);
