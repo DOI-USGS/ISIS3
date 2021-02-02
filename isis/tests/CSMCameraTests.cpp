@@ -6,12 +6,11 @@
 #include "csm/Ellipsoid.h"
 #include "csm/RasterGM.h"
 
-#include "AlternativeTestCsmModel.h"
-#include "TestCsmPlugin.h"
-#include "MockCsmPlugin.h"
 #include "Fixtures.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "MockCsmPlugin.h"
 #include "TestUtilities.h"
-#include "TestCsmModel.h"
 #include "StringBlob.h"
 #include "FileName.h"
 
@@ -21,6 +20,21 @@ using json = nlohmann::json;
 #include "gmock/gmock.h"
 
 using namespace Isis;
+
+// gMock matchers for CSM structs
+::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected) {
+  return ::testing::AllOf(
+      ::testing::Field(&csm::ImageCoord::line, ::testing::DoubleNear(expected.line, 0.0001)),
+      ::testing::Field(&csm::ImageCoord::samp, ::testing::DoubleNear(expected.samp, 0.0001))
+  );
+}
+::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected) {
+  return ::testing::AllOf(
+      ::testing::Field(&csm::EcefCoord::x, ::testing::DoubleNear(expected.x, 0.0001)),
+      ::testing::Field(&csm::EcefCoord::y, ::testing::DoubleNear(expected.y, 0.0001)),
+      ::testing::Field(&csm::EcefCoord::z, ::testing::DoubleNear(expected.z, 0.0001))
+  );
+}
 
 // Mock CSM Model class
 class MockRasterGM : public csm::RasterGM {
@@ -115,6 +129,7 @@ class CSMCameraFixture : public SmallCube {
   protected:
     QString filename;
     MockRasterGM mockModel;
+    Camera *testCam;
 
     void SetUp() override {
       SmallCube::SetUp();
@@ -177,6 +192,8 @@ class CSMCameraFixture : public SmallCube {
       filename = testCube->fileName();
       testCube->close();
       testCube->open(filename);
+
+      testCam = testCube->camera();
     }
 };
 
@@ -210,14 +227,85 @@ TEST(CSMCameraTest, LoadMockTest) {
 }
 
 TEST_F(CSMCameraFixture, SetImage) {
-  Camera *testCam = testCube->camera();
   csm::Ellipsoid wgs84;
-  // EXPECT_CALL(mockModel, imageToRemoteImagingLocus(csm::ImageCoord(4.5, 4.5), _, _, _))
-  EXPECT_CALL(mockModel, imageToRemoteImagingLocus)
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
-      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0))); // looking straight down X-Axis
+      // looking straight down X-Axis
+      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0)));
 
   testCam->SetImage(5, 5);
   EXPECT_EQ(testCam->UniversalLatitude(), 0.0);
   EXPECT_EQ(testCam->UniversalLongitude(), 0.0);
+}
+
+TEST_F(CSMCameraFixture, SetGround) {
+  // Define some things to match/return
+  csm::Ellipsoid wgs84;
+  csm::ImageCoord imagePt(4.5, 4.5);
+  csm::EcefCoord groundPt(wgs84.getSemiMajorRadius(), 0, 0);
+  csm::EcefCoord observerPos(wgs84.getSemiMajorRadius() + 50000, 0, 0);
+
+  // Setup expected calls/returns
+  EXPECT_CALL(mockModel, groundToImage(MatchEcefCoord(groundPt), ::testing::_, ::testing::_, ::testing::_))
+      .Times(1)
+      .WillOnce(::testing::Return(imagePt));
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(observerPos));
+
+  testCam->SetGround(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees));
+  EXPECT_EQ(testCam->Line(), 5.0);
+  EXPECT_EQ(testCam->Sample(), 5.0);
+}
+
+TEST_F(CSMCameraFixture, Resolution) {
+  // Setup to return the ground partials we want
+  // The pseudoinverse of:
+  // 1 2 3
+  // 4 5 6
+  //
+  // is
+  // -17  8
+  //  -2  2  *  1/18
+  //  13 -4
+  EXPECT_CALL(mockModel, computeGroundPartials)
+      .Times(6)
+      .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
+
+  // We also have to set the mock up for setimage
+  csm::Ellipsoid wgs84;
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0)));
+
+  testCam->SetImage(5, 5);
+
+  // Use expect near here because the psuedoinverse calculation is only accurate to ~1e-10
+  double expectedLineRes = sqrt(17*17 + 2*2 + 13*13)/18;
+  double expectedSampRes = sqrt(8*8 + 2*2 + 4*4)/18;
+  EXPECT_NEAR(testCam->LineResolution(), expectedLineRes, 1e-10);
+  EXPECT_NEAR(testCam->ObliqueLineResolution(), expectedLineRes, 1e-10);
+  EXPECT_NEAR(testCam->SampleResolution(), expectedSampRes, 1e-10);
+  EXPECT_NEAR(testCam->ObliqueSampleResolution(), expectedSampRes, 1e-10);
+  EXPECT_NEAR(testCam->PixelResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
+  EXPECT_NEAR(testCam->ObliquePixelResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
+}
+
+TEST_F(CSMCameraFixture, SubSpacecraftPoint) {
+  csm::ImageCoord imagePt(4.5, 4.5);
+  csm::Ellipsoid wgs84;
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillRepeatedly(::testing::Return(csm::EcefCoord(wgs84.getSemiMajorRadius() + 50000, 0, 0)));
+
+  // We also have to set the mock up for setimage
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0)));
+
+  testCam->SetImage(5, 5);
+  double lat, lon;
+  testCam->subSpacecraftPoint(lat, lon);
+  EXPECT_EQ(lat, 0.0);
+  EXPECT_EQ(lon, 0.0);
 }
