@@ -48,6 +48,8 @@ namespace Isis {
     cube.read(stateString);
     PvlObject &blobLabel = stateString.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
+    // TODO check that we can actually make a model with the appropriate name from the model state
+    // before doing it
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
     m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.string()));
     // If the dynamic cast failed, raise an exception
@@ -61,12 +63,7 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    if (m_target) {
-      delete m_target;
-      m_target = nullptr;
-    }
-
-    m_target = setTarget(*cube.label());
+    setTarget(*cube.label());
 
     std::cout << "Target status" << std::endl;
     if (target()) {
@@ -383,28 +380,28 @@ namespace Isis {
   // CSMCamera(cube) -> Camera(cube) -> Sensor(cube) -> Spice(cube)
   // Spice::init() creates a Target in such a way that requires spice data / tables, so
   // this works around that.
-  Target *CSMCamera::setTarget(Pvl label) {
+  void CSMCamera::setTarget(Pvl label) {
     Target *target = new Target();
     PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
     QString targetName = inst["TargetName"][0];
     target->setName(targetName);
 
     // get radii from CSM
-    csm::SettableEllipsoid *ellipsoidModel = dynamic_cast<csm::SettableEllipsoid*>(m_model);
-    if (!ellipsoidModel) {
-      // TODO is there a fallback we can do here?
-      QString msg = "Failed to get ellipsoid from CSM Model.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    csm::Ellipsoid targetEllipsoid = ellipsoidModel->getEllipsoid();
-    std::vector<Distance> radii {Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
-                                 Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
-                                 Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
+    csm::Ellipsoid targetEllipsoid = csm::SettableEllipsoid::getEllipsoid(m_model);
+    std::vector<Distance> radii  = {Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
+                                    Distance(targetEllipsoid.getSemiMajorRadius(), Distance::Meters),
+                                    Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
     target->setRadii(radii);
 
     // TODO: Set it to the appropriate shape model (might not be an ellipse)
     target->setShapeEllipsoid();
-    return target;
+
+    if (m_target) {
+      delete m_target;
+      m_target = nullptr;
+    }
+
+    m_target = target;
   }
 
 

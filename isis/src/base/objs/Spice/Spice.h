@@ -389,7 +389,6 @@ namespace Isis {
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-      virtual Target *setTarget(Pvl label);
       Target *m_target; //!< Target of the observation
 
     private:

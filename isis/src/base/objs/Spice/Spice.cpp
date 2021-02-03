@@ -117,7 +117,7 @@ namespace Isis {
   // TODO: docs
   void Spice::csmInit(Cube &cube, Pvl label) {
     defaultInit();
-    m_target = setTarget(label);
+    m_target = new Target;
     NaifStatus::CheckErrors();
   }
 
@@ -278,7 +278,7 @@ namespace Isis {
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code below has been refactored
-      m_target = setTarget(lab);
+      m_target = new Target(this, lab);
 
       // This should not be here. Consider having spiceinit add the necessary rings kernels to the
       // Extra parameter if the user has set the shape model to RingPlane.
@@ -298,7 +298,7 @@ namespace Isis {
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
 
-      m_target = setTarget(lab);
+      m_target = new Target(this, lab);
     }
 
     // Get NAIF ik, spk, sclk, and ck codes
@@ -490,12 +490,6 @@ namespace Isis {
       m_instrumentPosition->LoadCache(t);
     }
     NaifStatus::CheckErrors();
-  }
-
-
-  // New function to set m_target
-  Target *Spice::setTarget(Pvl label) {
-    return new Target(this, label);
   }
 
 
