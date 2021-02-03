@@ -243,17 +243,32 @@ TEST_F(CSMCameraFixture, SetGround) {
   csm::Ellipsoid wgs84;
   csm::ImageCoord imagePt(4.5, 4.5);
   csm::EcefCoord groundPt(wgs84.getSemiMajorRadius(), 0, 0);
+  SurfacePoint surfPoint(Latitude(0.0, Angle::Degrees),
+                         Longitude(0.0, Angle::Degrees),
+                         Distance(wgs84.getSemiMajorRadius(), Distance::Meters));
   csm::EcefCoord observerPos(wgs84.getSemiMajorRadius() + 50000, 0, 0);
 
   // Setup expected calls/returns
   EXPECT_CALL(mockModel, groundToImage(MatchEcefCoord(groundPt), ::testing::_, ::testing::_, ::testing::_))
-      .Times(1)
-      .WillOnce(::testing::Return(imagePt));
+      .Times(4)
+      .WillRepeatedly(::testing::Return(imagePt));
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
-      .Times(1)
-      .WillOnce(::testing::Return(observerPos));
+      .Times(4)
+      .WillRepeatedly(::testing::Return(observerPos));
 
-  testCam->SetGround(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees));
+  EXPECT_TRUE(testCam->SetGround(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees)));
+  EXPECT_EQ(testCam->Line(), 5.0);
+  EXPECT_EQ(testCam->Sample(), 5.0);
+
+  EXPECT_TRUE(testCam->SetGround(surfPoint));
+  EXPECT_EQ(testCam->Line(), 5.0);
+  EXPECT_EQ(testCam->Sample(), 5.0);
+
+  EXPECT_TRUE(testCam->SetUniversalGround(0.0, 0.0));
+  EXPECT_EQ(testCam->Line(), 5.0);
+  EXPECT_EQ(testCam->Sample(), 5.0);
+
+  EXPECT_TRUE(testCam->SetUniversalGround(0.0, 0.0, wgs84.getSemiMajorRadius()));
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 }
