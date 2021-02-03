@@ -55,6 +55,8 @@ namespace Isis {
       // Noop
     }
 
+    // TODO operate on a copy of the label so that we don't modify the file if we fail
+
     QString isdFilePath = ui.GetFileName("ISD");
 
     QList<QStringList> possibleModels;
@@ -133,13 +135,19 @@ namespace Isis {
 
     string modelState = model->getModelState();
 
-    // Add the TargetName to the instrument group, if specified:
+    // If the user doesn't specify a target name, then we will still need
+    // something on the label for the Target & ShapeModel so add Unknown
+    if (!cube->hasGroup("Instrument")) {
+      cube->putGroup(PvlGroup("Instrument"));
+    }
+    PvlGroup &instrumentGroup = cube->group("Instrument");
     if (ui.WasEntered("TARGETNAME")) {
-      if (!cube->hasGroup("Instrument")) {
-        cube->putGroup(PvlGroup("Instrument"));
-      }
-      PvlGroup &instrumentGroup = cube->group("Instrument");
       instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
+    }
+    else {
+      PvlKeyword targetKey("TargetName", "Unknown");
+      targetKey.addComment("Radii will come from the CSM model");
+      instrumentGroup.addKeyword(targetKey, Pvl::Replace);
     }
 
     // Populate the CsmInfo group with useful information
@@ -153,8 +161,9 @@ namespace Isis {
                             QString::fromStdString(model->getReferenceDateAndTime()));
     csm::GeometricModel *modelWithParams = dynamic_cast<csm::GeometricModel*>(model);
 
-    // TEMPORARY WORK AROUND 
-    if (false&&modelWithParams) {
+    // TODO TEMPORARY WORK AROUND
+    // if (false&&modelWithParams) {
+    if (modelWithParams) {
       PvlKeyword paramNames("ModelParameterNames");
       PvlKeyword paramUnits("ModelParameterUnits");
       PvlKeyword paramTypes("ModelParameterTypes");
@@ -169,15 +178,15 @@ namespace Isis {
           case csm::param::FICTITIOUS:
             paramTypes += "FICTITIOUS";
             break;
-        
+
           case csm::param::REAL:
             paramTypes += "REAL";
             break;
-        
+
           case csm::param::FIXED:
             paramTypes += "FIXED";
             break;
-        
+
           default:
             paramTypes += "UNKNOWN";
             break;
@@ -198,7 +207,7 @@ namespace Isis {
 
     if (ui.WasEntered("SHAPEMODEL")) {
       // TODO validate the shapemodel
-      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL")), Pvl::Replace);
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetFileName("SHAPEMODEL")), Pvl::Replace);
     }
     else {
       kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Null"), Pvl::Replace);

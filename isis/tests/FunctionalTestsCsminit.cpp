@@ -104,6 +104,11 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(modelName, TestCsmModel::SENSOR_MODEL_NAME);
 
+  // Check the Instrument group
+  ASSERT_TRUE(testCube->hasGroup("Instrument"));
+  PvlGroup &instGroup = testCube->group("Instrument");
+  EXPECT_TRUE(instGroup.hasKeyword("TargetName"));
+
   // Check the CsmInfo group
   ASSERT_TRUE(testCube->hasGroup("CsmInfo"));
   PvlGroup &infoGroup = testCube->group("CsmInfo");
@@ -132,7 +137,7 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
 }
 
-TEST_F(CSMPluginFixture, CSMinitRunTwice) {
+TEST_F(CSMPluginFixture, CSMInitRunTwice) {
   // Run csminit twice in a row. Verify that end result is as if csminit were
   // only run once with the second arguments.
   QVector<QString> args = {
@@ -188,7 +193,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   EXPECT_FALSE(kernGroup.hasKeyword("ShapeModel"));
 }
 
-TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
+TEST_F(CSMPluginFixture, CSMInitMultiplePossibleModels) {
   // Test csminit when multiple possible models can be created. First, verify that this will fail
   // without specifying the MODELNAME, then specify the MODELNAME and check the results.
 
@@ -202,9 +207,9 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   // and/or plugin name.
   try {
     csminit(options);
-  } 
+  }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("Multiple models can be created from the ISD")); 
+    EXPECT_THAT(e.what(), testing::HasSubstr("Multiple models can be created from the ISD"));
   }
 
   // Re-run with the model name specified
@@ -260,7 +265,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
 }
 
 
-TEST_F(CSMPluginFixture, CSMinitFails) {
+TEST_F(CSMPluginFixture, CSMInitFails) {
   // Create an ISD that will result in no successful models
   json isd;
   isd["name"] = "failing_isd";
@@ -281,16 +286,16 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
   // Expect a failure due to being unable to construct any model from the isd
   try {
     csminit(options);
-  } 
+  }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("No loaded model could be created from the ISD")); 
+    EXPECT_THAT(e.what(), testing::HasSubstr("No loaded model could be created from the ISD"));
   }
 }
 
 
 // This test uses the DefaultCube fixture because it has already has attached
 // spice data that csminit should remove.
-TEST_F(DefaultCube, CSMinitSpiceCleanup) {
+TEST_F(DefaultCube, CSMInitSpiceCleanup) {
   // Create an ISD
   json isd;
   isd["test_param_one"] = 1.0;
@@ -324,7 +329,7 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 
 // This test uses the DefaultCube fixture because it has already has attached
 // spice data that csminit should not remove on a failure.
-TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
+TEST_F(DefaultCube, CSMInitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
   isd["test_param_one"] = "value_one";

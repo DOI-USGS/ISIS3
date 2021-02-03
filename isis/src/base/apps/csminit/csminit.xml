@@ -40,6 +40,9 @@
     <change name="Jesse Mapel" date="2020-11-18">
       Original Version
     </change>
+    <change name="Jesse Mapel and Stuart Sides" date="2021-02-03">
+      Modified to always add a TargetName and Instrument group to the label for the camera model.
+    </change>
   </history>
 
   <groups>
@@ -74,13 +77,12 @@
     <group name="Target Specification">
       <parameter name="TARGETNAME">
         <type>string</type>
-        <internalDefault>none</internalDefault>
+        <internalDefault>Unknown</internalDefault>
         <brief>
           The name of the body observed by the image.
         </brief>
         <description>
-          The name of the body observed by the image. If not entered, then the
-          target already listed on the label will be used.
+          The name of the body observed by the image.
         </description>
       </parameter>
 

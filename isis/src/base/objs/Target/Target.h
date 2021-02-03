@@ -78,6 +78,7 @@ namespace Isis {
     public:
       // constructors
       Target(Spice *spice, Pvl &label);
+      Target(Pvl &label);
       Target();
 
       //! Destroys the Target
@@ -94,6 +95,7 @@ namespace Isis {
       void setShapeEllipsoid();
       void setRadii(std::vector<Distance> radii);
       void setName(QString name);
+      void setSpice(Spice *spice);
 
       ShapeModel *shape() const;
       Spice *spice() const;

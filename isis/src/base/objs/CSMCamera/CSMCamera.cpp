@@ -73,7 +73,7 @@ namespace Isis {
       std::cout << "Shape status" << std::endl;
       if (target()->shape()) {
         std::cout << "Target name: " << target()->shape()->name() << std::endl;
-        std::cout << "Target is DEM?: " << target()->shape()->name() << std::endl;
+        std::cout << "Target is DEM?: " << target()->shape()->isDEM() << std::endl;
       }
       else {
         std::cout << "Shape Uninitialized" << std::endl;
@@ -377,14 +377,9 @@ namespace Isis {
     return imagePartials;
   }
 
-  // CSMCamera(cube) -> Camera(cube) -> Sensor(cube) -> Spice(cube)
-  // Spice::init() creates a Target in such a way that requires spice data / tables, so
-  // this works around that.
+
   void CSMCamera::setTarget(Pvl label) {
-    Target *target = new Target();
-    PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
-    QString targetName = inst["TargetName"][0];
-    target->setName(targetName);
+    Target *target = new Target(label);
 
     // get radii from CSM
     csm::Ellipsoid targetEllipsoid = csm::SettableEllipsoid::getEllipsoid(m_model);
@@ -393,8 +388,11 @@ namespace Isis {
                                     Distance(targetEllipsoid.getSemiMinorRadius(), Distance::Meters)};
     target->setRadii(radii);
 
-    // TODO: Set it to the appropriate shape model (might not be an ellipse)
-    target->setShapeEllipsoid();
+    // Target needs to be able to access the camera to do things like
+    // compute resolution
+    // TODO find a better way to do this. It would better if we could set this up
+    //      inside of the Target constructor so that it always has a Spice object.
+    target->setSpice(this);
 
     if (m_target) {
       delete m_target;
