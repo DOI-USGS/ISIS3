@@ -243,9 +243,6 @@ TEST_F(CSMCameraFixture, SetGround) {
   csm::Ellipsoid wgs84;
   csm::ImageCoord imagePt(4.5, 4.5);
   csm::EcefCoord groundPt(wgs84.getSemiMajorRadius(), 0, 0);
-  SurfacePoint surfPoint(Latitude(0.0, Angle::Degrees),
-                         Longitude(0.0, Angle::Degrees),
-                         Distance(wgs84.getSemiMajorRadius(), Distance::Meters));
   csm::EcefCoord observerPos(wgs84.getSemiMajorRadius() + 50000, 0, 0);
 
   // Setup expected calls/returns
@@ -260,7 +257,9 @@ TEST_F(CSMCameraFixture, SetGround) {
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 
-  EXPECT_TRUE(testCam->SetGround(surfPoint));
+  EXPECT_TRUE(testCam->SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees),
+                                 Longitude(0.0, Angle::Degrees),
+                                 Distance(wgs84.getSemiMajorRadius(), Distance::Meters))));
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 
