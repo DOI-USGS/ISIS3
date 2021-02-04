@@ -115,6 +115,28 @@ namespace Isis {
 
 
   /**
+   * Construct a Target without SPICE data
+   *
+   * @param lab Label containing a Kernels group that specifies the shape modelß.
+   */
+  Target::Target(Pvl &label) {
+    // Initialize everything to null
+    m_bodyCode = NULL;
+    m_systemCode = NULL;
+    m_name = NULL;
+    m_systemName = NULL;
+    m_spice = NULL;
+    init();
+
+    PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
+    QString targetName = inst["TargetName"][0];
+    setName(targetName);
+
+    m_shape = ShapeModelFactory::create(this, label);
+  }
+
+
+  /**
    * Constructs an empty Target object
    *
    * @author 2012-03-20 Debbie A. Cook
@@ -604,7 +626,7 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Target::setRadii(std::vector<Distance> radii) {
-    if (m_radii.size() == 0) {
+    if (m_radii.size() < 3) {
       m_radii.resize(3, Distance());
     }
     m_radii[0] = radii[0];
@@ -619,6 +641,12 @@ namespace Isis {
       m_name = new QString;
     }
     *m_name = name;
+  }
+
+
+  // Set the Target's sensor model
+  void Target::setSpice(Spice *spice) {
+    m_spice = spice;
   }
 
 

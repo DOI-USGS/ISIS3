@@ -65,15 +65,11 @@ namespace Isis {
 
     try {
       // Is there a CSM blob on the cube?
-      // Key off of the CSM state blob, rather than the info group
-      // hasBlob() add to Cube!
-      if (cube.hasGroup("CsmInfo")) {
-        std::cout << "Creating CSM Camera" << std::endl;
+      if (cube.hasBlob("String", "CSMState")) {
         // Create ISIS CSM Camera Model
         return new CSMCamera(cube);
       }
       else {
-        std::cout << "Creating ISIS Camera" << std::endl;
         // First get the spacecraft and instrument and combine them
         Pvl &lab = *cube.label();
         PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);

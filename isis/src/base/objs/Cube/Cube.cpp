@@ -1817,16 +1817,17 @@ namespace Isis {
 
 
   /**
-   * Check to see if the cube contains a pvl table by the provided name
+   * Check to see if the cube contains a BLOB.
    *
-   * @param name The name of the pvl table to search for
+   * @param type The type of the BLOB to search for
+   * @param name The name of the BLOB to search for
    *
-   * @return bool True if the pvl table was found
+   * @return bool True if the BLOB was found
    */
-  bool Cube::hasTable(const QString &name) {
+  bool Cube::hasBlob(const QString &type, const QString &name) {
     for(int o = 0; o < label()->objects(); o++) {
       PvlObject &obj = label()->object(o);
-      if (obj.isNamed("Table")) {
+      if (obj.isNamed(type)) {
         if (obj.hasKeyword("Name")) {
           QString temp = (QString) obj["Name"];
           temp = temp.toUpper();
@@ -1837,6 +1838,18 @@ namespace Isis {
       }
     }
     return false;
+  }
+
+
+  /**
+   * Check to see if the cube contains a pvl table by the provided name
+   *
+   * @param name The name of the pvl table to search for
+   *
+   * @return bool True if the pvl table was found
+   */
+  bool Cube::hasTable(const QString &name) {
+    return hasBlob("Table", name);
   }
 
 

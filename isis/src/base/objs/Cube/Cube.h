@@ -260,7 +260,7 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob, 
+      void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
@@ -315,6 +315,7 @@ namespace Isis {
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
+      bool hasBlob(const QString &type, const QString &name);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
