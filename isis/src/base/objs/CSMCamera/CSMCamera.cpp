@@ -1,6 +1,10 @@
-/**
- * New blurb TODO
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "CSMCamera.h"
 #include "CameraGroundMap.h"
@@ -48,9 +52,24 @@ namespace Isis {
     cube.read(stateString);
     PvlObject &blobLabel = stateString.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
-    // TODO check that we can actually make a model with the appropriate name from the model state
-    // before doing it
+    QString modelName = blobLabel.findKeyword("ModelName")[0];
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
+    if (!plugin) {
+      QStringList availablePlugins;
+      for (const csm::Plugin *plugin: csm::Plugin::getList()) {
+        availablePlugins.append(QString::fromStdString(plugin->getPluginName()));
+      }
+      QString msg = "Failed to find plugin [" + pluginName + "] for image [" + cube.fileName() +
+                    "]. Check that the corresponding CSM plugin library is in the directory "
+                    "specified by your IsisPreferences. Loaded plugins [" +
+                    availablePlugins.join(", ") + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.string())) {
+      QString msg = "CSM state string attached to image [" + cube.fileName() + "]. cannot "
+                    "be converted to a [" + modelName + "] using [" + pluginName + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.string()));
     // If the dynamic cast failed, raise an exception
     if (!m_model) {

@@ -307,8 +307,6 @@ namespace Isis {
     // We will need a transform class
     Transform *transform = 0;
 
-    std::cout << "Starting transformation" << std::endl;
-
     // Okay we need to decide how to apply the rubbersheeting for the transform
     // Does the user want to define how it is done?
     if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
@@ -430,12 +428,8 @@ namespace Isis {
       p.StartProcess(*transform, *interp);
     }
 
-    std::cout << "Transformation complte" << std::endl;
-
     // Wrap up the warping process
     p.EndProcess();
-
-    std::cout << "Cleaned up" << std::endl;
 
     // add mapping to print.prt
     log->addGroup(cleanMapping);

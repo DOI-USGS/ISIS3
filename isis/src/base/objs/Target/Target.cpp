@@ -626,7 +626,7 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Target::setRadii(std::vector<Distance> radii) {
-    if (m_radii.size() == 0) {
+    if (m_radii.size() < 3) {
       m_radii.resize(3, Distance());
     }
     m_radii[0] = radii[0];
