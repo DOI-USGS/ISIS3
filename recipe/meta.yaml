@@ -46,6 +46,7 @@ build:
 requirements:
   build:
   - ale >=0.8.5
+  - armadillo >=9.200.4
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
@@ -91,6 +92,7 @@ requirements:
   - superlu
   - tnt
   - x264=20131218
+  - xerces-c=3.1.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
@@ -98,12 +100,9 @@ requirements:
   - xorg-libxi
   - zlib
 
-  host:
-  - armadillo
-  - xerces-c
-
   run:
   - ale >=0.8.5
+  - armadillo >=9.200.4
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
@@ -146,7 +145,7 @@ requirements:
   - superlu
   - tnt
   - x264=20131218
-  - xerces-c
+  - xerces-c=3.1.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
