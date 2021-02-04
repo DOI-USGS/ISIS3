@@ -146,6 +146,11 @@ namespace Isis {
     }
 
     // If we are here then everything went well so save the pixel and return true
+    m_lookB[0] = locusVec[0];
+    m_lookB[1] = locusVec[1];
+    m_lookB[2] = locusVec[2];
+    m_newLookB = true;
+    p_pointComputed = true;
     p_childSample = sample;
     p_childLine = line;
     return true;
@@ -217,9 +222,12 @@ namespace Isis {
     // Check for occlusion
     double line, sample;
     csmToIsisPixel(imagePt, line, sample);
+    csm::EcefLocus imageLocus = m_model->imageToRemoteImagingLocus(imagePt);
+    // TODO should this be in meters or kilometers?
+    std::vector<double> sensorPosition = {imageLocus.point.x, imageLocus.point.y, imageLocus.point.z};
     shape->clearSurfacePoint();
     shape->intersectSurface(surfacePt,
-                            sensorPositionBodyFixed(line, sample),
+                            sensorPosition,
                             true);
     if (!shape->hasIntersection()) {
       validBackProject = false;
@@ -227,6 +235,10 @@ namespace Isis {
 
     // If the back projection was successful, then save it
     if (validBackProject) {
+      m_lookB[0] = imageLocus.direction.x;
+      m_lookB[1] = imageLocus.direction.y;
+      m_lookB[2] = imageLocus.direction.z;
+      m_newLookB = true;
       p_childSample = p_alphaCube->BetaSample(sample);
       p_childLine = p_alphaCube->BetaLine(line);
       p_pointComputed = true;
@@ -256,7 +268,7 @@ namespace Isis {
   }
 
 
-  double CSMCamera::PixelResolution() {
+  double CSMCamera::DetectorResolution() {
     // Redo the line and sample resolution calculations because it avoids
     // a call to ImagePartials which could be a costly call
     vector<double> imagePartials = ImagePartials();
@@ -271,39 +283,53 @@ namespace Isis {
 
 
   double CSMCamera::ObliqueLineResolution() {
+    // CSM resolution is always the oblique resolution so just return it
     return LineResolution();
   }
 
 
   double CSMCamera::ObliqueSampleResolution() {
+    // CSM resolution is always the oblique resolution so just return it
     return SampleResolution();
   }
 
 
-  double CSMCamera::ObliquePixelResolution() {
-    return PixelResolution();
+  double CSMCamera::ObliqueDetectorResolution() {
+    // CSM resolution is always the oblique resolution so just return it
+    return DetectorResolution();
   }
 
 
-  double CSMCamera::parentLine() {
+  double CSMCamera::parentLine() const {
     return p_alphaCube->AlphaLine(Line());
   }
 
 
-  double CSMCamera::parentSample() {
+  double CSMCamera::parentSample() const {
     return p_alphaCube->AlphaSample(Sample());
   }
 
 
+  void CSMCamera::instrumentBodyFixedPosition(double p[3]) const {
+    std::vector<double> position = sensorPositionBodyFixed();
+    p[0] = position[0];
+    p[1] = position[1];
+    p[2] = position[2];
+  }
+
+
+  // TODO change SPICE to use this or instrumentBodyFixedPosition instead of doing
+  // The rotation inside of other functions.
+  //
   // Broke sensorPosition call out to separate function in preparation for in the future separating the corresponding
   // call out of Spice::subSpacecraft to decrease repeated code and just override this function.
-  std::vector<double> CSMCamera::sensorPositionBodyFixed(){
+  std::vector<double> CSMCamera::sensorPositionBodyFixed() const {
     return sensorPositionBodyFixed(parentLine(), parentSample());
   }
 
 
   // stateless version
-  std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample){
+  std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample) const {
     csm::ImageCoord imagePt;
     isisToCsmPixel(line, sample, imagePt);
     csm::EcefCoord sensorPosition =  m_model->getSensorPosition(imagePt);
@@ -427,7 +453,7 @@ namespace Isis {
    * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
    * function accounts for that and wraps the coordinate in a csm::ImageCoord.
    */
-  void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) {
+  void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const {
     csmPixel.line = line - 0.5;
     csmPixel.samp = sample - 0.5;
   }
@@ -438,7 +464,7 @@ namespace Isis {
    * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
    * function accounts for that and unpacks the csm::ImageCoord.
    */
-  void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) {
+  void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) const {
     line = csmPixel.line + 0.5;
     sample = csmPixel.samp + 0.5;
   }
@@ -450,7 +476,7 @@ namespace Isis {
    * units and coordinate systems. CSM ground points are always rectangular,
    * body-fixed coordinates in meters.
    */
-  csm::EcefCoord CSMCamera::isisToCsmGround(const SurfacePoint &groundPt) {
+  csm::EcefCoord CSMCamera::isisToCsmGround(const SurfacePoint &groundPt) const {
     return csm::EcefCoord(groundPt.GetX().meters(),
                           groundPt.GetY().meters(),
                           groundPt.GetZ().meters());
@@ -463,11 +489,58 @@ namespace Isis {
    * units and coordinate systems. CSM ground points are always rectangular,
    * body-fixed coordinates in meters.
    */
-  SurfacePoint CSMCamera::csmToIsisGround(const csm::EcefCoord &groundPt) {
+  SurfacePoint CSMCamera::csmToIsisGround(const csm::EcefCoord &groundPt) const {
     return SurfacePoint(Displacement(groundPt.x, Displacement::Meters),
                         Displacement(groundPt.y, Displacement::Meters),
                         Displacement(groundPt.z, Displacement::Meters));
   }
+
+
+  double CSMCamera::PhaseAngle() const {
+    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(isisToCsmGround(GetSurfacePoint()));
+    std::vector<double> sunVec = {sunEcefVec.x, sunEcefVec.y, sunEcefVec.z};
+    return target()->shape()->phaseAngle(sensorPositionBodyFixed(), sunVec);
+  }
+
+
+  double CSMCamera::EmissionAngle() const {
+    return target()->shape()->emissionAngle(sensorPositionBodyFixed());
+  }
+
+
+  double CSMCamera::IncidenceAngle() const {
+    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(isisToCsmGround(GetSurfacePoint()));
+    std::vector<double> sunVec = {sunEcefVec.x, sunEcefVec.y, sunEcefVec.z};
+    return target()->shape()->incidenceAngle(sunVec);
+  }
+
+
+
+
+  SpicePosition *CSMCamera::sunPosition() const {
+    QString msg = "Sun position is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  SpicePosition *CSMCamera::instrumentPosition() const {
+    QString msg = "Instrument position is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  SpiceRotation *CSMCamera::bodyRotation() const {
+    QString msg = "Target body orientation is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  SpiceRotation *CSMCamera::instrumentRotation() const {
+    QString msg = "Instrument orientation is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
 }
 
 // Plugin

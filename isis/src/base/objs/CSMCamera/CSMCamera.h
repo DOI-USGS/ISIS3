@@ -80,30 +80,41 @@ namespace Isis {
 
       virtual double LineResolution();
       virtual double SampleResolution();
-      virtual double PixelResolution();
+      virtual double DetectorResolution();
       virtual double ObliqueLineResolution();
       virtual double ObliqueSampleResolution();
-      virtual double ObliquePixelResolution();
+      virtual double ObliqueDetectorResolution();
 
-      virtual double parentLine();
-      virtual double parentSample();
+      virtual double parentLine() const;
+      virtual double parentSample() const;
 
       void subSpacecraftPoint(double &lat, double &lon);
       void subSpacecraftPoint(double &lat, double &lon, double line, double sample);
 
+      virtual double PhaseAngle() const;
+      virtual double EmissionAngle() const;
+      virtual double IncidenceAngle() const;
+
+      virtual SpicePosition *sunPosition() const;
+      virtual SpicePosition *instrumentPosition() const;
+      virtual SpiceRotation *bodyRotation() const;
+      virtual SpiceRotation *instrumentRotation() const;
+
+      virtual void instrumentBodyFixedPosition(double p[3]) const;
+
     protected:
       void setTarget(Pvl label);
 
-      std::vector<double> sensorPositionBodyFixed();
-      std::vector<double> sensorPositionBodyFixed(double line, double sample);
+      std::vector<double> sensorPositionBodyFixed() const;
+      std::vector<double> sensorPositionBodyFixed(double line, double sample) const;
 
     private:
       csm::RasterGM *m_model; //! CSM sensor model
 
-      void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel);
-      void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample);
-      csm::EcefCoord isisToCsmGround(const SurfacePoint &groundPt);
-      SurfacePoint csmToIsisGround(const csm::EcefCoord &groundPt);
+      void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const;
+      void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) const;
+      csm::EcefCoord isisToCsmGround(const SurfacePoint &groundPt) const;
+      SurfacePoint csmToIsisGround(const csm::EcefCoord &groundPt) const;
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();

@@ -302,41 +302,41 @@ namespace Isis {
       virtual ~Spice();
 
       // Methods
-      void setTime(const iTime &time);
+      virtual void setTime(const iTime &time);
       void instrumentPosition(double p[3]) const;
-      void instrumentBodyFixedPosition(double p[3]) const;
-      void sunPosition(double p[3]) const;
-      double targetCenterDistance() const;
-      double sunToBodyDist() const;
+      virtual void instrumentBodyFixedPosition(double p[3]) const;
+      virtual void sunPosition(double p[3]) const;
+      virtual double targetCenterDistance() const;
+      virtual double sunToBodyDist() const;
 
-      Longitude solarLongitude();
-      void instrumentBodyFixedVelocity(double v[3]) const;
+      virtual Longitude solarLongitude();
+      virtual void instrumentBodyFixedVelocity(double v[3]) const;
       iTime time() const;
 
       void radii(Distance r[3]) const;
 
-      void createCache(iTime startTime, iTime endTime,
-                       const int size, double tol);
-      iTime cacheStartTime() const;
-      iTime cacheEndTime() const;
+      virtual void createCache(iTime startTime, iTime endTime,
+                               const int size, double tol);
+      virtual iTime cacheStartTime() const;
+      virtual iTime cacheEndTime() const;
 
       virtual void subSpacecraftPoint(double &lat, double &lon);
-      void subSolarPoint(double &lat, double &lon);
+      virtual  void subSolarPoint(double &lat, double &lon);
 
       virtual Target *target() const;
       QString targetName() const;
 
-      iTime getClockTime(QString clockValue,
-                         int sclkCode = -1,
-                         bool clockTicks=false);
+      virtual iTime getClockTime(QString clockValue,
+                                 int sclkCode = -1,
+                                 bool clockTicks=false);
       SpiceDouble getDouble(const QString &key, int index = 0);
       SpiceInt getInteger(const QString &key,   int index = 0);
       QString getString(const QString &key,     int index = 0);
 
-      SpicePosition *sunPosition() const;
-      SpicePosition *instrumentPosition() const;
-      SpiceRotation *bodyRotation() const;
-      SpiceRotation *instrumentRotation() const;
+      virtual SpicePosition *sunPosition() const;
+      virtual SpicePosition *instrumentPosition() const;
+      virtual SpiceRotation *bodyRotation() const;
+      virtual SpiceRotation *instrumentRotation() const;
 
       bool isUsingAle();
       bool hasKernels(Pvl &lab);

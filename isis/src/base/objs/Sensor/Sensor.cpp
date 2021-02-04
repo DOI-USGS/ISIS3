@@ -59,6 +59,7 @@ namespace Isis {
    * @param cube Cube whose label contains Instrument and Kernels groups.
    */
   Sensor::Sensor(Cube &cube) : Spice(cube) {
+    m_newLookB = false;
   }
 
 
@@ -367,7 +368,7 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion tests
    */
@@ -409,7 +410,7 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion test
    */
@@ -430,7 +431,7 @@ namespace Isis {
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
 
-    shape->intersectSurface(SurfacePoint(lat, lon, rad), 
+    shape->intersectSurface(SurfacePoint(lat, lon, rad),
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
                             backCheck);
 
@@ -450,10 +451,10 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion test
-   * 
+   *
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     //std::cout << "Sensor::SetGround()\n";
@@ -465,7 +466,7 @@ namespace Isis {
       return false;
     }
 
-    shape->intersectSurface(surfacePt, 
+    shape->intersectSurface(surfacePt,
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
                             backCheck);
 
@@ -539,7 +540,7 @@ namespace Isis {
     vector<double> lookC = instrumentRotation()->ReferenceVector(lookDirectionJ2000());
     v[0] = lookC[0];
     v[1] = lookC[1];
-    v[2] = lookC[2]; 
+    v[2] = lookC[2];
   }
 
  /**
@@ -554,8 +555,8 @@ namespace Isis {
     lookB[2] = m_lookB[2];
     return lookB;
   }
-  
-  
+
+
    /**
    * Returns the look direction in the camera coordinate system.
    *

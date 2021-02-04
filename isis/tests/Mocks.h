@@ -28,8 +28,8 @@ class MockCamera : public Camera {
   public:
     MockCamera(Cube &cube): Camera(cube) {}
     MOCK_METHOD(bool, SetImage, (const double sample, const double line), (override));
-    MOCK_METHOD(double, Line, (), (override));
-    MOCK_METHOD(double, Sample, (), (override));
+    MOCK_METHOD(double, Line, (), (const, override));
+    MOCK_METHOD(double, Sample, (), (const, override));
     MOCK_METHOD(double, UniversalLatitude, (), (const override));
     MOCK_METHOD(double, UniversalLongitude, (), (const override));
     MOCK_METHOD(bool, SetUniversalGround, (const double latitude, const double longitude), (override));
