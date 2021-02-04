@@ -47,7 +47,6 @@ requirements:
   build:
   - ale >=0.8.5
   - boost=1.68.0
-  - armadillo
   - blas
   - bullet=2.86.1=0
   - bz2file
@@ -92,7 +91,6 @@ requirements:
   - superlu
   - tnt
   - x264=20131218
-  - xerces-c
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
@@ -100,10 +98,13 @@ requirements:
   - xorg-libxi
   - zlib
 
+  host:
+  - armadillo
+  - xerces-c
+
   run:
   - ale >=0.8.5
   - boost=1.68.0
-  - armadillo
   - blas
   - bullet=2.86.1=0
   - bz2file
