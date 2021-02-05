@@ -82,6 +82,7 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
+    // TODO: Find out why this is 12 hrs different than ths StartTime in the ISIS label.
     std::cout << m_model->getReferenceDateAndTime() << std::endl;
     // We have to strip off any trailing Zs and then add separators in order for iTime to work
     // TODO make this work with more time string formats and move to iTime
@@ -644,6 +645,22 @@ namespace Isis {
   }
 
 
+  double CSMCamera::SolarDistance() const {
+    QString msg = "Solar distance is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  double CSMCamera::RightAscension() {
+    QString msg = "Right Ascension is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  double CSMCamera::Declination() {
+    QString msg = "Declination is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
 }
 
 // Plugin

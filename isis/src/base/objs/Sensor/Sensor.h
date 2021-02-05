@@ -215,14 +215,14 @@ namespace Isis {
       std::vector<double> lookDirectionJ2000() const;
       std::vector<double> lookDirectionBodyFixed() const;
 
-      double RightAscension();
-      double Declination();
+      virtual double RightAscension();
+      virtual double Declination();
 
       // Return vector between spacecraft and surface point in body-fixed
       void SpacecraftSurfaceVector(double scSurfaceVector[3]) const;
       virtual double SlantDistance() const;
       double LocalSolarTime();
-      double SolarDistance() const;
+      virtual double SolarDistance() const;
       double SpacecraftAltitude();
 
       // Return local radius from dem
