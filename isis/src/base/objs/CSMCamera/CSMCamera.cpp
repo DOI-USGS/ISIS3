@@ -638,7 +638,7 @@ namespace Isis {
    *
    * @param et Ephemeris time
    */
-  void Spice::computeSolarLongitude(iTime et) {
+  void CSMCamera::computeSolarLongitude(iTime et) {
     QString msg = "Solar longitude is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
