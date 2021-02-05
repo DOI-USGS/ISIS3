@@ -575,7 +575,9 @@ namespace Isis {
    * @return @b double The angle of right ascension, in degrees.
    */
   double Sensor::RightAscension() {
-    if (m_newLookB) computeRaDec();
+    if (m_newLookB) {
+      computeRaDec();
+    }
     return m_ra;
   }
 
@@ -586,7 +588,9 @@ namespace Isis {
    * @return @b double Declination angle, in degrees.
    */
   double Sensor::Declination() {
-    if (m_newLookB) computeRaDec();
+    if (m_newLookB) {
+      computeRaDec();
+    }
     return m_dec;
   }
 

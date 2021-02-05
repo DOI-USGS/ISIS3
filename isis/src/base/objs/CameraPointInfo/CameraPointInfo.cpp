@@ -409,7 +409,7 @@ namespace Isis {
 
       double pB[3], spB[3], sB[3];
       QString utc;
-      double ssplat, ssplon, sslat, sslon, ocentricLat, ographicLat, pe360Lon, pw360Lon;
+      double ssplat, ssplon, ocentricLat, ographicLat, pe360Lon, pw360Lon;
 
       {
         gp->findKeyword("FileName").setValue(m_currentCube->fileName());
@@ -574,27 +574,30 @@ namespace Isis {
         }
         std::cout << "  Tried to get solar distance" << std::endl;
         try {
+          double sslat, sslon;
           m_camera->subSolarPoint(sslat, sslon);
           gp->findKeyword("SubSolarLatitude").setValue(toString(sslat), "DEGREE");
           gp->findKeyword("SubSolarLongitude").setValue(toString(sslon), "DEGREE");
+
+          try {
+            double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
+                                                         m_camera->UniversalLongitude(),
+                                                         sslat, sslon);
+            gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz), "DEGREE");
+          }
+          catch(IException &e) {
+            std::cout << e.toString() << std::endl;
+            gp->findKeyword("SubSolarGroundAzimuth").setValue("NULL");
+          }
+          std::cout << "  Tried to get sub solar ground azimuth" << std::endl;
         }
         catch(IException &e) {
           std::cout << e.toString() << std::endl;
           gp->findKeyword("SubSolarLatitude").setValue("NULL");
           gp->findKeyword("SubSolarLongitude").setValue("NULL");
-        }
-        std::cout << "  Tried to get sub solar lat, lon" << std::endl;
-        try {
-          double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
-                                                       m_camera->UniversalLongitude(),
-                                                       sslat, sslon);
-          gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz), "DEGREE");
-        }
-        catch(IException &e) {
-          std::cout << e.toString() << std::endl;
           gp->findKeyword("SubSolarGroundAzimuth").setValue("NULL");
         }
-        std::cout << "  Tried to get sub solar ground azimuth" << std::endl;
+        std::cout << "  Tried to get sub solar lat, lon" << std::endl;
 
         gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
         std::cout << "  Got phase angle: " << m_camera->PhaseAngle() << std::endl;

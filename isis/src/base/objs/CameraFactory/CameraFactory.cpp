@@ -67,7 +67,13 @@ namespace Isis {
       // Is there a CSM blob on the cube?
       if (cube.hasBlob("String", "CSMState")) {
         // Create ISIS CSM Camera Model
-        return new CSMCamera(cube);
+        try {
+          return new CSMCamera(cube);
+        } 
+        catch (IException &e) {
+          QString msg = "Unable to create CSM camera using CSMState Cube blob.";
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
       }
       else {
         // First get the spacecraft and instrument and combine them
@@ -117,8 +123,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      // Message only makes sense for ISIS-style camera model
-      string message = "Unable to initialize camera model from group [Instrument]";
+      string message = "Unable to initialize camera model in Camera Factory.";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }

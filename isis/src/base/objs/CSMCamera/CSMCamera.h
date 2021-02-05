@@ -106,9 +106,13 @@ namespace Isis {
 
       virtual void instrumentBodyFixedPosition(double p[3]) const;
       virtual void sunPosition(double p[3]) const;
+      virtual double SolarDistance() const;
 
       virtual double SlantDistance() const;
       virtual double targetCenterDistance() const;
+
+      virtual double RightAscension();
+      virtual double Declination();
 
     protected:
       void setTarget(Pvl label);
