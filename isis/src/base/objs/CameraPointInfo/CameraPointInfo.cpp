@@ -421,6 +421,7 @@ namespace Isis {
                           m_camera->RightAscension()), "DEGREE");
         }
         catch (IException &e) {
+          std::cout << e.toString() << std::endl;
           gp->findKeyword("RightAscension").setValue("Null");
         }
         std::cout << "  Tried to get Camera RA" << std::endl;
@@ -429,6 +430,7 @@ namespace Isis {
                           m_camera->Declination()), "DEGREE");
         }
         catch (IException &e) {
+          std::cout << e.toString() << std::endl;
           gp->findKeyword("Declination").setValue("Null");
         }
         std::cout << "  Tried to get Camera Dec" << std::endl;
@@ -531,35 +533,68 @@ namespace Isis {
                                                  toString(subspcgrdaz), "DEGREE");
         std::cout << "  Got sub spacecraft azimuth: " << subspcgrdaz << std::endl;
 
-        m_camera->sunPosition(sB);
-        gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
-        gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
-        gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
-        gp->findKeyword("SunPosition").addComment("Sun Information");
-        std::cout << "  Got sub spacecraft lat, lon: " << sB[0] << ", " << sB[1] << ", " << sB[2] << std::endl;
-
-        double sunAzi = m_camera->SunAzimuth();
-        if (Isis::IsValidPixel(sunAzi)) {
-          gp->findKeyword("SubSolarAzimuth").setValue(toString(sunAzi), "DEGREE");
+        try {
+          m_camera->sunPosition(sB);
+          gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
+          gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
+          gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
+          gp->findKeyword("SunPosition").addComment("Sun Information");
         }
-        else {
+        catch (IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("SunPosition").addValue("Null");
+          gp->findKeyword("SunPosition").addValue("Null");
+          gp->findKeyword("SunPosition").addValue("Null");
+          gp->findKeyword("SunPosition").addComment("Sun Information");
+        }
+        std::cout << "  Tried to get sun position" << std::endl;
+
+        try {
+          double sunAzi = m_camera->SunAzimuth();
+          if (Isis::IsValidPixel(sunAzi)) {
+            gp->findKeyword("SubSolarAzimuth").setValue(toString(sunAzi), "DEGREE");
+          }
+          else {
+            gp->findKeyword("SubSolarAzimuth").setValue("NULL");
+          }
+        }
+        catch(IException &e) {
+          std::cout << e.toString() << std::endl;
           gp->findKeyword("SubSolarAzimuth").setValue("NULL");
         }
-        std::cout << "  Got sub solar azimuth: " << sunAzi << std::endl;
+        std::cout << "  Tried to get sun azimuth" << std::endl;
 
-        gp->findKeyword("SolarDistance").setValue(toString(
-                        m_camera->SolarDistance()), "AU");
-        std::cout << "  Got solar distance: " << m_camera->SolarDistance() << std::endl;
-        m_camera->subSolarPoint(sslat, sslon);
-        gp->findKeyword("SubSolarLatitude").setValue(toString(sslat), "DEGREE");
-        gp->findKeyword("SubSolarLongitude").setValue(toString(sslon), "DEGREE");
-        std::cout << "  Got sub solar lat, lon: " << sslat << ", " << sslon << std::endl;
-        double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
-                                              m_camera->UniversalLongitude(),
-                                              sslat, sslon);
-        gp->findKeyword("SubSolarGroundAzimuth").setValue(
-                                                 toString(subsolgrdaz), "DEGREE");
-        std::cout << "  Got sub solar azimuth: " << subsolgrdaz << std::endl;
+        try {
+          gp->findKeyword("SolarDistance").setValue(toString(
+                          m_camera->SolarDistance()), "AU");
+        }
+        catch(IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("SolarDistance").setValue("NULL");
+        }
+        std::cout << "  Tried to get solar distance" << std::endl;
+        try {
+          m_camera->subSolarPoint(sslat, sslon);
+          gp->findKeyword("SubSolarLatitude").setValue(toString(sslat), "DEGREE");
+          gp->findKeyword("SubSolarLongitude").setValue(toString(sslon), "DEGREE");
+        }
+        catch(IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("SubSolarLatitude").setValue("NULL");
+          gp->findKeyword("SubSolarLongitude").setValue("NULL");
+        }
+        std::cout << "  Tried to get sub solar lat, lon" << std::endl;
+        try {
+          double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
+                                                       m_camera->UniversalLongitude(),
+                                                       sslat, sslon);
+          gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz), "DEGREE");
+        }
+        catch(IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("SubSolarGroundAzimuth").setValue("NULL");
+        }
+        std::cout << "  Tried to get sub solar ground azimuth" << std::endl;
 
         gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
         std::cout << "  Got phase angle: " << m_camera->PhaseAngle() << std::endl;
@@ -587,12 +622,24 @@ namespace Isis {
         utc = m_camera->time().UTC();
         gp->findKeyword("UTC").setValue(utc);
         std::cout << "  Got Camera Time utc: " << utc << std::endl;
-        gp->findKeyword("LocalSolarTime").setValue(toString(
-                        m_camera->LocalSolarTime()), "hour");
-        std::cout << "  Got local solar time: " << m_camera->LocalSolarTime() << std::endl;
-        gp->findKeyword("SolarLongitude").setValue(toString(
-                        m_camera->solarLongitude().degrees()), "DEGREE");
-        std::cout << "  Got local longitude: " << m_camera->solarLongitude().degrees() << std::endl;
+        try {
+          gp->findKeyword("LocalSolarTime").setValue(toString(
+                          m_camera->LocalSolarTime()), "hour");
+        }
+        catch (IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("LocalSolarTime").setValue("Null");
+        }
+        std::cout << "  Tried to get the local solar time" << std::endl;
+        try {
+          gp->findKeyword("SolarLongitude").setValue(toString(
+                          m_camera->solarLongitude().degrees()), "DEGREE");
+        }
+        catch (IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("SolarLongitude").setValue("Null");
+        }
+        std::cout << "  Tried to get local longitude" << std::endl;
 
         std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
@@ -601,19 +648,34 @@ namespace Isis {
         gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
         std::cout << "  Got look direction body fixed: " << lookB[0] << ", " << lookB[1] << ", " << lookB[2] << ", " << std::endl;
 
-        std::vector<double>lookJ = m_camera->lookDirectionJ2000();
-        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
-        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
-        gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
-        std::cout << "  Got look direction J2000: " << lookJ[0] << ", " << lookJ[1] << ", " << lookJ[2] << ", " << std::endl;
+        try {
+          std::vector<double>lookJ = m_camera->lookDirectionJ2000();
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
+        }
+        catch (IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+        }
+        std::cout << "  Tried to get look direction J2000" << std::endl;
 
-        double lookC[3];
-        m_camera->LookDirection(lookC);
-        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "DEGREE");
-        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "DEGREE");
-        gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "DEGREE");
-        std::cout << "  Got look direction camera: " << lookC[0] << ", " << lookC[1] << ", " << lookC[2] << ", " << std::endl;
-
+        try {
+          double lookC[3];
+          m_camera->LookDirection(lookC);
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "DEGREE");
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "DEGREE");
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "DEGREE");
+        }
+        catch (IException &e) {
+          std::cout << e.toString() << std::endl;
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+        }
+        std::cout << "  Tried to get look direction camera" << std::endl;
 
 
         if (allowErrors) gp->findKeyword("Error").setValue("NULL");

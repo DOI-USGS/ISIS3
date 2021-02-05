@@ -82,6 +82,19 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
+    std::cout << m_model->getReferenceDateAndTime() << std::endl;
+    // We have to strip off any trailing Zs and then add separators in order for iTime to work
+    // TODO make this work with more time string formats and move to iTime
+    QString timeString = QString::fromStdString(m_model->getReferenceDateAndTime());
+    timeString.remove("z", Qt::CaseInsensitive);
+    timeString.insert(13, ":");
+    timeString.insert(11, ":");
+    timeString.insert(6, "-");
+    timeString.insert(4, "-");
+    std::cout << timeString << std::endl;
+
+    m_refTime = iTime(timeString);
+
     setTarget(*cube.label());
 
     std::cout << "Target status" << std::endl;
@@ -151,8 +164,13 @@ namespace Isis {
     m_lookB[2] = locusVec[2];
     m_newLookB = true;
     p_pointComputed = true;
+    // TODO do we need to apply the alpha cube?
     p_childSample = sample;
     p_childLine = line;
+    if (!m_et) {
+      m_et = new iTime();
+    }
+    *m_et = m_refTime + m_model->getImageTime(imagePt);
     return true;
   }
 
@@ -239,16 +257,27 @@ namespace Isis {
       m_lookB[1] = imageLocus.direction.y;
       m_lookB[2] = imageLocus.direction.z;
       m_newLookB = true;
+      // TODO is this the correct time to apply the alpha cube?
       p_childSample = p_alphaCube->BetaSample(sample);
       p_childLine = p_alphaCube->BetaLine(line);
       p_pointComputed = true;
       shape->setHasIntersection(true);
+      if (!m_et) {
+        m_et = new iTime();
+      }
+      *m_et = m_refTime + m_model->getImageTime(imagePt);
       return true;
     }
 
     // Otherwise reset
     shape->clearSurfacePoint();
     return false;
+  }
+
+
+  void CSMCamera::setTime(const iTime &time) {
+    QString msg = "Setting the image time is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -333,7 +362,11 @@ namespace Isis {
     csm::ImageCoord imagePt;
     isisToCsmPixel(line, sample, imagePt);
     csm::EcefCoord sensorPosition =  m_model->getSensorPosition(imagePt);
-    std::vector<double> result {sensorPosition.x, sensorPosition.y, sensorPosition.z};
+    // CSM uses meters, but ISIS wants this in Km
+    std::vector<double> result {
+        sensorPosition.x / 1000.0,
+        sensorPosition.y / 1000.0,
+        sensorPosition.z / 1000.0};
     return result;
   }
 
@@ -350,9 +383,32 @@ namespace Isis {
   void CSMCamera::subSpacecraftPoint(double &lat, double &lon, double line, double sample) {
     // Get s/c position from CSM because it is vector from center of body to that
     vector<double> sensorPosition = sensorPositionBodyFixed(line, sample);
-    SurfacePoint surfacePoint(Displacement(sensorPosition[0], Displacement::Meters), Displacement(sensorPosition[1], Displacement::Meters), Displacement(sensorPosition[2], Displacement::Meters)); // Be careful -- what are the units actually?
+    SurfacePoint surfacePoint(
+        Displacement(sensorPosition[0], Displacement::Kilometers),
+        Displacement(sensorPosition[1], Displacement::Kilometers),
+        Displacement(sensorPosition[2], Displacement::Kilometers));
     lat = surfacePoint.GetLatitude().degrees();
     lon = surfacePoint.GetLongitude().degrees();
+  }
+
+
+  /**
+   * Returns the sub-solar latitude/longitude in universal coordinates (0-360
+   * positive east, ocentric)
+   *
+   * This is not supported for CSM sensors because we cannot get the position
+   * of the sun, only the illumination direction
+   *
+   * @param lat Sub-solar latitude
+   * @param lon Sub-solar longitude
+   *
+   * @see setTime()
+   * @throw Isis::IException::Programmer - "You must call SetTime
+   *             first."
+   */
+  void CSMCamera::subSolarPoint(double &lat, double &lon) {
+    QString msg = "Sun position is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -514,7 +570,40 @@ namespace Isis {
     return target()->shape()->incidenceAngle(sunVec);
   }
 
+  double CSMCamera::SlantDistance() const {
+    std::vector<double> sensorPosition = sensorPositionBodyFixed();
+    SurfacePoint groundPoint = GetSurfacePoint();
 
+    std::vector<double> sensorToGround = {
+        groundPoint.GetX().kilometers() - (sensorPosition[0]),
+        groundPoint.GetY().kilometers() - (sensorPosition[1]),
+        groundPoint.GetZ().kilometers() - (sensorPosition[2])};
+
+    return sqrt(
+        sensorToGround[0] * sensorToGround[0] +
+        sensorToGround[1] * sensorToGround[1] +
+        sensorToGround[2] * sensorToGround[2]);
+  }
+
+
+  /**
+   * Calculates and returns the distance from the spacecraft to the target center
+   *
+   * @return double Distance to the center of the target from the spacecraft
+   */
+  double CSMCamera::targetCenterDistance() const {
+    std::vector<double> sensorPosition = sensorPositionBodyFixed();
+    return sqrt(
+        sensorPosition[0] * sensorPosition[0] +
+        sensorPosition[1] * sensorPosition[1] +
+        sensorPosition[2] * sensorPosition[2]);
+  }
+
+
+  void CSMCamera::sunPosition(double p[3]) const {
+    QString msg = "Sun position is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
 
 
   SpicePosition *CSMCamera::sunPosition() const {
@@ -537,6 +626,20 @@ namespace Isis {
 
   SpiceRotation *CSMCamera::instrumentRotation() const {
     QString msg = "Instrument orientation is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  /**
+   * Computes the solar longitude for the given ephemeris time.  If the target
+   * is sky, the longitude is set to -999.0.
+   *
+   * This is not supported for CSM models because we cannot get the sun position
+   *
+   * @param et Ephemeris time
+   */
+  void CSMCamera::computeSolarLongitude(iTime et) {
+    QString msg = "Solar longitude is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "Camera.h"
+#include "iTime.h"
 #include "Target.h"
 
 #include <vector>
@@ -78,6 +79,8 @@ namespace Isis {
       virtual bool SetUniversalGround(const double latitude, const double longitude);
       virtual bool SetUniversalGround(const double latitude, const double longitude, double radius);
 
+      virtual void setTime(const iTime &time);
+
       virtual double LineResolution();
       virtual double SampleResolution();
       virtual double DetectorResolution();
@@ -88,8 +91,9 @@ namespace Isis {
       virtual double parentLine() const;
       virtual double parentSample() const;
 
-      void subSpacecraftPoint(double &lat, double &lon);
-      void subSpacecraftPoint(double &lat, double &lon, double line, double sample);
+      virtual void subSpacecraftPoint(double &lat, double &lon);
+      virtual void subSpacecraftPoint(double &lat, double &lon, double line, double sample);
+      virtual void subSolarPoint(double &lat, double &lon);
 
       virtual double PhaseAngle() const;
       virtual double EmissionAngle() const;
@@ -101,6 +105,10 @@ namespace Isis {
       virtual SpiceRotation *instrumentRotation() const;
 
       virtual void instrumentBodyFixedPosition(double p[3]) const;
+      virtual void sunPosition(double p[3]) const;
+
+      virtual double SlantDistance() const;
+      virtual double targetCenterDistance() const;
 
     protected:
       void setTarget(Pvl label);
@@ -108,8 +116,11 @@ namespace Isis {
       std::vector<double> sensorPositionBodyFixed() const;
       std::vector<double> sensorPositionBodyFixed(double line, double sample) const;
 
+      virtual void computeSolarLongitude(iTime et);
+
     private:
       csm::RasterGM *m_model; //! CSM sensor model
+      iTime m_refTime; //! The reference time that all model image times are relative to
 
       void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const;
       void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) const;

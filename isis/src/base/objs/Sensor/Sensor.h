@@ -220,7 +220,7 @@ namespace Isis {
 
       // Return vector between spacecraft and surface point in body-fixed
       void SpacecraftSurfaceVector(double scSurfaceVector[3]) const;
-      double SlantDistance() const;
+      virtual double SlantDistance() const;
       double LocalSolarTime();
       double SolarDistance() const;
       double SpacecraftAltitude();
