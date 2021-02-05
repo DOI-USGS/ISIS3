@@ -25,6 +25,18 @@ for (lbl in labels) {
                       bash miniconda.sh -b -p ${condaPath}
                     """
                   }
+                    
+                  // skip build for centos
+                  if ("${label}" != "centos") {
+                    checkout scm
+
+                    sh """
+                      git checkout dev 
+                      cd recipe 
+                      ${condaPath}/bin/conda install conda-build
+                      ${condaPath}/bin/conda build . --no-anaconda-upload  
+                    """
+                  }
                   
                   sh """
                      ${condaPath}/bin/conda config --set always_yes True
@@ -37,18 +49,6 @@ for (lbl in labels) {
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
                   """
-
-                  // skip build for centos
-                  if ("${label}" != "centos") {
-                    checkout scm
-
-                    sh """
-                      git checkout dev 
-                      cd recipe 
-                      ${condaPath}/bin/conda install conda-build
-                      ${condaPath}/bin/conda build . --no-anaconda-upload  
-                    """
-                  }
                 }
             }
         }
