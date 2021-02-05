@@ -321,7 +321,7 @@ namespace Isis {
       virtual iTime cacheEndTime() const;
 
       virtual void subSpacecraftPoint(double &lat, double &lon);
-      virtual  void subSolarPoint(double &lat, double &lon);
+      virtual void subSolarPoint(double &lat, double &lon);
 
       virtual Target *target() const;
       QString targetName() const;
@@ -372,6 +372,7 @@ namespace Isis {
       void storeValue(QString key, int index, SpiceValueType type,
                       QVariant value);
       QVariant readStoredValue(QString key, SpiceValueType type, int index);
+      virtual void computeSolarLongitude(iTime et);
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -390,6 +391,8 @@ namespace Isis {
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
       Target *m_target; //!< Target of the observation
+      iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
+      Longitude *m_solarLongitude; //!< Body rotation solar longitude value
 
     private:
       // Don't allow copies
@@ -401,10 +404,7 @@ namespace Isis {
       void defaultInit();
 
       void load(PvlKeyword &key, bool notab);
-      void computeSolarLongitude(iTime et);
 
-      Longitude *m_solarLongitude; //!< Body rotation solar longitude value
-      iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
       QVector<QString> * m_kernels; //!< Vector containing kernels filenames
 
       // cache stuff
