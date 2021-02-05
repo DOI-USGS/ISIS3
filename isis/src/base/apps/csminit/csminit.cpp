@@ -162,8 +162,8 @@ namespace Isis {
     csm::GeometricModel *modelWithParams = dynamic_cast<csm::GeometricModel*>(model);
 
     // TODO TEMPORARY WORK AROUND
-    // if (false&&modelWithParams) {
-    if (modelWithParams) {
+    if (false&&modelWithParams) {
+    // if (modelWithParams) {
       PvlKeyword paramNames("ModelParameterNames");
       PvlKeyword paramUnits("ModelParameterUnits");
       PvlKeyword paramTypes("ModelParameterTypes");

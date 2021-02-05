@@ -276,9 +276,9 @@ namespace Isis {
       int ReferenceBand() const;
       bool HasReferenceBand() const;
       virtual void SetBand(const int band);
-      virtual double Sample();
-      int Band();
-      virtual double Line();
+      virtual double Sample() const;
+      int Band() const;
+      virtual double Line() const;
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);
@@ -289,9 +289,9 @@ namespace Isis {
       virtual double PixelResolution();
       virtual double LineResolution();
       virtual double SampleResolution();
-      double DetectorResolution();
+      virtual double DetectorResolution();
 
-      double ObliqueDetectorResolution();
+      virtual double ObliqueDetectorResolution();
       virtual double ObliqueSampleResolution();
       virtual double ObliqueLineResolution();
       virtual double ObliquePixelResolution();

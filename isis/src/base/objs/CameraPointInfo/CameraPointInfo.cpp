@@ -60,7 +60,7 @@ namespace Isis {
 
   /**
    * Set the output format (true is CSV, false is PVL)
-   * 
+   *
    * @param csvOutput The new value to set csvOutput
    */
    void CameraPointInfo::SetCSVOutput(bool csvOutput) {
@@ -241,6 +241,7 @@ namespace Isis {
    *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::GetPointInfo(bool passed, bool allowOutside, bool allowErrors) {
+    std::cout << "Starting GetPointInfo" << std::endl;
     PvlGroup *gp = new PvlGroup("GroundPoint");
 
     //Outputting in PVL format
@@ -351,8 +352,6 @@ namespace Isis {
 
   }
 
-
-
     bool noErrors = passed;
     QString error = "";
     if (!m_camera->HasSurfaceIntersection()) {
@@ -360,11 +359,13 @@ namespace Isis {
       noErrors = false;
       if (!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
+    std::cout << "Checked surface intersection" << std::endl;
     if (!m_camera->InCube() && !allowOutside) {
       error = "Requested position does not project in camera model; not inside cube";
       noErrors = false;
       if (!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
+    std::cout << "Checked in image" << std::endl;
 
     if (!noErrors) {
       for (int i = 0; i < gp->keywords(); i++) {
@@ -385,11 +386,14 @@ namespace Isis {
       gp->findKeyword("FileName").setValue(m_currentCube->fileName());
       gp->findKeyword("Sample").setValue(toString(m_camera->Sample()));
       gp->findKeyword("Line").setValue(toString(m_camera->Line()));
+      std::cout << "  Got Camera Sample & Line: " << m_camera->Sample() << ", " << m_camera->Line() << std::endl;
       gp->findKeyword("EphemerisTime").setValue(
                       toString(m_camera->time().Et()), "seconds");
+      std::cout << "  Got Camera Time: " << m_camera->time().Et() << std::endl;
       gp->findKeyword("EphemerisTime").addComment("Time");
       QString utc = m_camera->time().UTC();
       gp->findKeyword("UTC").setValue(utc);
+      std::cout << "  Got Camera Time UTC: " << utc << std::endl;
       gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
       gp->findKeyword("SunPosition").addComment("Sun Information");
       gp->findKeyword("Phase").addComment("Illumination and Other");
@@ -412,16 +416,30 @@ namespace Isis {
         gp->findKeyword("Sample").setValue(toString(m_camera->Sample()));
         gp->findKeyword("Line").setValue(toString(m_camera->Line()));
         gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
-        gp->findKeyword("RightAscension").setValue(toString(
-                        m_camera->RightAscension()), "DEGREE");
-        gp->findKeyword("Declination").setValue(toString(
-                        m_camera->Declination()), "DEGREE");
+        try {
+          gp->findKeyword("RightAscension").setValue(toString(
+                          m_camera->RightAscension()), "DEGREE");
+        }
+        catch (IException &e) {
+          gp->findKeyword("RightAscension").setValue("Null");
+        }
+        std::cout << "  Tried to get Camera RA" << std::endl;
+        try {
+          gp->findKeyword("Declination").setValue(toString(
+                          m_camera->Declination()), "DEGREE");
+        }
+        catch (IException &e) {
+          gp->findKeyword("Declination").setValue("Null");
+        }
+        std::cout << "  Tried to get Camera Dec" << std::endl;
         ocentricLat = m_camera->UniversalLatitude();
         gp->findKeyword("PlanetocentricLatitude").setValue(toString(ocentricLat), "DEGREE");
+        std::cout << "  Got Camera Planetocentric Latitude: " << ocentricLat << std::endl;
 
         // Convert lat to planetographic
         Distance radii[3];
         m_camera->radii(radii);
+        std::cout << "  Got Camera Radii: " << radii[0].meters() << ", " << radii[1].meters() << ", " << radii[2].meters() << std::endl;
         ographicLat = TProjection::ToPlanetographic(ocentricLat,
                                               radii[0].kilometers(),
                                               radii[2].kilometers());
@@ -429,6 +447,7 @@ namespace Isis {
 
         pe360Lon = m_camera->UniversalLongitude();
         gp->findKeyword("PositiveEast360Longitude").setValue(toString(pe360Lon), "DEGREE");
+        std::cout << "  Got Camera 350 Positive East Longitude: " << m_camera->UniversalLongitude() << std::endl;
 
         //Convert lon to -180 - 180 range
         gp->findKeyword("PositiveEast180Longitude").setValue(toString(
@@ -446,22 +465,30 @@ namespace Isis {
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[1]), "km");
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[2]), "km");
+        std::cout << "  Got Camera ground point coordinate: " << pB[0] << ", " << pB[1] << ", " << pB[2] << std::endl;
 
         gp->findKeyword("LocalRadius").setValue(toString(
                         m_camera->LocalRadius().meters()), "meters");
+        std::cout << "  Got Camera local radius: " << m_camera->LocalRadius().meters() << std::endl;
         gp->findKeyword("SampleResolution").setValue(toString(
                         m_camera->SampleResolution()), "meters/pixel");
+        std::cout << "  Got Camera sample resolution: " << m_camera->SampleResolution() << std::endl;
         gp->findKeyword("LineResolution").setValue(toString(
                         m_camera->LineResolution()), "meters/pixel");
+        std::cout << "  Got Camera line resolution: " << m_camera->LineResolution() << std::endl;
 
         gp->findKeyword("ObliqueDetectorResolution").setValue(
                     toString(m_camera->ObliqueDetectorResolution()),"meters");
+        std::cout << "  Got Camera oblique detector resolution: " << m_camera->ObliqueDetectorResolution() << std::endl;
         gp->findKeyword("ObliqueLineResolution").setValue(
                     toString(m_camera->ObliqueLineResolution()),"meters");
+        std::cout << "  Got Camera oblique line resolution: " << m_camera->ObliqueLineResolution() << std::endl;
         gp->findKeyword("ObliqueSampleResolution").setValue(
                     toString(m_camera->ObliqueSampleResolution()),"meters");
+        std::cout << "  Got Camera oblique sample resolution: " << m_camera->ObliqueSampleResolution() << std::endl;
         gp->findKeyword("ObliquePixelResolution").setValue(
                     toString(m_camera->ObliquePixelResolution()), "meters/pix");
+        std::cout << "  Got Camera oblique pixel resolution: " << m_camera->ObliquePixelResolution() << std::endl;
 
 
         //body fixed
@@ -470,6 +497,7 @@ namespace Isis {
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
         gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
+        std::cout << "  Got Camera spacecraft position: " << spB[0] << ", " << spB[1] << ", " << spB[2] << std::endl;
 
         double spacecraftAzi = m_camera->SpacecraftAzimuth();
         if (Isis::IsValidPixel(spacecraftAzi)) {
@@ -478,29 +506,37 @@ namespace Isis {
         else {
           gp->findKeyword("SpacecraftAzimuth").setValue("NULL");
         }
+        std::cout << "  Got spacecraft azimuth: " << spacecraftAzi << std::endl;
 
         gp->findKeyword("SlantDistance").setValue(toString(
                         m_camera->SlantDistance()), "km");
+        std::cout << "  Got slant distance: " << m_camera->SlantDistance() << std::endl;
         gp->findKeyword("TargetCenterDistance").setValue(toString(
                         m_camera->targetCenterDistance()), "km");
+        std::cout << "  Got target center distance: " << m_camera->targetCenterDistance() << std::endl;
         m_camera->subSpacecraftPoint(ssplat, ssplon);
         gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat), "DEGREE");
         gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon), "DEGREE");
+        std::cout << "  Got sub spacecraft lat, lon: " << ssplat << ", " << ssplon << std::endl;
         gp->findKeyword("SpacecraftAltitude").setValue(toString(
                         m_camera->SpacecraftAltitude()), "km");
+        std::cout << "  Got spacecraft altitude: " <<  m_camera->SpacecraftAltitude() << std::endl;
         gp->findKeyword("OffNadirAngle").setValue(toString(
                         m_camera->OffNadirAngle()), "DEGREE");
+        std::cout << "  Got off nadir angle: " <<  m_camera->OffNadirAngle() << std::endl;
         double subspcgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
                                               m_camera->UniversalLongitude(),
                                               ssplat, ssplon);
         gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(
                                                  toString(subspcgrdaz), "DEGREE");
+        std::cout << "  Got sub spacecraft azimuth: " << subspcgrdaz << std::endl;
 
         m_camera->sunPosition(sB);
         gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
         gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
         gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
         gp->findKeyword("SunPosition").addComment("Sun Information");
+        std::cout << "  Got sub spacecraft lat, lon: " << sB[0] << ", " << sB[1] << ", " << sB[2] << std::endl;
 
         double sunAzi = m_camera->SunAzimuth();
         if (Isis::IsValidPixel(sunAzi)) {
@@ -509,24 +545,31 @@ namespace Isis {
         else {
           gp->findKeyword("SubSolarAzimuth").setValue("NULL");
         }
+        std::cout << "  Got sub solar azimuth: " << sunAzi << std::endl;
 
         gp->findKeyword("SolarDistance").setValue(toString(
                         m_camera->SolarDistance()), "AU");
+        std::cout << "  Got solar distance: " << m_camera->SolarDistance() << std::endl;
         m_camera->subSolarPoint(sslat, sslon);
         gp->findKeyword("SubSolarLatitude").setValue(toString(sslat), "DEGREE");
         gp->findKeyword("SubSolarLongitude").setValue(toString(sslon), "DEGREE");
+        std::cout << "  Got sub solar lat, lon: " << sslat << ", " << sslon << std::endl;
         double subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
                                               m_camera->UniversalLongitude(),
                                               sslat, sslon);
         gp->findKeyword("SubSolarGroundAzimuth").setValue(
                                                  toString(subsolgrdaz), "DEGREE");
+        std::cout << "  Got sub solar azimuth: " << subsolgrdaz << std::endl;
 
         gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
+        std::cout << "  Got phase angle: " << m_camera->PhaseAngle() << std::endl;
         gp->findKeyword("Phase").addComment("Illumination and Other");
         gp->findKeyword("Incidence").setValue(toString(
                         m_camera->IncidenceAngle()), "DEGREE");
+        std::cout << "  Got incidence angle: " << m_camera->IncidenceAngle() << std::endl;
         gp->findKeyword("Emission").setValue(toString(
                         m_camera->EmissionAngle()), "DEGREE");
+        std::cout << "  Got emission angle: " << m_camera->EmissionAngle() << std::endl;
 
         double northAzi = m_camera->NorthAzimuth();
         if (Isis::IsValidPixel(northAzi)) {
@@ -535,33 +578,41 @@ namespace Isis {
         else {
           gp->findKeyword("NorthAzimuth").setValue("NULL");
         }
+        std::cout << "  Got North azimuth: " << northAzi << std::endl;
 
         gp->findKeyword("EphemerisTime").setValue(toString(
                         m_camera->time().Et()), "seconds");
         gp->findKeyword("EphemerisTime").addComment("Time");
+        std::cout << "  Got Camera Time: " << m_camera->time().Et() << std::endl;
         utc = m_camera->time().UTC();
         gp->findKeyword("UTC").setValue(utc);
+        std::cout << "  Got Camera Time utc: " << utc << std::endl;
         gp->findKeyword("LocalSolarTime").setValue(toString(
                         m_camera->LocalSolarTime()), "hour");
+        std::cout << "  Got local solar time: " << m_camera->LocalSolarTime() << std::endl;
         gp->findKeyword("SolarLongitude").setValue(toString(
                         m_camera->solarLongitude().degrees()), "DEGREE");
+        std::cout << "  Got local longitude: " << m_camera->solarLongitude().degrees() << std::endl;
 
         std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
+        std::cout << "  Got look direction body fixed: " << lookB[0] << ", " << lookB[1] << ", " << lookB[2] << ", " << std::endl;
 
         std::vector<double>lookJ = m_camera->lookDirectionJ2000();
         gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
         gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
         gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
+        std::cout << "  Got look direction J2000: " << lookJ[0] << ", " << lookJ[1] << ", " << lookJ[2] << ", " << std::endl;
 
         double lookC[3];
         m_camera->LookDirection(lookC);
         gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "DEGREE");
         gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "DEGREE");
         gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "DEGREE");
+        std::cout << "  Got look direction camera: " << lookC[0] << ", " << lookC[1] << ", " << lookC[2] << ", " << std::endl;
 
 
 

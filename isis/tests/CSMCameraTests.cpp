@@ -248,6 +248,7 @@ TEST_F(CSMCameraFixture, SetImage) {
   EXPECT_EQ(testCam->UniversalLongitude(), 0.0);
 }
 
+// TODO fix the mock for the new setGround code to get the look vector
 TEST_F(CSMCameraFixture, SetGround) {
   // Define some things to match/return
   csm::ImageCoord imagePt(4.5, 4.5);
@@ -309,8 +310,8 @@ TEST_F(CSMCameraFixture, Resolution) {
   EXPECT_NEAR(testCam->ObliqueLineResolution(), expectedLineRes, 1e-10);
   EXPECT_NEAR(testCam->SampleResolution(), expectedSampRes, 1e-10);
   EXPECT_NEAR(testCam->ObliqueSampleResolution(), expectedSampRes, 1e-10);
-  EXPECT_NEAR(testCam->PixelResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
-  EXPECT_NEAR(testCam->ObliquePixelResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
+  EXPECT_NEAR(testCam->DetectorResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
+  EXPECT_NEAR(testCam->ObliqueDetectorResolution(), (expectedLineRes+expectedSampRes) / 2.0, 1e-10);
 }
 
 TEST_F(CSMCameraFixture, SubSpacecraftPoint) {
