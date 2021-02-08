@@ -274,12 +274,6 @@ namespace Isis {
   }
 
 
-  void CSMCamera::setTime(const iTime &time) {
-    QString msg = "Setting the image time is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-
-
   double CSMCamera::LineResolution() {
     vector<double> imagePartials = ImagePartials();
     return sqrt(imagePartials[0]*imagePartials[0] +
@@ -390,37 +384,6 @@ namespace Isis {
     lon = surfacePoint.GetLongitude().degrees();
   }
 
-
-  /**
-   * Returns the sub-solar latitude/longitude in universal coordinates (0-360
-   * positive east, ocentric)
-   *
-   * This is not supported for CSM sensors because we cannot get the position
-   * of the sun, only the illumination direction
-   *
-   * @param lat Sub-solar latitude
-   * @param lon Sub-solar longitude
-   *
-   * @see setTime()
-   * @throw Isis::IException::Programmer - "You must call SetTime
-   *             first."
-   */
-  void CSMCamera::subSolarPoint(double &lat, double &lon) {
-    QString msg = "Sun position is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-
-
-  /**
-   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or
-   * square, depending on the sampling mode.  The first vertex is the top left.
-   *
-   * The CSM API does not support this type of internal information about the sensor.
-   */
-   QList<QPointF> CSMCamera::PixelIfovOffsets() {
-     QString msg = "Pixel Field of View is not computable for a CSM camera model.";
-     throw IException(IException::User, msg, _FILEINFO_);
-   }
 
   /**
   * Compute the partial derivatives of the ground point with respect to
@@ -610,6 +573,44 @@ namespace Isis {
         sensorPosition[0] * sensorPosition[0] +
         sensorPosition[1] * sensorPosition[1] +
         sensorPosition[2] * sensorPosition[2]);
+  }
+
+
+  void CSMCamera::setTime(const iTime &time) {
+    QString msg = "Setting the image time is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  /**
+   * Returns the sub-solar latitude/longitude in universal coordinates (0-360
+   * positive east, ocentric)
+   *
+   * This is not supported for CSM sensors because we cannot get the position
+   * of the sun, only the illumination direction
+   *
+   * @param lat Sub-solar latitude
+   * @param lon Sub-solar longitude
+   *
+   * @see setTime()
+   * @throw Isis::IException::Programmer - "You must call SetTime
+   *             first."
+   */
+  void CSMCamera::subSolarPoint(double &lat, double &lon) {
+    QString msg = "Sub solar point is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  /**
+   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or
+   * square, depending on the sampling mode.  The first vertex is the top left.
+   *
+   * The CSM API does not support this type of internal information about the sensor.
+   */
+  QList<QPointF> CSMCamera::PixelIfovOffsets() {
+    QString msg = "Pixel Field of View is not supported for CSM camera models";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 

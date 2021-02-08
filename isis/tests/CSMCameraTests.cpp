@@ -540,3 +540,218 @@ TEST_F(CSMSetCameraFixture, EmissionAngle) {
 
   EXPECT_DOUBLE_EQ(testCam->EmissionAngle(), 0.0);
 }
+
+
+TEST_F(CSMCameraFixture, SetTime) {
+  try
+  {
+    testCam->setTime(iTime("2000-01-01T11:58:55.816"));
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Setting the image time is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Setting the image time is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, SubSolarPoint) {
+  try
+  {
+    double lat, lon;
+    testCam->subSolarPoint(lat ,lon);
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Sub solar point is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Sub solar point is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, PixelIfovOffsets) {
+  try
+  {
+    testCam->PixelIfovOffsets();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Pixel Field of View is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Pixel Field of View is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, SunPosition) {
+  try
+  {
+    double position[3];
+    testCam->sunPosition(position);
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Sun position is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Sun position is not supported for CSM camera models\"";
+  }
+
+  try
+  {
+    testCam->sunPosition();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Sun position is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Sun position is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, InstrumentPosition) {
+  try
+  {
+    testCam->instrumentPosition();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Instrument position is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Instrument position is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, BodyRotation) {
+  try
+  {
+    testCam->bodyRotation();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Target body orientation is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Target body orientation is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, InstrumentRotation) {
+  try
+  {
+    testCam->instrumentRotation();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Instrument orientation is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Instrument orientation is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, SolarLongitude) {
+  try
+  {
+    testCam->solarLongitude();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Solar longitude is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Solar longitude is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, SolarDistance) {
+  try
+  {
+    testCam->SolarDistance();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Solar distance is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Solar distance is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, RightAscension) {
+  try
+  {
+    testCam->RightAscension();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Right Ascension is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Right Ascension is not supported for CSM camera models\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, Declination) {
+  try
+  {
+    testCam->Declination();
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Declination is not supported "
+        "for CSM camera models")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IExcpetion with message \""
+      " Declination is not supported for CSM camera models\"";
+  }
+}
