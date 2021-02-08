@@ -82,8 +82,6 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    // TODO: Find out why this is 12 hrs different than ths StartTime in the ISIS label.
-    std::cout << m_model->getReferenceDateAndTime() << std::endl;
     // We have to strip off any trailing Zs and then add separators in order for iTime to work
     // TODO make this work with more time string formats and move to iTime
     QString timeString = QString::fromStdString(m_model->getReferenceDateAndTime());
