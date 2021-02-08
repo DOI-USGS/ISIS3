@@ -221,6 +221,33 @@ class CSMCameraFixture : public CSMCubeFixture {
 };
 
 
+class CSMSetCameraFixture : public CSMCameraFixture {
+  protected:
+    csm::Ellipsoid wgs84;
+    csm::ImageCoord imagePt;
+    csm::EcefCoord groundPt;
+    csm::EcefLocus imageLocus;
+
+    void SetUp() override {
+      CSMCameraFixture::SetUp();
+
+      imagePt = csm::ImageCoord(4.5, 4.5);
+      groundPt = csm::EcefCoord(wgs84.getSemiMajorRadius(), 0, 0);
+      imageLocus = csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0);
+
+      // Setup the mock for setImage and ensure it succeeds
+      EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
+          .Times(1)
+          .WillOnce(::testing::Return(imageLocus));
+      EXPECT_CALL(mockModel, getImageTime)
+          .Times(1)
+          .WillOnce(::testing::Return(10.0));
+
+      ASSERT_TRUE(testCam->SetImage(5, 5)); // Assert here so that the test code doesn't run if the camera isn't set
+    }
+};
+
+
 class CSMDemCameraFixture : public CSMCubeFixture {
   protected:
     Camera *testCam;
@@ -404,7 +431,7 @@ TEST_F(CSMDemCameraFixture, SetGround) {
 }
 
 
-TEST_F(CSMCameraFixture, Resolution) {
+TEST_F(CSMSetCameraFixture, Resolution) {
   // Setup to return the ground partials we want
   // The pseudoinverse of:
   // 1 2 3
@@ -418,17 +445,6 @@ TEST_F(CSMCameraFixture, Resolution) {
       .Times(6)
       .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
 
-  // We also have to set the mock up for setimage
-  csm::Ellipsoid wgs84;
-  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
-      .Times(1)
-      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0)));
-  EXPECT_CALL(mockModel, getImageTime)
-      .Times(1)
-      .WillOnce(::testing::Return(10.0));
-
-  testCam->SetImage(5, 5);
-
   // Use expect near here because the psuedoinverse calculation is only accurate to ~1e-10
   double expectedLineRes = sqrt(17*17 + 2*2 + 13*13)/18;
   double expectedSampRes = sqrt(8*8 + 2*2 + 4*4)/18;
@@ -441,22 +457,11 @@ TEST_F(CSMCameraFixture, Resolution) {
 }
 
 
-TEST_F(CSMCameraFixture, SubSpacecraftPoint) {
-  csm::Ellipsoid wgs84;
-  csm::ImageCoord imagePt(4.5, 4.5);
+TEST_F(CSMSetCameraFixture, SubSpacecraftPoint) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillRepeatedly(::testing::Return(csm::EcefCoord(wgs84.getSemiMajorRadius() + 50000, 0, 0)));
 
-  // We also have to set the mock up for setimage
-  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
-      .Times(1)
-      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0)));
-  EXPECT_CALL(mockModel, getImageTime)
-      .Times(1)
-      .WillOnce(::testing::Return(10.0));
-
-  testCam->SetImage(5, 5);
   double lat, lon;
   testCam->subSpacecraftPoint(lat, lon);
   EXPECT_EQ(lat, 0.0);
