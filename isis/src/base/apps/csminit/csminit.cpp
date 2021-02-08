@@ -21,6 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "CSMCamera.h"
 #include "Cube.h"
 #include "IException.h"
 #include "Process.h"
@@ -46,17 +47,10 @@ namespace Isis {
     // Get the cube here so that we check early if it doesn't exist
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
-    // We have to call this to get the plugin list loaded right now
-    try {
-      Camera *cam = CameraFactory::Create(*cube);
-      delete cam;
-    }
-    catch(...) {
-      // Noop
-    }
+    // We have to call this to get the plugin list loaded.
+    CameraFactory::Create();
 
     // TODO operate on a copy of the label so that we don't modify the file if we fail
-
     QString isdFilePath = ui.GetFileName("ISD");
 
     QList<QStringList> possibleModels;
@@ -163,7 +157,7 @@ namespace Isis {
 
     // TODO TEMPORARY WORK AROUND
     if (false&&modelWithParams) {
-    // if (modelWithParams) {
+    //if (modelWithParams) {
       PvlKeyword paramNames("ModelParameterNames");
       PvlKeyword paramUnits("ModelParameterUnits");
       PvlKeyword paramTypes("ModelParameterTypes");
@@ -198,6 +192,13 @@ namespace Isis {
       infoGroup += paramTypes;
     }
     cube->putGroup(infoGroup);
+
+    // TODO: 
+    // Kernels, Instrument, CsmInfo groups
+    // save off original copy
+    // make a new modified version
+    // if all goes well, use new verison
+    // if fails, use copy of original
 
     // Update existing Kernels Group or create new one and add shapemodel if provided
     if (!cube->hasGroup("Kernels")) {
@@ -281,19 +282,10 @@ namespace Isis {
       kernelsGroup.deleteKeyword("Tolerance");
     }
 
-    // Remove tables from spiceinit
-    cube->deleteBlob("Table", "InstrumentPointing");
-    cube->deleteBlob("Table", "InstrumentPosition");
-    cube->deleteBlob("Table", "BodyRotation");
-    cube->deleteBlob("Table", "SunPosition");
-    cube->deleteBlob("Table", "CameraStatistics");
-    cube->deleteBlob("Polygon", "Footprint");
 
     if (cube->label()->hasObject("NaifKeywords")) {
       cube->label()->deleteObject("NaifKeywords");
     }
-
-    cube->deleteBlob("String", "CSMState");
 
     // Create our CSM State blob as a string
     // Add the CSM string to the Blob.
@@ -302,12 +294,34 @@ namespace Isis {
     blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
     blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
 
+    try {
+      CSMCamera(*cube, csmStateBlob);
+    } 
+    catch (IException &e) {
+      QString message = "Failed to create a CSMCamera prior to writing the CSM state information to the cube.";
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    }
+
+    cube->deleteBlob("String", "CSMState");
+
+    // Remove tables from spiceinit
+    cube->deleteBlob("Table", "InstrumentPointing");
+    cube->deleteBlob("Table", "InstrumentPosition");
+    cube->deleteBlob("Table", "BodyRotation");
+    cube->deleteBlob("Table", "SunPosition");
+    cube->deleteBlob("Table", "CameraStatistics");
+    cube->deleteBlob("Polygon", "Footprint");
+
     // Write CSM State blob to cube
     cube->write(csmStateBlob);
-
-    // TODO attempt to get the CSM Model from the cube
-
     p.WriteHistory(*cube);
-  }
 
+    try {
+      CameraFactory::Create(*cube);
+    } 
+    catch (IException &e) {
+      QString message = "Failed to create a CSMCamera after writing the CSM state information to the cube.";
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    }
+  }
 }

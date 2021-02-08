@@ -65,6 +65,7 @@ namespace Isis {
   class CameraFactory {
     public:
       static Camera *Create(Cube &cube);
+      static void Create();
       static int CameraVersion(Cube &cube);
       static int CameraVersion(Pvl &lab);
 
@@ -81,6 +82,7 @@ namespace Isis {
       ~CameraFactory() {};
 
       static Plugin m_cameraPlugin;   //!< The plugin file for the camera
+      static bool m_initialized; //!<Has the plugin list been initialized
   };
 };
 
