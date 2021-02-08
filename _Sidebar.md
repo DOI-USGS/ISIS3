@@ -15,7 +15,6 @@
 
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
-  * [RFC6 - BLOB Redesign](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC6:-BLOB-Redesign)
 
 
 # Archived RFCs
@@ -25,6 +24,7 @@
   * [RFC3 - Impact on Application Users](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC3a:-SPICE-Modularization----Impact-on-Application-Users)
   * [RFC4 - Migration of ISIS Data to GitHub - Updated Information 2020-03-16](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC4---Migration-of-ISIS-Data-to-Git)
   * [RFC5 - Remove old LRO LOLA/GRAIL SPK files](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC5-Remove-old-LOLAGRAIL-SPKs)
+  * [RFC6 - BLOB Redesign](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC6:-BLOB-Redesign)
 
 # Instrument Workflows
 * [Kaguya Terrain Camera](https://github.com/USGS-Astrogeology/ISIS3/wiki/Kaguya-Terrain-Camera)
