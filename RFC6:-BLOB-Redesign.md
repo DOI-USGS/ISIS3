@@ -1,7 +1,7 @@
 - Feature/Process Name: BLOB Redesign
 - Start Date: October 23, 2020
-- RFC PR: [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
-- Issue: (link or create and link and associated issue for discussion)
+- RFC PR: forethcoming
+- Issue: [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
 - Author: Jesse Mapel, Adam Paquette, & Austin Sanders
 
 <!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new wiki page titled RFC#:Title, where the number is the next incrementing number. If you would like to submit an RFC, but are unable to edit the wiki, please open an issue and we will assist you in getting your RFC posted. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
