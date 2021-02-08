@@ -461,13 +461,82 @@ TEST_F(CSMSetCameraFixture, Resolution) {
 }
 
 
+TEST_F(CSMSetCameraFixture, InstrumentBodyFixedPosition) {
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(imageLocus.point));
+
+  double position[3];
+  testCam->instrumentBodyFixedPosition(position);
+  EXPECT_EQ(position[0], (imageLocus.point.x) / 1000.0);
+  EXPECT_EQ(position[1], (imageLocus.point.y) / 1000.0);
+  EXPECT_EQ(position[2], (imageLocus.point.z) / 1000.0);
+}
+
+
 TEST_F(CSMSetCameraFixture, SubSpacecraftPoint) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
-      .WillRepeatedly(::testing::Return(csm::EcefCoord(wgs84.getSemiMajorRadius() + 50000, 0, 0)));
+      .WillOnce(::testing::Return(imageLocus.point));
 
   double lat, lon;
   testCam->subSpacecraftPoint(lat, lon);
   EXPECT_EQ(lat, 0.0);
   EXPECT_EQ(lon, 0.0);
+}
+
+
+TEST_F(CSMSetCameraFixture, SlantDistance) {
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(imageLocus.point));
+
+  double expectedDistance = sqrt(
+      pow(imageLocus.point.x - groundPt.x, 2) +
+      pow(imageLocus.point.y - groundPt.y, 2) +
+      pow(imageLocus.point.z - groundPt.z, 2)) / 1000.0;
+  EXPECT_DOUBLE_EQ(testCam->SlantDistance(), expectedDistance);
+}
+
+
+TEST_F(CSMSetCameraFixture, TargetCenterDistance) {
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(imageLocus.point));
+
+  double expectedDistance = sqrt(
+      pow(imageLocus.point.x, 2) +
+      pow(imageLocus.point.y, 2) +
+      pow(imageLocus.point.z, 2)) / 1000.0;
+  EXPECT_DOUBLE_EQ(testCam->targetCenterDistance(), expectedDistance);
+}
+
+
+TEST_F(CSMSetCameraFixture, PhaseAngle) {
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::EcefCoord(groundPt.x + 50000, groundPt.y, groundPt.z + 50000)));
+  EXPECT_CALL(mockModel, getIlluminationDirection(MatchEcefCoord(groundPt)))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, 1.0)));
+
+  EXPECT_DOUBLE_EQ(testCam->PhaseAngle(), 45.0);
+}
+
+
+TEST_F(CSMSetCameraFixture, IncidenceAngle) {
+  EXPECT_CALL(mockModel, getIlluminationDirection(MatchEcefCoord(groundPt)))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, 1.0)));
+
+  EXPECT_DOUBLE_EQ(testCam->IncidenceAngle(), 90.0);
+}
+
+
+TEST_F(CSMSetCameraFixture, EmissionAngle) {
+  EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
+      .Times(1)
+      .WillOnce(::testing::Return(imageLocus.point));
+
+  EXPECT_DOUBLE_EQ(testCam->EmissionAngle(), 0.0);
 }

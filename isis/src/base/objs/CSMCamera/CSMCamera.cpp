@@ -552,8 +552,15 @@ namespace Isis {
 
 
   double CSMCamera::PhaseAngle() const {
-    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(isisToCsmGround(GetSurfacePoint()));
-    std::vector<double> sunVec = {sunEcefVec.x, sunEcefVec.y, sunEcefVec.z};
+    csm::EcefCoord groundPt = isisToCsmGround(GetSurfacePoint());
+    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(groundPt);
+    // ISIS wants the position of the sun, not just the vector from the ground
+    // point to the sun. So, we approximate this by adding in the ground point.
+    // ISIS wants this in Km so convert
+    std::vector<double> sunVec = {
+        (sunEcefVec.x + groundPt.x) / 1000.0,
+        (sunEcefVec.y + groundPt.y) / 1000.0,
+        (sunEcefVec.z + groundPt.z) / 1000.0};
     return target()->shape()->phaseAngle(sensorPositionBodyFixed(), sunVec);
   }
 
@@ -564,8 +571,15 @@ namespace Isis {
 
 
   double CSMCamera::IncidenceAngle() const {
-    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(isisToCsmGround(GetSurfacePoint()));
-    std::vector<double> sunVec = {sunEcefVec.x, sunEcefVec.y, sunEcefVec.z};
+    csm::EcefCoord groundPt = isisToCsmGround(GetSurfacePoint());
+    csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(groundPt);
+    // ISIS wants the position of the sun, not just the vector from the ground
+    // point to the sun. So, we approximate this by adding in the ground point.
+    // ISIS wants this in Km so convert
+    std::vector<double> sunVec = {
+        (sunEcefVec.x + groundPt.x) / 1000.0,
+        (sunEcefVec.y + groundPt.y) / 1000.0,
+        (sunEcefVec.z + groundPt.z) / 1000.0};
     return target()->shape()->incidenceAngle(sunVec);
   }
 
