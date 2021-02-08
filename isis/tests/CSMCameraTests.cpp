@@ -251,9 +251,13 @@ class CSMSetCameraFixture : public CSMCameraFixture {
 class CSMDemCameraFixture : public CSMCubeFixture {
   protected:
     Camera *testCam;
+    double demRadius;
 
     void SetUp() override {
       CSMCubeFixture::SetUp();
+
+      // Record the demRadius at 0 lat, 0 lon
+      demRadius = 3394200.43980104;
 
       // Update the shapemodel on the cube
       PvlGroup &kernGroup = testCube->group("Kernels");
@@ -333,7 +337,7 @@ TEST_F(CSMDemCameraFixture, SetImage) {
   EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
       // looking straight down X-Axis
-      .WillOnce(::testing::Return(csm::EcefLocus(3394200.43980104 + 50000, 0, 0, -1, 0, 0)));
+      .WillOnce(::testing::Return(csm::EcefLocus(demRadius + 50000, 0, 0, -1, 0, 0)));
   EXPECT_CALL(mockModel, computeGroundPartials)
       .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
   EXPECT_CALL(mockModel, getImageTime)
@@ -397,8 +401,8 @@ TEST_F(CSMCameraFixture, SetGround) {
 TEST_F(CSMDemCameraFixture, SetGround) {
   // Define some things to match/return
   csm::ImageCoord imagePt(4.5, 4.5);
-  csm::EcefCoord groundPt(3394200.43980104, 0, 0);
-  csm::EcefLocus imageLocus(3394200.43980104 + 50000, 0, 0, -1, 0, 0);
+  csm::EcefCoord groundPt(demRadius, 0, 0);
+  csm::EcefLocus imageLocus(demRadius + 50000, 0, 0, -1, 0, 0);
 
   // Setup expected calls/returns
   EXPECT_CALL(mockModel, groundToImage(MatchEcefCoord(groundPt), ::testing::_, ::testing::_, ::testing::_))
@@ -417,7 +421,7 @@ TEST_F(CSMDemCameraFixture, SetGround) {
 
   EXPECT_TRUE(testCam->SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees),
                                  Longitude(0.0, Angle::Degrees),
-                                 Distance(3394200.43980104, Distance::Meters))));
+                                 Distance(demRadius, Distance::Meters))));
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 
@@ -425,7 +429,7 @@ TEST_F(CSMDemCameraFixture, SetGround) {
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 
-  EXPECT_TRUE(testCam->SetUniversalGround(0.0, 0.0, 3394200.43980104));
+  EXPECT_TRUE(testCam->SetUniversalGround(0.0, 0.0, demRadius));
   EXPECT_EQ(testCam->Line(), 5.0);
   EXPECT_EQ(testCam->Sample(), 5.0);
 }
