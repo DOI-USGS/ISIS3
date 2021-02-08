@@ -521,9 +521,9 @@ namespace Isis {
     // point to the sun. So, we approximate this by adding in the ground point.
     // ISIS wants this in Km so convert
     std::vector<double> sunVec = {
-        (sunEcefVec.x + groundPt.x) / 1000.0,
-        (sunEcefVec.y + groundPt.y) / 1000.0,
-        (sunEcefVec.z + groundPt.z) / 1000.0};
+        (groundPt.x - sunEcefVec.x) / 1000.0,
+        (groundPt.y - sunEcefVec.y) / 1000.0,
+        (groundPt.z - sunEcefVec.z) / 1000.0};
     return target()->shape()->phaseAngle(sensorPositionBodyFixed(), sunVec);
   }
 
@@ -540,9 +540,9 @@ namespace Isis {
     // point to the sun. So, we approximate this by adding in the ground point.
     // ISIS wants this in Km so convert
     std::vector<double> sunVec = {
-        (sunEcefVec.x + groundPt.x) / 1000.0,
-        (sunEcefVec.y + groundPt.y) / 1000.0,
-        (sunEcefVec.z + groundPt.z) / 1000.0};
+        (groundPt.x - sunEcefVec.x) / 1000.0,
+        (groundPt.y - sunEcefVec.y) / 1000.0,
+        (groundPt.z - sunEcefVec.z) / 1000.0};
     return target()->shape()->incidenceAngle(sunVec);
   }
 

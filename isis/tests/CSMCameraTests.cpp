@@ -518,7 +518,7 @@ TEST_F(CSMSetCameraFixture, PhaseAngle) {
       .WillOnce(::testing::Return(csm::EcefCoord(groundPt.x + 50000, groundPt.y, groundPt.z + 50000)));
   EXPECT_CALL(mockModel, getIlluminationDirection(MatchEcefCoord(groundPt)))
       .Times(1)
-      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, 1.0)));
+      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, -1.0)));
 
   EXPECT_DOUBLE_EQ(testCam->PhaseAngle(), 45.0);
 }
@@ -527,7 +527,7 @@ TEST_F(CSMSetCameraFixture, PhaseAngle) {
 TEST_F(CSMSetCameraFixture, IncidenceAngle) {
   EXPECT_CALL(mockModel, getIlluminationDirection(MatchEcefCoord(groundPt)))
       .Times(1)
-      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, 1.0)));
+      .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, -1.0)));
 
   EXPECT_DOUBLE_EQ(testCam->IncidenceAngle(), 90.0);
 }
