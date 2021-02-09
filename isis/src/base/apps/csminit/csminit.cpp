@@ -129,6 +129,22 @@ namespace Isis {
 
     string modelState = model->getModelState();
 
+    // Making copies of original Pvl Groups from input label so they can be restored if csminit fails.
+    PvlGroup originalInstrument;
+    PvlGroup originalKernels;
+    PvlGroup originalCsmInfo;
+    if (cube->hasGroup("Instrument")) {
+      originalInstrument = cube->group("Instrument");
+    }
+
+    if (cube->hasGroup("Kernels")) {
+      originalKernels = cube->group("Kernels");
+    }
+
+    if (cube->hasGroup("CsmInfo")) {
+      originalCsmInfo = cube->group("CsmInfo");
+    }
+
     // If the user doesn't specify a target name, then we will still need
     // something on the label for the Target & ShapeModel so add Unknown
     if (!cube->hasGroup("Instrument")) {
@@ -192,13 +208,6 @@ namespace Isis {
       infoGroup += paramTypes;
     }
     cube->putGroup(infoGroup);
-
-    // TODO: 
-    // Kernels, Instrument, CsmInfo groups
-    // save off original copy
-    // make a new modified version
-    // if all goes well, use new verison
-    // if fails, use copy of original
 
     // Update existing Kernels Group or create new one and add shapemodel if provided
     if (!cube->hasGroup("Kernels")) {
@@ -298,13 +307,30 @@ namespace Isis {
       CSMCamera(*cube, csmStateBlob);
     } 
     catch (IException &e) {
+
+      cube->deleteGroup("Instrument");
+      if (originalInstrument.keywords() != 0) {
+	cube->putGroup(originalInstrument);
+      }
+
+      cube->deleteGroup("Kernels");      
+      if (originalKernels.keywords() != 0) {
+	cube->putGroup(originalKernels);
+      }
+
+      cube->deleteGroup("CsmInfo");      
+      if (originalCsmInfo.keywords() != 0) {
+	cube->putGroup(originalCsmInfo);
+      }
+
       QString message = "Failed to create a CSMCamera prior to writing the CSM state information to the cube.";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
 
+    // Delete existing CSMState Blob if it already exists before writing a new one
     cube->deleteBlob("String", "CSMState");
 
-    // Remove tables from spiceinit
+    // Remove tables from spiceinit before writing to the cube
     cube->deleteBlob("Table", "InstrumentPointing");
     cube->deleteBlob("Table", "InstrumentPosition");
     cube->deleteBlob("Table", "BodyRotation");
