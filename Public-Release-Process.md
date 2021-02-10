@@ -24,7 +24,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
 * Create a fresh branch off of the appropriate version branch. Branches are created for each minor (i.e. 3.x or 4.x) version of ISIS, and each then specific release is associated with a minor version (i.e. 3.x.x or 4.x.x) tag on that version branch. 
 
-    * For releases, there should already be a branch for this version created during the release candidate process. If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. If we are doing a release for ISIS 3.10, the git command to create a branch and checkout to it is `git checkout -b 3.10 upstream/dev`. If there already is a version branch: `git checkout -b 3.10 upstream/3.10` 
+    * For releases, there should already be a branch for this version created during the release candidate process. If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. If you are doing a release for ISIS 3.10, the git command to create a branch and checkout to it is `git checkout -b 3.10 upstream/dev`. If there is already a version branch: `git checkout -b 3.10 upstream/3.10` 
 
 
     * For release candidates, there may or may not be a branch for the version. If there is not, create a branch off of `dev`. If there is a version branch: `git checkout -b 3.10 upstream/3.10`.
