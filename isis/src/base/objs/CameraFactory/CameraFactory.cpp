@@ -20,13 +20,22 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+
+#include <csm/Plugin.h>
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QLibrary>
+
 #include "CameraFactory.h"
 
 #include "Camera.h"
-#include "Plugin.h"
-#include "IException.h"
 #include "FileName.h"
+#include "IException.h"
+#include "Plugin.h"
+#include "Preference.h"
 
+using namespace csm;
 using namespace std;
 
 namespace Isis {
@@ -102,9 +111,12 @@ namespace Isis {
 
 
   /**
-   * Reads the appropriate plugin file for the camera
+   * Reads the appropriate plugin file for the ISIS cameras, and scans the
+   * directories specified in IsisPreferences for CSM cameras.
    */
   void CameraFactory::initPlugin() {
+
+    // Handle the ISIS camera plugins
     if (m_cameraPlugin.fileName() == "") {
       FileName localFile("Camera.plugin");
       if (localFile.fileExists())
@@ -113,6 +125,22 @@ namespace Isis {
       FileName systemFile("$ISISROOT/lib/Camera.plugin");
       if (systemFile.fileExists())
         m_cameraPlugin.read(systemFile.expanded());
+    }
+
+    // Find the CSM plugins by searching the directories identified in the Preferences.
+    // Load the found libraries. This causes the static instance(s) to be constructed,
+    // and thus registering the model with the csm Plugin class.
+    Preference &p = Preference::Preferences();
+    PvlGroup &grp = p.findGroup("Plugins", Isis::Pvl::Traverse);
+    for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
+      FileName csmDir = grp["CSMDirectory"][i];
+
+      QDirIterator csmLib(csmDir.expanded(), {"*.so", "*.dylib"}, QDir::Files);
+      while (csmLib.hasNext()) {
+        QString csmLibName = csmLib.next();
+        QLibrary csmDynamicLib(csmLibName);
+        csmDynamicLib.load();
+      }
     }
   }
 

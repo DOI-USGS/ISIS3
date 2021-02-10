@@ -10,6 +10,7 @@
 #include "HistogramWidget.h"
 #include "Statistics.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 
 namespace Isis {
   /**
@@ -72,8 +73,6 @@ namespace Isis {
 
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
-
-    p_stretch->setType("BinaryStretch"); 
 
     setLayout(p_mainLayout);
     setStretch(calculateNewStretch());
@@ -375,5 +374,16 @@ namespace Isis {
     }
 
     return newStretch;
+  }
+
+
+  /**
+   * Gets the CubeStretch for this Binary Stretch
+   * 
+   * @return CubeStretch 
+   */
+  CubeStretch BinaryStretchType::getStretch() {
+    CubeStretch cubeStretch(*p_stretch, "Binary");
+    return cubeStretch;
   }
 }
