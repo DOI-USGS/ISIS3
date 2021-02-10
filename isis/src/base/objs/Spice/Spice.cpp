@@ -79,7 +79,7 @@ namespace Isis {
   Spice::Spice(Cube &cube) {
     Pvl &lab = *cube.label();
     // TODO: update to check to see if it has a state string
-    if (cube.hasGroup("CsmInfo")) {
+    if (cube.hasBlob("String", "CSMState")) {
       csmInit(cube, lab);
     }
     else {
