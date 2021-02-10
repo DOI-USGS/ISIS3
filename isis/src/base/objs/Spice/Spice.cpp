@@ -114,7 +114,14 @@ namespace Isis {
   }
 
 
-  // TODO: docs
+  /**
+   * Initialize the Spice object for a CSMCamera.
+   * This sets up the Spice/Sensor/Camera object to not have any SPICE dependent
+   * members initialized.
+   *
+   * @param cube The Cube containing image data for the camera
+   * @param label The label containing information for the camera
+   */
   void Spice::csmInit(Cube &cube, Pvl label) {
     defaultInit();
     m_target = new Target;
@@ -122,6 +129,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Default initialize the members of the SPICE object.
+   */
   void Spice::defaultInit() {
     m_solarLongitude = new Longitude;
 
