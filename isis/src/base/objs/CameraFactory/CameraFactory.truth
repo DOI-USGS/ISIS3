@@ -1,32 +1,32 @@
 Unit test for CameraFactory
 Testing missing Instrument Group ...
-Version: **ERROR** Unable to locate latest camera model version number in Camera Factory.
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** Unable to find PVL group [Instrument].
 
 **ERROR** Unable to initialize camera model in Camera Factory.
 **ERROR** Unable to find PVL group [Instrument].
 
 Testing missing spacecraft name ...
-Version: **ERROR** Unable to locate latest camera model version number in Camera Factory.
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** PVL Keyword [SpacecraftName] does not exist in [Group = Instrument].
 
 **ERROR** Unable to initialize camera model in Camera Factory.
 **ERROR** PVL Keyword [SpacecraftName] does not exist in [Group = Instrument].
 
 Testing missing instrument id ...
-Version: **ERROR** Unable to locate latest camera model version number in Camera Factory.
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** PVL Keyword [InstrumentId] does not exist in [Group = Instrument].
 
 **ERROR** Unable to initialize camera model in Camera Factory.
 **ERROR** PVL Keyword [InstrumentId] does not exist in [Group = Instrument].
 
 Testing unsupported camera mode ...
-Version: **ERROR** Unable to locate latest camera model version number in Camera Factory.
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
 **ERROR** Unable to find PVL group [BOGUSSPACECRAFT/BOGUSINSTRUMENT].
 
 **ERROR** Unable to initialize camera model in Camera Factory.
-**ERROR** Unable to locate latest camera model version number in Camera Factory.
+**ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
 **ERROR** Unable to find PVL group [BOGUSSPACECRAFT/BOGUSINSTRUMENT].
 
