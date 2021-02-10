@@ -156,11 +156,11 @@ namespace Isis {
       instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
     }
     else {
-      // leave it alone if it's already set. 
-      // TODO: leave Target alone if it's currently set. Might break something.
-      PvlKeyword targetKey("TargetName", "Unknown");
-      targetKey.addComment("Radii will come from the CSM model");
-      instrumentGroup.addKeyword(targetKey, Pvl::Replace);
+      if (!instrumentGroup.hasKeyword("TargetName")) {
+        PvlKeyword targetKey("TargetName", "Unknown");
+        targetKey.addComment("Radii will come from the CSM model");
+        instrumentGroup.addKeyword(targetKey, Pvl::Replace);
+      }
     }
 
     // Populate the CsmInfo group with useful information
