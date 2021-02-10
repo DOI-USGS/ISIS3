@@ -90,29 +90,10 @@ namespace Isis {
     timeString.insert(11, ":");
     timeString.insert(6, "-");
     timeString.insert(4, "-");
-    std::cout << timeString << std::endl;
 
     m_refTime = iTime(timeString);
 
     setTarget(*cube.label());
-
-    std::cout << "Target status" << std::endl;
-    if (target()) {
-      std::cout << "Target name: " << target()->name() << std::endl;
-      std::vector<Distance> targetRad = target()->radii();
-      std::cout << "Target radii: " << targetRad[0].meters() << ", " << targetRad[1].meters() << ", " << targetRad[2].meters() << std::endl;
-      std::cout << "Shape status" << std::endl;
-      if (target()->shape()) {
-        std::cout << "Target name: " << target()->shape()->name() << std::endl;
-        std::cout << "Target is DEM?: " << target()->shape()->isDEM() << std::endl;
-      }
-      else {
-        std::cout << "Shape Uninitialized" << std::endl;
-      }
-    }
-    else {
-      std::cout << "Target Uninitialized" << std::endl;
-    }
   }
 
 
