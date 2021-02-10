@@ -46,18 +46,26 @@ namespace Isis {
    * Prepare to write string to output cube
    */
   void StringBlob::WriteInit() {
-    int bytes = m_string.size();
-    std::cout << "String size in StringBlob writeinit" << bytes << std::endl;
-    char *temp = p_buffer;
-//    p_nbytes = bytes
-    p_buffer = new char[p_nbytes+bytes];
-    std::cout << "nbytes in StringBlob writeinit" << p_nbytes << std::endl;
-    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
-    const char *ptr = m_string.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
+    p_nbytes = m_string.size();
 
-    if (temp != NULL) delete [] temp;
+    if (p_buffer != NULL) {
+      delete p_buffer;
+    }
+
+    p_buffer = new char[p_nbytes];
+    const char *ptr = m_string.c_str();
+    memcpy(p_buffer, (void *)ptr, p_nbytes);
+
+//    int bytes = m_string.size();
+//    char *temp = p_buffer;
+//    p_buffer = new char[p_nbytes+bytes];
+
+//    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
+//    const char *ptr = m_string.c_str();
+//    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
+//    p_nbytes += bytes;
+
+//    if (temp != NULL) delete [] temp;
   }
 
   /**

@@ -157,7 +157,7 @@ namespace Isis {
     }
     else {
       // leave it alone if it's already set. 
-      // TODO: leave Target alone if it's currently set. Might break something. 
+      // TODO: leave Target alone if it's currently set. Might break something.
       PvlKeyword targetKey("TargetName", "Unknown");
       targetKey.addComment("Radii will come from the CSM model");
       instrumentGroup.addKeyword(targetKey, Pvl::Replace);
@@ -299,39 +299,11 @@ namespace Isis {
       cube->label()->deleteObject("NaifKeywords");
     }
 
-//    try {
-//      CSMCamera(*cube, QString::fromStdString(plugin->getPluginName()), 
-//                QString::fromStdString(model->getModelName()), QString::fromStdString(modelState));
-//    } 
-//    catch (IException &e) {
-//
-//      cube->deleteGroup("Instrument");
-//      if (originalInstrument.keywords() != 0) {
-//        cube->putGroup(originalInstrument);
-//      }
-//
-//      cube->deleteGroup("Kernels");      
-//      if (originalKernels.keywords() != 0) {
-//        cube->putGroup(originalKernels);
-//      }
-//
-//      cube->deleteGroup("CsmInfo");      
-//      if (originalCsmInfo.keywords() != 0) {
-//        cube->putGroup(originalCsmInfo);
-//      }
-//
-//      QString message = "Failed to create a CSMCamera.";
-//      throw IException(e, IException::Unknown, message, _FILEINFO_);
-//    }
-//
-
     // Save off all old Blobs to restore in the case of csminit failure
-
     StringBlob originalCsmStateBlob("", "CSMState");
     if (cube->hasBlob("String", "CSMState")) {
       cube->read(originalCsmStateBlob);
     }
-    std::cout << "Old CSM blob size: " << originalCsmStateBlob.Size() << std::endl;
 
     Table originalInstrumentPointing("InstrumentPointing");
     if (cube->hasTable("InstrumentPointing")) {
@@ -374,8 +346,6 @@ namespace Isis {
     cube->deleteBlob("Table", "CameraStatistics");
     cube->deleteBlob("Polygon", "Footprint");
 
-    cube->reopen("rw");
-
     // Create our CSM State blob as a string and add the CSM string to the Blob.
     StringBlob csmStateBlob(modelState, "CSMState");
     PvlObject &blobLabel = csmStateBlob.Label();
@@ -383,43 +353,32 @@ namespace Isis {
     blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
     cube->write(csmStateBlob);
 
-    std::cout << "New CSM blob size: " << csmStateBlob.Size() << std::endl;
-    std::cout << "ORIGINAL size after new one created: " << originalCsmStateBlob.Size() << std::endl;
-
     try {
       CameraFactory::Create(*cube);
-      std::cout << "ORIGINAL size after CREATE: " << originalCsmStateBlob.Size() << std::endl;
       p.WriteHistory(*cube);
     } 
     catch (IException &e) {
-      std::cout << "WHY NOT: " << originalCsmStateBlob.Size() << std::endl;
       // Restore the original groups on the label
       cube->deleteGroup("Instrument");
       if (originalInstrument.keywords() != 0) {
         cube->putGroup(originalInstrument);
       }
 
-      cube->deleteGroup("Kernels");      
+      cube->deleteGroup("Kernels");     
       if (originalKernels.keywords() != 0) {
         cube->putGroup(originalKernels);
       }
 
-      cube->deleteGroup("CsmInfo");      
+      cube->deleteGroup("CsmInfo");
       if (originalCsmInfo.keywords() != 0) {
         cube->putGroup(originalCsmInfo);
       }
 
-      std::cout << "New blob size in catch 412: " << originalCsmStateBlob.Size() << std::endl;
       cube->deleteBlob("String", "CSMState");
-      std::cout << "New blob size in catch 414: " << originalCsmStateBlob.Size() << std::endl;
-
-      // try cube->reopen("rw");
 
       // Restore the original blobs
       if (originalCsmStateBlob.Size() != 0) {
-        std::cout << "New blob size in catch before: " << originalCsmStateBlob.Size() << std::endl;
         cube->write(originalCsmStateBlob);
-        std::cout << "New blob size in catch after: " << originalCsmStateBlob.Size() << std::endl;
       }
 
       if (originalInstrumentPointing.Records() != 0) {
