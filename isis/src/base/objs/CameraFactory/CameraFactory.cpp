@@ -132,14 +132,6 @@ namespace Isis {
 
   
   /**
-   * Just initialize the CSM and ISIS plugin lists.
-   */
-  void CameraFactory::Create() {
-    initPlugin();
-  }
-
-
-  /**
    * Reads the appropriate plugin file for the ISIS cameras, and scans the
    * directories specified in IsisPreferences for CSM cameras.
    */

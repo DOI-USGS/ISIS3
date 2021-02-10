@@ -27,7 +27,7 @@ namespace Isis {
     public:
       // constructors
       CSMCamera(Cube &cube);
-      CSMCamera(Cube &cube, StringBlob &state);
+//      CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString);
 
       //! Destroys the CSMCamera object.
       ~CSMCamera() {};

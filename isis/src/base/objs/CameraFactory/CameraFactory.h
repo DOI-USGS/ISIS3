@@ -65,13 +65,11 @@ namespace Isis {
   class CameraFactory {
     public:
       static Camera *Create(Cube &cube);
-      static void Create();
       static int CameraVersion(Cube &cube);
       static int CameraVersion(Pvl &lab);
-
-    private:
       static void initPlugin();
 
+    private:
       /**
        * Constructor (Its private, so you cannot use it.  Use the Create method
        * instead

@@ -24,6 +24,7 @@ find files of those names at the top level of this repository. **/
 #include "CSMCamera.h"
 #include "Cube.h"
 #include "IException.h"
+#include "ImagePolygon.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -48,7 +49,7 @@ namespace Isis {
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
     // We have to call this to get the plugin list loaded.
-    CameraFactory::Create();
+    CameraFactory::initPlugin();
 
     // TODO operate on a copy of the label so that we don't modify the file if we fail
     QString isdFilePath = ui.GetFileName("ISD");
@@ -155,6 +156,8 @@ namespace Isis {
       instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
     }
     else {
+      // leave it alone if it's already set. 
+      // TODO: leave Target alone if it's currently set. Might break something. 
       PvlKeyword targetKey("TargetName", "Unknown");
       targetKey.addComment("Radii will come from the CSM model");
       instrumentGroup.addKeyword(targetKey, Pvl::Replace);
@@ -296,38 +299,71 @@ namespace Isis {
       cube->label()->deleteObject("NaifKeywords");
     }
 
-    // Create our CSM State blob as a string
-    // Add the CSM string to the Blob.
-    StringBlob csmStateBlob(modelState, "CSMState");
-    PvlObject &blobLabel = csmStateBlob.Label();
-    blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
-    blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
+//    try {
+//      CSMCamera(*cube, QString::fromStdString(plugin->getPluginName()), 
+//                QString::fromStdString(model->getModelName()), QString::fromStdString(modelState));
+//    } 
+//    catch (IException &e) {
+//
+//      cube->deleteGroup("Instrument");
+//      if (originalInstrument.keywords() != 0) {
+//        cube->putGroup(originalInstrument);
+//      }
+//
+//      cube->deleteGroup("Kernels");      
+//      if (originalKernels.keywords() != 0) {
+//        cube->putGroup(originalKernels);
+//      }
+//
+//      cube->deleteGroup("CsmInfo");      
+//      if (originalCsmInfo.keywords() != 0) {
+//        cube->putGroup(originalCsmInfo);
+//      }
+//
+//      QString message = "Failed to create a CSMCamera.";
+//      throw IException(e, IException::Unknown, message, _FILEINFO_);
+//    }
+//
 
-    try {
-      CSMCamera(*cube, csmStateBlob);
-    } 
-    catch (IException &e) {
+    // Save off all old Blobs to restore in the case of csminit failure
 
-      cube->deleteGroup("Instrument");
-      if (originalInstrument.keywords() != 0) {
-	cube->putGroup(originalInstrument);
-      }
+    StringBlob originalCsmStateBlob("", "CSMState");
+    if (cube->hasBlob("String", "CSMState")) {
+      cube->read(originalCsmStateBlob);
+    }
+    std::cout << "Old CSM blob size: " << originalCsmStateBlob.Size() << std::endl;
 
-      cube->deleteGroup("Kernels");      
-      if (originalKernels.keywords() != 0) {
-	cube->putGroup(originalKernels);
-      }
-
-      cube->deleteGroup("CsmInfo");      
-      if (originalCsmInfo.keywords() != 0) {
-	cube->putGroup(originalCsmInfo);
-      }
-
-      QString message = "Failed to create a CSMCamera prior to writing the CSM state information to the cube.";
-      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    Table originalInstrumentPointing("InstrumentPointing");
+    if (cube->hasTable("InstrumentPointing")) {
+      cube->read(originalInstrumentPointing);
     }
 
-    // Delete existing CSMState Blob if it already exists before writing a new one
+    Table originalInstrumentPosition("InstrumentPosition");
+    if (cube->hasTable("InstrumentPosition")) {
+      cube->read(originalInstrumentPosition);
+    }
+
+    Table originalBodyRotation("BodyRotation");
+    if (cube->hasTable("BodyRotation")) {
+      cube->read(originalBodyRotation);
+    }
+
+    Table originalSunPosition("SunPosition");
+    if (cube->hasTable("SunPosition")) {
+      cube->read(originalSunPosition);
+    }
+
+    Table originalCameraStatistics("CameraStatistics");
+    if (cube->hasTable("CameraStatistics")) {
+      cube->read(originalCameraStatistics);
+    }
+
+    ImagePolygon originalFootprint;
+    if (cube->hasBlob("Polygon", "ImageFootprint")) {
+      cube->read(originalFootprint);
+    }
+
+    // Remove blob from old csminit run
     cube->deleteBlob("String", "CSMState");
 
     // Remove tables from spiceinit before writing to the cube
@@ -338,15 +374,79 @@ namespace Isis {
     cube->deleteBlob("Table", "CameraStatistics");
     cube->deleteBlob("Polygon", "Footprint");
 
-    // Write CSM State blob to cube
+    cube->reopen("rw");
+
+    // Create our CSM State blob as a string and add the CSM string to the Blob.
+    StringBlob csmStateBlob(modelState, "CSMState");
+    PvlObject &blobLabel = csmStateBlob.Label();
+    blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
+    blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
     cube->write(csmStateBlob);
-    p.WriteHistory(*cube);
+
+    std::cout << "New CSM blob size: " << csmStateBlob.Size() << std::endl;
+    std::cout << "ORIGINAL size after new one created: " << originalCsmStateBlob.Size() << std::endl;
 
     try {
       CameraFactory::Create(*cube);
+      std::cout << "ORIGINAL size after CREATE: " << originalCsmStateBlob.Size() << std::endl;
+      p.WriteHistory(*cube);
     } 
     catch (IException &e) {
-      QString message = "Failed to create a CSMCamera after writing the CSM state information to the cube.";
+      std::cout << "WHY NOT: " << originalCsmStateBlob.Size() << std::endl;
+      // Restore the original groups on the label
+      cube->deleteGroup("Instrument");
+      if (originalInstrument.keywords() != 0) {
+        cube->putGroup(originalInstrument);
+      }
+
+      cube->deleteGroup("Kernels");      
+      if (originalKernels.keywords() != 0) {
+        cube->putGroup(originalKernels);
+      }
+
+      cube->deleteGroup("CsmInfo");      
+      if (originalCsmInfo.keywords() != 0) {
+        cube->putGroup(originalCsmInfo);
+      }
+
+      std::cout << "New blob size in catch 412: " << originalCsmStateBlob.Size() << std::endl;
+      cube->deleteBlob("String", "CSMState");
+      std::cout << "New blob size in catch 414: " << originalCsmStateBlob.Size() << std::endl;
+
+      // try cube->reopen("rw");
+
+      // Restore the original blobs
+      if (originalCsmStateBlob.Size() != 0) {
+        std::cout << "New blob size in catch before: " << originalCsmStateBlob.Size() << std::endl;
+        cube->write(originalCsmStateBlob);
+        std::cout << "New blob size in catch after: " << originalCsmStateBlob.Size() << std::endl;
+      }
+
+      if (originalInstrumentPointing.Records() != 0) {
+        cube->write(originalInstrumentPointing);
+      }
+
+      if (originalInstrumentPosition.Records() != 0) {
+        cube->write(originalInstrumentPosition);
+      }
+
+      if (originalBodyRotation.Records() != 0) {
+        cube->write(originalBodyRotation);
+      }
+
+      if (originalSunPosition.Records() != 0) {
+        cube->write(originalSunPosition);
+      }
+
+      if (originalCameraStatistics.Records() != 0) {
+        cube->write(originalCameraStatistics);
+      }
+
+      if (originalFootprint.Size() != 0) {
+        cube->write(originalFootprint);
+      }
+
+      QString message = "Failed to create a CSMCamera.";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }

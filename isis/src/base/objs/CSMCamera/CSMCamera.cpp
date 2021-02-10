@@ -44,16 +44,13 @@ using namespace std;
 
 namespace Isis {
 
-  /**
-   * Constructor for the USGS CSM Camera Model inside ISIS.
-   */
-  CSMCamera::CSMCamera(Cube &cube, StringBlob &state) : Camera(cube) {
-    PvlObject &blobLabel = state.Label();
-    QString pluginName = blobLabel.findKeyword("PluginName")[0];
-    QString modelName = blobLabel.findKeyword("ModelName")[0];
-    init(cube, pluginName, modelName, QString::fromStdString(state.string()));
-  }
-
+//  /**
+//   * Constructor for the USGS CSM Camera Model inside ISIS.
+//   */
+//  CSMCamera::CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString) : Camera(cube) {
+//    init(cube, pluginName, modelName, stateString);
+//  }
+//
 
   /**
    * Constructor for the USGS CSM Camera Model inside ISIS.

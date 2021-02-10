@@ -47,9 +47,11 @@ namespace Isis {
    */
   void StringBlob::WriteInit() {
     int bytes = m_string.size();
-
+    std::cout << "String size in StringBlob writeinit" << bytes << std::endl;
     char *temp = p_buffer;
+//    p_nbytes = bytes
     p_buffer = new char[p_nbytes+bytes];
+    std::cout << "nbytes in StringBlob writeinit" << p_nbytes << std::endl;
     if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
     const char *ptr = m_string.c_str();
     memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
