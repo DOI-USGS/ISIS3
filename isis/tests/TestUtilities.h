@@ -57,7 +57,6 @@ namespace Isis {
   void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex=0,
                       double tolerance = 0.000001);
 
-  // gMock matchers for CSM structs
   ::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected);
   ::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected);
 }
