@@ -66,7 +66,8 @@ namespace Isis {
 
     importFits.setProcessFileStructure(0);
 
-    Cube *output = importFits.SetOutputCube("TO");
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    Cube *output = importFits.SetOutputCube(ui.GetFileName("TO"), att);
 
     // Get the path where the New Horizons translation tables are.
     QString transDir = "$ISISROOT/appdata/translations/";
@@ -127,7 +128,8 @@ namespace Isis {
 
       importFits.setProcessFileStructure(1);
 
-      Cube *outputError = importFits.SetOutputCube("ERROR");
+      CubeAttributeOutput &attErr = ui.GetOutputAttribute("ERROR");
+      Cube *outputError = importFits.SetOutputCube(ui.GetFileName("ERROR"), attErr);
 
       // Save the input FITS label in the Cube original labels
       Pvl pvlError;
@@ -147,7 +149,8 @@ namespace Isis {
 
       importFits.setProcessFileStructure(2);
 
-      Cube *outputError = importFits.SetOutputCube("QUALITY");
+      CubeAttributeOutput &attQual = ui.GetOutputAttribute("QUALITY");
+      Cube *outputError = importFits.SetOutputCube(ui.GetFileName("QUALITY"), attQual);
 
       // Save the input FITS label in the Cube original labels
       Pvl pvlError;
