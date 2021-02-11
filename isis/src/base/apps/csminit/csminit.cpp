@@ -163,6 +163,11 @@ namespace Isis {
       }
     }
 
+    if (!instrumentGroup.hasKeyword("InstrumentId")) {
+      PvlKeyword instrumentIdKey("InstrumentId", QString::fromStdString(model->getSensorIdentifier()));
+      instrumentGroup.addKeyword(instrumentIdKey, Pvl::Replace);
+    }
+
     // Populate the CsmInfo group with useful information
     cube->deleteGroup("CsmInfo");
     PvlGroup infoGroup("CsmInfo");
