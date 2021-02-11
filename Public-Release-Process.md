@@ -71,7 +71,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
 * Update the version variable to the version of ISIS you are building. 
 
-    * If you are building a standard release, use the same version number as in [Part B](#Part_B:_Update_isis/CMakeLists.txt). 
+    * If you are building a standard release, use the same version number as in [Part B](#part-b-update-isiscmakeliststxt). 
 
     * If you are building a release candidate, include "_RCx".  
 
@@ -112,7 +112,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
       * Make sure to change the target from `dev` to the appropriate version branch for your release. 
 
-      * The release "Tag version" must be the \<version\> from the meta.yaml file you modified in [Part C](#Part_C:_Update_recipe/meta.yaml). 
+      * The release "Tag version" must be the \<version\> from the meta.yaml file you modified in [Part C](#part-c-update-recipemetayaml). 
 
       * Mission and non-standard builds (including release candidates) must be tagged as pre-release. 
 
@@ -132,15 +132,11 @@ In this step, we will prepare the local repository to build from as well as upda
 
 ## Step 4: Create the Builds for Anaconda Cloud 
 
-  
 
 In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. There are two builds for standard releases: one for Linux (built on Ubuntu 18 LTS), and one for Mac (built on Mac OS 10.14). Missions may only need one build and not the other. Communicate with your team as to what they need. Repeat this and the upload process process for each necessary system. 
 
-  
-
 Anaconda leverages caching in many places which can cause issues. If you are getting unexpected issues, try a different installation and/or a different machine. 
 
-  
 
 ### Part A: Operating System 
 
@@ -150,7 +146,6 @@ Anaconda leverages caching in many places which can cause issues. If you are get
 
     * If you do not have access to a Ubuntu 18 LTS, you can ssh into prog28. 
 
-  
 
 ### Part B: Setup Anaconda 
 
@@ -174,9 +169,10 @@ commands:
 
     * If running ```anaconda login``` resulted in an error message similar to ```[ERROR] API server not found. Please check your API url configuration``` run the following command and try again: ```anaconda config --set ssl_verify False```  
 
+
 ### Part C: Run the Build 
 
-* Go to the root of the repository you set up in [Step 3 Part A](#Part_A:_Setup_Repository). Make sure it is up to date. 
+* Go to the root of the repository you set up in [Step 3 Part A](#part-a-setup-repository). Make sure it is up to date. 
 
     * Switch to the appropriate version branch 
 
@@ -194,35 +190,22 @@ commands:
 
 ## Step 5: Test the Conda Build 
 
-  
 
 After the conda build completes, it should be tested by uploading it to your personal anaconda cloud account and conda installing it locally.  
 
-  
-
 * Use the command ```anaconda upload -u <conda-cloud-username> <path-to-the-.tar.bz2-file>``` to upload the conda build to your personal anaconda channel. 
-
-  
 
 * Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install this package locally for testing, but at the installation step, instead of running `conda install -c usgs-astrogeology isis`, run `conda install -c <conda-cloud-username> -c usgs-astrogeology isis`  
 
-  
-
 * Run an ISIS application, like `spiceinit -h` and insure that it runs without error. This is testing whether the conda environment set up during the install is complete enough to run ISIS.   
 
-  
 
 ## Step 6: Upload the Build to Anaconda Cloud 
 
-  
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. Uploading the .tar.bz2 file requires one command, however, non-standard builds (release candidates or custom builds), must be uploaded with a label.  
 
-  
-
 * If you missed the location of the .tar.bz2 file at the bottom of the build, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build. 
-
-  
 
 * For a standard release, use the command ```anaconda upload -u usgs-astrogeology <path-to-the-.tar.bz2-file>``` 
 
@@ -232,11 +215,8 @@ In this step, we will upload the build(s) that we just created into the Anaconda
 
    * For example, when generating a custom build for the CaSSIS team, we would use the "cassis" label and the command ```anaconda upload -u usgs-astrogeology -l cassis <path-to-the-.tar.bz2-file>``` 
 
-  
-
 If the upload fails or displays a prompt for a username and password, try adding an API token for usgs-astrogeology to your environment by running `export ANACONDA_API_TOKEN=<token>`. Ask another developer for the API token. This approach is recommended over adding `-t <token>` to your anaconda upload command, because of a known bug where `-t` is either interpreted as a package type or a token depending on its position in the `anaconda upload` command.  
 
-  
 
 ## Step 7: Back up the Build  
 
@@ -246,49 +226,34 @@ Back up the build by copying the .tar.bz2 to:
 
   * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS. 
 
-  
 
 ## Step 8: Update Data and TestData Areas on rsync Servers 
 
-  
 
 This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes. 
 
-  
-
 **Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc).** 
 
-  
 
 ### Part A: Update the Local Server 
 
 * Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers. 
 
-  
-
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
 
-  
-
-  
 
 ### Part B: Update the Remote Server 
 
 * Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
 
-  
-
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
-
 
 
 ## Step 9: Create Internal Builds/Installs for Astro 
 
-  
 
 This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. These commands must be run as isis3mgr for permission purposes. 
 
-  
 
 ### Part A: Shared Anaconda Installs 
 
@@ -298,7 +263,6 @@ This step covers creating the builds and the installation environments of ISIS f
 
     * For MacOS: `/usgs/cpkgs/anaconda3_macOS` 
 
-  
 
 ### Part B: Installing ISIS 
 
@@ -312,51 +276,37 @@ This step covers creating the builds and the installation environments of ISIS f
 
     * For the step which sets up the data and testData areas, make sure to use the new isis_data and isis_testData directories, i.e.: `python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=/usgs/cpkgs/isis3/isis_data  --test-dir=/usgs/cpkgs/isis3/isis_testData` 
 
-  
-
-  
-
 * Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice. 
 
-  
 
 ## Step 10: Update Documentation 
 
-  
 
-**This step is only done for standard releases.** 
-
-  
+**This step is only done for standard feature releases.** 
 
 This step will update the ISIS documentation on our [website](https://isis.astrogeology.usgs.gov/UserDocs/) for our users worldwide. These commands must be run as isis3mgr for permission purposes. 
 
-  
 
 ### Part A: Build the documentation 
 
-  
 
 * Perform a local build (not a conda build) using the instructions available [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake) 
 
-* setisis to the build directory from [Step 3 Part A](#Part_A:_Setup_Repository). 
+* setisis to the build directory from [Step 3 Part A](#part-a-setup-repository). 
 
 * Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code. 
 
-  
 
 ### Part B: Upload the documentation 
 
 * In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc``` as the isis3mgr user. 
 
-  
 
 ## Step 11: Communicate Availability of Build 
 
-  
 
 This step will will communicate that a new version of ISIS is available. 
 
-  
 
 ### Part A: External Announcement 
 
