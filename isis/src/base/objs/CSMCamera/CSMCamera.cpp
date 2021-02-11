@@ -857,7 +857,7 @@ namespace Isis {
 
 
   /**
-   * Get the SpicePosition object the contains the state information for the sun in J2000.
+   * Get the SpicePosition object that contains the state information for the sun in J2000.
    *
    * This is not supported for CSM sensors because we cannot get the position
    * of the sun, only the illumination direction.
