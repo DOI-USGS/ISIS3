@@ -22,10 +22,15 @@ If the heading does not yet exist under Unreleased, then add it as a 3rd heading
 with three #.
 
 
-When preparing for a public release add a new 2nd heading, with two #, under
+When preparing for a public release candidate add a new 2nd heading, with two #, under
 Unreleased with the version number and the release date, in year-month-day
 format. Then, add a link for the new version at the bottom of this document and
 update the Unreleased link so that it compares against the latest release tag.
+
+
+When preparing for a bug fix release create a new 2nd heading above the Fixed
+heading to indicate that only the bug fixes and security fixes are in the bug fix
+release.
 -->
 
 ## [Unreleased]
