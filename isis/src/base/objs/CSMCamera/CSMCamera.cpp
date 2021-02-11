@@ -53,7 +53,11 @@ namespace Isis {
 //
 
   /**
-   * Constructor for the USGS CSM Camera Model inside ISIS.
+   * Constructor for an ISIS Camera model that uses a Community Sensor Model (CSM)
+   * for the principal transformations.
+   *
+   * @param cube The Cube containing image data and CSM Model information for the
+   *             ISIS Camera Model.
    */
   CSMCamera::CSMCamera(Cube &cube) : Camera(cube) {
     StringBlob state("","CSMState");
@@ -116,7 +120,18 @@ namespace Isis {
   }
 
 
-  // TODO make this an iterative technique that updates the locus each iteration
+  /**
+   * Set the image sample and line for the Camera Model and then compute the
+   * cooresponding image time, look vector, and ground point.
+   *
+   * @param sample The image sample coordinate
+   * @param line The image line coordinate
+   *
+   * @returns @b bool If the image coordinate was set successfully
+   *
+   * @todo Change the locus ground intersection to iteratively approximate a curved
+   *       locus instead of assuming a straight locus.
+   */
   bool CSMCamera::SetImage(const double sample, const double line) {
     csm::ImageCoord imagePt;
     isisToCsmPixel(p_alphaCube->AlphaLine(line), p_alphaCube->AlphaSample(sample), imagePt);
@@ -174,16 +189,51 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the latitude and longitude for the Camera Model and then compute the
+   * cooresponding image time, look vector, and image coordinate. The ground
+   * point radius will be computed from the shape model.
+   *
+   * @param latitude The ground point latitude in degrees
+   * @param longitude The ground point longitude in positive East, 360 domain degrees
+   *
+   * @returns @b bool If the ground point was set successfully
+   */
   bool CSMCamera::SetUniversalGround(const double latitude, const double longitude) {
-    return SetGround(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees));
+    return SetGround(
+        Latitude(latitude, Angle::Degrees),
+        Longitude(longitude, Angle::Degrees));
   }
 
 
+/**
+   * Set the latitude, longitude, and radius for the Camera Model and then compute the
+   * cooresponding image time, look vector, and image coordinate.
+   *
+   * @param latitude The ground point latitude in degrees
+   * @param longitude The ground point longitude in positive East, 360 domain degrees
+   * @param radius The ground point radius in meters
+   *
+   * @returns @b bool If the ground point was set successfully
+   */
   bool CSMCamera::SetUniversalGround(const double latitude, const double longitude, double radius) {
-    return SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees), Longitude(longitude, Angle::Degrees), Distance(radius, Distance::Meters)));
+    return SetGround(SurfacePoint(
+        Latitude(latitude, Angle::Degrees),
+        Longitude(longitude, Angle::Degrees),
+        Distance(radius, Distance::Meters)));
   }
 
 
+  /**
+   * Set the latitude and longitude for the Camera Model and then compute the
+   * cooresponding image time, look vector, and image coordinate. The ground
+   * point radius will be computed from the shape model.
+   *
+   * @param latitude The ground point latitude
+   * @param longitude The ground point longitude
+   *
+   * @returns @b bool If the ground point was set successfully
+   */
   bool CSMCamera::SetGround(Latitude latitude, Longitude longitude) {
     ShapeModel *shape = target()->shape();
     Distance localRadius;
@@ -205,6 +255,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the ground point for the Camera Model and then compute the
+   * cooresponding image time, look vector, and image coordinate.
+   *
+   * @param surfacePt The ground point
+   *
+   * @returns @b bool If the ground point was set successfully
+   */
   bool CSMCamera::SetGround(const SurfacePoint & surfacePt) {
     ShapeModel *shape = target()->shape();
     if (!surfacePt.Valid()) {
@@ -256,7 +314,6 @@ namespace Isis {
       m_lookB[1] = imageLocus.direction.y;
       m_lookB[2] = imageLocus.direction.z;
       m_newLookB = true;
-      // TODO is this the correct time to apply the alpha cube?
       p_childSample = p_alphaCube->BetaSample(sample);
       p_childLine = p_alphaCube->BetaLine(line);
       p_pointComputed = true;
@@ -274,6 +331,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the line resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so this uses a more time consuming but
+   * more accurate method and thus is equivalent to the oblique line resolution.
+   *
+   * For time dependent sensor models, this may also be the line-to-line resolution
+   * and not the resolution within a line or framelet. This is determined by the
+   * CSM model's ground computeGroundPartials method.
+   *
+   * @returns @b double The line resolution in meters per pixel
+   */
   double CSMCamera::LineResolution() {
     vector<double> imagePartials = ImagePartials();
     return sqrt(imagePartials[0]*imagePartials[0] +
@@ -282,6 +352,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the sample resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so this uses a more time consuming but
+   * more accurate method and thus is equivalent to the oblique sample resolution.
+   *
+   * @returns @b double The sample resolution in meters per pixel
+   */
   double CSMCamera::SampleResolution() {
     vector<double> imagePartials = ImagePartials();
     return sqrt(imagePartials[1]*imagePartials[1] +
@@ -290,6 +369,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the detector resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so this uses a more time consuming but
+   * more accurate method and thus is equivalent to the oblique detector resolution.
+   *
+   * @returns @b double The detector resolution in meters per pixel
+   */
   double CSMCamera::DetectorResolution() {
     // Redo the line and sample resolution calculations because it avoids
     // a call to ImagePartials which could be a costly call
@@ -304,34 +392,82 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the oblique line resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so obliqueness does not need to be
+   * accounted for. Thus, this is equivalent to the line resolution.
+   *
+   * @returns @b double The oblique line resolution in meters per pixel
+   */
   double CSMCamera::ObliqueLineResolution() {
     // CSM resolution is always the oblique resolution so just return it
     return LineResolution();
   }
 
 
+  /**
+   * Compute the oblique sample resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so obliqueness does not need to be
+   * accounted for. Thus, this is equivalent to the sample resolution.
+   *
+   * @returns @b double The oblique sample resolution in meters per pixel
+   */
   double CSMCamera::ObliqueSampleResolution() {
     // CSM resolution is always the oblique resolution so just return it
     return SampleResolution();
   }
 
 
+  /**
+   * Compute the oblique detector resolution in meters per pixel for the current set point.
+   *
+   * CSM sensor models do not expose all of the necessary parameters to do the
+   * same calculation as ISIS sensor models, so obliqueness does not need to be
+   * accounted for. Thus, this is equivalent to the detector resolution.
+   *
+   * @returns @b double The oblique detector resolution in meters per pixel
+   */
   double CSMCamera::ObliqueDetectorResolution() {
     // CSM resolution is always the oblique resolution so just return it
     return DetectorResolution();
   }
 
 
+  /**
+   * Returns the currently set parent line for the camera model.
+   * This is the line from the original image before any cropping, scaling, or
+   * other transformations.
+   *
+   * @returns @b double The currently set line
+   */
   double CSMCamera::parentLine() const {
     return p_alphaCube->AlphaLine(Line());
   }
 
 
+  /**
+   * Returns the currently set parent sample for the camera model.
+   * This is the sample from the original image before any cropping, scaling, or
+   * other transformations.
+   *
+   * @returns @b double The currently set sample
+   */
   double CSMCamera::parentSample() const {
     return p_alphaCube->AlphaSample(Sample());
   }
 
 
+  /**
+   * Get the position of the sensor in the body fixed coordinate system at the
+   * currently set time.
+   *
+   * @param[out] p A double array that will be filled with the (X, Y, Z)
+   *               position in kilometers.
+   */
   void CSMCamera::instrumentBodyFixedPosition(double p[3]) const {
     std::vector<double> position = sensorPositionBodyFixed();
     p[0] = position[0];
@@ -340,17 +476,34 @@ namespace Isis {
   }
 
 
-  // TODO change SPICE to use this or instrumentBodyFixedPosition instead of doing
-  // The rotation inside of other functions.
-  //
-  // Broke sensorPosition call out to separate function in preparation for in the future separating the corresponding
-  // call out of Spice::subSpacecraft to decrease repeated code and just override this function.
+  /**
+   * Get the position of the sensor in the body fixed coordinate system at the
+   * currently set time.
+   *
+   * @returns @b std::vector<double> The (X, Y, Z) position in kilometers.
+   *
+   * @todo move this function into Spice and replace calls to manually rotate
+   *       the sensor position into the body fixed frame with this so that
+   *       we do not have to duplicate as many functions in here.
+   */
   std::vector<double> CSMCamera::sensorPositionBodyFixed() const {
     return sensorPositionBodyFixed(parentLine(), parentSample());
   }
 
 
-  // stateless version
+  /**
+   * Get the position of the sensor in the body fixed coordinate system at an
+   * image coordinate
+   *
+   * @param line The line of the image coordinate
+   * @param sample the sample of the image coordinate
+   *
+   * @returns @b std::vector<double> The (X, Y, Z) position in kilometers.
+   *
+   * @todo move this function into Spice and replace calls to manually rotate
+   *       the sensor position into the body fixed frame with this so that
+   *       we do not have to duplicate as many functions in here.
+   */
   std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample) const {
     csm::ImageCoord imagePt;
     isisToCsmPixel(line, sample, imagePt);
@@ -364,15 +517,29 @@ namespace Isis {
   }
 
 
-  // Override the subSpacecraftPoint function in Spice because it requires m_bodyRotation and m_instrumentPosition to
-  // exist, and does a rotation from J2000 to body-fixed. Since CSM already operates in body-fixed coordinates
-  // such a rotation is not necessary.
+  /**
+   * Get the latitude and longitude of the sub-spacecraft point at the currently
+   * set time.
+   *
+   * @param[out] lat Will be filled with the latitude in degrees
+   * @param[out] lon Will be filled with the longitude in positive East,
+   *                 360 domain degrees
+   */
   void CSMCamera::subSpacecraftPoint(double &lat, double &lon) {
     subSpacecraftPoint(lat, lon, parentLine(), parentSample());
   }
 
 
-  // stateless version
+  /**
+   * Get the latitude and longitude of the sub-spacecraft point at the an image
+   * coordinate.
+   *
+   * @param[out] lat Will be filled with the latitude in degrees
+   * @param[out] lon Will be filled with the longitude in positive East,
+   *                 360 domain degrees
+   * @param line The line of the image coordinate
+   * @param sample the sample of the image coordinate
+   */
   void CSMCamera::subSpacecraftPoint(double &lat, double &lon, double line, double sample) {
     // Get s/c position from CSM because it is vector from center of body to that
     vector<double> sensorPosition = sensorPositionBodyFixed(line, sample);
@@ -396,6 +563,9 @@ namespace Isis {
   * y WRT sample
   * z WRT line
   * z WRT sample
+  *
+  * @return @b std::vector<double> The partial derivatives of the image to ground
+  *                                transformation
   */
   vector<double> CSMCamera::ImagePartials() {
     return ImagePartials(GetSurfacePoint());
@@ -413,6 +583,16 @@ namespace Isis {
   * y WRT sample
   * z WRT line
   * z WRT sample
+  *
+  * These are not normally available from the CSM model, so we use
+  * csm::RasterGM::computeGroundPartials to get the Jacobian of the ground to
+  * image transformation. Then we use the pseudoinverse of that to get the
+  * Jacobian of the image to ground transformation.
+  *
+  * @param groundPoint The ground point to compute the partials at
+  *
+  * @return @b std::vector<double> The partial derivatives of the image to ground
+  *                                transformation
   */
   vector<double> CSMCamera::ImagePartials(SurfacePoint groundPoint) {
     csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
@@ -441,6 +621,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the Target object for the camera model.
+   *
+   * @param label The label containing information to create the Target from
+   */
   void CSMCamera::setTarget(Pvl label) {
     Target *target = new Target(label);
 
@@ -470,6 +655,10 @@ namespace Isis {
    * Convert an ISIS pixel coordinate to a CSM pixel coordinate.
    * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
    * function accounts for that and wraps the coordinate in a csm::ImageCoord.
+   *
+   * @param line The ISIS line of the image coordinate
+   * @param sample The ISIS sample of the image coordinate
+   * @param[out] csmPixel The CSM image coordinate
    */
   void CSMCamera::isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const {
     csmPixel.line = line - 0.5;
@@ -481,6 +670,10 @@ namespace Isis {
    * Convert a CSM pixel coordinate to an ISIS pixel coordinate.
    * The ISIS image origin is (0.5, 0.5), the CSM image origin is (0, 0). This
    * function accounts for that and unpacks the csm::ImageCoord.
+   *
+   * @param csmPixel The CSM image coordinate
+   * @param[out] line The ISIS line of the image coordinate
+   * @param[out] sample The ISIS sample of the image coordinate
    */
   void CSMCamera::csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) const {
     line = csmPixel.line + 0.5;
@@ -493,6 +686,10 @@ namespace Isis {
    * ISIS ground points can be created from and converted to many different
    * units and coordinate systems. CSM ground points are always rectangular,
    * body-fixed coordinates in meters.
+   *
+   * @param groundPt The ISIS ground coordinate
+   *
+   * @returns @b csm::EcefCoord the CSM ground coordinate in meters
    */
   csm::EcefCoord CSMCamera::isisToCsmGround(const SurfacePoint &groundPt) const {
     return csm::EcefCoord(groundPt.GetX().meters(),
@@ -506,6 +703,10 @@ namespace Isis {
    * ISIS ground points can be created from and converted to many different
    * units and coordinate systems. CSM ground points are always rectangular,
    * body-fixed coordinates in meters.
+   *
+   * @param groundPt The CSM ground coordinate in meters
+   *
+   * @returns @b SurfacePointthe ISIS ground coordinate
    */
   SurfacePoint CSMCamera::csmToIsisGround(const csm::EcefCoord &groundPt) const {
     return SurfacePoint(Displacement(groundPt.x, Displacement::Meters),
@@ -514,6 +715,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the phase angle at the currently set ground point.
+   *
+   * @returns @b double The phase angle in degrees
+   */
   double CSMCamera::PhaseAngle() const {
     csm::EcefCoord groundPt = isisToCsmGround(GetSurfacePoint());
     csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(groundPt);
@@ -528,11 +734,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Compute the emission angle at the currently set ground point.
+   *
+   * @returns @b double The emission angle in degrees
+   */
   double CSMCamera::EmissionAngle() const {
     return target()->shape()->emissionAngle(sensorPositionBodyFixed());
   }
 
 
+  /**
+   * Compute the incidence angle at the currently set ground point.
+   *
+   * @returns @b double The incidence angle in degrees
+   */
   double CSMCamera::IncidenceAngle() const {
     csm::EcefCoord groundPt = isisToCsmGround(GetSurfacePoint());
     csm::EcefVector sunEcefVec = m_model->getIlluminationDirection(groundPt);
@@ -546,6 +762,13 @@ namespace Isis {
     return target()->shape()->incidenceAngle(sunVec);
   }
 
+
+  /**
+   * Compute the slant distance form the sensor to the ground point at the
+   * currently set time.
+   *
+   * @returns @b double The distance from the sensor to the ground point in kilometers
+   */
   double CSMCamera::SlantDistance() const {
     std::vector<double> sensorPosition = sensorPositionBodyFixed();
     SurfacePoint groundPoint = GetSurfacePoint();
@@ -563,9 +786,10 @@ namespace Isis {
 
 
   /**
-   * Calculates and returns the distance from the spacecraft to the target center
+   * Calculates and returns the distance from the spacecraft to the target center at the
+   * currently set time.
    *
-   * @return double Distance to the center of the target from the spacecraft
+   * @returns @b double Distance to the center of the target from the spacecraft in kilometers.
    */
   double CSMCamera::targetCenterDistance() const {
     std::vector<double> sensorPosition = sensorPositionBodyFixed();
@@ -576,6 +800,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the time and update the sensor position and orientation.
+   *
+   * This is not supported for CSM cameras because the time is a function of the
+   * image coordinate and the two cannot be changed independently.
+   *
+   * @param time The time to set
+   */
   void CSMCamera::setTime(const iTime &time) {
     QString msg = "Setting the image time is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -584,17 +816,13 @@ namespace Isis {
 
   /**
    * Returns the sub-solar latitude/longitude in universal coordinates (0-360
-   * positive east, ocentric)
+   * positive east, ocentric).
    *
    * This is not supported for CSM sensors because we cannot get the position
-   * of the sun, only the illumination direction
+   * of the sun, only the illumination direction.
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
-   *
-   * @see setTime()
-   * @throw Isis::IException::Programmer - "You must call SetTime
-   *             first."
    */
   void CSMCamera::subSolarPoint(double &lat, double &lon) {
     QString msg = "Sub solar point is not supported for CSM camera models";
@@ -603,10 +831,11 @@ namespace Isis {
 
 
   /**
-   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or
-   * square, depending on the sampling mode.  The first vertex is the top left.
+   * Returns the pixel ifov offsets from center of pixel. The first vertex is the top left.
    *
    * The CSM API does not support this type of internal information about the sensor.
+   *
+   * @returns @b QList<QPointF> The field of view offsets
    */
   QList<QPointF> CSMCamera::PixelIfovOffsets() {
     QString msg = "Pixel Field of View is not supported for CSM camera models";
@@ -614,30 +843,73 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the body fixed position of the sun in kilometers.
+   *
+   * This is not supported for CSM sensors because we cannot get the position
+   * of the sun, only the illumination direction.
+   *
+   * @param[out] p The position of the sun
+   */
   void CSMCamera::sunPosition(double p[3]) const {
     QString msg = "Sun position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Get the SpicePosition object that contains the state information for the sun in J2000.
+   *
+   * This is not supported for CSM sensors because we cannot get the position
+   * of the sun, only the illumination direction.
+   *
+   * @returns @b SpicePosition* A pointer to the SpicePosition object for the Sun
+   */
   SpicePosition *CSMCamera::sunPosition() const {
     QString msg = "Sun position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Get the SpicePosition object the contains the state information for the sensor in J2000.
+   *
+   * This is not supported for CSM sensors because we can only query the sensor position
+   * and velocity at specific image coordinates or times. We cannot access the internal
+   * representation inside of the CSM model, if it even exists.
+   *
+   * @returns @b SpicePosition* A pointer to the SpicePosition object for the sensor
+   */
   SpicePosition *CSMCamera::instrumentPosition() const {
     QString msg = "Instrument position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Get the SpiceRotation object the contains the orientation of the target body
+   * relative to J2000.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
+   */
   SpiceRotation *CSMCamera::bodyRotation() const {
     QString msg = "Target body orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Get the SpiceRotation object the contains the orientation of the sensor
+   * relative to J2000.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
+   */
   SpiceRotation *CSMCamera::instrumentRotation() const {
     QString msg = "Instrument orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -648,7 +920,7 @@ namespace Isis {
    * Computes the solar longitude for the given ephemeris time.  If the target
    * is sky, the longitude is set to -999.0.
    *
-   * This is not supported for CSM models because we cannot get the sun position
+   * This is not supported for CSM models because we cannot get the sun position.
    *
    * @param et Ephemeris time
    */
@@ -658,35 +930,43 @@ namespace Isis {
   }
 
 
+  /**
+   * Computes the distance to the sun from the currently set ground point
+   *
+   * This is not supported for CSM models because we cannot get the sun position.
+   *
+   * @returns @b double The distance to the sun
+   */
   double CSMCamera::SolarDistance() const {
     QString msg = "Solar distance is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Computes the Right Ascension of the currently set image coordinate.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b double The Right Ascension
+   */
   double CSMCamera::RightAscension() {
     QString msg = "Right Ascension is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
+  /**
+   * Computes the Declination of the currently set image coordinate.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b double The Declination
+   */
   double CSMCamera::Declination() {
     QString msg = "Declination is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
-}
-
-// Plugin
-/**
- * This is the function that is called in order to instantiate a CSMCamera object.
- *
- * @param lab Cube labels
- *
- * @return Isis::Camera* CSMCamera
- * @internal
- *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
- *            Cassini namespace.
- */
-extern "C" Isis::Camera *CSMCameraPlugin(Isis::Cube &cube) {
-  return new Isis::CSMCamera(cube);
 }

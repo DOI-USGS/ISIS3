@@ -115,9 +115,11 @@ namespace Isis {
 
 
   /**
-   * Construct a Target without SPICE data
+   * Construct a Target without SPICE data.
+   * The label should contain an Instrument group with a TargetName and
+   * a Kernels group with a ShapeModel.
    *
-   * @param lab Label containing a Kernels group that specifies the shape modelß.
+   * @param label Label containing information about the Target.
    */
   Target::Target(Pvl &label) {
     // Initialize everything to null
@@ -635,7 +637,13 @@ namespace Isis {
   }
 
 
-  // set the Target Name
+  /**
+   * Set the name for the Target.
+   * This function should be used if the target name is not available on the label
+   * originally used to initialize the Target.
+   *
+   * @param name The new name of the Target
+   */
   void Target::setName(QString name) {
     if (m_name == NULL) {
       m_name = new QString;
@@ -644,7 +652,13 @@ namespace Isis {
   }
 
 
-  // Set the Target's sensor model
+  /**
+   * Set the Spice pointer for the Target.
+   * This function should be used if the Target was initialized without SPICE
+   * data but is still needed by a sensor model.
+   *
+   * @param spice A pointer to the new Spice object
+   */
   void Target::setSpice(Spice *spice) {
     m_spice = spice;
   }
