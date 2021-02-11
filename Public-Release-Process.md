@@ -8,17 +8,41 @@ This document explains the release process for Official Releases, Release Candid
 
 ## Step 1: Check current false positive test failures 
 
-  
 
 In this step, we check the currently failing tests. This is currently a judgement call on whether or not the tests are false-positives. This decision should be made by 2+ developers on the development team. 
 
-  
 
-## Step 2: Set Up the Local and Remote Repositories 
+
+## Step 2: Update the Github documents
+
+**This step is only required for release candidates and bug fix release. If you are creating a full feature release, skip this step.**
+
+In this step we will update the documents that are stored in the Github repository. Our changes will be going into the dev branch so create a fresh local branch off of the dev branch.
+
+
+### Part A: Collecting the Changes in the Release
+
+* Update the Changelog 
+  * For release candidates we need to update the Changelog to label all of the currently unreleased changes as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
+  * For bug fix releases we need to update the Changelog to label **only the bug fixes** as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
+
+
+### Part B: Update the Authors List 
+
+* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`.
+
+
+### Part C: Submit a Pull Request
+
+* Submit a pull request into the dev branch with your modifications to the Changelog and the Authors list.
+* For a bug fix release you will also need to [cherry-pick](https://www.atlassian.com/git/tutorials/cherry-pick) the squashed commit from your pull request into the version branch. If you run into merge conflicts it may be easier to simply redo the above steps with the version branch instead of dev.
+
+
+
+## Step 3: Set Up the Local and Remote Repositories 
 
 In this step, we will prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines. 
 
-  
 
 ### Part A: Setup Repository 
 
@@ -26,10 +50,8 @@ In this step, we will prepare the local repository to build from as well as upda
 
     * For releases, there should already be a branch for this version created during the release candidate process. If there is not already a branch for this version, you will need to create a branch for this release off of `dev`. If you are doing a release for ISIS 3.10, the git command to create a branch and checkout to it is `git checkout -b 3.10 upstream/dev`. If there is already a version branch: `git checkout -b 3.10 upstream/3.10` 
 
-
     * For release candidates, there may or may not be a branch for the version. If there is not, create a branch off of `dev`. If there is a version branch: `git checkout -b 3.10 upstream/3.10`.
 
- 
 
 ### Part B: Update isis/CMakeLists.txt 
 
@@ -69,19 +91,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
   
 
-### Part D: Update the Authors List 
-
-* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`. 
-
-  
-
-### Part E: Update the Changelog 
-
-* Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for labeling the unreleased changes as being part of this release. 
-
-  
-
-### Part F: Create a Pull Request 
+### Part D: Create a Pull Request
 
 * Make a pull request with your local changes into the version (i.e., the version number created above) branch of the repository. 
 
@@ -94,7 +104,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
   
 
-### Part G: Make Github Release 
+### Part E: Make Github Release 
 
 * Draft a new github release.  
 
@@ -120,7 +130,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
   
 
-## Step 3: Create the Builds for Anaconda Cloud 
+## Step 4: Create the Builds for Anaconda Cloud 
 
   
 
@@ -166,7 +176,7 @@ commands:
 
 ### Part C: Run the Build 
 
-* Go to the root of the repository you set up in [Step 2 Part A](#Part_A:_Setup_Repository). Make sure it is up to date. 
+* Go to the root of the repository you set up in [Step 3 Part A](#Part_A:_Setup_Repository). Make sure it is up to date. 
 
     * Switch to the appropriate version branch 
 
@@ -182,7 +192,7 @@ commands:
 
   
 
-## Step 4: Test the Conda Build 
+## Step 5: Test the Conda Build 
 
   
 
@@ -202,7 +212,7 @@ After the conda build completes, it should be tested by uploading it to your per
 
   
 
-## Step 5: Upload the Build to Anaconda Cloud 
+## Step 6: Upload the Build to Anaconda Cloud 
 
   
 
@@ -228,7 +238,7 @@ If the upload fails or displays a prompt for a username and password, try adding
 
   
 
-## Step 6: Back up the Build  
+## Step 7: Back up the Build  
 
 Back up the build by copying the .tar.bz2 to: 
 
@@ -238,7 +248,7 @@ Back up the build by copying the .tar.bz2 to:
 
   
 
-## Step 7: Update Data and TestData Areas on rsync Servers 
+## Step 8: Update Data and TestData Areas on rsync Servers 
 
   
 
@@ -270,11 +280,9 @@ This step covers how to update the data on the rysnc servers. This is where our 
 
 * Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
 
-  
 
-The default  
 
-## Step 8: Create Internal Builds/Installs for Astro 
+## Step 9: Create Internal Builds/Installs for Astro 
 
   
 
@@ -312,7 +320,7 @@ This step covers creating the builds and the installation environments of ISIS f
 
   
 
-## Step 9: Update Documentation 
+## Step 10: Update Documentation 
 
   
 
@@ -330,7 +338,7 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 
 * Perform a local build (not a conda build) using the instructions available [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake) 
 
-* setisis to the build directory from [Step 2 Part A](#Part_A:_Setup_Repository). 
+* setisis to the build directory from [Step 3 Part A](#Part_A:_Setup_Repository). 
 
 * Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code. 
 
@@ -342,7 +350,7 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 
   
 
-## Step 10: Communicate Availability of Build 
+## Step 11: Communicate Availability of Build 
 
   
 
@@ -360,97 +368,68 @@ This step will will communicate that a new version of ISIS is available.
 
 ## How to install or update to <X.Y.Z> 
 
-  
 
 Installation instructions of ISIS can be found in the README on our [github page ](https://github.com/USGS-Astrogeology/ISIS3). 
 
-  
 
-If you already have a version of ISIS 3.6.0 or later installed in an anaconda environment, you can update to <X.Y.Z> by activating your existing isis conda environment and running `conda update isis` . 
+If you already have a version of ISIS 4.0.0 or later installed in an anaconda environment, you can update to <X.Y.Z> by activating your existing isis conda environment and running `conda update isis` . 
 
-  
 
 ### How to get access to <X.Y.Z> at the ASC 
 
-  
 
 The new process proposed in the internal [RFC](https://astrodiscuss.usgs.gov/t/internal-rfc-distribution-of-isis3-at-asc/52/26) is now in full effect. Please review the process of using anaconda environments to activate isis [here](https://astrodiscuss.usgs.gov/t/using-the-asc-conda-environment-for-isisx-y-z/106). 
 
-  
 
 Once a version of conda is active, run the command: `conda activate isis<X.Y.Z>` to use this newest version of ISIS. 
 
-  
 
 ## Changes for <X.Y.Z> 
 
-  
+<!---
+Copy this release's section of the Changelog here
+-->
 
-* <Changes> 
-
-* <Go> 
-
-* <Here> 
-
-  
 
 ## Notes 
 
-  
 
 The following operating systems are supported for this release: 
 
-  
 
-Fedora 28 
-
-Ubuntu 18.04 
-
-CentOS 7.0 
-
-macOS Mohave 10.14 
+* Fedora 28 
+* Ubuntu 18.04 
+* CentOS 7.0 
+* macOS Mohave 10.14 
 
 (Other Linux/macOS variants may be able to run this release, but are not officially supported.) 
 
-  
 
 If you find a problem with this release, please create an issue on our [github issues page](https://github.com/USGS-Astrogeology/ISIS3/issues/new/choose/) 
 
 ``` 
 
-* To create the change log look at the commits on the dev branch since the last release. 
-
-    * This list is intended for users, so commits that only modify tests, CI, Github files (READMEs, issue templates, etc.), and/or build files should be excluded. 
-
-  
-
 * For a Release Candidate, add the following under "Notes":  
 
-  
 
 ``` 
 
 There are some important considerations to keep in mind when using this release candidate: 
 
-  
 
 * Do not use this version for production work. A stable isisX.XX.XX release will be uploaded after a month. 
-
-* The ISIS3 online documentation will not be updated until the stable release is announced. 
+* The ISIS online documentation will not be updated until the stable release is announced. 
 
 ``` 
 
-  
 
 ### Part B: Internal Announcement 
 
-  
 
 * Send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. 
 
     * Your e-mail can simply be a link to the external announcement. 
 
-  
 
 ## Problems 
 
@@ -463,8 +442,6 @@ Could not find conda environment: <isis version>
 You can list all discoverable environments with `conda info --envs`. 
 
 ``` 
-
-  
 
 Run the following command: 
 
