@@ -67,10 +67,9 @@ namespace Isis {
       static Camera *Create(Cube &cube);
       static int CameraVersion(Cube &cube);
       static int CameraVersion(Pvl &lab);
-
-    private:
       static void initPlugin();
 
+    private:
       /**
        * Constructor (Its private, so you cannot use it.  Use the Create method
        * instead
@@ -81,6 +80,7 @@ namespace Isis {
       ~CameraFactory() {};
 
       static Plugin m_cameraPlugin;   //!< The plugin file for the camera
+      static bool m_initialized; //!<Has the plugin list been initialized
   };
 };
 

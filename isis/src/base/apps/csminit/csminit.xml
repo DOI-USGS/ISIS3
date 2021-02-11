@@ -77,7 +77,7 @@
     <group name="Target Specification">
       <parameter name="TARGETNAME">
         <type>string</type>
-        <internalDefault>Unknown</internalDefault>
+        <internalDefault>Current TargetName in input label or Unknown if not present.</internalDefault>
         <brief>
           The name of the body observed by the image.
         </brief>
