@@ -46,6 +46,7 @@ using namespace std;
 
 namespace Isis {
   Plugin CameraFactory::m_cameraPlugin;
+  bool CameraFactory::m_initialized = false;
 
   /**
    * Creates a Camera object using Pvl Specifications
@@ -61,8 +62,9 @@ namespace Isis {
   Camera *CameraFactory::Create(Cube &cube) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
-    initPlugin();
 
+    initPlugin();
+    
     try {
       // Is there a CSM blob on the cube?
       if (cube.hasBlob("String", "CSMState")) {
@@ -128,39 +130,41 @@ namespace Isis {
     }
   }
 
-
+  
   /**
    * Reads the appropriate plugin file for the ISIS cameras, and scans the
    * directories specified in IsisPreferences for CSM cameras.
    */
   void CameraFactory::initPlugin() {
+    if (!m_initialized) {
+      // Handle the ISIS camera plugins
+      if (m_cameraPlugin.fileName() == "") {
+        FileName localFile("Camera.plugin");
+        if (localFile.fileExists())
+          m_cameraPlugin.read(localFile.expanded());
 
-    // Handle the ISIS camera plugins
-    if (m_cameraPlugin.fileName() == "") {
-      FileName localFile("Camera.plugin");
-      if (localFile.fileExists())
-        m_cameraPlugin.read(localFile.expanded());
+        FileName systemFile("$ISISROOT/lib/Camera.plugin");
+        if (systemFile.fileExists())
+          m_cameraPlugin.read(systemFile.expanded());
+      }
 
-      FileName systemFile("$ISISROOT/lib/Camera.plugin");
-      if (systemFile.fileExists())
-        m_cameraPlugin.read(systemFile.expanded());
-    }
+      // Find the CSM plugins by searching the directories identified in the Preferences.
+      // Load the found libraries. This causes the static instance(s) to be constructed,
+      // and thus registering the model with the csm Plugin class.
+      Preference &p = Preference::Preferences();
+      PvlGroup &grp = p.findGroup("Plugins", Isis::Pvl::Traverse);
+      for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
+        FileName csmDir = grp["CSMDirectory"][i];
 
-    // Find the CSM plugins by searching the directories identified in the Preferences.
-    // Load the found libraries. This causes the static instance(s) to be constructed,
-    // and thus registering the model with the csm Plugin class.
-    Preference &p = Preference::Preferences();
-    PvlGroup &grp = p.findGroup("Plugins", Isis::Pvl::Traverse);
-    for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
-      FileName csmDir = grp["CSMDirectory"][i];
-
-      QDirIterator csmLib(csmDir.expanded(), {"*.so", "*.dylib"}, QDir::Files);
-      while (csmLib.hasNext()) {
-        QString csmLibName = csmLib.next();
-        QLibrary csmDynamicLib(csmLibName);
-        csmDynamicLib.load();
+        QDirIterator csmLib(csmDir.expanded(), {"*.so", "*.dylib"}, QDir::Files);
+        while (csmLib.hasNext()) {
+          QString csmLibName = csmLib.next();
+          QLibrary csmDynamicLib(csmLibName);
+          csmDynamicLib.load();
+        }
       }
     }
+    m_initialized = true;
   }
 
 

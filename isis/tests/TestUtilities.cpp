@@ -151,20 +151,20 @@ namespace Isis {
 
   // Check to see if a QString contains only numeric values.
   bool isNumeric(QString str){
-    QRegExp re("-*\\d*.*\\d*");  
+    QRegExp re("-*\\d*.*\\d*");
     return re.exactMatch(str);
   }
 
 
   // Compares CSV lines
-  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex) { 
+  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex) {
     QStringList compareMe = headerStr.split(",");
     for (int i=initialIndex; i<compareMe.size(); i++) {
       if (isNumeric(compareMe[i].trimmed())) {
         EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), 0.000001);
       }
       else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), compareMe[i].toStdString()); 
+        EXPECT_EQ(QString(csvLine[i]).toStdString(), compareMe[i].toStdString());
       }
     }
   };
@@ -172,14 +172,33 @@ namespace Isis {
 
   // Compares CSV lines
   void compareCsvLine(CSVReader::CSVAxis csvLine, CSVReader::CSVAxis csvLine2, int initialIndex,
-                      double tolerance) { 
+                      double tolerance) {
     for (int i=initialIndex; i < csvLine.dim(); i++) {
       if (isNumeric(QString(csvLine[i].trimmed()))) {
         EXPECT_NEAR(csvLine[i].toDouble(), csvLine2[i].toDouble(), tolerance);
       }
       else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), csvLine2[i].toStdString()); 
+        EXPECT_EQ(QString(csvLine[i]).toStdString(), csvLine2[i].toStdString());
       }
     }
   };
+
+
+  // Matches a CSM Image Coord for gMock
+  ::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected) {
+    return ::testing::AllOf(
+        ::testing::Field(&csm::ImageCoord::line, ::testing::DoubleNear(expected.line, 0.0001)),
+        ::testing::Field(&csm::ImageCoord::samp, ::testing::DoubleNear(expected.samp, 0.0001))
+    );
+}
+
+
+  // Matches a CSM ECEF Coord for gMock
+  ::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected) {
+    return ::testing::AllOf(
+        ::testing::Field(&csm::EcefCoord::x, ::testing::DoubleNear(expected.x, 0.0001)),
+        ::testing::Field(&csm::EcefCoord::y, ::testing::DoubleNear(expected.y, 0.0001)),
+        ::testing::Field(&csm::EcefCoord::z, ::testing::DoubleNear(expected.z, 0.0001))
+    );
+  }
 }

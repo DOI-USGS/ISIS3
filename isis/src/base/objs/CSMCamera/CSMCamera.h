@@ -21,10 +21,13 @@ find files of those names at the top level of this repository. **/
 #include "csm/RasterGM.h"
 
 namespace Isis {
+  class StringBlob;
   class CSMCamera : public Camera {
+
     public:
       // constructors
       CSMCamera(Cube &cube);
+//      CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString);
 
       //! Destroys the CSMCamera object.
       ~CSMCamera() {};
@@ -123,6 +126,8 @@ namespace Isis {
       virtual void computeSolarLongitude(iTime et);
 
     private:
+      void init(Cube &cube, QString pluginName, QString modelName, QString stateString);
+
       csm::RasterGM *m_model; //! CSM sensor model
       iTime m_refTime; //! The reference time that all model image times are relative to
 

@@ -1,19 +1,19 @@
 #include <QString>
-#include <QUuid>
 #include <iostream>
 
-#include "csm/CorrelationModel.h"
+#include "csm/csm.h"
 #include "csm/Ellipsoid.h"
-#include "csm/RasterGM.h"
 
 #include "Fixtures.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MockCsmPlugin.h"
+#include "Mocks.h"
 #include "TestUtilities.h"
 #include "StringBlob.h"
 #include "FileName.h"
+#include "Fixtures.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -21,297 +21,6 @@ using json = nlohmann::json;
 #include "gmock/gmock.h"
 
 using namespace Isis;
-
-// gMock matchers for CSM structs
-::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected) {
-  return ::testing::AllOf(
-      ::testing::Field(&csm::ImageCoord::line, ::testing::DoubleNear(expected.line, 0.0001)),
-      ::testing::Field(&csm::ImageCoord::samp, ::testing::DoubleNear(expected.samp, 0.0001))
-  );
-}
-::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected) {
-  return ::testing::AllOf(
-      ::testing::Field(&csm::EcefCoord::x, ::testing::DoubleNear(expected.x, 0.0001)),
-      ::testing::Field(&csm::EcefCoord::y, ::testing::DoubleNear(expected.y, 0.0001)),
-      ::testing::Field(&csm::EcefCoord::z, ::testing::DoubleNear(expected.z, 0.0001))
-  );
-}
-
-// Mock CSM Model class
-// TODO this should also inherit from SettableEllipsoid and we need to
-// mock in the MARS radii
-class MockRasterGM : public csm::RasterGM {
-  public:
-    // csm::Model
-    MOCK_METHOD(csm::Version, getVersion, (), (const, override));
-    MOCK_METHOD(std::string, getModelName, (), (const, override));
-    MOCK_METHOD(std::string, getPedigree, (), (const, override));
-    MOCK_METHOD(std::string, getImageIdentifier, (), (const, override));
-    MOCK_METHOD(void, setImageIdentifier, (const std::string&, csm::WarningList*), (override));
-    MOCK_METHOD(std::string, getSensorIdentifier, (), (const, override));
-    MOCK_METHOD(std::string, getPlatformIdentifier, (), (const, override));
-    MOCK_METHOD(std::string, getCollectionIdentifier, (), (const, override));
-    MOCK_METHOD(std::string, getTrajectoryIdentifier, (), (const, override));
-    MOCK_METHOD(std::string, getSensorType, (), (const, override));
-    MOCK_METHOD(std::string, getSensorMode, (), (const, override));
-    MOCK_METHOD(std::string, getReferenceDateAndTime, (), (const, override));
-    MOCK_METHOD(std::string, getModelState, (), (const, override));
-    MOCK_METHOD(void, replaceModelState, (const std::string&), (override));
-    // csm::GeometricModel methods
-    MOCK_METHOD(csm::EcefCoord, getReferencePoint, (), (const, override));
-    MOCK_METHOD(void, setReferencePoint, (const csm::EcefCoord&), (override));
-    MOCK_METHOD(int, getNumParameters, (), (const, override));
-    MOCK_METHOD(std::string, getParameterName, (int), (const, override));
-    MOCK_METHOD(std::string, getParameterUnits, (int), (const, override));
-    MOCK_METHOD(bool, hasShareableParameters, (), (const, override));
-    MOCK_METHOD(bool, isParameterShareable, (int), (const, override));
-    MOCK_METHOD(csm::SharingCriteria, getParameterSharingCriteria, (int), (const, override));
-    MOCK_METHOD(double, getParameterValue, (int), (const, override));
-    MOCK_METHOD(void, setParameterValue, (int, double), (override));
-    MOCK_METHOD(csm::param::Type, getParameterType, (int), (const, override));
-    MOCK_METHOD(void, setParameterType, (int, csm::param::Type), (override));
-    MOCK_METHOD(double, getParameterCovariance, (int, int), (const, override));
-    MOCK_METHOD(void, setParameterCovariance, (int, int, double), (override));
-    MOCK_METHOD(int, getNumGeometricCorrectionSwitches, (), (const, override));
-    MOCK_METHOD(std::string, getGeometricCorrectionName, (int), (const, override));
-    MOCK_METHOD(void, setGeometricCorrectionSwitch, (int, bool, csm::param::Type), (override));
-    MOCK_METHOD(bool, getGeometricCorrectionSwitch, (int), (const, override));
-    MOCK_METHOD(std::vector<double>,
-                getCrossCovarianceMatrix,
-                (const csm::GeometricModel&, csm::param::Set, const csm::GeometricModel::GeometricModelList&),
-                (const, override));
-    // RasterGM methods
-    MOCK_METHOD(csm::ImageCoord, groundToImage, (const csm::EcefCoord&, double, double*, csm::WarningList*), (const, override));
-    MOCK_METHOD(csm::ImageCoordCovar,
-                groundToImage,
-                (const csm::EcefCoordCovar&, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::EcefCoord,
-                imageToGround,
-                (const csm::ImageCoord&, double, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::EcefCoordCovar,
-                imageToGround,
-                (const csm::ImageCoordCovar&, double, double, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::EcefLocus,
-                imageToProximateImagingLocus,
-                (const csm::ImageCoord&, const csm::EcefCoord&, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::EcefLocus,
-                imageToRemoteImagingLocus,
-                (const csm::ImageCoord&, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::ImageCoord, getImageStart, (), (const, override));
-    MOCK_METHOD(csm::ImageVector, getImageSize, (), (const, override));
-    MOCK_METHOD((std::pair<csm::ImageCoord, csm::ImageCoord>), getValidImageRange, (), (const, override));
-    MOCK_METHOD((std::pair<double,double>), getValidHeightRange, (), (const, override));
-    MOCK_METHOD(csm::EcefVector, getIlluminationDirection, (const csm::EcefCoord&), (const, override));
-    MOCK_METHOD(double, getImageTime, (const csm::ImageCoord&), (const, override));
-    MOCK_METHOD(csm::EcefCoord, getSensorPosition, (const csm::ImageCoord&), (const, override));
-    MOCK_METHOD(csm::EcefCoord, getSensorPosition, (double), (const, override));
-    MOCK_METHOD(csm::EcefVector, getSensorVelocity, (const csm::ImageCoord&), (const, override));
-    MOCK_METHOD(csm::EcefVector, getSensorVelocity, (double), (const, override));
-    MOCK_METHOD(csm::RasterGM::SensorPartials,
-                computeSensorPartials,
-                (int, const csm::EcefCoord&, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(csm::RasterGM::SensorPartials,
-                computeSensorPartials,
-                (int, const csm::ImageCoord&, const csm::EcefCoord&, double, double*, csm::WarningList*),
-                (const, override));
-    MOCK_METHOD(std::vector<double>, computeGroundPartials, (const csm::EcefCoord&), (const, override));
-    MOCK_METHOD(const csm::CorrelationModel&, getCorrelationModel, (), (const, override));
-    MOCK_METHOD(std::vector<double>,
-                getUnmodeledCrossCovariance,
-                (const csm::ImageCoord&, const csm::ImageCoord&),
-                (const, override));
-};
-
-
-class CSMCubeFixture : public SmallCube {
-  protected:
-    QString filename;
-    MockRasterGM mockModel;
-    Camera *testCam;
-
-    void SetUp() override {
-      SmallCube::SetUp();
-
-      // Instrument group
-      // Just need a target name
-      PvlGroup instGroup("Instrument");
-      instGroup += PvlKeyword("TargetName", "TestTarget");
-      instGroup += PvlKeyword("InstrumentId", "TestId");
-      testCube->putGroup(instGroup);
-
-      // Kernels group
-      // Just need a shapemodel specified
-      PvlGroup kernGroup("Kernels");
-      kernGroup += PvlKeyword("ShapeModel", "Null");
-      testCube->putGroup(kernGroup);
-
-      // CSMInfo group
-      // This just has to exist, but fill it out for completeness and incase it
-      // ever does matter
-      PvlGroup infoGroup("CsmInfo");
-      infoGroup += PvlKeyword("CSMPlatformID", "TestPlatform");
-      infoGroup += PvlKeyword("CSMInstrumentId", "TestInstrument");
-      infoGroup += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816"); // J2000 epoch
-
-      PvlKeyword paramNames("ModelParameterNames");
-      paramNames += "TestNoneParam";
-      paramNames += "TestFictitiousParam";
-      paramNames += "TestRealParam";
-      paramNames += "TestFixedParam";
-      PvlKeyword paramUnits("ModelParameterUnits");
-      paramUnits += "unitless";
-      paramUnits += "m";
-      paramUnits += "rad";
-      paramUnits += "lines/sec";
-      PvlKeyword paramTypes("ModelParameterTypes");
-      paramTypes += "NONE";
-      paramTypes += "FICTITIOUS";
-      paramTypes += "REAL";
-      paramTypes += "FIXED";
-
-      infoGroup += paramNames;
-      infoGroup += paramUnits;
-      infoGroup += paramTypes;
-
-      testCube->putGroup(infoGroup);
-
-      // Register the mock with our plugin
-      std::string mockModelName = QUuid().toString().toStdString();
-      MockCsmPlugin loadablePlugin;
-      loadablePlugin.registerModel(mockModelName, &mockModel);
-
-      // CSMState BLOB
-      StringBlob csmStateBlob(mockModelName, "CSMState");
-      csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
-      csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
-      testCube->write(csmStateBlob);
-      filename = testCube->fileName();
-      testCube->close();
-      testCube->open(filename, "rw");
-    }
-};
-
-
-class CSMCameraFixture : public CSMCubeFixture {
-  protected:
-    Camera *testCam;
-
-    void SetUp() override {
-      CSMCubeFixture::SetUp();
-
-      // Account for calls that happen while making a CSMCamera
-      EXPECT_CALL(mockModel, getSensorIdentifier())
-          .Times(2)
-          .WillRepeatedly(::testing::Return("MockSensorID"));
-      EXPECT_CALL(mockModel, getPlatformIdentifier())
-          .Times(2)
-          .WillRepeatedly(::testing::Return("MockPlatformID"));
-      EXPECT_CALL(mockModel, getReferenceDateAndTime())
-          .Times(1)
-          .WillRepeatedly(::testing::Return("20000101T115855.816"));
-
-      testCam = testCube->camera();
-    }
-};
-
-
-class CSMSetCameraFixture : public CSMCameraFixture {
-  protected:
-    csm::Ellipsoid wgs84;
-    csm::ImageCoord imagePt;
-    csm::EcefCoord groundPt;
-    csm::EcefLocus imageLocus;
-
-    void SetUp() override {
-      CSMCameraFixture::SetUp();
-
-      imagePt = csm::ImageCoord(4.5, 4.5);
-      groundPt = csm::EcefCoord(wgs84.getSemiMajorRadius(), 0, 0);
-      imageLocus = csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0);
-
-      // Setup the mock for setImage and ensure it succeeds
-      EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
-          .Times(1)
-          .WillOnce(::testing::Return(imageLocus));
-      EXPECT_CALL(mockModel, getImageTime)
-          .Times(1)
-          .WillOnce(::testing::Return(10.0));
-
-      ASSERT_TRUE(testCam->SetImage(5, 5)); // Assert here so that the test code doesn't run if the camera isn't set
-    }
-};
-
-
-class CSMDemCameraFixture : public CSMCubeFixture {
-  protected:
-    Camera *testCam;
-    double demRadius;
-
-    void SetUp() override {
-      CSMCubeFixture::SetUp();
-
-      // Record the demRadius at 0 lat, 0 lon
-      demRadius = 3394200.43980104;
-
-      // Update the shapemodel on the cube
-      PvlGroup &kernGroup = testCube->group("Kernels");
-      kernGroup.addKeyword(PvlKeyword("ShapeModel", "data/CSMCamera/mola_compressed_prep.cub"), Pvl::Replace);
-
-      // Close and re-open the cube, then save off the new camera
-      testCube->close();
-      testCube->open(filename, "rw");
-
-      // Account for calls that happen while making a CSMCamera
-      EXPECT_CALL(mockModel, getSensorIdentifier())
-          .Times(2)
-          .WillRepeatedly(::testing::Return("MockSensorID"));
-      EXPECT_CALL(mockModel, getPlatformIdentifier())
-          .Times(2)
-          .WillRepeatedly(::testing::Return("MockPlatformID"));
-      EXPECT_CALL(mockModel, getReferenceDateAndTime())
-          .Times(1)
-          .WillRepeatedly(::testing::Return("20000101T115855.816"));
-
-      testCam = testCube->camera();
-    }
-};
-
-
-TEST(CSMCameraTest, MockTest) {
-  MockRasterGM mockModel;
-  EXPECT_CALL(mockModel, getVersion())
-      .Times(1)
-      .WillOnce(::testing::Return(csm::Version(1, 2, 3)));
-  csm::Version mockVersion = mockModel.getVersion();
-  EXPECT_EQ(mockVersion.major(), 1);
-  EXPECT_EQ(mockVersion.minor(), 2);
-  EXPECT_EQ(mockVersion.revision(), 3);
-}
-
-
-TEST(CSMCameraTest, LoadMockTest) {
-  MockRasterGM mockModel;
-  EXPECT_CALL(mockModel, getVersion())
-      .Times(1)
-      .WillOnce(::testing::Return(csm::Version(1, 2, 3)));
-
-  // Use a universally unique identifier for thread safety
-  std::string mockModelName = QUuid().toString().toStdString();
-  MockCsmPlugin loadablePlugin;
-  loadablePlugin.registerModel(mockModelName, &mockModel);
-
-  csm::Model *returnedModel = csm::Plugin::findPlugin(MockCsmPlugin::PLUGIN_NAME)->constructModelFromState(mockModelName);
-  csm::Version mockVersion = returnedModel->getVersion();
-  EXPECT_EQ(mockVersion.major(), 1);
-  EXPECT_EQ(mockVersion.minor(), 2);
-  EXPECT_EQ(mockVersion.revision(), 3);
-}
 
 TEST_F(CSMCameraFixture, SetImage) {
   csm::Ellipsoid wgs84;
@@ -333,7 +42,7 @@ TEST_F(CSMCameraFixture, SetImage) {
 }
 
 
-TEST_F(CSMDemCameraFixture, SetImage) {
+TEST_F(CSMCameraDemFixture, SetImage) {
   EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
       // looking straight down X-Axis
@@ -398,7 +107,7 @@ TEST_F(CSMCameraFixture, SetGround) {
 }
 
 
-TEST_F(CSMDemCameraFixture, SetGround) {
+TEST_F(CSMCameraDemFixture, SetGround) {
   // Define some things to match/return
   csm::ImageCoord imagePt(4.5, 4.5);
   csm::EcefCoord groundPt(demRadius, 0, 0);
@@ -435,7 +144,7 @@ TEST_F(CSMDemCameraFixture, SetGround) {
 }
 
 
-TEST_F(CSMSetCameraFixture, Resolution) {
+TEST_F(CSMCameraSetFixture, Resolution) {
   // Setup to return the ground partials we want
   // The pseudoinverse of:
   // 1 2 3
@@ -461,7 +170,7 @@ TEST_F(CSMSetCameraFixture, Resolution) {
 }
 
 
-TEST_F(CSMSetCameraFixture, InstrumentBodyFixedPosition) {
+TEST_F(CSMCameraSetFixture, InstrumentBodyFixedPosition) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(imageLocus.point));
@@ -474,7 +183,7 @@ TEST_F(CSMSetCameraFixture, InstrumentBodyFixedPosition) {
 }
 
 
-TEST_F(CSMSetCameraFixture, SubSpacecraftPoint) {
+TEST_F(CSMCameraSetFixture, SubSpacecraftPoint) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(imageLocus.point));
@@ -486,7 +195,7 @@ TEST_F(CSMSetCameraFixture, SubSpacecraftPoint) {
 }
 
 
-TEST_F(CSMSetCameraFixture, SlantDistance) {
+TEST_F(CSMCameraSetFixture, SlantDistance) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(imageLocus.point));
@@ -499,7 +208,7 @@ TEST_F(CSMSetCameraFixture, SlantDistance) {
 }
 
 
-TEST_F(CSMSetCameraFixture, TargetCenterDistance) {
+TEST_F(CSMCameraSetFixture, TargetCenterDistance) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(imageLocus.point));
@@ -512,7 +221,7 @@ TEST_F(CSMSetCameraFixture, TargetCenterDistance) {
 }
 
 
-TEST_F(CSMSetCameraFixture, PhaseAngle) {
+TEST_F(CSMCameraSetFixture, PhaseAngle) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(csm::EcefCoord(groundPt.x + 50000, groundPt.y, groundPt.z + 50000)));
@@ -524,7 +233,7 @@ TEST_F(CSMSetCameraFixture, PhaseAngle) {
 }
 
 
-TEST_F(CSMSetCameraFixture, IncidenceAngle) {
+TEST_F(CSMCameraSetFixture, IncidenceAngle) {
   EXPECT_CALL(mockModel, getIlluminationDirection(MatchEcefCoord(groundPt)))
       .Times(1)
       .WillOnce(::testing::Return(csm::EcefVector(0.0, 0.0, -1.0)));
@@ -533,7 +242,7 @@ TEST_F(CSMSetCameraFixture, IncidenceAngle) {
 }
 
 
-TEST_F(CSMSetCameraFixture, EmissionAngle) {
+TEST_F(CSMCameraSetFixture, EmissionAngle) {
   EXPECT_CALL(mockModel, getSensorPosition(MatchImageCoord(imagePt)))
       .Times(1)
       .WillOnce(::testing::Return(imageLocus.point));

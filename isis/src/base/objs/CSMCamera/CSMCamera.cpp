@@ -43,6 +43,15 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+
+//  /**
+//   * Constructor for the USGS CSM Camera Model inside ISIS.
+//   */
+//  CSMCamera::CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString) : Camera(cube) {
+//    init(cube, pluginName, modelName, stateString);
+//  }
+//
+
   /**
    * Constructor for an ISIS Camera model that uses a Community Sensor Model (CSM)
    * for the principal transformations.
@@ -51,11 +60,20 @@ namespace Isis {
    *             ISIS Camera Model.
    */
   CSMCamera::CSMCamera(Cube &cube) : Camera(cube) {
-    StringBlob stateString("","CSMState");
-    cube.read(stateString);
-    PvlObject &blobLabel = stateString.Label();
+    StringBlob state("","CSMState");
+    cube.read(state);
+    PvlObject &blobLabel = state.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];
+    init(cube, pluginName, modelName, QString::fromStdString(state.string()));
+  }
+
+
+  /**
+   * Init method which performs most of the setup for the USGS CSM
+   * Camera Model inside ISIS. 
+   */
+  void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString){
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
     if (!plugin) {
       QStringList availablePlugins;
@@ -68,12 +86,12 @@ namespace Isis {
                     availablePlugins.join(", ") + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.string())) {
+    if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
       QString msg = "CSM state string attached to image [" + cube.fileName() + "]. cannot "
                     "be converted to a [" + modelName + "] using [" + pluginName + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.string()));
+    m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.toStdString()));
     // If the dynamic cast failed, raise an exception
     if (!m_model) {
       QString msg = "Failed to convert CSM Model to RasterGM.";
@@ -85,6 +103,8 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
+    // TODO: Find out why this is 12 hrs different than ths StartTime in the ISIS label.
+    // std::cout << m_model->getReferenceDateAndTime() << std::endl;
     // We have to strip off any trailing Zs and then add separators in order for iTime to work
     // TODO make this work with more time string formats and move to iTime
     QString timeString = QString::fromStdString(m_model->getReferenceDateAndTime());
@@ -93,29 +113,10 @@ namespace Isis {
     timeString.insert(11, ":");
     timeString.insert(6, "-");
     timeString.insert(4, "-");
-    std::cout << timeString << std::endl;
 
     m_refTime = iTime(timeString);
 
     setTarget(*cube.label());
-
-    std::cout << "Target status" << std::endl;
-    if (target()) {
-      std::cout << "Target name: " << target()->name() << std::endl;
-      std::vector<Distance> targetRad = target()->radii();
-      std::cout << "Target radii: " << targetRad[0].meters() << ", " << targetRad[1].meters() << ", " << targetRad[2].meters() << std::endl;
-      std::cout << "Shape status" << std::endl;
-      if (target()->shape()) {
-        std::cout << "Target name: " << target()->shape()->name() << std::endl;
-        std::cout << "Target is DEM?: " << target()->shape()->isDEM() << std::endl;
-      }
-      else {
-        std::cout << "Shape Uninitialized" << std::endl;
-      }
-    }
-    else {
-      std::cout << "Target Uninitialized" << std::endl;
-    }
   }
 
 
