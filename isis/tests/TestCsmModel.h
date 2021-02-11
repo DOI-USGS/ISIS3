@@ -6,7 +6,6 @@
 #include "csm/RasterGM.h"
 #include "csm/Plugin.h"
 #include "csm/Version.h"
-#include "csm/PointCloudGM.h"
 #include "csm/CorrelationModel.h"
 
 #include <nlohmann/json.hpp>
@@ -157,5 +156,6 @@ class TestCsmModel : public csm::RasterGM {
 
   private:
     std::vector<double> m_param_values; //! Parameter values associated with the sensor model
+    csm::NoCorrelationModel m_correlationModel;
 };
 #endif

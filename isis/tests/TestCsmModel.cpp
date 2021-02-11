@@ -175,7 +175,7 @@ std::string TestCsmModel::getSensorMode() const {
  * @return std::string reference date and time
  */
 std::string TestCsmModel::getReferenceDateAndTime() const {
-  return "TestCsmModel_ReferenceDateTime";
+  return "20000101T115959Z";
 }
 
 
@@ -618,8 +618,7 @@ std::vector<double> TestCsmModel::computeGroundPartials(const csm::EcefCoord& gr
 }
 
 const csm::CorrelationModel& TestCsmModel::getCorrelationModel() const {
-  csm::NoCorrelationModel model;
-  return model;
+  return m_correlationModel;
 }
 
 std::vector<double> TestCsmModel::getUnmodeledCrossCovariance(
