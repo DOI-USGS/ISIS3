@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <iomanip>
 
-#include <QDateTime>
 #include <QDebug>
 #include <QList>
 #include <QPointF>
