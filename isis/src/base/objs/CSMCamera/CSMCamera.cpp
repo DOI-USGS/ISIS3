@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <iomanip>
 
+#include <QDateTime>
 #include <QDebug>
 #include <QList>
 #include <QPointF>
@@ -71,7 +72,7 @@ namespace Isis {
 
   /**
    * Init method which performs most of the setup for the USGS CSM
-   * Camera Model inside ISIS. 
+   * Camera Model inside ISIS.
    */
   void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString){
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
@@ -103,18 +104,10 @@ namespace Isis {
     m_spacecraftNameLong = QString::fromStdString(m_model->getPlatformIdentifier());
     m_spacecraftNameShort = QString::fromStdString(m_model->getPlatformIdentifier());
 
-    // TODO: Find out why this is 12 hrs different than ths StartTime in the ISIS label.
-    // std::cout << m_model->getReferenceDateAndTime() << std::endl;
-    // We have to strip off any trailing Zs and then add separators in order for iTime to work
-    // TODO make this work with more time string formats and move to iTime
     QString timeString = QString::fromStdString(m_model->getReferenceDateAndTime());
-    timeString.remove("z", Qt::CaseInsensitive);
-    timeString.insert(13, ":");
-    timeString.insert(11, ":");
-    timeString.insert(6, "-");
-    timeString.insert(4, "-");
-
-    m_refTime = iTime(timeString);
+    // Strip the UTC time zone indicator for iTime
+    timeString.remove("Z");
+    m_refTime.setUtc(timeString);
 
     setTarget(*cube.label());
   }
