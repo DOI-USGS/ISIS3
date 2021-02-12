@@ -44,14 +44,6 @@ using namespace std;
 
 namespace Isis {
 
-//  /**
-//   * Constructor for the USGS CSM Camera Model inside ISIS.
-//   */
-//  CSMCamera::CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString) : Camera(cube) {
-//    init(cube, pluginName, modelName, stateString);
-//  }
-//
-
   /**
    * Constructor for an ISIS Camera model that uses a Community Sensor Model (CSM)
    * for the principal transformations.
@@ -70,8 +62,12 @@ namespace Isis {
 
 
   /**
-   * Init method which performs most of the setup for the USGS CSM
-   * Camera Model inside ISIS.
+   * Init method which performs most of the setup for the CSM Camera Model inside ISIS.
+   *
+   * @param cube The cube with the image data
+   * @param pluginName The name of the CSM::Plugin that will create the CSM::Model
+   * @param modelName The name of the CSM::Model that will be created
+   * @param stateString The state string the the CSM::Model will be created from
    */
   void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString){
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
