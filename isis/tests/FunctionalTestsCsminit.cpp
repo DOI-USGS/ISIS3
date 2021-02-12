@@ -328,6 +328,48 @@ TEST_F(DefaultCube, CSMInitSpiceCleanup) {
 
 
 // This test uses the DefaultCube fixture because it has already has attached
+TEST_F(DefaultCube, CSMInitSpiceRestoredAfterFailure) {
+  // Create an ISD
+  json isd;
+  isd["test_param_one"] = 1.0;
+  isd["test_param_two"] = 2.0;
+
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+testCube->fileName(),
+    "isd="+isdPath,
+    "shape=fake.broken"};
+
+  QString cubeFile = testCube->fileName();
+
+  PvlGroup kernelsGroup = testCube->group("Kernels");
+  PvlGroup instrumentGroup = testCube->group("Instrument");
+
+  UserInterface options(APP_XML, args);
+
+  testCube->close();
+
+  ASSERT_ANY_THROW(csminit(options));
+
+  Cube outputCube(cubeFile);
+  ASSERT_NO_THROW(outputCube.camera());
+
+  EXPECT_TRUE(outputCube.hasTable("InstrumentPointing"));
+  EXPECT_TRUE(outputCube.hasTable("InstrumentPosition"));
+  EXPECT_TRUE(outputCube.hasTable("BodyRotation"));
+  EXPECT_TRUE(outputCube.hasTable("SunPosition"));
+  ASSERT_TRUE(outputCube.hasGroup("Kernels"));
+  ASSERT_TRUE(outputCube.hasGroup("Instrument"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, kernelsGroup, outputCube.group("Kernels"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, instrumentGroup, outputCube.group("Instrument"));
+}
+
+
+// This test uses the DefaultCube fixture because it has already has attached
 // spice data that csminit should not remove on a failure.
 TEST_F(DefaultCube, CSMInitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models

@@ -175,7 +175,7 @@ std::string TestCsmModel::getSensorMode() const {
  * @return std::string reference date and time
  */
 std::string TestCsmModel::getReferenceDateAndTime() const {
-  return "TestCsmModel_ReferenceDateTime";
+  return "20000101T115959Z";
 }
 
 
@@ -484,4 +484,147 @@ std::vector<double> TestCsmModel::getCrossCovarianceMatrix(
   return covariance;
 }
 
+// csm::RasterGM methods
+csm::ImageCoord TestCsmModel::groundToImage(const csm::EcefCoord& groundPt,
+                         double desiredPrecision,
+                         double* achievedPrecision,
+                         csm::WarningList* warnings) const {
+  return csm::ImageCoord(0.0,0.0);
+}
+
+
+csm::ImageCoordCovar TestCsmModel::groundToImage(const csm::EcefCoordCovar& groundPt,
+                              double desiredPrecision,
+                              double* achievedPrecision,
+                              csm::WarningList* warnings) const {
+  return csm::ImageCoordCovar(0.0, 0.0, 0.0, 0.0, 0.0);
+}
+  
+
+csm::EcefCoord TestCsmModel::imageToGround(const csm::ImageCoord& imagePt,
+                               double height,
+                               double desiredPrecision,
+                               double* achievedPrecision,
+                               csm::WarningList* warnings) const {
+  return csm::EcefCoord(0.0, 0.0, 0.0);
+}
+
+csm::EcefCoordCovar TestCsmModel::imageToGround(const csm::ImageCoordCovar& imagePt,
+                                    double height,
+                                    double heightVariance,
+                                    double desiredPrecision,
+                                    double* achievedPrecision,
+                                    csm::WarningList* warnings) const {
+  return csm::EcefCoordCovar(0.0, 0.0, 0.0);
+}
+
+
+csm::EcefLocus TestCsmModel::imageToProximateImagingLocus(
+  const csm::ImageCoord& imagePt,
+  const csm::EcefCoord& groundPt,
+  double desiredPrecision,
+  double* achievedPrecision,
+  csm::WarningList* warnings) const {
+  return csm::EcefLocus(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
+
+csm::EcefLocus TestCsmModel::imageToRemoteImagingLocus(
+  const csm::ImageCoord& imagePt,
+  double desiredPrecision,
+  double* achievedPrecision,
+  csm::WarningList* warnings) const {
+  return csm::EcefLocus(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
+
+csm::ImageCoord TestCsmModel::getImageStart() const {
+  return csm::ImageCoord(0.0, 0.0);
+}
+
+
+csm::ImageVector TestCsmModel::getImageSize() const {
+  return csm::ImageVector(0.0, 0.0);
+}
+
+
+std::pair<csm::ImageCoord,csm::ImageCoord> TestCsmModel::getValidImageRange() const {
+  std::pair<csm::ImageCoord,csm::ImageCoord> csmPair(csm::ImageCoord(0.0, 0.0), csm::ImageCoord(0.0, 0.0));
+  return csmPair;
+}
+
+
+std::pair<double,double> TestCsmModel::getValidHeightRange() const {
+  std::pair<double, double> csmPair(0.0, 0.0);
+  return csmPair;
+}
+
+
+csm::EcefVector TestCsmModel::getIlluminationDirection(const csm::EcefCoord& groundPt) const {
+  return csm::EcefVector(0.0, 0.0, 0.0);
+}
+
+
+double TestCsmModel::getImageTime(const csm::ImageCoord& imagePt) const {
+  return 0.0;
+}
+
+
+csm::EcefCoord TestCsmModel::getSensorPosition(const csm::ImageCoord& imagePt) const {
+  return csm::EcefCoord(0.0, 0.0, 0.0);
+}
+
+
+csm::EcefCoord TestCsmModel::getSensorPosition(double time) const {
+  return csm::EcefCoord(0.0, 0.0, 0.0);
+}
+
+
+csm::EcefVector TestCsmModel::getSensorVelocity(const csm::ImageCoord& imagePt) const {
+  return csm::EcefVector(0.0, 0.0, 0.0);
+}
+
+
+csm::EcefVector TestCsmModel::getSensorVelocity(double time) const {
+  return csm::EcefVector(0.0, 0.0, 0.0);
+}
+
+
+csm::RasterGM::SensorPartials TestCsmModel::computeSensorPartials(
+            int index,
+            const csm::EcefCoord& groundPt,
+            double desiredPrecision,
+            double* achievedPrecision,
+            csm::WarningList* warnings) const {
+  return csm::RasterGM::SensorPartials(0.0, 0.0);
+}
+
+
+csm::RasterGM::SensorPartials TestCsmModel::computeSensorPartials(
+            int index,
+            const csm::ImageCoord& imagePt,
+            const csm::EcefCoord& groundPt,
+            double desiredPrecision,
+            double* achievedPrecision,
+            csm::WarningList* warnings) const {
+  
+  return csm::RasterGM::SensorPartials(0.0, 0.0);
+}
+
+
+std::vector<double> TestCsmModel::computeGroundPartials(const csm::EcefCoord& groundPt) const {
+  std::vector<double> vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  return vec;
+}
+
+const csm::CorrelationModel& TestCsmModel::getCorrelationModel() const {
+  return m_correlationModel;
+}
+
+std::vector<double> TestCsmModel::getUnmodeledCrossCovariance(
+            const csm::ImageCoord& pt1,
+            const csm::ImageCoord& pt2) const {
+  std::vector<double> vec = {0.0, 0.0, 0.0, 0.0};
+  return vec;
+}
 
