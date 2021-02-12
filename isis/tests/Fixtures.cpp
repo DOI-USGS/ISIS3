@@ -908,7 +908,7 @@ namespace Isis {
         .WillRepeatedly(::testing::Return("MockPlatformID"));
     EXPECT_CALL(mockModel, getReferenceDateAndTime())
         .Times(1)
-        .WillRepeatedly(::testing::Return("20000101T115855.816"));
+        .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
 
     testCam = testCube->camera();
   }
@@ -954,7 +954,7 @@ namespace Isis {
         .WillRepeatedly(::testing::Return("MockPlatformID"));
     EXPECT_CALL(mockModel, getReferenceDateAndTime())
         .Times(1)
-        .WillRepeatedly(::testing::Return("20000101T115855.816"));
+        .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
 
     testCam = testCube->camera();
   }
