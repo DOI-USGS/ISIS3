@@ -23,6 +23,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <QString>
+
 #include "Preference.h"
 
 #include "FileName.h"
@@ -47,8 +49,8 @@ namespace Isis {
   }
 
   /**
-   * Constructs a iTime object and initializes it to the time from the argument.  
-   *  
+   * Constructs a iTime object and initializes it to the time from the argument.
+   *
    * @param time A time string formatted in standard UTC or similar format.
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
@@ -431,7 +433,7 @@ namespace Isis {
 
     if(Second() < 10) utc += "0" + SecondString(precision);
     else utc += SecondString(precision);
-    
+
     return utc;
   }
 
@@ -443,6 +445,29 @@ namespace Isis {
   }
 
   void iTime::setUtc(QString utcString) {
+    // If the time string is in ISO basic format add separators for utc2et
+    if ( utcString.contains("T") && // Check for ISO T format
+         !utcString.contains("-") && // Check for missing data separator
+         !utcString.contains(":")) { // Check for missing time separator
+      QString dateString = utcString.split("T").front();
+      dateString.insert(4, "-");
+      // If format is YYYYDOY we are done with the date string
+      // Otherwise we are in YYYYMMDD format
+      if (dateString.size() > 8) {
+        dateString.insert(7, "-");
+      }
+
+      QString timeString = utcString.split("T").back();
+      // If the format is hh or hhmm, resize and pad with 0s out to hh0000 or hhmm00
+      if (timeString.size() < 6) {
+        timeString.resize(6, '0');
+      }
+      timeString.insert(2, ":");
+      timeString.insert(5, ":");
+
+      utcString = dateString + "T" + timeString;
+    }
+
     NaifStatus::CheckErrors();
     LoadLeapSecondKernel();
 
