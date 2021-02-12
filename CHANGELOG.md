@@ -22,21 +22,35 @@ If the heading does not yet exist under Unreleased, then add it as a 3rd heading
 with three #.
 
 
-When preparing for a public release add a new 2nd heading, with two #, under
+When preparing for a public release candidate add a new 2nd heading, with two #, under
 Unreleased with the version number and the release date, in year-month-day
 format. Then, add a link for the new version at the bottom of this document and
 update the Unreleased link so that it compares against the latest release tag.
+
+
+When preparing for a bug fix release create a new 2nd heading above the Fixed
+heading to indicate that only the bug fixes and security fixes are in the bug fix
+release.
 -->
 
 ## [Unreleased]
 
 ### Added
 
+- Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
+- Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
+
+### Fixed
+
+- Fixed relative paths not being properly converted to absolute paths in isisVarInit.py [4274](https://github.com/USGS-Astrogeology/ISIS3/issues/4274)
+
+## [4.4.0] - 2021-02-11
+
+### Added
+
 - Added warning to ocams2isis about the model being out of date. [#4200](https://github.com/USGS-Astrogeology/ISIS3/issues/4200)
 - Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images. [#3860](https://github.com/USGS-Astrogeology/ISIS3/issues/3860)
 - Update qview MeasureTool to add an option to calculate distances using RA/DEC and update qview to show DEC/RA rather than LAT/LON in lower-right corner [#3371](https://github.com/USGS-Astrogeology/ISIS3/issues/3371)
-- Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
-- Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
 - Updated spiceinit so that a user can specify a shape model and use the spice web service without any errors. [#1986](https://github.com/USGS-Astrogeology/ISIS3/issues/1986) 
 
 ### Fixed
@@ -45,7 +59,6 @@ update the Unreleased link so that it compares against the latest release tag.
 - Fixed not being able to enable USECOORDLIST argument in mappt. [#4150](https://github.com/USGS-Astrogeology/ISIS3/issues/4150)
 - Fixed history entry not being added to a cube when running spiceinit with web=true. [4040](https://github.com/USGS-Astrogeology/ISIS3/issues/4040)
 - Updated wavelength and bandbin values in translation files for the TGO CaSSIS BandBin group. [4147](https://github.com/USGS-Astrogeology/ISIS3/issues/4147)
-- Fixed relative paths not being properly converted to absolute paths in isisVarInit.py [4274](https://github.com/USGS-Astrogeology/ISIS3/issues/4274)
 
 ## [4.3.0] - 2020-10-02
 
@@ -250,7 +263,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.3.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.4.0...HEAD
+[4.4.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.3.0...4.4.0
 [4.3.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.1...4.2.0
 [4.1.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.0...4.1.1
