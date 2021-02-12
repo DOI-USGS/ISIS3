@@ -64,12 +64,26 @@
       <parameter name="ISD">
         <type>filename</type>
         <fileMode>input</fileMode>
+        <internalDefault>none</internalDefault>
         <brief>
           The Instrument Support Data (ISD) file that will be used.
         </brief>
         <description>
           The Instrument Support Data (ISD) file that will be used to create the
           model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
+        </description>
+      </parameter>
+
+      <parameter name="STATE">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          A Community Sensor Model (CSM) state string
+        </brief>
+        <description>
+          A file containing a Community Sensor Model (CSM) state string that will be used to create the
+          model for the input cube. 
         </description>
       </parameter>
     </group>

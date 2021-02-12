@@ -397,3 +397,105 @@ TEST_F(DefaultCube, CSMInitSpiceNoCleanup) {
   // The cube should still be intact and we should still be able to get a camera
   EXPECT_NO_THROW(outputCube.camera());
 }
+
+TEST_F(CSMPluginFixture, CSMInitStateStringFails) {
+  // Create an state string that will result in no successful models
+  json state;
+  state["name"] = "failing_isd";
+  state["test_param_one"] = "value_one";
+  state["test_param_does_not_exist"] = "failing_value";
+
+  QString statePath = tempDir.path() + "/failing.json";
+  std::ofstream file(statePath.toStdString());
+  file << state;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+filename,
+    "state="+statePath};
+
+  UserInterface options(APP_XML, args);
+
+  // Expect a failure due to missing modelname and pluginname
+  try {
+    csminit(options);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("When using a State string, PLUGINNAME and MODELNAME must be specified"));
+  }
+
+  QVector<QString> argsWithModel = {
+    "from="+filename,
+    "state="+statePath, 
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsWithModel(APP_XML, argsWithModel);
+
+  // Expect a failure due to a bad state string. 
+  try {
+    csminit(optionsWithModel);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Could not construct sensor model using STATE string and MODELNAME"));
+  }
+
+  QVector<QString> argsWithIsdAndState = {
+    "from="+filename,
+    "isd=fakePath",
+    "state="+statePath, 
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsWithIsdAndState(APP_XML, argsWithIsdAndState);
+
+  // Expect a failure due to providing both an ISD and a STATE string
+  try {
+    csminit(optionsWithIsdAndState);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Cannot enter both [ISD] and [STATE]. Please enter either [ISD] or [STATE]"));
+  }
+}
+
+TEST_F(CSMPluginFixture, CSMInitWithState) {
+  // Run csminit with ISD
+  QVector<QString> args = {
+    "from="+filename,
+    "isd="+isdPath
+  };
+
+  UserInterface options(APP_XML, args);
+  csminit(options);
+
+  testCube->open(filename);
+
+  // Read blob off csminited cube, get state string and save off to compare
+  StringBlob state("","CSMState");
+  testCube->read(state);
+  testCube->close();
+
+  // Write the state out to a file
+  std::string stateBefore = state.string();
+  QString statePath = tempDir.path() + "/state.json"; 
+  std::ofstream stateFile(statePath.toStdString());
+  stateFile << stateBefore;
+  stateFile.flush();
+
+  // Run csminit with state just saved to file
+  QVector<QString> argsState = {
+    "from="+filename,
+    "state="+statePath,
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsState(APP_XML, argsState);
+  csminit(optionsState);
+
+  // Pull state string off. if ending state string = original state string these are functionally equiv.
+  testCube->open(filename);
+
+  StringBlob stateAfter("","CSMState");
+  testCube->read(stateAfter);
+  EXPECT_STREQ(stateBefore.c_str(), stateAfter.string().c_str());
+}
