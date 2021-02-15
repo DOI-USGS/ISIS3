@@ -10,6 +10,7 @@
 #include "HistogramWidget.h"
 #include "Statistics.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 
 namespace Isis {
   /**
@@ -70,8 +71,6 @@ namespace Isis {
 
     sliderWidget->setLayout(sliderLayout);
     p_mainLayout->addWidget(sliderWidget, 1, 0);
-
-    p_stretch->setType("SawtoothStretch"); 
 
     setLayout(p_mainLayout);
 
@@ -309,6 +308,17 @@ namespace Isis {
   Stretch SawtoothStretchType::calculateNewStretch() {
     return calculateNewStretch(p_offsetEdit->text().toDouble(),
                                p_widthEdit->text().toDouble());
+  }
+
+
+  /**
+   * Gets the CubeStretch for this Sawtooth Stretch.
+   * 
+   * @return CubeStretch 
+   */
+  CubeStretch SawtoothStretchType::getStretch() {
+    CubeStretch cubeStretch(*p_stretch, "Sawtooth");
+    return cubeStretch;
   }
 }
 

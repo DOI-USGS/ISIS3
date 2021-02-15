@@ -11,6 +11,7 @@
 #include "HistogramWidget.h"
 #include "Statistics.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 
 namespace Isis {
   /**
@@ -54,8 +55,6 @@ namespace Isis {
     connect(p_table, SIGNAL(cellChanged(int, int)),
             this, SLOT(readTable()));
     disconnect(this, SIGNAL(stretchChanged()), this, SLOT(updateTable()));
-
-    p_stretch->setType("ManualStretch");
 
     setLayout(p_mainLayout);
     setStretch(stretch);
@@ -151,4 +150,16 @@ namespace Isis {
 
     return stretch;
   }
+
+
+/**
+ * Gets the current CubeStretch for this ManualStretch. 
+ *  
+ * @return CubeStretch 
+ */
+  CubeStretch ManualStretchType::getStretch() {
+    CubeStretch cubeStretch(*p_stretch, "Manual");
+    return cubeStretch;
+  }
+
 }

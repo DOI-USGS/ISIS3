@@ -34,6 +34,7 @@
 #include "Projection.h"
 #include "RingPlaneProjection.h"
 #include "TProjection.h"
+#include "CubeStretch.h"
 #include "Stretch.h"
 #include "StretchTool.h"
 #include "ViewportBuffer.h"
@@ -162,7 +163,7 @@ namespace Isis
 
   void IndependentCubeViewport::restretch(ViewportBuffer * buffer)
   {
-    Stretch globalStretch = grayStretch();
+    CubeStretch globalStretch = grayStretch();
     globalStretch.CopyPairs(StretchTool::stretchBand(this, StretchTool::Gray));
     stretchGray(globalStretch);
   }
@@ -234,7 +235,7 @@ namespace Isis
         newGlobal.AddPair(DBL_MAX, 255.0);
       }
       
-      globalStretch = new Stretch(newGlobal);
+      globalStretch = new CubeStretch(newGlobal);
       
       if (isVisible())
         stretchGray(newGlobal);

@@ -255,11 +255,14 @@ namespace Isis {
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
 
-      if (!kernelSuccess)
+      if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
                          _FILEINFO_);
+      }
     }
+    icube->deleteGroup("CsmInfo");
+    icube->deleteBlob("String","CSMState");
     p.WriteHistory(*icube);
     p.EndProcess();
   }

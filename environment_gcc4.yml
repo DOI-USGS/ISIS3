@@ -15,6 +15,7 @@ dependencies:
   - bzip2
   - cmake >=3.15
   - cspice
+  - csm>=3.0.3,<3.0.4
   - curl
   - doxygen
   - eigen
@@ -26,6 +27,7 @@ dependencies:
   - gsl
   - hdf5
   - icu
+  - inja
   - jama
   - jpeg==9b
   - kakadu==1
