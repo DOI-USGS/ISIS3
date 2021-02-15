@@ -41,7 +41,7 @@ int main(void) {
   try {
 
     cout << "Testing medium fiducial fit on a 100 x 100 cropped frame" << endl;
-    Cube cm("$lo/testData/3083_med_raw.cub", "r");
+    Cube cm("$ISISTESTDATA/isis/src/lo/unitTestData/3083_med_raw.cub", "r");
     Camera *camm = CameraFactory::Create(cm);
 
     cout << "FileName: " << FileName(cm.fileName()).name() << endl;
@@ -132,7 +132,7 @@ int main(void) {
     }
 
     cout << "Testing high fiducial fit on a full 34530 x 8750 frame" << endl;
-    Cube ch("$lo/testData/4164H_Full_mirror.cub", "r");
+    Cube ch("$ISISTESTDATA/isis/src/lo/unitTestData/4164H_Full_mirror.cub", "r");
     Camera *camh = CameraFactory::Create(ch);
 
     cout << "FileName: " << FileName(ch.fileName()).name() << endl;

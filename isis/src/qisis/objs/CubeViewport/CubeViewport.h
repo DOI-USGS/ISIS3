@@ -37,6 +37,7 @@ namespace Isis {
   class Projection;
   class Pvl;
   class PvlKeyword;
+  class CubeStretch;
   class Stretch;
   class Tool;
   class UniversalGroundMap;
@@ -128,6 +129,9 @@ namespace Isis {
    *  @history 2018-07-31 Kaitlyn Lee - Added setTrackingCube() and trackingCube() so that a
    *                          tracking cube is stored when needed and we do not have to open it in
    *                          AdvancedTrackTool every time the cursor is moved.
+   *  @history 2020-06-09 Kristin Berry - Updated paintPixmap() to move getStretch out of inner
+   *                          for loops. This provides a significant speed increase for qisis
+   *                          applications with cube viewports.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -171,14 +175,14 @@ namespace Isis {
           const BandInfo &operator=(BandInfo other);
 
           //! @return The Stretch
-          Stretch getStretch() const;
+          CubeStretch getStretch() const;
           //! @param newStretch The new Stretch value
           void setStretch(const Stretch &newStretch);
           //! The band
           int band;
         private:
           //! The Stretch
-          Stretch *stretch;
+          CubeStretch *stretch;
       };
 
       //! @param cube The cube to set the CubeViewport window to
@@ -336,13 +340,13 @@ namespace Isis {
        */
       double grayPixel(int sample, int line);
       //! @return The gray Stretch
-      Stretch grayStretch() const;
+      CubeStretch grayStretch() const;
       //! @return The red Stretch
-      Stretch redStretch() const;
+      CubeStretch redStretch() const;
       //! @return The green Stretch
-      Stretch greenStretch() const;
+      CubeStretch greenStretch() const;
       //! @return The blue Strech
-      Stretch blueStretch() const;
+      CubeStretch blueStretch() const;
 
       //! @return The cube associated with viewport
       Cube *cube() const {

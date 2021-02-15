@@ -108,6 +108,7 @@ Group = InstrumentName
 
   # MEX
   Translation   = (Hrsc, HRSC)
+  Translation   = (Src, SRC)
 
   # Messenger
   Translation   = (Mdis, MDIS-NAC)

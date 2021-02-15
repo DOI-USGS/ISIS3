@@ -66,7 +66,7 @@
       Histogram object no longer has SetRange, updated to use SetValidRange
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Noah Hilt" date="2008-08-01">
       Changed the plot window to the new HistogramToolWindow
@@ -79,7 +79,24 @@
     <change name="Curtis Rose" date="2016-06-10">
      Changed the application to fail immediately if the TO argument is not
      entered from the commandline. Fixes #3914.
-    </change>	
+    </change>
+    <change name="Austin Sanders" date="2020-06-08">
+      Updated logic such that min/max values are no longer calculated from .cub
+      if values are provided by the user.  Fixes #3881.
+    </change>
+    <change name="Kaitlyn Lee" date="2020-06-11">
+      Added "Pixels Below Min" and "Pixels Above Max" to the CSV output and changed how the data is
+      outputted. Originally, the CSV output and the GUI histogram would use the DN value in the
+      middle of a bin to represent that bin. That is, the CSV output used to have a "DN" value that
+      was the bin's middle pixel DN. This was not intuitive to users. Removed the "DN" value and added "MinInclusive" and "MaxExclusive" to the CSV so that bins are represented by their min/max values. These changes were also reflected in the histrogram creation. The x-axis is now based off of the min value of a bin instead of the middle value. These changes were made alongside changes made to Histogram and cnethist.
+    </change>
+    <change name="Kristin Berry" date="2020-06-25">
+      Re-added the ability to set number of bins without setting min/max values after the last update. 
+      Follow-on to #3881.
+    </change>
+    <change name="Stuart Sides" date="2020-09-02">
+      Added GUI helper for filling in computed min/max. Fixed #3880.
+    </change>
   </history>
 
   <oldName>
@@ -130,6 +147,17 @@
         <description>
           Minimum DN value in histogram.  If not entered it will automatically be computed.
         </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonCalcMinMax</function>
+            <brief>Fill in the auto calculated MINIMUM and MAXIMUM for the input cube</brief>
+            <description>
+              This button will calculate what the default MINIMUM and MAXIMUM values would be
+              and fills the respective GUI fields with them.
+            </description>
+            <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
+          </helper>
+        </helpers>
         <lessThan>
           <item>MAXIMUM</item>
         </lessThan>

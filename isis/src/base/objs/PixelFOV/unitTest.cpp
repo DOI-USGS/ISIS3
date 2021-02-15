@@ -50,7 +50,7 @@ int main(void) {
 
   cout << "Unit Test for PixelFOV..." << endl;
   try {
-    char file[1024] = "$dawn/testData/FC21B0001010_09049002212F5D.cub";
+    char file[1024] = "$ISISTESTDATA/isis/src/dawn/unitTestData/FC21B0001010_09049002212F5D.cub";
     QList<double> knownLat;
     knownLat << 48.366139970 <<  48.365525166 << 48.366769868 << 48.367384602;
     QList<double> knownLon;

@@ -45,7 +45,7 @@ int main(void) {
     double knownLat = -75.7874376789158504;
     double knownLon = 270.6409527241640944;
 
-    Cube c("$clementine1/testData/lhd0147b.200.lev1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/clementine/unitTestData/lhd0147b.200.lev1.cub", "r");
     HiresCamera *cam = (HiresCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

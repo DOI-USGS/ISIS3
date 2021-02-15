@@ -45,7 +45,7 @@ int main(void) {
    */
   try {
 
-    Cube c("$cassini/testData/W1525116136_1.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/cassini/unitTestData/W1525116136_1.cub", "r");
     IssWACamera *cam = (IssWACamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;

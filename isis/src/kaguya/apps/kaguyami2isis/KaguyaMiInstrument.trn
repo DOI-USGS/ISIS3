@@ -33,11 +33,13 @@ End_Group
 Group = SpacecraftName
   Auto
   InputKey       = SPACECRAFT_NAME
+  InputKey       = INSTRUMENT_HOST_NAME
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = SpacecraftName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (KAGUYA, SELENE-M)
+  Translation    = (KAGUYA, "SELENE MAIN ORBITER")
 End_Group
 
 Group = InstrumentName
@@ -513,6 +515,7 @@ End_Group
 Group = FirstDetectorElementPosition
   Auto
   InputKey       = FIRST_DETECTOR_ELEMENT_POSITION
+  InputKey       = FIRST_DETECTOR_ELEM_POSITION
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = FirstDetectorElementPosition

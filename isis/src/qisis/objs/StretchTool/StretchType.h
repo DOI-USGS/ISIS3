@@ -7,6 +7,7 @@ namespace Isis {
   class Stretch;
   class Cube;
   class Histogram;
+  class CubeStretch;
 }
 
 class QTableWidget;
@@ -44,8 +45,7 @@ namespace Isis {
 
       virtual ~StretchType();
 
-      virtual Stretch getStretch();
-
+      virtual CubeStretch getStretch();
       /**
        * Children must re-implement this to update their stretch pairs and GUI
        *   elements appropriately. This could be called with a

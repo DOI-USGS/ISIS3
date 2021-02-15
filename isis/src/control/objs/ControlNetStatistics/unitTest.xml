@@ -32,7 +32,7 @@
         <filter>
           *.lis
         </filter>
-       <default><item>$base/testData/cnet/serialNum.lis</item></default>
+       <default><item>$ISISTESTDATA/isis/src/base/unitTestData/cnet/serialNum.lis</item></default>
       </parameter>
       <parameter name="CNET">
         <type>filename</type>
@@ -46,7 +46,7 @@
         <filter>
           *.net
         </filter>
-        <default><item>$base/testData/cnet/cnetbin.net</item></default>
+        <default><item>$ISISTESTDATA/isis/src/base/unitTestData/cnet/cnetbin.net</item></default>
       </parameter>
     </group>
   </groups>

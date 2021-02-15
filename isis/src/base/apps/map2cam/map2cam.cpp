@@ -14,6 +14,7 @@ namespace Isis{
   Camera *outcam;
 
   void map2cam_f(UserInterface &ui) {
+
     // Open the input camera cube that we will be matching and create
     // the camera object
     FileName match = FileName(ui.GetFileName("MATCH"));
@@ -39,6 +40,7 @@ namespace Isis{
                                        mcube->lineCount(),
                                        outcam);
 
+   
     // Allocate the output cube but don't propagate any labels from the map
     // file. Instead propagate from the camera file
     rub.PropagateLabels(false);
@@ -47,7 +49,7 @@ namespace Isis{
     rub.SetOutputCube(fname, outputAtt,
                       transform->OutputSamples(),
                       transform->OutputLines(),
-                      icube->bandCount());
+                      mcube->bandCount());
     rub.PropagateLabels(match.expanded());
     rub.PropagateTables(match.expanded());
 
@@ -67,7 +69,7 @@ namespace Isis{
     if(!outcam->IsBandIndependent()) {
       rub.BandChange(BandChange);
     }
-
+    
     // Warp the cube
     rub.StartProcess(*transform, *interp);
     rub.EndProcess();
@@ -75,6 +77,8 @@ namespace Isis{
     // Cleanup
     delete transform;
     delete interp;
+
+    p.EndProcess();
   }
 
   // Transform object constructor
@@ -123,6 +127,6 @@ namespace Isis{
   }
 
   void BandChange(const int band) {
-    outcam->SetBand(mcube->physicalBand(band));
+    outcam->SetBand(band);
   }
 }

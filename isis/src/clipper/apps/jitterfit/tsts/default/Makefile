@@ -13,3 +13,5 @@ commands:
 		scale=1.0 > /dev/null; 
 	catlab from=$(OUTPUT)/simulated_clipper_eis_nac_rolling_shutter.cub \
 		to=$(OUTPUT)/simulated_clipper_eis_nac_rolling_shutter_labels.pvl > /dev/null;
+	$(SED) 's/[# ]//g' $(OUTPUT)/coefficients.txt > $(OUTPUT)/coefficients.csv;
+	$(RM) $(OUTPUT)/coefficients.txt > /dev/null;

@@ -24,7 +24,7 @@
 
 #include "iTime.h"
 
-#include <cmath>
+#include <QtMath>
 #include <utility>
 #include <vector>
 
@@ -148,8 +148,8 @@ namespace Isis {
     p_parentSample   = (p_detectorSample - p_ss) / p_detectorSampleSumming + 1.0;
     p_parentLine     = (p_detectorLine   - p_sl) / p_detectorLineSumming   + 1.0;
 
-    while((abs(sample - currentSample) < 1e-7) &&
-          (abs(line - currentLine) < 1e-7)) {
+    while((qFabs(sample - currentSample) < 1e-7) &&
+          (qFabs(line - currentLine) < 1e-7)) {
       
       currentSample = (currentSample - jittered.first);
       currentLine = (currentLine - jittered.second);

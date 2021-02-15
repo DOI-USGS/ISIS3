@@ -63,7 +63,7 @@ TEST_P(Types, Type) {
   EXPECT_EQ(column.DataType(), GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(Column, Types, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(Column, Types, ::testing::Values(
   Column::NoType, Column::Integer, Column::Real, Column::String, Column::Pixel));
 
 //Tests SetAlignment & Alignment functions with every member of the Align enum
@@ -74,7 +74,7 @@ TEST_P(Align, Alignment) {
   EXPECT_EQ(column.Alignment(), GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(Column, Align, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(Column, Align, ::testing::Values(
   Column::NoAlign, Column::Right, Column::Left, Column::Decimal));
 
 //Tests SetPrecision & Precision functions with Real type and Pixel type.
@@ -132,7 +132,7 @@ TEST(Column, SetWidthError) {
 //Should throw an error when Alignment is Decimal and
 //SetType is called with String or Integer
 TEST_P(TypeError, SetTypeError) {
-  QString message = "Integer or string type is not sensible if alignment is Decimal.";
+  QString message = "Integer or string type is not sensible if alignment is Decimal";
   Column column;
   column.SetAlignment(Column::Decimal);
   try {
@@ -151,7 +151,7 @@ TEST_P(TypeError, SetTypeError) {
 //Should throw an error when Type is String or Integer and
 //SetAllignment is called with Decimal
 TEST_P(TypeError, SetAlignmentError) {
-  QString message = "Decimal alignment does not make sense for integer or string values.";
+  QString message = "Decimal alignment does not make sense for integer or string values";
   Column column;
   column.SetType(GetParam());
   try {
@@ -166,7 +166,7 @@ TEST_P(TypeError, SetAlignmentError) {
   }
 }
 
-INSTANTIATE_TEST_CASE_P(Column, TypeError, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(Column, TypeError, ::testing::Values(
   Column::Integer, Column::String));
 
 //Tests that Precision's exceptions are working correctly
@@ -187,5 +187,5 @@ TEST_P(PrecisionError, SetPrecisionError) {
     << message.toStdString() <<"\"";
   }
 }
-INSTANTIATE_TEST_CASE_P(Column, PrecisionError, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(Column, PrecisionError, ::testing::Values(
   Column::NoAlign, Column::Right, Column::Left));

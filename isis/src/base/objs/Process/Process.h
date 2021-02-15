@@ -154,6 +154,7 @@ namespace Isis {
    *                          empty QList is provided to this parameter which will propagate all
    *                          tables. Updated unitTest to test this change. References #4433.
    *  @history 2018-07-27 Kaitlyn Lee - Added unsigned/signed integer pixel type handling.
+   *  @history 2020-06-06 Stuart Sides - Closed cube file used to propagte tables.
    */
   class Process {
     protected:
@@ -237,11 +238,15 @@ namespace Isis {
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
       virtual void SetInputCube(Isis::Cube *inCube);
-
+      virtual void SetInputCube(Cube *cube, 
+                                    int requirements);
 
       virtual Isis::Cube *SetOutputCube(const QString &parameter);
+      virtual Isis::Cube *SetOutputCubeStretch(const QString &parameter, UserInterface *ui=nullptr);
       virtual Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
                                 const int nlines, const int nbands = 1);
+      virtual Isis::Cube *SetOutputCubeStretch(const QString &parameter, const int nsamps,
+                                const int nlines, const int nbands = 1, UserInterface *ui=nullptr);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,

@@ -55,11 +55,11 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Flat file must have a name."))
+    EXPECT_TRUE(e.toString().toLatin1().contains("Flat file must have a name"))
       << e.toString().toStdString();
   }
   catch(...) {
-    FAIL() << "Expected an IException with message: \"Flat file must have a name.\"";
+    FAIL() << "Expected an IException with message: \"Flat file must have a name\"";
   }
 }
 
@@ -121,7 +121,7 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( (double) groundPoint.findKeyword("Phase"), 80.528381932125, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("Incidence"), 70.127983116628, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("Emission"), 12.133564327344, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("NorthAzimuth"), 332.65918493997, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("NorthAzimuth"), 332.65918493997, 2e-8);
 
   EXPECT_NEAR( (double) groundPoint.findKeyword("EphemerisTime"), -709401200.26114, 1e-8);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("UTC"), "1977-07-09T20:05:51.5549999");

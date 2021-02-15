@@ -2,9 +2,11 @@
 
 #include <QHBoxLayout>
 #include <QString>
+#include <QPushButton>
 
 #include "CubeViewport.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "AdvancedStretch.h"
 
 namespace Isis {
@@ -23,7 +25,7 @@ namespace Isis {
 
     setWindowTitle("Advanced Stretch Tool");
 
-    QHBoxLayout *layout = new QHBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout();
     
     setLayout(layout);
   }
@@ -53,17 +55,27 @@ namespace Isis {
       Stretch &bluStretch, Histogram &bluHist) {
     destroyCurrentStretches();
 
+    QHBoxLayout* rgbLayout = new QHBoxLayout();
+
     p_redStretch = new AdvancedStretch(redHist, redStretch,
                                        "Red", QColor(Qt::red));
-    layout()->addWidget(p_redStretch);
+    rgbLayout->addWidget(p_redStretch);
 
     p_grnStretch = new AdvancedStretch(grnHist, grnStretch,
                                        "Green", QColor(Qt::green));
-    layout()->addWidget(p_grnStretch);
+    rgbLayout->addWidget(p_grnStretch);
 
     p_bluStretch = new AdvancedStretch(bluHist, bluStretch,
                                        "Blue", QColor(Qt::blue));
-    layout()->addWidget(p_bluStretch);
+    rgbLayout->addWidget(p_bluStretch);
+
+    ((QVBoxLayout*)layout())->addLayout(rgbLayout);
+
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    ((QVBoxLayout*)layout())->addWidget(line);
+
     updateGeometry();
 
     connect(p_redStretch, SIGNAL(stretchChanged()),
@@ -72,6 +84,26 @@ namespace Isis {
             this, SIGNAL(stretchChanged()));
     connect(p_bluStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
+
+    // Add buttons for save/load/delete stretch to RGB stretches
+    QPushButton *saveToCubeButton = new QPushButton("Save Stretch Pairs to Cube..."); 
+    saveToCubeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(saveToCube()));
+
+    QPushButton *deleteFromCubeButton = new QPushButton("Delete Stretch Pairs from Cube...");
+    deleteFromCubeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SIGNAL(deleteFromCube()));
+
+    QPushButton *loadStretchButton = new QPushButton("Restore Saved Stretch from Cube...");
+    loadStretchButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SIGNAL(loadStretch()));
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+
+    buttonLayout->addWidget(saveToCubeButton);
+    buttonLayout->addWidget(deleteFromCubeButton);
+    buttonLayout->addWidget(loadStretchButton);
+    ((QBoxLayout*)layout())->addLayout(buttonLayout);
   }
 
   /**
@@ -137,12 +169,46 @@ namespace Isis {
 
 
   /**
-   * Restores a saved stretch from the cube 
+   * Restores a saved grayscale stretch from the cube 
    *  
    * @param stretch 
    */
-  void AdvancedStretchDialog::restoreSavedStretch(Stretch stretch){
-    p_grayStretch->restoreSavedStretch(stretch);
+  void AdvancedStretchDialog::restoreGrayStretch(CubeStretch stretch){
+    if (p_grayStretch) {
+      p_grayStretch->restoreSavedStretch(stretch); 
+    }
+    else {
+      QString msg = "Gray mode not enabled, cannot restore gray stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Restores a saved RGB stretch from the cube 
+   *  
+   * @param red 
+   * @param green 
+   * @param blue 
+   */
+  void AdvancedStretchDialog::restoreRgbStretch(CubeStretch red, CubeStretch green, CubeStretch blue) {
+    if (isRgbMode()) {
+      if (p_redStretch) {
+        p_redStretch->restoreSavedStretch(red); 
+      }
+      
+      if (p_grnStretch) {
+        p_grnStretch->restoreSavedStretch(green); 
+      }
+      
+      if (p_bluStretch) {
+        p_bluStretch->restoreSavedStretch(blue); 
+      }
+    }
+    else {
+      QString msg = "RGB mode not enabled, cannot restore RGB stretch";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -281,7 +347,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrayStretch() {
+  CubeStretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
       return p_grayStretch->getStretch();
     }
@@ -297,7 +363,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getRedStretch() {
+  CubeStretch AdvancedStretchDialog::getRedStretch() {
     if(p_redStretch) {
       return p_redStretch->getStretch();
     }
@@ -313,7 +379,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getGrnStretch() {
+  CubeStretch AdvancedStretchDialog::getGrnStretch() {
     if(p_grnStretch) {
       return p_grnStretch->getStretch();
     }
@@ -329,7 +395,7 @@ namespace Isis {
    *
    * @return Stretch
    */
-  Stretch AdvancedStretchDialog::getBluStretch() {
+  CubeStretch AdvancedStretchDialog::getBluStretch() {
     if(p_bluStretch) {
       return p_bluStretch->getStretch();
     }

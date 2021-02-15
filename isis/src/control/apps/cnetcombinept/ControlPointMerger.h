@@ -2,8 +2,8 @@
 #define ControlPointMerger_h
 /**
  * @file
- * $Revision: 1.0 $ 
- * $Date: 2014/02/27 18:49:25 $ 
+ * $Revision: 1.0 $
+ * $Date: 2014/02/27 18:49:25 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -24,6 +24,7 @@
 
 #include <QtGlobal>
 #include <QList>
+#include <QSet>
 #include <QString>
 #include <QScopedPointer>
 #include <QSharedPointer>
@@ -38,17 +39,17 @@
 namespace Isis {
 
 /**
- * @brief Combine control points based upon distance criteria 
- *  
- * This class will collect and compute ControlPoint candidates that are within 
- * a pixel tolerance for merging into a single control point. 
- *  
- * The criteria applied computes statistics on all common measures within the 
+ * @brief Combine control points based upon distance criteria
+ *
+ * This class will collect and compute ControlPoint candidates that are within
+ * a pixel tolerance for merging into a single control point.
+ *
+ * The criteria applied computes statistics on all common measures within the
  * control point for image coordinate searches.
- *  
+ *
  * @author  2015-10-11 Kris Becker
- *  
- * @internal 
+ *
+ * @internal
  *   @history 2015-10-11 Kris Becker - Original Version
  *   @history 2016-12-06 Jesse Mapel - Updated documentation.  References #4558.
  *   @history 2016-12-06 Jesse Mapel - Moved implementation to cpp file.  References #4558.
@@ -62,6 +63,7 @@ class ControlPointMerger {
     virtual ~ControlPointMerger();
 
     int size() const;
+    QSet<QString> mergedPoints() const;
     void clear();
     int apply(ControlPoint *point, QList<MeasurePoint> &candidates);
     int merge(ControlPoint *source, ControlPoint *candidate, const Statistics &stats);
@@ -73,7 +75,7 @@ class ControlPointMerger {
                                                   merged by the ControlPointMerger.*/
 
     inline bool isValid(const ControlMeasure &m) const;
-    inline double image_distance(const ControlMeasure &source, 
+    inline double image_distance(const ControlMeasure &source,
                                  const ControlMeasure &candidate) const;
 };
 

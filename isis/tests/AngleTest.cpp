@@ -139,8 +139,9 @@ TEST(AngleExceptions, LessThanNullAngle){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
   
   try {
-    angle1 < Isis::Angle();
-    FAIL() << "Expected an error";
+    if (angle1 < Isis::Angle()) {
+      FAIL() << "Expected an error";
+    }
    }
    catch(Isis::IException &e) {
      EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
@@ -155,8 +156,9 @@ TEST(AngleExceptions, NullAngleLessThan){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
 
   try {
-    Isis::Angle() < angle1;
-    FAIL() << "Expected an error";
+    if (Isis::Angle() < angle1) {
+      FAIL() << "Expected an error";
+    }
    }
    catch(Isis::IException &e) {
      EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
@@ -171,8 +173,9 @@ TEST(AngleExceptions, NullAngleLessThanOrEqual){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
 
   try {
-    Isis::Angle() <= angle1;
-    FAIL() << "Expected an error";
+    if (Isis::Angle() <= angle1) {
+      FAIL() << "Expected an error";
+    }
    }
    catch(Isis::IException &e) {
      EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
@@ -188,8 +191,9 @@ TEST(AngleExceptions, GreaterThanNullAngle){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
   
   try {
-    angle1 > Isis::Angle();
-    FAIL() << "Expected an error";
+    if (angle1 > Isis::Angle()) {
+      FAIL() << "Expected an error";
+    }
    }
    catch(Isis::IException &e) {
      EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"))
@@ -205,8 +209,9 @@ TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
   
   try {
-    angle1 >= Isis::Angle();
-    FAIL() << "Expected an error";
+    if (angle1 >= Isis::Angle()) {
+      FAIL() << "Expected an error";
+    }
    }
    catch(Isis::IException &e) {
      EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"))

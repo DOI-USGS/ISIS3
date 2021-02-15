@@ -6,7 +6,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale=0.7.2
+  - ale>=0.8.5
   - boost=1.68.0
   - armadillo
   - blas
@@ -15,6 +15,7 @@ dependencies:
   - bzip2
   - cmake >=3.15
   - cspice
+  - csm>=3.0.3,<3.0.4
   - curl
   - doxygen
   - eigen
@@ -26,6 +27,7 @@ dependencies:
   - gsl
   - hdf5
   - icu
+  - inja
   - jama
   - jpeg==9b
   - kakadu==1
@@ -41,7 +43,7 @@ dependencies:
   - nanoflann
   - nlohmann_json
   - ninja==1.7.2
-  - conda-forge/label/gcc7::nn
+  - nn=1.86.0=h470a237_1003
   - opencv>=3.0.0,<=4.0.0
   - openssl
   - pcl=1.8.1
