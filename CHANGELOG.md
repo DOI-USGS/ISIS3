@@ -35,8 +35,6 @@ release.
 
 ## [Unreleased]
 
-## [4.4.0] - 2021-01-05
-
 ### Added
 
 - Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
