@@ -42,12 +42,6 @@ namespace Isis {
    * @param(out) log The Pvl that attempted models will be logged to
    */
   void csminit(UserInterface &ui, Pvl *log) {
-    // Do error-checking that the UI can't do for us
-    if (ui.WasEntered("ISD") && ui.WasEntered("STATE")) {
-      QString message = "Cannot enter both [ISD] and [STATE]. Please enter either [ISD] or [STATE].";
-      throw IException(IException::User, message, _FILEINFO_);
-    }
-
     // We are not processing the image data, so this process object is just for
     // managing the Cube in memory and adding history
     Process p;
