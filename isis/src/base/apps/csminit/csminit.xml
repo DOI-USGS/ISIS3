@@ -43,6 +43,12 @@
     <change name="Jesse Mapel and Stuart Sides" date="2021-02-03">
       Modified to always add a TargetName and Instrument group to the label for the camera model.
     </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-10">
+      Modified to revert label and Cube changes on failure.
+    </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-12">
+      Added the ability to take a state string instead of an ISD.
+    </change>
   </history>
 
   <groups>
@@ -83,7 +89,7 @@
         </brief>
         <description>
           A file containing a Community Sensor Model (CSM) state string that will be used to create the
-          model for the input cube. 
+          model for the input cube.
         </description>
       </parameter>
     </group>
