@@ -1,5 +1,5 @@
 # Translates CaSSIS xml labels into the Archive PvlGroup values
-# for the ingested ISIS3 cube labels.
+# for the ingested ISIS cube labels.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.
@@ -48,7 +48,7 @@ End_Group
 
 Group = ProductVersionId
   Auto
-  Optional 
+  Optional
   InputPosition  = Identification_Area
   InputKey       = version_id
   OutputName     = ProductVersionId
@@ -189,7 +189,7 @@ End_Group
 Group = FocalLength
   Auto
   Optional
-  InputPosition  = (CaSSIS_Header, CaSSIS_General) 
+  InputPosition  = (CaSSIS_Header, CaSSIS_General)
   InputKey       = TELESCOPE_FOCAL_LENGTH
   OutputName     = FocalLength
   OutputPosition = (Object, IsisCube, Group, Archive)
@@ -506,4 +506,3 @@ End_Group
 #    </xs:complexType>
 
 End
-

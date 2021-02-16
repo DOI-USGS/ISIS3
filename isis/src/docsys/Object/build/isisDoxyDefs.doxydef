@@ -19,8 +19,8 @@
  * Namespace containing standardized %Isis error messages
  *
  * IsisMessage is not a class. It only contains a namespace which consists of
- * all the standardized Isis error messages. These messages should be used 
- * when applicable instead of constructing the message string inside the 
+ * all the standardized Isis error messages. These messages should be used
+ * when applicable instead of constructing the message string inside the
  * object or application.
  *
  */
@@ -102,7 +102,7 @@
  * @history  2017-01-19 Kristin Berry - Added the ExoMars Trace Gas Orbiter mission. References #4584
  * @history  2017-06-26 Jesse Mapel - Added the Juno mission.
  * @history  2018-03-27 Tyler Wilson - Added the Europa Clipper mission.
- * 
+ *
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
  * @todo Make "std" namespace invisible... probably not gonna happen
@@ -260,7 +260,7 @@
      *
      * @{
      */
-    
+
           // APOLLO
           /**
            * \defgroup  Apollo                       Apollo
@@ -293,7 +293,7 @@
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Cassini/
            *
            */
-          
+
           // CHANDRAYAAN1
           /**
            * \defgroup  Chandrayaan1                       Chandrayaan 1
@@ -336,12 +336,12 @@
            *
            * Mission site: https://www.jpl.nasa.gov/missions/europa-clipper/
            *
-           */          
+           */
           // DAWN
           /**
            * \defgroup  Dawn                       Dawn
            *
-           * These objects provide functionality for manipulating data from the 2007 Dawn 
+           * These objects provide functionality for manipulating data from the 2007 Dawn
            * mission to the celestial bodies Vesta and Ceres.
            *
            * Mission site: http://dawn.jpl.nasa.gov/
@@ -356,7 +356,7 @@
            *
            * These objects provide functionality for manipulating data from the
            * ExoMars Trace Gas Orbiter mission to Mars which launched on March 14, 2016.
-           * 
+           *
            * Mission site: http://exploration.esa.int/mars/46475-trace-gas-orbiter/
            *
            */
@@ -382,24 +382,24 @@
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Galileo/
            */
-          
+
           // HAYABUSA
           /**
            * \defgroup  Hayabusa                         Hayabusa
            *
-           * These objects provide functionality for manipulating data from the 2003 Hayabusa 
+           * These objects provide functionality for manipulating data from the 2003 Hayabusa
            * mission to the small asteroid Itokawa.
            *
            * Mission site: http://www.isas.jaxa.jp/e/enterp/missions/hayabusa/
            *
            */
-          
+
           // HAYABUSA2
           /**
            * \defgroup  Hayabusa2                        Hayabusa2
            *
-           * These objects provide functionality for manipulating data from the 2014 Hayabusa2 
-           * mission to the asteroid Ryugu. The purpose of this mission is to study the origin 
+           * These objects provide functionality for manipulating data from the 2014 Hayabusa2
+           * mission to the asteroid Ryugu. The purpose of this mission is to study the origin
            * and evolution of the solar system as well as materials for life by leveraging the
            * experience acquired from the Hayabusa mission.
            *
@@ -413,30 +413,30 @@
            *
            * These objects provide functionality for manipulating data from the
            * Juno mission to Jupiter.
-           * 
+           *
            * Mission site: https://www.nasa.gov/mission_pages/juno/main/index.html
            *
            */
-          
+
           // KAGUYA
           /**
            * \defgroup  Kaguya                       Kaguya
            *
            * These objects provide functionality for manipulating data from the 2007
-           * Kaguya mission to the moon. 
+           * Kaguya mission to the moon.
            *
            * Mission site: http://www.isas.jaxa.jp/e/enterp/missions/kaguya/
            *
            */
-          
-          // LUNAR ORBITER 
+
+          // LUNAR ORBITER
           /**
-           * \defgroup  LunarOrbiter                      Lunar Orbiter 
+           * \defgroup  LunarOrbiter                      Lunar Orbiter
            *
            * These objects provide functionality for manipulating data from the
            * Lunar Orbiter missions of the 1960's.
            *
-           * Mission summary: http://www.lpi.usra.edu/expmoon/orbiter/orbiter.html 
+           * Mission summary: http://www.lpi.usra.edu/expmoon/orbiter/orbiter.html
            *
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/LunarOrbiter/
            *
@@ -449,7 +449,7 @@
            * These objects provide functionality for manipulating data from the
            * Lunar Reconnaissance Orbiter (2008).
            *
-           * Mission site: http://lunar.gsfc.nasa.gov/ 
+           * Mission site: http://lunar.gsfc.nasa.gov/
            *
            */
 
@@ -485,7 +485,7 @@
            * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Rovers/
            *
            */
-          
+
           // MARS EXPRESS
           /**
            * \defgroup  MarsExpress                    Mars Express
@@ -575,8 +575,8 @@
            * \defgroup  NearEarthAsteroidRendezvousShoemaker  Near Earth Asteroid Rendezvous - Shoemaker
            *
            * These objects provide functionality for manipulating data from the
-           * Near Earth Asteroid Rendezvous - Shoemaker mission. Near Earth 
-           * Asteroid Rendezvous, launched in 1996, flew by Earth, Eros, and 
+           * Near Earth Asteroid Rendezvous - Shoemaker mission. Near Earth
+           * Asteroid Rendezvous, launched in 1996, flew by Earth, Eros, and
            * Mathilde, orbited Eros, then landed on Eros.
            *
            * Mission site: http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1996-008A
@@ -590,39 +590,39 @@
            * These objects provide functionality for manipulating data from the
            * New Horizons mission. New Horizons is part of NASA's New Frontiers
            * Program.
-           * New Horizons launched January 19, 2006 and is expected to spend five months studying 
+           * New Horizons launched January 19, 2006 and is expected to spend five months studying
            * Pluto durring the summer of 2015.
            *
            * Mission site: http://www.nasa.gov/mission_pages/newhorizons/main/#.VA4QY8NuH4I
            *
            */
-          
+
           // OSIRIS-REx
           /**
            * \defgroup  OSIRIS-REx                                   OSIRIS-REx
            *
-           * These objects provide functionality for manipulating data from the 
+           * These objects provide functionality for manipulating data from the
            * OSIRIS-REx asteroid sample return mission. The 2016 OSIRIS-REx mission's
            * key objectives include mapping out the asteroid Bennu's surface, analyzing
-           * a sample of Bennu's regolith, documenting the sample site, calculating Bennu's 
+           * a sample of Bennu's regolith, documenting the sample site, calculating Bennu's
            * orbit deviation, and comparing observations made at the asteroid to observations
            * made on Earth.
            *
            * Mission site: http://www.asteroidmission.org/
            *
            */
-          
+
           // ROBOTIC LUNAR OBSERVATORY
           /**
            * \defgroup  RoboticLunarObservatory                   Robotic Lunar Observatory
            *
-           * These objects provide functionality for manipulating data from the Robotic Lunar 
+           * These objects provide functionality for manipulating data from the Robotic Lunar
            * Observatory at the United States Geological Survey in Flagstaff, Arizona.
            *
            * Mission site: http://www.moon-cal.org/
            *
            */
-          
+
           // ROSETTA
           /**
            * \defgroup  Rosetta                              Rosetta
@@ -633,7 +633,7 @@
            * Mission site: http://rosetta.esa.int/
            *
            */
-          
+
           // SMALL MISSIONS FOR ADVANCED RESEARCH AND TECHNOLOGY 1
           /**
            * \defgroup  SmallMissionsForAdvancedResearchAndTechnology1  Small Missions for Advanced Research and Technology 1
@@ -645,7 +645,7 @@
            * Mission site: http://sci.esa.int/smart-1/
            *
            */
-          
+
           // VIKING
           /**
            * \defgroup  Viking                        Viking
@@ -684,7 +684,7 @@
     /* @}  end of Missions group */
 
 
-// MAIN PAGE - content of the table-of-contents page for the %Isis 3 Object Documentation
+// MAIN PAGE - content of the table-of-contents page for the %Isis Object Documentation
 //  TODO: look at using doxy conditional processing to have different main page for
 //        API vs. Programmer Docs
 

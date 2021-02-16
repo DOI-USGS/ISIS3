@@ -5,29 +5,29 @@
 using namespace std;
 
 namespace Isis {
-  
-  
- 
+
+
+
   /**
    * Crop a cube along a line, sample range. This is the programmatic interface to
-   * the ISIS3 stats application.
+   * the ISIS stats application.
    *
    * @param ui The User Interface to parse the parameters from
-   */ 
+   */
   PvlGroup crop(UserInterface &ui) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));  
+    icube->open(ui.GetFileName("FROM"));
     return crop(icube, ui);
   }
 
-  
+
   /**
    * Compute the stats for an ISIS cube. This is the programmatic interface to
-   * the ISIS3 stats application.
+   * the ISIS stats application.
    *
-   * @param cube input cube to be cropped 
+   * @param cube input cube to be cropped
    * @param ui The User Interface to parse the parameters from
-   */ 
+   */
   PvlGroup crop(Cube *cube, UserInterface &ui) {
     // Globals and prototypes
     int ss, sl, sb;

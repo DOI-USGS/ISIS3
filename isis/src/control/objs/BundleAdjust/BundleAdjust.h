@@ -63,7 +63,7 @@ namespace Isis {
   /**
    * @brief An image bundle adjustment object.
    *
-   * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS 3 cubes.
+   * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS cubes.
    * Using the collineariy condition, BundleAdjust can construct a system of normal equations
    * and then using the CHOLMOD library, solve that system.
    *
@@ -324,10 +324,10 @@ namespace Isis {
    *                            point for converting point sigmas to/from radians from/to meters.
    *                            References #4649 and #501.
    *  @history 2019-05-15 Debbie A. Cook - The call to CameraGroundMap::GetXY in method
-   *                            ComputePartials was modified to not check for points on the back side 
+   *                            ComputePartials was modified to not check for points on the back side
    *                            of the planet when computing instrument coordinates during the bundle
-   *                            adjustment.  In the future a control net diagnostic program might be 
-   *                            useful to detect any points not visible on an image based on the exterior 
+   *                            adjustment.  In the future a control net diagnostic program might be
+   *                            useful to detect any points not visible on an image based on the exterior
    *                            orientation of the image.  References #2591.
    */
   class BundleAdjust : public QObject {

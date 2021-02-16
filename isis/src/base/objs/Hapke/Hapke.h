@@ -41,7 +41,7 @@ namespace Isis {
    * @author 1989-08-02 Unknown
    *
    * @internal
-   *   @history 2008-01-14 Janet Barret - Imported into Isis3 from Isis2.
+   *   @history 2008-01-14 Janet Barret - Imported into ISIS from Isis2.
    *   @history 2008-03-07 Janet Barrett - Moved variables and related
    *                           methods that pertain to Hapke specific parameters
    *                           to the PhotoModel class.

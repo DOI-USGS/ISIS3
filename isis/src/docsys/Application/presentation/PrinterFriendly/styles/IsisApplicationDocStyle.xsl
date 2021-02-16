@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -14,8 +14,8 @@ Deborah Lee Soltesz
 
 -->
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -86,7 +86,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        ISIS 3 Application Documentation</p>
+        ISIS Application Documentation</p>
 
         <hr/>
 
@@ -186,10 +186,10 @@ Deborah Lee Soltesz
           This program replaces the following
           <xsl:choose>
             <xsl:when test="count(oldName/item) > 1">
-            applications 
+            applications
             </xsl:when>
             <xsl:otherwise>
-            application 
+            application
             </xsl:otherwise>
           </xsl:choose>
           existing in previous versions of ISIS:
@@ -955,7 +955,7 @@ document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@s
     <xsl:variable name="text">
       <xsl:choose>
         <xsl:when test ="@link">
-          <xsl:value-of select="normalize-space(@link)"/> 
+          <xsl:value-of select="normalize-space(@link)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="normalize-space(.)"/>
@@ -992,4 +992,3 @@ document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@s
 
 
 </xsl:stylesheet>
-

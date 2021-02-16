@@ -37,14 +37,14 @@
 namespace Isis {
 
   /**
-   * @brief A ProgramAnalyzer accumulates print log runtime statistics 
-   *  
-   * This class reads an ISIS3 print log and accumulates runtime statistics for 
-   * all programs found in the log file.  It will compute overall CPU and 
+   * @brief A ProgramAnalyzer accumulates print log runtime statistics
+   *
+   * This class reads an ISIS print log and accumulates runtime statistics for 
+   * all programs found in the log file.  It will compute overall CPU and
    * connect time to use in analysis of (typically I/O) performance.
-   *  
-   * Various format and reporting utilities are provided to externalize the 
-   * results. 
+   *
+   * Various format and reporting utilities are provided to externalize the
+   * results.
    *
    * @ingroup Utility
    * @author 2006-11-09 Kris Becker
@@ -105,7 +105,7 @@ namespace Isis {
         Statistics  cputime;
         Statistics  iotime;
         RunTimeStats() : pname(""), contime(), cputime(), iotime() { }
-        RunTimeStats(const QString &name) : pname(name), contime(), 
+        RunTimeStats(const QString &name) : pname(name), contime(),
                                                 cputime(), iotime() { }
       };
 
@@ -119,7 +119,7 @@ namespace Isis {
         QString to;
         double      cpuTime;
         double      connectTime;
-        ProgramData() : status(BADDATA), name(""), runtime(""), 
+        ProgramData() : status(BADDATA), name(""), runtime(""),
                         from(""), to(""), cpuTime(0.0), connectTime(0.0) { }
       };
 
@@ -137,7 +137,7 @@ namespace Isis {
 
       void init();
       int getCount (Status status) const;
-      QString getKey(PvlObject &obj, const QString &key, 
+      QString getKey(PvlObject &obj, const QString &key,
                          const QString &grp = "") const;
 
       /** Find a string in a PvlContainer */
@@ -162,5 +162,3 @@ namespace Isis {
 
 
 #endif
-
-

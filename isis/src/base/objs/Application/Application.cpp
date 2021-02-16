@@ -517,7 +517,7 @@ namespace Isis {
       const QString &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      QString msg = "This process (program) was executed by an existing Isis 3 "
+      QString msg = "This process (program) was executed by an existing Isis "
           "process. However, we failed to establish a communication channel "
           "with the parent (launcher) process. The parent process has a PID of "
           "[" + toString(iApp->GetUserInterface().ParentId()) + "]";
@@ -532,7 +532,7 @@ namespace Isis {
     data += '\n';
 
     if (p_connectionToParent->write(data.toLatin1().data(), data.toLatin1().size()) == -1) {
-      QString msg = "This process (program) was executed by an exiting Isis 3 "
+      QString msg = "This process (program) was executed by an exiting Isis "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +

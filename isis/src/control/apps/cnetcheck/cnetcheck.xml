@@ -12,7 +12,7 @@
       is recommended to run cnetcheck before running jigsaw (can use the same
       input image cube list and control network) in order to catch a choice of
       potential issues with the control network and the corresponding input
-      image cube list.  
+      image cube list.
     </p>
     <p>
       The default primary function of cnetcheck is to idenify any
@@ -32,7 +32,7 @@
     <p>
       NOTE2: If it is discovered that a known island is missing an output island
       file (i.e., output list not created as expected), it is possible that the
-      image cube file name(s) were not listed in the input list (FROMLIST).  
+      image cube file name(s) were not listed in the input list (FROMLIST).
     </p>
     <p>
       All output files are created in the working directory where cnetcheck is
@@ -81,7 +81,7 @@
       Added the SINGLECUBE parameter, renaming SINGLE to SINGLEMEASURE as a consequence.
     </change>
     <change name="Mackenzie Boyd" date="2010-05-28">
-      Modified functionality of NOLATLON option to check all measures, not just 
+      Modified functionality of NOLATLON option to check all measures, not just
       each cube.
     </change>
     <change name="Christopher Austin" date="2009-06-08">
@@ -122,11 +122,11 @@
           List of input cube file names in the Control Network
         </brief>
         <description>
-          A text file containing one column of ISIS3 image cube file names.
+          A text file containing one column of ISIS image cube file names.
           Every image cube file used in the control network should be included
           in this list.  The input images are required to be a <def>Level0</def>
           or <def>Level1</def> cube with a successful 'spiceinit' applied
-          previously. 
+          previously.
         </description>
         <filter>
           *.txt *.lis *.list
@@ -158,9 +158,9 @@
           The character to be inserted between output file field entries
         </brief>
         <description>
-          This option determines which character will be used to separate 
+          This option determines which character will be used to separate
           the output file field entries, with the default option as a tab.
-          Other options are comma, single space, or "OTHER," which allows 
+          Other options are comma, single space, or "OTHER," which allows
           the user to input whatever they wish as the delimiter character.
         </description>
         <default><item>TAB</item></default>
@@ -228,7 +228,7 @@
         </brief>
         <description>
           The results of the validity check are placed in output file names with
-          the given prefix.            
+          the given prefix.
           <p>
             For example, PREFIX=CHK_, will result in an output filename
             CHK_Island.1 or CHK_NoControl.txt
@@ -246,7 +246,7 @@
           When Ignore=TRUE, any <def link="Control Point">control points</def>
           and <def link="Control Measures">control measures</def> that are
           flagged as invalid within the network (IGNORE=TRUE), are NOT
-          considered links across images/groups when identifying islands.  
+          considered links across images/groups when identifying islands.
           <p>
             Ignore=TRUE is the default for consistency with other apps, such as
             jigsaw, that do NOT consider invalid points or measures.
@@ -272,9 +272,9 @@
           not found in the input control network (CNET) are considered images
           without control.  These filenames and serial numbers will be listed in
           the output file named [PREFIX]NoControl.txt (with a field delimiter
-          [DELIMIT]).  
+          [DELIMIT]).
           <p>
-            No output file will be created if all images are controlled.  
+            No output file will be created if all images are controlled.
           </p>
           <p>
             NOCONTROL=False will turn off this testing of images without
@@ -293,13 +293,13 @@
           NOCUBE=True, an output file named [PREFIX]NoCube.txt will be created,
           which will list all <def link="Serial Number">serial numbers</def>
           encountered in the input Control Network (CNET) that do not have a
-          corresponding image cube file name in the provided list (FROMLIST).             
+          corresponding image cube file name in the provided list (FROMLIST).
           <p>
-            No output file will be created if all serial numbers match to an 
-            image cube file name.  
+            No output file will be created if all serial numbers match to an
+            image cube file name.
           </p>
           <p>
-            NOCUBE=False will turn off the testing for matching serial number 
+            NOCUBE=False will turn off the testing for matching serial number
             and input image file names.
           </p>
         </description>
@@ -315,9 +315,9 @@
           SINGLEMEASURE=True, a file named [PREFIX]SinglePointCubes.txt will be
           created, which will list all image cube file names that exist as the
           single Control Measure in any Control Point within the provided
-          Control Network.  
+          Control Network.
           <p>
-            Note: In general and when possible, a control point should have more 
+            Note: In general and when possible, a control point should have more
             than one control measures (more than three).
           </p>
           <p>
@@ -341,7 +341,7 @@
             Images under this scenario must be resolved before running jigsaw.
             A single image must not have more than one measure to the same
             control point.
-          </p>  
+          </p>
           <p>
             If there are no such duplicate Control Measures, then no file is
             created.
@@ -356,8 +356,8 @@
           Check for images that are measured to only one Control Point
         </brief>
         <description>
-          When true, a file named [PREFIX]SingleCubes.txt will be created, 
-          that will list all image cube filenames that are measured to only 
+          When true, a file named [PREFIX]SingleCubes.txt will be created,
+          that will list all image cube filenames that are measured to only
           one control point.
           <p>
             These images would have a convex hull value near zero, meaning there
@@ -368,7 +368,7 @@
           </p>
           <p>
             If there are no such single Cubes, then no file is created.
-          </p> 
+          </p>
         </description>
       </parameter>
 
@@ -382,7 +382,7 @@
           When true, a file named [PREFIX]NoLatLon.txt will be created, which
           will list all Serial Numbers within the given Control Network and
           FROMLIST which a latitude and longitude value cannot be computed at
-          their respective image measure coordinate.  
+          their respective image measure coordinate.
           <p>
             These identified Serial Numbers and image cube filenames will be
             followed by the Control Point IDs where the latitude and longitude
@@ -421,11 +421,11 @@
           </p>
           <p>
             The default of 1.0 for a max tolerance will effectively cause
-            nearly every image to be reported, as it is highly unlikely that 
-            a convex hull will cover 100% of it's corresponding image.   
-            With a tolerance of 0.25, any image whose convex hull covers less 
-            than a quarter of the image area will be reported.  A minimal 
-            tolerance of 0.0 effectively makes the test meaningless, allowing 
+            nearly every image to be reported, as it is highly unlikely that
+            a convex hull will cover 100% of it's corresponding image.
+            With a tolerance of 0.25, any image whose convex hull covers less
+            than a quarter of the image area will be reported.  A minimal
+            tolerance of 0.0 effectively makes the test meaningless, allowing
             images to "pass" this test without having ay control point coverage.
           </p>
           <p>

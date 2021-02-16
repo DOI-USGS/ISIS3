@@ -2272,7 +2272,7 @@ namespace Isis {
 
   /**
    * This is a helper, used by open(...), that handles opening Isis 2 cubes as
-   *   if they were Isis 3 cubes.
+   *   if they were Isis cubes.
    *
    * @param oldCube The filename of the Isis 2 cube
    */

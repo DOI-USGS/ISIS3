@@ -1,6 +1,6 @@
-# This file is used by the ProcessImportPds class to define the offset and 
+# This file is used by the ProcessImportPds class to define the offset and
 # multiplication factors used to convert PDS 3 SampleProjectionOffset
-# and LineProjectionOffset to ISIS3 UpperLeftX and UpperLeftY.
+# and LineProjectionOffset to ISIS UpperLeftX and UpperLeftY.
 #
 # The Keyword defines which keyword is searched for in the pds file.  The
 # Pattern is then used to match the value in the defined keyword.  If there
@@ -19,20 +19,20 @@
 #  Anytime a new group is added to this file, all 6 keywords must to be
 #  defined (Keyword, Pattern, xMult, yMult, xOff, yOff).
 #
-#  @history 2007-04-10  Tracie Sucharski, Original version with 
+#  @history 2007-04-10  Tracie Sucharski, Original version with
 #                       Isis2 definitions.
-#  @history 2008-06-10  Jeff Anderson, Fixed Magellan to be more specific to 
+#  @history 2008-06-10  Jeff Anderson, Fixed Magellan to be more specific to
 #                       FMAPS and MIDRS
 #  @history 2008-10-01  Steven Lambright, Fixed Isis 2 offsets, fixed cassini radars
 #                       Keyword/Pattern values. Commented and fixed MIDR offsets.
-#  @history 2011-01-26  Janet Barrett, Added support for Kaguya Terrain Camera 
+#  @history 2011-01-26  Janet Barrett, Added support for Kaguya Terrain Camera
 #                       (TC_MAP)
 #  @history 2011-11-16  Jeff Anderson, Added support for LROC data
 #  @history 2012-03-04  Janet Barrett, Added support for Kaguya Terrain Camera
 #                       Ortho data (TCO_MAP)
 #  @history 2017-05-25  J Bonn  KAGUYA TERRAIN CAMERA and  KAGUYA TERRAIN CAMERA
-#                       ORTHO entires to +0.5 yoff,yoff per ticket m04506 
-#  @history 2017-05-26  T Hare  With ticket m02244 fix, Removed entires that no 
+#                       ORTHO entires to +0.5 yoff,yoff per ticket m04506
+#  @history 2017-05-26  T Hare  With ticket m02244 fix, Removed entires that no
 #                       longer need an override including: CHANDRAYAAN and LRO
 #                       MINIRF, CASSINI RADAR, LROC PDS RDR, MESSENGER DEM, and
 #                       HRSC PDS products. Added new entry for MGS MOLA
@@ -50,7 +50,7 @@ Object = ProjectionOffsetMults
     xMult   = -1.0
     yMult   = 1.0
     xOff    = -0.5
-    yOff    = 1.0 
+    yOff    = 1.0
   End_Group
 
   # VIKING ORBITER
@@ -114,5 +114,3 @@ Object = ProjectionOffsetMults
   End_Group
 
 End_Object
-
-         

@@ -42,7 +42,7 @@ namespace Isis {
   class Spice;
 
   /**
-   * This class is used to create and store valid Isis3 targets.
+   * This class is used to create and store valid Isis targets.
    *
    * @author 2012-03-20 Debbie A. Cook
    *
@@ -50,10 +50,10 @@ namespace Isis {
    *  @history 2015-07-31 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
    *                          NAIF errors were signaled. References #2248.
    *  @history 2016-05-18 Jeannie Backer - Moved TProjection::TargetRadii() methods to
-   *                          Target::radiiGroup() methods. Added overloaded 
-   *                          lookupNaifBodyCode(QString) to have a generic static method that 
-   *                          takes the TargetName as an input parameter. Added overloaded 
-   *                          lookupNaifBodyCode(Pvl) to use the label passed into Target's 
+   *                          Target::radiiGroup() methods. Added overloaded
+   *                          lookupNaifBodyCode(QString) to have a generic static method that
+   *                          takes the TargetName as an input parameter. Added overloaded
+   *                          lookupNaifBodyCode(Pvl) to use the label passed into Target's
    *                          constructor to find the code if not found using
    *                          the name or spice pointer provided. References #3934.
    *  @history 2016-05-18 Jeannie Backer - Removed unused lookupNaifBodyCode() method that takes no
@@ -66,7 +66,7 @@ namespace Isis {
    *                          up the Naif body code instead of the Naif body frame code.  We may
    *                          need to add a method to look up the Naif body frame code as well.
    *                          Also moved the try loop attempting to find the radii tagged with the
-   *                          Naif body code ahead of the try loop that attempts to find the radii 
+   *                          Naif body code ahead of the try loop that attempts to find the radii
    *                           tagged with the body frame code in the method radiiGroup.  Fixed
    *                           any mention of Naif body frame code that should be Naif body code.
    *                           These are not the same.  Naif tags the body radii keyword with the

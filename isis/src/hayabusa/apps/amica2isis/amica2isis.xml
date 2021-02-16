@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="amica2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+<application name="amica2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 <!-- $Id: amica2isis.xml 6226 2015-06-09 20:46:13Z jwbacker@GS.DOI.NET $ -->
 
   <brief>Import PDS/FITS formatted Hayabusa image into ISIS cube</brief>
 
   <description>
     <p>
-       This application will import and convert a Hayabusa Asteroid Multiband 
-       Imaging Camera (AMICA) PDS image to an ISIS cube. The application reads 
-       and translates eight AMICA filters.  See chart in <i>AMICA Filters</i> 
+       This application will import and convert a Hayabusa Asteroid Multiband
+       Imaging Camera (AMICA) PDS image to an ISIS cube. The application reads
+       and translates eight AMICA filters.  See chart in <i>AMICA Filters</i>
        below for details on the different filters.
     </p>
     <br/>
@@ -28,88 +28,88 @@
       </li>
     </ul>
     <p>
-       The input PDS formatted detached header file (.lbl) for the Hayabusa 
-       AMICA image must be used in the FROM parameter.  This header contains a 
-       reference to a FITS formatted file ending in a .fit extension containing 
-       the image data.  Both files must reside in the same directory or errors 
+       The input PDS formatted detached header file (.lbl) for the Hayabusa
+       AMICA image must be used in the FROM parameter.  This header contains a
+       reference to a FITS formatted file ending in a .fit extension containing
+       the image data.  Both files must reside in the same directory or errors
        will occur.
     </p>
     <h3>When TARGET Parameter Should Be Specified</h3>
     <ul>
       <li>
-        When Hayabusa AMICA EDR labels contain an incorrect value for the 
-      TARGET_NAME keyword 
+        When Hayabusa AMICA EDR labels contain an incorrect value for the
+      TARGET_NAME keyword
       </li>
       <li>
-         Define TARGET = "SKY" to later project the data with 
+         Define TARGET = "SKY" to later project the data with
         <em>skymap</em>.
       </li>
     </ul>
     <br/>
     <h2>Mission Overview</h2>
     <p>
-       The Hayabusa spacecraft was launched on 9 May 2003.  The AMICA 
-       instrument acquired more than 1,400 multispectral and high resolution 
-       images of the asteroid 25143 Itokawa beginning 12 September 2005 for 
-       three months.  The primary goal of the mission was to land on the 
-       asteroid and return samples to Earth.  The spacecraft safely landed on 
-       Itokawa in November 2005 and returned the samples to Earth in June 2010.  
+       The Hayabusa spacecraft was launched on 9 May 2003.  The AMICA
+       instrument acquired more than 1,400 multispectral and high resolution
+       images of the asteroid 25143 Itokawa beginning 12 September 2005 for
+       three months.  The primary goal of the mission was to land on the
+       asteroid and return samples to Earth.  The spacecraft safely landed on
+       Itokawa in November 2005 and returned the samples to Earth in June 2010.
        Further information can be found in Ishiguro et al. (2010)
     </p>
     <p>
-        During the rendezvous phase with Itokawa, Hayabusa was designed to find 
-        its position relative to the asteroid autonomously using optical 
-        navigation cameras (ONC) and range data based on light-detection and 
-        ranging (LIDAR) technology. The ONC-T, a refractive telescope camera head, 
-        is referred to as the AMICA when used for scientific observations. Prior 
-        to "touch-and-go sampling", Itokawa was mapped by AMICA to select 
-        sampling sites free of serious obstacles such as meter-sized boulders 
+        During the rendezvous phase with Itokawa, Hayabusa was designed to find
+        its position relative to the asteroid autonomously using optical
+        navigation cameras (ONC) and range data based on light-detection and
+        ranging (LIDAR) technology. The ONC-T, a refractive telescope camera head,
+        is referred to as the AMICA when used for scientific observations. Prior
+        to "touch-and-go sampling", Itokawa was mapped by AMICA to select
+        sampling sites free of serious obstacles such as meter-sized boulders
         and craters.
-    </p> 
+    </p>
     <h2>Instrument Overview</h2>
     <p>
-       The AMICA instrument is a refracting telescope consisting of five lenses, 
-       each of which is cosmic-radiation-resistant and anti-reflection coated.  
-       A quartz optical parallel window is placed in front of the first lens for 
-       radiation protection.  The SITe charge-coupled device (CCD) chip, 
-       developed and built by NEC TOSHIBA Space Systems, Ltd., is of the 
-       back-illuminated MPP (Multi-Pinned Phase) type. The CCD is kept below -10 
-       degrees C in ordinary in-flight condition.  The CCD dimensions are 1024 x 
-       1000 visible pixels (full dimensions are 1024 x 1024) and the camera 
-       field of view is 5.83 x 5.69 degrees.  The 12 columns on either side of 
-       the 1024 x 1000 pixel array are dark due to an obscuring mask. DNs in 
-       these areas were found to be dependent on both incident flux and 
-       wavelength, suggesting that the masks are not perfectly impermeable to 
-       light.  Therefore, these pixels cannot be used for dark current 
-       correction.  The remaining unobscured region has the dimensions 1000 x 
-       1000. 
+       The AMICA instrument is a refracting telescope consisting of five lenses,
+       each of which is cosmic-radiation-resistant and anti-reflection coated.
+       A quartz optical parallel window is placed in front of the first lens for
+       radiation protection.  The SITe charge-coupled device (CCD) chip,
+       developed and built by NEC TOSHIBA Space Systems, Ltd., is of the
+       back-illuminated MPP (Multi-Pinned Phase) type. The CCD is kept below -10
+       degrees C in ordinary in-flight condition.  The CCD dimensions are 1024 x
+       1000 visible pixels (full dimensions are 1024 x 1024) and the camera
+       field of view is 5.83 x 5.69 degrees.  The 12 columns on either side of
+       the 1024 x 1000 pixel array are dark due to an obscuring mask. DNs in
+       these areas were found to be dependent on both incident flux and
+       wavelength, suggesting that the masks are not perfectly impermeable to
+       light.  Therefore, these pixels cannot be used for dark current
+       correction.  The remaining unobscured region has the dimensions 1000 x
+       1000.
     </p>
     <p>
-       AMICA is one of the ONCs comprised of  three units: three CCD camera 
-       heads (ONC-T, ONC-W1, and ONC-W2), an analog signal processing unit 
-       (ONC-AE), and a digital signal processing unit (ONC-E). AMICA (ONC-T) and 
-       two wide-angle navigation cameras (ONC-W1 and ONC-W2) are controlled 
-       through ONC-E and ONC-AE, and the signals obtained are converted from 
-       analog to digital in ONC-AE. The digitized images are numerically 
-       processed by the ONC-E. The design of the AMICA camera head flight model 
-       is essentially the same as that of its prototype model. It is a CCD 
-       camera with a refractor telescope consisting of cosmic 
-       radiation-resistant and antireflection-coated lenses. The CCD device was 
-       configured in a frame-transfer architecture with an image area and a 
-       frame storage area. The depth of field (the distance between the camera 
-       and objects that are observed in focus) was designed to be 75 m to 
-       infinity. 
+       AMICA is one of the ONCs comprised of  three units: three CCD camera
+       heads (ONC-T, ONC-W1, and ONC-W2), an analog signal processing unit
+       (ONC-AE), and a digital signal processing unit (ONC-E). AMICA (ONC-T) and
+       two wide-angle navigation cameras (ONC-W1 and ONC-W2) are controlled
+       through ONC-E and ONC-AE, and the signals obtained are converted from
+       analog to digital in ONC-AE. The digitized images are numerically
+       processed by the ONC-E. The design of the AMICA camera head flight model
+       is essentially the same as that of its prototype model. It is a CCD
+       camera with a refractor telescope consisting of cosmic
+       radiation-resistant and antireflection-coated lenses. The CCD device was
+       configured in a frame-transfer architecture with an image area and a
+       frame storage area. The depth of field (the distance between the camera
+       and objects that are observed in focus) was designed to be 75 m to
+       infinity.
     </p>
     <p>
-       AMICA has an eight position filter wheel, of which seven filters are nearly 
-       equivalent to the ECAS bands (Tedesco et al. 1982). Below is a table of 
+       AMICA has an eight position filter wheel, of which seven filters are nearly
+       equivalent to the ECAS bands (Tedesco et al. 1982). Below is a table of
        the filters and their specifications:
     </p>
     <br/>
     <h2>AMICA Filters</h2>
     <p>
-       The following table provides the specifications for each of the eight 
-       AMICA filters. 
+       The following table provides the specifications for each of the eight
+       AMICA filters.
     </p>
       <TABLE BORDER="1">
             <CAPTION>
@@ -165,32 +165,32 @@
     <br/>
     <h2>Data Archive</h2>
     <p>
-       The Hayabusa AMICA data archive is located at  several locations.  The 
+       The Hayabusa AMICA data archive is located at  several locations.  The
        Japanese provide the data from the
       <a href="http://darts.isas.jaxa.jp/pub/planet/pds3/hay-a-amica-3-hayamica-v1.0/">Japanese Hayabusa AMICA archive website</a>.
       The data are also available from the
-      <a href="http://sbn.psi.edu/pds/resource/hayamica.html">NASA PDS Small 
+      <a href="http://sbn.psi.edu/pds/resource/hayamica.html">NASA PDS Small
       Bodies Node</a> and is the recommended source.
     </p>
     <p>
-       The file naming convention for ONC images is 
-       {T}{C}{nnnnnnnnnn}_{filter}.fits, where: {T} indicates the type of data 
+       The file naming convention for ONC images is
+       {T}{C}{nnnnnnnnnn}_{filter}.fits, where: {T} indicates the type of data
        ("S" for scientific data or "N" for navigation data), {C}
-       identifies the name of the instrument (T, W1, and W2 for ONC-T (i.e. 
-       AMICA), ONC-W1, and ONC-W2, respectively); {nnnnnnnnnn} is the mission 
-       elapsed time when the images is generated in ONC-E; {filter} is the name 
-       of the filter (ul, b, v, w, x, p, and zs, respectively).      
+       identifies the name of the instrument (T, W1, and W2 for ONC-T (i.e.
+       AMICA), ONC-W1, and ONC-W2, respectively); {nnnnnnnnnn} is the mission
+       elapsed time when the images is generated in ONC-E; {filter} is the name
+       of the filter (ul, b, v, w, x, p, and zs, respectively).
     </p>
     <br/>
     <h2>References</h2>
     <cite>
-       Ishiguro, Masateru, et al. "The Hayabusa Spacecraft Asteroid Multi-band 
-       Imaging Camera (AMICA)". Icarus 207.2 (2010): 714-731. 
+       Ishiguro, Masateru, et al. "The Hayabusa Spacecraft Asteroid Multi-band
+       Imaging Camera (AMICA)". Icarus 207.2 (2010): 714-731.
     </cite>
     <br/>
     <cite>
-      Tedesco, E.F., D.J. Tholen, and B. Zellner.  The eight-color asteroid 
-      survey:  Standard stars.  Astron. J. 87, 1587-1592, 1982. 
+      Tedesco, E.F., D.J. Tholen, and B. Zellner.  The eight-color asteroid
+      survey:  Standard stars.  Astron. J. 87, 1587-1592, 1982.
     </cite>
 
   </description>
@@ -200,20 +200,20 @@
       Original version
     </change>
     <change name="Kris Becker" date="2014-04-03">
-      Added support for subimage areas.  This was done by using the AlphaCube 
-      (or crop) feature which provides necessary elements for the AMICA camera 
+      Added support for subimage areas.  This was done by using the AlphaCube
+      (or crop) feature which provides necessary elements for the AMICA camera
       model to work properly.  Fixes #2056.
     </change>
     <change name="Kris Becker" date="2015-02-26">
-      Removed AlphaCube usage to favor more flexible implementation in the 
+      Removed AlphaCube usage to favor more flexible implementation in the
       AMICA camera model. Output of the image data is now in real format.
       Fixes #2180 and #2193.
     </change>
   </history>
 
   <category>
-    <missionItem>Hayabusa</missionItem> 
-  </category> 
+    <missionItem>Hayabusa</missionItem>
+  </category>
 
   <groups>
     <group name="Files">
@@ -224,23 +224,23 @@
           Input PDS formatted detached header file for AMICA image
         </brief>
         <description>
-           This file is the PDS label (ending in .lbl) to the image data.  The 
-           image data are stored in  FITS format with the detached .lbl file 
-           describing generic access to the data.  The program, 
-           <em>amica2isis</em>, will also read the FITS file and extract 
-           the header contained therein.  Some FITS label values are transferred 
+           This file is the PDS label (ending in .lbl) to the image data.  The
+           image data are stored in  FITS format with the detached .lbl file
+           describing generic access to the data.  The program,
+           <em>amica2isis</em>, will also read the FITS file and extract
+           the header contained therein.  Some FITS label values are transferred
            to the output ISIS files as well for completeness.
         </description>
         <filter>*.lbl *.LBL</filter>
       </parameter>
-      
+
       <parameter name="TO">
          <type>cube</type>
          <pixelType>real</pixelType>
          <fileMode>output</fileMode>
-         <brief>Output ISIS3 cube filename</brief>
+         <brief>Output ISIS cube filename</brief>
          <description>
-           Use this parameter to select the output filename of the ISIS cube 
+           Use this parameter to select the output filename of the ISIS cube
            generated by this application.
          </description>
          <filter>*.cub</filter>
@@ -250,19 +250,19 @@
     <group name="Parameters">
         <parameter name="TARGET">
             <type>string</type>
-            <brief>Provide target name if absent or incorrect in input (FROM) 
-              label 
+            <brief>Provide target name if absent or incorrect in input (FROM)
+              label
             </brief>
             <description>
               <p>
-                 This parameter may be necessary as some AMICA EDR labels may 
-                 not contain correct values for the TARGET_NAME keyword. This 
-                 parameter can be used to provide the correct name of the target.  
-                 It may also be used to specify SKY as the target to support 
-                 projecting data to the celestial sphere. 
+                 This parameter may be necessary as some AMICA EDR labels may
+                 not contain correct values for the TARGET_NAME keyword. This
+                 parameter can be used to provide the correct name of the target.
+                 It may also be used to specify SKY as the target to support
+                 projecting data to the celestial sphere.
               </p>
             </description>
-            <internalDefault>Label Value</internalDefault> 
+            <internalDefault>Label Value</internalDefault>
         </parameter>
     </group>
   </groups>

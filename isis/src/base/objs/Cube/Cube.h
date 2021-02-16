@@ -180,7 +180,7 @@ namespace Isis {
       virtual ~Cube();
 
       /**
-       * These are the possible storage formats of Isis3 cubes. There is an
+       * These are the possible storage formats of ISIS cubes. There is an
        *   internal IO handler for each one of these.
        */
       enum Format {
@@ -260,7 +260,7 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob, 
+      void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
@@ -396,7 +396,7 @@ namespace Isis {
 
       /**
        * If open was called with an Isis 2 cube, then this will be
-       *   the name of the imported Isis3 cube. m_labelFileName and
+       *   the name of the imported ISIS cube. m_labelFileName and
        *   m_dataFileName will store the Isis 2 cube's information.
        */
       FileName *m_tempCube;

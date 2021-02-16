@@ -162,7 +162,7 @@ namespace Isis{
     results.setName("Results");
     results += PvlKeyword("Warning",
                           "When using cam2map or cam2cam, images imported into "
-                          "Isis3 using crism2isis should only be interpolated "
+                          "Isis using crism2isis should only be interpolated "
                           "using the nearest-neighbor algorithm due to gimble "
                           "jitter of the MRO CRISM instrument.");
     if (log){

@@ -23,7 +23,7 @@ namespace Isis {
   /**
    * Initialize the EllipsoidShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
     setName("Ellipsoid");
@@ -33,7 +33,7 @@ namespace Isis {
   /**
    * Initialize the EllipsoidShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   EllipsoidShape::EllipsoidShape() : ShapeModel () {
     setName("Ellipsoid");
@@ -81,8 +81,8 @@ namespace Isis {
 
 
   /**
-   * Calculates the unit normal to an ellipsoid at the point of intersection.  
-   * In the event that the three axial radii of the body are equal, this 
+   * Calculates the unit normal to an ellipsoid at the point of intersection.
+   * In the event that the three axial radii of the body are equal, this
    * method returns the normal vector for a sphere.
    *
    * The implicit equation for an ellipsoid is:

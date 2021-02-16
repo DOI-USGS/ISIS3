@@ -66,7 +66,7 @@ namespace Isis {
 
     if(!isIsisProgram) {
       QString msg = "Program [" + programName + "] does not appear to be a "
-          "valid Isis 3 program";
+          "valid Isis program";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
