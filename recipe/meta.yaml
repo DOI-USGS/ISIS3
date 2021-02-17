@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "4.3.0_RC1" %}
+{% set version = "4.4.0" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -45,24 +45,17 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-  - cmake >=3.15
-  - doxygen
-  - make
-  - ninja==1.7.2
-  - openssl>=1.0.0,<1.1.0
-  - libprotobuf=3.9.1
-  - xalan-c
-
-  host:
-  - armadillo
   - ale >=0.8.5
+  - armadillo >=9.200.4
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
   - bz2file
   - bzip2
+  - cmake >=3.15
   - cspice
   - curl
+  - doxygen
   - eigen
   - embree
   - geos>=3.7,<3.8
@@ -77,15 +70,19 @@ requirements:
   - kakadu==1
   - krb5
   - libpng>=1.6.34
+  - libprotobuf=3.9.1
   - libtiff
   - libxml2
+  - make
   - mesalib
   - mysql
   - mysql-connector-c
   - nanoflann
+  - ninja==1.7.2
   - nlohmann_json
   - nn
   - opencv=3.2
+  - openssl>=1.0.0,<1.1.0
   - pcl
   - protobuf=3.9.1
   - qhull
@@ -96,7 +93,7 @@ requirements:
   - superlu
   - tnt
   - x264=20131218
-  - xerces-c
+  - xerces-c=3.1.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
@@ -106,6 +103,7 @@ requirements:
 
   run:
   - ale >=0.8.5
+  - armadillo >=9.200.4
   - boost=1.68.0
   - blas
   - bullet=2.86.1=0
@@ -138,7 +136,7 @@ requirements:
   - superlu
   - tnt
   - x264=20131218
-  - xerces-c
+  - xerces-c=3.1.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm

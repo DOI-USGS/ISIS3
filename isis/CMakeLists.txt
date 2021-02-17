@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "4.3.0")
+set(VERSION            "4.4.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -45,7 +45,7 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
 string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
-set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
+set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
