@@ -9,7 +9,7 @@
 # > source isis3Startup.csh
 #
 # Replace the "????" in the above command line with the path you installed
-# the Isis distribution
+# the ISIS distribution
 #
 #_HIST  FEB 21 2006 - Jac Shinaman - USGS, Astrogeology - added code to prevent
 #               duplication of paths

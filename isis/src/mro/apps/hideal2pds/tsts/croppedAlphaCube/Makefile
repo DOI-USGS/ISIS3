@@ -6,7 +6,7 @@
 # -- The input has been cropped (An AlphaCube group exists)
 # -- Center and Length keywords in the BandBin group have no units
 #
-# To verify the image data, use pds2hideal to reimport to Isis. The reimported 
+# To verify the image data, use pds2hideal to reimport to ISIS. The reimported 
 # cube hideal2pds2hideal.cub should be identical to input.cub
 #
 # To verify the table data, use table dump on the reimported cube.

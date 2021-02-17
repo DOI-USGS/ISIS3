@@ -319,7 +319,7 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
             break;
         }
 
-        // Sets out to isis special pixel or leaves it if valid
+        // Sets out to ISIS special pixel or leaves it if valid
         out[samp] = TestPixel(out[samp]);
 
         if(Isis::IsValidPixel(out[samp])) {

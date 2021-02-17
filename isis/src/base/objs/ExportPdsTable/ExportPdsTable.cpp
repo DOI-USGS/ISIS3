@@ -3,11 +3,11 @@
  * $Revision: 1.1 $
  * $Date: 2005/08/18 23:00:25 $
  *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   Unless noted otherwise, the portions of ISIS written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   Although ISIS has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software
  *   and related material nor shall the fact of distribution constitute any such
  *   warranty, and no responsibility is assumed by the USGS in connection
@@ -15,7 +15,7 @@
  *
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   the Privacy &amp; Disclaimers page on the ISIS website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -57,7 +57,7 @@ namespace Isis {
     m_isisTable = new Table(isisTable);
     m_numRows = isisTable.Records(); //one row in pdsTable per record in isisTable
     m_rowBytes = m_isisTable->RecordSize(); //this should be the same value
-                                            //for all pds rows and isis records
+                                            //for all pds rows and ISIS records
   }
 
   /**
@@ -99,7 +99,7 @@ namespace Isis {
     m_pdsByteOrder = pdsTableByteOrder.toUpper();
 
     if (m_pdsByteOrder != "MSB" && m_pdsByteOrder != "LSB") {
-      QString msg = "Unable to export the Isis Table [" + m_isisTable->Name()
+      QString msg = "Unable to export the ISIS Table [" + m_isisTable->Name()
                     + "] to a PDS table using the requested byte order ["
                     + m_pdsByteOrder + "]. Valid values are MSB or LSB.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -223,7 +223,7 @@ namespace Isis {
 
   /**
    * Static method that formats the given ISIS table name in PDS format.
-   * This method takes the upper camel case Isis table name and returns
+   * This method takes the upper camel case ISIS table name and returns
    * a PDS table name that is underscore separated, all upper case and
    * with "_TABLE" appended to the end of the name, if not already present.
    *
@@ -254,11 +254,11 @@ namespace Isis {
   /**
    * Pack the buffer with data from the table record, swapping bytes if needed.
    *
-   * @param record ISIS TableRecord to be exported 
+   * @param record ISIS TableRecord to be exported
    * @param buffer Output buffer to be filled with PDS table row data in the
    *               appropriate byte order.
    * @param endianSwap Pointer to EndianSwapper object to swap bytes if the
-   *                   input Isis Table byte order is not the same as the output
+   *                   input ISIS Table byte order is not the same as the output
    *                   PDS byte order.
    */
   void ExportPdsTable::Pack(TableRecord record, char *buffer,

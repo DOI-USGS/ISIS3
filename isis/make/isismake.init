@@ -87,7 +87,7 @@ ifdef CODE_COVERAGE_BIN_DIR
 endif
 
 #---------------------------------------------------------------------------
-# Set up the Isis include and library directories
+# Set up the ISIS include and library directories
 #---------------------------------------------------------------------------
 ISISINCDIR = -I$(ISISROOT)/inc
 ISISLIBDIR = -L$(ISISROOT)/lib

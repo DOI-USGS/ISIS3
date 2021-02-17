@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="fits2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-  
+
   <brief>
-    Import fits files into Isis format
+    Import fits files into ISIS format
   </brief>
   <description>
-    This program will import fits (Flexible Image Transport System) image files into 
+    This program will import fits (Flexible Image Transport System) image files into
     ISIS format. FITS files with extensions are supported upto and including the first  non-image
     extension. Images follwing the first  non-image extension can not be accessed
     (i.e., NAXIS = 0 , implying extensions with data, are not supported). Some common header data
      is transfered to the ISIS labels. Primary image data is transfered completely.
   </description>
-  
+
   <history>
     <change name="Mackenzie Boyd" date="2009-10-27">
       Original version.
-    </change> 
+    </change>
     <change name="Stuart Sides" date="2014-08-29">
       Added the ability to read image extensions.
-    </change> 
+    </change>
     <change name="Kristin Berry" date="2015-06-02">
-      Added the ability to set the organization of the input file to BIL, BSQ, or BIP. 
-      Added tests for these new options.  
+      Added the ability to set the organization of the input file to BIL, BSQ, or BIP.
+      Added tests for these new options.
     </change>
     <change name="Jeannie Backer and Kaj Williams" date="2017-07-07">
       Modified to reflect ProcessImportFits method name change from fitsLabel to fitsImageLabel.
@@ -48,7 +48,7 @@
           A fits file to be converted to an isis cube
         </brief>
         <description>
-          Use this parameter to select the filename of a fits file to be 
+          Use this parameter to select the filename of a fits file to be
           converted to a cube. Currently extensions and files with no initial
           data, NAXIS = 0, are not supported.
         </description>
@@ -81,7 +81,7 @@
         </brief>
         <description>
           Use this parameter to select which image to extract from the FITS file. The primary image
-          is 0, the first  image extension is 1, the second image extension is 2, and so on. NOTE: 
+          is 0, the first  image extension is 1, the second image extension is 2, and so on. NOTE:
           Image extensions following any non-image extension can not be accessed.
         </description>
       </parameter>
@@ -95,7 +95,7 @@
         </default>
         <brief>Image Organization</brief>
         <description>
-          The organization of lines, samples, and bands in the file. 
+          The organization of lines, samples, and bands in the file.
         </description>
         <list>
           <option value="BSQ">
@@ -141,10 +141,10 @@
         <guiInterface>
           <image width="506" height="343" src="assets/images/gui.jpg">
             <brief>
-              The application's gui  
+              The application's gui
             </brief>
             <description>
-              The gui for the application, with parameters set to import a fits 
+              The gui for the application, with parameters set to import a fits
               file to a cube.
             </description>
             <thumbnail width="200" height="136" caption="" src="assets/thumbs/gui.jpg"/>

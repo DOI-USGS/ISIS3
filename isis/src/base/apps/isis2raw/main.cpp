@@ -24,7 +24,7 @@ Cube *p_cube;
 
 // Main program
 void IsisMain() {
-  // Create an object for exporting Isis data
+  // Create an object for exporting ISIS data
   ProcessExport p;
 
   // Open the input cube

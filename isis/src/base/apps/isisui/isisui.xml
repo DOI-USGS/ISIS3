@@ -46,7 +46,7 @@
         Documentation fixes
     </change>
     <change name="Kris Becker" date="2009-11-27">
-        Changed the call to Application to provide compatability withg Qt 
+        Changed the call to Application to provide compatability withg Qt
         startup requirements.
     </change>
 
@@ -68,10 +68,10 @@
       <parameter name="arg2">
         <type>boolean</type>
         <brief>
-          Flag for starting the Isis GUI
+          Flag for starting the ISIS GUI
         </brief>
         <description>
-          If this flag is present anywhere on the command line, the Isis GUI
+          If this flag is present anywhere on the command line, the ISIS GUI
           will be started. All application parameters from the other arguments
           will be inserted into the correct fields.
         </description>
@@ -155,4 +155,3 @@
     </example>
   </examples>
 </application>
-

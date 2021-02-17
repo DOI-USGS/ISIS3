@@ -356,7 +356,7 @@ namespace Isis {
     QLabel *preparationText = new QLabel("<p>qmos only supports files which "
         "have latitude and longitude information associated with them. Global "
         "projections are also not supported. If your files meet these "
-        "requirements, it is beneficial to run a couple of Isis programs on "
+        "requirements, it is beneficial to run a couple of ISIS programs on "
         "your files before loading them into qmos. The programs you should run "
         "are:<ul>"
         "<li><i>camstats from=future_input_to_qmos.cub attach=true "

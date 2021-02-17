@@ -3,12 +3,12 @@
 <application name="marci2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
     <brief>
-      Import an MRO MARCI image to an Isis cube
+      Import an MRO MARCI image to an ISIS cube
     </brief>
 
     <description>
         This program takes an image from the Mars Reconnaissance Orbiter Color Imager
-        and produces an Isis cube containing the image data.
+        and produces an ISIS cube containing the image data.
     </description>
 
     <history>
@@ -26,7 +26,7 @@
         Added keywords to the Archive group in labels.
       </change>
       <change name="Kristin Berry" date="2019-11-09">
-        Added keywords to the labels for variable exposure duration and the frame sequence. 
+        Added keywords to the labels for variable exposure duration and the frame sequence.
 	References #2034
       </change>
     </history>
@@ -79,7 +79,7 @@
           <default><item>true</item></default>
           <inclusions><item>COLOROFFSET_SIZE</item></inclusions>
         </parameter>
-           
+
         <parameter name="COLOROFFSET_SIZE">
           <type>integer</type>
           <brief>Amount of filter heights to pad with for COLOROFFSET</brief>
@@ -87,12 +87,12 @@
             The filters are offset by a certain number of filters, which is a multiple of their height. It appears
             the filters are all offset by twice their height, or two filter heights. One filter height can be explained by
             the method of taking pictures: the first filter on the first framelet is one higher than the second filter on
-            the first framelet.  
+            the first framelet.
           </description>
           <default><item>2</item></default>
           <minimum inclusive="false">0</minimum>
         </parameter>
-           
+
         <parameter name="FLIP">
           <type>string</type>
           <brief>Flip the framelets for pictures taken on ascending orbits</brief>
@@ -102,19 +102,19 @@
             <option value="AUTO">
             <brief>Auto-detect whether or not this correction is needed</brief>
               <description>
-              This option will look at the correlation between the first framelet's data and the second framelet's data. 
+              This option will look at the correlation between the first framelet's data and the second framelet's data.
               If there is a better correlation between the end of the first framelet and the end of the second
               framelet compared to the beginning of the second framelet, the framelets will be flipped. This only
               correlates the first filter's data.
               </description>
-            </option> 
+            </option>
             <option value="YES">
               <brief>Flip the framelets</brief>
               <description>
                 On ascending orbits, the framelets are aligned incorrectly. This option will mirror the framelets to correct this problem.
               </description>
             </option>
-               
+
             <option value="NO">
               <brief>Don't modify original data</brief>
               <description>
@@ -125,7 +125,7 @@
         </parameter>
       </group>
     </groups>
-    
+
     <examples>
       <example>
         <brief>
@@ -136,7 +136,7 @@
         </description>
         <terminalInterface>
           <commandLine>
-            FROM=T02_001000_1199_MC_00N230W.IMG TO=T02_001000_1199_MC_00N230W.cub FLIP=AUTO|YES|NO  
+            FROM=T02_001000_1199_MC_00N230W.IMG TO=T02_001000_1199_MC_00N230W.cub FLIP=AUTO|YES|NO
           </commandLine>
           <description>
             This is the command line for running this program with a typical EDR. FLIP should be AUTO, YES, or NO.
@@ -169,7 +169,7 @@
             <description>
               Since this particular input image had a RED, GREEN, and ORANGE filter, it was possible to display the image
               in color. To give a better picture of the outputs, because MARCI takes long strips of data, this image was
-              cropped. In order to show the same feature as the flipped image, the crop was at line 5800 to a height of 1000 pixels. 
+              cropped. In order to show the same feature as the flipped image, the crop was at line 5800 to a height of 1000 pixels.
               This image was created with FLIP set to NO, because AUTO flipped the data. When you look closely, especially compared
               to the flipped data, the features in this data are distorted.
             </description>

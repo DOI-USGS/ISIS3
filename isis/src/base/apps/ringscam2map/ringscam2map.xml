@@ -923,7 +923,7 @@
        <description>
          This example is the first of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the next,
-         MATCHMAP is set to YES.  In this case MAP is an Isis level 2 image.  
+         MATCHMAP is set to YES.  In this case MAP is an Isis level 2 image.
          The mapping parameters of the output file will be read from the
          mapping group of the MAP level 2 image.
        </description>
@@ -1006,10 +1006,10 @@
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
           <brief> Output image for cam2map RINGLONSEAM=AUTO</brief>
           <description> This is the output of cam2map demonstating the use of
-                        MATCHMAP=YES with an Isis level 2 image as MAP.
+                        MATCHMAP=YES with an ISIS level 2 image as MAP.
                         Contrast this output with the level 2 image used as MAP
                         and with the next example which was also created with
-                        MATCHMAP=YES, but uses an Isis map file as MAP.
+                        MATCHMAP=YES, but uses an ISIS map file as MAP.
           </description>
           <thumbnail caption="Output of cam2map run with MATCHMAP=YES and map file" src="assets/thumbs/ToFile_EN0108827082M.lev2_thumb.jpg" width="200" height="200"/>
           <parameterName>TO</parameterName>
@@ -1022,7 +1022,7 @@
          This example is the second of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the
          previous, MATCHMAP is set to YES.  In this case MAP is an
-         Isis map file.  The mapping parameters of the output file will
+         ISIS map file.  The mapping parameters of the output file will
          be read from this map file.
        </description>
       <terminalInterface>
@@ -1106,9 +1106,9 @@
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
           <brief> Output image for ringscam2map RINGLONSEAM=AUTO</brief>
           <description> This is the output of ringscam2map demonstating the use of
-                        MATCHMAP=YES with an Isis map file as MAP.  Contrast
+                        MATCHMAP=YES with an ISIS map file as MAP.  Contrast
                         this output with the previous example, which was also
-                        created with MATCHMAP=YES, but uses an Isis level 2 image
+                        created with MATCHMAP=YES, but uses an ISIS level 2 image
                         for MAP.
           </description>
           <thumbnail caption="Output of ringscam2map run with MATCHMAP=YES and map file" src="assets/thumbs/ToFile_EN0108827082M.lev2_thumb.jpg " width="200" height="200"/>

@@ -16,7 +16,7 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
-  // Create an Isis Table with each type of field
+  // Create an ISIS Table with each type of field
   TableField dblField("Double Value", TableField::Double);
   TableField intField("Integer Value", TableField::Integer);
   TableField textField("Text Value", TableField::Text, 2);
@@ -27,18 +27,18 @@ int main(int argc, char *argv[]) {
   record += textField;
   record += realField;
   Table table("TableToExport", record);
-  record[0] = 3.14159;  
-  record[1] = 3;  
-  record[2] = "PI";  
+  record[0] = 3.14159;
+  record[1] = 3;
+  record[2] = "PI";
   record[3] = (float) (22.0/7.0);
-  table += record; 
-  record[0] = 2.71828;  
-  record[1] = 2;  
-  record[2] = "e";  
+  table += record;
+  record[0] = 2.71828;
+  record[1] = 2;
+  record[2] = "e";
   record[3] = (float) (1/1 + 1/1 + 1/(1*2) + 1/(1*2*3) + 1/(1*2*3*4) + 1/(1*2*3*4*5));
-  table += record; 
+  table += record;
 
-  // We will export and reimport this table (LSB export and MSB export) 
+  // We will export and reimport this table (LSB export and MSB export)
   ExportPdsTable exportedTable(table);
   int tableRecBytes = 1*8 + 1*4 + 1*2 + 1*4;
   char *buf;
@@ -155,4 +155,3 @@ int main(int argc, char *argv[]) {
   cout << "formatPdsTableName(CamelCase) = " << ExportPdsTable::formatPdsTableName("CamelCase") << endl;
   cout << "formatPdsTableName(CamelCase2) = " << ExportPdsTable::formatPdsTableName("CamelCase2") << endl;
 }
-

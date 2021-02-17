@@ -3,32 +3,32 @@
 <application name="hi2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import HiRISE EDR images into Isis cube format
+    Import HiRISE EDR images into ISIS cube format
   </brief>
 
   <description>
     <p>
-      Converts a single channel HiRISE EDR into an Isis Cube file.
-      The observation image data from the EDR is transfered into the Isis Cube data.
-      The observation line prefix and suffix data will be combined into a single Isis table
+      Converts a single channel HiRISE EDR into an ISIS Cube file.
+      The observation image data from the EDR is transfered into the ISIS Cube data.
+      The observation line prefix and suffix data will be combined into a single ISIS table
       named "HiRISE Ancillary". The calibration image data will be placed into an Isis
       table named "HiRISE Calibration Image", and the calibration line prefix and suffix
-      data will be combined into a single Isis table named "HiRISE Calibration Ancillary".
+      data will be combined into a single ISIS table named "HiRISE Calibration Ancillary".
     </p>
     <p>
-      8 bit EDR pixels are checked for invalid values in the following order: 
+      8 bit EDR pixels are checked for invalid values in the following order:
       gaps (255 = 0xFF), high instrument saturation (254 = 0xFE), and low
-      instrument saturation (0 = 0x00). See the following table for what these 
-      values are converted to. Once the special pixels have been delt with the 
-      8 bit data is processed in one of two ways depending on the UNLUT 
-      parameter. If UNLUT is false then the 8 bit values are simply moved into 
+      instrument saturation (0 = 0x00). See the following table for what these
+      values are converted to. Once the special pixels have been delt with the
+      8 bit data is processed in one of two ways depending on the UNLUT
+      parameter. If UNLUT is false then the 8 bit values are simply moved into
       a signed 16 bit integer without modifying their magnitude. If UNLUT is
-      true, the 8 bit values are converted to their 14 bit value by applying 
+      true, the 8 bit values are converted to their 14 bit value by applying
       the lookup table and stored in a signed 16 bit integer. The lookup table
       from the EDR labels contaings 256 pairs of 14 bit values. The first pair
-      is the range of 14 bit pixels that were compressed to 8 bit pixel value 
+      is the range of 14 bit pixels that were compressed to 8 bit pixel value
       zero (0). The second pair is the range compressed to pixel value one (1),
-      and so on. 8 bit pixels are mapped to the corresponding average of the 
+      and so on. 8 bit pixels are mapped to the corresponding average of the
       14 bit lookup table range.
     </p>
     <table class="tableFormattedInformation">
@@ -60,7 +60,7 @@
     </table>
 
     <p>
-      16 bit EDR pixels are checked for invalid values in the following order: 
+      16 bit EDR pixels are checked for invalid values in the following order:
       gaps (-1 = 0xFFFF), low order byte appears to be the beginning of a gap
       (0x??FF), outside of unsigned 14 bit range (0 to 16383), high instrument saturation
       (16383 = 0x3FFF), and low instrument saturation (0 = 0x0000).
@@ -112,17 +112,17 @@
     <p>
       The line prefix and suffix data for the calibration and observation image are converted
       and stored into their respective tables in the same manner as the image pixels.
-      The Isis tables which hold 
-      prefix and suffix data have four, four byte integer fields. These are "Gap Flag", 
+      The ISIS tables which hold
+      prefix and suffix data have four, four byte integer fields. These are "Gap Flag",
       "LineNumber", "BufferPixels", and "DarkPixels". The BufferPixel field contains twelve
       integers and the DarkPixel field contains sixteen integers. Other information from the
-      EDR prefix tables such as the synchronization pattern are not transfered to the Isis file.
+      EDR prefix tables such as the synchronization pattern are not transfered to the ISIS file.
     </p>
     <p>
       The "GapFlag" is taken directly from byte zero of the EDR line prefix data and is stored
       in the least significant byte of the four byte field integer. The upper three bytes are set to all
       zeros. The byte from the EDR has two possible values, all zeros and all ones. This means
-      the Isis GapFlag value as an integer has two possible values, 255 and zero (0).
+      the ISIS GapFlag value as an integer has two possible values, 255 and zero (0).
     </p>
       The "LineNumber" is taken from bytes three, four and five of the EDR line prefix data and
       is stored into a single four byte integer with the most significant byte set to zero.
@@ -130,15 +130,15 @@
     </p>
       The twelve values for "BufferPixels" are taken from the EDR line prefix buffer pixels.
       8-bit buffer pixels are converted to 16 bit values in exactly the same way as image pixels.
-      All buffer pixels are stored in the 
-      corresponding Isis "BufferPixels" array. All pixel values will be
-      stored in the low order two bytes and will be swapped if the native byte order is least 
+      All buffer pixels are stored in the
+      corresponding ISIS "BufferPixels" array. All pixel values will be
+      stored in the low order two bytes and will be swapped if the native byte order is least
       significant byte first.
     <p>
       The sixteen values for "DarkPixels" are taken from the EDR line suffix dark pixels, and are
       handled in the same manner as the buffer pixels.
     </p>
-    <img src='assets/hi2isis_diagram.png' alt='Diagram of output Isis cube' width='499' height='520' />
+    <img src='assets/hi2isis_diagram.png' alt='Diagram of output ISIS cube' width='499' height='520' />
 
   </description>
 
@@ -151,10 +151,10 @@
         and Ancillary Image BLOBs.
     </change>
     <change name="Stuart Sides" date="2004-10-18">
-        Added documentation specific to the Isis tables that are created.
+        Added documentation specific to the ISIS tables that are created.
     </change>
     <change name="Stuart Sides" date="2004-10-22">
-      Fixed a bug with the allocation of the TableField "image". It now works for 
+      Fixed a bug with the allocation of the TableField "image". It now works for
       HiRISE EDRs that have a binning mode other than one (1).
     </change>
     <change name="Stuart Sides" date="2005-02-28">
@@ -168,7 +168,7 @@
     <change name="Stuart Sides" date="2005-06-27">
       Added the parameter UNLUT to give the ability to apply the 8 to 14 bit
       look up table or not. Also fixed problem with gaps, LIS and HIS being reported
-      correctly but not converted correctly to double precision values before 
+      correctly but not converted correctly to double precision values before
       being inserted into the BUFFER.
     </change>
     <change name="Stuart Sides" date="2005-07-21">
@@ -193,7 +193,7 @@
       Checks if input file is rdr.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Steven Lambright" date="2011-04-18">
       Removed a line of code that didn't make sense
@@ -225,7 +225,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output ISIS cube
          </brief>
          <description>
            Use this parameter to select the output filename. The output file will

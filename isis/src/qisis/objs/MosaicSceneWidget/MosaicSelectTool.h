@@ -7,7 +7,7 @@
 
 namespace Isis {
   /**
-   * @brief Handles selection operations for Isis qt apps
+   * @brief Handles selection operations for ISIS qt apps
    *
    * @ingroup Visualization Tools
    *
@@ -36,4 +36,3 @@ namespace Isis {
 };
 
 #endif
-

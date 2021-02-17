@@ -64,7 +64,7 @@
         </brief>
         <description>
           This is used to specify tolerances between the two input file. If this file is not specified, the two Pvl files must match exactly.
-          See Isis Application and Category Test How-to for information about the tolerance file.
+          See ISIS Application and Category Test How-to for information about the tolerance file.
         </description>
         <filter>
           *.pvl *.txt *.pvl.DIFF

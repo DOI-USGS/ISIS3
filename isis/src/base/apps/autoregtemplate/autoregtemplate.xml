@@ -230,7 +230,7 @@
           The minimum value a pixel must have in order to be considered valid
           and used in the auto registration.  This parameter is optional, and
           does not have to be set.  The auto registration algorithm will default
-          to the Isis ValidMinimum, if this parameter is not provided.
+          to the ISIS ValidMinimum, if this parameter is not provided.
         </description>
         <internalDefault>None</internalDefault>
       </parameter>
@@ -243,7 +243,7 @@
           The maximum value a pixel must have in order to be considered valid
           and used in the auto registration.  This parameter is optional, and
           does not have to be set.  The auto registration algorithm will default
-          to the Isis ValidMaximum, if this parameter is not provided.
+          to the ISIS ValidMaximum, if this parameter is not provided.
         </description>
         <internalDefault>None</internalDefault>
       </parameter>
@@ -308,7 +308,7 @@
           The minimum value a pixel must have in order to be considered valid
           and used in the auto registration.  This parameter is optional, and
           does not have to be set.  The auto registration algorithm will default
-          to the Isis ValidMinimum if this parameter is not provided.
+          to the ISIS ValidMinimum if this parameter is not provided.
         </description>
         <internalDefault>None</internalDefault>
       </parameter>
@@ -321,7 +321,7 @@
           The maximum value a pixel must have in order to be considered valid
           and used in the auto registration.  This parameter is optional, and
           does not have to be set.  The auto registration algorithm will default
-          to the Isis ValidMaximum, if this parameter is not provided.
+          to the ISIS ValidMaximum, if this parameter is not provided.
         </description>
         <internalDefault>None</internalDefault>
       </parameter>

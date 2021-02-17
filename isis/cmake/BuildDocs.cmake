@@ -71,7 +71,7 @@ function(build_upper_level)
   copy_folder(${docBuildFolder}/w3c    ${docInstallFolder})
 
   # Make new (empty) output folders
-  set(newFolders UserDocs AboutIsis General Guides Installation TechnicalInfo)
+  set(newFolders UserDocs AboutISIS General Guides Installation TechnicalInfo)
   foreach(f ${newFolders})
     file(MAKE_DIRECTORY "${docInstallFolder}/${f}")
   endforeach()
@@ -115,10 +115,10 @@ function(build_documents_folder)
   file(REMOVE ${doctocPath})
   cat(${docBuildFolder}/build/doctoc_header.xml ${doctocPath})
   foreach(f ${docFolders})
-    
+
     # Each folder in documents gets a section added to doctoc
     get_filename_component(docName ${f} NAME_WE)
-    
+
     execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} dirParam \"${docName}\"  ${XALAN_INFILE_OPTION} ${f}/${docName}.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/IsisDocumentTOCbuild.xsl OUTPUT_VARIABLE result)
     file(APPEND ${doctocPath} ${result})
 
@@ -463,7 +463,7 @@ endfunction(build_object_docs)
 # Build all the documentation
 function(build_docs)
 
-  message("Building Isis Documentation...")
+  message("Building ISIS Documentation...")
 
   # Set up output directory and a temporary directory for building
   set(docBuildFolder   ${CMAKE_BINARY_DIR}/docBuild)

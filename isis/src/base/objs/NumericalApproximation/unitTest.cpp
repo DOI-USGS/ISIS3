@@ -54,7 +54,7 @@ inline double integral(double a, double b) {
 
 
 int main(int argc, char *argv[]) {
-  // include isis preferences so that line numbers will not be printed with errors
+  // include ISIS preferences so that line numbers will not be printed with errors
   Isis::Preference::Preferences(true);
 
   cout << endl << "Unit test for NumericalApproximation" << endl;

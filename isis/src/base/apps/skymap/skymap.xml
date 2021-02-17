@@ -10,7 +10,7 @@
     This program converts a cube in camera coordinates to a map projection.  It differs from the application "cam2map" in that it maps camera
     ra/dec (right acsension/declination) to map projection longitude/latitude.  The program is useful for inflight geometric and optical distortion
     calibration of a camera when star images are collected.  The input cube labels must have an Instrument Group and
-    Kernels Group.  That is, the program "spiceinit" should be run on the input cube prior to "skymap".  
+    Kernels Group.  That is, the program "spiceinit" should be run on the input cube prior to "skymap".
 
     <p>
     This program will pick appropriate defaults for most parameters.   In particular for the MAP parameter, it will generate the following:
@@ -41,7 +41,7 @@
   Note that an important concept here is a Mapping group can come from any PVL file.   You can use an existing map projected cube
   as input for the MAP user parameter.  Because the cube has PVL labels and contains the Mapping group, you will essentially force
   the input camera cube to have the same mapping parameters or match the existing cube.  Information about map projections and
-  the Mapping group can be found in the Isis user documentation.
+  the Mapping group can be found in the ISIS user documentation.
   </p>
 
   <p>
@@ -81,19 +81,19 @@
         to be processed in ProcessRubberSheet.
      </change>
       <change name="Elizabeth Miller" date="2006-05-03">
-        Redid UI to match cam2map 
+        Redid UI to match cam2map
       </change>
       <change name="Elizabeth Miller" date="2006-05-18">
         Depricated CubeProjection and ProjectionManager to ProjectionFactory
       </change>
       <change name="Elizabeth Miller" date="2006-05-30">
-        Moved helper buttons and refined helper error checking 
+        Moved helper buttons and refined helper error checking
       </change>
       <change name="Steven Lambright" date="2007-06-22">
         Fixed typo in user documentation
-      </change>    
+      </change>
       <change name="Steven Lambright" date="2008-05-13">
-        Removed references to CubeInfo 
+        Removed references to CubeInfo
       </change>
       <change name="Travis Addair" date="2009-08-10">
         Mapping group parameters are now placed into the print file.
@@ -142,7 +142,7 @@
             <brief>View MapFile</brief>
             <description>
               This helper button will cat out the mapping group of the given mapfile to the session log
-               of the application 
+               of the application
              </description>
             <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
@@ -171,7 +171,7 @@
         <default><item>CAMERA</item></default>
         <description>
           This parameter is used to specify how the scale is obtained for the output map
-          projected cube. 
+          projected cube.
         </description>
         <helpers>
           <helper name="H1">
@@ -224,8 +224,8 @@
         <type>double</type>
         <brief>Scale in pixels per degree</brief>
         <description>
-            The number of pixels per degrees (RA/DEC).  By default, 
-            the program attempts to compute this value as 1 / IFOV of the camera. 
+            The number of pixels per degrees (RA/DEC).  By default,
+            the program attempts to compute this value as 1 / IFOV of the camera.
             Note you will typically need to convert
             IFOV in milli-or-micro radians to degrees.
             Alternatively, you can entered the scale in the MAP file in
@@ -287,9 +287,9 @@
         <brief>Starting right ascension</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The starting right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
-          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.   
-        </description>          
+          The starting right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.
+        </description>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
       </parameter>
@@ -299,8 +299,8 @@
         <brief>Ending right ascension</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The ending right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
-          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.   
+          The ending right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.
         </description>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
@@ -312,8 +312,8 @@
         <brief>Starting declination</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The starting declination of the sky map.  If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
-          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.    
+          The starting declination of the sky map.  If not entered it will be read computed from the CAMERA or read from the MAP file, depending
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>
@@ -324,8 +324,8 @@
         <brief>Ending declination</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The ending declination of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
-          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.    
+          The ending declination of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>

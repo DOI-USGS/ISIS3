@@ -3,12 +3,12 @@
 <application name="gllssi2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import a Galileo solid state imager (SSI) image EDR into Isis cube format
+    Import a Galileo solid state imager (SSI) image EDR into ISIS cube format
   </brief>
 
   <description>
     Converts a PDS formatted Galileo solid state imager (SSI) image EDR
-    into an Isis Cube.  The required instrument labels will be propagated
+    into an ISIS Cube.  The required instrument labels will be propagated
     into the instrument group.  The user must choose an input image label,
     output cube name, and frame mode, or summing mode.  Galileo SSI images have
     a summing mode of FULL (800 x 800 pixels) or SUMMED (400 x 400 pixels).
@@ -118,7 +118,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output ISIS cube
          </brief>
          <description>
            Use this parameter to select the output filename

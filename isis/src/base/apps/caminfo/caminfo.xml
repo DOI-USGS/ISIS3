@@ -30,7 +30,7 @@
     The output file can be in PVL or CSV (Comma Separated Value) format. The "APPEND" option allows
     the new generated information to be appended to the output file. This is especially useful for
     CSV file format. If the CSV format is chosen, only Camstats, Statistics and Geometry options
-    are allowed. Isis Label, Original Label and Polygon options are disabled for CSV format.
+    are allowed. ISIS Label, Original Label and Polygon options are disabled for CSV format.
   </p>
   <p>
     The following is an example of caminfo output generated when in PVL format:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- sample of examples section from crop.xml Isis Application XML file  -->
+<!-- sample of examples section from crop.xml ISIS Application XML file  -->
 
   <examples>
     <example>
@@ -47,4 +47,3 @@
       </guiInterfaces>
     </example>
   </examples>
-

@@ -52,7 +52,7 @@
     <title>Multipage Document Example</title>
     <brief>An example of a multipage Document</brief>
     <description>An example demonstrating how a multipage Document with inline content is created.
-                        The XML contains several file elements under the files element and during the Isis build
+                        The XML contains several file elements under the files element and during the ISIS build
                         will be converted into a set HTML formatted web pages.</description>
     <author>Deborah Lee Soltesz</author>
     <date>2002-12-12</date>

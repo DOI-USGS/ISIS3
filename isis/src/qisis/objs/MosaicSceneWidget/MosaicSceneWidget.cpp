@@ -132,7 +132,7 @@ namespace Isis {
 
     // Pass on signals to the MosaicControlNetTool
     connect(this, SIGNAL(cnetModified()), cnetTool, SLOT(rebuildPointGraphics()));
-        
+
     m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));
     m_tools->append(new MosaicGridTool(this));
@@ -1147,7 +1147,7 @@ namespace Isis {
     "isis/wiki/Learning_About_Map_Projections");
     QLabel *preparingMapFile = new QLabel(tr(
         "<h3>Preparing a Map File</h3>"
-        "Please refer to Isis applications such as 'maptemplate' or 'mosrange' for more details "
+        "Please refer to ISIS applications such as 'maptemplate' or 'mosrange' for more details "
         "on creating a custom map file that defines the desired projection, latitude "
         "system, and longitude direction and domain. This program will use the latitude range "
         "and longitude range if they exist in the loaded file. A choice of map templates that can be used as "
@@ -1280,7 +1280,7 @@ namespace Isis {
 
       connect(mosItem, SIGNAL(changed(const QList<QRectF> &)),
               m_graphicsView, SLOT(updateScene(const QList<QRectF> &)));
-      connect(mosItem, SIGNAL(mosaicCubeClosed(Image *)), 
+      connect(mosItem, SIGNAL(mosaicCubeClosed(Image *)),
               this, SIGNAL(mosCubeClosed(Image *)));
 
       // We want everything to have a unique Z value so we can manage the z order
@@ -1388,7 +1388,7 @@ namespace Isis {
 
       QPoint projectScrollPos(toInt(positionInfo["ScrollPosition"][0]),
                               toInt(positionInfo["ScrollPosition"][1]));
-        
+
       getView()->horizontalScrollBar()->setValue(projectScrollPos.x());
       getView()->verticalScrollBar()->setValue(projectScrollPos.y());
     }
@@ -1400,7 +1400,7 @@ namespace Isis {
       delete m_projectViewTransform;
       m_projectViewTransform = NULL;
     }
-    
+
     m_progress->setVisible(false);
     emit cubesChanged();
   }

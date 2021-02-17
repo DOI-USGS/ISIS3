@@ -1786,7 +1786,7 @@ namespace Isis {
               break;
           }
 
-          // Sets out to isis special pixel or leaves it if valid
+          // Sets out to ISIS special pixel or leaves it if valid
           (*out)[samp] = TestPixel((*out)[samp]);
 
           if (Isis::IsValidPixel((*out)[samp])) {
@@ -2022,7 +2022,7 @@ namespace Isis {
               break;
           }
 
-          // Sets out to isis special pixel or leaves it if valid
+          // Sets out to ISIS special pixel or leaves it if valid
           (*out)[osamp] = TestPixel((*out)[osamp]);
 
           if (Isis::IsValidPixel((*out)[osamp])) {
@@ -2223,7 +2223,7 @@ namespace Isis {
               break;
           }
 
-          // Sets out to isis special pixel or leaves it if valid
+          // Sets out to ISIS special pixel or leaves it if valid
           (*out)[samp] = TestPixel((*out)[samp]);
 
           if (Isis::IsValidPixel((*out)[samp])) {

@@ -7,8 +7,8 @@
   </brief>
 
   <description>
-    Several programs in Isis have an input parameter "OVERLAPLIST." This program
-    is designed to produce the OVERLAPLIST for other Isis programs to use.<br />
+    Several programs in ISIS have an input parameter "OVERLAPLIST." This program
+    is designed to produce the OVERLAPLIST for other ISIS programs to use.<br />
     <br />
 
     An overlap list is a file describing how the images in a file list intersect
@@ -105,7 +105,7 @@
     </change>
     <change name="Steven Lambright" date="2009-05-28">
       The input list will be internally sorted by serial number so that
-      one list of input images will always produce the same results regardless 
+      one list of input images will always produce the same results regardless
       of the sort order.
     </change>
     <change name="Christopher Austin" date="2010-03-26">
@@ -120,11 +120,11 @@
       with me to document findimageoverlaps was Ra'ad Saleh and Bob Sucharski.
     </change>
     <change name="Marjorie Hahn" date="2016-08-05">
-      Fixed a bug where ImageOverlapSet was not recording overlaps where 
+      Fixed a bug where ImageOverlapSet was not recording overlaps where
       one image is fully enveloped within another. Fixes #2199.
     </change>
     <change name="Marjorie Hahn" date="2016-10-03">
-      Added an exception for giving findimageoverlaps a cube list of only 
+      Added an exception for giving findimageoverlaps a cube list of only
       one cube. Fixes #4200.
     </change>
     <change name="Ian Humphrey" date="2017-05-23">

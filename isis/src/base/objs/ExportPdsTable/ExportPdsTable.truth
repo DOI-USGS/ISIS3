@@ -13,7 +13,7 @@ Double Value	Integer Value	Text Value	Real Value
 
 Testing errors ...
 **ERROR** Unable to export Isis::Table object to PDS. The Isis::Table record size [18] is larger than the record bytes allowed in the PDS file [17].
-**ERROR** Unable to export the Isis Table [TableToExport] to a PDS table using the requested byte order [L]. Valid values are MSB or LSB.
+**ERROR** Unable to export the ISIS Table [TableToExport] to a PDS table using the requested byte order [L]. Valid values are MSB or LSB.
 
 Testing static method, formatPdsTableName()...
 formatPdsTableName(Table) = TABLE

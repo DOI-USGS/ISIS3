@@ -8,7 +8,7 @@
 # > source isis3Startup.csh
 #
 # Replace the "????" in the above command line with the path you installed
-# the Isis distribution
+# the ISIS distribution
 #
 ################################################################################
 

@@ -32,7 +32,7 @@ int main() {
   doit(lab);
 
   // We can't do this in the unit test because it prints out an absolute path
-  // to the isis root which changes.
+  // to the ISIS root which changes.
   //lab.findObject("PhotometricModel").findGroup("Algorithm").
   //    addKeyword(PvlKeyword("Name","Bogus"));
   //std::cout << "Testing unsupported photometric model ..." << std::endl;

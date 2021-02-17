@@ -1,6 +1,6 @@
 #######################################################
 # This file allows the user to customize their Isis
-# configuration.  See the Isis Preference Dictionary
+# configuration.  See the ISIS Preference Dictionary
 # on our website isis.astrogeology.usgs.gov for a
 # full description of each group.
 ########################################################
@@ -54,7 +54,7 @@ EndGroup
 # models.
 #
 # Leave the ShapeModel Group commented-out to continue
-# using the ISIS default. 
+# using the ISIS default.
 #
 # RayTraceEngine = Bullet | Embree
 # OnError = Continue | Fail
@@ -136,16 +136,16 @@ Group = FileCustomization
 EndGroup
 
 ########################################################
-# Customize how Isis uses your computer's resources.
+# Customize how ISIS uses your computer's resources.
 #
 # CubeWriteThread = Always | Optimized | Never
-#   Always - Override Isis program defaults and always
+#   Always - Override ISIS program defaults and always
 #     use a separate thread for writing out cubes. This
 #     will probably improve performance for some
 #     programs, will probably negatively impact programs
 #     that read/write the same file. This option should
 #     be used with caution.
-#   Optimized - Let the Isis program decide based on
+#   Optimized - Let the ISIS program decide based on
 #     it's own internal knowledge.
 #   Never - Revert to the original method of writing
 #     cubes always.
@@ -186,7 +186,7 @@ EndGroup
 ########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
-# should be left to the Isis administrator
+# should be left to the ISIS administrator
 ########################################################
 
 Group = DataDirectory

@@ -3,7 +3,7 @@
 
 <!--
 
-This stylesheet is used to strip information out of the XML Schema for Isis AML and create a new XML file summarizing the categories
+This stylesheet is used to strip information out of the XML Schema for ISIS AML and create a new XML file summarizing the categories
 
 Author
 Deborah Lee Soltesz
@@ -38,4 +38,3 @@ Deborah Lee Soltesz
 </xsl:output>
 
 </xsl:stylesheet>
-

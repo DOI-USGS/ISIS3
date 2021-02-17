@@ -1,19 +1,19 @@
 /**
  * @file
  *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   Unless noted otherwise, the portions of ISIS written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   Although ISIS has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the ISIS website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -45,7 +45,7 @@ void TestLineSamp(Camera *cam, double samp, double line);
  *   @history 2010-02-24 Christopher Austin - Altered knownLat/Lon
  *            for the new naif precision
  *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
- *            for new methods. Added Isis Disclaimer to file.
+ *            for new methods. Added ISIS Disclaimer to file.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -111,7 +111,7 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
-    
+
     // Test name methods
     cout << endl << endl << "Test name methods ..." << endl;
     cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
@@ -144,4 +144,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = ERROR" << endl << endl;
   }
 }
-

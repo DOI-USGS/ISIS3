@@ -87,7 +87,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output ISIS cube
          </brief>
          <description>
            Use this parameter to select the output filename.

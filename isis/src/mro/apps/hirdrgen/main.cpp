@@ -216,7 +216,7 @@ void IsisMain() {
   pdsLabel += PvlKeyword("PRODUCT_VERSION_ID", ui.GetString("VERSION"));
 
   // Add MRO:CCD_FLAG, MRO:BINNING, MRO:TDI
-  // As pulled from the input Isis cube, the values are in CPMM order, so
+  // As pulled from the input ISIS cube, the values are in CPMM order, so
   // convert them to CCD order
   PvlKeyword ccdFlag("MRO:CCD_FLAG");
   PvlKeyword &cpmmFlag = origLabel.findObject("OriginalLabelObject").
@@ -388,12 +388,12 @@ void IsisMain() {
     /**
      *  Calculate the SCALING_FACTOR and OFFSET keywords
      *  Set these so the unsigned 16bit PDS disk values can be converted back
-     *  to the correct values Isis had
+     *  to the correct values ISIS had
      *  These keywords are used to map stored/disk values to the correct values so,
      *  the input(x axis) values are the unsigned Xbit values from the PDS file
      */
     // ??? unneccessary calculation - this is done by ProcessExportPds class.
-    double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum()); 
+    double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum());
     double intercept = maxmax - slope * p.GetOutputMaximum();
     image.addKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
     image.addKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);

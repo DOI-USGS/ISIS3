@@ -3,12 +3,12 @@
 <application name="lo2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import an Isis 2 Lunar Orbiter image file into Isis.
+    Import an ISIS 2 Lunar Orbiter image file into ISIS.
   </brief>
 
   <description>
-    This program will import a Lunar Orbiter PDS or Isis 2 Cube image file into
-    an Isis cube.
+    This program will import a Lunar Orbiter PDS or ISIS 2 Cube image file into
+    an ISIS cube.
   </description>
 
   <history>
@@ -48,10 +48,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input Lunar Orbiter PDS or Isis2 cube
+          Input Lunar Orbiter PDS or ISIS2 cube
         </brief>
         <description>
-          Use this parameter to select the Lunar Orbiter PDS or Isis 2 Cube.
+          Use this parameter to select the Lunar Orbiter PDS or ISIS 2 Cube.
         </description>
         <filter>
           *.img *.cub *.CUB
@@ -62,7 +62,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output ISIS cube
          </brief>
          <description>
            Use this parameter to select the output filename
@@ -80,7 +80,7 @@
       Using lo2isis
       </brief>
       <description>
-        The use of lo2isis to ingest Isis2 cubes and output Isis cubes with the correct labels.
+        The use of lo2isis to ingest ISIS2 cubes and output ISIS cubes with the correct labels.
       </description>
       <terminalInterface>
         <commandLine>
@@ -88,7 +88,7 @@
 	  to= 3133_h1.cub
         </commandLine>
         <description>
-	This example shows the use of lo2isis to create an Isis cube from an Isis2 cube.
+	This example shows the use of lo2isis to create an ISIS cube from an ISIS2 cube.
         </description>
       </terminalInterface>
 

@@ -74,7 +74,7 @@ namespace Isis {
       // Get the single line of encoded XML from the input file that the client, spiceinit, sent us.
       TextFile inFile( ui.GetFileName("FROM") );
       QString hexCode;
-      
+
       // GetLine returns false if it was the last line... so we can't check for problems really
       inFile.GetLine(hexCode);
 
@@ -117,7 +117,7 @@ namespace Isis {
                 node = node.nextSibling() ) {
             QDomElement element = node.toElement();
 
-            // Store off the other isis version
+            // Store off the other ISIS version
             if (element.tagName() == "isis_version") {
               QString encoded = element.firstChild().toText().data();
               otherVersion = QByteArray::fromHex( encoded.toLatin1() ).constData();
@@ -153,13 +153,13 @@ namespace Isis {
         QStringList remoteVersion = otherVersion.split(QRegExp("\\s+"))[0].split(QRegExp("\\."));
         if ( remoteVersion[0].toInt() <= 3 && remoteVersion[1].toInt() < 5) {
 
-         QString msg ="The SPICE server only supports Isis versions greater than or equal to 3.5.*.*.";
+         QString msg ="The SPICE server only supports ISIS versions greater than or equal to 3.5.*.*.";
                  msg += "Your version:   [" + otherVersion + "] is not compatible";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
       }
-      
+
       // This next section looks a lot like spiceinit, its semi-duplicated because
       //   I did not want users to be able to spiceinit a label without cube
       //   data.
@@ -247,7 +247,7 @@ namespace Isis {
       }
 
       FileName inputLabels;
-      
+
       while (ck.at(0).size() != 0 && !kernelSuccess) {
         // create an empty kernel
         Kernel realCkKernel;
@@ -282,7 +282,7 @@ namespace Isis {
         }
 
         realCkKernel.setKernels(ckKernelList);
-        
+
         /*
          * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
          * classes take a cube instead of a pvl as input.
@@ -455,7 +455,7 @@ namespace Isis {
 
         if (errPvl.groups() > 0)
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
-        
+
         if (log) {
           log->addGroup(currentKernels);
         }

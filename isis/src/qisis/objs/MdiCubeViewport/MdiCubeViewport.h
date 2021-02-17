@@ -37,7 +37,7 @@ namespace Isis {
   class ViewportBuffer;
 
   /**
-   * @brief Cube display widget for certain Isis MDI applications
+   * @brief Cube display widget for certain ISIS MDI applications
    *
    * @ingroup Visualization Tools
    *

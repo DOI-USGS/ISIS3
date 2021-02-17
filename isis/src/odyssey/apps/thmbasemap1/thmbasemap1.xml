@@ -13,7 +13,7 @@
     wavelength band is selected for the mosaic, and the 14.88um atmosphere
     band is used as input to "thmdriftcor" program.  The following programs
     are run:
-        thm2isis - converts to isis format
+        thm2isis - converts to ISIS format
 	spiceinit - updates SPICE information
 	camstats - collects camera staistics
 	thmdriftcor - applies atmosphere correction using 14.88um band

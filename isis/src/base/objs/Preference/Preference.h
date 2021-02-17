@@ -3,12 +3,12 @@
  * $Revision: 1.4 $
  * $Date: 2010/05/28 17:57:03 $
  *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   Unless noted otherwise, the portions of ISIS written by the USGS are
  *   public domain. See individual third-party library and package descriptions
  *   for intellectual property information, user agreements, and related
  *   information.
  *
- *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   Although ISIS has been used by the USGS, no warranty, expressed or
  *   implied, is made by the USGS as to the accuracy and functioning of such
  *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
@@ -16,7 +16,7 @@
  *
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   in a browser or see the Privacy &amp; Disclaimers page on the ISIS website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -34,7 +34,7 @@ namespace Isis {
    * @brief Reads user preferences from a data file.
    *
    * This class is used to load, set, and obtain user preferences for
-   * the operation of Isis. User preferences for Isis are items such
+   * the operation of ISIS. User preferences for ISIS are items such
    * as the name of the log file, default data directories, and processing
    * status. This is essentially a specialized version of a Label object. It
    * reads a system-wide preference file and overwrites values in
@@ -61,7 +61,7 @@ namespace Isis {
    *   @history 2008-01-09 Steven Lambright - Made Application a friend
    *                           for destruction purposes
    *   @history 2008-07-08 Steven Lambright - Now uses atexit for destruction
-   *   @history 2010-05-28 Steven Lambright - More resilient to $HOME/.Isis
+   *   @history 2010-05-28 Steven Lambright - More resilient to $HOME/.ISIS
    *                           problems
    *   @history 2010-07-19 Jeannie Walldren - Added FileCustomization group to
    *                           TestPreferences file

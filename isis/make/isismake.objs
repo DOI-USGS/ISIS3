@@ -161,7 +161,7 @@ qrc_%.cpp: %.qrc
 	$(RCC) $(RCCDEFINES) -o $@ $(<F);
 
 help:
-	echo "Isis Make Object Commands"
+	echo "ISIS Make Object Commands"
 	echo "------------------------ "
 	echo "make                            : Builds the object"
 	echo "make MODE=DEBUG                 : Builds the object for stack tracing and memory"

@@ -6,7 +6,7 @@
   </brief>
 
   <description>
-  <p> 
+  <p>
   This program, hicolormos, produces a mosaic and adds keywords to the "Mosaic" label group of an
   ISIS cube. You need only input a FROM1 parameter, a TO parameter, and select a PRIORITY. The
   FROM2 parameter is not required to run the hicolormos application. Although the new group
@@ -15,22 +15,22 @@
   <p>
     Here are a few points to keep in mind:
   </p>
-  
+
   <ul>
     <li>
-      The output from hicubeit  (used to stack individual CCDs into a multi band cube) is required as 
+      The output from hicubeit  (used to stack individual CCDs into a multi band cube) is required as
       input for hicolormos  and the output of hicolormos is used as input to hirdrgen.
     </li>
     <li>
-      The  input cubes  to this program must be from the same observation,  stacked by hicubeit, and 
+      The  input cubes  to this program must be from the same observation,  stacked by hicubeit, and
       map projected.
     </li>
     <li>
       The input file cannot be a RDR file or be the output file created by mapmos or automos.
     </li>
   </ul>
-  
-  The CCDs of the HiRISE instrument are arranged such that color products can only be produced in two 
+
+  The CCDs of the HiRISE instrument are arranged such that color products can only be produced in two
   positions within the CCD array.  The CCDs that overlap for a color product are RED4, IR10, and
   BG12 or RED5, IR11, and BG13.  The data from two selected bands are input using the FROM1 and FROM2
   parameters.<br/>
@@ -65,11 +65,11 @@
     </change>
     <change name="Robert Sucharski" date="2007-10-18">
       Added code to get the avg. line and sample for gathering camera infomation if using the avg latitude and longitude fails.
-      We continue to use the latitude and longitude so that we are backwards compatible.  We added this new code because 
+      We continue to use the latitude and longitude so that we are backwards compatible.  We added this new code because
       the camera could not find an intersect for some images (polar) if we used projection latitude and longitude to "setGround".
      </change>
     <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. References #972.
+       Updated Spice members to be more compliant with ISIS coding standards. References #972.
     </change>
     <change name="Tracie Sucharski" date="2012-12-06">
       Changed to use TProjection instead of Projection.  References #775.

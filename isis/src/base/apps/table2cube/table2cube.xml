@@ -10,9 +10,9 @@
   </category>
 
   <description>
-     This program converts a single field of a table into a cube. 
-     The table records will become lines in the output cube, and the table field data will become samples. 
-     So, a field with an array of size three and twenty records will produce a 3 sample by 20 line cube. 
+     This program converts a single field of a table into a cube.
+     The table records will become lines in the output cube, and the table field data will become samples.
+     So, a field with an array of size three and twenty records will produce a 3 sample by 20 line cube.
   </description>
 
   <history>
@@ -20,7 +20,7 @@
       Original Version
     </change>
     <change name="Jeannie Backer" date="2012-10-04">
-      PROG: Changed references to TableField methods to lower camel case. Ordered includes. 
+      PROG: Changed references to TableField methods to lower camel case. Ordered includes.
       Added g_ prefix to global variables. References #1169.
     </change>
   </history>
@@ -71,7 +71,7 @@
           Field Name
         </brief>
         <description>
-          Specify the field name inside of the cube to gather the data from. The size of the array inside of 
+          Specify the field name inside of the cube to gather the data from. The size of the array inside of
           this field will be the same as the number of samples in the output cube (unless otherwise specified).
         </description>
       </parameter>
@@ -105,7 +105,7 @@
           Starting element in field
         </brief>
         <description>
-          Specify the starting element in the field. For example, if you have an array of size three but only 
+          Specify the starting element in the field. For example, if you have an array of size three but only
           want the last element this should be set to three. One Based.
         </description>
       </parameter>
@@ -117,7 +117,7 @@
           Number of elements in field
         </brief>
         <description>
-          Specify the number of elements in the field to convert into the output cube, this starts with the first 
+          Specify the number of elements in the field to convert into the output cube, this starts with the first
           record specified by STARTELEM. One Based.
         </description>
       </parameter>
@@ -158,7 +158,7 @@
         <image width="500" height="500" src="assets/images/out.jpg">
           <brief>Image after conversion</brief>
           <description>
-            This is the table from out.tbl after being converted to an Isis cube. The file "out.tbl" was constructed by making a
+            This is the table from out.tbl after being converted to an ISIS cube. The file "out.tbl" was constructed by making a
             500 by 500 table of the mathematical equation: element mod row (effectively x % y).
           </description>
           <thumbnail caption="Table after being converted" width="200" height="200" src="assets/thumbs/out.jpg"/>

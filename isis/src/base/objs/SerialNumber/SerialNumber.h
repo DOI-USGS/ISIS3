@@ -6,11 +6,11 @@
  * $Revision: 1.8 $
  * $Date: 2008/06/18 18:54:11 $
  *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   Unless noted otherwise, the portions of ISIS written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   Although ISIS has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software
  *   and related material nor shall the fact of distribution constitute any such
  *   warranty, and no responsibility is assumed by the USGS in connection
@@ -18,7 +18,7 @@
  *
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   the Privacy &amp; Disclaimers page on the ISIS website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -36,8 +36,8 @@ namespace Isis {
    * @brief Serial Number composer
    *
    * A Serial Number is a unique identification for some object such as an
-   * Isis cube. A Serial Number for a specific object must be repeatable. This
-   * class is intended to be used to create all Serial Numbers for Isis.
+   * ISIS cube. A Serial Number for a specific object must be repeatable. This
+   * class is intended to be used to create all Serial Numbers for ISIS.
    *
    * @ingroup ControlNetworks
    *

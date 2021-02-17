@@ -6,11 +6,11 @@
   </brief>
 
   <description>
-    This program will output the labels from an Isis cube or its detached label 
-    file.  If it is run in gui mode, the label will be written to the gui log 
-    screen. Otherwise, it will be written to the terminal window.  
-    <strong>Note:</strong> This program is designed to output Isis cube 
-    labels.  However, it will work on many files with pds like labels.  
+    This program will output the labels from an ISIS cube or its detached label
+    file.  If it is run in gui mode, the label will be written to the gui log
+    screen. Otherwise, it will be written to the terminal window.
+    <strong>Note:</strong> This program is designed to output ISIS cube 
+    labels.  However, it will work on many files with pds like labels.
   </description>
 
   <category>
@@ -38,13 +38,13 @@
     <change name="Brendan George" date="2006-09-26">
       Documentation fixes
     </change>
-    <change name="Steven Koechle" date="2008-05-20"> 
+    <change name="Steven Koechle" date="2008-05-20">
       Added TO parameter
     </change>
-    <change name="Jeannie Walldren" date="2010-06-24"> 
+    <change name="Jeannie Walldren" date="2010-06-24">
       Added more filters for FROM and TO.  Updated documentation.
     </change>
-    <change name="Mackenzie Boyd" date="2010-07-26"> 
+    <change name="Mackenzie Boyd" date="2010-07-26">
       Added APPEND option.
     </change>
   </history>
@@ -58,7 +58,7 @@
           Input cube
         </brief>
         <description>
-          This is the input cube file from which the labels will be extracted. 
+          This is the input cube file from which the labels will be extracted.
         </description>
         <filter>
           *.cub *.lbl
@@ -74,10 +74,10 @@
           None
         </internalDefault>
         <description>
-          The text file to which the result Pvl will be written. 
+          The text file to which the result Pvl will be written.
         </description>
         <filter>
-          *.txt *.prt *.pvl 
+          *.txt *.prt *.pvl
         </filter>
       </parameter>
     </group>
@@ -90,8 +90,8 @@
           Append output to file
         </brief>
         <description>
-          This option allows output to be appened to an already existing file. 
-          If this option is not checked and the file exists, it will be 
+          This option allows output to be appened to an already existing file.
+          If this option is not checked and the file exists, it will be
           overwritten.
         </description>
       </parameter>
@@ -109,7 +109,7 @@
           from=peaks.cub
         </commandLine>
         <description>
-          In this example, catlab will extract the labels from the input 
+          In this example, catlab will extract the labels from the input
           cube and output them to the terminal window:
                   <pre>
 Object = IsisCube
@@ -144,9 +144,9 @@ Object = Label
 End_Object
 
 Object = History
-  Name = IsisCube 
-  StartByte = 29425665 
-  Bytes = 1048 
+  Name = IsisCube
+  StartByte = 29425665
+  Bytes = 1048
 End_Object
 End
         </pre>
@@ -159,7 +159,7 @@ End
               Example using GUI
             </brief>
             <description>
-              In this example, catlab will extract the labels from the input 
+              In this example, catlab will extract the labels from the input
               cube and output them to the GUI log screeen.
             </description>
             <thumbnail width="200" height="194" caption="" src="assets/thumbs/catlabGUI1thumb.jpg"/>
@@ -177,7 +177,7 @@ End
           from=peaks.cub to=peaks.pvl
         </commandLine>
         <description>
-          In this example, catlab will extract the labels from the input 
+          In this example, catlab will extract the labels from the input
           cube and output them to a pvl file.
         </description>
       </terminalInterface>
@@ -188,8 +188,8 @@ End
               Example using GUI
             </brief>
             <description>
-              In this example, catlab will extract the labels from the input 
-              cube and output them to a pvl file.  They will not print in the 
+              In this example, catlab will extract the labels from the input
+              cube and output them to a pvl file.  They will not print in the
               GUI log screeen.
             </description>
             <thumbnail width="200" height="194" caption="" src="assets/thumbs/catlabGUI2thumb.jpg"/>
@@ -202,9 +202,9 @@ End
             Output pvl created by catlab.
           </brief>
           <description>
-            In this example, the label is printed in a pvl file.  This pvl is 
-            identical to the terminal interface or GUI log screen 
-            outputs in Example 1.  
+            In this example, the label is printed in a pvl file.  This pvl is
+            identical to the terminal interface or GUI log screen
+            outputs in Example 1.
           </description>
           <parameterName>
             TO

@@ -18,7 +18,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
- 
+
 #include <QCheckBox>
 #include <QRadioButton>
 #include "FileDialog.h"
@@ -26,15 +26,15 @@
 namespace Isis {
 
   /**
-  * @brief Widget to save(Save As) Isis cubes(used in qview) to display the 
-  * FileDialog to select the output cube. This dialog additionally displays 
-  * radio buttons for choices FullImage, ExportAsIs, ExportFullRes. These choices 
-  * are located at the bottom of the dialog. 
-  *  
-  * FullImage     - copies the entire image into the user specified output file 
-  * ExportAsIs    - copies the image as displayed in the qview app window 
-  * ExportFullRes - copies the image as displayed in the qview app window but with 
-  *                 full resolution 
+  * @brief Widget to save(Save As) ISIS cubes(used in qview) to display the
+  * FileDialog to select the output cube. This dialog additionally displays
+  * radio buttons for choices FullImage, ExportAsIs, ExportFullRes. These choices
+  * are located at the bottom of the dialog.
+  *
+  * FullImage     - copies the entire image into the user specified output file
+  * ExportAsIs    - copies the image as displayed in the qview app window
+  * ExportFullRes - copies the image as displayed in the qview app window but with
+  *                 full resolution
   *
   * @ingroup Visualization Tools
   *
@@ -42,7 +42,7 @@ namespace Isis {
   *
   * @internal
   *   @history 2011-05-11  Sharmila Prasad - Initial Version
-  *   @history 2017-06-01  Kaj Williams - renamed "save as ..." radio buttons to reflect their actual usage. Updated the associated tooltips. 
+  *   @history 2017-06-01  Kaj Williams - renamed "save as ..." radio buttons to reflect their actual usage. Updated the associated tooltips.
   *                        Also updated the "enum saveAsType"  documentation.
   */
   class SaveAsDialog : public FileDialog {
@@ -54,7 +54,7 @@ namespace Isis {
       **/
       enum saveAsType {FullImage, ExportAsIs, ExportFullRes};
       int getSaveAsType();
-      
+
     public slots:
       void setFullImage(bool);
       void setAsIs(bool);

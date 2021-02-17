@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+ISIS<?xml version="1.0" encoding="UTF-8"?>
 
-<application name="rolo2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="rolo2ISIS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import isis2 rolo image into isis </brief>
+  <brief>Import ISIS2 rolo image into ISIS </brief>
 
   <description>
-    This program will import an isis2 rolo image into an isis cube.
+    This program will import an ISIS2 rolo image into an ISIS cube.
   </description>
 
   <history>
@@ -26,10 +26,10 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input rolo isis2 file
+          Input rolo ISIS2 file
         </brief>
         <description>
-          Use this parameter to select the isis2 filename.
+          Use this parameter to select the ISIS2 filename.
         </description>
         <filter>
           *.alx *.cub
@@ -40,7 +40,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output Isis cube
+           Output ISIS cube
          </brief>
          <description>
            Use this parameter to select the output filename
@@ -61,7 +61,7 @@
       Using rolo2isis
       </brief>
       <description>
-        The use of rolo2isis to ingest rolo isis2 data and output isis cubes
+        The use of rolo2isis to ingest rolo ISIS2 data and output ISIS cubes
       </description>
       <terminalInterface>
         <commandLine>
@@ -69,7 +69,7 @@
           to=mm185801.cub
         </commandLine>
         <description>
-          This example shows the use of rolo2isis to create an Isis cube
+          This example shows the use of rolo2ISIS to create an ISIS cube
         </description>
       </terminalInterface>
 

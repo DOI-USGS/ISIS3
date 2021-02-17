@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="isis2fits" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-  
+
   <brief>
     Exports a cube to fits format
   </brief>
 
   <description>
-    This program will export an Isis cube to fits format. It is recommended
+    This program will export an ISIS cube to fits format. It is recommended
     that the image be output in 32-bit per pixel format. The user may also
     choose to output into an 8-bit, 16-bit unsigned, or 16-bit signed image but
     in order to ensure that the range of pixels is not truncated when going to
@@ -31,13 +31,13 @@
       Updated documentation to follow current standards
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Mackenzie Boyd" date="2009-10-29">
-      Made SkyMap and All options work, added more keywords to ALL option, 
-      removed unsigned 16 bit option, made file total come out to a sum evenly 
+      Made SkyMap and All options work, added more keywords to ALL option,
+      removed unsigned 16 bit option, made file total come out to a sum evenly
       divisible by 2880 as specified in the standard.
-          
+
     </change>
   </history>
 
@@ -76,7 +76,7 @@
         <brief>
           Output fits file
         </brief>
-        <description> 
+        <description>
           Use this parameter to specify the name of the output fits file. If you
           do not include an extension of ".fits" it will be added automatically.
         </description>
@@ -138,7 +138,7 @@
           This parameter is used to select one of four ways to stretch
           (or map) output pixels.  They are NONE, LINEAR, or MANUAL. It is
           recommended that output data that is less precise than the input data
-          from whence it came (i.e. 32-bit data being output as 8-bit data) be 
+          from whence it came (i.e. 32-bit data being output as 8-bit data) be
           stretched.
         </description>
 
@@ -246,9 +246,9 @@
         <default><item>NOMINAL</item></default>
         <brief>Level of information in the header (nominal, projection)</brief>
         <description>
-          This parameter is used to determine how much information will appear 
+          This parameter is used to determine how much information will appear
           in the FITS header. Minimally, the header will include the information
-          necessary to conform to the FITS header, which conveniently also 
+          necessary to conform to the FITS header, which conveniently also
           allows it to be read by a FITS file reader. This is automatically read
           from the cube label.
         </description>
@@ -256,11 +256,11 @@
           <option value="NOMINAL">
             <brief>Nominal Fits header</brief>
             <description>
-              This option will include only minimal information in the fits 
+              This option will include only minimal information in the fits
               header. This includes the bits per pixel, the number of samples in
-              the cube, the number of lines in the cube, and the core base and 
-              multiplier for DN values. Though this will transfer information to 
-              the fits standard quickly, it will essentially strip the cube of 
+              the cube, the number of lines in the cube, and the core base and
+              multiplier for DN values. Though this will transfer information to
+              the fits standard quickly, it will essentially strip the cube of
               all information other than raw pixel values.
             </description>
           </option>
@@ -275,8 +275,8 @@
           <option value="ALL">
             <brief>Include as much of the cube label as possible</brief>
             <description>
-              This option will include as many keywords from the label as are 
-              supported by the fits standard, including the information from the 
+              This option will include as many keywords from the label as are
+              supported by the fits standard, including the information from the
               skymap.
             </description>
           </option>

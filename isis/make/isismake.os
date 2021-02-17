@@ -77,7 +77,7 @@ ifneq "$(or $(findstring MacOSX10_7, $(HOST_OS)), $(findstring MacOSX10_8, $(HOS
 endif
 
 #---------------------------------------------------------------------------
-# Set up for the required elements in Isis makes
+# Set up for the required elements in ISIS makes
 # NOTE: XTRAstuff comes from the make file of specific applications
 #---------------------------------------------------------------------------
 ALLINCDIRS  = -I.

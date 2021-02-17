@@ -23,7 +23,7 @@
 #                       Isis2 definitions.
 #  @history 2008-06-10  Jeff Anderson, Fixed Magellan to be more specific to
 #                       FMAPS and MIDRS
-#  @history 2008-10-01  Steven Lambright, Fixed Isis 2 offsets, fixed cassini radars
+#  @history 2008-10-01  Steven Lambright, Fixed ISIS 2 offsets, fixed cassini radars
 #                       Keyword/Pattern values. Commented and fixed MIDR offsets.
 #  @history 2011-01-26  Janet Barrett, Added support for Kaguya Terrain Camera
 #                       (TC_MAP)

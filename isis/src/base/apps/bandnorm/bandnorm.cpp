@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-// Isis specific include files go next
+// ISIS specific include files go next
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "IException.h"
@@ -22,24 +22,24 @@ namespace Isis {
   static vector<int> band;
   static vector<double> average;
   static vector<double> normalizer;
-  
+
   // function prototypes
   static void getStats(Buffer &in);
   static void normalize(Buffer &in, Buffer &out);
   static void Tokenize(const QString &str,
                 vector<QString> & tokens,
                 const QString &delimiters = " ");
-  
+
   void bandnorm(UserInterface &ui) {
     Cube icube(ui.GetFileName("FROM"), "r");
     bandnorm(&icube, ui);
   }
-  
-  
+
+
   void bandnorm(Cube *icube, UserInterface &ui) {
     // We will be processing by line
     ProcessByLine p;
-  
+
     // Now get the statistics for each band or the entire cube
     QString avg = ui.GetString("AVERAGE");
     p.SetInputCube(icube);
@@ -108,18 +108,18 @@ namespace Isis {
         normalizer.push_back(stats.Average());
       }
     }
-  
+
     // Setup the output file and apply the correction
     p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(), icube->lineCount(), icube->bandCount());
     p.StartProcess(normalize);
-  
+
     // Cleanup
     p.EndProcess();
     normalizer.clear();
     band.clear();
     average.clear();
   }
-  
+
   //**********************************************************
   // Get statistics on a band or entire cube
   //**********************************************************
@@ -129,12 +129,12 @@ namespace Isis {
     average.push_back(stats.Average());
     band.push_back(in.Band() - 1);
   }
-  
+
   // Apply coefficients
   void normalize(Buffer &in, Buffer &out) {
     int index = in.Band() - 1;
     double coeff = normalizer[index];
-  
+
     // Now loop and apply the coefficents
     for(int i = 0; i < in.size(); i++) {
       if(IsSpecial(in[i])) {
@@ -148,19 +148,19 @@ namespace Isis {
       }
     }
   }
-  
+
   // Tokenizer
   void Tokenize(const QString &strQStr,
                 vector<QString> & tokens,
                 const QString &delimitersQStr) {
     IString str = strQStr;
     IString delimiters = delimitersQStr;
-  
+
     //Skip delimiters at the beginning
     string::size_type lastPos = str.find_first_not_of(delimiters, 0);
     // Find first "non-delimiter".
     string::size_type pos     = str.find_first_of(delimiters, lastPos);
-  
+
     while(string::npos != pos  ||  string::npos != lastPos) {
       // Found a token, add it to the vector
       tokens.push_back(str.substr(lastPos, pos - lastPos).c_str());

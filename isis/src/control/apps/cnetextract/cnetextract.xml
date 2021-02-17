@@ -761,7 +761,7 @@
             control network, while Free Points will calculate the lat/lon
             from the images provided by the FROMLIST. These calculated lat/lon
             values will be added to Free Points in the output control network
-            for reference purposes. However, no Isis application will use
+            for reference purposes. However, no ISIS application will use
             these lat/lons that are added to Free Points.
           </p>
 

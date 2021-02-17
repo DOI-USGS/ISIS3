@@ -5,36 +5,36 @@
      Generate radiometrically (cosmetic) corrected HiRISE Channel products.
   </brief>
   <description>
-    Hicalproc is one of the pipelines in the list of HiROC pipelines. This 
-    pipeline is used to process images after the EDRs are produced. This 
-    pipeline generates radiometrically (cosmetic) corrected HiRISE Channel 
-    products. The input is a raw HiRISE channel image.The output will be a 
-    radiometrically corrected channel image. This procedure continues to go 
-    through considerable evolution as the instrument calibration procedures are 
-    improved. The application  is version 1.42 of the hical pipeline from UofA 
-    perl script. 
-    <p/> Hicalproc is a pipeline application which processes the image through a 
-    series of Isis apps depending on the options. 
-    <br/>Following are the applications that are run by default irrespective of 
-    the image type: 
-    <br/><b>hical</b> - Run caliberation steps 
-    <br/><b>gaindrift</b> - Apply gaindrift corrections. Uses HiGainFx procedure 
-    <br/><b>hicubenorm</b> - Apply highpass Cubenorm correction <p/> 
-    Following options are provided which can be chosen depending on the input 
-    image: <br/><b>Ingestion</b> - Import and initialize a raw HiRISE image into 
-    Isis format running the apps hi2isis and spiceinit 
-    <br/><b>Furrows</b> - Run hifurrows to remove furrows in the image 
+    Hicalproc is one of the pipelines in the list of HiROC pipelines. This
+    pipeline is used to process images after the EDRs are produced. This
+    pipeline generates radiometrically (cosmetic) corrected HiRISE Channel
+    products. The input is a raw HiRISE channel image.The output will be a
+    radiometrically corrected channel image. This procedure continues to go
+    through considerable evolution as the instrument calibration procedures are
+    improved. The application  is version 1.42 of the hical pipeline from UofA
+    perl script.
+    <p/> Hicalproc is a pipeline application which processes the image through a
+    series of ISIS apps depending on the options.
+    <br/>Following are the applications that are run by default irrespective of
+    the image type:
+    <br/><b>hical</b> - Run caliberation steps
+    <br/><b>gaindrift</b> - Apply gaindrift corrections. Uses HiGainFx procedure
+    <br/><b>hicubenorm</b> - Apply highpass Cubenorm correction <p/>
+    Following options are provided which can be chosen depending on the input
+    image: <br/><b>Ingestion</b> - Import and initialize a raw HiRISE image into
+    ISIS format running the apps hi2isis and spiceinit
+    <br/><b>Furrows</b> - Run hifurrows to remove furrows in the image
     <br/><b>NoiseFilter</b> - Run hinoise to remove noise <br/>
     <b>Destripe</b> - Run hidestripe to remove stripes <br/>
-    <b>Mapping</b> - Finally process the input file through the map projection 
+    <b>Mapping</b> - Finally process the input file through the map projection
     phase <p/>
-    This application requires a configuration file, if none provided a system 
-    default will be used. <p/>If ingestion and/or mapping are chosen, then 
+    This application requires a configuration file, if none provided a system
+    default will be used. <p/>If ingestion and/or mapping are chosen, then
     respective parameters need to be configured. <p/>
   </description>
   <category>
     <missionItem>Mars Reconnaissance Orbiter</missionItem>
-  </category> 
+  </category>
   <history>
    <change name="Sharmila Prasad" date="2011-02-10">
      Original Version
@@ -51,7 +51,7 @@
         <fileMode>input</fileMode>
         <brief>Input image to be corrected</brief>
         <description>
-          Input HiRISE image in isis or raw format that needs to be 
+          Input HiRISE image in ISIS or raw format that needs to be
           radiometrically corrected.
         </description>
         <filter>*.cub | *.img</filter>
@@ -62,7 +62,7 @@
         <fileMode>output</fileMode>
         <brief>Radiometrically caliberated and corrected image</brief>
         <description>
-          Radiometrically caliberated and corrected isis image
+          Radiometrically caliberated and corrected ISIS image
         </description>
          <filter>*.cub</filter>
       </parameter>
@@ -72,7 +72,7 @@
          <fileMode>input</fileMode>
          <brief>User specific configuration for caliberation</brief>
          <description>
-           User specific configuration for caliberation else Isis default will 
+           User specific configuration for caliberation else ISIS default will
            be used
          </description>
          <internalDefault>$mro/calibration/hical.????.conf</internalDefault>
@@ -81,9 +81,9 @@
       <parameter name="REMOVE">
         <type>boolean</type>
         <brief>Remove Intermediate Files</brief>
-        <description>Remove Intermediate Files created by the 
+        <description>Remove Intermediate Files created by the
           pipeline</description>
-        <default><item>false </item></default> 
+        <default><item>false </item></default>
         </parameter>
     </group>
 
@@ -91,15 +91,15 @@
         <parameter name="INGESTION">
           <type>boolean</type>
           <brief>Import and initialize a HiRISE image</brief>
-          <description>Import and initialize a raw HiRISE image into 
-            Isis format running the apps hi2isis and spiceinit</description>
+          <description>Import and initialize a raw HiRISE image into
+            ISIS format running the apps hi2isis and spiceinit</description>
           <default><item>false</item></default>
         </parameter>
-  
+
        <parameter name="FURROWS">
           <type>boolean</type>
           <brief>Remove furrows</brief>
-          <description>Run hifurrows to remove the furrows which 
+          <description>Run hifurrows to remove the furrows which
             runs trimfilter and lowpass filter there after</description>
           <default><item>false</item></default>
         </parameter>
@@ -114,7 +114,7 @@
        <parameter name="DESTRIPE">
           <type>boolean</type>
           <brief>Remove stripes</brief>
-          <description>Run hidestripe which uses combination of 
+          <description>Run hidestripe which uses combination of
             low and high pass filters to destripe the image</description>
           <default><item>false</item></default>
         </parameter>
@@ -208,7 +208,7 @@
             <option value="ELLIPSOID">
               <brief>Use triiaxial ellipsoid from PCK</brief>
               <description>
-                The camera will use the radii defined in the planetary constants file (PCK) when 
+                The camera will use the radii defined in the planetary constants file (PCK) when
                 determining intersections of the body surface
                 </description>
               <exclusions>
@@ -218,8 +218,8 @@
             <option value="SYSTEM">
               <brief>Search system for a default shape model</brief>
               <description>
-                This option will search the default system data area ($ISISDATA/base/dems) for a shape model that 
-                matches the target of the input cube.  If none are found then no shape model will be used and the default 
+                This option will search the default system data area ($ISISDATA/base/dems) for a shape model that
+                matches the target of the input cube.  If none are found then no shape model will be used and the default
                 ellipsoid parameters found in the planetary constants (PCK) file define the shape.
               </description>
               <exclusions>
@@ -241,7 +241,7 @@
             User defined ISIS cube shape model.
           </brief>
           <description>
-            A map projected ISIS cube which contains the radii of the target.  The file can 
+            A map projected ISIS cube which contains the radii of the target.  The file can
             cover more than the input cube (FROM) but must minimally cover the data in the input cube.
           </description>
           <defaultPath>$base//dems/</defaultPath>
@@ -272,7 +272,7 @@
           <brief>Pixel resolution in meters</brief>
           <internalDefault>Automatic</internalDefault>
           <description>
-            Specifies the resolution in meters per pixel.  
+            Specifies the resolution in meters per pixel.
             If not in the MAP file the resolution will be computed from
             the themis level 1 cube.
           </description>
