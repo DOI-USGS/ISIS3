@@ -221,7 +221,7 @@ namespace Isis {
     projCubeLabel >> projLabel;
 
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    testCube->fromIsd(tempDir.path() + "default.cub", label, isd, "rw");
 
     LineManager line(*testCube);
     int pixelValue = 1;
@@ -249,6 +249,7 @@ namespace Isis {
   }
 
   void DefaultCube::resizeCube(int samples, int lines, int bands) {
+    std::cout<< "In resize"<<std::endl;
     label = Pvl();
     PvlObject &isisCube = testCube->label()->findObject("IsisCube");
     label.addObject(isisCube);
@@ -264,13 +265,42 @@ namespace Isis {
 
     LineManager line(*testCube);
     int pixelValue = 1;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = (double) (pixelValue % 255);
-        pixelValue++;
+    for(int band = 1; band <= bands; band++) {
+      for (int i = 1; i <= testCube->lineCount(); i++) { 
+        line.SetLine(i, band);
+        for (int j = 0; j < line.size(); j++) { 
+          line[j] = (double) (pixelValue % 255);
+          pixelValue++;
+        }
+        testCube->write(line);
       }
-      testCube->write(line);
-    } 
+    }
+
+    projLabel = Pvl();
+    PvlObject &isisProjCube= projTestCube->label()->findObject("IsisCube");
+    projLabel.addObject(isisProjCube);
+
+    PvlGroup &projDim = projLabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    projDim.findKeyword("Samples").setValue(QString::number(samples));
+    projDim.findKeyword("Lines").setValue(QString::number(lines));
+    projDim.findKeyword("Bands").setValue(QString::number(bands));
+
+    delete projTestCube;
+    projTestCube = new Cube();
+    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(int band = 1; band <= bands; band++) {
+      for (int i = 1; i <= projTestCube->lineCount(); i++) { 
+        line.SetLine(i, band);
+        for (int j = 0; j < line.size(); j++) { 
+          line[j] = (double) (pixelValue % 255);
+          pixelValue++;
+        }
+        projTestCube->write(line);
+      }
+    }
   }
 
   void DefaultCube::TearDown() {

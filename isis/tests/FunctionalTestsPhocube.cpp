@@ -20,7 +20,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName};
   UserInterface options(APP_XML, args);
-  resizeCube(10, 10, 1);
+  resizeCube(5, 5, 1);
   phocube(testCube, options);
 
   Cube cube(cubeFileName);
@@ -49,8 +49,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
 }
 
 TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
-  // QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
-  QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "dn=true", "phase=true", "emission=true",
                            "incidence=true", "localemission=true", "localincidence=true",
                            "latitude=true", "longitude=true", "pixelresolution=true",
@@ -61,7 +60,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
                            "bodyfixed=true", "localtime=true"};
 
   UserInterface options(APP_XML, args);
-  resizeCube(10, 10, 1);
+  resizeCube(5, 5, 1);
   phocube(testCube, options);
 
   Cube cube(cubeFileName);
@@ -102,31 +101,30 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   cube.close();
 }
 
-// Tests that pixels in bands except for the DN band are set to Null.
 TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
-  QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "specialpixels=false", "dn=true", "emission=false", 
                            "incidence=false", "latitude=false", "longitude=false"};
   UserInterface options(APP_XML, args);
 
   // Make the testing cube smaller and fill it with special pixels
-  resizeCube(10, 10, 1);
+  resizeCube(5, 5, 1);
   LineManager line(*testCube);
   int pixelValue = 1;
   int lineNum = 0;
   for(line.begin(); !line.end(); line++) {
     for(int i = 0; i < line.size(); i++) {
       if (lineNum == 0) {
-        line[i] = (int) pixelValue++ % 255;
+        line[i] = (int) pixelValue++;
       }
       else if (lineNum == 1) {
-        line[i] = 0;
+        line[i] = LOW_REPR_SAT1;
       }
       else if (lineNum == 2) {
         line[i] = HIGH_REPR_SAT1;
       }
       else if (lineNum == 3) {
-        line[i] = 0;
+        line[i] = LOW_INSTR_SAT1;
       }
       else if (lineNum == 4) {
         line[i] = HIGH_INSTR_SAT1;
@@ -158,14 +156,14 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
     outLine.SetLine(i, band);
     cube.read(outLine);
     for (int j = 0; j < outLine.size(); j++) { 
-      if (i == 1) {
-        EXPECT_FALSE(IsSpecial(line[j]))<<"Line: " << i << " Sample: " << j << " Band: " << band;
+      if (i == 1) { // First line of both bands should match the input cube
+        EXPECT_FALSE(IsSpecial(outLine[j]));
       }
-      else if (band == 1) {
-        EXPECT_EQ(line[j], 0)<<"Line: " << i << " Sample: " << j << " Band: " << band;
+      else if (band == 1) { // Rest of the first band are the special pixels from the input cube
+        EXPECT_TRUE(IsSpecial(outLine[j]));
       }
-      else {
-        EXPECT_EQ(line[j], NULL8)<<"Line: " << i << " Sample: " << j << " Band: " << band;
+      else {  // Rest of the second band should be all NULL
+        EXPECT_EQ(outLine[j], NULL8);
       }
     }
     // Check next band
@@ -173,6 +171,69 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
       i = 1;
       band++;
     }
+  }
+
+  cube.close();
+}
+
+// TEST_F(DefaultCube, FunctionalTestPhocubeOffBody) {
+//   QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
+//   QVector<QString> args = {"to=" + cubeFileName};
+//   UserInterface options(APP_XML, args);
+//   resizeCube(5, 5, 1);
+//   phocube(testCube, options);
+
+//   Cube cube(cubeFileName);
+//   Pvl *isisLabel = cube.label();
+
+//   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+//   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+//   ASSERT_EQ(cube.bandCount(), 5);
+
+//   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
+//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
+//   EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
+
+//   for (int i = 0; i < cube.bandCount(); i++) {
+//     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
+//     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+//   }
+
+//   cube.close();
+// }
+
+TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
+  QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "dn=true", "emission=false", 
+                           "incidence=false", "latitude=false", "longitude=false"};
+  UserInterface options(APP_XML, args);
+  resizeCube(5, 5, 1);
+  phocube(projTestCube, options);
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 5);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
+  EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
+
+  for (int i = 0; i < cube.bandCount(); i++) {
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
   }
 
   cube.close();
