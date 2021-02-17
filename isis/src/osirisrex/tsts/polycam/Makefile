@@ -25,7 +25,8 @@ commands:
 	           from=$(OUTPUT)/2019-01-13T23_35_59.000_PCAM_L2b_V001.cub                \
 	           ckpredict=t                                                             \
 	           spkpredict=t                                                            \
-	           extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                           \
+	           SCLK='$$osirisrex/kernels/sclk/SCLK.tsc'                                \
+			   extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                           \
 	           >& /dev/null;
 
 #	# phocube first image

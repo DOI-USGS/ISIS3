@@ -25,7 +25,8 @@ commands:
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           ckpredict=t                                                                       \
 	           spkpredict=t                                                                      \
-	           extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                                     \
+	           SCLK='$$osirisrex/kernels/sclk/SCLK.tsc'                                          \
+			   extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                                     \
 	           >& /dev/null;
 
 	# phocube first image
