@@ -179,6 +179,9 @@ namespace Isis {
    *                            SetLocalGround(bool backCheck) to make a callback to the
    *                            ShapeModel::isOccludedFrom() to test for point
    *                            visability.
+   *   @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Made several functions
+   *                           virtual and moved look vector member variable to protected. Ensured
+   *                           that m_newLookB always initializes to the same value.
    */
   class Sensor : public Spice {
     public:
