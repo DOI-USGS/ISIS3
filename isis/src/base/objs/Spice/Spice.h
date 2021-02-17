@@ -290,12 +290,14 @@ namespace Isis {
    *                           is in encoded clock ticks, rather than a full spacecraft clock time
    *                           string. As such, when used sct2e_c is used to convert to an ET rather
    *                           than scs2e_c.
+   *  @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Made several methods virtual,
+   *                           moved several member variables to protected, and added initialization
+   *                           path for a sensor model without SPICE data.
    */
   class Spice {
     public:
       // constructors
       Spice(Cube &cube);
-//      Spice(Cube &cube, bool noTables); NO LONGER USED
       Spice(Pvl &lab, nlohmann::json);
 
       // destructor

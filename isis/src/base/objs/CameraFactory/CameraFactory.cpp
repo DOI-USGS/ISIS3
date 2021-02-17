@@ -35,7 +35,6 @@
 #include "IException.h"
 #include "Plugin.h"
 #include "Preference.h"
-#include "StringBlob.h"
 
 #include "csm/csm.h"
 #include "csm/Model.h"
@@ -64,14 +63,14 @@ namespace Isis {
     // load the system file
 
     initPlugin();
-    
+
     try {
       // Is there a CSM blob on the cube?
       if (cube.hasBlob("String", "CSMState")) {
         // Create ISIS CSM Camera Model
         try {
           return new CSMCamera(cube);
-        } 
+        }
         catch (IException &e) {
           QString msg = "Unable to create CSM camera using CSMState Cube blob.";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -130,7 +129,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Reads the appropriate plugin file for the ISIS cameras, and scans the
    * directories specified in IsisPreferences for CSM cameras.

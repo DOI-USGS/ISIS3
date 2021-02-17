@@ -327,7 +327,7 @@ TEST_F(DefaultCube, CSMInitSpiceCleanup) {
 }
 
 
-// This test uses the DefaultCube fixture because it has already has attached
+// This test uses the DefaultCube fixture because it has already been spiceinit'd
 TEST_F(DefaultCube, CSMInitSpiceRestoredAfterFailure) {
   // Create an ISD
   json isd;
@@ -426,13 +426,13 @@ TEST_F(CSMPluginFixture, CSMInitStateStringFails) {
 
   QVector<QString> argsWithModel = {
     "from="+filename,
-    "state="+statePath, 
+    "state="+statePath,
     "modelname=TestCsmModel",
     "pluginname=TestCsmPlugin"};
 
   UserInterface optionsWithModel(APP_XML, argsWithModel);
 
-  // Expect a failure due to a bad state string. 
+  // Expect a failure due to a bad state string.
   try {
     csminit(optionsWithModel);
   }
@@ -443,7 +443,7 @@ TEST_F(CSMPluginFixture, CSMInitStateStringFails) {
   QVector<QString> argsWithIsdAndState = {
     "from="+filename,
     "isd=fakePath",
-    "state="+statePath, 
+    "state="+statePath,
     "modelname=TestCsmModel",
     "pluginname=TestCsmPlugin"};
 
@@ -477,7 +477,7 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
 
   // Write the state out to a file
   std::string stateBefore = state.string();
-  QString statePath = tempDir.path() + "/state.json"; 
+  QString statePath = tempDir.path() + "/state.json";
   std::ofstream stateFile(statePath.toStdString());
   stateFile << stateBefore;
   stateFile.flush();

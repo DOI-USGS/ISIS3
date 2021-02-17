@@ -72,6 +72,9 @@ namespace Isis {
    *                           These are not the same.  Naif tags the body radii keyword with the
    *                           Naif body code.  The Naif body frame code refers to the orientation
    *                           (SpiceRotation) of the body.  References #4649 and #501.
+   *  @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Added the ability to
+   *                          create a Target without SPICE data and later set the sensor
+   *                          model pointer.
    */
   class Target {
 

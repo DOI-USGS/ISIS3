@@ -55,17 +55,6 @@ namespace Isis {
     p_buffer = new char[p_nbytes];
     const char *ptr = m_string.c_str();
     memcpy(p_buffer, (void *)ptr, p_nbytes);
-
-//    int bytes = m_string.size();
-//    char *temp = p_buffer;
-//    p_buffer = new char[p_nbytes+bytes];
-
-//    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
-//    const char *ptr = m_string.c_str();
-//    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-//    p_nbytes += bytes;
-
-//    if (temp != NULL) delete [] temp;
   }
 
   /**

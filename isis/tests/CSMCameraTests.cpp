@@ -263,7 +263,7 @@ TEST_F(CSMCameraFixture, SetTime) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Setting the image time is not supported for CSM camera models\"";
   }
 }
@@ -282,7 +282,7 @@ TEST_F(CSMCameraFixture, SubSolarPoint) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Sub solar point is not supported for CSM camera models\"";
   }
 }
@@ -300,7 +300,7 @@ TEST_F(CSMCameraFixture, PixelIfovOffsets) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Pixel Field of View is not supported for CSM camera models\"";
   }
 }
@@ -319,7 +319,7 @@ TEST_F(CSMCameraFixture, SunPosition) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Sun position is not supported for CSM camera models\"";
   }
 
@@ -334,7 +334,7 @@ TEST_F(CSMCameraFixture, SunPosition) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Sun position is not supported for CSM camera models\"";
   }
 }
@@ -352,7 +352,7 @@ TEST_F(CSMCameraFixture, InstrumentPosition) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Instrument position is not supported for CSM camera models\"";
   }
 }
@@ -370,7 +370,7 @@ TEST_F(CSMCameraFixture, BodyRotation) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Target body orientation is not supported for CSM camera models\"";
   }
 }
@@ -388,7 +388,7 @@ TEST_F(CSMCameraFixture, InstrumentRotation) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Instrument orientation is not supported for CSM camera models\"";
   }
 }
@@ -406,7 +406,7 @@ TEST_F(CSMCameraFixture, SolarLongitude) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Solar longitude is not supported for CSM camera models\"";
   }
 }
@@ -424,7 +424,7 @@ TEST_F(CSMCameraFixture, SolarDistance) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Solar distance is not supported for CSM camera models\"";
   }
 }
@@ -442,7 +442,7 @@ TEST_F(CSMCameraFixture, RightAscension) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Right Ascension is not supported for CSM camera models\"";
   }
 }
@@ -460,7 +460,7 @@ TEST_F(CSMCameraFixture, Declination) {
   }
   catch(...)
   {
-      FAIL() << "Expected an IExcpetion with message \""
+      FAIL() << "Expected an IException with message \""
       " Declination is not supported for CSM camera models\"";
   }
 }

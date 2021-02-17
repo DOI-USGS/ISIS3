@@ -74,6 +74,8 @@ namespace Isis {
    *                          Fixes #5325.
    *  @history 2019-06-15 Kristin Berry - Added a precision option to UTC to specify the precision
    *           of the output value. The default (old) precision is used if no argument is specified.
+   *  @history 2021-02-17 Jesse Mapel - Added the ability to pass ISO 8601 basic format time
+   *                          strings to setUtc.
    */
   class iTime {
     public:

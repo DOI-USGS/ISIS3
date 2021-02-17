@@ -275,9 +275,9 @@ TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
       .WillRepeatedly(::testing::Return("MockPlatformID"));
   EXPECT_CALL(mockModel, getReferenceDateAndTime)
       .WillRepeatedly(::testing::Return("20000101T115855.816"));
-EXPECT_CALL(mockModel, imageToRemoteImagingLocus)
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus)
       .WillRepeatedly(::testing::Return(csm::EcefLocus(pointRadius + 50000, 0, 0, -1, 0, 0)));
-EXPECT_CALL(mockModel, groundToImage(::testing::An<const csm::EcefCoord&>(), ::testing::_, ::testing::_, ::testing::_))
+  EXPECT_CALL(mockModel, groundToImage(::testing::An<const csm::EcefCoord&>(), ::testing::_, ::testing::_, ::testing::_))
       .WillRepeatedly(::testing::Return(csm::ImageCoord(4.5, 4.5)));
   EXPECT_CALL(mockModel, computeGroundPartials)
       .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));

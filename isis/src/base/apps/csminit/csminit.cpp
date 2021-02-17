@@ -61,6 +61,11 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
 
+    else if (!ui.WasEntered("ISD") && !ui.WasEntered("STATE")) {
+      QString message = "Either an ISD or a State string must be entered.";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+
     else if (ui.WasEntered("ISD")) {
       QString isdFilePath = ui.GetFileName("ISD");
 
@@ -186,11 +191,6 @@ namespace Isis {
       }
     } // end of State else statement
 
-    else {
-      QString message = "Either an ISD or a State string must be entered.";
-      throw IException(IException::User, message, _FILEINFO_);
-    }
-
     string modelState = model->getModelState();
 
     // Making copies of original Pvl Groups from input label so they can be restored if csminit fails.
@@ -209,8 +209,6 @@ namespace Isis {
       originalCsmInfo = cube->group("CsmInfo");
     }
 
-    // If the user doesn't specify a target name, then we will still need
-    // something on the label for the Target & ShapeModel so add Unknown
     if (!cube->hasGroup("Instrument")) {
       cube->putGroup(PvlGroup("Instrument"));
     }
@@ -218,12 +216,12 @@ namespace Isis {
     if (ui.WasEntered("TARGETNAME")) {
       instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
     }
-    else {
-      if (!instrumentGroup.hasKeyword("TargetName")) {
-        PvlKeyword targetKey("TargetName", "Unknown");
-        targetKey.addComment("Radii will come from the CSM model");
-        instrumentGroup.addKeyword(targetKey, Pvl::Replace);
-      }
+    // If the user doesn't specify a target name, then we will still need
+    // something on the label for the Target & ShapeModel so add Unknown
+    else if (!instrumentGroup.hasKeyword("TargetName")) {
+      PvlKeyword targetKey("TargetName", "Unknown");
+      targetKey.addComment("Radii will come from the CSM model");
+      instrumentGroup.addKeyword(targetKey, Pvl::Replace);
     }
 
     if (!instrumentGroup.hasKeyword("InstrumentId")) {

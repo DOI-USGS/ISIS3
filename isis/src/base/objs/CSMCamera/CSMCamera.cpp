@@ -110,15 +110,12 @@ namespace Isis {
 
   /**
    * Set the image sample and line for the Camera Model and then compute the
-   * cooresponding image time, look vector, and ground point.
+   * corresponding image time, look vector, and ground point.
    *
    * @param sample The image sample coordinate
    * @param line The image line coordinate
    *
    * @returns @b bool If the image coordinate was set successfully
-   *
-   * @todo Change the locus ground intersection to iteratively approximate a curved
-   *       locus instead of assuming a straight locus.
    */
   bool CSMCamera::SetImage(const double sample, const double line) {
     csm::ImageCoord imagePt;
@@ -166,7 +163,6 @@ namespace Isis {
     m_lookB[2] = locusVec[2];
     m_newLookB = true;
     p_pointComputed = true;
-    // TODO do we need to apply the alpha cube?
     p_childSample = sample;
     p_childLine = line;
     if (!m_et) {
@@ -179,7 +175,7 @@ namespace Isis {
 
   /**
    * Set the latitude and longitude for the Camera Model and then compute the
-   * cooresponding image time, look vector, and image coordinate. The ground
+   * corresponding image time, look vector, and image coordinate. The ground
    * point radius will be computed from the shape model.
    *
    * @param latitude The ground point latitude in degrees
@@ -196,7 +192,7 @@ namespace Isis {
 
 /**
    * Set the latitude, longitude, and radius for the Camera Model and then compute the
-   * cooresponding image time, look vector, and image coordinate.
+   * corresponding image time, look vector, and image coordinate.
    *
    * @param latitude The ground point latitude in degrees
    * @param longitude The ground point longitude in positive East, 360 domain degrees
@@ -214,7 +210,7 @@ namespace Isis {
 
   /**
    * Set the latitude and longitude for the Camera Model and then compute the
-   * cooresponding image time, look vector, and image coordinate. The ground
+   * corresponding image time, look vector, and image coordinate. The ground
    * point radius will be computed from the shape model.
    *
    * @param latitude The ground point latitude
@@ -245,7 +241,7 @@ namespace Isis {
 
   /**
    * Set the ground point for the Camera Model and then compute the
-   * cooresponding image time, look vector, and image coordinate.
+   * corresponding image time, look vector, and image coordinate.
    *
    * @param surfacePt The ground point
    *
@@ -286,7 +282,6 @@ namespace Isis {
     double line, sample;
     csmToIsisPixel(imagePt, line, sample);
     csm::EcefLocus imageLocus = m_model->imageToRemoteImagingLocus(imagePt);
-    // TODO should this be in meters or kilometers?
     std::vector<double> sensorPosition = {imageLocus.point.x, imageLocus.point.y, imageLocus.point.z};
     shape->clearSurfacePoint();
     shape->intersectSurface(surfacePt,
@@ -469,10 +464,6 @@ namespace Isis {
    * currently set time.
    *
    * @returns @b std::vector<double> The (X, Y, Z) position in kilometers.
-   *
-   * @todo move this function into Spice and replace calls to manually rotate
-   *       the sensor position into the body fixed frame with this so that
-   *       we do not have to duplicate as many functions in here.
    */
   std::vector<double> CSMCamera::sensorPositionBodyFixed() const {
     return sensorPositionBodyFixed(parentLine(), parentSample());
@@ -487,10 +478,6 @@ namespace Isis {
    * @param sample the sample of the image coordinate
    *
    * @returns @b std::vector<double> The (X, Y, Z) position in kilometers.
-   *
-   * @todo move this function into Spice and replace calls to manually rotate
-   *       the sensor position into the body fixed frame with this so that
-   *       we do not have to duplicate as many functions in here.
    */
   std::vector<double> CSMCamera::sensorPositionBodyFixed(double line, double sample) const {
     csm::ImageCoord imagePt;
@@ -626,8 +613,6 @@ namespace Isis {
 
     // Target needs to be able to access the camera to do things like
     // compute resolution
-    // TODO find a better way to do this. It would better if we could set this up
-    //      inside of the Target constructor so that it always has a Spice object.
     target->setSpice(this);
 
     if (m_target) {

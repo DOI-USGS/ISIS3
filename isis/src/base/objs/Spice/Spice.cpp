@@ -78,7 +78,6 @@ namespace Isis {
   // TODO: DOCUMENT EVERYTHING
   Spice::Spice(Cube &cube) {
     Pvl &lab = *cube.label();
-    // TODO: update to check to see if it has a state string
     if (cube.hasBlob("String", "CSMState")) {
       csmInit(cube, lab);
     }
@@ -90,18 +89,6 @@ namespace Isis {
     }
   }
 
-
-  /**
-   * Constructs a Spice object.
-   *
-   * @param lab  Pvl labels.
-   * @param noTables Indicates the use of tables.
-   */
-// NO LONGER USED
-//  Spice::Spice(Cube &cube, bool noTables) {
-//    init(*cube.label(), noTables);
-//  }
-//
 
   /**
    * Constructs a Spice Object

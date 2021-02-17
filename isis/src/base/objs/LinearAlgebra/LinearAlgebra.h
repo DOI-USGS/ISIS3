@@ -71,6 +71,7 @@ namespace Isis {
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
    *   @history 2017-12-12 Jeannie Backer - Added SymmetricMatrix typedef.
+   *   @history 2021-02-17 Jesse Mapel - Added pseudoinverse method.
    *
    *
    *   @todo document methods (a) add naif routine names to documentation where appropriate,

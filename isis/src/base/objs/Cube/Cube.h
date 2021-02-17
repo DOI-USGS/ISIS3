@@ -171,6 +171,7 @@ namespace Isis {
    *                           an IsisPreference file cannot be found. Fixes #5145.
    *   @history 2018-11-16 Jesse Mapel - Made several methods virtual for mocking.
    *   @history 2019-06-15 Kristin Berry - Added latLonRange method to return the valid lat/lon rage of the cube. The values in the mapping group are not sufficiently accurate for some purposes.
+   *   @history 2021-02-17 Jesse Mapel - Added hasBlob method to check for any type of BLOB.
    */
   class Cube {
     public:
