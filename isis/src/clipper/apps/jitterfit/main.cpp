@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <iostream>
@@ -35,17 +43,17 @@ struct RegistrationData {
 };
 
 void IsisMain() {
-  
+
   bool registrationFileSpecified = false;
-  
+
   UserInterface &ui = Application::GetUserInterface();
-  
+
   Cube jitterCube;
   jitterCube.open(ui.GetFileName("FROM"), "rw");
-  
+
   Cube checkCube;
   checkCube.open(ui.GetFileName("FROM2"), "r");
-  
+
   Pvl defFile;
   defFile.read(ui.GetFileName("DEFFILE"));
   AutoReg *ar = AutoRegFactory::Create(defFile);
@@ -69,35 +77,35 @@ void IsisMain() {
   // ???? Question: Why use a file name here? Can't Table/blob read from an open Cube?
   Table mainReadouts(QString("Normalized Main Readout Line Times"), jitterCube.fileName());
   Table checklineReadouts(QString("Normalized Checkline Readout Line Times"), checkCube.fileName());
-  
-  // Register each check line to the area near the corrisponding main image line using the 
+
+  // Register each check line to the area near the corrisponding main image line using the
   // registration definition file
   QList<RegistrationData> registrationData;
   for (int k = 0; k < checkCube.lineCount(); k++) {
-    
+
     int checklineLine = checklineReadouts[k][0];
     int mainLine = mainReadouts[checklineLine][0];
-    
+
     int sample = (int)(pointSpacing / 2.0 + 0.5);
-    
-    ar->PatternChip()->TackCube(sample, k + 1); 
+
+    ar->PatternChip()->TackCube(sample, k + 1);
     ar->PatternChip()->Load(checkCube);
-    
+
     ar->SearchChip()->TackCube(sample, checklineLine * scale); // The checkline will correspond to the line number that the checkCube was taken at
     ar->SearchChip()->Load(jitterCube);
-    
+
     ar->Register();
-    
+
     if (registrationFileSpecified) {
-      outputFile << checklineLine << "," << sample/scale << "," << 
-                    std::setprecision(14) << double(checklineReadouts[k][1]) << "," << 
-                    ar->CubeLine()/scale << "," << ar->CubeSample()/scale << ","  << 
-                    double(mainReadouts[mainLine][1]) << "," << 
-                    checklineLine - ar->CubeLine()/scale << "," << 
-                    sample/scale - ar->CubeSample()/scale << "," << 
+      outputFile << checklineLine << "," << sample/scale << "," <<
+                    std::setprecision(14) << double(checklineReadouts[k][1]) << "," <<
+                    ar->CubeLine()/scale << "," << ar->CubeSample()/scale << ","  <<
+                    double(mainReadouts[mainLine][1]) << "," <<
+                    checklineLine - ar->CubeLine()/scale << "," <<
+                    sample/scale - ar->CubeSample()/scale << "," <<
                     ar->GoodnessOfFit() << "," << ar->Success() << endl;
     }
-    
+
     RegistrationData checkLineRegistration;
     checkLineRegistration.checkLine = checklineLine;
     checkLineRegistration.checkSample = sample/scale;
@@ -148,12 +156,12 @@ void IsisMain() {
     if (checkLineRow.goodness >= tolerance) {
 
       /* Normalization Equation
-       * 
-       * a = min of scale 
+       *
+       * a = min of scale
        * b = max of scale
-       * 
-       * ((b - a)(x - min(x)) / (max(x) - min(x))) + a 
-       * 
+       *
+       * ((b - a)(x - min(x)) / (max(x) - min(x))) + a
+       *
        * We're normalizing from -1 to 1 so the equation below is simplified
        */
 
@@ -175,9 +183,9 @@ void IsisMain() {
   outputCoefficientFile.open(coefficientTo.toLatin1().data());
   outputCoefficientFile << "# Line, Sample" << endl;
 
-  PvlKeyword &jitterLineCoefficients = 
+  PvlKeyword &jitterLineCoefficients =
       jitterCube.label()->findKeyword("JitterLineCoefficients", PvlObject::Traverse);
-  PvlKeyword &jitterSampleCoefficients = 
+  PvlKeyword &jitterSampleCoefficients =
       jitterCube.label()->findKeyword("JitterSampleCoefficients", PvlObject::Traverse);
 
   for (int i = 0; i < degree; i++) {
@@ -216,12 +224,12 @@ void IsisMain() {
         solvedSample = solvedSample + sampleFunction->Coefficient(k) * pow(checkLineRow.matchedTime, k+1);
       }
 
-      outputResidualFile << std::setprecision(14) << checkLineRow.matchedLine << "," << 
+      outputResidualFile << std::setprecision(14) << checkLineRow.matchedLine << "," <<
                             std::setprecision(14) << checkLineRow.checkLine - solvedLine << "," <<
-                            std::setprecision(14) << lsqLine.Residual(i) << "," << 
-                            std::setprecision(14) << checkLineRow.matchedSample << "," << 
-                            std::setprecision(14) << checkLineRow.checkSample - solvedSample << "," << 
-                            std::setprecision(14) << lsqSample.Residual(i) << "," << 
+                            std::setprecision(14) << lsqLine.Residual(i) << "," <<
+                            std::setprecision(14) << checkLineRow.matchedSample << "," <<
+                            std::setprecision(14) << checkLineRow.checkSample - solvedSample << "," <<
+                            std::setprecision(14) << lsqSample.Residual(i) << "," <<
                             std::setprecision(14) << checkLineRow.matchedTime << endl;
     }
 

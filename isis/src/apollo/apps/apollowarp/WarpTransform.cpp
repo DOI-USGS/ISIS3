@@ -1,18 +1,26 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <iostream>
 
 #include "WarpTransform.h"
 
 namespace Isis {
-  WarpTransform::WarpTransform(BasisFunction &basisLine, 
-       BasisFunction &basisSamp, bool weighted, std::vector<double> &inputLine, 
+  WarpTransform::WarpTransform(BasisFunction &basisLine,
+       BasisFunction &basisSamp, bool weighted, std::vector<double> &inputLine,
        std::vector<double> &inputSample, std::vector<double> &outputLine,
-       std::vector<double> &outputSample, int inputLines, int inputSamples, 
+       std::vector<double> &outputSample, int inputLines, int inputSamples,
        int outputLines, int outputSamples) {
-       
+
     p_outputLines = outputLines;
     p_outputSamples = outputSamples;
-  
+
     // Create the equations for the control points using a least squares fit
     p_lsqInputSamp = new LeastSquares(basisSamp);
     p_lsqInputLine = new LeastSquares(basisLine);
@@ -24,23 +32,23 @@ namespace Isis {
       p_lsqInputLine->AddKnown(known,inputLine[i]);
       p_lsqInputSamp->AddKnown(known,inputSample[i]);
     }
-  
+
     p_lsqInputLine->Solve();
     p_lsqInputSamp->Solve();
-  
+
     p_weighted = weighted;
     if (weighted) {
       p_outputLine = outputLine;
       p_outputSample = outputSample;
     }
   }
-  
+
   WarpTransform::~WarpTransform() {
     if (p_lsqInputLine != NULL) delete p_lsqInputLine;
     if (p_lsqInputSamp != NULL) delete p_lsqInputSamp;
   }
-  
-   
+
+
   // Convert the requested output samp/line to an input samp/line
   bool WarpTransform::Xform (double &inSample, double &inLine,
                         const double outSample, const double outLine) {
@@ -59,7 +67,7 @@ namespace Isis {
       p_lsqInputLine->Solve();
       p_lsqInputSamp->Solve();
     }
-  
+
     static std::vector<double> vars;
     if (vars.size() != 2) vars.resize(2);
     vars[0] = outLine;
@@ -68,7 +76,7 @@ namespace Isis {
     inSample = p_lsqInputSamp->Evaluate(vars);
     return true;
   }
-  
+
   PvlGroup WarpTransform::Residuals () {
     PvlGroup errs("Residuals");
     for (int i=0; i<p_lsqInputLine->Knowns(); i++) {
