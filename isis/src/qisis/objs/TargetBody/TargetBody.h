@@ -1,28 +1,13 @@
 #ifndef TargetBody_h
 #define TargetBody_h
 
-/**
- * @file
- * $Revision: 1.20 $
- * $Date: 2009/10/15 01:35:17 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <vector>
 
@@ -60,7 +45,7 @@ namespace Isis {
    * This class represents a target body in a project-based GUI interface. It encapsulates ideas
    *   about a target such as it's display name, how it should be viewed, where it is on disk, etc.
    *
-   *  
+   *
    * @ingroup qisis
    *
    * @author 2015-06-08 Ken Edmundson
@@ -72,10 +57,10 @@ namespace Isis {
    *   @history 2016-06-13 Tyler Wilson - Added new documentation and corrected
    *                          formatting to be consisten with ISIS3 coding standards.
    *                          Fixes #3997 and #4018.
-   *   @hitsory 2018-07-12 Summer Stapleton - Added m_targetName and targetName() in order to 
-   *                           collect the TargetName from the original cube label for 
+   *   @hitsory 2018-07-12 Summer Stapleton - Added m_targetName and targetName() in order to
+   *                           collect the TargetName from the original cube label for
    *                           comparisons related to image imports in ipce. References #5460.
-   *  
+   *
    */
   class TargetBody : public QObject {
 
@@ -171,7 +156,7 @@ namespace Isis {
        *   when saving to disk).
        */
       QUuid *m_id;
-      
+
       /**
        * The TargetName as it appears in the original cube.
        */
