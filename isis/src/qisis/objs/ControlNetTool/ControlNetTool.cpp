@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ControlNetTool.h"
 
 #include <sstream>
@@ -38,7 +46,7 @@ using namespace std;
 namespace Isis {
   /**
    * ControlNet tool - Handles mouse button actions and drawing control points on viewports in the
-   * CubeDnView for the ipce application. 
+   * CubeDnView for the ipce application.
    *
    * @param parent Pointer to the parent widget for the ControlNet tool
    *
@@ -373,10 +381,10 @@ namespace Isis {
 
   /**
    * Draw all Fixed or Constrained points on the ground source viewport
-   *  
+   *
    * @param vp Viewport whose measurements will be drawn
-   * @param painter The QPainter used to draw crosshair 
-   * @param groundMap The UniversalGroundMap for the Cube associated with this viewport 
+   * @param painter The QPainter used to draw crosshair
+   * @param groundMap The UniversalGroundMap for the Cube associated with this viewport
    *
    */
   void ControlNetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter,

@@ -1,6 +1,14 @@
 #ifndef PhotometricFunction_h
 #define PhotometricFunction_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
@@ -13,14 +21,14 @@
 namespace Isis {
 
   /**
-   * @brief Implement templatized MIN fumnction 
+   * @brief Implement templatized MIN fumnction
    *
    * Returns mininum value of both inputs of a specific type
    *
    * @param A first constant value of a type for comparison
    * @param B second constant value of a type for comparison
-   * 
-   * @return @b T type value 
+   *
+   * @return @b T type value
    *
    */
   template<typename T> inline T MIN( const T &A, const T &B ) {
@@ -32,15 +40,15 @@ namespace Isis {
     }
   }
 
-  /** 
-   * @brief Implement templatized MAX fumnction 
+  /**
+   * @brief Implement templatized MAX fumnction
    *
    * Returns maximum value of both inputs of a specifific type
    *
    * @param A first constant value of a type for comparison
    * @param B second constant value of a type for comparison
    *
-   * @return @b T type value 
+   * @return @b T type value
    *
    */
   template<typename T> inline T MAX( const T &A, const T &B ) {

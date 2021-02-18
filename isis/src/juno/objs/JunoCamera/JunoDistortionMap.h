@@ -1,33 +1,19 @@
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2008/02/21 16:04:33 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
 #ifndef JunoDistortionMap_h
 #define JunoDistortionMap_h
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <vector>
 #include "CameraDistortionMap.h"
 
 namespace Isis {
-  /** Distort/undistort focal plane coordinates for Juno's JunoCam camera. 
+  /** Distort/undistort focal plane coordinates for Juno's JunoCam camera.
    *
    * Creates a map for adding/removing optical distortions
    * from the focal plane of a camera.
@@ -38,8 +24,8 @@ namespace Isis {
    *
    * @author 2017-08-04 Jeannie Backer and Kristin Berry
    *
-   * @internal 
-   *   @history 2017-08-04 Jeannie Backer and  Kristin Berry - Original version. 
+   * @internal
+   *   @history 2017-08-04 Jeannie Backer and  Kristin Berry - Original version.
    *
    */
   class JunoDistortionMap : public CameraDistortionMap {

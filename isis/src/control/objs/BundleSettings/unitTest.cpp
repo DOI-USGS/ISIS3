@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QByteArray>
 #include <QDataStream>
 #include <QDebug>
@@ -49,8 +57,8 @@ void printXml(const T &);
   *                           Fixes #4797.
   *   @history 2018-05-24 Ken Edmundson - Updated truth data to indicate default value for
   *                                       m_createInverseMatrix was changed from true to false.
-  *   @history 2018-06-04 Debbie A. Cook - (added to BundleXYZ branch on 2017-06-25) Updated to 
-  *                           reflect added argument for control pointcoordinate type.  References 
+  *   @history 2018-06-04 Debbie A. Cook - (added to BundleXYZ branch on 2017-06-25) Updated to
+  *                           reflect added argument for control pointcoordinate type.  References
   *                           #4649 and #501.
   *
   *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
@@ -373,4 +381,3 @@ void printXml(const T &printable) {
   output.remove(QRegExp("<id>[^<]*</id>"));
   qDebug().noquote() << output << endl << endl;
 }
-

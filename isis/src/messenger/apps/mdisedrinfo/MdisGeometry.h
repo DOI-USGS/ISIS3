@@ -1,27 +1,13 @@
 #ifndef MdisGeometry_h
 #define MdisGeometry_h
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2009/09/19 00:12:10 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <string>
 #include <vector>
@@ -64,17 +50,17 @@ namespace Isis {
    *                           Sky (it was previously only computed when the
    *                           center reference pixel intersected the target).
    *   @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in MdisGeometry
-   *   @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
+   *   @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to
    *                           ensure it is restricted to the 0-360 degree domain.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards.  References #972..
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References  
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References
    *                           #775 and #1114.
    *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
    *   @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF
    *                           errors were signaled. References #2248.
-   *   @history 2016-05-10 Jeannie Backer - Replaced call to NAIF routine bodn2c with call to static 
+   *   @history 2016-05-10 Jeannie Backer - Replaced call to NAIF routine bodn2c with call to static
    *                           method Isis::Target::lookupNaifBodyCode. Reference #3934
    */
   class MdisGeometry {
@@ -197,4 +183,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

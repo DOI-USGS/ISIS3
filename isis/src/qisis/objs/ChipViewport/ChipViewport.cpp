@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ChipViewport.h"
@@ -136,7 +144,7 @@ namespace Isis {
    *
    * @param newStretch Pointer to the new stretch to apply
    * @param cvp Pointer to the cube viewport to apply the stretch to
-   */ 
+   */
   void ChipViewport::stretchFromCubeViewport(Stretch *newStretch, CubeViewport *cvp) {
 
     ASSERT(cvp != NULL);
@@ -168,8 +176,8 @@ namespace Isis {
 
   /**
    * Locks or unlocks the stretch on the chip viewport during transformations (zoom, pan, etc.)
-   *  
-   * @param newStatus Non-zero locks the stretch 
+   *
+   * @param newStatus Non-zero locks the stretch
    */
   void ChipViewport::changeStretchLock(int newStatus) {
     if (newStatus == 0)
@@ -326,7 +334,7 @@ namespace Isis {
   }
 
 
-  /**  
+  /**
    * Load with info from given ChipViewport
    *
    * @param newView The chip viewport to load from
@@ -385,7 +393,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Pan left
    */
   void ChipViewport::panLeft() {
@@ -604,8 +612,8 @@ namespace Isis {
    * Slot to geom chip (apply geometry transformation)
    *
    * @param matchChip The matching chip for the geometry
-   * @param matchChipCube The matching chip's cube for the geometry 
-   * 
+   * @param matchChipCube The matching chip's cube for the geometry
+   *
    * @internal
    *   @history 2010-06-16 Jeannie Walldren - Catch possible iException from Chip's
    *                           Load() method and display in QMessageBox
@@ -633,7 +641,7 @@ namespace Isis {
 
   /**
    * Slot to un-geom chip (revert geometry transformation)
-   * 
+   *
    * @internal
    *   @history 2010-06-16 Jeannie Walldren - Catch possible iException from Chip's
    *                           Load() method and display in QMessageBox

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QDebug>
@@ -41,8 +49,8 @@ void IsisMain() {
 
   instId = instId.simplified().trimmed();
   missionId = missionId.simplified().trimmed();
-  if (missionId.compare("ROSETTA", Qt::CaseInsensitive) != 0 
-     && instId.compare("OSINAC", Qt::CaseInsensitive) != 0 
+  if (missionId.compare("ROSETTA", Qt::CaseInsensitive) != 0
+     && instId.compare("OSINAC", Qt::CaseInsensitive) != 0
      && instId.compare("OSIWAC", Qt::CaseInsensitive) != 0) {
     QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                   "a Rosetta OSIRIS Wide Angle Camera (WAC) or Narrow Angle Camera (NAC) file.";
@@ -96,7 +104,7 @@ void IsisMain() {
 
   // Set the BandBin filter name, center, and width values based on the
   // FilterNumber.  Note OSIRIS has 2 filter wheels, so information
-  // must be looked up and stored for both.  
+  // must be looked up and stored for both.
   PvlGroup &bbGrp(outLabel.findGroup("BandBin", Pvl::Traverse));
   PvlGroup groupWithFilterInfo=pdsLabel.findGroup("SR_MECHANISM_STATUS");
   QString combFilterName = groupWithFilterInfo["FILTER_NAME"];
@@ -107,24 +115,24 @@ void IsisMain() {
   vector<double> filterWidths(2,0.0);
   vector<double> filterCenters(2,0.0);
 
-  // OSIRIS NAC and WAC have different filters 
+  // OSIRIS NAC and WAC have different filters
   for (int i = 0; i < filterNames.size(); i++) {
     // Translate the Instrument group
     try {
       transFile = transDir + "RosettaOsirisFilters.trn";
       PvlTranslationTable filterTable(transFile.expanded());
-      filterCenters[i] = toDouble(filterTable.Translate("FilterCenter_" + instId, 
+      filterCenters[i] = toDouble(filterTable.Translate("FilterCenter_" + instId,
                                                         filterNames[i]));
-      filterWidths[i] = toDouble(filterTable.Translate("FilterWidth_" + instId, 
+      filterWidths[i] = toDouble(filterTable.Translate("FilterWidth_" + instId,
                                                        filterNames[i]));
     }
     catch (IException &e) {
-      QString msg = "Input file [" + inFile.expanded() 
+      QString msg = "Input file [" + inFile.expanded()
                     + "] appears invalid. "
-                    + "FilterName [" 
-                    + filterNames[i] 
+                    + "FilterName ["
+                    + filterNames[i]
                     + "] for instrument ["
-                    + instId 
+                    + instId
                     + "] not found in ["
                     + transFile.expanded() + "].";
       throw IException(e, IException::Io, msg, _FILEINFO_);

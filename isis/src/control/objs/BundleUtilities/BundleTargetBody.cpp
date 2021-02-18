@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleTargetBody.h"
 
 #include <QDebug>
@@ -35,7 +43,7 @@ namespace Isis {
 
   /**
    * Creates an BundleTargetBody object from a target.
-   * 
+   *
    * @param target A pointer to the target body that this object will represent.
    */
   BundleTargetBody::BundleTargetBody(Target *target) {
@@ -62,13 +70,13 @@ namespace Isis {
 
     m_raPole = target->poleRaCoefs();
     m_decPole = target->poleDecCoefs();
-    m_pm = target->pmCoefs();    
+    m_pm = target->pmCoefs();
   }
 
 
   /**
    * Copy constructor. Makes a copy of another BundleTargetBody.
-   * 
+   *
    * @param src The BundleTargetBody to copy from.
    */
   BundleTargetBody::BundleTargetBody(const BundleTargetBody &src) {
@@ -91,9 +99,9 @@ namespace Isis {
     m_pm = src.m_pm;
 
     m_parameterSolveCodes = src.m_parameterSolveCodes;
-    
+
     m_parameterNamesList = src.m_parameterNamesList;
-    
+
     m_weights = src.m_weights;
     m_corrections = src.m_corrections;
     m_solution = src.m_solution;
@@ -135,27 +143,27 @@ namespace Isis {
       m_pm = src.m_pm;
 
       m_parameterSolveCodes = src.m_parameterSolveCodes;
-      
+
       m_parameterNamesList = src.m_parameterNamesList;
-      
+
       m_weights = src.m_weights;
       m_corrections = src.m_corrections;
       m_solution = src.m_solution;
       m_aprioriSigmas = src.m_aprioriSigmas;
       m_adjustedSigmas = src.m_adjustedSigmas;
     }
-    
+
     return *this;
   }
 
 
   /**
    * @brief Sets the solve settings for the target body.
-   * 
+   *
    * Sets the solve settings for the target body's right ascension, declination,
    * prime meridian, and radius based on the input values.
    * Parameter vectors, sigma vectors and the weight vector will be filled in the following order:
-   * 
+   *
    * pole right ascension,
    * pole right ascension velocity,
    * pole right ascension acceleration,
@@ -169,16 +177,16 @@ namespace Isis {
    * triaxial radius B,
    * triaxial radius C,
    * mean radius.
-   * 
+   *
    * Any parameters that are not being solved for (based on targetParameterSolveCodes)
    * will be omitted.  For example, if solving for pole right ascension, pole declination,
    * prime meridian, and mean radius; the vectors would be:
-   * 
+   *
    * pole right ascension,
    * pole declination,
    * prime meridian,
    * mean radius.
-   * 
+   *
    * @param targetParameterSolveCodes A set of TargetSolveCodes indicating what to solve for.
    * @param aprioriPoleRA The apriori pole right ascension angle.
    * @param sigmaPoleRA The apriori pole right ascension angle sigma.
@@ -201,7 +209,7 @@ namespace Isis {
    * @param sigmaRadiusC The apriori C radius distance sigma.
    * @param aprioriMeanRadius The apriori mean radius distance.
    * @param sigmaMeanRadius the apriori mean radius distance sigma.
-   * 
+   *
    * @see readFromPvl(PvlObject &tbObject)
    */
   void BundleTargetBody::setSolveSettings(std::set<int> targetParameterSolveCodes,
@@ -421,7 +429,7 @@ namespace Isis {
 
   /**
    * If the pole right ascension angle will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleRA() {
@@ -433,7 +441,7 @@ namespace Isis {
 
   /**
    * If the pole right ascension velocity will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleRAVelocity() {
@@ -445,7 +453,7 @@ namespace Isis {
 
   /**
    * If the pole right ascension acceleration will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleRAAcceleration() {
@@ -457,7 +465,7 @@ namespace Isis {
 
   /**
    * If the pole declination angle will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleDec() {
@@ -469,7 +477,7 @@ namespace Isis {
 
   /**
    * If the pole declination velocity will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleDecVelocity() {
@@ -481,7 +489,7 @@ namespace Isis {
 
   /**
    * If the pole declination acceleration will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePoleDecAcceleration() {
@@ -493,7 +501,7 @@ namespace Isis {
 
   /**
    * If the prime meridian angle will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePM() {
@@ -505,7 +513,7 @@ namespace Isis {
 
   /**
    * If the prime meridian velocity will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePMVelocity() {
@@ -517,7 +525,7 @@ namespace Isis {
 
   /**
    * If the prime meridian acceleration will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solvePMAcceleration() {
@@ -529,7 +537,7 @@ namespace Isis {
 
   /**
    * If the triaxial radii will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solveTriaxialRadii() {
@@ -543,7 +551,7 @@ namespace Isis {
 
   /**
    * If the mean radius will be solved for with this target body.
-   * 
+   *
    * @return @b bool If it will be solved for.
    */
   bool BundleTargetBody::solveMeanRadius() {
@@ -555,18 +563,18 @@ namespace Isis {
 
   /**
    * @brief Applies a vector of corrections to the parameters for the target body.
-   * 
+   *
    * Applies a vector of corrections to the internal parameters for the
    * target body and records the corrections in the internal corrections vector.
    * The corrections vector should be ordered the same as the parameter vector descriped
    * in setSolveSettings.
-   * 
+   *
    * @param corrections The vector containing correction values.
-   * 
+   *
    * @throws IException::Programmer "In BundleTargetBody::applyParameterCorrections:
    *                                 correction and m_targetParameter vectors sizes don't match."
    * @throws IException::Unknown "Unable to apply parameter corrections to BundleTargetBody."
-   * 
+   *
    * @see setSolveSettings
    */
   void BundleTargetBody::applyParameterCorrections(
@@ -583,7 +591,7 @@ namespace Isis {
 
     try {
       int n = 0;
-      for (std::set<int>::iterator it=m_parameterSolveCodes.begin(); 
+      for (std::set<int>::iterator it=m_parameterSolveCodes.begin();
            it!=m_parameterSolveCodes.end(); ++it) {
         switch (*it) {
           case PoleRA:
@@ -663,11 +671,11 @@ namespace Isis {
 
   /**
    * Converts a QString to a TargetRadiiSolveMethod.
-   * 
+   *
    * @param method The Qstring of a solve method.
-   * 
+   *
    * @return @b TargetRadiiSolveMethod The converted solve method.
-   * 
+   *
    * @throws IException::Programmer "Unknown target body radius solution method"
    */
   BundleTargetBody::TargetRadiiSolveMethod BundleTargetBody::stringToTargetRadiiOption(
@@ -691,11 +699,11 @@ namespace Isis {
 
   /**
    * Converts a TargetRadiiSolveMethod to a QString
-   * 
+   *
    * @param method The TargetRadiiSolveMethod to convert.
-   * 
+   *
    * @return @b QString The solve method as a QString.
-   * 
+   *
    * @throws IException::Programmer "Unknown target body radius solve method enum"
    */
   QString BundleTargetBody::targetRadiiOptionToString(TargetRadiiSolveMethod method) {
@@ -714,9 +722,9 @@ namespace Isis {
   /**
    * Returns the vector of parameter weights.
    * See setSolveSettings for how the vector is ordered.
-   * 
+   *
    * @return @b vector<double>& The vector of parameter weights.
-   * 
+   *
    * @see setSolveSettings
    */
   LinearAlgebra::Vector &BundleTargetBody::parameterWeights() {
@@ -727,9 +735,9 @@ namespace Isis {
   /**
    * Returns the vector of corrections applied to the parameters.
    * See setSolveSettings for how the vector is ordered.
-   * 
+   *
    * @return @b vector<double>& The vector of parameter corrections.
-   * 
+   *
    * @see setSolveSettings
    */
   LinearAlgebra::Vector &BundleTargetBody::parameterCorrections() {
@@ -740,9 +748,9 @@ namespace Isis {
   /**
    * Returns the vector of parameters solution.
    * See setSolveSettings for how the vector is ordered.
-   * 
+   *
    * @return @b vector<double>& The vector of parameter solution.
-   * 
+   *
    * @see setSolveSettings
    */
   LinearAlgebra::Vector &BundleTargetBody::parameterSolution() {
@@ -753,9 +761,9 @@ namespace Isis {
   /**
    * Returns the vector of apriori parameters sigmas.
    * See setSolveSettings for how the vector is ordered.
-   * 
+   *
    * @return @b vector<double>& The vector of apriori parameter sigmas.
-   * 
+   *
    * @see setSolveSettings
    */
   LinearAlgebra::Vector &BundleTargetBody::aprioriSigmas() {
@@ -766,9 +774,9 @@ namespace Isis {
   /**
    * Returns the vector of adjusted parameters sigmas.
    * See setSolveSettings for how the vector is ordered.
-   * 
+   *
    * @return @b vector<double>& The vector of adjusted parameter sigmas.
-   * 
+   *
    * @see setSolveSettings
    */
   LinearAlgebra::Vector &BundleTargetBody::adjustedSigmas() {
@@ -801,15 +809,15 @@ namespace Isis {
 
   /**
    * @brief Returns the number of radius parameters being solved for.
-   * 
+   *
    * Returns the number of radius parameters being solved for
    * which is based on the target radius solve method:
    * None -> 0
    * Mean -> 1
    * All  -> 3
-   * 
+   *
    * @return @b int The number of radius parameters being solved for.
-   * 
+   *
    * @see TargetRadiiSolveMethod
    */
   int BundleTargetBody::numberRadiusParameters() {
@@ -823,7 +831,7 @@ namespace Isis {
 
   /**
    * Returns the total number of parameters being solved for.
-   * 
+   *
    * @return @b int The number of parameters being solved for.
    */
   int BundleTargetBody::numberParameters() {
@@ -833,15 +841,15 @@ namespace Isis {
 
   /**
    * @brief Returns the coefficients of the right ascension polynomial.
-   * 
+   *
    * Returns The vector of right ascension polynomial coefficients ordered as:
-   * 
+   *
    * angle,
    * velocity,
    * acceleration.
-   * 
+   *
    * Only coefficients that are being solved for will be included.
-   * 
+   *
    * @return @b vector<Angle> The right ascension polynomial coefficients.
    */
   std::vector<Angle> BundleTargetBody::poleRaCoefs() {
@@ -851,15 +859,15 @@ namespace Isis {
 
   /**
    * @brief Returns the coefficients of the declination polynomial.
-   * 
+   *
    * Returns The vector of declination polynomial coefficients ordered as:
-   * 
+   *
    * angle,
    * velocity,
    * acceleration.
-   * 
+   *
    * Only coefficients that are being solved for will be included.
-   * 
+   *
    * @return @b vector<Angle> The declination polynomial coefficients.
    */
   std::vector<Angle> BundleTargetBody::poleDecCoefs() {
@@ -869,15 +877,15 @@ namespace Isis {
 
   /**
    * @brief Returns the coefficients of the prime meridian polynomial.
-   * 
+   *
    * Returns The vector of prime meridian polynomial coefficients ordered as:
-   * 
+   *
    * angle,
    * velocity,
    * acceleration.
-   * 
+   *
    * Only coefficients that are being solved for will be included.
-   * 
+   *
    * @return @b vector<Angle> The prime meridian polynomial coefficients.
    */
   std::vector<Angle> BundleTargetBody::pmCoefs() {
@@ -887,11 +895,11 @@ namespace Isis {
 
   /**
    * @brief Returns the radius values.
-   * 
+   *
    * Returns the vector of radius values formatted as RadiusA, RadiusB, RadiusC.
-   * 
+   *
    * @return @b vector<Distance> The vector of radius values.
-   * 
+   *
    * @throws IException::Programmer "The triaxial radii can only be accessed
    *                                 when solving for triaxial radii."
    */
@@ -906,9 +914,9 @@ namespace Isis {
 
   /**
    * Returns the mean radius.
-   * 
+   *
    * @return @b Distance The mean radius.
-   * 
+   *
    * @throws IException::Programmer "The mean radius can only be accessed
    *                                 when solving for mean radius."
    */
@@ -923,13 +931,13 @@ namespace Isis {
 
   /**
    * @brief Calculates and returns the weighted sum of the squares of the corrections.
-   * 
+   *
    * Calculates and returns the weighted sum of the squares of the corrections
    * computed by V(T)*P*V where:
    * V is the vector of corrections,
    * P is the weight matrix,
    * V(T) is the transpose of V.
-   * 
+   *
    * @return @b double The weighted sum of the squares of the corrections (vtpv).
    */
   double BundleTargetBody::vtpv() {
@@ -950,9 +958,9 @@ namespace Isis {
 
   /**
    * Formats and returns the parameter values as a QString.
-   * 
+   *
    * @param errorPropagation If adjusted sigmas should be output.
-   * 
+   *
    * @return @b QString A formatted QString containing the parameter values.
    */
   QString BundleTargetBody::formatBundleOutputString(bool errorPropagation) {
@@ -1100,9 +1108,9 @@ namespace Isis {
   /**
    * Returns a list of all the parameters being solved for as QStrings.
    * This should only be called after formatBundleOutputString.
-   * 
+   *
    * @return @b QStringList A list of the parameters being solved for.
-   * 
+   *
    * @see formatBundleOutputString
    */
   QStringList BundleTargetBody::parameterList() {
@@ -1115,11 +1123,11 @@ namespace Isis {
    *
    * specifically for standard jigsaw interface, not the
    * Integrated Photogrammetric Control Environment (IPCE)
-   * 
+   *
    * @param tbObject The Pvl file to read from.
-   * 
+   *
    * @return @b bool If the solve parameters were successfuly set.
-   * 
+   *
    * @throws IException::User "Ra must be given as none, position, velocity, or acceleration"
    * @throws IException::User "Dec must be given as none, position, velocity, or acceleration"
    * @throws IException::User "Pm must be given as none, position, velocity, or acceleration"
@@ -1166,7 +1174,7 @@ namespace Isis {
    * @throws IException::User "MeanRadiusValue must be >= 0".
    * @throws IException::User "MeanRadiusSigma must be a valid double (blank defaults to 0)."
    * @throws IException::User "MeanRadiusSigma must be >= 0".
-   * 
+   *
    * @see setSolveSettings
    */
   bool BundleTargetBody::readFromPvl(PvlObject &tbObject) {
@@ -1298,7 +1306,7 @@ namespace Isis {
     Distance sigmaRadiusC;
     Distance aprioriMeanRadius;
     Distance sigmaMeanRadius;
-    
+
     //TODO Determine which need to be non-negative. JAM
 
     for (g = tbObject.beginGroup(); g != tbObject.endGroup(); ++g) {
@@ -1675,7 +1683,7 @@ namespace Isis {
    *
    * @return @b Distance The distance from the center of the ellipsoid to its surface
    *                     at the given lat/lon location.
-   * 
+   *
    * @throws IException::Programmer "Local radius can only be found if
    *                                 triaxial radii were solved for."
    */

@@ -1,21 +1,10 @@
-/**
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "HiLab.h"
 #include "IException.h"
@@ -25,13 +14,13 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs a HiLab Object
-   * @param cube The cube containing the HiRise labels to be processed. 
+   * @param cube The cube containing the HiRise labels to be processed.
    */
   HiLab::HiLab(Cube *cube) {
     PvlGroup group = cube->group("Instrument");
     p_cpmmNumber = group["CpmmNumber"];
     p_channel = group["ChannelNumber"];
-  
+
     if(group.hasKeyword("Summing")) {
       p_bin = group["Summing"];
     }
@@ -39,7 +28,7 @@ namespace Isis {
       std::string msg = "Cannot find required Summing keyword in label";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-  
+
     if(group.hasKeyword("Tdi")) {
       p_tdi = group["Tdi"];
     }

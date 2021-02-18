@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include "Application.h"
@@ -187,8 +195,8 @@ void IsisMain() {
         observationId =  archiveGroup["ObservationId"][0];
         firstStartTime =      instGroup["StartTime"][0];
         startClock =     instGroup["SpacecraftClockStartCount"][0];
-        lastStartTime   =     instGroup["StartTime"][0]; 
-        exposureDuration  = instGroup["ExposureDuration"][0]; 
+        lastStartTime   =     instGroup["StartTime"][0];
+        exposureDuration  = instGroup["ExposureDuration"][0];
       }
       else {
         // current cube's StartTime/StopTime values
@@ -203,10 +211,10 @@ void IsisMain() {
         }
       }
     }
-       
+
    // After selecting the last StartTime, calculate the StopTime
    iTime lastStartTimeValue = iTime(lastStartTime);
-   iTime stopTimeValue = lastStartTimeValue + exposureDuration.toDouble(); 
+   iTime stopTimeValue = lastStartTimeValue + exposureDuration.toDouble();
    stopTime = stopTimeValue.UTC(3);
 
    // Get the archiveGroup from the first cube in the list
@@ -224,7 +232,7 @@ void IsisMain() {
     QString toMosaic = ui.GetFileName("TO");
     QString mosaicPriority = ui.GetString("PRIORITY");
 
-    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority 
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority
                           + " TRACK=TRUE";
 
     if (QString::compare(ui.GetString("GRANGE"), "USER", Qt::CaseInsensitive) == 0) {
@@ -248,7 +256,7 @@ void IsisMain() {
     mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
     mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");
     mos += PvlKeyword("PhaseAngle ", toString(phaseAngle), "degrees");
-    mos += PvlKeyword("LocalTime ", toString(localSolarTime)); 
+    mos += PvlKeyword("LocalTime ", toString(localSolarTime));
     mos += PvlKeyword("SolarLongitude ", toString(solarLongitude), "degrees");
     mos += PvlKeyword("SubSolarAzimuth ", toString(sunAzimuth), "degrees");
     mos += PvlKeyword("NorthAzimuth ", toString(northAzimuth), "degrees");

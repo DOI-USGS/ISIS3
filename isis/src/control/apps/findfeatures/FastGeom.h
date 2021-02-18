@@ -1,5 +1,6 @@
 #ifndef FastGeom_h
 #define FastGeom_h
+
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.

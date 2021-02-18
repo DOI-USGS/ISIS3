@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
@@ -19,7 +27,7 @@ namespace Isis {
 
  /**
   * Create an LROCEmpirical photometric object
-  * 
+  *
   * @author 2016-08-15 Victor Silva
   *
   * @internal
@@ -41,14 +49,14 @@ namespace Isis {
    * @brief Initialize class from input PVL and Cube files
    *
    * This method is typically called at the class instantiation
-   * time but is reentrant. It reads the parameter PVL file and 
+   * time but is reentrant. It reads the parameter PVL file and
    * extracts Photometric model and Normalization models from it.
    * The cube is needed to match all potential profiles for each
    * band.
    *
    * @param pvl Input PVL parameter files
    * @param cube Input cube file to correct
-   * 
+   *
    * @throws IException::User "Errors in the input PVL file."
    * @throws IException::User "Band with wavelength Center does not have
    *                           PhotometricModel Algorithm group/profile."
@@ -96,7 +104,7 @@ namespace Isis {
       }
       else { // Appropriate photometric parameters not found
         ostringstream mess;
-        mess << "Band [" << i + 1 << "] with wavelength Center = [" << center[i] << 
+        mess << "Band [" << i + 1 << "] with wavelength Center = [" << center[i] <<
         "] does not have PhotometricModel Algorithm group/profile";
         IException e(IException::User, mess.str(), _FILEINFO_);
         errs += e.toString() + "\n";
@@ -116,15 +124,15 @@ namespace Isis {
   /**
    * @brief Method to get photometric property given angles
    *
-   * This method computes photometric property at the given cube location after 
+   * This method computes photometric property at the given cube location after
    * proper parameter container is found for the specific band.
-   * 
+   *
    * @param i    Incidence angle in degrees
    * @param e    Emission angle in degrees
    * @param g    Phase angle in degrees
    * @param band cube band to be tested
    *
-   * 
+   *
    * @throws IException::Programmer "Provided band out of range."
    *
    * @return @b double The photometric property
@@ -150,7 +158,7 @@ namespace Isis {
   /**
    * @brief Performs actual photometric correction calculations
    *
-   * This routine computes photometric correction using parameters for the 
+   * This routine computes photometric correction using parameters for the
    * LROC Emperical equation.
    *
    * @param parms Container of band-specific exponential parameters
@@ -193,13 +201,13 @@ namespace Isis {
 
   /**
    * @brief Return parameters used for all bands
-   * 
+   *
    * Method creates keyword vector of band-specific parameters
    * used in the photometric correction.
    *
    * @param pvl Output PVL container for keywords written
    *
-   * @author 2016-08-15 Victor Silva 
+   * @author 2016-08-15 Victor Silva
    *
    * @internal
    *   @history 2016-08-15 Victor Silva - Adapted code from lrowacpho application
@@ -267,11 +275,11 @@ namespace Isis {
    *
    * This method determines the set of LROCEmpirical parameters to
    * use for a given wavelength. It iterates through all band profiles
-   * as read from the PVL file and computes the difference between 
-   * wavelength parameter and the BandBinCenter keyword. The absolute 
-   * value of this value is checke against the BandBinCenterTolerance 
-   * parameter and if it is less than or equal to it, a Parameter 
-   * container is returned. 
+   * as read from the PVL file and computes the difference between
+   * wavelength parameter and the BandBinCenter keyword. The absolute
+   * value of this value is checke against the BandBinCenterTolerance
+   * parameter and if it is less than or equal to it, a Parameter
+   * container is returned.
    *
    * @param wavelength The wavelength to find parameters for
    *
@@ -280,8 +288,8 @@ namespace Isis {
    *                                     found for the wavelength then a
    *                                     default parameters object is returned.
    *
-   * @author 2016-08-15 Victor Silva 
-   * 
+   * @author 2016-08-15 Victor Silva
+   *
    * @internal
    *   @history 2016-08-15 Victor Silva - Adapted from the lrowacpho application
    *                           written by Kris Becker.

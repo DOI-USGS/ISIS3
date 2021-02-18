@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cmath>
@@ -64,7 +72,7 @@ bool solarDistance;
 bool subSolarLatitude;
 bool subSolarLongitude;
 bool subSolarGroundAzimuth;
-bool phase; 
+bool phase;
 bool emission;
 bool incidence;
 bool localEmission;
@@ -89,8 +97,8 @@ void camdev(Buffer &out);
 
 
 // Function to create a keyword with same values of a specified count
-template <typename T> PvlKeyword makeKey(const QString &name, 
-                                         const int &nvals, 
+template <typename T> PvlKeyword makeKey(const QString &name,
+                                         const int &nvals,
                                          const T &value);
 
 // Structure containing new mosaic planes
@@ -103,7 +111,7 @@ struct MosData {
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
-void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value = "Null");
 
 
@@ -130,7 +138,7 @@ void IsisMain() {
       QString msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-  } 
+  }
   else {
     try {
       cam = icube->camera();
@@ -178,7 +186,7 @@ void IsisMain() {
   solarDistance = false;
   subSolarLatitude = false;
   subSolarLongitude = false;
-  subSolarGroundAzimuth = false;  
+  subSolarGroundAzimuth = false;
   phase = false;
   emission = false;
   incidence = false;
@@ -193,11 +201,11 @@ void IsisMain() {
   ephemerisTime = false;
   UTC = false;
   localSolarTime = false;
-  solarLongitude = false;  
+  solarLongitude = false;
   morphologyRank = false;
-  albedoRank = false;  
-  
-  
+  albedoRank = false;
+
+
   if (!noCamera) {
     if ((ra = ui.GetBoolean("RADEC"))) nbands++;
     if ((declination = ui.GetBoolean("RADEC"))) nbands++;
@@ -230,13 +238,13 @@ void IsisMain() {
     if ((solarDistance = ui.GetBoolean("SOLARDISTANCE"))) nbands++;
     if ((subSolarLatitude = ui.GetBoolean("SUBSOLARLATITUDE"))) nbands++;
     if ((subSolarLongitude = ui.GetBoolean("SUBSOLARLONGITUDE"))) nbands++;
-    if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;    
+    if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
     if ((phase = ui.GetBoolean("PHASE"))) nbands++;
     if ((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
     if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
     if ((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
     if ((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
-    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;    
+    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
     if ((distortedFocalPlaneX = ui.GetBoolean("DISTORTEDFOCALPLANE"))) nbands++;
     if ((distortedFocalPlaneY = ui.GetBoolean("DISTORTEDFOCALPLANE"))) nbands++;
     if ((undistortedFocalPlaneX = ui.GetBoolean("UNDISTORTEDFOCALPLANE"))) nbands++;
@@ -245,10 +253,10 @@ void IsisMain() {
     if ((ephemerisTime = ui.GetBoolean("EPHEMERISTIME"))) nbands++;
     if ((UTC = ui.GetBoolean("UTC"))) nbands++;
     if ((localSolarTime = ui.GetBoolean("LOCALSOLARTIME"))) nbands++;
-    if ((solarLongitude = ui.GetBoolean("SOLARLONGITUDE"))) nbands++;   
-    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
+    if ((solarLongitude = ui.GetBoolean("SOLARLONGITUDE"))) nbands++;
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
     if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
-    
+
   }
   if((dn = ui.GetBoolean("DN"))) nbands++;
   if((planetocentricLatitude = ui.GetBoolean("PLANETOCENTRICLATITUDE"))) nbands++;
@@ -292,7 +300,7 @@ void IsisMain() {
   if (pixelResolution) name += "Pixel Resolution";
   if (lineResolution) name += "Line Resolution";
   if (sampleResolution) name += "Sample Resolution";
-  if (detectorResolution) name += "Detector Resolution";  
+  if (detectorResolution) name += "Detector Resolution";
   if (spacecraftPositionX) name += "Spacecraft Position X";
   if (spacecraftPositionY) name += "Spacecraft Position Y";
   if (spacecraftPositionZ) name += "Spacecraft Position Z";
@@ -329,17 +337,17 @@ void IsisMain() {
   if (solarLongitude) name += "Solar Longitude";
   if (morphologyRank) name += "morphologyRank";
   if (albedoRank) name += "albedoRank";
-  
-  
+
+
 
 
   // Create the output cube.  Note we add the input cube to expedite propagation
   // of input cube elements (label, blobs, etc...).  It will be cleared
   // prior to systematic processing only if the DN option is not selected.
-  // If DN is chosen by the user, then we propagate the input buffer with a 
+  // If DN is chosen by the user, then we propagate the input buffer with a
   // different function - one that accepts both input and output buffers.
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), 
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
                                 icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
 
@@ -443,9 +451,9 @@ void camdev(Buffer &out) {
           if (planetographicLatitude) {
             Distance radii[3];
             cam->radii(radii);
-            double ocentricLat; 
+            double ocentricLat;
             ocentricLat = cam->UniversalLatitude();
-            out[index] = TProjection::ToPlanetographic(ocentricLat, radii[0].kilometers(), 
+            out[index] = TProjection::ToPlanetographic(ocentricLat, radii[0].kilometers(),
                                                  radii[2].kilometers());
             index += 64 * 64;
           }
@@ -538,7 +546,7 @@ void camdev(Buffer &out) {
         }
         if(!noCamera) {
           double ssplat, ssplon;
-          ssplat = 0.0; 
+          ssplat = 0.0;
           ssplon = 0.0;
           cam->subSpacecraftPoint(ssplat, ssplon);
           if(subSpacecraftLatitude) {
@@ -629,7 +637,7 @@ void camdev(Buffer &out) {
             out[index] = incidence.degrees();
             index += 64 * 64;
           }
-        }        
+        }
         if(northAzimuth) {
           out[index] = cam->NorthAzimuth();
           index += 64 * 64;
@@ -758,4 +766,3 @@ void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
   bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
   return;
 }
-

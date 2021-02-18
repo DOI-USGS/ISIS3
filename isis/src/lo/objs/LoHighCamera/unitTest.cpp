@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 #include <iostream>
 
@@ -56,7 +45,7 @@ int main(void) {
     files.append("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cropped.cub"); // LO3 High
     files.append("$ISISTESTDATA/isis/src/lo/unitTestData/4164H_Full_mirror.cub"); // L04 High
     files.append("$ISISTESTDATA/isis/src/lo/unitTestData/5006_high_res_1.cropped.cub"); // L05 High
-    
+
     for (int i = 0; i < files.size(); i++) {
       Cube c(files[i], "r");
       LoHighCamera *cam = (LoHighCamera *) CameraFactory::Create(c);
@@ -64,73 +53,73 @@ int main(void) {
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
-      
+
       // Test kernel IDs
       cout << "Kernel IDs: " << endl;
       cout << "CK Frame ID = " << cam->CkFrameId() << endl;
       cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
       cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
       cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-      
+
       // Test name methods
       cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
       cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
       cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
       cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
-      
-      // Test Shutter Open/Close 
-      
+
+      // Test Shutter Open/Close
+
       const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
       // approximate 1 tenth of a second since Lunar Orbiter did not provide
-      double exposureDuration = .1; 
+      double exposureDuration = .1;
       QString stime = inst["StartTime"];
       double et; // StartTime keyword is the center exposure time
       str2et_c(stime.toLatin1().data(), &et);
       pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
       cout << "Shutter open = " << shuttertimes.first.Et() << endl;
       cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
-      
-      
+
+
       // Test all four corners to make sure the conversions are right
       cout << "For upper left corner ..." << endl;
       TestLineSamp(cam, 1.0, 1.0);
-      
+
       cout << "For upper right corner ..." << endl;
       TestLineSamp(cam, cam->Samples(), 1.0);
-      
+
       cout << "For lower left corner ..." << endl;
       TestLineSamp(cam, 1.0, cam->Lines());
-      
+
       cout << "For lower right corner ..." << endl;
       TestLineSamp(cam, cam->Samples(), cam->Lines());
-      
+
       double samp = cam->Samples() / 2;
       double line = cam->Lines() / 2;
       cout << "For center pixel position ..." << endl;
-      
+
       if(!cam->SetImage(samp, line)) {
         cout << "ERROR" << endl;
         return 0;
       }
-      
+
       if(abs(cam->UniversalLatitude() - knownLat[i]) < 1E-10) {
         cout << "Latitude OK" << endl;
       }
       else {
-        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i] 
+        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i]
         << endl;
       }
-      
+
       if(abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
         cout << "Longitude OK" << endl;
       }
       else {
-        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] 
+        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i]
         << endl;
       }
       cout << endl << "--------------------------------------------" << endl;
     }
-    
+
      // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
     Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");

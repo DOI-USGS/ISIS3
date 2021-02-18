@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QRegularExpression>
@@ -83,15 +91,15 @@ void IsisMain() {
     productId.setValue(observationId);
   }
 
-  targetGroup.addKeyword(productId);  
+  targetGroup.addKeyword(productId);
   logicalId += productId[0];
   process.setLogicalId(logicalId);
 
-  // For a mosaic, calculate stitched browse LID (lidvid) 
-  // This is as follows: 
+  // For a mosaic, calculate stitched browse LID (lidvid)
+  // This is as follows:
   // StartTime of the first framelet, rounded down to the nearest second
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    QString startTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StartTime"); 
+    QString startTime = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("StartTime");
     startTime = iTime(startTime).UTC(0).toLower().remove("-").remove(":");
 
     // StopTime of the last framelet, rounded down to the nearest second + 4 seconds
@@ -137,10 +145,10 @@ void IsisMain() {
   process.addSchema("PDS4_PSA_EM16_CAS_1000.xsd",
                     "xmlns:cas",
                     "http://psa.esa.int/psa/em16/cas/v1");
- 
+
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    process.addSchema("PDS4_GEOM_1B00_1610.sch", 
+    process.addSchema("PDS4_GEOM_1B00_1610.sch",
                       "PDS4_GEOM_1B00_1610.xsd",
                       "xmlns:geom",
                       "http://pds.nasa.gov/pds4/geom/v1");
@@ -152,7 +160,7 @@ void IsisMain() {
   QDomDocument &pdsLabel = process.GetLabel();
 
   // The default translation for for non-mosaicked output
-  QString exportTranslationFile = "$ISISROOT/appdata/translations/TgoCassisExport.trn"; 
+  QString exportTranslationFile = "$ISISROOT/appdata/translations/TgoCassisExport.trn";
 
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     exportTranslationFile = "$ISISROOT/appdata/translations/TgoCassisExportMosaic.trn";
@@ -164,11 +172,11 @@ void IsisMain() {
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);
-  process.reorder(); 
-  
+  process.reorder();
+
   // Units are automatically translated for the focal length, and there is no way at this time to
   // turn it off, but the cas:CASSIS_Data standard specifies that the focal-length output may not
-  // have units, so remove the units from cas:focal length. 
+  // have units, so remove the units from cas:focal length.
   QDomDocument &pdsLabelNext = process.GetLabel();
   QDomElement observationNode = pdsLabelNext.documentElement().firstChildElement("Observation_Area");
   QStringList xmlPath;
@@ -180,7 +188,7 @@ void IsisMain() {
   QDomElement focalLengthNode = process.getElement(xmlPath, observationNode);
 
   if (focalLengthNode.hasAttribute("unit")) {
-    focalLengthNode.removeAttribute("unit"); 
+    focalLengthNode.removeAttribute("unit");
   }
 
   QString outFile = ui.GetFileName("TO");
