@@ -51,7 +51,7 @@ int main(void) {
     double knownLon = 0;
 
     qDebug() << "Testing with test image...";
-    Cube c("$clipper/testData/simulated_clipper_eis_wac_rolling_shutter.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/clipper/unitTestData/simulated_clipper_eis_wac_rolling_shutter.cub", "r");
     ClipperWacFcCamera *cam = (ClipperWacFcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();

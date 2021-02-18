@@ -7,8 +7,10 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 #    TEST A: pass in a list of cubes with different sizes
 	echo -e "Different sized cubes:" > $(OUTPUT)/error_temp.txt;
+	$(LS) -r $(INPUT)/isisTruth.cub $(INPUT)/f319b18.cub >> $(OUTPUT)/tmp.lis;
+	$(CAT) $(OUTPUT)/tmp.lis | $(SED) 's/isisTruth.cub/isisTruth.cub+1/' > $(OUTPUT)/input.lis;
 	if [ `$(APPNAME) \
-	  fromlist=$(INPUT)/input.lis \
+	  fromlist=$(OUTPUT)/input.lis \
 	  to=$(OUTPUT)/error.cub \
 	  2>> $(OUTPUT)/error_temp.txt > /dev/null` ]; \
 	  then true; \
@@ -40,6 +42,8 @@ commands:
 	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp3.txt > $(OUTPUT)/error.txt;
 
 #    Cleanup
+	$(RM) $(OUTPUT)/tmp.lis;
+	$(RM) $(OUTPUT)/input.lis;
 	$(RM) $(OUTPUT)/error_temp.txt;
 	$(RM) $(OUTPUT)/error_temp2.txt;
 	$(RM) $(OUTPUT)/error_temp3.txt;

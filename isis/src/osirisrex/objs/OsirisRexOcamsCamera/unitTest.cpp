@@ -48,14 +48,14 @@ int main(void) {
   try {
 
     cout << "\nTesting PolyCam (backwards compatibility)..." << endl;
-    Cube polyCamCube("$osirisrex/testData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
+    Cube polyCamCube("$ISISTESTDATA/isis/src/osirisrex/unitTestData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
     double knownLat = 13.9465663689936950;
     double knownLon = 349.0213035062322433;
     double sample = 512.0;
     double line = 512.0;
     testCamera(polyCamCube, sample, line, knownLat, knownLon);
     cout << "\nTesting PolyCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube polyCamCube2("$osirisrex/testData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
+    Cube polyCamCube2("$ISISTESTDATA/isis/src/osirisrex/unitTestData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
     knownLat = -5.5191879351483450;
     knownLon = 349.6939492565607566;
     sample = 512.0;
@@ -64,14 +64,14 @@ int main(void) {
     cout << "============================================================================" << endl;
 
     cout << "\nTesting MapCam (backwards compatibility)..." << endl;
-    Cube mapCamCube("$osirisrex/testData/D19030320000.cub", "r");
+    Cube mapCamCube("$ISISTESTDATA/isis/src/osirisrex/unitTestData/D19030320000.cub", "r");
     knownLat = 73.9976065262802933;
     knownLon = 149.3814386120742768;
     sample = 512.0;
     line = 512.0;
     testCamera(mapCamCube, sample, line, knownLat, knownLon);
     cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
+    Cube mapCamCube2("$ISISTESTDATA/isis/src/osirisrex/unitTestData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
     knownLat = -19.2946930665326732;
     knownLon = 145.9510736765638512;
     sample = 512.0;
