@@ -29,7 +29,7 @@ QString WritePvl(QString fitsKey, QString group, QString key, Cube *icube, bool 
 // Main program
 void IsisMain() {
 
-  // Create an object for exporting ISIS data
+  // Create an object for exporting Isis data
   ProcessExport p;
   // Open the input cube
   Cube *icube = p.SetInputCube("FROM");
@@ -83,7 +83,7 @@ void IsisMain() {
   }
 
 
-  // Write the minimal fits header
+  // Write the minimal fits header   
   QString header;
 
   // specify that this file conforms to simple fits standard

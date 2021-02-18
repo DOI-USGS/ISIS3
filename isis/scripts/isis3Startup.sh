@@ -9,7 +9,7 @@
 # > . isis3Startup.sh
 #
 # Replace the "????" in the above command line with the path you installed
-# the ISIS distribution
+# the Isis distribution
 #
 if [ ! "$ISISROOT" ]; then
   ISISROOT=/usgs/pkgs/isis3/install

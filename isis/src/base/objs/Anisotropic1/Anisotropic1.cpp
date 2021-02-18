@@ -57,11 +57,11 @@ namespace Isis {
    *          code
    * @history 1999-03-12 K Teal Thompson  Port to Unix/ISIS;
    *          declare vars; add implicit none.
-   * @history 2007-02-20 Janet Barrett - Imported from ISIS2
-   *          pht_atm_functions to ISIS.
+   * @history 2007-02-20 Janet Barrett - Imported from Isis2
+   *          pht_atm_functions to Isis.
    * @history 2008-11-05 Jeannie Walldren - Replaced
    *          NumericalMethods::r8expint() with AtmosModel::En().
-   *          Replaced Isis::PI with PI since this is in ISIS
+   *          Replaced Isis::PI with PI since this is in Isis
    *          namespace.
    * @history 2011-12-19 Janet Barrett - Added code to estimate the
    *          shadow brightness value (transs). Also got rid of

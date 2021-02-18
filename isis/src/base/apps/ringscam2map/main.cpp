@@ -229,12 +229,12 @@ void IsisMain() {
     trim = ui.GetBoolean("TRIM"); // trim allowed for defaultrange=map
   }
   else if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
-    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
+    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, 
                                                                            *incam);
     trim = false;
   }
   else { // if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
-    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
+    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, 
                                                                             false);
     trim = ui.GetBoolean("TRIM");
   }
@@ -271,7 +271,7 @@ void IsisMain() {
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
-    // Force rings data into ISIS by returning ring radius for latitude
+    // Force rings data into Isis by returning ring radius for latitude
     // and azimuth (ring longitude) for longitude
     if(outmap->SetUniversalGround(incam->LocalRadius().meters(),
                                   incam->UniversalLongitude())) {
@@ -294,7 +294,7 @@ void IsisMain() {
 
   // We will need a transform class
   Transform *transform = 0;
-
+  
   // Okay we need to decide how to apply the rubbersheeting for the transform
   // Does the user want to define how it is done?
   if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
@@ -305,7 +305,7 @@ void IsisMain() {
 
     int patchSize = ui.GetInteger("PATCHSIZE");
     if (patchSize <= 1) patchSize = 3; // Make the patchsize reasonable
-    p.setPatchParameters(1, 1, patchSize, patchSize,
+    p.setPatchParameters(1, 1, patchSize, patchSize, 
                          patchSize-1, patchSize-1);
     p.processPatchTransform(*transform, *interp);
   }
@@ -338,7 +338,7 @@ void IsisMain() {
   // The user didn't want to override the program smarts.
   // Handle linescan cameras.  Always process using the forward
   // driven patch option. Faster and we get better orthorectification
-  //
+  // 
   // TODO:  For now use the default patch size.  Need to modify
   // to determine patch size based on 1) if the limb is in the file
   // or 2) if the DTM is much coarser than the image
@@ -352,10 +352,10 @@ void IsisMain() {
   }
 
   // The user didn't want to override the program smarts.
-  // Handle pushframe cameras.  Always process using the forward driven patch
-  // option.  It is much faster than the tfile method.  We will need to
+  // Handle pushframe cameras.  Always process using the forward driven patch 
+  // option.  It is much faster than the tfile method.  We will need to 
   // determine patch sizes based on the size of the push frame.
-  //
+  // 
   // TODO: What if the user has run crop, enlarge, or shrink on the push
   // frame cube.  Things probably won't work unless they do it just right
   // TODO: What about the THEMIS VIS Camera.  Will tall narrow (128x4) patches
@@ -380,7 +380,7 @@ void IsisMain() {
     if (fabs(betaLine - 1.0) > 0.0000000001) {
       if (fabs(betaLine - (int) betaLine) > 0.00001) {
         string msg = "Input file is a pushframe camera cropped at a ";
-        msg += "fractional pixel.  Can not project";
+        msg += "fractional pixel.  Can not project"; 
         throw IException(IException::User, msg, _FILEINFO_);
       }
       int offset = (((int) (betaLine + 0.5)) - 1) % frameSize;
@@ -397,7 +397,7 @@ void IsisMain() {
     p.processPatchTransform(*transform, *interp);
   }
 
-  // The user didn't want to override the program smarts.  The other camera
+  // The user didn't want to override the program smarts.  The other camera 
   // types have not be analyized.  This includes Radar and Point.  Continue to
   // use the reverse geom option with the default tiling hints
   else {
@@ -413,7 +413,7 @@ void IsisMain() {
     p.StartProcess(*transform, *interp);
   }
 
-  // Wrap up the warping process
+  // Wrap up the warping process 
   p.EndProcess();
 
   // add mapping to print.prt
@@ -689,3 +689,4 @@ void LoadCameraRange() {
   ui.Clear("DEFAULTRANGE");
   ui.PutAsString("DEFAULTRANGE", "CAMERA");
 }
+

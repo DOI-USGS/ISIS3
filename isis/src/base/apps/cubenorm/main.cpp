@@ -7,7 +7,7 @@
 #include <vector>
 #include <algorithm>
 
-// ISIS specific include files go next
+// Isis specific include files go next
 #include "ProcessByTile.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"

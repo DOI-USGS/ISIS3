@@ -91,7 +91,7 @@
               The data is stored with the sample dimension varying the fastest,
               followed by the band dimension, then the line dimension.
               All samples for line 1 band 1 are followed by all samples for
-              line 1 band 2 and so on until the final band.  This pattern
+              line 1 band 2 and so on until the final band.  This pattern 
               is then repeated for each line.
             </description>
           </option>
@@ -285,7 +285,7 @@
   <examples>
     <example>
       <brief>
-        Converting an ascii file to an ISIS Cube
+        Converting an ascii file to an Isis Cube
       </brief>
       <description>
         This example will show the conversion from a ascii file to a cube.
@@ -295,16 +295,16 @@
             FROM=input.txt TO=out.cub
             samples=10 lines=10 skip=35
         </commandLine>
-        <description>Convert the image input.txt to the ISIS Cube out.cub</description>
+        <description>Convert the image input.txt to the Isis Cube out.cub</description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/ascii2isisGUI.jpg" width="450" height="550">
-            <brief>Convert the image input.txt to the ISIS Cube out.cub</brief>
+            <brief>Convert the image input.txt to the Isis Cube out.cub</brief>
             <description>
-              The is the GUI for ascii2isis when converting the ascii file input.txt to the ISIS Cube out.cub
+              The is the GUI for ascii2isis when converting the ascii file input.txt to the Isis Cube out.cub
             </description>
-            <thumbnail caption="Convert ascii.txt to the ISIS Cube out.cub" src="assets/thumbs/ascii2isisGUI.jpg" width="200" height="200" />
+            <thumbnail caption="Convert ascii.txt to the Isis Cube out.cub" src="assets/thumbs/ascii2isisGUI.jpg" width="200" height="200" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -323,9 +323,9 @@
 
       <outputImages>
         <image width="550" height="550" src="assets/images/out.jpg">
-          <brief>Output ISIS Cube</brief>
+          <brief>Output Isis Cube</brief>
           <description>
-            The is the output ISIS Cube peaks.cub generated from this example.
+            The is the output Isis Cube peaks.cub generated from this example.
           </description>
           <thumbnail src="assets/thumbs/out.jpg" width="200" height="200" caption="Output Image" />
         </image>

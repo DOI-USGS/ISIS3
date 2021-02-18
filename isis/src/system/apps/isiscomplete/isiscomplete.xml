@@ -2,12 +2,12 @@
 
 <application name="isiscomplete" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Outputs the completion command for any ISIS application
+    Outputs the completion command for any Isis application
   </brief>
 
   <description>
     <p>
-      This program is used to load tcsh tab-completion settings for all ISIS applications. This
+      This program is used to load tcsh tab-completion settings for all Isis applications. This
       program will NOT run in GUI mode! Call this program like this:
       eval `isiscomplete isisapp [isisapp2 isisapp3 ...]`
     </p>
@@ -22,7 +22,7 @@
       Original version
     </change>
     <change name="Steven Lambright" date="2008-05-06">
-      isiscomplete now does not complete itself and does not complete when ISIS is in debug mode
+      isiscomplete now does not complete itself and does not complete when isis is in debug mode
     </change>
     <change name="Steven Lambright" date="2008-06-17">
       This program now handles qview properly

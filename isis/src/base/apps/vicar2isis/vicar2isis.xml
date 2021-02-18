@@ -3,11 +3,11 @@
 <application name="vicar2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import Vicar image file into ISIS format
+    Import Vicar image file into Isis format
   </brief>
 
   <description>
-    This program will import a Vicar image file into an ISIS cube.  No
+    This program will import a Vicar image file into an Isis cube.  No
     translation of Vicar labels are done.
   </description>
 
@@ -51,7 +51,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename
@@ -197,23 +197,23 @@
   <examples>
     <example>
       <brief>
-        Converting an vicar file to an ISIS Cube
+        Converting an vicar file to an Isis Cube
       </brief>
       <description>
         This example will show the conversion from a vicar file to a cube.
       </description>
       <terminalInterface>
         <commandLine>FROM=input.img TO=out.cub</commandLine>
-        <description>Convert the image input.img to the ISIS Cube out.cub</description>
+        <description>Convert the image input.img to the Isis Cube out.cub</description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/vicar2isisGUI.jpg" width="450" height="550">
-            <brief>Convert the image input.img to the ISIS Cube out.cub</brief>
+            <brief>Convert the image input.img to the Isis Cube out.cub</brief>
             <description>
-              The is the GUI for vicar2isis when converting the ascii file input.txt to the ISIS Cube out.cub
+              The is the GUI for vicar2isis when converting the ascii file input.txt to the Isis Cube out.cub
             </description>
-            <thumbnail caption="Convert input.img to the ISIS Cube out.cub" src="assets/thumbs/vicar2isisGUI.jpg" width="164" height="200" />
+            <thumbnail caption="Convert input.img to the Isis Cube out.cub" src="assets/thumbs/vicar2isisGUI.jpg" width="164" height="200" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -232,9 +232,9 @@
 
       <outputImages>
         <image width="550" height="550" src="assets/images/out.jpg">
-          <brief>Output ISIS Cube</brief>
+          <brief>Output Isis Cube</brief>
           <description>
-            The is the output ISIS Cube peaks.cub generated from this example.
+            The is the output Isis Cube peaks.cub generated from this example.
           </description>
           <thumbnail src="assets/thumbs/out.jpg" width="200" height="200" caption="Output Image" />
         </image>

@@ -7,7 +7,7 @@
 
   <description>
       <p>
-        Takes an input ISIS cube with HiRISE RDR specific labels, and outputs a PDS compatible file.
+        Takes an input Isis cube with HiRISE RDR specific labels, and outputs a PDS compatible file.
         The DN values are NOT assumed to be between 0.0 and 1.0.
         All DN values between MINPER and MAXPER will be stretched to an unsigned integer with
         a size equal to the number of bits specified by BITS, excluding the special pixels.
@@ -109,7 +109,7 @@
                   The input cube
               </brief>
               <description>
-                  This is the ISIS cube to be exported to PDS format. All bands of the cube will be exported to the PDS file.
+                  This is the Isis cube to be exported to PDS format. All bands of the cube will be exported to the PDS file.
               </description>
               <filter>*.cub</filter>
           </parameter>

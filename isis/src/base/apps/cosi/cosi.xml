@@ -20,7 +20,7 @@
       Converted to ISIS3
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo
+      Removed references to CubeInfo 
     </change>
   </history>
 
@@ -37,7 +37,7 @@
           Input camera cube
         </brief>
         <description>
-          An ISIS cube with a supported camera model and initialized with SPICE.
+          An Isis cube with a supported camera model and initialized with SPICE.
         </description>
         <filter>
           *.cub
@@ -48,10 +48,10 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
-           The name of the output ISIS cube.  This cube will contain the input cube  divided by the cosine of the
+           The name of the output Isis cube.  This cube will contain the input cube  divided by the cosine of the
            incidence angle.
          </description>
          <filter>

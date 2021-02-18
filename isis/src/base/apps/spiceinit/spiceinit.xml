@@ -341,8 +341,8 @@
           This option uses the ISIS SPICE Website to get the most up to
           date kernels available. The ATTACH parameter must be enabled for this option. Manually
           specifying kernel files is not allowed when this option is used. This service may
-          be temporarily unavailable when new ISIS releases are being
-          distributed. Any mismatch in ISIS version will cause this option to fail; only
+          be temporarily unavailable when new Isis releases are being
+          distributed. Any mismatch in Isis version will cause this option to fail; only
           the most recent version of ISIS is supported. An active internet
           connection is required to use this service. Running with this option is slower than downloading the SPICE data locally (download all of $ISISDATA) and running spiceinit
           with the local data. This data can take up a lot of space. The size of the download

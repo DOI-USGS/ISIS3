@@ -3,11 +3,11 @@
 # -- RationaleDescription value is copied from the Original Labels object
 # -- Default version number is used.
 # -- ImageJitterCorrected keyword does not exist in the input cube
-# -- No AlphaCube group exists (implying a full size image, but this is a
+# -- No AlphaCube group exists (implying a full size image, but this is a 
 #    cropped image with no AphaCube to save tesing time)
 # -- Center and Length keywords in the BandBin group have NANOMETERS as units
 #
-# To verify the image data, use pds2hideal to reimport to ISIS. The reimported 
+# To verify the image data, use pds2hideal to reimport to Isis. The reimported 
 # cube hideal2pds2hideal.cub should be identical to input.cub
 #
 # To verify the table data, use table dump on the reimported cube.

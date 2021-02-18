@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
 }
 
 void PrintHelp() {
-  cout << "This program is used to set up the ISIS tab-completion for the tcsh shell. ";
-  cout << "The output of this program is a list of commands for the ISIS setup script to execute." << endl;
+  cout << "This program is used to set up the isis tab-completion for the tcsh shell. ";
+  cout << "The output of this program is a list of commands for the isis setup script to execute." << endl;
   cout << "Usage: isiscomplete isisappname [isisappname2 isisappname3 ...]" << endl;
 }
 

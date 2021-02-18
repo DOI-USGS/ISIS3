@@ -1,4 +1,4 @@
-# Translation file for converting ISIS cube projection labels for SIMPLE CYLINDRICAL
+# Translation file for converting Isis cube projection labels for SIMPLE CYLINDRICAL
 # to PDS IMAGE_MAP_PROJECTION labels
 Group = MAP_PROJECTION_TYPE
   Auto

@@ -2,11 +2,11 @@
 
 <application name="crism2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import MRO CRISM PDS image cube into ISIS format cube</brief>
+  <brief>Import MRO CRISM PDS image cube into Isis format cube</brief>
 
   <description>
-    This program will import an MRO CRISM PDS image into an ISIS cube. Each
-    time this program is run, the user should get a warning that the
+    This program will import an MRO CRISM PDS image into an Isis cube. Each
+    time this program is run, the user should get a warning that the 
     nearest-neighbor interpolation should be used if cam2map or cam2cam is run
     on the imported image due to gimble jitter. The following CRISM formats are
     supported:
@@ -42,7 +42,7 @@
       fix was developed by Jeff Anderson. Fixes #1552.
     </change>
     <change name="Summer Stapleton" date="2017-06-27">
-     Added conditional to check whether default offsets and multipliers where changed from their
+     Added conditional to check whether default offsets and multipliers where changed from their 
      default values and log them if so.
     </change>
   </history>
@@ -76,7 +76,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename

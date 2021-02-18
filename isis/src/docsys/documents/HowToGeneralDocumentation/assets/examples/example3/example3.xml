@@ -3,7 +3,7 @@
   <files>
     <file>
       <body>
-        <p>This is the content of this example document. This will become the content of the HTML page generated during the ISIS build.</p>
+        <p>This is the content of this example document. This will become the content of the HTML page generated during the Isis build.</p>
       </body>
       <type>HTML</type>
       <source>

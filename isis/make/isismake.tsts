@@ -81,7 +81,7 @@ else
 endif
 
 # Make sure all apps use the correct preferences file when testing, unless
-# they have set NOPREFERENCES. This is valid for non-ISIS apps.
+# they have set NOPREFERENCES. This is valid for non-Isis apps.
 ifeq ($(origin NOPREFERENCES), undefined)
   APPNAME += -preference=$(ISISROOT)/TestPreferences
 endif
@@ -118,7 +118,7 @@ DIRLISTPATTERN="drwxrwsr--"
 # Displays a list of targets and their descriptions.
 #----------------------------------------------------------------------------
 help: FORCE
-	echo "ISIS Make Test Commands"
+	echo "Isis Make Test Commands"
 	echo "------------------------ "
 	echo "make test               : Run test and print result, remove output"
 	echo "make test MODE=NOCLEAN  : Run test and print result, leave output"

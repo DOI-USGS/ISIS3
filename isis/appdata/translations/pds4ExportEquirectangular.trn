@@ -1,12 +1,12 @@
-# Translation file for converting ISIS cube projection labels for Equirectangular
+# Translation file for converting Isis cube projection labels for Equirectangular
 # to PDS4 image map projection labels
 #
 #
 # history 2017-10-26 Makayla Shepherd, Jeannie Backer, and Kristin Berry - Original version
 # history 2017-11-16 Kristin Berry - Updated order of Spatial_Reference_Information section, changed
-#                        formatting, and added units. Also changed UNKs on bounding coordinates to
-#                        TBDs since they are required to be set.
-
+#                        formatting, and added units. Also changed UNKs on bounding coordinates to 
+#                        TBDs since they are required to be set. 
+ 
 Group = LocalIdentifierReference
   Auto
   InputDefault     = Image_Array_Object
@@ -134,7 +134,7 @@ End_Group
 
 Group = PlanarCoordinateEncodingMethod
   Auto
-  InputDefault  = "Coordinate Pair"
+  InputDefault  = "Coordinate Pair" 
   OutputName     = cart:planar_coordinate_encoding_method
   OutputPosition = (Product_Observational, Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Planar_Coordinate_Information)
   Translation    = (*, *)
@@ -208,7 +208,7 @@ Group = UpperLeftCornerY
   Translation    = (*, *)
 End_Group
 
-### Spatial Reference Information -> Horizontal_Cooridnate_System_Definition -> Geodetic_Model
+### Spatial Reference Information -> Horizontal_Cooridnate_System_Definition -> Geodetic_Model 
 Group = LatitudeType
   Auto
   InputKey       = LatitudeType
@@ -253,7 +253,7 @@ Group = PolarRadius
   Translation    = (*, *)
 End_Group
 
-Group = LongitudeDirection
+Group = LongitudeDirection 
   Auto
   InputKey       = LongitudeDirection
   InputGroup     = "IsisCube,Mapping"

@@ -13,7 +13,7 @@ class QRect;
 
 namespace Isis {
   /**
-   * @brief Handles zoom operations for ISIS qt apps
+   * @brief Handles zoom operations for Isis qt apps
    *
    * @ingroup Visualization Tools
    *
@@ -66,3 +66,4 @@ namespace Isis {
 };
 
 #endif
+

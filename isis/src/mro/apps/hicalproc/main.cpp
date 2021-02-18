@@ -61,7 +61,7 @@ void IsisMain() {
     sTempFiles.push_back(FileName("$TEMPORARY/p1_out.cub").expanded());
     p1.KeepTemporaryFiles(!bRemoveTempFiles);
 
-    // If Raw image convert to ISIS format
+    // If Raw image convert to Isis format
     p1.AddToPipeline("hi2isis");
     p1.Application("hi2isis").SetInputParameter ("FROM", false);
     p1.Application("hi2isis").SetOutputParameter("TO", "lev2");
@@ -427,7 +427,7 @@ void CleanUp(vector<QString> & psTempFiles, QString psInfile)
 }
 
 /**
- * With the Channel, CCD in the ISIS label, find the coefficient values
+ * With the Channel, CCD in the isis label, find the coefficient values
  * for this image
  *
  * @author Sharmila Prasad (11/24/2010)
@@ -625,3 +625,4 @@ void AnalyzeCubenormStats(QString psStatsFile, int piSumming, double & pdMinDN, 
   cerr << "MinDN=" << pdMinDN << "   MaxDN=" << pdMaxDN << endl;
 #endif
 }
+

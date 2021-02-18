@@ -19,18 +19,18 @@ include $(ISISROOT)/make/isismake.os
 # Let the user know how to use the system
 #----------------------------------------------------------------------------
 help:
-	echo "ISIS Make System Commands"
+	echo "Isis Make System Commands"
 	echo "------------------------ "
 	echo "make all        : Build and install the entire system (incs,api,apps,docs)"
 	echo "make thirdParty : Copy required 3rdParty libraries into distribution"
 	echo "make incs       : Install API include files"
-	echo "make api        : Build and install the ISIS API"
-	echo "make apps       : Build and install ISIS Applications"
-	echo "make docs       : Build ISIS Web Documentation"
+	echo "make api        : Build and install the Isis API"
+	echo "make apps       : Build and install Isis Applications"
+	echo "make docs       : Build Isis Web Documentation"
 	echo "make quickclean : Clean binaries from source tree but not app test areas"
 	echo "make cleansrc   : Clean binaries from source tree"
 	echo "make clean      : Clean source tree and install area"
-	echo "make unitTest   : Build and execute unit tests for ISIS API"
+	echo "make unitTest   : Build and execute unit tests for Isis API"
 	echo "make appTest    : Build and execute application tests"
 	echo "make catTest    : Build and execute category tests"
 	echo "make coverage   : Build a test coverage report from generated coverage info"
@@ -65,7 +65,7 @@ incs:
 # Target = api
 # Dependencies = objects
 #
-# The ISIS API is essentially libisis.a which will be created in the
+# The Isis API is essentially libisis.a which will be created in the
 # directory $(ISISROOT)/lib.  Make api traverses the objs directories
 # (src/base/objs/*) and archives the ".o" files into libisis.a.  Therefore
 # the ".o" files must exist.
@@ -83,10 +83,10 @@ incs:
 #----------------------------------------------------------------------------
 
 api:
-	echo $(CURTIMESTAMP) "Building ISIS API"
+	echo $(CURTIMESTAMP) "Building Isis API"
 	mkdir -p lib
 	$(MAKE) --directory=src objects
-	echo $(CURTIMESTAMP) "Finished building ISIS API"
+	echo $(CURTIMESTAMP) "Finished building Isis API"
 	echo $(CURTIMESTAMP) ""
 	echo $(CURTIMESTAMP) "Adding API objects"
 	if [ "$(HOST_ARCH)" == "Linux" ]; then            \
@@ -113,27 +113,27 @@ osx_static:
 		$(MAKE) --directory=$$i plugin install; 	  \
 	done
 
-#	echo "Building ISIS API with debugging"
+#	echo "Building Isis API with debugging"
 #	cd src; $(MAKE) objects MODE=DEBUG
 #	cd src; $(MAKE) api MODE=DEBUG
-#	echo "Finished building ISIS API with debugging"
+#	echo "Finished building Isis API with debugging"
 #	echo " "
 
 #----------------------------------------------------------------------------
 # Target = apps
 # Dependencies = none
 #
-# This will build and install all the ISIS application in the directory
+# This will build and install all the Isis application in the directory
 # $(ISISROOT)/bin.  It also installs the application Xml file in
 # $(ISISROOT/bin/xml.  Again the make system traverse the apps directories
 # (src/base/apps) and builds/installs each application.  Of course the
 # API must be built for this to work properly
 #----------------------------------------------------------------------------
 apps:
-	echo $(CURTIMESTAMP) "Building ISIS Applications"
+	echo $(CURTIMESTAMP) "Building Isis Applications"
 	mkdir -p bin/xml
 	$(MAKE) --directory=src applications
-	echo $(CURTIMESTAMP) "Finished building ISIS Applications"
+	echo $(CURTIMESTAMP) "Finished building Isis Applications"
 	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
@@ -143,28 +143,28 @@ apps:
 # This target traverse both the objs and apps directories and moves the
 # Xml and assets directories into specific sub-directories under
 # $(ISISROOT)/src/docsys.  Then it builds the entire docsys tree which
-# generates the ISIS Documentation under $(ISISROOT)/doc
+# generates the Isis Documentation under $(ISISROOT)/doc
 #----------------------------------------------------------------------------
 docs:
-	echo $(CURTIMESTAMP) "Building ISIS Documentation"
+	echo $(CURTIMESTAMP) "Building Isis Documentation"
 	mkdir -p doc
 	$(MAKE) --directory=src documentation
 	$(MAKE) --directory=src/docsys docs
-	echo $(CURTIMESTAMP) "Finished building ISIS Documentation"
+	echo $(CURTIMESTAMP) "Finished building Isis Documentation"
 
 
 #----------------------------------------------------------------------------
 # Target = coverage
 # Dependencies = none
 #
-# This target builds a report on how much of ISIS is tested in the automated
+# This target builds a report on how much of Isis is tested in the automated
 # tests. This is currently excluding applications that run other applications
 # because of the amount of time it takes to generate the report (and that's
 # not how we want to test our applications ideally).
 #----------------------------------------------------------------------------
 coverage:
 	if [ "$(CODE_COVERAGE_BIN_DIR)" == "" ]; then                         \
-	  echo "Make sure you use MODE=TC when building ISIS for a coverage"  \
+	  echo "Make sure you use MODE=TC when building Isis for a coverage"  \
 	       "report.";                                                     \
 	  exit 1;                                                             \
 	fi;                                                                   \
@@ -174,7 +174,7 @@ coverage:
 	CSEXEFILES=(`find src/ -name "*.csexe"` `find bin/ -name "*.csexe"`); \
 	if [ "$${#CSMESFILES[@]}" == "0" ] ||                                 \
 	   [ "$${#CSEXEFILES[@]}" == "0" ]; then                              \
-	  echo "Please build ISIS and run the tests with MODE=TC before "     \
+	  echo "Please build Isis and run the tests with MODE=TC before "     \
 	       "trying to build a coverage report.";                          \
 	  exit 1;                                                             \
 	fi;                                                                   \
@@ -198,21 +198,21 @@ coverage:
 	done;                                                                     \
 	$(ECHO) -ne $(CURTIMESTAMP) "Scope Coverage:      ";                      \
 	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
-	    --title="ISIS System-Wide Test Scope Coverage"                        \
+	    --title="Isis System-Wide Test Scope Coverage"                        \
 	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
 	    --global=all --method=all --source=all --execution=all                \
 	    --method-sort=coverage --execution-sort=coverage                      \
 	    --source-sort=coverage -h scopecoverage;                              \
 	$(ECHO) -ne $(CURTIMESTAMP) "Line Coverage:       ";                      \
 	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
-	    --title="ISIS System-Wide Test Line Coverage"                         \
+	    --title="Isis System-Wide Test Line Coverage"                         \
 	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
 	    --global=all --method=all --source=all --execution=all                \
 	    --method-sort=coverage --execution-sort=coverage                      \
 	    --source-sort=coverage --line-coverage -h linecoverage;               \
 	$(ECHO) -ne $(CURTIMESTAMP) "Function Coverage:   ";                      \
 	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
-	    --title="ISIS System-Wide Test Function Coverage"                     \
+	    --title="Isis System-Wide Test Function Coverage"                     \
 	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
 	    --global=all --method=all --source=all --execution=all                \
 	    --method-sort=coverage --execution-sort=coverage                      \
@@ -222,7 +222,7 @@ coverage:
 #----------------------------------------------------------------------------
 # Target = quickclean
 #
-# This target cleans the entire ISIS system enough for a recompile.  It cleans ".o" files and
+# This target cleans the entire Isis system enough for a recompile.  It cleans ".o" files and
 # binary executables from the source tree.  It also, clears the running
 # areas under $ISISROOT (inc, doc, bin, bin/xml, and lib)
 #
@@ -232,7 +232,7 @@ coverage:
 # This walks the src tree and removes ".o" files and binary files
 #----------------------------------------------------------------------------
 quickclean:
-	echo $(CURTIMESTAMP) "Cleaning ISIS (quick)"; \
+	echo $(CURTIMESTAMP) "Cleaning Isis (quick)"; \
 	$(MAKE) --directory=src quickclean;   \
 	rm -rf inc;                           \
 	rm -rf doc;                           \
@@ -248,7 +248,7 @@ quickclean:
 # Target = clean
 # Dependencies = cleansrc
 #
-# This target cleans the entire ISIS system.  It cleans ".o" files and
+# This target cleans the entire Isis system.  It cleans ".o" files and
 # binary executables from the source tree.  It also clears the running
 # areas under $ISISROOT (inc, doc, bini, bin/xml, and lib)
 #
@@ -277,7 +277,7 @@ tabcomplete:
 	if [ ! -d bin ]; then                                                    \
 	  echo $(CURTIMESTAMP) "You must build the applications first";          \
 	elif [ ! -f bin/isiscomplete ]; then                                     \
-	  echo $(CURTIMESTAMP) "ISIS application 'isiscomplete' is missing";     \
+	  echo $(CURTIMESTAMP) "Isis application 'isiscomplete' is missing";     \
 	else                                                                     \
 	  echo "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;                \
 	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;~/g' |     \
@@ -295,19 +295,19 @@ tabcomplete:
 # output data (whether it be a cube, text file, postscript file, etc)
 #----------------------------------------------------------------------------
 unitTest:
-	echo $(CURTIMESTAMP) "Testing ISIS API"
+	echo $(CURTIMESTAMP) "Testing Isis API"
 	$(MAKE) --directory=src unitTest
-	echo $(CURTIMESTAMP) "Finished testing ISIS API"
+	echo $(CURTIMESTAMP) "Finished testing Isis API"
 
 appTest:
-	echo $(CURTIMESTAMP) "Testing ISIS Applications version 2"
+	echo $(CURTIMESTAMP) "Testing Isis Applications version 2"
 	$(MAKE) --directory=src appTest
-	echo $(CURTIMESTAMP) "Finished testing ISIS Applications version 2"
+	echo $(CURTIMESTAMP) "Finished testing Isis Applications version 2"
 
 catTest:
-	echo $(CURTIMESTAMP) "Testing ISIS Category"
+	echo $(CURTIMESTAMP) "Testing Isis Category"
 	$(MAKE) --directory=src catTest
-	echo $(CURTIMESTAMP) "Finished testing ISIS Category"
+	echo $(CURTIMESTAMP) "Finished testing Isis Category"
 
 #----------------------------------------------------------------------------
 # Target = thirdParty

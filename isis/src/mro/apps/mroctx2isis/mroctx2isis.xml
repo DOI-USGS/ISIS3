@@ -3,12 +3,12 @@
 <application name="mroctx2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
     <brief>
-      Import an MRO CTX image as an ISIS cube
+      Import an MRO CTX image as an Isis cube
     </brief>
 
     <description>
         This program takes an image from the Mars Reconnaissance Orbiter Context Imager
-        and produces an ISIS cube containing the image data.
+        and produces an Isis cube containing the image data.
     </description>
 
     <history>
@@ -41,7 +41,7 @@
           Checks if input file is rdr.
         </change>
         <change name="Steven Lambright" date="2008-05-13">
-          Removed references to CubeInfo
+          Removed references to CubeInfo 
         </change>
         <change name="Steven Lambright" date="2008-09-02">
           Fixed bug where dark current data could be corrupted if FILLGAP was true
@@ -93,7 +93,7 @@
             <brief>Prefix Pixels</brief>
             <description>
                 Prefix dark pixels to strip off and put in a BLOB table. The default value is computed.  This will compute
-                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are
+                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are 
                 being left on the edge of the image, adjust this parameter accordingly.
             </description>
             <minimum inclusive="yes">0</minimum>
@@ -104,7 +104,7 @@
             <brief>Suffix Pixels</brief>
             <description>
                 Suffix dark pixels to strip off and put in a BLOB table.  The default value is computed.  This will compute
-                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are
+                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are 
                 being left on the edge of the image, adjust this parameter accordingly.
             </description>
             <minimum inclusive="yes">0</minimum>
@@ -114,9 +114,9 @@
             <type>boolean</type>
             <brief> Set zeros to null</brief>
             <description>
-              The CTX table for the SQROOT SAMPLE_BIT_MODE_ID correlates the DN value
+              The CTX table for the SQROOT SAMPLE_BIT_MODE_ID correlates the DN value 
               zero to one. Errorenous data is also set to a DN value of zero. When enabled, this
-              option assumes the DN values of zero are errenous data and thus zeros are set to NULL.
+              option assumes the DN values of zero are errenous data and thus zeros are set to NULL. 
               When disabled, this data is preserved.
             </description>
             <default><item>true</item></default>

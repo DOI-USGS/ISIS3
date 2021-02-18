@@ -296,7 +296,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 2) getColumnName(index) - Unable to import the binary PDS table into ISIS.
+  // 2) getColumnName(index) - Unable to import the binary PDS table into Isis.
   //        The requested column index exceeds the number of columns.
   try {
     cout << "Throw error for attempt to access invalid column index: " << endl;
@@ -308,7 +308,7 @@ int main(int argc, char *argv[]) {
   }
 
   // 3) importTable(QStringList colNames, Qtring tableName) - Unable to import the PDS table into
-  //        ISIS. The requested column name does not exist in the table.
+  //        Isis. The requested column name does not exist in the table.
   try {
     cout << "Throw error for attempt to export non-existent columns: " << endl;
     QStringList columnNames;
@@ -380,9 +380,9 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 11) makeFieldFromBinaryTable()- Only 4 byte integer values are
-  //                     supported in ISIS. PDS column has an integer DATA_TYPE
+  //                     supported in Isis. PDS column has an integer DATA_TYPE
   //                     with N bytes. For MSB_INTEGER
   try {
     cout << "Throw error for invalid MSB_INTEGER bytes in label file: " << endl;
@@ -396,9 +396,9 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 12) makeFieldFromBinaryTable()- Only 4 byte integer values are
-  //                     supported in ISIS. PDS column has an integer DATA_TYPE
+  //                     supported in Isis. PDS column has an integer DATA_TYPE
   //                     with N bytes. For LSB_INTEGER
   try {
     cout << "Throw error for invalid INTEGER bytes in label file: " << endl;
@@ -412,9 +412,9 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 13) makeFieldFromBinaryTable()- Only 4 or 8 byte real values are
-  //                     supported in ISIS. PDS column has an integer DATA_TYPE
+  //                     supported in Isis. PDS column has an integer DATA_TYPE
   //                     with N bytes. For IEEE_REAL
   try {
     cout << "Throw error for invalid REAL bytes in label file: " << endl;
@@ -428,9 +428,9 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 14) makeFieldFromBinaryTable()- Only 4 or 8 byte real values are
-  //                     supported in ISIS. PDS column has an integer DATA_TYPE
+  //                     supported in Isis. PDS column has an integer DATA_TYPE
   //                     with N bytes. For PC_REAL
   try {
     cout << "Throw error for invalid REAL bytes in label file: " << endl;
@@ -444,7 +444,7 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 15) makeFieldFromBinaryTable()- PDS Column has an unsupported DATA_TYPE.
   try {
     cout << "Throw error for invalid column DATA_TYPE in label file: " << endl;
@@ -458,7 +458,7 @@ int main(int argc, char *argv[]) {
 
   // This will cause the following errors to be thrown
   // 10) importTable() - Unable to import the binary PDS table from the PDS file
-  //                     into ISIS.
+  //                     into Isis.
   // 16) setByteOrder()- The column DATA_TYPE values indicate differing byte
   //                     orders.
   try {

@@ -82,7 +82,7 @@
         <brief>Type of value to output</brief>
         <description>
           This is the value to output in all pixels in the output image.  The
-          value can be one of the standard ISIS special pixel values (NULL, LIS,
+          value can be one of the standard Isis special pixel values (NULL, LIS,
           LRS, HIS, HRS) or a user specified constant.
         </description>
         <list>

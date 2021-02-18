@@ -63,7 +63,7 @@
       <p>
         The TRACK feature creates a separate tracking cube in addition to the mosaic cube, and
         contains information for the source files of every pixel within the output mosaic.
-        This cube will have the same base-name as the mosaic cube but will end in
+        This cube will have the same base-name as the mosaic cube but will end in 
         "_tracking.cub". The tracking cube must always reside in the same directory as the
         mosaic cube to be properly accessed; this means that if the mosaic cube is copied or
         moved, then its associated tracking cube must be copied or moved to the same location.
@@ -81,7 +81,7 @@
         will begin at an offset of 3. In other words, a pixel of DN value 3 in the tracking
         cube means that this same pixel within the mosaic was taken from the first input
         image. The tracking cube cannot be used outside of the QVIEW-AdvancedTracking tool
-        except as a visual representation of the source cubes for the different pixels.
+        except as a visual representation of the source cubes for the different pixels. 
       </p>
       <p>
         The TRACK feature works with Priority options ONTOP and BENEATH for single band input
@@ -116,7 +116,7 @@
               (<def>NULL</def>,<def>HRS</def>,<def>HIS</def>,<def>LRS</def>,<def>LIS</def>) will NOT
               replace an existing Valid output mosaic pixel unless the optional flags are set. Refer
               to parameters HIGHSATURATION,LOWSATURATION, and NULL to override replacement of Valid
-              output mosaic pixels.
+              output mosaic pixels. 
               <p>
                 <b>NOTE:</b> When using this priority with multi-band mosaics and with the TRACK
                 option set, all Special Pixel flags must be set as well. This is because the same
@@ -409,7 +409,7 @@
        Original version
     </change>
     <change name="Jeff Anderson" date="2004-02-26">
-       Converted to ISIS 3.0
+       Converted to Isis 3.0
     </change>
     <change name="Jeff Anderson" date="2004-07-28">
        Fixed bug caused by PVL refactor

@@ -58,7 +58,7 @@ namespace Isis {
     FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
-    // For some reason GUI style is not detected correctly by Qt for ISIS.
+    // For some reason GUI style is not detected correctly by Qt for Isis.
     // This solution is less than ideal since it assumes one of at least 4
     // possible styles that could exist for X11 systems.  Plastique will
     // probably be the most common style for KDE users.  If its wrong (say it

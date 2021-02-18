@@ -5,11 +5,11 @@
  * $Revision: 1.11 $
  * $Date: 2010/02/22 02:25:02 $
  *
- *   Unless noted otherwise, the portions of ISIS written by the USGS are public
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
- *   Although ISIS has been used by the USGS, no warranty, expressed or implied,
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software
  *   and related material nor shall the fact of distribution constitute any such
  *   warranty, and no responsibility is assumed by the USGS in connection
@@ -17,7 +17,7 @@
  *
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the ISIS website,
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -38,7 +38,7 @@ namespace Isis {
   /**
    * @brief  Byte swapper
    *
-   * This class is used to import an image into ISIS. It is a powerful base
+   * This class is used to import an image into Isis. It is a powerful base
    * class which can be used to skip over header bytes, trailer bytes, prefix
    * and/or suffix bytes. By deriving off of this class it can be used to Import
    * vicar, PDS, fits, or many other standard format images.
@@ -415,43 +415,43 @@ namespace Isis {
 
       double p_null_min;     /**< The pixel value which is the lower bound of
                                   NULL data. All pixels between this value and
-                                  the max will be converted to the ISIS NULL
+                                  the max will be converted to the Isis NULL
                                   value.*/
       double p_null_max;     /**< The pixel value which is the upper bound of
                                   NULL data. All pixels between this value and
-                                  the min will be converted to the ISIS NULL
+                                  the min will be converted to the Isis NULL
                                   value.*/
       double p_hrs_min;     /**< The pixel value which is the lower bound of
                                   HRS data. All pixels between this value and
-                                  the max will be converted to the ISIS HRS
+                                  the max will be converted to the Isis HRS
                                   value.*/
       double p_hrs_max;     /**< The pixel value which is the upper bound of
                                   HRS data. All pixels between this value and
-                                  the min will be converted to the ISIS HRS
+                                  the min will be converted to the Isis HRS
                                   value.*/
       double p_his_min;     /**< The pixel value which is the lower bound of
                                   HIS data. All pixels between this value and
-                                  the max will be converted to the ISIS HIS
+                                  the max will be converted to the Isis HIS
                                   value.*/
       double p_his_max;     /**< The pixel value which is the upper bound of
                                   HIS data. All pixels between this value and
-                                  the min will be converted to the ISIS HIS
+                                  the min will be converted to the Isis HIS
                                   value.*/
       double p_lrs_min;     /**< The pixel value which is the lower bound of
                                   LRS data. All pixels between this value and
-                                  the max will be converted to the ISIS LRS
+                                  the max will be converted to the Isis LRS
                                   value.*/
       double p_lrs_max;     /**< The pixel value which is the upper bound of
                                   LRS data. All pixels between this value and
-                                  the min will be converted to the ISIS LRS
+                                  the min will be converted to the Isis LRS
                                   value.*/
       double p_lis_min;     /**< The pixel value which is the lower bound of
                                   LIS data. All pixels between this value and
-                                  the max will be converted to the ISIS LIS
+                                  the max will be converted to the Isis LIS
                                   value.*/
       double p_lis_max;     /**< The pixel value which is the upper bound of LIS
                                  data. All pixels between this value and the min
-                                 will be converted to the ISIS LIS value.*/
+                                 will be converted to the Isis LIS value.*/
   };
 };
 #endif

@@ -2,7 +2,7 @@
 
 <application name="pds2hideal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-      Reimport an exported hirise PDS product to an ISIS Ideal camera.
+      Reimport an exported hirise PDS product to an Isis Ideal camera.
   </brief>
 
   <description>
@@ -55,11 +55,11 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Name of the output file to contain the imported ISIS cube.
+          Name of the output file to contain the imported Isis cube.
         </brief>
         <description>
           The name of the output file.  This file will contain the imported
-          ISIS HiRISE Ideal cube and the related Spice Tables.
+          Isis HiRISE Ideal cube and the related Spice Tables.
         </description>
         <pixelType>signedWord</pixelType>
         <filter>
@@ -71,13 +71,13 @@
         <type>string</type>
         <brief>
           String containing the location of the ShapeModel file of the original
-          ISIS cube that was exported to PDS.
+          Isis cube that was exported to PDS.
         </brief>
         <description>
           This parameter should contain the directory path of the ShapeModel
           file. This path will be added to the ShapeModel keyword in the
           Kernels Group of the output cube. It should be the same path as shown
-          in the original ISIS cube before it was exported to the PDS product.
+          in the original Isis cube before it was exported to the PDS product.
         </description>
         <default>
           <item>

@@ -39,7 +39,7 @@ NofNoisyBits
 SubframeData
 SeqStep
 
-Now without Name Conversion:
+Now without Name Conversion: 
 VERSION, TYPE, SECONDARY HEADER FLAG
 APID
 PACKET SEQUENCE CONTROL
@@ -75,7 +75,7 @@ NOF NOISY BITS
 SUBFRAME DATA
 SEQ STEP
 Getting ISIS Table...
-VersionTypeSecondaryHeaderFlag	Apid	PacketSequenceControl	PacketsLength	ScetTimeClock	ScetTimeUtc	FrameNumber	FrameCount	SubframeCount	PacketsCount	ShutterStatus	ChannelId	CompressionMode	SpectralRange	CurrentMode	SubCurrentMode	IrExpo	IrTemp	CcdExpo	CcdTemp	MirrorSin	Mirror	SpectTemp	TeleTemp	ColdTipTemp	RadiatorTemp	SuMotorCurr	LedgeTemp	StartNoisyBits	EndNoisyBits	CrOrw	NofNoisyBits	SubframeData	SeqStep
+VersionTypeSecondaryHeaderFlag	Apid	PacketSequenceControl	PacketsLength	ScetTimeClock	ScetTimeUtc	FrameNumber	FrameCount	SubframeCount	PacketsCount	ShutterStatus	ChannelId	CompressionMode	SpectralRange	CurrentMode	SubCurrentMode	IrExpo	IrTemp	CcdExpo	CcdTemp	MirrorSin	Mirror	SpectTemp	TeleTemp	ColdTipTemp	RadiatorTemp	SuMotorCurr	LedgeTemp	StartNoisyBits	EndNoisyBits	CrOrw	NofNoisyBits	SubframeData	SeqStep	
 
 
 
@@ -107,9 +107,9 @@ Constructing new ImportPdsTable where the PDS table object name is INDEX_TABLE
 Testing getColumnFields...
 
 Column TELEMETRY_SOURCE_NAME items: 1
-  030_009_f0006-000-0000_003_0128278505-223.dat
+  030_009_f0006-000-0000_003_0128278505-223.dat               
 
-Column Description for this column:
+Column Description for this column: 
 m_name: TELEMETRY_SOURCE_NAME
 m_colnum: 42
 m_dataType: CHARACTER
@@ -120,13 +120,13 @@ m_items: 1
 
 
 Column ROVER_MOTION_COUNTER items: 5
-  0
-  0
-  0
-  0
-  0
+  0     
+  0     
+  0     
+  0     
+  0     
 
-Column Description for this column:
+Column Description for this column: 
 m_name: ROVER_MOTION_COUNTER
 m_colnum: 43
 m_dataType: INTEGER
@@ -137,60 +137,60 @@ m_items: 5
 
 
 
-Throw error for invalid table file name:
+Throw error for invalid table file name: 
 **ERROR** Unable to import PDS table.  Neither of the following possible table files were found: [INVALID_TABLE_FILE_NAME.DAT]  or [./invalid_table_file_name.dat].
 **ERROR** Failed to convert string [INVALID_TABLE_FILE_NAME] to an integer.
 
-Throw error for attempt to access invalid column index:
-**PROGRAMMER ERROR** Unable to import the binary PDS table [TABLE] into ISIS. The requested column index [5] exceeds the last column index [3].
+Throw error for attempt to access invalid column index: 
+**PROGRAMMER ERROR** Unable to import the binary PDS table [TABLE] into Isis. The requested column index [5] exceeds the last column index [3].
 
-Throw error for attempt to export non-existent columns:
-**PROGRAMMER ERROR** Unable to import the PDS table [My Table] into ISIS. The requested column name [Invalid Column Name] does not exist in table.
+Throw error for attempt to export non-existent columns: 
+**PROGRAMMER ERROR** Unable to import the PDS table [My Table] into Isis. The requested column name [Invalid Column Name] does not exist in table.
 
 Throw error for missing table location in label file:
 **ERROR** The PDS file data/lsb_pds_binary_table.lbl does not have the required TABLE object, [MISSING_TABLE]. The PDS label file is probably invalid.
 
 Throw error for invalid table format type in label file:
-**USER ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into ISIS. The PDS INTERCHANGE_FORMAT [UNKNOWN_FORMAT_TYPE] is not supported. Valid values are ASCII or BINARY.
+**USER ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis. The PDS INTERCHANGE_FORMAT [UNKNOWN_FORMAT_TYPE] is not supported. Valid values are ASCII or BINARY.
 
 Print message when COLUMNS value not matching number of COLUMN objects:
 Number of columns in the COLUMNS label keyword (3) does not match number of COLUMN objects found (4)
 
-Throw error for invalid Text PDS table to be imported:
-**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/invalidTextTable.tab] into ISIS.
+Throw error for invalid Text PDS table to be imported: 
+**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/invalidTextTable.tab] into Isis.
 **PROGRAMMER ERROR** Failed to convert data in row [0].
 **PROGRAMMER ERROR** Conversion failure of column VERSION, TYPE, SECONDARY HEADER FLAG.
 **ERROR** Failed to convert string [A] to an integer.
 
-Throw error for invalid MSB_INTEGER bytes in label file:
-**ERROR** Unable to import the PDS table [EXPORTED_ISIS_TABLE] from the PDS file [data/msb_pds_binary_table.dat] into ISIS.
-**ERROR** Only 4 byte integer values are supported in ISIS. PDS Column [Integer Value] has an integer DATA_TYPE with [BYTES = 8].
+Throw error for invalid MSB_INTEGER bytes in label file: 
+**ERROR** Unable to import the PDS table [EXPORTED_ISIS_TABLE] from the PDS file [data/msb_pds_binary_table.dat] into Isis.
+**ERROR** Only 4 byte integer values are supported in Isis. PDS Column [Integer Value] has an integer DATA_TYPE with [BYTES = 8].
 
-Throw error for invalid INTEGER bytes in label file:
-**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into ISIS.
-**ERROR** Only 4 byte integer values are supported in ISIS. PDS Column [Integer Value] has an integer DATA_TYPE with [BYTES = 2].
+Throw error for invalid INTEGER bytes in label file: 
+**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis.
+**ERROR** Only 4 byte integer values are supported in Isis. PDS Column [Integer Value] has an integer DATA_TYPE with [BYTES = 2].
 
-Throw error for invalid REAL bytes in label file:
-**ERROR** Unable to import the PDS table [EXPORTED_ISIS_TABLE] from the PDS file [data/msb_pds_binary_table.dat] into ISIS.
-**ERROR** Only 4 byte or 8 byte real values are supported in ISIS. PDS Column [Double Value] has a real DATA_TYPE with [BYTES = 12].
+Throw error for invalid REAL bytes in label file: 
+**ERROR** Unable to import the PDS table [EXPORTED_ISIS_TABLE] from the PDS file [data/msb_pds_binary_table.dat] into Isis.
+**ERROR** Only 4 byte or 8 byte real values are supported in Isis. PDS Column [Double Value] has a real DATA_TYPE with [BYTES = 12].
 
-Throw error for invalid REAL bytes in label file:
-**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into ISIS.
-**ERROR** Only 4 byte or 8 byte real values are supported in ISIS. PDS Column [Double Value] has a real DATA_TYPE with [BYTES = 2].
+Throw error for invalid REAL bytes in label file: 
+**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis.
+**ERROR** Only 4 byte or 8 byte real values are supported in Isis. PDS Column [Double Value] has a real DATA_TYPE with [BYTES = 2].
 
-Throw error for invalid column DATA_TYPE in label file:
-**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into ISIS.
+Throw error for invalid column DATA_TYPE in label file: 
+**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis.
 **ERROR** PDS Column [Double Value] has an unsupported DATA_TYPE [UNKNOWN_DATA_TYPE].
 
-Throw error for inconsistent byte order in label file:
-**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into ISIS.
+Throw error for inconsistent byte order in label file: 
+**ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis.
 **ERROR** Unable to import the binary PDS table [TABLE]. The column DATA_TYPE values indicate differing byte orders.
 
-Throw error if index used to request a column description
-is greater than the number of columns in the table:
+Throw error if index used to request a column description 
+is greater than the number of columns in the table: 
 **PROGRAMMER ERROR** Index (100) into Columns invalid (max: 48).
 
-Throw error if index used to request a column description is less than 0:
+Throw error if index used to request a column description is less than 0: 
 **PROGRAMMER ERROR** Index (-1) into Columns invalid (max: 48).
 
 cols = 4
@@ -202,5 +202,5 @@ IntegerValue
 TextValue
 RealValue
 type Double Value column = PC_REAL
-set Double Value column to type MSB_INTEGER
+set Double Value column to type MSB_INTEGER 
 type Double Value column = MSB_INTEGER

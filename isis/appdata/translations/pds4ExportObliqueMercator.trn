@@ -1,4 +1,4 @@
-# Translation file for converting ISIS cube projection labels for Oblique Mercator
+# Translation file for converting Isis cube projection labels for Oblique Mercator
 # to PDS4 cartography labels
 
 #### Keywords for Bounding Coordinates
@@ -46,13 +46,13 @@ Group = west_bounding_coordinate
   Translation    = (*, *)
 End_Group
 
-# TODO: add units (degrees)
+# TODO: add units (degrees) 
 
 ### Keywords for Geo Transformation
 
 # Keywords for Geodetic Model  (not inside Planar)
 # TODO: add units
-# is spheroid name required?
+# is spheroid name required? 
 #<cart:Geodetic_Model>
 #<cart:spheroid_name>Mercury</cart:spheroid_name>
 #</cart:Geodetic_Model>
@@ -122,7 +122,7 @@ Group = map_projection_name
   Translation    = (Oblique_Mercator, *)
 End_Group
 
-# TODO: is N/A a valid value?
+# TODO: is N/A a valid value? 
 Group = standard_parallel_1
   Auto
   Optional
@@ -171,7 +171,7 @@ End_Group
 ## Planar Coordinate Information ##
 # TODO: add units
 # <cart:planar_coordinate_encoding_method>Coordinate Pair</cart:planar_coordinate_encoding_method>
-# Group = planar_coordinate_encoding_method?
+# Group = planar_coordinate_encoding_method? 
 
 Group = pixel_resolution_x
   Auto
@@ -213,7 +213,7 @@ Group = pixel_scale_y
   Translation    = (*, *)
 End_Group
 
-# Geo_Transformation
+# Geo_Transformation 
 # TODO: add units
 
 Group = upperleft_corner_x
@@ -238,9 +238,9 @@ Group = upperleft_corner_y
   Translation    = (*, *)
 End_Group
 
-# Omitted min/max (s,l) because did not see a reference to these in the PDS4 standards.
+# Omitted min/max (s,l) because did not see a reference to these in the PDS4 standards. 
 
-# Map Rotation not supported by PDS4?
+# Map Rotation not supported by PDS4? 
 #Group = MAP_PROJECTION_ROTATION
 #  Auto
 #  InputKey       = MapProjectionRotation

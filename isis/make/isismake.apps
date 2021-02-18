@@ -244,7 +244,7 @@ html:
 	$(MAKE) `basename $(CURDIR)`.html;
 
 help:
-	echo "ISIS Make Application Commands"
+	echo "Isis Make Application Commands"
 	echo "------------------------ "
 	echo "make                            : Builds the Application"
 	echo "make MODE=DEBUG                 : Builds the Application for stack tracing and"

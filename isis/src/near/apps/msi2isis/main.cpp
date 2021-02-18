@@ -221,7 +221,7 @@ void flipAndTrim(Buffer &in, Buffer &out) {
 }
 
 /**
- * Translate the MSI labels into ISIS.
+ * Translate the MSI labels into Isis.
  *
  * This method requires the Instrument, BandBin, and Kernels groups to already
  * exist in the labels.

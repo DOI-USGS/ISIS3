@@ -14,7 +14,7 @@ Program uses the fiducial marks along the edges of Apollo Panoramic Images to st
 //third party libraries if needed
 #include <Ransac.h>
 
-//ISIS Headers if needed
+//Isis Headers if needed
 #include  "AutoReg.h"
 #include  "AutoRegFactory.h"
 #include  "Centroid.h"

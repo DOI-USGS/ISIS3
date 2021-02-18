@@ -3,11 +3,11 @@
 <application name="raw2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import raw cube into ISIS format
+    Import raw cube into Isis format
   </brief>
 
   <description>
-    This program will import a raw image into an ISIS cube.  Bytes will be swapped if
+    This program will import a raw image into an Isis cube.  Bytes will be swapped if
     necessary and there is an option to create special pixels.
   </description>
 
@@ -82,7 +82,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename
@@ -345,7 +345,7 @@
       Using raw2isis with default parameters
       </brief>
       <description>
-        The use of raw2isis to ingest raw data and output ISIS cubes.
+        The use of raw2isis to ingest raw data and output Isis cubes.
       </description>
       <terminalInterface>
         <commandLine>
@@ -357,7 +357,7 @@
       bittype=real
         </commandLine>
         <description>
-	This example shows the use of raw2isis create an ISIS cube.
+	This example shows the use of raw2isis create an Isis cube.
         </description>
       </terminalInterface>
 
@@ -394,7 +394,7 @@
 	  Final output image after the conversion
           </brief>
           <description>
-	    Converts from PDS format to a ISIS cube.
+	    Converts from PDS format to a Isis cube.
           </description>
           <thumbnail caption= "The cube image after conversion"
           src="assets/thumbs/out.jpg" width="126" height="126"/>

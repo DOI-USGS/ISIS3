@@ -3,12 +3,12 @@
  * $Revision: 1.7 $
  * $Date: 2009/07/29 21:14:35 $
  *
- *   Unless noted otherwise, the portions of ISIS written by the USGS are
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
  *   for intellectual property information, user agreements, and related
  *   information.
  *
- *   Although ISIS has been used by the USGS, no warranty, expressed or
+ *   Although Isis has been used by the USGS, no warranty, expressed or
  *   implied, is made by the USGS as to the accuracy and functioning of such
  *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
@@ -16,7 +16,7 @@
  *
  *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the ISIS website,
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
@@ -39,7 +39,7 @@
 #endif
 
 /**
- * @brief Base include file for all ISIS applications
+ * @brief Base include file for all Isis applications
  *
  * This is not technically a class.  Instead it is the main include file
  * the must be placed at the beginning of every executable program. For
@@ -49,8 +49,8 @@
  * #include "Isis.h"
  * @endcode
  * The include file
- * handles starting the ISIS GUI, error messages, and a host of other
- * ISIS related duties that should be performed in all ISIS programs.
+ * handles starting the Isis GUI, error messages, and a host of other
+ * Isis related duties that should be performed in all Isis programs.
  * It actually contains the standard C++
  * declaration of main (i.e., int main (int argc, char *argv[])) and
  * invokes the function IsisMain which must
@@ -64,9 +64,9 @@
  * }
  * @endcode
  * The Isis.h file includes code that catches all thrown exceptions.  It
- * first trys to catch and report ISIS specific errors.  That is,
+ * first trys to catch and report Isis specific errors.  That is,
  * those thrown
- * within IsisMain or by ISIS objects created in IsisMain.  It will
+ * within IsisMain or by Isis objects created in IsisMain.  It will
  * then catch C++ system type errors and respond accordingly.  This
  * eliminates the need for the application programmer to trap errors.
  * They may however, throw errors as necessary to indicate error
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
   // Note: as printing and logging IExceptions requires ISISROOT to be set (for preferences),
   //       The case below cannot be handled with IExceptions
   if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
-    std::cerr << "Please set ISISROOT before running any ISIS applications" << std::endl;
+    std::cerr << "Please set ISISROOT before running any Isis applications" << std::endl;
     exit(1);
   }
 

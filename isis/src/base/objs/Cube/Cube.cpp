@@ -401,7 +401,7 @@ namespace Isis {
 
 
   /**
-   * This method will create an ISIS cube for writing.   The programmer should
+   * This method will create an isis cube for writing.   The programmer should
    * make appropriate calls to Set methods before invoking Create.  If none are
    * made there are internal defaults which are:
    * @code
@@ -590,7 +590,7 @@ namespace Isis {
 
 
   /**
-   * This method will create an ISIS cube for writing.   The programmer should
+   * This method will create an isis cube for writing.   The programmer should
    * make appropriate calls to Set methods before invoking Create.  If none are
    * made there are internal defaults which are:
    * @code
@@ -626,7 +626,7 @@ namespace Isis {
 
 
   /**
-   * This method will open an ISIS cube for reading or reading/writing.
+   * This method will open an isis cube for reading or reading/writing.
    *
    * @param[in] cubeFileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
@@ -773,7 +773,7 @@ namespace Isis {
 
 
   /**
-   * This method will reopen an ISIS sube for reading or reading/writing.
+   * This method will reopen an isis sube for reading or reading/writing.
    *   If access requested is read/write and the open fails, open as read only
    *   and throw error.
    *
@@ -2123,7 +2123,7 @@ namespace Isis {
    *
    * @param labelFileName FileName to initialize from
    *
-   * @param readWrite bool that determines whether the label is an old ISIS label and needs to be
+   * @param readWrite bool that determines whether the label is an old isis label and needs to be
    *          reformatted
    */
   void Cube::initLabelFromFile(FileName labelFileName, bool readWrite) {

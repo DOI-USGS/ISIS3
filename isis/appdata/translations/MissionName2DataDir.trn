@@ -21,7 +21,7 @@
 # Translation may be repeated as needed.
 #
 # This file is used to translate the SpacecraftName from the
-# ISIS cube Instrument group to an IsisPreference value.
+# Isis cube Instrument group to an IsisPreference value.
 # The left value in a translation entry should be exactly
 # the same as the IsisPreference and the right side should
 # be exactly the same as the SpacecraftName from the cube.

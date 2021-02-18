@@ -9,7 +9,7 @@
   <description>
     <p>
       This program creates an XML document of "pack" elements for use within the
-      ISIS installer.  Each pack represent an optional installation package for
+      Isis installer.  Each pack represent an optional installation package for
       the user, enabling them to select the targets they are working with, and
       only download the relevant DEMs.  This XML file is generated from the
       kernels.????.db file in the $base/dems area.

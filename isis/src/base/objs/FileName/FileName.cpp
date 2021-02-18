@@ -197,7 +197,7 @@ namespace Isis {
 
   /**
    * Returns a QString of the full file name including the file path, excluding the attributes.
-   * Any ISIS Preferences or environment variables indicated by $, are changed to what they
+   * Any Isis Preferences or environment variables indicated by $, are changed to what they
    * represent.
    *
    * <pre>
@@ -516,7 +516,7 @@ namespace Isis {
 
   /**
    * Returns a QString of the full file name including the file path, excluding the attributes
-   * with any ISIS Preferences or environment variables indicated by $, changed to what they
+   * with any Isis Preferences or environment variables indicated by $, changed to what they
    * represent.
    *
    * <pre>
@@ -878,7 +878,7 @@ namespace Isis {
 
           QString varValue;
 
-          // Find the corresponding ISIS Preference if one exists
+          // Find the corresponding Isis Preference if one exists
           if(Preference::Preferences().hasGroup("DataDirectory")) {
             PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
             if(dataDir.hasKeyword(varName)) {

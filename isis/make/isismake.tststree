@@ -25,7 +25,7 @@ cleanuplockfile:
 	fi;
 
 # When we make casename-print it should print the cases' log. This acquires the
-# appropriate lock before printing. There is a 30s timeout on the lock before
+# appropriate lock before printing. There is a 30s timeout on the lock before 
 # breaking it.
 %-print:
 	CASENAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                           \
@@ -77,19 +77,19 @@ cleanuplockfile:
 
 #----------------------------------------------------------------------------
 # Target = help
-# Dependencies =
+# Dependencies = 
 #
 # Displays a list of targets and their descriptions.
 #----------------------------------------------------------------------------
 help:
-	echo "ISIS Make Tests Commands"
+	echo "Isis Make Tests Commands"
 	echo "------------------------ "
 	echo "make test                   : Runs and displays results for all of the tests"
 	echo "make newtest TEST=testname  : Creates a new test named testname"
 
 #----------------------------------------------------------------------------
 # Target = tests
-# Dependencies =
+# Dependencies = 
 #
 # Iteretates over all of the tests and runs them.  If the test
 # has no makefile or there is no tests a message is
@@ -120,13 +120,13 @@ force: ;
 
 #----------------------------------------------------------------------------
 # Target = newtest
-# Dependencies = variable TEST
+# Dependencies = variable TEST 
 #
-# Creates a new test in the current directory.  Relies on
-# the TEST variable to create a new folder that will contain
+# Creates a new test in the current directory.  Relies on 
+# the TEST variable to create a new folder that will contain 
 # the new test.  If the folder does not already exist then it is
 # created and the right Makefile is copied into that directory
-# and the test is told to create what it needs.
+# and the test is told to create what it needs. 
 #----------------------------------------------------------------------------
 newtest:
 	if [ "$(TEST)" = "" ]; \

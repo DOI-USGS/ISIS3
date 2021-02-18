@@ -2,12 +2,12 @@
 
 <application name="dawnfc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted Dawn FC EDR or RDR image cube into ISIS format cube</brief>
+  <brief>Import PDS formatted Dawn FC EDR or RDR image cube into Isis format cube</brief>
 
   <description>
     <p>
     This application will import a PDS formatted Dawn Framing Camera (FC) level
-    1 (EDR) or level 2 (RDR) radiometrically calibrated image into an ISIS cube.
+    1 (EDR) or level 2 (RDR) radiometrically calibrated image into an Isis cube.
     The resulting cube ("TO" parameter) will function properly in other ISIS
     cartographic software such as "spiceinit" and "cam2map".   The Dawn FC EDRs
     and RDRs will be available for download from the PDS Small Bodies Node at
@@ -16,7 +16,7 @@
     <p>
     Although allowed in PDS standards, Dawn EDR and RDR files are arranged in a
     rarely used spatial storage order.  That is,  the bottom line of the image
-    is stored first within the image array object contained in the PDS file.
+    is stored first within the image array object contained in the PDS file. 
     This
     application modifies the arrangement by reversing the line storage order in
     the output cube; however,  be aware that other
@@ -85,7 +85,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to define the output ISIS cube filename

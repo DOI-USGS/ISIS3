@@ -1,4 +1,4 @@
-ISIS #
+#
 # The group names listed here are the native names used by
 # applications to get the foreign names and values
 #
@@ -21,7 +21,7 @@ ISIS #
 # Translation may be repeated as needed.
 #
 # This file is used to translate the InstrumentId from the
-# ISIS cube Instrument group to an InstrumentName
+# Isis cube Instrument group to an InstrumentName
 #
 # history Jeannie Backer and Adam Goins - Added Kaguya TC.
 

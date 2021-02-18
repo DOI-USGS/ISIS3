@@ -33,7 +33,7 @@ void IsisMain() {
   //  Open input text file
   UserInterface &ui = Application::GetUserInterface();
   from = ui.GetFileName("FROM");
-
+  
   // Get storage order of data
   order = ui.GetString("ORDER");
 
@@ -45,13 +45,13 @@ void IsisMain() {
 
   //  Setup output cube
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-
+  
   // Set special pixel ranges
   if (ui.GetBoolean("SETNULLRANGE")) {
     null_min = ui.GetDouble("NULLMIN");
     null_max = ui.GetDouble("NULLMAX");
   }
-
+  
   if (ui.GetBoolean("SETHRSRANGE")) {
     hrs_min = ui.GetDouble("HRSMIN");
     hrs_max = ui.GetDouble("HRSMAX");
@@ -61,23 +61,23 @@ void IsisMain() {
     lrs_max = ui.GetDouble("LRSMAX");
   }
 
-
+  
   fin.open(from.toLatin1().data(), std::ios::in);
   if (!fin.is_open()) {
     QString msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-
+  
   //  Skip header information if it exists
   fin.seekg(skip, std::ios::beg);
 
-
+  
   //  Set up process depending on order
   if (order == "BSQ") {
     ProcessByLine p;
 
-
+    
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
@@ -85,7 +85,7 @@ void IsisMain() {
   if (order == "BIL") {
     ProcessBySpectra p(Isis::ProcessBySpectra::ByLine);
 
-
+    
     // Set Special Pixel ranges
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
@@ -94,7 +94,7 @@ void IsisMain() {
   if (order == "BIP") {
     ProcessBySpectra p(Isis::ProcessBySpectra::PerPixel);
 
-
+    
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
@@ -107,14 +107,14 @@ void ascii2isis(Buffer &out) {
   //Define all legal characters for the beginning of a number
   const string legal = ".0123456789+-";
 
-
+    
   for (int i = 0; i < out.size(); i++) {
-
+    
     //Discard all nonlegal characters
     while ((legal.find(fin.peek()) == string::npos) && !fin.eof()) {
       fin.ignore();
-    }
-
+    }  
+    
     fin >> out[i];
 
     // If we've reached the end of file and stream is bad, we didn't find enough numerical data
@@ -140,7 +140,7 @@ void ascii2isis(Buffer &out) {
 
 /**
   * Tests the pixel. If it is valid it will return the dn value,
-  * otherwise it will return the ISIS special pixel value that
+  * otherwise it will return the Isis special pixel value that
   * corresponds to it
   *
   * @param pixel The double precision value that represents a

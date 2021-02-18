@@ -8,10 +8,10 @@
 
   <description>
     <p>
-    This program will import and convert a PDS-formatted Rosetta OSIRIS image into an ISIS cube.
+    This program will import and convert a PDS-formatted Rosetta OSIRIS image into an ISIS cube. 
     The input file can be in compressed or decompressed form, and can be from OSIRIS's Wide-Angle
     Camera (WAC) or its Narrow-Angle Camera (NAC.) Input PDS files are converted to 32-bit if they are not already
-    32-bit.
+    32-bit. 
     </p>
     <h3> Requirements </h3>
     <ul>
@@ -26,17 +26,17 @@
     <h2>Instrument Overview</h2>
    <p>
    OSIRIS contains a high-resolution Narrow-Angle Camera (NAC) and a Wide-Angle Camera (WAC) that share a common shutter,
-   filter wheel, and detector. The detector is a custom backside-illuminated 2048 x 2048 CCD with a UV-antireflection coating.
+   filter wheel, and detector. The detector is a custom backside-illuminated 2048 x 2048 CCD with a UV-antireflection coating. 
 
-   OSIRIS-NAC has an off-axis three mirror system that minimizes the stray light hitting the CCD, and a field of view of 2.20 x 2.22 degrees.
-   OSIRIS-WAC has an off-axis two mirror system which is also designed to minimize stray light and has a wider field of view of 11.34 x 12.11 degrees.
+   OSIRIS-NAC has an off-axis three mirror system that minimizes the stray light hitting the CCD, and a field of view of 2.20 x 2.22 degrees. 
+   OSIRIS-WAC has an off-axis two mirror system which is also designed to minimize stray light and has a wider field of view of 11.34 x 12.11 degrees. 
 
-   OSIRIS-NAC has 12 filters that cover wavelengths 250-1000 nm at a resolution of 18.6 microradians/pixel, and OSIRIS-WAC has 14 filters  over 240 -  720 nm at a resolution of 101 microradians/pixel. More detailed filter specifications are provided in the tables below.
+   OSIRIS-NAC has 12 filters that cover wavelengths 250-1000 nm at a resolution of 18.6 microradians/pixel, and OSIRIS-WAC has 14 filters  over 240 -  720 nm at a resolution of 101 microradians/pixel. More detailed filter specifications are provided in the tables below. 
    </p>
    <h2>Narrow-Angle Filters</h2>
     <p>
        The following table provides the specifications for each of the 16
-       OSIRIS-NAC filters.
+       OSIRIS-NAC filters. 
     </p>
       <TABLE BORDER="1">
             <CAPTION>
@@ -133,7 +133,7 @@
     <p>
        The following table provides the specifications for each of the 14
        OSIRIS-WAC filters. One of the filter wheels is always set to Empty because of hardware constraints.
-       The wavelengths and full-width half maximums (FWHMs) for the Empty filters are set to 0 in the ISIS cube label.
+       The wavelengths and full-width half maximums (FWHMs) for the Empty filters are set to 0 in the ISIS cube label. 
     </p>
       <TABLE BORDER="1">
             <CAPTION>
@@ -229,22 +229,22 @@
     <h2>Data Archive</h2>
     <p>
       The Rosetta data are available from the
-      <a href="http://pds-smallbodies.astro.umd.edu/data_sb/missions/rosetta/index.shtml">NASA PDS Small
+      <a href="http://pds-smallbodies.astro.umd.edu/data_sb/missions/rosetta/index.shtml">NASA PDS Small 
       Bodies Node</a>.
     </p>
   <p>
-     The file-naming convention for OSIRIS images on the PDS archive is: {C}{YYYYMM DD}T{HHMMSSUUU}{FF}{L}{I}F{A}{B}.img, where: {C} is set to either N or W to indicate a NAC or WAC image, respectively, {YYYYMM DD} is the year, month, and day, of image acquisition; T is a separator that stands for "Time", and {HHMMSSUUU} is the hour, minute, second, and milli-second of acquisition. {FF} indicates the image file type: ID is a normal image, TH is a thumbnail image, and PA, PB, and OL indicate different  kinds of calibration data; {L} is the processing level of the image; {I} is the instance id of the image, F is a separator that stands for "Filter", {A} indicates the position of filter wheel #1, and {B} indicates the position of filter wheel #2.
+     The file-naming convention for OSIRIS images on the PDS archive is: {C}{YYYYMM DD}T{HHMMSSUUU}{FF}{L}{I}F{A}{B}.img, where: {C} is set to either N or W to indicate a NAC or WAC image, respectively, {YYYYMM DD} is the year, month, and day, of image acquisition; T is a separator that stands for "Time", and {HHMMSSUUU} is the hour, minute, second, and milli-second of acquisition. {FF} indicates the image file type: ID is a normal image, TH is a thumbnail image, and PA, PB, and OL indicate different  kinds of calibration data; {L} is the processing level of the image; {I} is the instance id of the image, F is a separator that stands for "Filter", {A} indicates the position of filter wheel #1, and {B} indicates the position of filter wheel #2. 
     </p>
 
     <h2>References</h2>
     <cite>
-       Hviid, Stubbe F. "Osiris Experiment Data Record and Software Interface
+       Hviid, Stubbe F. "Osiris Experiment Data Record and Software Interface 
        Specification (EDR/SIS) " Issue 3, 04/04/2011
     </cite>
-    <br />
-    <cite>
-       H. U. Keller et al. "OSIRIS - The Scientific Camera System Onboard Rosetta."
-       Space Science Reviews. Volume 128, Issue 1-4, pp 433-506.
+    <br /> 
+    <cite> 
+       H. U. Keller et al. "OSIRIS - The Scientific Camera System Onboard Rosetta." 
+       Space Science Reviews. Volume 128, Issue 1-4, pp 433-506. 
     </cite>
     <br/>
 
@@ -255,17 +255,17 @@
       Original Version
     </change>
     <change name="Kristin Berry" date="2016-03-29">
-      Update to work with WAC images, in addition to NAC. Significantly
+      Update to work with WAC images, in addition to NAC. Significantly 
       expanded documentation. Fixes #1900.
     </change>
     <change name="Kristin Berry" date="2016-04-25">
       Renamed application to rososiris2isis to disambiguate from osiris-rex
-      mission utilities.
+      mission utilities. 
     </change>
     <change name="Jeannie Backer" date="2018-03-29">
       Fixed typo of FilterName from Fe203 to Fe2O3 (letter O, not zero).
       Improved error messages. Moved hard-coded FilterName comparisons out of
-      code to translation file osirisFilters.trn. Fixes #5369.
+      code to translation file osirisFilters.trn. Fixes #5369. 
     </change>
   </history>
 
@@ -282,7 +282,7 @@
           Input PDS formatted Rosetta Osiris image file
         </brief>
         <description>
-          Use this parameter to select the Rosetta Osiris filename.
+          Use this parameter to select the Rosetta Osiris filename. 
         </description>
         <filter>
           *.imq  *.img
@@ -293,7 +293,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename.

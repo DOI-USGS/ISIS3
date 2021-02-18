@@ -2,12 +2,12 @@
 
 <application name="cnetpvl2bin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Converts an ISIS control network file from pvl format into binary.
+    Converts an Isis control network file from pvl format into binary.
   </brief>
 
   <description>
     <p>
-      This program converts an ISIS control network file from an ascii pvl 
+      This program converts an Isis control network file from an ascii pvl 
     format into a binary formatted file.
     </p>
   </description>

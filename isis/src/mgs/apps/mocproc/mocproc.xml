@@ -13,7 +13,7 @@
     not disabled.
     </p>
     <p>
-    All intermediate files will be generated in the users ISIS temporary
+    All intermediate files will be generated in the users Isis temporary
     directory and deleted after they are no longer needed. In case of a catastrophic
     failure the intermediate files should be deleted.
     </p>
@@ -51,7 +51,7 @@
       Added CKNADIR functionality
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo
+      Removed references to CubeInfo 
     </change>
     <change name="Steven Lambright" date="2008-10-27">
       This program now uses the Pipeline class to accomplish its processing.
@@ -77,8 +77,8 @@
         <description>
           Input filename. This file can be in one of four stages. A compressed
           PDS formatted MOC EDR, an uncompressed PDS formatted MOC EDR,
-          a Level0 ISIS cube with a complete kernels group in its label, or a
-          Level1 radiometriclly calibrated ISIS cube.
+          a Level0 Isis cube with a complete kernels group in its label, or a
+          Level1 radiometriclly calibrated Isis cube.
         </description>
         <filter>
           *.imq *.img
@@ -234,16 +234,16 @@
           Select the definition of the shape model for spiceinit
         </brief>
         <description>
-	    ISIS camera models can use a shape model (a projected ISIS cube that defines
+	    ISIS camera models can use a shape model (a projected ISIS cube that defines 
 	    the radii for a global or regional area).  You can choose
-            to select a shape model or to use the definition of the ellipsoid found
+            to select a shape model or to use the definition of the ellipsoid found 
 	    in the planetary constants (PCK) file.
         </description>
         <list>
           <option value="ELLIPSOID">
             <brief>Use triiaxial ellipsoid from PCK</brief>
 	    <description>
-		The camera will use the radii defined in the planetary constants file (PCK)
+		The camera will use the radii defined in the planetary constants file (PCK) 
 		when determining intersections of the body surface
 	    </description>
             <exclusions>
@@ -253,9 +253,9 @@
           <option value="SYSTEM">
             <brief>Search system for a default shape model</brief>
             <description>
-		This option will search the default system data area ($ISISDATA/base/dems)
+		This option will search the default system data area ($ISISDATA/base/dems) 
 		for a shape model that matches the target of the input cube.  If none are
-                found then no shape model will be used and the default ellipsoid parameters
+                found then no shape model will be used and the default ellipsoid parameters 
 		found in the planetary constants (PCK) file define the shape.
             </description>
             <exclusions>
@@ -278,7 +278,7 @@
           User defined ISIS cube shape model.
         </brief>
         <description>
-	    A map projected ISIS cube which contains the radii of the target.  The file
+	    A map projected ISIS cube which contains the radii of the target.  The file 
 	    can cover more than the input cube
             (FROM) but must minimally cover the data in the input cube.
         </description>
@@ -313,7 +313,7 @@
         <internalDefault>Automatic</internalDefault>
         <description>
           Specifies the resolution in meters per pixel. If not
-          entered the resolution will
+          entered the resolution will 
           be obtained from the MAP file.
           If not in the MAP file the resolution will be computed from
           the input camera cube.

@@ -38,7 +38,7 @@
   <files>
     <file>
       <body>
-        <h2>Changed ISIS Classes</h2>
+        <h2>Changed Isis Classes</h2>
           <ul>
             <xsl:for-each select="isisReleaseNotes/object[count(historyEntry) > 0]">
             <xsl:sort select="@name" />
@@ -51,7 +51,7 @@
             </xsl:for-each>
           </ul>
 
-        <h2>Changed ISIS Classes (detailed)</h2>
+        <h2>Changed Isis Classes (detailed)</h2>
           <xsl:for-each select="isisReleaseNotes/object[count(historyEntry) > 0]">
           <xsl:sort select="@name" />
           <a>
@@ -114,7 +114,7 @@
   <bibliography>
     <title>API Changes</title>
     <brief>Changes since the last ISIS release</brief>
-    <description>Listing of the classes that have changed in ISIS since the last major release.</description>
+    <description>Listing of the classes that have changed in Isis since the last major release.</description>
     <author>Steven Lambright</author>
     <date>2011-12-27</date>
   </bibliography>

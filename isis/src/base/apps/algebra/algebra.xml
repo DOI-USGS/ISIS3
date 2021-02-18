@@ -8,7 +8,7 @@
 
   <description>
     This program will perform simple algebra on either one or two cubes.
-    The two cubes may be added, subtracted, multiplied or divided.  The
+    The two cubes may be added, subtracted, multiplied or divided.  The 
     following equations are used:
 
     <pre>
@@ -32,7 +32,7 @@
     </change>
 
     <change name="Tracie Sucharski" date="2002-08-20">
-      Ported to ISIS 3.0, combining add,mad,b16mad and mult.
+      Ported to Isis 3.0, combining add,mad,b16mad and mult.
     </change>
     <change name="Tracie Sucharski" date="2002-10-29">
       Was not handling special pixel values correctly.  If only one input
@@ -77,7 +77,7 @@
     </change>
     <change name="Stacy Alley" date="2007-08-20">
       Fixed segmenation fault error. If the user did not enter a FROM2 value then tried to perform a non-unary operation
-      the program would crash. FIX:The program will inform the user of the error without crashing so they can make the
+      the program would crash. FIX:The program will inform the user of the error without crashing so they can make the 
       proper correction.
     </change>
     <change name="Mackenzie Boyd" date="2011-04-11">
@@ -258,7 +258,7 @@
           This defines the additive constant for entire equation.
         </description>
       </parameter>
-
+	
       <parameter name="D">
         <type>double</type>
         <default>
@@ -269,7 +269,7 @@
           This defines the additive constant for the first input cube.
         </description>
        </parameter>
-
+	
       <parameter name="E">
         <type>double</type>
         <default>

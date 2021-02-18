@@ -3,11 +3,11 @@
 <application name="ddd2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import msss ddd file into ISIS format
+    Import msss ddd file into Isis format
   </brief>
 
   <description>
-    This program will import a ddd image into an ISIS cube. The ddd format files
+    This program will import a ddd image into an Isis cube. The ddd format files
     are created by Malin Space Science Systems.
   </description>
 
@@ -71,7 +71,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename

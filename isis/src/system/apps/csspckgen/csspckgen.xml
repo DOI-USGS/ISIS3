@@ -18,9 +18,9 @@
       string.
     </p>
     <p>
-      New version of ISIS are capable of resolving this date string and
+      New version of Isis are capable of resolving this date string and
       grabbing the latest PCK from the data area.  In an effort to support
-      legacy versions of ISIS 3, this program adds Selection groups for the
+      legacy versions of Isis 3, this program adds Selection groups for the
       direct paths to the latest PCK files, and is called by the makedb script
       within the Cassini PCK directory in order to always contain the latest
       PCKs.
@@ -29,17 +29,17 @@
       When initializing a file, spiceinit will grab the last PCK in the DB file
       that it can use for the given coverage period.  With this in mind, the
       date-versioned filenames should be placed below the direct filenames such
-      that new versions of ISIS will resolve the latest PCK at runtime.  This
+      that new versions of Isis will resolve the latest PCK at runtime.  This
       way, in case a user is missing the directly specified PCK, they could fall
       back to whatever happens to be the latest PCK in their data area.
-      Unfortunately, in legacy versions of ISIS 3, spiceinit only looks at the
+      Unfortunately, in legacy versions of Isis 3, spiceinit only looks at the
       coverage time, and does not consider whether a file exists when
       determining if it is usable, thus the date-versioned filenames must be
       placed above the direct filenames, and will thus not be used until legacy
       support is dropped.
     </p>
     <p>
-      Once all supported versions of ISIS contain the date-versioning logic,
+      Once all supported versions of Isis contain the date-versioning logic,
       these direct filenames should no longer be added by this program, and
       removed from all future DB files.
     </p>

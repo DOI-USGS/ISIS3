@@ -133,7 +133,7 @@ namespace Isis {
    * This method is used for ASCII or BINARY PDS tables.
    *
    * @param pdsLabFile Name of PDS table label file
-   * @param pdsTableFile Name of PDS table data file to be imported into ISIS
+   * @param pdsTableFile Name of PDS table data file to be imported into Isis
    *                (optional)
    * @param pdsTableName Name of the table object in the PDS file (optional)
    *
@@ -220,14 +220,14 @@ namespace Isis {
    *
    * @return QString Returns the column name as requested
    *
-   * @throws IException::Programmer "Unable to import the binary PDS table into ISIS . The
+   * @throws IException::Programmer "Unable to import the binary PDS table into Isis. The
    *                                 requested column index exceeds the last column index."
    */
   QString ImportPdsTable::getColumnName(const unsigned int &index,
                                         const bool &formatted) const {
     if ((int) index >= columns() - 1) {
       QString msg = "Unable to import the binary PDS table [" + m_tableName
-                    + "] into ISIS . The requested column index ["
+                    + "] into Isis. The requested column index ["
                     + toString((int) index) + "] exceeds the last column index ["
                     + toString(columns() - 1) + "]";
       throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
@@ -328,7 +328,7 @@ namespace Isis {
    *
    * @return Table Table containing PDS table data
    *
-   * @throws IException::Unknown "Unable to import the PDS table from the PDS file into ISIS ."
+   * @throws IException::Unknown "Unable to import the PDS table from the PDS file into Isis."
    */
   Table ImportPdsTable::importTable(const QString &isisTableName) {
     try {
@@ -339,7 +339,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to import the PDS table [" + m_tableName
-                    + "] from the PDS file [" + m_pdsTableFile + "] into ISIS .";
+                    + "] from the PDS file [" + m_pdsTableFile + "] into Isis.";
       throw IException(e, IException::Unknown, msg.toStdString(), _FILEINFO_);
 
     }
@@ -382,7 +382,7 @@ namespace Isis {
    *
    * @return Table Table containing the specified columns
    *
-   * @throws IException::Programmer "Unable to import the PDS table into ISIS . The requested
+   * @throws IException::Programmer "Unable to import the PDS table into Isis. The requested
    *                                 column name does not exist in table."
    */
   Table ImportPdsTable::importTable(const QStringList &colnames,
@@ -392,7 +392,7 @@ namespace Isis {
       const ColumnDescr *descr = findColumn(colnames[i]);
       if (!descr) {
         QString msg = "Unable to import the PDS table [" + m_tableName
-                      + "] into ISIS . The requested column name ["
+                      + "] into Isis. The requested column name ["
                       + colnames[i] + "] does not "
                       "exist in table.";
         throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
@@ -446,7 +446,7 @@ namespace Isis {
    *
    * @throws IException::Unknown "The PDS file does not have the required TABLE object.
    *                              The PDS label file is probably invalid"
-   * @throws IException::User "Unable to import the PDS table from the PDS file into ISIS .
+   * @throws IException::User "Unable to import the PDS table from the PDS file into Isis.
    *                           The PDS INTERCHANGE_FORMAT is not supported. Valid values are
    *                           ASCII or BINARY."
    */
@@ -500,7 +500,7 @@ namespace Isis {
     if (m_pdsTableType != "ASCII" && m_pdsTableType.toUpper() != "BINARY") {
       QString msg = "Unable to import the PDS table [" + tableName
                     + "] from the PDS file ["
-                    + pdsTableFile + "] into ISIS . "
+                    + pdsTableFile + "] into Isis. "
                     "The PDS INTERCHANGE_FORMAT [" + m_pdsTableType
                     + "] is not supported. Valid values are ASCII or BINARY.";
       throw IException(IException::User, msg.toStdString(), _FILEINFO_);
@@ -888,7 +888,7 @@ namespace Isis {
    *
    * @param cols Columns for a given row
    * @param cdesc Column description used to create TableField
-   * @param tfield ISIS  TableField used to determine the data type to be imported.
+   * @param tfield Isis TableField used to determine the data type to be imported.
    *
    * @return TableField  Returns the TableField with the value from the column
    *
@@ -948,7 +948,7 @@ namespace Isis {
 
 
   /**
-   * @brief Fill the ISIS  Table object with PDS table data
+   * @brief Fill the ISIS Table object with PDS table data
    *
    * This method populates the ISIS Table object with selected PDS table data
    * fields.
@@ -1105,10 +1105,10 @@ namespace Isis {
    * @return TableField object with the correct field name and field type, but
    *         no value.
    *
-   * @throws IException::Unknown "Only 4 byte integer values are supported in ISIS .
+   * @throws IException::Unknown "Only 4 byte integer values are supported in Isis.
    *                              PDS column [column name] has an integer DATA_TYPE with
    *                              [BYTES = column's number of bytes]."
-   * @throws IException::Unknown "Only 4 byte or 8 byte real values are supported in ISIS .
+   * @throws IException::Unknown "Only 4 byte or 8 byte real values are supported in Isis.
    *                              PDS column [column name] has a real DATA_TYPE with
    *                              [BYTES = column's number of bytes].
    * @throws IException::Unknown "PDS column [column name] has an unsupported DATA_TYPE
@@ -1121,7 +1121,7 @@ namespace Isis {
     if (dataType == "MSB_INTEGER" || dataType == "INTEGER"
         || dataType == "SUN_INTEGER" || dataType == "MAC_INTEGER") {
       if (cdesc.m_numBytes != 4) {
-        QString msg = "Only 4 byte integer values are supported in ISIS . "
+        QString msg = "Only 4 byte integer values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
                       + "] has an integer DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
@@ -1133,7 +1133,7 @@ namespace Isis {
     else if (dataType == "LSB_INTEGER" || dataType == "VAX_INTEGER"
              || dataType == "PC_INTEGER" ) {
       if (cdesc.m_numBytes != 4) {
-        QString msg = "Only 4 byte integer values are supported in ISIS . "
+        QString msg = "Only 4 byte integer values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
                       + "] has an integer DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
@@ -1155,7 +1155,7 @@ namespace Isis {
         return TableField(name, TableField::Real);
       }
       else {
-        IString msg = "Only 4 byte or 8 byte real values are supported in ISIS . "
+        IString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
                       + "] has a real DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
@@ -1171,7 +1171,7 @@ namespace Isis {
         return TableField(name, TableField::Real);
       }
       else {
-        QString msg = "Only 4 byte or 8 byte real values are supported in ISIS . "
+        QString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
                       "PDS Column [" + cdesc.m_name
                       + "] has a real DATA_TYPE with [BYTES = "
                       + toString(cdesc.m_numBytes) + "].";
@@ -1183,7 +1183,7 @@ namespace Isis {
              || dataType == "DATE" || dataType == "TIME" ) {
       return TableField(name, TableField::Text, cdesc.m_numBytes);
     }
-    // ISIS  tables currently don't support any of the following PDS DATA_TYPE:
+    // Isis tables currently don't support any of the following PDS DATA_TYPE:
     // BIT_STRING, COMPLEX, N/A, BOOLEAN, UNSIGNED_INTEGER, IBM types, some VAX types
     IString msg = "PDS Column [" + cdesc.m_name
                   + "] has an unsupported DATA_TYPE ["

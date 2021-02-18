@@ -14,13 +14,13 @@
       copying process, if a pixel in the tracking band of the input mosaic is not associated with
       any of the original input images, a NULL value is written to that pixel in the tracking cube.
       The mosaic cube's bit type remains the same, but the tracking cube's bit type will always be
-      unsigned integer.
+      unsigned integer. 
     </p>
     <p>
       <b>Please Note: This application only works for 32-bit ("Real") mosaics as both 8-bit and
       16-bit mosaics created prior to ISIS version 3.6.0 are considered to be corrupted.</b>
     </p>
-
+    
   </description>
 
   <category>
@@ -38,7 +38,7 @@
       being written instead.
     </change>
     <change name="Kaitlyn Lee" date="2018-10-16">
-      Removed FLOAT_MAX because it was not being used in the code and was causing build warnings
+      Removed FLOAT_MAX because it was not being used in the code and was causing build warnings 
       on MacOS 10.13. References #5520.
     </change>
   </history>
@@ -69,7 +69,7 @@
           Output mosaic and tracking cube
         </brief>
         <description>
-          The output mosaic cube name that will be up to date with ISIS version 3.6.0 and above. 
+          The output mosaic cube name that will be up to date with isis version 3.6.0 and above. 
           This cube will no longer have the tracking band or the InputImages table, but a tracking
           cube will be created in the same location with this information. This tracking cube will
           have the same base name as the mosaic, but will end in "_tracking.cub".

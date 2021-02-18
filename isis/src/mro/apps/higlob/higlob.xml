@@ -14,11 +14,11 @@
       </p>
     <img src='assets/higlob_diagram.png' alt='Diagram of output pixel groups' width='444' height='520' />
     <p>
-       The pixel values are retrieved from either the ISIS tables or the main image.
-       The calibration buffer and dark pixels are pulled from the "HiRISE Ancillary" table. The main
+       The pixel values are retrieved from either the Isis tables or the main image.
+       The calibration buffer and dark pixels are pulled from the "HiRISE Ancillary" table. The main 
        calibration image pixels come from the "HiRISE Calibration Image" table. The image buffer
        and dark pixels come from the "HiRISE Ancillary" table. The observation pixels come from
-       the main ISIS cube.
+       the main Isis cube.
      </p>
      <p>
        The calibration image and observation image pixels of a HiRISE image can be flipped from left to right
@@ -58,10 +58,10 @@
         Documentation fixes
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo
+      Removed references to CubeInfo 
     </change>
     <change name="Jeannie Backer" date="2012-10-04">
-      PROG: Changed references to TableField methods to lower camel case. Ordered includes.
+      PROG: Changed references to TableField methods to lower camel case. Ordered includes. 
       Added g_ prefix to global variables. References #1169.
     </change>
   </history>
@@ -75,8 +75,8 @@
           Input HiRISE cube
         </brief>
         <description>
-  	      The HiRISE cube containing the image and tables from the EDR product. This must
-          be an ISIS cube (i.e., "hi2isis" must be run before "higlob").
+  	      The HiRISE cube containing the image and tables from the EDR product. This must 
+          be an Isis cube (i.e., "hi2isis" must be run before "higlob").
         </description>
         <filter>
           *.cub

@@ -6,7 +6,7 @@
   </brief>
 
   <description>
-    This program will import a TIFF formatted Apollo Image into an ISIS cube.
+    This program will import a TIFF formatted Apollo Image into an Isis cube. 
   </description>
 
   <history>
@@ -25,7 +25,7 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input file
+          Input file 
         </brief>
         <description>
           Use this parameter to specify the name of the input image.
@@ -39,7 +39,7 @@
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube
+           Output Isis cube
          </brief>
          <description>
            Use this parameter to select the output filename

@@ -2,13 +2,13 @@
 
 <application name="hideal2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-      Export an ISIS mosaicked ideal cube from a HiRISE image to a PDS product
+      Export an Isis mosaicked ideal cube from a HiRISE image to a PDS product
       containing related spice data.
   </brief>
 
   <description>
     <pre>
-      This application takes an ISIS cube from the HiRISE instrument that
+      This application takes an Isis cube from the HiRISE instrument that
       has been jitter corrected and mosaicked and exports it to a PDS product
       with detached label and spice tables.
 
@@ -70,7 +70,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          ISIS ideal camera cube to be exported to PDS format
+          Isis ideal camera cube to be exported to PDS format
         </brief>
         <description>
           The Ideal cube from a HiRISE image containing the related spice data

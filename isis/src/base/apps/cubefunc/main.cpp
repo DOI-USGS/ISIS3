@@ -73,7 +73,7 @@ void IsisMain() {
 
   if(bad != 0) {
     PvlGroup results("Results");
-    QString message = "Invalid input pixels converted to ISIS NULL values";
+    QString message = "Invalid input pixels converted to Isis NULL values";
     results += PvlKeyword("Error", message);
     results += PvlKeyword("Count", toString(bad));
     Application::Log(results);

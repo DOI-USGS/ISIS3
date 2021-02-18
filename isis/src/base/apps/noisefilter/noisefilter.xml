@@ -9,7 +9,7 @@
   <description>
      This program applies a noise filter to a cube.  Pixel values that
      are considered to be noise will be replaced with either the average
-     of the boxcar or the ISIS NULL value.  The criteria for determining
+     of the boxcar or the Isis NULL value.  The criteria for determining
      whether a pixel is noise or not is given by the TOLMIN and TOLMAX
      parameters.  If the difference between the input pixel and the average
      of the boxcar is greater than the tolerance given, the pixel is
@@ -67,7 +67,7 @@
       Added a flattol parameter - it replaces the tolmin parameter in isis2 boxfilter
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo
+      Removed references to CubeInfo 
     </change>
   </history>
 
@@ -146,10 +146,10 @@
            Scaled tolerance value
         </brief>
         <description>
-          Minimum tolerance value used in the STDDEV filter.  If the difference
-          between the original pixel, and the average value of the noise filter is
-          less than the FLATTOL then the output pixel will remain unchanged
-          from the input pixel.  Without this safeguard, very uniform inage areas
+          Minimum tolerance value used in the STDDEV filter.  If the difference 
+          between the original pixel, and the average value of the noise filter is 
+          less than the FLATTOL then the output pixel will remain unchanged 
+          from the input pixel.  Without this safeguard, very uniform inage areas 
           (low standard deviation) will be excessively smoothed, creating areas
           of constant DN.
         </description>
@@ -226,10 +226,10 @@
             </description>
           </option>
           <option value="NULL">
-            <brief> Replace noise with ISIS Null value </brief>
+            <brief> Replace noise with Isis Null value </brief>
             <description>
               If the input pixel is considered noise, it is replaced with
-              the ISIS Null value.
+              the Isis Null value.
             </description>
           </option>
         </list>
