@@ -179,14 +179,14 @@ Try to load a cube that is not camera or map projection:
 **USER ERROR** Can not geom chip. Chip cube [] is not a camera or map projection.
 **ERROR** Unable to initialize cube projection from file [].
 **ERROR** Unable to find PVL group [Mapping] in file [].
-**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** Unable to initialize camera model in Camera Factory.
 **ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with a match cube that is not camera or map projection:
 **USER ERROR** Can not geom chip. Match chip cube [] is not a camera or map projection.
 **ERROR** Unable to initialize cube projection from file [].
 **ERROR** Unable to find PVL group [Mapping] in file [].
-**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** Unable to initialize camera model in Camera Factory.
 **ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:

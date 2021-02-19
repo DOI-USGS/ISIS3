@@ -30,15 +30,15 @@ namespace Isis {
   /**
    * @brief Class for computing sensor ground coordinates
    *
-   * The sensor class allows for the computation of parameters related to orbiting instruments. 
-   * In particular, a time and look direction can be set and from those the ground coordinate 
-   * (latitude/longitude) along with phase, incidence, and emission angles can be computed. 
-   * Likewise, a ground point can be set and look direction can be computed. This class is derived 
-   * from the Spice class. 
+   * The sensor class allows for the computation of parameters related to orbiting instruments.
+   * In particular, a time and look direction can be set and from those the ground coordinate
+   * (latitude/longitude) along with phase, incidence, and emission angles can be computed.
+   * Likewise, a ground point can be set and look direction can be computed. This class is derived
+   * from the Spice class.
    *
-   * An important capability of this class is the ability to use a surface model other than an 
-   * ellipsoid when intersecting the look direction of the sensor with the planetary body. This 
-   * allows for the generation of othrorectified products. The file containing the surface model 
+   * An important capability of this class is the ability to use a surface model other than an
+   * ellipsoid when intersecting the look direction of the sensor with the planetary body. This
+   * allows for the generation of othrorectified products. The file containing the surface model
    * is a cube and is obtained from the labels in the follow form:
    *   @code
    *     Group = Kernels
@@ -137,17 +137,17 @@ namespace Isis {
    *   @history 2012-05-04 Steven Lambright - Re-enabled a safety check in the DemRadius() method
    *                           which was needed due to Projection not uniformly handling Null
    *                           inputs. Fixes #807.
-   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-09-06 Steven Lambright and Stuart Sides - Changed the constructors to take
    *                           Cube instead of Pvl to prevent redundant parsing. This
    *                           should eventually be refactored into a CubeLabel or similar object
    *                           so that an actual cube isn't required in the future, but for now
    *                           this enables the control net GUI to create a camera from a cube
-   *                           with no dimensions in the label. 
-   *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into 
-   *                           new classes:  ShapeModel, EllipsoidShape, DemShape, and 
-   *                           EquatorialCylindricalShape.  Also modified to use new Target class.  
+   *                           with no dimensions in the label.
+   *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into
+   *                           new classes:  ShapeModel, EllipsoidShape, DemShape, and
+   *                           EquatorialCylindricalShape.  Also modified to use new Target class.
    *                           References #775 and #1114
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method to lower
    *                           camel case. References #1181.
@@ -163,6 +163,9 @@ namespace Isis {
    *                            SetLocalGround(bool backCheck) to make a callback to the
    *                            ShapeModel::isOccludedFrom() to test for point
    *                            visability.
+   *   @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Made several functions
+   *                           virtual and moved look vector member variable to protected. Ensured
+   *                           that m_newLookB always initializes to the same value.
    */
   class Sensor : public Spice {
     public:
@@ -191,22 +194,22 @@ namespace Isis {
       Distance LocalRadius(Latitude lat, Longitude lon);
       Distance LocalRadius(double lat, double lon);
 
-      double PhaseAngle() const;
-      double EmissionAngle() const;
-      double IncidenceAngle() const;
+      virtual double PhaseAngle() const;
+      virtual double EmissionAngle() const;
+      virtual double IncidenceAngle() const;
 
       void LookDirection(double v[3]) const;
       std::vector<double> lookDirectionJ2000() const;
       std::vector<double> lookDirectionBodyFixed() const;
 
-      double RightAscension();
-      double Declination();
+      virtual double RightAscension();
+      virtual double Declination();
 
       // Return vector between spacecraft and surface point in body-fixed
       void SpacecraftSurfaceVector(double scSurfaceVector[3]) const;
-      double SlantDistance() const;
+      virtual double SlantDistance() const;
       double LocalSolarTime();
-      double SolarDistance() const;
+      virtual double SolarDistance() const;
       double SpacecraftAltitude();
 
       // Return local radius from dem
@@ -232,15 +235,17 @@ namespace Isis {
       virtual QString spacecraftNameLong() const = 0;
       virtual QString spacecraftNameShort() const = 0;
 
+    protected:
+      SpiceDouble m_lookB[3];  //!< Look direction in body fixed
+      bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
+
     private:
       // This version of DemRadius is for SetLookDirection ONLY. Do not call.
       // DAC TODO Why is next declaration here? Don't move until I know
 //      double DemRadius(double lat, double lon);
       void CommonInitialize(const std::string &demCube);
 
-      SpiceDouble m_lookB[3];  //!< Look direction in body fixed
 
-      bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
       SpiceDouble m_ra;     //!< Right ascension (sky longitude)
       SpiceDouble m_dec;    //!< Decliation (sky latitude)
       void computeRaDec();  //!< Computes the ra/dec from the look direction
