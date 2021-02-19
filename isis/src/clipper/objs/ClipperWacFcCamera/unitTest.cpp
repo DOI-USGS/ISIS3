@@ -47,9 +47,9 @@ void TestLineSamp(Camera *cam, double samp, double line);
  */
 
 // IMPORTANT NOTE: This test is believed to be failing because the test data has an arbitrary date
-// for the StartTime, which means that the spice probably shows the spacecraft as not being near and 
+// for the StartTime, which means that the spice probably shows the spacecraft as not being near and
 // pointed at Europa. If the spacecraft isn't near and pointed at Europa, there will be no intersection
-// and SetImage will fail. 
+// and SetImage will fail.
 int main(void) {
   Preference::Preferences(true);
 
@@ -62,7 +62,7 @@ int main(void) {
     double knownLon = 0;
 
     qDebug() << "Testing with test image...";
-    Cube c("$clipper/testData/simulated_clipper_eis_wac_rolling_shutter.cub", "r");
+    Cube c("$ISISTESTDATA/isis/src/clipper/unitTestData/simulated_clipper_eis_wac_rolling_shutter.cub", "r");
     ClipperWacFcCamera *cam = (ClipperWacFcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();

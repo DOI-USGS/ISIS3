@@ -59,7 +59,7 @@ class TestRollingShutterCamera : public RollingShutterCamera {
           string msg = "SPK Reference ID is unique to mission-specific cameras";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
-        
+
         // These are pure virtual within Sensor that must be overriden
         virtual QString instrumentNameLong() const { return QString("RollingShutting"); }
         virtual QString instrumentNameShort() const { return QString("RS"); }
@@ -73,7 +73,7 @@ int main() {
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
-    Cube cube("$clipper/testData/simulated_clipper_eis_nac_rolling_shutter.cub", "r");
+    Cube cube("$ISISTESTDATA/isis/src/base/unitTestData/simulated_clipper_eis_nac_rolling_shutter.cub", "r");
     TestRollingShutterCamera cam(cube);
 
     // test camera type
