@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <vector>
@@ -126,7 +134,7 @@ void IsisMain () {
   Isis::PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
   QString filterNum = (QString) bandBin["FilterNumber"][0];
-  //We have to pay special attention incase we are passed a 
+  //We have to pay special attention incase we are passed a
   //single band image that has been "exploded" from a multiband wac
   if (instModeId == "COLOR" && g_bands.size() == 1)
    g_bands[0] = (toInt(filterNum) -2);
@@ -259,7 +267,7 @@ void IsisMain () {
   PvlKeyword temperaturePvl("TemperatureFile");
   if (g_temprature) {
     if (tempFile.toLower() == "default" || tempFile.length() == 0)
-      tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl"; 
+      tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl";
 
     FileName tempFileName(tempFile);
     if (tempFileName.isVersioned())
@@ -518,15 +526,15 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
               //
               // Where:
               //  'a' and 'b' are band dependant constants read in via a pvl file
-              //  
+              //
               //  AND
-              //  
+              //
               // frameTemp: (Pre-Calculated as it is used in multiple places)
               //
               //    (WAC end temp - WAC start temp)
               //    -------------------------------   *   frame   +   WAC start temp
               //         (WAC num framelets)
-              // 
+              //
               //
               //
               if (correctBand != -1)
@@ -771,7 +779,7 @@ void GetMask(QString &fileString, double temp, Buffer* &data) {
  * LRO calibration directory
  *
  * @param calibrationType The type of calibration data
- * 
+ *
  * @return @b QString Path of the calibration directory
  *
  * @internal

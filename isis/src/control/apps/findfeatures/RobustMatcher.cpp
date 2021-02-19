@@ -1,26 +1,11 @@
-/**
- * @file
- * $Revision$
- * $Date$
- * $Id$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 
 #include <string>
@@ -61,17 +46,17 @@ RobustMatcher::RobustMatcher() : MatcherAlgorithms(), QLogger(),
 }
 
 
-RobustMatcher::RobustMatcher(const QString &name) : 
-                             MatcherAlgorithms(), 
-                             QLogger(),m_name(name), 
+RobustMatcher::RobustMatcher(const QString &name) :
+                             MatcherAlgorithms(),
+                             QLogger(),m_name(name),
                              m_parameters() {
   init();
 }
 
-RobustMatcher::RobustMatcher(const QString &name, 
+RobustMatcher::RobustMatcher(const QString &name,
                              const MatcherAlgorithms &algorithms,
                              const PvlFlatMap &parameters,
-                             const QLogger &logger) : 
+                             const QLogger &logger) :
                              MatcherAlgorithms(algorithms),QLogger(logger),
                              m_name(name), m_parameters() {
   init(parameters);
@@ -672,7 +657,7 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
 // i.e. size will be 0)
 int RobustMatcher::ratioTest(std::vector<std::vector<cv::DMatch> > &matches,
                              double &mtime) const {
-  
+
   double v_ratio = toDouble(m_parameters.get("Ratio"));
   if ( isDebug() ) {
     logger() << "Entered RobustMatcher::ratioTest(matches[2]) for 2 NearestNeighbors (NN)...\n";
@@ -817,7 +802,7 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   cv::Mat fundamental = cv::Mat::eye(3,3,CV_64F);
 
   // See if enough points to compute fundamental matrix. Minumum number needed
-  // for RANSAC is 8 points. 
+  // for RANSAC is 8 points.
   int v_minEpiPoints = toInt(m_parameters.get("MinimumFundamentalPoints"));
   if ( (unsigned int) v_minEpiPoints > matches.size() ) {
     if ( isDebug() ) {
@@ -884,8 +869,8 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   if ( toBool(m_parameters.get("RefineFundamentalMatrix"))  ) {
 
     // See if enough points to compute fundamental matrix. Minumum number needed
-    // for RANSAC is 8 points. 
-    int v_minEpiPoints = toInt(m_parameters.get("MinimumFundamentalPoints")); 
+    // for RANSAC is 8 points.
+    int v_minEpiPoints = toInt(m_parameters.get("MinimumFundamentalPoints"));
     if ( (unsigned int) v_minEpiPoints <= outMatches.size() ) {
 
       // Make a copy of the inliers of the first fundamental processing

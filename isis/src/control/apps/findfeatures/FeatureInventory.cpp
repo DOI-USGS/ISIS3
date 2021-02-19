@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <boost/foreach.hpp>
 
@@ -32,7 +19,7 @@
 #include "FeatureInventory.h"
 
 namespace Isis {
-  FeatureInventory::FeatureInventory() : m_theFeatureCreator(), 
+  FeatureInventory::FeatureInventory() : m_theFeatureCreator(),
                                          m_theMatcherCreator()  { }
 
 
@@ -43,11 +30,11 @@ namespace Isis {
                              FeatureInventory::FeatureCreator maker,
                              const QStringList &aliases) {
 
-    // Add the fundamental 
-    int v_made(0);    
+    // Add the fundamental
+    int v_made(0);
     // There cannot be withspace at the begging or end of the name - its okay
     // to embed them.
-    QString v_name = name.toLower().trimmed(); 
+    QString v_name = name.toLower().trimmed();
     m_theFeatureCreator.insert(v_name, maker);
     v_made++;
 
@@ -58,11 +45,11 @@ namespace Isis {
        QString l_name = a_name.toLower().trimmed();
        m_theFeatureCreator.insert(l_name, maker);
        v_made++;
-       if ( l_name.contains(QRegularExpression("^detector\\.*", 
+       if ( l_name.contains(QRegularExpression("^detector\\.*",
                                                QRegularExpression::CaseInsensitiveOption) ) ) {
          m_detectorNames.append( l_name.toLower() );
        }
-       if ( a_name.contains(QRegularExpression("^extractor\\.*", 
+       if ( a_name.contains(QRegularExpression("^extractor\\.*",
                                                QRegularExpression::CaseInsensitiveOption) ) ) {
          m_extractorNames.append( l_name.toLower() );
        }
@@ -77,9 +64,9 @@ namespace Isis {
                              FeatureInventory::MatcherCreator maker,
                              const QStringList &aliases) {
     int v_made(0);
-    // There cannot be whitespace at the begining or end of the name - its okay 
-    // to embed them. 
-    QString v_name = name.toLower().trimmed(); 
+    // There cannot be whitespace at the begining or end of the name - its okay
+    // to embed them.
+    QString v_name = name.toLower().trimmed();
     m_theMatcherCreator.insert(v_name, maker);
     m_matcherNames.append( name.toLower() );
     v_made++;
@@ -87,7 +74,7 @@ namespace Isis {
     // Add all aliases. Expected to of form "detector.name, extractor.name",
     // etc....
     BOOST_FOREACH ( QString a_name, aliases ) {
-      QString l_name = a_name.toLower().trimmed(); 
+      QString l_name = a_name.toLower().trimmed();
       if ( !l_name.isEmpty() ) {
         m_theMatcherCreator.insert(l_name, maker);
       }
@@ -108,7 +95,7 @@ namespace Isis {
 
     QString name = parts.takeFirst().toLower().trimmed();
     PvlFlatMap variables = parameters(parts);
-    
+
     if ( m_theFeatureCreator.contains(name) ) {
       FeatureCreator creator = m_theFeatureCreator.value(name);
       return ( creator( variables, config) );
@@ -133,7 +120,7 @@ namespace Isis {
     return ( algo );
   }
 
-  
+
   FeatureAlgorithmPtr FeatureInventory::getExtractor(const QString &config) const {
     FeatureAlgorithmPtr algo = getFeature(config);
     if ( !algo->hasExtractor() ) {
@@ -202,7 +189,7 @@ namespace Isis {
       else {
         QString mess = "Algorithm [" + algorithmName +
                       "] is not a supported OpenCV3 algorithm.";
-        throw IException(IException::User, mess, _FILEINFO_); 
+        throw IException(IException::User, mess, _FILEINFO_);
       }
 
       algorithmObject += aliases( lowerName );
@@ -237,7 +224,7 @@ namespace Isis {
     else {
       QString mess = "Algorithm [" + algorithmName +
                      "] is not a supported OpenCV3 algorithm.";
-      throw IException(IException::Programmer, mess, _FILEINFO_); 
+      throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
     return ( aliasKey );
@@ -279,7 +266,7 @@ namespace Isis {
 
 
   /** Split the string with the provided separator in individual parts   */
-   QStringList FeatureInventory::parse(const QString &config, 
+   QStringList FeatureInventory::parse(const QString &config,
                                        const QString &sep) const {
      return ( config.split(sep, QString::SkipEmptyParts) );
    }
@@ -301,4 +288,3 @@ namespace Isis {
    }
 
 };
-

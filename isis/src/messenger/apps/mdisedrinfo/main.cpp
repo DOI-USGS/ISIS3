@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 //  $Id: mdisedrinfo.cpp,v 1.8 2008/07/11 22:38:41 nhilt Exp $
 #include "Isis.h"
 
@@ -170,4 +178,3 @@ void IsisMain() {
   QString fromName(from.expanded());
   if(delete_from) remove(fromName.toLatin1().data());
 }
-

@@ -1,27 +1,13 @@
 #ifndef ControlNetVersioner_h
 #define ControlNetVersioner_h
-/**
- * @file
- * $Revision: 1.9 $
- * $Date: 2009/07/15 17:33:52 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QString>
 
@@ -399,13 +385,13 @@ namespace Isis {
    *                           Target::GetRadii calls to speed up createPoint().
    *   @history 2018-01-12 Adam Goins - Added Progress during reads.
    *   @history 2018-01-24 Jesse Mapel - Fixed c++11 build warnings.
-   *                         
+   *
    *   @history 2018-01-27 Jesse Mapel - Fixed some documentation formatting. Added a section
    *                           describing the different file format versions.
    *   @history 2018-01-30 Adam Goins - Ensured point sizes are written/read as lsb by using
    *                           EndianSwapper.
-   *   @history 2018-02-25 Debbie A. Cook - Generalized calls to 
-   *                           ControlPoint::IsLatitudeConstrained to IsCoord1Constained 
+   *   @history 2018-02-25 Debbie A. Cook - Generalized calls to
+   *                           ControlPoint::IsLatitudeConstrained to IsCoord1Constained
    *                           and added or updated a few comments. *** TODO *** make sure
    *                           the new methods are fully functional for either coordinate type
    *                           once the new header keyword is added.
@@ -416,11 +402,11 @@ namespace Isis {
    *                           so that these values can be grabbed from a ControlNet on read.
    *                           Also Fixes #5361.
    *   @history 2018-06-01 Debbie A. Cook - (added to BundleXYZ 2018-02-25)
-   *                           Generalized calls to ControlPoint::IsLatitudeConstrained to 
+   *                           Generalized calls to ControlPoint::IsLatitudeConstrained to
    *                           IsCoord1Constained and added or updated a few comments.
    *                           *** TODO *** make sure the new methods are fully functional
    *                           for either coordinate type once the new header keyword is added.
-   *                           
+   *
    *   @history 2018-07-03 Jesse Mapel - Removed target radii from versioner. References #5457.
    */
   class ControlNetVersioner {

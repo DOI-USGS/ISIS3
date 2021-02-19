@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "NewHorizonsLeisaCamera.h"
 
@@ -38,11 +26,11 @@ namespace Isis {
   /**
    * Constructs a New Horizons LEISA LineScanCamera object. LEISA is technically a frame
    * type camera, but it has the etalon filer in front of it exposing each line of a frame to have a
-   * different wavelength, so we treat it like a linescan camera. Each band of the ISIS cube is made 
-   * by combining all the corresponding frame line numbers into that band (i.e., All the line number 
-   * 1s from each frame in an observatoin are combined into band 1, all line number 2s are put into 
-   * band 2, and so on) 
-   * 
+   * different wavelength, so we treat it like a linescan camera. Each band of the ISIS cube is made
+   * by combining all the corresponding frame line numbers into that band (i.e., All the line number
+   * 1s from each frame in an observatoin are combined into band 1, all line number 2s are put into
+   * band 2, and so on)
+   *
    * @param something Description
    *
    * @author Kristin Berry
@@ -53,9 +41,9 @@ namespace Isis {
     m_instrumentNameShort = "LEISA";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
-    
-    // Override the SPICE error process for SPICE calls 
-    NaifStatus::CheckErrors(); 
+
+    // Override the SPICE error process for SPICE calls
+    NaifStatus::CheckErrors();
 
     SetFocalLength();
     SetPixelPitch();
@@ -65,9 +53,9 @@ namespace Isis {
     QString expDuration = inst["ExposureDuration"];
 
     QString stime = inst["SpacecraftClockStartCount"];
-    double m_etStart = getClockTime(stime).Et(); 
-    
-    // The line rate is set to the time between each frame since we are treating LEASA as a linescan    
+    double m_etStart = getClockTime(stime).Et();
+
+    // The line rate is set to the time between each frame since we are treating LEASA as a linescan
     double m_lineRate = expDuration.toDouble();
 
     // The detector map tells us how to convert from image coordinates to
@@ -106,27 +94,27 @@ namespace Isis {
       m_originalBand.append(toInt(orgBand[i]));
     }
 
-    // Use the defualt no correction distortion map. 
+    // Use the defualt no correction distortion map.
     new CameraDistortionMap(this);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();  
+    LoadCache();
 
     // Check to see if there were any SPICE errors
-    NaifStatus::CheckErrors();  
+    NaifStatus::CheckErrors();
   }
 
 
   /**
-   * Change the New Horizons camera parameters based on the band number 
+   * Change the New Horizons camera parameters based on the band number
    *
    * @param vband The band number to set
    *
-   * @author 2014-09-24 Stuart Sides 
-   *  
+   * @author 2014-09-24 Stuart Sides
+   *
    */
   void NewHorizonsLeisaCamera::SetBand(const int vband) {
     if ( (vband < 1) || (vband > m_originalBand.size())) {
@@ -138,7 +126,7 @@ namespace Isis {
     int band;
     band = m_originalBand[vband-1];
     Camera::SetBand(vband);
-    
+
     // Get the affine coefficients from the focal plane map and adjust the constant terms to
     // provide the correct Y/Line offset for this band
     QVector<double> temp;
@@ -172,15 +160,14 @@ namespace Isis {
 
 
 /**
- * This is the function that is called in order to instantiate a 
- * NewHorizonsLeisaCamera object. 
+ * This is the function that is called in order to instantiate a
+ * NewHorizonsLeisaCamera object.
  *
  * @param lab Cube labels
  *
  * @return Isis::Camera* NewHorizonsLeisaCamera
- * 
+ *
  */
 extern "C" Isis::Camera *NewHorizonsLeisaCameraPlugin(Isis::Cube &cube) {
   return new Isis::NewHorizonsLeisaCamera(cube);
 }
-

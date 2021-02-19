@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "QtieFileTool.h"
 
 #include <QApplication>
@@ -42,7 +50,7 @@ namespace Isis {
     saveAction()->setEnabled(false);
   }
 
-  
+
   /**
    *  Open base image and image to be adjusted
    *
@@ -56,7 +64,7 @@ namespace Isis {
    *                            network.
    * @history 2010-05-13  Tracie Sucharski - Use match cube directory to determine
    *                            default directory for cnet.
-   * @history 2012-05-10  Tracie Sucharski - The FileTool::closeAll method no longer 
+   * @history 2012-05-10  Tracie Sucharski - The FileTool::closeAll method no longer
    *                            closes viewports, so re-implemented closing of old
    *                            cube viewports before opening new.
    *

@@ -1,6 +1,14 @@
 #ifndef AmicaCalUtils_h
 #define AmicaCalUtils_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <string>
 #include <vector>
@@ -49,7 +57,7 @@ static void loadNaifTiming() {
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
     leapseconds = leapseconds.highestVersion();
-    Isis::FileName sclk("$hayabusa/kernels/sclk/hayabusa.tsc");    
+    Isis::FileName sclk("$hayabusa/kernels/sclk/hayabusa.tsc");
     Isis::FileName pck1("$hayabusa/kernels/tspk/de403s.bsp");
     Isis::FileName pck2("$hayabusa/kernels/tspk/sb_25143_140.bsp");
     Isis::FileName pck3("$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp");
@@ -85,7 +93,7 @@ static void loadNaifTiming() {
  *
  * This method requires the appropriate NAIK kernels to be loaded that
  * provides instrument time support, leap seconds and planet body ephemeris.
- *  
+ *
  * @return @b double Distance in AU between Sun and observed body.
  */
 static bool sunDistanceAU(const QString &scStartTime,
@@ -230,7 +238,7 @@ void  translate(Cube *flatField, int *transform, QString fname) {
   Mat originalCropped = temp(Rect(startsample,startline,width+1,height+1));
 
 
-  if (scale ==1) {   
+  if (scale ==1) {
     mat2isis(&originalCropped,fname);
   }
   else {
@@ -303,7 +311,7 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
   double r = sqrt(X*X+Y*Y);
   double sum = 0;
 
-  for (int i = 0; i < N; i ++)   {     
+  for (int i = 0; i < N; i ++)   {
     sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c() ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
   }
 
@@ -345,9 +353,9 @@ double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int 
          i++;
        }
        else {
-         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);                 
+         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);
          i++;
-       }      
+       }
     }
   }
 
@@ -360,4 +368,3 @@ double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int 
 
 
 #endif
-

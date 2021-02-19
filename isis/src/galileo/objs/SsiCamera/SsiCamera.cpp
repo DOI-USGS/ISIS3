@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision: 1.4 $
- * $Date: 2008/05/14 21:07:11 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "SsiCamera.h"
 
 #include <QString>
@@ -41,10 +28,10 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs a SsiCamera object using the image labels.
-   *  
-   * @param lab Pvl label from a Galileo SSI image. 
-   *  
-   * @internal 
+   *
+   * @param lab Pvl label from a Galileo SSI image.
+   *
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Added call
    *                          to ShutterOpenCloseTimes() method.
    */
@@ -53,7 +40,7 @@ namespace Isis {
     m_instrumentNameShort = "SSI";
     m_spacecraftNameLong = "Galileo Orbiter";
     m_spacecraftNameShort = "Galileo";
-    
+
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     double k1;
@@ -100,9 +87,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map
@@ -152,12 +139,12 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate a SsiCamera
- * object. 
+ * object.
  *
  * @param lab Cube labels
  *
- * @return Isis::Camera* SsiCamera 
- * @internal 
+ * @return Isis::Camera* SsiCamera
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Galileo namespace.
  */

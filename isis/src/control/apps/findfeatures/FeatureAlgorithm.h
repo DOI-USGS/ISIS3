@@ -1,26 +1,14 @@
 #ifndef FeatureAlgorithm_h
 #define FeatureAlgorithm_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "IException.h"
 #include "PvlFlatMap.h"
@@ -39,38 +27,38 @@
 namespace Isis {
 
 /**
- * @brief Wrapper for generic algorithm OpenCV3 feature matcher algorithms 
- *  
- * This class provides a generic wrapper that is intended to restore some of the 
- * functionality for these algorithms that were lost in the upgrade from version 
- * 2. Hence, the class T is intended to be an OpenCV Ptr type that contains 
- * either a Feature2D or DescriptorMatcher algorithm pointer. 
- *  
- * However, the design does lend itself to overide some the OpenCV specifics 
- * if needed. 
- *  
- * The OpenCV implementation can simply extract and populate the 
- * the PvlFlatMap variable structure to allow the default 
- * implementation to serve up the algorithm variables to the 
- * calling environment - or provide a specific implementation if 
- * inadequate. 
- *  
- * The config variable provides a direct way to store how the 
- * invocation string in the form of 
- * "algorithmname@var:value@var:value...". 
- *  
+ * @brief Wrapper for generic algorithm OpenCV3 feature matcher algorithms
+ *
+ * This class provides a generic wrapper that is intended to restore some of the
+ * functionality for these algorithms that were lost in the upgrade from version
+ * 2. Hence, the class T is intended to be an OpenCV Ptr type that contains
+ * either a Feature2D or DescriptorMatcher algorithm pointer.
+ *
+ * However, the design does lend itself to overide some the OpenCV specifics
+ * if needed.
+ *
+ * The OpenCV implementation can simply extract and populate the
+ * the PvlFlatMap variable structure to allow the default
+ * implementation to serve up the algorithm variables to the
+ * calling environment - or provide a specific implementation if
+ * inadequate.
+ *
+ * The config variable provides a direct way to store how the
+ * invocation string in the form of
+ * "algorithmname@var:value@var:value...".
+ *
  * @author  2016-11-30 Kris Becker
- *  
- * @internal 
- *   @history 2016-11-30 Kris Becker - Original Version 
+ *
+ * @internal
+ *   @history 2016-11-30 Kris Becker - Original Version
  */
 
 template <class T> class FeatureAlgorithm {
   public:
     FeatureAlgorithm();
     FeatureAlgorithm(const QString &name, const QString &type);
-    FeatureAlgorithm(const QString &name, const QString &type, 
-                     const T algorithm, 
+    FeatureAlgorithm(const QString &name, const QString &type,
+                     const T algorithm,
                      const PvlFlatMap &variables = PvlFlatMap());
     virtual ~FeatureAlgorithm();
 
@@ -86,7 +74,7 @@ template <class T> class FeatureAlgorithm {
     void    setConfig(const QString &config);
     QString config() const;
 
-    // Setter/getter for algorithm variable    
+    // Setter/getter for algorithm variable
     virtual bool setVariable(const QString &var, const QString &value);
     virtual QString getVariable(const QString &var,
                                 const QString &separator = ",");
@@ -130,42 +118,42 @@ template <class T> class FeatureAlgorithm {
 
 /**
  * @brief Default constructor, which is likely needed but useless
- * 
- * @author 2016-12-07 Kris Becker 
+ *
+ * @author 2016-12-07 Kris Becker
  */
-template <class T> FeatureAlgorithm<T>::FeatureAlgorithm() : 
-                                         m_name("FeatureAlgorithm"), 
-                                         m_type("Algorithm"), m_config(), 
+template <class T> FeatureAlgorithm<T>::FeatureAlgorithm() :
+                                         m_name("FeatureAlgorithm"),
+                                         m_type("Algorithm"), m_config(),
                                          m_algorithm(), m_variables() {  }
 
 
 /**
- * @brief Construct a named feature algorithm 
- *  
- * This constructor is partially valid but assumes the deriving class defines 
- * the algoritm after construction 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Construct a named feature algorithm
+ *
+ * This constructor is partially valid but assumes the deriving class defines
+ * the algoritm after construction
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @param name  Name of algorithm
  * @param type  Type of Algorithm, typically "Feature2D" or "DecriptorMatcher"
  */
-template <class T> FeatureAlgorithm<T>::FeatureAlgorithm(const QString &name, 
-                                                         const QString &type) : 
-                                                         m_name(name), 
-                                                         m_type(type), 
-                                                         m_config(), 
+template <class T> FeatureAlgorithm<T>::FeatureAlgorithm(const QString &name,
+                                                         const QString &type) :
+                                                         m_name(name),
+                                                         m_type(type),
+                                                         m_config(),
                                                          m_algorithm(),
                                                          m_variables() {  }
 
 /**
- * @brief Construct a complete algorithm 
- *  
- * This constructor will provide a complete algorithm with the parameters 
- * provided. 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Construct a complete algorithm
+ *
+ * This constructor will provide a complete algorithm with the parameters
+ * provided.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @param name       Name of algorithm
  * @param type       Type of Algorithm, typically "Feature2D" or "DecriptorMatcher"
  * @param algorithm  Algorithm (assumed to be a cv::Ptr-type parameter
@@ -173,34 +161,34 @@ template <class T> FeatureAlgorithm<T>::FeatureAlgorithm(const QString &name,
  */
 template <class T> FeatureAlgorithm<T>::FeatureAlgorithm(const QString &name,
                                                          const QString &type,
-                                                         const T algorithm, 
-                                                         const PvlFlatMap &variables) : 
-                                                         m_name(name), 
-                                                         m_type(type), 
-                                                         m_config(), 
-                                                         m_algorithm(algorithm), 
+                                                         const T algorithm,
+                                                         const PvlFlatMap &variables) :
+                                                         m_name(name),
+                                                         m_type(type),
+                                                         m_config(),
+                                                         m_algorithm(algorithm),
                                                          m_variables(variables) { }
 
 /** Destructor */
 template <class T> FeatureAlgorithm<T>::~FeatureAlgorithm() { }
 
 /**
- * @brief Check validity of algorithm 
- *  
- * The default implementation is to simply test if the cv::Ptr is valid. 
- * Derived classes can reimplement this method if needed. 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Check validity of algorithm
+ *
+ * The default implementation is to simply test if the cv::Ptr is valid.
+ * Derived classes can reimplement this method if needed.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @return bool Returns true if all is well, false if not
  */
 template <class T> bool FeatureAlgorithm<T>::isValid() const {
-  return ( !m_algorithm.empty() ); 
+  return ( !m_algorithm.empty() );
 }
 
 /** Return the name of the algorithm */
 template <class T> QString FeatureAlgorithm<T>::name() const {
-  return ( m_name ); 
+  return ( m_name );
 }
 
 /** Returns the type of the algorithm   */
@@ -215,44 +203,44 @@ template <class T> QString FeatureAlgorithm<T>::description() const {
 
 /** Set the config string if appropriate (typically seen at higher level) */
 template <class T> void FeatureAlgorithm<T>::setConfig(const QString &config) {
-   m_config = config; 
+   m_config = config;
 }
 
 /** Return the config string */
 template <class T> QString FeatureAlgorithm<T>::config() const {
-  return ( m_config ); 
+  return ( m_config );
 }
 
 /**
- * @brief Set an algorithm variable to a specific value 
- *  
- * The parameters provided in this method are deferred to the 
- * setAlgorithmVariables() method that derived classes must implement. A 
- * PvlFlatMap of the value is constructed and passed into the derived routine 
- * that implenents the setting of all variables. The derived class must return 
- * the number of valid variables set, which in this case is expected to be 1, 
- * which is tested for success. If it fails, an exception is thrown. The 
- * deriving class can also throw an exception if indicated, which is trapped 
- * and propagated up the call chain. 
- *  
- * If the setting succeeds the value is added to the existing Pvl container to 
- * maintain consistent states of the algorithm variable settings. 
- *  
- * If the needed, the deriving class can reimplement this method if the 
- * behavior is not acceptable. 
- *  
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Set an algorithm variable to a specific value
+ *
+ * The parameters provided in this method are deferred to the
+ * setAlgorithmVariables() method that derived classes must implement. A
+ * PvlFlatMap of the value is constructed and passed into the derived routine
+ * that implenents the setting of all variables. The derived class must return
+ * the number of valid variables set, which in this case is expected to be 1,
+ * which is tested for success. If it fails, an exception is thrown. The
+ * deriving class can also throw an exception if indicated, which is trapped
+ * and propagated up the call chain.
+ *
+ * If the setting succeeds the value is added to the existing Pvl container to
+ * maintain consistent states of the algorithm variable settings.
+ *
+ * If the needed, the deriving class can reimplement this method if the
+ * behavior is not acceptable.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @param var   Name of variable to set. Deriving classes should not expect
  *              case insensitive variable names. Note PvlFlatMap is case
- *              insensitive. 
+ *              insensitive.
  * @param value String value to set
- * 
- * @return bool True if the variable was successfully set. A false condition 
- *              will never be returned as an exception is thrown on failure. 
+ *
+ * @return bool True if the variable was successfully set. A false condition
+ *              will never be returned as an exception is thrown on failure.
  */
 template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &var,
-                                                      const QString &value) { 
+                                                      const QString &value) {
       PvlFlatMap variable;
       variable.add(var, value);
       try {
@@ -267,54 +255,54 @@ template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &var,
       }
 
       m_variables.merge(variable);
-      return (true); 
+      return (true);
     }
 
 /**
  * @brief Return the values of an algorithm parameter
- *  
- * This method returns the value of an algorithm as it is currently set. 
- *  
- * @author 2016-12-12 Kris Becker 
- * 
+ *
+ * This method returns the value of an algorithm as it is currently set.
+ *
+ * @author 2016-12-12 Kris Becker
+ *
  * @param var  Name of variable to retrieve
- * 
- * @return QString The value of the variable. Multiple values are separateed by 
+ *
+ * @return QString The value of the variable. Multiple values are separateed by
  *         commas.
  */
 template <class T> QString FeatureAlgorithm<T>::getVariable(const QString &var,
-                                                            const QString &separator) { 
+                                                            const QString &separator) {
       if ( m_variables.exists(var) ) {
         return (m_variables.allValues(var).join(separator));
       }
-      return (QString()); 
+      return (QString());
     }
 
 /**
- * @brief Set variable with value contained in a QVariant 
- *  
- * This method is for those algorithm uncommon variable types that are not 
- * suitable to be represented as a string or may require special consideration 
- * (such as higher precision of doubles). The default implementation, however, 
- * attempts to convert the QVariant content to a string and apply it using the 
- * setAlgorithmnVariables() method. 
- *  
- * Deriving classes can reimplement this method should it need specialized 
- * value treatment. 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
- * @param name Name of variable to set 
+ * @brief Set variable with value contained in a QVariant
+ *
+ * This method is for those algorithm uncommon variable types that are not
+ * suitable to be represented as a string or may require special consideration
+ * (such as higher precision of doubles). The default implementation, however,
+ * attempts to convert the QVariant content to a string and apply it using the
+ * setAlgorithmnVariables() method.
+ *
+ * Deriving classes can reimplement this method should it need specialized
+ * value treatment.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
+ * @param name Name of variable to set
  * @param var  QVariant containing the value to appy in the algorithm
- * 
- * @return bool True if successful, however failures result in a thrown 
+ *
+ * @return bool True if successful, however failures result in a thrown
  *              exception
  */
 template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &vname,
-                                                         const QVariant &var) { 
+                                                         const QVariant &var) {
       QString value = var.toString();
-      if ( value.isEmpty() ) { 
-        QString mess = "Variant/variable " + vname + 
+      if ( value.isEmpty() ) {
+        QString mess = "Variant/variable " + vname +
                        " cannot be converted in " + name();
         throw IException(IException::Programmer, mess, _FILEINFO_);
       }
@@ -327,30 +315,30 @@ template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &vname,
       }
 
       m_variables.merge(variable);
-      return (true); 
+      return (true);
     }
 
 /**
- * @brief Retreive an algorithm variable in a QVariant 
- *  
- * This method is provided for algorithm variable types that are not well 
- * suited for representation in strings. One such example may be a cv::Mat 
- * variable type. 
- *  
- * This method should be reimplemented by deriving classes with special 
- * variable types if needed. The deffault behavior is to convert the parameter 
- * data to a QStringList. 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Retreive an algorithm variable in a QVariant
+ *
+ * This method is provided for algorithm variable types that are not well
+ * suited for representation in strings. One such example may be a cv::Mat
+ * variable type.
+ *
+ * This method should be reimplemented by deriving classes with special
+ * variable types if needed. The deffault behavior is to convert the parameter
+ * data to a QStringList.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @param var   Name of variable to retrieve its value from
  * @param value A QVariont to return the value in
- * 
- * @return bool True if successful, however failures result in a thrown 
+ *
+ * @return bool True if successful, however failures result in a thrown
  *              exception
  */
 template <class T> bool FeatureAlgorithm<T>::getVariable(const QString &var,
-                                                         QVariant &value) { 
+                                                         QVariant &value) {
       value = QVariant(QStringList());
       if ( m_variables.exists(var) ) {
         if ( m_variables.count(var) > 0 ) {
@@ -358,7 +346,7 @@ template <class T> bool FeatureAlgorithm<T>::getVariable(const QString &var,
         }
         return (true);
       }
-      return (false); 
+      return (false);
     }
 
 /** Returns the PvlFlatMap containing all the variable/values as
@@ -369,11 +357,11 @@ template <class T> const PvlFlatMap &FeatureAlgorithm<T>::variables() const {
 
 /**
  * @brief Create an object structure of algorithm definition
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @param objname   Optional name for the PvlObject of the description
- * 
+ *
  * @return PvlObject PvlObject containing a description of the algorithm
  */
 template <class T> PvlObject FeatureAlgorithm<T>::info(const QString &objname) const {
@@ -406,9 +394,9 @@ template <class T> PvlFlatMap FeatureAlgorithm<T>::getAlgorithmVariables() const
 
 
 template <class T> int FeatureAlgorithm<T>::setAlgorithmVariables(const PvlFlatMap &variables) {
-  throw IException(IException::Programmer, "Derived classes must reimplement this method", 
+  throw IException(IException::Programmer, "Derived classes must reimplement this method",
                    _FILEINFO_);
-  
+
   return (0);
 }
 

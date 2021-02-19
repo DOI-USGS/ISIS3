@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 
 #include "Angle.h"
@@ -22,14 +30,14 @@
 using namespace std;
 
 
-namespace Isis { 
-  
+namespace Isis {
+
   // Global variables
   static Camera *cam;
   static TProjection *proj;
   static int nbands;
   static bool noCamera;
-  
+
   static bool dn;
   static bool ra;
   static bool declination;
@@ -66,7 +74,7 @@ namespace Isis {
   static bool subSolarLatitude;
   static bool subSolarLongitude;
   static bool subSolarGroundAzimuth;
-  static bool phase; 
+  static bool phase;
   static bool emission;
   static bool incidence;
   static bool localEmission;
@@ -83,28 +91,28 @@ namespace Isis {
   static bool solarLongitude;
   static bool morphologyRank;
   static bool albedoRank;
-  
-  
+
+
   static void camdevDN(Buffer &in, Buffer &out);
   static void camdev(Buffer &out);
-  
-  
+
+
   // Function to create a keyword with same values of a specified count
-  template <typename T> static PvlKeyword makeKey(const QString &name, 
-                                           const int &nvals, 
+  template <typename T> static PvlKeyword makeKey(const QString &name,
+                                           const int &nvals,
                                            const T &value);
-  
+
   // Structure containing new mosaic planes
   struct MosData {
     MosData() :  m_morph(Null), m_albedo(Null) {  }
     double m_morph;
     double m_albedo;
   };
-  
+
   // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
   MosData *getMosaicIndicies(Camera &camera, MosData &md);
   // Updates BandBin keyword
-  static void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+  static void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                      const QString &default_value = "Null");
 
 
@@ -126,7 +134,7 @@ namespace Isis {
     else {
       noCamera = true;
     }
-  
+
     if(noCamera) {
       try {
         proj = (TProjection *) icube->projection();
@@ -135,7 +143,7 @@ namespace Isis {
         QString msg = "Mosaic files must contain mapping labels";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
-    } 
+    }
     else {
       try {
         cam = icube->camera();
@@ -146,10 +154,10 @@ namespace Isis {
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
-  
+
     // We will be processing by brick.
     ProcessByBrick p;
-  
+
     // Find out which bands are to be created
     nbands = 0;
     ra = false;
@@ -183,7 +191,7 @@ namespace Isis {
     solarDistance = false;
     subSolarLatitude = false;
     subSolarLongitude = false;
-    subSolarGroundAzimuth = false;  
+    subSolarGroundAzimuth = false;
     phase = false;
     emission = false;
     incidence = false;
@@ -198,11 +206,11 @@ namespace Isis {
     ephemerisTime = false;
     UTC = false;
     localSolarTime = false;
-    solarLongitude = false;  
+    solarLongitude = false;
     morphologyRank = false;
-    albedoRank = false;  
-    
-    
+    albedoRank = false;
+
+
     if (!noCamera) {
       if ((ra = ui.GetBoolean("RADEC"))) nbands++;
       if ((declination = ui.GetBoolean("RADEC"))) nbands++;
@@ -235,13 +243,13 @@ namespace Isis {
       if ((solarDistance = ui.GetBoolean("SOLARDISTANCE"))) nbands++;
       if ((subSolarLatitude = ui.GetBoolean("SUBSOLARLATITUDE"))) nbands++;
       if ((subSolarLongitude = ui.GetBoolean("SUBSOLARLONGITUDE"))) nbands++;
-      if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;    
+      if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
       if ((phase = ui.GetBoolean("PHASE"))) nbands++;
       if ((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
       if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
       if ((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
       if ((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
-      if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;    
+      if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
       if ((distortedFocalPlaneX = ui.GetBoolean("DISTORTEDFOCALPLANE"))) nbands++;
       if ((distortedFocalPlaneY = ui.GetBoolean("DISTORTEDFOCALPLANE"))) nbands++;
       if ((undistortedFocalPlaneX = ui.GetBoolean("UNDISTORTEDFOCALPLANE"))) nbands++;
@@ -250,22 +258,22 @@ namespace Isis {
       if ((ephemerisTime = ui.GetBoolean("EPHEMERISTIME"))) nbands++;
       if ((UTC = ui.GetBoolean("UTC"))) nbands++;
       if ((localSolarTime = ui.GetBoolean("LOCALSOLARTIME"))) nbands++;
-      if ((solarLongitude = ui.GetBoolean("SOLARLONGITUDE"))) nbands++;   
-      if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
+      if ((solarLongitude = ui.GetBoolean("SOLARLONGITUDE"))) nbands++;
+      if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
       if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
-      
+
     }
     if((dn = ui.GetBoolean("DN"))) nbands++;
     if((planetocentricLatitude = ui.GetBoolean("PLANETOCENTRICLATITUDE"))) nbands++;
     if((positiveEast360Longitude = ui.GetBoolean("POSITIVEEAST360LONGITUDE"))) nbands++;
     if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
-  
+
     if(nbands < 1) {
       QString message = "At least one parameter must be entered"
                        "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
       throw IException(IException::User, message, _FILEINFO_);
     }
-  
+
     // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
     // if it exists.  Otherwise, the default will be "DN"
     QString bname = "DN";
@@ -278,7 +286,7 @@ namespace Isis {
         bname = mybb["FilterName"][0];
       }
     }
-  
+
     // Create a bandbin group for the output label
     PvlKeyword name("Name");
     if (dn) name += bname;
@@ -297,7 +305,7 @@ namespace Isis {
     if (pixelResolution) name += "Pixel Resolution";
     if (lineResolution) name += "Line Resolution";
     if (sampleResolution) name += "Sample Resolution";
-    if (detectorResolution) name += "Detector Resolution";  
+    if (detectorResolution) name += "Detector Resolution";
     if (spacecraftPositionX) name += "Spacecraft Position X";
     if (spacecraftPositionY) name += "Spacecraft Position Y";
     if (spacecraftPositionZ) name += "Spacecraft Position Z";
@@ -334,17 +342,17 @@ namespace Isis {
     if (solarLongitude) name += "Solar Longitude";
     if (morphologyRank) name += "morphologyRank";
     if (albedoRank) name += "albedoRank";
-    
-    
-  
-  
+
+
+
+
     // Create the output cube.  Note we add the input cube to expedite propagation
     // of input cube elements (label, blobs, etc...).  It will be cleared
     // prior to systematic processing only if the DN option is not selected.
-    // If DN is chosen by the user, then we propagate the input buffer with a 
+    // If DN is chosen by the user, then we propagate the input buffer with a
     // different function - one that accepts both input and output buffers.
     p.SetInputCube(icube, OneBand);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(), 
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(),
                                   icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     if (dn) {
@@ -364,25 +372,25 @@ namespace Isis {
     if(!cobj.hasGroup("BandBin")) {
       cobj.addGroup(PvlGroup("BandBin"));
     }
-    
+
     PvlGroup &bb = cobj.findGroup("BandBin");
     bb.addKeyword(name, PvlContainer::Replace);
     int nvals = name.size();
     UpdateBandKey("Center", bb, nvals, "1.0");
-    
+
     if ( bb.hasKeyword("OriginalBand") ) {
       UpdateBandKey("OriginalBand", bb, nvals, "1.0");
     }
-    
+
     if ( bb.hasKeyword("Number") ) {
       UpdateBandKey("Number", bb, nvals, "1.0");
     }
-    
+
     UpdateBandKey("Width", bb, nvals, "1.0");
     p.EndProcess();
   }
-  
-  
+
+
   //  This propagates the input plane to the output plane, then passes it off to
   //  the general routine
   void camdevDN(Buffer &in, Buffer &out) {
@@ -391,8 +399,8 @@ namespace Isis {
     }
     camdev(out);
   }
-  
-  
+
+
   //  Computes all the geometric properties for the output buffer.  Certain
   //  knowledge of the buffers size is assumed below, so ensure the buffer
   //  is still of the expected size.
@@ -402,13 +410,13 @@ namespace Isis {
     int skipDN = (dn) ? 64 * 64   :  0;
     for(int i = 0; i < 64; i++) {
       for(int j = 0; j < 64; j++) {
-  
+
         MosData mosd, *p_mosd(0);  // For special mosaic angles
-  
+
         int index = i * 64 + j + skipDN;
         double samp = out.Sample(index);
         double line = out.Line(index);
-  
+
         bool isGood=false;
         if (noCamera) {
           isGood = proj->SetWorld(samp, line);
@@ -416,7 +424,7 @@ namespace Isis {
         else {
           isGood = cam->SetImage(samp, line);
         }
-  
+
         if (isGood) {
           if (ra) {
             out[index] = cam->RightAscension();
@@ -439,9 +447,9 @@ namespace Isis {
             if (planetographicLatitude) {
               Distance radii[3];
               cam->radii(radii);
-              double ocentricLat; 
+              double ocentricLat;
               ocentricLat = cam->UniversalLatitude();
-              out[index] = TProjection::ToPlanetographic(ocentricLat, radii[0].kilometers(), 
+              out[index] = TProjection::ToPlanetographic(ocentricLat, radii[0].kilometers(),
                                                    radii[2].kilometers());
               index += 64 * 64;
             }
@@ -534,7 +542,7 @@ namespace Isis {
           }
           if(!noCamera) {
             double ssplat, ssplon;
-            ssplat = 0.0; 
+            ssplat = 0.0;
             ssplon = 0.0;
             cam->subSpacecraftPoint(ssplat, ssplon);
             if(subSpacecraftLatitude) {
@@ -615,17 +623,17 @@ namespace Isis {
             Angle emission;
             bool success;
             cam->LocalPhotometricAngles(phase, incidence, emission, success);
-  
+
             if (localEmission) {
               out[index] = emission.degrees();
               index += 64 * 64;
             }
-  
+
             if (localIncidence) {
               out[index] = incidence.degrees();
               index += 64 * 64;
             }
-          }        
+          }
           if(northAzimuth) {
             out[index] = cam->NorthAzimuth();
             index += 64 * 64;
@@ -671,7 +679,7 @@ namespace Isis {
             out[index] = mosd.m_morph;
             index += 64 * 64;
           }
-  
+
           if (albedoRank) {
             if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
             out[index] = mosd.m_albedo;
@@ -688,8 +696,8 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   // Function to create a keyword with same values of a specified count
   template <typename T>
     PvlKeyword makeKey(const QString &name, const int &nvals,
@@ -700,8 +708,8 @@ namespace Isis {
       }
       return (key);
     }
-  
-  
+
+
   // Computes the special morphologyRank and albedoRank planes
   MosData *getMosaicIndicies(Camera &camera, MosData &md) {
     const double Epsilon(1.0E-8);
@@ -716,7 +724,7 @@ namespace Isis {
     }
     double res = camera.PixelResolution();
     if (fabs(res) < Epsilon) res = Epsilon;
-  
+
     md = MosData();  // Nullifies the data
     if (myemission.isValid()) {
       // Compute morphologyRank
@@ -724,7 +732,7 @@ namespace Isis {
       if (fabs(cose) < Epsilon) cose = Epsilon;
       // Convert resolution to units of KM
       md.m_morph = (res / 1000.0) / cose;
-  
+
       if (myincidence.isValid()) {
         // Compute albedoRank
         double cosi = cos(myincidence.radians());
@@ -733,11 +741,11 @@ namespace Isis {
         md.m_albedo = (res / 1000.0 ) * ( (1.0 / cose) + (1.0 / cosi) );
       }
     }
-  
+
     return (&md);
   }
-  
-  
+
+
   //  Updates existing BandBin keywords with additional values to ensure
   //  label compilancy (which should support Camera models).  It checks for the
   //  existance of the keyword and uses its (assumed) first value to set nvals
@@ -745,14 +753,14 @@ namespace Isis {
   //  value.
   void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                      const QString &default_value) {
-  
+
     QString defVal(default_value);
     if ( bb.hasKeyword(keyname) ) {
       defVal = bb[keyname][0];
     }
-  
+
     bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
     return;
   }
-  
+
 }

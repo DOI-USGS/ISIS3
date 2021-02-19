@@ -1,24 +1,14 @@
 #ifndef NewGroundSourceLocationDialog_h
 #define NewGroundSourceLocationDialog_h
 
-/**
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
- 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <QCheckBox>
 #include <QDir>
@@ -30,8 +20,8 @@
 namespace Isis {
 
   /**
-  * @brief Dialog used by ControlPointEditWidget to select a new location for ground source files. 
-  * Gives option of using new location for all subsequent ground points and whether to update the 
+  * @brief Dialog used by ControlPointEditWidget to select a new location for ground source files.
+  * Gives option of using new location for all subsequent ground points and whether to update the
   * control net to reflect the new location.
   *
   * @ingroup Visualization Tools
@@ -45,11 +35,11 @@ namespace Isis {
       Q_OBJECT
     public:
       NewGroundSourceLocationDialog(QString title, QString &directory, QWidget *parent = 0);
-      
+
 //    QDir newGroundSourceLocation();
       bool changeAllGroundSourceLocation();
       bool changeControlNet();
-      
+
     private:
       QPointer<QCheckBox> m_changeAllGround;   //!< Change location of all subsequent ground control points
       QPointer<QCheckBox> m_changeControlNet;  //!< Change location of ground source in the control network
@@ -57,4 +47,3 @@ namespace Isis {
 };
 
 #endif
-

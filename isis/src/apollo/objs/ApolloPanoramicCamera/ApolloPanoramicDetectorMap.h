@@ -1,29 +1,13 @@
 #ifndef ApolloPanoramicDetectorMap_h
 #define ApolloPanoramicDetectorMap_h
 
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.7 $                                                             
- * $Date: 2005/10/03 22:43:39 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+/** This is free and unencumbered software released into the public domain.
 
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */                                                                   
 
 #include "ApolloPanIO.h"
 #include "LineScanCameraDetectorMap.h"
@@ -31,20 +15,20 @@
 #include "PvlGroup.h"
 
 namespace Isis {
-    /**                                                                       
-     * @brief Convert between parent image (aka encoder aka machine)  coordinates and detector 
+    /**
+     * @brief Convert between parent image (aka encoder aka machine)  coordinates and detector
      *         coordinates
-     *                                                                        
+     *
      * This class is used to convert between parent image (aka encoder aka machine) coordinates
-     * (sample/line) and detector coordinates for a the Apollo Panoramic Image. 
-     *                                                                        
+     * (sample/line) and detector coordinates for a the Apollo Panoramic Image.
+     *
      * @author 2011-11-21 Orrin Thomas
-     *                                                                        
-     * @internal                                                              
+     *
+     * @internal
      *   @history 2011-11-21 Orrin Thomas - Original version
      *   @history 2012-07-10 Orrin Thomas - Updated to current coding standards
      *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
-     */        
+     */
     class ApolloPanoramicDetectorMap : public CameraDetectorMap {
     public:
       /**
@@ -87,7 +71,7 @@ namespace Isis {
 
       /**
        * Return the time in seconds between scan lines
-       * 
+       *
        * @return double Time in seconds between scan lines
        */
       double LineRate() const {
@@ -96,28 +80,28 @@ namespace Isis {
 
       /**
        * Mean (average) of interior orientation residual vector lengths, accesor
-       * 
+       *
        * @return double Mean of interior orientation residual vector lengths
        */
       double  meanResidual() { return p_intOri.meanResiduals(); };
 
       /**
        * Max interior orientation residual vector length, accesor
-       * 
+       *
        * @return double Max interior orientation residual vector length
        */
       double   maxResidual() { return p_intOri.maxResiduals(); };
 
       /**
        * Standard deviation of interior orientation residual vector lengths, accesor
-       * 
+       *
        * @return double Standard deviation of interior orientation residual vector lengths
        */
       double stdevResidual() { return p_intOri.stdevResiduals(); };
 
       private:
-        
-        double m_etMiddle; //!< Ephemeris time at the middle line 
+
+        double m_etMiddle; //!< Ephemeris time at the middle line
         double m_lineRate; //!< line exposure duration
         Pvl *m_lab;        //!< Image label used to construct camera object
 
@@ -130,4 +114,3 @@ namespace Isis {
     };
 };
 #endif
-

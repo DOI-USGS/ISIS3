@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cstdio>
@@ -475,16 +483,16 @@ QByteArray fixLabels(QString fileName, History *hist){
 
   // Check if the instrument name is valid
   if (labels.contains(QByteArray("INSTRUMENT_NAME\n"))) {
- 
-    // Only set name to Unknown and warn the user about a missing INSTRUMENT_NAME 
+
+    // Only set name to Unknown and warn the user about a missing INSTRUMENT_NAME
     // if it wasn't specified by the user.
     UserInterface &ui = Application::GetUserInterface();
     if (ui.GetString("INSTRUMENT") == "AUTOMATIC") {
       labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = Unknown");
-      PvlGroup insNameWarning("Warning"); 
+      PvlGroup insNameWarning("Warning");
       PvlKeyword insNameMsg("Message", "The INSTRUMENT_NAME for [" + fileName + "] is empty."
                                 + "The InstrumentId in the output cube will instead be set to "
-                                + "[Unknown] and the labels will not translate. To create a cube "  
+                                + "[Unknown] and the labels will not translate. To create a cube "
                                 + "with translated labels, re-run this "
                                 + "application with INSTRUMENT set to NAC or WAC.");
 

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "SpecialPixel.h"
 #include "CubeAttribute.h"
@@ -344,12 +352,12 @@ void IsisMain() {
       // find the filter num
       int filtNum = 0;
       int numKnownFilters = sizeof(knownFilters) / sizeof(QString);
-      
+
       while (filtNum < numKnownFilters &&
             (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][filter] != knownFilters[filtNum]) {
         filtNum ++;
       }
-      
+
       padding[filter] = (colorOffset * filterHeight) * filtNum;
     }
     else {
@@ -370,7 +378,7 @@ void IsisMain() {
 
   if (!inst.hasKeyword("VariableExposureDuration") || !inst.hasKeyword("FrameNumber")) {
     QString msg = "The instrument keywords VariableExposureDuration and FrameNumber"
-                  "must exist to calibrate this MARCI file. Prior to isis3.10.0 these" 
+                  "must exist to calibrate this MARCI file. Prior to isis3.10.0 these"
                   "keywords were not added by marci2isis; you may need to rerun isis3.10+"
                   "marci2isis on your images.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -379,8 +387,8 @@ void IsisMain() {
   // The previous version of marcical read the first exposure duration and frame number from
   // the label and the other durations/frames (if any) from the mission's varexp.tab file.
   // In order to minimize the changes to this code while modifying it to use the keywords instead of
-  // reading the varexp.tab file directly, the duration/frame where the frame is zero are dropped from 
-  // the array when converting them from the keywords. This calibration code should be 
+  // reading the varexp.tab file directly, the duration/frame where the frame is zero are dropped from
+  // the array when converting them from the keywords. This calibration code should be
   // able to be simplified significantly by not removing the frameNumber=0 exposure/frame and
   // removing the first frame ifs in the calibration code below.
   PvlKeyword expTimesKey = inst["VariableExposureDuration"];
@@ -433,7 +441,7 @@ void IsisMain() {
         // Seems like something might be wrong here.
         frame = 0;
         exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
-      } 
+      }
       else {
         maxOffset = padding[band-1];
         frame = (icube.lineCount() - maxOffset) / filterHeight - 1;
@@ -466,7 +474,7 @@ void IsisMain() {
             else {
               exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
             }
-            // Exposure duration for the UV filters are calculated from the non-UV exposure duration 
+            // Exposure duration for the UV filters are calculated from the non-UV exposure duration
             if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
                  (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
               exposure = ifdelay - 57.763 - exposure;
@@ -571,7 +579,7 @@ void IsisMain() {
 }
 
 /*
-   From the MARCI calibration report, Bell et al., 2009, 
+   From the MARCI calibration report, Bell et al., 2009,
    Mars Reconnaissance Orbiter Mars Color Imager (MARCI):
    Instrument description, calibration, and performance, JGR, 114 E08S92
    doi:10.1029/2008JE003315
@@ -663,6 +671,6 @@ END_OBJECT = COLUMN
 
 END_OBJECT                     = TABLE
 
-END 
- 
+END
+
   */

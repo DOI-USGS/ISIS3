@@ -1,6 +1,14 @@
 #ifndef TableView_H
 #define TableView_H
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QWidget>
 
 #include "AbstractTableModel.h"
@@ -28,8 +36,8 @@ namespace Isis {
     *                           also passed.  This was added for IPCE, for the interaction with
     *                           other views.
     *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when 
-    *                           attempting to edit a control point when there is not an active 
+    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when
+    *                           attempting to edit a control point when there is not an active
     *                           control network. Fixes #5048.
     */
   class TableView : public QWidget {
@@ -71,14 +79,14 @@ namespace Isis {
 
       void editControlPoint(ControlPoint *, QString);
 
-    private: 
+    private:
       // disable copying and assigning of this class
       TableView(const TableView &);
       TableView &operator=(const TableView &other);
-      
+
       // methods
       void nullify();
-      
+
       // data
       TableViewHeader *m_header;      //!< The table header
       TableViewContent *m_content;    //!< The content of the header
