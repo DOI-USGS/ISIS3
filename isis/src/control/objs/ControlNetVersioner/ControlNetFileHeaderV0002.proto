@@ -1,4 +1,4 @@
-// Protocol buffer header descriptor for Isis3 Control Networks
+// Protocol buffer header descriptor for Isis Control Networks
 //
 // 2017-12-11 Kristin Berry - Separated header and point into separate files.
 // 2018-06-13 Jesse Mapel - Added flag to indicate it is a protobuf 2 file

@@ -65,7 +65,7 @@ namespace Isis {
   /**
    * Set the input parameter for this application and whether or not this
    * application supports the virtual bands functionality. It supports the virtual
-   * bands functionality if the input is an Isis 3 cube.
+   * bands functionality if the input is an Isis cube.
    *
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param supportsVirtualBands True if this application supports virtual bands
@@ -80,7 +80,7 @@ namespace Isis {
   /**
    * Set the input parameter for this application and whether or not this
    * application supports the virtual bands functionality. It supports the virtual
-   * bands functionality if the input is an Isis 3 cube.
+   * bands functionality if the input is an Isis cube.
    *
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param value Custom parameter value; Recommended to use an alternate

@@ -42,7 +42,7 @@ namespace Isis {
    *                           namespace into the Kernel class and renamed it
    *                           Type. Added accessor and mutator methods. Changed
    *                           method names to lower camel case and changed
-   *                           member variable prefix to m_ to comply with Isis3
+   *                           member variable prefix to m_ to comply with Isis
    *                           standards. Documented enumeration, methods, member
    *                           variables. Created unitTest.References #924.
    */

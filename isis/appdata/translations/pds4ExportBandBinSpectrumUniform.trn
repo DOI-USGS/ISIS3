@@ -1,35 +1,35 @@
-# Initial ISIS3 to PDS4 export of ISIS3 BandBin group for PDS4 uniformly sampled spectral arrays.
+# Initial ISIS to PDS4 export of ISIS BandBin group for PDS4 uniformly sampled spectral arrays.
 #
 # Sections of an example PDS4 output label are included above the relevant translation groups.
-# Based on requirements and options specified in 
+# Based on requirements and options specified in
 # https://pds.nasa.gov/datastandards/schema/released/sp/v1/PDS4_SP_1100.xsd
 # and https://pds.nasa.gov/datastandards/schema/released/sp/v1/PDS4_SP_1100.sch
-# 
-# Spectral_Characteristics:Local_Internal_Reference:local_identifier_reference 
-#     = Array_3D_Spectrum:local_identifier 
+#
+# Spectral_Characteristics:Local_Internal_Reference:local_identifier_reference
+#     = Array_3D_Spectrum:local_identifier
 #     = Spectral_Array_Object
-# Spectral_Characteristics:Local_Internal_Reference:local_reference_type 
-#     = Axis_Uniformly_Sampled:Local_Internal_Reference:local_reference_type 
+# Spectral_Characteristics:Local_Internal_Reference:local_reference_type
+#     = Axis_Uniformly_Sampled:Local_Internal_Reference:local_reference_type
 #     = spectral_characteristics_to_array_axis
-# Axis_Uniformly_Sampled:local_identifier_reference 
-#     = Axis_Array:axis_name 
+# Axis_Uniformly_Sampled:local_identifier_reference
+#     = Axis_Array:axis_name
 #     = Band
 #
 # history 2017-11-06 Kristin Berry  - Original Version.
-# history 2017-11-14 Jeannie Backer - Changed width and center to optional and added other 
-#                        InputKeys to look for. 
-# history 2017-11-15 Kristin Berry  - Updated after more research into requirements. 
-# history 2018-05-11 Jeannie Backer - Added default values for references. 
+# history 2017-11-14 Jeannie Backer - Changed width and center to optional and added other
+#                        InputKeys to look for.
+# history 2017-11-15 Kristin Berry  - Updated after more research into requirements.
+# history 2018-05-11 Jeannie Backer - Added default values for references.
 #                        Combined redundant translations.
 
 #        <sp:Spectral_Characteristics>
 #          <sp:bin_width_desc>
 #             Description
-#    
+#
 # Move this to mission translation file?
  Group = BinWidthDescription
   Auto
-  InputDefault      = UNK 
+  InputDefault      = UNK
   OutputName        = sp:bin_width_desc
   OutputPosition    = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics)
   Translation       = (*, *)
@@ -71,7 +71,7 @@ End_Group
 # Needs val from enumeration
 Group = AxisLocalReferenceType
   Auto
-  InputDefault     = spectral_characteristics_to_array_axis 
+  InputDefault     = spectral_characteristics_to_array_axis
   InputPosition    = (IsisCube, BandBin)
   OutputName       = sp:local_reference_type
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Uniformly_Sampled, sp:Local_Internal_Reference)
@@ -90,16 +90,16 @@ End_Group
 
 Group = SamplingParameterType
   Auto
-  InputDefault     = wavelength 
+  InputDefault     = wavelength
   OutputName       = sp:sampling_parameter_type
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Uniformly_Sampled)
   Translation      = (*, *)
 End_Group
 
-# 
+#
 #Group = SamplingInterval
 #  Auto
-#  InputDefault     = 0.0 
+#  InputDefault     = 0.0
 #  OutputName       = sp:sampling_interval
 #  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Uniformly_Sampled)
 #  Translation      = (*, *)

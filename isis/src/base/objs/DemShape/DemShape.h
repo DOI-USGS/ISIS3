@@ -33,9 +33,9 @@ namespace Isis {
   class Projection;
 
   /**
-   * @brief Define shapes and provide utilities for targets stored as Isis3 maps
+   * @brief Define shapes and provide utilities for targets stored as ISIS maps
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an ISIS 3 map
+   * This class will define shapes of ISIS target bodies with the shape defined by an ISIS map
    * fille (level 2 image), as well as provide utilities to retrieve radii and photometric
    * information for the intersection point.
    *
@@ -60,7 +60,7 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output in
    *                           testDemCube() to allow the test to pass when not using the standard
    *                           data areas. Fixes #4738.
-   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new
    *                            intersectSurface methods in ShapeModel are accessible by DemShape.
    *
    */
@@ -76,7 +76,7 @@ namespace Isis {
       ~DemShape();
 
       // Make parent functions visible
-      using Isis::ShapeModel::intersectSurface; 
+      using Isis::ShapeModel::intersectSurface;
 
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,

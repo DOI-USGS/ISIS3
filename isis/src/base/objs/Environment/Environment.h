@@ -27,7 +27,7 @@
 class QString;
 
 namespace Isis {
-  
+
   /**
    * @author 2011-04-01 Eric Hyer & Steven Lambright
    *
@@ -35,7 +35,7 @@ namespace Isis {
    *   @history 2011-09-20 Steven Lambright - Added support for 4 line version
    *                           file.
    *   @history 2012-03-06 Steven Lambright - Added automatic environment
-   *                           setup that works with every Isis 3 application.
+   *                           setup that works with every Isis application.
    *                           This includes the 'qisis' applications. The
    *                           automatic setup is setting the Qt plugin path
    *                           because picking up a plugin from the OS means
@@ -52,21 +52,21 @@ namespace Isis {
   class Environment {
     public:
       ~Environment() {}
-      
+
       static QString userName();
       static QString hostName();
       static QString isisVersion();
-      
+
       static QString getEnvironmentValue(QString, QString);
     protected:
       Environment();
-      
-      
+
+
     private:
       /**
        *  Construct an environment in static space to initialize some
-       *    global Isis 3 environment options. This initialization
-       *    applies to anything that links against the Isis 3 library.
+       *    global Isis environment options. This initialization
+       *    applies to anything that links against the Isis library.
        */
       static Environment automaticEnvironmentSetup;
   };

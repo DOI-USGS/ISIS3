@@ -49,7 +49,7 @@
       The addition of these RETRYBOTH and RECALCULATE parameters has modified the content of
       the output statistics. Additional information is included in the output statistics
       so that previously calculated overlap statistics can be reloaded when using these parameters.
-      Note that statistics files created with previous versions of ISIS 3 can still be used as
+      Note that statistics files created with previous versions of ISIS can still be used as
       input statistics.
     </p>
     <p>

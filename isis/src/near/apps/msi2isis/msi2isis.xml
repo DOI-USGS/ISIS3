@@ -3,21 +3,21 @@
 <application name="msi2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import NEAR MSI files into ISIS3 format
+    Import NEAR MSI files into ISIS format
   </brief>
   <description>
-    This program will import raw images, acquired from the Near Earth Asteroid 
-    Rendezvous - Shoemaker (NEAR Shoemaker) mission's Multispectral Imager 
-    (MSI) instrument, to ISIS3 data file format. 
+    This program will import raw images, acquired from the Near Earth Asteroid
+    Rendezvous - Shoemaker (NEAR Shoemaker) mission's Multispectral Imager
+    (MSI) instrument, to ISIS data file format.
 
-    The raw image must be in FITS (Flexible Image Transport) format and  
-    have a PDS label file that points to the location of the FITS image. You must input either the label file or the FITS file for the "TO" input 
-    parameter.  Projected images are not supported.  Please note if the FITS file is given, the label file must 
+    The raw image must be in FITS (Flexible Image Transport) format and
+    have a PDS label file that points to the location of the FITS image. You must input either the label file or the FITS file for the "TO" input
+    parameter.  Projected images are not supported.  Please note if the FITS file is given, the label file must
     exist in the same directory or the program will throw an error.
 
-    This program will verify that the input files are valid by checking the 
-    following label keyword values.  An error will be  thrown if any of these 
-    criteria are not met. 
+    This program will verify that the input files are valid by checking the
+    following label keyword values.  An error will be  thrown if any of these
+    criteria are not met.
     <ul>
       <li>INSTRUMENT_ID = MSI</li>
       <li>LINE_SAMPLES = 537</li>
@@ -26,13 +26,13 @@
       <li>LINE_DISPLAY_DIRECTION = UP</li>
     </ul>
 
-    The output cube- successfully imported into ISIS3 goes through the following processes:
+    The output cube- successfully imported into ISIS goes through the following processes:
     <ul>
-      <li>Convert the raw FITS image data to an ISIS3 cube.</li>
-      <li> Save the labels from the input PDS label file to the output ISIS3 cube. Note that FITS labels are not transferred. </li>
+      <li>Convert the raw FITS image data to an ISIS cube.</li>
+      <li> Save the labels from the input PDS label file to the output ISIS cube. Note that FITS labels are not transferred. </li>
       <li>Enlarge the image from 537 samples x 244 lines to 537 x 412 using the user-specified interpolation algorithm. Defaults to cubic convolution.</li>
       <li>Flip the image vertically, i.e. across the horizontal axis.</li>
-      <li>Trim 33 pixels from the top, bottom, left and right sides. These 
+      <li>Trim 33 pixels from the top, bottom, left and right sides. These
             pixels along the borders will be set to nulls.</li>
     </ul>
 
@@ -40,11 +40,11 @@
 
   <history>
     <change name="Jeannie Backer" date="2013-03-27">
-      Original version of msi2isis. References #1248. 
+      Original version of msi2isis. References #1248.
     </change>
      <change name="Kristin Berry" date="2014-05-19">
-         Updated to add labels from the input PDS label file to the output ISIS3 cube. References #2088. 
-    </change> 
+         Updated to add labels from the input PDS label file to the output ISIS cube. References #2088.
+    </change>
   </history>
 
   <seeAlso>
@@ -66,12 +66,12 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input NEAR MSI file to be converted to an ISIS3 cube
+          Input NEAR MSI file to be converted to an ISIS cube
         </brief>
         <description>
-          Name of the input NEAR MSI image file to be imported into ISIS3 
-          format. You may enter the label or the image file. If the image 
-          file is given, the program will search in the same directory for a 
+          Name of the input NEAR MSI image file to be imported into ISIS
+          format. You may enter the label or the image file. If the image
+          file is given, the program will search in the same directory for a
           label file with the same base name as the image file base name.
         </description>
         <filter>
@@ -83,10 +83,10 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Output ISIS3 cube filename
+          Output ISIS cube filename
         </brief>
         <description>
-          Name of the ISIS3 output cube file that has been imported, enlarged, 
+          Name of the ISIS output cube file that has been imported, enlarged,
           flipped, and trimmed.
         </description>
         <filter>
@@ -104,7 +104,7 @@
         <brief>Type of interpolation for enlarge process</brief>
         <description>
           This is the type of interpolation to be performed on the input when
-          the image is enlarged from 537 samples x 244 lines to 
+          the image is enlarged from 537 samples x 244 lines to
           537 samples x 412 lines.
         </description>
         <list>
@@ -140,7 +140,7 @@
         Usage of this import application
       </brief>
       <description>
-        This example shows how to import an MSI fits file to the ISIS3 cube format using the label file.
+        This example shows how to import an MSI fits file to the ISIS cube format using the label file.
       </description>
       <terminalInterface>
         <commandLine>

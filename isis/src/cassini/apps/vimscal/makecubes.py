@@ -8,7 +8,7 @@ import numpy as np
 Author:  2016-09-09 Tyler Wilson
 History:
 
-Description:  This script creates calibration cubes for use 
+Description:  This script creates calibration cubes for use
 by the VIMS calibration program vimscal.
 
 Input:  Calibration text files.
@@ -35,9 +35,9 @@ example_usage = "Example:  python makecubes.py /home/tjwilson/cal_files/RC19-mul
 
 def cleanup(filepath):
     """Cleaner function which attempts to remove temporary cubes and cube lists.
-        
+
         Args:
-            filepath:  The path to the directory containing the filewe wish to remove.            
+            filepath:  The path to the directory containing the filewe wish to remove.
 
         Raises: A general exception if anything goes wrong.  The script exits at that point.
     """
@@ -58,10 +58,10 @@ except IndexError:
     print("Please enter a valid path to the calibration files.")
     print(usage)
     sys.exit(example_usage)
-    
+
 try:
     files = os.listdir(sys.argv[1])
-except OSError:   
+except OSError:
     print("There is no directory named:  "+datapath)
     print(usage)
     sys.exit(example_usage)
@@ -81,8 +81,8 @@ match = re.search(r'[0-9]{4}',version)
 if (match == None):
     sys.exit("Please enter a 4 digit version number such as: 0001")
 
-'''    
-try:    
+'''
+try:
     precision=sys.argv[4]
 except IndexError:
     print("Please enter an integer value for the number of decimal places in the calibration files.")
@@ -92,7 +92,7 @@ except IndexError:
 precision=10
 
 filtered = []
-#This is to ensure that we are only grabbing the txt calibration files and not 
+#This is to ensure that we are only grabbing the txt calibration files and not
 #anything else which might be in the directory.
 for f in files:
 	if (f.startswith(prefix) and f.endswith('.txt') ):
@@ -105,14 +105,14 @@ if ( len(filtered) == 0):
 
 
 for datafile in filtered:
-    try:  
+    try:
         #datafile without it's extension
         datafilename=os.path.splitext(datafile)[0]
         if (datafilename.find("-") > 0 ):
             datafilename.replace("-",".")
         #import the datafile into a matrix
         data = np.genfromtxt(datapath+"/"+datafile)
-        bandvals = data[:,1]        
+        bandvals = data[:,1]
         args3="samples=64"
         args4 ="lines=64"
         args5="bands=1"
@@ -130,20 +130,20 @@ for datafile in filtered:
             fstring = format_string.format(float(band))
             args2="value="+fstring
             #print(fstring)
-            try:          
+            try:
                 p=subprocess.Popen([cmd,args1,args2,args3,args4,args5],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             except OSError:
-                sys.exit("Please set a valid ISIS3 version before executing this script.")
+                sys.exit("Please set a valid ISIS version before executing this script.")
             except:
-                sys.exit("Something went wrong.  Please set a valid ISIS3 version before executing this script.")            
+                sys.exit("Something went wrong.  Please set a valid ISIS version before executing this script.")            
             out,err = p.communicate()
             if (str (err) ):
                 print(err)
-            
+
             cubelist.write(tempcubepath+"\n")
             print(tempcubepath)
-            i = i+1	
-                
+            i = i+1
+
         cubelist.close()
         #Stack the temp cubes (there are 352 of them) into the calibration cube using cubeit
         cmd = "cubeit"
@@ -160,5 +160,3 @@ for datafile in filtered:
 
 
     cleanup(datapath)
- 
-

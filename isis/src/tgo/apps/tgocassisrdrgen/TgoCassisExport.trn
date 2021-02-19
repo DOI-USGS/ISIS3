@@ -1,4 +1,4 @@
-# Translation for TGO CaSSIS export from ISIS3 cube to PDS4 product.
+# Translation for TGO CaSSIS export from ISIS cube to PDS4 product.
 #
 # Note these translations must be are ordered based on the required PDS4 order.
 #
@@ -13,7 +13,7 @@
 # history 2018-05-18 Jeannie Backer - Changed group names to upper camel case for consistency.
 # history 2018-05-22 Kaitlyn Lee - Moved mosaic keywords to tgoCassisExportMosaic.trn.
 # history 2018-06-18 Jeannie Backer - Look for ObservationId in Archive group
-# history 2019-06-12 Kristin Berry - Removed CaSSIS_Header for non-PDS4 compliance. 
+# history 2019-06-12 Kristin Berry - Removed CaSSIS_Header for non-PDS4 compliance.
 
 #Group = FileName
 #  Auto
@@ -100,7 +100,7 @@ End_Group
 #Group = SmithedCK
 #  Auto
 #  Optional
-#  InputKey        = SmithedCK 
+#  InputKey        = SmithedCK
 #  InputPosition   = (IsisCube, Archive)
 #  OutputName      = cassis:smithedck
 #  OutputPosition  = (Product_Observational, Mission_Area, cassis:CaSSIS)
@@ -118,7 +118,7 @@ End_Group
 #End_Group
 
 # Commented-out non-PDS4 compliant CaSSIS_Header. Left in here in case
-# we want to translate these into a PDS4-compliant structure in the future. 
+# we want to translate these into a PDS4-compliant structure in the future.
 
 #Group = ProductId
 #  Auto

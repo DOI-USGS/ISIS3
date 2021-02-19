@@ -1,8 +1,8 @@
 #ifndef LoCameraFiducialMap_h
 #define LoCameraFiducialMap_h
 /**
- * @file 
- *  
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -31,7 +31,7 @@ namespace Isis {
    * either the Lunar Orbiter High Resolution Camera or the Lunar Orbiter Medium
    * resolution camera for any of the last three Lunar Orbiter missions.  The
    * transformation map is an affine transformation defined by values written in
-   * the Isis 3 Instrument group labels.
+   * the Isis Instrument group labels.
    *
    * This class will load the fiducial sample/line and x/y values from the labels,
    * compute the coefficients of the affine transformation, and place the

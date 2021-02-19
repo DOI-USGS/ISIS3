@@ -3,48 +3,48 @@
 <application name="hyb1pds4gen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Convert Hayabusa1 image from from ISIS3 cube to PDS4 format
+    Convert Hayabusa1 image from from ISIS cube to PDS4 format
   </brief>
 
   <description>
-   This programs exports an ISIS3 Haybusa cube to a PDS4 product. 
-   If available, Instrument and  Mapping information will be written to the detached 
+   This programs exports an ISIS Haybusa cube to a PDS4 product.
+   If available, Instrument and  Mapping information will be written to the detached
    output PDS4 formatted xml label file.
     <p>
        Note that not all require keyword values in the generated PDS4 labels can be determined automatically
-       by ISIS3. Some must be updated by the user (by opening up the xml label output by this
-       application and editing it with a text editor) for the generated label to be PDS4 compliant. 
-       The values UNK (unknown) and TBD (to be determined) are used as placeholders in 
-       the generated label. 
-       TBD are PDS4 required values and must be replaced by the user for the output label to be PDS4 compliant. 
-       Some of these TBDs can only be replaced with one of several specific enumerated values to meet compliancy. 
-       These possible values can be found in the 
-       <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS4 Information Model Specification</a> 
-       in the Value/Class column of the table for the associated tag or in the index at the end of the document. 
-       Searching this page for the name of the field you need to determine a value for is recommended. 
+       by ISIS. Some must be updated by the user (by opening up the xml label output by this
+       application and editing it with a text editor) for the generated label to be PDS4 compliant.
+       The values UNK (unknown) and TBD (to be determined) are used as placeholders in
+       the generated label.
+       TBD are PDS4 required values and must be replaced by the user for the output label to be PDS4 compliant.
+       Some of these TBDs can only be replaced with one of several specific enumerated values to meet compliancy.
+       These possible values can be found in the
+       <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS4 Information Model Specification</a>
+       in the Value/Class column of the table for the associated tag or in the index at the end of the document.
+       Searching this page for the name of the field you need to determine a value for is recommended.
     </p>
-    
+
     <p>
-      For example: For a cube with map-projected data, ISIS3 will populate planar_coordinate 
-      encoding_method with a value on its own, but if it did not and instead had "TBD", we would find at 
-      <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html#attribute_cart_planar_coordinate_information_cart_planar_coordinate_encoding_method">planar_coordinate_coding_method</a> 
+      For example: For a cube with map-projected data, ISIS will populate planar_coordinate
+      encoding_method with a value on its own, but if it did not and instead had "TBD", we would find at
+      <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html#attribute_cart_planar_coordinate_information_cart_planar_coordinate_encoding_method">planar_coordinate_coding_method</a>
       that there are 3 possible values: 'Coordinate Pair', 'Distance and Bearing', 'Row and Column'.
     </p>
-    
+
     <p>
-      Not everything is in the  
+      Not everything is in the
       <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS4 Information Model Specification</a>
        at this time, so if the information about a tag is not in there, it may be necessary to find
-        the options in the appropriate schematron file (.sch) available at: 
-        <a href="https://pds.jpl.nasa.gov/pds4/schema/released/">PDS4 Released Schema</a>. 
-        For the previous example, the same information can be found in the 
+        the options in the appropriate schematron file (.sch) available at:
+        <a href="https://pds.jpl.nasa.gov/pds4/schema/released/">PDS4 Released Schema</a>.
+        For the previous example, the same information can be found in the
         <a href="https://pds.jpl.nasa.gov/pds4/cart/v1/PDS4_CART_1700.sch">PDS4 Cartography schematron file </a>.
     </p>
-    
+
     <p>
-      UNK  is used as a placeholder if any value can be used and still be a valid PDS4-formatted 
+      UNK  is used as a placeholder if any value can be used and still be a valid PDS4-formatted
       xml header. UNKs can, but are not required to be, replaced by the user with
-      better information. 
+      better information.
     </p>
 
   </description>
@@ -83,7 +83,7 @@
           Output pds image
         </brief>
         <description>
-          The resulting pds file. For PDS4, a detached label of the same name with the file extension .xml 
+          The resulting pds file. For PDS4, a detached label of the same name with the file extension .xml
           will be created in the same directory.
         </description>
         <filter>
@@ -100,7 +100,7 @@
         </brief>
         <description>
           This value is used to set the required PDS4 value, logical_identifier. It should be a
-          6-part colon separated string of the form 
+          6-part colon separated string of the form
           <b>urn:space_agency:archiving_agency:pds_approved_bundle_id:pds_approved_collection_id:product_id</b>.
           Note that space_agency is generally "nasa" and archiving_agency is generally "pds".
         </description>

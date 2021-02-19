@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        ISIS 3 Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -221,7 +221,7 @@ Deborah Lee Soltesz
             Old vs. New Program Names</a>
           </th>
           <td>
-          A useful table cross-referencing the current application names in ISIS 3 to the names of applications in previous versions of ISIS.
+          A useful table cross-referencing the current application names in ISIS to the names of applications in previous versions of ISIS.
 
           </td>
         </tr>

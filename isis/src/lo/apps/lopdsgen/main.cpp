@@ -87,7 +87,7 @@ void IsisMain() {
   // Transfer the instrument group to the output cube
   QString transDir = "$ISISROOT/appdata/translations/";
 
-  // Isis 3 cubes being exported for the first time
+  // Isis cubes being exported for the first time
   if(!origLabel.hasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
 
     PvlToPvlTranslationManager orig(origLabel, transDir + "LoOriginalExport.trn");

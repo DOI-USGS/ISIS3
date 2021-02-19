@@ -2,12 +2,12 @@
 
 <application name="cnetbin2pvl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Converts an Isis3 control network file from binary into pvl format.
+    Converts an Isis control network file from binary into pvl format.
   </brief>
 
   <description>
     <p>
-      This program converts an Isis3 control network file from binary into a human readable
+      This program converts an Isis control network file from binary into a human readable
       UTF-8 pvl formatted file. The output .pvl will be written as the latest PVL version.
       The most recent PVL template can be found in the Control data directory under templates/controlnetworks.
     </p>

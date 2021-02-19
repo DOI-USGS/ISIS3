@@ -95,8 +95,8 @@
         <h2> <a name="intro">Introduction</a> </h2>
         <p>
           This document will describe the coding standards for maintaining <strong>
-          ISIS 3</strong> source code.  It was created to ensure that the <strong>
-          ISIS 3</strong> package is programmed for consistency, readability and ease
+          ISIS</strong> source code.  It was created to ensure that the <strong>
+          ISIS</strong> package is programmed for consistency, readability and ease
           of future maintenance. This document does not attempt to address every
           possible issue. However, the guidelines that have been outlined should not
           be deviated from, except under special situations.
@@ -105,7 +105,7 @@
         <h2> <a name="formatting">Formatting</a> </h2>
         <h3> <a name="indenting">Indenting</a> </h3>
         <p>
-          The general indenting scheme for <strong>ISIS 3</strong> is 2 spaces (no
+          The general indenting scheme for <strong>ISIS</strong> is 2 spaces (no
           tabs).  Wrapped lines of code should be indented a minimum of 4 spaces
           from the beginning line of the command.  Programmers may choose to indent
           more than 4 spaces to make the code more readable.  For example, it is
@@ -312,7 +312,7 @@
         <p>
           When declaring a vector or list data type, no space between the keyword
           and the opening angle bracket should be used.  This is merely an aesthetic
-          preference for consistency throughout <strong>ISIS 3</strong>.
+          preference for consistency throughout <strong>ISIS</strong>.
         </p>
         <p>
           For example:
@@ -420,7 +420,7 @@
 
         <h3> <a name="logicalOperators">Logical Operators</a> </h3>
         <p>
-          The use of aliases for logical operators is prohibited in <strong>ISIS 3
+          The use of aliases for logical operators is prohibited in <strong>ISIS
           </strong>.  For example, a program must not contain the following aliases:
           <table border="1">
             <tr>
@@ -484,42 +484,42 @@
         <h3> <a name="sourceCodeDocs">Source Code Documentation</a> </h3>
         <h4> <a name="doxygenComments"></a> Doxygen </h4>
         <p>
-	  Isis 3 uses the <a href="http://www.doxygen.org ">Doxygen</a> documentation 
-	  extraction software. Doxygen has extended the tag set of the 
-	  <a href="http://java.sun.com/j2se/javadoc">javadoc documentation style</a>, 
-	  a systematic in-code documentation style that allows pertinent documentation to 
-	  be extracted easily. Doxygen is just one of many software packages that are 
-	  able to extract and use javadoc documentation for a variety of purposes, 
-	  allowing us to take advantage of a wealth of documentation extractors, IDEs, 
+	  ISIS uses the <a href="http://www.doxygen.org ">Doxygen</a> documentation
+	  extraction software. Doxygen has extended the tag set of the
+	  <a href="http://java.sun.com/j2se/javadoc">javadoc documentation style</a>,
+	  a systematic in-code documentation style that allows pertinent documentation to
+	  be extracted easily. Doxygen is just one of many software packages that are
+	  able to extract and use javadoc documentation for a variety of purposes,
+	  allowing us to take advantage of a wealth of documentation extractors, IDEs,
 	  and other tools on the market that make our lives simpler and more productive.
         </p>
         <ul>
           <li>
-            Documentation should be provided for each entity (class, method, struct, 
-	    variable, etc.) in the source code <em>where the primary or most commonly 
-	    used definition of that entity resides</em>. Generally, this means the 
+            Documentation should be provided for each entity (class, method, struct,
+	    variable, etc.) in the source code <em>where the primary or most commonly
+	    used definition of that entity resides</em>. Generally, this means the
 	    following files contain documentation for the listed entities:
             <ul>
               <li>
-                <b>Header (.h)</b>: classes, inline functions, enums, typedefs, unions, 
+                <b>Header (.h)</b>: classes, inline functions, enums, typedefs, unions,
 		structs, and variables declared in the header file
               </li>
               <li>
-                <b>Implementation (.cpp)</b>: member function implementations and any 
+                <b>Implementation (.cpp)</b>: member function implementations and any
 		entities declared or defined in the implementation file
               </li>
             </ul>
           </li>
-          
+
           <li>
-            To allow Doxygen to generate external documentation specialized commenting styles 
-	    must be used.  The comments are typically before each entity but single line 
+            To allow Doxygen to generate external documentation specialized commenting styles
+	    must be used.  The comments are typically before each entity but single line
 	    comments on the same line can be added after the entity.  For example:
           <ul>
             <li>
               <b>Single line of documentation (<em>documentation line</em>)</b>
               <ul>
-                <li>start documentation with string <b>//!</b> before or <b>//!&lt;</b> after 
+                <li>start documentation with string <b>//!</b> before or <b>//!&lt;</b> after
 		    the code
 		</li>
                 <li>Before the entity
@@ -528,7 +528,7 @@
                     int myInteger ;
                   </div>
                 </li>
-          
+
                 <li>After the entity
                   <div class="code">
                     int myInteger ; //!&lt; my integer<br/>
@@ -536,7 +536,7 @@
                 </li>
               </ul>
             </li>
-          
+
             <li>
               <b>Multi-lined documentation (<em>documentation block</em>)</b>
               <ul>
@@ -563,16 +563,16 @@ void setGlobalB() {
           Return to Table of Contents
         </font></a></p>
 
-        <h4> <a name="usingHTML"></a> Using HTML </h4> 
+        <h4> <a name="usingHTML"></a> Using HTML </h4>
         <p>
           HTML can be used anywhere in your documentation.
-          Keep it simple. Doxygen will "interpret" your HTML, so you may not get the 
-          desired effect. Best advice, avoid attempting special effects by just using 
-	  the basic HTML formatting tags - bold, underline, pre, code, table (caption, 
-	  tr, td, th), etc. and only when really necessary. Better yet, consider using 
-	  the formatting tags in the Other Useful Tags section instead of HTML. Your 
-	  plain old text will be pretty nicely rendered into paragraphs with automatically 
-	  linked items and other bells and whistles. Keep your source readable: minimize 
+          Keep it simple. Doxygen will "interpret" your HTML, so you may not get the
+          desired effect. Best advice, avoid attempting special effects by just using
+	  the basic HTML formatting tags - bold, underline, pre, code, table (caption,
+	  tr, td, th), etc. and only when really necessary. Better yet, consider using
+	  the formatting tags in the Other Useful Tags section instead of HTML. Your
+	  plain old text will be pretty nicely rendered into paragraphs with automatically
+	  linked items and other bells and whistles. Keep your source readable: minimize
 	  formatting.
         </p>
         <p align="right"><a href="#top"><font size="1">
@@ -581,15 +581,15 @@ void setGlobalB() {
 
         <h4> <a name="autolinking"></a> Autolinking </h4>
         <p>
-          Class, method, variable, and other entity names will be automatically linked 
-	  in the documentation. To prevent this for a specific occurence of a name, 
-	  use a percent sign (%) in front of the name. For example, if you have a 
-	  class name "Histogram" and you want to prevent the linking of the word 
-	  "Histogram" in your description because it is not referring to the class but 
+          Class, method, variable, and other entity names will be automatically linked
+	  in the documentation. To prevent this for a specific occurence of a name,
+	  use a percent sign (%) in front of the name. For example, if you have a
+	  class name "Histogram" and you want to prevent the linking of the word
+	  "Histogram" in your description because it is not referring to the class but
 	  to an actual histogram, use "%Histogram" to prevent the word from being linked.
         </p>
         <p>
-          E-mail addresses and web addresses are also automatically linked. If a web 
+          E-mail addresses and web addresses are also automatically linked. If a web
 	  address is particularly long, put it on its own line.
         </p>
         <p align="right"><a href="#top"><font size="1">
@@ -623,13 +623,13 @@ void setGlobalB() {
           letter.  As a general rule, class names should be nouns.
         </p>
         <p>
-          <strong>**Note:</strong>  There are 3 existing classes in <strong>ISIS 3
+          <strong>**Note:</strong>  There are 3 existing classes in <strong>ISIS
           </strong> that do not follow this convention.  The <strong>iString
           </strong> and <strong>iTime</strong> classes needed a prefix to
           distinguish them from the C++ system string and time classes.  While
           these classes will not be changed at this time, in the event that
           similar classes are created, a capital letter <i>I</i> prefix should
-          be used to remain consistent with the rest of <strong>ISIS 3</strong>.
+          be used to remain consistent with the rest of <strong>ISIS</strong>.
         </p>
         <p>
           For example:
@@ -648,7 +648,7 @@ void setGlobalB() {
           Member functions should be lower camel case, when possible.  That is, the
           first letter should be lower case and, if the class is a multi-word
           phrase, spaces are eliminated and each subsequent word should begin with a
-          capital letter.  This should remain consistent throughout <strong>ISIS 3
+          capital letter.  This should remain consistent throughout <strong>ISIS
           </strong> except in two cases.  Constructor and destructor methods must be
           upper camel case to match the class name.   The other case in which this
           convention may not be followed is when a method overrides or overloads an
@@ -703,10 +703,10 @@ void setGlobalB() {
 
         <h3> <a name="dataMemberNames">Data Member Names</a> </h3>
         <p>
-          <strong>ISIS 3</strong> currently uses three types of data members: <i>
+          <strong>ISIS</strong> currently uses three types of data members: <i>
           global</i>, <i>protected</i>, and <i>private</i>. Note that global and
           protected data members should be avoided and public member data in
-          classes is not permitted in <strong>ISIS 3</strong>.
+          classes is not permitted in <strong>ISIS</strong>.
         </p>
         <p>
           Global variables should have the prefix <i>g_</i> followed by a lower
@@ -889,7 +889,7 @@ void setGlobalB() {
         <h3> <a name="orderingLibraryIncludes">Ordering Library Includes</a> </h3>
         <p>
           No code should exist before <font color="olive"><b>#include</b></font>
-          statements in <strong>ISIS 3</strong> files.  These <font color="olive"><b>
+          statements in <strong>ISIS</strong> files.  These <font color="olive"><b>
           #include</b></font> statements should be separated into groups of
           libraries by a single blank line and each group should be ordered
           alphabetically.  All <font color="olive"><b>#include</b></font> statements
@@ -1035,7 +1035,7 @@ void setGlobalB() {
 
         <h2> <a name="documentation">Documentation</a> </h2>
         <p>
-          Documentation for <strong>ISIS 3</strong> is done using Doxygen.
+          Documentation for <strong>ISIS</strong> is done using Doxygen.
         </p>
         <p align="right"><a href="#top"><font size="1">
           Return to Table of Contents
@@ -1055,7 +1055,7 @@ void setGlobalB() {
         <p>
           All history entries should be below an internal tag and indented 2 spaces
           from the start of the internal tag.  Doxygen history entries in <strong>
-          ISIS 3</strong> should begin with the date of the form YYYY-MM-DD, followed
+          ISIS</strong> should begin with the date of the form YYYY-MM-DD, followed
           by the name of the programmer(s) responsible for the changes.  This is
           followed by a dash, padded by a space on each side before the comment.
           When wrapping a Doxygen history entry, the subsequent lines should begin 4
@@ -1130,12 +1130,12 @@ void setGlobalB() {
         <h3> <a name="structures">Structures</a> </h3>
         <p>
           The <font color="purple"><b>struct</b></font> keyword is not all together
-          disallowed in <strong>ISIS 3</strong>, however there are restrictions on
+          disallowed in <strong>ISIS</strong>, however there are restrictions on
           its use.  The use of a structure is prohibited from the public API in
-          <strong>ISIS 3</strong>, this would include global definitions in a header
+          <strong>ISIS</strong>, this would include global definitions in a header
           file.  That is, any structures in a class must be private or protected.
           Structures can also be used in applications.  A structure that contains
-          only data is acceptable in ISIS 3.  Structures in <strong>ISIS 3
+          only data is acceptable in ISIS.  Structures in <strong>ISIS
           </strong> cannot have methods.
         </p>
         <p align="right"><a href="#top"><font size="1">
@@ -1360,8 +1360,8 @@ void setGlobalB() {
 
         <h2><a name="todo">TO DO</a></h2>
           <ul>
-          <li> 
-	    Improve examples - possibly a reference to a single canonical file in 
+          <li>
+	    Improve examples - possibly a reference to a single canonical file in
 	    the source tree
 	  </li>
           <li> Binary Operators - Determine padding. </li>
@@ -1426,12 +1426,12 @@ void setGlobalB() {
   </audience>
 
   <bibliography>
-    <title>ISIS 3 Coding Standards and Style Guide</title>
-    <brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
+    <title>ISIS Coding Standards and Style Guide</title>
+    <brief>Coding standards for ISIS developers (effective February 1, 2012).</brief>
     <description>
       This document will describe the coding standards for maintaining <strong>
-      ISIS 3</strong> source code.  It was created to ensure that the <strong>
-      ISIS 3</strong> package is programmed for consistency, readability and ease
+      ISIS</strong> source code.  It was created to ensure that the <strong>
+      ISIS</strong> package is programmed for consistency, readability and ease
       of future maintenance. This document does not attempt to address every
       possible issue. However, the guidelines that have been outlined should not
       be deviated from, except under special situations.
@@ -1466,4 +1466,3 @@ void setGlobalB() {
   </history>
 
 </documentation>
-

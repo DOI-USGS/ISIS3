@@ -1,4 +1,4 @@
-// SIP Wrapper to the ISIS3 bundle class
+// SIP Wrapper to the ISIS bundle class
 %Include type_conversions.sip
 
 

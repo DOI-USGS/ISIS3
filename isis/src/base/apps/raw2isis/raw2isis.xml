@@ -146,7 +146,7 @@
         <brief>Bit type of input data</brief>
         <description>
           Bit type of data:
-            8 bit, 
+            8 bit,
             16 bit signed, or
             32 bit
         </description>
@@ -345,7 +345,7 @@
       Using raw2isis with default parameters
       </brief>
       <description>
-        The use of raw2isis to ingest raw data and output Isis3 cubes. 
+        The use of raw2isis to ingest raw data and output Isis cubes.
       </description>
       <terminalInterface>
         <commandLine>
@@ -357,10 +357,10 @@
       bittype=real
         </commandLine>
         <description>
-	This example shows the use of raw2isis create an Isis3 cube. 
+	This example shows the use of raw2isis create an Isis cube.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/raw2isisGUI.jpg">
@@ -387,14 +387,14 @@
           <parameterName>FROM</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="550" height="550" src="assets/images/out.jpg">
           <brief>
 	  Final output image after the conversion
           </brief>
           <description>
-	    Converts from PDS format to a Isis3 cube.
+	    Converts from PDS format to a Isis cube.
           </description>
           <thumbnail caption= "The cube image after conversion"
           src="assets/thumbs/out.jpg" width="126" height="126"/>

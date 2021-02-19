@@ -142,15 +142,15 @@ namespace Isis {
 
 
   /**
-   * Returns a translated value. The translation group name is 
-   * used to find the input group, keyword, default and 
-   * tranlations in the translation table. If the keyword does not 
-   * exist in the input label, the input default if available will 
-   * be used as the input value. This input value is then used to 
-   * search all of the translations. If a match is found the 
-   * translated value is returned. 
+   * Returns a translated value. The translation group name is
+   * used to find the input group, keyword, default and
+   * tranlations in the translation table. If the keyword does not
+   * exist in the input label, the input default if available will
+   * be used as the input value. This input value is then used to
+   * search all of the translations. If a match is found the
+   * translated value is returned.
    *
-   * @param translationGroupName The name of the PVL translation 
+   * @param translationGroupName The name of the PVL translation
    *                        group used to identify the
    *                        input/output keywords to be
    *                        translated. Often, this is the
@@ -158,8 +158,8 @@ namespace Isis {
    *
    * @param index The index into the input keyword array.  Defaults to 0
    *
-   * @return @b QString The translated output value to be 
-   *         placed in the ISIS3 cube label.
+   * @return @b QString The translated output value to be
+   *         placed in the ISIS cube label.
    *
    * @throws IException::Unknown "Failed to translate output value."
    * @throws IException::Unknown "Cannot translate value. Xml files can only
@@ -175,7 +175,7 @@ namespace Isis {
    * @throws IException::Unknown "Could not find an input value or default value."
    * @throws IException::Unknown "Input element does not have the named attribute."
    */
-  QString XmlToPvlTranslationManager::Translate(QString translationGroupName, 
+  QString XmlToPvlTranslationManager::Translate(QString translationGroupName,
                                                 int index) {
     try {
     if (index != 0) {
@@ -245,7 +245,7 @@ namespace Isis {
       cout << endl << "Finding input element:" << endl << endl;
       cout << inputParentElement.tagName() << endl;
     }
-    // traverse the input position path 
+    // traverse the input position path
     Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputPosition",
                                       transGroup.begin(),
                                       transGroup.end());
@@ -254,7 +254,7 @@ namespace Isis {
     QString childName;
     while(it != transGroup.end()) {
       const PvlKeyword &inputPosition = *it;
-      inputParentElement = oldInputParentElement; 
+      inputParentElement = oldInputParentElement;
 
         for (int i = 0; i < inputPosition.size(); i++) {
           childName = inputPosition[i];
@@ -270,9 +270,9 @@ namespace Isis {
         if (!inputParentElement.isNull()) {
           break;
         }
-        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end()); 
+        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end());
     }
-     
+
     if (inputParentElement.isNull()) {
       if (hasInputDefault(translationGroupName)) {
         if (isDebug) {
@@ -372,9 +372,9 @@ namespace Isis {
    * dependencies are requirements on the values of attributes of the element
    * and/or the values of sibling elements. The dependencies are specified by
    * strings that are formatted as follows
-   * <code>[tag/att]\@[tagName/attName]|[value]</code> or 
-   * <code>[tagName/attName]|[value]</code> 
-   * 
+   * <code>[tag/att]\@[tagName/attName]|[value]</code> or
+   * <code>[tagName/attName]|[value]</code>
+   *
    * @param element The element to check dependencies on.
    * @param dependencies A multi-valued keyword were every entry specifies a
    *                     requirement upon either an attribute of the element or
@@ -461,7 +461,7 @@ namespace Isis {
    * @param inputLabel The input label file to be translated.
    * @param outputLabel The output translated Pvl.
    */
-  void XmlToPvlTranslationManager::Auto(FileName &inputLabel, 
+  void XmlToPvlTranslationManager::Auto(FileName &inputLabel,
                                         Pvl &outputLabel) {
     parseFile(inputLabel);
     Auto(outputLabel);
