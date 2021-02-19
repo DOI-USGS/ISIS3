@@ -576,7 +576,7 @@ void calculateSpecificEnergy(Cube *icube) {
   else {
 
   //Discrepancies between the VIMS and Spacecraft clock necessitated a
-  //conversion multiplier, which is in the USGS: ISIS3 version of vimscal
+  //conversion multiplier, which is in the USGS: ISIS version of vimscal
   //but was not part of the University of Arizona pipeline.  Below is the
   //text describing this problem:
   /**

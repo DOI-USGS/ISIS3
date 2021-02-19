@@ -273,7 +273,7 @@
     </change>
     <change name="Kelvin Rodriguez" date="2016-08-16">
       removed redundant boolean statement (len == 0) which caused warnings in clang.
-      Part of porting to OS X 10.11. 
+      Part of porting to OS X 10.11.
     </change>
     <change name="Ian Humphrey" date="2016-09-29">
       When using LATLON=true, control points that are out of the specified latitude and longitude
@@ -295,10 +295,10 @@
           <fileMode>input</fileMode>
           <internalDefault>No input cube list</internalDefault>
           <brief>
-            List of ISIS3 cubes in the input Control Network
+            List of ISIS cubes in the input Control Network
           </brief>
           <description>
-          A text file containing one column of ISIS3 cube file names. Every cube
+          A text file containing one column of ISIS cube file names. Every cube
           used in the input control network should be contained in this list.
           </description>
           <filter>
@@ -349,10 +349,10 @@
           <fileMode>output</fileMode>
           <internalDefault>No output cube list</internalDefault>
           <brief>
-            List of ISIS3 cubes in the output Control Network file
+            List of ISIS cubes in the output Control Network file
           </brief>
           <description>
-          This optional output text file contains one column of ISIS3 cube file names associated
+          This optional output text file contains one column of ISIS cube file names associated
           with the ONET. This list can only include cubes that were provided in the FROMLIST.
           </description>
           <filter>
@@ -666,7 +666,7 @@
         <description>
           <p>
             Use this parameter to select a text file that contains a list of
-            ISIS3 cubes. All the Control Points which contain at least one of
+            ISIS cubes. All the Control Points which contain at least one of
             these cubes will be extracted.
           </p>
 

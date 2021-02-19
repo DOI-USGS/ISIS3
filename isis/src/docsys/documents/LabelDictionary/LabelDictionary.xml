@@ -96,7 +96,7 @@ EndObject
           </tr>
           <tr><td>Format</td>
               <td>String (Tile or BandSequential)</td>
-              <td>This keyword indicates how the cube data is arranged.  BandSequential indicates the pixels are stored first by sample, then by line, and finally by band.  Tile indicates the pixels are stored in tiles which is the preferred storage mechanism in ISIS 3 as it facilities the fastest “universal access”. The tiles are stored in row major format.  That is, all the tiles for band 1 ordered from left-to-right, then top-to-bottom, followed by all the tiles for band 2, etc.</td>
+              <td>This keyword indicates how the cube data is arranged.  BandSequential indicates the pixels are stored first by sample, then by line, and finally by band.  Tile indicates the pixels are stored in tiles which is the preferred storage mechanism in  as it facilities the fastest “universal access”. The tiles are stored in row major format.  That is, all the tiles for band 1 ordered from left-to-right, then top-to-bottom, followed by all the tiles for band 2, etc.</td>
           </tr>
           <tr><td>TileSamples, TileLines</td>
               <td>Integer</td>

@@ -291,11 +291,11 @@ void IsisMain() {
 }
 
 /**
- * Translate labels from PDS3 input to generic ISIS3 output. Note: Some values
+ * Translate labels from PDS3 input to generic ISIS output. Note: Some values
  * will be updated for the individual output cubes.
  *
  * @param inputLabel The input PDS3 label.
- * @param outputLabel A reference to the output ISIS3 label to be updated.
+ * @param outputLabel A reference to the output ISIS label to be updated.
  */
 void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   // Get the directory where the Juno translation tables are

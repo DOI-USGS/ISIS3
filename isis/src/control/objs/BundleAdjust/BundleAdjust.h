@@ -48,7 +48,7 @@ namespace Isis {
   /**
    * @brief An image bundle adjustment object.
    *
-   * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS 3 cubes.
+   * BundleAdjust is used to perform a bundle adjustment on overlapping ISIS cubes.
    * Using the collineariy condition, BundleAdjust can construct a system of normal equations
    * and then using the CHOLMOD library, solve that system.
    *

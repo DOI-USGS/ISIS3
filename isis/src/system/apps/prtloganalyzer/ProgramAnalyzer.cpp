@@ -143,7 +143,7 @@ void ProgramAnalyzer::include(const QString &name) {
  * be added to the list of programs to be analyzed.  They are subject to the
  * exclude and include program lists.
  *
- * @param logfile An ISIS3 print.prt file
+ * @param logfile An ISIS print.prt file
  */
 void ProgramAnalyzer::add(const QString &logfile) {
   Pvl plog(logfile);
@@ -155,12 +155,12 @@ void ProgramAnalyzer::add(const QString &logfile) {
 /**
  * @brief Adds a program object originating from a print.prt file
  *
- * The PvlObject provided is assumed to orginate from an ISIS3 print.prt log
+ * The PvlObject provided is assumed to orginate from an ISIS print.prt log
  * file.  It contains information that will be extracted and analyzed according
  * to the features of this class.
  *
  *
- * @param program Pvl object containing the output log of an ISIS3 application
+ * @param program Pvl object containing the output log of an ISIS application
  */
 void ProgramAnalyzer::add(PvlObject &program) {
   _count++;
@@ -406,7 +406,7 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime,
 /**
  * @brief Compute analysis of program entry
  *
- * This method accepts a Pvl object that is assumed to orignate from an ISIS3
+ * This method accepts a Pvl object that is assumed to orignate from an ISIS
  * print.prt log file and conforms to the format in the log file.
  *
  * Data is extracted from certain keywords in the object.  Invalid objects or

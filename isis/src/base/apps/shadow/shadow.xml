@@ -11,7 +11,7 @@
 
     We use the sun's position at the center of the input cube or a user-defined
     observation time. By default, we factor in shadows cast by features.
-    This program operates much like the ISIS3 'shade' program which instead requires azimuth/elevation as input.<br/><br/>
+    This program operates much like the ISIS 'shade' program which instead requires azimuth/elevation as input.<br/><br/>
 
     However, with the shadow application, using the sun's position allows much
     higher precision shading and enables the possibility of computing shadowed areas.

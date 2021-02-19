@@ -78,7 +78,7 @@ TEST_F( BundleMeasure_CreateObj, Constructor ) {
 
 TEST_F( BundleMeasure_CreateObj, CopyConstructor ) {
 
-  // First, check if the lineResidual is being initialized to ISIS3 Null.
+  // First, check if the lineResidual is being initialized to ISIS Null.
   EXPECT_EQ( testBundleMeasurePtr->lineResidual(), Null );
 
   // The interior ControlMeasure object's Line Residual will be used to confirm
@@ -109,7 +109,7 @@ TEST_F( BundleMeasure_CreateObj, CopyConstructor ) {
 
 TEST_F( BundleMeasure_CreateObj, AssignmentOperator ) {
 
-  // First, check if the lineResidual is being initialized to ISIS3 Null.
+  // First, check if the lineResidual is being initialized to ISIS Null.
   EXPECT_EQ( testBundleMeasurePtr->lineResidual(), Null );
 
   // The interior ControlMeasure object's Line Residual will be used to confirm

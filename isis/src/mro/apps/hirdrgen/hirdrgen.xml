@@ -10,7 +10,7 @@
         Takes an input Isis cube with HiRISE RDR specific labels, and outputs a PDS compatible file.
         The DN values are NOT assumed to be between 0.0 and 1.0.
         All DN values between MINPER and MAXPER will be stretched to an unsigned integer with
-        a size equal to the number of bits specified by BITS, excluding the special pixels. 
+        a size equal to the number of bits specified by BITS, excluding the special pixels.
       <p>
           NOTE: This program does not generate the final PDS HiRISE product. The output
           from this program is converted to a JPEG 2000 in the HiRISE pipeline processing.
@@ -70,27 +70,27 @@
       Added parameters to allow for a user specified manual stretch.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
-    <change name="Stuart Sides" date="2008-06-06"> 
-      Changed output keyword PRODUCT_VERSION_ID from an automatic 
-      translation to a user input parameter 
+    <change name="Stuart Sides" date="2008-06-06">
+      Changed output keyword PRODUCT_VERSION_ID from an automatic
+      translation to a user input parameter
     </change>
-    <change name="Steven Lambright" date="2008-07-10"> 
+    <change name="Steven Lambright" date="2008-07-10">
       Added Rationale Description option
     </change>
-    <change name="Janet Barrett" date="2010-02-17"> 
+    <change name="Janet Barrett" date="2010-02-17">
       Added ability to write output file in JPEG2000 format.
     </change>
-    <change name="Christopher Austin" date="2010-03-01"> 
+    <change name="Christopher Austin" date="2010-03-01">
       Fixed an error which misplaced the proper SCALING_FACTOR and OFFSET
       keyword values.
     </change>
-    <change name="Jeannie Backer" date="2012-11-21"> 
+    <change name="Jeannie Backer" date="2012-11-21">
       Changed bandwidth units from nm to NM.  Fixed bug so that the program
       no uses the default MAXPER=100 value correctly. References #678
       PROG: [Changed ProcessExportPds::SetDetached() method call to correct
-      spelling. Added g_ to global variables to meet Isis3 standards.]
+      spelling. Added g_ to global variables to meet Isis standards.]
     </change>
     <change name="Tracie Sucharski" date="2012-12-06">
      Changed to use TProjection instead of Projection.  References #775
@@ -111,7 +111,7 @@
               <description>
                   This is the Isis cube to be exported to PDS format. All bands of the cube will be exported to the PDS file.
               </description>
-              <filter>*.cub</filter> 
+              <filter>*.cub</filter>
           </parameter>
 
           <parameter name="TO">
@@ -121,7 +121,7 @@
                   The ouput file
               </brief>
               <description>
-                  This is the destination file, where the input cube data will 
+                  This is the destination file, where the input cube data will
                   be written in PDS format. This file will have unsigned 16 bit DN values in the
                   PDS IMAGE object no matter what type the input file is. All valid data from the input
                   cube will be converted to unsigned, 16 bit, most significant byte first (Big Endian).
@@ -145,7 +145,7 @@
             <brief>Automatically calculate stretch</brief>
             <description>Automatically calculate stretch</description>
             <exclusions>
-              <item>MIN</item> 
+              <item>MIN</item>
               <item>MAX</item>
             </exclusions>
           </option>
@@ -153,7 +153,7 @@
             <brief>User defined stretch</brief>
             <description>User defined stretch</description>
               <exclusions>
-              <item>MINPER</item> 
+              <item>MINPER</item>
               <item>MAXPER</item>
             </exclusions>
           </option>
@@ -186,7 +186,7 @@
             Minimum DN valid percentage
           </brief>
           <description>
-            The cumulative percentage value to be mapped to the minimum 
+            The cumulative percentage value to be mapped to the minimum
             valid pixel for the specified number of bits. For example: With BITS=10
             and MINPER=1.0, the DN which corresponds to the cummulative
             percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
@@ -210,10 +210,10 @@
             Mazimum DN valid percentage
           </brief>
           <description>
-            The cumulative percentage value to be mapped to the maximum 
+            The cumulative percentage value to be mapped to the maximum
             valid pixel for the specified number of bits. For example: With BITS=10
             and MINPER=99.0, the DN which corresponds to the cummulative
-            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
+            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2.
             Where 1023 represents HIS and 1022 represents HRS.
           </description>
           <minimum inclusive="yes">0.0</minimum>
@@ -239,14 +239,14 @@
             The number of bits to compress the input data to. The valid data as
             well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
             compressed into this number of bits. The output data type will be
-            automaticity choosen using this value. A value of 8 will create 
+            automaticity choosen using this value. A value of 8 will create
             unsigned byte output files. Values from 9 to 16 will create unsigned
             word output files. Unused bits in the unsigned word output file will be
             set to zero.
           </description>
           <minimum inclusive="yes">8</minimum>
           <maximum inclusive="yes">16</maximum>
-        </parameter> 
+        </parameter>
         <parameter name="ENCODING_TYPE">
           <type>string</type>
           <default><item>NONE</item></default>
@@ -267,7 +267,7 @@
               <description>The data is encoded as JPEG2000</description>
             </option>
           </list>
-        </parameter> 
+        </parameter>
       </group>
 
       <group name="Special Keyword">
@@ -280,8 +280,8 @@
             Value for the output PDS keyword PRODUCT_VERSION_ID
           </brief>
           <description>
-            This parameter allows the user to specify the value of the standard 
-            PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This 
+            This parameter allows the user to specify the value of the standard
+            PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This
             keyword will be located in the Root of the PDS PVL label.
           </description>
         </parameter>
@@ -292,7 +292,7 @@
             Value for the output PDS keyword RATIONALE_DESC
           </brief>
           <description>
-            This parameter allows the user to specify the value of the standard 
+            This parameter allows the user to specify the value of the standard
             PDS keyword RATIONALE_DESC within the output PDS label. This keyword
             will be located in the Root of the PDS PVL label.
           </description>

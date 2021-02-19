@@ -2,11 +2,11 @@
 
 <application name="mimap2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted Kaguya MI MAP file to ISIS3 cube format</brief>
+  <brief>Import PDS formatted Kaguya MI MAP file to ISIS cube format</brief>
 
   <description>
     <p>
-      This program converts PDS formatted Kaguya MI MAP files to ISIS3
+      This program converts PDS formatted Kaguya MI MAP files to ISIS
       <def link="Cube">cube</def> format.
     </p>
     <p>
@@ -45,11 +45,11 @@
       default values to obtain an image that meets specific requirements. The
       program will apply a correction by changing the sign of the SAMPLE_PROJECTION_OFFSET
       keyword value. The modified label is written to a temporary detached label file
-      and then used to import the Kaguya MI MAP file into ISIS 3.
+      and then used to import the Kaguya MI MAP file into ISIS.
     </p>
     <p>
       <b>Special Pixel Assignment:</b> The incoming special pixel values are assigned
-      equivalent values for special pixels in ISIS 3. If any incoming pixel value falls
+      equivalent values for special pixels in ISIS. If any incoming pixel value falls
       within two different special pixel types, the special pixel with the higher priority
       is assigned. The precedence for special pixels in ISIS from highest to lowest is
       1)<b>NULL</b>, 2)<b>HRS</b>, 3)<b>LRS</b>, 4)<b>HIS</b>, and 5)<b>LIS</b>.
@@ -92,7 +92,7 @@
       default values and log them if so.
     </change>
     <change name="Christopher Combs" date ="2018-01-19">
-      Changed call to SetPdsFile to reflect changes to PvlToPvlTranslationManager. Fixes #4345, 
+      Changed call to SetPdsFile to reflect changes to PvlToPvlTranslationManager. Fixes #4345,
       #4421.
     </change>
   </history>

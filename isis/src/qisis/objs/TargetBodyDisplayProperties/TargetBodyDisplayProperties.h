@@ -57,7 +57,7 @@ namespace Isis {
    *   @history 2015-05-27 Ken Edmundson - Creation.
    *   @hsitory 21016-06-14 Tyler Wilson - Added documentation to member functions/variables
    *                           and corrected some formatting to bring the the code in line
-   *                           with ISIS3 coding standards.  Fixes #3997.
+   *                           with ISIS coding standards.  Fixes #3997.
    *
    */
   class TargetBodyDisplayProperties : public DisplayProperties {

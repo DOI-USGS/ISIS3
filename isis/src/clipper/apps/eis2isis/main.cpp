@@ -270,7 +270,7 @@ void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, Origin
     FileName checklineXmlFileName = ui.GetFileName("FROM2");
 
     if (ui.WasEntered("CHECKLINEREADOUT")) {
-      // Process the checkline image to an ISIS3 cube and write the checkline tables
+      // Process the checkline image to an ISIS cube and write the checkline tables
       ProcessImport p2;
       translateCoreInfo(checklineXmlFileName, p2);
       if (checklineXmlFileName.removeExtension()

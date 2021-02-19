@@ -329,7 +329,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   cube->write(ol);
 }
 
-// Translate Isis 2 labels into Isis 3 labels.
+// Translate Isis 2 labels into Isis labels.
 void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   // Transfer the instrument group to the output cube
   QString transDir = "$ISISROOT/appdata/translations/";

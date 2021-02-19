@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <xsl:param name="dirParam"/>
@@ -113,8 +113,8 @@
 
   <bibliography>
     <title>API Changes</title>
-    <brief>Changes since the last Isis 3 release</brief>
-    <description>Listing of the classes that have changed in Isis 3 since the last major release.</description>
+    <brief>Changes since the last ISIS release</brief>
+    <description>Listing of the classes that have changed in Isis since the last major release.</description>
     <author>Steven Lambright</author>
     <date>2011-12-27</date>
   </bibliography>

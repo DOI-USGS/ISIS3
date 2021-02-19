@@ -21,7 +21,7 @@
       Converted from Isis 2 to Isis 3
         </change>
         <change name="Steven Koechle" date="2008-06-13">
-            Added PvlKeyword to top of print file that says how many errors the 
+            Added PvlKeyword to top of print file that says how many errors the
             print file contains. This value is also printed to the screen.
         </change>
     </history>
@@ -40,7 +40,7 @@
                     </item>
                 </default>
                 <description>
-  	      The file is a default session log file output by Isis 3.  This file is in PVL format.
+  	      The file is a default session log file output by Isis.  This file is in PVL format.
                 </description>
             </parameter>
 
@@ -56,7 +56,7 @@
                     </item>
                 </default>
                 <description>
-          This file will be in Pvl format and contain the Session Logs from Isis 3 program runs that had errors.
+          This file will be in Pvl format and contain the Session Logs from Isis program runs that had errors.
                 </description>
             </parameter>
         </group>

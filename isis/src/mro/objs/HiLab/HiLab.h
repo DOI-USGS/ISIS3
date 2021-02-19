@@ -16,7 +16,7 @@ namespace Isis {
   /**
    * @brief Process HiRise label
    *
-   * This class retrieves label keyword values from an Isis3
+   * This class retrieves label keyword values from an Isis
    * HiRise cube file. This class receives a Cube object from
    * an opened HiRise cube file and has methods to return HiRise
    * specific keyword values from the label.

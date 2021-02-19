@@ -1,11 +1,9 @@
 /** This is free and unencumbered software released into the public domain.
-
 The authors of ISIS do not claim copyright on the contents of this file.
 For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-
 #include "LabelTranslationManager.h"
 
 #include <ostream>
@@ -146,7 +144,7 @@ namespace Isis {
    * @param index The index into the input keyword array.  Defaults to 0
    *
    * @return @b QString The translated output value to be
-   *         placed in the ISIS3 cube label.
+   *         placed in the ISIS cube label.
    *
    * @throws IException::Unknown "Failed to translate output value."
    * @throws IException::Unknown "Cannot translate value. Xml files can only

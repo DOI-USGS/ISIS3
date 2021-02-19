@@ -1,27 +1,11 @@
 #ifndef Table_h
 #define Table_h
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2010/05/14 19:17:09 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Blob.h"
 #include <vector>
 #include "TableRecord.h"
@@ -31,16 +15,16 @@ namespace Isis {
   /**
    * @brief Class for storing Table blobs information.
    *
-   * This class can create new Tables or read table blobs from files. In 
-   * general, records correspond to rows and fields correspond to columns. Thus 
-   * the TableRecord class corresponds to a vector of row entries and 
-   * TableField class corresponds to a specific entry of the table for a given 
-   * record. Isis3 Table objects are record based, N records in a table. Each 
-   * record will have the same number of fields, F. The fields can be of 
-   * different types including Integer, Double, Text, and Real. The class 
-   * uses PVL to store the structure of the table N, F, and Field types and 
+   * This class can create new Tables or read table blobs from files. In
+   * general, records correspond to rows and fields correspond to columns. Thus
+   * the TableRecord class corresponds to a vector of row entries and
+   * TableField class corresponds to a specific entry of the table for a given
+   * record. Isis Table objects are record based, N records in a table. Each 
+   * record will have the same number of fields, F. The fields can be of
+   * different types including Integer, Double, Text, and Real. The class
+   * uses PVL to store the structure of the table N, F, and Field types and
    * binary to store the table data.
-   *  
+   *
    * See the classes TableRecord and TableField for more information.
    *
    * If you would like to see Table being used in implementation, see histats.cpp
@@ -71,19 +55,19 @@ namespace Isis {
    *                           operator+=(record) that verifies that the record sizes match.
    *                           References #1178
    *   @history 2018-08-13 Summer Stapleton - Added a default constructor for logic relating to the
-   *                           overhaul of the mosaic tracking now being handled in a separate 
+   *                           overhaul of the mosaic tracking now being handled in a separate
    *                           tracking cube.
    */
   class Table : public Isis::Blob {
     public:
-      /** 
-       *  
-       */ 
-      enum Association { 
-             None, 
-             Samples, 
-             Lines, 
-             Bands 
+      /**
+       *
+       */
+      enum Association {
+             None,
+             Samples,
+             Lines,
+             Bands
       };
 
       // Constructors and Destructors
@@ -98,7 +82,7 @@ namespace Isis {
 
       ~Table();
 
-      
+
       friend std::istream&operator>>(std::istream &is, Table &table);
       friend std::ostream&operator<<(std::ostream &os, Table &table);
 
@@ -146,4 +130,3 @@ namespace Isis {
 };
 
 #endif
-

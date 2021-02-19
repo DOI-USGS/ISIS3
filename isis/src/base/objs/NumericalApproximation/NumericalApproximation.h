@@ -1,5 +1,11 @@
 #ifndef NumericalApproximation_h
 #define NumericalApproximation_h
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <string>
 #include <vector>
@@ -16,7 +22,7 @@ namespace Isis {
    *        analysis methods of interpolation, extrapolation and
    *        approximation of a tabulated set of @a x, @a y data.
    *
-   * This class contains a merged version of the Isis3 classes
+   * This class contains a merged version of the Isis classes
    * @b DataInterp and @b NumericalMethods.  In addition,
    * some methods from @b AtmosModel were moved to this class, the
    * @a CubicNeighborhood interpolation type was

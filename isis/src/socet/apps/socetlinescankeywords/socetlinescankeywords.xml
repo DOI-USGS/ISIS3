@@ -62,7 +62,7 @@
       standards.
     </change>
     <change name="E. Howington-Kraus" date="2013-02-20">
-      Completed modifications to meet ISIS coding standards for formal installation into ISIS3.
+      Completed modifications to meet ISIS coding standards for formal installation into ISIS.
       Added support for HiRISE jitter-corrected images created at U of A.  Added check for needed
       SPICE data (blobs) attached to the cube label. Renamed parameter PUSHKEY to TO.  Temporarily
       removed support for MEX-HSRC and MGS-MOC sensors until they are tested and working under the

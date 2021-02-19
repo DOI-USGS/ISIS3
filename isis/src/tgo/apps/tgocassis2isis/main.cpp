@@ -183,7 +183,7 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
  * Translate the cartographic info from the xml.
  *
  * @param xmlFileName The xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  */
 bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
@@ -215,7 +215,7 @@ bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
  * Translate the Mosaic group info from the xml.
  *
  * @param xmlFileName The xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  */
 bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
@@ -283,11 +283,11 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
 
 
 /**
- * Translate instrument, bandbin, and archive info from xml label into ISIS3
+ * Translate instrument, bandbin, and archive info from xml label into ISIS
  * label and add kernels group.
  *
  * @param inputLabel Reference to the xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  *
  * @internal

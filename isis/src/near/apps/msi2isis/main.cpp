@@ -56,7 +56,7 @@ void IsisMain() {
 
   // These images are small (537 cols x 244 line) and will be run
   //  through 3 processes.
-  //  (1) Import to Isis3 cube format
+  //  (1) Import to Isis cube format
   //  (2) Enlarge to 537 cols x 412 lines
   //  (3) Flip over horizontal axis, if LINE_DISPLAY_DIRECTION=UP
   //      and null edges.
@@ -182,7 +182,7 @@ void IsisMain() {
     remove(importProcessOutCube.expanded().toLatin1());
     remove(enlargeProcessOutCube.expanded().toLatin1());
     QString msg = "Unable to translate the labels from [" + from.expanded()
-                  + "] to ISIS3 format using msi2isis.";
+                  + "] to ISIS format using msi2isis.";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
   // now, determine the number of samples, then flip and trim the output cube
@@ -229,13 +229,13 @@ void flipAndTrim(Buffer &in, Buffer &out) {
 }
 
 /**
- * Translate the MSI labels into Isis3.
+ * Translate the MSI labels into Isis.
  *
  * This method requires the Instrument, BandBin, and Kernels groups to already
  * exist in the labels.
  *
  * @param inputLabelPvl The PDS input file.
- * @param isisLabelPvl The output Isis3 cube label Pvl.
+ * @param isisLabelPvl The output Isis cube label Pvl.
  */
 void translateMsiLabels(Pvl inputLabelPvl, Pvl *isisLabelPvl) {
   PvlGroup &instGrp(isisLabelPvl->findGroup("Instrument", Pvl::Traverse));

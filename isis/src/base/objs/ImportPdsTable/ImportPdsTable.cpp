@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 1.1 $
- * $Date: 2005/08/18 23:00:25 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "ImportPdsTable.h"
 
 #include <cctype>
@@ -469,7 +454,7 @@ namespace Isis {
     if (tabObj.hasKeyword("RECORD_BYTES")) {
       m_recordBytes = (int) tabObj.findKeyword("RECORD_BYTES");
     }
-    // The table description has "ROW_BYTES" and "ROW_SUFFIX_BYTES". These summed is the 
+    // The table description has "ROW_BYTES" and "ROW_SUFFIX_BYTES". These summed is the
     // record length. Can be for detached and attached labels
     else if (tabObj.hasKeyword("ROW_BYTES") && tabObj.hasKeyword("ROW_SUFFIX_BYTES")) {
       m_recordBytes = (int) tabObj.findKeyword("ROW_BYTES") +
@@ -888,7 +873,7 @@ namespace Isis {
    *
    * @param cols Columns for a given row
    * @param cdesc Column description used to create TableField
-   * @param tfield Isis3 TableField used to determine the data type to be imported.
+   * @param tfield Isis TableField used to determine the data type to be imported.
    *
    * @return TableField  Returns the TableField with the value from the column
    *
@@ -1183,7 +1168,7 @@ namespace Isis {
              || dataType == "DATE" || dataType == "TIME" ) {
       return TableField(name, TableField::Text, cdesc.m_numBytes);
     }
-    // Isis3 tables currently don't support any of the following PDS DATA_TYPE:
+    // Isis tables currently don't support any of the following PDS DATA_TYPE:
     // BIT_STRING, COMPLEX, N/A, BOOLEAN, UNSIGNED_INTEGER, IBM types, some VAX types
     IString msg = "PDS Column [" + cdesc.m_name
                   + "] has an unsupported DATA_TYPE ["

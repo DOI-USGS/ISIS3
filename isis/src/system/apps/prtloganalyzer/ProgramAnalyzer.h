@@ -26,7 +26,7 @@ namespace Isis {
   /**
    * @brief A ProgramAnalyzer accumulates print log runtime statistics
    *
-   * This class reads an ISIS3 print log and accumulates runtime statistics for
+   * This class reads an ISIS print log and accumulates runtime statistics for 
    * all programs found in the log file.  It will compute overall CPU and
    * connect time to use in analysis of (typically I/O) performance.
    *
