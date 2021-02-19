@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cstdio>
@@ -227,7 +235,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   // For VIS, we have the following one to one correspondence of these keywords:
   // BandNumber   {1, 2, 3, 4, 5}
   // FilterNumber {2, 5, 3, 4, 1}
-  // 
+  //
   // Note that the BandNumber will match the OriginalBand only if the image
   // to be imported contains band number 1 and is not missing consecutive band numbers.
   bandBin += sqube.findGroup("BandBin")["BandBinBandNumber"];

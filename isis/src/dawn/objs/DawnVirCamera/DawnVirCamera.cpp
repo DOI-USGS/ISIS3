@@ -1,4 +1,12 @@
- #include "DawnVirCamera.h"
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
+#include "DawnVirCamera.h"
 
 #include <cctype>
 #include <iostream>
@@ -30,12 +38,12 @@ namespace Isis {
     // constructors
   /**
    * Creates a camera for a Dawn VIR cube
-   * 
+   *
    * @param cube The cube to make a camera for
-   * 
+   *
    */
   DawnVirCamera::DawnVirCamera(Cube &cube) : LineScanCamera(cube) {
-    
+
     m_instrumentNameLong = "Visual and Infrared Spectrometer";
     m_instrumentNameShort = "VIR";
     m_spacecraftNameLong = "Dawn";
@@ -151,33 +159,33 @@ namespace Isis {
   DawnVirCamera::~DawnVirCamera() {
   }
 
-  /** 
+  /**
    *  Returns CK frame identifier
-   * 
+   *
    * @return @b int The CK frame identifier.
    */
-  int DawnVirCamera::CkFrameId() const {  
-    return (-203000); 
+  int DawnVirCamera::CkFrameId() const {
+    return (-203000);
   }
 
 
-  /** 
+  /**
    *  Returns CK reference frame identifier
-   * 
+   *
    * @return @b int The CK reference frame identifier.
    */
-  int DawnVirCamera::CkReferenceId() const { 
-    return (1); 
+  int DawnVirCamera::CkReferenceId() const {
+    return (1);
   }
 
 
-  /** 
+  /**
    *  Return PK reference frame identifier
-   * 
+   *
    * @return @b int The PK reference frame identifier
    */
-  int DawnVirCamera::SpkReferenceId() const { 
-    return (1); 
+  int DawnVirCamera::SpkReferenceId() const {
+    return (1);
   }
 
 
@@ -203,9 +211,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return the pixel summing rate
-   * 
+   *
    * @return @b int The pixel summing rate.
    */
   int DawnVirCamera::pixelSumming() const {
@@ -213,9 +221,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return the exposure time
-   * 
+   *
    * @return @b double The exposure time for a pixel.
    */
   double DawnVirCamera::exposureTime() const {
@@ -223,9 +231,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return the line scan rate
-   * 
+   *
    * @return @b double The time between lines in the cube.
    */
   double DawnVirCamera::scanLineTime() const {
@@ -233,9 +241,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return the start time for a given line exposure time
-   * 
+   *
    * @return @b double The et time at the start of the line's exposure.
    */
   double DawnVirCamera::lineStartTime(const double midExpTime) const {
@@ -243,9 +251,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return the end time for a given line exposure time
-   * 
+   *
    * @return @b double The et time at the end of the line's exposure.
    */
   double DawnVirCamera::lineEndTime(const double midExpTime) const {
@@ -253,9 +261,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return start time for the entire cube.
-   * 
+   *
    * @return @b double The et time at the start of the cube.
    */
   double DawnVirCamera::startTime() const {
@@ -263,9 +271,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Return end time for the entire cube.
-   * 
+   *
    * @return @b double The et time at the end of the cube.
    */
   double DawnVirCamera::endTime() const {
@@ -273,9 +281,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Returns number of housekeeping records found in the cube Table
-   * 
+   *
    * @return @b int The number of housekeeping records.
    */
   int DawnVirCamera::hkLineCount() const {
@@ -291,7 +299,7 @@ namespace Isis {
    * MirrorSin, and MirrorCos.  These fields contain the scan line time in
    * SCLK, status of shutter - open, closed (dark), sine and cosine of the
    * scan mirror, respectively.
-   * 
+   *
    * @param filename The filename of the cube with the house keeping table.
    * @param linerate The linerate for the cube.
    *
@@ -395,9 +403,9 @@ namespace Isis {
    * From the VIR housekeeping data, compute the pointing table for each line
    *  in the image.  This table is for instrumentRotation(Table &) to establish
    *  line/sample pointing information.
-   *  
+   *
    * @internal
-   *   @history 2011-07-22 Kris Becker 
+   *   @history 2011-07-22 Kris Becker
    */
   Table DawnVirCamera::getPointingTable(const QString &virChannel,
                                         const int zeroFrame)  {
@@ -519,7 +527,7 @@ namespace Isis {
    *  acceleration vectors are then set to 0.
    *
    * @internal
-   *   @history 2011-07-22 Kris Becker 
+   *   @history 2011-07-22 Kris Becker
    */
 
   DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const QString &frame1,
@@ -562,12 +570,12 @@ namespace Isis {
    *  the labels.  If a kernel with the file pattern "dawn_vir_?????????_?.bc"
    *  is present as a CK kernel, then that kernel contains mirror scan angles
    *  for each line.
-   *  
+   *
    *  If the kernel does not exist, this camera model will provide these angles
    *  from the VIR housekeeping data.
    *
    * @internal
-   *   @history 2011-07-22 Kris Becker 
+   *   @history 2011-07-22 Kris Becker
    */
   bool DawnVirCamera::hasArticulationKernel(Pvl &label) const {
     Kernels kerns(label);
@@ -582,7 +590,7 @@ namespace Isis {
 
 }
 
-/** 
+/**
  *  Instantiate a new DawnVirCamera model for the given label content
  */
 extern "C" Isis::Camera *DawnVirCameraPlugin(Isis::Cube &cube) {

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "CubeAttribute.h"
 #include "ProcessByTile.h"
 #include "Pvl.h"
@@ -11,23 +19,23 @@ using namespace std;
 
 
 namespace Isis {
-  void cal(vector<Buffer *> &in, 
+  void cal(vector<Buffer *> &in,
          vector<Buffer *> &out);
 
-  
+
   void apollocal(UserInterface &ui) {
     Cube cube(ui.GetFileName("FROM"), "r");
     apollocal(&cube, ui);
   }
-  
-  
+
+
   void apollocal(Cube *inCube, UserInterface &ui) {
     // We will be processing by line
     ProcessByTile p;
     p.SetTileSize(128, 128);
-  
+
     p.SetInputCube(inCube);
-  
+
     PvlGroup &dataDir =
         Preference::Preferences().findGroup("DataDirectory");
     PvlTranslationTable tTable("$ISISROOT/appdata/translations/MissionName2DataDir.trn");
@@ -35,17 +43,17 @@ namespace Isis {
         (inCube->group("Instrument")).findKeyword("SpacecraftName")[0])][0];
     QString camera =
         (inCube->group("Instrument")).findKeyword("InstrumentId")[0];
-  
+
     CubeAttributeInput cai;
     p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
-  
+
     CubeAttributeOutput cao;
     cao.setPixelType(Real);
     p.SetOutputCube(
         FileName(ui.GetAsString("TO")).expanded(),
         cao, inCube->sampleCount(), inCube->lineCount(),
         inCube->bandCount());
-  
+
     p.StartProcess(cal);
     p.EndProcess();
   }
@@ -55,8 +63,8 @@ namespace Isis {
     Buffer &inp = *in[0];      // Input Cube
     Buffer &fff = *in[1];      // Flat Field File
     Buffer &outp = *out[0];    // Output Cube
-  
-    
+
+
     // Loop for each pixel in the line.
     for (int i=0; i<inp.size(); i++) {
       if (IsSpecial(inp[i])) {

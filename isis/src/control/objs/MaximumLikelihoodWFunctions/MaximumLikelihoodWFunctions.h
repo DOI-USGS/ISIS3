@@ -1,42 +1,27 @@
 #ifndef MaximumLikelihoodWFunctions_h
 #define MaximumLikelihoodWFunctions_h
 
-/**
- * @file
- * $Revision: 1.14 $
- * $Date: 2009/09/08 17:38:17 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QString>
 
 namespace Isis {
   /**
-   * @brief Class provides maximum likelihood estimation functions for robust parameter estimation, 
+   * @brief Class provides maximum likelihood estimation functions for robust parameter estimation,
    *        e.g. in bundle adjustment.
    *
-   * A maximum likelihood estimation W function provides a scheme for 're-weighting' observations so 
-   * that measures with large residuals have reduced or negligible effect on the solution.  There 
-   * are many such functions available, a few have been programmed into this class.  See enum Model 
-   * documentation for specifics of the estimation models. 
-   *  
-   * References:  Zhangs,  "Parameter Estimation: A Tutorial with Application to Conic Fitting" 
+   * A maximum likelihood estimation W function provides a scheme for 're-weighting' observations so
+   * that measures with large residuals have reduced or negligible effect on the solution.  There
+   * are many such functions available, a few have been programmed into this class.  See enum Model
+   * documentation for specifics of the estimation models.
+   *
+   * References:  Zhangs,  "Parameter Estimation: A Tutorial with Application to Conic Fitting"
    *              Koch, "Parameter Estimation and Hypothesis Testing in Linear Systems"
    *                    2nd edition, chapter 3.8
    *              Manual of Photogrammetry, 5th edition, chapter 2.2 (particularly 2.2.6)
@@ -58,12 +43,12 @@ namespace Isis {
    *                           methods.
    *   @history 2014-09-19 Jeannie Backer - Removed bugs. Added documentation. Cleaned
    *                           duplicate code.
-   *   @history 2018-06-29 Christopher Combs - Added extra HuberModified case to stringToModel(). 
+   *   @history 2018-06-29 Christopher Combs - Added extra HuberModified case to stringToModel().
    *                           Fixes #5446.
    */
   class MaximumLikelihoodWFunctions {
   public:
-    /** 
+    /**
      * The supported maximum likelihood estimation models.
      */
     // Each model has an accompannying private method that converts from a
@@ -77,15 +62,15 @@ namespace Isis {
        *   No measures are totally disregarded.
        *    http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
        */
-      Huber,     
-     
+      Huber,
+
       /** A modification to Huber's method propsed by William J.J. Rey in Introduction to Robust
        *  and Quasi-Robust Statistical Methods. Springer, Berlin, Heidelberg, 1983.  It has similiar
        *  properties to the Huber, but with a continuous second derivative.  This comes at the cost
        *  of being somewhat more computationally expernsive.  No measures are totally disregarded.
        *    http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
        */
-      HuberModified,  
+      HuberModified,
 
       /** The Welsch method aggresively discounts measures with large resiudals.  Residuals two
        *  times greater than the tweaking constant are all but ignored.  This method can be risky to
@@ -96,7 +81,7 @@ namespace Isis {
        *  (such as Huber's).
        *    http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
        */
-      Welsch,         
+      Welsch,
 
       /** The Chen method was found in "Robust Regression with Projection Based M-estimators"  Chen,
        *  et. al.,  though Chen does not take credit as the author.  It was of interest because he
@@ -132,7 +117,7 @@ namespace Isis {
     // scalar functions provide access to various flavors of this scalar (as
     // a function of the residual divided by the residuals sigma)
 
-    double sqrtWeightScaler(double residualZScore); //it is often convient to use square roots of 
+    double sqrtWeightScaler(double residualZScore); //it is often convient to use square roots of
                                                     //weights when building normals, this function
                                                     // provides the scaler for the square root of
                                                     // the weight directly
@@ -158,7 +143,7 @@ namespace Isis {
    double m_tweakingConstant; /**< The tweaking constant for the maximum likelihood models.
                                    Default values are available for each model using the method
                                    setTweakingConstantDefault(). This value can also be manually
-                                   adjusted using the method setTweakingConstant(). If there is 
+                                   adjusted using the method setTweakingConstant(). If there is
                                    knowlege of the probility distrubtion of the residuals in an
                                    adjustment, tweakingConstantQuantile() will recommend which
                                    quantile to use as the tweaking constant.*/

@@ -13,7 +13,7 @@ commands:
 	match=$(INPUT)/match.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
-	description="Isis2 list has different number of lines from Isis3 list" \
+	description="Isis2 list has different number of lines from Isis list" \
 	networkid=TestNet01 \
 	target=Titan 2> $(OUTPUT)/error1.txt > /dev/null;
 	ls $(INPUT)/Isis2_cube*.cub >& $(OUTPUT)/cub2.lis;

@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 #include <iostream>
 
@@ -36,7 +25,7 @@ void testCamera(Cube &c, double sample, double line, double knownLat, double kno
 void testLineSamp(Camera *cam, double sample, double line);
 
 /**
- * This is the unit test for the Osiris Rex Camera model. 
+ * This is the unit test for the Osiris Rex Camera model.
  *
  * @author  2015-11-10 Stuart C. Sides
  * @internal
@@ -47,9 +36,9 @@ void testLineSamp(Camera *cam, double sample, double line);
  *                           PolyCamFocusPositionNaifId keyword.
  *   @history 2017-09-18 Kristin Berry - Updated known latitudes and longitudes for the addition of
  *                           the distortion model. (For non-backwards compatibility MapCam cube
- *                           only, since we do not yet have a PolyCam cube with a motor position 
- *                           that we have a distortion solution for.) 
- * 
+ *                           only, since we do not yet have a PolyCam cube with a motor position
+ *                           that we have a distortion solution for.)
+ *
  */
 
 int main(void) {
@@ -59,33 +48,33 @@ int main(void) {
   try {
 
     cout << "\nTesting PolyCam (backwards compatibility)..." << endl;
-    Cube polyCamCube("$osirisrex/testData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
+    Cube polyCamCube("$ISISTESTDATA/isis/src/osirisrex/unitTestData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
     double knownLat = 13.9465663689936950;
     double knownLon = 349.0213035062322433;
-    double sample = 512.0; 
+    double sample = 512.0;
     double line = 512.0;
     testCamera(polyCamCube, sample, line, knownLat, knownLon);
     cout << "\nTesting PolyCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube polyCamCube2("$osirisrex/testData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
+    Cube polyCamCube2("$ISISTESTDATA/isis/src/osirisrex/unitTestData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
     knownLat = -5.5191879351483450;
     knownLon = 349.6939492565607566;
-    sample = 512.0; 
+    sample = 512.0;
     line = 512.0;
     testCamera(polyCamCube2, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
 
     cout << "\nTesting MapCam (backwards compatibility)..." << endl;
-    Cube mapCamCube("$osirisrex/testData/D19030320000.cub", "r");
+    Cube mapCamCube("$ISISTESTDATA/isis/src/osirisrex/unitTestData/D19030320000.cub", "r");
     knownLat = 73.9976065262802933;
     knownLon = 149.3814386120742768;
-    sample = 512.0; 
+    sample = 512.0;
     line = 512.0;
     testCamera(mapCamCube, sample, line, knownLat, knownLon);
     cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
+    Cube mapCamCube2("$ISISTESTDATA/isis/src/osirisrex/unitTestData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
     knownLat = -19.2946930665326732;
     knownLon = 145.9510736765638512;
-    sample = 512.0; 
+    sample = 512.0;
     line = 512.0;
     testCamera(mapCamCube2, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
@@ -95,7 +84,7 @@ int main(void) {
     Cube samCamCube("$osirisrex/testData/20141111T202650_SCAM_L2_V001_SCAM.cub", "r");
     knownLat = 0.0;
     knownLon = 0.0;
-    sample = 512.0; 
+    sample = 512.0;
     line = 512.0;
     testCamera(samCamCube, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
@@ -107,7 +96,7 @@ int main(void) {
   }
 }
 
-void testCamera(Cube &cube, 
+void testCamera(Cube &cube,
                 double sample, double line,
                 double knownLat, double knownLon) {
 
@@ -123,14 +112,14 @@ void testCamera(Cube &cube,
   cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
   cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
   cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-  
+
   // Test name methods
   cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
   cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
   cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
   cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
 
-  // Test Shutter Open/Close 
+  // Test Shutter Open/Close
   const PvlGroup &inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
   QString stime = inst["StartTime"];
@@ -192,4 +181,3 @@ void testLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = NO INTERSECTION" << endl << endl;
   }
 }
-

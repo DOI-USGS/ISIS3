@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "crism2isis.h"
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
@@ -162,7 +170,7 @@ namespace Isis{
     results.setName("Results");
     results += PvlKeyword("Warning",
                           "When using cam2map or cam2cam, images imported into "
-                          "Isis3 using crism2isis should only be interpolated "
+                          "Isis using crism2isis should only be interpolated "
                           "using the nearest-neighbor algorithm due to gimble "
                           "jitter of the MRO CRISM instrument.");
     if (log){

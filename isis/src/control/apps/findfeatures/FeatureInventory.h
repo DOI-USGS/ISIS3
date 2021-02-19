@@ -1,26 +1,14 @@
 #ifndef FeatureInventory_h
 #define FeatureInventory_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "IException.h"
 #include "PvlFlatMap.h"
@@ -38,38 +26,38 @@
 namespace Isis {
 
 /**
- * @brief Wrapper for generic algorithm OpenCV3 feature matcher algorithms 
- *  
- * This class provides a generic wrapper that is intended to restore some of the 
- * functionality for these algorithms that were lost in the upgrade from version 
- * 2. Hence, the class T is intended to be an OpenCV Ptr type that contains 
- * either a Feature2D or DescriptorMatcher algorithm pointer. 
- *  
- * However, the design does lend itself to overide some the OpenCV specifics 
- * if needed. 
- *  
- * The OpenCV implementation can simply extract and populate the 
- * the PvlFlatMap variable structure to allow the default 
- * implementation to serve up the algorithm variables to the 
- * calling environment - or provide a specific implementation if 
- * inadequate. 
- *  
- * The config variable provides a direct way to store how the 
- * invocation string in the form of 
- * "algorithmname@var:value@var:value...". 
- *  
+ * @brief Wrapper for generic algorithm OpenCV3 feature matcher algorithms
+ *
+ * This class provides a generic wrapper that is intended to restore some of the
+ * functionality for these algorithms that were lost in the upgrade from version
+ * 2. Hence, the class T is intended to be an OpenCV Ptr type that contains
+ * either a Feature2D or DescriptorMatcher algorithm pointer.
+ *
+ * However, the design does lend itself to overide some the OpenCV specifics
+ * if needed.
+ *
+ * The OpenCV implementation can simply extract and populate the
+ * the PvlFlatMap variable structure to allow the default
+ * implementation to serve up the algorithm variables to the
+ * calling environment - or provide a specific implementation if
+ * inadequate.
+ *
+ * The config variable provides a direct way to store how the
+ * invocation string in the form of
+ * "algorithmname@var:value@var:value...".
+ *
  * @author  2016-11-30 Kris Becker
- *  
- * @internal 
- *   @history 2016-11-30 Kris Becker - Original Version 
+ *
+ * @internal
+ *   @history 2016-11-30 Kris Becker - Original Version
  */
 
 class FeatureInventory {
   public:
     // Creator and storage types
-    typedef Feature2DAlgorithm* (*FeatureCreator)(const PvlFlatMap &object, 
+    typedef Feature2DAlgorithm* (*FeatureCreator)(const PvlFlatMap &object,
                                                   const QString &config);
-    typedef DescriptorMatcherAlgorithm* (*MatcherCreator)(const PvlFlatMap &object, 
+    typedef DescriptorMatcherAlgorithm* (*MatcherCreator)(const PvlFlatMap &object,
                                                   const QString &config);
 
     FeatureInventory();
@@ -143,7 +131,7 @@ class FeatureInventory {
 
       return ( numAliases );
     }
-    
+
   private:
 
     typedef QMap<QString, FeatureCreator>  Features;

@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.2 $
- * $Date: 2008/06/19 23:35:38 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "ShapeModelFactory.h"
 
@@ -65,15 +49,15 @@ namespace Isis {
 
 
   /**
-   * Construct a valid shape model from the given target and contents of kernels 
-   * group. If the Kernels group does not have a ShapeModel or ElevationModel 
-   * specified, then the default model is an ellipsoidal shape. 
-   * 
+   * Construct a valid shape model from the given target and contents of kernels
+   * group. If the Kernels group does not have a ShapeModel or ElevationModel
+   * specified, then the default model is an ellipsoidal shape.
+   *
    * @param target Pointer to target body model.
    * @param pvl Pvl containing a Kernels group.
-   * 
+   *
    * @return ShapeModel* Pointer to the created ShapeModel object.
-   * 
+   *
    * @author 2017-03-17 Kris Becker
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
@@ -174,7 +158,7 @@ namespace Isis {
         // Check to see of ISIS cube DEMs get a pass
         FileName v_shapefile(shapeModelFilenames);
         QString ext = v_shapefile.extension().toLower();
-        // Cubes are not supported at this time. 
+        // Cubes are not supported at this time.
 
         try {
           BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
@@ -187,9 +171,9 @@ namespace Isis {
               throw IException(IException::Unknown, mess, _FILEINFO_);
             }
 
-            // Always throw an error in this case 
+            // Always throw an error in this case
             QString b_msg = "Bullet could not initialize DEM!";
-            throw IException(IException::Unknown, b_msg, _FILEINFO_);            
+            throw IException(IException::Unknown, b_msg, _FILEINFO_);
           }
           else {
 
@@ -212,9 +196,9 @@ namespace Isis {
           if ("fail" == onerror) throw fileError;
         }
 
-        // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23) 
+        // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23)
       }
-      
+
       //-------------- Check for Embree engine -------------------------------//
       if ( "embree" == preferred ) {
 
@@ -238,7 +222,7 @@ namespace Isis {
                                                 PvlContainer::Replace);
 
           return ( embreeModel );
-          
+
         } catch (IException &ie) {
           fileError.append(ie);
           QString mess = "Unable to create preferred EmbreeShapeModel";
@@ -274,7 +258,7 @@ namespace Isis {
         // TODO Deal with stacks -- this could be a list of DEMs
         Isis::Cube* shapeModelCube = new Isis::Cube;
         try {
-          // first, try to open the shape model file as an Isis3 cube
+          // first, try to open the shape model file as an Isis cube
           shapeModelCube->open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
@@ -336,7 +320,7 @@ namespace Isis {
           // in case no error was thrown, but constructor returned NULL
           fileError.append(IException(IException::Unknown, msg, _FILEINFO_));
         }
-        
+
         delete shapeModelCube;
 
       }

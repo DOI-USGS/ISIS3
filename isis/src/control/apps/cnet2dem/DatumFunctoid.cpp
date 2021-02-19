@@ -1,26 +1,11 @@
-/**                                                                       
- * @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cstdarg>
 #include <cstdio>
 #include <string>
@@ -57,9 +42,9 @@ DatumFunctoidFactory::DatumFunctoidFactory() {
    return;
 }
 
-DatumFunctoidFactory::~DatumFunctoidFactory() { } 
+DatumFunctoidFactory::~DatumFunctoidFactory() { }
 
-DatumFunctoidFactory *DatumFunctoidFactory::getInstance() { 
+DatumFunctoidFactory *DatumFunctoidFactory::getInstance() {
   if (!m_maker) {
     m_maker = new DatumFunctoidFactory();
   }
@@ -78,16 +63,16 @@ QStringList DatumFunctoidFactory::algorithms() const {
 }
 
 DatumFunctoidList DatumFunctoidFactory::create(const QString &specs,
-                                               const bool &errorIfEmpty) 
+                                               const bool &errorIfEmpty)
                                                const {
-  DatumFunctoidList functoids; 
+  DatumFunctoidList functoids;
 
   // Individual algorithm specifications are separated by vertical bars
   QStringList algorithms = specs.split(",", QString::SkipEmptyParts);
   // cout << "create: got " << algorithms.size() << " algorithms...\n";
   if ( algorithms.size() == 0 ) {
     if ( errorIfEmpty ) {
-      QString mess = "No functoid algorithm specifictions found!"; 
+      QString mess = "No functoid algorithm specifictions found!";
       throw IException(IException::User, mess, _FILEINFO_);
     }
     return ( functoids );
@@ -103,7 +88,7 @@ DatumFunctoidList DatumFunctoidFactory::create(const QString &specs,
       nerrors++;
     }
     else {
-      functoids.append(f); 
+      functoids.append(f);
     }
   }
 
@@ -130,14 +115,14 @@ DatumFunctoid *DatumFunctoidFactory::make(const QString &funcspec) const {
 
 /**
  * @brief Parse a parameter string for values and return in parameter map
- * 
+ *
  * @author 2015-09-08 Kris Becker
- * 
- * @param parameters 
- * 
- * @return PvlFlatMap 
+ *
+ * @param parameters
+ *
+ * @return PvlFlatMap
  */
-PvlFlatMap DatumFunctoidFactory::parseParameters(const QString &parameters) 
+PvlFlatMap DatumFunctoidFactory::parseParameters(const QString &parameters)
                                                     const {
   PvlFlatMap pmap;
 
@@ -173,7 +158,7 @@ PvlFlatMap DatumFunctoidFactory::parseParameters(const QString &parameters)
  /**
    * @brief Exit termination routine
    *
-   * This (static) method ensure this object is destroyed when Qt exits.  
+   * This (static) method ensure this object is destroyed when Qt exits.
    *
    * Note that it is error to add this to the system _atexit() routine because
    * this object utilizes Qt classes.  At the time the atexit call stack is

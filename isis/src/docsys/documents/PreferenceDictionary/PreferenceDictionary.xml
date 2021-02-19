@@ -11,12 +11,12 @@ This reference document describes the elements of the ISIS User Preference file.
 <h2><a name="UserInterface">User Interface</a></h2>
 <p>
 The user interface group in the preference file allows you to customize the way your applications run, and how they look
-in graphical form.  The user interface in either graphical or command line mode supplies a progress indicator to the user. 
+in graphical form.  The user interface in either graphical or command line mode supplies a progress indicator to the user.
 The increment of the progress bar can be customized to increase the bar by 10%, 5%, 2%, or 1%.   Additionally, in the
 command line mode, the user can turn off the progress bar if desired.  The GUI will always update the progress bar.  The
 style of the GUI can be customized to have a windows, cde, kde, etc. look to it.  The browser fired up from the GUI can
 also be specified, along with the size of the GUI, and its font type and size.  By default, all history files are stored in the
-users home directory under .Isis/history.  This can be customized to save the history files in the users current directory 
+users home directory under .Isis/history.  This can be customized to save the history files in the users current directory
 (using '.') or any other directory.  The history recording can also be turned off if the user does not wish to record any
 history on the programs being run.
 
@@ -39,9 +39,9 @@ EndGroup
 
 <h2><a name="">Error Facility</a></h2>
 <p>
-Errors can be written in either standard (single line) or PVL format.  
-Additionally, the source file and line number identifying where the error 
-occurred can be suppressed. Stack traces can also be displayed when running ISIS 
+Errors can be written in either standard (single line) or PVL format.
+Additionally, the source file and line number identifying where the error
+occurred can be suppressed. Stack traces can also be displayed when running ISIS
 in debug mode.
 
 <pre style="padding-left:4em;">
@@ -69,7 +69,7 @@ EndGroup
 
 <h2><a name="ShapeModel">ShapeModel</a></h2>
 <p>
-These parameters control which ray-tracing engine is used for working with shapemodels. To use the ISIS3 default, omit or comment-out the ShapeModel group. 
+These parameters control which ray-tracing engine is used for working with shapemodels. To use the ISIS default, omit or comment-out the ShapeModel group. 
 The tolerance is to check the visibility or occlusion of a point and is in kilometers.
 <pre style="padding-left:4em;">
 Group = ShapeModel

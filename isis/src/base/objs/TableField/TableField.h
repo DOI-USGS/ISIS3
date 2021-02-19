@@ -1,27 +1,11 @@
 #ifndef TableField_h
 #define TableField_h
-/**
- * @file
- * $Revision: 1.2 $
- * $Date: 2007/05/31 22:20:12 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <vector>
 
 #include <QString>
@@ -29,15 +13,15 @@
 namespace Isis {
   class PvlGroup;
   /**
-   * @brief Class for storing an Isis::Table's field information. 
-   *  
-   * This class represents the field values of an Isis3 table. In Isis3, fields 
-   * correspond to column values.  Each TableField object is a single table 
-   * entry for a column value at a specific row (or record) of the table. 
-   *  
-   * Be careful to note that the size of a field is the number of array values 
-   * for a single column entry.  It is not the number of rows or records of the 
-   * table. 
+   * @brief Class for storing an Isis::Table's field information.
+   *
+   * This class represents the field values of an Isis table. In Isis3, fields 
+   * correspond to column values.  Each TableField object is a single table
+   * entry for a column value at a specific row (or record) of the table.
+   *
+   * Be careful to note that the size of a field is the number of array values
+   * for a single column entry.  It is not the number of rows or records of the
+   * table.
    *
    * @ingroup LowLevelCubeIO
    *
@@ -57,18 +41,18 @@ namespace Isis {
    *                           field is set to a string value that is longer than the number of
    *                           allowed bytes for the field. References #700.
    *   @history 2015-10-04 Jeannie Backer Improved coding standards. References #1178
-   *  
+   *
    *   @todo Finish class documentation
    */
   class TableField {
     public:
       /**
-       * This enum describes the value type for the TableField.   
+       * This enum describes the value type for the TableField.
        */
-      enum Type { 
+      enum Type {
              Integer, //!< The values in the field are 4 byte integers.
-             Double,  //!< The values in the field are 8 byte doubles. 
-             Text,    /**< The values in the field are text strings with 1 byte 
+             Double,  //!< The values in the field are 8 byte doubles.
+             Text,    /**< The values in the field are text strings with 1 byte
                            per character.*/
              Real     //!< The values in the field are 4 byte reals or floats.
       };
@@ -78,7 +62,7 @@ namespace Isis {
       TableField(PvlGroup &field);
       ~TableField();
 
-      
+
       QString name() const;
       Type type() const;
       bool isInteger() const;
@@ -113,7 +97,7 @@ namespace Isis {
     private:
       QString m_name;            //!< Field name
       Type m_type;                   //!< Field value type
-      int m_size;                    /**< Field size. This is the number of 
+      int m_size;                    /**< Field size. This is the number of
                                           values per field entry of the table.*/
       int m_bytes;                   //!< Number of bytes in field
       std::vector<int> m_ivalues;    /**< Vector containing integer field values.

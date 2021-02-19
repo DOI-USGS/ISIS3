@@ -1,4 +1,4 @@
-// Protocol buffer descriptor for ISIS3 ControlNet class hierarchy
+// Protocol buffer descriptor for ISIS ControlNet class hierarchy
 //
 // 2017-12-11 Kristin Berry - Separated top-level messages into different files
 // 2018-06-13 Jesse Mapel - Added flag to indicate it is a protobuf 2 file

@@ -40,7 +40,7 @@ Deborah Lee Soltesz
 
     <hr/>
     <h2>
-      ISIS 3
+      ISIS
     </h2>
 
     <div>

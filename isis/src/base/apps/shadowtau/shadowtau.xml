@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="shadowtau" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
- 
+
   <brief>
-   Estimate optical depth (tau) using information from shadow measurements 
+   Estimate optical depth (tau) using information from shadow measurements
   </brief>
-  
+
   <description>
     <p>
-      This program estimates the optical depth (tau) values using a table file 
-      that consists of measurements collected at different locations on 
-      <def>Level1</def> images with ISIS <i>qview</i> or another image 
-      display program.  Information for different images can be entered into 
-      a single table file.  The input values gathered are the average 
-      <def link="Digital Number">density</def> measurements 
-      of a dark shadow and its photometric properties, and the average 
-      density of an unshadowed level-surface near the measured dark shadow on a 
-      <def>Level1</def> image that are output to a table file.  The table file 
-      contains one line per image point of the measured values separated by a 
-      comma or space in the following order:      
+      This program estimates the optical depth (tau) values using a table file
+      that consists of measurements collected at different locations on
+      <def>Level1</def> images with ISIS <i>qview</i> or another image
+      display program.  Information for different images can be entered into
+      a single table file.  The input values gathered are the average
+      <def link="Digital Number">density</def> measurements
+      of a dark shadow and its photometric properties, and the average
+      density of an unshadowed level-surface near the measured dark shadow on a
+      <def>Level1</def> image that are output to a table file.  The table file
+      contains one line per image point of the measured values separated by a
+      comma or space in the following order:
       <ol>
         <li>Image ID</li>
-        <li><def link="Incidence Angle">Incidence angle</def> of the measured 
+        <li><def link="Incidence Angle">Incidence angle</def> of the measured
 	    dark shadow</li>
-        <li><def link="Emission Angle">Emission angle</def> of the measured 
+        <li><def link="Emission Angle">Emission angle</def> of the measured
 	    dark shadow</li>
         <li><def link="Phase Angle">Phase angle</def> of the measured dark shadow</li>
-        <li>The average DN (<def link="Radiance">radiance</def>) of a level 
+        <li>The average DN (<def link="Radiance">radiance</def>) of a level
 	    unshadowed area</li>
         <li>The average DN (radiance) of a dark shadowed area</li>
       </ol>
     </p>
     <p>
-      The image below shows an example of areas that could be measured on a 
-      <def>Level1</def> image using the qview tools.  The tracking tool is used 
-      to obtain the phase, incidence, and emission angles of the dark shadow.  
-      The statistics tool in <i>qview</i> is used to obtain the 
-      average density of the selected area on a dark shadow and an unshadowed 
-      area near the dark shadow. The average pixel values can be added to the 
+      The image below shows an example of areas that could be measured on a
+      <def>Level1</def> image using the qview tools.  The tracking tool is used
+      to obtain the phase, incidence, and emission angles of the dark shadow.
+      The statistics tool in <i>qview</i> is used to obtain the
+      average density of the selected area on a dark shadow and an unshadowed
+      area near the dark shadow. The average pixel values can be added to the
       tracking window, under notes, for each point, and saved to an output file.
       Another option is to record the information using a text editor.
       <br /> <br />
@@ -48,9 +48,9 @@
     </p>
     <p>
       Whatever method is used to record the information into a table file,
-      the input file to shadowtau must have required column information in a 
-      specific order.  Note: the program qview does not output the photometric 
-      information in the correct order, so the user must modify the output 
+      the input file to shadowtau must have required column information in a
+      specific order.  Note: the program qview does not output the photometric
+      information in the correct order, so the user must modify the output
       before using the table file in shadowtau.
     </p>
     <p>
@@ -65,7 +65,7 @@
      </pre>
      </p>
      <p>
-       The following is the result of shadowtau; the bolded values are estimated 
+       The following is the result of shadowtau; the bolded values are estimated
        tau and albedo values, respectively:<br />
        <pre>
      PSP_001414_1780_RED5.cub, 54.3287, 17.7148, 70.0486, 0.0943, 0.0667265, <b>0.43133</b>, <b>0.120277</b>
@@ -76,23 +76,23 @@
        </pre>
     </p>
     <p>
-      For each line in the table file above, the model results for the tau  
-      and <def link="Albedo">albedo</def> of the surface are appended to 
-      the end of the input line as shown in bold, and exported to the output 
-      file.  All the results are based on user-selected photometric and 
-      atmospheric models, and either the default or user-modified parameter values.  
-      Most of the parameters default to appropriate values for Mars red filter 
-      images since it is the only other planet with modest atmospheric optical 
-      depths besides Earth.  The results from the program are useful as an initial value 
+      For each line in the table file above, the model results for the tau
+      and <def link="Albedo">albedo</def> of the surface are appended to
+      the end of the input line as shown in bold, and exported to the output
+      file.  All the results are based on user-selected photometric and
+      atmospheric models, and either the default or user-modified parameter values.
+      Most of the parameters default to appropriate values for Mars red filter
+      images since it is the only other planet with modest atmospheric optical
+      depths besides Earth.  The results from the program are useful as an initial value
       for the "tau" parameter when a photometric correction is applied to the images.
     </p>
     <p>
-      The surface and atmosphere models use the same assumptions as the 
-      <i>photomet</i> photometric correction software, so the estimated 
-      optical depths are useful for processing images with that program.  In 
-      other words, the optical depth calculated by this program is model-dependent; 
-      however, it is exactly the model-dependent value that will produce the most 
-      effective photometric correction in <i>photomet</i>.  
+      The surface and atmosphere models use the same assumptions as the
+      <i>photomet</i> photometric correction software, so the estimated
+      optical depths are useful for processing images with that program.  In
+      other words, the optical depth calculated by this program is model-dependent;
+      however, it is exactly the model-dependent value that will produce the most
+      effective photometric correction in <i>photomet</i>.
     </p>
 <small>
 <br/>
@@ -107,42 +107,42 @@
 <tr>
 <th>Name</th>
 <th>Required parameter names</th>
-</tr>    
+</tr>
 <tr>
 <td> Hapkehen </td>
 <td>B0, hg1, hg2, hh, theta, wh</td>
-</tr>  
+</tr>
 <tr>
 <td> Hapkeleg </td>
 <td>Theta, wh, bh, ch, hh, b0, zerob0st</td>
 </tr>  <tr>
 <td> Lambert </td>
 <td>None</td>
-</tr>  
+</tr>
 <tr>
 <td> LommelSeeliger </td>
 <td>None</td>
-</tr>  
+</tr>
 <tr>
 <td> LunarLambert </td>
 <td>L</td>
-</tr>  
+</tr>
 <tr>
 <td> LunarLambertEmpirical <b>(Disabled until next release)</b> </td>
 <td>Datafile</td>
-</tr>  
+</tr>
 <tr>
 <td> LunarLambertMcEwen </td>
 <td>None</td>
-</tr>  
+</tr>
 <tr>
 <td> Minnaert </td>
 <td>K</td>
-</tr>  
+</tr>
 <tr>
 <td> MinnaertEmpirical <b>(Disabled until next release)</b> </td>
 <td>Datafile</td>
-</tr>  
+</tr>
 </table>
 <br/>
 <br/>
@@ -152,7 +152,7 @@
 <tr>
 <th>Name</th>
 <th>Description</th>
-<th>ISIS3 default</th>
+<th>ISIS default</th>
 <th>Valid range</th>
 </tr>
 <tr>
@@ -266,7 +266,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 <tr>
 <th>Function model name</th>
 <th>Required parameters</th>
-</tr> 
+</tr>
 <tr>
 <td> Anisotropic1 </td>
 <td>Bha, hnorm, wha</td>
@@ -302,7 +302,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 <tr>
 <th>Name</th>
 <th>Description</th>
-<th>ISIS3 Default</th>
+<th>ISIS Default</th>
 <th>Valid Range</th>
 </tr>
 <tr>
@@ -338,31 +338,31 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 
 <pre>
 References:
- 
+
 Chandrasekhar, S., 1960.  Radiative Transfer. Dover, 393 pp.
-Hapke, B. W., 1981. Bidirectional reflectance spectroscopy 1: Theory. 
-   J. Geophys. Res., pp. 86,3039-3054. 
-Hapke, B., 1984. Bidirectional reflectance spectroscopy 3: Corrections for 
+Hapke, B. W., 1981. Bidirectional reflectance spectroscopy 1: Theory.
+   J. Geophys. Res., pp. 86,3039-3054.
+Hapke, B., 1984. Bidirectional reflectance spectroscopy 3: Corrections for
    macroscopic roughness. Icarus, 59, pp. 41-59.
-Hapke, B., 1986. Bidirectional reflectance spectroscopy 4: The extinction 
-   coefficient and the opposition effect. Icarus, 67, pp. 264-280. 
-Johnson, J. R., et al., 1999, Preliminary Results on Photometric Properties of 
-   Materials at the Sagan Memorial Station, Mars, J. Geophys. Res., 104, 8809. 
+Hapke, B., 1986. Bidirectional reflectance spectroscopy 4: The extinction
+   coefficient and the opposition effect. Icarus, 67, pp. 264-280.
+Johnson, J. R., et al., 1999, Preliminary Results on Photometric Properties of
+   Materials at the Sagan Memorial Station, Mars, J. Geophys. Res., 104, 8809.
 Kirk, R. L., Thompson, K. T., Becker, T. L., and Lee, E. M., 2000.
-   Photometric modelling for planetary cartography. Lunar Planet. Sci., XXXI, 
+   Photometric modelling for planetary cartography. Lunar Planet. Sci., XXXI,
    Abstract #2025, Lunar and Planetary Institute, Houston (CD-ROM).
-Kirk, R. L., Thompson, K. T., and Lee, E. M., 2001. Photometry of the 
-   martian atmosphere:  An improved practical model for cartography and 
-   photoclinometry. Lunar Planet. Sci., XXXII, Abstract #1874, Lunar and 
-   Planetary Institute, Houston (CD-ROM). 
-McEwen, A. S., 1991. Photometric functions for photoclinometry and other 
+Kirk, R. L., Thompson, K. T., and Lee, E. M., 2001. Photometry of the
+   martian atmosphere:  An improved practical model for cartography and
+   photoclinometry. Lunar Planet. Sci., XXXII, Abstract #1874, Lunar and
+   Planetary Institute, Houston (CD-ROM).
+McEwen, A. S., 1991. Photometric functions for photoclinometry and other
    applications.  Icarus, 92, pp. 298-311.
-Tanaka, K. L., and and Davis, P. A., 1988, Tectonic History of the Syria 
-   Planum Provice of Mars, J. Geophys. Res., 93, 14,893. 
-Thorpe, T. E., 1973, Mariner 9 Photometric Observations of Mars from 
+Tanaka, K. L., and and Davis, P. A., 1988, Tectonic History of the Syria
+   Planum Provice of Mars, J. Geophys. Res., 93, 14,893.
+Thorpe, T. E., 1973, Mariner 9 Photometric Observations of Mars from
    November 1971 through March 1972, Icarus, 20, 482.
-Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere 
-   from the Imager on Mars Pathfinder, J. Geophys. Res., 104, 8987 
+Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
+   from the Imager on Mars Pathfinder, J. Geophys. Res., 104, 8987
 </pre>
 </description>
 
@@ -422,9 +422,9 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
             Input text file name
         </brief>
         <description>
-          Input text file name with Image ID, incidence, emission, and phase 
-	  angle of the measured dark shadow, average DN value of flat area 
-	  and  average DN value of a dark shadowed area 
+          Input text file name with Image ID, incidence, emission, and phase
+	  angle of the measured dark shadow, average DN value of flat area
+	  and  average DN value of a dark shadowed area
         </description>
         <filter>
           *.txt
@@ -437,9 +437,9 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
             Output text file name
         </brief>
         <description>
-          Output text file name with the input ImageID, incidence, emission, 
-	  and phase angle of the measured dark shadow, average DN value of 
-	  flat area, average DN value of a dark shadowed area, plus the 
+          Output text file name with the input ImageID, incidence, emission,
+	  and phase angle of the measured dark shadow, average DN value of
+	  flat area, average DN value of a dark shadowed area, plus the
 	  estimated tau (optical depth) and albedo (albedo of the surface)
 	  values appended to each input line.
         </description>
@@ -448,7 +448,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         </filter>
       </parameter>
     </group>
-    
+
     <group name="Photometric Model">
       <parameter name="PHTNAME">
         <type>combo</type>
@@ -461,15 +461,15 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
           <dl>
           <dt><b>HAPKEHEN</b></dt>
            <dd>
-              Derive model albedo using the complete Hapke model with Henyey-Greenstein 
-	      single-particle phase function whose coefficients are hg1 and hg2, 
-	      plus single scattering albedo wh, opposition surge parameters hh and 
+              Derive model albedo using the complete Hapke model with Henyey-Greenstein
+	      single-particle phase function whose coefficients are hg1 and hg2,
+	      plus single scattering albedo wh, opposition surge parameters hh and
 	      b0, and macroscopic roughness theta.  For a smooth model with opposition
 	      effect use theta=0. <br/>
 	      <br/>
-	      The table below shows the Hapke parameters for Mars from Johnson et 
+	      The table below shows the Hapke parameters for Mars from Johnson et
 	      al. (1999) for IMP data  of Photometry Flats (soil) and may be reasonably
-	      representative of Mars as a whole.  Note that (hg1, hg2=1.0) is 
+	      representative of Mars as a whole.  Note that (hg1, hg2=1.0) is
 	      equivalent to (-hg1, hg2=0.0). <br/>
 	      <br/>
 	      <table border="1">
@@ -507,21 +507,21 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
 	      <td>1.0</td>
 	      </tr>
 	      </table>
-          </dd>          
+          </dd>
           <dt><b>HAPKELEG</b></dt>
           <dd>
-              Derive model albedo using complete Hapke model with Henyey Legendre 
-	      two-term Legendre polynomial phase function whose coefficients are bh 
-	      and ch, plus single scattering albedo wh, opposition surge parameters 
+              Derive model albedo using complete Hapke model with Henyey Legendre
+	      two-term Legendre polynomial phase function whose coefficients are bh
+	      and ch, plus single scattering albedo wh, opposition surge parameters
 	      hh and b0, and macroscopic roughness theta.
-          </dd>          
+          </dd>
           <dt><b>LAMBERT </b></dt>
           <dd>
-              A simple photometric model which predicts that light incident on a 
-	      surface is scattered uniformly in all directions; the total amount 
-	      of reflected light depends on the incidence angle of the illumination. 
+              A simple photometric model which predicts that light incident on a
+	      surface is scattered uniformly in all directions; the total amount
+	      of reflected light depends on the incidence angle of the illumination.
 	      This function does not depend upon the outgoing light direction.
-          </dd>          
+          </dd>
           <dt><b>LOMMELSEELIGER</b></dt>
           <dd>
               This model takes into account the <def>radiance</def> that results from
@@ -530,28 +530,28 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               scattering (scattering of diffuse light which has made its way
               indirectly to the same position by being scattered one or more
               times). This model depends on the incidence and emission angles.
-          </dd>          
+          </dd>
           <dt><b>LUNARLAMBERTMCEWEN</b></dt>
           <dd>
               This model was developed specifically for use with the Moon, and
               designed to be used in conjunction with the Moon(MoonAlbedo)
               normalization model.
-          </dd>          
-          <dt><b>LUNARLAMBERTEMPIRICAL</b>, <b>LUNARLAMBERT</b>, 
+          </dd>
+          <dt><b>LUNARLAMBERTEMPIRICAL</b>, <b>LUNARLAMBERT</b>,
 	  <b>MINNAERTEMPIRICAL</b>, and <b>MINNAERT</b>
 	  </dt>
           <dd>
               These models combine a weighted sum of the LommelSeeliger and
               Lambert models. Given a suitable value for the LunarLambert
-              function weight, L, these models fit the true 
+              function weight, L, these models fit the true
 	      <def link="Reflectance">reflectance</def> behavior
               of many planetary surfaces equally well as the Hapke model. These
               models also depend on the incidence and emission angles.
-          </dd>          
-          </dl>         
+          </dd>
+          </dl>
 	  <p>
 	     LUNARLAMBERTEMPIRICAL and MINNAERTEMPIRICAL photometric models, and
-	     the parameter name DATAFILE are disabled until the next release.  
+	     the parameter name DATAFILE are disabled until the next release.
 	     There was a problem using the two functions listed above.
 	  </p>
         </description>
@@ -566,7 +566,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               Hapke-Henyey-Greenstein Photometric Model
             </brief>
             <description>
-              Derive model albedo using complete Hapke model with Henyey-Greenstein 
+              Derive model albedo using complete Hapke model with Henyey-Greenstein
 	      single-particle phase function.
             </description>
             <inclusions>
@@ -591,7 +591,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               Hapke Legendre Polynomial Photometric Model
             </brief>
             <description>
-              Derive model albedo using complete Hapke model with Henyey Legendre 
+              Derive model albedo using complete Hapke model with Henyey Legendre
 	      two-term Legendre polynomial phase function.
             </description>
             <inclusions>
@@ -640,7 +640,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
             </brief>
             <description>
               This model takes into account the <def link="Radiance">radiance</def>
-	      that results from single scattering (scattering of collimated 
+	      that results from single scattering (scattering of collimated
 	      incident light).
             </description>
             <exclusions>
@@ -683,13 +683,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
             </exclusions>
           </option>
 	  //-->
-	  
+
           <option value="LUNARLAMBERTMCEWEN">
             <brief>
               Lunar Lambert-McEwen Photometric Model
             </brief>
             <description>
-              This model was designed for the Moon to be used in conjunction with the 
+              This model was designed for the Moon to be used in conjunction with the
               MoonAlbedo normalization model.
             </description>
             <exclusions>
@@ -755,7 +755,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>L</item>
               <item>DATAFILE</item>
             </exclusions>
-          </option> 
+          </option>
 	  //-->
           <option value="MINNAERT">
             <brief>
@@ -813,7 +813,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
-          The Hapke single scattering albedo of surface particles, 
+          The Hapke single scattering albedo of surface particles,
 	  see Hapke (1981).
         </description>
         <minimum inclusive="no">0.0</minimum>
@@ -833,7 +833,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
 	  surface.  See Hapke (1981).  The two-parameter Henyey Greenstein
 	  function is as follows:
 	  <blockquote>
-	  P(phase)=(1-hg2) * (1-hg1**2)/(1+hg1**2+2*hg1*cos(phase))**1.5 
+	  P(phase)=(1-hg2) * (1-hg1**2)/(1+hg1**2+2*hg1*cos(phase))**1.5
 	  + hg2  * (1-hg1**2)/(1+hg1**2-2*hg1*cos(phase))**1.5
 	  </blockquote>
         </description>
@@ -851,9 +851,9 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase
           function.  The second parameter of the two-parameter Henyey-Greenstein
-	  model for the scattering phase function of single particles in the 
-	  surface.  This parameter controls the proportions in a linear 
-	  mixture of ordinary Heneyey Greenstein phase functions with asymmetry 
+	  model for the scattering phase function of single particles in the
+	  surface.  This parameter controls the proportions in a linear
+	  mixture of ordinary Heneyey Greenstein phase functions with asymmetry
 	  parameters equal to +hg1 and -hg1.  See HG1 for the full formula.
         </description>
         <minimum inclusive="yes">0.0</minimum>
@@ -869,13 +869,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
-          function.  A two-term Legendre polynomial is used for the scattering 
+          function.  A two-term Legendre polynomial is used for the scattering
 	  phase function of single particles in the surface:
 	  <blockquote>
 	  P(phase) = 1 + bh * p1(cos(phase)) + ch * p2(cos(phase)) <br/>
 	  </blockquote>
 	  Bh is not to be confused with the Legendre coefficient bha
-	  of the phase function for atmospheric particles, used when 
+	  of the phase function for atmospheric particles, used when
 	  atmname=anisotropic1 or anisotropic2.
         </description>
         <minimum inclusive="no">-1.0</minimum>
@@ -891,7 +891,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
-          function.  A two-term Legendre polynomial is used for the scattering 
+          function.  A two-term Legendre polynomial is used for the scattering
 	  phase function of single particles in the surface: <br/>
 	  <blockquote>
           P(phase) = 1 + bh * p1(cos(phase)) + ch * p2(cos(phase))
@@ -909,7 +909,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
-          The Hapke opposition surge component.  The width parameter for the opposition 
+          The Hapke opposition surge component.  The width parameter for the opposition
 	  effect for the surface if Hapkehen or Hapkeleg is used.  See Hapke (1984).
         </description>
         <minimum inclusive="yes">0.0</minimum>
@@ -946,13 +946,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               B0 will not be set to zero for standard conditions phase
             </brief>
             <description>
-              This option specifies that the opposition surge B0 will not be set to zero 
+              This option specifies that the opposition surge B0 will not be set to zero
               during the standard conditions phase.
             </description>
           </option>
           <option value="TRUE">
             <brief>
-              B0 will be set to zero for standard conditions phase 
+              B0 will be set to zero for standard conditions phase
             </brief>
             <description>
               This option specifies that the opposition surge B0 will be set to zero
@@ -970,12 +970,12 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
-          The Lunar Lambert function weight that governs limb-darkening 
-	  in the lunar lambert photometric function: 
+          The Lunar Lambert function weight that governs limb-darkening
+	  in the lunar lambert photometric function:
           <blockquote>
 	  Func=(1-L)*u0 + 2*L*u0/(u0+u)
           </blockquote>
-	  The values generally fall in the range from 0 (Lambert function) to 1 
+	  The values generally fall in the range from 0 (Lambert function) to 1
 	  (Lommel-Seeliger or "lunar" function).
         </description>
       </parameter>
@@ -988,12 +988,12 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
-          The Minnaert function exponent that governs limb-darkening in the 
-	  Minnaert photometric function: 
+          The Minnaert function exponent that governs limb-darkening in the
+	  Minnaert photometric function:
           <blockquote>
 	  Func=u0**K * u**(K-1)
           </blockquote>
-          The values generally fall in the range from 0.5 ("lunar-like", 
+          The values generally fall in the range from 0.5 ("lunar-like",
 	  almost no limb darkening) to 1.0 (Lambert function).
         </description>
         <minimum inclusive="yes">0.0</minimum>
@@ -1004,31 +1004,31 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <type>filename</type>
          <fileMode>input</fileMode>
         <brief>
-	  PVL file with parameter values for empirical functions 
+	  PVL file with parameter values for empirical functions
         </brief>
         <filter>*.txt</filter>
         <description>
           <p>
-          This file contains a table of parameter values for Lunar Lambert 
-	  Empirical (PHASELIST, LLIST, PHASECURVELIST) and Minnaert Empirical 
-	  (PHASELIST, KLIST, PHASECURVELIST) functions.  The file may contain 
-	  sets of values for both empirical functions, generally intended to 
+          This file contains a table of parameter values for Lunar Lambert
+	  Empirical (PHASELIST, LLIST, PHASECURVELIST) and Minnaert Empirical
+	  (PHASELIST, KLIST, PHASECURVELIST) functions.  The file may contain
+	  sets of values for both empirical functions, generally intended to
 	  represent the same Hapke model (same planetary surface).  The
-          <i>phoempglobal</i> program can be used to calculate the parameter 
-          values that best approximate a Hapke model. The output file from 
-	  <i>phoempglobal</I> can be used as input for the datafile parameter.  
+          <i>phoempglobal</i> program can be used to calculate the parameter
+          values that best approximate a Hapke model. The output file from
+	  <i>phoempglobal</I> can be used as input for the datafile parameter.
           </p>
 	  <p>
-          The example below is for Mars red filter images.  The phase angles 
-	  (PhaseList) at 
-	  which the coefficient values for the Lunar Lambert Empirical (LList) 
-	  and the Minnaert Empirical (KLIST) approximation are calculated, 
-	  along with the brightness (PhaseCurveList) values at those points.  
+          The example below is for Mars red filter images.  The phase angles
+	  (PhaseList) at
+	  which the coefficient values for the Lunar Lambert Empirical (LList)
+	  and the Minnaert Empirical (KLIST) approximation are calculated,
+	  along with the brightness (PhaseCurveList) values at those points.
 	  The values for each parameter must be entered on a single line.
 	  The example belows shows the values on two or three lines for
-	  presentation only. Remember, the values must be on a single line 
+	  presentation only. Remember, the values must be on a single line
 	  in the input file.
-          </p>       
+          </p>
 <pre>
 
   Object = PhotometricModel
@@ -1057,12 +1057,12 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
                        0.09797,0.08750,0.07594,0.06466,0.05471,0.04665,0.03935,
 		       0.03339,0.02642,0.01482,0."
     EndGroup
-  EndObject 
+  EndObject
  </pre>
-        </description> 
+        </description>
       </parameter>
  //-->
-      
+
     </group>
      <group name="Atmospheric Model">
       <parameter name="ATMNAME">
@@ -1082,7 +1082,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
 	  <br/>
 	  <br/>
           <b>
-	    The table below are photometric parameter values for Mars, 
+	    The table below are photometric parameter values for Mars,
 	    adopted from Tomasko et al. (1999):
           </b><br/>
 	  <table border="1">
@@ -1219,9 +1219,9 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of single particle Henyey Greenstein phase
-          function.  Henyey-Greenestein asymmetry parameter for atmospheric 
-	  particle phase function, used in hapkeatm1 and hapkeatm2 atmospheric models.  
-	  Not to be confused with corresponding parameter hg1 for the 
+          function.  Henyey-Greenestein asymmetry parameter for atmospheric
+	  particle phase function, used in hapkeatm1 and hapkeatm2 atmospheric models.
+	  Not to be confused with corresponding parameter hg1 for the
 	  surface particles.
         </description>
         <minimum inclusive="no">-1.0</minimum>
@@ -1252,7 +1252,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <description>
           The coefficient of the single particle Legendre phase function.
 	  Coefficient of p1 (cosine) term of atmospheric particle phase
-	  function, used in anisotropic1 and anisotropic2 atmospheric models. Not to be confused 
+	  function, used in anisotropic1 and anisotropic2 atmospheric models. Not to be confused
 	  with corresponding coefficient bh for the surface particles.
         </description>
         <minimum inclusive="yes">-1.0</minimum>
@@ -1268,15 +1268,15 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <internalDefault>None Specified</internalDefault>
         <description>
           The atmospheric shell thickness normalized to the planet
-          radius, used to modify angles to get more accurate path lengths 
+          radius, used to modify angles to get more accurate path lengths
 	  near the terminator (Ratio of scale height to the planetary
-	  radius).  The hnorm parameter is defined as "0.003" for Mars, 
-	  which is the only planet for which the atmospheric modes are currently 
+	  radius).  The hnorm parameter is defined as "0.003" for Mars,
+	  which is the only planet for which the atmospheric modes are currently
 	  used.
         </description>
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
     </group>
-   
+
   </groups>
 </application>

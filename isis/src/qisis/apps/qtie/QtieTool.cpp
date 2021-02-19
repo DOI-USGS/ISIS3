@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "QtieTool.h"
 
 #include <QApplication>
@@ -250,9 +258,9 @@ namespace Isis {
     regMenu->addAction(templateFile);
     regMenu->addAction(viewTemplate);
     //    registrationMenu->addAction(interestOp);
-    
+
     p_whatsThis = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/contexthelp.png").expanded()),
-                              "&Whats's This", 
+                              "&Whats's This",
                               p_tieTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
@@ -342,9 +350,9 @@ namespace Isis {
    *                           run on new files.
    * @history  2010-05-11 Tracie Sucharski - Moved the creation of control net
    *                           to the QtieFileTool::open.
-   * @history  2012-05-11 Tracie Sucharski - Delete cubes,  A better solution- rewrite 
-   *                           QtieFileTool::open , to pass in filenames only? 
-   *                            
+   * @history  2012-05-11 Tracie Sucharski - Delete cubes,  A better solution- rewrite
+   *                           QtieFileTool::open , to pass in filenames only?
+   *
    */
   void QtieTool::clearFiles() {
     p_tieTool->setVisible(false);
@@ -512,8 +520,8 @@ namespace Isis {
    * @history  2010-05-18 Jeannie Walldren - Modified Point ID
    *                          QInputDialog to return if "Cancel"
    *                          is clicked.
-   * @history 2012-05-10  Tracie Sucharski - If point doesn't exist on 
-   *                          base map, return. 
+   * @history 2012-05-10  Tracie Sucharski - If point doesn't exist on
+   *                          base map, return.
    */
   void QtieTool::createPoint(double lat, double lon) {
 
@@ -795,7 +803,7 @@ namespace Isis {
       //     longitude sigma        = 1000.0
       //     radius sigma           = Null since we are not solving for radius
       //     outlier rejection      = false
-      settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal, 
+      settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal,
                                 SurfacePoint::Latitudinal, 1000.0,1000.0, Isis::Null);
   //************************************************************************************************
       QList<BundleObservationSolveSettings> observationSolveSettingsList;
@@ -883,9 +891,9 @@ namespace Isis {
       message += errors;
 //      message += "\n\nMaximum Error = " + QString::number(outNet.MaximumResiudal());
 //      message += "\nAverage Error = " + QString::number(outNet.AverageResidual());
-      message += "\n\nMaximum Error = " 
+      message += "\n\nMaximum Error = "
                + QString::number(outNet.GetMaximumResidual());
-      message += "\nAverage Error = " 
+      message += "\nAverage Error = "
                + QString::number(outNet.AverageResidual());
       QMessageBox::warning((QWidget *)parent(), "Error", message);
       return;
@@ -948,7 +956,7 @@ namespace Isis {
    */
 
   void QtieTool::setTemplateFile() {
-    
+
     QString filename = QFileDialog::getOpenFileName(p_tieTool,
                        "Select a registration template", ".",
                        "Registration template files (*.def *.pvl);;All files (*)");

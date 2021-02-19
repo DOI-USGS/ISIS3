@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include "CSVReader.h"
@@ -31,13 +39,13 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
 void translateEISLabels(FileName &inputLabel, Pvl *outputLabel);
 void translateLabels(FileName &inputLabel, Pvl *outputLabel, FileName transFile);
 Table normalizeTimeTable(const FileName &file, const QString &tableName, int numLines);
-Table createTable(const FileName &file, const QString &tableName, int numLines); 
+Table createTable(const FileName &file, const QString &tableName, int numLines);
 void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, OriginalXmlLabel xmlLabel);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName xmlFileName = ui.GetFileName("FROM");
-  
+
   try {
     ProcessImport p;
     translateCoreInfo(xmlFileName, p);
@@ -50,24 +58,24 @@ void IsisMain() {
         ".dat file for this XML exists and is located in the same directory.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-  
+
     Cube *outputCube = p.SetOutputCube("TO");
     Pvl *outputLabel = outputCube->label();
-    
+
     translateEISLabels(xmlFileName, outputLabel);
-    
+
     FileName outputCubeFileName(ui.GetFileName("TO"));
 
     OriginalXmlLabel xmlLabel;
     xmlLabel.readFromXmlFile(xmlFileName);
 
     p.StartProcess();
-    
+
     // The ClipperNacRollingShutterCamera requires extra information for instantiating a camera.
     if (outputLabel->findKeyword("InstrumentId", PvlObject::Traverse)[0] == "EIS-NAC-RS") {
       modifyNacRollingShutterLabel(outputCube, xmlFileName, xmlLabel);
     }
-    
+
     // Write out original label before closing the cube
     outputCube->write(xmlLabel);
 
@@ -100,8 +108,8 @@ void IsisMain() {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    outputCube->putGroup(kerns); 
-  
+    outputCube->putGroup(kerns);
+
     p.EndProcess();
   }
   catch (IException &e) {
@@ -169,7 +177,7 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
   importer.SetBase(toDouble(str));
   str = labelXlater.Translate("CoreMultiplier");
   importer.SetMultiplier(toDouble(str));
-  
+
   // These are hard-coded to ISIS values, but the team may choose to set them
   // differently and include them in the imported xml file in the future
   importer.SetNull(Isis::NULL4, Isis::NULL4);
@@ -187,7 +195,7 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
  * @param Pvl outputCube Pointer to the output cube where ISIS labels will be added and updated.
 */
 void translateEISLabels(FileName &inputLabel, Pvl *outputLabel) {
-  
+
   // Translate labels for each translation file needed
   translateLabels(inputLabel, outputLabel, FileName("$ISISROOT/appdata/translations/ClipperEisInstrument.trn"));
 }
@@ -216,24 +224,24 @@ void translateLabels(FileName &inputLabel, Pvl *outputLabel, FileName transFile)
  * @param FileName xmlFileName File name of the original xml label
  */
 void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, OriginalXmlLabel xmlLabel) {
-  
+
   UserInterface &ui = Application::GetUserInterface();
-  
+
   Pvl *outputLabel = outputCube->label();
-  
+
   // Set a default value for the JitterSampleCoefficients and the JitterLineCoefficient keywords in the Instrument group.
   // These values are overwritten with a call to the jitterfit application.
   PvlKeyword jitterLineCoefficients = PvlKeyword("JitterLineCoefficients", (toString(0.0)));
   jitterLineCoefficients += toString(0.0);
   jitterLineCoefficients += toString(0.0);
   outputLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(jitterLineCoefficients);
-  
+
   PvlKeyword jitterSampleCoefficients = PvlKeyword("JitterSampleCoefficients", (toString(0.0)));
   jitterSampleCoefficients += toString(0.0);
   jitterSampleCoefficients += toString(0.0);
   outputLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(jitterSampleCoefficients);
-  
-  
+
+
   // Write the line times tables to the main EIS cube
   if (ui.WasEntered("MAINREADOUT")) {
 
@@ -245,24 +253,24 @@ void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, Origin
     outputCube->write(normalizedReadout);
 
   }
-  // Since ClipperNacRolingShutterCamera requires the "Normailized Main Readout Line 
+  // Since ClipperNacRolingShutterCamera requires the "Normailized Main Readout Line
   // Times" table, we are requiring that a file of lines and their times be
   // provided in the MAINREADOUT parameter. It may be possible to refactor
   // the camera object to be able to handle when a table does not exist and
   // this will be able to be refactored to not require a line times file.
   else {
     QString msg = "This image appears to be a Narrow Angle Rolling Shutter Camera. "
-                  "You must provide the line times file associated with [" + xmlFileName.name() + 
+                  "You must provide the line times file associated with [" + xmlFileName.name() +
                   "] as the [MAINREADOUT] parameter.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
-  // Handle an optional checkline cube. 
+
+  // Handle an optional checkline cube.
   if (ui.WasEntered("FROM2")) {
     FileName checklineXmlFileName = ui.GetFileName("FROM2");
 
     if (ui.WasEntered("CHECKLINEREADOUT")) {
-      // Process the checkline image to an ISIS3 cube and write the checkline tables
+      // Process the checkline image to an ISIS cube and write the checkline tables
       ProcessImport p2;
       translateCoreInfo(checklineXmlFileName, p2);
       if (checklineXmlFileName.removeExtension()
@@ -277,12 +285,12 @@ void modifyNacRollingShutterLabel(Cube *outputCube, FileName xmlFileName, Origin
         ".dat file for this XML exists and is located in the same directory.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      
+
       Cube *checklineCube = p2.SetOutputCube("TO2");
       Pvl *checklineLabel = checklineCube->label();
 
       translateEISLabels(checklineXmlFileName, checklineLabel);
-      
+
       OriginalXmlLabel checklineXmlLabel;
       xmlLabel.readFromXmlFile(checklineXmlFileName);
       p2.StartProcess();
@@ -382,34 +390,34 @@ Table normalizeTimeTable(const FileName &file, const QString &tableName, int num
 
 /**
  * Creates a table from a CSV file.
- * 
+ *
  * @param const FileName &file Name of the CSV file to read in
  * @param const QString &tableName Name of the table to create
  * @param int numLines Number of lines in the CSV file (without header)
- * 
+ *
  * @return Table Returns the created table.
  */
 Table createTable(const FileName &file, const QString &tableName, int numLines) {
   CSVReader csv(file.expanded());
-  
+
   // Number of lines provided must match number of rows in csv file
   if (numLines != csv.rows()) {
     QString msg = "Readout table [" + file.expanded() +
                   "] does not have the same number of lines as the image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   // Define the fields and their types
   TableField lineField("line number", TableField::Integer);
   TableField timeField("time", TableField::Double);
-  
+
   // Add the fields to a TableRecord to define the Table
   TableRecord record;
   record += lineField;
   record += timeField;
-  
+
   Table table(tableName, record);
-  
+
   // Grab the values from the csv and put them into the table row-by-row
   for (int i = 0; i < csv.rows(); i++) {
     CSVReader::CSVAxis row = csv.getRow(i);

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QtGlobal>
@@ -12,12 +20,12 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
- 
+
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
 
-  QString cnetfrom  = ui.GetAsString("CNET"); 
+  QString cnetfrom  = ui.GetAsString("CNET");
   double  weight     = ui.GetDouble("WEIGHT");
   double  tolerance  = ui.GetDouble("TOLERANCE");
   int     maxpoints  = ui.GetDouble("MAXPOINTS");
@@ -25,7 +33,7 @@ void IsisMain() {
   QString suppressed = ui.GetString("SUPPRESSED").toLower();
 
   if (tolerance < 0.0 || tolerance > 1.0) {
-      QString msg = "TOLERANCE must be between 0.0 and 1.0"; 
+      QString msg = "TOLERANCE must be between 0.0 and 1.0";
       throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -47,7 +55,7 @@ void IsisMain() {
     if ( ui.WasEntered("NETWORKID") ) {
       netid = ui.GetString("NETWORKID");
     }
-    suppressor->write(ui.GetAsString("ONET"), result, saveall, netid); 
+    suppressor->write(ui.GetAsString("ONET"), result, saveall, netid);
   }
 
   // Report results
@@ -61,4 +69,3 @@ void IsisMain() {
   p.EndProcess();
 
 }
-

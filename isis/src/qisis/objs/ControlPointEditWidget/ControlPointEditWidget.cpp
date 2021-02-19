@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ControlPointEditWidget.h"
@@ -560,14 +568,14 @@ namespace Isis {
 
 
   /**
-   * Fill m_projectShapeNames with ALL shapes currently in project. The first 
+   * Fill m_projectShapeNames with ALL shapes currently in project. The first
    * m_numberProjectShapesWithPoint actually contain the location of m_editPoint.
    *
-   * @param latitude (double) Latitude for determining point location.  Defaults to Null which 
+   * @param latitude (double) Latitude for determining point location.  Defaults to Null which
    *                          results in the m_editPoint location being used, AprioriCoordinates
    *                          if they exist, otherwise the reference measure's location will be
    *                          used.
-   * @param longitude (double) Longitude for determining point location.  Defaults to Null which 
+   * @param longitude (double) Longitude for determining point location.  Defaults to Null which
    *                          results in the m_editPoint location being used, AprioriCoordinates
    *                          if they exist, otherwise the reference measure's location will be
    *                          used.
@@ -831,7 +839,7 @@ namespace Isis {
           success = false;
         }
         else {
-          groundSourceType = m_editPoint->GetAprioriSurfacePointSource(); 
+          groundSourceType = m_editPoint->GetAprioriSurfacePointSource();
           success = true;
         }
       }
@@ -867,12 +875,12 @@ namespace Isis {
 
 
   /**
-   * Ground source file from control net cannot be found, give user option to give new location. 
-   * The option also exists to change for the rest of the ground points in the control net and to 
-   * change the apriori xyz source file in the control net to the new location. 
-   * 
+   * Ground source file from control net cannot be found, give user option to give new location.
+   * The option also exists to change for the rest of the ground points in the control net and to
+   * change the apriori xyz source file in the control net to the new location.
+   *
    * @param groundFile FileName of ground source that has moved location
-   * 
+   *
    * @return FileName Ground source with new location path
    *
    */
@@ -894,7 +902,7 @@ namespace Isis {
 
       //  If can't find ground, re-prompt user for new location. Maybe it's a new ground source.
       if (!newGroundFile.fileExists()) {
-        //  Give options for finding ground source file location. A new location 
+        //  Give options for finding ground source file location. A new location
         //  for new location or new source, either a Shape in the project, or import a new shape,
         //  or simplay choose file?
         QString message = "Ground Source file " + groundFile.expanded();
@@ -946,7 +954,7 @@ namespace Isis {
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++ ) {
       ControlPoint *cp = m_controlNet->GetPoint(i);
       if (cp->HasAprioriSurfacePointSourceFile()) {
-        FileName groundFile(cp->GetAprioriSurfacePointSourceFile()); 
+        FileName groundFile(cp->GetAprioriSurfacePointSourceFile());
         QFileInfo oldFile(groundFile.expanded());
         QFileInfo newFile(m_newGroundDir, oldFile.fileName());
         groundFile = newFile.absoluteFilePath();
@@ -1002,9 +1010,9 @@ namespace Isis {
 
 
   /**
-   * Initialize the given Dem and appropriate member variables for later use editing Fixed or 
-   * Constrained control points. 
-   * 
+   * Initialize the given Dem and appropriate member variables for later use editing Fixed or
+   * Constrained control points.
+   *
    * @param demFile QString The file name of the DEM
    *
    */
@@ -1095,8 +1103,8 @@ namespace Isis {
 
   /**
    * Slot called when user changes selection in m_groundSourceCombo
-   * 
-   * @param index int 
+   *
+   * @param index int
    *
    */
   void ControlPointEditWidget::groundSourceFileSelectionChanged(int index) {
@@ -1129,13 +1137,13 @@ namespace Isis {
       if (m_leftCombo->findText(QFileInfo(m_groundFilename).fileName()) >= 0) {
         m_leftCombo->removeItem(m_leftCombo->findText(QFileInfo(m_groundFilename).fileName()));
         if (m_leftMeasure->GetCubeSerialNumber() == m_groundSN) {
-          selectLeftMeasure(0); 
+          selectLeftMeasure(0);
         }
       }
       if (m_rightCombo->findText(QFileInfo(m_groundFilename).fileName())) {
         m_rightCombo->removeItem(m_rightCombo->findText(QFileInfo(m_groundFilename).fileName()));
         if (m_rightMeasure->GetCubeSerialNumber() == m_groundSN) {
-          selectRightMeasure(0); 
+          selectRightMeasure(0);
         }
       }
       m_pointFiles.removeAll(m_groundFilename);
@@ -1206,7 +1214,7 @@ namespace Isis {
   /**
    * Load point into ControlPointEditWidget.
    *
-   * @param serialNumber (QString) The serial number of cube point was chosen from.  
+   * @param serialNumber (QString) The serial number of cube point was chosen from.
    *
    * @internal
    *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
@@ -1280,10 +1288,10 @@ namespace Isis {
         aprioriSurfacePointFile = checkGroundFileLocation(aprioriSurfacePointFile);
       }
       if (!aprioriSurfacePointFile.toString().isEmpty()) {
-        m_groundSourceCombo->addItem(aprioriSurfacePointFile.toString()); 
+        m_groundSourceCombo->addItem(aprioriSurfacePointFile.toString());
         m_groundSourceCombo->setCurrentText(aprioriSurfacePointFile.toString());
         m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
-                                         QColor(Qt::darkGreen), Qt::ForegroundRole); 
+                                         QColor(Qt::darkGreen), Qt::ForegroundRole);
         m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
                                          QFont("DejaVu Sans", 10, QFont::Bold), Qt::FontRole);
       }
@@ -1299,11 +1307,11 @@ namespace Isis {
                                        QFont("DejaVu Sans", 10, QFont::Bold), Qt::FontRole);
     }
     if (m_editPoint->GetType() == ControlPoint::Free) {
-      m_groundSourceCombo->setEnabled(false); 
+      m_groundSourceCombo->setEnabled(false);
       m_radiusSourceCombo->setEnabled(false);
     }
     else {
-      m_groundSourceCombo->setEnabled(true); 
+      m_groundSourceCombo->setEnabled(true);
       m_radiusSourceCombo->setEnabled(true);
     }
     m_groundSourceCombo->blockSignals(false);
@@ -1435,12 +1443,12 @@ namespace Isis {
 
 
   /**
-   * Create a new control point at the given latitude, longitude 
-   *  
+   * Create a new control point at the given latitude, longitude
+   *
    * @param latitude The latitude position for the new control point
    * @param longitude The longitude position for the new control point
-   * @param cube The cube that the user used to select position for new control point 
-   * @param isGroundSource Boolean indicating whether the cube used to choose position is a ground source 
+   * @param cube The cube that the user used to select position for new control point
+   * @param isGroundSource Boolean indicating whether the cube used to choose position is a ground source
    *
    */
 
@@ -1791,9 +1799,9 @@ namespace Isis {
     }
 
     // If this is a fixed or constrained point, and either the left or right measure is the ground
-    // source, update the lat,lon,radius.  
+    // source, update the lat,lon,radius.
     //
-    if (m_editPoint->GetType() != ControlPoint::Free && 
+    if (m_editPoint->GetType() != ControlPoint::Free &&
         (m_leftMeasure->GetCubeSerialNumber() == m_groundSN ||
          m_rightMeasure->GetCubeSerialNumber() == m_groundSN)) {
       // If point is locked and it is not a new point, print error
@@ -2062,7 +2070,7 @@ namespace Isis {
     else {
       Shape *shape = m_nameToShapeMap[m_radiusSourceCombo->currentText()];
       if (shape) {
-        m_radiusFilename = shape->cube()->externalCubeFileName().toString(); 
+        m_radiusFilename = shape->cube()->externalCubeFileName().toString();
         //m_radiusSourceType = shape->radiusSource();
       }
       // Radius source comes from what is already saved in the cnet as AprioriRadiusSourceFile
@@ -2087,11 +2095,11 @@ namespace Isis {
         QString msg = "Could not read radius from DEM, will default to "
           "local radius of reference measure.";
         QMessageBox::warning(this, "Warning", msg);
-        if (m_editPoint->GetRefMeasure()->Camera()->SetGround(Latitude(lat, Angle::Degrees), 
+        if (m_editPoint->GetRefMeasure()->Camera()->SetGround(Latitude(lat, Angle::Degrees),
                                                               Longitude(lon, Angle::Degrees))) {
           radius = m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
           //  TODO  Should this be set here, this is probably not working as intended since it is
-          //         overwritten below outside of if (radius == Null) 
+          //         overwritten below outside of if (radius == Null)
           m_editPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::None);
         }
         else {

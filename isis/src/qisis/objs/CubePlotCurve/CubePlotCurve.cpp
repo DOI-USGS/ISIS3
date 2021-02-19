@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "CubePlotCurve.h"
@@ -378,11 +386,11 @@ namespace Isis {
 
     size = m_sourceCube.size();
     classData.append((char *)&size, sizeof(int));
-    
+
     for (int i = 0; i < size; i++) {
       int sourceCubeSize = m_sourceCube.at(i).toUtf8().size();
       classData.append((char *)&sourceCubeSize, sizeof(int));
-      classData.append(m_sourceCube.at(i).toUtf8());    
+      classData.append(m_sourceCube.at(i).toUtf8());
     }
 
     size = m_pointList.size();
@@ -470,7 +478,7 @@ namespace Isis {
           deleteThisCurve = true;
         }
       }
-      // handle the configure action dialog 
+      // handle the configure action dialog
       // opens the dialog with only the right-clicked CubePlotCurve
       else if (chosenAct == configureAct) {
         CubePlotCurveConfigureDialog configure(this);

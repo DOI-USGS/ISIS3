@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // $Id: amicacal.cpp 6045 2015-02-07 02:06:59Z moses@GS.DOI.NET $
 #include "Isis.h"
 
@@ -43,7 +51,7 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 QString loadCalibrationVariables(const QString &config);
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
+// PSF correction is currently not working and has been removed as an option.
 //void psfCorrection(vector<Buffer *>& in, vector<Buffer *>& out);
 //void psfCorrectionBoxcar(Buffer &in, double &result);
 #endif
@@ -120,8 +128,8 @@ static double g_radStd = 3.42E-3;//!< Base conversion for all filters (Tbl. 9)
 static QVector<Pixel> hotPixelVector;  //!< A pixel vector that contains the Hot Pixel locations
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
-// PSF variables 
+// PSF correction is currently not working and has been removed as an option.
+// PSF variables
 //static bool g_applyPSF = false;
 //static int ns, nl, nb;     //!< Number of samples, lines, bands of the input cube
 //static int g_size = 23;   //!< The size of the Boxcar used for calculating the light diffusion model.
@@ -148,14 +156,14 @@ void IsisMain() {
 
   Cube *inputCube = process.SetInputCube("FROM");
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
+// PSF correction is currently not working and has been removed as an option.
 //  g_applyPSF = ui.GetBoolean("APPLYPSF");
 #endif
 
   // Basic assurances...
   if (inputCube->bandCount() != 1) {
-    throw IException(IException::User, 
-                     "AMICA images may only contain one band", 
+    throw IException(IException::User,
+                     "AMICA images may only contain one band",
                      _FILEINFO_);
   }
 
@@ -174,17 +182,17 @@ void IsisMain() {
 
   //Set up binning and image subarea mapping
 
-  AlphaCube myAlpha(1024, 1024, inputCube->sampleCount(), 
-                    inputCube->lineCount(), 
-                    startSample + 1, 
-                    startLine + 1, 
-                    lastSample + 1, 
+  AlphaCube myAlpha(1024, 1024, inputCube->sampleCount(),
+                    inputCube->lineCount(),
+                    startSample + 1,
+                    startLine + 1,
+                    lastSample + 1,
                     lastLine + 1);
 
   alpha = &myAlpha;
 
   try {
-    g_exposureTime = inst["ExposureDuration"] ; 
+    g_exposureTime = inst["ExposureDuration"] ;
   }
   catch(IException &e) {
     QString msg = "Unable to read [ExposureDuration] keyword in the Instrument group "
@@ -212,7 +220,7 @@ void IsisMain() {
   int lastline = inst["LastLine"];
   int lastsample = inst["LastSample"];
 
-  nsubImages = archive["SubImageCount"];  // If > 1, some correction is 
+  nsubImages = archive["SubImageCount"];  // If > 1, some correction is
                                           // not needed/performed
 
   QString compmode = archive["OutputMode"];
@@ -261,14 +269,14 @@ void IsisMain() {
   }
   else {
     // Image is cropped so we have to deal with it
-    FileName transFlat = FileName::createTempFile("$TEMPORARY/" 
-                                                  + flatfile.baseName() 
+    FileName transFlat = FileName::createTempFile("$TEMPORARY/"
+                                                  + flatfile.baseName()
                                                   + "_translated.cub");
 
     Cube *flatOriginal = new Cube(flatfile.expanded() );
-    
+
     int transform[5] = {binning, startsample, firstLine, lastsample, lastline};
-    
+
     // Translates and scales the flatfield image.  Scaling
     // might be necessary in the event that the raw image was also binned.
 
@@ -276,7 +284,7 @@ void IsisMain() {
 
     QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
     flatcube.swap(translated);
-    
+
     CubeAttributeInput att;
     process.SetInputCube(transFlat.expanded(), att);
   }
@@ -285,7 +293,7 @@ void IsisMain() {
   QString fname = outputCube->fileName();
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
+// PSF correction is currently not working and has been removed as an option.
   //ns = inputCube->sampleCount();
   //nl = inputCube->lineCount();
   //nb = inputCube->bandCount();
@@ -299,8 +307,8 @@ void IsisMain() {
   QString g_units = "DN";
 
   if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
-     throw IException(IException::Programmer, 
-                      "Cannot calculated distance to sun!", 
+     throw IException(IException::Programmer,
+                      "Cannot calculated distance to sun!",
                       _FILEINFO_);
   }
 
@@ -311,35 +319,35 @@ void IsisMain() {
   }
   else if ( QString::compare(g_iofCorrection, "dn", Qt::CaseInsensitive) != 0 ) {
     /* Note - this radiance calibration scaling factor is applied to both radiance and iof
-     * 
+     *
      * Units of RADIANCE
      * equation:
      *     Rad(i)=image(DN/s) * C * S(i) where
-     *         C = radStd = 3.42.10^-3 
-     *         S(i) = iofScale, 
-     *             with S(v) = 1, 
+     *         C = radStd = 3.42.10^-3
+     *         S(i) = iofScale,
+     *             with S(v) = 1,
      *             S(zs)=3.286 (factor computed by Lucille Le Corre of PSI),
      *             and the remaining scale factors from table 9 of the Ishiguro et al. 2010 paper
-     */ 
-    g_calibrationScale = g_radStd * g_iofScale / g_exposureTime; 
+     */
+    g_calibrationScale = g_radStd * g_iofScale / g_exposureTime;
     g_units = "W / (m**2 micrometer sr)";
 
     if ( QString::compare(g_iofCorrection, "iof", Qt::CaseInsensitive) == 0 ) {
       /* Note: iof (i.e. reflectance) equation described below is just
        *       Ref(i) = Rad(i) * pi * d^2 /Fv
-       *       so this if-statement is nested 
+       *       so this if-statement is nested
        *
        * Units of I/F (reflectance)
        * equation:
-       *     Ref(v)=image(DN/s) * C * S(i) * pi * d^2/F(v) where 
+       *     Ref(v)=image(DN/s) * C * S(i) * pi * d^2/F(v) where
        *         C, S(i) are as described above,
        *         d is the solar distance from the label of the v filter image,
-       *         Fv = solarflux(v) = 1861.145142 is the solar flux 
+       *         Fv = solarflux(v) = 1861.145142 is the solar flux
        *             resampled to V filter bandpass with Quantum Efficiency
        */
-      g_calibrationScale = g_calibrationScale 
-                           * Isis::PI 
-                           * (g_solarDist * g_solarDist) 
+      g_calibrationScale = g_calibrationScale
+                           * Isis::PI
+                           * (g_solarDist * g_solarDist)
                            / g_solarFlux;
       g_units = "I over F";
     }
@@ -351,9 +359,9 @@ void IsisMain() {
     process.StartProcess(calibrate);
   }
   catch (IException &ie) {
-    throw IException(ie, 
-                     IException::Programmer, 
-                     "Radiometric calibration failed!", 
+    throw IException(ie,
+                     IException::Programmer,
+                     "Radiometric calibration failed!",
                      _FILEINFO_);
   }
 
@@ -391,8 +399,8 @@ void IsisMain() {
   calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_calibrationScale, 16)));
   calibrationLog.addKeyword(PvlKeyword("Units", g_units));
 
-#if 0 
-// PSF correction is currently not working and has been removed as an option. 
+#if 0
+// PSF correction is currently not working and has been removed as an option.
   // This section will apply the PSF correction
   if ( g_applyPSF ) {
     //PSF correction
@@ -408,9 +416,9 @@ void IsisMain() {
 
 
     processDiffusionModel.SetInputCube(outputCube);
-    processDiffusionModel.SetOutputCube(psfModel.name(), attOutput, 
-                                        outputCube->sampleCount(), 
-                                        outputCube->lineCount(), 
+    processDiffusionModel.SetOutputCube(psfModel.name(), attOutput,
+                                        outputCube->sampleCount(),
+                                        outputCube->lineCount(),
                                         outputCube->bandCount());
 
     processDiffusionModel.SetBoxcarSize(g_size, g_size);
@@ -428,9 +436,9 @@ void IsisMain() {
         outputCube->putGroup(calibrationLog);
         process.EndProcess();
         remove( psfModel.expanded().toLatin1().data() );
-        throw IException(ie, 
-                         IException::Programmer, 
-                         "Calculating the diffusion model failed!", 
+        throw IException(ie,
+                         IException::Programmer,
+                         "Calculating the diffusion model failed!",
                          _FILEINFO_);
       }
 
@@ -460,14 +468,14 @@ void IsisMain() {
         calibrationLog.addKeyword(PvlKeyword("PSF_Focused", toString(g_alpha, 6)));
 
         key = PvlKeyword("PSF_Sigma");
-        for (int i = 0 ; i < g_N ; i++ ) { 
-          key.addValue(toString(g_sigma[i])); 
+        for (int i = 0 ; i < g_N ; i++ ) {
+          key.addValue(toString(g_sigma[i]));
         }
         calibrationLog.addKeyword(key);
 
         key = PvlKeyword("PSF_Diffuse");
-        for (int i = 0 ; i < g_N ; i++ ) { 
-          key.addValue(toString(g_A[i])); 
+        for (int i = 0 ; i < g_N ; i++ ) {
+          key.addValue(toString(g_A[i]));
         }
 
       }
@@ -477,19 +485,19 @@ void IsisMain() {
         outputCube->putGroup(calibrationLog);
         process.EndProcess();
         remove( psfModel.expanded().toLatin1().data() );
-        throw IException(ie, 
-                         IException::Programmer, 
-                         "Applying the PSF correction failed!", 
+        throw IException(ie,
+                         IException::Programmer,
+                         "Applying the PSF correction failed!",
                          _FILEINFO_);
 
-      }  
-      
+      }
+
       processPSFCorrection.EndProcess();
 
-      // Remove the PSF file  
+      // Remove the PSF file
       remove( psfModel.expanded().toLatin1().data() );
   }
-#endif 
+#endif
 
   // Write Calibration group to output file
   outputCube->putGroup(calibrationLog);
@@ -530,7 +538,7 @@ FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix) 
 
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
+// PSF correction is currently not working and has been removed as an option.
 /**
  * @brief This function moves the PSF kernel through each pixel of the input cube and approximates
  * the amount of light diffusion produced by that pixel.
@@ -585,7 +593,7 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
   }
 
 }
-#endif 
+#endif
 
 
 /**
@@ -613,7 +621,7 @@ QString loadCalibrationVariables(const QString &config)  {
   PvlGroup &solarFluxGroup = g_configFile.findGroup("SolarFlux");
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
+// PSF correction is currently not working and has been removed as an option.
 //  PvlGroup &psfDiffuse = g_configFile.findGroup("PSFDiffuse");
 //  PvlGroup &psfFocused = g_configFile.findGroup("PSFFocused");
 #endif
@@ -663,15 +671,15 @@ QString loadCalibrationVariables(const QString &config)  {
 
   loadNaifTiming();  // Ensure the proper kernels are loaded
 
-  scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);  
+  scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);
   tsecs = obsStartTime - g_launchTime.Et();
   tdays = tsecs / 86400;
-  g_bias = g_b0 
-           + g_b1 * tdays 
+  g_bias = g_b0
+           + g_b1 * tdays
            + g_b2 * (tdays * tdays);
 
 #if 0
-// PSF correction is not working and is temporarily removed. 
+// PSF correction is not working and is temporarily removed.
   //g_bias = 0;
   //cout << "g_bias = "  << g_bias << endl;
 
@@ -821,4 +829,3 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   }
   return;
 }
-

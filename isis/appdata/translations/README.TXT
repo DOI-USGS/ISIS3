@@ -1,4 +1,4 @@
-MissionName2DataDir.trn - Converts Mision names into the Isis3 preference name
+MissionName2DataDir.trn - Converts Mision names into the ISIS preference name
 used to access mission specific data (e.g. space craft clock kernels). This file
 replaced Missions.trn as of Isis 3.1.12.
 

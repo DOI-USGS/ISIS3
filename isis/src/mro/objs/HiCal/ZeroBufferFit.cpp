@@ -1,26 +1,11 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2008/06/11 00:56:51 $
- * $Id: ZeroBufferFit.cpp,v 1.4 2008/06/11 00:56:51 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <string>
 #include <vector>
@@ -43,15 +28,15 @@ using namespace std;
 namespace Isis {
 
   /**
-   * @brief Compute second level drift correction (Zf module) 
-   *  
-   * This class provides the second level drift correction that is  
-   * 
-   * 
-   * @param conf 
+   * @brief Compute second level drift correction (Zf module)
+   *
+   * This class provides the second level drift correction that is
+   *
+   *
+   * @param conf
    */
-  ZeroBufferFit::ZeroBufferFit(const HiCalConf &conf) : 
-                             NonLinearLSQ(), Module("ZeroBufferFit") { 
+  ZeroBufferFit::ZeroBufferFit(const HiCalConf &conf) :
+                             NonLinearLSQ(), Module("ZeroBufferFit") {
     DbProfile prof = conf.getMatrixProfile();
     _history.add("Profile["+ prof.Name()+"]");
     _timet.setBin(ToInteger(prof("Summing")));
@@ -77,7 +62,7 @@ namespace Isis {
 
 
     QString histstr = "ZeroBufferFit(AbsErr[" + ToString(_absErr) +
-                          "],RelErr[" + ToString(_relErr) + 
+                          "],RelErr[" + ToString(_relErr) +
                           "],MaxIter[" + ToString(maxIters()) + "])";
    _history.add(histstr);
 
@@ -85,22 +70,22 @@ namespace Isis {
 
   /**
    * @brief Compute non-linear fit to (typically) ZeroBufferSmooth module
-   *  
-   * This method computes a non-linear fit to the result of the 
-   * ZeroBufferSmooth module. There are several things that can go wrong and 
-   * some config conditions that dictate behavior of this process. 
-   *  
-   * Should the image be a short exposure (i.e., not many lines) the fit will 
-   * not succeed so it simply skips this entire module providing the input 
-   * result (d) as the solution.  This wil also occur when the user has selected 
-   * the skip option for the module. 
-   *  
-   * A fit is attempted on the ZeroBufferSmooth data.  The non-linear solution 
-   * must converge within the specifed number of iterations (MaximumIterations) 
-   * or a polynomial fit will be used in leui of a valid solution. 
-   * 
+   *
+   * This method computes a non-linear fit to the result of the
+   * ZeroBufferSmooth module. There are several things that can go wrong and
+   * some config conditions that dictate behavior of this process.
+   *
+   * Should the image be a short exposure (i.e., not many lines) the fit will
+   * not succeed so it simply skips this entire module providing the input
+   * result (d) as the solution.  This wil also occur when the user has selected
+   * the skip option for the module.
+   *
+   * A fit is attempted on the ZeroBufferSmooth data.  The non-linear solution
+   * must converge within the specifed number of iterations (MaximumIterations)
+   * or a polynomial fit will be used in leui of a valid solution.
+   *
    * @param d   ZeroBufferSmooth data solution as input to this method
-   * 
+   *
    * @return HiVector Returns result of the processing
    */
   HiVector ZeroBufferFit::Solve(const HiVector &d) {
@@ -113,7 +98,7 @@ namespace Isis {
       _cc = HiVector(2, 0.0);
       _chisq = 0.0;
       if ( !gotGoodLines(d) ) {
-        hist << "NotEnoughLines(GoodLines[" << goodLines(d) 
+        hist << "NotEnoughLines(GoodLines[" << goodLines(d)
              << "],MinimumLines[" << _minLines << "]);";
       }
 
@@ -133,7 +118,7 @@ namespace Isis {
         _history.add("a1("+ToString(_coefs[1])+"+-"+ToString(_uncert[1])+")");
         _history.add("a2("+ToString(_coefs[2])+"+-"+ToString(_uncert[2])+")");
         _history.add("a3("+ToString(_coefs[3])+"+-"+ToString(_uncert[3])+")");
-      } 
+      }
       else {
         //  Punt, fit a straight line to the data
         _cc = poly_fit(d);
@@ -143,8 +128,8 @@ namespace Isis {
         a[2] = 0.0;
         a[3] = 0.0;
         _coefs = a;
-  
-        hist << "Failed::Reason("<< statusstr() << "),#Iters[" 
+
+        hist << "Failed::Reason("<< statusstr() << "),#Iters["
              << nIterations() << "])";
         _history.add(hist.str().c_str());
         _history.add("a0("+ToString(_coefs[0])+")");
@@ -154,7 +139,7 @@ namespace Isis {
         if ( _useLinFit ) {
           _history.add("OnFailureUse(LinearFit(Zf))");
         }
-        else {  
+        else {
           _skipFit = true;
           _history.add("OnFailureUse(ZfBuffer)");
         }
@@ -163,15 +148,15 @@ namespace Isis {
     return (Yfit());
   }
 
-  /** 
+  /**
    * @brief Compute the initial guess of the fit
-   *  
-   * This method provides the non-linear fit with an initial guess of the 
-   * solution.  It involves a linear fit to the latter half of the data to 
-   * provide the first two coefficents, the difference of the averages of the 
-   * residuals at both ends of the data set and 5 times the last line time as 
-   * the final (fourth) element...a bit involved really. 
-   * 
+   *
+   * This method provides the non-linear fit with an initial guess of the
+   * solution.  It involves a linear fit to the latter half of the data to
+   * provide the first two coefficents, the difference of the averages of the
+   * residuals at both ends of the data set and 5 times the last line time as
+   * the final (fourth) element...a bit involved really.
+   *
    * @return NLVector  4-element vector of the initial guess coefficients
    */
   NonLinearLSQ::NLVector ZeroBufferFit::guess()  {
@@ -217,27 +202,27 @@ namespace Isis {
                           ToString(_guess[1])+ ","+
                           ToString(_guess[2])+ ","+
                           ToString(_guess[3])+ "]");
-    return (g); 
+    return (g);
   }
 
   /**
    * @brief Computes the interation check for convergence
-   *  
+   *
    * @param Iter     Current iteration
    * @param fitcoefs Vector of current fit coefficients
    * @param uncerts  Uncertainties
    * @param cplxconj Complex conjugate of the current iteration
    * @param Istatus  State of current iteration
-   * 
+   *
    * @return int Simply passes on the Istatus value
    */
-  int ZeroBufferFit::checkIteration(const int Iter, const NLVector &fitcoefs, 
+  int ZeroBufferFit::checkIteration(const int Iter, const NLVector &fitcoefs,
                      const NLVector &uncerts, double cplxconj,
-                     int Istatus) { 
+                     int Istatus) {
       _chisq = pow(cplxconj, 2.0);
       return (Istatus);
   }
-                          
+
   /** Computes the function value at the current iteration */
   NonLinearLSQ::NLVector ZeroBufferFit::f_x(const NLVector &a) {
     double a0 = a[0];
@@ -307,14 +292,14 @@ namespace Isis {
 
   /**
    * @brief Compute a polyonomial fit using multivariate statistics
-   *  
-   * Used as a fallback solution, this method computes a linear statistical 
-   * solution from the linear regression analysis of the multivariate statistics 
-   * of the data. 
-   * 
+   *
+   * Used as a fallback solution, this method computes a linear statistical
+   * solution from the linear regression analysis of the multivariate statistics
+   * of the data.
+   *
    * @param d     Data vector to fit
    * @param line0 Current line number in the image
-   * 
+   *
    * @return HiVector Returns the fitted data
    */
   HiVector ZeroBufferFit::poly_fit(const HiVector &d, const double line0) const {
@@ -341,14 +326,12 @@ namespace Isis {
 
     HiVector fit = Yfit();
     for (int i = 0 ; i < _data.dim() ; i++) {
-      o << formatDbl(i) << " " 
+      o << formatDbl(i) << " "
         << formatDbl(_timet(i)) << " "
-        << formatDbl(_data[i]) << " " 
+        << formatDbl(_data[i]) << " "
         << formatDbl(fit[i]) << endl;
     }
     return;
   }
 
 }     // namespace Isis
-
-

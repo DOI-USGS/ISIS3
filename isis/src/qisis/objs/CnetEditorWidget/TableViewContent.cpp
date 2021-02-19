@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "TableViewContent.h"
@@ -37,7 +45,7 @@
 namespace Isis {
   /**
     * Constructor
-    * 
+    *
     * @param someModel The abstract table model
     */
   TableViewContent::TableViewContent(AbstractTableModel *someModel) {
@@ -89,7 +97,7 @@ namespace Isis {
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
         this, SLOT(showContextMenu(QPoint)));
-    
+
     m_activeControlNet = false;
   }
 
@@ -131,7 +139,7 @@ namespace Isis {
 
   /**
     * Returns the minimum size hint
-    * 
+    *
     * @return QSize Minimum size hint
     */
   QSize TableViewContent::minimumSizeHint() const {
@@ -141,9 +149,9 @@ namespace Isis {
 
   /**
     * Returns the minimum size hint
-    * 
+    *
     * @see TableViewContent::minimumSizeHint()
-    * 
+    *
     * @return QSize Minimum size hint
     */
   QSize TableViewContent::sizeHint() const {
@@ -153,7 +161,7 @@ namespace Isis {
 
   /**
     * Returns the model
-    * 
+    *
     * @return AbstractTableModel The model of the table
     */
   AbstractTableModel *TableViewContent::getModel() {
@@ -199,16 +207,16 @@ namespace Isis {
   //     refresh();
   //   }
 
-  
+
   /**
     * Sets if there is an active control net
-    * 
+    *
     * @param bool The bool if there is an active control net
     */
   void TableViewContent::setActiveControlNet(bool activeNet) {
     m_activeControlNet = activeNet;
   }
-  
+
 
   /**
     * Refreshes the table and viewport
@@ -237,7 +245,7 @@ namespace Isis {
 
   /**
     * Updates the horizontal scroll bar
-    * 
+    *
     * @param scrollRight True if the horizontal scroll bar has scrolled right
     */
   void TableViewContent::updateHorizontalScrollBar(bool scrollRight) {
@@ -259,8 +267,8 @@ namespace Isis {
 
 
   /**
-    * Scrolls to the selected items 
-    * 
+    * Scrolls to the selected items
+    *
     * @param newlySelectedItems Newly selected items to scroll to
     */
   void TableViewContent::scrollTo(
@@ -272,7 +280,7 @@ namespace Isis {
 
   /**
     * Scrolls to the selected item
-    * 
+    *
     * @param newlySelectedItem Newly selected item to scroll to
     */
   void TableViewContent::scrollTo(AbstractTreeItem *newlySelectedItem) {
@@ -298,10 +306,10 @@ namespace Isis {
 
   /**
     * Overrides QObject::eventFilter
-    * 
-    * @param target The object that was changed 
+    *
+    * @param target The object that was changed
     * @param event The event that was triggered
-    * 
+    *
     * @return bool True if the event is filtered out
     */
   bool TableViewContent::eventFilter(QObject *target, QEvent *event) {
@@ -310,8 +318,8 @@ namespace Isis {
 
 
   /**
-    * Overrides QWidget::mouseDoubleClickEvent. 
-    * 
+    * Overrides QWidget::mouseDoubleClickEvent.
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -338,7 +346,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mousePressEvent.
-    * 
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::mousePressEvent(QMouseEvent *event) {
@@ -464,7 +472,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mouseReleaseEvent. Empty function
-    * 
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::mouseReleaseEvent(QMouseEvent *event) {
@@ -473,7 +481,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mouseMoveEvent.
-    * 
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::mouseMoveEvent(QMouseEvent *event) {
@@ -539,7 +547,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::leaveEvent
-    * 
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::leaveEvent(QEvent *event) {
@@ -549,7 +557,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::keyPressEvent
-    * 
+    *
     * @param event QMouseEvent
     */
   void TableViewContent::keyPressEvent(QKeyEvent *event) {
@@ -848,7 +856,7 @@ namespace Isis {
 
   /**
     * Paints the table when there is a paint event. Overrides QWidget::paintEvent
-    * 
+    *
     * @param event The paint event
     */
   void TableViewContent::paintEvent(QPaintEvent *event) {
@@ -970,8 +978,8 @@ namespace Isis {
 
 
   /**
-    * Updates the table when it is resized. 
-    * 
+    * Updates the table when it is resized.
+    *
     * @param event Resize event
     */
   void TableViewContent::resizeEvent(QResizeEvent *event) {
@@ -983,7 +991,7 @@ namespace Isis {
 
   /**
     * Updates the item list when the user scrolls
-    * 
+    *
     * @param dx X scroll
     * @param dy Y scroll
     */
@@ -1016,7 +1024,7 @@ namespace Isis {
 
   /**
     * Rebuilds the models when the data is changed
-    * 
+    *
     * @param col The table column that changed
     */
   void TableViewContent::cellDataChanged(const TableColumn *col) {
@@ -1048,7 +1056,7 @@ namespace Isis {
 
   /**
     * Copies the selected cells
-    * 
+    *
     * @param allCells Determines if all of the visible rows should be copied
     */
   void TableViewContent::copyCellSelection(bool allCells) {
@@ -1135,8 +1143,8 @@ namespace Isis {
   /**
     * Calculates the visible range of a column and returns the index of the column
     *
-    * @param screenX X value of the screen size 
-    * 
+    * @param screenX X value of the screen size
+    *
     * @return int Column that fits the screen, or if there aren't any columns that fit -1
     */
   int TableViewContent::getColumnFromScreenX(int screenX) const {
@@ -1158,8 +1166,8 @@ namespace Isis {
   /**
     * Calculates the visible range of a row and returns the index of the column
     *
-    * @param screenY Y value of the screen size 
-    * 
+    * @param screenY Y value of the screen size
+    *
     * @return int Row that fits the screen, or if there aren't any columns that fit -1
     */
   int TableViewContent::getRowFromScreenY(int screenY) const {
@@ -1175,7 +1183,7 @@ namespace Isis {
 
   /**
     * Checks if there is an active cell
-    * 
+    *
     * @return bool True if there is an active cell
     */
   bool TableViewContent::hasActiveCell() const {
@@ -1185,7 +1193,7 @@ namespace Isis {
 
   /**
     * Checks if there is a row selected
-    * 
+    *
     * @return bool True if there is a row selected
     */
   bool TableViewContent::hasRowSelection() const {
@@ -1195,9 +1203,9 @@ namespace Isis {
 
   /**
     * Checks if the mouse is in the selected cells
-    * 
+    *
     * @param mousePos Mouse position
-    * 
+    *
     * @return bool True if the mouse is in the selected cells
     */
   bool TableViewContent::mouseInCellSelection(QPoint mousePos) const {
@@ -1211,9 +1219,9 @@ namespace Isis {
 
   /**
     * Checks if the mouse is in the selected row
-    * 
+    *
     * @param mousePos Mouse position
-    * 
+    *
     * @return bool True if the mouse is in the selected row
     */
   bool TableViewContent::mouseInRowSelection(QPoint mousePos) const {
@@ -1225,9 +1233,9 @@ namespace Isis {
 
   /**
     * Checks if the row number is valid
-    * 
+    *
     * @param rowNum Row to check
-    * 
+    *
     * @return bool True if the row is greater or equal to 0 and less than m_items->size()
     */
   bool TableViewContent::rowIsValid(int rowNum) const {
@@ -1242,9 +1250,9 @@ namespace Isis {
 
   /**
     * Checks if the column number is valid
-    * 
+    *
     * @param colNum Column to check
-    * 
+    *
     * @return bool True if the column is greater or equal to 0 and less than m_items->size()
     */
   bool TableViewContent::columnIsValid(int colNum) const {
@@ -1259,10 +1267,10 @@ namespace Isis {
 
   /**
     * Checks if the cell is editable
-    * 
+    *
     * @param rowNum The cell's row
     * @param colNum The cell's column
-    * 
+    *
     * @return bool True if the cell is selectable and editable
     */
   bool TableViewContent::cellIsEditable(int rowNum, int colNum) const {
@@ -1283,9 +1291,9 @@ namespace Isis {
 
   /**
     * Checks if the column has a non empty title
-    * 
+    *
     * @param colNum The column to check
-    * 
+    *
     * @return bool True if the column has a non-empty title
     */
   bool TableViewContent::isDataColumn(int colNum) const {
@@ -1296,11 +1304,11 @@ namespace Isis {
 
   /**
     * Repaints the row
-    * 
+    *
     * @param painter The QPainter
     * @param rowNum The row to repaint
     * @param absolutePosition The row position
-    * @param relativePosition The row position in the visible area 
+    * @param relativePosition The row position in the visible area
     */
   void TableViewContent::paintRow(QPainter *painter, int rowNum,
       QPoint absolutePosition, QPoint relativePosition) {
@@ -1446,7 +1454,7 @@ namespace Isis {
 
   /**
     * Updates which cell is active
-    * 
+    *
     * @param screenPos The position of the active cell
     */
   void TableViewContent::updateActiveCell(QPoint screenPos) {
@@ -1499,7 +1507,7 @@ namespace Isis {
 
   /**
     * Updates which column is selected
-    * 
+    *
     * @param item The new selected group
     */
   void TableViewContent::updateColumnGroupSelection(AbstractTreeItem *item) {
@@ -1527,9 +1535,9 @@ namespace Isis {
 
   /**
     * Updates which row is selected
-    * 
+    *
     * @param lastRow The index of the last row
-    * 
+    *
     * @return QList< AbstractTreeItem * > The newly selected row
     */
   QList< AbstractTreeItem * > TableViewContent::updateRowGroupSelection(int lastRow) {
@@ -1568,7 +1576,7 @@ namespace Isis {
 
   /**
     * Copies selected cells
-    * 
+    *
     * @see copyCellSelection
     */
   void TableViewContent::copySelection() {
@@ -1578,7 +1586,7 @@ namespace Isis {
 
   /**
     * Copies all of the cells
-    * 
+    *
     * @see copyCellSelection
     */
   void TableViewContent::copyAll() {
@@ -1663,7 +1671,7 @@ namespace Isis {
 
   /**
     * Populates the context menus based on where the user clicked
-    * 
+    *
     * @param mouseLocation Location of the mouse
     */
   void TableViewContent::showContextMenu(QPoint mouseLocation) {
@@ -1673,11 +1681,11 @@ namespace Isis {
     // TODO: 2017-05-17 TLS
     // Always allow editing of point.  Should we check for editLock??
     QList<AbstractTreeItem *> selectedRows = m_model->getSelectedItems();
-    
+
 
     // If there is a row selection, show a context menu if the user clicked
     // anywhere on any of the selected row(s).
-    
+
     if (QApplication::applicationName() != "cneteditor") {
       if (m_activeControlNet) {
         m_editControlPointAct->setEnabled(true);

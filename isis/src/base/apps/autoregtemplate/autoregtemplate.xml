@@ -78,7 +78,7 @@
     </applications>
     <documents>
       <document>
-        <title>Pattern Matching in ISIS 3</title>
+        <title>Pattern Matching in ISIS</title>
         <source>
           <filename>PatternMatch.html</filename>
           <path>../../../../documents/PatternMatch/</path>
@@ -133,8 +133,8 @@
           The new pattern and search chips will be this many times smaller than the originals.
         </brief>
         <description>
-          Reduction factor used to speed up the pattern matching algorithm. The original pattern 
-          and search chips are divided by this factor to get the size of the new pattern and 
+          Reduction factor used to speed up the pattern matching algorithm. The original pattern
+          and search chips are divided by this factor to get the size of the new pattern and
           search chips.
         </description>
         <internalDefault>None</internalDefault>
@@ -522,7 +522,7 @@
       </description>
       <terminalInterface>
         <commandLine>
-          algorithm=MinimumDifference tolerance=0.7 reductionfactor=2 
+          algorithm=MinimumDifference tolerance=0.7 reductionfactor=2
           interp=nearestneighbor psamp=15 pline=15 pmin=1200 pmax=2800
           pvalidpercent=75 ssamp=31 sline=31 smin=1200 smax=2800
           minimumzscore = 0.5 ssubchipvalidpercent = 80 distancetolerance=2.5
@@ -537,4 +537,3 @@
   </examples>
 
 </application>
-

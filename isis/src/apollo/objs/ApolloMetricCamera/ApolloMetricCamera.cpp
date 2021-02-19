@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ApolloMetricCamera.h"
 
 #include "ApolloMetricDistortionMap.h"
@@ -49,7 +38,7 @@ namespace Isis {
    */
   ApolloMetricCamera::ApolloMetricCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
-    
+
     m_instrumentNameLong = "Metric Camera";
     m_instrumentNameShort = "Metric";
 
@@ -89,7 +78,7 @@ namespace Isis {
       QString msg = "File does not appear to be an Apollo image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    
+
     // Get the camera characteristics
     SetFocalLength();
     SetPixelPitch();
@@ -122,7 +111,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  
+
   /**
    * Returns the shutter open and close times. The user should pass in the
    * exposure duration in seconds and the StartTime keyword value, converted to

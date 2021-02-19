@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <cmath>
 #include "Anisotropic1.h"
 #include "AtmosModel.h"
@@ -9,7 +15,7 @@ using std::max;
 namespace Isis {
   /**
    * Constructs an Anisotropic1 object
-   * 
+   *
    * @param pvl  Pvl object containing a valid Anisotropic1 specification
    * @param pmodel PhotoModel object containing valid Anisotropic1 data
    */
@@ -58,7 +64,7 @@ namespace Isis {
    * @history 1999-03-12 K Teal Thompson  Port to Unix/ISIS;
    *          declare vars; add implicit none.
    * @history 2007-02-20 Janet Barrett - Imported from Isis2
-   *          pht_atm_functions to Isis3.
+   *          pht_atm_functions to Isis.
    * @history 2008-11-05 Jeannie Walldren - Replaced
    *          NumericalMethods::r8expint() with AtmosModel::En().
    *          Replaced Isis::PI with PI since this is in Isis

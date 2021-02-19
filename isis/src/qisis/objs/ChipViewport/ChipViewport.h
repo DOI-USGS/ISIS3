@@ -1,27 +1,13 @@
 #ifndef ChipViewport_h
 #define ChipViewport_h
 
-/**
- * @file
- * $Revision: 1.6 $
- * $Date: 2010/06/17 00:08:45 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QPaintEvent>
 #include <QResizeEvent>
@@ -63,16 +49,16 @@ namespace Isis {
    *   @history 2010-12-01 Eric Hyer - Added stretch locking
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Changed point
    *                           type "Ground" to "Fixed".
-   *   @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet 
+   *   @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet
    *                           needed to know if user moved the tackpoint vs.
    *                           simply loading a new chip, or geoming the chip.
-   *   @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to 
+   *   @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to
    *                           userMovedTackPoint.
    *                           //TODO  Could not use tackPointChanged signal
    *                           because that signal is emitted whenever the
    *                           measure is loaded not just when the user
    *                           initiates the move.  This should be cleaned up.
-   *   @history 2011-09-14 Tracie Sucharski - Added user option to determine 
+   *   @history 2011-09-14 Tracie Sucharski - Added user option to determine
    *                           whether control points are drawn.
    *   @history 2012-07-26 Tracie Sucharski - Added method to return zoom factor and
    *                           slot to zoom to a specific zoom factor.
@@ -250,7 +236,7 @@ namespace Isis {
       // that either NULL or a valid ControlNet is being pointed to).
       ControlNet *m_controlNet;
 
-      bool m_stretchLocked; //!< Whether or not to lock the stretch when transforming 
+      bool m_stretchLocked; //!< Whether or not to lock the stretch when transforming
       Stretch *m_stretch;   //!< Current stretch on the chip viewport
   };
 };

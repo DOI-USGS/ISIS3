@@ -4,28 +4,13 @@
 #include "ControlNetStatistics.h"
 #include <fstream>
 
-/**
- * @file
- * $Revision: $
- * $Date: $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 namespace Isis {
   class ControlNet;
@@ -64,7 +49,7 @@ namespace Isis {
    *  @history 2011-10-05 Sharmila Prasad - Report double values with 10 digit precision
    *  @history 2011-11-03 Sharmila Prasad - Added functionality to filter by Convex Hull Ratio
    *  @history 2011-12-29 Sharmila Prasad - Updated GoodnessOfFit Filter. Fixes Mantis #652
-   *  @history 2017-08-08 Adam Goins - Changed references to SerialNumberList::Delete() to 
+   *  @history 2017-08-08 Adam Goins - Changed references to SerialNumberList::Delete() to
    *                           SerialNumberList::remove()
    *  @history 2017-12-12 Kristin Berry - Updated to use QVector instead of std::vector. Fixes
    *                           #5259.
@@ -80,19 +65,19 @@ namespace Isis {
       // Point Filters
       //! Filter Points by Pixel Shift
       void PointPixelShiftFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
-      
+
       //! Filter Points by Edit Lock
       void PointEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
       //! Filter Points by Measure Edit Lock number
       void PointNumMeasuresEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
-      
+
       //! Filter Points by Residual Magnitude
       void PointResMagnitudeFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
       //! Filter Points by GoodnessOfFit
       void PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+
       //! Filter Points by Point ID Expression
       void PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
@@ -129,7 +114,7 @@ namespace Isis {
 
       //! Filter Cubes by Distance between points in a Cube
       void CubeDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
-      
+
       //! Filter Cubes by its ConvexHull Ratio
       void CubeConvexHullFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
@@ -144,7 +129,7 @@ namespace Isis {
     private:
       std::ofstream mOstm;                     //!< output stream for printing to output file
       SerialNumberList mSerialNumFilter;  //!< Serial Number List file
-      
+
       void FilterOutPoint(int pindex);
       void FilterOutMeasuresBySerialNum(QString serialNum);
   };

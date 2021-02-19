@@ -1,48 +1,38 @@
 #ifndef RosettaOsirisCameraDistortionMap_h
 #define RosettaOsirisCameraDistortionMap_h
-/** 
- * @file 
- *  
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "CameraDistortionMap.h"
 
 #include "LinearAlgebra.h"
 
 namespace Isis {
-  /** 
+  /**
    * Distortion map for converting between undistorted focal plane and
    * distorted focal plane coordinates for the Rosetta OSIRIS NAC and WAC.
-   * 
+   *
    * The distortion models are defined by pixelspace polynomials. The
    * polynomials use zero-based pixel space with the origin at the top left
    * corner of the image, so the input focal plane coordinates are converted to
    * pixel coordinates using the boresight location and pixel pitch. After
    * computation, they are converted back into focal plane coordinates by the
    * inverse process.
-   * 
+   *
    * Given a set of distorted pixel coordinates (dx, dy), the undistorted pixel
    * coordinates (ux, uy) are computed as:
    * @f[ (ux, uy) = F(dx, dy) = ( \sum_{i=0}^3 \sum_{j=0}^3 C_{i,j}^x dx^i dy^j,
    * \sum_{i=0}^3 \sum_{j=0}^3 C_{i,j}^y dx^i dy^j) @f] where @f$ C_{i,j}^y @f$
    * and @f$ C_{i,j}^y @f$ are the @f$ (i,j)^{\text{th}} @f$ coefficients of
    * the @f$ x @f$ and @f$ y @f$ polynomials respectively.
-   * 
+   *
    * Given a set of undistorted pixel coordinates (ux, uy), Newton's method is
    * used to find the distorted coordinates (dx, dy) within a tolerance of
    * @f$ 10^{-7} @f$ pixels.
@@ -100,4 +90,3 @@ namespace Isis {
   };
 };
 #endif
-

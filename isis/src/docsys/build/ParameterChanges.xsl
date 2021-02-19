@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <xsl:param name="dirParam"/>
@@ -152,8 +152,8 @@
 
   <bibliography>
     <title>Application Parameter Changes</title>
-    <brief>Changes since the last ISIS 3 release</brief>
-    <description>Listing of the parameters that have changed in ISIS 3 since the last major release.</description>
+    <brief>Changes since the last ISIS release</brief>
+    <description>Listing of the parameters that have changed in ISIS since the last major release.</description>
     <author>Steven Lambright</author>
     <date>2011-10-05</date>
   </bibliography>

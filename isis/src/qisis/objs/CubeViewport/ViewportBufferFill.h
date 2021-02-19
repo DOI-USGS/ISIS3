@@ -1,6 +1,14 @@
 #ifndef VieportBufferFill_h
 #define VieportBufferFill_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ViewportBufferAction.h"
 
 class QRect;
@@ -14,8 +22,8 @@ namespace Isis {
    *   @history 2011-04-25 Steven Lambright - Fixed a problem where 1 too few
    *                       lines were being read
    *   @history 2015-06-30 Makayla Shepherd and Ian Humphrey - Modified stop() to keep the viewport
-   *                       buffer object from reading an extra line at the bottom of the viewport 
-   *                       rectangle. This could potentially cause a crash from reading outside of 
+   *                       buffer object from reading an extra line at the bottom of the viewport
+   *                       rectangle. This could potentially cause a crash from reading outside of
    *                       the bounds. Fixes #2171.
    */
   class ViewportBufferFill : public ViewportBufferAction {

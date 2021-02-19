@@ -2,19 +2,19 @@
 
 <application name="mat2cnet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Converts an ISIS2 match point file to an ISIS3 control network file.
+    Converts an ISIS2 match point file to an ISIS control network file.
   </brief>
 
   <description>
     <p>
-      This program converts an ISIS2 match point file to an ISIS3 control
+      This program converts an ISIS2 match point file to an ISIS control
       network file.  It requires a list file of ISIS2 cubes and corresponding
-      list file of ISIS3 cubes.
-      <strong>Note: </strong> In order to identify which ISIS3 cube
+      list file of ISIS cubes.
+      <strong>Note: </strong> In order to identify which ISIS cube
       corresponds to a particular ISIS2 cube, these lists must be the same
       length and ordering.  That is, if the first cube of the ISIS2 list was
       imported from a particular raw image (observation), then the first cube
-      of the ISIS3 list must be imported from the same image (observation),
+      of the ISIS list must be imported from the same image (observation),
       and so on for each cube listed.
     </p>
     <p>
@@ -33,7 +33,7 @@
       the RAND PPP file for these points will be copied to the RAND PPP log.
     </p>
     <p>
-      The following indicates how the ISIS2 Class is translated to an ISIS3 MeasureType
+      The following indicates how the ISIS2 Class is translated to an ISIS MeasureType
       <ul>
         <li> "T" (Truth) is translated to Reference</li>
         <li> "S" (SubPixel) is tranlated to RegisteredSubPixel</li>
@@ -132,7 +132,7 @@
           A text file containing one column of ISIS2 cube file names. Every
           file used in the match point file should be represented in this list.
           <strong>Note: </strong> The cubes must be available for the program
-          to open and must be in the same order as the ISIS3 cubes in LIST3.
+          to open and must be in the same order as the ISIS cubes in LIST3.
           An error will be thrown if the number of files in this list does not
           match the number of files in LIST2, or if the IMAGE_ID and
           IMAGE_NUMBER keywords are not found in any ISIS2 cube.
@@ -150,7 +150,7 @@
         </brief>
         <description>
           Use this parameter to specify the ISIS2 match point file to be
-          converted to an ISIS3 control network file.  This file must contain a
+          converted to an ISIS control network file.  This file must contain a
           two line header.  The first line of the header must have the
           "Matchpoint Total" keyword and a value for the number of measures in
           the match point file.  The second line of the header should be text
@@ -265,11 +265,11 @@
           file will be locked. That is, if this parameter is set to true,
           then each ControPoint in the output ControlNet that exists in the
           RAND PPP file will have the keyword EditLock set to true. This
-          prevents any editing by most ISIS3 programs (with the exception of
+          prevents any editing by most ISIS programs (with the exception of
           jigsaw) to the latitude, longitude, and radius values associated to
           the points in the RAND PPP file. Furthermore, the reference measures
           of each of these points will be treated as if they are locked,
-          preventing any editing by ISIS3 programs to the sample and line
+          preventing any editing by ISIS programs to the sample and line
           values found in the match point file. This parameter defaults to TRUE
           and can only be used if the INPUTPPP parameter is set to true.
         </description>
@@ -301,10 +301,10 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          List of ISIS3 input cubes in the match point file.
+          List of ISIS input cubes in the match point file.
         </brief>
         <description>
-          A text file containing one column of ISIS3 cube file names. Every
+          A text file containing one column of ISIS cube file names. Every
           file used in the match point file should be represented in this list.
           <strong>Note: </strong> The cubes must be available for the program to
           open and must be in the same order as the ISIS2 cubes in LIST2.  An
@@ -320,7 +320,7 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          ISIS3 output control network file
+          ISIS output control network file
         </brief>
         <description>
           Use this parameter to specify the file name of the output ISIS3
@@ -409,7 +409,7 @@
         <description>
           Run the <strong>mat2cnet</strong> application to create a ControlNet
           file from a match point file with corresponding ISIS2 cubelist and
-          ISIS3 cubelist
+          ISIS cubelist
         </description>
       </terminalInterface>
       <guiInterfaces>

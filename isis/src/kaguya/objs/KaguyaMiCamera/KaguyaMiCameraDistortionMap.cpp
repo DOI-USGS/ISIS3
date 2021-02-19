@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <iostream>
 
@@ -45,13 +34,13 @@ namespace Isis {
   }
 
   /**
-   * @param naifIkCode 
+   * @param naifIkCode
    */
   void KaguyaMiCameraDistortionMap::SetDistortion(const int naifIkCode) {
     //determine if this is the VIS or the NIR sensor, by loooking at the pixel pitch
     if (p_camera->PixelPitch() == 0.013) m_numDistCoef = 3;  //VIS camera has 3 distortion coefs
     else                       m_numDistCoef = 4;  //NIR camera has 4 distortion coefs
-    
+
     //read the distortion coefs from the NAIF Kernels
     QString naifXKey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_X";
     QString naifYKey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_Y";
@@ -80,7 +69,7 @@ namespace Isis {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
     //cout << "focal plane: " << dx << " " << dy << "\n";
-    //NOTE: the IK/FK kernel does not include the " + dx" as I do below.  They also define the 
+    //NOTE: the IK/FK kernel does not include the " + dx" as I do below.  They also define the
     // radial distance only in terms of Y.  Erroneously (I believe) they use only the
     // DISTORTION_COEF_X's in their model definition.  Finally, they provide different distortion
     // coefficients for each line of the CCD--despite them going throught the same optical path.
@@ -93,9 +82,9 @@ namespace Isis {
     // small adjustmenst being provided by the distortion model are only relevant as the offsets (x)
     // approach zero.
     if (m_numDistCoef == 3) {  //VIS camera
-      p_undistortedFocalPlaneX = 
+      p_undistortedFocalPlaneX =
         m_boreX + m_distCoefX[0] + dy*(m_distCoefX[1] + dy*m_distCoefX[2]) + dx;
-      p_undistortedFocalPlaneY = 
+      p_undistortedFocalPlaneY =
         m_boreY + m_distCoefY[0] + dy*(m_distCoefY[1] + dy*m_distCoefY[2]) + dy;
     }
     else {  //NIR camera
@@ -128,7 +117,7 @@ namespace Isis {
     if (m_numDistCoef == 3) {  //quadratic distortion model
       //use the quadratic equation to find the distorted Y value
       double A,B,C;  //coefficients of the quadric equation
-      
+
       A = m_distCoefY[2];
       B = 1.0 + m_distCoefY[1];
       C = m_distCoefY[0] +m_boreY - uy;
@@ -142,7 +131,7 @@ namespace Isis {
         p_focalPlaneY = fabs(uy - roots[0]) < fabs(uy - roots[1]) ? roots[0] : roots[1];
 
       //now that we know the distortedY we can directly calculate the X
-      p_focalPlaneX = ux - 
+      p_focalPlaneX = ux -
         (m_boreX + m_distCoefX[0] + p_focalPlaneY*(m_distCoefX[1] + p_focalPlaneY*m_distCoefX[2]));
 
       return true;
@@ -168,17 +157,17 @@ namespace Isis {
           delta << fabs(roots[i]-uy);
 
         if ( roots.size() == 3) //three roots to choose among
-          p_focalPlaneY = delta[0] < delta[1] ? 
-                         (delta[0] < delta[2] ? roots[0]:roots[2]) : 
+          p_focalPlaneY = delta[0] < delta[1] ?
+                         (delta[0] < delta[2] ? roots[0]:roots[2]) :
                          (delta[1] < delta[2] ? roots[1]:roots[2]) ;
         else  //two roots to choose between
           p_focalPlaneY = delta[0] < delta[1] ? roots[0]:roots[1]  ;
       }
-     
+
       //now that we know the distortedY we can directly calculate the X
-      p_focalPlaneX = ux - (m_boreX +m_distCoefX[0] + 
-                      p_focalPlaneY*(m_distCoefX[1] + 
-                      p_focalPlaneY*(m_distCoefX[2] +  
+      p_focalPlaneX = ux - (m_boreX +m_distCoefX[0] +
+                      p_focalPlaneY*(m_distCoefX[1] +
+                      p_focalPlaneY*(m_distCoefX[2] +
                       p_focalPlaneY* m_distCoefX[3])));
       return true;
     }
