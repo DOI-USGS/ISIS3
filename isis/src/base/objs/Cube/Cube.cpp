@@ -24,6 +24,7 @@ find files of those names at the top level of this repository. **/
 #include "CubeTileHandler.h"
 #include "Endian.h"
 #include "FileName.h"
+#include "History.h"
 #include "ImageHistogram.h"
 #include "IException.h"
 #include "LineManager.h"
@@ -829,6 +830,18 @@ namespace Isis {
     m_ioHandler->read(bufferToFill);
   }
 
+  History *Cube::readHistory(const QString &name) const {
+    Blob historyBlob(name, "History");
+    try {
+      // read history from cube, if it exists.
+      historyBlob.Read(fileName());
+    }
+    catch (IException &) {
+    // if the history does not exist in the cube, this function creates it.
+    }
+    History *history = new History(historyBlob);
+    return history;
+  }
 
   /**
    * This method will write a blob of data (e.g. History, Table, etc)

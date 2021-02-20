@@ -16,24 +16,27 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+  /**
+   *  Default Constructor for history
+   */
+  History::History() {
+    p_history.setTerminator("End");
+   }
 
   /**
-   *  Constructor for reading a history blob
-   *  @param name
+   *  Constructor for reading a blob
+   *  @param blob
    */
-  History::History(const QString &name) : Isis::Blob(name, "History") {
-    p_history.setTerminator("");
-  }
+  History::History(Isis::Blob &blob) {
+    p_history.setTerminator("End");
 
-  /**
-   *  Constructor for reading a history blob
-   *  @param name
-   *  @param file
-   */
-  History::History(const QString &name, const QString &file) :
-    Isis::Blob(name, "History") {
-    Blob::Read(file);
-  }
+    stringstream os;
+    char *blob_buffer = blob.getBuffer();
+    for (int i = 0; i < blob.Size(); i++) {
+      os << blob_buffer[i];
+    }
+    os >> p_history;
+   }
 
   //! Destructor
   History::~History() {
@@ -56,24 +59,19 @@ namespace Isis {
     p_history.addObject(obj);
   }
 
-  /**
-   *
-   */
-  void History::WriteInit() {
+  Blob *History::toBlob(const QString &name) {
     ostringstream ostr;
-    if (p_nbytes > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
-    int bytes = histStr.size();
+    int nbytes = histStr.size();
 
-    char *temp = p_buffer;
-    p_buffer = new char[p_nbytes+bytes];
-    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
+    char *buffer = new char[nbytes];
     const char *ptr = histStr.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
+    memcpy(&buffer[0], (void *)ptr, nbytes);
 
-    if (temp != NULL) delete [] temp;
+    Blob *newBlob = new Blob(name, "History");
+    newBlob->setData(buffer, nbytes);
+    return newBlob;
   }
 
   /**
@@ -82,24 +80,6 @@ namespace Isis {
    * @return @b Pvl
    */
   Pvl History::ReturnHist() {
-    Pvl pvl;
-    stringstream os;
-    for (int i = 0; i < p_nbytes; i++) os << p_buffer[i];
-    os >> pvl;
-    return pvl;
-  }
-
-  /**
-   * Reads input stream into Pvl.
-   *
-   * @param pvl Pvl into which the input stream will be read.
-   * @param is Input stream.
-   */
-  void History::Read(const Isis::Pvl &pvl, std::istream &is) {
-    try {
-      Blob::Read(pvl, is);
-    }
-    catch (IException &e) {
-    }
+    return p_history;
   }
 }

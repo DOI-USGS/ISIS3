@@ -16,7 +16,7 @@ namespace Isis {
   /**
    * @author ????-??-?? Unknown
    *
-   * @internal 
+   * @internal
    *   @history 2006-12-11 Kris Becker Fixed bug in WriteInit method using a
    *                           temporary string to reference a char pointer to
    *                           its contents.  The string remain after the
@@ -29,22 +29,20 @@ namespace Isis {
    *                           include for Pvl since the include for Pvl was
    *                           removed from Blob.h. Added padding to control
    *                           statements. References #1169
-   *  
+   *
    * @todo This class needs documentation.
   */
-  class History : public Isis::Blob {
+  class History {
     public:
-      History(const QString &name);
-      History(const QString &name, const QString &file);
+      History();
+      History(Isis::Blob &blob);
       ~History();
 
       void AddEntry();
       void AddEntry(Isis::PvlObject &obj);
       Pvl ReturnHist();
-      void Read(const Isis::Pvl &pvl, std::istream &is);
 
-    protected:
-      void WriteInit();
+      Blob *toBlob(const QString &name = "IsisCube");
 
     private:
       Pvl p_history; //!< History Pvl
@@ -52,4 +50,3 @@ namespace Isis {
 };
 
 #endif
-
