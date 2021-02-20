@@ -170,13 +170,13 @@ namespace Isis {
 
         if (cube->label()->hasObject("History")) {
             // Record apollofindrx history to the cube
-            PvlObject histObj = cube->label()->findObject("History");
+            QString histName = (QString)cube->label()->findObject("History")["Name"];
             // create a History Blob with value found in the History PvlObject's Name keyword
             // read cube's History PvlObject data into the History Blob
-            Isis::History *hist = cube->readHistory();
+            Isis::History *hist = cube->readHistory(histName);
             // add apollofindrx History PvlObject into the History Blob and write to cube
             hist->AddEntry();
-            cube->write(*(hist->toBlob((QString)histObj["Name"])));
+            cube->write(*(hist->toBlob(histName)));
             cube->close();
         }
     }
