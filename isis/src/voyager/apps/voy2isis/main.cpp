@@ -78,7 +78,7 @@ void IsisMain() {
 
   // Preparse the IMG to fix messed up labels
 
-  History *hist = new History("IsisCube");
+  History *hist = new History();
   QByteArray pdsData = fixLabels(in.expanded(), hist);
 
   QTextStream pdsTextStream(&pdsData);
@@ -116,7 +116,7 @@ void IsisMain() {
     e.print();
   }
 
-  ocube->write(*hist);
+  ocube->write(*(hist->toBlob()));
 
   p.EndProcess();
 

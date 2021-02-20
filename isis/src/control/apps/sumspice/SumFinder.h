@@ -79,7 +79,8 @@ namespace Isis {
       double deltaT() const;
       double closest() const;
 
-      void setCube(const QString &name = "");
+      void resetCube();
+      void setCube(const QString &name);
       const Cube *cube() const;
       const QString &name() const;
 
@@ -88,8 +89,6 @@ namespace Isis {
       const SumFile *sumfile() const;
 
       bool update(const unsigned int options);
-
-      void writeHistory();
 
    protected:
       virtual bool calculateTimes(Cube &cube,

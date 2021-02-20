@@ -100,17 +100,9 @@ void IsisMain() {
 
   // Add history, write, and clean the data
   if(cube) {
-    History hist = History("IsisCube");
-    try {
-      // read history from cube, if it exists.
-      cube->read(hist);
-    }
-    catch(IException &e) {
-      // if the history does not exist in the cube, continue. In this case, 
-      // editlab will be the first History entry.
-    }
-    hist.AddEntry();
-    cube->write(hist);
+    History *hist = cube->readHistory();
+    hist->AddEntry();
+    cube->write(*(hist->toBlob()));
 
     // clean up
     cube->close();
@@ -128,10 +120,10 @@ void IsisMain() {
 /**
  * Modifies the given keyword with the user entered value, units, and/or
  * comment.
- * 
+ *
  * @param ui UserInterface object for this application.
  * @param keyword PvlKeyword to be modified.
- * 
+ *
  * @return PvlKeyword Modified keyword.
  */
 PvlKeyword &modifyKeyword(UserInterface &ui, PvlKeyword &keyword) {

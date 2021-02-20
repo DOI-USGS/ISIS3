@@ -228,9 +228,9 @@ void IsisMain() {
       uveven->putGroup(isis3UvEvenLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    uveven->write(history);
+    uveven->write(*(history.toBlob()));
     uveven->write(origLabel);
 
     uveven->close();
@@ -243,9 +243,9 @@ void IsisMain() {
       uvodd->putGroup(isis3UvOddLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    uvodd->write(history);
+    uvodd->write(*(history.toBlob()));
     uvodd->write(origLabel);
 
     uvodd->close();
@@ -258,9 +258,9 @@ void IsisMain() {
       viseven->putGroup(isis3VisEvenLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    viseven->write(history);
+    viseven->write(*(history.toBlob()));
     viseven->write(origLabel);
 
     viseven->close();
@@ -273,9 +273,9 @@ void IsisMain() {
       visodd->putGroup(isis3VisOddLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    visodd->write(history);
+    visodd->write(*(history.toBlob()));
     visodd->write(origLabel);
 
     visodd->close();

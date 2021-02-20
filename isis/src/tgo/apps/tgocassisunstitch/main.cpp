@@ -109,8 +109,7 @@ void IsisMain() {
       inputTables.append(table);
     }
     if(inputLabel->object(i).isNamed("History") && Isis::iApp != NULL) {
-      inputHistory.reset( new History((QString)inputLabel->object(i)["Name"]) );
-      cube->read(*inputHistory);
+      inputHistory.reset(cube->readHistory((QString)inputLabel->object(i)["Name"]));
       inputHistory->AddEntry();
     }
   }
@@ -212,7 +211,7 @@ void IsisMain() {
     }
 
     // Propagate History
-    g_outputCubes[i]->write(*inputHistory);
+    g_outputCubes[i]->write(*(inputHistory->toBlob( "IsisCube" )));
 
     // Close output cube
     g_outputCubes[i]->close();

@@ -189,7 +189,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  void Process::SetInputCube(Cube *cube, 
+  void Process::SetInputCube(Cube *cube,
                                     int requirements) {
     // Test for same size or one in all dimensions
     if(requirements & Isis::AllMatchOrOne) {
@@ -882,19 +882,18 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         Isis::Pvl & inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
           if(inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
-            Isis::History h((QString)inlab.object(i)["Name"]);
-            InputCubes[0]->read(h);
-            h.AddEntry();
-            cube.write(h);
+            Isis::History *h = InputCubes[0]->readHistory();
+            h->AddEntry();
+            cube.write(*(h->toBlob( (QString)inlab.object(i)["Name"] )));
             addedHist = true;
           }
         }
       }
 
       if(!addedHist && Isis::iApp != NULL) {
-        Isis::History h("IsisCube");
-        h.AddEntry();
-        cube.write(h);
+        Isis::History *h = cube.readHistory();
+        h->AddEntry();
+        cube.write(*(h->toBlob("IsisCube")));
       }
     }
   }

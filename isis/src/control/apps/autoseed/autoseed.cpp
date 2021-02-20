@@ -31,7 +31,7 @@ find files of those names at the top level of this repository. **/
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
 #include "PolygonTools.h"
-#include "Process.h"
+#include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
