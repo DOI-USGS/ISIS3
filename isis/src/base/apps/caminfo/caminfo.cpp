@@ -371,7 +371,7 @@ namespace Isis{
           if (getFootBlob) {
             // Need to read history to obtain parameters that were used to
             // create the footprint
-            History *hist = incube->readHistory("IsisCube");
+            History *hist = incube->readHistory();
             Pvl pvl = hist->ReturnHist();
             PvlObject::PvlObjectIterator objIter;
             bool found = false;
