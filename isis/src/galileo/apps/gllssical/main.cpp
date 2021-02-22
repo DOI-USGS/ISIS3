@@ -441,7 +441,17 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
     QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
     double obsStartTime;
-    obsStartTime = spicegll.getClockTime(startTime.toLatin1().data(), -77).Et();
+
+    try {
+      obsStartTime = spicegll.getClockTime(startTime.toLatin1().data(), -77).Et();      
+    } 
+    catch (IException &e) {
+      Isis::FileName sclk(label->findGroup("Kernels", Pvl::Traverse)["SpacecraftClock"][0]); 
+      QString sclkName(sclk.expanded()); 
+      furnsh_c(sclkName.toLatin1().data());
+      obsStartTime = spicegll.getClockTime(startTime.toLatin1().data(), -77).Et();
+    }
+
     spicegll.setTime(obsStartTime);
     double sunv[3];
     spicegll.sunPosition(sunv);
