@@ -100,9 +100,9 @@ void IsisMain() {
 
   // Add history, write, and clean the data
   if(cube) {
-    History *hist = cube->readHistory();
-    hist->AddEntry();
-    cube->write(*(hist->toBlob()));
+    History hist = cube->readHistory();
+    hist.AddEntry();
+    cube->write(*(hist.toBlob()));
 
     // clean up
     cube->close();

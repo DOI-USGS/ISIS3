@@ -916,7 +916,7 @@ namespace Isis {
 
     // Update the cube history
     p_matchCube->write(*cmatrix);
-    History *h = p_matchCube->readHistory("IsisCube");
+    History h = p_matchCube->readHistory("IsisCube");
     // try {
     //   h = ;
     // }
@@ -941,8 +941,8 @@ namespace Isis {
     results += PvlKeyword("BaseMap", p_baseCube->fileName());
     history += results;
 
-    h->AddEntry(history);
-    p_matchCube->write(*(h->toBlob()));
+    h.AddEntry(history);
+    p_matchCube->write(*(h.toBlob()));
     p_matchCube->reopen("r");
 
   }

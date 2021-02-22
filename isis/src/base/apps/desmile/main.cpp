@@ -100,9 +100,9 @@ void IsisMain() {
   // create a History Blob with value found in the History PvlObject's Name keyword
   QString histName = (QString)inCube->label()->findObject("History")["Name"];
   // read cube's History PvlObject data into the History Object
-  Isis::History *histBlob = inCube->readHistory(histName);
-  histBlob->AddEntry();
-  outCube->write(*(histBlob->toBlob(histName)));
+  History histBlob = inCube->readHistory(histName);
+  histBlob.AddEntry();
+  outCube->write(*(histBlob.toBlob(histName)));
 
   procSpectra.Finalize();
   delete outputSpectralDef;

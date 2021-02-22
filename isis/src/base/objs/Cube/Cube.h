@@ -249,7 +249,7 @@ namespace Isis {
       void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
-      History *readHistory(const QString &name = "IsisCube") const;
+      History readHistory(const QString &name = "IsisCube") const;
       void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);
 
