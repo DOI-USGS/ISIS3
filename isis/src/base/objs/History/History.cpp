@@ -69,7 +69,7 @@ namespace Isis {
     // The blob takes ownership of it and handles freeing the memory in
     // its decontructor
     char *buffer = new char[nbytes];
-    memcpy(&buffer, histStr.c_str(), nbytes);
+    memcpy(buffer, histStr.c_str(), nbytes);
 
     Blob *newBlob = new Blob(name, "History");
     newBlob->setData(buffer, nbytes);
