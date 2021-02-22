@@ -35,10 +35,12 @@ namespace Isis {
    *                                          were signaled. References #2248
    *
    */
+
+  class Cube;
   class CalParameters {
     public:
       // Constructor
-      CalParameters(const QString &fname);
+      CalParameters(const QString &fname, Cube *icube);
 
       /**
        * Calculates and returns time based offset at specified line and sample
@@ -62,7 +64,7 @@ namespace Isis {
       }
 
       /**
-       * Returns distance value found in the vikcal.sav file
+       * Returns estimated distance from Mars to the Sun found in the vikcal.sav file
        *
        * @return double Approximate distance from the sun
        */
@@ -221,7 +223,7 @@ namespace Isis {
                        int cam, QString wav, int cs1, int cs2, int cs3, int cs4);
       void vikoffSetup(QString mission, int spn, QString target,
                        int cam, double clock, int cs3);
-      void CalcSunDist(QString t);
+      double CalcSunDist(QString t, Cube *icube);
 
       double p_labexp;           //!<Exposure Duration from cube label
       double p_w0;               //!<Omega0 from vikcal.sav file
