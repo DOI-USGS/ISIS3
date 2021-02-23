@@ -62,26 +62,7 @@ namespace Isis {
    *  Constructs a Polygon object, setting the polygon name
    *
    */
-  ImagePolygon::ImagePolygon(Blob &blob) {
-    p_polygons = NULL;
-
-    p_cube = NULL;
-
-    m_leftCoord = NULL;
-    m_rightCoord = NULL;
-    m_topCoord = NULL;
-    m_botCoord = NULL;
-
-    p_cubeStartSamp = 1;
-    p_cubeStartLine = 1;
-
-    p_emission = 180.0;
-    p_incidence = 180.0;
-
-    p_subpixelAccuracy = 50; //An accuracte and quick number
-
-    p_ellipsoid = false;
-
+  ImagePolygon::ImagePolygon(Blob &blob) : ImagePolygon() {
     p_polyStr = blob.getBuffer();
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
