@@ -52,6 +52,7 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
+  class Table;
   class Histogram;
 
   /**
@@ -260,10 +261,11 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob, 
+      void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
+      void write(const Table &table);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);
@@ -315,9 +317,11 @@ namespace Isis {
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
+      Table readTable(const QString &name);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
+
 
     private:
       void applyVirtualBandsToLabel();

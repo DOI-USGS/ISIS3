@@ -65,8 +65,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Get statistics from the cube prefix and suffix data
-  Table hifix("HiRISE Ancillary");
-  icube->read(hifix);
+  Table hifix = icube->readTable("HiRISE Ancillary");
   Statistics darkStats, bufStats, rampDarkStats;
   int tdi = icube->group("Instrument")["Tdi"];
   int binning_mode = icube->group("Instrument")["Summing"];
@@ -126,8 +125,7 @@ void IsisMain() {
   int rampStart = maskLines;
   int rampLines = tdi / binning_mode;
 
-  Table calimg("HiRISE Calibration Image");
-  icube->read(calimg);
+  Table calimg = icube->readTable("HiRISE Calibration Image");
   Statistics calStats;
   //Statistics for the Reverse readout lines of the cal image
   Statistics reverseStats;
@@ -204,8 +202,7 @@ void IsisMain() {
   }
 
   // Get statistics from the calibration prefix and suffix data
-  Table calfix("HiRISE Calibration Ancillary");
-  icube->read(calfix);
+  Table calfix = icube->readTable("HiRISE Calibration Ancillary");
   Statistics calDarkStats, calBufStats;
   int rampLine0 = rampStart + 1;
   int rampLineN = (rampStart + rampLines - 1) - 1;

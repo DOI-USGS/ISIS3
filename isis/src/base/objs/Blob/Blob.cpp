@@ -62,7 +62,7 @@ namespace Isis {
    * @param type The blob type
    * @param file The filename to read from.
    */
-  Blob::Blob(const QString &name, const QString &type, 
+  Blob::Blob(const QString &name, const QString &type,
              const QString &file) {
     p_blobName = name;
     p_buffer = NULL;
@@ -103,7 +103,7 @@ namespace Isis {
    *
    * @param other Blob to be copied
    *
-   * @return Copied Blob 
+   * @return Copied Blob
    */
   Blob &Blob::operator=(const Blob &other) {
     p_blobPvl = other.p_blobPvl;
@@ -132,54 +132,54 @@ namespace Isis {
     if (p_buffer != NULL) delete [] p_buffer;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a string containing the Blob type.
-   *  
+   *
    *  @return @b string Type of blob.
-   */ 
+   */
   QString Blob::Type() const {
     return p_type;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a string containing the Blob name.
-   *  
+   *
    *  @return @b string The name of the blob.
-   */ 
+   */
   QString Blob::Name() const {
     return p_blobName;
   }
 
-  /** 
+  /**
    *  Accessor method that returns the number of bytes in the blob data.
-   *  
+   *
    *  @return @b int Number of bytes in the blob data.
-   */ 
+   */
   int Blob::Size() const {
     return p_nbytes;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a PvlObject containing the Blob label.
-   *  
+   *
    *  @return @b PvlObject The label of the blob.
-   */ 
+   */
   PvlObject &Blob::Label() {
     return p_blobPvl;
   }
 
-  /** 
+  /**
    *  This method searches the given Pvl for the Blob by the Blob's type and
    *  name. If found, the start byte, number of bytes are read from the Pvl.
    *  Also, if a keyword label pointer is found, the filename for the detached
    *  blob is stored and the pointer is removed from the blob pvl.
-   *  
+   *
    *  @param pvl The Pvl to be searched
    *  @param keywords A list of keyword, value pairs to match inside the blob's
    *  PVL object. Only if all the keyword match is the blob processed. This is used
-   *  when there are multiple blobs with the same name, but different keywords that 
+   *  when there are multiple blobs with the same name, but different keywords that
    *  define the exact blob (see Stretch with a band number)
-   */ 
+   */
   void Blob::Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords) {
     bool found = false;
     try {
@@ -319,7 +319,7 @@ namespace Isis {
   }
 
   /**
-   * This method reads the Blob data from an open input file stream. 
+   * This method reads the Blob data from an open input file stream.
    *
    * @param pvl A Pvl containing the label information.
    * @param istm The input file stream containing the blob data to be read.
@@ -351,9 +351,9 @@ namespace Isis {
 
 
  /**
-  * This virtual method for classes that inherit Blob. It is not defined in 
+  * This virtual method for classes that inherit Blob. It is not defined in
   * the Blob class.
-  */ 
+  */
   void Blob::ReadInit(){
   }
 
@@ -465,9 +465,9 @@ namespace Isis {
     p_blobPvl["StartByte"] = toString((BigInt)sbyte);
     p_blobPvl["Bytes"] = toString(p_nbytes);
 
-    
+
     // See if the blob is already in the file
-    bool found = false; 
+    bool found = false;
     if (overwrite) {
 
       for (int i = 0; i < pvl.objects(); i++) {
@@ -518,9 +518,9 @@ namespace Isis {
   }
 
   /**
-   * This virtual method for classes that inherit Blob. It is not defined in 
+   * This virtual method for classes that inherit Blob. It is not defined in
    * the Blob class.
-   */ 
+   */
   void Blob::WriteInit(){
   }
 
@@ -550,6 +550,23 @@ namespace Isis {
   bool IsBlob(PvlObject &obj) {
     if (obj.isNamed("TABLE")) return true;
     return false;
+  }
+
+
+  char *Blob::getBuffer() {
+    return p_buffer;
+  }
+
+
+  void Blob::setData(const char *buffer, int nbytes) {
+    p_nbytes = nbytes;
+
+    if (p_buffer != NULL) {
+      delete [] p_buffer;
+    }
+    p_buffer = new char[p_nbytes];
+
+    memcpy(p_buffer, buffer, nbytes);
   }
 } // end namespace isis
 

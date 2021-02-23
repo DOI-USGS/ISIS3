@@ -33,6 +33,7 @@
 #include <QMutex>
 
 #include "Application.h"
+#include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "CubeAttribute.h"
@@ -49,6 +50,7 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Table.h"
 #include "TProjection.h"
 #include "Longitude.h"
 
@@ -914,6 +916,12 @@ namespace Isis {
 //                 blobFileName.extension());
       blob.Write(*m_label, detachedStream, blobFileName.name());
     }
+  }
+
+
+  void Cube::write(const Table &table) {
+    Blob tableBlob = table.toBlob();
+    write(tableBlob);
   }
 
 
@@ -1837,6 +1845,13 @@ namespace Isis {
       }
     }
     return false;
+  }
+
+
+  Table Cube::readTable(const QString &name) {
+    Blob tableBlob(name, "Table");
+    read(tableBlob);
+    return Table(tableBlob);
   }
 
 
