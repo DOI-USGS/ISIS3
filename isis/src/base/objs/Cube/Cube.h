@@ -39,6 +39,7 @@ namespace Isis {
   class Histogram;
   class History;
   class OriginalLabel;
+  class ImagePolygon;
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -252,6 +253,7 @@ namespace Isis {
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
+      ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(OriginalLabel lab);
       void write(Buffer &wbuf);
