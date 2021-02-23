@@ -60,7 +60,6 @@ requirements:
   - embree
   - geos>=3.7,<3.8
   - geotiff
-  - gmm
   - gmp
   - gsl>=2.6
   - hdf5
@@ -114,7 +113,6 @@ requirements:
   - embree
   - geos>=3.7,<3.8
   - geotiff
-  - gmm
   - gsl>=2.6
   - hdf5
   - icu
