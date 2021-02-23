@@ -5,12 +5,8 @@ The authors of ISIS do not claim copyright on the contents of this file.
 For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
-<<<<<<< HEAD
-#include "Pvl.h"
-=======
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "Blob.h"
->>>>>>> 601e0c3159ca47538171794b12154f61e385f795
+#include "Pvl.h"
 #include <vector>
 #include "TableRecord.h"
 
@@ -23,11 +19,7 @@ namespace Isis {
    * general, records correspond to rows and fields correspond to columns. Thus
    * the TableRecord class corresponds to a vector of row entries and
    * TableField class corresponds to a specific entry of the table for a given
-<<<<<<< HEAD
-   * record. Isis3 Table objects are record based, N records in a table. Each
-=======
    * record. Isis Table objects are record based, N records in a table. Each
->>>>>>> 601e0c3159ca47538171794b12154f61e385f795
    * record will have the same number of fields, F. The fields can be of
    * different types including Integer, Double, Text, and Real. The class
    * uses PVL to store the structure of the table N, F, and Field types and
