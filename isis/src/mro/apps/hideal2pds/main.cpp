@@ -180,8 +180,7 @@ void IsisMain() {
   cubeLab.Auto(pdsLabel);
 
   // get original label information
-  OriginalLabel origBlob;
-  inputCube->read(origBlob);
+  OriginalLabel origBlob = inputCube->readOriginalLabel();
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");

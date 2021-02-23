@@ -146,6 +146,7 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   }
 
   // Create holder for original label
+  // TODO are we using origLabel anywhere?  It's not being written
   OriginalLabel origLabel(*pdsLabel);
   //pdsLabel->write(fi.baseName()+".pvl");
 
