@@ -882,18 +882,19 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         for(int i = 0; i < inlab.objects(); i++) {
           if(inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
             QString histBlobName = (QString)inlab.object(i)["Name"];
-            Isis::History *h = InputCubes[0]->readHistory(histBlobName);
-            h->AddEntry();
-            cube.write(*(h->toBlob(histBlobName)));
+            History h = InputCubes[0]->readHistory(histBlobName);
+            h.AddEntry();
+            cube.write(*(h.toBlob(histBlobName)));
             addedHist = true;
           }
         }
       }
 
       if(!addedHist && Isis::iApp != NULL) {
-        Isis::History *h = cube.readHistory();
-        h->AddEntry();
-        cube.write(*(h->toBlob()));
+        Isis::History h = cube.readHistory();
+        h.AddEntry();
+        
+        cube.write(*(h.toBlob()));
       }
     }
   }

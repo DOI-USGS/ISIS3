@@ -368,17 +368,13 @@ namespace Isis {
     }
   }
 
-  void Blob::setData(const char *buffer, int nbytes) {
+  void Blob::setData(char *buffer, int nbytes) {
     p_nbytes = nbytes;
 
     if (p_buffer != NULL) {
       delete [] p_buffer;
     }
-    p_buffer = new char[p_nbytes];
-
-    for (int i = 0; i < p_nbytes; i++) {
-      p_buffer[i] = buffer[i];
-    }
+    p_buffer = buffer;
   }
 
   /**

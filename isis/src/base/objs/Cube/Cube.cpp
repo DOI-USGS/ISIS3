@@ -831,7 +831,7 @@ namespace Isis {
     m_ioHandler->read(bufferToFill);
   }
 
-  History *Cube::readHistory(const QString &name) const {
+  History Cube::readHistory(const QString &name) const {
     Blob historyBlob(name, "History");
     try {
       // read history from cube, if it exists.
@@ -840,7 +840,7 @@ namespace Isis {
     catch (IException &) {
     // if the history does not exist in the cube, this function creates it.
     }
-    History *history = new History(historyBlob);
+    History history(historyBlob);
     return history;
   }
 

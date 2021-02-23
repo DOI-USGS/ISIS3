@@ -82,7 +82,7 @@ void IsisMain() {
     // we will check for target name inside the SetTarget() call
 
     // Prepare for update to the cube history
-    History *hist = c.readHistory();
+    History hist = c.readHistory();
 
     //----------------------------------------------------------------------------------
     // Execute the requested method
@@ -304,8 +304,8 @@ void IsisMain() {
     // Update history entry
     PvlObject hEntry =  Isis::iApp->History();
     hEntry.addGroup(results);
-    hist->AddEntry(hEntry);
-    c.write(*(hist->toBlob()));
+    hist.AddEntry(hEntry);
+    c.write(*(hist.toBlob()));
 
     // clean up
     c.close();
