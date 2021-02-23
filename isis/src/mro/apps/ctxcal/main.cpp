@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include "Brick.h"
 #include "Table.h"
 #include "Camera.h"
+#include "NaifStatus.h"
 
 using namespace std;
 using namespace Isis;
