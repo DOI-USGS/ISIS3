@@ -437,12 +437,12 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 
   if (iof) {
     Pvl *label = icube->label();
-    Spice spicegll(*icube);
-    spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
     QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
     double obsStartTime;
 
     try {
+      Spice spicegll(*icube);
+      spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
       obsStartTime = spicegll.getClockTime(startTime.toLatin1().data(), -77).Et();      
     } 
     catch (IException &e) {
