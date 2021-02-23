@@ -91,15 +91,11 @@ namespace Isis {
       }
 
       // Read the bounding polygon
-      ImagePolygon *poly = new ImagePolygon();
-      cube.read(*poly);
+      ImagePolygon poly = cube.readFootprint();
       cube.close();
       // Create an ImageOverlap with the serial number and the bounding
       // polygon and save it
-      geos::geom::MultiPolygon *tmp = PolygonTools::MakeMultiPolygon(poly->Polys());
-
-      delete poly;
-      poly = NULL;
+      geos::geom::MultiPolygon *tmp = PolygonTools::MakeMultiPolygon(poly.Polys());
 
       geos::geom::MultiPolygon *mp = NULL;
 

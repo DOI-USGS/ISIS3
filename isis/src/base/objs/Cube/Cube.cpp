@@ -26,6 +26,7 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "History.h"
 #include "ImageHistogram.h"
+#include "ImagePolygon.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "Message.h"
@@ -834,13 +835,28 @@ namespace Isis {
     Blob historyBlob(name, "History");
     try {
       // read history from cube, if it exists.
-      historyBlob.Read(fileName());
+      read(historyBlob);
     }
     catch (IException &) {
     // if the history does not exist in the cube, this function creates it.
     }
     History history(historyBlob);
     return history;
+  }
+
+  ImagePolygon Cube::readFootprint() const {
+    Blob footprintBlob("Footprint", "Polygon");
+    try {
+      // read history from cube, if it exists.
+      read(footprintBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Footprintinit must be run prior to reading the footprint";
+      msg += " with POLYGON=TRUE for cube [" + fileName() + "]";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    ImagePolygon footprint(footprintBlob);
+    return footprint;
   }
 
   /**
