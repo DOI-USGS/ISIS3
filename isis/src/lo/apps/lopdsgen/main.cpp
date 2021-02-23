@@ -85,8 +85,7 @@ void IsisMain() {
   pdsLabel.addKeyword(productId);
 
   // Translate the keywords from the original labels that go in this label
-  OriginalLabel origBlob;
-  iCube->read(origBlob);
+  OriginalLabel origBlob = iCube->readOriginalLabel();
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");

@@ -30,6 +30,7 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "LineManager.h"
 #include "Message.h"
+#include "OriginalLabel.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "Projection.h"
@@ -860,6 +861,22 @@ namespace Isis {
   }
 
   /**
+   * This method will read an OriginalLabel from a cube.
+   */
+  OriginalLabel Cube::readOriginalLabel() const {
+    Blob origLabelBlob("IsisCube", "OriginalLabel");
+    try {
+      origLabelBlob.Read(fileName());
+    }
+    catch (IException &){
+      QString msg = "Unable to locate OriginalLabel in " + fileName();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    OriginalLabel origLabel(origLabelBlob);
+    return origLabel;
+  }
+
+  /**
    * This method will write a blob of data (e.g. History, Table, etc)
    * to the cube as specified by the contents of the Blob object.
    *
@@ -929,6 +946,15 @@ namespace Isis {
     }
   }
 
+  /**
+   * This method will write an OriginalLabel object.
+   * to the cube as specified by the contents of the Blob object.
+   *
+   * @param Original label data to be written
+   */
+  void Cube::write(OriginalLabel lab) {
+    write(*(lab.toBlob()));
+  }
 
   /**
    * This method will write a buffer of data from the cube as specified by the

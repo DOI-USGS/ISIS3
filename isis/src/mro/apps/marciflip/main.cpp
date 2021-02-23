@@ -52,8 +52,7 @@ void IsisMain() {
   }
 
   if(icube->label()->hasObject("OriginalLabel")) {
-    OriginalLabel origLabel;
-    icube->read(origLabel);
+    OriginalLabel origLabel = icube->readOriginalLabel();
     outputCube->write(origLabel);
   }
 

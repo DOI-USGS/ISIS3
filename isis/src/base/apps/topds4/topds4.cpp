@@ -64,11 +64,10 @@ namespace Isis {
     // Add the original label (from an ingestion app) to the template engine data
     // Wrap it in an OriginalLabel so existing elements don't get overwritten
     if (cubeLabel.hasObject("OriginalLabel")) {
-      OriginalLabel origBlob;
-      icube->read(origBlob);
-      Pvl origLabel;
-      origLabel = origBlob.ReturnLabels();
-      dataSource["OriginalLabel"].update(pvlToJSON(origLabel));
+      OriginalLabel origLabel = icube->readOriginalLabel();
+      Pvl pvlOrigLabel;
+      pvlOrigLabel = origLabel.ReturnLabels();
+      dataSource["OriginalLabel"].update(pvlToJSON(pvlOrigLabel));
     }
     else if (cubeLabel.hasObject("OriginalXmlLabel")) {
       OriginalXmlLabel origXmlBlob;

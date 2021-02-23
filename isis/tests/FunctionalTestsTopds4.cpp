@@ -427,4 +427,3 @@ TEST_F(SmallCube, FunctionalTestTopds4OutputFileSize) {
   std::getline(renderedStream, line);
   EXPECT_EQ("69536", line);
 }
-

@@ -38,6 +38,7 @@ namespace Isis {
   class Statistics;
   class Histogram;
   class History;
+  class OriginalLabel;
   class ImagePolygon;
 
   /**
@@ -250,9 +251,11 @@ namespace Isis {
       void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
+      OriginalLabel readOriginalLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
+      void write(OriginalLabel lab);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);
