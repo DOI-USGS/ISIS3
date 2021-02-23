@@ -81,8 +81,7 @@ namespace Isis{
 
       // Add the orginal label blob
       if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
-        OriginalLabel orig;
-        incube->read(orig);
+        OriginalLabel orig = incube->readOriginalLabel();
         Pvl p = orig.ReturnLabels();
         p.setName("OriginalLabel");
         params.addObject(p);

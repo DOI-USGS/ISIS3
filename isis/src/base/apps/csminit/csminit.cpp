@@ -396,7 +396,7 @@ namespace Isis {
 
     ImagePolygon originalFootprint;
     if (cube->hasBlob("Polygon", "ImageFootprint")) {
-      cube->read(originalFootprint);
+      originalFootprint = cube->readFootprint();
     }
 
     // Remove blob from old csminit run
@@ -465,8 +465,8 @@ namespace Isis {
         cube->write(originalCameraStatistics);
       }
 
-      if (originalFootprint.Size() != 0) {
-        cube->write(originalFootprint);
+      if (originalFootprint.Polys()->getNumGeometries() != 0) {
+        cube->write(*(originalFootprint.toBlob()));
       }
 
       QString message = "Failed to create a CSMCamera.";

@@ -628,8 +628,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
           if(inlab.object(i).isNamed("OriginalLabel")) {
-            Isis::OriginalLabel ol;
-            InputCubes[0]->read(ol);
+            Isis::OriginalLabel ol = InputCubes[0]->readOriginalLabel();
             cube->write(ol);
           }
         }
