@@ -851,7 +851,7 @@ namespace Isis {
       read(footprintBlob);
     }
     catch (IException &e) {
-      QString msg = "Footprintinit must be run prior to running cnetadd";
+      QString msg = "Footprintinit must be run prior to reading the footprint";
       msg += " with POLYGON=TRUE for cube [" + fileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
