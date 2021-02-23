@@ -38,11 +38,10 @@ void IsisMain() {
 // linear = ui.GetBoolean("LINEAR");
   const QString in = ui.GetFileName("FROM");
 
-  calParam = new CalParameters(in);
-
   // Open the input cube
   Cube icube;
   icube.open(in, "r");
+  calParam = new CalParameters(in, &icube);
   Progress prog;
 
   // If the file has already been calibrated, throw an error
@@ -98,14 +97,12 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void cal(vector<Buffer *> &in,
-         vector<Buffer *> &out) {
+void cal(vector<Buffer *> &in, vector<Buffer *> &out) {
 
   Buffer &inp = *in[0];      // Input Cube
   Buffer &dcf = *in[1];      // Dark Current File
   Buffer &fff = *in[2];      // Flat Field File
   Buffer &outp = *out[0];    // Output Cube
-
 
   // Loop for each pixel in the line.
   for(int i = 0; i < inp.size(); i++) {
