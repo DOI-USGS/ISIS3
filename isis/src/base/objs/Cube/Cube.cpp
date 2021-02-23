@@ -1848,7 +1848,13 @@ namespace Isis {
 
   Table Cube::readTable(const QString &name) {
     Blob tableBlob(name, "Table");
-    read(tableBlob);
+    try {
+      read(tableBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
     return Table(tableBlob);
   }
 
