@@ -852,8 +852,9 @@ namespace Isis {
     try {
       origLabelBlob.Read(fileName());
     }
-    catch(IException &) {
-     //Intentionally left blank
+    catch (IException &){
+      QString msg = "Unablet to locate OriginalLabel in " + m_labelFileName->expanded().toLatin1();
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     OriginalLabel origLabel(origLabelBlob);
     return origLabel;

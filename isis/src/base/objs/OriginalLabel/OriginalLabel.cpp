@@ -25,12 +25,7 @@ namespace Isis {
    * Constructor for creating an original label from a blob object.
    */
   OriginalLabel::OriginalLabel(Isis::Blob &blob) {
-    stringstream os;
-    char* dataBuffer = blob.getBuffer();
-    for(int i = 0; i < blob.Size(); i++) {
-        os << dataBuffer[i];
-    }
-    os >> m_originalLabel;
+    fromBlob(blob);
   }
 
   /**
@@ -40,16 +35,9 @@ namespace Isis {
    * @param file File to read labels from
    */
   OriginalLabel::OriginalLabel(const QString &file){
-    Pvl pvl;
-    stringstream os;
     Blob blob = Blob("IsisCube", "OriginalLabel");
     blob.Read(file);
-    char *buff = blob.getBuffer();
-    for(int i = 0; i < blob.Size(); i++){
-      os << buff[i];
-    }
-    os >> pvl;
-    m_originalLabel = pvl;
+    fromBlob(blob);
   }
 
   /**
@@ -66,37 +54,23 @@ namespace Isis {
   OriginalLabel::~OriginalLabel() {
   }
 
-//  /**
-//   * Prepare labels for writing to the output cube.
-//   */
-//  void OriginalLabel::WriteInit() {
-//    ostringstream ostr;
-//    if(p_nbytes > 0) ostr << std::endl;
-//
-//    // store labels
-//    ostr << m_originalLabel;
-//    string orglblStr = ostr.str();
-//    int bytes = orglblStr.size();
-//
-//    // Copy label data to bytes variable
-//    char *temp = p_buffer;
-//    p_buffer = new char[p_nbytes+bytes];
-//    if(temp != NULL) memcpy(p_buffer, temp, p_nbytes);
-//    const char *ptr = orglblStr.c_str();
-//    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-//    p_nbytes += bytes;
-//
-//    if(temp != NULL) delete [] temp;
-//  }
-
+  void OriginalLabel::fromBlob(Isis::Blob blob) {
+    Pvl pvl;
+    stringstream os;
+    char *buff = blob.getBuffer();
+    for(int i = 0; i < blob.Size(); i++){
+      os << buff[i];
+    }
+    os >> pvl;
+    m_originalLabel = pvl;
+  }
 
   Isis::Blob *OriginalLabel::toBlob() {
     std::stringstream sstream;
     sstream << m_originalLabel;
     string orglblStr = sstream.str();
-
     Isis::Blob *blob = new Blob("IsisCube", "OriginalLabel");
-    blob->setData(orglblStr.data(), orglblStr.length());
+    blob->setData((char*)orglblStr.data(), orglblStr.length());
     return blob;
   }
 
@@ -106,10 +80,6 @@ namespace Isis {
    * @return (Isis::Pvl) original labels
    */
   Pvl OriginalLabel::ReturnLabels() {
-    Pvl pvl;
-    stringstream os;
-    os << m_originalLabel;
-    os >> pvl;
-    return pvl;
+    return m_originalLabel;
   }
 }

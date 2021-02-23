@@ -51,6 +51,7 @@ namespace Isis {
     private:
       // labels of original source
       Pvl m_originalLabel;
+      void fromBlob(Isis::Blob blob);
   };
 };
 
