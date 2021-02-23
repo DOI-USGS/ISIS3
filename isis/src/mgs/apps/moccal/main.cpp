@@ -128,8 +128,6 @@ void IsisMain() {
     cam = icube->camera();
     cam->setTime(startTime);
     sunAU = cam->sunToBodyDist() / kmPerAU;
-
-    std::cout << "from Camera: " << sunAU << std::endl;
   }
   catch(IException &e) {
     // Get the distance between Mars and the Sun at the given time in
@@ -154,8 +152,6 @@ void IsisMain() {
     unload_c(satKernel.toLatin1().data());
     unload_c(pckKernel.toLatin1().data());
     NaifStatus::CheckErrors();
-
-    std::cout << "from spice: " << sunAU << std::endl;
   }
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
