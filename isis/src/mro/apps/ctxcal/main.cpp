@@ -161,11 +161,17 @@ void IsisMain() {
       furnsh_c(pckKernel.toLatin1().data());
       NaifStatus::CheckErrors();
       double sunpos[6], lt;
+
       spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
+      NaifStatus::CheckErrors();
+
       dist1 = vnorm_c(sunpos);
+      
+      NaifStatus::CheckErrors();
       unload_c(bspKernel.toLatin1().data());
       unload_c(satKernel.toLatin1().data());
       unload_c(pckKernel.toLatin1().data());
+      NaifStatus::CheckErrors();
     }
     
     double dist = 2.07E8;
