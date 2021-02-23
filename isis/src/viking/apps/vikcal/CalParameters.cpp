@@ -394,8 +394,8 @@ namespace Isis {
         furnsh_c(tempfname2.toLatin1().data());
         utc2et_c(t.toLatin1().data(), &et);
         spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
-        return sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
         NaifStatus::CheckErrors();
+        return sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
       }
       catch(IException &e) {
         QString msg = "Unable to determine the distance from Mars to the Sun";
