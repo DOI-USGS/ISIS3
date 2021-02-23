@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <bitset>
@@ -32,7 +40,7 @@ void IsisMain() {
     if (minobs < 1) {
       minobs = 1;
     }
-  } 
+  }
   if (ui.WasEntered("MAXOBS")) {
     QString keyval = ui.GetString("MAXOBS");
     maxobs = toInt(keyval);
@@ -91,7 +99,7 @@ void IsisMain() {
   } obuf;
 
   if (!lab.hasObject("SP_SPECTRUM_WAV") || !lab.hasObject("SP_SPECTRUM_QA") ||
-      !lab.hasObject("SP_SPECTRUM_RAD") || !(lab.hasObject("SP_SPECTRUM_REF") || 
+      !lab.hasObject("SP_SPECTRUM_RAD") || !(lab.hasObject("SP_SPECTRUM_REF") ||
       (lab.hasObject("SP_SPECTRUM_REF1") && lab.hasObject("SP_SPECTRUM_REF2")))) {
     QString msg = "Input file [" + inFile.expanded() + "] is not a valid ";
     msg += "Kaguya Spectral Profiler file";
@@ -252,13 +260,13 @@ void IsisMain() {
   }
 
   PvlObject refobj;
-  PvlObject refobj2; 
+  PvlObject refobj2;
   if (lab.hasKeyword("^SP_SPECTRUM_REF")) {
     refobj = lab.findObject("SP_SPECTRUM_REF");
-  } 
+  }
   else {
-    refobj = lab.findObject("SP_SPECTRUM_REF1"); 
-    refobj2 = lab.findObject("SP_SPECTRUM_REF2"); 
+    refobj = lab.findObject("SP_SPECTRUM_REF1");
+    refobj2 = lab.findObject("SP_SPECTRUM_REF2");
   }
 
   int reflines = toInt(refobj.findKeyword("LINES")[0]);
@@ -298,11 +306,11 @@ void IsisMain() {
       ref[j+i*296] = (float)obuf.iword * refscale + refoffset;
     }
   }
-  
+
   //import reflectance 2 if it exists
-  double *ref2 = NULL; 
+  double *ref2 = NULL;
   if (lab.hasKeyword("^SP_SPECTRUM_REF2")) {
-    int reflines2 = toInt(refobj2.findKeyword("LINES")[0]); 
+    int reflines2 = toInt(refobj2.findKeyword("LINES")[0]);
     int refsamps2 = toInt(refobj2.findKeyword("LINE_SAMPLES")[0]);
     QString reftype2 = refobj2.findKeyword("SAMPLE_TYPE");
     int refbits2 = toInt(refobj2.findKeyword("SAMPLE_BITS")[0]);
@@ -357,33 +365,33 @@ void IsisMain() {
   os << "Wavelength";
 
   //If we have a newer-format file with two Reflectances, output both
-  if (ref2 != NULL) { 
+  if (ref2 != NULL) {
     for (int i=minobs; i<=maxobs; i++) {
-      os << "\t" << "Raw" << i << "\t"<< "Rad" << i << "\t" <<"Ref1_" << i << "\t" << "Ref2_" << i 
+      os << "\t" << "Raw" << i << "\t"<< "Rad" << i << "\t" <<"Ref1_" << i << "\t" << "Ref2_" << i
           << "\t" << "QA" << i;
     }
-    os << endl; 
+    os << endl;
 
     for (int j = 0; j < 296; j++) {
       os << wavelength[j];
       for (int i=minobs-1; i<maxobs; i++) {
-        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t" 
+        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t"
             << ref2[j+i*296] << "\t" << (std::bitset<16>) qa[j+i*296];
       }
       os << endl;
      }
-     delete ref2; 
-  } 
+     delete ref2;
+  }
   else {
     for (int i=minobs; i<=maxobs; i++) {
       os << "\t" << "Raw" << i << "\t" << "Rad" << i << "\t" << "Ref" << i << "\t" << "QA" << i;
     }
-    os << endl;    
+    os << endl;
 
     for (int j = 0; j < 296; j++) {
       os << wavelength[j];
       for (int i=minobs-1; i<maxobs; i++) {
-        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t" 
+        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t"
             << (std::bitset<16>) qa[j+i*296];
       }
        os << endl;

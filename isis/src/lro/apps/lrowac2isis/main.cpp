@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cstdio>
@@ -220,9 +228,9 @@ void IsisMain() {
       uveven->putGroup(isis3UvEvenLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    uveven->write(history);
+    uveven->write(*(history.toBlob()));
     uveven->write(origLabel);
 
     uveven->close();
@@ -235,9 +243,9 @@ void IsisMain() {
       uvodd->putGroup(isis3UvOddLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    uvodd->write(history);
+    uvodd->write(*(history.toBlob()));
     uvodd->write(origLabel);
 
     uvodd->close();
@@ -250,9 +258,9 @@ void IsisMain() {
       viseven->putGroup(isis3VisEvenLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    viseven->write(history);
+    viseven->write(*(history.toBlob()));
     viseven->write(origLabel);
 
     viseven->close();
@@ -265,9 +273,9 @@ void IsisMain() {
       visodd->putGroup(isis3VisOddLab.group(grp));
     }
 
-    History history("IsisCube");
+    History history;
     history.AddEntry();
-    visodd->write(history);
+    visodd->write(*(history.toBlob()));
     visodd->write(origLabel);
 
     visodd->close();

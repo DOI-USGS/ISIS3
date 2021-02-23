@@ -12,7 +12,7 @@
     <p>
       The user is given the option to specify incoming <def link="Special Pixels">special pixel</def>
       values in the PDS file so that they can be assigned equivalent values for special pixels
-      in ISIS3. The order of precedence for special pixels in ISIS3 from highest to
+      in ISIS. The order of precedence for special pixels in ISIS from highest to
       lowest priority is the following:
       <blockquote>
       <ol>
@@ -32,7 +32,7 @@
       example, if NULLMIN=0.0, NULLMAX=3.0, LISMIN=3.0, and LISMAX=5.0, the actual
       raw value 3.0 can be assigned as a NULL or LIS, but is translated to NULL because
       NULL has a higher priority than LIS.  The conversion of images from ISIS2 to
-      ISIS3 follows the same rules as PDS images, except that the label information
+      ISIS follows the same rules as PDS images, except that the label information
       is propagated to the output file.
     </p>
     <p>

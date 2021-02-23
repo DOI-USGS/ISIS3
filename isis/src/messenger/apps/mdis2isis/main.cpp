@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // $Id: mdis2isis.cpp 5059 2013-03-11 16:37:00Z slambright@GS.DOI.NET $
 #include "Isis.h"
 
@@ -287,7 +295,7 @@ int CreateFilterSpecs(const QString &instId, int filter_code,
   }
   else if(instId == "MDIS-WAC") {
     //  Set up WAC calibration file
-    FileName calibFile("$messenger/calibration/mdisCalibration????.trn"); 
+    FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
     calibFile = calibFile.highestVersion();
     Pvl config(calibFile.expanded());
 

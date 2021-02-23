@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2010/05/14 19:17:59 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "History.h"
 
 #include <fstream>
@@ -32,24 +16,27 @@
 using namespace std;
 
 namespace Isis {
+  /**
+   *  Default Constructor for history
+   */
+  History::History() {
+    p_history.setTerminator("End");
+   }
 
   /**
-   *  Constructor for reading a history blob
-   *  @param name
+   *  Constructor for reading a blob
+   *  @param blob
    */
-  History::History(const QString &name) : Isis::Blob(name, "History") {
-    p_history.setTerminator("");
-  }
+  History::History(Isis::Blob &blob) {
+    p_history.setTerminator("End");
 
-  /**
-   *  Constructor for reading a history blob
-   *  @param name
-   *  @param file
-   */
-  History::History(const QString &name, const QString &file) :
-    Isis::Blob(name, "History") {
-    Blob::Read(file);
-  }
+    stringstream os;
+    char *blob_buffer = blob.getBuffer();
+    for (int i = 0; i < blob.Size(); i++) {
+      os << blob_buffer[i];
+    }
+    os >> p_history;
+   }
 
   //! Destructor
   History::~History() {
@@ -72,24 +59,21 @@ namespace Isis {
     p_history.addObject(obj);
   }
 
-  /**
-   *
-   */
-  void History::WriteInit() {
+  Blob *History::toBlob(const QString &name) {
     ostringstream ostr;
-    if (p_nbytes > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
-    int bytes = histStr.size();
+    int nbytes = histStr.size();
 
-    char *temp = p_buffer;
-    p_buffer = new char[p_nbytes+bytes];
-    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
-    const char *ptr = histStr.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
+    // Don't worry about cleaning up this buffer
+    // The blob takes ownership of it and handles freeing the memory in
+    // its decontructor
+    char *buffer = new char[nbytes];
+    memcpy(buffer, histStr.c_str(), nbytes);
 
-    if (temp != NULL) delete [] temp;
+    Blob *newBlob = new Blob(name, "History");
+    newBlob->setData(buffer, nbytes);
+    return newBlob;
   }
 
   /**
@@ -98,24 +82,6 @@ namespace Isis {
    * @return @b Pvl
    */
   Pvl History::ReturnHist() {
-    Pvl pvl;
-    stringstream os;
-    for (int i = 0; i < p_nbytes; i++) os << p_buffer[i];
-    os >> pvl;
-    return pvl;
-  }
-
-  /**
-   * Reads input stream into Pvl.
-   *
-   * @param pvl Pvl into which the input stream will be read.
-   * @param is Input stream.
-   */
-  void History::Read(const Isis::Pvl &pvl, std::istream &is) {
-    try {
-      Blob::Read(pvl, is);
-    }
-    catch (IException &e) {
-    }
+    return p_history;
   }
 }

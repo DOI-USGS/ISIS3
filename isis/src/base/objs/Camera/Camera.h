@@ -1,27 +1,11 @@
 #ifndef Camera_h
 #define Camera_h
-/**
- * @file
- * $Revision: 7234 $
- * $Date: 2016-11-12 14:04:38 -0700 (Sat, 12 Nov 2016) $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "Sensor.h"
 
@@ -239,10 +223,10 @@ namespace Isis {
    *                           an error in the original formula, and updated the documention for this
    *                           function.  Fixes #4614.
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
-   *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to 
+   *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to
    *                           prevent a segfault when the distortion map is incomplete. Fixes $5163.
-   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
-   *                           collect the InstrumentId from the original cube label for 
+   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to
+   *                           collect the InstrumentId from the original cube label for
    *                           comparisons related to image imports in ipce. References #5460.
    */
 
@@ -262,8 +246,8 @@ namespace Isis {
       virtual bool SetUniversalGround(const double latitude, const double longitude);
       virtual bool SetUniversalGround(const double latitude, const double longitude,
                                       const double radius);
-      bool SetGround(Latitude latitude, Longitude longitude);
-      bool SetGround(const SurfacePoint & surfacePt);
+      virtual bool SetGround(Latitude latitude, Longitude longitude);
+      virtual bool SetGround(const SurfacePoint & surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
@@ -276,9 +260,9 @@ namespace Isis {
       int ReferenceBand() const;
       bool HasReferenceBand() const;
       virtual void SetBand(const int band);
-      virtual double Sample();
-      int Band();
-      virtual double Line();
+      virtual double Sample() const;
+      int Band() const;
+      virtual double Line() const;
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);
@@ -286,15 +270,15 @@ namespace Isis {
                      double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
-      double PixelResolution();
-      double LineResolution();
-      double SampleResolution();
-      double DetectorResolution();
+      virtual double PixelResolution();
+      virtual double LineResolution();
+      virtual double SampleResolution();
+      virtual double DetectorResolution();
 
-      double ObliqueDetectorResolution();
-      double ObliqueSampleResolution();
-      double ObliqueLineResolution();
-      double ObliquePixelResolution();
+      virtual double ObliqueDetectorResolution();
+      virtual double ObliqueSampleResolution();
+      virtual double ObliqueLineResolution();
+      virtual double ObliquePixelResolution();
 
 
       virtual double resolution();
@@ -331,7 +315,7 @@ namespace Isis {
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
-      
+
       QString instrumentId();
 
       QString instrumentNameLong() const;
@@ -502,7 +486,7 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;      //!< A friend class to calculate focal length
       friend class RadarSlantRangeMap;  //!< A friend class to calculate focal length
-      
+
       QString m_instrumentId;        //!< The InstrumentId as it appears on the cube.
 
       QString m_instrumentNameLong;  //!< Full instrument name
@@ -510,16 +494,21 @@ namespace Isis {
       QString m_spacecraftNameLong;  //!< Full spacecraft name
       QString m_spacecraftNameShort; //!< Shortened spacecraft name
 
+      double p_childSample;                  //!< Sample value for child
+      double p_childLine;                    //!< Line value for child
+      AlphaCube *p_alphaCube;                //!< A pointer to the AlphaCube
+
+      bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed
 
     private:
       void GroundRangeResolution();
       void ringRangeResolution();
       double ComputeAzimuth(const double lat, const double lon);
       bool RawFocalPlanetoImage();
-      // SetImage helper functions: 
-      // bool SetImageNoProjection(const double sample, const double line); 
+      // SetImage helper functions:
+      // bool SetImageNoProjection(const double sample, const double line);
       bool SetImageMapProjection(const double sample, const double line, ShapeModel *shape);
-      bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape); 
+      bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape);
 
 
       double p_focalLength;                  //!< The focal length, in units of millimeters
@@ -538,7 +527,6 @@ namespace Isis {
       /** Flag showing if ground range was computed successfully.*/
       bool p_groundRangeComputed;
 
-      bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed
 
       int p_samples;                         //!< The number of samples in the image
       int p_lines;                           //!< The number of lines in the image
@@ -567,9 +555,7 @@ namespace Isis {
       /** Flag showing if ring range was computed successfully.*/
       bool p_ringRangeComputed;
 
-      AlphaCube *p_alphaCube;                //!< A pointer to the AlphaCube
-      double p_childSample;                  //!< Sample value for child
-      double p_childLine;                    //!< Line value for child
+
       int p_childBand;                       //!< Band value for child
       CameraDistortionMap *p_distortionMap;  //!< A pointer to the DistortionMap
       CameraFocalPlaneMap *p_focalPlaneMap;  //!< A pointer to the FocalPlaneMap

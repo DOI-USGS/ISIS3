@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
@@ -11,7 +19,7 @@ namespace Isis {
    * Constructor
    *
    * Constructs a BundleMeasure from a ControlMeasure with the passed BundleControlPoint as its
-   * parent control point 
+   * parent control point
    *
    * @param controlMeasure Pointer to the ControlMeasure to store
    * @param bundleControlPoint Pointer to the BundleControlPoint that contains this
@@ -51,7 +59,7 @@ namespace Isis {
    *
    * Assigns the state of this BundleMeasure from another BundleMeasure
    *
-   * @param src The source BundleMeasure to assign state from 
+   * @param src The source BundleMeasure to assign state from
    *
    * @return @b BundleMeasure& Returns a reference to this BundleMeasure
    */
@@ -71,7 +79,7 @@ namespace Isis {
   /**
    * Sets the parent bundle observation
    *
-   * @param observation Pointer to the parent BundleObservation  
+   * @param observation Pointer to the parent BundleObservation
    */
   void BundleMeasure::setParentObservation(QSharedPointer<BundleObservation> observation) {
     m_parentObservation = observation;
@@ -81,7 +89,7 @@ namespace Isis {
   /**
    * Sets the parent bundle image
    *
-   * @param image Pointer to the parent BundleImage  
+   * @param image Pointer to the parent BundleImage
    */
   void BundleMeasure::setParentImage(QSharedPointer<BundleImage> image) {
     m_parentBundleImage = image;
@@ -96,7 +104,7 @@ namespace Isis {
    * @see ControlMeasure::SetRejected(bool reject)
    */
   void BundleMeasure::setRejected(bool reject) {
-    m_controlMeasure->SetRejected(reject); 
+    m_controlMeasure->SetRejected(reject);
   }
 
 
@@ -159,7 +167,7 @@ namespace Isis {
    *
    * @return @b const QSharedPointer<BundleObservationSolveSettings> Returns a const pointer to
    *     the BundleObservationSolveSettings for the parent BundleObservation
-   * 
+   *
    * @throws IException::Programmer "In BundleMeasure::observationSolveSettings:
    *                                 parent observation has not been set."
    */
@@ -178,7 +186,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetSample()
    *
-   * @return @b double Returns the sample measurement for this control measure 
+   * @return @b double Returns the sample measurement for this control measure
    */
   double BundleMeasure::sample() const {
     return m_controlMeasure->GetSample();
@@ -202,7 +210,7 @@ namespace Isis {
    *
    * @see ControlMeasure::GetLine()
    *
-   * @return @b double Returns the line measurement for this control measure 
+   * @return @b double Returns the line measurement for this control measure
    */
   double BundleMeasure::line() const {
     return m_controlMeasure->GetLine();
@@ -234,10 +242,10 @@ namespace Isis {
 
 
   /**
-   * Accesses the serial number of the cube containing this control measure 
+   * Accesses the serial number of the cube containing this control measure
    *
    * @see ControlMeasure::GetCubeSerialNumber()
-   * 
+   *
    * @return @b QString Returns the serial number of the cube that contains this control measure
    */
   QString BundleMeasure::cubeSerialNumber() const {
@@ -299,7 +307,7 @@ namespace Isis {
    * @see BundleObservation::index()
    *
    * @return @b int Returns the observation index of the parent observation
-   * 
+   *
    * @throws IException::Programmer "In BundleMeasure::observationIndex:
    *                                 parent observation has not been set."
    */

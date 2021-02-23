@@ -1,26 +1,11 @@
 #ifndef DemShape_h
 #define DemShape_h
-/**
- * @file
- * $Revision: 1.20 $
- * $Date: 2010/03/27 07:04:26 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "ShapeModel.h"
 
@@ -33,9 +18,9 @@ namespace Isis {
   class Projection;
 
   /**
-   * @brief Define shapes and provide utilities for targets stored as Isis3 maps
+   * @brief Define shapes and provide utilities for targets stored as ISIS maps
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an ISIS 3 map
+   * This class will define shapes of ISIS target bodies with the shape defined by an ISIS map
    * fille (level 2 image), as well as provide utilities to retrieve radii and photometric
    * information for the intersection point.
    *
@@ -60,7 +45,7 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp: Removed path of output in
    *                           testDemCube() to allow the test to pass when not using the standard
    *                           data areas. Fixes #4738.
-   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new
    *                            intersectSurface methods in ShapeModel are accessible by DemShape.
    *
    */
@@ -76,7 +61,7 @@ namespace Isis {
       ~DemShape();
 
       // Make parent functions visible
-      using Isis::ShapeModel::intersectSurface; 
+      using Isis::ShapeModel::intersectSurface;
 
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,

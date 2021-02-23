@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QString>
@@ -77,7 +85,7 @@ void IsisMain() {
     }
 
     if (!outputCube->group("Archive").hasKeyword("ObservationId")){
-      convertUniqueIdToObservationId(*outputLabel); 
+      convertUniqueIdToObservationId(*outputLabel);
     }
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
@@ -175,7 +183,7 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
  * Translate the cartographic info from the xml.
  *
  * @param xmlFileName The xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  */
 bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
@@ -207,7 +215,7 @@ bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
  * Translate the Mosaic group info from the xml.
  *
  * @param xmlFileName The xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  */
 bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
@@ -275,11 +283,11 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
 
 
 /**
- * Translate instrument, bandbin, and archive info from xml label into ISIS3
+ * Translate instrument, bandbin, and archive info from xml label into ISIS
  * label and add kernels group.
  *
  * @param inputLabel Reference to the xml label file name for the input image.
- * @param outputCube Pointer to output cube where ISIS3 labels will be added and
+ * @param outputCube Pointer to output cube where ISIS labels will be added and
  *                   updated.
  *
  * @internal
@@ -337,7 +345,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   }
 
   if (outputLabel->hasGroup("StopTime")) {
-    PvlKeyword *stopTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StopTime"]; 
+    PvlKeyword *stopTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StopTime"];
     QString stopTimeString = stopTime[0];
     if (stopTimeString.endsWith("Z", Qt::CaseInsensitive)){
       stopTimeString.chop(1);
@@ -440,7 +448,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
 
   // Add an alpha cube group based on the subwindowing
   if (archive.hasKeyword("Window_Count")) {
-    int windowNumber = (int)archive["Window_Count"] + 1; 
+    int windowNumber = (int)archive["Window_Count"] + 1;
     QString windowString = "Window_" + toString(windowNumber);
     int frameletStartSample = (int) archive[windowString + "_Start_Sample"] + 1;
     int frameletEndSample   = (int) archive[windowString + "_End_Sample"] + 1;

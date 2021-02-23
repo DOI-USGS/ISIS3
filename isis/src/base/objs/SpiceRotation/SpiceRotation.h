@@ -1,27 +1,11 @@
 #ifndef SpiceRotation_h
 #define SpiceRotation_h
-/**
- * @file
- * $Revision: 1.20 $
- * $Date: 2010/03/27 07:04:26 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <string>
 #include <vector>
 
@@ -172,7 +156,7 @@ namespace Isis {
    *                           includes, fixed history indentation and line
    *                           length. References #1181.
    *   @history 2013-03-27 Jeannie Backer - Added methods for MsiCamera. Brought
-   *                           class closer to Isis3 standards: moved method
+   *                           class closer to Isis standards: moved method
    *                           implementation to cpp file, fixed documentation.
    *                           References #1248.
    *   @history 2013-11-12 Ken Edmundson Programmers notes - Commented out cout
@@ -425,7 +409,7 @@ namespace Isis {
 
       int cacheSize() {
         if (m_orientation) {
-          return m_orientation->getRotations().size(); 
+          return m_orientation->getRotations().size();
         }
         return 0;
       }
@@ -444,7 +428,7 @@ namespace Isis {
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
       ale::Orientations *m_orientation; //! Cached orientation information
-                                       
+
     private:
       // method
       void setFrameType();

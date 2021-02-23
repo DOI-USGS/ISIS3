@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // system include files go first
 #include <QString>
 #include <iostream>
@@ -74,9 +82,9 @@ namespace Isis {
 
         // We will be processing by tile.
         ProcessByTile p;
-        
+
         p.SetInputCube(icube);
-        
+
         // Setup the input cube;
         // Obtain information from the input file
         totalSamples = icube->sampleCount();
@@ -84,7 +92,7 @@ namespace Isis {
         totalBands   = icube->bandCount();
 
         channel = icube->group("Instrument")["ChannelNumber"];
-        
+
         // Cubenorm New Version Flag
         bool bNewVersion = ui.GetBoolean("NEW_VERSION");
 
@@ -160,10 +168,10 @@ namespace Isis {
                 }
             }
             }
-            
+
             Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
             FileName outFileName = ui.GetFileName("TO");
-        
+
             // Setup the output file and apply the coefficients by either
             // subtracting or multipling them
             p.SetOutputCube(outFileName.expanded(), atts, totalSamples, totalLines, totalBands);
@@ -176,7 +184,7 @@ namespace Isis {
                 keepSame(totalBands, rowcol, DIVIDE);
             }
             }
-            
+
             // Process based on the mode
             if(ui.GetString("MODE") == "SUBTRACT") {
                 p.StartProcess(subtract);

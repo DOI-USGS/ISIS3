@@ -1,24 +1,24 @@
-# Initial ISIS3 to PDS4 export of ISIS3 BandBin group for PDS4 spectral arrays.
+# Initial ISIS to PDS4 export of ISIS BandBin group for PDS4 spectral arrays.
 #
 # Sections of an example PDS4 output label are included above the relevant translation groups.
 #
 # history 2017-11-06 Kristin Berry  - Original Version.
-# history 2017-11-14 Jeannie Backer - Changed width and center to optional and added other 
-#                        InputKeys to look for. 
-# history 2017-11-15 Kristin Berry  - Updated after more research into requirements. 
-# history 2018-05-11 Jeannie Backer - Added default values for references. 
+# history 2017-11-14 Jeannie Backer - Changed width and center to optional and added other
+#                        InputKeys to look for.
+# history 2017-11-15 Kristin Berry  - Updated after more research into requirements.
+# history 2018-05-11 Jeannie Backer - Added default values for references.
 #                        Combined redundant translations.
 
 
 # The entire Spectral_Characteristics class is optional
- 
+
 #        <sp:Spectral_Characteristics>
 #          <sp:bin_width_desc>
 #             Description
-#    
+#
  Group = BinWidthDescription
   Auto
-  InputDefault      = UNK 
+  InputDefault      = UNK
   OutputName        = sp:bin_width_desc
   OutputPosition    = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics)
   Translation       = (*, *)
@@ -60,7 +60,7 @@ End_Group
 # Needs val from enumeration
 Group = BinSetLocalReferenceType
   Auto
-  InputDefault     = spectral_characteristics_to_array_axis 
+  InputDefault     = spectral_characteristics_to_array_axis
   InputPosition    = (IsisCube, BandBin)
   OutputName       = sp:local_reference_type
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Bin_Set, sp:Local_Internal_Reference)
@@ -147,7 +147,7 @@ Group = BinWidth
 End_Group
 #??? check units
 
-# Optional, see NH LEISA for example of ISIS3 input cube that has this.
+# Optional, see NH LEISA for example of ISIS input cube that has this.
 #Group = OriginalBinNumber
 #  Auto
 #  Optional
@@ -166,7 +166,7 @@ Group = FilterName
   InputKey         = FilterName
   InputKey         = Name
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = sp:filter_name 
+  OutputName       = sp:filter_name
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Bin_Set, sp:Bin, sp:Filter)
   Translation      = (*, *)
 End_Group

@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "NewHorizonsLorriDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -26,15 +14,15 @@ using namespace std;
 namespace Isis {
 
   /**
-   *  
-   * Constructs a Distortion Map object for the New Horizons LORRI Camera. 
-   *  
+   *
+   * Constructs a Distortion Map object for the New Horizons LORRI Camera.
+   *
    * @param parent Pointer to parent Camera object
    * @param e2
    * @param e2
    * @param e2
    * @param zDirection passed on to the parrent
-   * 
+   *
    * @internal
    *   @history 2014-06-15 Stuart Sides - Original version
    */
@@ -50,9 +38,9 @@ namespace Isis {
   /**
    * Compute undistorted focal plane x/y
    *
-   * Compute undistorted focal plane x/y given a distorted focal plane x/y. After calling this 
-   * method, you can obtain the undistorted x/y via the UndistortedFocalPlaneX and 
-   * UndistortedFocalPlaneY methods 
+   * Compute undistorted focal plane x/y given a distorted focal plane x/y. After calling this
+   * method, you can obtain the undistorted x/y via the UndistortedFocalPlaneX and
+   * UndistortedFocalPlaneY methods
    *
    * @param dx Distorted focal plane x, in millimeters
    * @param dy Distorted focal plane y, in millimeters
@@ -81,7 +69,7 @@ namespace Isis {
     // NOTE: The discussions showed the Ky and e5 values needed to be negated. The e5 value has
     // now been negated in the LORRI IK, and the y is now negated in the equation below.
     // NOTE: The Y and Line values can not be negated in the transY and transL affines because
-    // this would cause the p_xxxxx class member variables to be in a flipped (top to bottom) 
+    // this would cause the p_xxxxx class member variables to be in a flipped (top to bottom)
     // coordinate system relative to the SPICE defined focal plane coordinate system.
     double dr = 1.0 - rr * p_e2 - y * p_e5 - x * p_e6;
 

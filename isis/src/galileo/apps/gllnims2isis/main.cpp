@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 //ISIS libraries
@@ -240,7 +248,7 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
   importPds.SetSuffixOffset(importPds.Samples(),importPds.Lines(),g_coreBands,g_coreItemBytes);
   g_suffixCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
-  importPds.StartProcess(); 
+  importPds.StartProcess();
   translateNIMSLabels(*pdsLabel,g_suffixCube,inFile,SUFFIX);
   importPds.EndProcess();
 
@@ -256,13 +264,13 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
   mappingInfo += Isis::PvlKeyword("MinimumLatitude");
   mappingInfo += Isis::PvlKeyword("MaximumLatitude");
   mappingInfo += Isis::PvlKeyword("MinimumLongitude");
-  mappingInfo += Isis::PvlKeyword("MaximumLongitude"); 
+  mappingInfo += Isis::PvlKeyword("MaximumLongitude");
   mappingInfo += Isis::PvlKeyword("MapProjectionType");
-  mappingInfo += Isis::PvlKeyword("MapScale"); 
-  mappingInfo += Isis::PvlKeyword("MapProjectionRotation"); 
-  mappingInfo += Isis::PvlKeyword("MajorEquatorialRadius"); 
-  mappingInfo += Isis::PvlKeyword("MinorEquatorialRadius"); 
-  mappingInfo += Isis::PvlKeyword("PolarRadius"); 
+  mappingInfo += Isis::PvlKeyword("MapScale");
+  mappingInfo += Isis::PvlKeyword("MapProjectionRotation");
+  mappingInfo += Isis::PvlKeyword("MajorEquatorialRadius");
+  mappingInfo += Isis::PvlKeyword("MinorEquatorialRadius");
+  mappingInfo += Isis::PvlKeyword("PolarRadius");
 
   if (originalMappingGroup["COORDINATE_SYSTEM_NAME"][0] == "PLANETOCENTRIC") {
     mappingInfo["LatitudeType"] = "Planetocentric";
@@ -314,7 +322,7 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
   coreCube.close();
   suffixCube.close();
 
-// Mapping group code -- keep in case we can use this in the future. 
+// Mapping group code -- keep in case we can use this in the future.
 
 #if 0
   // Reopen the cubes in order to fix the mapping group
@@ -412,7 +420,7 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
 
   coreCube.close();
   suffixCube.close();
-#endif 
+#endif
 }
 
 
@@ -593,4 +601,3 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
   importPds.SetBase(base);
   nimsCube->putGroup(bandBin);
 }
-

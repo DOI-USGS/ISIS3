@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
@@ -26,7 +34,7 @@ void hicolormos(UserInterface &ui) {
   if (ui.WasEntered("FROM2")) {
     Cube from2(ui.GetFileName("FROM2"), "r");
     hicolormos(&from1, &from2, ui);
-  } 
+  }
   else {
     hicolormos(&from1, nullptr, ui);
   }
@@ -50,9 +58,9 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   // Prep for second image if we have one
   Pvl from2lab;
   PvlGroup from2Mosaic("Mosaic");
-  
+
   if (from2) {
-    from2lab = *from2->label(); 
+    from2lab = *from2->label();
     tf.PutLine(from2->fileName() + "\n");
 
     // Test the observation ID between from1 and from2
@@ -64,12 +72,12 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
 
     from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
   }
-  
+
   tf.Close();  // Close list remember to delete
 
   // Make the source product ID (from1 mosaic group)
   PvlKeyword sourceProductId = from1Mosaic["SourceProductId"];
-  
+
   if(from2) {
     // Add source product Id for from2
     PvlKeyword from2SPI =  from2Mosaic["SourceProductId"];

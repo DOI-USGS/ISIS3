@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ControlPointV0001.h"
 
 #include <QString>
@@ -36,7 +44,7 @@ namespace Isis {
    * Create a ControlPointV0001 object from a version 1 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
-   * @param targetName The name of the target 
+   * @param targetName The name of the target
    */
   ControlPointV0001::ControlPointV0001(PvlObject &pointObject, const QString targetName)
       : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),

@@ -18,7 +18,7 @@
       string.
     </p>
     <p>
-      New version of Isis 3 are capable of resolving this date string and
+      New version of Isis are capable of resolving this date string and
       grabbing the latest PCK from the data area.  In an effort to support
       legacy versions of Isis 3, this program adds Selection groups for the
       direct paths to the latest PCK files, and is called by the makedb script

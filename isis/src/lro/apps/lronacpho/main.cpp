@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <string>
@@ -23,14 +31,14 @@ void phoCalWithBackplane (std::vector<Isis::Buffer *> &in, std::vector<Isis::Buf
  *
  * @brief Photometric application for the LRO NAC cameras
  *
- * This application provides featurs that allow multiband cubes for LRO NAC cameras 
+ * This application provides featurs that allow multiband cubes for LRO NAC cameras
  *   to be photometrically corrected
- *   
- * @author 2016-09-16 Victor Silva   
- *      
+ *
+ * @author 2016-09-16 Victor Silva
+ *
  * @internal
  *   @history 2016-09-19 Victor silva - Adapted from lrowacpho written by Kris Becker
- * 
+ *
  */
 void IsisMain (){
   // Isis Processing by line

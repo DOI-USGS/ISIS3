@@ -113,14 +113,9 @@ void IsisMain() {
   o.addGroup(mapGrp);
 
   // keep track of change to labels in history
-  History hist = History("IsisCube");
-  try {
-    cube.read(hist);
-  }
-  catch(IException &e) {
-  }
+  History hist = cube.readHistory();
   hist.AddEntry();
-  cube.write(hist);
+  cube.write(*(hist.toBlob()));
 
   cube.close();
 }

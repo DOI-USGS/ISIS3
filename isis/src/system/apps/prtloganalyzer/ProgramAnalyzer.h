@@ -1,27 +1,14 @@
 #ifndef ProgramAnalyzer_h
 #define ProgramAnalyzer_h
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2008/09/06 06:47:48 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <string>
 #include <vector>
@@ -37,14 +24,14 @@
 namespace Isis {
 
   /**
-   * @brief A ProgramAnalyzer accumulates print log runtime statistics 
-   *  
-   * This class reads an ISIS3 print log and accumulates runtime statistics for 
-   * all programs found in the log file.  It will compute overall CPU and 
+   * @brief A ProgramAnalyzer accumulates print log runtime statistics
+   *
+   * This class reads an ISIS print log and accumulates runtime statistics for 
+   * all programs found in the log file.  It will compute overall CPU and
    * connect time to use in analysis of (typically I/O) performance.
-   *  
-   * Various format and reporting utilities are provided to externalize the 
-   * results. 
+   *
+   * Various format and reporting utilities are provided to externalize the
+   * results.
    *
    * @ingroup Utility
    * @author 2006-11-09 Kris Becker
@@ -105,7 +92,7 @@ namespace Isis {
         Statistics  cputime;
         Statistics  iotime;
         RunTimeStats() : pname(""), contime(), cputime(), iotime() { }
-        RunTimeStats(const QString &name) : pname(name), contime(), 
+        RunTimeStats(const QString &name) : pname(name), contime(),
                                                 cputime(), iotime() { }
       };
 
@@ -119,7 +106,7 @@ namespace Isis {
         QString to;
         double      cpuTime;
         double      connectTime;
-        ProgramData() : status(BADDATA), name(""), runtime(""), 
+        ProgramData() : status(BADDATA), name(""), runtime(""),
                         from(""), to(""), cpuTime(0.0), connectTime(0.0) { }
       };
 
@@ -137,7 +124,7 @@ namespace Isis {
 
       void init();
       int getCount (Status status) const;
-      QString getKey(PvlObject &obj, const QString &key, 
+      QString getKey(PvlObject &obj, const QString &key,
                          const QString &grp = "") const;
 
       /** Find a string in a PvlContainer */
@@ -162,5 +149,3 @@ namespace Isis {
 
 
 #endif
-
-

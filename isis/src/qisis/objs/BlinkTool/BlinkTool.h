@@ -1,6 +1,14 @@
 #ifndef BlinkTool_h
 #define BlinkTool_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // This is the only include allowed in this file!
 #include "Tool.h"
 
@@ -42,7 +50,7 @@ namespace Isis {
       QString menuName() const {
         return "&Options";
       };
-    
+
     protected:
       void updateTool();
       bool eventFilter(QObject *o, QEvent *e);
@@ -68,4 +76,3 @@ namespace Isis {
 };
 
 #endif
-

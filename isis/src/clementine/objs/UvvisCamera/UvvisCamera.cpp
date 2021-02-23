@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "UvvisCamera.h"
 
@@ -36,10 +24,10 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs a Clementine UV/VIS Model using the image labels.
-   *  
-   * @param lab Pvl label from a Clementine UVVIS image. 
-   *  
-   * @internal 
+   *
+   * @param lab Pvl label from a Clementine UVVIS image.
+   *
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.  Added
    *                          call to ShutterOpenCloseTimes() method.
    */
@@ -48,7 +36,7 @@ namespace Isis {
     m_instrumentNameShort = "UVVIS";
     m_spacecraftNameLong = "Clementine 1";
     m_spacecraftNameShort = "Clementine1";
-    
+
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     SetFocalLength();
@@ -74,9 +62,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
 
     QString ppKey("INS" + toString(naifIkCode()) + "_PP");
@@ -84,7 +72,7 @@ namespace Isis {
     QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
 
     // Setup distortion map
-    new ClementineUvvisDistortionMap(this, 
+    new ClementineUvvisDistortionMap(this,
                                     getDouble(ppKey, 0), getDouble(ppKey, 1),
                                     getDouble(odKey, 0), getDouble(odKey, 1), getDouble(odKey, 2),
                                     getDouble(decenterKey, 0), getDouble(decenterKey, 1));
@@ -137,7 +125,7 @@ namespace Isis {
  * @param lab Cube labels
  *
  * @return Isis::Camera* UvvisCamera
- * @internal 
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Clementine namespace.
  */

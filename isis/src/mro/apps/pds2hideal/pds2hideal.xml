@@ -2,13 +2,13 @@
 
 <application name="pds2hideal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-      Reimport an exported hirise PDS product to an Isis 3 Ideal camera.
+      Reimport an exported hirise PDS product to an Isis Ideal camera.
   </brief>
 
   <description>
     <pre>
        The purpose oof this program is to re-import exported HiRISE Ideal camera cubes
-       into Isis3. The input label for this program should be a PDS label containing the 
+       into Isis. The input label for this program should be a PDS label containing the
        location of the exported image and table files.
 
        This application requires the following files:
@@ -27,7 +27,7 @@
 
   <category>
     <missionItem>Mars Reconnaissance Orbiter</missionItem>
-  </category>  
+  </category>
 
   <history>
     <change name="Jeannie Backer" date="2012-11-21">
@@ -40,11 +40,11 @@
       <parameter name="FROM">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <brief> 
+        <brief>
           Input file containing the PDS label.
         </brief>
         <description>
-          Name of the file containing the labels of the input PDS image. 
+          Name of the file containing the labels of the input PDS image.
         </description>
         <filter>
           *.img *.lbl
@@ -55,11 +55,11 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Name of the output file to contain the imported Isis3 cube.
+          Name of the output file to contain the imported Isis cube.
         </brief>
         <description>
           The name of the output file.  This file will contain the imported
-          Isis3 HiRISE Ideal cube and the related Spice Tables. 
+          Isis HiRISE Ideal cube and the related Spice Tables.
         </description>
         <pixelType>signedWord</pixelType>
         <filter>
@@ -71,20 +71,20 @@
         <type>string</type>
         <brief>
           String containing the location of the ShapeModel file of the original
-          Isis3 cube that was exported to PDS.
+          Isis cube that was exported to PDS.
         </brief>
         <description>
           This parameter should contain the directory path of the ShapeModel
-          file. This path will be added to the ShapeModel keyword in the 
+          file. This path will be added to the ShapeModel keyword in the
           Kernels Group of the output cube. It should be the same path as shown
-          in the original Isis3 cube before it was exported to the PDS product.
+          in the original Isis cube before it was exported to the PDS product.
         </description>
         <default>
           <item>
             $base/dems/
           </item>
         </default>
-      </parameter>    
+      </parameter>
       </group>
   </groups>
 

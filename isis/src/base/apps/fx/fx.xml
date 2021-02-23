@@ -7,30 +7,30 @@
 
   <description>
     <p>
-    Fx allows general arithmetic operations to be performed on an arbitrary 
+    Fx allows general arithmetic operations to be performed on an arbitrary
     number of input cubes.  Fx loads whatever input files are specified, applies
-    a user defined equation to those files and writes the results to an output 
-    file.  The input file can be a single band or multiple band cube file. If the 
-    band number is not specified for the multiple band cube file, then the 
+    a user defined equation to those files and writes the results to an output
+    file.  The input file can be a single band or multiple band cube file. If the
+    band number is not specified for the multiple band cube file, then the
     equation is applied to all the bands within the file.
     </p>
-    <p>    
-    Five files or fewer can be entered for parameters F1 to F5 under the "Input 
+    <p>
+    Five files or fewer can be entered for parameters F1 to F5 under the "Input
     Cube Files" section to specify the input data.  A second method to specify
-    data is to include an arbitrary number of 
-    files in a file list and enter the list name in the fromlist parameter that 
-    is only visible upon selecting the MODE list located under "File I/O Mode." 
-    If the user selects "OUPUTONLY" under "File I/O Mode" then an output file is 
+    data is to include an arbitrary number of
+    files in a file list and enter the list name in the fromlist parameter that
+    is only visible upon selecting the MODE list located under "File I/O Mode."
+    If the user selects "OUPUTONLY" under "File I/O Mode" then an output file is
     created based on an equation provided by the user.  The user will also need
     to specify the number of lines, samples, and bands of the output file.
     </p>
     <p>
-      The command line parsing has been improved to handle escape sequences and 
-      support arrays better.  The equation parser is case insensitive, ignores 
-      whitespace, and converts all braces to parentheses.  Parameter values, 
+      The command line parsing has been improved to handle escape sequences and
+      support arrays better.  The equation parser is case insensitive, ignores
+      whitespace, and converts all braces to parentheses.  Parameter values,
       when quoted, no longer need the quotes escaped.
     </p>
-    
+
     <blockquote>
      <small>
       <p>
@@ -40,28 +40,28 @@
       <p>
 	TCSH/BASH <br />
 	Before: crop from=\"some file.cub\" to=\"output file.cub\"<br />
-	Now: crop from="some file.cub" to="output file.cub"<br /> 
+	Now: crop from="some file.cub" to="output file.cub"<br />
       </p>
 
       <p>
-	Please note that the dollar sign ($) still requires a backslash for batchlist 
-	variables.  Array values, for programs such as <i>spiceinit</i>, will be the same. 
+	Please note that the dollar sign ($) still requires a backslash for batchlist
+	variables.  Array values, for programs such as <i>spiceinit</i>, will be the same.
       </p>
 
       <p>
-	TCSH<br />  
-	Before: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br /> 
-	Now: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br /> 
+	TCSH<br />
+	Before: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br />
+	Now: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br />
       </p>
 
       <p>
 	BASH<br />
-	Before: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br /> 
-	Now: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br /> 
+	Before: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br />
+	Now: spiceinit from=input.cub ck='(file1.bc,file2.bc)'<br />
       </p>
 
-      <p>   
-	An escape character "\" has been added to differentiate a first parenthesis 
+      <p>
+	An escape character "\" has been added to differentiate a first parenthesis
 	from the beginning of an array sequence.
       </p>
 
@@ -78,43 +78,43 @@
 	</p>
 
       <p>
-	The equation string entered within a GUI interface may not work if the 
-	entire string is copied, pasted, and executed at the command line. If the first 
-	character in the equation is a "(" then it must be prefixed by a "\" 
+	The equation string entered within a GUI interface may not work if the
+	entire string is copied, pasted, and executed at the command line. If the first
+	character in the equation is a "(" then it must be prefixed by a "\"
 	when executing as a command line, but the remaining parentheses do not
 	need to be prefixed with a backslash.
       </p>
 
       <p>
-	Example: 
+	Example:
       </p>
 
       <p>
-	This equation string works inside the fx GUI:<br /> 
-	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub 
-	equation=(f1*(f1>.004)) 
+	This equation string works inside the fx GUI:<br />
+	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub
+	equation=(f1*(f1>.004))
       </p>
 
       <p>
 	These equation strings fail on the command line: <br />
-	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub 
+	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub
 	equation=(f1*(f1>.004)) <br />
 	<br/>
-	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub 
-	equation="(f1*(f1>.004))" 
+	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub
+	equation="(f1*(f1>.004))"
       </p>
 
       <p>
 	This equation string works on the command line: <br />
-	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub 
-	equation="\(f1*(f1>.004))"<br /> 
+	fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub
+	equation="\(f1*(f1>.004))"<br />
       </p>
-     
+
       <p>
-        <b>Note:</b> The use of negative numbers within an equation could cause 
-	problems in the latest version of ISIS 3.  The "--" or "neg" operators are 
-	specifically designed to handle negative numbers within an equation. If an 
-	equation includes a negative number, prefix the value with a "--" instead 
+        <b>Note:</b> The use of negative numbers within an equation could cause
+	problems in the latest version of ISIS.  The "--" or "neg" operators are
+	specifically designed to handle negative numbers within an equation. If an
+	equation includes a negative number, prefix the value with a "--" instead
 	of "-" in the equation.
 	<br/><br/>
 	Example:<br/><br/>
@@ -124,8 +124,8 @@
       </p>
 
       <p>
-	For additional information see <b>Command Line Usage</b> under the User 
-	Documentation web pages for ISIS 3.<br />
+	For additional information see <b>Command Line Usage</b> under the User
+	Documentation web pages for ISIS.<br />
 
 	Note: Some instructions may be outdated.
       </p>
@@ -134,28 +134,28 @@
 
     <p>
       The equation parser is case insensitive and all braces, such as
-      "[{[{ }]}]" are converted to parentheses "(((( ))))" first.  Whitespace 
-      is ignored.  Currently, you must explicitly state all multiplication 
-      operations (e.g. 2pi will not work, but 2*pi will).  The modulus (%), 
-      AND, and OR operators are not implemented yet.  Functions 
+      "[{[{ }]}]" are converted to parentheses "(((( ))))" first.  Whitespace
+      is ignored.  Currently, you must explicitly state all multiplication
+      operations (e.g. 2pi will not work, but 2*pi will).  The modulus (%),
+      AND, and OR operators are not implemented yet.  Functions
       such as pha, ina, ema, lat, lon, radius, and resolution require a
       <def>Level1</def> input file with <def>SPICE</def> information in the
-      image labels.  That is, the program <i>spiceinit</i> should be executed on the 
-      input files before using these functions.  For <def>Level2</def> images, 
-      the backplanes containing the photometric and spatial information must be 
-      present.  This is normally performed with the program <i>phocube</i> 
+      image labels.  That is, the program <i>spiceinit</i> should be executed on the
+      input files before using these functions.  For <def>Level2</def> images,
+      the backplanes containing the photometric and spatial information must be
+      present.  This is normally performed with the program <i>phocube</i>
       before the image is projected to a <def>map projection</def>.
     </p>
 
     <p>
       <b>Requirements and result of operators</b>
        <br /><br />
-      The following operators return a "0" or "1" DN value when they are used 
-      in the equations: 
+      The following operators return a "0" or "1" DN value when they are used
+      in the equations:
     </p>
     <p>
      <blockquote>
-       &lt; , &gt;, &lt;=, &gt;=, ==, != 
+       &lt; , &gt;, &lt;=, &gt;=, ==, !=
      </blockquote>
     </p>
     <p>
@@ -167,31 +167,31 @@
        &lt;&lt;, &gt;&gt;  <br /><br />
        Example: <br />
        <blockquote>
-         Some pixels are set to NULL depending on whether the left or right pixel 
-	 shift operation is used. For example, the left image below is the input file, 
-	 and the right image is the result of "equation = f1 &lt;&lt; 10", which shows a 
+         Some pixels are set to NULL depending on whether the left or right pixel
+	 shift operation is used. For example, the left image below is the input file,
+	 and the right image is the result of "equation = f1 &lt;&lt; 10", which shows a
 	 10 pixel shift to the left. <br />
-	 <br/> 
+	 <br/>
 	 Sample 1 line 1 of the left image maps outside the image area of the right image; therefore,
-	 sample 11 line 1 of the left image maps to sample 1 line 1 of the right image, and 
-         sample 12 line 1 of the left image maps to sample 2 line 1 of the right image.  The 
+	 sample 11 line 1 of the left image maps to sample 1 line 1 of the right image, and
+         sample 12 line 1 of the left image maps to sample 2 line 1 of the right image.  The
 	 remaining pixels that do not have an assigned pixel value are set to NULL.
          <br />
 	 <br />
-	 
+
       <img src="assets/image/fx_left_10_pixel_shift_example.png" alt="Left shift" width="487" height="285" />
          <br />
        </blockquote>
      </blockquote>
-     
+
     </p>
     <p>
-      The following operators use the input image statistics to apply the 
-      equations: 
+      The following operators use the input image statistics to apply the
+      equations:
     </p>
     <p>
      <blockquote>
-       linemin, linemax, cubemin, cubemax, cubeavg, cubestd 
+       linemin, linemax, cubemin, cubemax, cubeavg, cubestd
      </blockquote>
     </p>
     <p>
@@ -201,40 +201,40 @@
     </p>
     <p>
      <blockquote>
-       min, max 
+       min, max
      </blockquote>
     </p>
     <p>
       In order to use the camera operators, images must be processed through <i>
-      spiceinit</i> so that the NAIF camera model information is stored in the image 
+      spiceinit</i> so that the NAIF camera model information is stored in the image
       labels. <b>These operators calculate values on a band-by-band basis so that band-dependent
       images have correctly calculated camera-related values</b>.
     </p>
     <p>
      <blockquote>
        pha, phal, phac, ina, inal, inac, ema, emal, emac <br />
-       lat, lon, radius, resolution 
+       lat, lon, radius, resolution
      </blockquote>
      </p>
     <p>
-      The following operators are used to convert between degrees and radians: 
+      The following operators are used to convert between degrees and radians:
     </p>
     <p>
      <blockquote>
-       rads, degs 
+       rads, degs
      </blockquote>
     </p>
     <br />
     <p>
-      <b>All trigonometric functions expect angles in radians, not degrees.  
-      However, all camera functions return angles in degrees and therefore should 
+      <b>All trigonometric functions expect angles in radians, not degrees.
+      However, all camera functions return angles in degrees and therefore should
       be converted to radians. </b>
     </p>
     <br />
     <p>
       The following table shows all currently supported scalars and special tokens:
     </p>
-    
+
     <table border = "1">
       <tr>
         <td colspan="3" align="center" valign="middle"><b>SCALARS</b></td>
@@ -281,13 +281,13 @@
       </tr>
     </table>
     <br />
-    
+
     <p>
-      The following table shows all currently supported operators sorted 
-      by precedence (0 = highest precedence). All examples are valid 
-      equations that assume one or more files (F1, F2, etc.) are loaded: 
-    </p>  
-    
+      The following table shows all currently supported operators sorted
+      by precedence (0 = highest precedence). All examples are valid
+      equations that assume one or more files (F1, F2, etc.) are loaded:
+    </p>
+
     <table border = "1">
       <tr>
         <td colspan="4" align="center" valign="middle"><b>OPERATORS</b></td>
@@ -303,176 +303,176 @@
         <td>{ [ ( ) ] }</td>
         <td>Parentheses, brackets, or braces</td>
         <td>f2*(f1+[30-{line/pi}])</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>-- or neg</td>
         <td>Negative sign</td>
         <td>--f1 + f2 or neg(f1) + f2</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>abs</td>
         <td>Absolute value</td>
         <td>abs(f2 - f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>min</td>
         <td>Minimum of two DNs</td>
         <td>f1 + min(5, f2) + min(f2, f3)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>max</td>
         <td>Maximum of two DNs</td>
         <td>20 * max(f1,f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>linemin</td>
         <td>Minimum of DNs on the current line</td>
         <td>f1 + linemin(f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>linemax</td>
         <td>Maximum of DNs on the current line</td>
         <td>f1 + linemax(f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cubemin</td>
         <td>Minimum of a cube</td>
         <td>f1 + cubemin(f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cubemax</td>
         <td>Maximum of a cube</td>
         <td>f1 + cubemax(f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cubeavg</td>
         <td>Average of a cube</td>
         <td>f1 / cubeavg(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cubestd</td>
         <td>Standard deviation of a cube</td>
         <td>f1 * (abs(f1-cubeavg(f1)) &lt; 2*cubestd(f1))</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>sin</td>
         <td>Sine</td>
         <td>f1 * sin(123/321)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cos</td>
         <td>Cosine</td>
         <td>cos(.02*50)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>tan</td>
         <td>Tangent</td>
         <td>tan(f1/f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>csc</td>
         <td>Cosecant</td>
         <td>12.3 + csc(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>sec</td>
         <td>Secant</td>
         <td>sin(pi/60) + (sec(f2))^2</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cot</td>
         <td>Cotangent</td>
         <td>line + cot(f1) - 42</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>asin</td>
         <td>Arcsine</td>
         <td>0.006 ^ asin(f1*5)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>acos</td>
         <td>Arccosine</td>
         <td>acos(1/[2*pi])</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>atan</td>
         <td>Arctangent</td>
         <td>atan(f1/e)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>atan2</td>
         <td>Arctangent2</td>
         <td>atan2(--10  5.5)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>sinh</td>
         <td>Hyperbolic sine</td>
         <td>55 + sinh(f2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>cosh</td>
         <td>Hyperbolic cosine</td>
         <td>cosh(sample^pi)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>tanh</td>
         <td>Hyperbolic tangent</td>
         <td>tanh(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>log or ln</td>
         <td>Natural log</td>
         <td>ln(abs(1/[f2-f1]))</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>log10</td>
         <td>Log base 10</td>
         <td>99 + log10(f1-160)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>sqrt</td>
         <td>Square root</td>
         <td>sqrt(abs[1000 - f2])</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>1</td>
         <td>pha</td>
         <td><def>Phase angle</def> on the ellipsoid</td>
         <td>pha(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>ina</td>
         <td><def>Incidence angle</def> on the ellipsoid</td>
         <td>ina(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>ema</td>
@@ -485,32 +485,32 @@
         <td>phal</td>
         <td>Local phase angle on DTM</td>
         <td>phal(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>inal</td>
         <td><def>Local incidence angle</def> on DTM</td>
         <td>inal(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>emal</td>
         <td><def>Local emission angle</def> on DTM</td>
         <td>emal(f1)</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>1</td>
         <td>phac</td>
         <td><def>Phase angle</def> on the ellipsoid at image center</td>
         <td>phac(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>inac</td>
         <td><def>Incidence angle</def> on the ellipsoid at image center</td>
         <td>inac(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>emac</td>
@@ -523,40 +523,40 @@
         <td>rads</td>
         <td>Convert degrees to radians</td>
         <td>f1 / cos(rads(pha(f1)))</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>1</td>
         <td>degs</td>
         <td>Convert radians to degrees</td>
         <td>degs(acos(f1))</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>1</td>
         <td>lat</td>
         <td><def>Latitude</def></td>
         <td>lat(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>lon</td>
         <td><def>Longitude</def></td>
         <td>lon(f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>1</td>
         <td>radius</td>
         <td><def>Radius</def> of DTM in meters</td>
         <td>radius(f1)</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>1</td>
         <td>res</td>
         <td><def>Pixel resolution</def> in meters</td>
         <td>res(f1)</td>
-      </tr>   
+      </tr>
 
 
       <tr>
@@ -564,82 +564,82 @@
         <td>^</td>
         <td>Exponent</td>
         <td>f1 ^ 3</td>
-      </tr>   
+      </tr>
       <tr>
         <td>3</td>
         <td>*</td>
         <td>Multiplication</td>
         <td>10 * f1</td>
-      </tr>   
+      </tr>
       <tr>
         <td>3</td>
         <td>/</td>
         <td>Division</td>
         <td>f2 / f1</td>
-      </tr>   
+      </tr>
 
       <tr>
         <td>4</td>
         <td>&lt;&lt;</td>
         <td>Left shift <b><i>(Note: pixel shift, not bitwise)</i></b></td>
         <td>f1 &lt;&lt; 250</td>
-      </tr>   
+      </tr>
       <tr>
         <td>4</td>
         <td>>></td>
         <td>Right shift <b><i>(Note: pixel shift, not bitwise)</i></b></td>
         <td>f2 + (f1 >> 500)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>5</td>
         <td>+</td>
         <td>Addition</td>
         <td>123 + 0.004 + f1</td>
-      </tr>   
+      </tr>
       <tr>
         <td>5</td>
         <td>-</td>
         <td>Subtraction</td>
         <td>10 - (--f1)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>></td>
         <td>Greater than <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 > f2</td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>&lt;</td>
         <td>Less than <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 * (f1 &lt; cubeavg(f1)) </td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>&lt;=</td>
         <td>Less than or equal <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 &lt;= 0.505</td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>>=</td>
         <td>Greater than or equal <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 * (f1 >= 101)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>==</td>
         <td>Equal to <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 == (f2/2)</td>
-      </tr>   
+      </tr>
       <tr>
         <td>6</td>
         <td>!=</td>
         <td>Not equal to <b><i>(Note: result is 0 or 1)</i></b></td>
         <td>f1 != f2</td>
-      </tr>   
-      </table>  
-    
+      </tr>
+      </table>
+
   </description>
 
   <category>
@@ -703,14 +703,14 @@
     </change>
   </history>
 
-  <groups>     
+  <groups>
     <group name = "Files">
       <parameter name = "F1">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>Input filename</brief>
         <description>
-          Input ISIS 3 cube filename.
+          Input ISIS cube filename.
         </description>
         <filter>
           *.cub
@@ -723,7 +723,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS 3 cube filename.
+          Input ISIS cube filename.
         </description>
         <filter>
           *.cub
@@ -736,7 +736,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS 3 cube filename.
+          Input ISIS cube filename.
         </description>
         <filter>
           *.cub
@@ -749,7 +749,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS 3 cube filename.
+          Input ISIS cube filename.
         </description>
         <filter>
           *.cub
@@ -762,7 +762,7 @@
         <internalDefault>None</internalDefault>
         <brief>Input filename</brief>
         <description>
-          Input ISIS 3 cube filename.
+          Input ISIS cube filename.
         </description>
         <filter>
           *.cub
@@ -784,14 +784,14 @@
        </filter>
       </parameter>
     </group>
- 
+
     <group name = "File list">
       <parameter name = "FROMLIST">
      	<type>filename</type>
      	<fileMode>input</fileMode>
      	<brief>Input list filename</brief>
      	<description>
-     	  This file contains a list of all the cube files to be processed.   
+     	  This file contains a list of all the cube files to be processed.
           Each file will be assigned F1 to F##(number of images in the input list).
      	</description>
      	<filter>
@@ -805,7 +805,7 @@
         <type>string</type>
         <brief>Image processing equation</brief>
         <description>
-          This equation will be parsed and used to perform the specified 
+          This equation will be parsed and used to perform the specified
 	  calculations.
         </description>
       </parameter>
@@ -817,8 +817,8 @@
         <default><item>CUBES</item></default>
         <brief>File I/O options</brief>
         <description>
-          Select one of the following options: <i>CUBES</i> to input cubes directly, 
-	  <i>LIST</i> to enter a text file containing a list of filenames, 
+          Select one of the following options: <i>CUBES</i> to input cubes directly,
+	  <i>LIST</i> to enter a text file containing a list of filenames,
 	  or <i>OUTPUTONLY</i> to create output data only.
         </description>
         <list>
@@ -834,7 +834,7 @@
               <item>BANDS</item>
             </exclusions>
           </option>
-          
+
           <option value = "LIST">
             <brief>Specify a list of input files</brief>
             <description>
@@ -851,7 +851,7 @@
               <item>BANDS</item>
             </exclusions>
           </option>
-        
+
           <option value = "OUTPUTONLY">
             <brief>Write output only</brief>
             <description>
@@ -902,18 +902,18 @@
       </parameter>
     </group>
 
-    
+
   </groups>
 
   <examples>
     <example>
       <brief>Add two images</brief>
       <description>
-        In this example, two images with the same filename but have two different bands 
+        In this example, two images with the same filename but have two different bands
 	will be added to each other.
       </description>
       <terminalInterface>
-        <commandLine> 
+        <commandLine>
           f1=../isisTruth.cub+1 f2=../isisTruth.cub+2 to=../result.cub equation=f1+ f2
         </commandLine>
         <description>
@@ -924,8 +924,8 @@
         <guiInterface>
           <image width="500" height="500" src="assets/image/fxgui.jpg">
             <brief>Example GUI</brief>
-            <description>Screenshot of GUI with parameters filled in to perform a 
-	      calculation on the input image. 
+            <description>Screenshot of GUI with parameters filled in to perform a
+	      calculation on the input image.
 	    </description>
             <thumbnail width="200" height="246" caption="fx GUI" src="assets/thumb/fxgui.jpg" />
           </image>
@@ -966,7 +966,7 @@
     <example>
       <brief>Create output only </brief>
       <description>
-        In this example, an output file that is 360 samples by 360 lines is created 
+        In this example, an output file that is 360 samples by 360 lines is created
 	by converting the line number to radians, and then calculating the cosine of the
 	calculated value using the following equation:
 	<blockquote>
@@ -975,14 +975,14 @@
 	The line number is input as degrees and converted to radians first in order
 	to output the correct cosine values.
       </description>
-      
+
       <terminalInterface>
-        <commandLine> 
+        <commandLine>
           to=cosine_of_line.cub equation="cos(rads(line))" mode=outputonly lines=360
 	  samples=360
         </commandLine>
         <description>
-          Convert the line number to radians, calculate the cosine of the new value, and 
+          Convert the line number to radians, calculate the cosine of the new value, and
 	  output the results to the output filename provided by the user.
         </description>
       </terminalInterface>
@@ -1000,7 +1000,7 @@
           <thumbnail caption="Output image" src="assets/thumb/thumb_cosine_of_line.jpg" width="180" height="180"/>
           <parameterName>TO</parameterName>
         </image>
-       </outputImages> 
+       </outputImages>
 
       <guiInterfaces>
         <guiInterface>
@@ -1016,19 +1016,19 @@
     <example>
       <brief>Create output only</brief>
       <description>
-        The example below demonstrates how easily one can get an incorrect product 
-	if angles are not converted to radians before calculating the cosine of a 
-	line number when the line number represents angles in degrees. In this example, 
+        The example below demonstrates how easily one can get an incorrect product
+	if angles are not converted to radians before calculating the cosine of a
+	line number when the line number represents angles in degrees. In this example,
 	the output file has 360 samples by 360 lines.
       </description>
-      
+
       <terminalInterface>
-        <commandLine> 
-          to=cosine_of_line_deg.cub equation="cos(line)" mode=outputonly 
+        <commandLine>
+          to=cosine_of_line_deg.cub equation="cos(line)" mode=outputonly
 	  lines=360 samples=360
         </commandLine>
         <description>
-          Calculate the cosine of the line number, and output the results to 
+          Calculate the cosine of the line number, and output the results to
 	  the output filename provided by the user.
         </description>
       </terminalInterface>
@@ -1037,7 +1037,7 @@
         <image src="assets/image/cosine_of_line_deg.jpg" width="360" height="360">
           <brief>Output file</brief>
           <description>
-	    This is the output file created based on a user defined equation 
+	    This is the output file created based on a user defined equation
 	    without specifying input filenames.
             <br /><br />
 	    <b>Parameter Name:</b> EQUATION <br /><br />
@@ -1046,15 +1046,15 @@
           <thumbnail caption="Output image" src="assets/thumb/thumb_cosine_of_line_deg.jpg" width="180" height="180"/>
           <parameterName>TO</parameterName>
         </image>
-       </outputImages> 
+       </outputImages>
 
       <guiInterfaces>
         <guiInterface>
           <image width="730" height="679" src="assets/image/fx_gui_cosine_line_deg_full.jpg">
             <brief>Example GUI</brief>
              <description>
-	       Screenshot of GUI with parameters filled in to perform a 
-	       calculation to create an output image. 
+	       Screenshot of GUI with parameters filled in to perform a
+	       calculation to create an output image.
 	     </description>
             <thumbnail width="300" height="272" caption="fx GUI" src="assets/thumb/fx_gui_cosine_line_deg_thumb.jpg" />
           </image>
@@ -1066,19 +1066,19 @@
     <example>
       <brief>Apply a gamma stretch</brief>
       <description>
-        In this example, a gamma stretch is applied to a CTX image. The image 
-	statistics are determined and used as part of the equation to calculate 
+        In this example, a gamma stretch is applied to a CTX image. The image
+	statistics are determined and used as part of the equation to calculate
 	new DN values.
       </description>
-      
+
       <terminalInterface>
-        <commandLine> 
-          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub 
-	  to=B10_013516_1520_XN_28S285W_gammast2.cub 
+        <commandLine>
+          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub
+	  to=B10_013516_1520_XN_28S285W_gammast2.cub
 	  equation="{[cubemax(f1)-abs(cubemin(f1))]*{[f1-abs(cubemin(f1))]/[cubemax(f1)-abs(cubemin(f1))]}^(1.0/1.8)}"
         </commandLine>
         <description>
-          Apply an equation to perform a gamma stretch to the image utilizing 
+          Apply an equation to perform a gamma stretch to the image utilizing
 	  the input image statistics.
         </description>
       </terminalInterface>
@@ -1093,13 +1093,13 @@
           <parameterName>F1</parameterName>
         </image>
       </inputImages>
-	  
+
       <outputImages>
         <image src="assets/image/B10_013516_1520_XN_28S285W_gammast.jpg" width="1667" height="1366">
           <brief> Output file</brief>
-          <description> 
+          <description>
 	    This is the output image where the bright and dark tones in the input
-	    image are adjusted based on the input image statistics that are incorporated 
+	    image are adjusted based on the input image statistics that are incorporated
 	    into the equation that is applied to calculate new output values.
             <br /><br />
 	    <b>Parameter Name:</b> EQUATION <br /><br/>
@@ -1109,7 +1109,7 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      
+
       <guiInterfaces>
         <guiInterface>
           <image width="728" height="1036" src="assets/image/fx_gui_gammast_reduced.jpg">
@@ -1120,17 +1120,17 @@
         </guiInterface>
       </guiInterfaces>
     </example>
-    
+
     <example>
       <brief>Create mask file</brief>
       <description>
-        In this example, all input DN values greater than 0.11 is set to "1.0" 
-	and all other pixels set to "0.0". 
+        In this example, all input DN values greater than 0.11 is set to "1.0"
+	and all other pixels set to "0.0".
       </description>
-      
+
       <terminalInterface>
-        <commandLine> 
-          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub 
+        <commandLine>
+          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub
 	  to=B10_013516_1520_XN_28S285W_mask.cub equation="f1>0.11"
         </commandLine>
         <description>
@@ -1149,12 +1149,12 @@
           <parameterName>F1</parameterName>
         </image>
       </inputImages>
-	  
+
       <outputImages>
         <image src="assets/image/B10_013516_1520_XN_28S285W_eo_mask.jpg" width="1667" height="1366">
           <brief> Output file</brief>
-          <description> 
-	    This is an image consisting of "0" and "1" DN values based on 
+          <description>
+	    This is an image consisting of "0" and "1" DN values based on
 	    the equation provided.
             <br /><br />
 	    <b>Parameter Name:</b> EQUATION <br /><br />
@@ -1175,20 +1175,20 @@
         </guiInterface>
       </guiInterfaces>
     </example>
-    
+
      <example>
       <brief>Extract desired data</brief>
       <description>
-        In this example, all DN values less than 0.11 will be set to "0.0" and 
-	all other DN values will retain the original input value. 
+        In this example, all DN values less than 0.11 will be set to "0.0" and
+	all other DN values will retain the original input value.
       </description>
       <terminalInterface>
-        <commandLine> 
-          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub 
+        <commandLine>
+          f1=B10_013516_1520_XN_28S285W_eo_reduced.cub
 	  to=B10_013516_1520_XN_28S285W_extract.cub equation="f1*(f1>0.11)"
         </commandLine>
         <description>
-          Apply the equation to retain all DN values greater than 0.11, 
+          Apply the equation to retain all DN values greater than 0.11,
 	  and set all other values to 0.0.
         </description>
       </terminalInterface>
@@ -1203,13 +1203,13 @@
           <parameterName>F1</parameterName>
         </image>
       </inputImages>
-	  
+
       <outputImages>
         <image src="assets/image/B10_013516_1520_XN_28S285W_eo_extract_fullqview.jpg" width="2493" height="1390">
           <brief> Output file</brief>
-          <description> The pink areas in this image were set to "0.0" based 
+          <description> The pink areas in this image were set to "0.0" based
 	  on the equation entered.  All other values retained the original values
-	  because the input value was multiplied by 1.0 when the calculations 
+	  because the input value was multiplied by 1.0 when the calculations
 	  were performed.
           <br /><br />
 	  <b>Parameter Name:</b> EQUATION <br /><br />
@@ -1229,7 +1229,7 @@
           </image>
         </guiInterface>
       </guiInterfaces>
-    </example>   
+    </example>
   </examples>
 
 </application>

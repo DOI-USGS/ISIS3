@@ -1,25 +1,11 @@
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2010/06/17 18:59:11 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "LoHighCamera.h"
 #include "LoHighDistortionMap.h"
 #include "LoCameraFiducialMap.h"
@@ -45,16 +31,16 @@ namespace Isis {
    * resolution images.
    *
    * @param lab Pvl label from a Lunar Orbiter High image.
-   * @internal 
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    *
    */
   LoHighCamera::LoHighCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
-    
+
     m_instrumentNameLong = "High Resolution Camera";
     m_instrumentNameShort = "High";
-    
+
     // LO3 High instrument kernel code = -533001
     if (naifIkCode() == -533001) {
       m_spacecraftNameLong = "Lunar Orbiter 3";
@@ -76,7 +62,7 @@ namespace Isis {
       msg += " is not a supported instrument kernel code for Lunar Orbiter.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     // Get the Instrument label information needed to define the camera for this frame
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -131,7 +117,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  
+
   /**
    * Returns the shutter open and close times. The user should pass in the
    * exposure duration in seconds and the StartTime keyword value, converted to
@@ -173,7 +159,7 @@ namespace Isis {
  * @param lab Cube labels
  *
  * @return Isis::Camera* LoHighCamera
- * @internal 
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed Lo
  *            namespace.
  */

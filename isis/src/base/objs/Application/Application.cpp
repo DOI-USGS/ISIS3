@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.22 $
- * $Date: 2010/06/29 23:42:18 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "IsisDebug.h"
 
 #include <cstdio>
@@ -517,7 +501,7 @@ namespace Isis {
       const QString &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      QString msg = "This process (program) was executed by an existing Isis 3 "
+      QString msg = "This process (program) was executed by an existing Isis "
           "process. However, we failed to establish a communication channel "
           "with the parent (launcher) process. The parent process has a PID of "
           "[" + toString(iApp->GetUserInterface().ParentId()) + "]";
@@ -532,7 +516,7 @@ namespace Isis {
     data += '\n';
 
     if (p_connectionToParent->write(data.toLatin1().data(), data.toLatin1().size()) == -1) {
-      QString msg = "This process (program) was executed by an exiting Isis 3 "
+      QString msg = "This process (program) was executed by an exiting Isis "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +

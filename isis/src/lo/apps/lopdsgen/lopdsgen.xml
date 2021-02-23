@@ -3,11 +3,11 @@
 <application name="lopdsgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Convert from Isis 3 Lunar Orbiter cubes to the PDS format
+    Convert from Isis Lunar Orbiter cubes to the PDS format
   </brief>
 
   <description>
-   Program to convert Isis 3 cubes for Lunar Orbiter strips and level 1 products 
+   Program to convert Isis cubes for Lunar Orbiter strips and level 1 products
    to PDS image files.
   </description>
 
@@ -24,7 +24,7 @@
       Updated test and example for changes to PVL.
     </change>
     <change name="Travis Addair" date="2010-02-16">
-      Added support for reexporting the cubes generated from PDS files produced 
+      Added support for reexporting the cubes generated from PDS files produced
       by this application.
     </change>
   </history>
@@ -38,7 +38,7 @@
           Input cube to be converted
         </brief>
         <description>
-          The LO strip or level 1 Isis 3 cube to be converted to PDS format.
+          The LO strip or level 1 Isis cube to be converted to PDS format.
         </description>
         <filter>
           *.cub
@@ -120,7 +120,7 @@
         <default><item>true</item></default>
         <brief>Dedicates the minimum DN value for null pixels.</brief>
         <description>
-          If set to true, the minimum value of the raw output data will be 
+          If set to true, the minimum value of the raw output data will be
           reserved for null pixels.  The actual value used for null pixels will
           be denoted in the print.prt file as well as displayed onscreen.
         </description>
@@ -305,7 +305,7 @@
         </list>
       </parameter>
     </group>
-  
+
     <group name="Special Keyword">
       <parameter name="NOTE">
         <type>string</type>
@@ -314,13 +314,13 @@
           Value for the output PDS keyword NOTE
         </brief>
         <description>
-          This parameter allows the user to specify the value of the standard 
+          This parameter allows the user to specify the value of the standard
           PDS keyword NOTE within the output PDS label. This keyword
           will be located in the Root of the PDS PVL label.
         </description>
       </parameter>
     </group>
-  </groups> 
+  </groups>
 
   <examples>
     <example>
@@ -328,8 +328,8 @@
           Export Level 1 cube to 32-bit PDS
       </brief>
       <description>
-          This example shows a typical conversion of an Isis 3 Lunar 
-          Orbiter cube to a PDS format image.  The default settings 
+          This example shows a typical conversion of an Isis Lunar
+          Orbiter cube to a PDS format image.  The default settings
           produce 32-bit data with least significant byte first order.
       </description>
       <terminalInterface>
@@ -337,11 +337,11 @@
               from=lev1.cub to=lev1.pds.img
           </commandLine>
           <description>
-              In this example, lopdsgen will convert a cube to a pds 
+              In this example, lopdsgen will convert a cube to a pds
               format image with all settings left at their defaults.
           </description>
       </terminalInterface>
-  
+
       <guiInterfaces>
         <guiInterface>
             <image width="614" height="750" src="assets/images/baseGui.jpg">
@@ -349,21 +349,21 @@
                   Example GUI
                 </brief>
                 <description>
-                  Screenshot of GUI with parameters set to export a level1 LO 
+                  Screenshot of GUI with parameters set to export a level1 LO
                   cube to a PDS image.
                 </description>
                 <thumbnail width="164" height="200" caption="lopdsgen gui" src="assets/thumbs/baseGui.jpg" />
             </image>
         </guiInterface>
       </guiInterfaces>
-  
+
       <inputImages>
           <image src="assets/images/input_level1.jpg" width="500" height="500">
             <brief>
               Input cube for lopdsgen
             </brief>
             <description>
-              This is an Isis 3 cube, specifically a level 1 LO product, that 
+              This is an Isis cube, specifically a level 1 LO product, that
               will be exported to a standard PDS format image.
             </description>
             <thumbnail caption="lev1.cub" src="assets/thumbs/input_level1.jpg" width="200" height="200" />
@@ -375,18 +375,18 @@
           <dataFile path="assets/input_labels.pvl">
               <brief>Click here for the labels of the input image</brief>
               <description>
-                This PVL contains the labels of the Isis 3, level 1 LO input 
-                image that will be exported to a PDS. 
+                This PVL contains the labels of the Isis, level 1 LO input
+                image that will be exported to a PDS.
               </description>
           </dataFile>
           <dataFile path="assets/output_labels.pvl">
               <brief>Click here for the labels of the output image</brief>
               <description>
-                This PVL contains the labels of the PDS format image that has 
-                been generated from an Isis 3, level 1 LO cube. 
+                This PVL contains the labels of the PDS format image that has
+                been generated from an Isis, level 1 LO cube.
               </description>
           </dataFile>
-      </dataFiles>  
+      </dataFiles>
 
       <outputImages>
         <image src="assets/images/output_level1.jpg" width="500" height="500">
@@ -394,12 +394,12 @@
             Output pds image from lopdsgen
           </brief>
           <description>
-            This is a PDS format image that has been produced by exporting the 
-            input Isis 3, level 1 LO cube with default settings.
+            This is a PDS format image that has been produced by exporting the
+            input Isis, level 1 LO cube with default settings.
           </description>
           <thumbnail caption="lev1.pds.img" src="assets/thumbs/output_level1.jpg" width="200" height="200" />
           <parameterName>TO</parameterName>
-        </image> 
+        </image>
       </outputImages>
     </example>
   </examples>

@@ -56,7 +56,7 @@
       use SpiceRotation class, added Messenger, began modifications to meet ISIS coding standards.
     </change>
     <change name="E. Howington-Kraus" date="2013-02-25">
-      Completed modifications to meet ISIS coding standards for formal installation into ISIS3.
+      Completed modifications to meet ISIS coding standards for formal installation into ISIS.
       Added check for needed SPICE data (blobs) attached to the cube label. Added parameter TO for
       user control over output settings file name (previously the program generated the output file
       name based on the base name of the FROM cube).  Temporarily removed support for APOLLO METRIC,

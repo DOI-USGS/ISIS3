@@ -14,7 +14,7 @@
     conditions.  The photometric correction is applied to each pixel by computing
     a photometric model based on local photometric angles and a set of parameters
     that defines the model.  Currently, no default values are assigned for any
-    parameter names in the ISIS3 version of <i>photomet</i>.
+    parameter names in the ISIS version of <i>photomet</i>.
     </p>
     <p>
     Photometric angles can be computed from the following:
@@ -197,7 +197,7 @@
     The tables below show the models and their related parameter requirements
     along with the ISIS2 default values.  The ISIS2 default values are only meant
     to serve as possible initial values to test backward compatibility since there
-    are no default values defined in ISIS3.
+    are no default values defined in ISIS.
     </p>
 
 <small>
@@ -3308,7 +3308,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         emission angle to 75.0 degrees and the maximum incidence angle to 85.0 degrees.  The
         photometric model and normalization model along with the parameter values are
         defined in the input PVL file.  This example uses a PVL file that follows the
-        format for a previous ISIS3 release.  The photomet program will recognize some older
+        format for a previous ISIS release.  The photomet program will recognize some older
         formats and parameter names, but if an error is returned, then update the settings
         using the latest parameter names and/or options listed in the tables under "DESCRIPTION."
       </description>

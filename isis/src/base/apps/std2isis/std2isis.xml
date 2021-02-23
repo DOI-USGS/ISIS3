@@ -9,13 +9,13 @@
   <description>
     This program will import several standard image formats to an Isis cube.
     The input image formats may include PNG, JPEG, JP2, TIFF, BMP, and GIF.  Not all
-    formats are available as the program implementation depends on the Qt 
+    formats are available as the program implementation depends on the Qt
     library by TrollTech.  This is not true of JPEG2000 files (JP2). It has
-    support in the ISIS3 library. By default, the number of bands in the output cube 
-    will be one, three, and four when the input image is all gray, RGB, 
-    and RGB with an alpha channel, respectively.  The user can, however, specify 
-    the color mode manually. The JP2 file can have any number of bands up to 
-    16384. The output from a JP2 file will be a multi-spectral ISIS3 image file.
+    support in the ISIS library. By default, the number of bands in the output cube
+    will be one, three, and four when the input image is all gray, RGB,
+    and RGB with an alpha channel, respectively.  The user can, however, specify
+    the color mode manually. The JP2 file can have any number of bands up to
+    16384. The output from a JP2 file will be a multi-spectral ISIS image file.
   </description>
 
   <history>
@@ -73,7 +73,7 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Output image 
+          Output image
         </brief>
         <description>
           Use this parameter to specify the name of the output cube.
@@ -88,18 +88,18 @@
             <default><item>AUTO</item></default>
             <brief>Mode for determining color model</brief>
             <description>
-                This parameter specifies the image mode for the output cube. If 
+                This parameter specifies the image mode for the output cube. If
                 GRAYSCALE, a single one-band cube will be created. If RGB, a
-                three-band cube is created.  Finally, if ARGB is selected, then 
-                a four-band cube will be created where the four bands correspond 
-                to first Red, second Green, third Blue, and last Alpha. 
+                three-band cube is created.  Finally, if ARGB is selected, then
+                a four-band cube will be created where the four bands correspond
+                to first Red, second Green, third Blue, and last Alpha.
             </description>
             <list>
                 <option value="AUTO">
                   <brief>Automatically determine output mode</brief>
                   <description>
-                      Checks to see if the image is a grayscale image, and if not, 
-                      if it has an alpha channel, and sets the output mode 
+                      Checks to see if the image is a grayscale image, and if not,
+                      if it has an alpha channel, and sets the output mode
                       accordingly.
                   </description>
                 </option>
@@ -263,9 +263,9 @@
         Converting an image to an Isis Cube in Automatic mode
       </brief>
       <description>
-        This example will show the conversion from a color PNG image to a cube, 
-        automatically determining the color mode.  Here, the output image will 
-        be a four-band ARGB cube, because the input image is both in color, and 
+        This example will show the conversion from a color PNG image to a cube,
+        automatically determining the color mode.  Here, the output image will
+        be a four-band ARGB cube, because the input image is both in color, and
         has an alpha channel.
       </description>
       <terminalInterface>
@@ -283,7 +283,7 @@
               Example GUI
               </brief>
             <description>
-              Screenshot of the GUI for std2isis, ready to convert the image 
+              Screenshot of the GUI for std2isis, ready to convert the image
               input.png to the Isis Cube argb.cub, with mode left at its default
               of AUTOMATIC.
             </description>
@@ -306,7 +306,7 @@
         <image width="492" height="492" src="assets/images/gray_argb.png">
           <brief>Output Isis Cube with Grayscale</brief>
           <description>
-            The four-band ARGB output image viewed in black-and-white with a 
+            The four-band ARGB output image viewed in black-and-white with a
             grayscale.
           </description>
           <thumbnail src="assets/thumbs/gray_argb.png" width="200" height="200" caption="Output Image in Black-and-White" />
@@ -314,10 +314,10 @@
         <image width="492" height="492" src="assets/images/rgb.png">
           <brief>Output Isis Cube with RGB</brief>
           <description>
-            The same four-band ARGB output image viewed in color with RGB 
-            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Note that 
-            the image here appears brighter than the original, because qview has 
-            auto-stretched the DN values, and can be adjusted back with qview's 
+            The same four-band ARGB output image viewed in color with RGB
+            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Note that
+            the image here appears brighter than the original, because qview has
+            auto-stretched the DN values, and can be adjusted back with qview's
             "stretch" tool.  The actual data, however, has not been changed.
           </description>
           <thumbnail src="assets/thumbs/rgb.png" width="200" height="200" caption="Output Image in Color" />
@@ -326,7 +326,7 @@
           <brief>Output Isis Cube with RGA</brief>
           <description>
             The same four-band ARGB output image viewed in color with RGB
-            filtering as in the previous image, but here Band 4 (the alpha 
+            filtering as in the previous image, but here Band 4 (the alpha
             channel) is viewed through the Blue filter.
           </description>
           <thumbnail src="assets/thumbs/argb.png" width="200" height="200" caption="Output Image in Color with Band 4 in Blue" />
@@ -339,7 +339,7 @@
         Converting an image to an Isis Cube in Grayscale mode
       </brief>
       <description>
-        This example will show the conversion from a color PNG image to a cube, 
+        This example will show the conversion from a color PNG image to a cube,
         with the color mode set to GRAYSCALE, meaning that the output image will
         be a single-band black-and-white cube.
       </description>
@@ -371,7 +371,7 @@
         <image height="492" width="492" src="assets/images/input.png">
           <brief>Input Image</brief>
           <description>
-            The input image, in this example, the same color PNG from the 
+            The input image, in this example, the same color PNG from the
             previous example.
           </description>
           <thumbnail src="assets/thumbs/input.png" width="200" height="200" caption="Input Image" />
@@ -394,7 +394,7 @@
         Converting an image to an Isis Cube in RGB mode
       </brief>
       <description>
-        This example will show the conversion from a color PNG image to a cube, 
+        This example will show the conversion from a color PNG image to a cube,
         with the color mode set to RGB, meaning that the output image will
         be a three-band color cube.
       </description>
@@ -426,7 +426,7 @@
         <image height="492" width="492" src="assets/images/input.png">
           <brief>Input Image</brief>
           <description>
-            The input image, in this example, the same color PNG from the 
+            The input image, in this example, the same color PNG from the
             first example.
           </description>
           <thumbnail src="assets/thumbs/input.png" width="200" height="200" caption="Input Image" />
@@ -437,7 +437,7 @@
        <image width="492" height="492" src="assets/images/gray_argb.png">
           <brief>Output Isis Cube with Grayscale</brief>
           <description>
-            The three-band RGB output image viewed in black-and-white with a 
+            The three-band RGB output image viewed in black-and-white with a
             grayscale.
           </description>
           <thumbnail src="assets/thumbs/gray_argb.png" width="200" height="200" caption="Output Image in Black-and-White" />
@@ -445,11 +445,11 @@
         <image width="492" height="492" src="assets/images/rgb.png">
           <brief>Output Isis Cube with RGB</brief>
           <description>
-            The same three-band RGB output image viewed in color with RGB 
-            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Once 
-            again, the output image appears to be brighter than the original due 
-            to qview's auto-stretching, but can be adjusted in qview with the 
-            "stretch" tool. 
+            The same three-band RGB output image viewed in color with RGB
+            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Once
+            again, the output image appears to be brighter than the original due
+            to qview's auto-stretching, but can be adjusted in qview with the
+            "stretch" tool.
           </description>
           <thumbnail src="assets/thumbs/rgb.png" width="200" height="200" caption="Output Image in Color" />
         </image>

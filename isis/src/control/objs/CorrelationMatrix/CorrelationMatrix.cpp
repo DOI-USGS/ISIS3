@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "CorrelationMatrix.h"
 
 #include <QDataStream>
@@ -19,8 +27,8 @@ namespace Isis {
    * Default Constructor
    */
   CorrelationMatrix::CorrelationMatrix() {
-    m_covarianceFileName = new FileName(""); 
-    m_correlationFileName = new FileName(""); 
+    m_covarianceFileName = new FileName("");
+    m_correlationFileName = new FileName("");
     m_visibleBlocks = new QList<SparseBlockColumnMatrix>();
     m_imagesAndParameters = new QMap<QString, QStringList>();
     m_diagonals = new QList<double>();
@@ -78,7 +86,7 @@ namespace Isis {
       QString msg = "Could not find the Covariance Matrix .dat file name.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-    
+
     try {
       QString corrFileName = storedMatrixData.findKeyword("CorrelationMatrixFileName")[0];
       if (corrFileName == "NULL") {
@@ -159,19 +167,19 @@ namespace Isis {
       delete m_imagesAndParameters;
       m_imagesAndParameters = NULL;
       m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
-  
+
       delete m_covarianceFileName;
       m_covarianceFileName = NULL;
       m_covarianceFileName = new FileName(*other.m_covarianceFileName);
-  
+
       delete m_correlationFileName;
       m_correlationFileName = NULL;
       m_correlationFileName = new FileName(*other.m_correlationFileName);
-  
+
       delete m_diagonals;
       m_diagonals = NULL;
       m_diagonals = new QList<double>(*other.m_diagonals);
-  
+
       delete m_visibleBlocks;
       m_visibleBlocks = NULL;
       m_visibleBlocks = new QList<SparseBlockColumnMatrix>(*other.m_visibleBlocks);
@@ -241,7 +249,7 @@ namespace Isis {
       while ( block.hasNext() ) { // each block in the column
         block.next();
         for (int row = 0; row < (int)block.value()->size1(); row++) { // each row in the block
-          for (int column = 0; column < (int)block.value()->size2(); column++) { // each column 
+          for (int column = 0; column < (int)block.value()->size2(); column++) { // each column
             // correlation = covariance / (variance1 * variance2)
             ( *block.value() )(row, column) = ( *block.value() )(row, column) /
                                               sqrt( (*m_diagonals)[param1] *
@@ -262,7 +270,7 @@ namespace Isis {
       outStream << sbcm;
       m_visibleBlocks->append(sbcm);
     }
-    
+
     // close file
     matrixInput.close();
     matrixOutput.close();
@@ -376,7 +384,7 @@ namespace Isis {
     }
     else {
       *m_imagesAndParameters = imagesAndParameters;
-    }      
+    }
   }
 
 
@@ -455,19 +463,19 @@ namespace Isis {
    * Object = CorrelationMatrixData
    *   CovarianceMatrixFileName = /location/covarianceTmpFileName.dat
    *   CorrelationMatrixFileName = /location/correlationTmpFileName.dat
-   * 
+   *
    *   Group = ImagesAndParameters
    *     Image1Name = "Param1, Param2, ..., ParamN"
    *     ...
    *     ImageNName = "..."
    *   End_Group
    * End_Object
-   * 
+   *
    * @return @b PvlGroup Returns the information needed to recreate this correlation matrix.
    */
   PvlObject CorrelationMatrix::pvlObject() {
     PvlObject corrMatInfo("CorrelationMatrixData");
-    
+
     corrMatInfo += PvlKeyword( "CovarianceMatrixFileName", m_covarianceFileName->expanded() );
     corrMatInfo += PvlKeyword( "CorrelationMatrixFileName", m_correlationFileName->expanded() );
 
@@ -478,7 +486,7 @@ namespace Isis {
       imgsAndParams += PvlKeyword( imgParamIt.key(), imgParamIt.value().join(",") );
     }
     corrMatInfo += imgsAndParams;
-    
+
     return corrMatInfo;
   }
 }

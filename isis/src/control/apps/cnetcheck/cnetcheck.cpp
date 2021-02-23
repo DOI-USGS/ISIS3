@@ -1,3 +1,12 @@
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iostream>
 #include <sstream>
 #include <set>
@@ -65,24 +74,24 @@ namespace Isis {
   QString g_delimiter;
 
   /**
-   * check control network validity 
+   * check control network validity
    *
-   * @param ui UserInterface object containing parameters 
-   * @param(out) log The Pvl that outlier results logged to check 
+   * @param ui UserInterface object containing parameters
+   * @param(out) log The Pvl that outlier results logged to check
    */
   QString cnetcheck(UserInterface &ui, Pvl *log) {
    ControlNet innet(ui.GetFileName("CNET"));
    FileList inlist(ui.GetFileName("FROMLIST"));
-   
+
    return cnetcheck(innet, inlist, ui, log);
   }
 
   /**
-   * check control network validity 
+   * check control network validity
    *
-   * @param innet input control network 
-   * @param inlist input file list 
-   * @param ui UserInterface object containing parameters 
+   * @param innet input control network
+   * @param inlist input file list
+   * @param ui UserInterface object containing parameters
    * @param(out) log The Pvl that outlier results logged to
    */
   QString cnetcheck(ControlNet &innet, FileList &inlist, UserInterface &ui, Pvl *log) {
@@ -248,9 +257,9 @@ namespace Isis {
     // Output the results to screen and files accordingly
 
     PvlGroup results("Results");
-    
-    QString networkName = ui.WasEntered("CNET") ? FileName(ui.GetFileName("CNET")).name() : innet.GetNetworkId(); 
-      
+
+    QString networkName = ui.WasEntered("CNET") ? FileName(ui.GetFileName("CNET")).name() : innet.GetNetworkId();
+
     stringstream ss(stringstream::in | stringstream::out);
 
     results.addKeyword(PvlKeyword("Islands", toString((BigInt)islands.size())));
@@ -448,10 +457,10 @@ namespace Isis {
     ss << "----------------------------------------" \
        "----------------------------------------" << endl << endl;
     QString logstr = ss.str().c_str();
-    
+
     if (log){
       log->addGroup(results);
-    } 
+    }
 
     if (!ui.IsInteractive()) {
       std::cout << ss.str();

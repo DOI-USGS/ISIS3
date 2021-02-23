@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "IsisDebug.h"
 #include "Cube.h"
 
@@ -41,6 +25,7 @@
 #include "CubeTileHandler.h"
 #include "Endian.h"
 #include "FileName.h"
+#include "History.h"
 #include "ImageHistogram.h"
 #include "IException.h"
 #include "LineManager.h"
@@ -847,6 +832,18 @@ namespace Isis {
     m_ioHandler->read(bufferToFill);
   }
 
+  History Cube::readHistory(const QString &name) const {
+    Blob historyBlob(name, "History");
+    try {
+      // read history from cube, if it exists.
+      historyBlob.Read(fileName());
+    }
+    catch (IException &) {
+    // if the history does not exist in the cube, this function creates it.
+    }
+    History history(historyBlob);
+    return history;
+  }
 
   /**
    * This method will write a blob of data (e.g. History, Table, etc)
@@ -1825,16 +1822,17 @@ namespace Isis {
 
 
   /**
-   * Check to see if the cube contains a pvl table by the provided name
+   * Check to see if the cube contains a BLOB.
    *
-   * @param name The name of the pvl table to search for
+   * @param type The type of the BLOB to search for
+   * @param name The name of the BLOB to search for
    *
-   * @return bool True if the pvl table was found
+   * @return bool True if the BLOB was found
    */
-  bool Cube::hasTable(const QString &name) {
+  bool Cube::hasBlob(const QString &type, const QString &name) {
     for(int o = 0; o < label()->objects(); o++) {
       PvlObject &obj = label()->object(o);
-      if (obj.isNamed("Table")) {
+      if (obj.isNamed(type)) {
         if (obj.hasKeyword("Name")) {
           QString temp = (QString) obj["Name"];
           temp = temp.toUpper();
@@ -1852,6 +1850,18 @@ namespace Isis {
     Blob tableBlob(name, "Table");
     read(tableBlob);
     return Table(tableBlob);
+  }
+
+
+  /**
+   * Check to see if the cube contains a pvl table by the provided name
+   *
+   * @param name The name of the pvl table to search for
+   *
+   * @return bool True if the pvl table was found
+   */
+  bool Cube::hasTable(const QString &name) {
+    return hasBlob("Table", name);
   }
 
 
@@ -2287,7 +2297,7 @@ namespace Isis {
 
   /**
    * This is a helper, used by open(...), that handles opening Isis 2 cubes as
-   *   if they were Isis 3 cubes.
+   *   if they were Isis cubes.
    *
    * @param oldCube The filename of the Isis 2 cube
    */

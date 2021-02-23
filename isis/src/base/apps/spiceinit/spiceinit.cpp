@@ -17,6 +17,7 @@
 #include "PvlToPvlTranslationManager.h"
 #include "SpiceClient.h"
 #include "SpiceClientStarter.h"
+#include "StringBlob.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "spiceinit.h"
@@ -262,7 +263,7 @@ namespace Isis {
       }
     }
     icube->deleteGroup("CsmInfo");
-    icube->deleteBlob("String","CSMState");
+
     p.WriteHistory(*icube);
     p.EndProcess();
   }
@@ -377,6 +378,15 @@ namespace Isis {
     currentKernels.addKeyword(iakKeyword, Pvl::Replace);
     currentKernels.addKeyword(demKeyword, Pvl::Replace);
 
+    // Save off the CSM State so it can be restored if spiceinit fails
+    StringBlob csmState("", "CSMState");
+    if (icube->hasBlob("String", "CSMState")) {
+      icube->read(csmState);
+    }
+
+    // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera
+    icube->deleteBlob("String", "CSMState");
+
     // report qualities
     PvlKeyword spkQuality("InstrumentPositionQuality");
     spkQuality.addValue(Kernel::typeEnum(spk.type()));
@@ -478,6 +488,10 @@ namespace Isis {
           log->addGroup(currentKernels);
         }
         icube->putGroup(originalKernels);
+
+        // restore CSM State blob if spiceinit failed
+        icube->write(csmState);
+
         throw IException(e);
       }
 
@@ -553,7 +567,7 @@ namespace Isis {
 
         *icube->label() += cam->getStoredNaifKeywords();
       }
-      //modify Kernels group only
+      // Modify Kernels group only
       else {
         Pvl *label = icube->label();
         int i = 0;

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QDataStream>
 #include <QDebug>
 
@@ -31,7 +39,7 @@ int main(int argc, char *argv[]) {
 
   qDebug() << "Default constructor sets model to Huber and corresponding default TC:";
   MaximumLikelihoodWFunctions wFunc;
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -43,12 +51,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstant(2.0);
   qDebug() << "TC constant re-set to 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -60,12 +68,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstantDefault();
   qDebug() << "TC constant re-set to default:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -77,12 +85,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setModel(MaximumLikelihoodWFunctions::Huber);
   qDebug() << "Model manually set with default TC:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -94,12 +102,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+
   wFunc.setModel(MaximumLikelihoodWFunctions::Huber, 2.0);
   qDebug() << "Model manually set with TC = 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -111,12 +119,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   MaximumLikelihoodWFunctions copyWFunc(wFunc);
   qDebug() << "Testing Copy constructor:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(copyWFunc.model());
   qDebug() << "TweakingConstant         = " << toString(copyWFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << copyWFunc.weightedResidualCutoff();
@@ -128,16 +136,16 @@ int main(int argc, char *argv[]) {
   temp = copyWFunc.sqrtWeightScaler(-2.0);
   qDebug() << "copyWFunc->sqrtWeightScaler(-2):   " << temp;
   temp = copyWFunc.sqrtWeightScaler(2.5);
-  qDebug() << "copyWFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  qDebug() << ""; 
+  qDebug() << "copyWFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+  qDebug() << "";
 
 
 
   qDebug() << "Reassign object using operator= and passing HuberModified to constructor with "
               "default TC:";
   wFunc = MaximumLikelihoodWFunctions(MaximumLikelihoodWFunctions::stringToModel("HuberModified"));
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -149,12 +157,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstant(2.0);
   qDebug() << "TC constant re-set to 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -166,12 +174,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstantDefault();
   qDebug() << "TC constant re-set to default:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -183,12 +191,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setModel(MaximumLikelihoodWFunctions::stringToModel("Huber_Modified"));
   qDebug() << "Model manually set to Huber_Modified with default TC:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -200,12 +208,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+
   wFunc.setModel(MaximumLikelihoodWFunctions::HuberModified, 2.0);
   qDebug() << "Model manually set with TC = 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -217,15 +225,15 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+  qDebug() << "";
 
 
 
   qDebug() << "Reassign object using operator= and passing Welsch with TC = 2.0:";
   wFunc = MaximumLikelihoodWFunctions(MaximumLikelihoodWFunctions::stringToModel("Welsch"), 2.0);
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -237,12 +245,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstantDefault();
   qDebug() << "TC constant set to default:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -254,12 +262,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setModel(MaximumLikelihoodWFunctions::Welsch);
   qDebug() << "Model manually set with default TC:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -271,12 +279,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+
   wFunc.setModel(MaximumLikelihoodWFunctions::Welsch, 2.0);
   qDebug() << "Model manually set with TC = 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -288,16 +296,16 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+  qDebug() << "";
 
 
 
 
   qDebug() << "Reassign object using operator= and passing Chen with default TC:";
   wFunc = MaximumLikelihoodWFunctions(MaximumLikelihoodWFunctions::stringToModel("Chen"));
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -309,12 +317,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstant(2.0);
   qDebug() << "TC constant re-set to 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -326,12 +334,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setTweakingConstantDefault();
   qDebug() << "TC constant re-set to default:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -343,12 +351,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
 
   wFunc.setModel(MaximumLikelihoodWFunctions::Chen);
   qDebug() << "Model manually set with default TC:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -360,12 +368,12 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+
   wFunc.setModel(MaximumLikelihoodWFunctions::Chen, 2.0);
   qDebug() << "Model manually set with TC = 2.0:";
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -377,9 +385,9 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
+  qDebug() << "";
 
 
   qDebug() << "Testing serialization...";
@@ -390,7 +398,7 @@ int main(int argc, char *argv[]) {
   QDataStream inputData(byteArray);
   MaximumLikelihoodWFunctions newWFunc;
   inputData >> newWFunc;
-  qDebug() << "Model                    = " 
+  qDebug() << "Model                    = "
            << MaximumLikelihoodWFunctions::modelToString(wFunc.model());
   qDebug() << "TweakingConstant         = " << toString(wFunc.tweakingConstant());
   qDebug() << "WeightedResidualCutoff   = " << wFunc.weightedResidualCutoff();
@@ -402,8 +410,8 @@ int main(int argc, char *argv[]) {
   temp = wFunc.sqrtWeightScaler(-2.0);
   qDebug() << "wFunc->sqrtWeightScaler(-2):   " << temp;
   temp = wFunc.sqrtWeightScaler(2.5);
-  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp; 
-  qDebug() << ""; 
+  qDebug() << "wFunc->sqrtWeightScaler(2.5):  " << temp;
+  qDebug() << "";
   qDebug() << "Huber enum written to and read from QByteArray:";
   QByteArray enumByteArray;
   QDataStream outputEnumData(&enumByteArray, QIODevice::WriteOnly);
@@ -412,25 +420,25 @@ int main(int argc, char *argv[]) {
   MaximumLikelihoodWFunctions::Model model;
   inputEnumData >> model;
   qDebug() << "Model                    = " << MaximumLikelihoodWFunctions::modelToString(model);
-  qDebug() << ""; 
-  qDebug() << ""; 
+  qDebug() << "";
+  qDebug() << "";
 
   qDebug() << "Testing error throws...";
   try {
     wFunc.setTweakingConstant(-1.0);
-  } 
+  }
   catch (IException &e) {
     e.print();
   }
   try {
     MaximumLikelihoodWFunctions::modelToString((MaximumLikelihoodWFunctions::Model)4);
-  } 
+  }
   catch (IException &e) {
     e.print();
   }
   try {
     MaximumLikelihoodWFunctions::stringToModel("Nonsense");
-  } 
+  }
   catch (IException &e) {
     e.print();
   }

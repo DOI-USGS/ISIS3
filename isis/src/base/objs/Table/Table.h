@@ -1,28 +1,16 @@
 #ifndef Table_h
 #define Table_h
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2010/05/14 19:17:09 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+<<<<<<< HEAD
 #include "Pvl.h"
+=======
+/* SPDX-License-Identifier: CC0-1.0 */
+#include "Blob.h"
+>>>>>>> 601e0c3159ca47538171794b12154f61e385f795
 #include <vector>
 #include "TableRecord.h"
 
@@ -35,7 +23,11 @@ namespace Isis {
    * general, records correspond to rows and fields correspond to columns. Thus
    * the TableRecord class corresponds to a vector of row entries and
    * TableField class corresponds to a specific entry of the table for a given
+<<<<<<< HEAD
    * record. Isis3 Table objects are record based, N records in a table. Each
+=======
+   * record. Isis Table objects are record based, N records in a table. Each
+>>>>>>> 601e0c3159ca47538171794b12154f61e385f795
    * record will have the same number of fields, F. The fields can be of
    * different types including Integer, Double, Text, and Real. The class
    * uses PVL to store the structure of the table N, F, and Field types and
@@ -153,4 +145,3 @@ namespace Isis {
 };
 
 #endif
-

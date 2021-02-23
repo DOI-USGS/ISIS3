@@ -13,7 +13,6 @@
 #include "iTime.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
-#include "Process.h"
 #include "ProgramLauncher.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -372,7 +371,7 @@ namespace Isis{
           if (getFootBlob) {
             // Need to read history to obtain parameters that were used to
             // create the footprint
-            History hist("IsisCube", incube->fileName());
+            History hist = incube->readHistory();
             Pvl pvl = hist.ReturnHist();
             PvlObject::PvlObjectIterator objIter;
             bool found = false;

@@ -1,26 +1,10 @@
-/**                                                                       
- * @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 
 #include <string>
@@ -53,12 +37,12 @@ int Transformer::size() const {
 }
 
 /**
- * @brief Add a transform to the list 
- *  
- * Caller supplies a pointer to an image transform and inherits ownership of the 
- * pointer. The pointers are stored in a shared pointer to memory management is 
- * handled automatically. 
- * 
+ * @brief Add a transform to the list
+ *
+ * Caller supplies a pointer to an image transform and inherits ownership of the
+ * pointer. The pointers are stored in a shared pointer to memory management is
+ * handled automatically.
+ *
  * @param transform Pointer to add to list
  */
 void Transformer::add(ImageTransform *transform) {
@@ -67,13 +51,13 @@ void Transformer::add(ImageTransform *transform) {
 }
 
 /**
- * @brief Apply image transforms to an image 
- *  
- * The incoming image is rendered in each transform, apply the results of the 
- * previous transform to the next transform. 
- * 
+ * @brief Apply image transforms to an image
+ *
+ * The incoming image is rendered in each transform, apply the results of the
+ * previous transform to the next transform.
+ *
  * @param image  Image to transform
- * @return cv::Mat Final result of all image transforms 
+ * @return cv::Mat Final result of all image transforms
  */
 cv::Mat Transformer::render(const cv::Mat &image) const {
   cv::Mat t_image = image;
@@ -84,11 +68,11 @@ cv::Mat Transformer::render(const cv::Mat &image) const {
 }
 
 /**
- * @brief Convert a point coordinate applied in each transform 
- *  
- * The point passed into this method has the forward point transform of each 
- * ImageTransform applied to result in the final coordinate. 
- * 
+ * @brief Convert a point coordinate applied in each transform
+ *
+ * The point passed into this method has the forward point transform of each
+ * ImageTransform applied to result in the final coordinate.
+ *
  * @param point        Point to transform with the transform list
  * @return cv::Point2f Transformed point coordinate
  */
@@ -101,14 +85,14 @@ cv::Point2f Transformer::forward(const cv::Point2f &point) const {
 }
 
 /**
- * @brief Convert the inverse of the point from the list of imaage tranforms 
- *  
- * The given point is assumed to have been appled with the forward() method, 
- * and modified or computed in the final transform data space. This method 
- * converts the coordinates back the the original coordinate system (typically 
- * raw image space) by traversing the list in reverse and applying the inverse 
- * point conversion method. 
- *  
+ * @brief Convert the inverse of the point from the list of imaage tranforms
+ *
+ * The given point is assumed to have been appled with the forward() method,
+ * and modified or computed in the final transform data space. This method
+ * converts the coordinates back the the original coordinate system (typically
+ * raw image space) by traversing the list in reverse and applying the inverse
+ * point conversion method.
+ *
  * @param point        Point to invert
  * @return cv::Point2f Resulting inverted point
  */

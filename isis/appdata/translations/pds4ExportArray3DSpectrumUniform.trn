@@ -1,4 +1,4 @@
-# ISIS3 to PDS4 export of ISIS3 cube information to Array_3D_Spectrum 
+# ISIS to PDS4 export of ISIS cube information to Array_3D_Spectrum 
 # for uniformly sampled spectral arrays.
 #
 # Based on requirements and options specified in
@@ -73,5 +73,3 @@ Group = Samples
   OutputPosition  = (Product_Observational, File_Area_Observational, Array_3D_Spectrum, new@Axis_Array)
   Translation     = (*, *)
 End_Group
-
-

@@ -1,6 +1,14 @@
 #ifndef _ControlNetValidMeasure_h_
 #define _ControlNetValidMeasure_h_
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "CubeManager.h"
 #include "IString.h"
 #include "Pvl.h"
@@ -8,28 +16,13 @@
 #include "Progress.h"
 #include "SerialNumberList.h"
 
-/**
- * @file
- * $Revision: $
- * $Date: $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 namespace Isis {
   class Camera;
@@ -71,7 +64,7 @@ namespace Isis {
     *                          ValidMeasure Group is found. Fixes Mantis #584
     *  @history 2013-01-31 Steven Lambright - Fixed LocationString() to return
     *                          valid text. Also, added a test for this text.
-    *                          Fixes #1436. 
+    *                          Fixes #1436.
     *  @history 2014-03-03 Janet Barrett - Initialize the mdDnValue variable in
     *                          the ValidStandardOptions method. Fixes #2040.
     *  @history 2016-07-13 Adam Paquette - Updated ValidStandardOptions to only
@@ -85,10 +78,10 @@ namespace Isis {
       ControlNetValidMeasure(Pvl &pvl);
 
       //! Initialize the Standard Options
-      void InitStdOptions(void);         
-      
+      void InitStdOptions(void);
+
       //! Initialize the Standard Options Pvl Group with no DefFile
-      void InitStdOptionsGroup(void);    
+      void InitStdOptionsGroup(void);
 
       virtual ~ControlNetValidMeasure();
 
@@ -105,25 +98,25 @@ namespace Isis {
 
       //! Validate whether the Emission Angle is in the set Range
       bool ValidEmissionAngle(double pdEmissionAngle);
-      
+
       //! Validate whether the Incidence Angle is in the set Range
       bool ValidIncidenceAngle(double pdIncidenceAngle);
-      
+
       //! Validate whether the DN Value is in the set Range
       bool ValidDnValue(double pdDnValue);
-      
+
       //! Validate whether the Resolution is in the set Range
       bool ValidResolution(double pdResolution);
-      
+
       //! Validate whether the Residuals are within the set Tolerance
-      bool ValidResidualTolerances(double pdSampleResidual, double pdLineResidual, 
+      bool ValidResidualTolerances(double pdSampleResidual, double pdLineResidual,
                      double pdResidualMagnitude, MeasureValidationResults & pResults);
 
       bool ValidShiftTolerances(double sampleShift, double lineShift,
           double pixelShift, MeasureValidationResults &results);
-      
+
       //! Validate the Lat/Lon
-      bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine); 
+      bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine);
 
       //! Get the Standard Options Pvl Group
       PvlGroup &GetStdOptions(void) {
@@ -193,17 +186,17 @@ namespace Isis {
       //! Validate Standard options to pick a reference based on a particular criteria
       MeasureValidationResults ValidStandardOptions(const ControlMeasure *pMeasure,
           Cube *pCube, Camera *camera, PvlGroup *pMeasureGrp = NULL);
-      
+
       //! Validate Standard options to pick a reference based on a particular criteria
-      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine,
           const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
-      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine,
           const ControlMeasure *pMeasure, Cube *pCube, Camera *measureCamera,
           PvlGroup *pMeasureGrp = NULL);
-      
+
       //! Validate Standard options to pick a reference based on a particular criteria
-      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine,
                                           Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
       bool IsCubeRequired() {
@@ -212,10 +205,10 @@ namespace Isis {
 
       /**
        * API to get status of CameraRequired flag
-       * 
+       *
        * @author Sharmila Prasad (5/19/2011)
-       * 
-       * @return bool 
+       *
+       * @return bool
        */
       bool IsCameraRequired() {
         return mbCameraRequired;
@@ -224,40 +217,40 @@ namespace Isis {
     protected:
       //! Validate PVL Min & Max DN Standard Options
       void ValidatePvlDN(void);
-      
+
       //! Validate PVL Min & Max EmissionAngle Standard Options
       void ValidatePvlEmissionAngle(void);
-      
+
       //! Validate PVL Min & Max IncidenceAngle Standard Options
       void ValidatePvlIncidenceAngle(void);
-      
+
       //! Validate PVL Min & Max Resolution Standard Options
       void ValidatePvlResolution(void);
-      
+
       //! Validate and read Pixels and Meters from Edge Standard Options
       void ValidatePvlFromEdge(void);
-      
+
       //! Validate Pvl Sample, Line, Residual Magnitude Tolerances
       void ValidatePvlResidualTolerances(void);
 
       void ValidatePvlShiftTolerances();
-      
+
       //! Read the Serial Numbers from the file and open assocaited cubes
       void ReadSerialNumbers(QString psSerialNumfile);
-      
+
       /**
-       * Set the CameraRequired Flag. This flag indicates whether a camera is required 
-       * to Validate a Control Measure. Camera is required to get Emission, Incidence 
-       * angles and Resolution 
-       * 
+       * Set the CameraRequired Flag. This flag indicates whether a camera is required
+       * to Validate a Control Measure. Camera is required to get Emission, Incidence
+       * angles and Resolution
+       *
        * @author Sharmila Prasad (5/19/2011)
-       * 
-       * @param pbFlag 
+       *
+       * @param pbFlag
        */
       void SetCameraRequiredFlag(bool pbFlag){
         mbCameraRequired = pbFlag;
       }
-      
+
       double mdMinDN;                  //!< Standard Option MinDN
       double mdMaxDN;                  //!< Standard Option MaxDN
       double mdMinResolution;          //!< Standard Option MinResolution
@@ -296,11 +289,10 @@ namespace Isis {
       CubeManager mCubeMgr;            //!< CubeManager to open and read cubes
       SerialNumberList mSerialNumbers; //!< Serial numbers list
 
-      bool mbCameraRequired;           //!< To improve speed, flag to indicate if 
+      bool mbCameraRequired;           //!< To improve speed, flag to indicate if
                                        //!< Camera needs to be opened
       bool mbValidateDN;               //!< Check if DN needs to be Validated
       bool mbValidateFromEdge;         //!< Check if Pixels/Meters from edge needs to be Validated
   };
 };
 #endif
-

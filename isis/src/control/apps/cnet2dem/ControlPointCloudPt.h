@@ -1,26 +1,13 @@
 #ifndef ControlPointCloudPt_h
 #define ControlPointCloudPt_h
-/**
- * @file
- * $Revision: 1.0 $ 
- * $Date: 2014/02/27 18:49:25 $ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <cmath>
 
@@ -38,14 +25,14 @@ namespace Isis {
 
 /**
  * @brief 3-D ControlPoint class for use in PointCloud datasets
- *  
+ *
  *  The ControlPoint container is required to not change its content for the
  *  duration of use of the nanoflann kd-tree built from the points.
- *  
+ *
  * @author 2015-10-11 Kris Becker
- *  
- * @internal 
- *   @history 2015-10-11 Kris Becker - Original Version 
+ *
+ * @internal
+ *   @history 2015-10-11 Kris Becker - Original Version
  */
 
 class ControlPointCloudPt {
@@ -62,25 +49,25 @@ class ControlPointCloudPt {
     ControlPointCloudPt() : m_xyz(), m_type(Image), m_serialno(),
                             m_data( new ControlPointData() ),
                             m_merged() {
-      m_data->getImageCoordinates(m_xyz); 
+      m_data->getImageCoordinates(m_xyz);
     }
 
     ControlPointCloudPt(ControlPoint *point, const CoordinateType &ptype,
                         const Ownership owner,
-                        const QString &serialno = "", 
-                        const double &weight = 1.0) : 
+                        const QString &serialno = "",
+                        const double &weight = 1.0) :
                         m_xyz( ), m_type(ptype), m_serialno(serialno),
                         m_data(new ControlPointData(point, owner, weight)),
                         m_merged() {
       if ( Image == ptype ) {
         m_data->setReference(serialno);
-        if ( !selectImageCoordinates() ) { 
-          m_data->disable(); 
+        if ( !selectImageCoordinates() ) {
+          m_data->disable();
         }
       }
       else {  //  ( Ground == ptype )
-        if ( !selectGroundCoordinates() ) { 
-          m_data->disable(); 
+        if ( !selectGroundCoordinates() ) {
+          m_data->disable();
         }
       }
     }
@@ -158,9 +145,9 @@ class ControlPointCloudPt {
     inline double w() const { return ( m_xyz[3] ); }
     inline const double *array() const { return ( m_xyz ); }
 
-    /** Compute real vector length (radius) from ControlPoint 
-     *  
-     *  Radius is returned in meters  
+    /** Compute real vector length (radius) from ControlPoint
+     *
+     *  Radius is returned in meters
      */
     inline double radius() const {
       // compute magnitude
@@ -171,7 +158,7 @@ class ControlPointCloudPt {
 
 
     /** Compute vector length (radius) - code based upon NAIF
-     *  
+     *
      *  Radius is returned in units of input parameters
      */
     inline double radius(const double x, const double y, const double z) const {
@@ -198,27 +185,27 @@ class ControlPointCloudPt {
     }
 
   private:
-    /** 
-     * @brief Shared ControlPoint data pointer 
-     * 
+    /**
+     * @brief Shared ControlPoint data pointer
+     *
      * @author 2015-10-11 Kris Becker
-     *  
-     * @internal 
+     *
+     * @internal
      *   @history 2015-10-11 Kris Becker - Original Version
      */
     class ControlPointData : public QSharedData {
       typedef ControlPointCloudPt::Ownership Ownership;
       public:
-        ControlPointData() : QSharedData(), m_point(0), m_reference(0), 
+        ControlPointData() : QSharedData(), m_point(0), m_reference(0),
                              m_weight(1.0), m_initial(0),
                              m_owner(Exclusive){ }
-        ControlPointData(ControlPoint *point, const Ownership owner, 
+        ControlPointData(ControlPoint *point, const Ownership owner,
                          const double weight = 1.0) :
-                         QSharedData(), m_point(point), 
-                         m_reference(0), 
+                         QSharedData(), m_point(point),
+                         m_reference(0),
                          m_weight(weight),
-                         m_initial(point->GetNumValidMeasures()), 
-                         m_owner(owner) { 
+                         m_initial(point->GetNumValidMeasures()),
+                         m_owner(owner) {
           if ( m_point->GetNumMeasures() > 0) {
             m_reference = m_point->GetRefMeasure();
           }
@@ -229,7 +216,7 @@ class ControlPointCloudPt {
                          m_weight(other.m_weight),
                          m_initial(other.m_initial),
                          m_owner(Shared) { }
-        ~ControlPointData() { 
+        ~ControlPointData() {
           if ( Exclusive == m_owner ) {
              delete (m_point);
              m_point = 0;
@@ -294,12 +281,12 @@ class ControlPointCloudPt {
         inline bool isDisabled() const {
           if ( 0 == m_point ) return ( true );
           return (
-                   m_point->IsInvalid()  || 
-                   m_point->IsIgnored() || 
+                   m_point->IsInvalid()  ||
+                   m_point->IsIgnored() ||
                    m_point->IsRejected() ||
                    m_point->IsEditLocked()  ||
                    ( 0 == m_reference )
-                   ); 
+                   );
         }
 
         inline void disable() {
@@ -309,10 +296,10 @@ class ControlPointCloudPt {
           return;
         }
 
-        // The first to call this method will take ownership of the 
+        // The first to call this method will take ownership of the
         // ControlPoint if Exclusive. Cloned otherwise.
         ControlPoint *take() {
-          ControlPoint *p(m_point); 
+          ControlPoint *p(m_point);
           if ( 0 == m_point ) {  return (p); }
 
           // If someone else owns the point, clone it
@@ -329,7 +316,7 @@ class ControlPointCloudPt {
         }
 
         // Data....
-        ControlPoint          *m_point; 
+        ControlPoint          *m_point;
         ControlMeasure        *m_reference;
         double                m_weight;
         int                   m_initial;
@@ -338,7 +325,7 @@ class ControlPointCloudPt {
 
       private:
         inline bool getNoPointData(double coords[4]) const {
-          coords[0] = coords[1] = coords[2] = 0.0; 
+          coords[0] = coords[1] = coords[2] = 0.0;
           coords[3] = m_weight;
           return ( false );
         }

@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "ClipperWacFcCamera.h"
 
@@ -40,8 +28,8 @@ namespace Isis {
    *
    * @param lab Pvl label from a Clipper wide angle framing camera image.
    *
-   * @author Stuart Sides and Summer Stapleton-Greig 
-   *  
+   * @author Stuart Sides and Summer Stapleton-Greig
+   *
    * @internal
    */
   ClipperWacFcCamera::ClipperWacFcCamera(Cube &cube) : FramingCamera(cube) {
@@ -53,14 +41,14 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
 
-    SetFocalLength(); 
+    SetFocalLength();
     SetPixelPitch();
 
     // Set up detector map, focal plane map, and distortion map
     new CameraDetectorMap(this);
     new CameraFocalPlaneMap(this, naifIkCode());
     new CameraDistortionMap(this);
-    
+
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
@@ -81,10 +69,10 @@ namespace Isis {
   }
 
   /**
-   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and 
+   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and
    * end an observation, but this function is being used to get the observation start and end times,
-   * so we will simulate a shutter. 
-   * 
+   * so we will simulate a shutter.
+   *
    * @param exposureDuration ExposureDuration keyword value from the labels,
    *                         converted to seconds.
    * @param time The StartTime keyword value from the labels, converted to
