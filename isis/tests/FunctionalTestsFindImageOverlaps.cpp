@@ -31,7 +31,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").exp
 TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
   ImagePolygon fp1;
   fp1.Create(*cube1);
-  cube1->write(fp1);
+  cube1->write(*(fp1.toBlob()));
 
   Cube newCube2;
   json newIsd2;
@@ -43,7 +43,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
 
   ImagePolygon fp2;
   fp2.Create(newCube2);
-  newCube2.write(fp2);
+  newCube2.write(*(fp2.toBlob()));
 
   FileList cubes;
   cubes.append(cube1->fileName());
@@ -115,7 +115,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
             {34, 1},
             {31, 1}};
   poly.Create(coords);
-  cube2->write(poly);
+  cube2->write(*(poly.toBlob()));
   cube2->reopen("rw");
 
   QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};

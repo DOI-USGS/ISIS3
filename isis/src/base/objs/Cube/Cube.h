@@ -38,6 +38,7 @@ namespace Isis {
   class Statistics;
   class Histogram;
   class History;
+  class ImagePolygon;
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -250,6 +251,7 @@ namespace Isis {
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       History readHistory(const QString &name = "IsisCube") const;
+      ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(Buffer &wbuf);
 
