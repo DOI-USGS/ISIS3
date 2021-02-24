@@ -446,8 +446,8 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
       Camera *cam;
       cam = icube->camera();
       cam->instrumentPosition()->SetAberrationCorrection("LT+S");
-      obsStartTime = cam->getClockTime(startTime.toLatin1().data(), -77).Et();
-      cam->setTime(obsStartTime);
+      // Set time to the starting time of the image by setting image.
+      cam->SetImage(0.5, 0.5);
 
       // rsun converted to AU
       rsun = cam->sunToBodyDist() / 1.49597870691E8 / 5.2;
