@@ -15,17 +15,17 @@
     </p>
 
     <p>
-      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
+      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature.
     </p>
 
     <h3>Dark Correction:</h3>
     <p>
       If the DarkFile parameter is set, the given file(s) will be used for calibration. If DarkFile
       is set to "Default" or not set at all, the dark files will be looked up based on the time and
-      temperature in the WAC being calibrated. The parameter,MiddleTemperatureFpa, is used for 
-      temperature and StartTime for time. This program, lrowaccal, will attempt to find the 2 dark 
-      files with closest time/temperature and interpolate/extrapolate from them. The method for 
-      finding dark files is as follows: 
+      temperature in the WAC being calibrated. The parameter,MiddleTemperatureFpa, is used for
+      temperature and StartTime for time. This program, lrowaccal, will attempt to find the 2 dark
+      files with closest time/temperature and interpolate/extrapolate from them. The method for
+      finding dark files is as follows:
       <ul>
       <li>Create filename template based on WAC image offset and type (UV, BW, etc). Example: WAC_UV_Offset68_*C_*T_Dark.????.cub</li>
       <li>Look in $lro/calibration/wac_darks for matching files.</li>
@@ -67,8 +67,8 @@
         </div>
       </li>
       <li>
-        If only one temperature is available, the 2 times that are closest to the WAC time will be 
-        chosen. This will allow WACs to always be calibrated against something, instead of just 
+        If only one temperature is available, the 2 times that are closest to the WAC time will be
+        chosen. This will allow WACs to always be calibrated against something, instead of just
         failing.
         <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
           Example result:<br/>
@@ -142,7 +142,7 @@
             --------------------
              a*(frameTemp) + b
 
-             Where: 
+             Where:
                'a' and 'b' are band dependent constants, read in from a file.
              AND
                frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
@@ -151,13 +151,13 @@
     </p>
 
     <p>
-      The DN level in an uncalibrated image is the sum of the true signal from the scene, 
+      The DN level in an uncalibrated image is the sum of the true signal from the scene,
       the bias, the dark current, and random noise in all 3 components. The random noise in
       the true signal and dark current is called shot noise and the random noise in the bias
       is called read noise. The true signal, bias, and dark current are defined as mean
-      values so that if the random noise were averaged down to insignificance by taking a 
-      very large number of images and averaging them, the resulting image would be the true 
-      scene, bias, and dark current with no systematic error. That implies the statistical 
+      values so that if the random noise were averaged down to insignificance by taking a
+      very large number of images and averaging them, the resulting image would be the true
+      scene, bias, and dark current with no systematic error. That implies the statistical
       distribution of the random noise has an average of zero, and therefore the random noise
       has both positive and negative values, except for the trivial case of zero random noise.
     </p>
@@ -208,26 +208,29 @@
       Original version
     </change>
     <change name="Dan Clarke" date="2012-08-13">
-      Updated use of deprecated methods (use ProcessCube instead 
-      of Start/EndProcess). Updated documentation/comments. 
+      Updated use of deprecated methods (use ProcessCube instead
+      of Start/EndProcess). Updated documentation/comments.
       Optimized/cleaned up code in Calibrate, GetDark, and GetMask.
-      Changed the algorithm for finding dark files in GetDark. 
-      GetDark will now find the two closest available dark file 
+      Changed the algorithm for finding dark files in GetDark.
+      GetDark will now find the two closest available dark file
       temperatures matching the input WAC cube. Then, it will find
-      the dark file at each temperature with the time closest to the 
-      WAC time. This should prevent failed calibrations from missing 
+      the dark file at each temperature with the time closest to the
+      WAC time. This should prevent failed calibrations from missing
       darks.
     </change>
     <change name="Adam Licht" date="2012-12-18">
       Fixed an error which would apply band 1 corrections to a
-      single passed in band, even if that band was not band 1. 
+      single passed in band, even if that band was not band 1.
     </change>
     <change name="Adam Licht" date="2013-04-16">
       Implemented a temperature based correction to lrowaccal.
-      This correction requires constants which are read from a 
+      This correction requires constants which are read from a
       pvl file. A file other than the default can be passed in
       via an argument. The correction may also be turned off via
       an argument.
+    </change>
+    <change name="Stuart Sides" date="2021-02-22">
+      Added ability to get the sun distance from the camera.
     </change>
   </history>
 
@@ -271,13 +274,13 @@
           Calibrate using a dark file.
         </brief>
         <description>
-          Calibrate using a correction based off of a dark file. Please see the Dark Correction 
-          section at the beginning of this document for a detailed explanation of how the 
+          Calibrate using a correction based off of a dark file. Please see the Dark Correction
+          section at the beginning of this document for a detailed explanation of how the
           correction is applied
         </description>
         <inclusions><item>DarkFile</item></inclusions>
       </parameter>
-      
+
       <parameter name="DarkFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -285,14 +288,14 @@
           Dark file used for calibration.
         </brief>
         <description>
-          Dark file used for calibration. The default is to use the dark file with the closest 
+          Dark file used for calibration. The default is to use the dark file with the closest
           time and temperature to the WAC image being calibrated. See the Dark Correction section
           at the beginning of this document for a detailed explanation of how dark files are
           chosen.
         </description>
       </parameter>
     </group>
-      
+
     <group name="Flatfield Options">
       <parameter name="Flatfield">
         <type>boolean</type>
@@ -305,7 +308,7 @@
         </description>
         <inclusions><item>FlatfieldFile</item></inclusions>
       </parameter>
-      
+
       <parameter name="FlatfieldFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -318,7 +321,7 @@
         </description>
       </parameter>
     </group>
-      
+
     <group name="Radiometric Options">
       <parameter name="Radiometric">
         <type>boolean</type>
@@ -327,15 +330,15 @@
           Do radiometric calibration.
         </brief>
         <description>
-          Perform a radiometric calibration on the input cub. This type of this correction is 
-          defined by the RadiometricType parameter. 
+          Perform a radiometric calibration on the input cub. This type of this correction is
+          defined by the RadiometricType parameter.
         </description>
         <inclusions>
           <item>RadiometricType</item>
           <item>RadiometricFile</item>
         </inclusions>
       </parameter>
-      
+
       <parameter name="RadiometricType">
         <type>string</type>
         <brief>
@@ -358,7 +361,7 @@
           </option>
         </list>
       </parameter>
-      
+
       <parameter name="RadiometricFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -366,12 +369,12 @@
           Radiometric constants file used for calibration.
         </brief>
         <description>
-          Radiometric constants file used for calibration. The default is to use the system 
+          Radiometric constants file used for calibration. The default is to use the system
           defined file with the highest version.
         </description>
       </parameter>
     </group>
-    
+
     <group name="Special Pixels Options">
       <parameter name="SpecialPixels">
         <type>boolean</type>
@@ -380,22 +383,22 @@
 
         </brief>
         <description>
-          This option will apply a special pixel mask to the input cub. The default is to use the 
-          system defined mask file with the matching WAC mode and closest Temperature to the input 
-          cub. Please see the main documentation for a detailed description of the 
-          Special Pixel Mask correction. 
+          This option will apply a special pixel mask to the input cub. The default is to use the
+          system defined mask file with the matching WAC mode and closest Temperature to the input
+          cub. Please see the main documentation for a detailed description of the
+          Special Pixel Mask correction.
         </description>
         <inclusions><item>SpecialPixelsFile</item></inclusions>
       </parameter>
-      
+
       <parameter name="SpecialPixelsFile">
         <type>filename</type>
         <default><item>Default</item></default>
         <brief>
-          This option will apply a special pixel mask to the cub. The default is to use the system 
-          defined mask file with the matching WAC mode and closest Temperature to the input cub. 
-          Please see the main documentation for a detailed description of the 
-          Special Pixel Mask correction. 
+          This option will apply a special pixel mask to the cub. The default is to use the system
+          defined mask file with the matching WAC mode and closest Temperature to the input cub.
+          Please see the main documentation for a detailed description of the
+          Special Pixel Mask correction.
         </brief>
         <description>
         </description>
@@ -427,6 +430,6 @@
         </description>
       </parameter>
     </group>
-   
+
   </groups>
 </application>
