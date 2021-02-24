@@ -70,8 +70,7 @@ namespace Isis {
       dataSource["OriginalLabel"].update(pvlToJSON(pvlOrigLabel));
     }
     else if (cubeLabel.hasObject("OriginalXmlLabel")) {
-      OriginalXmlLabel origXmlBlob;
-      icube->read(origXmlBlob);
+      OriginalXmlLabel origXmlBlob = icube->readOriginalXmlLabel();
       QDomDocument doc = origXmlBlob.ReturnLabels();
       dataSource["OriginalLabel"].update(xmlToJson(doc));
     }
