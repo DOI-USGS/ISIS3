@@ -459,6 +459,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
         spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
         Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
         QString sclkName(sclk.expanded());
+        NaifStatus::CheckErrors();
         furnsh_c(sclkName.toLatin1().data());
         NaifStatus::CheckErrors();
         double obsStartTime;
