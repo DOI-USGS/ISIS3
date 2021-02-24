@@ -36,6 +36,7 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
+  class Table;
   class Histogram;
   class History;
   class OriginalLabel;
@@ -255,6 +256,7 @@ namespace Isis {
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
+      void write(const Table &table);
       void write(OriginalLabel lab);
       void write(Buffer &wbuf);
 
@@ -307,10 +309,12 @@ namespace Isis {
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
+      Table readTable(const QString &name);
       bool hasBlob(const QString &type, const QString &name);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
+
 
     private:
       void applyVirtualBandsToLabel();

@@ -371,27 +371,27 @@ namespace Isis {
 
     Table originalInstrumentPointing("InstrumentPointing");
     if (cube->hasTable("InstrumentPointing")) {
-      cube->read(originalInstrumentPointing);
+      originalInstrumentPointing = cube->readTable("InstrumentPointing");
     }
 
     Table originalInstrumentPosition("InstrumentPosition");
     if (cube->hasTable("InstrumentPosition")) {
-      cube->read(originalInstrumentPosition);
+      originalInstrumentPosition = cube->readTable("InstrumentPosition");
     }
 
     Table originalBodyRotation("BodyRotation");
     if (cube->hasTable("BodyRotation")) {
-      cube->read(originalBodyRotation);
+      originalBodyRotation = cube->readTable("BodyRotation");
     }
 
     Table originalSunPosition("SunPosition");
     if (cube->hasTable("SunPosition")) {
-      cube->read(originalSunPosition);
+      originalSunPosition = cube->readTable("SunPosition");
     }
 
     Table originalCameraStatistics("CameraStatistics");
     if (cube->hasTable("CameraStatistics")) {
-      cube->read(originalCameraStatistics);
+      originalCameraStatistics = cube->readTable("CameraStatistics");
     }
 
     ImagePolygon originalFootprint;

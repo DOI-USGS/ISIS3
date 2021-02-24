@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 #include <QMutex>
 
 #include "Application.h"
+#include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "CubeAttribute.h"
@@ -36,6 +37,7 @@ find files of those names at the top level of this repository. **/
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Table.h"
 #include "TProjection.h"
 #include "Longitude.h"
 
@@ -955,6 +957,12 @@ namespace Isis {
   void Cube::write(OriginalLabel lab) {
     write(*(lab.toBlob()));
   }
+
+  void Cube::write(const Table &table) {
+    Blob tableBlob = table.toBlob();
+    write(tableBlob);
+  }
+
 
   /**
    * This method will write a buffer of data from the cube as specified by the
@@ -1877,6 +1885,19 @@ namespace Isis {
       }
     }
     return false;
+  }
+
+
+  Table Cube::readTable(const QString &name) {
+    Blob tableBlob(name, "Table");
+    try {
+      read(tableBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+    return Table(tableBlob);
   }
 
 

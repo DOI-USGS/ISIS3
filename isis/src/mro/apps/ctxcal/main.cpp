@@ -87,8 +87,7 @@ void IsisMain() {
   if(firstSamp > 0) firstSamp -= 38;
 
   //  Read dark current info, if no dc exit?
-  Table dcTable("Ctx Prefix Dark Pixels");
-  icube->read(dcTable);
+  Table dcTable = icube->readTable("Ctx Prefix Dark Pixels");
   //  TODO::  make sure dc records match cube nlines.
 
   //  If summing mode = 1 , average odd & even dc pixels separately for
