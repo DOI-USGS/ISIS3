@@ -505,6 +505,20 @@ namespace Isis {
     delete isdPathR;
   }
 
+
+  void MroCtxCube::SetUp() {
+    TempTestingFiles::SetUp();
+    
+    QString testPath = "/tmp/test.cub";
+    QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MroCtxCube::TearDown() {
+    testCube.reset();
+  }
+
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
