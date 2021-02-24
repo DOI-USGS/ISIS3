@@ -448,22 +448,9 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
       cam->instrumentPosition()->SetAberrationCorrection("LT+S");
       obsStartTime = cam->getClockTime(startTime.toLatin1().data(), -77).Et();
       cam->setTime(obsStartTime);
-      double sunv[3];
-      cam->sunPosition(sunv);
 
-      double sunkm = vnorm_c(sunv);
-
-      //  Convert to AU units
-      rsun = sunkm / 1.49597870691E8 / 5.2;
-
-      /*
-       * We are calculating I/F, so scaleFactor0 is:
-       *
-       *         S1       K
-       *      -------- * --- (D/5.2)**2
-       *         A1       Ko
-       */
-      scaleFactor0 = (s1 * (cubeConversion / gainConversion) * pow(rsun, 2)) / (scaleFactor);
+      // rsun converted to AU
+      rsun = cam->sunToBodyDist() / 1.49597870691E8 / 5.2;
     } 
     catch (IException &e) {
       // try original fallback for previously spiceinited data 
@@ -484,22 +471,21 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
         
         //  Convert to AU units
         rsun = sunkm / 1.49597870691E8 / 5.2;
-        
-        /*
-         * We are calculating I/F, so scaleFactor0 is:
-         *
-         *         S1       K
-         *      -------- * --- (D/5.2)**2
-         *         A1       Ko
-         */
-        scaleFactor0 = (s1 * (cubeConversion / gainConversion) * pow(rsun, 2)) / (scaleFactor);
       } 
       catch (IException &e) {
         QString message = "IOF option does not work with non-spiceinited cubes.";
         throw IException(e, IException::User, message, _FILEINFO_);
       }
     }
-
+        
+   /*
+    * We are calculating I/F, so scaleFactor0 is:
+    *
+    *         S1       K
+    *      -------- * --- (D/5.2)**2
+    *         A1       Ko
+    */
+    scaleFactor0 = (s1 * (cubeConversion / gainConversion) * pow(rsun, 2)) / (scaleFactor);
   }
   else {
     /*
