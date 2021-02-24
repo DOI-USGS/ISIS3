@@ -57,8 +57,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
   SpiceRotation *newKernelRotation = newCamera->instrumentRotation();
   SpiceRotation *originalRotation = testCube->camera()->instrumentRotation();
 
-  Table instPointingTable("InstrumentPointing");
-  testCube->read(instPointingTable);
+  Table instPointingTable = testCube->readTable("InstrumentPointing");
   double startTime = double(instPointingTable.Label()["CkTableStartTime"]);
 
   newKernelRotation->SetEphemerisTime(startTime);
@@ -127,8 +126,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
   SpiceRotation *newKernelRotation = newCamera->instrumentRotation();
   SpiceRotation *originalRotation = origCamera->instrumentRotation();
 
-  Table instPointingTable("InstrumentPointing");
-  testCube->read(instPointingTable);
+  Table instPointingTable = testCube->readTable("InstrumentPointing");
   double startTime = double(instPointingTable.Label()["CkTableStartTime"]);
 
   newKernelRotation->SetEphemerisTime(startTime);

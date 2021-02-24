@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Isis.h"
 #include "SpecialPixel.h"
+#include "Blob.h"
 #include "CubeAttribute.h"
 #include "Cube.h"
 #include "LineManager.h"

@@ -74,8 +74,7 @@ TEST(Demprep, DemprepDefault){
   ASSERT_NEAR(double(mapping["Scale"]), 1.21293, .00001);
   ASSERT_DOUBLE_EQ(double(mapping["CenterLatitude"]), 0.0);
 
-  Table shapeModel("ShapeModelStatistics");
-  cube.read(shapeModel);
+  Table shapeModel = cube.readTable("ShapeModelStatistics");
   // Assertion for minimum radius
   ASSERT_DOUBLE_EQ(double(shapeModel[0][0]), 1728.805);
   // Assertion for maximum radius
