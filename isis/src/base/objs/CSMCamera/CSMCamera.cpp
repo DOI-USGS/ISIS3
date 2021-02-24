@@ -52,8 +52,7 @@ namespace Isis {
    *             ISIS Camera Model.
    */
   CSMCamera::CSMCamera(Cube &cube) : Camera(cube) {
-    StringBlob state("","CSMState");
-    cube.read(state);
+    StringBlob state = cube.readString("CSMState");
     PvlObject &blobLabel = state.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];

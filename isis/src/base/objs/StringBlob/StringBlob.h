@@ -11,9 +11,12 @@ find files of those names at the top level of this repository. **/
 
 #include <string>
 
-#include "Blob.h"
+#include <QString>
+
+#include "Pvl.h"
 
 namespace Isis {
+  class Blob;
   /**
    * @brief Read and store std::strings on the cube.
    *
@@ -25,24 +28,31 @@ namespace Isis {
    * @internal
    *   @history 2020-11-19 Kristin Berry - Original Version
     */
-  class StringBlob : public Isis::Blob {
+  class StringBlob {
     public:
       StringBlob();
-      StringBlob(const QString &file);
+      StringBlob(Blob &blob);
       StringBlob(std::string str, QString name);
-      ~StringBlob();
+      virtual ~StringBlob();
 
-      std::string string() {
+      virtual Blob *toBlob() const;
+
+      std::string string() const {
         return m_string;
       }
 
-    protected:
-      // prepare data for writing
-      void WriteInit();
-      void ReadData(std::istream &stream);
+      QString name() const {
+        return m_name;
+      }
+
+      PvlObject &Label() {
+        return m_label;
+      }
 
     private:
       std::string m_string;
+      QString m_name;
+      PvlObject m_label;
   };
 };
 

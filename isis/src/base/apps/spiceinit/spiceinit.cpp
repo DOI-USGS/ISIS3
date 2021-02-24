@@ -381,7 +381,7 @@ namespace Isis {
     // Save off the CSM State so it can be restored if spiceinit fails
     StringBlob csmState("", "CSMState");
     if (icube->hasBlob("String", "CSMState")) {
-      icube->read(csmState);
+      icube->readString("CSMState");
     }
 
     // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera
@@ -673,7 +673,7 @@ namespace Isis {
         continue;
       }
     }
-    
+
     if (ui.GetString("SHAPE") == "USER") {
       kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
     }

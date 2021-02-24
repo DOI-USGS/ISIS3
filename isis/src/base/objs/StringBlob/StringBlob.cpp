@@ -7,26 +7,22 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include <string>
 #include "StringBlob.h"
-#include "Application.h"
+#include "Blob.h"
 
 using namespace std;
 namespace Isis {
   /**
    * Constructor for creating a string blob with no arguments
    */
-  StringBlob::StringBlob() : Isis::Blob("IsisCube", "String") {
+  StringBlob::StringBlob() {
     m_string = "";
+    m_name = "";
   }
 
-  /**
-   * Constructor for creating a string blob with a file to
-   * read labels from.
-   *
-   * @param file File to read labels from
-   */
-  StringBlob::StringBlob(const QString &file) :
-    Isis::Blob("IsisCube", "String") {
-    Blob::Read(file);
+  StringBlob::StringBlob(Blob &blob) {
+    m_label = blob.Label();
+    m_string = std::string(blob.getBuffer(), blob.Size());
+    m_name = blob.Name();
   }
 
   /**
@@ -34,55 +30,32 @@ namespace Isis {
    *
    * @param string String to read/write from the cube.
    */
-  StringBlob::StringBlob(std::string str, QString name) : Isis::Blob(name, "String") {
+  StringBlob::StringBlob(std::string str, QString name) {
     m_string = str;
+    m_name = name;
   }
 
   // Destructor
   StringBlob::~StringBlob() {
   }
 
-  /**
-   * Prepare to write string to output cube
-   */
-  void StringBlob::WriteInit() {
-    p_nbytes = m_string.size();
+  Blob *StringBlob::toBlob() const {
+    Blob *blob = new Blob(m_name, "String");
 
-    if (p_buffer != NULL) {
-      delete p_buffer;
+    char *buf = new char[m_string.size()];
+    memcpy(buf, m_string.c_str(), m_string.size());
+    blob->setData(buf, m_string.size());
+
+    PvlObject &blobLabel = blob->Label();
+    for (int i = 0; i < m_label.keywords(); i++) {
+      if (!blobLabel.hasKeyword(m_label[i].name())) {
+        blobLabel += m_label[i];
+      }
+    }
+    for (int g = 0; g < m_label.groups(); g++) {
+      blobLabel += m_label.group(g);
     }
 
-    p_buffer = new char[p_nbytes];
-    const char *ptr = m_string.c_str();
-    memcpy(p_buffer, (void *)ptr, p_nbytes);
-  }
-
-  /**
-   * Read binary data from an input stream into the string.
-   *
-   * @param stream The input stream to read from.
-   *
-   * @throws IException::Io - Error reading data from stream
-   */
-  void StringBlob::ReadData(std::istream &stream) {
-    // Read the binary data
-    if (p_buffer != NULL) delete [] p_buffer;
-    p_buffer = new char[p_nbytes];
-
-    streampos sbyte = p_startByte - 1;
-    stream.seekg(sbyte, std::ios::beg);
-    if (!stream.good()) {
-      QString msg = "Error preparing to read data from " + p_type +
-                   " [" + p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    stream.read(p_buffer, p_nbytes);
-    if (!stream.good()) {
-      QString msg = "Error reading data from " + p_type + " [" + p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    m_string = std::string(p_buffer, p_nbytes);
+    return blob;
   }
 }

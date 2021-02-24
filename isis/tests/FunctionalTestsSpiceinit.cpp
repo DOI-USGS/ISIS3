@@ -536,7 +536,7 @@ TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
   spiceinit(testCube, options);
 
   EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
-  EXPECT_ANY_THROW(testCube->read(testBlob));
+  EXPECT_ANY_THROW(testCube->readString("CSMState"));
 }
 
 TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
@@ -553,7 +553,7 @@ TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
   ASSERT_ANY_THROW(spiceinit(testCube, options));
 
   EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
-  EXPECT_NO_THROW(testCube->read(testBlob));
+  EXPECT_NO_THROW(testCube->readString("CSMState"));
 }
 
 TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
@@ -691,7 +691,7 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
   PvlGroup csmInfoGroup = testCube->group("CsmInfo");
   testCube->close();
 
-  // spiceinit 
+  // spiceinit
   QVector<QString> spiceinitArgs = {"from="+cubeFile};
 
   UserInterface spiceinitOptions(APP_XML, spiceinitArgs);

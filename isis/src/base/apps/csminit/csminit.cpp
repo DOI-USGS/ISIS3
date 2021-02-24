@@ -364,9 +364,9 @@ namespace Isis {
     }
 
     // Save off all old Blobs to restore in the case of csminit failure
-    StringBlob originalCsmStateBlob("", "CSMState");
+    StringBlob originalCsmStateBlob;
     if (cube->hasBlob("String", "CSMState")) {
-      cube->read(originalCsmStateBlob);
+      originalCsmStateBlob = cube->readString("CSMState");
     }
 
     Table originalInstrumentPointing("InstrumentPointing");
@@ -441,7 +441,7 @@ namespace Isis {
       cube->deleteBlob("String", "CSMState");
 
       // Restore the original blobs
-      if (originalCsmStateBlob.Size() != 0) {
+      if (originalCsmStateBlob.string().size() != 0) {
         cube->write(originalCsmStateBlob);
       }
 

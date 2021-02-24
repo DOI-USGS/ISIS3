@@ -88,13 +88,10 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   testCube->open(filename);
 
   // Get a model and a state string
-  StringBlob stateString("","CSMState");
-  testCube->read(stateString);
+  StringBlob stateString = testCube->readString("CSMState");
 
   // Verify contents of the StringBlob's PVL label
   PvlObject blobPvl = stateString.Label();
-  EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
@@ -159,13 +156,8 @@ TEST_F(CSMPluginFixture, CSMInitRunTwice) {
 
   testCube->open(filename);
 
-  StringBlob stateString("", "CSMState");
-  testCube->read(stateString);
+  StringBlob stateString = testCube->readString("CSMState");
   PvlObject blobPvl = stateString.Label();
-
-  // Verify contents of the StringBlob's PVL label
-  EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
@@ -222,13 +214,8 @@ TEST_F(CSMPluginFixture, CSMInitMultiplePossibleModels) {
   csminit(betterOptions);
 
   testCube->open(filename);
-  StringBlob stateString("", "CSMState");
-  testCube->read(stateString);
+  StringBlob stateString = testCube->readString("CSMState");
   PvlObject blobPvl = stateString.Label();
-
-  // Check blobPvl contents
-  EXPECT_EQ(stateString.Name().toStdString(), "CSMState");
-  EXPECT_EQ(stateString.Type().toStdString(), "String");
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
@@ -471,8 +458,7 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
   testCube->open(filename);
 
   // Read blob off csminited cube, get state string and save off to compare
-  StringBlob state("","CSMState");
-  testCube->read(state);
+  StringBlob state = testCube->readString("CSMState");
   testCube->close();
 
   // Write the state out to a file
@@ -495,7 +481,6 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
   // Pull state string off. if ending state string = original state string these are functionally equiv.
   testCube->open(filename);
 
-  StringBlob stateAfter("","CSMState");
-  testCube->read(stateAfter);
+  StringBlob stateAfter = testCube->readString("CSMState");
   EXPECT_STREQ(stateBefore.c_str(), stateAfter.string().c_str());
 }

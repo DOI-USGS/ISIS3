@@ -37,6 +37,7 @@ find files of those names at the top level of this repository. **/
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "StringBlob.h"
 #include "Table.h"
 #include "TProjection.h"
 #include "Longitude.h"
@@ -878,6 +879,19 @@ namespace Isis {
     return origLabel;
   }
 
+  StringBlob Cube::readString(const QString &name) const {
+    Blob blob(name, "String");
+    try {
+      read(blob);
+    }
+    catch (IException &){
+      QString msg = "Unable to locate String named [" + name + "] in [" + fileName() + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    StringBlob strBlob(blob);
+    return strBlob;
+  }
+
   /**
    * This method will write a blob of data (e.g. History, Table, etc)
    * to the cube as specified by the contents of the Blob object.
@@ -961,6 +975,11 @@ namespace Isis {
   void Cube::write(const Table &table) {
     Blob tableBlob = table.toBlob();
     write(tableBlob);
+  }
+
+
+  void Cube::write(const StringBlob &str) {
+    write(*(str.toBlob()));
   }
 
 

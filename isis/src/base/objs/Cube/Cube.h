@@ -36,6 +36,7 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
+  class StringBlob;
   class Table;
   class Histogram;
   class History;
@@ -255,9 +256,11 @@ namespace Isis {
       OriginalLabel readOriginalLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
+      StringBlob readString(const QString &name = "IsisCube") const;
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
       void write(OriginalLabel lab);
+      void write(const StringBlob &str);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);
