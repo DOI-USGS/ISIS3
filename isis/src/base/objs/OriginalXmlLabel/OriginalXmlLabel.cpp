@@ -36,7 +36,7 @@ namespace Isis {
     fromBlob(blob);
   }
 
-/**
+  /**
    * Constructs an OriginalXmlLabel from a blob
    *
    * @param blob Blob from which to create the OriginalXmlLabel
@@ -52,6 +52,10 @@ namespace Isis {
   OriginalXmlLabel::~OriginalXmlLabel() {
   }
 
+
+  /*
+   * Load blob data into m_originalLabel
+   */
   void OriginalXmlLabel::fromBlob(Isis::Blob blob) {
     QString errorMessage;
     int errorLine;
@@ -105,36 +109,6 @@ namespace Isis {
 
      xmlFile.close();
   }
-
-
-  /**
-   * Prepare to write the label out.
-   *
-   * @see Blob::Write
-   */
-//  void OriginalXmlLabel::WriteInit() {
-//    p_nbytes = m_originalLabel.toByteArray(0).size();
-//
-//    if (Isis::IsLsb()) {
-//      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
-//    }
-//    else {
-//      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
-//    }
-//  }
-//
-//
-//  /**
-//   * Write the label out to a stream.
-//   *
-//   * @param os The stream to write the label out to.
-//   *
-//   * @see Blob::Write
-//   */
-//  void OriginalXmlLabel::WriteData(std::fstream &os) {
-//    QByteArray labelByteArray = m_originalLabel.toByteArray(0);
-//    os.write( labelByteArray.data(), labelByteArray.size() );
-//  }
 
 
   /**
