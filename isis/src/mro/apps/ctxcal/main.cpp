@@ -15,6 +15,8 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "Brick.h"
 #include "Table.h"
+#include "Camera.h"
+#include "NaifStatus.h"
 
 using namespace std;
 using namespace Isis;
@@ -139,21 +141,40 @@ void IsisMain() {
   //    iof = conversion factor from counts/ms to i/f
   bool convertIOF = ui.GetBoolean("IOF");
   if(convertIOF) {
-    // Get the distance between Mars and the Sun at the given time in
-    // Astronomical Units (AU)
-    QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-    furnsh_c(bspKernel.toLatin1().data());
-    QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-    furnsh_c(satKernel.toLatin1().data());
-    QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-    furnsh_c(pckKernel.toLatin1().data());
-    double sunpos[6], lt;
-    spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
-    double dist1 = vnorm_c(sunpos);
-    unload_c(bspKernel.toLatin1().data());
-    unload_c(satKernel.toLatin1().data());
-    unload_c(pckKernel.toLatin1().data());
+    double dist1 = 1; 
+    try {
+      Camera *cam;
+      cam = icube->camera();
+      cam->setTime(startTime);
+      dist1 = cam->sunToBodyDist();
+    }
+    catch(IException &e) { 
+      // Get the distance between Mars and the Sun at the given time in
+      // Astronomical Units (AU)
+      QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+      NaifStatus::CheckErrors();
+      furnsh_c(bspKernel.toLatin1().data());
+      NaifStatus::CheckErrors();
+      QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
+      furnsh_c(satKernel.toLatin1().data());
+      NaifStatus::CheckErrors();
+      QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+      furnsh_c(pckKernel.toLatin1().data());
+      NaifStatus::CheckErrors();
+      double sunpos[6], lt;
 
+      spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
+      NaifStatus::CheckErrors();
+
+      dist1 = vnorm_c(sunpos);
+      
+      NaifStatus::CheckErrors();
+      unload_c(bspKernel.toLatin1().data());
+      unload_c(satKernel.toLatin1().data());
+      unload_c(pckKernel.toLatin1().data());
+      NaifStatus::CheckErrors();
+    }
+    
     double dist = 2.07E8;
     double w0 = 3660.5;
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
