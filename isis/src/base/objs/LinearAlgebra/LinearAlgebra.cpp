@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.1 $
- * $Date: 2009/09/09 23:15:18 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "LinearAlgebra.h"
 
 // std library
@@ -36,6 +20,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
+// Armadillo
+#include <armadillo>
+
 // other Isis library
 #include "Angle.h"
 #include "Constants.h"
@@ -45,9 +32,9 @@
 
 namespace Isis {
   /**
-   * Default constructor for a LinearAlgebra object. This is protected so it can 
-   * never be constructed. The static methods and typedefs in this class are 
-   * meant to be used without a LinearAlgebra object. 
+   * Default constructor for a LinearAlgebra object. This is protected so it can
+   * never be constructed. The static methods and typedefs in this class are
+   * meant to be used without a LinearAlgebra object.
    */
   LinearAlgebra::LinearAlgebra() {
   }
@@ -60,15 +47,15 @@ namespace Isis {
   }
 
 
-  /** 
-   * Determines whether the given matrix is the identity. Non-square matrices 
-   * always return false. A qfuzzycompare is used when checking the zeroes and 
-   * ones. 
-   * 
-   * @param matrix The matrix to check. Automatically returns false if not 
+  /**
+   * Determines whether the given matrix is the identity. Non-square matrices
+   * always return false. A qfuzzycompare is used when checking the zeroes and
+   * ones.
+   *
+   * @param matrix The matrix to check. Automatically returns false if not
    *               square.
-   * 
-   * @return @b bool Returns true if the matrix is a square identity matrix 
+   *
+   * @return @b bool Returns true if the matrix is a square identity matrix
    *                 (i.e. there are ones down the diagonal and zeroes elsewhere).
    */
   bool LinearAlgebra::isIdentity(const Matrix &matrix) {
@@ -90,13 +77,13 @@ namespace Isis {
   }
 
 
-  /** 
-   * Determines whether the given matrix is orthogonal by verifying 
-   * that the matrix and its tranpose are inverses. 
-   * 
-   * @param matrix The matrix to check. Automatically returns false 
+  /**
+   * Determines whether the given matrix is orthogonal by verifying
+   * that the matrix and its tranpose are inverses.
+   *
+   * @param matrix The matrix to check. Automatically returns false
    *               if not square.
-   * 
+   *
    * @return @b bool Returns true if the matrix is orthogonal.
    */
   bool LinearAlgebra::isOrthogonal(const Matrix &matrix) {
@@ -110,18 +97,18 @@ namespace Isis {
   }
 
 
-  /** 
-   * Determines whether the given matrix is a rotation matrix. 
-   *  
-   * @param matrix The matrix to check. Automatically returns false if not 2x2 
+  /**
+   * Determines whether the given matrix is a rotation matrix.
+   *
+   * @param matrix The matrix to check. Automatically returns false if not 2x2
    *               or 3x3.
-   *  
-   * @return @b bool Returns true if the given matrix represents a rotation. 
-   *  
-   * @throw IException::Programmer "Unable to determine whether 
+   *
+   * @return @b bool Returns true if the given matrix represents a rotation.
+   *
+   * @throw IException::Programmer "Unable to determine whether
    *                                the given matrix is a rotation matrix."
-   *  
-   */ 
+   *
+   */
   // derived from naif's isrot routine
   bool LinearAlgebra::isRotationMatrix(const Matrix &matrix) {
     // rotation matrices must be square
@@ -133,47 +120,47 @@ namespace Isis {
      * right-handed, orthonormal basis in 3-dimensional space.  The
      * converse is true:  all 3x3 matrices with this property are
      * rotation matrices.
-     * 
+     *
      * An ordered set of three vectors V1, V2, V3 forms a right-handed,
      * orthonormal basis if and only if
-     * 
+     *
      *    1)   || V1 ||  =  || V2 ||  =  || V3 ||  =  1
-     * 
+     *
      *    2)   V3 = V1 x V2.  Since V1, V2, and V3 are unit vectors,
      *         we also have
-     * 
+     *
      *         < V3, V1 x V2 > = 1.
-     * 
+     *
      *         This quantity is the determinant of the matrix whose
      *         colums are V1, V2 and V3.
-     * 
+     *
      * When finite precision numbers are used, rotation matrices will
      * usually fail to satisfy these criteria exactly.  We must use
      * criteria that indicate approximate conformance to the criteria
      * listed above.  We choose
-     * 
+     *
      *    1)   |   || Vi ||  -  1   |   <   NTOL,  i = 1, 2, 3.
      *                                  -
-     * 
+     *
      *    2)   Let
-     * 
+     *
      *                   Vi
      *            Ui = ------ ,   i = 1, 2, 3.
      *                 ||Vi||
-     * 
+     *
      *         Then we require
-     * 
+     *
      *            | < U3, U1 x U2 > - 1 |  <  DTOL;
      *                                     -
-     * 
+     *
      *         equivalently, letting U be the matrix whose columns
      *         are U1, U2, and U3, we insist on
-     * 
+     *
      *            | det(U) - 1 |  <  DTOL.
      *                            _
      * The columns of M must resemble unit vectors.  If the norms are
      * outside of the allowed range, M is not a rotation matrix.
-     * 
+     *
      * Also, the columns of M are required to be pretty nearly orthogonal.  The
      * discrepancy is gauged by taking the determinant of the matrix UNIT,
      * computed below, whose columns are the unitized columns of M.
@@ -198,7 +185,7 @@ namespace Isis {
     }
 
     try {
-      // get the determinant of the unitized matrix and if it is not near 1, 
+      // get the determinant of the unitized matrix and if it is not near 1,
       // this is not a rotation matrix
       double det = determinant(unitMatrix);
       if ( det >= 0.9 && det <=  1.1 ) {
@@ -215,10 +202,10 @@ namespace Isis {
 
 
   /**
-   * Determines whether the given matrix is filled with zereos. 
-   *  
+   * Determines whether the given matrix is filled with zereos.
+   *
    * @param vector The matrix to check.
-   * 
+   *
    * @return @b bool Returns true if the matrix is all zereos.
    */
   bool LinearAlgebra::isZero(const Matrix &matrix) {
@@ -236,9 +223,9 @@ namespace Isis {
 
   /**
    * Determines whether the given vector is filled with zereos.
-   *  
+   *
    * @param vector The vector to check.
-   * 
+   *
    * @return @b bool Returns true if the vector is all zereos.
    */
   bool LinearAlgebra::isZero(const Vector &vector) {
@@ -253,12 +240,12 @@ namespace Isis {
 
 
   /**
-   * Determines whether the given vector is empty (i.e. size 0). 
-   *  
+   * Determines whether the given vector is empty (i.e. size 0).
+   *
    * @param vector The vector to check.
-   * 
+   *
    * @return @b bool Returns true if the size of the given vector is zero.
-   * 
+   *
    */
   bool LinearAlgebra::isEmpty(const LinearAlgebra::Vector &vector) {
     return vector.empty();
@@ -266,10 +253,10 @@ namespace Isis {
 
 
   /**
-   * Determines whether the given vector is a unit vector. 
-   *  
+   * Determines whether the given vector is a unit vector.
+   *
    * @param vector The vector to check.
-   * 
+   *
    * @return @b bool Returns true if the vector is a unit vector.
    */
   bool LinearAlgebra::isUnit(const Vector &vector) {
@@ -281,16 +268,16 @@ namespace Isis {
 
 
   /**
-   * Returns the inverse of a 2x2 or 3x3 matrix. Throws an error if the given 
-   * matrix is not invertible. 
-   * 
+   * Returns the inverse of a 2x2 or 3x3 matrix. Throws an error if the given
+   * matrix is not invertible.
+   *
    * @param matrix The matrix to inverse.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The inverse matrix.
-   *  
-   * @throw IException::Programmer "The given matrix is not invertible. 
+   *
+   * @throw IException::Programmer "The given matrix is not invertible.
    *                                The determinant is 0.0."
-   * @throw IException::Programmer "Unable to invert the given matrix." 
+   * @throw IException::Programmer "Unable to invert the given matrix."
    */
   LinearAlgebra::Matrix LinearAlgebra::inverse(const Matrix &matrix) {
     try {
@@ -306,31 +293,31 @@ namespace Isis {
         QString msg = "The given matrix is not invertible. The determinant is 0.0.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      
+
       // since the determinant is not zero, we can calculate the reciprocal
       double scale = 1 / det;
-      
+
       LinearAlgebra::Matrix inverse = identity(matrix.size1());
       // find the inverse for 2x2
       if (matrix.size1() == 2) {
-        inverse(0,  0) =  scale * matrix(1, 1); 
-        inverse(0,  1) = -scale * matrix(0, 1); 
-      
-        inverse(1,  0) = -scale * matrix(1, 0); 
+        inverse(0,  0) =  scale * matrix(1, 1);
+        inverse(0,  1) = -scale * matrix(0, 1);
+
+        inverse(1,  0) = -scale * matrix(1, 0);
         inverse(1,  1) =  scale * matrix(0, 0);
         return inverse;
       }
       // else we have a 3x3
-      inverse(0,  0) = scale * ( matrix(1, 1) * matrix(2, 2) - matrix(2, 1) * matrix(1, 2) ); 
-      inverse(0,  1) = scale * ( matrix(0, 2) * matrix(2, 1) - matrix(2, 2) * matrix(0, 1) ); 
-      inverse(0,  2) = scale * ( matrix(0, 1) * matrix(1, 2) - matrix(1, 1) * matrix(0, 2) ); 
-                               
-      inverse(1,  0) = scale * ( matrix(1, 2) * matrix(2, 0) - matrix(2, 2) * matrix(1, 0) ); 
+      inverse(0,  0) = scale * ( matrix(1, 1) * matrix(2, 2) - matrix(2, 1) * matrix(1, 2) );
+      inverse(0,  1) = scale * ( matrix(0, 2) * matrix(2, 1) - matrix(2, 2) * matrix(0, 1) );
+      inverse(0,  2) = scale * ( matrix(0, 1) * matrix(1, 2) - matrix(1, 1) * matrix(0, 2) );
+
+      inverse(1,  0) = scale * ( matrix(1, 2) * matrix(2, 0) - matrix(2, 2) * matrix(1, 0) );
       inverse(1,  1) = scale * ( matrix(0, 0) * matrix(2, 2) - matrix(2, 0) * matrix(0, 2) );
-      inverse(1,  2) = scale * ( matrix(0, 2) * matrix(0, 1) - matrix(1, 2) * matrix(0, 0) ); 
-                               
-      inverse(2,  0) = scale * ( matrix(1, 0) * matrix(2, 1) - matrix(2, 0) * matrix(1, 1) ); 
-      inverse(2,  1) = scale * ( matrix(0, 1) * matrix(2, 0) - matrix(2, 1) * matrix(0, 0) ); 
+      inverse(1,  2) = scale * ( matrix(0, 2) * matrix(0, 1) - matrix(1, 2) * matrix(0, 0) );
+
+      inverse(2,  0) = scale * ( matrix(1, 0) * matrix(2, 1) - matrix(2, 0) * matrix(1, 1) );
+      inverse(2,  1) = scale * ( matrix(0, 1) * matrix(2, 0) - matrix(2, 1) * matrix(0, 0) );
       inverse(2,  2) = scale * ( matrix(0, 0) * matrix(1, 1) - matrix(1, 0) * matrix(0, 1) );
 
       return inverse;
@@ -343,10 +330,40 @@ namespace Isis {
 
 
   /**
+   * Returns the pseudoinverse of a matrix.
+   *
+   * @param matrix The matrix to compute the pseudoinverse of.
+   *
+   * @return @b LinearAlgebra::Matrix The pseudoinverse matrix.
+   */
+  LinearAlgebra::Matrix LinearAlgebra::pseudoinverse(const Matrix &matrix) {
+    // Copy values into Armadillo matrix
+    arma::mat arMat(matrix.size1(), matrix.size2());
+    for (size_t i = 0; i < matrix.size1(); i++) {
+      for (size_t j = 0; j < matrix.size2(); j++) {
+        arMat(i, j) = matrix(i, j);
+      }
+    }
+
+    arma::mat invArMat = arma::pinv(arMat);
+
+    // Copy values back to Boost matrix
+    LinearAlgebra::Matrix inverse(invArMat.n_rows, invArMat.n_cols);
+    for (size_t i = 0; i < invArMat.n_rows; i++) {
+      for (size_t j = 0; j < invArMat.n_cols; j++) {
+        inverse(i, j) = invArMat(i, j);
+      }
+    }
+
+    return inverse;
+  }
+
+
+  /**
    * Returns the transpose of the given matrix.
-   * 
+   *
    * @param matrix The matrix to transpose.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The transposed matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::transpose(const Matrix &matrix) {
@@ -357,16 +374,16 @@ namespace Isis {
 
   /**
    * Returns the identity matrix of size NxN.
-   * 
+   *
    * @param int The size of the square matrix.
-   *  
+   *
    * @return @b LinearAlgebra::Matrix The NxN square matrix.
-   * 
+   *
    * @throw IException::Programmer "Can not create identity matrix of negative size."
    */
   LinearAlgebra::Matrix LinearAlgebra::identity(int size) {
     if (size < 1) {
-      QString msg = "Can not create identity matrix of negative size [" 
+      QString msg = "Can not create identity matrix of negative size ["
                     + toString((int) size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -380,12 +397,12 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Returns a matrix with given dimensions that is filled with zeroes.
-   * 
+   *
    * @param rows The number of rows in the returned matrix.
    * @param columns The number of colums in the returned matrix.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix A zero-filled matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::zeroMatrix(int rows, int columns) {
@@ -394,11 +411,11 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Returns a vector of given length that is filled with zeroes.
-   * 
+   *
    * @param size Size of the vector.
-   * 
+   *
    * @return @b LinearAlgebra::Vector A zero-filled vector.
    */
   LinearAlgebra::Vector LinearAlgebra::zeroVector(int size) {
@@ -408,23 +425,23 @@ namespace Isis {
 
 
   /**
-   * Returns the determinant of the given 3x3 matrix. 
-   *  
-   * @param LinearAlgebra::Matrix The 3x3 matrix whose determinant will be 
+   * Returns the determinant of the given 3x3 matrix.
+   *
+   * @param LinearAlgebra::Matrix The 3x3 matrix whose determinant will be
    *                     calculated.
-   *  
+   *
    * @return @b double The determinant of the given matrix.
-   *  
-   * @throw IException::Programmer "Unable to calculate the determinant for the 
+   *
+   * @throw IException::Programmer "Unable to calculate the determinant for the
    *                                given matrix. This method only calculates the
    *                                determinant for 2x2 or 3x3 matrices."
-   * 
+   *
    */
   double LinearAlgebra::determinant(const Matrix &matrix) {
     if ( (matrix.size1() != matrix.size2()) || (matrix.size1() != 2 &&  matrix.size1() != 3) ) {
       QString msg = "Unable to calculate the determinant for the given matrix. "
                     "This method only calculates the determinant for 2x2 or 3x3 matrices."
-                    "The given matrix is [" + toString((int) matrix.size1()) + "x" 
+                    "The given matrix is [" + toString((int) matrix.size1()) + "x"
                     + toString((int) matrix.size2()) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -434,27 +451,27 @@ namespace Isis {
     }
     else {
 
-      return matrix(0, 0) * (matrix(1, 1)*matrix(2, 2) - matrix(1, 2)*matrix(2, 1)) 
-           - matrix(0, 1) * (matrix(1, 0)*matrix(2, 2) - matrix(1, 2)*matrix(2, 0)) 
-           + matrix(0, 2) * (matrix(1, 0)*matrix(2, 1) - matrix(1, 1)*matrix(2, 0));             
+      return matrix(0, 0) * (matrix(1, 1)*matrix(2, 2) - matrix(1, 2)*matrix(2, 1))
+           - matrix(0, 1) * (matrix(1, 0)*matrix(2, 2) - matrix(1, 2)*matrix(2, 0))
+           + matrix(0, 2) * (matrix(1, 0)*matrix(2, 1) - matrix(1, 1)*matrix(2, 0));
     }
 
   }
 
 
   /**
-   * Returns a unit vector that is codirectional with the given 
+   * Returns a unit vector that is codirectional with the given
    * vector by dividing each component of the vector by the vector magnitude.
-   *  
-   * @f$ \hat{v} = \frac{v}{\| v \|} @f$ 
-   * where @f$ \| u \|_ @f$ is the magnitude of u. 
-   *  
-   * @see magnitude() 
-   *  
+   *
+   * @f$ \hat{v} = \frac{v}{\| v \|} @f$
+   * where @f$ \| u \|_ @f$ is the magnitude of u.
+   *
+   * @see magnitude()
+   *
    * @param vector The vector to be normalized.
-   *  
+   *
    * @return @b LinearAlgebra::Vector A unit vector from the given vector.
-   *  
+   *
    * @throw IException::Programmer "Unable to normalize the zero vector."
    */
   LinearAlgebra::Vector LinearAlgebra::normalize(const Vector &vector) {
@@ -471,17 +488,17 @@ namespace Isis {
    * Computes the magnitude (i.e., the length) of the given
    * vector using the Euclidean norm (L2 norm).  The maximum norm
    * (L-infinity) is also used to stabilize the solution in order to avoid
-   * overflow. This method uses the computation 
-   *  
-   * @f$ \| v \| = \| v \|_\infty \| \frac{v}{\| v \|_\infty} \|_2 @f$ 
-   * where @f$ \| u \|_\infty = \max_{i=1}^n \{ \mid u_i \mid \}  @f$ is the maximum norm 
-   * and @f$ \| u \|_2 = \sqrt{\sum_{i=1}^n u_1^2} @f$ is the Euclidean norm. 
-   *  
-   *  
-   * @see absoluteMaximum() 
-   *  
+   * overflow. This method uses the computation
+   *
+   * @f$ \| v \| = \| v \|_\infty \| \frac{v}{\| v \|_\infty} \|_2 @f$
+   * where @f$ \| u \|_\infty = \max_{i=1}^n \{ \mid u_i \mid \}  @f$ is the maximum norm
+   * and @f$ \| u \|_2 = \sqrt{\sum_{i=1}^n u_1^2} @f$ is the Euclidean norm.
+   *
+   *
+   * @see absoluteMaximum()
+   *
    * @param vector The vector whose magnitude will be computed.
-   * 
+   *
    * @return @b double The magnitude (length) of the given vector.
    */
   double LinearAlgebra::magnitude(const Vector &vector) {
@@ -500,15 +517,15 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum norm (L-infinity norm) for the given vector. 
-   *  
-   * The maximum norm is defined by the absolute values of the vector 
-   * components: 
-   *  
-   * @f$ \| v \|_\infty = \max_{i=1}^n \{ \mid v_i \mid \} @f$ 
-   * 
+   * Returns the maximum norm (L-infinity norm) for the given vector.
+   *
+   * The maximum norm is defined by the absolute values of the vector
+   * components:
+   *
+   * @f$ \| v \|_\infty = \max_{i=1}^n \{ \mid v_i \mid \} @f$
+   *
    * @param vector The vector whose absolute maximum will be returned.
-   * 
+   *
    * @return @b double The maximum of the absolute values of the vector components.
    */
   double LinearAlgebra::absoluteMaximum(const Vector &vector) {
@@ -516,25 +533,25 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Returns the product of two matrices. Will throw an error if the matrices
    * are not properly sized (the number of columns of the first matrix must
    * match the number or rows of the second matrix).
-   * 
+   *
    * @param matrix1 The left matrix.
    * @param matrix2 The right matrix.
-   *  
+   *
    * @return @b LinearAlgebra::Matrix The resultant matrix product.
-   *  
-   * @throw IException::Programmer "Unable to multiply matrices 
+   *
+   * @throw IException::Programmer "Unable to multiply matrices
    *                                with mismatched dimensions."
    */
   LinearAlgebra::Matrix LinearAlgebra::multiply(const Matrix &matrix1, const Matrix &matrix2) {
     // Check to make sure we can multiply
     if (matrix1.size2() != matrix2.size1()) {
       QString msg = "Unable to multiply matrices with mismatched dimensions. "
-                    "The left matrix has [" + toString((int) matrix1.size2()) 
-                    + "] columns and the right matrix has [" + toString((int) matrix2.size1()) 
+                    "The left matrix has [" + toString((int) matrix1.size2())
+                    + "] columns and the right matrix has [" + toString((int) matrix2.size1())
                     + "] rows.";
 
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -546,26 +563,26 @@ namespace Isis {
 
 
   /**
-   * Computes the product of the given matrix and vector. The vector will 
-   * be multiplied on the right side of the given matrix. Will throw an 
-   * error if the two are not properly sized (matrix columns not equal to 
+   * Computes the product of the given matrix and vector. The vector will
+   * be multiplied on the right side of the given matrix. Will throw an
+   * error if the two are not properly sized (matrix columns not equal to
    * vector size).
-   * 
+   *
    * @param matrix The matrix to be multiplied.
-   * @param vector The column vector to be multiplied on the right side of 
+   * @param vector The column vector to be multiplied on the right side of
    *               the matrix.
-   *  
+   *
    * @return @b LinearAlgebra::Vector The resultant vector.
-   *  
-   * @throw IException::Programmer "Unable to multiply matrix and vector 
+   *
+   * @throw IException::Programmer "Unable to multiply matrix and vector
    *                                with mismatched dimensions."
    */
   LinearAlgebra::Vector LinearAlgebra::multiply(const Matrix &matrix, const Vector &vector) {
     // Check to make sure we can multiply
     if (matrix.size2() != vector.size()) {
       QString msg = "Unable to multiply matrix and vector with mismatched dimensions."
-                    "The given vector has [" + toString((int) vector.size()) 
-                    + "] components and the given matrix has [" 
+                    "The given vector has [" + toString((int) vector.size())
+                    + "] components and the given matrix has ["
                     + toString((int) matrix.size2()) + "] columns.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -577,10 +594,10 @@ namespace Isis {
 
   /**
    * Multiplies the given scalar and vector.
-   * 
+   *
    * @param scalar The scalar to be multiplied by each component of the vector.
    * @param vector The vector to be scaled.
-   * 
+   *
    * @return @b LinearAlgebra::Vector The resultant scaled vector.
    */
   LinearAlgebra::Vector LinearAlgebra::multiply(double scalar, const Vector &vector) {
@@ -591,10 +608,10 @@ namespace Isis {
 
   /**
    * Multiplies the given scalar and matrix.
-   * 
+   *
    * @param scalar The scalar to be multiplied by each element of the matrix.
    * @param matrix The matrix to be scaled.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The resultant scaled matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::multiply(double scalar, const Matrix &matrix) {
@@ -605,21 +622,21 @@ namespace Isis {
 
   /**
    * Adds the two given vectors.
-   * 
+   *
    * @param vector1 The first vector.
    * @param vector2 The second vector.
-   *  
+   *
    * @return @b LinearAlgebra::Vector The sum of the vectors.
-   *  
-   * @throw IException::Programmer "Unable to add vectors 
+   *
+   * @throw IException::Programmer "Unable to add vectors
    *                                with mismatched sizes."
    */
   LinearAlgebra::Vector LinearAlgebra::add(const Vector &vector1, const Vector &vector2) {
     // Vectors best be the same size
     if (vector1.size() != vector2.size()) {
       QString msg = "Unable to add vectors with mismatched sizes."
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -630,22 +647,22 @@ namespace Isis {
 
   /**
    * Subtracts the right vector from the left vector.
-   * 
+   *
    * @param vector1 The vector to the left of the subtraction operator.
    * @param vector2 The vector to the right of the subtraction operator.
-   *  
-   * @return @b LinearAlgebra::Vector The difference of the vectors 
+   *
+   * @return @b LinearAlgebra::Vector The difference of the vectors
    *                                  (i.e. vector1 - vector2).
-   *  
-   * @throw IException::Programmer "Unable to subtract vectors 
+   *
+   * @throw IException::Programmer "Unable to subtract vectors
    *                                with mismatched sizes."
    */
   LinearAlgebra::Vector LinearAlgebra::subtract(const Vector &vector1, const Vector &vector2) {
     // Vectors best be the same size
     if (vector1.size() != vector2.size()) {
       QString msg = "Unable to subtract vectors with mismatched sizes."
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -657,22 +674,22 @@ namespace Isis {
   /**
    * Returns the cross product of two vectors. Note: the cross-product
    * requires the vectors to have exactly three components each.
-   * 
+   *
    * @param vector1 The vector to the left of the cross product operator.
    * @param vector2 The vector to the right of the cross product operator.
-   *  
-   * @return @b LinearAlgebra::Vector The cross product of the given 
+   *
+   * @return @b LinearAlgebra::Vector The cross product of the given
    *                                  vectors (i.e. vector1 x vector2).
-   *  
-   * @throw IException::Programmer "Unable to calculate the cross 
+   *
+   * @throw IException::Programmer "Unable to calculate the cross
    *                                product on vectors that are not
    *                                size 3. "
    */
   LinearAlgebra::Vector LinearAlgebra::crossProduct(const Vector &vector1, const Vector &vector2) {
     if ((vector1.size() != 3) || (vector2.size() != 3)) {
       QString msg = "Unable to calculate the cross product on vectors that are not size 3. "
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -687,21 +704,21 @@ namespace Isis {
 
 
   /**
-   * Divides each vector by its corresponding absolute maximum, 
+   * Divides each vector by its corresponding absolute maximum,
    * computes the cross product of the new vectors, and normalizes the
-   * resultant vector from the cross product. Note: the 
-   * cross-product requires the vectors to have exactly three 
-   * components each. 
-   * 
+   * resultant vector from the cross product. Note: the
+   * cross-product requires the vectors to have exactly three
+   * components each.
+   *
    * @param vector1 The vector to the left of the cross product operator.
    * @param vector2 The vector to the right of the cross product operator.
-   *  
-   * @return @b LinearAlgebra::Vector The normalized cross product of the given vectors 
-   *                                  (i.e. normalize(vector1/absoluteMaximum(vector1) x 
-   *                                   vector2/absoluteMaximum(vector2))). 
+   *
+   * @return @b LinearAlgebra::Vector The normalized cross product of the given vectors
+   *                                  (i.e. normalize(vector1/absoluteMaximum(vector1) x
+   *                                   vector2/absoluteMaximum(vector2))).
    */
   // is this derived from naif's ucrss routine???
-  LinearAlgebra::Vector LinearAlgebra::normalizedCrossProduct(const Vector &vector1, 
+  LinearAlgebra::Vector LinearAlgebra::normalizedCrossProduct(const Vector &vector1,
                                                               const Vector &vector2) {
 
     double maxVector1 = LinearAlgebra::absoluteMaximum(vector1);
@@ -724,24 +741,24 @@ namespace Isis {
   }
 
 
-  /** 
-   * Computes the outer product of the given vectors. The outer product 
-   * operation is defined as the cross product of vector1 and the conjugate 
+  /**
+   * Computes the outer product of the given vectors. The outer product
+   * operation is defined as the cross product of vector1 and the conjugate
    * transpose of vector2.
-   *  
+   *
    * @param vector1 The vector to the left side of the outer product operator.
    * @param vector2 The vector to the right side of the outer product operator.
-   *  
+   *
    * @return @b LinearAlgebra::Matrix The outer product matrix of the given vectors.
-   *  
-   * @throw IException::Programmer "Unable to compute the outer product for 
+   *
+   * @throw IException::Programmer "Unable to compute the outer product for
    *                                vectors with mismatched sizes."
-   */ 
+   */
   LinearAlgebra::Matrix LinearAlgebra::outerProduct(const Vector &vector1, const Vector &vector2) {
     if (vector1.size() != vector2.size()) {
       QString msg = "Unable to compute the outer product for vectors with mismatched sizes."
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -750,16 +767,16 @@ namespace Isis {
 
 
   /**
-   * Computes the dot product of the given vectors. For Euclidean space, this is the same 
+   * Computes the dot product of the given vectors. For Euclidean space, this is the same
    * as the inner product, so these methods are interchangeable.
    *
-   * @see innerProduct() 
-   *  
+   * @see innerProduct()
+   *
    * @param vector1 The first vector.
    * @param vector2 The second vector.
-   * 
+   *
    * @return @b double The dot product of the vectors.
-   * 
+   *
    */
   double LinearAlgebra::dotProduct(const Vector &vector1, const Vector &vector2) {
     // no error check needed - this is done by innerProduct
@@ -767,25 +784,25 @@ namespace Isis {
   }
 
 
-  /** 
-   * Computes the inner product of the given vectors. For Euclidean space, this is the same 
-   * as the dot product, so these methods are interchangeable. 
+  /**
+   * Computes the inner product of the given vectors. For Euclidean space, this is the same
+   * as the dot product, so these methods are interchangeable.
    *
    * @see dotProduct()
    *
    * @param vector1 The first vector.
    * @param vector2 The second vector.
-   * 
+   *
    * @return @b double The inner product of the vectors.
-   * 
-   * @throw IException::Programmer "Unable to compute the dot product for vectors 
+   *
+   * @throw IException::Programmer "Unable to compute the dot product for vectors
    *                                with mismatched sizes."
    */
   double LinearAlgebra::innerProduct(const Vector &vector1, const Vector &vector2) {
     if (vector1.size() != vector2.size()) {
       QString msg = "Unable to compute the dot product for vectors with mismatched sizes."
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -793,36 +810,36 @@ namespace Isis {
   }
 
 
-  /** 
-   * Compute the vector projection of vector1 onto vector2. This is 
-   * the orthogonal projection of vector1 onto a line that is parallel 
-   * to vector2. 
-   *  
-   * It is defined by 
-   * @f$ proj_{v_2} v_1 = \frac{v_1 \cdot v_2}{\| v_2 \|^2}v_2 @f$ 
-   * where @f$ \| u \|_ @f$ is the magnitude of u. 
-   *  
+  /**
+   * Compute the vector projection of vector1 onto vector2. This is
+   * the orthogonal projection of vector1 onto a line that is parallel
+   * to vector2.
+   *
+   * It is defined by
+   * @f$ proj_{v_2} v_1 = \frac{v_1 \cdot v_2}{\| v_2 \|^2}v_2 @f$
+   * where @f$ \| u \|_ @f$ is the magnitude of u.
+   *
    * @param vector1 The vector to the left of the project operator.
    * @param vector2 The vector to the right of the project operator.
-   *  
-   * @return @b LinearAlgebra::Vector The resultant vector that is 
+   *
+   * @return @b LinearAlgebra::Vector The resultant vector that is
    *                                  the orthogonal projection of
    *                                  vector1 onto vector2.
-   *  
-   * @throw IException::Programmer "Unable to project vector1 onto vector2 
+   *
+   * @throw IException::Programmer "Unable to project vector1 onto vector2
    *                                with mismatched sizes."
-   */ 
+   */
   // derived from naif's vproj routine
   LinearAlgebra::Vector LinearAlgebra::project(const Vector &vector1, const Vector &vector2) {
     if (vector1.size() != vector2.size()) {
       QString msg = "Unable to project vector1 onto vector2 with mismatched sizes."
-                    "Vector1 has [" + toString((int) vector1.size()) 
-                    + "] components and vector2 has [" 
+                    "Vector1 has [" + toString((int) vector1.size())
+                    + "] components and vector2 has ["
                     + toString((int) vector2.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // if vector2 is the zero vector, then the projection of vector1 onto vector2 
+    // if vector2 is the zero vector, then the projection of vector1 onto vector2
     // is also the zero vector
     if (LinearAlgebra::isZero(vector2)) return vector2;
 
@@ -837,28 +854,28 @@ namespace Isis {
 
 
   /**
-   * Rotates a vector about an axis vector given a specified angle. 
-   * Note: this method only rotates a vector with three components since 
-   * the cross product calculation requires this. 
-   * 
+   * Rotates a vector about an axis vector given a specified angle.
+   * Note: this method only rotates a vector with three components since
+   * the cross product calculation requires this.
+   *
    * @param vector The vector to rotate, which must have three components.
    * @param axis  A vector defining the axis, which must also have three components.
    * @param angle The angle to rotate.
-   * 
+   *
    * @return @b LinearAlgebra::Vector The rotated vector.
-   *  
-   * @throw IException::Programmer "Unable to rotate vector about the 
+   *
+   * @throw IException::Programmer "Unable to rotate vector about the
    *                                given axis and angle. Vectors must
    *                                be of size 3 to perform rotation. "
    */
   // derived from naif's vrotv routine
-  LinearAlgebra::Vector LinearAlgebra::rotate(const Vector &vector, const Vector &axis, 
+  LinearAlgebra::Vector LinearAlgebra::rotate(const Vector &vector, const Vector &axis,
                                               Angle angle) {
     if ((vector.size() != 3) || (axis.size() != 3)) {
       QString msg = "Unable to rotate vector about the given axis and angle. "
                     "Vectors must be of size 3 to perform rotation. "
-                    "The given vector has [" + toString((int) vector.size()) 
-                    + "] components and the given axis has [" 
+                    "The given vector has [" + toString((int) vector.size())
+                    + "] components and the given axis has ["
                     + toString((int) axis.size()) + "] components.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -870,19 +887,19 @@ namespace Isis {
     // Compute the unit vector that is codirectional with the given axis
     Vector axisUnitVector = normalize(axis);
 
-    // Compute the projection of the given vector onto the axis unit vector.  
+    // Compute the projection of the given vector onto the axis unit vector.
     Vector projVectorOnAxis = project(vector,  axisUnitVector);
 
     // Compute the component of the input orthogonal to the AXIS.  Call it V1.
     Vector v1 = vector - projVectorOnAxis;
- 
+
     // Rotate V1 by 90 degrees about the AXIS and call the result V2.
     Vector v2 = LinearAlgebra::crossProduct(axisUnitVector, v1);
- 
+
     // Compute cos(angle)*v1 + sin(angle)*v2. This is v1 rotated about
     // the axis in the plane normal to the axis, call the result rplane
     double c = cos(angle.radians());
-    double s = sin(angle.radians()); 
+    double s = sin(angle.radians());
     Vector rplane = (c*v1) + (s*v2);
 
     // Add the rotated component in the normal plane to axis to the
@@ -895,20 +912,20 @@ namespace Isis {
   * Finds the unique vector P such that A = V + P, V is
   * parallel to B and P is perpendicular to B, where A is the first vector
   * (vector1) and B is the second vector (vector2) passed in by the user.
-  *  
-  * For all vectors A and B, there exists unique vectors V and P such that 
+  *
+  * For all vectors A and B, there exists unique vectors V and P such that
   * 1) A = V + P
-  * 2) V is parallel to B    
+  * 2) V is parallel to B
   * 3) P is perpendicular to B
-  * 
+  *
   * @param vector1 The first vector, denoted A in the description.
   * @param vector2 The second vector, denoted B in the description.
-  * 
+  *
   * @return @b LinearAlgebra::Vector A vector perpendicular to vector2 and
   *                                  equal to vector1-parallel2 (where
   *                                  parallel2 is some vector that is
   *                                  parallel to vector2).
-  */     
+  */
   // Derived from NAIF's vperp routine
   // possible that we may need to restrict size to dimesion 3, but doesn't seem
   // necessary in the code.
@@ -936,18 +953,18 @@ namespace Isis {
   }
 
 
-  /** 
-   * Converts a rotation's representation from a matrix to a axis of rotation 
-   * and its corresponding rotation angle. 
-   * 
+  /**
+   * Converts a rotation's representation from a matrix to a axis of rotation
+   * and its corresponding rotation angle.
+   *
    * @param rotationMatrix A matrix representing a rotation.
-   * 
+   *
    * @return @b LinearAlgebra::AxisAngle The axis-angle pair representing the rotation.
-   * 
-   * @throw IException::Programmer "Unable to convert the given matrix to an 
+   *
+   * @throw IException::Programmer "Unable to convert the given matrix to an
    *                                axis of rotation and a rotation angle. A
    *                                3x3 matrix is required."
-   * @throw IException::Programmer "Unable to convert the given matrix to an 
+   * @throw IException::Programmer "Unable to convert the given matrix to an
    *                                axis of rotation and a rotation angle.
    *                                The given matrix is not a rotation
    *                                matrix."
@@ -957,8 +974,8 @@ namespace Isis {
 
     if ((rotationMatrix.size1() != 3) || (rotationMatrix.size2() != 3)) {
       QString msg = "Unable to convert the given matrix to an axis of rotation "
-                    "and a rotation angle. A 3x3 matrix is required. The given matrix is [" 
-                    + toString((int) rotationMatrix.size1()) + "x" 
+                    "and a rotation angle. A 3x3 matrix is required. The given matrix is ["
+                    + toString((int) rotationMatrix.size1()) + "x"
                     + toString((int) rotationMatrix.size2()) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -969,7 +986,7 @@ namespace Isis {
                     "and a rotation angle. The given matrix is not a rotation matrix.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     Angle angle;
     Vector axis(3);
 
@@ -1003,59 +1020,59 @@ namespace Isis {
       axis = LinearAlgebra::normalize(subQuaternion);
       angle.setRadians(2.0 * atan2(magnitude(subQuaternion), quaternion(0)));
     }
-      
+
     return qMakePair(axis, angle);
   }
 
 
   /**
    * Converts a rotation's representation from a matrix to a set of Euler angles
-   * with corresponding axes. 
-   * 
+   * with corresponding axes.
+   *
    * @param rotationMatrix A matrix representing a rotation.
    * @param axes A list containing the order of axes.
-   *  
-   * @return @b QList< LinearAlgebra::EulerAngle> The list of 3 Euler angles 
+   *
+   * @return @b QList< LinearAlgebra::EulerAngle> The list of 3 Euler angles
    *                                              with their axes representing the rotation.
-   * 
-   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles. 
+   *
+   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles.
    *                                Exactly 3 axis codes are required."
-   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles 
+   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles
    *                                using the given axis codes. Axis codes must be 1, 2, or 3."
-   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles 
+   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles
    *                                using the given axis codes. The middle axis
    *                                code must differ from its neighbors."
-   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles. 
+   * @throw IException::Programmer "Unable to convert the given matrix to Euler angles.
    *                                A 3x3 matrix is required."
    * @throw IException::Programmer "Unable to convert the given matrix to Euler angles.
    *                                The given matrix is not a rotation matrix."
    */
   // Derived from NAIF's m2eul routine
-  QList<LinearAlgebra::EulerAngle> LinearAlgebra::toEulerAngles(const Matrix &rotationMatrix, 
+  QList<LinearAlgebra::EulerAngle> LinearAlgebra::toEulerAngles(const Matrix &rotationMatrix,
                                                                 const QList<int> axes) {
 
     // check there are 3 axes in the set {1,2,3} with center axis not equal to first or last
     if (axes.size() != 3) {
       QString msg = "Unable to convert the given matrix to Euler angles. "
-                    "Exactly 3 axis codes are required. The given list has [" 
+                    "Exactly 3 axis codes are required. The given list has ["
                     + toString((int) axes.size()) + "] axes.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     QSet<int> validAxes;
     validAxes << 1 << 2 << 3;
-    if (!validAxes.contains(axes[0]) 
-        || !validAxes.contains(axes[1]) 
+    if (!validAxes.contains(axes[0])
+        || !validAxes.contains(axes[1])
         || !validAxes.contains(axes[2])) {
       QString msg = "Unable to convert the given matrix to Euler angles using the given axis codes "
-                    "[" + toString(axes[0]) + ", " + toString(axes[1]) + ", " + toString(axes[2]) 
+                    "[" + toString(axes[0]) + ", " + toString(axes[1]) + ", " + toString(axes[2])
                     + "]. Axis codes must be 1, 2, or 3.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (axes[0] == axes[1] || axes[1] == axes[2]) {
       QString msg = "Unable to convert the given matrix to Euler angles using the given axis codes "
-                    "[" + toString(axes[0]) + ", " + toString(axes[1]) + ", " + toString(axes[2]) 
+                    "[" + toString(axes[0]) + ", " + toString(axes[1]) + ", " + toString(axes[2])
                     + "]. The middle axis code must differ from its neighbors.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1063,8 +1080,8 @@ namespace Isis {
     // check the matrix is 3x3 rotation
     if ((rotationMatrix.size1() != 3) || (rotationMatrix.size2() != 3)) {
       QString msg = "Unable to convert the given matrix to Euler angles. A 3x3 matrix is required. "
-                    "The given matrix is [" 
-                    + toString((int) rotationMatrix.size1()) + "x" 
+                    "The given matrix is ["
+                    + toString((int) rotationMatrix.size1()) + "x"
                     + toString((int) rotationMatrix.size2()) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1111,9 +1128,9 @@ namespace Isis {
       LinearAlgebra::Matrix tempMatrix = multiply( tempRotation,  change );
       tempRotation = multiply( transpose(change),  tempMatrix );
 
-      bool degen =    (    qFuzzyCompare(tempRotation(0, 2) + 1.0, 1.0) 
+      bool degen =    (    qFuzzyCompare(tempRotation(0, 2) + 1.0, 1.0)
                         && qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) )
-                   || (    qFuzzyCompare(tempRotation(2, 0) + 1.0, 1.0) 
+                   || (    qFuzzyCompare(tempRotation(2, 0) + 1.0, 1.0)
                         && qFuzzyCompare(tempRotation(2, 1) + 1.0, 1.0) )
                    || qFuzzyCompare( qAbs(tempRotation(2, 2)), 1.0 );
 
@@ -1122,7 +1139,7 @@ namespace Isis {
         angle3.setRadians( 0.0 );
         angle2.setRadians(  acos( tempRotation(2, 2) ) );
         angle1.setRadians( atan2( tempRotation(0, 1), tempRotation(0, 0) ) );
-        
+
       }
       else {
       // the normal case.
@@ -1148,9 +1165,9 @@ namespace Isis {
       change( axes[2] - 1, 2 ) = sign * 1.0;
       LinearAlgebra::Matrix tempMatrix = multiply( tempRotation,  change );
       tempRotation = multiply( transpose(change),  tempMatrix );
-      bool degen =    (    qFuzzyCompare(tempRotation(0, 0) + 1.0, 1.0) 
+      bool degen =    (    qFuzzyCompare(tempRotation(0, 0) + 1.0, 1.0)
                         && qFuzzyCompare(tempRotation(0, 1) + 1.0, 1.0) )
-                   || (    qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0) 
+                   || (    qFuzzyCompare(tempRotation(1, 2) + 1.0, 1.0)
                         && qFuzzyCompare(tempRotation(2, 2) + 1.0, 1.0) )
                    || qFuzzyCompare( qAbs(tempRotation(0, 2)), 1.0 );
 
@@ -1170,20 +1187,20 @@ namespace Isis {
     }
 
     QList<LinearAlgebra::EulerAngle> eulerAngles;
-    eulerAngles << qMakePair(angle3, axes[0]) 
-                << qMakePair(angle2, axes[1]) 
+    eulerAngles << qMakePair(angle3, axes[0])
+                << qMakePair(angle2, axes[1])
                 << qMakePair(angle1, axes[2]);
     return eulerAngles;
   }
 
 
   /**
-   * Converts a rotation's representation from a matrix to a unit quaternion. 
-   * 
+   * Converts a rotation's representation from a matrix to a unit quaternion.
+   *
    * @param rotationMatrix A matrix representing a rotation.
-   *  
-   * @return @b LinearAlgebra::Vector A unit quaternion representing the rotation. 
-   *  
+   *
+   * @return @b LinearAlgebra::Vector A unit quaternion representing the rotation.
+   *
    * @throw IException::Programmer "Unable to convert the given matrix to a quaternion.
                                     A 3x3 matrix is required.
    * @throw IException::Programmer "Unable to convert the given matrix to an axis of rotation
@@ -1195,8 +1212,8 @@ namespace Isis {
 
     if ((rotationMatrix.size1() != 3) || (rotationMatrix.size2() != 3)) {
       QString msg = "Unable to convert the given matrix to a quaternion. "
-                    "A 3x3 matrix is required. The given matrix is [" 
-                    + toString((int) rotationMatrix.size1()) + "x" 
+                    "A 3x3 matrix is required. The given matrix is ["
+                    + toString((int) rotationMatrix.size1()) + "x"
                     + toString((int) rotationMatrix.size2()) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1218,52 +1235,52 @@ namespace Isis {
     // snm = sn *  sm
 
     // The rotation matrix corresponding to our quaternion is:
-    // 
+    //
     // |  cc+s11-s22-s33      2*s12-2*cs3       2*s13+2*cs2   |
     // |    2*s12+2*cs3     cc-s11+s22-s33      2*s23-2*cs1   |
     // |    2*s13-2*cs2       2*s23+2*cs1     cc-s11-s22+s33  |
-    // 
-    // 
+    //
+    //
     // since |q| = cc + s11 + s22 + s33 = 1, we can use substitution on the diagonal entries to get
-    // 
+    //
     // |  1-2*s22-2*s33      2*s12-2*cs3      2*s13+2*cs2   |
     // |    2*s12+2*cs3    1-2*s11-2*s33      2*s23-2*cs1   |
     // |    2*s13-2*cs2      2*s23+2*cs1    1-2*s11-2*s22   |
-    // 
-    // 
-    // 
+    //
+    //
+    //
     // r(1,1)      = 1.0 - 2*s22 - 2*s33
     // r(2,1)      =       2*s12 + 2*cs3
     // r(3,1)      =       2*s13 - 2*cs2
-    // 
+    //
     // r(1,2)      =       2*s12 - 2*cs3
     // r(2,2)      = 1.0 - 2*s11 - 2*s33
     // r(3,2)      =       2*s23 + 2*cs1
-    // 
+    //
     // r(1,3)      =       2*s13 + 2*cs2
     // r(2,3)      =       2*s23 - 2*cs1
     // r(3,3)      = 1.0 - 2*s11 - 2*s22
-    
+
     // Using this matrix, we get the trace by summing the diagonal entries
     //    trace = (1-2*s22-2*s33) + (1-2*s11-2*s33) + (1-2*s11-2*s22)
     //          = 3 - 4*(s11 + s22 + s33)
 
-    // Therefore 
+    // Therefore
     //    1.0 + trace = 4 - 4*(s11 + s22 + s33)
     //                = 4*(1 - s11 - s22 - s33)       by factoring 4
     //                = 4*(|q| - s11 - s22 - s33)     since |q| = 1
     //                = 4*cc                          since |q| = cc + s11 + s22 + s33
-    // 
+    //
     // Solving for c, we get that
     // 4*cc = 1 + trace
     //  2*c = +/- sqrt(1 + trace)
     //    c = +/- 0.5 * sqrt( 1.0 + trace )
 
-    // We also have the following where {n,m,p} = {1,2,3} 
+    // We also have the following where {n,m,p} = {1,2,3}
     //   1.0 + trace - 2.0*r(n,n) = 4.0 - 4.0(snn + smm + spp) - 2(1.0 - 2.0(smm + spp ))
     //                            = 4.0 - 4.0(snn + smm + spp) - 2.0 + 4.0(smm + spp )
     //                            = 2.0 - 4.0*snn
-    // 
+    //
     // Solving for snn, we get
     //     2.0 - 4.0*snn =  1.0 + trace - 2.0*r(n,n)
     //    -2.0 + 4.0*snn = -1.0 - trace + 2.0*r(n,n)
@@ -1277,13 +1294,13 @@ namespace Isis {
     // In addition to these observations, note that all of the product
     // pairs can easily be computed by simplifying the expressions
     // (r(n,m) - r(m,n)) / 4.0 and (r(n,m) + r(m,n)) / 4.0
-    // 
+    //
     // For example,
     //  (r(3,2) - r(2,3)) / 4.0 = ( (2*s23 + 2*cs1) - (2*s23 - 2*cs1) ) / 4.0
     //                          = ( 4*cs1 ) / 4.0
     //                          =     cs1
-    // 
-    //  So we have the following 
+    //
+    //  So we have the following
     //  cs1 = (r(3,2) - r(2,3))/4.0
     //  cs2 = (r(1,3) - r(3,1))/4.0
     //  cs3 = (r(2,1) - r(1,2))/4.0
@@ -1311,7 +1328,7 @@ namespace Isis {
 
     // Note that cc4 + s114 + s224 + s334 = 4|q| = 4
     // Thus, at least one of the 4 terms is greater than 1.
-    double normalizingFactor; 
+    double normalizingFactor;
     LinearAlgebra::Vector quaternion(4);
     if ( cc4 >= 1.0 ) { // true if the trace is non-negative
 
@@ -1371,16 +1388,16 @@ namespace Isis {
 
 
   /**
-   * Converts a rotation's representation from an axis of rotation and its 
+   * Converts a rotation's representation from an axis of rotation and its
    * corresponding rotation angle to a 3x3 matrix.
-   * 
-   * 
+   *
+   *
    * @param axis The axis of rotation for a rotation.
    * @param angle The rotation angle.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The matrix representing the rotation.
-   * 
-   * @throw IException::Programmer "Unable to convert the given vector and 
+   *
+   * @throw IException::Programmer "Unable to convert the given vector and
    *                                angle to a rotation matrix. The given
    *                                vector is not a 3D axis vector."
    */
@@ -1388,7 +1405,7 @@ namespace Isis {
   LinearAlgebra::Matrix LinearAlgebra::toMatrix(const Vector &axis, Angle angle) {
     if (axis.size() != 3) {
       QString msg = "Unable to convert the given vector and angle to a rotation matrix. "
-                    "The given vector with size [" + toString((int) axis.size()) 
+                    "The given vector with size [" + toString((int) axis.size())
                     + "] is not a 3D axis vector.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1414,13 +1431,13 @@ namespace Isis {
 
 
   /**
-   * Converts a rotation's representation from an axis of rotation and its 
+   * Converts a rotation's representation from an axis of rotation and its
    * corresponding rotation angle to a 3x3 matrix.
-   * 
+   *
    * @param axisAngle The axis-angle pair representation of a rotation
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
-   * 
+   *
    */
   LinearAlgebra::Matrix LinearAlgebra::toMatrix(const AxisAngle &axisAngle) {
     return LinearAlgebra::toMatrix(axisAngle.first, axisAngle.second);
@@ -1428,30 +1445,30 @@ namespace Isis {
 
 
   /**
-   * Converts a rotation's representation from a set of Euler angles (3 angles, 
-   * each with a corresponding axis) to a 3x3 matrix. 
-   * 
+   * Converts a rotation's representation from a set of Euler angles (3 angles,
+   * each with a corresponding axis) to a 3x3 matrix.
+   *
    * @param angle3 The third angle and its axis.
    * @param angle2 The second angle and its axis.
    * @param angle1 The first angle and its axis.
-   * 
+   *
    * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
-   * 
-   * @throw IException::Programmer "Unable to convert the given Euler angles to 
+   *
+   * @throw IException::Programmer "Unable to convert the given Euler angles to
    *                                a matrix using the given axis codes. Axis
    *                                codes must be 1, 2, or 3."
    */
   // Derived from NAIF's eul2m routine
-  LinearAlgebra::Matrix LinearAlgebra::toMatrix(const EulerAngle &angle3, 
-                                                const EulerAngle &angle2, 
+  LinearAlgebra::Matrix LinearAlgebra::toMatrix(const EulerAngle &angle3,
+                                                const EulerAngle &angle2,
                                                 const EulerAngle &angle1) {
     QSet<int> validAxes;
     validAxes << 1 << 2 << 3;
-    if (!validAxes.contains(angle3.second) 
-        || !validAxes.contains(angle2.second) 
+    if (!validAxes.contains(angle3.second)
+        || !validAxes.contains(angle2.second)
         || !validAxes.contains(angle1.second)) {
       QString msg = "Unable to convert the given Euler angles to a matrix using the given axis "
-                    "codes [" + toString(angle3.second) + ", " + toString(angle2.second) + ", " 
+                    "codes [" + toString(angle3.second) + ", " + toString(angle2.second) + ", "
                     + toString(angle1.second) + "]. Axis codes must be 1, 2, or 3.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1461,8 +1478,8 @@ namespace Isis {
     // Calculate the 3x3 rotation matrix generated by a rotation
     // of a specified angle about a specified axis. This rotation
     // is thought of as rotating the coordinate system.
-    // 
-    //ROTATE(angle1, axis1); 
+    //
+    //ROTATE(angle1, axis1);
     double sinAngle = sin(angle1.first.radians());
     double cosAngle = cos(angle1.first.radians());
     // get the index offset based on the axis number corresponding to this angle
@@ -1476,7 +1493,7 @@ namespace Isis {
     m(index2, index1) = 0.0;   m(index2, index2) =  cosAngle;   m(index2, index3) = sinAngle;
     m(index3, index1) = 0.0;   m(index3, index2) = -sinAngle;   m(index3, index3) = cosAngle;
 
-    // 
+    //
     // C     ROTMAT applies a rotation of ANGLE radians about axis IAXIS to a
     // C     matrix.  This rotation is thought of as rotating the coordinate
     // C     system.
@@ -1495,7 +1512,7 @@ namespace Isis {
        tempMatrix(index2, i) =  cosAngle*m(index2, i) + sinAngle*m(index3, i);
        tempMatrix(index3, i) = -sinAngle*m(index2, i) + cosAngle*m(index3, i);
     }
-      
+
     //CALL ROTMAT ( tempMatrix,  ANGLE3,  AXIS3,  m  )
     sinAngle = sin(angle3.first.radians());
     cosAngle = cos(angle3.first.radians());
@@ -1515,13 +1532,13 @@ namespace Isis {
 
   /**
    * Converts a rotation's representation from a list of Euler angles (3 angles,
-   * each with a corresponding axis) to a 3x3 matrix. 
-   * 
+   * each with a corresponding axis) to a 3x3 matrix.
+   *
    * @param eulerAngles The Euler angle representation of a rotation.
-   *  
+   *
    * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
-   * 
-   * @throw IException::Programmer "Unable to convert the given Euler angles to 
+   *
+   * @throw IException::Programmer "Unable to convert the given Euler angles to
    *                                a matrix. Exactly 3 Euler angles are
    *                                required."
    */
@@ -1529,7 +1546,7 @@ namespace Isis {
 
     if (eulerAngles.size() != 3) {
       QString msg = "Unable to convert the given Euler angles to a matrix. "
-                    "Exactly 3 Euler angles are required. The given list has [" 
+                    "Exactly 3 Euler angles are required. The given list has ["
                     + toString((int) eulerAngles.size()) + "] angles.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1539,15 +1556,15 @@ namespace Isis {
 
 
   /**
-   * Converts a rotation's representation from a quaternion to a 3x3 matrix. 
-   * Note, if the given vector is not a unit vector or the zero vector, this 
-   * method will normalize it before computing the corresponding matrix. 
-   * 
+   * Converts a rotation's representation from a quaternion to a 3x3 matrix.
+   * Note, if the given vector is not a unit vector or the zero vector, this
+   * method will normalize it before computing the corresponding matrix.
+   *
    * @param quaternion   A unit quaternion representation of a rotation.
-   *  
+   *
    * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
-   *  
-   * @throw IException::Programmer "Unable to convert the given vector to a 
+   *
+   * @throw IException::Programmer "Unable to convert the given vector to a
    *                                rotation matrix. The given vector is not
    *                                a quaternion."
    */
@@ -1555,7 +1572,7 @@ namespace Isis {
   LinearAlgebra::Matrix LinearAlgebra::toMatrix(const Vector &quaternion) {
     if (quaternion.size() != 4) {
       QString msg = "Unable to convert the given vector to a rotation matrix. "
-                    "The given vector with [" + toString((int) quaternion.size()) 
+                    "The given vector with [" + toString((int) quaternion.size())
                     + "] components is not a quaternion.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1597,19 +1614,19 @@ namespace Isis {
 
 
   /**
-   * Sets the row of the given matrix to the values of the given vector. 
-   *  
+   * Sets the row of the given matrix to the values of the given vector.
+   *
    * @param matrix The address of the matrix to be altered.
    * @param vector The vector with the new values.
    * @param rowIndex The index of the row to be altered.
-   * 
-   * @throw IException::Programmer "Unable to set the matrix row to the given 
+   *
+   * @throw IException::Programmer "Unable to set the matrix row to the given
    *                                vector. Row index is out of bounds."
    */
   void LinearAlgebra::setRow(Matrix &matrix, const Vector &vector, int rowIndex) {
     if ( (rowIndex+1 > (int) matrix.size1()) ) {
-      QString msg = "Unable to set the matrix row to the given vector. Row index " 
-                    + toString(rowIndex) + " is out of bounds. The given matrix only has " 
+      QString msg = "Unable to set the matrix row to the given vector. Row index "
+                    + toString(rowIndex) + " is out of bounds. The given matrix only has "
                     + toString((int) matrix.size1()) + " rows." ;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1618,42 +1635,42 @@ namespace Isis {
 
 
   /**
-   * Sets the column of the given matrix to the values of the given vector. 
-   *  
+   * Sets the column of the given matrix to the values of the given vector.
+   *
    * @param matrix The address of the matrix to be altered.
    * @param vector The vector with the new values.
    * @param columnIndex The index of the column to be altered.
-   * 
-   * @throw IException::Programmer "Unable to set the matrix column to the given 
+   *
+   * @throw IException::Programmer "Unable to set the matrix column to the given
    *                                vector. Column index is out of bounds."
    */
   void LinearAlgebra::setColumn(Matrix &matrix, const Vector &vector, int columnIndex) {
     if ( (columnIndex+1 > (int) matrix.size2()) ) {
-      QString msg = "Unable to set the matrix column to the given vector. Column index " 
-                    + toString(columnIndex) + " is out of bounds. The given matrix only has " 
+      QString msg = "Unable to set the matrix column to the given vector. Column index "
+                    + toString(columnIndex) + " is out of bounds. The given matrix only has "
                     + toString((int) matrix.size1()) + " columns." ;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    boost::numeric::ublas::column(matrix, columnIndex) = vector; 
+    boost::numeric::ublas::column(matrix, columnIndex) = vector;
   }
 
 
   /**
    * Returns a vector whose components match those of the given matrix row.
-   *  
+   *
    * @param matrix The matrix to pull values from.
    * @param rowIndex The index of the matrix row to grab.
-   * 
-   * @return @b LinearAlgebra::Vector A vector whose values match the given row 
+   *
+   * @return @b LinearAlgebra::Vector A vector whose values match the given row
    *                                  of the given matrix.
-   * 
-   * @throw IException::Programmer "Unable to get the matrix row to the given 
+   *
+   * @throw IException::Programmer "Unable to get the matrix row to the given
    *                                vector. Row index is out of bounds."
    */
   LinearAlgebra::Vector LinearAlgebra::row(const Matrix &matrix, int rowIndex) {
     if ( (rowIndex+1 > (int) matrix.size1()) ) {
-      QString msg = "Unable to get the matrix row to the given vector. Row index " 
-                    + toString(rowIndex) + " is out of bounds. The given matrix only has " 
+      QString msg = "Unable to get the matrix row to the given vector. Row index "
+                    + toString(rowIndex) + " is out of bounds. The given matrix only has "
                     + toString((int) matrix.size1()) + " rows." ;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1663,20 +1680,20 @@ namespace Isis {
 
   /**
    * Returns a vector whose components match those of the given matrix column.
-   *  
+   *
    * @param matrix The matrix to pull values from.
    * @param columnIndex The index of the matrix column to grab.
-   * 
-   * @return @b LinearAlgebra::Vector A vector whose values match the given 
+   *
+   * @return @b LinearAlgebra::Vector A vector whose values match the given
    *                                  column of the given matrix.
-   * 
-   * @throw IException::Programmer "Unable to get the matrix column to the given 
+   *
+   * @throw IException::Programmer "Unable to get the matrix column to the given
    *                                vector. Column index is out of bounds."
    */
   LinearAlgebra::Vector LinearAlgebra::column(const Matrix &matrix, int columnIndex) {
     if ( (columnIndex+1 > (int) matrix.size2()) ) {
-      QString msg = "Unable to get the matrix column to the given vector. Column index " 
-                    + toString(columnIndex) + " is out of bounds. The given matrix only has " 
+      QString msg = "Unable to get the matrix column to the given vector. Column index "
+                    + toString(columnIndex) + " is out of bounds. The given matrix only has "
                     + toString((int) matrix.size1()) + " columns." ;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1684,15 +1701,15 @@ namespace Isis {
   }
 
 
-  /** 
-   * Constructs a 3 dimensional vector with the given component values. 
-   * 
+  /**
+   * Constructs a 3 dimensional vector with the given component values.
+   *
    * @param v0 The first component of the vector.
-   * @param v1 The second component of the vector. 
+   * @param v1 The second component of the vector.
    * @param v2 The third component of the vector.
-   * 
+   *
    * @return @b LinearAlgebra::Vector A vector containing the given values.
-   * 
+   *
    */
   LinearAlgebra::Vector LinearAlgebra::vector(double v0, double v1, double v2) {
     Vector v(3);
@@ -1704,15 +1721,15 @@ namespace Isis {
 
 
   /**
-   * Constructs a 4 dimensional vector with the given component values. 
-   * 
+   * Constructs a 4 dimensional vector with the given component values.
+   *
    * @param v0 The first component of the vector.
-   * @param v1 The second component of the vector. 
+   * @param v1 The second component of the vector.
    * @param v2 The third component of the vector.
    * @param v3 The fourth component of the vector.
-   * 
+   *
    * @return @b LinearAlgebra::Vector A vector containing the given values.
-   * 
+   *
    */
   LinearAlgebra::Vector LinearAlgebra::vector(double v0, double v1, double v2, double v3) {
     Vector v(4);
@@ -1725,11 +1742,11 @@ namespace Isis {
 
 
   /**
-   * Fills the first three elements of the given vector with the given values. 
-   * 
+   * Fills the first three elements of the given vector with the given values.
+   *
    * @param v A pointer to a 3-dimensional vector to be filled.
    * @param v0 The first component of the vector.
-   * @param v1 The second component of the vector. 
+   * @param v1 The second component of the vector.
    * @param v2 The third component of the vector.
    */
   void LinearAlgebra::setVec3(Vector *v, double v0, double v1, double v2) {
@@ -1740,11 +1757,11 @@ namespace Isis {
 
 
   /**
-   * Fills the first four elements of the given vector with the given values. 
-   * 
+   * Fills the first four elements of the given vector with the given values.
+   *
    * @param v A pointer to a 4-dimensional vector to be filled.
    * @param v0 The first component of the vector.
-   * @param v1 The second component of the vector. 
+   * @param v1 The second component of the vector.
    * @param v2 The third component of the vector.
    * @param v3 The fourth component of the vector.
    */
@@ -1756,17 +1773,17 @@ namespace Isis {
   }
 
 
-  /** 
-   * Constructs a vector of given size using the given vector and starting 
-   * index. 
-   * 
+  /**
+   * Constructs a vector of given size using the given vector and starting
+   * index.
+   *
    * @param v The original vector to get values from.
    * @param startIndex The index of the original vector, used to indicate
    *                   the first value that will be copied to the new vector.
-   * @param size The number of elements from the original vector to copy 
+   * @param size The number of elements from the original vector to copy
    *             to the new vector.
-   * 
-   * @return @b LinearAlgebra::Vector A sub-vector containing values from 
+   *
+   * @return @b LinearAlgebra::Vector A sub-vector containing values from
    *                                  the original vector.
    */
   LinearAlgebra::Vector LinearAlgebra::subVector(const Vector &v, int startIndex, int size) {
@@ -1780,15 +1797,15 @@ namespace Isis {
 
   /**
    * A global function to format a LinearAlgebra::Vector as a QString and writes
-   * it to a QDebug stream. 
-   *  
-   * @see toString(LinearAlgebra::Vector) 
-   *  
+   * it to a QDebug stream.
+   *
+   * @see toString(LinearAlgebra::Vector)
+   *
    * @param dbg The stream where the vector will be written.
    * @param vector The vector to be written.
-   * 
+   *
    * @return @b QDebug The stream with the QString-formatted vector.
-   * 
+   *
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Vector &vector) {
     QDebugStateSaver saver(dbg);
@@ -1798,15 +1815,15 @@ namespace Isis {
 
 
   /**
-   * A global function to format a LinearAlgebra::Matrix as a QString and 
-   * write it to a QDebug stream. There will be 4 spaces between each matrix 
-   * entry and each row is written on a new line. 
-   *  
+   * A global function to format a LinearAlgebra::Matrix as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
    * @param dbg The stream where the vector will be written.
    * @param matrix The matrix to be written.
-   * 
+   *
    * @return @b QDebug The stream with the QString-formatted matrix.
-   * 
+   *
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix) {
     QDebugStateSaver saver(dbg);
@@ -1822,15 +1839,15 @@ namespace Isis {
 
 
   /**
-   * A global function to format LinearAlgebra::Vector as a QString with the 
-   * given precision. The string will be comma-separated entries encased by 
-   * parentheses. 
-   *  
+   * A global function to format LinearAlgebra::Vector as a QString with the
+   * given precision. The string will be comma-separated entries encased by
+   * parentheses.
+   *
    * @param vector The vector to be converted.
    * @param precision Number of significant figures to convert.
-   * 
+   *
    * @return @b QString The string-formatted vector.
-   * 
+   *
    */
   QString toString(const LinearAlgebra::Vector &vector, int precision) {
     QString result = "( ";

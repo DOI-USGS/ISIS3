@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 7229 $
- * $Date: 2016-11-10 21:04:46 -0700 (Thu, 10 Nov 2016) $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Spice.h"
 
 #include <cfloat>
@@ -78,19 +63,15 @@ namespace Isis {
   // TODO: DOCUMENT EVERYTHING
   Spice::Spice(Cube &cube) {
     Pvl &lab = *cube.label();
-    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-    bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    init(lab, !hasTables);
-  }
-
-  /**
-   * Constructs a Spice object.
-   *
-   * @param lab  Pvl labels.
-   * @param noTables Indicates the use of tables.
-   */
-  Spice::Spice(Cube &cube, bool noTables) {
-    init(*cube.label(), noTables);
+    if (cube.hasBlob("String", "CSMState")) {
+      csmInit(cube, lab);
+    }
+    else {
+      PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
+      bool hasTables = (kernels["TargetPosition"][0] == "Table");
+      // BONUS TODO: update to pull out separate init methods
+      init(lab, !hasTables);
+    }
   }
 
 
@@ -103,6 +84,59 @@ namespace Isis {
   Spice::Spice(Pvl &lab, json isd) {
     init(lab, true, isd);
   }
+
+
+  /**
+   * Initialize the Spice object for a CSMCamera.
+   * This sets up the Spice/Sensor/Camera object to not have any SPICE dependent
+   * members initialized.
+   *
+   * @param cube The Cube containing image data for the camera
+   * @param label The label containing information for the camera
+   */
+  void Spice::csmInit(Cube &cube, Pvl label) {
+    defaultInit();
+    m_target = new Target;
+    NaifStatus::CheckErrors();
+  }
+
+
+  /**
+   * Default initialize the members of the SPICE object.
+   */
+  void Spice::defaultInit() {
+    m_solarLongitude = new Longitude;
+
+    m_et = nullptr;
+    m_kernels = new QVector<QString>;
+
+    m_startTime = new iTime;
+    m_endTime = new iTime;
+    m_cacheSize = new SpiceDouble;
+    *m_cacheSize = 0;
+
+    m_startTimePadding = new SpiceDouble;
+    *m_startTimePadding = 0;
+    m_endTimePadding = new SpiceDouble;
+    *m_endTimePadding = 0;
+
+    m_instrumentPosition = nullptr;
+    m_instrumentRotation = nullptr;
+
+    m_sunPosition = nullptr;
+    m_bodyRotation = nullptr;
+
+    m_allowDownsizing = false;
+
+    m_spkCode = nullptr;
+    m_ckCode = nullptr;
+    m_ikCode = nullptr;
+    m_sclkCode = nullptr;
+    m_spkBodyCode = nullptr;
+    m_bodyFrameCode = nullptr;
+    m_target = nullptr;
+  }
+
 
   /**
    * Initialization of Spice object.
@@ -120,27 +154,7 @@ namespace Isis {
   void Spice::init(Pvl &lab, bool noTables, json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
-    m_solarLongitude = new Longitude;
-
-    m_et = NULL;
-    m_kernels = new QVector<QString>;
-
-    m_startTime = new iTime;
-    m_endTime = new iTime;
-    m_cacheSize = new SpiceDouble;
-    *m_cacheSize = 0;
-
-    m_startTimePadding = new SpiceDouble;
-    *m_startTimePadding = 0;
-    m_endTimePadding = new SpiceDouble;
-    *m_endTimePadding = 0;
-
-    m_instrumentPosition = NULL;
-    m_instrumentRotation = NULL;
-    m_sunPosition = NULL;
-    m_bodyRotation = NULL;
-
-    m_allowDownsizing = false;
+    defaultInit();
 
     m_spkCode = new SpiceInt;
     m_ckCode = new SpiceInt;
@@ -173,6 +187,7 @@ namespace Isis {
     // We should remove this completely in the near future
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
     m_usingAle = false;
+
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
@@ -208,8 +223,7 @@ namespace Isis {
         m_usingAle = true;
       }
       catch(...) {
-
-        // Backup to stadnard ISIS implementation
+        // Backup to standard ISIS implementation
         if (noTables) {
           load(kernels["TargetPosition"], noTables);
           load(kernels["InstrumentPosition"], noTables);
@@ -265,10 +279,9 @@ namespace Isis {
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
+
       m_target = new Target(this, lab);
-
     }
-
 
     // Get NAIF ik, spk, sclk, and ck codes
     //
@@ -307,6 +320,7 @@ namespace Isis {
       // m_target doesn't have the getDouble method so Spice gets the radii for it
       m_target->setRadii(radii);
     }
+
     *m_spkBodyCode = m_target->naifBodyCode();
 
     // Override them if they exist in the labels
@@ -457,10 +471,9 @@ namespace Isis {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-
-
     NaifStatus::CheckErrors();
   }
+
 
   /**
    * Loads/furnishes NAIF kernel(s)
@@ -599,7 +612,6 @@ namespace Isis {
       delete m_kernels;
       m_kernels = NULL;
     }
-
     NaifStatus::CheckErrors();
   }
 
@@ -987,6 +999,7 @@ namespace Isis {
     return *m_naifKeywords;
   }
 
+
   /**
    * Virtual method that returns the pixel resolution of the sensor in
    * meters/pix.
@@ -994,7 +1007,7 @@ namespace Isis {
    * @return @b double Resolution value of 1.0
    */
   double Spice::resolution() {
-    return 1.;
+    return 1.0;
   };
 
 
@@ -1300,6 +1313,7 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
   }
+
 
   /**
    * Returns the sub-solar latitude/longitude in universal coordinates (0-360

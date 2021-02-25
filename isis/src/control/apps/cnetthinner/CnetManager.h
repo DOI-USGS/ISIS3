@@ -1,26 +1,14 @@
 #ifndef CnetManager_h
 #define CnetManager_h
-/**
- * @file
- * $Revision: 6565 $
- * $Date: 2016-02-10 17:15:35 -0700 (Wed, 10 Feb 2016) $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <ostream>
 #include <cassert>
 #include <cfloat>
@@ -53,14 +41,14 @@ namespace Isis {
   class CnetManager;
 
 /**
- * Class to store control points with a weight and computed strength for CnetManager. 
- *  
- * @author 2016-09-30 Kris Becker 
- *  
- * @internal 
+ * Class to store control points with a weight and computed strength for CnetManager.
+ *
+ * @author 2016-09-30 Kris Becker
+ *
+ * @internal
  *   @history 2016-09-30 Kris Becker - Original Version
  *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
- * 
+ *
  */
   class KPoint {
 
@@ -72,22 +60,22 @@ namespace Isis {
 
       void select(const bool &state = true);
 
-      //definitions of inline functions 
+      //definitions of inline functions
 
      /**
       * Get the control point the KPoint was constructed from.
-      * 
-      * @return @b ControlPoint* The original control point. 
+      *
+      * @return @b ControlPoint* The original control point.
       */
       inline ControlPoint *point() const {
         BOOST_ASSERT ( m_point != 0 );
         return ( m_point );
       }
 
-      
+
      /**
       * Gets the calculated strength of this KPoint.
-      * 
+      *
       * @return @b double The calculated strength of this KPoint.
       */
       inline double strength() const {
@@ -97,7 +85,7 @@ namespace Isis {
 
      /**
       * Gets the index of this KPoint.
-      * 
+      *
       * @return @b int The index of this KPoint.
       */
       inline int index () const {
@@ -106,8 +94,8 @@ namespace Isis {
 
 
      /**
-       * Gets the original index of this KPoint. 
-       *  
+       * Gets the original index of this KPoint.
+       *
        * @return @b int The original or source index of this KPoint.
        */
       inline int sourceIndex() const {
@@ -119,7 +107,7 @@ namespace Isis {
       double        m_strength; //! The calulated strength of this KPoint.
       int           m_sourceIndex; //! The original index of this KPoint.
       int           m_index; //! The calculated index of this KPoint.
-      bool          m_selected; //! Flag to indicated whether to use this KPoint or not. 
+      bool          m_selected; //! Flag to indicated whether to use this KPoint or not.
 
       double calculateStrength(const ControlPoint *point, const double &weight) const;
 
@@ -128,10 +116,10 @@ namespace Isis {
 
 /**
  * Container class for the network and suppression data.
- *  
- * @author 2016-09-30 Kris Becker 
- *  
- * @internal 
+ *
+ * @author 2016-09-30 Kris Becker
+ *
+ * @internal
  *   @history 2016-09-30 Kris Becker - Original Version
  *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
  */
@@ -144,7 +132,7 @@ namespace Isis {
       CnetManager(ControlNet &cnet, const double &weight = 0.0);
       virtual ~CnetManager();
 
-      int size() const; 
+      int size() const;
       int load(const QList<ControlPoint *> &pts, const double &weight = 0.0);
 
       QMap<QString, int> getCubeMeasureCount() const;
@@ -157,21 +145,21 @@ namespace Isis {
 
     protected:
       ControlPoint *point(const int index);
-        
+
     private:
       QList<KPoint>              m_kpts; //! List of KPoints managed by this class
 
       /**
        * @brief Ascending order sort functor
-       * 
+       *
        * This is a comparison class used to sort lists of KPoint objects by strength, in
        * ascending order.
-       * 
-       * @author 2016-09-30 Kris Becker 
-       *  
-       * @internal 
+       *
+       * @author 2016-09-30 Kris Becker
+       *
+       * @internal
        *   @history 2016-09-30 Kris Becker - Original Version
-       *  
+       *
        */
       class SortStrengthDescending {
         public:

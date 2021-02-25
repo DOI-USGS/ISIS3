@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="hyb2onc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+<application name="hyb2onc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 <!-- $Id: hyb2onc2isis.xml 6226 2017-07-05 20:46:13Z kewilliams@usgs.gov $ -->
 
   <brief>Import PDS/FITS formatted Hayabusa2 image into ISIS cube</brief>
@@ -7,7 +7,7 @@
   <description>
     <p>
        This application will import and convert a Hayabusa2 Optical Navigation Camera (ONC) FITS image to an ISIS cube.
-      
+
     </p>
     <br/>
     <h3>Requirements</h3>
@@ -19,54 +19,54 @@
         Output ISIS file name (.cub) (specified in <em>TO</em> label)
       </li>
       <li>
-        Target name if target must be overridden (specified in <em>TARGET</em>). 
+        Target name if target must be overridden (specified in <em>TARGET</em>).
       </li>
     </ul>
     <p>
        The input FITS formatted header file for the Hayabusa2
-       image must be used in the FROM parameter.  
+       image must be used in the FROM parameter.
     </p>
     <h3>When TARGET Parameter Should Be Specified</h3>
     <ul>
       <li>
-        When Hayabusa2 EDR labels contain an incorrect value for the 
-      TARGET_NAME keyword 
+        When Hayabusa2 EDR labels contain an incorrect value for the
+      TARGET_NAME keyword
       </li>
       <li>
-         To define TARGET = "SKY" to later project the data with 
+         To define TARGET = "SKY" to later project the data with
         <em>skymap</em>.
       </li>
     </ul>
     <br/>
     <h2>Mission Overview</h2>
     <p>
-       The Hayabusa2 spacecraft was launched on 3 Dec 2014.  The Optical Navigation Camera (ONC) 
+       The Hayabusa2 spacecraft was launched on 3 Dec 2014.  The Optical Navigation Camera (ONC)
        package is positioned on the nadir-facing panel.
     </p>
     <p>
-       The mission purpose is to rendezvous with (and provide a sample return from) 
-       the Apollo asteroid 162173 Ryugu, a Cg-type asteroid. 
-    </p> 
+       The mission purpose is to rendezvous with (and provide a sample return from)
+       the Apollo asteroid 162173 Ryugu, a Cg-type asteroid.
+    </p>
     <h2>Instrument Overview</h2>
     <p>
-       The ONC package consists of three cameras: the telescopic (ONC-T) camera and two wide-angle 
-       cameras (ONC-W1,ONC-W2). 
+       The ONC package consists of three cameras: the telescopic (ONC-T) camera and two wide-angle
+       cameras (ONC-W1,ONC-W2).
     </p>
     <p>
-       The wide-angle cameras each have a square 65.24 x 65.24 deg. field of view (FOV). The wide-angle 
+       The wide-angle cameras each have a square 65.24 x 65.24 deg. field of view (FOV). The wide-angle
        camera ONC-W1 and ONC-W2 have focal lengths of
-       10.35 mm and 10.44 mm, respectively. The telescope camera 
-       has a 6.35 x 6.35 deg. FOV. The telescopic camera ONC-T has a focal length of 121.1 mm. 
+       10.35 mm and 10.44 mm, respectively. The telescope camera
+       has a 6.35 x 6.35 deg. FOV. The telescopic camera ONC-T has a focal length of 121.1 mm.
     </p>
     <p>
-       The ONC package has a set of eight bandpass filters. Below is a table of 
+       The ONC package has a set of eight bandpass filters. Below is a table of
        the filters and their specifications:
     </p>
     <br/>
     <h2>ONC Filters</h2>
     <p>
-       The following table provides the specifications for each of the six 
-       ONC-T bandpass filters. 
+       The following table provides the specifications for each of the six
+       ONC-T bandpass filters.
     </p>
       <TABLE BORDER="1">
             <CAPTION>
@@ -124,12 +124,12 @@
     <p>
        ???
     </p>
-    
+
     <br/>
     <h2>References</h2>
     <br/>
     <cite>
-      Suzuki, H. et al. (2017) Initial Inflight Calibration for Hayabusa2 Optical Navigation Camera (ONC) for Scientific Observations of Asteroid Ryugu (in review for Icarus). 
+      Suzuki, H. et al. (2017) Initial Inflight Calibration for Hayabusa2 Optical Navigation Camera (ONC) for Scientific Observations of Asteroid Ryugu (in review for Icarus).
     </cite>
     <br/>
     <br/>
@@ -152,8 +152,8 @@
   </history>
 
   <category>
-    <missionItem>Hayabusa2</missionItem> 
-  </category> 
+    <missionItem>Hayabusa2</missionItem>
+  </category>
 
   <groups>
     <group name="Files">
@@ -164,23 +164,23 @@
           Input PDS formatted detached header file for ONC image.
         </brief>
         <description>
-           This file is the PDS label (ending in .lbl) to the image data.  The 
-           image data are stored in  FITS format with the detached .lbl file 
-           describing generic access to the data.  The program, 
-           <em>hyb2onc2isis</em>, will also read the FITS file and extract 
-           the header contained therein.  Some FITS label values are transferred 
+           This file is the PDS label (ending in .lbl) to the image data.  The
+           image data are stored in  FITS format with the detached .lbl file
+           describing generic access to the data.  The program,
+           <em>hyb2onc2isis</em>, will also read the FITS file and extract
+           the header contained therein.  Some FITS label values are transferred
            to the output ISIS files as well for completeness.
         </description>
         <filter>*.lbl *.LBL</filter>
       </parameter>
-      
+
       <parameter name="TO">
          <type>cube</type>
          <pixelType>real</pixelType>
          <fileMode>output</fileMode>
-         <brief>Output ISIS3 cube filename</brief>
+         <brief>Output ISIS cube filename</brief>
          <description>
-           Use this parameter to select the output filename of the ISIS cube 
+           Use this parameter to select the output filename of the ISIS cube
            generated by this application.
          </description>
          <filter>*.cub</filter>
@@ -190,19 +190,19 @@
     <group name="Parameters">
         <parameter name="TARGET">
             <type>string</type>
-            <brief>Provide target name if absent or incorrect in input (FROM) 
-              label 
+            <brief>Provide target name if absent or incorrect in input (FROM)
+              label
             </brief>
             <description>
               <p>
-                 This parameter may be necessary as some ONC EDR labels may 
-                 not contain correct values for the TARGET_NAME keyword. This 
-                 parameter can be used to provide the correct name of the target.  
-                 It may also be used to specify SKY as the target to support 
-                 projecting data to the celestial sphere. 
+                 This parameter may be necessary as some ONC EDR labels may
+                 not contain correct values for the TARGET_NAME keyword. This
+                 parameter can be used to provide the correct name of the target.
+                 It may also be used to specify SKY as the target to support
+                 projecting data to the celestial sphere.
               </p>
             </description>
-            <internalDefault>Label Value</internalDefault> 
+            <internalDefault>Label Value</internalDefault>
         </parameter>
     </group>
   </groups>

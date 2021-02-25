@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Application.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -65,7 +73,7 @@ namespace Isis {
     for (int point = 0; point < pNewNet.GetNumPoints(); ++point) {
       ControlPoint *newPnt = pNewNet.GetPoint(point);
       bool bError = false;
-      
+
       // Create a copy of original control point
       const ControlPoint origPnt(*newPnt);
 
@@ -81,13 +89,13 @@ namespace Isis {
         newPnt->SetDateTime(Application::DateTime());
       }
       else {
-        pvlPointObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock"); 
+        pvlPointObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock");
       }
 
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
       bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
       int numMeasures = newPnt->GetNumMeasures();
-      
+
       int iRefIndex = -1;
       if (newPnt->IsReferenceExplicit())
         iRefIndex = newPnt->IndexOfRefMeasure();
@@ -115,7 +123,7 @@ namespace Isis {
             newMsr->SetDateTime(Application::DateTime());
             newMsr->SetChooserName("Application cnetref(Resolution)");
           }
-         
+
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
@@ -126,7 +134,7 @@ namespace Isis {
 
           if (!newMsr->IsIgnored()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
-            
+
             MeasureValidationResults results =
               ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);
             if (!results.isValid()) {
@@ -237,14 +245,14 @@ namespace Isis {
             cm->SetChooserName("Application cnetref(Resolution)");
             //newPnt.UpdateMeasure(cm); // Redesign fixed this
           }
-        } 
+        }
       }
 
       if (*newPnt != origPnt) {
         iPointsModified++;
       }
-      
-      if (!bError && !newPnt->IsIgnored() && newPnt->IsReferenceExplicit() && iBestIndex != iRefIndex 
+
+      if (!bError && !newPnt->IsIgnored() && newPnt->IsReferenceExplicit() && iBestIndex != iRefIndex
           && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
@@ -252,7 +260,7 @@ namespace Isis {
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
               origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   toString(mdResVector[iRefIndex]));
-  
+
           istrTemp = QString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
           istrTemp += QString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
@@ -261,7 +269,7 @@ namespace Isis {
         else {
           pvlRefChangeGrp += Isis::PvlKeyword("PrevReference", "Not Set");
         }
-        
+
         pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",
             newPnt->GetMeasure(iBestIndex)->GetCubeSerialNumber());
         QString sKeyName = "NewHighestResolution";
@@ -357,11 +365,11 @@ namespace Isis {
           }
         }
         else if (meType == Mean) {
-          if ((int)mdResVector.size() == 2)  { 
+          if ((int)mdResVector.size() == 2)  {
             // Arbitrarily assign the 1st measure to be reference for a point with only 2 measures
             iBestIndex  = 0;
           }
-          else { 
+          else {
             double dDiff = fabs(dMean - mdResVector[i]);
             if (dBestResolution == -1 || dDiff <  dBestResolution) {
               dBestResolution = dDiff;
@@ -387,4 +395,3 @@ namespace Isis {
     return iBestIndex;
   }
 };
-

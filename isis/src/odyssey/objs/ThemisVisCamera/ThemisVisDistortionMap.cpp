@@ -1,21 +1,10 @@
-/**
- * @file 
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QDebug>
 #include "ThemisVisDistortionMap.h"
@@ -27,9 +16,9 @@ namespace Isis {
   /**
    * Constructs a Distortion Map for the Themis Vis Camera
    *
-   * @param parent Pointer to the parent Camera object 
-   * 
-   * @internal 
+   * @param parent Pointer to the parent Camera object
+   *
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.  Fixed
    *                          documentation.
    */
@@ -37,7 +26,7 @@ namespace Isis {
     CameraDistortionMap(parent, 1.0) {
     // Set necessary constant values
 
-    // The IR pixel pitch is used by VIS processing because optical distortion corrections are in 
+    // The IR pixel pitch is used by VIS processing because optical distortion corrections are in
     // terms of IR pixels. Note that the pixel pitch for the instrument currently being processed
     // is stored in ISIS2's ccd.mmpp.
     // from IR_PIXEL_PITCH in ISIS2's thm_parameters.def.N
@@ -129,7 +118,7 @@ namespace Isis {
     // between the boresight and the look vector for a given detector sample/line coordinate,
     // these factors are used to compute a detector sample coordinate that will give a look
     // vector corresponding to where the given look vector (detector sample/line) is
-    // really looking on the planet 
+    // really looking on the planet
     // (values read from VIS_OD_CX and VIS_OD_CY[N] in thm_parameters.def.7.2, last updated 03/2003)
     double vis_od_cx[] = { -4.02919e-5, 0.0, 0.0 }; // VIS optical distortion coefficients for x
     double vis_od_cy[] = { -0.0178649, -0.00727843, 5.65278e-5 };
@@ -139,9 +128,9 @@ namespace Isis {
     // compute IR pixels(lines) relative to boresight
     double j = p_undistortedFocalPlaneY / p_irPixelPitch;
 
-    // IR distortion in Y (pixels) 
+    // IR distortion in Y (pixels)
     // Note that (-j) is used here because the orientation of positive displacement from the boresight in the Y
-    // direction assumed for the correction parameters is opposite of the positive direction for j. 
+    // direction assumed for the correction parameters is opposite of the positive direction for j.
     double deltaj = vis_od_cy[0] + ( vis_od_cy[1] * (-j)) + ( vis_od_cy[2] * (-j) * (-j));
 
     // IR stretch factor in X direction
@@ -188,24 +177,24 @@ namespace Isis {
     double ux_guess, uy_guess;
 
     // "solve" undistorted focal plane equations for ux and uy to get beginning offset
-    double xOffset  = -dy / p_irPixelPitch * vis_od_cx[0] 
-                      + vis_od_cx[0] * p_irBoreLine 
+    double xOffset  = -dy / p_irPixelPitch * vis_od_cx[0]
+                      + vis_od_cx[0] * p_irBoreLine
                       - vis_od_cx[0] * p_ir_b5_effectiveDetectorLine;
-    double yOffset  =  p_irPixelPitch * vis_od_cy[0] / dy 
-                      - vis_od_cy[1] 
+    double yOffset  =  p_irPixelPitch * vis_od_cy[0] / dy
+                      - vis_od_cy[1]
                       + dy / p_irPixelPitch * vis_od_cy[2];
-    
+
     while (!done) {
     // In this loop, we will use the current offset to make a guess at the
     // undistorted focal plane coordinate that corresponds to the known
     // distorted focal plane coordinate.
-    // 
+    //
     // The offset is updated using the undistored guess.
-    // 
+    //
     // Each undistorted guess will be tested by reversing the equation used to
     // compute the current undistorted guess to get a corresponding distorted
     // coordinate.
-    // 
+    //
     // If this distorted coordinate that corresponds to the current undistorted
     // guess is close enough to the known distorted coordinate, then we will
     // accept the corresponding undistorted coordinate as our solution and end
@@ -215,11 +204,11 @@ namespace Isis {
       uy_guess = dy / (1.0 + yOffset);
 
       // offset is updated with each undistored x and y guess
-      xOffset = -uy_guess / p_irPixelPitch * vis_od_cx[0] 
-                + vis_od_cx[0] * p_irBoreLine 
+      xOffset = -uy_guess / p_irPixelPitch * vis_od_cx[0]
+                + vis_od_cx[0] * p_irBoreLine
                 - vis_od_cx[0] * p_ir_b5_effectiveDetectorLine;
-      yOffset =  p_irPixelPitch * vis_od_cy[0] / uy_guess 
-                - vis_od_cy[1] 
+      yOffset =  p_irPixelPitch * vis_od_cy[0] / uy_guess
+                - vis_od_cy[1]
                 + uy_guess / p_irPixelPitch * vis_od_cy[2];
 
       // find the distorted x/y corresponding to the undistorted x/y guess
@@ -238,7 +227,7 @@ namespace Isis {
         return false;
       }
     }
-    
+
     // use the undistorted x/y whose corresponding distorted x/y are both close enough to the known
     // distorted x/y
     p_undistortedFocalPlaneX = ux_guess;

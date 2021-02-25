@@ -2,8 +2,12 @@
 #include <QStringList>
 #include <QFile>
 
+#include "csm/csm.h"
+#include "csm/Ellipsoid.h"
+
 #include "campt.h"
 #include "Fixtures.h"
+#include "Mocks.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -259,4 +263,57 @@ TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), -1.0);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);
+}
+
+TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
+
+  double pointRadius = csm::Ellipsoid().getSemiMajorRadius();
+  // We don't care exactly how the Mock is called so just setup return values
+  EXPECT_CALL(mockModel, getSensorIdentifier)
+      .WillRepeatedly(::testing::Return("MockSensorID"));
+  EXPECT_CALL(mockModel, getPlatformIdentifier)
+      .WillRepeatedly(::testing::Return("MockPlatformID"));
+  EXPECT_CALL(mockModel, getReferenceDateAndTime)
+      .WillRepeatedly(::testing::Return("20000101T115855.816"));
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus)
+      .WillRepeatedly(::testing::Return(csm::EcefLocus(pointRadius + 50000, 0, 0, -1, 0, 0)));
+  EXPECT_CALL(mockModel, groundToImage(::testing::An<const csm::EcefCoord&>(), ::testing::_, ::testing::_, ::testing::_))
+      .WillRepeatedly(::testing::Return(csm::ImageCoord(4.5, 4.5)));
+  EXPECT_CALL(mockModel, computeGroundPartials)
+      .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
+  EXPECT_CALL(mockModel, getImageTime)
+      .WillRepeatedly(::testing::Return(10.0));
+  EXPECT_CALL(mockModel, computeGroundPartials)
+      .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
+  EXPECT_CALL(mockModel, getSensorPosition(::testing::An<const csm::ImageCoord&>()))
+      .WillRepeatedly(::testing::Return(csm::EcefCoord(pointRadius + 50000, 0, 0)));
+  EXPECT_CALL(mockModel, getIlluminationDirection)
+      .WillRepeatedly(::testing::Return(csm::EcefVector(0.0, 0.0, -1.0)));
+
+  QVector<QString> args = {"sample=5", "line=5"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  // Check that invalid values are all set to null
+  EXPECT_TRUE(groundPoint.findKeyword("RightAscension").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("Declination").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(0));
+  EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(1));
+  EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(2));
+  EXPECT_TRUE(groundPoint.findKeyword("SubSolarAzimuth").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SolarDistance").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SubSolarLatitude").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SubSolarLongitude").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SubSolarGroundAzimuth").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("LocalSolarTime").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("SolarLongitude").isNull());
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionJ2000").isNull(0));
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionJ2000").isNull(1));
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionJ2000").isNull(2));
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(0));
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(1));
+  EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(2));
 }

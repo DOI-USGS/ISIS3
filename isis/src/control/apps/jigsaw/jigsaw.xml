@@ -6,7 +6,7 @@
 
   <description>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3,
+      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis,
       level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
       simultaneously defines the selected image geometry information (camera pointing, spacecraft
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
@@ -25,7 +25,7 @@
 
     <p>
       The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that
-      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to
+      <def>SPICE</def> is included in the Isis <def>cube</def> labels in the Kernels group.  In order to
       run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
       net</def>, the name of an output <def>control net</def>, and the adjustment parameters.
       <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the

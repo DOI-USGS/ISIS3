@@ -1,21 +1,11 @@
-/**
- * @file
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -24,6 +14,8 @@
 #include "IException.h"
 #include "TextFile.h"
 #include "LineManager.h"
+#include "NaifStatus.h"
+#include "Camera.h"
 
 using namespace std;
 using namespace Isis;
@@ -129,22 +121,38 @@ void IsisMain() {
 #endif
   gbl::nullWago = ui.GetBoolean("NULLWAGO");
 
-  // Get the distance between Mars and the Sun at the given time in
-  // Astronomical Units (AU)
-  QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.toLatin1().data());
-  QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-  furnsh_c(satKernel.toLatin1().data());
-  QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.toLatin1().data());
-  double sunpos[6], lt;
-  spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
-  double dist = vnorm_c(sunpos);
   double kmPerAU = 1.4959787066E8;
-  double sunAU = dist / kmPerAU;
-  unload_c(bspKernel.toLatin1().data());
-  unload_c(satKernel.toLatin1().data());
-  unload_c(pckKernel.toLatin1().data());
+  double sunAU = 0;
+  try {
+    Camera *cam;
+    cam = icube->camera();
+    cam->setTime(startTime);
+    sunAU = cam->sunToBodyDist() / kmPerAU;
+  }
+  catch(IException &e) {
+    // Get the distance between Mars and the Sun at the given time in
+    // Astronomical Units (AU)
+    
+    NaifStatus::CheckErrors();
+    QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+    furnsh_c(bspKernel.toLatin1().data());
+    QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
+    furnsh_c(satKernel.toLatin1().data());
+    QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+    furnsh_c(pckKernel.toLatin1().data());
+    NaifStatus::CheckErrors();
+
+    double sunpos[6], lt;
+    spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
+    double dist = vnorm_c(sunpos);
+    sunAU = dist / kmPerAU;
+    
+    NaifStatus::CheckErrors();
+    unload_c(bspKernel.toLatin1().data());
+    unload_c(satKernel.toLatin1().data());
+    unload_c(pckKernel.toLatin1().data());
+    NaifStatus::CheckErrors();
+  }
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
   // we must go to counts/ms

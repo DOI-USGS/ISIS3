@@ -7,7 +7,11 @@ APPNAME = equalizer
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
+<<<<<<< HEAD
 	$(LS) $(INPUT)/I0*.cub > $(OUTPUT)/Fromlist.lst;
+=======
+	$(LS) $(INPUT)/I0*.cub > $(OUTPUT)/FromList.lst;
+>>>>>>> 24ac6f742df13cc10639d7a957a527bf34d94227
 	$(ECHO) $(INPUT)/I01523019RDR.lev2.cub > $(OUTPUT)/HoldList.lst;
 	$(APPNAME) fromlist=$(OUTPUT)/FromList.lst \
 	  holdlist=$(OUTPUT)/HoldList.lst \

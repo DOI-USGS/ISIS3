@@ -46,16 +46,15 @@ namespace Isis {
    * Prepare to write string to output cube
    */
   void StringBlob::WriteInit() {
-    int bytes = m_string.size();
+    p_nbytes = m_string.size();
 
-    char *temp = p_buffer;
-    p_buffer = new char[p_nbytes+bytes];
-    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
+    if (p_buffer != NULL) {
+      delete p_buffer;
+    }
+
+    p_buffer = new char[p_nbytes];
     const char *ptr = m_string.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
-
-    if (temp != NULL) delete [] temp;
+    memcpy(p_buffer, (void *)ptr, p_nbytes);
   }
 
   /**

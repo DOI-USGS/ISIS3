@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QFile>
@@ -38,11 +46,11 @@ using namespace Isis;
 // Control network manager
 typedef QList<QSharedPointer<ControlNet> >    ControlNetList;
 
-/** 
+/**
  * Functor for normalized 3D-to-2D Euclidean distances
- * 
+ *
  * @author 2015-03-14 Kris Becker
- * 
+ *
  * @internal
  *   @history 2015-03-14 Kris Becker - Original version.
  */
@@ -76,9 +84,9 @@ public:
                       datum2.x(), datum2.y(), datum2.z()) );
   }
 
-  inline double normalize(const double dx1, const double dy1, const double dz1, 
-                          const double dx2, const double dy2, const double dz2) 
-                          const { 
+  inline double normalize(const double dx1, const double dy1, const double dz1,
+                          const double dx2, const double dy2, const double dz2)
+                          const {
     double scale = m_znorm / radius(dx2, dy2, dz2);
     double nx = dx2 * scale;
     double ny = dy2 * scale;
@@ -88,7 +96,7 @@ public:
 
   inline double distance(const double dx1, const double dy1, const double dz1,
                          const double dx2, const double dy2, const double dz2)
-                         const { 
+                         const {
     double dx = dx1 - dx2;
     double dy = dy1 - dy2;
     double dz = dz1 - dz2;
@@ -125,7 +133,7 @@ typedef PointCloudSearchResult<PointType, DistanceType> ResultType;
 
 
 void IsisMain() {
- 
+
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
@@ -141,8 +149,8 @@ void IsisMain() {
   DatumFunctoidList functors = dfactory->create(algorithm);
 
   QStringList cnetfiles;
-  if ( ui.WasEntered("CNET") ) { 
-    cnetfiles.append(ui.GetAsString("CNET")); 
+  if ( ui.WasEntered("CNET") ) {
+    cnetfiles.append(ui.GetAsString("CNET"));
   }
 
   if ( ui.WasEntered("CNETLIST") ) {
@@ -158,7 +166,7 @@ void IsisMain() {
     throw IException(IException::User, mess, _FILEINFO_);
   }
   // Create the point cloud container and load the control networks
-  QScopedPointer<CNetPointCloud> cloud(new CNetPointCloud()); 
+  QScopedPointer<CNetPointCloud> cloud(new CNetPointCloud());
 
   // Collect some stuff from input nets for the output net
   QString netid;
@@ -177,10 +185,10 @@ void IsisMain() {
     int npoints(0);
     QList<ControlPoint *> points = cnet->take();
     BOOST_FOREACH ( ControlPoint *point, points) {
-      ControlPointCloudPt cpt(point, ControlPointCloudPt::Ground, 
+      ControlPointCloudPt cpt(point, ControlPointCloudPt::Ground,
                               ControlPointCloudPt::Exclusive);
-      if ( cpt.isValid() ) { 
-        cloud->addPoint(cpt); 
+      if ( cpt.isValid() ) {
+        cloud->addPoint(cpt);
         npoints++;
       }
     }
@@ -189,7 +197,7 @@ void IsisMain() {
 
     // Instead of having to save the ControlNet instances, we take ownership
     // of all the points from ControlNet and turn it over to the cloud...
-    // 
+    //
     //  cnetlist.append( QSharedPointer<ControlNet> ( cnet.take() ) );
   }
   std::cout << "\nTotal " << cloud->size() << " of " << allPoints << "\n";
@@ -232,7 +240,7 @@ void IsisMain() {
   // Only worry about this if a range search is requested
   if ( radial_search) {
     if (ui.WasEntered("DISTANCE")) {
-      search_radius = ui.GetDouble("DISTANCE"); 
+      search_radius = ui.GetDouble("DISTANCE");
     }
     else {
       // Compute range from center of pixel to corner in meters
@@ -268,11 +276,11 @@ void IsisMain() {
   mapper.SetMaximumSteps(tile.Bricks());
   mapper.CheckStatus();
 
- //  Process data using 3-D brick 
+ //  Process data using 3-D brick
   int npixels = tsamps * tlines;
   int nbands = tile.BandDimension();
   SurfacePoint point;
-  
+
   for ( int brick = 1 ; brick <= tile.Bricks() ; brick++ ) {
     tile.SetBrick(brick);
 
@@ -286,14 +294,14 @@ void IsisMain() {
       QVector<double> datum(nbands, Null);
 
       //  Map only valid projection translation
-      if ( (samp <= csamps) && (line <= clines) && 
+      if ( (samp <= csamps) && (line <= clines) &&
            ( tproj->SetWorld(samp, line) ) ) {
-#if 0        
+#if 0
         std::cout << "Line: " << line << "  Sample: " << samp << "\n";
-        std::cout << "Lat:  " << tproj->UniversalLatitude() 
+        std::cout << "Lat:  " << tproj->UniversalLatitude()
                   << " Long: " << tproj->UniversalLongitude() << "\n";
 #endif
-        
+
         // Trim if requested
         bool mapit(true);
         if ( ( trim ) && ( tproj->HasGroundRange() ) ) {
@@ -305,11 +313,11 @@ void IsisMain() {
 
         // Plot it only if its within mapping boundary conditions
         if ( mapit ) {
-          double lat = tproj->UniversalLatitude(); 
+          double lat = tproj->UniversalLatitude();
           double lon = tproj->UniversalLongitude();
           double radius = tproj->LocalRadius(lat);
 
-          point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+          point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
                                         Longitude(lon, Angle::Degrees),
                                         Distance(radius, Distance::Meters));
 
@@ -321,15 +329,15 @@ void IsisMain() {
                                   "MapPoint");
 
           // There are several combinations to consider
-          //    1) RADIAL search from RANGE <meters> at the lat/lon pixel center 
-          //    2) NEIGHBOR search selecting the NEIGHBORS closest to the center 
+          //    1) RADIAL search from RANGE <meters> at the lat/lon pixel center
+          //    2) NEIGHBOR search selecting the NEIGHBORS closest to the center
           //    3) BOTH searches requested will apply the RADIAL search first, then
-          //        and only if MINPOINTS points resulting from the RADIAL 
-          //        search are within RANGE <meters>, otherwise a NEIGHBOR 
+          //        and only if MINPOINTS points resulting from the RADIAL
+          //        search are within RANGE <meters>, otherwise a NEIGHBOR
           //        search is performed.
           ResultType results;
           if ( both_searches ) {
-            results = cloud_t.radius_query(cpt, search_radius_sq); 
+            results = cloud_t.radius_query(cpt, search_radius_sq);
             if ( minpoints > results.size() ) {
               results = cloud_t.neighbor_query(cpt, neighbors);
             }
@@ -392,4 +400,3 @@ void IsisMain() {
 
   p.EndProcess();
 }
-

@@ -1,26 +1,13 @@
 #ifndef BundleSettings_h
 #define BundleSettings_h
 
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 // Qt library
 #include <QList>
@@ -110,20 +97,20 @@ namespace Isis {
    *   @history 2018-06-28 Christopher Combs - Added observationSolveSettings() method to retrieve
    *                            m_observationSolveSettings. Fixes #497.
    *
-   *   @history 2017-06-25 Debbie Cook - Added m_cpCoordTypeReports and m_cpCoordTypeBundle. 
-   *                           The 2nd type determines how control point coordinates are entered 
-   *                           into the the matrix and interpreted throughout the adjustment.  The 
+   *   @history 2017-06-25 Debbie Cook - Added m_cpCoordTypeReports and m_cpCoordTypeBundle.
+   *                           The 2nd type determines how control point coordinates are entered
+   *                           into the the matrix and interpreted throughout the adjustment.  The
    *                           1st type determines the coordinate type of control points in reports.
-   *                           Added the new coordinate type as an argument to SetSolveOptions.  
+   *                           Added the new coordinate type as an argument to SetSolveOptions.
    *                           Changed GlobalAprioriSigmas names to more generic names:  Latitude to
    *                           PointCoord1, Longitude to PointCoord2, and Radius to PointCoord3 so
-   *                           they can be used for either lat/lon/radius or x/y/z.  Also added 
+   *                           they can be used for either lat/lon/radius or x/y/z.  Also added
    *                           accessor methods, CoordTypeReports() & CoordTypeBundle()
    *                           for the new coordinate type members.
    *                           References #4649 and #501.
    *   @history 2019-05-17 Tyler Wilson - Added QString m_cubeList member function as well
    *                           as get/set member functions.  References #3267.
-   *  
+   *
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
    *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
@@ -171,10 +158,10 @@ namespace Isis {
                            bool solveRadius = false,
                            SurfacePoint::CoordinateType coordTypeBundle = SurfacePoint::Latitudinal,
                            SurfacePoint::CoordinateType coordTypeReports = SurfacePoint::Latitudinal,
-                           double globalPointCoord1AprioriSigma = Isis::Null, 
-                           double globalPointCoord2AprioriSigma = Isis::Null, 
-                           double globalPointCoord3AprioriSigma = Isis::Null); 
-      void setOutlierRejection(bool outlierRejection, 
+                           double globalPointCoord1AprioriSigma = Isis::Null,
+                           double globalPointCoord2AprioriSigma = Isis::Null,
+                           double globalPointCoord3AprioriSigma = Isis::Null);
+      void setOutlierRejection(bool outlierRejection,
                                double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
@@ -197,7 +184,7 @@ namespace Isis {
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
-      QList<BundleObservationSolveSettings> observationSolveSettings() const; 
+      QList<BundleObservationSolveSettings> observationSolveSettings() const;
 
 
       //=====================================================================//
@@ -405,7 +392,7 @@ namespace Isis {
       // Control Points
       SurfacePoint::CoordinateType m_cpCoordTypeReports;  /**< Indicates the coordinate type for
                                                    outputting control points in reports.  */
-      SurfacePoint::CoordinateType m_cpCoordTypeBundle;     /**< Indicates the coordinate type used 
+      SurfacePoint::CoordinateType m_cpCoordTypeBundle;     /**< Indicates the coordinate type used
                                                     for control points in the bundle adjustment */
       // Output Options
       QString m_outputFilePrefix;    /**< The prefix for all output files. If the user does not want

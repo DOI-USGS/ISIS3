@@ -1,24 +1,10 @@
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <boost/foreach.hpp>
 #include "opencv2/opencv.hpp"
@@ -30,7 +16,7 @@
 namespace Isis {
 
   /**
-   * Constructs a default SURFAlgorithm with default variables. 
+   * Constructs a default SURFAlgorithm with default variables.
    */
   SURFAlgorithm::SURFAlgorithm() : Feature2DAlgorithm("SURF", "Feature2D", SURFType::create()) {
     m_variables.merge( getAlgorithmVariables() );
@@ -38,13 +24,13 @@ namespace Isis {
 
 
 /**
- * Constructs a SURFAlgorithm with input variables. 
- * 
+ * Constructs a SURFAlgorithm with input variables.
+ *
  * @param cvars Variables that are not included will be set to their default.
  * @param config The config string used to construct cvars.
  */
   SURFAlgorithm::SURFAlgorithm(const PvlFlatMap &cvars, const QString &config) :
-                               Feature2DAlgorithm("SURF", "Feature2D", 
+                               Feature2DAlgorithm("SURF", "Feature2D",
                                                   SURFType::create()) {
     setConfig(config);
     setAlgorithmVariables(cvars);
@@ -61,8 +47,8 @@ namespace Isis {
 
 
 /**
- * Returns a description of the DaisyAlgorithm. 
- * 
+ * Returns a description of the DaisyAlgorithm.
+ *
  * @return @b QString A description of the algorithm.
  */
   QString SURFAlgorithm::description() const {
@@ -75,11 +61,11 @@ namespace Isis {
 
 /**
  * Creates and returns an instance of SURFAlgorithm.
- * 
+ *
  * @param vars PvlFlatMap containing algorithm parameters and their values
  * @param config A configuration string input by the user
- * 
- * @return Feature2DAlgorithm 
+ *
+ * @return Feature2DAlgorithm
  */
   Feature2DAlgorithm *SURFAlgorithm::create(const PvlFlatMap &vars, const QString &config) {
     return ( new SURFAlgorithm(vars, config) );
@@ -87,48 +73,48 @@ namespace Isis {
 
 
   /**
-   * Returns true if the algorithm has a detector. 
-   *  
-   * @return @b true if the algorithm has a detector. 
+   * Returns true if the algorithm has a detector.
+   *
+   * @return @b true if the algorithm has a detector.
    */
-  bool SURFAlgorithm::hasDetector() const { 
-    return true; 
+  bool SURFAlgorithm::hasDetector() const {
+    return true;
   }
 
 
   /**
-   * Returns true if the algorithm has an extractor. 
-   *  
-   * @return @b true if the algorithm has an extractor. 
+   * Returns true if the algorithm has an extractor.
+   *
+   * @return @b true if the algorithm has an extractor.
    */
-  bool SURFAlgorithm::hasExtractor() const { 
-    return true; 
+  bool SURFAlgorithm::hasExtractor() const {
+    return true;
   }
 
 
   /**
-   * Returns true if the algorithm has a matcher. 
-   *  
-   * @return @b true if the algorithm has a matcher. 
+   * Returns true if the algorithm has a matcher.
+   *
+   * @return @b true if the algorithm has a matcher.
    */
-  bool SURFAlgorithm::hasMatcher() const { 
-    return false; 
+  bool SURFAlgorithm::hasMatcher() const {
+    return false;
   }
 
 
 
 /**
- * @brief Retreive all SURF algorithm variable defaults and populate container 
- *  
- * This method will retreive the current values of all the variables as they 
- * are currently set in the algorithm. 
- *  
- * Typically, this is called upon instantiation of the algorithm which provides 
- * the default state of the variables. However, it is reentrant such that it 
- * will return the current state of all the variables. 
- * 
- * @author 2016-12-07 Kris Becker 
- * 
+ * @brief Retreive all SURF algorithm variable defaults and populate container
+ *
+ * This method will retreive the current values of all the variables as they
+ * are currently set in the algorithm.
+ *
+ * Typically, this is called upon instantiation of the algorithm which provides
+ * the default state of the variables. However, it is reentrant such that it
+ * will return the current state of all the variables.
+ *
+ * @author 2016-12-07 Kris Becker
+ *
  * @return PvlFlatMap Container with all the SURF variables and values
  */
   PvlFlatMap SURFAlgorithm::getAlgorithmVariables( ) const {
@@ -144,38 +130,38 @@ namespace Isis {
 
 /**
  * @brief Set parameters as provided by the variables
- * 
+ *
  * @author  2016-12-06 Kris Becker
- * 
+ *
  * @param variables Container of parameters to set in the algorithm
- * 
+ *
  * @return int Number of variables actually set
  */
   int SURFAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
 
     SURFPtr v_ref = m_algorithm.dynamicCast<SURFType>();
     int nset(0);
-    if ( variables.exists("HessianThreshold") ) { 
+    if ( variables.exists("HessianThreshold") ) {
       v_ref->setHessianThreshold(toDouble(variables.get("HessianThreshold")));
       nset++;
     }
 
-    if ( variables.exists("NOctaves") ) { 
+    if ( variables.exists("NOctaves") ) {
       v_ref->setNOctaves(toInt(variables.get("NOctaves")));
       nset++;
     }
 
-    if ( variables.exists("NOctaveLayers") ) { 
+    if ( variables.exists("NOctaveLayers") ) {
       v_ref->setNOctaveLayers(toInt(variables.get("NOctaveLayers")));
       nset++;
     }
 
-    if ( variables.exists("Extended") ) { 
+    if ( variables.exists("Extended") ) {
       v_ref->setExtended(toBool(variables.get("Extended")));
       nset++;
     }
 
-    if ( variables.exists("Upright") ) { 
+    if ( variables.exists("Upright") ) {
       v_ref->setUpright(toBool(variables.get("Upright")));
       nset++;
     }
@@ -184,4 +170,3 @@ namespace Isis {
   }
 
 };
-

@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "LroWideAngleCamera.h"
 #include "LroWideAngleCameraFocalPlaneMap.h"
@@ -54,10 +42,10 @@ namespace Isis {
     PushFrameCamera(cube) {
 
     NaifStatus::CheckErrors();
-    
+
     m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
     m_spacecraftNameShort = "LRO";
-    
+
     // Set up the camera characteristics
     instrumentRotation()->SetFrame(naifIkCode());
     SetFocalLength();
@@ -263,7 +251,7 @@ namespace Isis {
 
     LroWideAngleCameraFocalPlaneMap *fplane = (LroWideAngleCameraFocalPlaneMap *) FocalPlaneMap();
     fplane->setBand(vband);
-    fplane->SetDetectorOrigin(p_boreSightSample[vband-1] + 1.0, 
+    fplane->SetDetectorOrigin(p_boreSightSample[vband-1] + 1.0,
                               p_boreSightLine[vband-1]   + 1.0);
 
     LroWideAngleCameraDistortionMap *distort = (LroWideAngleCameraDistortionMap *) DistortionMap();
@@ -330,8 +318,8 @@ namespace Isis {
 
   /**
    * CK frame ID -  - Instrument Code from spacit run on CK
-   *  
-   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Frame ID
    */
   int LroWideAngleCamera::CkFrameId() const {
@@ -340,9 +328,9 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    * CK Reference ID - J2000
-   * 
+   *
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Reference ID
    */
@@ -352,10 +340,10 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    *  SPK Reference ID - J2000
-   *  
-   * @return @b int The appropriate instrument code for the Spacecraft 
+   *
+   * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Reference ID
    */
   int LroWideAngleCamera::SpkReferenceId() const {

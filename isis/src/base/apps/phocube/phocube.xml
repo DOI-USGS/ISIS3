@@ -22,14 +22,14 @@ xsi:noNamespaceSchemaLocation=
     <ul>
       <li>Evaluate the individual bands in order to establish subsequent
           image processing steps</li>
-      <li>Specify as input to other ISIS3 programs such as fx and photomet</li>
+      <li>Specify as input to other ISIS programs such as fx and photomet</li>
       <li>Demonstrate the result of each selected option</li>
       <li>Determine how the images are mosaicked together after the
           Level2 images are created from the Level1 images with backplanes </li>
     </ul>
   </p>
   <p>
-    All ISIS3 applications default to the following geometric reference if a camera model exists:
+    All ISIS applications default to the following geometric reference if a camera model exists:
     <ul>
       <li>Longitude Domain = 360, longitude range reported from 0 to 360</li>
       <li>Latitude System = Ocentric</li>
@@ -56,13 +56,13 @@ xsi:noNamespaceSchemaLocation=
   </p>
   <p>
     The parameters "morphologyRank" and "albedoRank" are specifically designed to be used
-    by the ISIS3 mosaic programs.  A mosaic program will automatically compare
+    by the ISIS mosaic programs.  A mosaic program will automatically compare
     two pixel values to determine how each pixel is mosaicked into an output
     file, which depends on whether a morphology-based or an albedo-based
     product is desired.  The program computes a
     <def link="Digital Number">DN</def> value for every input pixel based on
     the formulas listed below and outputs the value to a backplane band.
-    These backplane bands are used by the ISIS3 mosaic programs.  The following are
+    These backplane bands are used by the ISIS mosaic programs.  The following are
     equations for "morphologyRank" and "albedoRank" options:
   <blockquote>
   <dl>
@@ -308,8 +308,8 @@ xsi:noNamespaceSchemaLocation=
     </change>
     <change name="Kaitlyn Lee" date="2020-06-04">
       Added SPECIALPIXELS parameter to allow users to skip calculations on special pixels, excluding
-      RA and DEC. This changed merged the two process functions, which were created to speed up 
-      the application when copying over DN values. After a few time tests, it doesn't look like the 
+      RA and DEC. This changed merged the two process functions, which were created to speed up
+      the application when copying over DN values. After a few time tests, it doesn't look like the
       merge causes the application to run longer. Changed the process function to be a lambda function
       to get rid of global variables.
     </change>

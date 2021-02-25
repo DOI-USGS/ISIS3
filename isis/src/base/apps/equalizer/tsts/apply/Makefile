@@ -3,7 +3,11 @@ APPNAME = equalizer
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
+<<<<<<< HEAD
 	$(LS) -r $(INPUT)/*.cub > $(OUTPUT)/Fromlist.lst;
+=======
+	$(LS) -r $(INPUT)/*.cub > $(OUTPUT)/FromList.lst;
+>>>>>>> 24ac6f742df13cc10639d7a957a527bf34d94227
 	$(CAT) $(INPUT)/instats.pvl | $(SED) "s|FileName = .*odyssey/testData/|FileName = $(INPUT)/|" > $(OUTPUT)/instats.pvl;
 	$(APPNAME) fromlist=$(OUTPUT)/FromList.lst \
 	  tolist=$(INPUT)/ToList.lst \

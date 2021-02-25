@@ -1,26 +1,13 @@
 #ifndef MeasurePoint_h
 #define MeasurePoint_h
-/**
- * @file
- * $Revision: 1.0 $ 
- * $Date: 2014/02/27 18:49:25 $ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <cmath>
 
@@ -37,13 +24,13 @@ namespace Isis {
 
 /**
  * @brief ControlPoint class for use in PointCloud datasets
- *  
+ *
  *  The ControlPoint container is required to not change its content for the
  *  duration of use of the nanoflann kd-tree built from the points.
- *  
+ *
  * @author  2015-10-11 Kris Becker
- *  
- * @internal 
+ *
+ * @internal
  *   @history 2015-10-11 Kris Becker - Original Version
  *   @history 2016-12-06 Jesse Mapel - Updated documentation.  References #4558.
  */
@@ -58,13 +45,13 @@ class MeasurePoint {
 
     /**
      * Constructs a MeasurePoint from a measure.
-     * 
+     *
      * @param measure  The measure that the MeasurePoint represents.
-     * @param weight   The weight of the MeasurePoint in the 
+     * @param weight   The weight of the MeasurePoint in the
      */
-    MeasurePoint(ControlMeasure *measure, const double &weight = 1.0) : 
+    MeasurePoint(ControlMeasure *measure, const double &weight = 1.0) :
                  m_data(new ControlMeasureData(measure, weight) ) {
-      m_data->m_isvalid = validMeasure(); 
+      m_data->m_isvalid = validMeasure();
     }
 
 
@@ -76,7 +63,7 @@ class MeasurePoint {
 
     /**
      * Determines if the MeasurePoint's parent control point is valid.
-     * 
+     *
      * @return @b bool If the measure's parent control point is valid.
      */
     inline bool validPoint() const {
@@ -84,17 +71,17 @@ class MeasurePoint {
       BOOST_ASSERT ( m != 0 );
       ControlPoint *p = m->Parent();
       BOOST_ASSERT ( p != 0 );
-      return (!(p->IsIgnored() || p->IsRejected() || p->IsEditLocked() || p->IsInvalid()) ); 
+      return (!(p->IsIgnored() || p->IsRejected() || p->IsEditLocked() || p->IsInvalid()) );
     }
 
 
     /**
      * If the MeasurePoint and parent control point are valid.
-     * 
+     *
      * @return @b bool If the MeasurePoint and parent control point are both valid.
      */
     inline bool isValid() const {
-      return ( m_data->m_isvalid && validPoint() ); 
+      return ( m_data->m_isvalid && validPoint() );
     }
 
 
@@ -109,7 +96,7 @@ class MeasurePoint {
 
     /**
      * Returns the size of the MeasurePoint.
-     * 
+     *
      * @return @b int Always one.
      */
     inline int size() const {
@@ -119,7 +106,7 @@ class MeasurePoint {
 
     /**
      * Returns the measure's point ID
-     * 
+     *
      * @return @b QString The point ID of the measure's parent control point.
      */
     inline QString id() const {
@@ -129,7 +116,7 @@ class MeasurePoint {
 
     /**
      * Returns the MeasurePoint's measure.
-     * 
+     *
      * @return @b ControlMeasure* A pointer to the contained measure.
      */
     inline const ControlMeasure *data() const {
@@ -139,7 +126,7 @@ class MeasurePoint {
 
     /**
      * Returns the parent control point.
-     * 
+     *
      * @return @b ControlPoint* A pointer to the parent control point.
      */
     inline ControlPoint *getPoint() const {
@@ -149,7 +136,7 @@ class MeasurePoint {
 
     /**
      * Returns the serial number of the cube the measure is on.
-     * 
+     *
      * @return @b QString The serial number of the cube the measure is on.
      */
     inline QString getSerialNumber() const {
@@ -159,7 +146,7 @@ class MeasurePoint {
 
     /**
      * Returns the MeasurePoint's x coordinate.
-     * 
+     *
      * @return @b double the MeasurePoint's x coordinate.
      */
     inline double x() const {
@@ -169,17 +156,17 @@ class MeasurePoint {
 
     /**
      * Returns the MeasurePoint's y coordinate.
-     * 
+     *
      * @return @b double the MeasurePoint's y coordinate.
      */
-    inline double y() const { 
+    inline double y() const {
       return ( m_data->m_xyz[1] );
     }
 
 
     /**
      * Returns the MeasurePoint's z coordinate.
-     * 
+     *
      * @return @b double the MeasurePoint's z coordinate.
      */
     inline double z() const {
@@ -189,7 +176,7 @@ class MeasurePoint {
 
     /**
      * Returns the MeasurePoint's weight.
-     * 
+     *
      * @return @b double the MeasurePoint's weight.
      */
     inline double w() const {
@@ -199,7 +186,7 @@ class MeasurePoint {
 
     /**
      * Returns the coordinates and weight of the MeasurePoint.
-     * 
+     *
      * @return @b double* A pointer to an array containing (in order)
      *                    the x, y, z, and weight of the MeasurePoint.
      */
@@ -211,9 +198,9 @@ class MeasurePoint {
     /**
      * Determines if the measures contained by this MeasurePoint and
      * another MeasurePoint are the same.
-     * 
+     *
      * @param other The MeasurePoint to compare against.
-     * 
+     *
      * @return @b bool If the measures are the same.
      */
     inline bool operator==(const MeasurePoint &other) const {
@@ -224,9 +211,9 @@ class MeasurePoint {
     /**
      * Determines if the measures contained by this MeasurePoint and
      * another MeasurePoint are not the same.
-     * 
+     *
      * @param other The MeasurePoint to compare against.
-     * 
+     *
      * @return @b bool If the measures are not the same.
      */
     inline bool operator!=(const MeasurePoint &other) const {
@@ -237,12 +224,12 @@ class MeasurePoint {
 
     /**
      * Data wrapper class for ControlMeasures.
-     * 
+     *
      * @see QSharedData
-     *  
+     *
      * @author  2015-10-11 Kris Becker
-     *  
-     * @internal 
+     *
+     * @internal
      *   @history 2015-10-11 Kris Becker - Original Version
      *   @history 2016-12-06 Jesse Mapel - Updated documentation.  References #4558.
      */
@@ -252,7 +239,7 @@ class MeasurePoint {
         /**
          * Constructs and empty ControlMeasureData.
          */
-        ControlMeasureData() : QSharedData(), m_measure(0), 
+        ControlMeasureData() : QSharedData(), m_measure(0),
                             m_weight(1.0), m_xyz(), m_isvalid(false)  {
           getImageCoordinates();
         }
@@ -260,12 +247,12 @@ class MeasurePoint {
 
         /**
          * Constructs a ControlMeasureData from a measure.
-         * 
+         *
          * @param measure The ControlMeasure to wrap.
          * @param weight The weight for the measure. Defaults to 1.0.
          */
-        ControlMeasureData(ControlMeasure *measure, const double &weight = 1.0) : 
-                         QSharedData(), m_measure(measure), m_weight(weight), 
+        ControlMeasureData(ControlMeasure *measure, const double &weight = 1.0) :
+                         QSharedData(), m_measure(measure), m_weight(weight),
                          m_xyz(), m_isvalid(false) {
           getImageCoordinates();
         }
@@ -315,13 +302,13 @@ class MeasurePoint {
 
     /**
      * Returns if the internal measure is valid.
-     * 
+     *
      * @return @b bool If the internal measure is valid.
      */
     inline bool validMeasure() const {
       ControlMeasure *m = m_data->m_measure;
       BOOST_ASSERT ( m != 0 );
-      return (!(m->IsIgnored() || m->IsRejected()) ); 
+      return (!(m->IsIgnored() || m->IsRejected()) );
     }
 
 };

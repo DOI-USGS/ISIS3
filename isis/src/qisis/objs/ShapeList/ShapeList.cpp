@@ -1,25 +1,11 @@
-/**
- * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ShapeList.h"
 
 #include <QDebug>
@@ -99,7 +85,7 @@ namespace Isis {
 
   /**
    * Creates an shape list from a list of cube file names. This is slow (serial) and not recommended.
-   * 
+   *
    * @param fileNames The list of cube fileNames.
    */
   ShapeList::ShapeList(QStringList &fileNames) {
@@ -123,7 +109,7 @@ namespace Isis {
 
   /**
    * Creates a SerialNumberList from the shape list.
-   * 
+   *
    * @return @b SerialNumberList The list of serial numbers for the cubes in the ShapeList.
    */
   SerialNumberList ShapeList::serialNumberList() {
@@ -139,9 +125,9 @@ namespace Isis {
 
   /**
    * Appends an shape to the shape list.
-   * 
+   *
    * @param value The shape to be appended.
-   * 
+   *
    * @see QList<Shape *>::append().
    */
   void ShapeList::append(Shape * const &value) {
@@ -152,9 +138,9 @@ namespace Isis {
 
   /**
    * Appends a list of shapes to the shape list.
-   * 
+   *
    * @param value the list of shapes to be appened.
-   * 
+   *
    * @see QList<Shape *>::append().
    */
   void ShapeList::append(const QList<Shape *> &value) {
@@ -165,7 +151,7 @@ namespace Isis {
 
   /**
    * Clears the shape list.
-   * 
+   *
    * @see QList<Shape *>::clear().
    */
   void ShapeList::clear() {
@@ -179,11 +165,11 @@ namespace Isis {
 
   /**
    * Erases a single shape from the shape list.
-   * 
+   *
    * @param pos An iterator pointing to the shape to be erased.
-   * 
+   *
    * @return @b QList::iterator An iterator pointing to the shape after the shape that was removed.
-   * 
+   *
    * @see QList<Shape *>::erase()
    */
   QList<Shape *>::iterator ShapeList::erase(iterator pos) {
@@ -196,13 +182,13 @@ namespace Isis {
   /**
    * Erases a range of shapes from the shape list.
    * Erases all shapes from begin up to (but not including) end.
-   * 
+   *
    * @param begin An iterator pointing to the first shape to be erased.
    * @param end An iterator pointing to the shape just after the last shape to be erased.
    *                Will be invalid after the call.
-   * 
+   *
    * @return @b QList::iterator An iterator pointing to the shape end refered to before the call.
-   * 
+   *
    * @see QList<Shape *>::erase()
    */
   QList<Shape *>::iterator ShapeList::erase(iterator begin, iterator end) {
@@ -214,10 +200,10 @@ namespace Isis {
 
   /**
    * Inserts an shape into the shape list at an index
-   * 
+   *
    * @param i The index at which to insert the shape.
    * @param value the shape to be inserted.
-   * 
+   *
    * @see QList<Shape *>::insert()
    */
   void ShapeList::insert(int i, Shape * const &value) {
@@ -229,12 +215,12 @@ namespace Isis {
 
   /**
    * Inserts an shape into the shape list after an iterator.
-   * 
+   *
    * @param before An iterator pointing to the shape that value will be inserted after
    * @param value The shape to be inserted.
-   * 
+   *
    * @return @b QList::iterator An iterator pointing to the inserted shape.
-   * 
+   *
    * @see QList<Shape *>::insert()
    */
   QList<Shape *>::iterator ShapeList::insert(iterator before, Shape * const &value) {
@@ -246,9 +232,9 @@ namespace Isis {
 
   /**
    * Inserts an shape at the beginning of the shape list.
-   * 
+   *
    * @param value The shape to be inserted.
-   * 
+   *
    * @see QList<Shape *>::prepend()
    */
   void ShapeList::prepend(Shape * const &value) {
@@ -260,9 +246,9 @@ namespace Isis {
   /**
    * Appends an shape to the end of the shape list.
    * Equivalent to append().
-   * 
+   *
    * @param value The shape to be appended.
-   * 
+   *
    * @see QList<Shape *>::push_back()
    */
   void ShapeList::push_back(Shape * const &value) {
@@ -274,9 +260,9 @@ namespace Isis {
   /**
    * Prepends an shape to the beginning of the shape list.
    * Equivalent to prepend().
-   * 
+   *
    * @param value The shape to be appended.
-   * 
+   *
    * @see QList<Shape *>::push_front()
    */
   void ShapeList::push_front(Shape * const &value) {
@@ -287,11 +273,11 @@ namespace Isis {
 
   /**
    * Removes all occurances of an shape.
-   * 
+   *
    * @param value The shape to be removed.
-   * 
+   *
    * @return @b int The number of occurances of the shape.
-   * 
+   *
    * @see QList<Shape *>::removeAll()
    */
   int ShapeList::removeAll(Shape * const &value) {
@@ -307,9 +293,9 @@ namespace Isis {
 
   /**
    * Removes the shape at an index.
-   * 
+   *
    * @param i The index of the shape to be removed.
-   * 
+   *
    * @see QList<Shape *>::removeAt()
    */
   void ShapeList::removeAt(int i) {
@@ -320,7 +306,7 @@ namespace Isis {
 
   /**
    * Removes the shape at the front of the shape list.
-   * 
+   *
    * @see QList<Shape *>::removeFirst()
    */
   void ShapeList::removeFirst() {
@@ -331,7 +317,7 @@ namespace Isis {
 
   /**
    * Removes the shape at the end of the shape list.
-   * 
+   *
    * @see QList<Shape *>::removeLast()
    */
   void ShapeList::removeLast() {
@@ -342,11 +328,11 @@ namespace Isis {
 
   /**
    * Removes the first occurance of an shape.
-   * 
+   *
    * @param value The shape to be removed.
-   * 
+   *
    * @return @b bool True if successful, otherwise false.
-   * 
+   *
    * @see QList<Shape *>::removeOne()
    */
   bool ShapeList::removeOne(Shape * const &value) {
@@ -362,9 +348,9 @@ namespace Isis {
 
   /**
    * Swaps the shape list with another list of shapes.
-   * 
+   *
    * @param other The list of shapes to swapped with.
-   * 
+   *
    * @see QList<Shape *>::swap()
    */
   void ShapeList::swap(QList<Shape *> &other) {
@@ -378,11 +364,11 @@ namespace Isis {
 
   /**
    * Removes the shape at an index and returns it.
-   * 
+   *
    * @param i The index of the shape to be removed and returned.
-   * 
+   *
    * @return @b Shape * The removed shape.
-   * 
+   *
    * @see QList<Shape *>::takeAt()
    */
   Shape *ShapeList::takeAt(int i) {
@@ -394,9 +380,9 @@ namespace Isis {
 
   /**
    * Removes and returns the first shape.
-   * 
+   *
    * @return @b Shape * The first shape.
-   * 
+   *
    * @see QList<Shape *>::takeFirst()
    */
   Shape *ShapeList::takeFirst() {
@@ -408,9 +394,9 @@ namespace Isis {
 
   /**
    * Removes and returns the last shape.
-   * 
+   *
    * @return @b Shape * The last shape.
-   * 
+   *
    * @see QList<Shape *>::takeLast()
    */
   Shape *ShapeList::takeLast() {
@@ -422,11 +408,11 @@ namespace Isis {
 
   /**
    * Appends a list of shapes to the end of the shape list.
-   * 
+   *
    * @param other The list of shapes to be appended.
-   * 
+   *
    * @return @b ShapeList & A reference to the shapeList.
-   * 
+   *
    * @see append()
    * @see QList<Shape *>::operator+=()
    */
@@ -443,11 +429,11 @@ namespace Isis {
 
   /**
    * Appends a single shape to the end of the shape list.
-   * 
+   *
    * @param other The shape to be appended.
-   * 
+   *
    * @return @b ShapeList & A reference to the shapeList.
-   * 
+   *
    * @see append()
    * @see QList<Shape *>::operator+=()
    */
@@ -460,11 +446,11 @@ namespace Isis {
 
   /**
    * Appends a list of shapes to the end of the shape list.
-   * 
+   *
    * @param other The list of shapes to be appended.
-   * 
+   *
    * @return @b ShapeList & A reference to the shapeList.
-   * 
+   *
    * @see append()
    * @see QList<Shape *>::operator<<()
    */
@@ -481,11 +467,11 @@ namespace Isis {
 
   /**
    * Appends a single shape to the end of the shape list.
-   * 
+   *
    * @param other The shape to be appended.
-   * 
+   *
    * @return @b ShapeList & A reference to the shapeList.
-   * 
+   *
    * @see append()
    * @see QList<Shape *>::operator<<()
    */
@@ -498,11 +484,11 @@ namespace Isis {
 
   /**
    * Assigns another list of shapes to the shape list.
-   * 
+   *
    * @param rhs The list of shapes that shapeList will become a copy of.
-   * 
+   *
    * @return @b ShapeList & A reference to the shapeList.
-   * 
+   *
    * @see QList<Shape *>::operator=()
    */
   ShapeList &ShapeList::operator=(const QList<Shape *> &rhs) {
@@ -521,7 +507,7 @@ namespace Isis {
    * Assignment operator
    *
    * @param rhs The right hand side of the '=' operator
-   * 
+   *
    * @return @b ShapeList & This shape list.
    */
   ShapeList &ShapeList::operator=(const ShapeList &rhs) {
@@ -584,9 +570,9 @@ namespace Isis {
 
   /**
    * Delete all of the contained Shapes from disk.
-   * 
+   *
    * @param project The project the shapes in the shape list belong to.
-   * 
+   *
    * @see Shape::deleteFromDisk()
    */
   void ShapeList::deleteFromDisk(Project *project) {
@@ -618,11 +604,11 @@ namespace Isis {
    *     ...
    *   </shapes>
    * </pre>
-   * 
+   *
    * @param stream XmlStream to write out the document.
    * @param project The project the shape list will be saved to.
    * @param newProjectRoot The path to the root directory for the new project.
-   * 
+   *
    * @throws iException::Io "Failed to create directory"
    * @throws iException::Io "Unable to save shape information because new file could not be opened for writing"
    */
@@ -700,7 +686,7 @@ namespace Isis {
 
   /**
    * Constructor for CopyShapeDataFunctor.
-   * 
+   *
    * @param project The project that the shape data will be saved to when the functor is used
    * @param newProjectRoot The path to the project root
    */
@@ -713,7 +699,7 @@ namespace Isis {
 
   /**
    * Copy constructor for CopyShapeDataFunctor.
-   * 
+   *
    * @param other The functor to copy from
    */
   ShapeList::CopyShapeDataFunctor::CopyShapeDataFunctor(const CopyShapeDataFunctor &other) {
@@ -732,9 +718,9 @@ namespace Isis {
   /**
    * Copies the cub/ecub files for an shape into m_project.
    * Used by save to copy the shapeList into a new project.
-   * 
+   *
    * @param shapeToCopy The shape to copy into m_project.
-   * 
+   *
    * @see save
    */
   void *ShapeList::CopyShapeDataFunctor::operator()(Shape * const &shapeToCopy) {
@@ -745,9 +731,9 @@ namespace Isis {
 
   /**
    * Assignment operator for CopyShapeDataFunctor.
-   * 
+   *
    * @param rhs The functor to assign from
-   * 
+   *
    * @return @b ShapeList::CopyShapeDataFunctor & A reference to a copy of the functor
    */
   ShapeList::CopyShapeDataFunctor &ShapeList::CopyShapeDataFunctor::operator=(
@@ -763,7 +749,7 @@ namespace Isis {
    *
    * @param shapeList The shape list we're going to be initializing
    * @param project The project that contains the shape list
-   * 
+   *
    * @see ShapeList::save()
    */
   ShapeList::XmlHandler::XmlHandler(ShapeList *shapeList, Project *project) {
@@ -808,7 +794,7 @@ namespace Isis {
    * file.
    *
    * @return @b bool If we should continue reading the XML (usually true).
-   * 
+   *
    * @throws IException::Io "Unable to open with read access"
    * @throws IException::Io "Failed to open shape list XML"
    */

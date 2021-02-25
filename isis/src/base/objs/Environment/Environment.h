@@ -1,33 +1,17 @@
 #ifndef Environment_h
 #define Environment_h
 
-/**
- * @file
- * $Revision: 1.16 $
- * $Date: 2010/06/29 23:42:18 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 class QString;
 
 namespace Isis {
-  
+
   /**
    * @author 2011-04-01 Eric Hyer & Steven Lambright
    *
@@ -35,7 +19,7 @@ namespace Isis {
    *   @history 2011-09-20 Steven Lambright - Added support for 4 line version
    *                           file.
    *   @history 2012-03-06 Steven Lambright - Added automatic environment
-   *                           setup that works with every Isis 3 application.
+   *                           setup that works with every Isis application.
    *                           This includes the 'qisis' applications. The
    *                           automatic setup is setting the Qt plugin path
    *                           because picking up a plugin from the OS means
@@ -52,21 +36,21 @@ namespace Isis {
   class Environment {
     public:
       ~Environment() {}
-      
+
       static QString userName();
       static QString hostName();
       static QString isisVersion();
-      
+
       static QString getEnvironmentValue(QString, QString);
     protected:
       Environment();
-      
-      
+
+
     private:
       /**
        *  Construct an environment in static space to initialize some
-       *    global Isis 3 environment options. This initialization
-       *    applies to anything that links against the Isis 3 library.
+       *    global Isis environment options. This initialization
+       *    applies to anything that links against the Isis library.
        */
       static Environment automaticEnvironmentSetup;
   };

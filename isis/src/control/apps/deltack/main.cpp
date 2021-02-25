@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cmath>
@@ -43,7 +51,7 @@ void printMatrix(const SpiceDouble m[3][3]);
 
 
 void IsisMain() {
-  Progress progress;  
+  Progress progress;
   UserInterface &ui = Application::GetUserInterface();
   QString filename = ui.GetFileName("FROM");
   //ControlNet m_cnet(ui.GetFileName("NET"),&progress);
@@ -58,7 +66,7 @@ void IsisMain() {
     // Create a serial number list
     SerialNumberList serialNumberList;
     serialNumberList.add(filename);
-    
+
     // Get the coordinate for updating the camera pointing
     // We will want to make the camera pointing match the lat/lon at this
     // line sample
@@ -90,13 +98,13 @@ void IsisMain() {
     results += PvlKeyword("Method", method);
     if ( "direct" == method ) {
       Camera *v_cam = c.camera();
-      
+
       // Map the latitude/longitude to a line/sample of the desired update
       // cout << "Input Lat, Lon = " << lat1.degrees() << "," << lon1.degrees() << "\n";
       results += PvlKeyword("Lat1", toString(lat1.degrees()), "degrees");
       results += PvlKeyword("Lon1", toString(lon1.degrees()), "degrees");
       if ( !v_cam->SetUniversalGround(lat1.degrees(), lon1.degrees()) ) {
-        QString mess = "Geometry coordinate does not map into image at location (" + 
+        QString mess = "Geometry coordinate does not map into image at location (" +
                        QString::number(lat1.degrees()) + "," + QString::number(lon1.degrees()) + ")";
         throw IException(IException::User, mess, _FILEINFO_);
       }
@@ -122,7 +130,7 @@ void IsisMain() {
         }
 
         // At this point, we only need the look direction which is always
-        // set at this stage - just don't have surface geometry. 
+        // set at this stage - just don't have surface geometry.
         PvlKeyword offbody = PvlKeyword("Samp1Line1Lat");
         offbody.addComment("Does not intersect surface - can still adjust pointing!");
         results += offbody;
@@ -172,7 +180,7 @@ void IsisMain() {
       }
       // We have three fields which indicates euler angle polynimials. We must
       // handle this differently.
-      else {  
+      else {
 
         // We only know how to handle a cache with just four records. Anything
         // else and we have to abort...
@@ -190,7 +198,7 @@ void IsisMain() {
         v_cam->instrumentRotation()->SetPolynomial();
         o_cmat = v_cam->instrumentRotation()->Cache("InstrumentPointing");
       }
-      
+
       // Write out a description in the spice table
       results += PvlKeyword("RecordsUpdated", toString(o_cmat.Records()));
       QString deltackComment = "deltackDirectAdjusted = " + Isis::iTime::CurrentLocalTime();
@@ -200,7 +208,7 @@ void IsisMain() {
       c.write(o_cmat);
     }
     else { // ( "bundle" == method )
-      
+
       Distance rad1;
       if (ui.WasEntered("RAD1")) {
         rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
@@ -208,7 +216,7 @@ void IsisMain() {
       else {
         rad1 = GetRadius(ui.GetFileName("FROM"), lat1, lon1);
       }
-      
+
       // In order to use the bundle adjustment class we will need a control
       // network
       ControlMeasure * m = new ControlMeasure;
@@ -217,13 +225,13 @@ void IsisMain() {
 
       //   m->SetType(ControlMeasure::Manual);
       m->SetType(ControlMeasure::RegisteredPixel);
-      
+
       ControlPoint * p = new ControlPoint;
       p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
       p->SetId("Point1");
       p->SetType(ControlPoint::Fixed);
       p->Add(m);
-      
+
       ControlNet cnet;
       //  cnet.SetType(ControlNet::ImageToGround);
       cnet.AddPoint(p);
@@ -244,21 +252,21 @@ void IsisMain() {
         else {
           rad2 = GetRadius(ui.GetFileName("FROM"), lat2, lon2);
         }
-      
+
         ControlMeasure * m = new ControlMeasure;
         m->SetCubeSerialNumber(serialNumberList.serialNumber(0));
         m->SetCoordinate(samp2, line2);
         m->SetType(ControlMeasure::Manual);
-      
+
         ControlPoint * p = new ControlPoint;
         p->SetAprioriSurfacePoint(SurfacePoint(lat2, lon2, rad2));
         p->SetId("Point2");
         p->SetType(ControlPoint::Fixed);
         p->Add(m);
-      
+
         cnet.AddPoint(p);
       }
-      
+
       // Bundle adjust to solve for new pointing
       BundleSettingsQsp settings = bundleSettings();
       BundleAdjust *bundleAdjust = new BundleAdjust(settings, cnet, serialNumberList);
@@ -285,13 +293,13 @@ void IsisMain() {
       //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
 
       c.write(cmatrix);
-      
+
       delete bundleAdjust;
       delete bundleSolution;
     }
 
     // Now do final clean up as the update was successful if we reach here...
-    
+
     // Check for existing polygon, if exists delete it
     if (c.label()->hasObject("Polygon")) {
       c.label()->deleteObject("Polygon");
@@ -354,7 +362,7 @@ BundleSettingsQsp bundleSettings() {
   //     longitude sigma        = 1000.0
   //     radius sigma           = Null since we are not solving for radius
   //     outlier rejection      = false
-  settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal, 
+  settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal,
                             SurfacePoint::Latitudinal, 1000.0, 1000.0, Isis::Null);
   settings->setOutlierRejection(false);
 
@@ -400,26 +408,26 @@ BundleSettingsQsp bundleSettings() {
 }
 
 /**
- * @brief Compute rotation matrix of one vector into another 
- *  
- * This function computes the 3x3 rotation matrix of one vector into another 
- * using Rodriques' formula. See 
- * https://math.stackexchange.com/questions/293116/rotating-one-3d-vector-to-another. 
- *  
- * The basic equation is: 
- *  
+ * @brief Compute rotation matrix of one vector into another
+ *
+ * This function computes the 3x3 rotation matrix of one vector into another
+ * using Rodriques' formula. See
+ * https://math.stackexchange.com/questions/293116/rotating-one-3d-vector-to-another.
+ *
+ * The basic equation is:
+ *
  *     R = I + sin(theta) * A + (1 - cos(theta)) * A^2
- *  
+ *
  *  where I is the identity matrix, theta is essentially the separation angle of
  *  the two vectors and A is the skew matrix of the cross product of the two
  *  vectors.  Note that if theta ~= 0, then the identity matrix is returned.
- *  
+ *
  *  Note this implementation does not handle the case where (pi - theta) ~= 0 as
  *  it doesn't seem possible in this case (choose for x any vector orthogonal to
  *  v1).
- * 
+ *
  * @author 2017-05-22 Kris Becker
- * 
+ *
  * @param v1  Vector to rotate into v2
  * @param v2  Desired vector of rotation
  * @param rmat  Returns 3x3 rotation matrix to rotate v1 -> v2
@@ -441,16 +449,16 @@ void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3
     ident_c ( rmat );
     return;
   }
-  
+
   // Need identity matrix
   SpiceDouble I[3][3];
   ident_c ( I );
 
   // Skew-symmetric matrix A corresponding to x
-  SpiceDouble A[3][3] = { 
+  SpiceDouble A[3][3] = {
                           {   0.0,  -x[2],  x[1] },
                           {  x[2],    0.0, -x[0] },
-                          { -x[1],   x[0],   0.0 } 
+                          { -x[1],   x[0],   0.0 }
                         };
 
   // Scale skew matrix by sin(theta)
@@ -474,17 +482,17 @@ void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3
 }
 
 /**
- * @brief Apply rotation matrix to each quaterion stored in the pointing table 
- *  
- * This routine will apply a 3x3 rotation matrix to every record in the table. 
- * The table is assumed to be an InstrumentPointing compatible (CK) table 
+ * @brief Apply rotation matrix to each quaterion stored in the pointing table
+ *
+ * This routine will apply a 3x3 rotation matrix to every record in the table.
+ * The table is assumed to be an InstrumentPointing compatible (CK) table
  * containing at least four elements/row. The first four elements are assumed to
- * be quaterions that are converted to a matrix such that simple matrix 
- * multiplication is applied to achieve an updated pointing quaternion. The 
- * results are stored back into the table. 
- * 
+ * be quaterions that are converted to a matrix such that simple matrix
+ * multiplication is applied to achieve an updated pointing quaternion. The
+ * results are stored back into the table.
+ *
  * @author 2017-08-01 Kris Becker
- * 
+ *
  * @param R     The constant angular pointing matrix that will be applied
  * @param table Instrument pointing table containing quaternions
  */

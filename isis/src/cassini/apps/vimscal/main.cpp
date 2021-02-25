@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cfloat>
@@ -568,7 +576,7 @@ void calculateSpecificEnergy(Cube *icube) {
   else {
 
   //Discrepancies between the VIMS and Spacecraft clock necessitated a
-  //conversion multiplier, which is in the USGS: ISIS3 version of vimscal
+  //conversion multiplier, which is in the USGS: ISIS version of vimscal
   //but was not part of the University of Arizona pipeline.  Below is the
   //text describing this problem:
   /**
