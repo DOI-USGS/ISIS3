@@ -31,7 +31,6 @@ namespace Isis {
    */
   OriginalXmlLabel::OriginalXmlLabel(const QString &file) {
     Blob blob = Blob("IsisCube", "OriginalXmlLabel");
-    blob.Label() += Isis::PvlKeyword("ByteOrder", "NULL");
     blob.Read(file);
     fromBlob(blob);
   }
@@ -77,6 +76,13 @@ namespace Isis {
     string orglblStr = sstream.str();
     Isis::Blob *blob = new Blob("IsisCube", "OriginalXmlLabel");
     blob->setData((char*)orglblStr.data(), orglblStr.length());
+    blob->Label() += Isis::PvlKeyword("ByteOrder", "NULL");
+    if (Isis::IsLsb()) {
+      blob->Label()["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
+    }
+    else {
+      blob->Label()["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
+    }
     return blob;
   }
 
