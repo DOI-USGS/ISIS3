@@ -993,7 +993,7 @@ namespace Isis {
     char *buffer = new char[nbytes];
     memcpy(buffer, histStr.c_str(), nbytes);
 
-    historyBlob = new Blob("IsisCube", "History");
-    historyBlob->setData(buffer, nbytes);
+    historyBlob = Blob("IsisCube", "History");
+    historyBlob.setData(buffer, nbytes);
   }
 }

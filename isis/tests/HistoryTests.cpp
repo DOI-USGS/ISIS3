@@ -13,7 +13,7 @@ TEST(HistoryTests, HistoryTestsDefaultConstructor) {
 }
 
 TEST_F(HistoryBlob, HistoryTestsFromBlob) {
-  History readHistory(*historyBlob);
+  History readHistory(historyBlob);
 
   Pvl historyPvl = readHistory.ReturnHist();
   ASSERT_TRUE(historyPvl.hasObject("mroctx2isis"));
@@ -31,7 +31,7 @@ TEST_F(HistoryBlob, HistoryTestsAddEntry) {
 }
 
 TEST_F(HistoryBlob, HistoryTeststoBlob) {
-  History history(*historyBlob);
+  History history(historyBlob);
 
   Blob *blob = history.toBlob();
 
