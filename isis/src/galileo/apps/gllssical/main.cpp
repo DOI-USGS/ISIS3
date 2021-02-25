@@ -438,10 +438,6 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   gainConversion = toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
 
   if (iof) {
-    Pvl *label = icube->label();
-    QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
-    double obsStartTime;
-
     try {
       Camera *cam;
       cam = icube->camera();
@@ -455,13 +451,18 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     catch (IException &e) {
       // try original fallback for previously spiceinited data 
       try {
+        Pvl *label = icube->label();
+        QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
+
         Spice spicegll(*icube);
         spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
         Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
         QString sclkName(sclk.expanded());
+
         NaifStatus::CheckErrors();
         furnsh_c(sclkName.toLatin1().data());
         NaifStatus::CheckErrors();
+
         double obsStartTime;
         scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
         spicegll.setTime(obsStartTime);

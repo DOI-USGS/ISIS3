@@ -81,7 +81,7 @@ namespace Isis {
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = getClockTime((QString)inst["SpacecraftClockStartCount"]).Et();
+    double et = iTime((QString)inst["StartTime"]).Et();
 
     //?????????? NEED THESE??????
     // exposure duration keyword value is measured in seconds
