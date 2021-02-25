@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 #include <string>
 #include <vector>
 
+#include "Cube.h"
 #include "IString.h"
 #include "HiCalTypes.h"
 #include "HiCalUtil.h"
@@ -36,15 +37,17 @@ namespace Isis {
    * @internal
    *   @history 2010-10-28 Kris Becker Renamed parameters replacing "Ziof" with
    *            "GainUnitConversion".
+   *   @history 2021-02-24 Stuart Sides Added a cube parameter to the
+   *            constructor to support getting sun distance from the camera
    */
   class GainUnitConversion : public Module {
 
     public:
       //  Constructors and Destructor
       GainUnitConversion() : Module("GainUnitConversion"), _units("DN") { }
-      GainUnitConversion(HiCalConf &conf, const QString &units) :
+      GainUnitConversion(HiCalConf &conf, const QString &units, Cube *cube) :
                  Module("GainUnitConversion"),  _units(units) {
-        init(conf);
+        init(conf, cube);
       }
 
       /** Destructor */
@@ -53,7 +56,7 @@ namespace Isis {
     private:
       QString   _units;
 
-      void init(HiCalConf &conf) {
+      void init(HiCalConf &conf, Cube *cube) {
         _history.clear();
         DbProfile prof = conf.getMatrixProfile();
         _history.add("Profile["+ prof.Name()+"]");
@@ -61,7 +64,7 @@ namespace Isis {
         double sed = ToDouble(prof("ScanExposureDuration"));  // units = us
         if ( IsEqual(_units, "IOF") ) {
           //  Add solar I/F correction parameters
-          double au = conf.sunDistanceAU();
+          double au = conf.sunDistanceAU(cube);
           _history.add("SunDist[" + ToString(au) + " (AU)]");
           double suncorr =  1.5 / au;
           suncorr *= suncorr;
