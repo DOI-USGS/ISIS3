@@ -163,6 +163,9 @@
       Modified code that it doesn't require a camera model to calculate the I/F.
       Fixes #1740.
     </change>
+    <change name="Kristin Berry" date="2021-02-23">
+      Modified code to try to use the camera to get the target-sun distance to calculate the IOF.
+    </change>
   </history>
 
   <groups>     
