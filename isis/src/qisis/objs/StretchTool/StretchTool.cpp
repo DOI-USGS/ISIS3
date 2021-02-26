@@ -495,9 +495,9 @@ namespace Isis {
 
         std::vector<PvlKeyword> keywordValueBlue;
         keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
-        StretchBlob redStretchBlob = icube->readStretchBlob(stretchName, "Stretch", keywordValueRed);
-        StretchBlob greenStretchBlob = icube->readStretchBlob(stretchName, "Stretch", keywordValueGreen);
-        StretchBlob blueStretchBlob = icube->readStretchBlob(stretchName, "Stretch", keywordValueBlue);
+        StretchBlob redStretchBlob = icube->readStretchBlob(stretchName, keywordValueRed);
+        StretchBlob greenStretchBlob = icube->readStretchBlob(stretchName, keywordValueGreen);
+        StretchBlob blueStretchBlob = icube->readStretchBlob(stretchName, keywordValueBlue);
 
         CubeStretch redStretch = redStretchBlob.getStretch();
         CubeStretch greenStretch = greenStretchBlob.getStretch();

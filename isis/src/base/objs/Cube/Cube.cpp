@@ -883,15 +883,16 @@ namespace Isis {
   /**
    * This method will read a StretchBlob from a cube.
    */
-  StretchBlob Cube::readStretchBlob(QString name, QString type, const std::vector<PvlKeyword> keywords) const {
-    Blob blob(name, type);
-    //try {
+  StretchBlob Cube::readStretchBlob(QString name, const std::vector<PvlKeyword> keywords) const {
+    Blob blob(name, "Stretch");
+    try {
       blob.Read(fileName(), keywords);
-    //}
-    //catch (IException &){
-      //QString msg = "Unable to locate Stretch information in " + fileName();
-      //throw IException(IException::User, msg, _FILEINFO_);
-    //}
+    }
+    catch (IException &e){
+      std::cout << e.what() << '\n';
+      QString msg = "Unable to locate Stretch information in " + fileName();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
     StretchBlob stretchBlob(blob);
     return stretchBlob;
   }

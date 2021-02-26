@@ -256,7 +256,6 @@ namespace Isis {
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
       StretchBlob readStretchBlob(QString name="CubeStretch",
-                                  QString type="Stretch",
                                   const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;

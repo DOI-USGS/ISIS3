@@ -16,7 +16,7 @@ namespace Isis {
    * @param name Name to use for Stretch
    * @param type Type of stretch
    */
-  CubeStretch::CubeStretch(QString name, QString stretchType, int bandNumber) : m_name(name), 
+  CubeStretch::CubeStretch(QString name, QString stretchType, int bandNumber) : m_name(name),
     m_type(stretchType), m_bandNumber(bandNumber) {
   }
 
@@ -25,6 +25,11 @@ namespace Isis {
   CubeStretch::~CubeStretch() {
   }
 
+  CubeStretch::CubeStretch(CubeStretch const& stretch): Stretch(stretch) {
+    m_name = stretch.getName();
+    m_type = stretch.getType();
+    m_bandNumber = stretch.getBandNumber();
+  }
 
   /**
    * Constructs a CubeStretch object from a normal Stretch.
@@ -67,7 +72,7 @@ namespace Isis {
    *
    * @return QString Type of Stretch.
    */
-  QString CubeStretch::getType(){
+  QString CubeStretch::getType() const{
     return m_type;
   }
 
@@ -97,7 +102,7 @@ namespace Isis {
    *
    * @return QString name of stretch
    */
-  QString CubeStretch::getName(){
+  QString CubeStretch::getName() const{
     return m_name;
   }
 
@@ -107,7 +112,7 @@ namespace Isis {
    *
    * @return int band number
    */
-  int CubeStretch::getBandNumber() {
+  int CubeStretch::getBandNumber() const{
     return m_bandNumber;
   }
 

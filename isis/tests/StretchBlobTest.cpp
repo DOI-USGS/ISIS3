@@ -28,11 +28,11 @@ TEST(StretchBlob, Constructors) {
   // Test retrieval of cubeStretch from StretchBlob
   CubeStretch retrievedStretch = stretchStretchBlob.getStretch();
 
-  EXPECT_STREQ(stretchBlob.getStretch().getName().toLatin1().data(), "CubeStretch");
-  EXPECT_STREQ(stretchBlob.getStretch().getType().toLatin1().data(), "Stretch");
+  EXPECT_STREQ(stretchBlob.getStretch().getName().toLatin1().data(), "DefaultStretch");
+  EXPECT_STREQ(stretchBlob.getStretch().getType().toLatin1().data(), "Default");
 
   EXPECT_STREQ(nameStretchBlob.getStretch().getName().toLatin1().data(), "name");
-  EXPECT_STREQ(nameStretchBlob.getStretch().getType().toLatin1().data(), "Stretch");
+  EXPECT_STREQ(nameStretchBlob.getStretch().getType().toLatin1().data(), "Default");
 
   EXPECT_STREQ(stretchStretchBlob.getStretch().getName().toLatin1().data(), "TestStretch");
   EXPECT_STREQ(stretchStretchBlob.getStretch().getType().toLatin1().data(), "testType");
@@ -58,9 +58,10 @@ TEST_F(DefaultCube, StretchBlobWriteRead) {
 
   // Write to Cube
   testCube->write(*(stretchBlob.toBlob()));
+  testCube->reopen("rw");
+  
   // Set up stretch and blob to restore to
-
-  StretchBlob restoreBlob = testCube->readStretchBlob(stretchName, "testType");
+  StretchBlob restoreBlob = testCube->readStretchBlob(stretchName);
   CubeStretch restoredStretch = stretchBlob.getStretch();
   EXPECT_TRUE(restoredStretch == cubeStretch);
 };

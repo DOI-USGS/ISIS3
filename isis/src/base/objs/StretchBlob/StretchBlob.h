@@ -32,7 +32,7 @@ namespace Isis {
       StretchBlob(CubeStretch stretch);
       StretchBlob(QString name);
       StretchBlob(Blob blob);
-      Isis::Blob *toBlob();
+      Isis::Blob *toBlob(QString const& name="CubeStretch");
       ~StretchBlob();
 
       CubeStretch getStretch();
