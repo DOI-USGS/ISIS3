@@ -14,8 +14,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/ctxcal.xml").expanded();
 
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
-  QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path() + "/outTemp.cub";
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
@@ -39,8 +38,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
 
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalFlatfile) {
-  QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path() + "/outTemp.cub";
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName, "flatfile=$ISISDATA/mro/calibration/ctxFlat_0001.cub"};
 
   UserInterface options(APP_XML, args);
@@ -64,8 +62,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalFlatfile) {
 
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
-  QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path() + "/outTemp.cub";
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName, "iof=false"};
 
   UserInterface options(APP_XML, args);
@@ -89,8 +86,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
 
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalCameraComparison) {
-  QTemporaryDir prefix;
-  QString outCubeFileNameCam = prefix.path() + "/outTemp.cub";
+  QString outCubeFileNameCam = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileNameCam};
 
   UserInterface options(APP_XML, args);
