@@ -12,9 +12,9 @@ namespace Isis {
   /**
    * Constructs a CubeStretch object with default mapping of special pixel values to
    * themselves and a provided name, and a provided stretch type
-   *  
-   * @param name Name to use for Stretch 
-   * @param type Type of stretch 
+   *
+   * @param name Name to use for Stretch
+   * @param type Type of stretch
    */
   CubeStretch::CubeStretch(QString name, QString stretchType, int bandNumber) : m_name(name), 
     m_type(stretchType), m_bandNumber(bandNumber) {
@@ -28,7 +28,7 @@ namespace Isis {
 
   /**
    * Constructs a CubeStretch object from a normal Stretch.
-   *  
+   *
    * @param Stretch Stretch to construct the CubeStretch from.
    */
   CubeStretch::CubeStretch(Stretch const& stretch): Stretch(stretch) {
@@ -40,7 +40,7 @@ namespace Isis {
 
   /**
    * Constructs a CubeStretch object from a normal Stretch.
-   *  
+   *
    * @param Stretch Stretch to construct the CubeStretch from.
    */
   CubeStretch::CubeStretch(Stretch const& stretch, QString stretchType): Stretch(stretch), m_type(stretchType) {
@@ -51,21 +51,21 @@ namespace Isis {
 
   /**
    * Check if the CubeStretches are equal
-   * 
+   *
    * @param stretch2 The stretch to compare with
-   * 
+   *
    * @return bool True if stretches are equal. Else, false.
    */
   bool CubeStretch::operator==(CubeStretch& stretch2) {
-    return (getBandNumber() == stretch2.getBandNumber()) && 
+    return (getBandNumber() == stretch2.getBandNumber()) &&
            (getName() == stretch2.getName()) &&
            (Text() == stretch2.Text());
   }
 
   /**
    * Get the Type of Stretch.
-   * 
-   * @return QString Type of Stretch. 
+   *
+   * @return QString Type of Stretch.
    */
   QString CubeStretch::getType(){
     return m_type;
@@ -74,8 +74,8 @@ namespace Isis {
 
   /**
    * Set the type of Stretch.
-   * 
-   * @param QString Type of Stretch. 
+   *
+   * @param QString Type of Stretch.
    */
   void CubeStretch::setType(QString stretchType){
     m_type = stretchType;
@@ -84,7 +84,7 @@ namespace Isis {
 
   /**
    * Set the Stretch name.
-   * 
+   *
    * @param QString name for stretch
    */
   void CubeStretch::setName(QString name){
@@ -94,7 +94,7 @@ namespace Isis {
 
   /**
    * Get the Stretch name.
-   * 
+   *
    * @return QString name of stretch
    */
   QString CubeStretch::getName(){
@@ -104,7 +104,7 @@ namespace Isis {
 
   /**
    * Get the band number for the stretch.
-   * 
+   *
    * @return int band number
    */
   int CubeStretch::getBandNumber() {
@@ -114,12 +114,10 @@ namespace Isis {
 
   /**
    * Set the band number for the stretch.
-   * 
+   *
    * @param int band number
    */
   void CubeStretch::setBandNumber(int bandNumber) {
     m_bandNumber = bandNumber;
   }
 } // end namespace isis
-
-

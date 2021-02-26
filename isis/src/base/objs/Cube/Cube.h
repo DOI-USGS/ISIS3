@@ -36,11 +36,13 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
+  class StretchBlob;
   class Table;
   class Histogram;
   class History;
   class OriginalLabel;
   class ImagePolygon;
+
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -253,6 +255,9 @@ namespace Isis {
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
+      StretchBlob readStretchBlob(QString name="CubeStretch",
+                                  QString type="Stretch",
+                                  const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);

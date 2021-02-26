@@ -26,19 +26,16 @@ namespace Isis {
    * @internal
    *  @history 2020-07-28 Kristin Berry and Stuart Sides - Original Version
    */
-  class StretchBlob : public Isis::Blob {
-    public: 
+  class StretchBlob {
+    public:
       StretchBlob();
       StretchBlob(CubeStretch stretch);
       StretchBlob(QString name);
+      StretchBlob(Blob blob);
+      Isis::Blob *toBlob();
       ~StretchBlob();
 
-      CubeStretch getStretch(); 
-
-    protected:
-      void WriteInit();
-      void ReadData(std::istream &is);
-      void WriteData(std::fstream &os);
+      CubeStretch getStretch();
 
     private:
       CubeStretch m_stretch; //! Stretch associated with the blob
@@ -46,4 +43,3 @@ namespace Isis {
 };
 
 #endif
-

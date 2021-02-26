@@ -6,7 +6,7 @@
 #include "Fixtures.h"
 
 #include <QString>
-#include <QDebug> 
+#include <QDebug>
 
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
@@ -23,21 +23,24 @@ TEST(StretchBlob, Constructors) {
   // Set Stretch
   CubeStretch cubeStretch("TestStretch", "testType", 2);
   StretchBlob stretchStretchBlob(cubeStretch);
+  StretchBlob stretchFromBlob(*(stretchStretchBlob.toBlob()));
 
   // Test retrieval of cubeStretch from StretchBlob
   CubeStretch retrievedStretch = stretchStretchBlob.getStretch();
 
-  EXPECT_STREQ(stretchBlob.Name().toLatin1().data(), "CubeStretch");
-  EXPECT_STREQ(stretchBlob.Type().toLatin1().data(), "Stretch"); 
+  EXPECT_STREQ(stretchBlob.getStretch().getName().toLatin1().data(), "CubeStretch");
+  EXPECT_STREQ(stretchBlob.getStretch().getType().toLatin1().data(), "Stretch");
 
-  EXPECT_STREQ(nameStretchBlob.Name().toLatin1().data(), "name");
-  EXPECT_STREQ(nameStretchBlob.Type().toLatin1().data(), "Stretch"); 
+  EXPECT_STREQ(nameStretchBlob.getStretch().getName().toLatin1().data(), "name");
+  EXPECT_STREQ(nameStretchBlob.getStretch().getType().toLatin1().data(), "Stretch");
 
-  EXPECT_STREQ(stretchStretchBlob.Name().toLatin1().data(), "CubeStretch");
-  EXPECT_STREQ(stretchStretchBlob.Type().toLatin1().data(), "Stretch");
+  EXPECT_STREQ(stretchStretchBlob.getStretch().getName().toLatin1().data(), "TestStretch");
+  EXPECT_STREQ(stretchStretchBlob.getStretch().getType().toLatin1().data(), "testType");
 
   EXPECT_STREQ(retrievedStretch.getName().toLatin1().data(), cubeStretch.getName().toLatin1().data());
   EXPECT_STREQ(retrievedStretch.getType().toLatin1().data(), cubeStretch.getType().toLatin1().data());
+
+  EXPECT_STREQ(stretchFromBlob.getStretch().getType().toLatin1().data(), cubeStretch.getType().toLatin1().data());
   EXPECT_EQ(retrievedStretch.getBandNumber(), cubeStretch.getBandNumber());
 };
 
@@ -54,10 +57,10 @@ TEST_F(DefaultCube, StretchBlobWriteRead) {
   Isis::StretchBlob stretchBlob(cubeStretch);
 
   // Write to Cube
-  testCube->write(stretchBlob);
+  testCube->write(*(stretchBlob.toBlob()));
   // Set up stretch and blob to restore to
-  StretchBlob restoreBlob(stretchName);
-  testCube->read(restoreBlob);
+
+  StretchBlob restoreBlob = testCube->readStretchBlob(stretchName, "testType");
   CubeStretch restoredStretch = stretchBlob.getStretch();
   EXPECT_TRUE(restoredStretch == cubeStretch);
 };
