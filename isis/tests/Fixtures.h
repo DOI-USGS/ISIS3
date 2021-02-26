@@ -180,6 +180,14 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class MgsMocCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
