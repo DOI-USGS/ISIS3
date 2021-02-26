@@ -102,7 +102,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalCameraComparison) {
   Pvl *lab = testCube->label(); 
   lab->deleteObject("NaifKeywords");
 
-  QString outCubeFileNameNoCam = prefix.path() + "/outTemp.cub";
+  QString outCubeFileNameNoCam = tempDir.path() + "/outTempNoCam.cub";
   args = {"to="+outCubeFileNameNoCam};
   
   try {
