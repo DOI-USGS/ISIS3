@@ -421,8 +421,8 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/app.xml").expanded();
 
 TEST_F(SomeFixture, FunctionalTestAppName) {
-  QTemporaryDir prefix;
-  QString outCubeFileName = prefix.path() + "/outTemp.cub";
+  // tempDir exists if the fixture subclasses TempTestingFiles, which most do
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
