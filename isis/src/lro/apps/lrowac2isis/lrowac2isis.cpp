@@ -19,6 +19,7 @@ find files of those names at the top level of this repository. **/
 #include "Brick.h"
 #include "History.h"
 #include "Stretch.h"
+#include "Application.h"
 
 using namespace std;
 
@@ -229,9 +230,12 @@ namespace Isis {
         uveven->putGroup(isis3UvEvenLab.group(grp));
       }
 
-      History history("IsisCube");
-      uveven->write(history);
-      uveven->write(origLabel);
+      if(iApp) {
+        History history("IsisCube");
+        history.AddEntry();
+        visodd->write(history);
+        visodd->write(origLabel);
+      }
 
       uveven->close();
       delete uveven;
@@ -243,9 +247,12 @@ namespace Isis {
         uvodd->putGroup(isis3UvOddLab.group(grp));
       }
 
-      History history("IsisCube");
-      uvodd->write(history);
-      uvodd->write(origLabel);
+      if(iApp) {
+        History history("IsisCube");
+        history.AddEntry();
+        visodd->write(history);
+        visodd->write(origLabel);
+      }
 
       uvodd->close();
       delete uvodd;
@@ -257,9 +264,12 @@ namespace Isis {
         viseven->putGroup(isis3VisEvenLab.group(grp));
       }
 
-      History history("IsisCube");
-      viseven->write(history);
-      viseven->write(origLabel);
+      if(iApp) {
+        History history("IsisCube");
+        history.AddEntry();
+        visodd->write(history);
+        visodd->write(origLabel);
+      }
 
       viseven->close();
       delete viseven;
@@ -271,9 +281,12 @@ namespace Isis {
         visodd->putGroup(isis3VisOddLab.group(grp));
       }
 
-      History history("IsisCube");
-      visodd->write(history);
-      visodd->write(origLabel);
+      if(iApp) {
+        History history("IsisCube");
+        history.AddEntry();
+        visodd->write(history);
+        visodd->write(origLabel);
+      }
 
       visodd->close();
       delete visodd;
