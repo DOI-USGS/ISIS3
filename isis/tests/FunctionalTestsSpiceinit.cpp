@@ -7,13 +7,13 @@
 #include "spiceinit.h"
 #include "csminit.h"
 
+#include "Blob.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "FileName.h"
 
@@ -528,7 +528,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
 TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
   // Add stuff from csminit
   testCube->putGroup(PvlGroup("CsmInfo"));
-  StringBlob testBlob("test string", "CSMState");
+  Blob testBlob("CSMState", "String");
   testCube->write(testBlob);
 
   QVector<QString> args(0);
@@ -536,13 +536,13 @@ TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
   spiceinit(testCube, options);
 
   EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
-  EXPECT_ANY_THROW(testCube->readString("CSMState"));
+  EXPECT_FALSE(testCube->hasBlob("String", "CSMState"));
 }
 
 TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
   // Add stuff from csminit
   testCube->putGroup(PvlGroup("CsmInfo"));
-  StringBlob testBlob("test string", "CSMState");
+  Blob testBlob("CSMState", "String");
   testCube->write(testBlob);
 
   // Mangle the cube so that spiceinit failes
@@ -553,7 +553,7 @@ TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
   ASSERT_ANY_THROW(spiceinit(testCube, options));
 
   EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
-  EXPECT_NO_THROW(testCube->readString("CSMState"));
+  EXPECT_TRUE(testCube->hasBlob("String", "CSMState"));
 }
 
 TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {

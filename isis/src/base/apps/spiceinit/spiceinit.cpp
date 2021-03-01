@@ -17,7 +17,7 @@
 #include "PvlToPvlTranslationManager.h"
 #include "SpiceClient.h"
 #include "SpiceClientStarter.h"
-#include "StringBlob.h"
+#include "Blob.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "spiceinit.h"
@@ -379,9 +379,9 @@ namespace Isis {
     currentKernels.addKeyword(demKeyword, Pvl::Replace);
 
     // Save off the CSM State so it can be restored if spiceinit fails
-    StringBlob csmState("", "CSMState");
+    Blob csmState("CSMState", "String");
     if (icube->hasBlob("String", "CSMState")) {
-      icube->readString("CSMState");
+      icube->read(csmState);
     }
 
     // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera

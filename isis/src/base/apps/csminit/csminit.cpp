@@ -29,7 +29,6 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "StringBlob.h"
 
 using namespace std;
 
@@ -364,9 +363,9 @@ namespace Isis {
     }
 
     // Save off all old Blobs to restore in the case of csminit failure
-    StringBlob originalCsmStateBlob;
+    Blob originalCsmStateBlob("CSMState", "String");
     if (cube->hasBlob("String", "CSMState")) {
-      originalCsmStateBlob = cube->readString("CSMState");
+      cube->read(originalCsmStateBlob);
     }
 
     Table originalInstrumentPointing("InstrumentPointing");
@@ -411,7 +410,10 @@ namespace Isis {
     cube->deleteBlob("Polygon", "Footprint");
 
     // Create our CSM State blob as a string and add the CSM string to the Blob.
-    StringBlob csmStateBlob(modelState, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    char *buf = new char[modelState.size()];
+    memcpy(buf, modelState.c_str(), modelState.size());
+    csmStateBlob.setData(buf, modelState.size()); // This passes ownership so don't delete buf
     PvlObject &blobLabel = csmStateBlob.Label();
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);
@@ -441,7 +443,7 @@ namespace Isis {
       cube->deleteBlob("String", "CSMState");
 
       // Restore the original blobs
-      if (originalCsmStateBlob.string().size() != 0) {
+      if (originalCsmStateBlob.Size() != 0) {
         cube->write(originalCsmStateBlob);
       }
 

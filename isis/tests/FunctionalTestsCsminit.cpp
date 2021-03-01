@@ -4,11 +4,11 @@
 #include <iostream>
 
 #include "AlternativeTestCsmModel.h"
+#include "Blob.h"
 #include "TestCsmPlugin.h"
 #include "Fixtures.h"
 #include "TestUtilities.h"
 #include "TestCsmModel.h"
-#include "StringBlob.h"
 #include "FileName.h"
 
 #include <nlohmann/json.hpp>
@@ -88,14 +88,16 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   testCube->open(filename);
 
   // Get a model and a state string
-  StringBlob stateString = testCube->readString("CSMState");
+  Blob stateString("CSMState", "String");
+  testCube->read(stateString);
 
-  // Verify contents of the StringBlob's PVL label
+  // Verify contents of the Blob's PVL label
   PvlObject blobPvl = stateString.Label();
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
+  std::string modelState(stateString.getBuffer(), stateString.Size());
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // Check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
@@ -156,7 +158,8 @@ TEST_F(CSMPluginFixture, CSMInitRunTwice) {
 
   testCube->open(filename);
 
-  StringBlob stateString = testCube->readString("CSMState");
+  Blob stateString("CSMState", "String");
+  testCube->read(stateString);
   PvlObject blobPvl = stateString.Label();
 
   // Check blob label ModelName and Plugin Name
@@ -165,7 +168,8 @@ TEST_F(CSMPluginFixture, CSMInitRunTwice) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
+  std::string modelState(stateString.getBuffer(), stateString.Size());
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // Make sure there is only one CSMState Blob on the label
   PvlObject *label = testCube->label();
@@ -214,12 +218,14 @@ TEST_F(CSMPluginFixture, CSMInitMultiplePossibleModels) {
   csminit(betterOptions);
 
   testCube->open(filename);
-  StringBlob stateString = testCube->readString("CSMState");
+  Blob stateString("CSMState", "String");
+  testCube->read(stateString);
   PvlObject blobPvl = stateString.Label();
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, stateString.string()));
+  std::string modelState(stateString.getBuffer(), stateString.Size());
+  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // check blob label ModelName and Plugin Name
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
@@ -458,11 +464,12 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
   testCube->open(filename);
 
   // Read blob off csminited cube, get state string and save off to compare
-  StringBlob state = testCube->readString("CSMState");
+  Blob state("CSMState", "String");
+  testCube->read(state);
   testCube->close();
 
   // Write the state out to a file
-  std::string stateBefore = state.string();
+  std::string stateBefore(state.getBuffer(), state.Size());
   QString statePath = tempDir.path() + "/state.json";
   std::ofstream stateFile(statePath.toStdString());
   stateFile << stateBefore;
@@ -481,6 +488,8 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
   // Pull state string off. if ending state string = original state string these are functionally equiv.
   testCube->open(filename);
 
-  StringBlob stateAfter = testCube->readString("CSMState");
-  EXPECT_STREQ(stateBefore.c_str(), stateAfter.string().c_str());
+  Blob stateBlobAfter("CSMState", "String");
+  testCube->read(stateBlobAfter);
+  std::string stateAfter(stateBlobAfter.getBuffer(), stateBlobAfter.Size());
+  EXPECT_EQ(stateBefore, stateAfter);
 }
