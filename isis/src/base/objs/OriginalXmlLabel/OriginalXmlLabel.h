@@ -29,19 +29,21 @@ namespace Isis {
    *                           OriginalLabel. Fixes #4584.
    *
    */
-  class OriginalXmlLabel : public Isis::Blob {
+  class OriginalXmlLabel {
     public:
       OriginalXmlLabel();
       OriginalXmlLabel(const QString &file);
+      OriginalXmlLabel(Blob &blob);
       ~OriginalXmlLabel();
 
+      Blob *toBlob();
+
+      void fromBlob(Isis::Blob blob);
       void readFromXmlFile(const FileName &xmlFileName);
-      const QDomDocument &ReturnLabels() const;
+      const QDomDocument &ReturnLabels();
 
     protected:
       void ReadData(std::istream &stream);
-      void WriteData(std::fstream &os);
-      void WriteInit();
 
     private:
       QDomDocument m_originalLabel; //!< Original Xml Label.
@@ -49,4 +51,3 @@ namespace Isis {
 };
 
 #endif
-

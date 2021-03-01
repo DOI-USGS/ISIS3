@@ -32,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "Message.h"
 #include "OriginalLabel.h"
+#include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "Projection.h"
@@ -878,6 +879,23 @@ namespace Isis {
     return origLabel;
   }
 
+
+  /**
+   * This method will read an OriginalXmlLabel from a cube.
+   */
+  OriginalXmlLabel Cube::readOriginalXmlLabel() const {
+    Blob origXmlLabelBlob("IsisCube", "OriginalXmlLabel");
+    try {
+      origXmlLabelBlob.Read(fileName());
+    }
+    catch (IException &){
+      QString msg = "Unable to locate OriginalXmlLabel in " + fileName();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    OriginalXmlLabel origXmlLabel(origXmlLabelBlob);
+    return origXmlLabel;
+  }
+
   /**
    * This method will write a blob of data (e.g. History, Table, etc)
    * to the cube as specified by the contents of the Blob object.
@@ -957,6 +975,18 @@ namespace Isis {
   void Cube::write(OriginalLabel lab) {
     write(*(lab.toBlob()));
   }
+
+
+  /**
+   * This method will write an OriginalXmlLabel object.
+   * to the cube as specified by the contents of the Blob object.
+   *
+   * @param Original xml label data to be written
+   */
+  void Cube::write(OriginalXmlLabel lab) {
+    write(*(lab.toBlob()));
+  }
+
 
   void Cube::write(const Table &table) {
     Blob tableBlob = table.toBlob();
