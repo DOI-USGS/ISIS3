@@ -14,6 +14,8 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "TextFile.h"
 #include "LineManager.h"
+#include "NaifStatus.h"
+#include "Camera.h"
 
 using namespace std;
 using namespace Isis;
@@ -119,22 +121,38 @@ void IsisMain() {
 #endif
   gbl::nullWago = ui.GetBoolean("NULLWAGO");
 
-  // Get the distance between Mars and the Sun at the given time in
-  // Astronomical Units (AU)
-  QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.toLatin1().data());
-  QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-  furnsh_c(satKernel.toLatin1().data());
-  QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.toLatin1().data());
-  double sunpos[6], lt;
-  spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
-  double dist = vnorm_c(sunpos);
   double kmPerAU = 1.4959787066E8;
-  double sunAU = dist / kmPerAU;
-  unload_c(bspKernel.toLatin1().data());
-  unload_c(satKernel.toLatin1().data());
-  unload_c(pckKernel.toLatin1().data());
+  double sunAU = 0;
+  try {
+    Camera *cam;
+    cam = icube->camera();
+    cam->setTime(startTime);
+    sunAU = cam->sunToBodyDist() / kmPerAU;
+  }
+  catch(IException &e) {
+    // Get the distance between Mars and the Sun at the given time in
+    // Astronomical Units (AU)
+    
+    NaifStatus::CheckErrors();
+    QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+    furnsh_c(bspKernel.toLatin1().data());
+    QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
+    furnsh_c(satKernel.toLatin1().data());
+    QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+    furnsh_c(pckKernel.toLatin1().data());
+    NaifStatus::CheckErrors();
+
+    double sunpos[6], lt;
+    spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
+    double dist = vnorm_c(sunpos);
+    sunAU = dist / kmPerAU;
+    
+    NaifStatus::CheckErrors();
+    unload_c(bspKernel.toLatin1().data());
+    unload_c(satKernel.toLatin1().data());
+    unload_c(pckKernel.toLatin1().data());
+    NaifStatus::CheckErrors();
+  }
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
   // we must go to counts/ms

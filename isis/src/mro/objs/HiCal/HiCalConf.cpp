@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <SpiceUsr.h>
 
 #include "Brick.h"
+#include "Camera.h"
 #include "Cube.h"
 #include "FileName.h"
 #include "HiCalConf.h"
@@ -295,27 +296,45 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @return double Distance in AU between Sun and observed body
    */
-  double HiCalConf::sunDistanceAU() {
-    NaifStatus::CheckErrors();
-    loadNaifTiming();
-
-    QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
-    double obsStartTime;
-    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
-
-    QString targetName = getKey("TargetName", "Instrument");
-    if (targetName.toLower() == "sky" ||
-        targetName.toLower() == "cal" ||
-        targetName.toLower() == "phobos" ||
-        targetName.toLower() == "deimos") {
-      targetName = "Mars";
+  double HiCalConf::sunDistanceAU(Cube *cube) {
+    double sunkm = 0.0;
+    try {
+      Camera *cam;
+      cam = cube->camera();
+      cam->SetImage(0.5, 0.5);
+      sunkm = cam->sunToBodyDist();
+      NaifStatus::CheckErrors();
     }
-    double sunv[3];
-    double lt;
-    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
-                    sunv, &lt);
-    double sunkm = vnorm_c(sunv);
-    NaifStatus::CheckErrors();
+    catch (IException &e) {
+      try {
+        loadNaifTiming();
+
+        QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
+        double obsStartTime;
+        NaifStatus::CheckErrors();
+        scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
+
+        QString targetName = getKey("TargetName", "Instrument");
+        if (targetName.toLower() == "sky" ||
+            targetName.toLower() == "cal" ||
+            targetName.toLower() == "phobos" ||
+            targetName.toLower() == "deimos") {
+          targetName = "Mars";
+        }
+        double sunv[3];
+        double lt;
+        (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+                        sunv, &lt);
+        sunkm = vnorm_c(sunv);
+
+        NaifStatus::CheckErrors();
+      }
+      catch(IException &e) {
+        QString msg = "Unable to determine the distance from the target to the sun";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }
