@@ -509,7 +509,7 @@ namespace Isis {
   void MroCtxCube::SetUp() {
     TempTestingFiles::SetUp();
     
-    QString testPath = "/tmp/test.cub";
+    QString testPath = tempDir.path() + "/test.cub";
     QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
     testCube.reset(new Cube(testPath));
   }
@@ -518,6 +518,7 @@ namespace Isis {
   void MroCtxCube::TearDown() {
     testCube.reset();
   }
+
 
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
