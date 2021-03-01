@@ -23,6 +23,7 @@ find files of those names at the top level of this repository. **/
 #include "CubeAttribute.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
+#include "CubeStretch.h"
 #include "Endian.h"
 #include "FileName.h"
 #include "History.h"
@@ -37,7 +38,6 @@ find files of those names at the top level of this repository. **/
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
-#include "StretchBlob.h"
 #include "Table.h"
 #include "TProjection.h"
 #include "Longitude.h"
@@ -883,17 +883,17 @@ namespace Isis {
   /**
    * This method will read a StretchBlob from a cube.
    */
-  StretchBlob Cube::readStretchBlob(QString name, const std::vector<PvlKeyword> keywords) const {
-    Blob blob(name, "Stretch");
+  CubeStretch Cube::readStretchBlob(QString name, const std::vector<PvlKeyword> keywords) const {
+    Blob stretchBlob(name, "Stretch");
     try {
-      blob.Read(fileName(), keywords);
+      stretchBlob.Read(fileName(), keywords);
     }
     catch (IException &e){
       std::cout << e.what() << '\n';
       QString msg = "Unable to locate Stretch information in " + fileName();
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    StretchBlob stretchBlob(blob);
+    CubeStretch cubeStretch(stretchBlob);
     return stretchBlob;
   }
 

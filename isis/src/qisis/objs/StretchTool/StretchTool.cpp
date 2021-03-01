@@ -35,7 +35,6 @@
 #include "Workspace.h"
 
 #include "CubeStretch.h"
-#include "StretchBlob.h"
 
 using namespace std;
 
@@ -475,8 +474,7 @@ namespace Isis {
 
     if (ok) {
       if (cvp->isGray()) {
-        StretchBlob stretchBlob = icube->readStretchBlob(stretchName);
-        CubeStretch cubeStretch = stretchBlob.getStretch();
+        CubeStretch cubeStretch = icube->readStretchBlob(stretchName);
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
@@ -495,13 +493,10 @@ namespace Isis {
 
         std::vector<PvlKeyword> keywordValueBlue;
         keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
-        StretchBlob redStretchBlob = icube->readStretchBlob(stretchName, keywordValueRed);
-        StretchBlob greenStretchBlob = icube->readStretchBlob(stretchName, keywordValueGreen);
-        StretchBlob blueStretchBlob = icube->readStretchBlob(stretchName, keywordValueBlue);
 
-        CubeStretch redStretch = redStretchBlob.getStretch();
-        CubeStretch greenStretch = greenStretchBlob.getStretch();
-        CubeStretch blueStretch = blueStretchBlob.getStretch();
+        CubeStretch redStretch = icube->readStretchBlob(stretchName, keywordValueRed);
+        CubeStretch greenStretch = icube->readStretchBlob(stretchName, keywordValueGreen);
+        CubeStretch blueStretch = icube->readStretchBlob(stretchName, keywordValueBlue);
 
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
@@ -706,11 +701,10 @@ namespace Isis {
         // Write single stretch to cube
         stretch.setName(text);
         stretch.setBandNumber(cvp->grayBand());
-        StretchBlob stretchBlob(stretch);
 
         // Overwrite an existing stretch with the same name if it exists. The user was warned
         // and decided to overwrite.
-        icube->write(*(stretchBlob.toBlob()));
+        icube->write(*(stretch.toBlob()));
       }
       else {
         CubeStretch redStretch, greenStretch, blueStretch;
@@ -727,18 +721,15 @@ namespace Isis {
 
         redStretch.setName(text);
         redStretch.setBandNumber(cvp->redBand());
-        StretchBlob redStretchBlob(redStretch);
-        icube->write(*(redStretchBlob.toBlob()), false);
+        icube->write(*(redStretch.toBlob()), false);
 
         greenStretch.setName(text);
         greenStretch.setBandNumber(cvp->greenBand());
-        StretchBlob greenStretchBlob(greenStretch);
-        icube->write(*(greenStretchBlob.toBlob()), false);
+        icube->write(*(greenStretch.toBlob()), false);
 
         blueStretch.setName(text);
         blueStretch.setBandNumber(cvp->blueBand());
-        StretchBlob blueStretchBlob(blueStretch);
-        icube->write(*(blueStretchBlob.toBlob()), false);
+        icube->write(*(blueStretch.toBlob()), false);
       }
 
       // Don't leave open rw -- not optimal.
