@@ -20,11 +20,6 @@ namespace Isis {
     m_type(stretchType), m_bandNumber(bandNumber) {
   }
 
-
-  // Default destructor
-  CubeStretch::~CubeStretch() {
-  }
-
   CubeStretch::CubeStretch(CubeStretch const& stretch): Stretch(stretch) {
     m_name = stretch.getName();
     m_type = stretch.getType();
@@ -51,6 +46,32 @@ namespace Isis {
   CubeStretch::CubeStretch(Stretch const& stretch, QString stretchType): Stretch(stretch), m_type(stretchType) {
     m_name = "DefaultName";
     m_bandNumber = 1;
+  }
+
+  CubeStretch::CubeStretch(Blob blob) : Stretch() {
+    char *buff = blob.getBuffer();
+    std::string stringFromBuffer(buff, blob.Size());
+    setName(blob.Label()["Name"][0]);
+    setType(blob.Label()["StretchType"][0]);
+    Parse(QString::fromStdString(stringFromBuffer));
+    setBandNumber(blob.Label()["BandNumber"][0].toInt());
+  }
+
+  // Default destructor
+  CubeStretch::~CubeStretch() {
+  }
+
+  Isis::Blob CubeStretch::toBlob(QString const& name) const {
+    Isis::Blob blob(name, "Stretch");
+
+    blob.Label()["Name"] = getName();
+    blob.Label() += PvlKeyword("StretchType", getType());
+    blob.Label() += PvlKeyword("BandNumber", QString::number(getBandNumber()));
+    std::string blobString = Text().toStdString();
+    char *buff = new char[blobString.length()+1];
+    std::strcpy(buff, blobString.c_str());
+    blob.setData(buff, blobString.size());
+    return blob;
   }
 
 

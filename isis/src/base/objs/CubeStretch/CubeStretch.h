@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "Stretch.h"
+#include "Blob.h"
 
 namespace Isis {
   /**
@@ -26,13 +27,16 @@ namespace Isis {
   class CubeStretch : public Stretch {
     public:
       CubeStretch(QString name="DefaultStretch", QString stretchType="Default", int bandNumber = 1);
-      ~CubeStretch();
 
       CubeStretch(CubeStretch const& stretch);
       CubeStretch(Stretch const& stretch);
       CubeStretch(Stretch const& stretch, QString type);
+      CubeStretch(Blob blob);
+      ~CubeStretch();
 
       bool operator==(CubeStretch& stretch2);
+
+      Isis::Blob toBlob(QString const& name="CubeStretch") const;
 
       QString getType() const;
       void setType(QString stretchType);

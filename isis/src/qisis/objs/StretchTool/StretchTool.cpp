@@ -35,7 +35,6 @@
 #include "Workspace.h"
 
 #include "CubeStretch.h"
-#include "StretchBlob.h"
 
 using namespace std;
 
@@ -460,7 +459,7 @@ namespace Isis {
       }
     }
 
-    bool ok;
+    bool ok = false;
     QString stretchName;
     // Only display load stretch dialog if there are stretches saved to the cube
     if (namelist.size() >=1) {
@@ -475,8 +474,7 @@ namespace Isis {
 
     if (ok) {
       if (cvp->isGray()) {
-        StretchBlob stretchBlob = icube->readStretchBlob(stretchName);
-        CubeStretch cubeStretch = stretchBlob.getStretch();
+        CubeStretch cubeStretch = icube->readStretchBlob(stretchName);
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
@@ -495,13 +493,10 @@ namespace Isis {
 
         std::vector<PvlKeyword> keywordValueBlue;
         keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
-        StretchBlob redStretchBlob = icube->readStretchBlob(stretchName, keywordValueRed);
-        StretchBlob greenStretchBlob = icube->readStretchBlob(stretchName, keywordValueGreen);
-        StretchBlob blueStretchBlob = icube->readStretchBlob(stretchName, keywordValueBlue);
 
-        CubeStretch redStretch = redStretchBlob.getStretch();
-        CubeStretch greenStretch = greenStretchBlob.getStretch();
-        CubeStretch blueStretch = blueStretchBlob.getStretch();
+        CubeStretch redStretch = icube->readStretchBlob(stretchName, keywordValueRed);
+        CubeStretch greenStretch = icube->readStretchBlob(stretchName, keywordValueGreen);
+        CubeStretch blueStretch = icube->readStretchBlob(stretchName, keywordValueBlue);
 
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
@@ -548,7 +543,7 @@ namespace Isis {
       }
     }
 
-    bool ok;
+    bool ok = false;
     QString toDelete;
     // Only display list of stretches to delete if there are stretches saved to the cube
     if (namelist.size() >= 1) {
@@ -706,11 +701,10 @@ namespace Isis {
         // Write single stretch to cube
         stretch.setName(text);
         stretch.setBandNumber(cvp->grayBand());
-        StretchBlob stretchBlob(stretch);
 
         // Overwrite an existing stretch with the same name if it exists. The user was warned
         // and decided to overwrite.
-        icube->write(*(stretchBlob.toBlob()));
+        icube->write(stretch.toBlob());
       }
       else {
         CubeStretch redStretch, greenStretch, blueStretch;
@@ -727,18 +721,18 @@ namespace Isis {
 
         redStretch.setName(text);
         redStretch.setBandNumber(cvp->redBand());
-        StretchBlob redStretchBlob(redStretch);
-        icube->write(*(redStretchBlob.toBlob()), false);
+        Blob stretchBlob = redStretch.toBlob();
+        icube->write(stretchBlob, false);
 
         greenStretch.setName(text);
         greenStretch.setBandNumber(cvp->greenBand());
-        StretchBlob greenStretchBlob(greenStretch);
-        icube->write(*(greenStretchBlob.toBlob()), false);
+        stretchBlob = greenStretch.toBlob();
+        icube->write(stretchBlob, false);
 
         blueStretch.setName(text);
         blueStretch.setBandNumber(cvp->blueBand());
-        StretchBlob blueStretchBlob(blueStretch);
-        icube->write(*(blueStretchBlob.toBlob()), false);
+        stretchBlob = blueStretch.toBlob();
+        icube->write(stretchBlob, false);
       }
 
       // Don't leave open rw -- not optimal.

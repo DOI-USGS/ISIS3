@@ -31,12 +31,12 @@ namespace Isis {
   class CubeAttributeOutput;
   class CubeCachingAlgorithm;
   class CubeIoHandler;
+  class CubeStretch;
   class FileName;
   class Projection;
   class Pvl;
   class PvlGroup;
   class Statistics;
-  class StretchBlob;
   class Table;
   class Histogram;
   class History;
@@ -255,12 +255,13 @@ namespace Isis {
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
-      StretchBlob readStretchBlob(QString name="CubeStretch",
+      CubeStretch readStretchBlob(QString name="CubeStretch",
                                   const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
+      void write(const CubeStretch &cubeStretch);
       void write(OriginalLabel lab);
       void write(Buffer &wbuf);
 
