@@ -26,9 +26,21 @@ TEST_F(MgsMocCube, FunctionalTestMroMoccalDefault) {
   }
   
   Cube oCube(outCubeFileName, "r");
+  
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("a"),   16.03);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("off"), 25.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ex"),  100.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("z"),   27.67658);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("dc"),  0.00133691);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("g"),   0.123262);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("w0"),  3.991);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("s"),   1.423426946984);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 0.50767834462549);
 
   Histogram *oCubeStats = oCube.histogram();
-
+  
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.056909484090283513);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 22.763793636113405);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
@@ -50,6 +62,19 @@ TEST_F(MgsMocCube, FunctionalTestMroMoccalIofFalse) {
   }
   
   Cube oCube(outCubeFileName, "r");
+  
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("a"),   16.03);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("off"), 25.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ex"),  100.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("z"),   27.67658);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("dc"),  0.00133691);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("g"),   0.123262);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("w0"),  3.991);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("s"),   1.423426946984);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1);
+
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -74,6 +99,18 @@ TEST_F(MgsMocCube, FunctionalTestMroMoccalNullwagoTrue) {
   }
   
   Cube oCube(outCubeFileName, "r");
+  
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("a"),   16.03);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("off"), 25.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ex"),  100.0);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("z"),   27.67658);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("dc"),  0.00133691);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("g"),   0.123262);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("w0"),  3.991);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("s"),   1.423426946984);
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 0.50767834462549);
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -116,6 +153,9 @@ TEST_F(MgsMocCube, FunctionalTestMroMoccalCameraComparison) {
 
   PvlGroup noCamLab = oNoCamCube.label()->findObject("IsisCube").findGroup("Radiometry"); 
   PvlGroup camLab = oCamCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  
+  EXPECT_DOUBLE_EQ((double)noCamLab.findKeyword("iof"), 0.50767834462549);
+  EXPECT_DOUBLE_EQ((double)noCamLab.findKeyword("a"),   16.03);
 
   EXPECT_DOUBLE_EQ((double)noCamLab.findKeyword("iof"), 
                    (double)camLab.findKeyword("iof"));
