@@ -234,7 +234,6 @@ namespace Isis {
         History history("IsisCube");
         history.AddEntry();
         uveven->write(history);
-
       }
       uveven->write(origLabel);
 
@@ -269,7 +268,7 @@ namespace Isis {
         History history("IsisCube");
         history.AddEntry();
         viseven->write(history);
-      }    
+      }
       viseven->write(origLabel);
 
       viseven->close();
