@@ -233,9 +233,10 @@ namespace Isis {
       if(iApp) {
         History history("IsisCube");
         history.AddEntry();
-        visodd->write(history);
-        visodd->write(origLabel);
+        uveven->write(history);
+
       }
+      uveven->write(origLabel);
 
       uveven->close();
       delete uveven;
@@ -250,9 +251,9 @@ namespace Isis {
       if(iApp) {
         History history("IsisCube");
         history.AddEntry();
-        visodd->write(history);
-        visodd->write(origLabel);
+        uvodd->write(history);
       }
+      uvodd->write(origLabel);
 
       uvodd->close();
       delete uvodd;
@@ -267,9 +268,9 @@ namespace Isis {
       if(iApp) {
         History history("IsisCube");
         history.AddEntry();
-        visodd->write(history);
-        visodd->write(origLabel);
-      }
+        viseven->write(history);
+      }    
+      viseven->write(origLabel);
 
       viseven->close();
       delete viseven;
@@ -285,8 +286,8 @@ namespace Isis {
         History history("IsisCube");
         history.AddEntry();
         visodd->write(history);
-        visodd->write(origLabel);
       }
+      visodd->write(origLabel);
 
       visodd->close();
       delete visodd;
