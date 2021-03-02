@@ -54,6 +54,7 @@ namespace Isis {
       Blob(const QString &name, const QString &type,
            const QString &file);
       Blob(const Blob &other);
+      Blob() = default;
       Blob &operator=(const Blob &other);
 
       virtual ~Blob();

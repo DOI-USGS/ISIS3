@@ -249,6 +249,14 @@ class CSMCameraDemFixture : public CSMCubeFixture {
 
     void SetUp() override;
 };
+
+class HistoryBlob : public TempTestingFiles {
+  protected:
+    Blob historyBlob;
+    PvlObject historyPvl;
+
+    void SetUp() override;
+};
 }
 
 #endif

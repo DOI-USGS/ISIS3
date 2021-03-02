@@ -41,6 +41,7 @@ namespace Isis {
   class Histogram;
   class History;
   class OriginalLabel;
+  class OriginalXmlLabel;
   class ImagePolygon;
 
 
@@ -255,14 +256,16 @@ namespace Isis {
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
-      CubeStretch readStretchBlob(QString name="CubeStretch",
+      CubeStretch readCubeStretch(QString name="CubeStretch",
                                   const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
+      OriginalXmlLabel readOriginalXmlLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
       void write(const CubeStretch &cubeStretch);
       void write(OriginalLabel lab);
+      void write(OriginalXmlLabel lab);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);

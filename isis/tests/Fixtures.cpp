@@ -959,4 +959,41 @@ namespace Isis {
     testCam = testCube->camera();
   }
 
+  void HistoryBlob::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::istringstream hss(R"(
+      Object = mroctx2isis
+        IsisVersion       = "4.1.0  | 2020-07-01"
+        ProgramVersion    = 2016-06-10
+        ProgramPath       = /Users/acpaquette/repos/ISIS3/build/bin
+        ExecutionDateTime = 2020-07-01T16:48:40
+        HostName          = Unknown
+        UserName          = acpaquette
+        Description       = "Import an MRO CTX image as an Isis cube"
+
+        Group = UserParameters
+          FROM    = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W.IMG
+          TO      = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cub
+          SUFFIX  = 18
+          FILLGAP = true
+        End_Group
+      End_Object)");
+
+    hss >> historyPvl;
+
+    std::ostringstream ostr;
+    ostr << historyPvl;
+    std::string histStr = ostr.str();
+    int nbytes = histStr.size();
+
+    // Don't worry about cleaning up this buffer
+    // The blob takes ownership of it and handles freeing the memory in
+    // its decontructor
+    char *buffer = new char[nbytes];
+    memcpy(buffer, histStr.c_str(), nbytes);
+
+    historyBlob = Blob("IsisCube", "History");
+    historyBlob.setData(buffer, nbytes);
+  }
 }

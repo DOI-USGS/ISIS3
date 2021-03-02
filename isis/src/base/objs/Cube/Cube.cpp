@@ -33,6 +33,7 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "Message.h"
 #include "OriginalLabel.h"
+#include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "Projection.h"
@@ -883,7 +884,7 @@ namespace Isis {
   /**
    * This method will read a StretchBlob from a cube.
    */
-  CubeStretch Cube::readStretchBlob(QString name, const std::vector<PvlKeyword> keywords) const {
+  CubeStretch Cube::readCubeStretch(QString name, const std::vector<PvlKeyword> keywords) const {
     Blob stretchBlob(name, "Stretch");
     try {
       stretchBlob.Read(fileName(), keywords);
@@ -895,6 +896,22 @@ namespace Isis {
     }
     CubeStretch cubeStretch(stretchBlob);
     return stretchBlob;
+
+
+  /**
+   * This method will read an OriginalXmlLabel from a cube.
+   */
+  OriginalXmlLabel Cube::readOriginalXmlLabel() const {
+    Blob origXmlLabelBlob("IsisCube", "OriginalXmlLabel");
+    try {
+      origXmlLabelBlob.Read(fileName());
+    }
+    catch (IException &){
+      QString msg = "Unable to locate OriginalXmlLabel in " + fileName();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    OriginalXmlLabel origXmlLabel(origXmlLabelBlob);
+    return origXmlLabel;
   }
 
   /**
@@ -976,6 +993,18 @@ namespace Isis {
   void Cube::write(OriginalLabel lab) {
     write(*(lab.toBlob()));
   }
+
+
+  /**
+   * This method will write an OriginalXmlLabel object.
+   * to the cube as specified by the contents of the Blob object.
+   *
+   * @param Original xml label data to be written
+   */
+  void Cube::write(OriginalXmlLabel lab) {
+    write(*(lab.toBlob()));
+  }
+
 
   void Cube::write(const Table &table) {
     Blob tableBlob = table.toBlob();
