@@ -459,7 +459,7 @@ namespace Isis {
       }
     }
 
-    bool ok;
+    bool ok = false;
     QString stretchName;
     // Only display load stretch dialog if there are stretches saved to the cube
     if (namelist.size() >=1) {
@@ -543,7 +543,7 @@ namespace Isis {
       }
     }
 
-    bool ok;
+    bool ok = false;
     QString toDelete;
     // Only display list of stretches to delete if there are stretches saved to the cube
     if (namelist.size() >= 1) {
@@ -704,7 +704,7 @@ namespace Isis {
 
         // Overwrite an existing stretch with the same name if it exists. The user was warned
         // and decided to overwrite.
-        icube->write(*(stretch.toBlob()));
+        icube->write(stretch.toBlob());
       }
       else {
         CubeStretch redStretch, greenStretch, blueStretch;
@@ -721,15 +721,18 @@ namespace Isis {
 
         redStretch.setName(text);
         redStretch.setBandNumber(cvp->redBand());
-        icube->write(*(redStretch.toBlob()), false);
+        Blob stretchBlob = redStretch.toBlob();
+        icube->write(stretchBlob, false);
 
         greenStretch.setName(text);
         greenStretch.setBandNumber(cvp->greenBand());
-        icube->write(*(greenStretch.toBlob()), false);
+        stretchBlob = greenStretch.toBlob();
+        icube->write(stretchBlob, false);
 
         blueStretch.setName(text);
         blueStretch.setBandNumber(cvp->blueBand());
-        icube->write(*(blueStretch.toBlob()), false);
+        stretchBlob = blueStretch.toBlob();
+        icube->write(stretchBlob, false);
       }
 
       // Don't leave open rw -- not optimal.

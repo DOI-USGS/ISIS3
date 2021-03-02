@@ -41,8 +41,8 @@ TEST(CubeStretch, CopyConstructor) {
 TEST(CubeStretch, BlobConstructor) {
   // Set Stretch
   Isis::CubeStretch cubeStretch("TestStretch", "testType", 2);
-  Isis::CubeStretch cubeStretchFromBlob(*(cubeStretch.toBlob()));
-  
+  Isis::CubeStretch cubeStretchFromBlob(cubeStretch.toBlob());
+
 
   EXPECT_STREQ(cubeStretchFromBlob.getName().toLatin1().data(), cubeStretch.getName().toLatin1().data());
   EXPECT_STREQ(cubeStretchFromBlob.getType().toLatin1().data(), cubeStretch.getType().toLatin1().data());
@@ -62,7 +62,7 @@ TEST_F(DefaultCube, CubeStretchWriteRead) {
   cubeStretch.AddPair(1.0, 100.0);
 
   // Write to Cube
-  testCube->write(*(cubeStretch.toBlob()));
+  testCube->write(cubeStretch);
   testCube->reopen("rw");
 
   // Set up stretch and blob to restore to

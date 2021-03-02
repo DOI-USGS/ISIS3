@@ -982,6 +982,11 @@ namespace Isis {
     write(tableBlob);
   }
 
+  void Cube::write(const CubeStretch &cubeStretch) {
+    Blob cubeStretchBlob = cubeStretch.toBlob();
+    write(cubeStretchBlob);
+  }
+
 
   /**
    * This method will write a buffer of data from the cube as specified by the

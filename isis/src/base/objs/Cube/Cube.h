@@ -261,6 +261,7 @@ namespace Isis {
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
+      void write(const CubeStretch &cubeStretch);
       void write(OriginalLabel lab);
       void write(Buffer &wbuf);
 
