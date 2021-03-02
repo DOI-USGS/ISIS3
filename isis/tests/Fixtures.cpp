@@ -974,4 +974,18 @@ namespace Isis {
     testCam = testCube->camera();
   }
 
+
+  void MgsMocCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mgsImages/mocImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MgsMocCube::TearDown() {
+    testCube.reset();
+  }
+
 }

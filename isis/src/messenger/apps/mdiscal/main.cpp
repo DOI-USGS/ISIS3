@@ -315,7 +315,7 @@ void IsisMain() {
     empiricalCorrectionFile = "";
     g_empiricalCorrectionFactor = loadEmpiricalCorrection(startTime, g_filterNumber + 1,
                                                           empiricalCorrectionFile,
-                                                          empiricalCorrectionDate);
+                                                          empiricalCorrectionDate, icube);
     empiricalCorrectionFactor = toString(g_empiricalCorrectionFactor);
   }
   else {
@@ -335,7 +335,7 @@ void IsisMain() {
     PvlGroup& inst = icube->group("Instrument");
     QString target = inst["TargetName"];
     QString startTime = inst["SpacecraftClockCount"];
-    if (sunDistanceAU(startTime, target, g_solarDist)) {
+    if (sunDistanceAU(startTime, target, g_solarDist, icube)) {
       vector<double> sol = loadSolarIrr(g_isNarrowAngleCamera, g_isBinnedData,
                                         g_filterNumber + 1, solirrfile);
       g_Ff = sol[2];
