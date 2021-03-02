@@ -474,7 +474,7 @@ namespace Isis {
 
     if (ok) {
       if (cvp->isGray()) {
-        CubeStretch cubeStretch = icube->readStretchBlob(stretchName);
+        CubeStretch cubeStretch = icube->readCubeStretch(stretchName);
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreGrayStretch(cubeStretch);
         }
@@ -494,9 +494,9 @@ namespace Isis {
         std::vector<PvlKeyword> keywordValueBlue;
         keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
 
-        CubeStretch redStretch = icube->readStretchBlob(stretchName, keywordValueRed);
-        CubeStretch greenStretch = icube->readStretchBlob(stretchName, keywordValueGreen);
-        CubeStretch blueStretch = icube->readStretchBlob(stretchName, keywordValueBlue);
+        CubeStretch redStretch = icube->readCubeStretch(stretchName, keywordValueRed);
+        CubeStretch greenStretch = icube->readCubeStretch(stretchName, keywordValueGreen);
+        CubeStretch blueStretch = icube->readCubeStretch(stretchName, keywordValueBlue);
 
         if (m_advancedStretch->isVisible()) {
           m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);

@@ -896,6 +896,7 @@ namespace Isis {
     }
     CubeStretch cubeStretch(stretchBlob);
     return stretchBlob;
+  }
 
 
   /**

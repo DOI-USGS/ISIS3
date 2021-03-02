@@ -66,7 +66,7 @@ TEST_F(DefaultCube, CubeStretchWriteRead) {
   testCube->reopen("rw");
 
   // Set up stretch and blob to restore to
-  Isis::CubeStretch restoredStretch = testCube->readStretchBlob(stretchName);
+  Isis::CubeStretch restoredStretch = testCube->readCubeStretch(stretchName);
   EXPECT_TRUE(restoredStretch == cubeStretch);
 };
 
