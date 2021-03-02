@@ -28,6 +28,9 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
 
   Cube oCube(outCubeFileName, "r");
 
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1.86764430855461e-04);
+  
   Histogram *oCubeStats = oCube.histogram();
 
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.077640061192214491);
@@ -75,7 +78,10 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
   }
 
   Cube oCube(outCubeFileName, "r");
-
+  
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1); 
+  
   Histogram *oCubeStats = oCube.histogram();
 
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 221.12296661376953);
@@ -120,6 +126,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalCameraComparison) {
 
   EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"), 
                    (double)camLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"));
-  
+
+  EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"), 1.86764430855461e-04);
 }
 
