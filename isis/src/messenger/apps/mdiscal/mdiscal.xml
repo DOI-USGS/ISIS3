@@ -655,6 +655,10 @@
       was applied.  This will change the output DNs for any images where FLATFIELD=false. 
       Updated documentation. Fixes #2338
     </change>
+    <change name="Kristin Berry" date="2021-02-26">
+      Updated to use camera for the target-sun distance and clock time to ET conversion, if possible.
+      This enables the program to be run without local spice kernels (the spice server can be used for spiceinit.)
+    </change>
   </history>
 
   <groups>
