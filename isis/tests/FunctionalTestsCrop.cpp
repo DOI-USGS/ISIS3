@@ -36,7 +36,7 @@ TEST_F(LargeCube, FunctionalTestCropDefault) {
   EXPECT_NEAR(oCubeStats->StandardDeviation(), 57.735748638374318, 0.0000000001);
 }
 
-TEST_F(DefaultCube, FunctionalTestCropSkip1) {
+TEST_F(LargeCube, FunctionalTestCropSkip1) {
   QTemporaryDir tempDir;
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
@@ -54,13 +54,13 @@ TEST_F(DefaultCube, FunctionalTestCropSkip1) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 505.25);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 50525);
-  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 302.16673352386897);
+  EXPECT_NEAR(oCubeStats->Average(), 2, 0.01);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 20);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 10);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0, 0.0000000001);
 }
 
-TEST_F(DefaultCube, FunctionalTestCropSkip2) {
+TEST_F(LargeCube, FunctionalTestCropSkip2) {
   QTemporaryDir tempDir;
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
@@ -78,8 +78,8 @@ TEST_F(DefaultCube, FunctionalTestCropSkip2) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 505.25);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 50525);
-  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 100);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 302.16673352386897);
+  EXPECT_NEAR(oCubeStats->Average(), 73, 0.01);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 31025);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 425);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 14.714259545157688, 0.0000000001);
 }
