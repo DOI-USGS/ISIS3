@@ -10,10 +10,10 @@ find files of those names at the top level of this repository. **/
 #include <QTextStream>
 
 #include "Cube.h"
-#include "GisBlob.h"
 #include "GisGeometry.h"
 #include "GisTopology.h"
 #include "IException.h"
+#include "ImagePolygon.h"
 #include "IString.h"
 #include "Preference.h"
 
@@ -30,7 +30,7 @@ using namespace std;
  *   @history 2016-02-23 Jeannie Backer - Original version.
  *   @history 2016-03-01 Ian Humphrey - Added a few more tests for clone(), wkb() and wkt()'s
  *                           scope coverage. References #2398.
- *  
+ *
  */
 int main() {
   try {
@@ -45,8 +45,8 @@ int main() {
     QString inputFile = "$ISISTESTDATA/isis/src/messenger/unitTestData/EW0211286081G.lev1.cub";
     Cube cube;
     cube.open(inputFile);
-    GisBlob footprint(cube);
-    QString wktFromCube = footprint.polygon();
+    ImagePolygon footprint = cube.readFootprint();
+    QString wktFromCube = QString::fromStdString(footprint.polyStr());
     qDebug() << "wkt from cube: " << wktFromCube;
 
     // create geometry from wkt string and make sure the output string matches
@@ -61,7 +61,7 @@ int main() {
     qDebug() << "==============================================================================";
     qDebug() << "";
 
-    // get wkb string from previous geometry and use it to create a new geometry from wkb 
+    // get wkb string from previous geometry and use it to create a new geometry from wkb
     QString wkbFromGeom = topo->wkb(fromWKT, GisTopology::PreserveGeometry);
     qDebug() << "WKB: " << wkbFromGeom;
     qDebug() << "wkt from cube == wkb from geometry? " << (wktFromCube == wkbFromGeom);
@@ -104,7 +104,7 @@ int main() {
 
     qDebug() << "==============================================================================";
     qDebug() << "";
-   
+
     // create a "clone" using NULL
     GEOSGeometry *nullClone = topo->clone(NULL);
     if (!nullClone)
@@ -152,7 +152,7 @@ int main() {
     catch (IException &e) {
       e.print();
     }
-  
+
     qDebug() << "";
     qDebug() << "Try to get a GEOSGeometry from bad wkt...";
     try {
@@ -163,7 +163,7 @@ int main() {
       e.print();
     }
     */
-  
+
   }
   catch (IException &e) {
     qDebug() << "";
@@ -171,5 +171,5 @@ int main() {
     QString msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
-  
+
 }

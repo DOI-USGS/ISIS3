@@ -211,6 +211,11 @@ namespace Isis {
         return p_polygons;
       };
 
+      //!  Return a geos Multipolygon
+      std::string polyStr() const {
+        return p_polyStr;
+      };
+
       double validSampleDim();
       double validLineDim();
 
