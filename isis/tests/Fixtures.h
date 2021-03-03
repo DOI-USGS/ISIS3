@@ -180,6 +180,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class MroCtxCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class MgsMocCube : public DefaultCube {
     protected:
       std::unique_ptr<Cube> testCube;
@@ -187,6 +197,7 @@ namespace Isis {
       void SetUp() override;
       void TearDown() override;
   };
+
 
   class MroHiriseCube : public DefaultCube {
     protected:
