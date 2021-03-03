@@ -38,7 +38,6 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Pixels group
   EXPECT_EQ(PixelTypeName(uvEvenCube.pixelType()), "Real");
-  EXPECT_EQ(ByteOrderName(uvEvenCube.byteOrder()), "Lsb");
   EXPECT_DOUBLE_EQ(uvEvenCube.base(), 0.0);
   EXPECT_DOUBLE_EQ(uvEvenCube.multiplier(), 1.0);
 
@@ -92,7 +91,6 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Pixels group
   EXPECT_EQ(PixelTypeName(uvOddCube.pixelType()), "Real");
-  EXPECT_EQ(ByteOrderName(uvOddCube.byteOrder()), "Lsb");
   EXPECT_DOUBLE_EQ(uvOddCube.base(), 0.0);
   EXPECT_DOUBLE_EQ(uvOddCube.multiplier(), 1.0);
 
@@ -146,7 +144,6 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Pixels group
   EXPECT_EQ(PixelTypeName(visEvenCube.pixelType()), "Real");
-  EXPECT_EQ(ByteOrderName(visEvenCube.byteOrder()), "Lsb");
   EXPECT_DOUBLE_EQ(visEvenCube.base(), 0.0);
   EXPECT_DOUBLE_EQ(visEvenCube.multiplier(), 1.0);
 
@@ -200,7 +197,6 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Pixels group
   EXPECT_EQ(PixelTypeName(visOddCube.pixelType()), "Real");
-  EXPECT_EQ(ByteOrderName(visOddCube.byteOrder()), "Lsb");
   EXPECT_DOUBLE_EQ(visOddCube.base(), 0.0);
   EXPECT_DOUBLE_EQ(visOddCube.multiplier(), 1.0);
 

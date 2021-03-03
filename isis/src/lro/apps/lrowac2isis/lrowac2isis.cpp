@@ -27,23 +27,23 @@ namespace Isis {
 
   vector<Cube *> outputCubes;
   vector<int> frameletLines;
-  void separateFramelets(Buffer &in);
-  void writeNullsToFile();
-  void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
+  static void separateFramelets(Buffer &in);
+  static void writeNullsToFile();
+  static void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
                        Pvl &isis3UvEven, Pvl &isis3UvOdd, UserInterface &ui);
-  void ValidateInputLabels(Pvl &pdsLab);
+  static void ValidateInputLabels(Pvl &pdsLab);
 
   std::vector<int> padding;
   int colorOffset = 0;
   int inputCubeLines = 0;
 
   // Output UV Files
-  Cube *uveven = NULL;
-  Cube *uvodd = NULL;
+  static Cube *uveven = NULL;
+  static Cube *uvodd = NULL;
 
   // Output VIS Files
-  Cube *viseven = NULL;
-  Cube *visodd = NULL;
+  static Cube *viseven = NULL;
+  static Cube *visodd = NULL;
 
   Stretch lookupTable;
 
