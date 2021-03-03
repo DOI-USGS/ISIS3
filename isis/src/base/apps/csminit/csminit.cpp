@@ -44,22 +44,18 @@ namespace Isis {
   void csminit(UserInterface &ui, Pvl *log) {
     // We are not processing the image data, so this process object is just for
     // managing the Cube in memory and adding history
-    std::cout << "Inside csminit" << '\n';
     Process p;
     // Get the cube here so that we check early if it doesn't exist
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
-    std::cout << "Set an input cube" << '\n';
 
     // We have to call this to get the plugin list loaded.
     CameraFactory::initPlugin();
 
-    std::cout << "Initialized plugin" << '\n';
     // These three variables are the main product of the following if/else statement
     QString pluginName;
     QString modelName;
     csm::Model *model = nullptr;
 
-    std::cout << "Set a null model" << '\n';
     if (ui.WasEntered("ISD") && ui.WasEntered("STATE")) {
       QString message = "Cannot enter both [ISD] and [STATE]. Please enter either [ISD] or [STATE].";
       throw IException(IException::User, message, _FILEINFO_);
