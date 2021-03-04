@@ -1,3 +1,5 @@
+#include <QTemporaryDir>
+
 #include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -7,6 +9,7 @@
 #include "lrowac2isis.h"
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 using namespace Isis;
 
@@ -15,9 +18,9 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/lrowac2isis.xml").expanded(
 TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   QTemporaryDir prefix;
 
-  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.";
+  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.cub";
   QVector<QString> args = {"from=data/lrowac2isis/wac0000a1c4_cropped.img",
-                           "to=" + cubeFileName + "cub"};
+                           "to=" + cubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
@@ -28,7 +31,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   }
 
   // UV Even Cube
-  Cube uvEvenCube(cubeFileName + "uv.even.cub");
+  QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
+  Cube uvEvenCube(cubeFileUvEven);
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -81,7 +85,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   EXPECT_EQ(uvEvenHist->StandardDeviation(), 31.168941871307862);
 
   // UV Odd Cube
-  Cube uvOddCube(cubeFileName + "uv.odd.cub");
+  QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
+  Cube uvOddCube(cubeFileUvOdd);
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -134,7 +139,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   EXPECT_NEAR(uvOddHist->StandardDeviation(), 30.5786, 0.0001);
 
   // VIS Even Cube
-  Cube visEvenCube(cubeFileName + "vis.even.cub");
+  QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
+  Cube visEvenCube(cubeFileVisEven);
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -187,7 +193,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   EXPECT_NEAR(visEvenHist->StandardDeviation(), 40.1957, 0.0001);
 
   // VIS Odd Cube
-  Cube visOddCube(cubeFileName + "vis.odd.cub");
+  QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
+  Cube visOddCube(cubeFileVisOdd);
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
@@ -256,7 +263,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
   }
 
   // UV Even Cube
-  Cube uvEvenCube(cubeFileName + "uv.even.cub");
+  QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
+  Cube uvEvenCube(cubeFileUvEven);
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -281,7 +289,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
   EXPECT_NEAR(uvEvenHist->StandardDeviation(), 32.4207, 0.0001);
 
   // UV Odd Cube
-  Cube uvOddCube(cubeFileName + "uv.odd.cub");
+  QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
+  Cube uvOddCube(cubeFileUvOdd);
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -306,7 +315,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
   EXPECT_NEAR(uvOddHist->StandardDeviation(), 30.5786, 0.0001);
 
   // VIS Even Cube
-  Cube visEvenCube(cubeFileName + "vis.even.cub");
+  QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
+  Cube visEvenCube(cubeFileVisEven);
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -349,7 +359,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
   EXPECT_NEAR(visEvenHist->StandardDeviation(), 26.579817, 0.0001);
 
   // VIS Odd Cube
-  Cube visOddCube(cubeFileName + "vis.odd.cub");
+  QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
+  Cube visOddCube(cubeFileVisOdd);
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
@@ -410,7 +421,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
   }
 
   // UV Even Cube
-  Cube uvEvenCube(cubeFileName + "uv.even.cub");
+  QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
+  Cube uvEvenCube(cubeFileUvEven);
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -435,7 +447,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
   EXPECT_NEAR(uvEvenHist->StandardDeviation(), 15.39449863, 0.0001);
 
   // UV Odd Cube
-  Cube uvOddCube(cubeFileName + "uv.odd.cub");
+  QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
+  Cube uvOddCube(cubeFileUvOdd);
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -460,7 +473,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
   EXPECT_NEAR(uvOddHist->StandardDeviation(), 15.25508, 0.0001);
 
   // VIS Even Cube
-  Cube visEvenCube(cubeFileName + "vis.even.cub");
+  QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
+  Cube visEvenCube(cubeFileVisEven);
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -485,7 +499,8 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
   EXPECT_NEAR(visEvenHist->StandardDeviation(), 6.821865, 0.0001);
 
   // VIS Odd Cube
-  Cube visOddCube(cubeFileName + "vis.odd.cub");
+  QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
+  Cube visOddCube(cubeFileVisOdd);
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
