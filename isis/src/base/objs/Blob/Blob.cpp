@@ -368,12 +368,33 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * Set the data stored in the BLOB.
+   *
+   * This function will copy the data buffer, if you want to avoid that use
+   * takeData which will take ownership of the buffer.
+   *
+   * @param buffer The buffer of data. The BLOB does not take ownership of this,
+   *               the caller is still responsible for cleaning it up.
+   * @param nbytes The amount of data in the buffer
+   */
   void Blob::setData(const char *buffer, int nbytes) {
     char *buf = new char[nbytes];
     memcpy(buf, buffer, nbytes);
     takeData(buf, nbytes);
   }
 
+
+  /**
+   * Set the data stored in the BLOB without copying it.
+   *
+   * This function takes ownership of the data buffer and will delete is when the BLOB
+   * is cleaned up.
+   *
+   * @param buffer The buffer of data. The BLOB takes ownership of this.
+   * @param nbytes The amount of data in the buffer
+   */
   void Blob::takeData(char *buffer, int nbytes) {
     p_nbytes = nbytes;
 

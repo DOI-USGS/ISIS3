@@ -413,7 +413,7 @@ namespace Isis {
     Blob csmStateBlob("CSMState", "String");
     char *buf = new char[modelState.size()];
     memcpy(buf, modelState.c_str(), modelState.size());
-    csmStateBlob.setData(buf, modelState.size()); // This passes ownership so don't delete buf
+    csmStateBlob.setData(modelState.c_str(), modelState.size());
     PvlObject &blobLabel = csmStateBlob.Label();
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);
