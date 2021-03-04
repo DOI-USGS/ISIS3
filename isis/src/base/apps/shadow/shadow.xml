@@ -20,7 +20,8 @@
 
     <strong>User-Requirements</strong><br/>
       The user must supply an elevation model (DEM) and either an observation time or a cube
-      with raw camera geometry (see 'spiceinit').<br/><br/>
+      with raw camera geometry (see 'spiceinit'). If providing an observation time, the SPICE kernels
+      associated with the image target must have been downloaded and be available on the user's machine.<br/><br/>
 
     <strong>Understanding the Algorithm</strong><br/>
     The 'shade' program's algorithm is called 'hillshade' in this algorithm description.
