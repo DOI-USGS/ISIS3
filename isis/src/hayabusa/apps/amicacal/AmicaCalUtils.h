@@ -100,7 +100,6 @@ static bool sunDistanceAU(Cube *iCube,
                           const QString &target,
                           double &sunDist) {
 
-  //  Ensure NAIF kernels are loaded
   try {
     Camera *cam; 
     cam = iCube->camera();
@@ -109,6 +108,7 @@ static bool sunDistanceAU(Cube *iCube,
   }
   catch(IException &e) {
     try {
+      //  Ensure NAIF kernels are loaded
       loadNaifTiming();
       sunDist = 1.0;
 
