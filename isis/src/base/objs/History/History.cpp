@@ -65,14 +65,8 @@ namespace Isis {
     string histStr = ostr.str();
     int nbytes = histStr.size();
 
-    // Don't worry about cleaning up this buffer
-    // The blob takes ownership of it and handles freeing the memory in
-    // its decontructor
-    char *buffer = new char[nbytes];
-    memcpy(buffer, histStr.c_str(), nbytes);
-
     Blob *newBlob = new Blob(name, "History");
-    newBlob->setData(buffer, nbytes);
+    newBlob->setData(histStr.c_str(), histStr.size());
     return newBlob;
   }
 

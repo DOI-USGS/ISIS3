@@ -1344,22 +1344,12 @@ namespace Isis {
       string msg = "Cannot write a NULL polygon!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    string polyStr = wkt->write(p_polygons);
-    int nbytes = polyStr.size();
 
+    string polyStr = wkt->write(p_polygons);
     delete wkt;
 
-    ostringstream ostr;
-    ostr << polyStr;
-
-    // Don't worry about cleaning up this buffer
-    // The blob takes ownership of it and handles freeing the memory in
-    // its decontructor
-    char *buffer = new char[nbytes];
-    memcpy(buffer, polyStr.c_str(), nbytes);
-
     Blob *newBlob = new Blob("Footprint", "Polygon");
-    newBlob->setData(buffer, nbytes);
+    newBlob->setData(polyStr.c_str(), polyStr.size());
     return newBlob;
   }
 

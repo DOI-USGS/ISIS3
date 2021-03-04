@@ -76,7 +76,8 @@ namespace Isis {
 
 
       char *getBuffer();
-      void setData(char *buffer, int nbytes);
+      void setData(const char *buffer, int nbytes);
+      void takeData(char *buffer, int nbytes);
 
     protected:
       void Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
