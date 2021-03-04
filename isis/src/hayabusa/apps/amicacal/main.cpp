@@ -48,7 +48,7 @@ using namespace std;
 FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix);
 void calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 
-QString loadCalibrationVariables(const QString &config);
+QString loadCalibrationVariables(const QString &config, Cube *iCube);
 
 #if 0
 // PSF correction is currently not working and has been removed as an option.
@@ -299,14 +299,14 @@ void IsisMain() {
   //nb = inputCube->bandCount();
 #endif
 
-  QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
+  QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"), inputCube);
 
   g_timeRatio = g_tvct / (g_exposureTime + g_tvct);
   g_darkCurrent = g_d0 * exp(g_d1 * g_temperature);
   g_calibrationScale = 1.0;
   QString g_units = "DN";
 
-  if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
+  if ( !sunDistanceAU(inputCube, startTime, target, g_solarDist) ) {
      throw IException(IException::Programmer,
                       "Cannot calculated distance to sun!",
                       _FILEINFO_);
@@ -600,7 +600,7 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
  * @brief Loads the calibration variables into the program.
  */
 
-QString loadCalibrationVariables(const QString &config)  {
+QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
 
 //  UserInterface& ui = Application::GetUserInterface();
 
@@ -655,23 +655,31 @@ QString loadCalibrationVariables(const QString &config)  {
   g_b2 = biasGroup["B"][2].toDouble();
 
 
-  g_launchTimeStr=QString(biasGroup["launchTime"]);
-
-  //cout << g_launchTimeStr << endl;
-
-  //static iTime g_launchTime("2003-05-09T04:29:25");
-  g_launchTime =g_launchTimeStr;
-  //iTime g_t0(g_startTime);
-  //cout << "g_t0"  << g_t0.EtString();
+  g_launchTimeStr = QString(biasGroup["launchTime"]);
+  g_launchTime = g_launchTimeStr;
 
   // Compute BIAS correction factor (it's a constant so do it once!)
   double obsStartTime;
   double tsecs;
   double tdays;
+  
+  try{
+    Camera *cam; 
+    cam = iCube->camera();
+    cam->SetImage (0.5, 0.5);
+    obsStartTime = cam->time().Et();
+  }
+  catch(IException &e) {
+    try{
+      loadNaifTiming();  // Ensure the proper kernels are loaded
+      scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);
+    }
+    catch (IException &e) {
+        QString message = "IOF option does not work with non-spiceinited cubes.";
+        throw IException(e, IException::User, message, _FILEINFO_);
+    }
+  }
 
-  loadNaifTiming();  // Ensure the proper kernels are loaded
-
-  scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);
   tsecs = obsStartTime - g_launchTime.Et();
   tdays = tsecs / 86400;
   g_bias = g_b0

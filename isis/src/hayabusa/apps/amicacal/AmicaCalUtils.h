@@ -14,8 +14,10 @@ find files of those names at the top level of this repository. **/
 #include <vector>
 #include <QString>
 
+#include "Camera.h"
 #include "CSVReader.h"
 #include "IException.h"
+#include "iTime.h"
 #include "FileName.h"
 #include "LineManager.h"
 #include "NaifStatus.h"
@@ -23,13 +25,8 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 
-#include "Spice.h"
-
-
-
 // OpenCV libraries
 #include <opencv2/opencv.hpp>
-
 
 /**
  * @author 2016-04-04 Tyler Wilson
@@ -38,6 +35,8 @@ find files of those names at the top level of this repository. **/
  */
 using namespace cv;
 using namespace std;
+
+#define KM_PER_AU 149597871
 
 namespace Isis {
 
@@ -96,42 +95,54 @@ static void loadNaifTiming() {
  *
  * @return @b double Distance in AU between Sun and observed body.
  */
-static bool sunDistanceAU(const QString &scStartTime,
+static bool sunDistanceAU(Cube *iCube,
+                          const QString &scStartTime,
                           const QString &target,
                           double &sunDist) {
 
-  //  Ensure NAIF kernels are loaded
-  loadNaifTiming();
-  sunDist = 1.0;
+  try {
+    Camera *cam; 
+    cam = iCube->camera();
+    cam->SetImage (0.5, 0.5);
+    sunDist = cam->sunToBodyDist() / KM_PER_AU;
+  }
+  catch(IException &e) {
+    try {
+      //  Ensure NAIF kernels are loaded
+      loadNaifTiming();
+      sunDist = 1.0;
 
-  //  Determine if the target is a valid NAIF target
-  SpiceInt tcode;
-  SpiceBoolean found;
-  bodn2c_c(target.toLatin1().data(), &tcode, &found);
+      NaifStatus::CheckErrors();
 
-  if (!found) return (false);
+      //  Determine if the target is a valid NAIF target
+      SpiceInt tcode;
+      SpiceBoolean found;
+      bodn2c_c(target.toLatin1().data(), &tcode, &found);
 
-  //  Convert starttime to et
-  double obsStartTime;
-  scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
+      if (!found) return false;
 
+      //  Convert starttime to et
+      double obsStartTime;
+      scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
 
+      //  Get the vector from target to sun and determine its length
+      double sunv[3];
+      double lt;
+      spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun", sunv, &lt);
+      NaifStatus::CheckErrors();
 
-  //  Get the vector from target to sun and determine its length
-  double sunv[3];
-  double lt;
-  spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
-                  sunv, &lt);
-  NaifStatus::CheckErrors();
+      double sunkm = vnorm_c(sunv);
 
-  double sunkm = vnorm_c(sunv);
+      //  Return in AU units
+      sunDist = sunkm / KM_PER_AU;
+    }
+    catch (IException &e) {
+      QString message = "Failed to calculate the sun-target distance.";
+      throw IException(e, IException::User, message, _FILEINFO_);
+    }
+  }
 
-
-  //  Return in AU units
-  sunDist = sunkm / 1.49597870691E8;
-
-  //cout << "sunDist = " << sunDist << endl;
-  return (true);
+  return true;
 }
 
 

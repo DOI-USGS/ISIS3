@@ -545,6 +545,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         Added DN/S as an output option. Apply dark current current as it was disabled
         in earlier versions.
     </change>
+    <change name="Kaitlyn Lee" date="2021-02-24">
+      Added ability to get the sun distance from the camera.
+    </change>
   </history>
 
   <groups>
