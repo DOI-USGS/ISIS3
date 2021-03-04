@@ -284,7 +284,7 @@ namespace Isis {
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
-        Cube *checklineCube = p2.SetOutputCube("TO2");
+        Cube *checklineCube = p2.SetOutputCube("TO2", ui);
         Pvl *checklineLabel = checklineCube->label();
 
         translateEISLabels(checklineXmlFileName, checklineLabel);
