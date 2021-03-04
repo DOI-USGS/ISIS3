@@ -41,7 +41,7 @@
         For this program to work properly, the image starting time is required. The
         starting time can be determined using the camera model if the image has been
         run through spiceinit or it can be determined using the starting clock count
-        and the SPICE clock kernal. Both ways produce identical results. Using the
+        and the SPICE clock kernel. Both ways produce identical results. Using the
         camera model has the advantage of not requiring local mission specific kernels
         be available. See spiceinit web=true.
       </p>
