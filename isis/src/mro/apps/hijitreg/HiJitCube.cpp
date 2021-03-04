@@ -174,7 +174,9 @@ namespace Isis {
       try {
         Camera *cam;
         cam = camera();
-        cam->SetImage (0.5, 256.5);
+        // This SetImage at (1,1) is used to match the non-camera code below. (0.5, 0.5) should match the start
+        // clock count of the image, but instead (1, 1) matches. This suggests something odd in the Camera
+        cam->SetImage (1.0, 1.0);
         jdata.obsStartTime = cam->time().Et();
       } catch (IException &e) {
         try {
