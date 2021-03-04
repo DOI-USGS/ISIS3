@@ -189,6 +189,11 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class GalileoSsiCube : public DefaultCube {
+    protected:
+      void SetUp() override;
+      void TearDown() override;
+  };
 
   class MgsMocCube : public DefaultCube {
     protected:

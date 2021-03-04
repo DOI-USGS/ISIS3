@@ -520,6 +520,125 @@ namespace Isis {
   }
 
 
+  void GalileoSsiCube::SetUp() {
+    DefaultCube::SetUp();
+
+    // Change default dims 
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue("800");
+    dim.findKeyword("Lines").setValue("800");
+    dim.findKeyword("Bands").setValue("1");
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-77001");
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "Galileo Orbiter"
+        InstrumentId              = "SOLID STATE IMAGING SYSTEM"
+        TargetName                = IO
+        SpacecraftClockStartCount = 05208734.39
+        StartTime                 = 1999-10-11T18:05:15.815
+        ExposureDuration          = 0.04583 <seconds>
+        GainModeId                = 100000
+        TelemetryFormat           = IM4
+        LightFloodStateFlag       = ON
+        InvertedClockStateFlag    = "NOT INVERTED"
+        BlemishProtectionFlag     = OFF
+        ExposureType              = NORMAL
+        ReadoutMode               = Contiguous
+        FrameDuration             = 8.667 <seconds>
+        Summing                   = 1
+        FrameModeId               = FULL
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = testCube->label()->findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName   = RED
+        FilterNumber = 2
+        Center       = 0.671 <micrometers>
+        Width        = .06 <micrometers>
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE                  = 501
+        BODY501_RADII              = (1829.4, 1819.3, 1815.7)
+        BODY_FRAME_CODE            = 10023
+        INS-77001_FOCAL_LENGTH     = 1500.46655964
+        INS-77001_K1               = -2.4976983626e-05
+        INS-77001_PIXEL_PITCH      = 0.01524
+        INS-77001_TRANSX           = (0.0, 0.01524, 0.0)
+        INS-77001_TRANSY           = (0.0, 0.0, 0.01524)
+        INS-77001_ITRANSS          = (0.0, 65.6167979, 0.0)
+        INS-77001_ITRANSL          = (0.0, 0.0, 65.6167979)
+        INS-77001_BORESIGHT_SAMPLE = 400.0
+        INS-77001_BORESIGHT_LINE   = 400.0
+      End_Object
+    )");
+    
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    std::istringstream ar(R"(
+    Group = Archive
+      DataSetId     = GO-J/JSA-SSI-2-REDR-V1.0
+      ProductId     = 24I0146
+      ObservationId = 24ISGLOCOL01
+      DataType      = RADIANCE
+      CalTargetCode = 24
+    End_Group
+    )");
+
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
+    PvlGroup newArchive; 
+    ar >> newArchive;
+    archive = newArchive;
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+        for(int i = 0; i < line.size(); i++) {
+          line[i] = (double)(i+1);
+        }
+        testCube->write(line);
+    }
+
+    // need to remove old camera pointer
+    delete testCube;
+    // This is now a MRO cube
+
+    testCube = new Cube(newCube, "rw");
+  }
+
+
+  void GalileoSsiCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
