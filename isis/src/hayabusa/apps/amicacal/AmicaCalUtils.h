@@ -25,8 +25,6 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 
-// #include "Spice.h"
-
 // OpenCV libraries
 #include <opencv2/opencv.hpp>
 
@@ -107,14 +105,14 @@ static bool sunDistanceAU(Cube *iCube,
     Camera *cam; 
     cam = iCube->camera();
     cam->SetImage (0.5, 0.5);
-    iTime startTime(cam->time());
-    cam->setTime(startTime);
     sunDist = cam->sunToBodyDist() / KM_PER_AU;
   }
   catch(IException &e) {
     try {
       loadNaifTiming();
       sunDist = 1.0;
+
+      NaifStatus::CheckErrors();
 
       //  Determine if the target is a valid NAIF target
       SpiceInt tcode;
@@ -139,7 +137,7 @@ static bool sunDistanceAU(Cube *iCube,
       sunDist = sunkm / KM_PER_AU;
     }
     catch (IException &e) {
-      QString message = "IOF option does not work with non-spiceinited cubes.";
+      QString message = "Failed to calculate the sun-target distance.";
       throw IException(e, IException::User, message, _FILEINFO_);
     }
   }
