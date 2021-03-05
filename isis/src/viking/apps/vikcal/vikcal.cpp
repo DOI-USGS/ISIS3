@@ -18,7 +18,7 @@ using namespace std;
 
 namespace Isis {
   
-  void cal(vector<Buffer *> &in,
+  static void cal(vector<Buffer *> &in,
            vector<Buffer *> &out);
   
   static CalParameters *calParam;
