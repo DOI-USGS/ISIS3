@@ -10,7 +10,7 @@
 #
 # ProgressBarPercent = 1 | 2 | 5 | 10
 # ProgressBar = On | Off
-# GuiStyle = windows | motif | cde | motifplus | 
+# GuiStyle = windows | motif | cde | motifplus |
 #            platinum | sgi | kde | aqua
 # GuiHelpBrowser = { your preferred browser, may need path }
 # GuiFontName = helvetica | times | charter | any legal font
@@ -52,16 +52,16 @@ EndGroup
 ########################################################
 # Specify which ray-tracing engine to use for shape
 # models.
-# 
+#
 # Leave the ShapeModel Group commented-out to continue
-# using the ISIS3 default. 
+# using the ISIS default.
 #
 # RayTraceEngine = Bullet | Embree
 # OnError = Continue | Fail
 # Tolerance = { numerical value that will be set as the
 #           tolerance for the Bullet or Embree shape
-#           model } 
-# 
+#           model }
+#
 ########################################################
 
 #Group = ShapeModel
@@ -88,7 +88,7 @@ EndGroup
 #                           window displaying the error.
 #    Off - in command-line mode - only the results are
 #                           reported to the terminal, or
-#                           in the case of an error, 
+#                           in the case of an error,
 #                           the error is reported in Pvl
 #                           to the terminal.
 #        - in interactive mode - same as command-line mode,
@@ -119,7 +119,7 @@ Group = CubeCustomization
   Overwrite  = Allow
   Format     = Attached
   History    = On
-  MaximumSize = 12 
+  MaximumSize = 12
 EndGroup
 
 ########################################################
@@ -166,6 +166,21 @@ EndGroup
 Group = Performance
   CubeWriteThread = Optimized
   GlobalThreads = 2
+EndGroup
+
+########################################################
+#
+# Indicate where ISIS should search for Community
+# Sensor Model (CSM) plugins. The value of this keyword
+# should be a list of paths, that contain CSM plugin
+# libraries.
+#
+########################################################
+
+Group = Plugins
+  CSMDirectory = ("$CONDA_PREFIX/lib/isis/csm3.0.3/", -
+                  "$CONDA_PREFIX/csmlibs/3.0.3/", -
+                  "$HOME/.Isis/csm3.0.3/")
 EndGroup
 
 ########################################################

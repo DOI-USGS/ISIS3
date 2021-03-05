@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <algorithm>
@@ -20,7 +28,7 @@ using namespace Isis;
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     QString networkId, QString description);
-void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, 
+void mergeNetwork(ControlNet &baseNet, ControlNet &newNet,
     PvlObject &cnetLog, Progress progress);
 
 ControlPoint * mergePoint(
@@ -243,7 +251,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     PvlObject cnetLog = createNetworkLog(newNet);
 
     // Merge the network, add the resulting conflicts to the log
-    progress.SetText("Merging file " + QString::number(cnetIndex+1) 
+    progress.SetText("Merging file " + QString::number(cnetIndex+1)
                                      + " of " + QString::number(filelist.size()));
     mergeNetwork(*baseNet, newNet, cnetLog, progress);
     addLog(conflictLog, cnetLog);
@@ -531,4 +539,3 @@ void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog) {
   if (pointLog.keywords() > 1 || pointLog.groups() > 0)
     cnetLog.addObject(pointLog);
 }
-

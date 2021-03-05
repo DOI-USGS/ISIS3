@@ -1,6 +1,6 @@
 #
-# This ISIS 3 translation file is used to create ISIS 3 band bin cube labels
-# from Voyager ".IMG" labels. Other sections of the ISIS 3 labels are 
+# This ISIS translation file is used to create ISIS band bin cube labels
+# from Voyager ".IMG" labels. Other sections of the ISIS labels are 
 # handled by other translation files.
 #
 
@@ -72,4 +72,3 @@ Group = BandWidth
   Translation    = (0.090000, 7)
   Translation    = (0.0, *)
 End_Group
-

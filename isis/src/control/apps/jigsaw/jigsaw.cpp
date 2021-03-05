@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iostream>
 
 #include <QDir>
@@ -54,6 +62,19 @@ namespace Isis {
 
     // retrieve settings from jigsaw gui
     BundleSettingsQsp settings = bundleSettings(ui);
+    if(settings->bundleTargetBody()) {
+      if(settings->bundleTargetBody()->solveTriaxialRadii() ||
+         settings->bundleTargetBody()->solveMeanRadius()) {
+        PvlGroup radiusSolveWarning("RadiusSolveWarning");
+        radiusSolveWarning.addKeyword(PvlKeyword("Warning", "The radii solve is currently \
+                                                   under review and is likely resulting \
+                                                   in addition error in the bundle adjust. \
+                                                   We recommend that you do not solve for radii at this moment."));
+         if(log) {
+           log->PvlObject::addGroup(radiusSolveWarning);
+         }
+      }
+    }
     settings->setCubeList(cubeList);
     BundleAdjust *bundleAdjustment = NULL;
     try {
@@ -147,12 +168,12 @@ namespace Isis {
       if (log) {
         Pvl summary;
         std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
-        iss >> summary; 
-        
+        iss >> summary;
+
         for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
           log->addGroup(*grpIt);
         }
-        
+
         log->addGroup(gp);
       }
       delete bundleSolution;

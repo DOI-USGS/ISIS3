@@ -1,27 +1,13 @@
 #ifndef BundleControlPoint_h
 #define BundleControlPoint_h
-/**
- * @file
- * $Revision: 1.20 $
- * $Date: 2014/5/22 01:35:17 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QVector>
 
@@ -41,7 +27,7 @@ namespace Isis {
 
   /**
    * This class holds information about a control point that BundleAdjust needs to run correctly.
-   * 
+   *
    * This class was created to extract functionality from BundleAdjust and wrap a ControlPoint
    * with the extra necessary information to correctly perform a bundle adjustment.
    *
@@ -57,7 +43,7 @@ namespace Isis {
    *   @history 2016-06-27 Jesse Mapel - Updated documentation and ISIS coding standards in
    *                           preparation for merging IPCE into ISIS.  Fixes #4075.
    *   @history 2016-08-15 Ian Humphrey - Added computeResiduals(), setNumberOfRejectedMeasures(),
-   *                           setRejected(), zeroNumberOfRejectedMeasures(), 
+   *                           setRejected(), zeroNumberOfRejectedMeasures(),
    *                           numberOfRejectedMeasures(), residualRms(), and type(). Modified
    *                           numberMeasures() to return this->size(), since only non-ignored
    *                           control measures will be added to this BundleControlPoint.
@@ -69,22 +55,22 @@ namespace Isis {
    *   @history 2016-10-27 Tyler Wilson - Modified formatRadiusAprioriSigmaString, formatAprioriSigmaString,
    *                          and formatBundleOutputDetailString to accept a third argument (bool solveRadius)
    *                          with a default value = false.  References #4317.
-   *   @history 2017-07-26 Debbie A. Cook - Added BundleSettings and metersToRadians as arguments 
-   *                           to constructor and moved setWeights call from BundleAdjust::init into 
-   *                           constructor.   Added m_bundleControlPointCoordinateType.  This option 
-   *                           determines how control point coordinates are entered into 
-   *                           BundleControlPoint, interpreted throughout the adjustment, and 
+   *   @history 2017-07-26 Debbie A. Cook - Added BundleSettings and metersToRadians as arguments
+   *                           to constructor and moved setWeights call from BundleAdjust::init into
+   *                           constructor.   Added m_bundleControlPointCoordinateType.  This option
+   *                           determines how control point coordinates are entered into
+   *                           BundleControlPoint, interpreted throughout the adjustment, and
    *                           output. The coordinate type needs to be in this class, because
-   *                           BundleControlPoints are created without a parent control net and added to 
+   *                           BundleControlPoints are created without a parent control net and added to
    *                           a control net later.  Made format methods generic in regards to coordinate type.
    *                           Added utility method setSigmaWeightFromGlobals.
-   *                           Merged methods formatLatitudeAdjustedSigmaString, 
+   *                           Merged methods formatLatitudeAdjustedSigmaString,
    *                           formatLongitudeAdjustedSigmaString, and formatRadiusAdjustedSigmaString
-   *                           into a single generic coordinate method with an additional argument 
-   *                           for the coordinate index.  Did a similar merge for the family of  
+   *                           into a single generic coordinate method with an additional argument
+   *                           for the coordinate index.  Did a similar merge for the family of
    *                           methods like formatLatitudeAprioriSigmaString.  Moved some of the
-   *                           functionality from BundleAdjust to this class as a new method 
-   *                           applyParameterCorrections.  Also had to move BundleAdjust method 
+   *                           functionality from BundleAdjust to this class as a new method
+   *                           applyParameterCorrections.  Also had to move BundleAdjust method
    *                           productAlphaAV to this class to support applyParameterCorrections.
    *                           References #4649 and #501.
    *  @history 2017-08-24 Debbie A. Cook - Revised output units to be compatible with output from
@@ -95,11 +81,11 @@ namespace Isis {
    *  @history 2018-05-31 Debbie A. Cook - Moved code from BundleAdjust::applyParameterCorrections
    *                           pertaining to updating the adjusted surface point and method productAlphaAv into new
    *                           methods applyParameterCorrections, updateAdjustedSurfacePointLatitudinally, and
-   *                           updateAdjustedSurfacePointRectangularly in BundleControlPoint.  Reference 
+   *                           updateAdjustedSurfacePointRectangularly in BundleControlPoint.  Reference
    *                           #4649 and #501.
    *  @history 2018-09-28 Debbie A. Cook - Removed the metersToRadians argument from
    *                           the constructor and from the setWeights method since we are now
-   *                           using the local radius of the point to convert lat/lon sigmas 
+   *                           using the local radius of the point to convert lat/lon sigmas
    *                           from meters to radians.  References #4649 and #501.
   */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
@@ -127,8 +113,8 @@ namespace Isis {
       void setNumberOfRejectedMeasures(int numRejected);
       void setRejected(bool reject);
       void setWeights(const BundleSettingsQsp settings);
-      void setSigmaWeightFromGlobals(double gSigma, int index); 
-      void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor); 
+      void setSigmaWeightFromGlobals(double gSigma, int index);
+      void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor);
       void zeroNumberOfRejectedMeasures();
       void productAlphaAV(double alpha,
                           SparseBlockMatrix &sparseNormals,
@@ -159,7 +145,7 @@ namespace Isis {
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
       QString formatBundleOutputDetailString(bool errorPropagation, bool solveRadius=false) const;
-      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation, 
+      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation,
                                                         bool solveRadius=false) const;
       QString formatBundleRectangularOutputDetailString(bool errorPropagation) const;
       QString formatValue(double value, int fieldWidth, int precision) const;
@@ -176,7 +162,7 @@ namespace Isis {
       // methods
       void updateAdjustedSurfacePointLatitudinally(const BundleTargetBodyQsp target);
       void updateAdjustedSurfacePointRectangularly();
-      
+
       //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;
 
@@ -203,4 +189,3 @@ namespace Isis {
 }
 
 #endif // BundleControlPoint_h
-

@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "NewHorizonsMvicFrameCamera.h"
 
@@ -39,11 +27,11 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Constructs a New Horizons MVIC Framing Camera object. The MVIC push-frame camera operates 
+   * Constructs a New Horizons MVIC Framing Camera object. The MVIC push-frame camera operates
    * in "staring" mode, so it has been implemented as a framing camera rather than a push-frame.
-   * The test images show the same part of the planet in each framelet, so the push-frame 
-   * implementation will not work since the same lat/lon values are located in possibly every 
-   * framelet. 
+   * The test images show the same part of the planet in each framelet, so the push-frame
+   * implementation will not work since the same lat/lon values are located in possibly every
+   * framelet.
    *
    * @param lab Pvl label from a New Horizons MVIC Framing Camera image.
    *
@@ -55,7 +43,7 @@ namespace Isis {
     m_instrumentNameShort = "MVIC FRAMING";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
-    
+
     NaifStatus::CheckErrors();
 
     SetFocalLength();
@@ -66,7 +54,7 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     m_exposure = inst["ExposureDuration"];
     QString stime = inst["SpacecraftClockStartCount"];
-    // **  TODO  **  Need an offset time added to labels at ingestion??  The 0.125 value is 
+    // **  TODO  **  Need an offset time added to labels at ingestion??  The 0.125 value is
     //     the value in DELTAT00.
     double offset = 0.125;
     m_etStart = getClockTime(stime).Et() + offset;
@@ -137,7 +125,7 @@ namespace Isis {
 
     iTime time(m_utcTime[vband-1]);
     double et = time.Et();
-   
+
     SpiceChar utc[30];
     et2utc_c(et, "ISOC", 3, 30, utc);
     Camera::setTime(et);
@@ -145,7 +133,7 @@ namespace Isis {
 
     //  Set up valid band access
     Camera::SetBand(vband);
-    
+
   }
 
 

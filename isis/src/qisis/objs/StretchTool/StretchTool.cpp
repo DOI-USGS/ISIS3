@@ -34,6 +34,9 @@
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 
+#include "CubeStretch.h"
+#include "StretchBlob.h"
+
 using namespace std;
 
 namespace Isis {
@@ -288,6 +291,16 @@ namespace Isis {
     connect(m_flashButton, SIGNAL(pressed()), this, SLOT(stretchChanged()));
     connect(m_flashButton, SIGNAL(released()), this, SLOT(stretchChanged()));
 
+    // Buttons migrated out of Advanced Stretch Tool
+    QPushButton *saveToCubeButton = new QPushButton("Save"); 
+    connect(saveToCubeButton, SIGNAL(clicked(bool)), this, SLOT(saveStretchToCube()));
+
+    QPushButton *deleteFromCubeButton = new QPushButton("Delete");
+    connect(deleteFromCubeButton, SIGNAL(clicked(bool)), this, SLOT(deleteFromCube()));
+
+    QPushButton *loadStretchButton = new QPushButton("Restore");
+    connect(loadStretchButton, SIGNAL(clicked(bool)), this, SLOT(loadStretchFromCube()));
+
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
     layout->addWidget(m_copyButton);
@@ -298,6 +311,13 @@ namespace Isis {
     layout->addWidget(m_stretchMaxEdit);
     layout->addWidget(advancedButton);
     layout->addWidget(m_flashButton);
+
+    // should only display if gray stretch
+    // Save/Restore strech only supported for Grayscale images. Hide buttons if in RGB.
+    layout->addWidget(saveToCubeButton);
+    layout->addWidget(deleteFromCubeButton);
+    layout->addWidget(loadStretchButton);
+
     layout->addStretch(); // Pushes everything else left in the menu bar
     hbox->setLayout(layout);
 
@@ -327,7 +347,7 @@ namespace Isis {
           }
         }
       }
-      //Otherwise it is in color mode
+      // Otherwise it is in color mode
       else if(!cvp->isGray() &&
               !cvp->redBuffer()->working() &&
               !cvp->greenBuffer()->working() &&
@@ -349,6 +369,7 @@ namespace Isis {
       }
     }
   }
+
 
   /**
    * Update the streches and corresponding histograms for all the
@@ -389,26 +410,124 @@ namespace Isis {
     Cube* icube = cvp->cube();
     Pvl* lab = icube->label();
 
-    // Create a list of existing Stretch names
     QStringList namelist; 
-    PvlObject::PvlObjectIterator objIter;
-    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
-      if (objIter->name() == "Stretch") {
-        PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
-        namelist.append(tempName); 
+
+    // Create a list of existing Stretch names
+    if (cvp->isGray()) {
+      PvlObject::PvlObjectIterator objIter;
+      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+        if (objIter->name() == "Stretch") {
+          PvlKeyword tempKeyword = objIter->findKeyword("Name");
+          int bandNumber = int(objIter->findKeyword("BandNumber"));
+          if (cvp->grayBand() == bandNumber) {
+            QString tempName = tempKeyword[0]; 
+            namelist.append(tempName); 
+          }
+        }
+      }
+    }
+    else {
+      int redBandNumber = cvp->redBand();
+      int greenBandNumber = cvp->greenBand();
+      int blueBandNumber = cvp->blueBand();
+
+      QMap<QString, QList<int>> tempNameMap;
+      PvlObject::PvlObjectIterator objIter;
+      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+        if (objIter->name() == "Stretch") {
+          PvlKeyword tempKeyword = objIter->findKeyword("Name");
+          int bandNumber = int(objIter->findKeyword("BandNumber"));
+          if (bandNumber == redBandNumber || bandNumber == greenBandNumber 
+              || bandNumber == blueBandNumber) {
+            QString tempName = tempKeyword[0]; 
+            if (tempNameMap.contains(tempName)) {
+              tempNameMap[tempName].append(bandNumber);
+            }
+            else
+            {
+              tempNameMap[tempName] = {bandNumber};
+            }
+          }
+        }
+      }
+      QMap<QString, QList<int>>::const_iterator i = tempNameMap.constBegin();
+      while (i != tempNameMap.constEnd()) {
+        if (i.value().contains(redBandNumber) && i.value().contains(greenBandNumber) &&
+            i.value().contains(blueBandNumber) ){
+          namelist.append(i.key());
+        }
+        ++i;
       }
     }
 
     bool ok;
-    QString stretchName = QInputDialog::getItem(m_advancedStretch, tr("Load Stretch"),
-                                         tr("Name of Stretch to Load:"), namelist, 0,
-                                         false, &ok);
+    QString stretchName;
+    // Only display load stretch dialog if there are stretches saved to the cube
+    if (namelist.size() >=1) {
+      stretchName = QInputDialog::getItem((QWidget *)parent(), tr("Load Stretch"), 
+                                          tr("Name of Stretch to Load:"), namelist, 0,
+                                          false, &ok);
+    }
+    else {
+      QMessageBox::information((QWidget *)parent(), "Information", 
+                                   "There are no saved stretches to restore.");
+    }
 
     if (ok) {
-      Stretch stretch(stretchName); 
-      icube->read(stretch);
-      m_advancedStretch->restoreSavedStretch(stretch); 
+      if (cvp->isGray()) {
+        StretchBlob stretchBlob(stretchName); 
+        icube->read(stretchBlob);
+        CubeStretch cubeStretch = stretchBlob.getStretch();
+        if (m_advancedStretch->isVisible()) {
+          m_advancedStretch->restoreGrayStretch(cubeStretch);
+        }
+        // Get the current cube stretche and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch grayOriginal = cvp->grayStretch();
+        grayOriginal.CopyPairs(cubeStretch);
+        cvp->stretchGray(grayOriginal);
+      }
+      else {
+        StretchBlob redStretchBlob(stretchName); 
+        StretchBlob greenStretchBlob(stretchName); 
+        StretchBlob blueStretchBlob(stretchName); 
+        
+        std::vector<PvlKeyword> keywordValueRed;
+        keywordValueRed.push_back(PvlKeyword("BandNumber",  QString::number(cvp->redBand())));
+
+        std::vector<PvlKeyword> keywordValueGreen;
+        keywordValueGreen.push_back(PvlKeyword("BandNumber", QString::number(cvp->greenBand())));
+
+        std::vector<PvlKeyword> keywordValueBlue;
+        keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
+
+        icube->read(redStretchBlob, keywordValueRed);
+        icube->read(greenStretchBlob, keywordValueGreen);
+        icube->read(blueStretchBlob, keywordValueBlue);
+
+        CubeStretch redStretch = redStretchBlob.getStretch();
+        CubeStretch greenStretch = greenStretchBlob.getStretch();
+        CubeStretch blueStretch = blueStretchBlob.getStretch();
+
+        if (m_advancedStretch->isVisible()) {
+          m_advancedStretch->restoreRgbStretch(redStretch, greenStretch, blueStretch);
+        }
+
+        // Get the current cube stretches and copy the new stretch pairs over so that the 
+        // special pixel values set in the viewport are maintained.
+        CubeStretch redOriginal = cvp->redStretch();
+        CubeStretch greenOriginal = cvp->greenStretch();
+        CubeStretch blueOriginal = cvp->blueStretch();
+
+        redOriginal.CopyPairs(redStretch);
+        greenOriginal.CopyPairs(greenStretch);
+        blueOriginal.CopyPairs(blueStretch);
+
+        cvp->stretchRed(redOriginal);
+        cvp->stretchGreen(greenOriginal);
+        cvp->stretchBlue(blueOriginal);
+      }
+      emit stretchChanged();
     }
   }
 
@@ -427,15 +546,27 @@ namespace Isis {
     for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
-        namelist.append(tempName); 
+        int bandNumber = int(objIter->findKeyword("BandNumber"));
+        if (cvp->grayBand() == bandNumber) {
+          QString tempName = tempKeyword[0]; 
+          namelist.append(tempName); 
+        }
       }
     }
 
     bool ok;
-    QString toDelete = QInputDialog::getItem(m_advancedStretch, tr("Delete Stretch"),
-                                         tr("Name of Stretch to Delete:"), namelist, 0,
-                                         false, &ok);
+    QString toDelete;
+    // Only display list of stretches to delete if there are stretches saved to the cube
+    if (namelist.size() >= 1) {
+      toDelete = QInputDialog::getItem((QWidget *)parent(), tr("Delete Stretch"), 
+                                       tr("Name of Stretch to Delete:"), namelist, 0,
+                                       false, &ok);
+    }
+    else {
+      QMessageBox::information((QWidget *)parent(), "Information", 
+                               "There are no saved stretches to delete.");
+    }
+
     if (ok) {
       if (icube->isReadOnly()) {
         try {
@@ -489,6 +620,41 @@ namespace Isis {
     bool ok;
     QString name; 
 
+    // 
+    // At this time, it is NOT possible to save an RGB stretch with the same band number 
+    // multiple times, if the saved stretch for each is different. If the saved stretch is the same
+    // this is okay.
+    // 
+    // For example, r=1, g=1, b=1, with the same stretch for each is okay
+    //              r=1, g=1, b=2, where the stretches for band 1 are the same, is okay 
+    //              r=1, g=1, b=1, where the the stretches for band 1 are different (red stretch !=
+    //                                                                               green stretch)
+    // 
+    if (!cvp->isGray()) {
+      CubeStretch redStretch, greenStretch, blueStretch;
+      if (m_advancedStretch->isVisible()) {
+        redStretch = m_advancedStretch->getRedStretch();
+        greenStretch = m_advancedStretch->getGrnStretch();
+        blueStretch = m_advancedStretch->getBluStretch();
+      }
+      else {
+        redStretch = cvp->redStretch();
+        greenStretch = cvp->greenStretch();
+        blueStretch = cvp->blueStretch();
+      }
+
+      int redBand = cvp->redBand();
+      int greenBand = cvp->greenBand(); 
+      int blueBand = cvp->blueBand();
+
+      if (((redBand == greenBand) && !(redStretch == greenStretch)) ||
+          ((redBand == blueBand)  && !(redBand == blueBand)) ||
+          ((greenBand == blueBand) && !(greenBand == blueBand))) {
+        QMessageBox::information((QWidget *)parent(), "Error", "Sorry, cannot save RGB stretches which include the same band multiple times, but have different stretches for each"); 
+        return;
+      }
+    }
+
     // "Get the name for the stretch" dialog
     QString text = QInputDialog::getText(m_advancedStretch, tr("Save Stretch"),
                                          tr("Enter a name to save the stretch as:"), QLineEdit::Normal,
@@ -522,8 +688,7 @@ namespace Isis {
       }
 
       if (icube->isReadOnly()) {
-        //  ReOpen cube as read/write
-        //  If cube readonly print error
+        //  reOpen cube as read/write
         try {
           cvp->cube()->reopen("rw");
         }
@@ -534,16 +699,53 @@ namespace Isis {
         }
       }
 
-      Stretch stretch = m_advancedStretch->getGrayStretch();
+      // If gray, only one stretch to save
+      if (cvp->isGray()) {
+        CubeStretch stretch;
+        if (m_advancedStretch->isVisible()) {
+          stretch = m_advancedStretch->getGrayStretch();
+        }
+        else {
+          stretch = cvp->grayStretch(); 
+        }
+        
+        // Write single stretch to cube
+        stretch.setName(text);
+        stretch.setBandNumber(cvp->grayBand());
+        StretchBlob stretchBlob(stretch);
 
-      // consider moving into Stretch::WriteInit()
-      stretch.Label()["Name"] = text;
-      stretch.Label() += PvlKeyword("StretchType", stretch.getType());
+        // Overwrite an existing stretch with the same name if it exists. The user was warned
+        // and decided to overwrite.
+        icube->write(stretchBlob);
+      }
+      else {
+        CubeStretch redStretch, greenStretch, blueStretch;
+        if (m_advancedStretch->isVisible()) {
+          redStretch = m_advancedStretch->getRedStretch();
+          greenStretch = m_advancedStretch->getGrnStretch();
+          blueStretch = m_advancedStretch->getBluStretch();
+        }
+        else {
+          redStretch = cvp->redStretch();
+          greenStretch = cvp->greenStretch();
+          blueStretch = cvp->blueStretch();
+        }
 
-      // Greyscale is only available option for now
-      stretch.Label() += PvlKeyword("Color", "Greyscale");
+        redStretch.setName(text);
+        redStretch.setBandNumber(cvp->redBand());
+        StretchBlob redStretchBlob(redStretch);
+        icube->write(redStretchBlob, false);
 
-      icube->write(stretch);
+        greenStretch.setName(text);
+        greenStretch.setBandNumber(cvp->greenBand());
+        StretchBlob greenStretchBlob(greenStretch);
+        icube->write(greenStretchBlob, false);
+
+        blueStretch.setName(text);
+        blueStretch.setBandNumber(cvp->blueBand());
+        StretchBlob blueStretchBlob(blueStretch);
+        icube->write(blueStretchBlob, false);
+      }
 
       // Don't leave open rw -- not optimal. 
       cvp->cube()->reopen("r");
@@ -910,7 +1112,6 @@ namespace Isis {
       m_advancedStretch->updateStretch(cubeViewport());
       m_advancedStretch->show();
     }
-
     updateTool();
   }
 

@@ -1,25 +1,11 @@
-/**
- * @file
- * $Revision$
- * $Date$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ProjectItemProxyModel.h"
@@ -58,7 +44,7 @@ namespace Isis {
    */
   QModelIndex ProjectItemProxyModel::mapIndexFromSource(const QModelIndex &sourceIndex) {
     ProjectItem *proxyItem = mapItemFromSource( sourceModel()->itemFromIndex(sourceIndex) );
-    
+
     if (proxyItem) {
       return proxyItem->index();
     }
@@ -67,7 +53,7 @@ namespace Isis {
     }
 
   }
-  
+
 
   /**
    * Returns the QModelIndex of an item in the souce model that corresponds with
@@ -79,7 +65,7 @@ namespace Isis {
    */
   QModelIndex ProjectItemProxyModel::mapIndexToSource(const QModelIndex &proxyIndex) {
     ProjectItem *sourceItem = mapItemToSource( itemFromIndex(proxyIndex) );
-    
+
     if (sourceItem) {
       return sourceItem->index();
     }
@@ -125,7 +111,7 @@ namespace Isis {
    */
   QItemSelection ProjectItemProxyModel::mapSelectionToSource(const QItemSelection &proxySelection) {
     QItemSelection sourceSelection = QItemSelection();
-  
+
     foreach ( QModelIndex proxyIndex, proxySelection.indexes() ) {
       QModelIndex sourceIndex = mapIndexToSource(proxyIndex);
       if ( sourceIndex.isValid() ) {
@@ -184,7 +170,7 @@ namespace Isis {
     }
 
     ProjectItem *proxyItem;
-    
+
     if (ProjectItem *parentItem = mapItemFromSource( sourceItem->parent() ) ) {
       proxyItem = addChild(sourceItem, parentItem);
     }
@@ -204,7 +190,7 @@ namespace Isis {
    * Adds a list of items to the proxy model.
    *
    * @param[in] sourceItem (QList<ProjectItem *>) The list of items in the
-   *                                              source model.                                              
+   *                                              source model.
    */
   void ProjectItemProxyModel::addItems(QList<ProjectItem *> sourceItems) {
     foreach (ProjectItem *item, sourceItems) {
@@ -213,7 +199,7 @@ namespace Isis {
     emit itemsAdded();
   }
 
-  
+
   /**
    * Removes an item and its children from the proxy model.
    *
@@ -226,8 +212,8 @@ namespace Isis {
 //  qDebug()<<"ProjectItemProxyModel::removeItem  item= "<<item;
     ProjectItemModel::removeItem(item);
   }
-  
-  
+
+
   /**
    * Sets the source model. If there are already items in the model and the
    * source model is set to a different source model, the proxy model is
@@ -295,13 +281,13 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Slot that updates the current item in the proxy model only if it is
    * different than the corresponding item in the source model.
    */
   void ProjectItemProxyModel::updateProxyCurrent() {
-    QModelIndex newProxyCurrent = mapIndexFromSource( 
+    QModelIndex newProxyCurrent = mapIndexFromSource(
         sourceModel()->selectionModel()->currentIndex() );
     if ( newProxyCurrent != selectionModel()->currentIndex() ) {
       selectionModel()->setCurrentIndex(newProxyCurrent, QItemSelectionModel::Current);
@@ -316,7 +302,7 @@ namespace Isis {
   void ProjectItemProxyModel::updateSourceCurrent() {
     QModelIndex newSourceCurrent = mapIndexToSource( selectionModel()->currentIndex() );
     if ( newSourceCurrent != sourceModel()->selectionModel()->currentIndex() ) {
-      sourceModel()->selectionModel()->setCurrentIndex(newSourceCurrent, 
+      sourceModel()->selectionModel()->setCurrentIndex(newSourceCurrent,
                                                        QItemSelectionModel::Current);
     }
   }
@@ -327,13 +313,13 @@ namespace Isis {
    * different than the corresponding selection in the source model.
    */
   void ProjectItemProxyModel::updateProxySelection() {
-    QItemSelection newProxySelection = mapSelectionFromSource( 
+    QItemSelection newProxySelection = mapSelectionFromSource(
         sourceModel()->selectionModel()->selection() );
     if ( newProxySelection != selectionModel()->selection() ) {
       selectionModel()->select(newProxySelection, QItemSelectionModel::ClearAndSelect);
     }
   }
- 
+
 
   /**
    * Slot that updates the selection in the source model only if it is
@@ -341,9 +327,9 @@ namespace Isis {
    */
   void ProjectItemProxyModel::updateSourceSelection() {
     QItemSelection newSourceSelection = mapSelectionToSource( selectionModel()->selection() );
-    if ( mapSelectionFromSource(newSourceSelection) != 
+    if ( mapSelectionFromSource(newSourceSelection) !=
          mapSelectionFromSource( sourceModel()->selectionModel()->selection() ) ) {
-      sourceModel()->selectionModel()->select(newSourceSelection, 
+      sourceModel()->selectionModel()->select(newSourceSelection,
                                               QItemSelectionModel::ClearAndSelect);
     }
   }
@@ -378,9 +364,9 @@ namespace Isis {
     if ( parentItem && (parentItem->model() != this) ) {
       return 0;
     }
-    
+
     ProjectItem *proxyItem = mapItemFromSource(sourceItem);
-    
+
     if (!proxyItem) {
       proxyItem = new ProjectItem();
       proxyItem->setProjectItem(sourceItem);
@@ -436,7 +422,7 @@ namespace Isis {
     return true;
   }
 
-  
+
   /**
    * Adds the data (selected items) from the source model to the proxy model.
    *
@@ -444,7 +430,7 @@ namespace Isis {
    * @param action (Qt::DropAction)
    * @param row (int)
    * @param column(int)
-   * @param QModelIndex (const QModelIndex &) 
+   * @param QModelIndex (const QModelIndex &)
    *
    * @return @b bool True if the data was successfully added to the proxy model.
    */

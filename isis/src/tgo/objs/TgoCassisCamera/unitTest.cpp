@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QDebug>
 
 #include <iomanip>
@@ -38,10 +27,10 @@ using namespace Isis;
 void TestLineSamp(Camera *cam, double samp, double line);
 
 /**
- * Unit test for TGO CaSSIS camera. 
+ * Unit test for TGO CaSSIS camera.
  *
  * @internal
- *   @history 2018-08-15 Jeannie Backer - Updated lat/lon changes due to 
+ *   @history 2018-08-15 Jeannie Backer - Updated lat/lon changes due to
  *                           changes in focal length.
  */
 int main(void) {
@@ -69,7 +58,7 @@ int main(void) {
     qDebug() << "SPK Reference ID = " << cam->SpkReferenceId();
     qDebug() << "";
 
-    // Test Shutter Open/Close 
+    // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = toDouble( inst["ExposureDuration"][0] );
     QString stime = inst["StartTime"];
@@ -107,7 +96,7 @@ int main(void) {
       qDebug() << "Latitude OK";
     }
     else {
-      qDebug() << qSetRealNumberPrecision(18) 
+      qDebug() << qSetRealNumberPrecision(18)
                << "Latitude off by: " << cam->UniversalLatitude() - knownLat;
     }
 
@@ -115,7 +104,7 @@ int main(void) {
       qDebug() << "Longitude OK";
     }
     else {
-      qDebug() << qSetRealNumberPrecision(18) 
+      qDebug() << qSetRealNumberPrecision(18)
                << "Longitude off by: " << cam->UniversalLongitude() - knownLon;
     }
   }
@@ -146,4 +135,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     qDebug() << "";
   }
 }
-

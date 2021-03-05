@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -46,9 +35,9 @@ void TestLineSamp(Camera *cam, double samp, double line);
  *                         calculated in code-the label keywords for Ir exposure and interline
  *                         delay is incorrect.  The camera model is also now doing calculations
  *                         in x, y, z instead of lat, lon.
- *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
+ *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to
  *                           relative pathnames. Fixes #2054.
- *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added tests for spacecraft and 
+ *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added tests for spacecraft and
  *                           instrument name methods.
  */
 int main(void) {
@@ -76,7 +65,7 @@ int main(void) {
     //  Tested separatedly:  Ir Normal partial field of view -none of the    C1465336166_1.ir.cub
     //      pixels' centers intersect with the ground.
     //      However, right around the bottom of pixel, samp:3 line:4 and top of samp:3 line:5 there
-    //      are some intersections, which means we can get lat/lon, but we cannot back project.          
+    //      are some intersections, which means we can get lat/lon, but we cannot back project.
     char files[5][1024] = { "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1515951157_1.ir.cub",
                             "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1514390782_1.ir.cub",
                             "$ISISTESTDATA/isis/src/cassini/unitTestData/CM_1514390782_1.vis.cub",
@@ -201,7 +190,7 @@ int main(void) {
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-    
+
     //  Test a non-intersecting pixel
     double samp = 3.;
     double line = 4.;
@@ -233,7 +222,7 @@ int main(void) {
     }
 
     cout << endl;
-    
+
     // Test name methods
     cout << endl << "Testing name methods ..." << endl;
     cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
@@ -266,4 +255,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = ERROR" << endl << endl;
   }
 }
-

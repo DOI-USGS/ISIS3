@@ -1,26 +1,14 @@
 #ifndef MatchImage_h
 #define MatchImage_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <QString>
 #include <QSharedPointer>
@@ -38,19 +26,19 @@ namespace Isis {
 
 /**
  * @brief Container for match image data
- *  
- * This class provides storage and computational conversion from original 
- * source image to transformed image. The transformed image takes the original 
- * source image and applies any image transformations to render the image that 
- * is to used in the matcher. 
- *  
- * Its internal data storage is explicitly shared so the object can be copied 
- * freely. When a new image is set, the match data is cleared including the 
+ *
+ * This class provides storage and computational conversion from original
+ * source image to transformed image. The transformed image takes the original
+ * source image and applies any image transformations to render the image that
+ * is to used in the matcher.
+ *
+ * Its internal data storage is explicitly shared so the object can be copied
+ * freely. When a new image is set, the match data is cleared including the
  * transforms for clean match rendering.
- *  
- * @author 2015-10-03 Kris Becker 
- * @internal 
- *   @history 2015-10-03 Kris Becker - Original Version 
+ *
+ * @author 2015-10-03 Kris Becker
+ * @internal
+ *   @history 2015-10-03 Kris Becker - Original Version
  */
 
 class MatchImage {
@@ -62,8 +50,8 @@ class MatchImage {
       m_data->m_source = source;
     }
 
-    MatchImage(const ImageSource &source, 
-               const Keypoints &keypoints, 
+    MatchImage(const ImageSource &source,
+               const Keypoints &keypoints,
                const Descriptors &descriptor,
                const double &ptime = 0.0)  {
       m_data = new ImageData();
@@ -172,23 +160,23 @@ class MatchImage {
     }
 
   private:
-    /** 
+    /**
      *  Shared Image data pointer
-     *  
-     * @author 2015-10-03 Kris Becker 
-     * @internal 
-     *   @history 2015-10-03 Kris Becker - Original Version 
+     *
+     * @author 2015-10-03 Kris Becker
+     * @internal
+     *   @history 2015-10-03 Kris Becker - Original Version
      */
     class ImageData : public QSharedData {
       public:
         ImageData() : m_source(), m_transforms(),
-                      m_keypoints(), m_descriptors(), 
+                      m_keypoints(), m_descriptors(),
                       m_duration(0) { }
         ImageData(const ImageData &other) : QSharedData(other),
-                                            m_source(other.m_source), 
-                                            m_transforms(other.m_transforms), 
-                                            m_keypoints(), 
-                                            m_descriptors(), 
+                                            m_source(other.m_source),
+                                            m_transforms(other.m_transforms),
+                                            m_keypoints(),
+                                            m_descriptors(),
                                             m_duration(0) { }
         ~ImageData() { }
 
@@ -197,7 +185,7 @@ class MatchImage {
         }
 
         // Data....
-        ImageSource  m_source; 
+        ImageSource  m_source;
         Transformer  m_transforms;
         Keypoints    m_keypoints;
         Descriptors  m_descriptors;

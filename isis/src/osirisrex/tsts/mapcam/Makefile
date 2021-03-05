@@ -27,7 +27,7 @@ commands:
 	           spkpredict=t                                                                      \
 	           SCLK='$$osirisrex/kernels/sclk/SCLK.tsc'                                          \
 			   extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                                     \
-	           >& /dev/null;
+	           ;
 
 	# phocube first image
 	# create 7 band backplane with from the following values:

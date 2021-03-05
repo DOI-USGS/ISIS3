@@ -1,36 +1,35 @@
-/**
- * @file
- * $Revision: 1.5 $
- * $Date: 2009/05/12 20:07:31 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
+#include <csm/Plugin.h>
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QLibrary>
 
 #include "CameraFactory.h"
 
 #include "Camera.h"
-#include "Plugin.h"
-#include "IException.h"
+#include "CSMCamera.h"
 #include "FileName.h"
+#include "IException.h"
+#include "Plugin.h"
+#include "Preference.h"
 
+#include "csm/csm.h"
+#include "csm/Model.h"
+#include "csm/Plugin.h"
+
+using namespace csm;
 using namespace std;
 
 namespace Isis {
   Plugin CameraFactory::m_cameraPlugin;
+  bool CameraFactory::m_initialized = false;
 
   /**
    * Creates a Camera object using Pvl Specifications
@@ -46,74 +45,109 @@ namespace Isis {
   Camera *CameraFactory::Create(Cube &cube) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
+
     initPlugin();
 
     try {
-      // First get the spacecraft and instrument and combine them
-      Pvl &lab = *cube.label();
-      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
-      QString spacecraft = (QString) inst["SpacecraftName"];
-      QString name = (QString) inst["InstrumentId"];
-      spacecraft = spacecraft.toUpper();
-      name = name.toUpper();
-      QString group = spacecraft + "/" + name;
-      group = group.remove(" ");
-
-      PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
-      // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
-      if (!kerns.hasKeyword("CameraVersion")) {
-        kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
+      // Is there a CSM blob on the cube?
+      if (cube.hasBlob("String", "CSMState")) {
+        // Create ISIS CSM Camera Model
+        try {
+          return new CSMCamera(cube);
+        }
+        catch (IException &e) {
+          QString msg = "Unable to create CSM camera using CSMState Cube blob.";
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
       }
+      else {
+        // First get the spacecraft and instrument and combine them
+        Pvl &lab = *cube.label();
+        PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
+        QString spacecraft = (QString) inst["SpacecraftName"];
+        QString name = (QString) inst["InstrumentId"];
+        spacecraft = spacecraft.toUpper();
+        name = name.toUpper();
+        QString group = spacecraft + "/" + name;
+        group = group.remove(" ");
 
-      int cameraOriginalVersion = (int)kerns["CameraVersion"];
-      int cameraNewestVersion = CameraVersion(cube);
+        PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
+        // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
+        if (!kerns.hasKeyword("CameraVersion")) {
+          kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
+        }
 
-      if (cameraOriginalVersion != cameraNewestVersion) {
-        string msg = "The camera model used to create a camera for this cube is out of date, " \
-                     "please re-run spiceinit on the file or process with an old Isis version " \
-                     "that has the correct camera model.";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        int cameraOriginalVersion = (int)kerns["CameraVersion"];
+        int cameraNewestVersion = CameraVersion(cube);
+
+        if (cameraOriginalVersion != cameraNewestVersion) {
+          string msg = "The camera model used to create a camera for this cube is out of date, " \
+                       "please re-run spiceinit on the file or process with an old Isis version " \
+                       "that has the correct camera model.";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+
+        // See if we have a camera model plugin
+        QFunctionPointer ptr;
+        try {
+          ptr = m_cameraPlugin.GetPlugin(group);
+        }
+        catch(IException &e) {
+          QString msg = "Unsupported camera model, unable to find plugin for ";
+          msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
+          msg += name + "]";
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
+
+        // Now cast that pointer in the proper way
+        Camera * (*plugin)(Isis::Cube &cube);
+        plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
+
+        // Create the camera as requested
+        return (*plugin)(cube);
       }
-
-      // See if we have a camera model plugin
-      QFunctionPointer ptr;
-      try {
-        ptr = m_cameraPlugin.GetPlugin(group);
-      }
-      catch(IException &e) {
-        QString msg = "Unsupported camera model, unable to find plugin for ";
-        msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
-        msg += name + "]";
-        throw IException(e, IException::Unknown, msg, _FILEINFO_);
-      }
-
-      // Now cast that pointer in the proper way
-      Camera * (*plugin)(Isis::Cube &cube);
-      plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
-
-      // Create the projection as requested
-      return (*plugin)(cube);
     }
     catch(IException &e) {
-      string message = "Unable to initialize camera model from group [Instrument]";
+      string message = "Unable to initialize camera model in Camera Factory.";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
 
 
   /**
-   * Reads the appropriate plugin file for the camera
+   * Reads the appropriate plugin file for the ISIS cameras, and scans the
+   * directories specified in IsisPreferences for CSM cameras.
    */
   void CameraFactory::initPlugin() {
-    if (m_cameraPlugin.fileName() == "") {
-      FileName localFile("Camera.plugin");
-      if (localFile.fileExists())
-        m_cameraPlugin.read(localFile.expanded());
+    if (!m_initialized) {
+      // Handle the ISIS camera plugins
+      if (m_cameraPlugin.fileName() == "") {
+        FileName localFile("Camera.plugin");
+        if (localFile.fileExists())
+          m_cameraPlugin.read(localFile.expanded());
 
-      FileName systemFile("$ISISROOT/lib/Camera.plugin");
-      if (systemFile.fileExists())
-        m_cameraPlugin.read(systemFile.expanded());
+        FileName systemFile("$ISISROOT/lib/Camera.plugin");
+        if (systemFile.fileExists())
+          m_cameraPlugin.read(systemFile.expanded());
+      }
+
+      // Find the CSM plugins by searching the directories identified in the Preferences.
+      // Load the found libraries. This causes the static instance(s) to be constructed,
+      // and thus registering the model with the csm Plugin class.
+      Preference &p = Preference::Preferences();
+      PvlGroup &grp = p.findGroup("Plugins", Isis::Pvl::Traverse);
+      for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
+        FileName csmDir = grp["CSMDirectory"][i];
+
+        QDirIterator csmLib(csmDir.expanded(), {"*.so", "*.dylib"}, QDir::Files);
+        while (csmLib.hasNext()) {
+          QString csmLibName = csmLib.next();
+          QLibrary csmDynamicLib(csmLibName);
+          csmDynamicLib.load();
+        }
+      }
     }
+    m_initialized = true;
   }
 
 

@@ -41,10 +41,13 @@
       Fixed poutput pvl to not have spaces in the keyword names
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Christopher Austin" date="2010-06-16">
       Fixed pvl comments
+    </change>
+    <change name="Stuart Sides" date="2021-02-22">
+      Added ability to calibrate using the camera instead of direcly using SPICE kernels
     </change>
   </history>
 
@@ -57,7 +60,7 @@
           Input cube file name
         </brief>
         <description>
-          The cube to be calibrated.  
+          The cube to be calibrated.
         </description>
         <filter>
           *.cub

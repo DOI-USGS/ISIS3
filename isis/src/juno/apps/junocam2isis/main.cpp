@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QFile>
@@ -33,13 +41,13 @@ QList<Cube *> g_outputCubes;
 QList<QString> g_outputCubeFileNames;
 int g_frameletLines = 0;
 QStringList g_filterList;
-QList<int> g_filterOffsetList; 
+QList<int> g_filterOffsetList;
 int g_fullFrameLines = 0;
 
 void IsisMain() {
   ProcessImportPds importPds;
   g_outputCubes.clear();
-  
+
   UserInterface &ui = Application::GetUserInterface();
   FileName inputFile = ui.GetFileName("FROM");
 
@@ -51,7 +59,7 @@ void IsisMain() {
   translateLabel(inputLabel, outputLabel);
 
   bool doFullCcd = ui.GetBoolean("FULLCCD");
-  int spacecraftCode = -61500; 
+  int spacecraftCode = -61500;
 
   if (doFullCcd) {
     PushFrameCameraCcdLayout ccdLayout(spacecraftCode);
@@ -76,7 +84,7 @@ void IsisMain() {
     int blueLines = ccdLayout.getFrameInfo(-61501).m_lines;
     int greenOffset = ccdLayout.getFrameInfo(-61502).m_startLine;
     int greenLines = ccdLayout.getFrameInfo(-61502).m_lines;
-    int redOffset = ccdLayout.getFrameInfo(-61503).m_startLine; 
+    int redOffset = ccdLayout.getFrameInfo(-61503).m_startLine;
 
     // Determine which filters are contained in the input label and set the fullFrameLines.
     for (int i=0; i < g_filterList.size(); i++) {
@@ -98,8 +106,8 @@ void IsisMain() {
       }
     }
 
-    int numFullFrames = importPds.Lines() / g_fullFrameLines; 
-        
+    int numFullFrames = importPds.Lines() / g_fullFrameLines;
+
     // Allocate this number of total cubes of the correct size
     FileName outputFileName(ui.GetFileName("TO"));
     QString outputBaseName = outputFileName.removeExtension().expanded();
@@ -122,7 +130,7 @@ void IsisMain() {
       QString fullFrameNumString = QString("%1").arg(i+1, 4, 10, QChar('0'));
       fullFrameCube->setDimensions(ccdLayout.ccdSamples(), ccdLayout.ccdLines(), 1);
       fullFrameCube->setPixelType(Isis::SignedWord);
-      FileName fullFrameCubeFileName(outputBaseName 
+      FileName fullFrameCubeFileName(outputBaseName
                                      + "_" + fullFrameNumString
                                      + ".cub");
       fullFrameCube->create(fullFrameCubeFileName.expanded());
@@ -134,7 +142,7 @@ void IsisMain() {
     progress.CheckStatus();
     allCubesListFile.close();
 
-    // Figure out where each framelet belongs as we go through and process them. 
+    // Figure out where each framelet belongs as we go through and process them.
     importPds.Progress()->SetText("Processing FullCCDFrame output cubes.");
     importPds.StartProcess(processFullFrames);
     importPds.EndProcess();
@@ -148,7 +156,7 @@ void IsisMain() {
         if (!g_outputCubes[i]->isOpen()) {
           g_outputCubes[i]->open(g_outputCubeFileNames[i], "rw");
         }
-        g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j)); 
+        g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j));
       }
       // Update the labels
       Pvl *fullFrameLabel = g_outputCubes[i]->label();
@@ -158,7 +166,7 @@ void IsisMain() {
       PvlGroup &bandBin = fullFrameLabel->findGroup("BandBin", PvlObject::Traverse);
       bandBin.addKeyword(PvlKeyword("FilterName", "FULLCCD"),
                          PvlObject::Replace);
-      
+
       // Add filter-specific code to band bin Group
       bandBin.addKeyword(PvlKeyword("NaifIkCode", toString(spacecraftCode)));
 
@@ -169,7 +177,7 @@ void IsisMain() {
     }
     progress.CheckStatus();
   }
-  else { 
+  else {
     // Process individual framelets: For now, keep processing the "old" way.
     int numSubimages = importPds.Lines() / g_frameletLines;
     int frameletsPerFilter = numSubimages / g_filterList.size();
@@ -199,16 +207,16 @@ void IsisMain() {
       frameletCube->setDimensions(importPds.Samples(), g_frameletLines, 1);
       frameletCube->setPixelType(Isis::SignedWord);
       int filterIndex = i % g_filterList.size();
-      FileName frameletCubeFileName(outputBaseName 
-                                    + "_" + g_filterList[filterIndex] 
-                                    + "_" + frameletNumString 
+      FileName frameletCubeFileName(outputBaseName
+                                    + "_" + g_filterList[filterIndex]
+                                    + "_" + frameletNumString
                                     + ".cub");
 
       frameletCube->create(frameletCubeFileName.expanded());
       g_outputCubes.append(frameletCube);
       frameletCube->close();
       g_outputCubeFileNames.append(frameletCubeFileName.expanded());
-      
+
       QFile filterListFile(outputBaseName + "_" + g_filterList[filterIndex] + ".lis");
       if ( (frameletNumber == 1 && !filterListFile.open(QFile::WriteOnly | QFile::Text))
            || (frameletNumber > 1 && !filterListFile.open(QFile::Append | QFile::Text)) ) {
@@ -235,9 +243,9 @@ void IsisMain() {
     progress.SetMaximumSteps(numSubimages);
     for (int i = 0; i < numSubimages; i++) {
       // re-open cube
-      QString cubeFileName = g_outputCubes[i]->fileName(); 
+      QString cubeFileName = g_outputCubes[i]->fileName();
       if ( !g_outputCubes[i]->isOpen() ) {
-        g_outputCubes[i]->open(g_outputCubeFileNames[i], "rw"); 
+        g_outputCubes[i]->open(g_outputCubeFileNames[i], "rw");
       }
       // fromeix labels
       progress.CheckStatus();
@@ -254,7 +262,7 @@ void IsisMain() {
       PvlGroup &bandBin = frameletLabel->findGroup("BandBin", PvlObject::Traverse);
       bandBin.addKeyword(PvlKeyword("FilterName", filterName),
                          PvlObject::Replace);
-      
+
       if (filterName.compare("BLUE", Qt::CaseInsensitive) == 0) {
         spacecraftCode = -61501;
       }
@@ -283,11 +291,11 @@ void IsisMain() {
 }
 
 /**
- * Translate labels from PDS3 input to generic ISIS3 output. Note: Some values 
- * will be updated for the individual output cubes. 
- *  
+ * Translate labels from PDS3 input to generic ISIS output. Note: Some values
+ * will be updated for the individual output cubes.
+ *
  * @param inputLabel The input PDS3 label.
- * @param outputLabel A reference to the output ISIS3 label to be updated.
+ * @param outputLabel A reference to the output ISIS label to be updated.
  */
 void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   // Get the directory where the Juno translation tables are
@@ -307,7 +315,7 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   if (spcName.compare("JUNO", Qt::CaseInsensitive) != 0
       || instId.compare("JNC", Qt::CaseInsensitive) != 0) {
 
-    QString msg = "Unrecognized Spacecraft name [" 
+    QString msg = "Unrecognized Spacecraft name ["
                   + spcName
                   + "] and instrument ID ["
                   + instId
@@ -364,31 +372,31 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
 }
 
 /**
- * Opens cube from g_outputCubes at provided index, closes cube at index-1 (last cube) 
+ * Opens cube from g_outputCubes at provided index, closes cube at index-1 (last cube)
  */
 void openNextCube(int nextCubeIndex) {
   if (nextCubeIndex >= 1) {
     if (g_outputCubes[nextCubeIndex-1]->isOpen()) {
-      g_outputCubes[nextCubeIndex - 1]->close(); 
+      g_outputCubes[nextCubeIndex - 1]->close();
     }
   }
   if (!g_outputCubes[nextCubeIndex]->isOpen()) {
-    g_outputCubes[nextCubeIndex]->open(g_outputCubeFileNames[nextCubeIndex], "rw"); 
+    g_outputCubes[nextCubeIndex]->open(g_outputCubeFileNames[nextCubeIndex], "rw");
   }
 }
 
 
 /**
- * Separates each of the individual frames into their own file. 
- *  
- * @param in A reference to the input Buffer to process. 
+ * Separates each of the individual frames into their own file.
+ *
+ * @param in A reference to the input Buffer to process.
  */
 void processFramelets(Buffer &in) {
   // get the index for the correct output cube
   int outputCube = (in.Line() - 1) / g_frameletLines % g_outputCubes.size();
 
   // When we move to a new framlet, close the old cube and open the next one to avoid
-  // having too many cubes open and hitting the open file limit. 
+  // having too many cubes open and hitting the open file limit.
   if( ((in.Line() - 1) % g_frameletLines) == 0 ) {
     openNextCube(outputCube);
   }
@@ -406,21 +414,21 @@ void processFramelets(Buffer &in) {
 
 /**
  * Separates each into separate "fullframe" ccd images
- *  
- * @param in A reference to the input Buffer to process. 
+ *
+ * @param in A reference to the input Buffer to process.
  */
 void processFullFrames(Buffer &in) {
   // get the index for the correct output cube
   int outputCube = (in.Line() - 1) / g_fullFrameLines % g_outputCubes.size();
 
   // When we move to a new framlet, close the old cube and open the next one to avoid
-  // having too many cubes open and hitting the open file limit. 
+  // having too many cubes open and hitting the open file limit.
   if( ((in.Line() - 1) % g_fullFrameLines) == 0 ) {
     openNextCube(outputCube);
   }
 
   LineManager mgr(*g_outputCubes[outputCube]);
-  
+
   int outputCubeLineNumber = ((in.Line()-1) % g_fullFrameLines);
   int filterIndex = (outputCubeLineNumber / g_frameletLines) % g_filterList.size();
   outputCubeLineNumber += g_filterOffsetList[filterIndex];
@@ -432,4 +440,3 @@ void processFullFrames(Buffer &in) {
   }
   g_outputCubes[outputCube]->write(mgr);
 }
-

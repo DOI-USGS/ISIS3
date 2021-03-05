@@ -13,7 +13,7 @@
     running <i>cam2map</i>.  The <def link="Map Projection">map projection</def> is defined using a
     <def>PVL</def> file which is specified in <i>cam2map</i> in the MAP parameter.  Note: the system defaults
       to the Sinusoidal projection (ISIS projection based templates are located in $ISISROOT/appdata/templates/maps).
-    To learn more about using map projections in ISIS, refer to the ISIS Workshop 
+    To learn more about using map projections in ISIS, refer to the ISIS Workshop
     <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
@@ -950,7 +950,7 @@
        <description>
          This example is the first of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the next,
-         MATCHMAP is set to YES.  In this case MAP is an Isis3 level 2 image.
+         MATCHMAP is set to YES.  In this case MAP is an ISIS level 2 image.
          The mapping parameters of the output file will be read from the
          mapping group of the MAP level 2 image.
        </description>

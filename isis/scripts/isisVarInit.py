@@ -21,6 +21,26 @@ from pathlib import Path
 # SPDX-License-Identifier: CC0-1.0
 
 
+class ResolveAction(argparse.Action):
+    """A custom action that returns the absolute version of the provided
+    pathlib.Path argument.
+    """
+
+    def __init__(self, option_strings, dest, type=None, **kwargs):
+        if issubclass(Path, type):
+            super(ResolveAction, self).__init__(
+                option_strings, dest, type=type, **kwargs
+            )
+        else:
+            raise TypeError(
+                f"The type= parameter of argument {dest} must be a "
+                f"class or subclass of pathlib.Path."
+            )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values.resolve())
+
+
 def mkdir(p: Path) -> str:
     """Returns a string with a message about the creation or existance
     of the path, *p*."""
@@ -64,23 +84,26 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument(
     "-d",
     "--data-dir",
-    default=os.environ["CONDA_PREFIX"] + "/data",
+    default=Path(os.environ["CONDA_PREFIX"] + "/data"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Data Directory, default: %(default)s",
 )
 parser.add_argument(
     "-t",
     "--test-dir",
-    default=os.environ["CONDA_PREFIX"] + "/testData",
+    default=Path(os.environ["CONDA_PREFIX"] + "/testData"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Test Data Directory, default: %(default)s",
 )
 
 parser.add_argument(
     "-a",
     "--ale-dir",
-    default=os.environ["CONDA_PREFIX"] + "/aleData",
+    default=Path(os.environ["CONDA_PREFIX"] + "/aleData"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Ale Data Directory, default: %(default)s",
 )
 args = parser.parse_args()

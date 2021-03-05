@@ -1,26 +1,14 @@
 #ifndef MdisCamera_h
 #define MdisCamera_h
-/**
- * @file
- * $Revision: 6403 $
- * $Date: 2015-10-23 12:32:20 -0700 (Fri, 23 Oct 2015) $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "FramingCamera.h"
 
 #include <QString>
@@ -37,7 +25,7 @@ namespace Isis {
    * file $ISISDATA/messenger/kernels/iak/mdisAddendum???.ti for details.
    *
    * @ingroup SpiceInstrumentsAndCameras
-   * @ingroup Messenger 
+   * @ingroup Messenger
    * @see http://pds-imaging.jpl.nasa.gov/documentation/MDISEDRSIS.PDF
    * @see http://pds-imaging.jpl.nasa.gov/documentation/MDIS_CDR_RDRSIS.PDF
    *
@@ -83,7 +71,7 @@ namespace Isis {
    *                           documentation. Removed Messenger namespace wrap inside Isis
    *                           namespace wrap. Added Isis Disclaimer to files. Added NAIF error
    *                           check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-07-25 Kris Becker - Added temperature dependant focal
    *                           length computation from new IK content.  Fixes #922.
@@ -102,7 +90,7 @@ namespace Isis {
    *   @history 2015-10-01 Ian Humphrey and Makayla Shepherd - Updated check for Wac instrument to
    *                           include instrument codes that correspond to its filters. References
    *                           #2335.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
    */
@@ -111,19 +99,19 @@ namespace Isis {
       MdisCamera(Cube &cube);
       //! Destroys the MdisCamera Object
       ~MdisCamera() {};
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
       /**
        * CK frame ID -  - MESSENGER instrument code (MSGR_SPACECRAFT)
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-236000); }
-      /** 
+      /**
        * CK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
@@ -135,10 +123,10 @@ namespace Isis {
        *         Kernel Target ID
        */
       virtual int SpkTargetId() const { return (-236); }
-      /** 
+      /**
        *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }

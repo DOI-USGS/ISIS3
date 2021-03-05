@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="csminit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Attach a CSM model state to a cube.
+  </brief>
+
+  <description>
+    <p>
+      This program takes Instrument Support Data (ISD) and attempts to create a
+      valid Community Sensor Model (CSM) state string using models from the
+      loaded CSM Libraries. If a single state string can be created, it is
+      attached to the cube in the CSMState BLOB for later use. If there are
+      multiple models that create valid state strings, then this program will
+      error and return a list of possible models. The user will then have to
+      re-run this program using the PLUGINNAME and/or MODELNAME parameters to
+      select a specific model.
+    </p>
+    <p>
+      Information about the CSM model will also be added to the CsmInfo group on
+      the cube label. These are just for users to reference and are not used
+      programmatically.
+    </p>
+    <p>
+      This program can be run on any Cube file, but if the Cube has spice data
+      from spiceinit then it will be removed so that there is no ambiguity
+      between the ISIS and CSM model.
+    </p>
+    <p>
+      See the Plugins group in the IsisPreferences file for information about
+      how to load CSM Libraries for use with this and other ISIS applications.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2020-11-18">
+      Original Version
+    </change>
+    <change name="Jesse Mapel and Stuart Sides" date="2021-02-03">
+      Modified to always add a TargetName and Instrument group to the label for the camera model.
+    </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-10">
+      Modified to revert label and Cube changes on failure.
+    </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-12">
+      Added the ability to take a state string instead of an ISD.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input cube that the state string will be attached to.
+        </brief>
+        <description>
+          The input cube that the state string will be attached to. Any kernels
+          specified in the kernels group and any attached SPICE tables will be
+          removed when the model state is attached.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+
+      <parameter name="ISD">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The Instrument Support Data (ISD) file that will be used.
+        </brief>
+        <description>
+          The Instrument Support Data (ISD) file that will be used to create the
+          model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
+        </description>
+      </parameter>
+
+      <parameter name="STATE">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          A Community Sensor Model (CSM) state string
+        </brief>
+        <description>
+          A file containing a Community Sensor Model (CSM) state string that will be used to create the
+          model for the input cube.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Target Specification">
+      <parameter name="TARGETNAME">
+        <type>string</type>
+        <internalDefault>Current TargetName in input label or Unknown if not present.</internalDefault>
+        <brief>
+          The name of the body observed by the image.
+        </brief>
+        <description>
+          The name of the body observed by the image.
+        </description>
+      </parameter>
+
+      <parameter name="SHAPEMODEL">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The shapemodel to represent the surface of the observed body.
+        </brief>
+        <description>
+          The shapemodel to represent the surface of the observed body. If none
+          is entered, then a bi-axial ellipsoid is used. The radii are defined
+          by the CSM model.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Model Specification">
+      <parameter name="PLUGINNAME">
+        <type>string</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The name of the plugin to use.
+        </brief>
+        <description>
+          The name of the plugin to use. The loaded CSM Libraries will be
+          searched for a plugin that has this name. If no such plugin is found
+          an error will be returned.
+        </description>
+      </parameter>
+
+      <parameter name="MODELNAME">
+        <type>string</type>
+        <internalDefault>none</internalDefault>
+        <brief>
+          The name of the model to use.
+        </brief>
+        <description>
+          The name of the model to use. The loaded CSM Libraries will be
+          searched for a model that has this name. If no such model is found an
+          error will be returned.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,25 +1,14 @@
 #ifndef WorkOrder_H
 #define WorkOrder_H
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <QAction>
 #include <QDateTime>
@@ -314,8 +303,8 @@ namespace Isis {
    *                           a private QString object called m_data.  References #4492.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
-   *   @history 2018-06-28 Makayla Shepherd - Removed the ProgressBar cleanup because it was 
-   *                           causing a seg fault when the ProgressBar was added to the 
+   *   @history 2018-06-28 Makayla Shepherd - Removed the ProgressBar cleanup because it was
+   *                           causing a seg fault when the ProgressBar was added to the
    *                           HistoryTreeWidget. The HistoryTreeWidget will now clean up the
    *                           ProgressBar. Fixes #5228.
    */

@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 1.10 $
- * $Date: 2010/01/04 18:01:31 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "LabelTranslationManager.h"
 
 #include <ostream>
@@ -142,15 +127,15 @@ namespace Isis {
 
 
   /**
-   * Returns a translated value. The translation group name is 
-   * used to find the input group, keyword, default and 
-   * tranlations in the translation table. If the keyword does not 
-   * exist in the input label, the input default if available will 
-   * be used as the input value. This input value is then used to 
-   * search all of the translations. If a match is found the 
-   * translated value is returned. 
+   * Returns a translated value. The translation group name is
+   * used to find the input group, keyword, default and
+   * tranlations in the translation table. If the keyword does not
+   * exist in the input label, the input default if available will
+   * be used as the input value. This input value is then used to
+   * search all of the translations. If a match is found the
+   * translated value is returned.
    *
-   * @param translationGroupName The name of the PVL translation 
+   * @param translationGroupName The name of the PVL translation
    *                        group used to identify the
    *                        input/output keywords to be
    *                        translated. Often, this is the
@@ -158,8 +143,8 @@ namespace Isis {
    *
    * @param index The index into the input keyword array.  Defaults to 0
    *
-   * @return @b QString The translated output value to be 
-   *         placed in the ISIS3 cube label.
+   * @return @b QString The translated output value to be
+   *         placed in the ISIS cube label.
    *
    * @throws IException::Unknown "Failed to translate output value."
    * @throws IException::Unknown "Cannot translate value. Xml files can only
@@ -175,7 +160,7 @@ namespace Isis {
    * @throws IException::Unknown "Could not find an input value or default value."
    * @throws IException::Unknown "Input element does not have the named attribute."
    */
-  QString XmlToPvlTranslationManager::Translate(QString translationGroupName, 
+  QString XmlToPvlTranslationManager::Translate(QString translationGroupName,
                                                 int index) {
     try {
     if (index != 0) {
@@ -245,7 +230,7 @@ namespace Isis {
       cout << endl << "Finding input element:" << endl << endl;
       cout << inputParentElement.tagName() << endl;
     }
-    // traverse the input position path 
+    // traverse the input position path
     Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputPosition",
                                       transGroup.begin(),
                                       transGroup.end());
@@ -254,7 +239,7 @@ namespace Isis {
     QString childName;
     while(it != transGroup.end()) {
       const PvlKeyword &inputPosition = *it;
-      inputParentElement = oldInputParentElement; 
+      inputParentElement = oldInputParentElement;
 
         for (int i = 0; i < inputPosition.size(); i++) {
           childName = inputPosition[i];
@@ -270,9 +255,9 @@ namespace Isis {
         if (!inputParentElement.isNull()) {
           break;
         }
-        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end()); 
+        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end());
     }
-     
+
     if (inputParentElement.isNull()) {
       if (hasInputDefault(translationGroupName)) {
         if (isDebug) {
@@ -372,9 +357,9 @@ namespace Isis {
    * dependencies are requirements on the values of attributes of the element
    * and/or the values of sibling elements. The dependencies are specified by
    * strings that are formatted as follows
-   * <code>[tag/att]\@[tagName/attName]|[value]</code> or 
-   * <code>[tagName/attName]|[value]</code> 
-   * 
+   * <code>[tag/att]\@[tagName/attName]|[value]</code> or
+   * <code>[tagName/attName]|[value]</code>
+   *
    * @param element The element to check dependencies on.
    * @param dependencies A multi-valued keyword were every entry specifies a
    *                     requirement upon either an attribute of the element or
@@ -461,7 +446,7 @@ namespace Isis {
    * @param inputLabel The input label file to be translated.
    * @param outputLabel The output translated Pvl.
    */
-  void XmlToPvlTranslationManager::Auto(FileName &inputLabel, 
+  void XmlToPvlTranslationManager::Auto(FileName &inputLabel,
                                         Pvl &outputLabel) {
     parseFile(inputLabel);
     Auto(outputLabel);

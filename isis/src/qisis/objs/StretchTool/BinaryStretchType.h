@@ -11,6 +11,7 @@ class QString;
 namespace Isis {
   class Histogram;
   class Stretch;
+  class CubeStretch;
 
   /**
    * @brief This handles the advanced binary stretch
@@ -34,6 +35,7 @@ namespace Isis {
                         const QString &name, const QColor &color);
       ~BinaryStretchType();
 
+      virtual CubeStretch getStretch();
       virtual void setStretch(Stretch);
 
     private slots:

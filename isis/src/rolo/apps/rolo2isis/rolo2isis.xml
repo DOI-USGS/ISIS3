@@ -2,10 +2,10 @@
 
 <application name="rolo2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import isis2 rolo image into isis3 </brief>
+  <brief>Import isis2 rolo image into isis </brief>
 
   <description>
-    This program will import an isis2 rolo image into an isis3 cube.
+    This program will import an isis2 rolo image into an isis cube.
   </description>
 
   <history>
@@ -55,13 +55,13 @@
   </groups>
 
   <examples>
-    
+
     <example>
       <brief>
       Using rolo2isis
       </brief>
       <description>
-        The use of rolo2isis to ingest rolo isis2 data and output isis3 cubes
+        The use of rolo2isis to ingest rolo isis2 data and output isis cubes
       </description>
       <terminalInterface>
         <commandLine>
@@ -69,10 +69,10 @@
           to=mm185801.cub
         </commandLine>
         <description>
-          This example shows the use of rolo2isis to create an Isis3 cube
+          This example shows the use of rolo2isis to create an Isis cube
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="720" height="886" src="assets/images/roloExampleGUI.png">
@@ -87,7 +87,7 @@
         </guiInterface>
       </guiInterfaces>
     </example>
-  
+
   </examples>
 
 </application>

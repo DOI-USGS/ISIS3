@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "Pipeline.h"
 
@@ -21,7 +29,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  
+
   if(ui.WasEntered("CK")) {
     FileName ckPreference = ui.GetFileName("CK");
     if(!ckPreference.fileExists()){
@@ -29,7 +37,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  
+
   if(ui.WasEntered("SPK")) {
     FileName spkPreference = ui.GetFileName("SPK");
     if(!spkPreference.fileExists()){
@@ -54,7 +62,7 @@ void IsisMain() {
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFileName("FROM"));
 
-    if((QString)labels["DETECTOR_ID"][0] == "VIS") { 
+    if((QString)labels["DETECTOR_ID"][0] == "VIS") {
       if(((QString)labels["DATA_SET_ID"]).contains("RDR")) {
         ProcessVis(true);
       }

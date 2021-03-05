@@ -1,26 +1,10 @@
-/**
- * @file
- * $Revision: 1.5 $
- * $Date: 2009/12/29 23:03:52 $
- * $Id: HiCalConf.cpp,v 1.5 2009/12/29 23:03:52 ehyer Exp $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
 #include <numeric>
@@ -32,6 +16,7 @@
 #include <SpiceUsr.h>
 
 #include "Brick.h"
+#include "Camera.h"
 #include "Cube.h"
 #include "FileName.h"
 #include "HiCalConf.h"
@@ -311,27 +296,45 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @return double Distance in AU between Sun and observed body
    */
-  double HiCalConf::sunDistanceAU() {
-    NaifStatus::CheckErrors();
-    loadNaifTiming();
-
-    QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
-    double obsStartTime;
-    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
-
-    QString targetName = getKey("TargetName", "Instrument");
-    if (targetName.toLower() == "sky" ||
-        targetName.toLower() == "cal" ||
-        targetName.toLower() == "phobos" ||
-        targetName.toLower() == "deimos") {
-      targetName = "Mars";
+  double HiCalConf::sunDistanceAU(Cube *cube) {
+    double sunkm = 0.0;
+    try {
+      Camera *cam;
+      cam = cube->camera();
+      cam->SetImage(0.5, 0.5);
+      sunkm = cam->sunToBodyDist();
+      NaifStatus::CheckErrors();
     }
-    double sunv[3];
-    double lt;
-    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
-                    sunv, &lt);
-    double sunkm = vnorm_c(sunv);
-    NaifStatus::CheckErrors();
+    catch (IException &e) {
+      try {
+        loadNaifTiming();
+
+        QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
+        double obsStartTime;
+        NaifStatus::CheckErrors();
+        scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
+
+        QString targetName = getKey("TargetName", "Instrument");
+        if (targetName.toLower() == "sky" ||
+            targetName.toLower() == "cal" ||
+            targetName.toLower() == "phobos" ||
+            targetName.toLower() == "deimos") {
+          targetName = "Mars";
+        }
+        double sunv[3];
+        double lt;
+        (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+                        sunv, &lt);
+        sunkm = vnorm_c(sunv);
+
+        NaifStatus::CheckErrors();
+      }
+      catch(IException &e) {
+        QString msg = "Unable to determine the distance from the target to the sun";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }

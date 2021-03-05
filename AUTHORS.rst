@@ -41,6 +41,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Lee, Ella Mae
 - Lee, Kaitlyn (United States Geological Survey, Astro Geology Science
   Center)
+- Leggett, Rebecca (United States Geological Survey, Astro Geology
+  Science Center)
 - Mapel, Jesse (United States Geological Survey, Astro Geology Science
   Center)
 - Milazzo, Moses
@@ -64,6 +66,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Sides, Stuart (United States Geological Survey, Astro Geology
   Science Center)
 - Silva, Victor
+- Stamile, Amy (United States Geological Survey, Astro Geology Science
+  Center)
 - Stapleton, Summer
 - Stebenne, Andrew
 - Sucharski, Tracie

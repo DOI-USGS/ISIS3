@@ -10,6 +10,7 @@ class QString;
 
 namespace Isis {
   class Stretch;
+  class CubeStretch;
   class Histogram;
 
   /**
@@ -37,6 +38,7 @@ namespace Isis {
                           const QString &name, const QColor &color);
       ~SawtoothStretchType();
 
+      virtual CubeStretch getStretch();
       virtual void setStretch(Stretch);
 
     private slots:

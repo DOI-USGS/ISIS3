@@ -1,6 +1,14 @@
 #ifndef RosettaVirtisCamera_h
 #define RosettaVirtisCamera_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "LineScanCamera.h"
 
 #include <QString>
@@ -10,11 +18,11 @@
 #include "VariableLineScanCameraDetectorMap.h"
 
 namespace Isis {
-  /** 
-   * @brief Camera model for both Rosetta VIRTIS-M instruments 
-   *  
-   * @ingroup SpiceInstrumentsAndCameras 
-   * @ingroup Rosetta 
+  /**
+   * @brief Camera model for both Rosetta VIRTIS-M instruments
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup Rosetta
    *
    * @author 2017-08-23 Kris Becker
    *
@@ -54,16 +62,16 @@ namespace Isis {
       double startTime() const;
       double endTime() const;
 
-      Table getPointingTable(const QString &channelId, 
+      Table getPointingTable(const QString &channelId,
                              const int zeroFrame);
-      SMatrix getStateRotation(const QString &frame1, 
-                               const QString &frame2, 
+      SMatrix getStateRotation(const QString &frame1,
+                               const QString &frame2,
                                const double &et) const;
 
       bool hasArticulationKernel(Pvl &label) const;
 
-      /** 
-       *  
+      /**
+       *
        * @author ????-??-?? Unknown
        * @internal
        *   @history ????-??-?? Unknown - Original version.

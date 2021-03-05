@@ -2,7 +2,10 @@
 #include <QTemporaryFile>
 #include <QRegularExpression>
 
+#include <nlohmann/json.hpp>
+
 #include "spiceinit.h"
+#include "csminit.h"
 
 #include "Cube.h"
 #include "CubeAttribute.h"
@@ -10,10 +13,13 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "FileName.h"
 
 #include "Fixtures.h"
+
+using json = nlohmann::json;
 
 #include "gmock/gmock.h"
 
@@ -518,3 +524,184 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"][0], "0.5");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"].unit(0), "seconds");
 }
+
+TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  StringBlob testBlob("test string", "CSMState");
+  testCube->write(testBlob);
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  spiceinit(testCube, options);
+
+  EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
+  EXPECT_ANY_THROW(testCube->read(testBlob));
+}
+
+TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  StringBlob testBlob("test string", "CSMState");
+  testCube->write(testBlob);
+
+  // Mangle the cube so that spiceinit failes
+  testCube->deleteGroup("Instrument");
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  ASSERT_ANY_THROW(spiceinit(testCube, options));
+
+  EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
+  EXPECT_NO_THROW(testCube->read(testBlob));
+}
+
+TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
+
+  std::istringstream labelStrm(R"(
+    Object = IsisCube
+      Object = Core
+        StartByte   = 65537
+        Format      = Tile
+        TileSamples = 128
+        TileLines   = 128
+
+        Group = Dimensions
+          Samples = 1204
+          Lines   = 1056
+          Bands   = 1
+        End_Group
+
+        Group = Pixels
+          Type       = UnsignedByte
+          ByteOrder  = Lsb
+          Base       = 0.0
+          Multiplier = 1.0
+        End_Group
+      End_Object
+
+      Group = Instrument
+        SpacecraftName       = VIKING_ORBITER_1
+        InstrumentId         = VISUAL_IMAGING_SUBSYSTEM_CAMERA_B
+        TargetName           = MARS
+        StartTime            = 1977-07-09T20:05:51
+        ExposureDuration     = 0.008480 <seconds>
+        SpacecraftClockCount = 33322515
+        FloodModeId          = ON
+        GainModeId           = HIGH
+        OffsetModeId         = ON
+      End_Group
+
+      Group = Archive
+        DataSetId       = VO1/VO2-M-VIS-2-EDR-V2.0
+        ProductId       = 387A06
+        MissonPhaseName = EXTENDED_MISSION
+        ImageNumber     = 33322515
+        OrbitNumber     = 387
+      End_Group
+
+      Group = BandBin
+        FilterName = CLEAR
+        FilterId   = 4
+      End_Group
+
+      Group = Kernels
+        NaifFrameCode = -27002
+      End_Group
+
+      Group = Reseaus
+        Line     = (5, 6, 8, 9, 10, 11, 12, 13, 14, 14, 15, 133, 134, 135, 137,
+                    138, 139, 140, 141, 141, 142, 143, 144, 263, 264, 266, 267,
+                    268, 269, 269, 270, 271, 272, 273, 393, 393, 395, 396, 397,
+                    398, 399, 399, 400, 401, 402, 403, 523, 524, 525, 526, 527,
+                    527, 528, 529, 530, 530, 532, 652, 652, 654, 655, 656, 657,
+                    657, 658, 659, 660, 661, 662, 781, 783, 784, 785, 786, 787,
+                    788, 788, 789, 790, 791, 911, 912, 913, 914, 915, 916, 917,
+                    918, 918, 919, 920, 921, 1040, 1041, 1043, 1044, 1045, 1045,
+                    1046, 1047, 1047, 1048, 1050)
+        Sample   = (24, 142, 259, 375, 491, 607, 723, 839, 954, 1070, 1185, 24,
+                    84, 201, 317, 433, 549, 665, 780, 896, 1011, 1127, 1183, 25,
+                    142, 259, 375, 492, 607, 722, 838, 953, 1068, 1183, 25, 84,
+                    201, 317, 433, 549, 665, 779, 895, 1010, 1125, 1182, 25, 143,
+                    259, 375, 491, 607, 722, 837, 952, 1067, 1182, 25, 84, 201,
+                    317, 433, 548, 664, 779, 894, 1009, 1124, 1181, 25, 142, 258,
+                    374, 490, 605, 720, 835, 951, 1066, 1180, 24, 83, 200, 316,
+                    431, 547, 662, 776, 892, 1007, 1122, 1179, 23, 140, 257, 373,
+                    488, 603, 718, 833, 948, 1063, 1179)
+        Type     = (1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                    5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5,
+                    5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5,
+                    5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5,
+                    5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6)
+        Valid    = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        Template = $viking1/reseaus/vo1.visb.template.cub
+        Status   = Nominal
+      End_Group
+    End_Object
+  End
+  )");
+
+  Pvl label;
+  labelStrm >> label;
+
+  QTemporaryFile tempFile;
+  tempFile.open();
+  Cube testCube;
+
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
+  QVector<QString> args = {"web=true", "shape=user", "model=" + demCube->fileName()};
+  UserInterface options(APP_XML, args);
+  spiceinit(&testCube, options);
+
+  PvlGroup kernels = testCube.label()->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels.findKeyword("ShapeModel"), demCube->fileName());
+}
+
+
+TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
+  // csminit the cube
+
+  // Create an ISD
+  json isd;
+  isd["test_param_one"] = 1.0;
+  isd["test_param_two"] = 2.0;
+
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QString cubeFile = testCube->fileName();
+
+  QVector<QString> csmArgs = {
+    "from="+cubeFile,
+    "isd="+isdPath};
+
+  QString CSMINIT_APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+  UserInterface csmOptions(CSMINIT_APP_XML, csmArgs);
+  testCube->close();
+
+  ASSERT_NO_THROW(csminit(csmOptions));
+  testCube->open(cubeFile);
+  PvlGroup csmInfoGroup = testCube->group("CsmInfo");
+  testCube->close();
+
+  // spiceinit 
+  QVector<QString> spiceinitArgs = {"from="+cubeFile};
+
+  UserInterface spiceinitOptions(APP_XML, spiceinitArgs);
+  ASSERT_ANY_THROW(spiceinit(spiceinitOptions));
+
+  Cube outputCube(cubeFile);
+
+  ASSERT_NO_THROW(outputCube.camera());
+  EXPECT_TRUE(outputCube.hasBlob("String", "CSMState"));
+  ASSERT_TRUE(outputCube.hasGroup("CsmInfo"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, csmInfoGroup, outputCube.group("CsmInfo"));
+}
+

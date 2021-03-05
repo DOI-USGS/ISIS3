@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 1.35 $
- * $Date: 2010/02/22 02:26:15 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "ProcessImportPds.h"
 
 #include <QString>
@@ -1460,7 +1445,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The label where the translated Isis2 keywords will
    *            be placed
@@ -1478,7 +1463,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 instrument labels as possible
+   * Fill as many of the Isis instrument labels as possible
    *
    * @param lab The label where the tramslated Isis2 keywords will
    *            be placed
@@ -1519,7 +1504,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The lable where the translated PDS keywords will
    *            be placed
@@ -1535,7 +1520,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The lable where the translated PDS keywords will
    *            be placed

@@ -1,4 +1,4 @@
-# Translation for Hayabusa 1 export from ISIS3 cube to PDS4 product.
+# Translation for Hayabusa 1 export from ISIS cube to PDS4 product.
 #
 # Note these translations must be are ordered based on the required PDS4 order.
 #
@@ -17,7 +17,7 @@ End_Group
 Group = FirstSample
   Auto
   Optional
-  InputKey        = FirstSample 
+  InputKey        = FirstSample
   InputPosition   = (IsisCube, Instrument)
   OutputName      = img:first_sample
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Subframe_Parameters)
@@ -27,7 +27,7 @@ End_Group
 Group = FirstLine
   Auto
   Optional
-  InputKey        = FirstLine 
+  InputKey        = FirstLine
   InputPosition   = (IsisCube, Instrument)
   OutputName      = img:first_line
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Subframe_Parameters)
@@ -37,7 +37,7 @@ End_Group
 Group = PixelAveragingHeight
   Auto
   Optional
-  InputKey        = Binning 
+  InputKey        = Binning
   InputPosition   = (IsisCube, Instrument)
   OutputName      = img:pixel_averaging_height
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)
@@ -47,7 +47,7 @@ End_Group
 Group = PixelAveragingWidth
   Auto
   Optional
-  InputKey        = Binning 
+  InputKey        = Binning
   InputPosition   = (IsisCube, Instrument)
   OutputName      = img:pixel_averaging_width
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Downsample_Parameters)

@@ -6,7 +6,7 @@
 
   <description>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3,
+      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis,
       level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
       simultaneously defines the selected image geometry information (camera pointing, spacecraft
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
@@ -25,7 +25,7 @@
 
     <p>
       The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that
-      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to
+      <def>SPICE</def> is included in the Isis <def>cube</def> labels in the Kernels group.  In order to
       run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
       net</def>, the name of an output <def>control net</def>, and the adjustment parameters.
       <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
@@ -64,6 +64,12 @@
      pages.
     </p>
 
+    <h4>Relevant Documentation</h4>
+    <p>
+      For information on what the original <b>jigsaw</b> code was based on checkout
+      <a href="https://www.rand.org/pubs/notes/N3330.html">Rand Notebook</a>
+    </p>
+
     <h4>Known Issues</h4>
       <blockquote>
       <b>Running jigsaw with a control net containing <i>JigsawRejected</i>
@@ -84,6 +90,30 @@
         clear the <i>JigsawRejected</i> flags.</li>
         </ol>
         </blockquote>
+      </p>
+      </blockquote>
+
+      <blockquote>
+      <b>Solving for the target body radii (triaxial or mean) is NOT possible and
+      likely increases error in the solve.</b>
+      <p>
+        With the current jigsaw implementation, it is NOT possible to individually
+        solve for either the mean or triaxial radii as seperate calculations in
+        the bundle adjustment. More specifically, the target body radii has no
+        effect when solving for individual points and thus cannot be solved for in the bundle.
+        A local radii solve is already part of the sequence of equations that <b>jigsaw</b>
+        uses to compute various partial derivatives to populate the solve matrix.
+        A seperate mean or triaxial radii solve can be applied to the target body
+        and the partials from this separate application are added to the
+        solve matrix. This option adds additional computation time to <b>jigsaw</b>
+        and creates additional uncertainty/error in the bundle adjust. We advise
+        the mean and triaxial radii solve be avoided.
+      </p>
+      <p>
+        If you are trying to generate a spheroid from a control network there are
+        other programs that can do this for you. An easier but more naive method
+        is ingesting the <i>OUTPUT_CSV</i> from your network, gather local radii
+        information from those points, then generate a sphereiod from those local radii.
       </p>
       </blockquote>
 
@@ -282,6 +312,12 @@
       settings for different instrumentIDs. Added logic into the observationSolveSettings
       function to construct BundleObservationSolveSettings objects based off of the settings
       in the pvl file.
+    </change>
+    <change name="Adam Paquette" date="2020-12-23">
+      Added a warning when solving for target body radii/radius that is output to
+      the application log. Updated the documentation to include the original
+      rand notebook that jigsaw was based on. Also added a section in the documentation
+      describing the target body radii solve issue.
     </change>
   </history>
 

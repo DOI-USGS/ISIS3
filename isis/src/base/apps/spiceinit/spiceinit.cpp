@@ -17,6 +17,7 @@
 #include "PvlToPvlTranslationManager.h"
 #include "SpiceClient.h"
 #include "SpiceClientStarter.h"
+#include "StringBlob.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "spiceinit.h"
@@ -255,11 +256,15 @@ namespace Isis {
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
 
-      if (!kernelSuccess)
+      if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
                          _FILEINFO_);
+      }
     }
+    icube->deleteGroup("CsmInfo");
+
+    p.WriteHistory(*icube);
     p.EndProcess();
   }
 
@@ -373,6 +378,15 @@ namespace Isis {
     currentKernels.addKeyword(iakKeyword, Pvl::Replace);
     currentKernels.addKeyword(demKeyword, Pvl::Replace);
 
+    // Save off the CSM State so it can be restored if spiceinit fails
+    StringBlob csmState("", "CSMState");
+    if (icube->hasBlob("String", "CSMState")) {
+      icube->read(csmState);
+    }
+
+    // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera
+    icube->deleteBlob("String", "CSMState");
+
     // report qualities
     PvlKeyword spkQuality("InstrumentPositionQuality");
     spkQuality.addValue(Kernel::typeEnum(spk.type()));
@@ -474,6 +488,10 @@ namespace Isis {
           log->addGroup(currentKernels);
         }
         icube->putGroup(originalKernels);
+
+        // restore CSM State blob if spiceinit failed
+        icube->write(csmState);
+
         throw IException(e);
       }
 
@@ -549,7 +567,7 @@ namespace Isis {
 
         *icube->label() += cam->getStoredNaifKeywords();
       }
-      //modify Kernels group only
+      // Modify Kernels group only
       else {
         Pvl *label = icube->label();
         int i = 0;
@@ -574,8 +592,6 @@ namespace Isis {
           }
         }
       }
-
-      p.WriteHistory(*icube);
     }
     catch(IException &) {
       icube->putGroup(originalKernels);
@@ -612,11 +628,7 @@ namespace Isis {
     QString shape     = QString(ui.GetString("SHAPE")).toLower();
 
     if (shape == "user") {
-      shape = QString(ui.GetAsString("MODEL"));
-
-      // Test for valid labels with mapping group at least
-      Pvl shapeTest(shape);
-      shapeTest.findGroup("Mapping", Pvl::Traverse);
+      shape = "ellipsoid";
     }
 
     double startPad = ui.GetDouble("STARTPAD");
@@ -637,7 +649,6 @@ namespace Isis {
     connectionProgress.CheckStatus();
 
     PvlGroup kernelsGroup = client.kernelsGroup();
-    PvlGroup logGrp = client.applicationLog();
     PvlObject naifKeywords = client.naifKeywordsObject();
     Table *pointingTable = client.pointingTable();
     Table *positionTable = client.positionTable();
@@ -662,12 +673,17 @@ namespace Isis {
         continue;
       }
     }
-
-    if (log) {
-      log->addGroup(logGrp);
+    
+    if (ui.GetString("SHAPE") == "USER") {
+      kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
     }
 
     icube->putGroup(kernelsGroup);
+
+    if (log) {
+      log->addGroup(kernelsGroup);
+    }
+
     icube->label()->addObject(naifKeywords);
 
     icube->write(*pointingTable);

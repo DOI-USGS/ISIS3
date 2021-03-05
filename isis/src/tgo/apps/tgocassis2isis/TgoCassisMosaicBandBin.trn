@@ -1,6 +1,6 @@
 # Translates CaSSIS xml labels into the BandBin PvlGroup values
-# for the ingested ISIS3 cube labels, for exported mosaics which have been
-# generated using tgocassisrdrgen. 
+# for the ingested ISIS cube labels, for exported mosaics which have been
+# generated using tgocassisrdrgen.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.
@@ -36,7 +36,9 @@
 # axis_name tag with a value of Sample.
 #
 # history:
-#   2018-06-13 Kristin Berry - Original Version. 
+#   2018-06-13 Kristin Berry - Original Version.
+#   2020-12-22 Kaitlyn Lee - Updated Center and Width translations to match
+                             TgoCassisBandBin.trn.
 
 Group = FilterName
   Auto
@@ -54,10 +56,10 @@ Group = Center
   InputKey       = img:filter_name
   OutputName     = Center
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (675, PAN)
-  Translation    = (485, BLU)
-  Translation    = (840, RED)
-  Translation    = (985, NIR)
+  Translation    = (677.4, PAN)
+  Translation    = (497.4, BLU)
+  Translation    = (835.4, RED)
+  Translation    = (940.2, NIR)
 
 End_Group
 
@@ -67,10 +69,10 @@ Group = Width
   InputKey       = img:filter_name
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (250, PAN)
-  Translation    = (165, BLU)
-  Translation    = (100, RED)
-  Translation    = (220, NIR)
+  Translation    = (231.5, PAN)
+  Translation    = (134.3, BLU)
+  Translation    = (98.0, RED)
+  Translation    = (120.6, NIR)
 
 End_Group
 

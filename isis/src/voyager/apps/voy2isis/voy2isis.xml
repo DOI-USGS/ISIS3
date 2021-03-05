@@ -10,15 +10,15 @@
       <p>
     This program will take in raw image files from the Voyager spacecraft
     mission and import them into Isis formatted cubes.  The input files are
-    compressed Planetary Data System (PDS) formatted Voyager Experiment 
-    Data Record (EDR) files.  The output cube will contain tranlated labels in 
-    pvl format with instrument, archive, bandbin, kernel, and nominal reseau 
+    compressed Planetary Data System (PDS) formatted Voyager Experiment
+    Data Record (EDR) files.  The output cube will contain tranlated labels in
+    pvl format with instrument, archive, bandbin, kernel, and nominal reseau
     information.
       </p>
       <p>
     Some input images from the PDS archive may be missing a value for INSTRUMENT_NAME in their header.
     For these images, the name of the instrument can be specified as NAC (NARROW_ANGLE_CAMERA)
-     or WAC (WIDE_ANGLE_CAMERA) using the optional INSTRUMENT parameter. 
+     or WAC (WIDE_ANGLE_CAMERA) using the optional INSTRUMENT parameter.
     Users are encouraged to find this information in the pds data volume index.tab file.
       </p>
   </description>
@@ -29,16 +29,16 @@
     </change>
     <change name="Jeannie Walldren" date="2009-03-23">
       Modified the Makefile in the app test to ignore particular lines when
-      comparing labels.  Removed the orginal extension from the name of the 
-      temporary decompressed file output by a call to vdcomp.  Modified error 
+      comparing labels.  Removed the orginal extension from the name of the
+      temporary decompressed file output by a call to vdcomp.  Modified error
       message for accuracy.
     </change>
     <change name="Mackenzie Boyd" date="2010-04-30">
       Modified StartTime in labels to remove Z from end. Modified naif frame
-      code for all cameras to be -100 (-32001 -> -32101) from what they were 
+      code for all cameras to be -100 (-32001 -> -32101) from what they were
       previously to match updated ck and fk kernels. Added significant changes
-      which affect the start time and image number for improved accuracy. 
-    </change>  
+      which affect the start time and image number for improved accuracy.
+    </change>
     <change name="Steven Lambright" date="2010-06-17">
       Updated to make input IMQ's PVL labels parsable by our PVL classes
     </change>
@@ -46,10 +46,10 @@
       Added keywords Camera_State_1 and Camera_State_2.
     </change>
     <change name="Mackenzie Boyd" date="2011-01-21">
-      Added support for .img files. 
+      Added support for .img files.
     </change>
     <change name="Stuart Sides" date="2012-05-05">
-      Added Center and Width keywords to the BandBin group. 
+      Added Center and Width keywords to the BandBin group.
     </change>
     <change name="Kristin Berry" date="2015-07-22">
       Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248
@@ -64,7 +64,7 @@
       Made changes to allow merge of two voy2isis tickets. References #4421, #4345.
     </change>
     <change name="Kristin Berry" date="2019-11-06">
-      Added the INSTRUMENT parameter to allow the specification of the InstrumentId 
+      Added the INSTRUMENT parameter to allow the specification of the InstrumentId
       when it cannot be determined from the labels. Fixed #3426
     </change>
   </history>
@@ -131,7 +131,7 @@
            Output Isis cube
          </brief>
          <description>
-           Use this parameter to select the output filename for the imported 
+           Use this parameter to select the output filename for the imported
            image.
          </description>
          <filter>
@@ -144,10 +144,10 @@
         <brief>Defines the InstrumentId to use for the image. Only needs to be specified if missing from the input image.</brief>
         <default><item>AUTOMATIC</item></default>
         <description>
-          This parameter is used to specify the InstrumentId for the image. If left at 
-           its default value, ISIS will determine the InstrumentId automatically 
-	   using the INSTRUMENT_NAME value from the input image. This option was added because some images are 
-	   missing the INSTRUMENT_NAME from their labels. 
+          This parameter is used to specify the InstrumentId for the image. If left at
+           its default value, ISIS will determine the InstrumentId automatically
+	   using the INSTRUMENT_NAME value from the input image. This option was added because some images are
+	   missing the INSTRUMENT_NAME from their labels.
         </description>
           <list>
            <option value="AUTOMATIC">
@@ -179,14 +179,14 @@
       <brief>Using voy2isis</brief>
       <description>
         This example shows the use of voy2isis to ingest Voyager EDRs and output
-        Isis3 cubes.
+        Isis cubes.
       </description>
       <terminalInterface>
         <commandLine>
           from=input/voyagerEdr.imq to=isisImage.cub
         </commandLine>
         <description>
-          This example shows how to import with voy2isis.  Both parameters must 
+          This example shows how to import with voy2isis.  Both parameters must
           be used.
         </description>
       </terminalInterface>
@@ -197,7 +197,7 @@
               Example GUI
             </brief>
             <description>
-              Screenshot of the GUI 
+              Screenshot of the GUI
             </description>
             <thumbnail width="200" height="168" src="assets/thumbs/voy2isisGUI.jpg" caption="voy2isis gui"/>
           </image>

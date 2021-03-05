@@ -1,32 +1,19 @@
 #ifndef GainUnitConversion_h
 #define GainUnitConversion_h
-/**
- * @file
- * $Revision: 1.2 $
- * $Date: 2008/05/14 21:07:22 $
- * $Id$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <cmath>
 #include <string>
 #include <vector>
 
+#include "Cube.h"
 #include "IString.h"
 #include "HiCalTypes.h"
 #include "HiCalUtil.h"
@@ -50,15 +37,17 @@ namespace Isis {
    * @internal
    *   @history 2010-10-28 Kris Becker Renamed parameters replacing "Ziof" with
    *            "GainUnitConversion".
+   *   @history 2021-02-24 Stuart Sides Added a cube parameter to the
+   *            constructor to support getting sun distance from the camera
    */
   class GainUnitConversion : public Module {
 
     public:
       //  Constructors and Destructor
       GainUnitConversion() : Module("GainUnitConversion"), _units("DN") { }
-      GainUnitConversion(HiCalConf &conf, const QString &units) :
+      GainUnitConversion(HiCalConf &conf, const QString &units, Cube *cube) :
                  Module("GainUnitConversion"),  _units(units) {
-        init(conf);
+        init(conf, cube);
       }
 
       /** Destructor */
@@ -67,7 +56,7 @@ namespace Isis {
     private:
       QString   _units;
 
-      void init(HiCalConf &conf) {
+      void init(HiCalConf &conf, Cube *cube) {
         _history.clear();
         DbProfile prof = conf.getMatrixProfile();
         _history.add("Profile["+ prof.Name()+"]");
@@ -75,7 +64,7 @@ namespace Isis {
         double sed = ToDouble(prof("ScanExposureDuration"));  // units = us
         if ( IsEqual(_units, "IOF") ) {
           //  Add solar I/F correction parameters
-          double au = conf.sunDistanceAU();
+          double au = conf.sunDistanceAU(cube);
           _history.add("SunDist[" + ToString(au) + " (AU)]");
           double suncorr =  1.5 / au;
           suncorr *= suncorr;

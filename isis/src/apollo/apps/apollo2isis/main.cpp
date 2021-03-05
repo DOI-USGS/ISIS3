@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "Chip.h"
 #include "UserInterface.h"
@@ -49,11 +57,11 @@ void IsisMain() {
 
   QString filename = FileName(ui.GetFileName("FROM")).baseName();
   FileName toFile = ui.GetFileName("TO");
-  
+
   apollo = new Apollo(filename);
 
-  utcTime = (QString)pdsLabel["START_TIME"];  
-  
+  utcTime = (QString)pdsLabel["START_TIME"];
+
   // Setup the output cube attributes for a 16-bit unsigned tiff
   Isis::CubeAttributeOutput cao;
   cao.setPixelType(Isis::Real);
@@ -64,11 +72,11 @@ void IsisMain() {
   p.EndProcess();
 
   cube.open(toFile.expanded(), "rw");
-  
+
   // Once the image is imported, we need to find and decrypt the code
   if (apollo->IsMetric() && FindCode())
     TranslateCode();
-    
+
   CalculateTransform();
   // Once we have decrypted the code, we need to populate the image labels
   TranslateApolloLabels(filename, &cube);
@@ -88,7 +96,7 @@ bool FindCode() {
   for (int i=1; i<chip.Samples()-6*RADIUS-1; i+=RADIUS/8) {
     for (int j=1; j<=chip.Lines()-4*RADIUS-1; j+=RADIUS/8) {
       if ( chip.GetValue(i,j) > 60000 && chip.GetValue(i+2*RADIUS, j) > 60000 &&
-                  chip.GetValue(i+2*RADIUS, j+2*RADIUS) < 60000 && 
+                  chip.GetValue(i+2*RADIUS, j+2*RADIUS) < 60000 &&
                   chip.GetValue(i+2*RADIUS, j+4*RADIUS) > 60000)  {
         // Now that we've found one, let's refine the location
         codeFound = true;
@@ -99,7 +107,7 @@ bool FindCode() {
       }
     }
   }
-  
+
   // If the code was not found, we will use the default location
   codeFound = false;
   codeSample = CENTER_SAMPLE;
@@ -119,7 +127,7 @@ void CalculateTransform() {
       sampleUR, lineUR,
       sampleLL, lineLL,
       sampleLR, lineLR;
-      
+
   RefineCodeLocation();
   sampleUL = codeSample;
   lineUL = codeLine;
@@ -135,7 +143,7 @@ void CalculateTransform() {
   RefineCodeLocation();
   sampleLL = codeSample;
   lineLL = codeLine;
-  
+
   if (code[0][0] == 1 && code[0][31] ==1 && code[3][0] == 1 && code[3][31] == 1) {
   rotation = -1*atan((sampleLR-sampleUR+sampleLL-sampleUL)/(lineLR-lineUR+lineLL-lineUL)) - 0.00281891751001 - 0.000648055741779;
   sampleTranslation = (sampleUL+sampleUR+sampleLL+sampleLR)/4;
@@ -151,7 +159,7 @@ void CalculateTransform() {
           sampleTranslation = 600;
           lineTranslation = 22700;
   }
-  
+
   if (apollo->IsApollo17())
           rotation += 0.0111002410269388;
 }
@@ -207,7 +215,7 @@ void TranslateCode() {
       else code[i][31-j] = false;
     }
   }
-  
+
   for (int j=0; j<32; j++) {
     for (int i=0; i<4; i++) {
     }
@@ -222,11 +230,11 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   PvlGroup inst("Instrument");
   PvlGroup kern("Kernels");
   PvlGroup codeGroup("Code");
-  
+
   inst += PvlKeyword("SpacecraftName", apollo->SpacecraftName());
   inst += PvlKeyword("InstrumentId", apollo->InstrumentId());
   inst += PvlKeyword("TargetName", apollo->TargetName());
-  
+
   if ( !IsValidCode() ){
     PvlGroup error("ERROR");
     error.addComment("The decrypted code is invalid.");
@@ -243,12 +251,12 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   else {
     codeGroup += PvlKeyword("StartTime", FrameTime());
     codeGroup += PvlKeyword("SpacecraftAltitude", toString(Altitude()),"meters");
-  
+
     if (apollo->IsMetric()){
       codeGroup += PvlKeyword("ExposureDuration", toString(ShutterInterval()), "milliseconds");
       codeGroup += PvlKeyword("ForwardMotionCompensation", FMC());
     }
-    
+
     for (int i=0; i<4; i++) {
       PvlKeyword keyword("Column"+toString(i+1));
       for (int j=0; j<32; j++) {
@@ -257,13 +265,13 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
       codeGroup += keyword;
     }
   }
-    
+
   PvlGroup bandBin("BandBin");
   // There are no filters on the camera, so the default is clear with id # of 1
   // the BandBin group is only included to work with the spiceinit application
   bandBin += PvlKeyword("FilterName", "CLEAR");
   bandBin += PvlKeyword("FilterId", "1");
-  
+
   kern += PvlKeyword("NaifFrameCode", apollo->NaifFrameCode());
 
   // Set up the nominal reseaus group
@@ -273,24 +281,24 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   QString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
   Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
   PvlGroup *reseaus = &resTemplate.findGroup("Reseaus");
-  
+
   // Update reseau locations based on refined code location
   for (int i=0; i<(reseaus->findKeyword("Type")).size(); i++) {
     double x = toDouble(reseaus->findKeyword("Sample")[i]) + sampleTranslation + 2278,
            y = toDouble(reseaus->findKeyword("Line")[i]) + lineTranslation - 20231;
-    
+
     if (apollo->IsApollo17()) {
         x += 50;
         y += 20;
     }
-    
+
     reseaus->findKeyword("Sample")[i] = toString(
         cos(rotation)*(x-sampleTranslation) - sin(rotation)*(y-lineTranslation) + sampleTranslation);
     reseaus->findKeyword("Line")[i] = toString(
         sin(rotation)*(x-sampleTranslation) + cos(rotation)*(y-lineTranslation) + lineTranslation);
   }
   inst += PvlKeyword("StartTime", utcTime);
-    
+
   opack->putGroup(inst);
   opack->putGroup(bandBin);
   opack->putGroup(kern);
@@ -303,7 +311,7 @@ bool IsValidCode() {
   return codeFound && ( code[0][0] || !code[0][3] || !code[0][5] || code[0][10] ||  !code[0][11] || !code[0][12] || code[0][15] || !code[0][16] || code[0][21] || !code[0][22] || !code[0][26] || code[0][31] ||
                          code[1][0] || !code[1][6] || !code[1][11] || code[1][12] || !code[1][13] || !code[1][14] || code[1][15] || !code[1][28] || code[1][29] || !code[1][30] || code[1][31] ||
                          code[2][0] || code[2][15] || !code[2][21] || code[2][22] || !code[2][23] || !code[2][24] || !code[2][25] || !code[2][26] || !code[2][27] || !code[2][28] || !code[2][29] || !code[2][30] || code[2][31] )
-                   && (!(apollo->IsMetric()) || (code[3][0] || !code[3][13] || !code[3][14] || code[3][15] || !code[3][16] || !code[3][17] || !code[3][18] || !code[3][19] || !code[3][20] || !code[3][21] || 
+                   && (!(apollo->IsMetric()) || (code[3][0] || !code[3][13] || !code[3][14] || code[3][15] || !code[3][16] || !code[3][17] || !code[3][18] || !code[3][19] || !code[3][20] || !code[3][21] ||
                                                    !code[3][22] || !code[3][23] || !code[3][24] || !code[3][25] || !code[3][26] || !code[3][27] || !code[3][28] || !code[3][30] || code[3][31]));
 }
 
@@ -319,29 +327,29 @@ QString FrameTime() {
       if (i<4) days += (int)pow(2.0, i)*code[0][9-i];
       else days += 10*(int)pow(2.0, i-4)*code[0][8-i];
     }
-    
+
     for (int i=0; i<6; i++) {
       if (i<4) hours += (int)pow(2.0, i)*code[0][20-i];
       else hours += 10*(int)pow(2.0, i-4)*code[0][18-i];
     }
-    
+
     for (int i=0; i<7; i++) {
       if (i<4) minutes += (int)pow(2.0, i)*code[0][30-i];
       else minutes += 10*(int)pow(2.0, i-4)*code[0][29-i];
     }
-    
+
     for (int i=0; i<7; i++) {
       if (i<4) seconds += (int)pow(2.0, i)*code[1][10-i];
       else seconds += 10*(int)pow(2.0, i-4)*code[1][9-i];
     }
-    
+
     // And the milliseconds
     for (int i=0; i<12; i++) {
       if (i<4) seconds += 0.001* pow(2.0, i)*code[1][27-i];
       else if (i<8) seconds += 0.01*pow(2.0, i-4)*code[1][27-i];
       else seconds += 0.1*pow(2.0, i-8)*code[1][27-i];
     }
-    
+
     // Perform checks to make sure the time is correct
     //   (i.e. convert 60 seconds to a minute, etc.)
     if (seconds > 60) {
@@ -358,11 +366,11 @@ QString FrameTime() {
     }
     // This last check will only affect Apollo 15 which launched in July (31 days) and landed in August
     // Both Apollo 16 and Apollo 17 launched and landed in the same month
-    if (days > 31){ 
+    if (days > 31){
       days -= 31;
       month += 1;
     }
-  
+
     QString sTime = toString(year) + "-";
     if (month < 10) sTime += "0";
     sTime += toString(month)+ "-";
@@ -374,7 +382,7 @@ QString FrameTime() {
     sTime += toString(minutes) + ":";
     if (seconds <10) sTime += "0";
     sTime += toString(seconds);
-    
+
     return sTime;
 }
 

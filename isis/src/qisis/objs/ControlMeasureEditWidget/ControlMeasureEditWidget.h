@@ -1,6 +1,14 @@
 #ifndef ControlMeasureEditWidget_h
 #define ControlMeasureEditWidget_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // This is the only include allowed in this file!
 #include <QWidget>
 
@@ -158,7 +166,7 @@ namespace Isis {
     *                           points.
     *   @history 2018-10-10 Tracie Sucharski - Fixed blink extension to use geom if selected and
     *                           correct zoom factor.
-    *                          
+    *
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.

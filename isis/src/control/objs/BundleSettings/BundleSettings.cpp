@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleSettings.h"
 
 #include <QDataStream>
@@ -264,13 +272,13 @@ namespace Isis {
                                        bool solveRadius,
                                        SurfacePoint::CoordinateType coordTypeBundle,
                                        SurfacePoint::CoordinateType coordTypeReports,
-                                       double globalPointCoord1AprioriSigma, 
-                                       double globalPointCoord2AprioriSigma, 
+                                       double globalPointCoord1AprioriSigma,
+                                       double globalPointCoord2AprioriSigma,
                                        double globalPointCoord3AprioriSigma) {
     m_solveObservationMode = solveObservationMode;
     m_solveRadius = solveRadius;
     m_updateCubeLabel = updateCubeLabel;
-    m_errorPropagation = errorPropagation;      
+    m_errorPropagation = errorPropagation;
     m_cpCoordTypeReports = coordTypeReports;
     m_cpCoordTypeBundle = coordTypeBundle;
     // m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
@@ -471,8 +479,8 @@ namespace Isis {
 
 
   /**
-   * Retrieves global a priori sigma for 1st coordinate of points for this bundle 
-   * 
+   * Retrieves global a priori sigma for 1st coordinate of points for this bundle
+   *
    * @return @b double The global a priori sigma for point coordinate 1.
    */
   double BundleSettings::globalPointCoord1AprioriSigma() const {
@@ -482,7 +490,7 @@ namespace Isis {
 
   /**
    * Retrieves the global a priori sigma for 2nd coordinate of points for this bundle
-   * 
+   *
    * @return @b double The global a priori sigma for point coordinate 2.
    */
   double BundleSettings::globalPointCoord2AprioriSigma() const {
@@ -491,8 +499,8 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma 3rd coordinate of points for this bundle 
-   * 
+   * Retrieves the global a priori sigma 3rd coordinate of points for this bundle
+   *
    * @return @b double The global a priori sigma for point coordinate 3.
    */
   double BundleSettings::globalPointCoord3AprioriSigma() const {
@@ -512,8 +520,8 @@ namespace Isis {
 
 
   /**
-   * Retrieves solve settings for the observation corresponding to the given observation number. 
-   * If no corresponding settings object exists, return a new solve settings with no related 
+   * Retrieves solve settings for the observation corresponding to the given observation number.
+   * If no corresponding settings object exists, return a new solve settings with no related
    * observation numbers.
    *
    * @param observationNumber The observation number associated with the
@@ -570,7 +578,7 @@ namespace Isis {
    */
   QList<BundleObservationSolveSettings> BundleSettings::observationSolveSettings() const {
     return m_observationSolveSettings;
-  } 
+  }
 
 
   // =============================================================================================//
