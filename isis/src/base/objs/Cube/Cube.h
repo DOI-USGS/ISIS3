@@ -31,6 +31,7 @@ namespace Isis {
   class CubeAttributeOutput;
   class CubeCachingAlgorithm;
   class CubeIoHandler;
+  class CubeStretch;
   class FileName;
   class Projection;
   class Pvl;
@@ -42,6 +43,7 @@ namespace Isis {
   class OriginalLabel;
   class OriginalXmlLabel;
   class ImagePolygon;
+
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -254,11 +256,14 @@ namespace Isis {
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       OriginalLabel readOriginalLabel() const;
+      CubeStretch readCubeStretch(QString name="CubeStretch",
+                                  const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       OriginalXmlLabel readOriginalXmlLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
+      void write(const CubeStretch &cubeStretch);
       void write(OriginalLabel lab);
       void write(OriginalXmlLabel lab);
       void write(Buffer &wbuf);
