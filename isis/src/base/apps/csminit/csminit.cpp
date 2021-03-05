@@ -29,7 +29,6 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "StringBlob.h"
 
 using namespace std;
 
@@ -364,7 +363,7 @@ namespace Isis {
     }
 
     // Save off all old Blobs to restore in the case of csminit failure
-    StringBlob originalCsmStateBlob("", "CSMState");
+    Blob originalCsmStateBlob("CSMState", "String");
     if (cube->hasBlob("String", "CSMState")) {
       cube->read(originalCsmStateBlob);
     }
@@ -411,7 +410,8 @@ namespace Isis {
     cube->deleteBlob("Polygon", "Footprint");
 
     // Create our CSM State blob as a string and add the CSM string to the Blob.
-    StringBlob csmStateBlob(modelState, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(modelState.c_str(), modelState.size());
     PvlObject &blobLabel = csmStateBlob.Label();
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);

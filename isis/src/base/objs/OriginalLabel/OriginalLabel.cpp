@@ -70,7 +70,7 @@ namespace Isis {
     sstream << m_originalLabel;
     string orglblStr = sstream.str();
     Isis::Blob *blob = new Blob("IsisCube", "OriginalLabel");
-    blob->setData((char*)orglblStr.data(), orglblStr.length());
+    blob->setData(orglblStr.c_str(), orglblStr.size());
     return blob;
   }
 

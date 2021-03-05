@@ -21,7 +21,6 @@ find files of those names at the top level of this repository. **/
 #include "csm/RasterGM.h"
 
 namespace Isis {
-  class StringBlob;
   class CSMCamera : public Camera {
 
     public:
