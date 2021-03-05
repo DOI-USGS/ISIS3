@@ -13,10 +13,14 @@ find files of those names at the top level of this repository. **/
 #include <string>
 #include <vector>
 
+#include "Camera.h"
 #include "CSVReader.h"
 #include "FileName.h"
 #include "IString.h"
+#include "iTime.h"
+#include "NaifStatus.h"
 #include "Spice.h"
+
 /**
  * @author ????-??-?? Kris Becker
  *
@@ -65,7 +69,7 @@ namespace Isis {
   static void loadNaifTiming() {
     static bool naifLoaded = false;
     if (!naifLoaded) {
-//  Load the NAIF kernels to determine timing data
+      //  Load the NAIF kernels to determine timing data
       Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
       leapseconds = leapseconds.highestVersion();
 
@@ -75,7 +79,7 @@ namespace Isis {
       Isis::FileName pck("$base/kernels/spk/de???.bsp");
       pck = pck.highestVersion();
 
-//  Load the kernels
+      //  Load the kernels
       QString leapsecondsName(leapseconds.expanded());
       QString sclkName(sclk.expanded());
       QString pckName(pck.expanded());
@@ -83,11 +87,12 @@ namespace Isis {
       furnsh_c(sclkName.toLatin1().data());
       furnsh_c(pckName.toLatin1().data());
 
-//  Ensure it is loaded only once
+      //  Ensure it is loaded only once
       naifLoaded = true;
     }
     return;
   }
+
 
   /**
    * @brief Computes the distance from the Sun to the observed body
@@ -99,34 +104,54 @@ namespace Isis {
    */
   static bool sunDistanceAU(const QString &scStartTime,
                             const QString &target,
-                            double &sunDist) {
-
-    //  Ensure NAIF kernels are loaded
-    loadNaifTiming();
-    sunDist = 1.0;
-
-    //  Determine if the target is a valid NAIF target
-    SpiceInt tcode;
-    SpiceBoolean found;
-    bodn2c_c(target.toLatin1().data(), &tcode, &found);
-    if (!found) return (false);
-
-    //  Convert starttime to et
-    double obsStartTime;
-    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
-
-    //  Get the vector from target to sun and determine its length
-    double sunv[3];
-    double lt;
-    spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
-                    sunv, &lt);
-    double sunkm = vnorm_c(sunv);
-
-    //  Return in AU units
-    sunDist = sunkm / 1.49597870691E8;
+                            double &sunDist,
+                            Cube *cube) {
+    try {
+      Camera *cam;
+      cam = cube->camera();
+      cam->SetImage(0.5, 0.5);
+      sunDist = cam->sunToBodyDist() / 1.49597870691E8;
+    }
+    catch (IException &e) {
+      try {
+        //  Ensure NAIF kernels are loaded
+        NaifStatus::CheckErrors();
+        loadNaifTiming();
+        sunDist = 1.0;
+        
+        //  Determine if the target is a valid NAIF target
+        SpiceInt tcode;
+        SpiceBoolean found;
+        bodn2c_c(target.toLatin1().data(), &tcode, &found);
+        if (!found) return (false);
+        
+        //  Convert starttime to et
+        double obsStartTime;
+        scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
+        NaifStatus::CheckErrors();
+        
+        //  Get the vector from target to sun and determine its length
+        double sunv[3];
+        double lt;
+        spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+                        sunv, &lt);
+        double sunkm = vnorm_c(sunv);
+        
+        //  Return in AU units
+        sunDist = sunkm / 1.49597870691E8;
+      } 
+      catch (IException &e) {
+        QString message = "Unable to determine the sun-target distance.";
+        throw IException(e, IException::Unknown, message, _FILEINFO_);
+      }
+    }
     return (true);
   }
 
+
+  /**
+   * Load WAC CSV.
+   */
   std::vector<double> loadWACCSV(const QString &fname, int filter,
                                  int nvalues, bool header=true, int skip=0) {
     //  Open the CSV file
@@ -159,6 +184,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Load NAC CSV.
+   */
   std::vector<double> loadNACCSV(const QString &fname, int nvalues,
                                  bool header=true, int skip=0) {
     //  Open the CSV file
@@ -180,6 +208,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Load responsivity 
+   */
   std::vector<double> loadResponsivity(bool isNAC, bool binned, int filter,
                                        QString &fname) {
 
@@ -205,6 +236,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Load solar irradiation
+   */
   std::vector<double> loadSolarIrr(bool isNAC, bool binned, int filter,
                                    QString &fname)  {
 
@@ -225,6 +259,10 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * Loads the smear component
+   */
   double loadSmearComponent(bool isNAC, int filter, QString &fname) {
 
     FileName smearfile(fname);
@@ -245,6 +283,7 @@ namespace Isis {
     }
     return (smear[0]);
   }
+
 
 /**
  * @brief Load and retrieve empirical correction factor
@@ -319,7 +358,7 @@ namespace Isis {
  *                      to WAC filter data.
  */
  double loadEmpiricalCorrection(const QString &scStartTime, const int filter,
-                                QString &ename, QString &eDate) {
+                                QString &ename, QString &eDate, Cube *cube) {
 
    //  This table maps the filter number extracted from BandBin/Number keyword
    //  to the columns (index) in the empirical correction table
@@ -363,12 +402,27 @@ namespace Isis {
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
-    // Ensure NAIF kernels are loaded for NAIF time computations
-    loadNaifTiming();
+    double obsStartTime = 0.0;
+    try {
+      Camera *cam = cube->camera();
+      obsStartTime = cam->getClockTime(scStartTime, -236).Et();
+    } 
+    catch (IException &e) {
+      try {
+        // Ensure NAIF kernels are loaded for NAIF time computations
+        NaifStatus::CheckErrors();
+        loadNaifTiming();
 
-    //  Convert s/c clock start time to et
-    double obsStartTime;
-    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
+        //  Convert s/c clock start time to et
+        scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
+        NaifStatus::CheckErrors();
+
+      } 
+      catch (IException &e) {
+        QString message = "Could not convert spacecraft clock start count to ET.";
+        throw IException(e, IException::Unknown, message, _FILEINFO_);
+      }
+    }
 
     // Set initial conditions and loop through all rows in the event table
     double evalue = 1.0;
@@ -378,8 +432,7 @@ namespace Isis {
       CSVReader::CSVAxis eRow = csv.getRow(i);
       QString utcTime = eRow[0];
       double eTime;
-      utc2et_c(utcTime.toLatin1().data(), &eTime);
-
+      eTime = iTime(utcTime.toLatin1().data()).Et();
       // If current time is greater than start time this is the post event case
       if (eTime > obsStartTime) {
         //  Get closest pre or post event correction factor
@@ -401,7 +454,6 @@ namespace Isis {
     // Return the factor
     return (evalue);
   }
-
 
 };
 #endif

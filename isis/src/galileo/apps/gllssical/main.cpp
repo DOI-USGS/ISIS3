@@ -9,10 +9,12 @@ find files of those names at the top level of this repository. **/
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "Buffer.h"
+#include "Camera.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
 #include "Spice.h"
 #include "TextFile.h"
+#include "NaifStatus.h"
 
 using namespace Isis;
 using namespace std;
@@ -444,31 +446,55 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   gainConversion = toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
 
   if (iof) {
-    Pvl *label = icube->label();
-    Spice spicegll(*icube);
-    spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
-    QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
-    Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
-    QString sclkName(sclk.expanded());
-    furnsh_c(sclkName.toLatin1().data());
-    double obsStartTime;
-    scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
-    spicegll.setTime(obsStartTime);
-    double sunv[3];
-    spicegll.sunPosition(sunv);
+    try {
+      Camera *cam;
+      cam = icube->camera();
+      cam->instrumentPosition()->SetAberrationCorrection("LT+S");
+      // Set time to the starting time of the image by setting image.
+      cam->SetImage(0.5, 0.5);
 
-    double sunkm = vnorm_c(sunv);
+      // rsun converted to AU
+      rsun = cam->sunToBodyDist() / 1.49597870691E8 / 5.2;
+    } 
+    catch (IException &e) {
+      // try original fallback for previously spiceinited data 
+      try {
+        Pvl *label = icube->label();
+        QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
 
-    //  Convert to AU units
-    rsun = sunkm / 1.49597870691E8 / 5.2;
+        Spice spicegll(*icube);
+        spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
+        Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
+        QString sclkName(sclk.expanded());
 
-    /*
-     * We are calculating I/F, so scaleFactor0 is:
-     *
-     *         S1       K
-     *      -------- * --- (D/5.2)**2
-     *         A1       Ko
-     */
+        NaifStatus::CheckErrors();
+        furnsh_c(sclkName.toLatin1().data());
+        NaifStatus::CheckErrors();
+
+        double obsStartTime;
+        scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
+        spicegll.setTime(obsStartTime);
+        double sunv[3];
+        spicegll.sunPosition(sunv);
+
+        double sunkm = vnorm_c(sunv);
+        
+        //  Convert to AU units
+        rsun = sunkm / 1.49597870691E8 / 5.2;
+      } 
+      catch (IException &e) {
+        QString message = "IOF option does not work with non-spiceinited cubes.";
+        throw IException(e, IException::User, message, _FILEINFO_);
+      }
+    }
+        
+   /*
+    * We are calculating I/F, so scaleFactor0 is:
+    *
+    *         S1       K
+    *      -------- * --- (D/5.2)**2
+    *         A1       Ko
+    */
     scaleFactor0 = (s1 * (cubeConversion / gainConversion) * pow(rsun, 2)) / (scaleFactor);
   }
   else {

@@ -72,7 +72,7 @@ namespace Isis {
 
     for (auto poly : *p_polygons) {
       geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-      for (int i = 0; i < coordArray.getSize(); i++) {
+      for (size_t i = 0; i < coordArray.getSize(); i++) {
         p_pts->add(geos::geom::Coordinate(coordArray.getAt(i)));
       }
     }

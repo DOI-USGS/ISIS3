@@ -68,10 +68,7 @@ namespace Isis {
     blob.Label() += PvlKeyword("StretchType", getType());
     blob.Label() += PvlKeyword("BandNumber", QString::number(getBandNumber()));
     std::string blobString = Text().toStdString();
-    char *buff = new char[blobString.length()+1];
-    memcpy(buff, blobString.c_str(), blobString.length()+1);
-    //std::strcpy(buff, blobString.c_str());
-    blob.setData(buff, blobString.size());
+    blob.setData(blobString.c_str(), blobString.size());
     return blob;
   }
 

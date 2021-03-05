@@ -505,6 +505,21 @@ namespace Isis {
     delete isdPathR;
   }
 
+
+  void MroCtxCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MroCtxCube::TearDown() {
+    testCube.reset();
+  }
+
+
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
@@ -986,15 +1001,23 @@ namespace Isis {
     std::ostringstream ostr;
     ostr << historyPvl;
     std::string histStr = ostr.str();
-    int nbytes = histStr.size();
-
-    // Don't worry about cleaning up this buffer
-    // The blob takes ownership of it and handles freeing the memory in
-    // its decontructor
-    char *buffer = new char[nbytes];
-    memcpy(buffer, histStr.c_str(), nbytes);
 
     historyBlob = Blob("IsisCube", "History");
-    historyBlob.setData(buffer, nbytes);
+    historyBlob.setData(histStr.c_str(), histStr.size());
   }
+
+
+  void MgsMocCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mgsImages/mocImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MgsMocCube::TearDown() {
+    testCube.reset();
+  }
+
 }

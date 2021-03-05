@@ -168,8 +168,7 @@ set(thirdPartyCppFlags -Wall
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
                        -DUSE_UNSTABLE_GEOS_CPP_API=1
-		               -Wno-strict-overflow
-                       -DGMM_USES_SUPERLU
+                       -Wno-strict-overflow
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
@@ -273,7 +272,6 @@ find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
-find_package(GMM       5.0     REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)

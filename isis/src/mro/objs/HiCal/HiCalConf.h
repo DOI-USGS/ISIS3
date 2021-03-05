@@ -20,6 +20,8 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
 
+  class Cube;
+
   /**
    *  @brief HiCalConf manages HiRISE calibration matrices
    * that alter some or all of the
@@ -111,7 +113,7 @@ namespace Isis {
       int getMatrixBand() const;
       int getMatrixBand(const DbProfile &p) const;
 
-      double sunDistanceAU();
+      double sunDistanceAU(Cube *cube);
 
       DbProfile getMatrixProfile(const QString &profile = "") const;
       ValueList getList(const DbProfile &profile, const QString &key) const;
