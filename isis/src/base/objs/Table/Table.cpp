@@ -425,7 +425,7 @@ namespace Isis {
       memcpy(&buf[bufferPos], p_recbufs[rec], RecordSize());
     }
 
-    tableBlob.setData(buf, nbytes);
+    tableBlob.takeData(buf, nbytes);
 
     return tableBlob;
   }

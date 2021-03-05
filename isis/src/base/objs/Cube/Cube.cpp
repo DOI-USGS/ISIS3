@@ -23,6 +23,7 @@ find files of those names at the top level of this repository. **/
 #include "CubeAttribute.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
+#include "CubeStretch.h"
 #include "Endian.h"
 #include "FileName.h"
 #include "History.h"
@@ -881,6 +882,24 @@ namespace Isis {
 
 
   /**
+   * This method will read a StretchBlob from a cube.
+   */
+  CubeStretch Cube::readCubeStretch(QString name, const std::vector<PvlKeyword> keywords) const {
+    Blob stretchBlob(name, "Stretch");
+    try {
+      stretchBlob.Read(fileName(), keywords);
+    }
+    catch (IException &e){
+      std::cout << e.what() << '\n';
+      QString msg = "Unable to locate Stretch information in " + fileName();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    CubeStretch cubeStretch(stretchBlob);
+    return stretchBlob;
+  }
+
+
+  /**
    * This method will read an OriginalXmlLabel from a cube.
    */
   OriginalXmlLabel Cube::readOriginalXmlLabel() const {
@@ -991,6 +1010,11 @@ namespace Isis {
   void Cube::write(const Table &table) {
     Blob tableBlob = table.toBlob();
     write(tableBlob);
+  }
+
+  void Cube::write(const CubeStretch &cubeStretch) {
+    Blob cubeStretchBlob = cubeStretch.toBlob();
+    write(cubeStretchBlob);
   }
 
 

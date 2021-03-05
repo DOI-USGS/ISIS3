@@ -4,11 +4,11 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 
+#include "Blob.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
-#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "ControlNet.h"
 
@@ -887,7 +887,8 @@ namespace Isis {
     loadablePlugin.registerModel(mockModelName, &mockModel);
 
     // CSMState BLOB
-    StringBlob csmStateBlob(mockModelName, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(mockModelName.c_str(), mockModelName.size());
     csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
     csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
     testCube->write(csmStateBlob);

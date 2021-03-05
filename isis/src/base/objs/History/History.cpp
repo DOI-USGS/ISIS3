@@ -74,17 +74,14 @@ namespace Isis {
     string histStr = ostr.str();
     int bytes = histStr.size();
 
-    char *temp = p_histBuffer;
-    p_histBuffer = new char[p_bufferSize+bytes];
-    if (temp != NULL) memcpy(p_histBuffer, temp, p_bufferSize);
+    int blobBufferSize = p_bufferSize+bytes;
+    char *blobBuffer = new char[blobBufferSize];
+    if (p_histBuffer != NULL) memcpy(blobBuffer, p_histBuffer, p_bufferSize);
     const char *ptr = histStr.c_str();
-    memcpy(&p_histBuffer[p_bufferSize], (void *)ptr, bytes);
-    p_bufferSize += bytes;
-
-    if (temp != NULL) delete [] temp;
+    memcpy(&blobBuffer[p_bufferSize], (void *)ptr, bytes);
 
     Blob *newBlob = new Blob(name, "History");
-    newBlob->setData(p_histBuffer, p_bufferSize);
+    newBlob->takeData(blobBuffer, blobBufferSize);
     return newBlob;
   }
 
