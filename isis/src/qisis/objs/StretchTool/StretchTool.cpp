@@ -679,10 +679,10 @@ namespace Isis {
       if (icube->isReadOnly()) {
         //  reOpen cube as read/write
         try {
-          cvp->cube()->reopen("rw");
+          icube->reopen("rw");
         }
         catch(IException &) {
-          cvp->cube()->reopen("r");
+          icube->reopen("r");
           QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write to save stretch");
           return;
         }

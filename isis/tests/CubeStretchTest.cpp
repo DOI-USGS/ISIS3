@@ -51,7 +51,7 @@ TEST(CubeStretch, BlobConstructor) {
   EXPECT_EQ(cubeStretchFromBlob.getBandNumber(), cubeStretch.getBandNumber());
 };
 
-TEST_F(DefaultCube, CubeStretchWriteRead) {
+TEST_F(SmallCube, CubeStretchWriteRead) {
   // Set up Stretch to write
   QString stretchName = "TestStretch";
   Isis::CubeStretch cubeStretch(stretchName, "testType", 2);
