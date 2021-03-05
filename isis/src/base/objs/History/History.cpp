@@ -21,7 +21,7 @@ namespace Isis {
    */
   History::History() {
     p_history.setTerminator("End");
-   }
+  }
 
   /**
    *  Constructor for reading a blob
@@ -30,16 +30,17 @@ namespace Isis {
   History::History(Isis::Blob &blob) {
     p_history.setTerminator("End");
 
-    stringstream os;
     char *blob_buffer = blob.getBuffer();
-    for (int i = 0; i < blob.Size(); i++) {
-      os << blob_buffer[i];
-    }
-    os >> p_history;
-   }
+    p_bufferSize = blob.Size();
+    p_histBuffer = new char[p_bufferSize];
+    memcpy(p_histBuffer, blob_buffer, p_bufferSize);
+  }
 
   //! Destructor
   History::~History() {
+    if (p_histBuffer != NULL) {
+      delete [] p_histBuffer;
+    }
   }
 
   /**
@@ -59,23 +60,45 @@ namespace Isis {
     p_history.addObject(obj);
   }
 
+  /**
+   * Converts a history object into a new blob object
+   *
+   * @param name Name of the History object to create
+   *
+   * @return @b Blob
+   */
   Blob *History::toBlob(const QString &name) {
     ostringstream ostr;
+    if (p_bufferSize > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
-    int nbytes = histStr.size();
+    int bytes = histStr.size();
+
+    int blobBufferSize = p_bufferSize+bytes;
+    char *blobBuffer = new char[blobBufferSize];
+    if (p_histBuffer != NULL) memcpy(blobBuffer, p_histBuffer, p_bufferSize);
+    const char *ptr = histStr.c_str();
+    memcpy(&blobBuffer[p_bufferSize], (void *)ptr, bytes);
 
     Blob *newBlob = new Blob(name, "History");
-    newBlob->setData(histStr.c_str(), histStr.size());
+    newBlob->takeData(blobBuffer, blobBufferSize);
     return newBlob;
   }
 
   /**
-   * Reads p_buffer into a pvl
+   * Reads p_histBuffer into a pvl
    *
    * @return @b Pvl
    */
   Pvl History::ReturnHist() {
-    return p_history;
+    Pvl pvl;
+    stringstream os;
+    for (int i = 0; i < p_bufferSize; i++) os << p_histBuffer[i];
+
+    for (int i = 0; i < p_history.objects(); i++) {
+      os << p_history.object(i);
+    }
+    os >> pvl;
+    return pvl;
   }
 }

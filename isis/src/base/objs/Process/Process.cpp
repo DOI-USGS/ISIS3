@@ -625,7 +625,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
 
       // Transfer tables from the first input cube
       if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
-        if(InputCubes[0]->hasBlob("IsisCube", "OriginalLabel")){
+        if(InputCubes[0]->hasBlob("OriginalLabel", "IsisCube")){
           Isis::Pvl &inlab = *InputCubes[0]->label();
           for(int i = 0; i < inlab.objects(); i++) {
             if(inlab.object(i).isNamed("OriginalLabel")) {

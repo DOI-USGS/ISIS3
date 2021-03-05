@@ -870,7 +870,7 @@ namespace Isis {
   OriginalLabel Cube::readOriginalLabel() const {
     Blob origLabelBlob("IsisCube", "OriginalLabel");
     try {
-      origLabelBlob.Read(fileName());
+      read(origLabelBlob);
     }
     catch (IException &){
       QString msg = "Unable to locate OriginalLabel in " + fileName();

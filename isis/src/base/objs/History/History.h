@@ -29,6 +29,9 @@ namespace Isis {
    *                           include for Pvl since the include for Pvl was
    *                           removed from Blob.h. Added padding to control
    *                           statements. References #1169
+   *   @history 2021-03-05 Adam Paquette - Refactored History to no longer be a
+   *                           child class of a blob for a cleaner definition
+   *                           of responsabilities for the object
    *
    * @todo This class needs documentation.
   */
@@ -46,6 +49,8 @@ namespace Isis {
 
     private:
       Pvl p_history; //!< History Pvl
+      char *p_histBuffer = nullptr; //!< Store for read in history data
+      int p_bufferSize = 0;
   };
 };
 
