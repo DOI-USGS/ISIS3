@@ -67,7 +67,13 @@ namespace Isis {
     weight.clear();
     dcScaleFactor = 0.0;
     exposureDuration = 0.0;
-  
+    
+    CubeAttributeInput &atts = ui.GetInputAttribute("FROM");
+    if(atts.bands().size() != 0) {
+      vector<QString> bands = atts.bands();
+      icube->setVirtualBands(bands);
+    }
+    
     // Set up our ProcessByLine
     ProcessByLine p;
     p.SetInputCube(icube);

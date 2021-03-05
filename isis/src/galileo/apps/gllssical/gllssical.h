@@ -1,4 +1,4 @@
-#ifndef gllssical_h // Change this to your app name in all lower case suffixed with _h (e.g. campt_h, cam2map_h etc.)
+#ifndef gllssical_h 
 #define gllssical_h
 
 #include "Cube.h"

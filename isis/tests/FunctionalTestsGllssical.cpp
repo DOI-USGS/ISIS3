@@ -69,7 +69,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalClear) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName};
-  std::cout << *testCube->label() << std::endl;
+  
   UserInterface options(APP_XML, args);
   try {
     gllssical(options);

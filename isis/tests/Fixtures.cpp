@@ -626,8 +626,6 @@ namespace Isis {
 
     // need to remove old camera pointer
     delete testCube;
-    // This is now a MRO cube
-
     testCube = new Cube(newCube, "rw");
   }
 
