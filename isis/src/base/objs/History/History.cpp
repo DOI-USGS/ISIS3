@@ -20,7 +20,7 @@ namespace Isis {
    *  Default Constructor for history
    */
   History::History() {
-    p_history.setTerminator("End");
+    p_history.setTerminator("");
   }
 
   /**
@@ -28,7 +28,7 @@ namespace Isis {
    *  @param blob
    */
   History::History(Isis::Blob &blob) {
-    p_history.setTerminator("End");
+    p_history.setTerminator("");
 
     char *blob_buffer = blob.getBuffer();
     p_bufferSize = blob.Size();

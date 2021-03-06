@@ -102,6 +102,8 @@ void IsisMain() {
   if(cube) {
     History hist = cube->readHistory();
     hist.AddEntry();
+    Pvl HistoryPvl = hist.ReturnHist();
+    std::cout << HistoryPvl << std::endl;
     cube->write(*(hist.toBlob()));
 
     // clean up

@@ -872,9 +872,9 @@ namespace Isis {
     try {
       read(origLabelBlob);
     }
-    catch (IException &){
+    catch (IException &e){
       QString msg = "Unable to locate OriginalLabel in " + fileName();
-      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     OriginalLabel origLabel(origLabelBlob);
     return origLabel;
@@ -887,12 +887,11 @@ namespace Isis {
   CubeStretch Cube::readCubeStretch(QString name, const std::vector<PvlKeyword> keywords) const {
     Blob stretchBlob(name, "Stretch");
     try {
-      stretchBlob.Read(fileName(), keywords);
+      read(stretchBlob, keywords);
     }
     catch (IException &e){
-      std::cout << e.what() << '\n';
       QString msg = "Unable to locate Stretch information in " + fileName();
-      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     CubeStretch cubeStretch(stretchBlob);
     return stretchBlob;
@@ -905,11 +904,11 @@ namespace Isis {
   OriginalXmlLabel Cube::readOriginalXmlLabel() const {
     Blob origXmlLabelBlob("IsisCube", "OriginalXmlLabel");
     try {
-      origXmlLabelBlob.Read(fileName());
+      read(origXmlLabelBlob);
     }
-    catch (IException &){
+    catch (IException &e){
       QString msg = "Unable to locate OriginalXmlLabel in " + fileName();
-      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     OriginalXmlLabel origXmlLabel(origXmlLabelBlob);
     return origXmlLabel;
