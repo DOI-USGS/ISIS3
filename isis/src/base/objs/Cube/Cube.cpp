@@ -867,8 +867,8 @@ namespace Isis {
   /**
    * This method will read an OriginalLabel from a cube.
    */
-  OriginalLabel Cube::readOriginalLabel() const {
-    Blob origLabelBlob("IsisCube", "OriginalLabel");
+  OriginalLabel Cube::readOriginalLabel(const QString &name) const {
+    Blob origLabelBlob(name, "OriginalLabel");
     try {
       read(origLabelBlob);
     }

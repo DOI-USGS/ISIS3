@@ -255,7 +255,7 @@ namespace Isis {
       void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
-      OriginalLabel readOriginalLabel() const;
+      OriginalLabel readOriginalLabel(const QString &name="IsisCube") const;
       CubeStretch readCubeStretch(QString name="CubeStretch",
                                   const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       OriginalXmlLabel readOriginalXmlLabel() const;
