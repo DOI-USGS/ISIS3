@@ -38,11 +38,6 @@ TEST_F(DefaultCube, FunctionalTestVikcalDefault) {
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("dist0"), 243840000.0);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("dist1"), 211727039.58284);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("1.0/exp*w1"), 0.0010794114853583);
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Acoeff"), -1.73472347597681e-18);
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Bcoeff"), 6.6576789654188e-19);
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Ccoeff"), 1.26851654180804e-17);
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Dcoeff"), -1.02999206386123e-18);
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Ecoeff"), 8.5423645120816);
 
   Histogram *oCubeStats = oCube.histogram();
 
