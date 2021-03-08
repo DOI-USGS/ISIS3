@@ -967,7 +967,6 @@ namespace Isis {
     cubeFileList.write(cubeListPath);
   }
 
-<<<<<<< HEAD
 
  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
@@ -1031,8 +1030,9 @@ namespace Isis {
 
     QString fileName = testCube->fileName();  
     delete testCube;
-    testCube = new Cube(fileName, "rw"); 
-=======
+    testCube = new Cube(fileName, "rw");
+ }
+
   void CSMCubeFixture::SetUp() {
     SmallCube::SetUp();
 
@@ -1169,7 +1169,6 @@ namespace Isis {
 
   void MgsMocCube::TearDown() {
     testCube.reset();
->>>>>>> 7519c848346bdcd51295af267fc2c8da108264da
   }
 
 }

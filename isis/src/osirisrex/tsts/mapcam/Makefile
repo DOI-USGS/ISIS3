@@ -25,9 +25,11 @@ commands:
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           ckpredict=t                                                                       \
 	           spkpredict=t                                                                      \
+	           ckrecon=f 																		 \
+			   spkrecon=f                                                                        \
 	           SCLK='$$osirisrex/kernels/sclk/SCLK.tsc'                                          \
 			   extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                                     \
-	           ;
+	           >& /dev/null;
 
 	# phocube first image
 	# create 7 band backplane with from the following values:
