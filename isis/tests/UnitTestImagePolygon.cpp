@@ -32,7 +32,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonDefaultParams) {
   std::vector<double> lats = {9.928429, 9.928429, 10.434929, 10.434929, 9.928429};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
@@ -59,7 +59,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonSubPoly) {
   std::vector<double> lats = {10.039260, 10.039260, 10.213952, 10.213952, 10.039260};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
@@ -92,7 +92,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
   std::vector<double> lats = {54.208706, 54.208706, 77.858556, 77.858556, 54.208706};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
@@ -149,7 +149,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
   std::vector<double> lats = {12.939325, 12.939325, 26.058469, 26.058469, 12.939325};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
@@ -196,7 +196,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
   std::vector<double> lats = {-43.643248, -43.643248, -42.323638, -42.323638, -43.643248};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
@@ -248,7 +248,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   footprintCube.close();
-  
+
   ASSERT_EQ(234, poly.numVertices());
 
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -258,7 +258,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
   std::vector<double> lats = {-66.783492, -66.783492, 5.718545, 5.718545, -66.783492};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
-  for (int i = 0; i < coordArray.getSize(); i++) {
+  for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
