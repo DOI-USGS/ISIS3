@@ -176,41 +176,55 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
   cube.close();
 }
 
-// TEST_F(DefaultCube, FunctionalTestPhocubeOffBody) {
-//   QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
-//   QVector<QString> args = {"to=" + cubeFileName};
-//   UserInterface options(APP_XML, args);
-//   resizeCube(5, 5, 1);
-//   phocube(testCube, options);
+TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "emission=false", "radec=true", 
+                           "incidence=false", "latitude=false", "longitude=false",};
+  UserInterface options(APP_XML, args);
+  phocube(testCube, options);
 
-//   Cube cube(cubeFileName);
-//   Pvl *isisLabel = cube.label();
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
 
-//   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
-//   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
-//   ASSERT_EQ(cube.bandCount(), 5);
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 3);
 
-//   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
-//   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
-//   EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Right Ascension");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Declination");
+  
+  int band = 1;
+  LineManager outLine(cube);
+  for (int i = 1; i <= cube.lineCount(); i++) { 
+    outLine.SetLine(i, band);
+    cube.read(outLine);
+    for (int j = 0; j < outLine.size(); j++) { 
+      if (band == 1 && i < 4) { // Phase band will not be null at on-body pixels
+        EXPECT_NE(outLine[j], Isis::NULL8);
+      }
+      else if (band == 1 && i >= 4) { // Phase band will be null at off-body pixels
+        EXPECT_EQ(outLine[j], Isis::NULL8);
+      }
+      else {  // RA and dec bands are not null at all pixels
+        EXPECT_NE(outLine[j], Isis::NULL8);
+      }
+    }
+    // Check next band
+    if (band == 1 && i == cube.lineCount()) {
+      i = 1;
+      band++;
+    }
+  }
 
-//   for (int i = 0; i < cube.bandCount(); i++) {
-//     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
-//     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
-//   }
-
-//   cube.close();
-// }
+  cube.close();
+}
 
 TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
-  QString cubeFileName = "/Users/kdlee/Desktop/phocubeTEMP.cub";
-  QVector<QString> args = {"to=" + cubeFileName, "dn=true", "emission=false", 
-                           "incidence=false", "latitude=false", "longitude=false"};
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "source=projection", "dn=true",
+                           "latitude=false", "longitude=false"};
   UserInterface options(APP_XML, args);
   resizeCube(5, 5, 1);
   phocube(projTestCube, options);
@@ -220,21 +234,13 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
-  ASSERT_EQ(cube.bandCount(), 5);
+  ASSERT_EQ(cube.bandCount(), 1);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
   EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
 
-  for (int i = 0; i < cube.bandCount(); i++) {
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
-  }
-
+  EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Center"), 1.0);
+  EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Width"), 1.0);
   cube.close();
 }

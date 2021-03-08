@@ -252,7 +252,6 @@ namespace Isis {
   }
 
   void DefaultCube::resizeCube(int samples, int lines, int bands) {
-    std::cout<< "In resize"<<std::endl;
     label = Pvl();
     PvlObject &isisCube = testCube->label()->findObject("IsisCube");
     label.addObject(isisCube);
@@ -349,6 +348,20 @@ namespace Isis {
 
     delete testCube;
     delete projTestCube;
+  }
+
+  void OffBodyCube::SetUp() {
+    TempTestingFiles::SetUp();
+    testCube = new Cube("data/offBodyImage/EW0131773041G.cal.crop.cub");
+  }
+
+
+  void OffBodyCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
   }
 
 

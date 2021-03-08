@@ -103,6 +103,14 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class OffBodyCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class ThreeImageNetwork : public TempTestingFiles {
     protected:
 

@@ -55,8 +55,6 @@ namespace Isis {
       noCamera = true;
     }
 
-    std::cout<<"noCamera: "<< noCamera<<std::endl;
-
     Camera *cam;
     TProjection *proj;
     if(noCamera) {
@@ -70,9 +68,7 @@ namespace Isis {
     }
     else {
       try {
-        std::cout<<"Before camera"<<std::endl;
         cam = icube->camera();
-        std::cout<<"After camera"<<std::endl;
       }
       catch(IException &e) {
         QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
