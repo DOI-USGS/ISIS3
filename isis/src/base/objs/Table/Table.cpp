@@ -138,6 +138,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Initialize a Table from a Blob that has been read from a file.
+   *
+   * @param blob The blob to extract the data for the Table from.
+   */
   void Table::initFromBlob(Blob &blob) {
     Clear();
 
@@ -221,17 +226,37 @@ namespace Isis {
   }
 
 
+  /**
+   * Write the Table to a file.
+   *
+   * This uses a Blob to serialize the Table data, see Blob::Write.
+   *
+   * @param file The file to write the Table to.
+   */
   void Table::Write(const QString &file) {
     Blob blob = toBlob();
     blob.Write(file);
   }
 
 
+  /**
+   * The Table's name
+   *
+   * @return @b QString the name of the Table
+   */
   QString Table::Name() const {
     return p_name;
   }
 
 
+  /**
+   * The Table's label
+   *
+   * Additional information can be stored on the Table's label and will be serialized
+   * in the Blob's label when written out to a file.
+   *
+   * @return @b PvlObject A reference to the label that can be modified
+   */
   PvlObject &Table::Label() {
     return p_label;
   }
@@ -381,6 +406,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Serialze the Table to a Blob that can be written to a file.
+   *
+   * @return @b Blob The Blob contaning the Table's data
+   */
   Blob Table::toBlob() const {
     Blob tableBlob(Name(), "Table");
     PvlObject &blobLabel = tableBlob.Label();
@@ -431,6 +461,18 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert the data from a Table into a string.
+   *
+   * This method will convert all of the Table's records and fields into a
+   * string but will not serialze any label information. See TableRecord::toString
+   * for how the records are converted into a string.
+   *
+   * @param table The Table to serialize
+   * @param fieldDelimiter The delimiter to use between fields
+   *
+   * @return @b QString The Table data as a string
+   */
   QString Table::toString(Table table, QString fieldDelimiter) {
     QString tableValues;
     // add the first record with header, the given delimiter, and a new line after each record

@@ -45,7 +45,7 @@ namespace Isis {
       void AddEntry(Isis::PvlObject &obj);
       Pvl ReturnHist();
 
-      Blob *toBlob(const QString &name = "IsisCube");
+      Blob toBlob(const QString &name = "IsisCube");
 
     private:
       Pvl p_history; //!< History Pvl

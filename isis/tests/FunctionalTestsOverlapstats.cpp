@@ -57,7 +57,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsDefault) {
             {35, 0},
             {30, 0}};
   poly.Create(coords);
-  cube3->write(*(poly.toBlob()));
+  cube3->write(poly);
   cube3->reopen("rw");
 
   FileList cubes;
@@ -113,7 +113,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsFull) {
             {34, 1},
             {31, 1}};
   poly.Create(coords);
-  cube2->write(*(poly.toBlob()));
+  cube2->write(poly);
   cube2->reopen("rw");
 
   FileList cubes;
@@ -167,7 +167,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestOverlapstatsNoOverlap) {
             {40, 50},
             {50, 50}};
   poly.Create(coords);
-  cube3->write(*(poly.toBlob()));
+  cube3->write(poly);
   cube3->reopen("rw");
 
   FileList cubes;

@@ -211,7 +211,7 @@ void IsisMain() {
     }
 
     // Propagate History
-    g_outputCubes[i]->write(*(inputHistory.toBlob( "IsisCube" )));
+    g_outputCubes[i]->write(inputHistory);
 
     // Close output cube
     g_outputCubes[i]->close();

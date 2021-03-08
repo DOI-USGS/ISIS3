@@ -115,7 +115,7 @@ void IsisMain() {
   // keep track of change to labels in history
   History hist = cube.readHistory();
   hist.AddEntry();
-  cube.write(*(hist.toBlob()));
+  cube.write(hist);
 
   cube.close();
 }

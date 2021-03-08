@@ -170,7 +170,7 @@ void createMosaicCube(QString inputName, QString outputName, QVector<QString> ba
                      _FILEINFO_);
   }
 
-  if (!mosaicCube.deleteBlob("Table", "InputImages")) {
+  if (!mosaicCube.deleteBlob("InputImages", "Table")) {
     QString msg = "The input cube [" + inputName + "] does not have a tracking table.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }

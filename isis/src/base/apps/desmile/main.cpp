@@ -102,7 +102,7 @@ void IsisMain() {
   // read cube's History PvlObject data into the History Object
   History histBlob = inCube->readHistory(histName);
   histBlob.AddEntry();
-  outCube->write(*(histBlob.toBlob(histName)));
+  outCube->write(histBlob, histName);
 
   procSpectra.Finalize();
   delete outputSpectralDef;

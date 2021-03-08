@@ -28,6 +28,7 @@ namespace Isis {
     fromBlob(blob);
   }
 
+
   /**
    * Constructor for creating an original blob with a given name and file to
    * read labels from.
@@ -39,6 +40,7 @@ namespace Isis {
     blob.Read(file);
     fromBlob(blob);
   }
+
 
   /**
    * Constructor for creating an original blob with a given name and Pvl
@@ -54,6 +56,12 @@ namespace Isis {
   OriginalLabel::~OriginalLabel() {
   }
 
+
+  /**
+   * Initialize the OriginalLabel from a Blob.
+   *
+   * @param blob The Blob to extract data from
+   */
   void OriginalLabel::fromBlob(Isis::Blob blob) {
     Pvl pvl;
     stringstream os;
@@ -65,21 +73,28 @@ namespace Isis {
     m_originalLabel = pvl;
   }
 
-  Isis::Blob *OriginalLabel::toBlob() {
+
+  /**
+   * Serialize the OriginalLabel data to a Blob.
+   *
+   * @return @b Blob
+   */
+  Isis::Blob OriginalLabel::toBlob() {
     std::stringstream sstream;
     sstream << m_originalLabel;
     string orglblStr = sstream.str();
-    Isis::Blob *blob = new Blob("IsisCube", "OriginalLabel");
-    blob->setData(orglblStr.c_str(), orglblStr.size());
+    Isis::Blob blob("IsisCube", "OriginalLabel");
+    blob.setData(orglblStr.c_str(), orglblStr.size());
     return blob;
   }
+
 
   /**
    * Returns the labels in a Pvl object
    *
    * @return (Isis::Pvl) original labels
    */
-  Pvl OriginalLabel::ReturnLabels() {
+  Pvl OriginalLabel::ReturnLabels() const {
     return m_originalLabel;
   }
 }

@@ -121,7 +121,7 @@ namespace Isis {
     if (iApp) {
         History history = g_ocube->readHistory();
         history.AddEntry();
-        g_ocube->write(*(history.toBlob()));
+        g_ocube->write(history);
     }
 
     // Add original label

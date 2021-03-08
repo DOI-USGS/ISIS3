@@ -23,6 +23,7 @@ namespace Isis {
     p_history.setTerminator("");
   }
 
+
   /**
    *  Constructor for reading a blob
    *  @param blob
@@ -36,12 +37,14 @@ namespace Isis {
     memcpy(p_histBuffer, blob_buffer, p_bufferSize);
   }
 
+
   //! Destructor
   History::~History() {
     if (p_histBuffer != NULL) {
       delete [] p_histBuffer;
     }
   }
+
 
   /**
    *   Adds History PvlObject
@@ -50,6 +53,7 @@ namespace Isis {
     PvlObject hist = Isis::iApp->History();
     AddEntry(hist);
   }
+
 
   /**
    * Adds given PvlObject to History Pvl
@@ -60,6 +64,7 @@ namespace Isis {
     p_history.addObject(obj);
   }
 
+
   /**
    * Converts a history object into a new blob object
    *
@@ -67,7 +72,7 @@ namespace Isis {
    *
    * @return @b Blob
    */
-  Blob *History::toBlob(const QString &name) {
+  Blob History::toBlob(const QString &name) {
     ostringstream ostr;
     if (p_bufferSize > 0) ostr << std::endl;
     ostr << p_history;
@@ -80,10 +85,11 @@ namespace Isis {
     const char *ptr = histStr.c_str();
     memcpy(&blobBuffer[p_bufferSize], (void *)ptr, bytes);
 
-    Blob *newBlob = new Blob(name, "History");
-    newBlob->takeData(blobBuffer, blobBufferSize);
+    Blob newBlob(name, "History");
+    newBlob.takeData(blobBuffer, blobBufferSize);
     return newBlob;
   }
+
 
   /**
    * Reads p_histBuffer into a pvl

@@ -258,8 +258,7 @@ namespace Isis {
     }
 
     if (!result && m_cube) {
-      // TODO: Move this to Blob!
-      Blob example = *(ImagePolygon().toBlob());
+      Blob example = ImagePolygon().toBlob();
 
       QString blobType = example.Type();
       QString blobName = example.Name();

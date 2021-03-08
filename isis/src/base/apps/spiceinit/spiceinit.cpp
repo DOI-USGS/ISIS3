@@ -380,12 +380,12 @@ namespace Isis {
 
     // Save off the CSM State so it can be restored if spiceinit fails
     Blob csmState("CSMState", "String");
-    if (icube->hasBlob("String", "CSMState")) {
+    if (icube->hasBlob("CSMState", "String")) {
       icube->read(csmState);
     }
 
     // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera
-    icube->deleteBlob("String", "CSMState");
+    icube->deleteBlob("CSMState", "String");
 
     // report qualities
     PvlKeyword spkQuality("InstrumentPositionQuality");

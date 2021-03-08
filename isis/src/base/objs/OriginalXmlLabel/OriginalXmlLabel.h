@@ -36,7 +36,7 @@ namespace Isis {
       OriginalXmlLabel(Blob &blob);
       ~OriginalXmlLabel();
 
-      Blob *toBlob();
+      Blob toBlob() const;
 
       void fromBlob(Isis::Blob blob);
       void readFromXmlFile(const FileName &xmlFileName);

@@ -41,8 +41,8 @@ namespace Isis {
       ~OriginalLabel();
 
       // Return the original labels
-      Pvl ReturnLabels();
-      Isis::Blob *toBlob();
+      Pvl ReturnLabels() const;
+      Isis::Blob toBlob();
 
     protected:
       // prepare data for writing

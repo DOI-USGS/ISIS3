@@ -137,8 +137,8 @@ namespace Isis {
       }
     }
 
-    cube->deleteBlob("Polygon", sn);
-    cube->write(*(poly.toBlob()));
+    cube->deleteBlob(sn, "Polygon");
+    cube->write(poly);
 
     if (precision) {
       PvlGroup results("Results");

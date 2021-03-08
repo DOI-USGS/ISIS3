@@ -116,7 +116,7 @@ void IsisMain() {
     e.print();
   }
 
-  ocube->write(*(hist->toBlob()));
+  ocube->write(*hist);
 
   p.EndProcess();
 

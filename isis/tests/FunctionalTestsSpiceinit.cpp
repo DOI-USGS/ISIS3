@@ -536,7 +536,7 @@ TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
   spiceinit(testCube, options);
 
   EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
-  EXPECT_FALSE(testCube->hasBlob("String", "CSMState"));
+  EXPECT_FALSE(testCube->hasBlob("CSMState", "String"));
 }
 
 TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
@@ -553,7 +553,7 @@ TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
   ASSERT_ANY_THROW(spiceinit(testCube, options));
 
   EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
-  EXPECT_TRUE(testCube->hasBlob("String", "CSMState"));
+  EXPECT_TRUE(testCube->hasBlob("CSMState", "String"));
 }
 
 TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
@@ -700,7 +700,7 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
   Cube outputCube(cubeFile);
 
   ASSERT_NO_THROW(outputCube.camera());
-  EXPECT_TRUE(outputCube.hasBlob("String", "CSMState"));
+  EXPECT_TRUE(outputCube.hasBlob("CSMState", "String"));
   ASSERT_TRUE(outputCube.hasGroup("CsmInfo"));
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, csmInfoGroup, outputCube.group("CsmInfo"));
 }
