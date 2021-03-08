@@ -538,6 +538,11 @@ namespace Isis {
     }
   }
 
+  /**
+   * Get the internal data buff of the Blob.
+   *
+   * @return @b char* A data buffer containing Blob::Size bytes
+   */
   char *Blob::getBuffer() {
     return p_buffer;
   }

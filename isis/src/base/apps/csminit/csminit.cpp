@@ -466,10 +466,9 @@ namespace Isis {
       }
 
 
-      if (originalFootprint.Polys() != NULL){
-        if (originalFootprint.Polys()->getNumGeometries() != 0) {
-          cube->write(originalFootprint);
-        }
+      if (originalFootprint.Polys() != NULL &&
+          originalFootprint.Polys()->getNumGeometries() != 0) {
+        cube->write(originalFootprint);
       }
 
       QString message = "Failed to create a CSMCamera.";

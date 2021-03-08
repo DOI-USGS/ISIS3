@@ -40,7 +40,7 @@ namespace Isis {
 
       void fromBlob(Isis::Blob blob);
       void readFromXmlFile(const FileName &xmlFileName);
-      const QDomDocument &ReturnLabels();
+      const QDomDocument &ReturnLabels() const;
 
     protected:
       void ReadData(std::istream &stream);

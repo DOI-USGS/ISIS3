@@ -64,7 +64,7 @@ namespace Isis {
    *
    */
   ImagePolygon::ImagePolygon(Blob &blob) : ImagePolygon() {
-    p_polyStr = blob.getBuffer();
+    p_polyStr = string(blob.getBuffer(), blob.Size());
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
     p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));

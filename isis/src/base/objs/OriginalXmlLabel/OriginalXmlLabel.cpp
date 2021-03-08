@@ -127,7 +127,7 @@ namespace Isis {
    *
    * @return @b QDomDocument The parsed original label
    */
-  const QDomDocument &OriginalXmlLabel::ReturnLabels(){
+  const QDomDocument &OriginalXmlLabel::ReturnLabels() const{
     return m_originalLabel;
   }
 }
