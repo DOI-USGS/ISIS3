@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "Camera.h"
@@ -21,7 +29,7 @@ enum OutputType {
 
 /**
  * Functor for collecting camera statistics.
- * 
+ *
  * @author 2016-11-16 Jesse Mapel
  * @internal
  *   @history 2016-11-16 Original Version.
@@ -29,12 +37,12 @@ enum OutputType {
 class CamTestFunctor {
 public:
   CamTestFunctor() {};
-  ~CamTestFunctor() {};  
+  ~CamTestFunctor() {};
   void setCamera(Camera* cam);
   void setOutType(OutputType outType);
   void setResults(Statistics* results);
   void operator()(Buffer &in, Buffer &out) const;
-  
+
 private:
   Camera* m_cam;
   OutputType m_outType;
@@ -50,10 +58,10 @@ void IsisMain() {
   Cube *iCube = p.SetInputCube("FROM");
   Camera *cam = iCube->camera();
   p.SetOutputCube("TO");
-  
+
   // Set to process by line
   p.SetBrickSize(iCube->sampleCount(), 1, 1);
-  
+
   IString format = ui.GetString("FORMAT");
 
   OutputType outFormat = Lat;
@@ -79,9 +87,9 @@ void IsisMain() {
   func.setOutType(outFormat);
   Statistics resultsStats;
   func.setResults(&resultsStats);
-  
+
   p.ProcessCube(func, false);
-  
+
   // Collect results
   PvlGroup results = PvlGroup("CamTestResults");
   results += PvlKeyword("FailedConversionsToLatLong", toString(resultsStats.LrsPixels()));
@@ -93,15 +101,15 @@ void IsisMain() {
     results += PvlKeyword("Minimum", toString(resultsStats.Minimum()));
     results += PvlKeyword("Maximum", toString(resultsStats.Maximum()));
   }
-  
+
   // Log output results
   Application::Log(results);
-  
+
   p.EndProcess();
 }
 
 // Functor Definitions
-  
+
 void CamTestFunctor::setCamera(Camera* cam) {
   m_cam = cam;
 }
@@ -154,7 +162,7 @@ void CamTestFunctor::operator()(Buffer &in, Buffer &out) const {
 
     }
   }
-  
+
   m_resultsStats->AddData(out.DoubleBuffer(), out.size());
 }
 /* Old Processing Routine

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include "Camera.h"
@@ -56,7 +64,7 @@ double g_avgOffsets[11][2];
     7 |   7-8   | -576
     8 |   8-9   |  607
     9 |  10-11  |  606
-   10 |  12-13  |  606      */ 
+   10 |  12-13  |  606      */
 
 const double g_lineOff[11] = {
    574,
@@ -73,7 +81,7 @@ const double g_lineOff[11] = {
 };
 
 void IsisMain() {
-  // clear global vectors and intitialize global ints 
+  // clear global vectors and intitialize global ints
   g_ccdFiles.clear();
   g_tempFiles.clear();
   g_ccdNumbers.clear();
@@ -92,7 +100,7 @@ void IsisMain() {
   init(inputList);
 
   // The first pipeline will create the match cube file
-  // 
+  //
   // cubeatt FROM="masterCcdFileName.cub" TO="./matchMaster.cub"
   // spiceinit FROM="./matchMaster.cub" ATTACH="NO"
   // spicefit FROM="./matchMaster.cub"
@@ -117,19 +125,19 @@ void IsisMain() {
 
   matchfilePipeline.Run();
 
-  // The main hijitter pipeline 
-  // 
+  // The main hijitter pipeline
+  //
   // FIRST PASS:
-  // 
+  //
   // for each file in file list
   // cubeatt FROM="originalFileName.cub" TO="./noproj.copy.FROM1.cub"
-  // 
+  //
   // for i = 1 to i = numFiles
   // spiceinit FROM="./noproj.copy.FROM1.cub" ATTACH="NO"
-  // 
+  //
   // echo  ./noproj.copy.FROM1.cub ./noproj.copy.FROM2.cub ... ./noproj.copy.FROM(numFiles).cub > ./appjit.lis
   // appjit FROMLIST="./appjit.lis" JITTER="jitterFileName.txt"
-  // 
+  //
   // for i = 1 to i = numFiles
   // noproj FROM="./noproj.copy.FROM1.cub" TO="./noproj.FROM1.cub" MATCH="./matchMaster.cub"
   Pipeline mainPipeline("Main hijitter Pipeline: cubeatt >> spiceinit >> appjit >> noproj");
@@ -148,8 +156,8 @@ void IsisMain() {
   mainPipeline.Application("spiceinit").AddConstParameter("ATTACH", "NO");
 
   mainPipeline.AddToPipeline("appjit");
-  mainPipeline.Application("appjit").SetInputParameter("FROMLIST", 
-                                            PipelineApplication::LastAppOutputListNoMerge, 
+  mainPipeline.Application("appjit").SetInputParameter("FROMLIST",
+                                            PipelineApplication::LastAppOutputListNoMerge,
                                             false);
   mainPipeline.Application("appjit").AddParameter("JITTER", "JITTER");
   mainPipeline.Application("appjit").AddParameter("DEGREE", "DEGREE");
@@ -158,7 +166,7 @@ void IsisMain() {
 
   mainPipeline.AddToPipeline("noproj");
   mainPipeline.Application("noproj").SetInputParameter("FROM", true);
-  mainPipeline.Application("noproj").AddConstParameter("MATCH", 
+  mainPipeline.Application("noproj").AddConstParameter("MATCH",
                                             FileName("$TEMPORARY/matchMaster.cub").expanded());
   mainPipeline.Application("noproj").SetOutputParameter("TO", FileName("$TEMPORARY/noproj").expanded());
 
@@ -172,16 +180,16 @@ void IsisMain() {
 
   if (ui.WasEntered("JITTERCK"))  {
     // run main hijitter pipeline again with the same parameters
-    // 
+    //
     // for each file in file list
     // cubeatt FROM="originalFileName.cub" TO="./noproj.copy.FROM1.cub"
-    // 
+    //
     // for i = 1 to i = numFiles
     // spiceinit FROM="./noproj.copy.FROM1.cub" ATTACH="NO"
-    // 
+    //
     // echo  ./noproj.copy.FROM1.cub ./noproj.copy.FROM2.cub ... ./noproj.copy.FROM(numFiles).cub > ./appjit.lis
     // appjit FROMLIST="./appjit.lis" JITTER="jitterFileName.txt"
-    // 
+    //
     // for i = 1 to i = numFiles
     // noproj FROM="./noproj.copy.FROM1.cub" TO="./noproj.FROM1.cub" MATCH="./matchMaster.cub"
     mainPipeline.Run();
@@ -189,7 +197,7 @@ void IsisMain() {
 
   // the outputs from this pipeline are temporary files created by cubeatt
   for (int i = 0; i < g_numFiles; i++) {
-    g_tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM" 
+    g_tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM"
                                    + toString(i + 1) + ".cub").expanded());
   }
 
@@ -197,15 +205,15 @@ void IsisMain() {
   processNoprojFiles(mainPipeline);
 
   // run main hijitter pipeline with new parameters:
-  // 
+  //
   // for each file in file list
   // cubeatt FROM="originalFileName.cub" TO="originalFileName.jitter.copy.FROM1.cub"
   // spiceinit FROM="originalFileName.jitter.copy.FROM1.cub" ATTACH="NO"
-  // 
+  //
   // echo  originalFileName.jitter.copy.FROM1.cub originalFileName.jitter.copy.FROM2.cub   ...  > ./appjit.lis
   // appjit FROMLIST="./appjit.lis" JITTER="jitterFileName.txt" MASTER="masterCcdFileName.jitter.copy.FROM1.cub" PITCHRATE="2.95810564663024e-05"
   // YAW="-9.06833084756325e-04"
-  // 
+  //
   // for each file in file list
   // noproj FROM="originalFileName.jitter.copy.FROM1.cub" TO="originalFileName.jitter.cub" MATCH="./matchMaster.cub"
   // editlab FROM="originalFileName.jitter.cub" OPTIONS="SETKEY" GRPNAME="Instrument" KEYWORD="ImageJitterCorrected" VALUE="1"
@@ -243,14 +251,14 @@ void IsisMain() {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // run main hijitter pipeline with same parameters as last run:
-    // 
+    //
     // for each file in file list
     // cubeatt FROM="originalFileName.cub" TO="originalFileName.jitter.copy.FROM1.cub"
     // spiceinit FROM="originalFileName.jitter.copy.FROM1.cub" ATTACH="NO"
-    // 
+    //
     // echo  originalFileName.jitter.copy.FROM1.cub originalFileName.jitter.copy.FROM2.cub   ...  > ./appjit.lis
     // appjit FROMLIST="./appjit.lis" JITTER="jitterFileName.txt" MASTER="masterFile.jitter.copy.FROM1.cub" PITCHRATE="2.95810564663024e-05" YAW="-9.06833084756325e-04"
-    // 
+    //
     // for each file in file list
     // noproj FROM="originalFileName.jitter.copy.FROM1.cub" TO="originalFileName.jitter.cub" MATCH="./matchMaster.cub"
     // editlab FROM="originalFileName.jitter.cub" OPTIONS="SETKEY" GRPNAME="Instrument" KEYWORD="ImageJitterCorrected" VALUE="1"
@@ -309,8 +317,8 @@ void IsisMain() {
 }
 
 /**
- * This method will validate and return the file name corresponding to 
- * the given master ccd number. 
+ * This method will validate and return the file name corresponding to
+ * the given master ccd number.
  *
  * @param inList Input file list
  * @param masterCcdNumber Number of the master CCD
@@ -330,10 +338,10 @@ FileName masterCcdFileName(FileList &inList, int masterCcdNumber) {
 }
 
 /**
- * This method will validate the input file list and set global 
- * variables: g_ccdFiles, g_ccdNumbers, g_numFiles, 
- * g_firstFilter 
- *  
+ * This method will validate the input file list and set global
+ * variables: g_ccdFiles, g_ccdNumbers, g_numFiles,
+ * g_firstFilter
+ *
  * @param inList Input file list entered by the user
  */
 void init(FileList &inList) {
@@ -365,14 +373,14 @@ void init(FileList &inList) {
         ccdNumber = (int) toInt((QString)ccdKeywordValue.mid(2));
       }
       else {
-        QString msg = "CcdId value of [" + ccdKeywordValue + "] found in [" 
+        QString msg = "CcdId value of [" + ccdKeywordValue + "] found in ["
                       + inList[i].toString() + "] not supported. Valid values "
                       "include RED0-RED9, IR10-IR11, BG12-BG13";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if (ccdNumber < 0 || ccdNumber > 13) {
-        QString msg = "CcdId value of [" + ccdKeywordValue + "] found in [" 
+        QString msg = "CcdId value of [" + ccdKeywordValue + "] found in ["
                       + inList[i].toString() + "] not supported. Valid values "
                       "include RED0-RED9, IR10-IR11, BG12-BG13";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -418,7 +426,7 @@ void init(FileList &inList) {
 //    }
 //    else if (foundFirstRedCcd && foundLastRedCcd && !g_ccdFiles[i].empty()) {
 //      QString msg = "Invalid file list. All red CCDs listed must be consecutive. "
-//                    "Input list has files containing [RED" + lastRedCcdFound 
+//                    "Input list has files containing [RED" + lastRedCcdFound
 //                    + "] and [RED" + toString((int)i) + "], but the CCDs between "
 //                    "are not represented in the given file list.";
 //      throw IException(IException::User, msg, _FILEINFO_);
@@ -463,7 +471,7 @@ void init(FileList &inList) {
           overlappingCcds = "CCD [" + color + toString((int) (i-1)) + "] is";
         }
         else {
-          overlappingCcds = "CCDs [RED" + toString((int) (i-1)) 
+          overlappingCcds = "CCDs [RED" + toString((int) (i-1))
                          + "] and [RED" + toString((int) (i+1)) + "] are";
         }
         QString msg = "Invalid file list. A file containing the CCD [" + color
@@ -481,12 +489,12 @@ void init(FileList &inList) {
 
 
 
-/** 
- * 
+/**
+ *
  *  @param p
- * 
- */ 
-void processNoprojFiles(Pipeline &p) {                                          
+ *
+ */
+void processNoprojFiles(Pipeline &p) {
   UserInterface &ui = Application::GetUserInterface();
 
   // This will be decremented on error, it's easier this way
@@ -494,7 +502,7 @@ void processNoprojFiles(Pipeline &p) {
   // numOffsets is an unnecesary variable. It should equal offsetIndeces.size()
   // int numOffsets = g_numFiles - 1;
   vector<int> offsetIndices;
- 
+
   Progress hijitregProg;
   hijitregProg.SetText("Running hijitreg");
   hijitregProg.SetMaximumSteps(1);
@@ -505,23 +513,23 @@ void processNoprojFiles(Pipeline &p) {
     // use the current cubes in the pipeline to create an output flat
     // file for this overlap from the hijireg program. This will
     // calculate avg offsets for the overlaps.
-    // 
+    //
     // Note that the consecutive CCD pairs (9,10) and (11,12) do not
     // overlap since 0-9 are red, 10-11 are near-infrared, and 12-13
     // are blue-green. For this reason, we don't run hijitreg for the
     // CCDs 9, 11, and 13.
-    if (g_ccdNumbers[i] != 9 && g_ccdNumbers[i] != 11 && g_ccdNumbers[i] != 13 
+    if (g_ccdNumbers[i] != 9 && g_ccdNumbers[i] != 11 && g_ccdNumbers[i] != 13
         && g_ccdNumbers[i+1] == g_ccdNumbers[i] + 1) {
 
       QString tempDir = FileName("$TEMPORARY").expanded();
-      QString flatFileName = tempDir + "/first" + toString(g_ccdNumbers[i]) 
+      QString flatFileName = tempDir + "/first" + toString(g_ccdNumbers[i])
                             + "-" + toString(g_ccdNumbers[i+1]) + ".flat";
       QString params = "";
       params += "FROM=" + tempDir + "/noproj.FROM" + toString(i + 1) + ".cub";
       params += " MATCH=" + tempDir + "/noproj.FROM" + toString(i + 2) + ".cub";
       params += " REGDEF=" + ui.GetFileName("REGDEF");
       params += " FLAT=" + flatFileName;
-      
+
       try {
         // hijitreg FROM=$TEMPORARY/noproj.FROM1.cub MATCH=
         ProgramLauncher::RunIsisProgram("hijitreg", params);
@@ -532,11 +540,11 @@ void processNoprojFiles(Pipeline &p) {
       }
 
       // Read offsets
-      
+
       TextFile flatFile(flatFileName);
       g_tempFiles.push_back(flatFileName);
-      
-      // set the offset index value (0-10) 
+
+      // set the offset index value (0-10)
       // Note: we know that g_ccdNumbers is not 9, 11, 13 since these cases are
       // already excluded above
       int offsetIndex = 0;
@@ -552,35 +560,35 @@ void processNoprojFiles(Pipeline &p) {
 
       g_avgOffsets[offsetIndex][0] = Isis::Null;
       g_avgOffsets[offsetIndex][1] = Isis::Null;
-      
+
       QString line;
       try {
         while( flatFile.GetLine(line, false) &&
-               (g_avgOffsets[offsetIndex][0] == Isis::Null 
+               (g_avgOffsets[offsetIndex][0] == Isis::Null
                 || g_avgOffsets[offsetIndex][1] == Isis::Null) ) {
           line = QString(line).simplified();
           int pos = line.indexOf("Average Sample Offset: ");
-      
+
           if (pos != -1) {
             // cut off text before our number (start pos + strlen + 1)
             line = line.mid(pos + strlen("Average Sample Offset: "));
-      
+
             // cut off text after our number
             line = line.mid(0, line.indexOf(" "));
-      
+
             g_avgOffsets[offsetIndex][0] = (double)toDouble((QString)line);
             pos = -1;
           }
-      
+
           pos = line.indexOf("Average Line Offset: ");
-      
+
           if (pos != -1) {
             // cut off text before our number (start pos + strlen + 1)
             line = line.mid(pos + strlen("Average Line Offset: "));
-      
+
             // cut off text after our number
             line = line.mid(0, line.indexOf(" "));
-      
+
             g_avgOffsets[offsetIndex][1] = (double)toDouble((QString)line);
             pos = -1;
           }
@@ -709,4 +717,3 @@ void cropLines(QString inFile, double eTime1, double eTime2, int & line1, int & 
   inCube->close();
   delete(inCube);
 }
-

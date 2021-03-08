@@ -91,7 +91,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     To use the default values for: `$ISISROOT, $ISISDATA, $ISISTESTDATA`, run the ISIS variable initialization script with default arguments.
 
-    To do this, for versions of ISIS 4.2.0 and earlier, use: 
+    To do this, for versions of ISIS 4.2.0 and earlier, use:
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
 
@@ -101,11 +101,11 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     Executing this script with no arguments will result in $ISISDATA=$CONDA\_PREFIX/data, and $ISISTESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
 
-    For ISIS 4.2.0 and earlier, use: 
+    For ISIS 4.2.0 and earlier, use:
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
-    For versions of ISIS after 4.2.0, use: 
+    For versions of ISIS after 4.2.0, use:
 
         python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
 
@@ -114,6 +114,38 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
         for Anaconda 3.4 and up - conda activate isis
         prior to Anaconda 3.4 - source activate isis
 
+### Installation with Docker
+The ISIS production Dockerfile automates the conda installation process above.
+You can either build the Dockerfile yourself or use the
+[usgsastro/isis](https://hub.docker.com/repository/docker/usgsastro/isis) 
+image from DockerHub.
+
+#### To build the Dockerfile
+1. Download [the production Docker file](./docker/production.dockerfile)
+2. Build the Dockerfile
+  ```
+  docker build -t isis -f production.dockerfile .
+  ```
+3. Run the Dockerfile
+  ```
+  docker run -it isis bash
+  ```
+
+#### Run run the prebuilt image
+```
+docker run -it usgsastro/isis bash
+```
+
+#### Usage with the ISIS data area
+Usually you'll want to mount an external directory containing the ISIS data.
+The data is not included in the Docker image.
+
+```
+docker run -v /my/data/dir:/opt/conda/data -v /my/testdata/dir:/opt/conda/testData -it usgsastro/isis bash
+```
+
+Then [download the data](#the-isis-data-area) into /my/data/dir to make it accessible inside your
+container.
 
 ### Practical Usage with other conda packages
 
@@ -285,12 +317,12 @@ Here are the minimum hardware requirements
 To build and compile ISIS requires following the instructions listed below, which are given on the GitHub wiki page for the ISIS project:
 
 -   [Getting Started With GitHub](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github)
--   [Building ISIS3 With cmake](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3)
--   [New ISIS3 environmental variables and their meanings](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#new-environmental-variable-meanings)
+-   [Building ISIS With cmake](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3)
+-   [New ISIS environmental variables and their meanings](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#new-environmental-variable-meanings)
 -   [Custom data and test directories](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#custom-data-and-test-data-directories)
 -   [Cleaning builds](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#cleaning-builds)
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
--   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
+-   [Building ISIS documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
 
 ## Citing ISIS
@@ -308,7 +340,7 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3D
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated. 
+In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated.
 
 The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
 
@@ -326,7 +358,7 @@ The ISIS Data rsync module specifies where to rsync the data from and is the nam
 
 If you plan to work with data from all missions, then the download will require about 520 GB for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a [Web service](#isis-spice-web-service) that can be used in lieu of downloading all of the SPICE files. This reduces the total download size to about 10 GB.
 
-### Full ISIS3 Data Download
+### Full ISIS Data Download
 
 The ISIS Data Area is hosted on rsync servers and not through conda channels like the ISIS binaries. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
@@ -335,7 +367,7 @@ To download all ISIS data, enter the following commands in the location where yo
     cd $ISISDATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/ .
 
-For earlier versions, use: 
+For earlier versions, use:
 
     cd $ISIS3DATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .

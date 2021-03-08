@@ -1,4 +1,5 @@
 #include <QTextStream>
+#include <QUuid>
 
 #include "CubeAttribute.h"
 #include "FileName.h"
@@ -7,6 +8,8 @@
 #include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
+#include "StringBlob.h"
+#include "TestUtilities.h"
 #include "ControlNet.h"
 
 namespace Isis {
@@ -556,6 +559,138 @@ namespace Isis {
     delete isdPathR;
   }
 
+
+  void MroCtxCube::SetUp() {
+    TempTestingFiles::SetUp();
+    
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MroCtxCube::TearDown() {
+    testCube.reset();
+  }
+
+
+  void GalileoSsiCube::SetUp() {
+    DefaultCube::SetUp();
+
+    // Change default dims 
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue("800");
+    dim.findKeyword("Lines").setValue("800");
+    dim.findKeyword("Bands").setValue("1");
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-77001");
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "Galileo Orbiter"
+        InstrumentId              = "SOLID STATE IMAGING SYSTEM"
+        TargetName                = IO
+        SpacecraftClockStartCount = 05208734.39
+        StartTime                 = 1999-10-11T18:05:15.815
+        ExposureDuration          = 0.04583 <seconds>
+        GainModeId                = 100000
+        TelemetryFormat           = IM4
+        LightFloodStateFlag       = ON
+        InvertedClockStateFlag    = "NOT INVERTED"
+        BlemishProtectionFlag     = OFF
+        ExposureType              = NORMAL
+        ReadoutMode               = Contiguous
+        FrameDuration             = 8.667 <seconds>
+        Summing                   = 1
+        FrameModeId               = FULL
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = testCube->label()->findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName   = RED
+        FilterNumber = 2
+        Center       = 0.671 <micrometers>
+        Width        = .06 <micrometers>
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE                  = 501
+        BODY501_RADII              = (1829.4, 1819.3, 1815.7)
+        BODY_FRAME_CODE            = 10023
+        INS-77001_FOCAL_LENGTH     = 1500.46655964
+        INS-77001_K1               = -2.4976983626e-05
+        INS-77001_PIXEL_PITCH      = 0.01524
+        INS-77001_TRANSX           = (0.0, 0.01524, 0.0)
+        INS-77001_TRANSY           = (0.0, 0.0, 0.01524)
+        INS-77001_ITRANSS          = (0.0, 65.6167979, 0.0)
+        INS-77001_ITRANSL          = (0.0, 0.0, 65.6167979)
+        INS-77001_BORESIGHT_SAMPLE = 400.0
+        INS-77001_BORESIGHT_LINE   = 400.0
+      End_Object
+    )");
+    
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    std::istringstream ar(R"(
+    Group = Archive
+      DataSetId     = GO-J/JSA-SSI-2-REDR-V1.0
+      ProductId     = 24I0146
+      ObservationId = 24ISGLOCOL01
+      DataType      = RADIANCE
+      CalTargetCode = 24
+    End_Group
+    )");
+
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
+    PvlGroup newArchive; 
+    ar >> newArchive;
+    archive = newArchive;
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+        for(int i = 0; i < line.size(); i++) {
+          line[i] = (double)(i+1);
+        }
+        testCube->write(line);
+    }
+
+    // need to remove old camera pointer
+    delete testCube;
+    testCube = new Cube(newCube, "rw");
+  }
+
+
+  void GalileoSsiCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
     dejitteredCube.open("data/mroKernels/mroHiriseProj.cub");
@@ -884,6 +1019,144 @@ namespace Isis {
     cubeFileList.append("data/rings/rings1proj.cub");
     cubeFileList.append("data/rings/rings2proj.cub");
     cubeFileList.write(cubeListPath);
+  }
+
+  void CSMCubeFixture::SetUp() {
+    SmallCube::SetUp();
+
+    // Instrument group
+    // Just need a target name
+    PvlGroup instGroup("Instrument");
+    instGroup += PvlKeyword("TargetName", "TestTarget");
+    instGroup += PvlKeyword("InstrumentId", "TestId");
+    testCube->putGroup(instGroup);
+
+    // Kernels group
+    // Just need a shapemodel specified
+    PvlGroup kernGroup("Kernels");
+    kernGroup += PvlKeyword("ShapeModel", "Null");
+    testCube->putGroup(kernGroup);
+
+    // CSMInfo group
+    // This just has to exist, but fill it out for completeness and incase it
+    // ever does matter
+    PvlGroup infoGroup("CsmInfo");
+    infoGroup += PvlKeyword("CSMPlatformID", "TestPlatform");
+    infoGroup += PvlKeyword("CSMInstrumentId", "TestInstrument");
+    infoGroup += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816"); // J2000 epoch
+
+    PvlKeyword paramNames("ModelParameterNames");
+    paramNames += "TestNoneParam";
+    paramNames += "TestFictitiousParam";
+    paramNames += "TestRealParam";
+    paramNames += "TestFixedParam";
+    PvlKeyword paramUnits("ModelParameterUnits");
+    paramUnits += "unitless";
+    paramUnits += "m";
+    paramUnits += "rad";
+    paramUnits += "lines/sec";
+    PvlKeyword paramTypes("ModelParameterTypes");
+    paramTypes += "NONE";
+    paramTypes += "FICTITIOUS";
+    paramTypes += "REAL";
+    paramTypes += "FIXED";
+
+    infoGroup += paramNames;
+    infoGroup += paramUnits;
+    infoGroup += paramTypes;
+
+    testCube->putGroup(infoGroup);
+
+    // Register the mock with our plugin
+    std::string mockModelName = QUuid().toString().toStdString();
+    MockCsmPlugin loadablePlugin;
+    loadablePlugin.registerModel(mockModelName, &mockModel);
+
+    // CSMState BLOB
+    StringBlob csmStateBlob(mockModelName, "CSMState");
+    csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
+    csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
+    testCube->write(csmStateBlob);
+    filename = testCube->fileName();
+    testCube->close();
+    testCube->open(filename, "rw");
+  }
+
+  void CSMCameraFixture::SetUp() {
+    CSMCubeFixture::SetUp();
+
+    // Account for calls that happen while making a CSMCamera
+    EXPECT_CALL(mockModel, getSensorIdentifier())
+        .Times(2)
+        .WillRepeatedly(::testing::Return("MockSensorID"));
+    EXPECT_CALL(mockModel, getPlatformIdentifier())
+        .Times(2)
+        .WillRepeatedly(::testing::Return("MockPlatformID"));
+    EXPECT_CALL(mockModel, getReferenceDateAndTime())
+        .Times(1)
+        .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
+
+    testCam = testCube->camera();
+  }
+
+  void CSMCameraSetFixture::SetUp() {
+    CSMCameraFixture::SetUp();
+
+    imagePt = csm::ImageCoord(4.5, 4.5);
+    groundPt = csm::EcefCoord(wgs84.getSemiMajorRadius(), 0, 0);
+    imageLocus = csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0);
+
+    // Setup the mock for setImage and ensure it succeeds
+    EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
+        .Times(1)
+        .WillOnce(::testing::Return(imageLocus));
+    EXPECT_CALL(mockModel, getImageTime)
+        .Times(1)
+        .WillOnce(::testing::Return(10.0));
+
+    ASSERT_TRUE(testCam->SetImage(5, 5)); // Assert here so that the test code doesn't run if the camera isn't set
+  }
+
+  void CSMCameraDemFixture::SetUp() {
+    CSMCubeFixture::SetUp();
+
+    // Record the demRadius at 0 lat, 0 lon
+    demRadius = 3394200.43980104;
+
+    // Update the shapemodel on the cube
+    PvlGroup &kernGroup = testCube->group("Kernels");
+    kernGroup.addKeyword(PvlKeyword("ShapeModel", "data/CSMCamera/mola_compressed_prep.cub"), Pvl::Replace);
+
+    // Close and re-open the cube, then save off the new camera
+    testCube->close();
+    testCube->open(filename, "rw");
+
+    // Account for calls that happen while making a CSMCamera
+    EXPECT_CALL(mockModel, getSensorIdentifier())
+        .Times(2)
+        .WillRepeatedly(::testing::Return("MockSensorID"));
+    EXPECT_CALL(mockModel, getPlatformIdentifier())
+        .Times(2)
+        .WillRepeatedly(::testing::Return("MockPlatformID"));
+    EXPECT_CALL(mockModel, getReferenceDateAndTime())
+        .Times(1)
+        .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
+
+    testCam = testCube->camera();
+  }
+
+
+  void MgsMocCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mgsImages/mocImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MgsMocCube::TearDown() {
+    testCube.reset();
   }
 
 }

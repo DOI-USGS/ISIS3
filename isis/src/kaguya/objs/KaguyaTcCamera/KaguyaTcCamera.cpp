@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "KaguyaTcCamera.h"
 #include "KaguyaTcCameraDistortionMap.h"
 
@@ -61,38 +50,38 @@ namespace Isis {
 
     // Setup detector map
     double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
-    
-    // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)   
+
+    // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
 
     // Detetermine what to set the starting detector sample to, based on swath mode
     QString swathMode = inst["SwathModeId"];
 
-    double startingDetectorSample = 1; 
+    double startingDetectorSample = 1;
     if (swathMode.compare("FULL") == 0) {
-      startingDetectorSample = 1; 
+      startingDetectorSample = 1;
     }
     else if (swathMode.compare("NOMINAL") == 0) {
-      startingDetectorSample = 297; 
+      startingDetectorSample = 297;
     }
     else if (swathMode.compare("HALF") == 0) {
       startingDetectorSample = 1172;
     }
 
     detectorMap->SetStartingDetectorSample(startingDetectorSample);
-    
+
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // This sets the origin of the detector (not image samp,line). It is zero bassed.
     // The detector offsets are 0,0 because the borsight is in the center of the array
-    // The origin of the detector does not depend on swath mode. 
+    // The origin of the detector does not depend on swath mode.
     QString key;
     key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(key);
 
     key = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(key);
-    focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight); 
+    focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
     // Setup distortion map
     new KaguyaTcCameraDistortionMap(this, naifIkCode());

@@ -987,7 +987,7 @@ namespace Isis {
    *                use the method ProcessExportPds::SetAttached() before
    *                calling ExportTable()."
 
-   * @param isisTable The Isis3 Table object to be exported to PDS.
+   * @param isisTable The ISIS Table object to be exported to PDS.
    * @param detachedPdsTableFileName The name of the exported PDS table file,
    *                                 if detached. This value should not
    *                                 include a path.  The path from the label

@@ -29,7 +29,7 @@ namespace Isis {
    *  @history 2009-12-18 Janet Barrett - Original version.
    *  @history 2017-08-21 Tyler Wilson, Ian Humphrey, Summer Stapleton - Added
    *                        support for new kakadu libraries.  References #4809.
-   *  
+   *
    */
 
 #if ENABLEJP2K
@@ -44,7 +44,7 @@ namespace Isis {
       //!<Place newline character between successive Kakadu produced error messages
       void add_text(const std::string &message);
 
-      //!<Write Kakadu error messages using ISIS3 methods
+      //!<Write Kakadu error messages using ISIS methods
       void flush(bool end_of_message = false);
 
       //!<Used to store accumulated Kakadu error messages

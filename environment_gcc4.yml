@@ -22,7 +22,6 @@ dependencies:
   - embree
   - geos=3.7.1
   - geotiff
-  - gmm
   - gmp
   - gsl
   - hdf5

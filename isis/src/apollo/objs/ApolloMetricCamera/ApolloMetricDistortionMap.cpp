@@ -1,31 +1,20 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ApolloMetricDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 
 using namespace std;
 namespace Isis {
   /**
-   *  
-   * Constructs a Distortion Map object for the Apollo Metric Camera. 
-   *  
+   *
+   * Constructs a Distortion Map object for the Apollo Metric Camera.
+   *
    * @param parent Pointer to parent Camera object
    * @param xp Pricipal point x-coordinate
    * @param yp Pricipal point y-coordinate
@@ -35,7 +24,7 @@ namespace Isis {
    * @param j1 First coefficient of decentering distortion
    * @param j2 Second coefficient of decentering distortion
    * @param t0 Angle between positive x-axis of image and vector to imaged point
-   * 
+   *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added documentation.
    *   @history 2013-03-18 Debbie A. Cook - Added flag to flip focal plane z axis

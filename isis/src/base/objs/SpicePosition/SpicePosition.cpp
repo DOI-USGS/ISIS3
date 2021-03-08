@@ -45,7 +45,7 @@ namespace Isis {
  * observer/target order in the NAIF spkez_c/spkezp_c routines when determining
  * the state of spacecraft and target body.
  *
- * Traditionally, ISIS3 (and ISIS2!) has had the target/observer order swapped
+ * Traditionally, ISIS (and ISIS2!) has had the target/observer order swapped
  * improperly to determine state vector between the two bodies.  This
  * constructor provides a transaitional path to correct this in a
  * controlled way.  See SpacecraftPosition for details.

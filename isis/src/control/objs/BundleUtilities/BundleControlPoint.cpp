@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleControlPoint.h"
 
 #include <QDebug>
@@ -17,9 +25,9 @@ namespace Isis {
 
 
   /**
-   * Constructs a BundleControlPoint object from a ControlPoint. Only the 
-   * non-ignored measures are added to the BundleControlPoint. 
-   * @param controlPoint Pointer to a ControlPoint that will be used to 
+   * Constructs a BundleControlPoint object from a ControlPoint. Only the
+   * non-ignored measures are added to the BundleControlPoint.
+   * @param controlPoint Pointer to a ControlPoint that will be used to
    *                     construct this BundleControlPoint.
    */
   BundleControlPoint::BundleControlPoint(const BundleSettingsQsp bundleSettings,
@@ -34,7 +42,7 @@ namespace Isis {
         continue;
       }
 
-      addMeasure(controlMeasure);      
+      addMeasure(controlMeasure);
     }
 
     // initialize to 0.0
@@ -61,9 +69,9 @@ namespace Isis {
 
 
   /**
-   * Copy constructor. Constructs a BundleControlPoint object from an existing 
-   * BundleControlPoint. 
-   *  
+   * Copy constructor. Constructs a BundleControlPoint object from an existing
+   * BundleControlPoint.
+   *
    * @param src The BundleControlPoint to be copied.
    */
   BundleControlPoint::BundleControlPoint(const BundleControlPoint &src) {
@@ -72,22 +80,22 @@ namespace Isis {
 
 
   /**
-   * Destructor for BundleControlPoint. 
+   * Destructor for BundleControlPoint.
    */
   BundleControlPoint::~BundleControlPoint() {
   }
 
 
   /**
-   * Copies given BundleControlPoint to this BundleControlPoint. 
-   *  
+   * Copies given BundleControlPoint to this BundleControlPoint.
+   *
    * @param src The BundleControlPoint to be copied.
    */
   void BundleControlPoint::copy(const BundleControlPoint &src) {
 
     // sanity check
     clear();
-    
+
     m_controlPoint = src.m_controlPoint;
 
     int numMeasures = src.size();
@@ -107,11 +115,11 @@ namespace Isis {
 
 
   /**
-   * Creates a BundleMeasure from the given ControlMeasure and appends it to 
-   * this BundleControlPoint's measure list. 
-   *  
+   * Creates a BundleMeasure from the given ControlMeasure and appends it to
+   * this BundleControlPoint's measure list.
+   *
    * @param controlMeasure The ControlMeasure to be converted.
-   * 
+   *
    * @return @b BundleMeasure* A pointer to the new BundleMeasure.
    */
   BundleMeasureQsp BundleControlPoint::addMeasure(ControlMeasure *controlMeasure) {
@@ -135,8 +143,8 @@ namespace Isis {
 
 
   /**
-   * Sets the adjusted surface point for this BundleControlPoint. 
-   *  
+   * Sets the adjusted surface point for this BundleControlPoint.
+   *
    * @param surfacePoint The surface point to be set.
    */
   void BundleControlPoint::setAdjustedSurfacePoint(SurfacePoint surfacePoint) {
@@ -169,9 +177,9 @@ namespace Isis {
 
 
   /**
-   * Sets the weights using the given BundleSettings QSharedPointer and a 
-   * conversion value for meters to radians. 
-   *  
+   * Sets the weights using the given BundleSettings QSharedPointer and a
+   * conversion value for meters to radians.
+   *
    * @param settings A QSharedPointer to BundleSettings object.
    * @param metersToRadians A double precision conversion factor.
    */
@@ -187,7 +195,7 @@ namespace Isis {
       m_weights[2] = 1.0e+50;
       // m_aprioriSigmas = Isis::Null by default
     }
-    
+
     if (m_controlPoint->GetType() == ControlPoint::Free) {
       // Global sigmas are temporary and should not be stored in the control net.  Currently
       // global sigmas are always in meters.  Make sure unit of weights is 1/(var unit squared),
@@ -207,7 +215,7 @@ namespace Isis {
       }
       else {
         if (!IsSpecial(globalPointCoord3AprioriSigma)) {
-          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2); 
+          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2);
         }
       }
     }
@@ -226,7 +234,7 @@ namespace Isis {
              m_controlPoint->GetAprioriSurfacePoint().GetWeight(m_coordTypeBundle, SurfacePoint::One);
       }
       else if (!IsSpecial(globalPointCoord1AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0); 
+        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0);
       } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
         // m_weights = 0.0
 
@@ -238,7 +246,7 @@ namespace Isis {
           m_controlPoint->GetAprioriSurfacePoint().GetWeight(m_coordTypeBundle, SurfacePoint::Two);
       }
       else if (!IsSpecial(globalPointCoord2AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1); 
+        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1);
       } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
         // m_weights = 0.0
 
@@ -254,7 +262,7 @@ namespace Isis {
             (m_coordTypeBundle, SurfacePoint::Three);
         }
         else if (!IsSpecial(globalPointCoord3AprioriSigma)) {
-          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2); 
+          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2);
         } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
           // m_weights = 0.0
       }
@@ -263,18 +271,18 @@ namespace Isis {
 
 
   /**
-   * Sets the member sigmas and weights from a global sigma.. 
-   * 
-// *** TODO *** Should index be SurfacePoint::CoordIndex? 
+   * Sets the member sigmas and weights from a global sigma..
+   *
+// *** TODO *** Should index be SurfacePoint::CoordIndex?
    * @param gSigma The global sigma to assign.
    * @param index The index of the point coordinate being set (0, 1, or 2).
    * @param cFactor The conversion factor applied to gSigma to match bundle variable units.
-   * 
-    * @see formatAprioriSigmaString() 
+   *
+    * @see formatAprioriSigmaString()
    */
-  void BundleControlPoint::setSigmaWeightFromGlobals(double gSigma, int index) {    
+  void BundleControlPoint::setSigmaWeightFromGlobals(double gSigma, int index) {
     m_aprioriSigmas[index] = gSigma;
-    
+
     switch (index) {
       case 0:
         if (m_coordTypeBundle == SurfacePoint::Latitudinal) {
@@ -297,7 +305,7 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         break;
-      case 1:  
+      case 1:
         // if (!IsSpecial(globalPointCoord2AprioriSigma)) {
         if (m_coordTypeBundle == SurfacePoint::Latitudinal) {
           double sigmaRadians =
@@ -314,9 +322,9 @@ namespace Isis {
           IString msg ="Unknown surface point coordinate type enum ["
             + toString(m_coordTypeBundle) + "]." ;
           throw IException(IException::Programmer, msg, _FILEINFO_);
-        } 
+        }
         break;
-      
+
       case 2:
       // Coordinate 2 is either latitudinal radius or rectangular z, both in m
       {
@@ -324,7 +332,7 @@ namespace Isis {
         m_weights[2] = 1./ (sigmakm*sigmakm); // 1/km^2
         }
         break;
-      
+
       default:
           IString msg ="Unknown coordinate index [" + toString(index) + "]." ;
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -358,7 +366,7 @@ namespace Isis {
     QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
 
     int subrangeStart, subrangeEnd;
-    
+
     while ( Qit.hasNext() ) {
       Qit.next();
 
@@ -366,7 +374,7 @@ namespace Isis {
 
       subrangeStart = sparseNormals.at(columnIndex)->startColumn();
       subrangeEnd = subrangeStart + Qit.value()->size2();
-      
+
       m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
@@ -383,10 +391,10 @@ namespace Isis {
                                                SparseBlockMatrix &sparseNormals,
                                                const BundleTargetBodyQsp target) {
     if (!isRejected()) {
-        
+
       // subtract product of Q and nj from NIC
       productAlphaAV(-1.0, sparseNormals, imageSolution);
-        
+
       // update adjusted surface point appropriately for the coordinate type
       switch (m_coordTypeBundle) {
         case SurfacePoint::Latitudinal:
@@ -400,7 +408,7 @@ namespace Isis {
             + toString(m_coordTypeBundle) + "]." ;
             throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-        
+
       // sum and save corrections
       m_corrections(0) += m_nicVector[0];
       m_corrections(1) += m_nicVector[1];
@@ -408,10 +416,10 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Accessor for the raw ControlPoint object used for this BundleControlPoint.
-   * 
+   *
    * @return @b ControlPoint* A pointer to the raw ControlPoint.
    */
   ControlPoint *BundleControlPoint::rawControlPoint() const {
@@ -421,7 +429,7 @@ namespace Isis {
 
   /**
    * Method used to determine whether this control point is rejected.
-   * 
+   *
    * @return @b bool Indicates whether this control point is rejected.
    */
   bool BundleControlPoint::isRejected() const {
@@ -431,7 +439,7 @@ namespace Isis {
 
   /**
    * Accesses number of measures associated with this BundleControlPoint.
-   * 
+   *
    * @return @b int The number of measures for this point.
    */
   int BundleControlPoint::numberOfMeasures() const {
@@ -465,7 +473,7 @@ namespace Isis {
 
   /**
    * Accesses the adjusted SurfacePoint associated with this BundleControlPoint.
-   * 
+   *
    * @return @b SurfacePoint The adjusted surface point.
    */
   SurfacePoint BundleControlPoint::adjustedSurfacePoint() const {
@@ -474,8 +482,8 @@ namespace Isis {
 
 
   /**
-   * Accesses the Point ID associated with this BundleControlPoint. 
-   * 
+   * Accesses the Point ID associated with this BundleControlPoint.
+   *
    * @return @b QString The ID for this point.
    */
   QString BundleControlPoint::id() const {
@@ -485,10 +493,10 @@ namespace Isis {
 
   /**
    * Accesses BundleControlPoint's type.
-   * 
+   *
    * @return @b ControlPoint::PointType The BundleControlPoint's type.  Options are:
    *                                    Fixed = 0, Constrained = 1, Free = 2.
-   * 
+   *
    * @see ControlPoint::GetType()
    */
   ControlPoint::PointType BundleControlPoint::type() const{
@@ -498,10 +506,10 @@ namespace Isis {
 
   /**
    * Accesses BundleControlPoint's coordinate type for reports.
-   * 
-   * @return @b ControlPoint::CoordinateType The BundleControlPoint's coordinate type. 
+   *
+   * @return @b ControlPoint::CoordinateType The BundleControlPoint's coordinate type.
    *                                    See SurfacePoint for the options.
-   * 
+   *
    * @see ControlPoint::getCoordType()
    */
   SurfacePoint::CoordinateType BundleControlPoint::coordTypeReports() const{
@@ -511,10 +519,10 @@ namespace Isis {
 
   /**
    * Accesses BundleControlPoint's control point coordinate type for the bundle adjustment.
-   * 
-   * @return @b ControlPoint::CoordinateType The BundleControlPoint's coordinate type. 
+   *
+   * @return @b ControlPoint::CoordinateType The BundleControlPoint's coordinate type.
    *                                    See SurfacePoint for the options.
-   * 
+   *
    * @see ControlPoint::getCoordTypeBundle()
    */
   SurfacePoint::CoordinateType BundleControlPoint::coordTypeBundle() const{
@@ -524,10 +532,10 @@ namespace Isis {
 
 // *** TODO *** Need to add bounded vectors to Linear Algebra class
   /**
-   * Accesses the 3 dimensional ordered vector of correction values associated 
-   * with coord1, coord2, and coord 3 (latitude, longitude, and radius or X, Y, and Z. 
+   * Accesses the 3 dimensional ordered vector of correction values associated
+   * with coord1, coord2, and coord 3 (latitude, longitude, and radius or X, Y, and Z.
    * A bounded vector is recommended because the size will always be 3.
-   * 
+   *
    * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of correction values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() {
@@ -536,9 +544,9 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimensional ordered vector of apriori sigmas (apriori 
-   * coordinate1, apriori coordinate2, apriori coordinate3). 
-   * 
+   * Accesses the 3 dimensional ordered vector of apriori sigmas (apriori
+   * coordinate1, apriori coordinate2, apriori coordinate3).
+   *
    * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of apriori sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
@@ -550,9 +558,9 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimensional ordered vector of adjusted sigmas (adjusted 
-   * coordinate1, adjusted coordinate2, adjusted coordinate3). 
-   * 
+   * Accesses the 3 dimensional ordered vector of adjusted sigmas (adjusted
+   * coordinate1, adjusted coordinate2, adjusted coordinate3).
+   *
    * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of adjusted sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
@@ -561,9 +569,9 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimensional ordered vector of weight values associated 
-   * with coordinate1, coordinate2, and coordinate3. 
-   * 
+   * Accesses the 3 dimensional ordered vector of weight values associated
+   * with coordinate1, coordinate2, and coordinate3.
+   *
    * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of weight values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
@@ -572,8 +580,8 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimensional ordered NIC vector. 
-   * 
+   * Accesses the 3 dimensional ordered NIC vector.
+   *
    * @return @b boost::numeric::ublas::bounded_vector<double,3>& The NIC vector.
    */
   boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() {
@@ -583,7 +591,7 @@ namespace Isis {
 
   /**
    * Accesses the CholMod matrix associated with this BundleControlPoint.
-   * 
+   *
    * @return @b SparseBlockRowMatrix& The CholMod row matrix.
    */
   SparseBlockRowMatrix &BundleControlPoint::cholmodQMatrix() {
@@ -592,17 +600,17 @@ namespace Isis {
 
 
   /**
-   * Formats an output summary string for this BundleControlPoint. This string 
-   * includes ID, point type, number of rays from non-rejected measures, 
-   * residual RMS, adjusted coordinate1, adjusted coordinate 2, and adjusted 
-   * coordinate 3 followed by the adjusted sigmas.  In the case of Latitudinal 
-   * coordinates, the coordinates will be adjusted latitude and longitude (in degrees), 
-   * the adjusted radius (in km), and the adjusted sigmas for latitude, longitude and 
-   * radius all in meters.  In the case of Rectangular coordinates, the coordinates 
-   * will be X, Y, Z (in km), and the adjusted sigmas for X, Y, and Z all in meters. 
-   *  
+   * Formats an output summary string for this BundleControlPoint. This string
+   * includes ID, point type, number of rays from non-rejected measures,
+   * residual RMS, adjusted coordinate1, adjusted coordinate 2, and adjusted
+   * coordinate 3 followed by the adjusted sigmas.  In the case of Latitudinal
+   * coordinates, the coordinates will be adjusted latitude and longitude (in degrees),
+   * the adjusted radius (in km), and the adjusted sigmas for latitude, longitude and
+   * radius all in meters.  In the case of Rectangular coordinates, the coordinates
+   * will be X, Y, Z (in km), and the adjusted sigmas for X, Y, and Z all in meters.
+   *
    * @param errorPropagation Indicates whether error propagation was selected.
-   * 
+   *
    * @return @b QString The formatted output summary string.
    */
   QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
@@ -611,7 +619,7 @@ namespace Isis {
     int numGoodRays    = numRays - numberOfRejectedMeasures();
     double ResidualRms = residualRms();
 
-    // Return generic set of control point coordinates as floating point values 
+    // Return generic set of control point coordinates as floating point values
     // Be careful because of the potential to confuse units.
     SurfacePoint::CoordUnits units = SurfacePoint::Degrees;
     if (m_coordTypeReports == SurfacePoint::Rectangular) units = SurfacePoint::Kilometers;
@@ -642,20 +650,20 @@ namespace Isis {
 
 
   /**
-   * Formats a detailed output string table for this BundleControlPoint. 
-   *  
+   * Formats a detailed output string table for this BundleControlPoint.
+   *
    * @param errorPropagation Indicates whether error propagation was selected.
-   * @param RTM Conversion factor from radians to meters. Used to convert the 
+   * @param RTM Conversion factor from radians to meters. Used to convert the
    *            latitude and longitude corrections to meters.
    * @param solveRadius A flag indicating to solve for each points individual radius.
    *            When solveRadius is false, the point radius is heavily weighted
-   * 
+   *
    * @return @b QString The formatted output detailed string.
    */
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
                                                              bool solveRadius) const {
     QString output;
-    
+
     switch (m_coordTypeReports) {
       case SurfacePoint::Latitudinal:
         output = formatBundleLatitudinalOutputDetailString(errorPropagation, solveRadius);
@@ -669,19 +677,19 @@ namespace Isis {
     }
     return output;
   }
-     
+
 
   /**
-   * Formats a detailed output string table for this Latitudinal BundleControlPoint. 
-   *  
+   * Formats a detailed output string table for this Latitudinal BundleControlPoint.
+   *
    * @param errorPropagation Indicates whether error propagation was selected.
-   * @param RTM Conversion factor from radians to meters. Used to convert the 
+   * @param RTM Conversion factor from radians to meters. Used to convert the
    *            latitude and longitude corrections to meters.
    * @param solveRadius A flag indicating to solve for each points individual radius.
    *            When solveRadius is false, the point radius is heavily weighted
-   * 
+   *
    * @return @b QString The formatted output detailed string.
-   * 
+   *
    * @internal
    *  @history 2017-08-24 Debbie A. Cook - Revised units of cor_rad to be km instead of meters
    *                                                     when outputting latitudinal corrections in degrees.  Fixed
@@ -725,7 +733,7 @@ namespace Isis {
       double yCor = m_corrections(1);  // km
       double z      = m_controlPoint->GetAdjustedSurfacePoint().GetZ().kilometers();
       double zCor = m_corrections(2);  // km
-      
+
       if (!IsSpecial(x) && !IsSpecial(y) && !IsSpecial(z)) {
         SurfacePoint rectPoint(Displacement(x - xCor, Displacement::Kilometers),
                               Displacement(y - yCor, Displacement::Kilometers),
@@ -753,7 +761,7 @@ namespace Isis {
       cor_rad_m  = m_corrections(2) * 1000.0;                   // radius correction, meters
 
       cor_lat_m = m_controlPoint->GetAdjustedSurfacePoint().LatitudeToMeters(m_corrections(0));
-      cor_lon_m = m_controlPoint->GetAdjustedSurfacePoint().LongitudeToMeters(m_corrections(1));  
+      cor_lon_m = m_controlPoint->GetAdjustedSurfacePoint().LongitudeToMeters(m_corrections(1));
       cor_rad_km = m_corrections(2);
 
       if (!IsSpecial(lat)) {
@@ -796,10 +804,10 @@ namespace Isis {
     output += QString("  LATITUDE%1%2%3%4%5%6\n")
         .arg(formatValue(latInit, 17, 8))                                         // deg
         .arg(formatValue(cor_lat_dd, 21, 8))                                 // deg
-        .arg(formatValue(cor_lat_m, 20, 8))                                  // m 
+        .arg(formatValue(cor_lat_m, 20, 8))                                  // m
         .arg(formatValue(lat, 20, 8))                                              // deg
         .arg(formatCoordAprioriSigmaString(idx, 18,8, true))        // m
-        .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m 
+        .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m
 
     idx = SurfacePoint::Two;
     output += QString(" LONGITUDE%1%2%3%4%5%6\n")
@@ -821,17 +829,17 @@ namespace Isis {
 
     return output;
   }
-     
+
 
   /**
-   * Formats a detailed output string table for this Rectangular BundleControlPoint. 
-   *  
+   * Formats a detailed output string table for this Rectangular BundleControlPoint.
+   *
    * @param errorPropagation Indicates whether error propagation was selected.
-   * 
+   *
    * @return @b QString The formatted output detailed string.
-   * 
+   *
    * @internal
-   *  @history 2017-08-24 Debbie A. Cook - Corrected units reported in comments to correctly report 
+   *  @history 2017-08-24 Debbie A. Cook - Corrected units reported in comments to correctly report
    *                                                       km and also in label line.
    */
  QString BundleControlPoint::formatBundleRectangularOutputDetailString
@@ -851,7 +859,7 @@ namespace Isis {
     double XInit = Isis::Null;
     double YInit = Isis::Null;
     double ZInit = Isis::Null;
-    
+
     if (m_coordTypeBundle == SurfacePoint::Latitudinal) {
       double lat      = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
       double latcor = m_corrections(0) * RAD2DEG;
@@ -923,10 +931,10 @@ namespace Isis {
     SurfacePoint::CoordIndex idx = SurfacePoint::One;
     output += QString(" BODY-FIXED-X%1%2%3%4%5\n")
             .arg(formatValue(XInit, 17, 8))                                       // km
-            .arg(formatValue(cor_X_m, 20, 8))                                // km 
+            .arg(formatValue(cor_X_m, 20, 8))                                // km
             .arg(formatValue(X, 20, 8))                                           // km
             .arg(formatCoordAprioriSigmaString(idx, 18,8, true))   // m
-            .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m 
+            .arg(formatCoordAdjustedSigmaString(idx, 18,8,errorPropagation)); // m
 
     idx = SurfacePoint::Two;
     output += QString(" BODY-FIXED-Y%1%2%3%4%5\n")
@@ -951,35 +959,35 @@ namespace Isis {
 
 
   /**
-   * Formats the given double precision value using the specified field width 
-   * and precision. If the given value is special, then "Null" is returned. 
-   *  
+   * Formats the given double precision value using the specified field width
+   * and precision. If the given value is special, then "Null" is returned.
+   *
    * @param value The double value to be formattted.
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the given double value to be saved off.
-   * 
+   *
    * @return @b QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatValue(double value, int fieldWidth, int precision) const {
     QString output;
-    IsSpecial(value) ? 
+    IsSpecial(value) ?
       output = QString("%1").arg("Null", fieldWidth) :
       output = QString("%1").arg(value, fieldWidth, 'f', precision);
     return output;
   }
 
-  
+
   /**
-   * Formats the apriori sigma value indicated by the given type code. If no 
-   * sigma was set, then the string "N/A" will be returned. 
-   *  
-   * @param index CoordIndex Coordinate index One: Latitude or X, Two:  Longitude or Y,  
+   * Formats the apriori sigma value indicated by the given type code. If no
+   * sigma was set, then the string "N/A" will be returned.
+   *
+   * @param index CoordIndex Coordinate index One: Latitude or X, Two:  Longitude or Y,
    *                                 or Three: Radius or Z
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * @param solveRadius A flag indicating to solve for each points individual radius.
    *            When solveRadius is false, the point radius is heavily weighted
-   * 
+   *
    * @return @b QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatAprioriSigmaString(SurfacePoint::CoordIndex index,
@@ -1002,17 +1010,17 @@ namespace Isis {
 
 
   /**
-   * Formats the apriori coordinate 1 (latitude or X) sigma value. 
-   *  
+   * Formats the apriori coordinate 1 (latitude or X) sigma value.
+   *
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
-   * 
+   *
    * @return @b QString The formatted apriori coordinate 1 sigma value, as a string.
-   *  
-   * @see formatAprioriSigmaString() 
+   *
+   * @see formatAprioriSigmaString()
    */
 QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordIndex index,
-                                                          int fieldWidth, 
+                                                          int fieldWidth,
                                                           int precision,
                                                           bool solveRadius) const {
     return formatAprioriSigmaString(index, fieldWidth, precision, solveRadius);
@@ -1020,16 +1028,16 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
 
 
   /**
-   * Formats the adjusted sigma value indicated by the given type code. If error 
-   * propagation is false or the selected sigma type was set to Null, then only 
-   * "N/A" will be returned. 
-   *  
-   * @param index CoordIndex  Coordinate index One: Latitude or X, Two:  Longitude or Y,  
+   * Formats the adjusted sigma value indicated by the given type code. If error
+   * propagation is false or the selected sigma type was set to Null, then only
+   * "N/A" will be returned.
+   *
+   * @param index CoordIndex  Coordinate index One: Latitude or X, Two:  Longitude or Y,
    *                                 or Three: Radius or Z
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
-   * 
+   *
    * @return @b QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatAdjustedSigmaString(SurfacePoint::CoordIndex index,
@@ -1057,16 +1065,16 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
 
 
   /**
-   * Formats the adjusted coordinate sigma value. 
-   *  
+   * Formats the adjusted coordinate sigma value.
+   *
    * @param index The coordinate index of the sigma to return.
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
-   * 
+   *
    * @return @b QString The formatted adjusted coordinate sigma value, as a string.
-   *  
-   * @see formatAdjustedSigmaString() 
+   *
+   * @see formatAdjustedSigmaString()
    */
 QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex index,
                                                                 int fieldWidth, int precision,
@@ -1115,7 +1123,7 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
 
       // convert to meters and apply
       pointRad += 1000. * radCorrection;
-      
+
       // ken testing - if solving for target body mean radius, set radius to current
       // mean radius value
       // Only allow radius options for Latitudinal coordinates
@@ -1163,7 +1171,7 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
       pointX += 1000. * XCorrection;
       pointY += 1000. * YCorrection;
       pointZ += 1000. * ZCorrection;
-    
+
       surfacepoint.SetRectangularCoordinates(
                                              Displacement(pointX, Displacement::Meters),
                                              Displacement(pointY, Displacement::Meters),

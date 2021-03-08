@@ -3,19 +3,19 @@
 <application name="isis2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Convert from ISIS3 cube to PDS 3 or PDS 4 format
+    Convert from ISIS cube to PDS 3 or PDS 4 format
   </brief>
 
   <description>
    Program to convert cubes to PDS3 or PDS4 image files.
 
-   For PDS4, If available, Instrument and  Mapping information will be written to the detached output PDS4 formatted xml label file.   
+   For PDS4, If available, Instrument and  Mapping information will be written to the detached output PDS4 formatted xml label file.
 <p>
-   Not all values in the generated PDS4 labels can be determined automatically by ISIS3, and some must be updated by the user (by opening up the xml label output by this application and editing it with a text editor) for the generated label to be PDS4 compliant. The values UNK (unknown) and TBD (to be determined) are used as placeholders in the generated label. TBD values must be replaced by the user for the output label to be PDS4 compliant. Some of these TBDs can only be replaced with one of several specific enumerated values to meet compliancy. These possible values can be found in the <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS 4 Information Model Specification</a> in the Value/Class column of the table for the associated tag or in the index at the end of the document. Searching this page for the name of the field you need to determine a value for is recommended. 
+   Not all values in the generated PDS4 labels can be determined automatically by ISIS3, and some must be updated by the user (by opening up the xml label output by this application and editing it with a text editor) for the generated label to be PDS4 compliant. The values UNK (unknown) and TBD (to be determined) are used as placeholders in the generated label. TBD values must be replaced by the user for the output label to be PDS4 compliant. Some of these TBDs can only be replaced with one of several specific enumerated values to meet compliancy. These possible values can be found in the <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html">PDS 4 Information Model Specification</a> in the Value/Class column of the table for the associated tag or in the index at the end of the document. Searching this page for the name of the field you need to determine a value for is recommended.
 </p>
 
 <p>
-For example: For a cube with map-projected data, ISIS3 will populate planar_coordinate encoding_method with a value on its own, but if it did not and instead had "TBD", we would find at <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html#attribute_cart_planar_coordinate_information_cart_planar_coordinate_encoding_method">planar_coordinate_coding_method</a> that there are 3 possible values: 'Coordinate Pair', 'Distance and Bearing', 'Row and Column'.
+For example: For a cube with map-projected data, ISIS will populate planar_coordinate encoding_method with a value on its own, but if it did not and instead had "TBD", we would find at <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/index_1900.html#attribute_cart_planar_coordinate_information_cart_planar_coordinate_encoding_method">planar_coordinate_coding_method</a> that there are 3 possible values: 'Coordinate Pair', 'Distance and Bearing', 'Row and Column'.
 </p>
 
 <p>
@@ -24,7 +24,7 @@ Not everything is in the  <a href="https://pds.jpl.nasa.gov/pds4/doc/im/current/
 
 <p>
 UNK  is used as a placeholder if any value can be used and still be a valid PDS4-formatted xml header. UNKs can, but are not required to be, replaced by the user with
-better information. 
+better information.
 </p>
 
   </description>
@@ -50,13 +50,13 @@ better information.
       image label. This checksum is generated from the image data. Fixes #1013.
     </change>
     <change name="Jeannie Backer, Mayayla Shepard, and Kristin Berry" date="2017-10-27">
-       Added PDS4 output option. Previously, this application converted ISIS3 cubes to PDS3 format only. 
+       Added PDS4 output option. Previously, this application converted ISIS cubes to PDS3 format only.
     </change>
     <change name="Jeannie Backer" date="2017-11-13">
-       Updated to attach *.img extension to pds4 output data file. 
+       Updated to attach *.img extension to pds4 output data file.
     </change>
     <change name="Kristin Berry" date="2017-11-26">
-       Updated with very basic documentation about the PDS4 output labels. 
+       Updated with very basic documentation about the PDS4 output labels.
     </change>
     </history>
 
@@ -83,7 +83,7 @@ better information.
           Output pds image
         </brief>
         <description>
-          The resulting pds file. For PDS4, a detached label of the same name with the file extension .xml 
+          The resulting pds file. For PDS4, a detached label of the same name with the file extension .xml
           will be created in the same directory.
         </description>
         <filter>
@@ -103,15 +103,15 @@ better information.
 	 </description>
 	 <list>
 	     <option value="PDS3">
-		 <brief>Convert ISIS3 cube to PDS3 format</brief>
+		 <brief>Convert ISIS cube to PDS3 format</brief>
 		 <description>
-		     Convert ISIS3 cube to PDS3 format.
+		     Convert ISIS cube to PDS3 format.
 		 </description>
 	     </option>
 	     <option value="PDS4">
-		 <brief>Convert ISIS3 cube to PDS4 format</brief>
+		 <brief>Convert ISIS cube to PDS4 format</brief>
 		 <description>
-		     Convert ISIS3 cube to PDS4 format.
+		     Convert ISIS cube to PDS4 format.
 		  </description>
 		  <exclusions>
 		      <item>LABTYPE</item>
@@ -261,7 +261,7 @@ better information.
           If set to true, then an MD5 checksum will be generated from the image data and
           attached to the output image labels.
         </description>
-      </parameter> 
+      </parameter>
     </group>
 
     <group name="Stretch Options">

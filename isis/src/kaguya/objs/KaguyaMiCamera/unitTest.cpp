@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 
 #include "Camera.h"
@@ -44,15 +33,15 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406, 
+    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406,
                             60.8041933170744215, 60.1567063916710580};
-    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660, 
+    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660,
                            135.3886983694549713, 135.3809757236753057};
 
-    char files[4][1024] = { "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_VIS.cub", "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_NIR.cub", 
-                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MVA_2B2_01_01228N608E1354.cub", 
+    char files[4][1024] = { "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_VIS.cub", "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_NIR.cub",
+                            "$ISISTESTDATA/isis/src/kaguya/unitTestData/MVA_2B2_01_01228N608E1354.cub",
                             "$ISISTESTDATA/isis/src/kaguya/unitTestData/MNA_2B2_01_01228N602E1354.cub"};
- 
+
     for (unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Cube c(files[i], "r");
       Camera *cam = CameraFactory::Create(c);
@@ -60,14 +49,14 @@ int main(int argc, char *argv[]) {
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
-  
+
       // Test kernel IDs
       cout << "Kernel IDs: " << endl;
       cout << "CK Frame ID = " << cam->CkFrameId() << endl;
       cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
       cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
       cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-      
+
       // Test name methods
       cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
       cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
@@ -113,7 +102,7 @@ int main(int argc, char *argv[]) {
       }
       cout << endl << "--------------------------------------------" << endl;
     }
-    
+
     // Test exception: camera is not a supported Kaguya camera
     cout << endl << "Testing exceptions:" << endl << endl;
     Cube test("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2530292409_v.cub", "r");

@@ -1305,7 +1305,13 @@ End_Object
                     </TD>
                 </TR>
             </TABLE>
-
+    <p>
+    If run on a non-spiceinited cube, this program requires access to local mission-specific 
+    SPICE kernels, in order to find the distance between the sun and the target body. 
+    When run on a spiceinited cube, this can be determined using the camera model.
+    Using a spiceinited cube as input has the advantage of not requiring that local 
+    mission-specific kernels be available. (See spiceinit web=true.)
+    </p>
   </description>
 
   <history>
@@ -1409,6 +1415,9 @@ End_Object
    </change>
    <change name="Kris Becker" date="2011-09-18">
        Merged hicalbeta changes into hical to make new release
+   </change>
+   <change name="Stuart Sides" date="2021-02-24"> 
+       Added ability to get sun distance from the camera.
    </change>
   </history>
 

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <string>
@@ -190,14 +198,14 @@ void IsisMain() {
     measureInfo += QString(CheckValue(Asp.GetLatSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { 
-      measureInfo += QString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; 
+    try {
+      measureInfo += QString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ",";
     }
     catch (IException &) {
       measureInfo += ",";
     }
-    try { 
-      measureInfo += QString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; 
+    try {
+      measureInfo += QString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ",";
     }
     catch (IException &) {
       measureInfo += ",";
@@ -216,14 +224,14 @@ void IsisMain() {
     measureInfo += QString(CheckValue(sp.GetLatSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(sp.GetLonSigma().degrees())) + ",";
     measureInfo += QString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { 
-      measureInfo += QString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; 
+    try {
+      measureInfo += QString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ",";
     }
     catch (IException &e) {
       measureInfo += ",";
     }
-    try { 
-      measureInfo += QString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; 
+    try {
+      measureInfo += QString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ",";
     }
     catch (IException &e) {
       measureInfo += ",";
@@ -398,7 +406,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
       output += QString(CheckValue((*point)[i][0])) + ",";
       output += QString(CheckValue((*point)[i][1])) + ",";
       output += QString(CheckValue((*point)[i][2])) + ",";
-    } 
+    }
     else {
       output += QString(CheckValue((*point)[i][0])) + ",";
     }

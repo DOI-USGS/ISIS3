@@ -15,16 +15,16 @@ namespace Isis {
   /**
    * @brief Class for storing Table blobs information.
    *
-   * This class can create new Tables or read table blobs from files. In 
-   * general, records correspond to rows and fields correspond to columns. Thus 
-   * the TableRecord class corresponds to a vector of row entries and 
-   * TableField class corresponds to a specific entry of the table for a given 
-   * record. Isis3 Table objects are record based, N records in a table. Each 
-   * record will have the same number of fields, F. The fields can be of 
-   * different types including Integer, Double, Text, and Real. The class 
-   * uses PVL to store the structure of the table N, F, and Field types and 
+   * This class can create new Tables or read table blobs from files. In
+   * general, records correspond to rows and fields correspond to columns. Thus
+   * the TableRecord class corresponds to a vector of row entries and
+   * TableField class corresponds to a specific entry of the table for a given
+   * record. Isis Table objects are record based, N records in a table. Each 
+   * record will have the same number of fields, F. The fields can be of
+   * different types including Integer, Double, Text, and Real. The class
+   * uses PVL to store the structure of the table N, F, and Field types and
    * binary to store the table data.
-   *  
+   *
    * See the classes TableRecord and TableField for more information.
    *
    * If you would like to see Table being used in implementation, see histats.cpp
@@ -55,19 +55,19 @@ namespace Isis {
    *                           operator+=(record) that verifies that the record sizes match.
    *                           References #1178
    *   @history 2018-08-13 Summer Stapleton - Added a default constructor for logic relating to the
-   *                           overhaul of the mosaic tracking now being handled in a separate 
+   *                           overhaul of the mosaic tracking now being handled in a separate
    *                           tracking cube.
    */
   class Table : public Isis::Blob {
     public:
-      /** 
-       *  
-       */ 
-      enum Association { 
-             None, 
-             Samples, 
-             Lines, 
-             Bands 
+      /**
+       *
+       */
+      enum Association {
+             None,
+             Samples,
+             Lines,
+             Bands
       };
 
       // Constructors and Destructors
@@ -82,7 +82,7 @@ namespace Isis {
 
       ~Table();
 
-      
+
       friend std::istream&operator>>(std::istream &is, Table &table);
       friend std::ostream&operator<<(std::ostream &os, Table &table);
 
@@ -130,4 +130,3 @@ namespace Isis {
 };
 
 #endif
-

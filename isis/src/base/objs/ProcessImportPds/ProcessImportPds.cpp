@@ -1445,7 +1445,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The label where the translated Isis2 keywords will
    *            be placed
@@ -1463,7 +1463,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 instrument labels as possible
+   * Fill as many of the Isis instrument labels as possible
    *
    * @param lab The label where the tramslated Isis2 keywords will
    *            be placed
@@ -1504,7 +1504,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The lable where the translated PDS keywords will
    *            be placed
@@ -1520,7 +1520,7 @@ namespace Isis {
 
 
   /**
-   * Fill as many of the Isis3 BandBin labels as possible
+   * Fill as many of the Isis BandBin labels as possible
    *
    * @param lab The lable where the translated PDS keywords will
    *            be placed

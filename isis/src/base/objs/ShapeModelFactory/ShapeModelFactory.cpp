@@ -49,15 +49,15 @@ namespace Isis {
 
 
   /**
-   * Construct a valid shape model from the given target and contents of kernels 
-   * group. If the Kernels group does not have a ShapeModel or ElevationModel 
-   * specified, then the default model is an ellipsoidal shape. 
-   * 
+   * Construct a valid shape model from the given target and contents of kernels
+   * group. If the Kernels group does not have a ShapeModel or ElevationModel
+   * specified, then the default model is an ellipsoidal shape.
+   *
    * @param target Pointer to target body model.
    * @param pvl Pvl containing a Kernels group.
-   * 
+   *
    * @return ShapeModel* Pointer to the created ShapeModel object.
-   * 
+   *
    * @author 2017-03-17 Kris Becker
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
@@ -158,7 +158,7 @@ namespace Isis {
         // Check to see of ISIS cube DEMs get a pass
         FileName v_shapefile(shapeModelFilenames);
         QString ext = v_shapefile.extension().toLower();
-        // Cubes are not supported at this time. 
+        // Cubes are not supported at this time.
 
         try {
           BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
@@ -171,9 +171,9 @@ namespace Isis {
               throw IException(IException::Unknown, mess, _FILEINFO_);
             }
 
-            // Always throw an error in this case 
+            // Always throw an error in this case
             QString b_msg = "Bullet could not initialize DEM!";
-            throw IException(IException::Unknown, b_msg, _FILEINFO_);            
+            throw IException(IException::Unknown, b_msg, _FILEINFO_);
           }
           else {
 
@@ -196,9 +196,9 @@ namespace Isis {
           if ("fail" == onerror) throw fileError;
         }
 
-        // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23) 
+        // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23)
       }
-      
+
       //-------------- Check for Embree engine -------------------------------//
       if ( "embree" == preferred ) {
 
@@ -222,7 +222,7 @@ namespace Isis {
                                                 PvlContainer::Replace);
 
           return ( embreeModel );
-          
+
         } catch (IException &ie) {
           fileError.append(ie);
           QString mess = "Unable to create preferred EmbreeShapeModel";
@@ -258,7 +258,7 @@ namespace Isis {
         // TODO Deal with stacks -- this could be a list of DEMs
         Isis::Cube* shapeModelCube = new Isis::Cube;
         try {
-          // first, try to open the shape model file as an Isis3 cube
+          // first, try to open the shape model file as an Isis cube
           shapeModelCube->open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
@@ -320,7 +320,7 @@ namespace Isis {
           // in case no error was thrown, but constructor returned NULL
           fileError.append(IException(IException::Unknown, msg, _FILEINFO_));
         }
-        
+
         delete shapeModelCube;
 
       }

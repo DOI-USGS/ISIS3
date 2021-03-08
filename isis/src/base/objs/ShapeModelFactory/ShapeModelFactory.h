@@ -31,8 +31,8 @@ namespace Isis {
    *                           Fixes #4890.
    *   @history 2017-03-23 Kris Becker - Added support for Embree and Bullet models.
    *   @history 2017-08-04 Kristin Berry - Removed checks for a 'CubeSupported' IsisPreferences Pvl
-   *                           Keyword. ISIS3 Cube DEMs are not supported by Embree and Bullet
-   *                           at this time. 
+   *                           Keyword. ISIS Cube DEMs are not supported by Embree and Bullet
+   *                           at this time.
    */
   class ShapeModelFactory {
     public:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="ipce" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-    
+
     <brief>
       Integrated Photogrammetric Control Environment
     </brief>
@@ -9,22 +9,22 @@
     <description>
     <img src='assets/images/IpceUserInterface.png' alt='IPCE User Interface' width='1050' height='388' />
     <p><label>Figure 1:</label> <caption>IPCE User Interface</caption></p>
-       
+
     <h4>Photogrammetric Control and IPCE</h4>
     <p>
       The quality of digital image mosaics (DIM) and digital elevation models (DEM) - and geologic maps using such products as basemaps - depends greatly upon accurate sensor position and pointing parameters. Spacecraft ephemeris and attitude data provide initial estimates for these parameters. Uncertainty in these data propagate to errors in mapping products. To minimize errors, images are controlled photogrammetrically. Overlapping images are registered to one another by measuring common features (tie points). Images may be tied to the ground by measuring features identifiable on base maps or DEMs (control points). Image measurements are input to the least-squares bundle adjustment which generates improved sensor position and pointing parameters plus the triangulated coordinates of tie and control points.
     </p>
     <p>
         The objective of the Integrated Photogrammetric Control Environment (IPCE) is to incorporate all aspects of the photogrammetric control process within a single interactive and user friendly environment. A project oriented design simplifies data management with the ability to save and restore project data and settings. Multiple, integrated views of data and processing output help to streamline the control workflow.
-    </p>        
-    <p>
-        IPCE currently includes functionality from the standalone isis3 applications <b><i>jigsaw</i></b>, <b><i>qview</i></b>, <b><i>qnet</i></b>, <b><i>qmos</i></b>, and <b><i>cneteditor</i></b>. Control networks can be visualized in a table view (e.g. <b><i>cneteditor</i></b>), or overlaid on an image view (e.g. <b><i>qview</i></b>, <b><i>qnet</i></b>) or an image footprint view (e.g. <b><i>qmos</i></b>). Control networks can be edited from these views as well. Editing includes adding, deleting, and refining control points and measures or modifying metadata associated with them. The bundle adjustment (e.g. <b><i>jigsaw</i></b>) can be performed any number of times within IPCE. Results can be analyzed, compared against other bundle adjustment runs, and saved/restored as part of the IPCE project.
     </p>
-        
+    <p>
+        IPCE currently includes functionality from the standalone isis applications <b><i>jigsaw</i></b>, <b><i>qview</i></b>, <b><i>qnet</i></b>, <b><i>qmos</i></b>, and <b><i>cneteditor</i></b>. Control networks can be visualized in a table view (e.g. <b><i>cneteditor</i></b>), or overlaid on an image view (e.g. <b><i>qview</i></b>, <b><i>qnet</i></b>) or an image footprint view (e.g. <b><i>qmos</i></b>). Control networks can be edited from these views as well. Editing includes adding, deleting, and refining control points and measures or modifying metadata associated with them. The bundle adjustment (e.g. <b><i>jigsaw</i></b>) can be performed any number of times within IPCE. Results can be analyzed, compared against other bundle adjustment runs, and saved/restored as part of the IPCE project.
+    </p>
+
     <p>
         A link to the IPCE User's Manual (PDF format) is given below under <b>Related Objects and Documents</b>. It contains example workflows as well as details on using the application.
      </p>
-     
+
     <h4>Known Issues</h4>
       <p>
 <ol>
@@ -38,12 +38,12 @@
 <li>	Images in bundle results will not contain footprint information until the project is saved and re-opened. Re-opening the project will generate the footprint information.</li>
 <li>	It is recommended that bundle output control networks be named uniquely. Otherwise unpredictable behavior may occur.</li>
 </ol>
-	
+
       </p>
 
    </description>
 
-   
+
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
@@ -71,8 +71,8 @@
     </documents>
 
 
-    
-    
+
+
 
   </seeAlso>
 
@@ -88,10 +88,10 @@
       Fixes #4358.
     </change>
    <change name="Tyler Wilson" date="2016-11-10">
-      Changed the alias reference for the data_management.png icon from 'data' to 'data-management'.  
+      Changed the alias reference for the data_management.png icon from 'data' to 'data-management'.
       Annoying errors were showing up on the command line when the application was launched due
       to a naming conflict.  Fixes #3982.
-   </change> 
+   </change>
    <change name="Tracie Sucharski" date="2017-06-22">
      Changed name of application from cnetsuite to ipce.
    </change>
@@ -104,7 +104,3 @@
   </history>
 
   </application>
-
-
-
-

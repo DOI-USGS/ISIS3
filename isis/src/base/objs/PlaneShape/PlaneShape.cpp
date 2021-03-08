@@ -26,7 +26,7 @@ namespace Isis {
   /**
    * Initialize the PlaneShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   PlaneShape::PlaneShape(Target *target, Pvl &pvl) : ShapeModel (target) {
     setName("Plane");
@@ -39,7 +39,7 @@ namespace Isis {
   /**
    * Initialize the PlaneShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   PlaneShape::PlaneShape(Target *target) : ShapeModel (target) {
     setName("Plane");
@@ -52,7 +52,7 @@ namespace Isis {
   /**
    * Initialize the PlaneShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   PlaneShape::PlaneShape() : ShapeModel () {
     setName("Plane");

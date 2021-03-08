@@ -518,6 +518,13 @@
         The effective average solar radiance for each camera and bandpass is given
         in the SOLAR directory.
     </pre>
+    <p>
+    If run on a non-spiceinited cube, this program requires access to local mission-specific 
+    SPICE kernels, in order to find the distance between the sun and the target body. 
+    When run on a spiceinited cube, this can be determined using the camera model.
+    Using a spiceinited cube as input has the advantage of not requiring that local 
+    mission-specific kernels be available. (See spiceinit web=true.)
+    </p>
   </description>
 
   <category>
@@ -654,6 +661,10 @@
       are always performed. Previously these were only applied if the flat field correction
       was applied.  This will change the output DNs for any images where FLATFIELD=false. 
       Updated documentation. Fixes #2338
+    </change>
+    <change name="Kristin Berry" date="2021-02-26">
+      Updated to use camera for the target-sun distance and clock time to ET conversion, if possible.
+      This enables the program to be run without local spice kernels (the spice server can be used for spiceinit.)
     </change>
   </history>
 

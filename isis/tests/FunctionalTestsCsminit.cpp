@@ -104,6 +104,11 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
   EXPECT_EQ(modelName, TestCsmModel::SENSOR_MODEL_NAME);
 
+  // Check the Instrument group
+  ASSERT_TRUE(testCube->hasGroup("Instrument"));
+  PvlGroup &instGroup = testCube->group("Instrument");
+  EXPECT_TRUE(instGroup.hasKeyword("TargetName"));
+
   // Check the CsmInfo group
   ASSERT_TRUE(testCube->hasGroup("CsmInfo"));
   PvlGroup &infoGroup = testCube->group("CsmInfo");
@@ -132,7 +137,7 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
 }
 
-TEST_F(CSMPluginFixture, CSMinitRunTwice) {
+TEST_F(CSMPluginFixture, CSMInitRunTwice) {
   // Run csminit twice in a row. Verify that end result is as if csminit were
   // only run once with the second arguments.
   QVector<QString> args = {
@@ -188,7 +193,7 @@ TEST_F(CSMPluginFixture, CSMinitRunTwice) {
   EXPECT_FALSE(kernGroup.hasKeyword("ShapeModel"));
 }
 
-TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
+TEST_F(CSMPluginFixture, CSMInitMultiplePossibleModels) {
   // Test csminit when multiple possible models can be created. First, verify that this will fail
   // without specifying the MODELNAME, then specify the MODELNAME and check the results.
 
@@ -202,9 +207,9 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
   // and/or plugin name.
   try {
     csminit(options);
-  } 
+  }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("Multiple models can be created from the ISD")); 
+    EXPECT_THAT(e.what(), testing::HasSubstr("Multiple models can be created from the ISD"));
   }
 
   // Re-run with the model name specified
@@ -260,7 +265,7 @@ TEST_F(CSMPluginFixture, CSMinitMultiplePossibleModels) {
 }
 
 
-TEST_F(CSMPluginFixture, CSMinitFails) {
+TEST_F(CSMPluginFixture, CSMInitFails) {
   // Create an ISD that will result in no successful models
   json isd;
   isd["name"] = "failing_isd";
@@ -281,16 +286,16 @@ TEST_F(CSMPluginFixture, CSMinitFails) {
   // Expect a failure due to being unable to construct any model from the isd
   try {
     csminit(options);
-  } 
+  }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("No loaded model could be created from the ISD")); 
+    EXPECT_THAT(e.what(), testing::HasSubstr("No loaded model could be created from the ISD"));
   }
 }
 
 
 // This test uses the DefaultCube fixture because it has already has attached
 // spice data that csminit should remove.
-TEST_F(DefaultCube, CSMinitSpiceCleanup) {
+TEST_F(DefaultCube, CSMInitSpiceCleanup) {
   // Create an ISD
   json isd;
   isd["test_param_one"] = 1.0;
@@ -322,9 +327,51 @@ TEST_F(DefaultCube, CSMinitSpiceCleanup) {
 }
 
 
+// This test uses the DefaultCube fixture because it has already been spiceinit'd
+TEST_F(DefaultCube, CSMInitSpiceRestoredAfterFailure) {
+  // Create an ISD
+  json isd;
+  isd["test_param_one"] = 1.0;
+  isd["test_param_two"] = 2.0;
+
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+testCube->fileName(),
+    "isd="+isdPath,
+    "shape=fake.broken"};
+
+  QString cubeFile = testCube->fileName();
+
+  PvlGroup kernelsGroup = testCube->group("Kernels");
+  PvlGroup instrumentGroup = testCube->group("Instrument");
+
+  UserInterface options(APP_XML, args);
+
+  testCube->close();
+
+  ASSERT_ANY_THROW(csminit(options));
+
+  Cube outputCube(cubeFile);
+  ASSERT_NO_THROW(outputCube.camera());
+
+  EXPECT_TRUE(outputCube.hasTable("InstrumentPointing"));
+  EXPECT_TRUE(outputCube.hasTable("InstrumentPosition"));
+  EXPECT_TRUE(outputCube.hasTable("BodyRotation"));
+  EXPECT_TRUE(outputCube.hasTable("SunPosition"));
+  ASSERT_TRUE(outputCube.hasGroup("Kernels"));
+  ASSERT_TRUE(outputCube.hasGroup("Instrument"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, kernelsGroup, outputCube.group("Kernels"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, instrumentGroup, outputCube.group("Instrument"));
+}
+
+
 // This test uses the DefaultCube fixture because it has already has attached
 // spice data that csminit should not remove on a failure.
-TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
+TEST_F(DefaultCube, CSMInitSpiceNoCleanup) {
   // Create an ISD that will result in no successful models
   json isd;
   isd["test_param_one"] = "value_one";
@@ -349,4 +396,106 @@ TEST_F(DefaultCube, CSMinitSpiceNoCleanup) {
 
   // The cube should still be intact and we should still be able to get a camera
   EXPECT_NO_THROW(outputCube.camera());
+}
+
+TEST_F(CSMPluginFixture, CSMInitStateStringFails) {
+  // Create an state string that will result in no successful models
+  json state;
+  state["name"] = "failing_isd";
+  state["test_param_one"] = "value_one";
+  state["test_param_does_not_exist"] = "failing_value";
+
+  QString statePath = tempDir.path() + "/failing.json";
+  std::ofstream file(statePath.toStdString());
+  file << state;
+  file.flush();
+
+  QVector<QString> args = {
+    "from="+filename,
+    "state="+statePath};
+
+  UserInterface options(APP_XML, args);
+
+  // Expect a failure due to missing modelname and pluginname
+  try {
+    csminit(options);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("When using a State string, PLUGINNAME and MODELNAME must be specified"));
+  }
+
+  QVector<QString> argsWithModel = {
+    "from="+filename,
+    "state="+statePath,
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsWithModel(APP_XML, argsWithModel);
+
+  // Expect a failure due to a bad state string.
+  try {
+    csminit(optionsWithModel);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Could not construct sensor model using STATE string and MODELNAME"));
+  }
+
+  QVector<QString> argsWithIsdAndState = {
+    "from="+filename,
+    "isd=fakePath",
+    "state="+statePath,
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsWithIsdAndState(APP_XML, argsWithIsdAndState);
+
+  // Expect a failure due to providing both an ISD and a STATE string
+  try {
+    csminit(optionsWithIsdAndState);
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Cannot enter both [ISD] and [STATE]. Please enter either [ISD] or [STATE]"));
+  }
+}
+
+TEST_F(CSMPluginFixture, CSMInitWithState) {
+  // Run csminit with ISD
+  QVector<QString> args = {
+    "from="+filename,
+    "isd="+isdPath
+  };
+
+  UserInterface options(APP_XML, args);
+  csminit(options);
+
+  testCube->open(filename);
+
+  // Read blob off csminited cube, get state string and save off to compare
+  StringBlob state("","CSMState");
+  testCube->read(state);
+  testCube->close();
+
+  // Write the state out to a file
+  std::string stateBefore = state.string();
+  QString statePath = tempDir.path() + "/state.json";
+  std::ofstream stateFile(statePath.toStdString());
+  stateFile << stateBefore;
+  stateFile.flush();
+
+  // Run csminit with state just saved to file
+  QVector<QString> argsState = {
+    "from="+filename,
+    "state="+statePath,
+    "modelname=TestCsmModel",
+    "pluginname=TestCsmPlugin"};
+
+  UserInterface optionsState(APP_XML, argsState);
+  csminit(optionsState);
+
+  // Pull state string off. if ending state string = original state string these are functionally equiv.
+  testCube->open(filename);
+
+  StringBlob stateAfter("","CSMState");
+  testCube->read(stateAfter);
+  EXPECT_STREQ(stateBefore.c_str(), stateAfter.string().c_str());
 }

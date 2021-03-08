@@ -155,6 +155,7 @@ namespace Isis {
    *                           an IsisPreference file cannot be found. Fixes #5145.
    *   @history 2018-11-16 Jesse Mapel - Made several methods virtual for mocking.
    *   @history 2019-06-15 Kristin Berry - Added latLonRange method to return the valid lat/lon rage of the cube. The values in the mapping group are not sufficiently accurate for some purposes.
+   *   @history 2021-02-17 Jesse Mapel - Added hasBlob method to check for any type of BLOB.
    */
   class Cube {
     public:
@@ -164,7 +165,7 @@ namespace Isis {
       virtual ~Cube();
 
       /**
-       * These are the possible storage formats of Isis3 cubes. There is an
+       * These are the possible storage formats of ISIS cubes. There is an
        *   internal IO handler for each one of these.
        */
       enum Format {
@@ -244,7 +245,7 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob, 
+      void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
       void write(Blob &blob, bool overwrite=true);
@@ -299,6 +300,7 @@ namespace Isis {
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
+      bool hasBlob(const QString &type, const QString &name);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
@@ -380,7 +382,7 @@ namespace Isis {
 
       /**
        * If open was called with an Isis 2 cube, then this will be
-       *   the name of the imported Isis3 cube. m_labelFileName and
+       *   the name of the imported ISIS cube. m_labelFileName and
        *   m_dataFileName will store the Isis 2 cube's information.
        */
       FileName *m_tempCube;

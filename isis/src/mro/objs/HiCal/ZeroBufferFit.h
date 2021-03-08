@@ -1,28 +1,14 @@
 #ifndef ZeroBufferFit_h
 #define ZeroBufferFit_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2008/05/23 19:15:17 $
- * $Id: ZeroBufferFit.h,v 1.4 2008/05/23 19:15:17 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <string>
 #include <vector>
 
@@ -37,18 +23,18 @@ namespace Isis {
 
   /**
    * @brief Computes non-linear lsq fit of HiRISE Drift (Zd module)
-   * 
+   *
    * This class is best used with individual HiRISE images as the number of
    * lines is critical to proper use.  It is best applied by getting the buffer
-   * as a reference and applying it during systematic processing.  
-   *  
-   * This class models the drift correction using the Levenberg-Marquardt 
-   * algorithm. 
-   * 
+   * as a reference and applying it during systematic processing.
+   *
+   * This class models the drift correction using the Levenberg-Marquardt
+   * algorithm.
+   *
    * @ingroup Utility
-   * 
-   * @author 2007-11-07 Kris Becker 
-   * @internal 
+   *
+   * @author 2007-11-07 Kris Becker
+   * @internal
    *   @history 2008-05-23 Kris Becker Added the ZdOnFailUseLinear option.
    *   @history 2010-10-28 Kris Becker Updated parameter names removing "Zd" and
    *            replacing with "ZeroBufferFit".
@@ -60,49 +46,49 @@ namespace Isis {
     /** Destructor */
     virtual ~ZeroBufferFit() { }
 
-    /** 
+    /**
      * @brief Set binning/summing mode
-     * 
+     *
      * @param bin Summing mode of observatio
      */
     void setBin(int bin) { _timet.setBin(bin); }
 
-    /** 
+    /**
      * @brief Set scan line time
-     * 
+     *
      * @param ltime Scan line time
      */
     void setLineTime(double ltime) { _timet.setLineTime(ltime); }
 
-    /** 
+    /**
      * @brief Returns the size of the data buffer
-     *  
-     * This is the size of the original data buffer. 
-     *  
+     *
+     * This is the size of the original data buffer.
+     *
      * @see nSize()
      * @return int Size of the input buffer
      */
      inline int size() const { return (_data.dim()); }
 
-    /** 
-     * @brief Returns the size of the fitted buffer 
-     *  
-     * \b Important: This returns the size of the buffer being 
+    /**
+     * @brief Returns the size of the fitted buffer
+     *
+     * \b Important: This returns the size of the buffer being
      *    fitted and not the size of original data buffer.  This is
      *    a requirement of the NonLinearLSQ class.  USE WITH
      *    CAUTION!
-     * 
-     * 
+     *
+     *
      * @return int Size of buffer being fitted
      */
     int nSize()  const { return (_b2.dim()); }
 
-    /** 
+    /**
      * @brief Number of parameter to be fitted
-     *  
-     * This is the number of parameters that ZeroBufferFit needs to 
-     * fit.  This method is a requirement of the NonLinearLSQ class. 
-     * 
+     *
+     * This is the number of parameters that ZeroBufferFit needs to
+     * fit.  This method is a requirement of the NonLinearLSQ class.
+     *
      * @return int  Number of parameter to fit
      */
     int nParms() const { return (4); }
@@ -118,7 +104,7 @@ namespace Isis {
 
     HiVector Solve(const HiVector &d);
     NLVector guess();
-    int checkIteration(const int Iter, const NLVector &fitcoefs, 
+    int checkIteration(const int Iter, const NLVector &fitcoefs,
                        const NLVector &uncerts, double cplxconj,
                        int Istatus);
 
@@ -130,7 +116,7 @@ namespace Isis {
     /** Returns the Degrees of Freedom */
     int    DoF()   const { return (nSize() - nParms()); }
 
-    HiVector Yfit() const; 
+    HiVector Yfit() const;
     HiVector Normalize(const HiVector &v);
 
   private:
@@ -157,12 +143,10 @@ namespace Isis {
      /** Returns the number of good lines in the image */
      int goodLines(const HiVector &d) const { return (d.dim() - _badLines); }
      /** Determines if the vector contains any valid lines */
-     bool gotGoodLines(const HiVector &d) const { 
+     bool gotGoodLines(const HiVector &d) const {
        return (goodLines(d) >= _minLines);
      }
-  };               
+  };
 
 }     // namespace Isis
 #endif
-
-

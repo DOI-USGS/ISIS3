@@ -454,7 +454,7 @@ namespace Isis {
     if (tabObj.hasKeyword("RECORD_BYTES")) {
       m_recordBytes = (int) tabObj.findKeyword("RECORD_BYTES");
     }
-    // The table description has "ROW_BYTES" and "ROW_SUFFIX_BYTES". These summed is the 
+    // The table description has "ROW_BYTES" and "ROW_SUFFIX_BYTES". These summed is the
     // record length. Can be for detached and attached labels
     else if (tabObj.hasKeyword("ROW_BYTES") && tabObj.hasKeyword("ROW_SUFFIX_BYTES")) {
       m_recordBytes = (int) tabObj.findKeyword("ROW_BYTES") +
@@ -873,7 +873,7 @@ namespace Isis {
    *
    * @param cols Columns for a given row
    * @param cdesc Column description used to create TableField
-   * @param tfield Isis3 TableField used to determine the data type to be imported.
+   * @param tfield Isis TableField used to determine the data type to be imported.
    *
    * @return TableField  Returns the TableField with the value from the column
    *
@@ -1168,7 +1168,7 @@ namespace Isis {
              || dataType == "DATE" || dataType == "TIME" ) {
       return TableField(name, TableField::Text, cdesc.m_numBytes);
     }
-    // Isis3 tables currently don't support any of the following PDS DATA_TYPE:
+    // Isis tables currently don't support any of the following PDS DATA_TYPE:
     // BIT_STRING, COMPLEX, N/A, BOOLEAN, UNSIGNED_INTEGER, IBM types, some VAX types
     IString msg = "PDS Column [" + cdesc.m_name
                   + "] has an unsupported DATA_TYPE ["

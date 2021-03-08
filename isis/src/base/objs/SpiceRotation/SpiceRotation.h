@@ -156,7 +156,7 @@ namespace Isis {
    *                           includes, fixed history indentation and line
    *                           length. References #1181.
    *   @history 2013-03-27 Jeannie Backer - Added methods for MsiCamera. Brought
-   *                           class closer to Isis3 standards: moved method
+   *                           class closer to Isis standards: moved method
    *                           implementation to cpp file, fixed documentation.
    *                           References #1248.
    *   @history 2013-11-12 Ken Edmundson Programmers notes - Commented out cout
@@ -409,7 +409,7 @@ namespace Isis {
 
       int cacheSize() {
         if (m_orientation) {
-          return m_orientation->getRotations().size(); 
+          return m_orientation->getRotations().size();
         }
         return 0;
       }
@@ -428,7 +428,7 @@ namespace Isis {
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
       ale::Orientations *m_orientation; //! Cached orientation information
-                                       
+
     private:
       // method
       void setFrameType();

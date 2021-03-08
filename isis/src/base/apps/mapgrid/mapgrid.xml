@@ -42,7 +42,7 @@
     </change>
     <change name="Steven Lambright" date="2007-06-21">
       Changed output to be in GML format, fixed bug with bounded option
-    </change>  
+    </change>
     <change name="Steven Lambright" date="2007-07-17">
       Fixed bug with include files.
     </change>
@@ -68,8 +68,8 @@
         </brief>
         <description>
           This file contains map projection information necessary to produce the
-          grid. This can be a conventional or user defined ISIS3 mapping
-          template or an existing projected ISIS3 cube.
+          grid. This can be a conventional or user defined ISIS mapping
+          template or an existing projected ISIS cube.
         </description>
         <filter>
           *.map *.cub *.txt
@@ -211,7 +211,7 @@
     <example>
       <brief> Sinusoidal Map Grid </brief>
       <description>
-        This example shows the qgis display of a sinusoidal projection created by this application.  
+        This example shows the qgis display of a sinusoidal projection created by this application.
         The following mapfile was used in the mapgrid application to create the grid.
         <pre>
 Group = Mapping
@@ -238,7 +238,7 @@ End
       <outputImages>
         <image src="assets/image/sinusoidalGrid.JPG" width="800" height="600">
           <brief> Output image as it appears in qgis for mapgrid</brief>
-          <description> 
+          <description>
               This is the output image that results.
           </description>
           <thumbnail caption="Output image showing the results of the mapgrid application." src="assets/thumb/sinusoidalGrid.JPG" width="200" height="200"/>
@@ -250,7 +250,7 @@ End
     <example>
       <brief> Lambert Confromal Map Grid </brief>
       <description>
-        This example shows the qgis display of a lambert conformal projection created by this application.  
+        This example shows the qgis display of a lambert conformal projection created by this application.
         The following mapfile was used in the this application to create the grid.
         <pre>
 Group = Mapping
@@ -280,7 +280,7 @@ End
       <outputImages>
         <image src="assets/image/lambertGrid.JPG" width="700" height="700">
           <brief>Output image as it appears in qgis</brief>
-          <description> 
+          <description>
               This is the output image that results
           </description>
           <thumbnail caption="Output image showing the results of the mapgrid application." src="assets/thumb/lambertGrid.JPG" width="200" height="200"/>

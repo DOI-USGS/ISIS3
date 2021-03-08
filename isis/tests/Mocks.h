@@ -3,6 +3,10 @@
 
 #include "gmock/gmock.h"
 
+#include "csm/CorrelationModel.h"
+#include "csm/csm.h"
+#include "csm/RasterGM.h"
+
 #include "Cube.h"
 #include "Camera.h"
 #include "Interpolator.h"
@@ -28,8 +32,8 @@ class MockCamera : public Camera {
   public:
     MockCamera(Cube &cube): Camera(cube) {}
     MOCK_METHOD(bool, SetImage, (const double sample, const double line), (override));
-    MOCK_METHOD(double, Line, (), (override));
-    MOCK_METHOD(double, Sample, (), (override));
+    MOCK_METHOD(double, Line, (), (const, override));
+    MOCK_METHOD(double, Sample, (), (const, override));
     MOCK_METHOD(double, UniversalLatitude, (), (const override));
     MOCK_METHOD(double, UniversalLongitude, (), (const override));
     MOCK_METHOD(bool, SetUniversalGround, (const double latitude, const double longitude), (override));
@@ -78,6 +82,96 @@ public:
   MOCK_METHOD(void, SetTiling, (long long start, long long end));
   MOCK_METHOD(void, EndProcess, (), (override));
   MOCK_METHOD(void, BandChange, (void (*funct)(const int band)), (override));
+};
+
+
+// Mock CSM Model class
+class MockRasterGM : public csm::RasterGM {
+  public:
+    // csm::Model
+    MOCK_METHOD(csm::Version, getVersion, (), (const, override));
+    MOCK_METHOD(std::string, getModelName, (), (const, override));
+    MOCK_METHOD(std::string, getPedigree, (), (const, override));
+    MOCK_METHOD(std::string, getImageIdentifier, (), (const, override));
+    MOCK_METHOD(void, setImageIdentifier, (const std::string&, csm::WarningList*), (override));
+    MOCK_METHOD(std::string, getSensorIdentifier, (), (const, override));
+    MOCK_METHOD(std::string, getPlatformIdentifier, (), (const, override));
+    MOCK_METHOD(std::string, getCollectionIdentifier, (), (const, override));
+    MOCK_METHOD(std::string, getTrajectoryIdentifier, (), (const, override));
+    MOCK_METHOD(std::string, getSensorType, (), (const, override));
+    MOCK_METHOD(std::string, getSensorMode, (), (const, override));
+    MOCK_METHOD(std::string, getReferenceDateAndTime, (), (const, override));
+    MOCK_METHOD(std::string, getModelState, (), (const, override));
+    MOCK_METHOD(void, replaceModelState, (const std::string&), (override));
+    // csm::GeometricModel methods
+    MOCK_METHOD(csm::EcefCoord, getReferencePoint, (), (const, override));
+    MOCK_METHOD(void, setReferencePoint, (const csm::EcefCoord&), (override));
+    MOCK_METHOD(int, getNumParameters, (), (const, override));
+    MOCK_METHOD(std::string, getParameterName, (int), (const, override));
+    MOCK_METHOD(std::string, getParameterUnits, (int), (const, override));
+    MOCK_METHOD(bool, hasShareableParameters, (), (const, override));
+    MOCK_METHOD(bool, isParameterShareable, (int), (const, override));
+    MOCK_METHOD(csm::SharingCriteria, getParameterSharingCriteria, (int), (const, override));
+    MOCK_METHOD(double, getParameterValue, (int), (const, override));
+    MOCK_METHOD(void, setParameterValue, (int, double), (override));
+    MOCK_METHOD(csm::param::Type, getParameterType, (int), (const, override));
+    MOCK_METHOD(void, setParameterType, (int, csm::param::Type), (override));
+    MOCK_METHOD(double, getParameterCovariance, (int, int), (const, override));
+    MOCK_METHOD(void, setParameterCovariance, (int, int, double), (override));
+    MOCK_METHOD(int, getNumGeometricCorrectionSwitches, (), (const, override));
+    MOCK_METHOD(std::string, getGeometricCorrectionName, (int), (const, override));
+    MOCK_METHOD(void, setGeometricCorrectionSwitch, (int, bool, csm::param::Type), (override));
+    MOCK_METHOD(bool, getGeometricCorrectionSwitch, (int), (const, override));
+    MOCK_METHOD(std::vector<double>,
+                getCrossCovarianceMatrix,
+                (const csm::GeometricModel&, csm::param::Set, const csm::GeometricModel::GeometricModelList&),
+                (const, override));
+    // RasterGM methods
+    MOCK_METHOD(csm::ImageCoord, groundToImage, (const csm::EcefCoord&, double, double*, csm::WarningList*), (const, override));
+    MOCK_METHOD(csm::ImageCoordCovar,
+                groundToImage,
+                (const csm::EcefCoordCovar&, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::EcefCoord,
+                imageToGround,
+                (const csm::ImageCoord&, double, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::EcefCoordCovar,
+                imageToGround,
+                (const csm::ImageCoordCovar&, double, double, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::EcefLocus,
+                imageToProximateImagingLocus,
+                (const csm::ImageCoord&, const csm::EcefCoord&, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::EcefLocus,
+                imageToRemoteImagingLocus,
+                (const csm::ImageCoord&, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::ImageCoord, getImageStart, (), (const, override));
+    MOCK_METHOD(csm::ImageVector, getImageSize, (), (const, override));
+    MOCK_METHOD((std::pair<csm::ImageCoord, csm::ImageCoord>), getValidImageRange, (), (const, override));
+    MOCK_METHOD((std::pair<double,double>), getValidHeightRange, (), (const, override));
+    MOCK_METHOD(csm::EcefVector, getIlluminationDirection, (const csm::EcefCoord&), (const, override));
+    MOCK_METHOD(double, getImageTime, (const csm::ImageCoord&), (const, override));
+    MOCK_METHOD(csm::EcefCoord, getSensorPosition, (const csm::ImageCoord&), (const, override));
+    MOCK_METHOD(csm::EcefCoord, getSensorPosition, (double), (const, override));
+    MOCK_METHOD(csm::EcefVector, getSensorVelocity, (const csm::ImageCoord&), (const, override));
+    MOCK_METHOD(csm::EcefVector, getSensorVelocity, (double), (const, override));
+    MOCK_METHOD(csm::RasterGM::SensorPartials,
+                computeSensorPartials,
+                (int, const csm::EcefCoord&, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(csm::RasterGM::SensorPartials,
+                computeSensorPartials,
+                (int, const csm::ImageCoord&, const csm::EcefCoord&, double, double*, csm::WarningList*),
+                (const, override));
+    MOCK_METHOD(std::vector<double>, computeGroundPartials, (const csm::EcefCoord&), (const, override));
+    MOCK_METHOD(const csm::CorrelationModel&, getCorrelationModel, (), (const, override));
+    MOCK_METHOD(std::vector<double>,
+                getUnmodeledCrossCovariance,
+                (const csm::ImageCoord&, const csm::ImageCoord&),
+                (const, override));
 };
 
 

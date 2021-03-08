@@ -34,7 +34,7 @@ namespace Isis {
    *   @history 2005-10-06 Elizabeth Miller - added unitTest.exclude file
    *   @history 2006-05-17 Elizabeth Miller - changed CameraManager.plugin to
    *                         Camera.plugin
-   *   @history 2009-05-12 Steven Lambright - Added CameraVersion(...) and 
+   *   @history 2009-05-12 Steven Lambright - Added CameraVersion(...) and
    *                         version checking.
    *   @history 2011-05-23 Jannet Barrett and Steven Lambright - Added
    *                          m_cameraPlugin to reduce cost of instantiating
@@ -42,9 +42,11 @@ namespace Isis {
    *   @history 2012-09-06 Steven Lambright - Changed Create() to take
    *                           Cube instead of Pvl because cameras now require cubes to
    *                           construct. Please see Camera for more information.
-   *   @history 2017-7-11 Summer Stapleton - Added functionality to find the most recent (last) 
+   *   @history 2017-7-11 Summer Stapleton - Added functionality to find the most recent (last)
    *                           version of the camera model
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *   @history 2021-02-17 Kristin Berry and  Stuart Sides - added static plugins initialized
+   *                           variable and made initPlugin plublic.
    */
 
   class CameraFactory {
@@ -52,10 +54,9 @@ namespace Isis {
       static Camera *Create(Cube &cube);
       static int CameraVersion(Cube &cube);
       static int CameraVersion(Pvl &lab);
-
-    private:
       static void initPlugin();
 
+    private:
       /**
        * Constructor (Its private, so you cannot use it.  Use the Create method
        * instead
@@ -66,6 +67,7 @@ namespace Isis {
       ~CameraFactory() {};
 
       static Plugin m_cameraPlugin;   //!< The plugin file for the camera
+      static bool m_initialized; //!<Has the plugin list been initialized
   };
 };
 

@@ -22,9 +22,9 @@ namespace Isis {
   class Target;
 
   /**
-   * @brief Define shapes and provide utilities for Isis3 targets
+   * @brief Define shapes and provide utilities for Isis targets
    *
-   * This base class will define shapes of Isis3 target bodies as well as provide utilities to
+   * This base class will define shapes of Isis target bodies as well as provide utilities to
    * retrieve radii and photometric information.
    *
    *
@@ -77,15 +77,15 @@ namespace Isis {
                                     std::vector<double> lookDirection)=0;
 
       // These two methods are for optional testing of occlusions when checking
-      // specific locations on the body from the observer. The first uses 
-      // localRadius() by default and so may be OK as is. 
+      // specific locations on the body from the observer. The first uses
+      // localRadius() by default and so may be OK as is.
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-      virtual bool intersectSurface(const SurfacePoint &surfpt, 
+      virtual bool intersectSurface(const SurfacePoint &surfpt,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-                                 
+
 
 
       // Return the surface intersection

@@ -38,7 +38,7 @@ void IsisMain() {
         "-preference=$ISISROOT/TestPreferences");
 
   cerr << endl;
-  cerr << "Testing non-existant Isis 3 program... " << endl;
+  cerr << "Testing non-existant Isis program... " << endl;
   cerr << endl;
   try {
     ProgramLauncher::RunIsisProgram("chocolatelab",
@@ -50,7 +50,7 @@ void IsisMain() {
 
 
   cerr << endl;
-  cerr << "Testing using Isis 3 program as a system program without pid... "
+  cerr << "Testing using Isis program as a system program without pid... "
        << endl;
   cerr << endl;
   try {

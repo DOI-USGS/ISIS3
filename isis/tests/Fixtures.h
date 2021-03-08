@@ -11,6 +11,9 @@
 
 #include <nlohmann/json.hpp>
 
+#include "csm/csm.h"
+#include "csm/Ellipsoid.h"
+
 #include "Cube.h"
 #include "IException.h"
 #include "OriginalLabel.h"
@@ -20,6 +23,8 @@
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "Blob.h"
+#include "MockCsmPlugin.h"
+#include "Mocks.h"
 #include "ControlNet.h"
 #include "FileList.h"
 #include "FileName.h"
@@ -176,13 +181,37 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class MroCtxCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class GalileoSsiCube : public DefaultCube {
+    protected:
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MgsMocCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
-      Cube dejitteredCube; 
-      QString jitterPath; 
+      Cube dejitteredCube;
+      QString jitterPath;
 
       void SetUp() override;
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
@@ -209,6 +238,42 @@ namespace Isis {
 
       void SetUp() override;
   };
+
+  class CSMCubeFixture : public SmallCube {
+  protected:
+    QString filename;
+    MockRasterGM mockModel;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraFixture : public CSMCubeFixture {
+  protected:
+    Camera *testCam;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraSetFixture : public CSMCameraFixture {
+  protected:
+    csm::Ellipsoid wgs84;
+    csm::ImageCoord imagePt;
+    csm::EcefCoord groundPt;
+    csm::EcefLocus imageLocus;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraDemFixture : public CSMCubeFixture {
+  protected:
+    Camera *testCam;
+    double demRadius;
+
+    void SetUp() override;
+};
 }
 
 #endif

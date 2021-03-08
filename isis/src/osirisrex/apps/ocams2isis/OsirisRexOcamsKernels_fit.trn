@@ -1,9 +1,9 @@
 #
-# This translation file is used to produce the ISIS 3 Kernels label group
+# This translation file is used to produce the ISIS Kernels label group
 # for the OSIRIS-REx MapCam and SamCam cameras.
 # Translation = (left,right) convert the input "right" to "left"
 #
-# history 2017-08-23 Jeannie Backer - Moved PolyCam to its own translation file since it uses 
+# history 2017-08-23 Jeannie Backer - Moved PolyCam to its own translation file since it uses
 #                        a different input label value to find the proper code.
 
 Group = NaifCode

@@ -22,7 +22,7 @@ namespace Isis {
    *        analysis methods of interpolation, extrapolation and
    *        approximation of a tabulated set of @a x, @a y data.
    *
-   * This class contains a merged version of the Isis3 classes
+   * This class contains a merged version of the Isis classes
    * @b DataInterp and @b NumericalMethods.  In addition,
    * some methods from @b AtmosModel were moved to this class, the
    * @a CubicNeighborhood interpolation type was

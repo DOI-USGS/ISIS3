@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<application name="deltack" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+<application name="deltack" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
 
   <brief>
@@ -8,115 +8,115 @@
 
   <description>
     <p>
-      <b>deltack</b> can be used to correct most instances of problems with 
-      camera attitude.  It adjusts camera orientation in the labels of a single 
-      Isis 3 cube (resection). In order for <b>deltack</b> to work properly, the 
-      input cube must have been initialized with <b>spiceinit</b> using 
-      ATTACH="YES". 
+      <b>deltack</b> can be used to correct most instances of problems with
+      camera attitude.  It adjusts camera orientation in the labels of a single
+      Isis cube (resection). In order for <b>deltack</b> to work properly, the 
+      input cube must have been initialized with <b>spiceinit</b> using
+      ATTACH="YES".
     </p>
     <h3>BUNDLE Method</h3>
     <p>
-      Like <b>jigsaw</b>, <b>deltack</b> works on both framing cameras and line 
-      scanners using the BUNDLE method.  The user must supply a 
-      latitude/longitude for at least one sample/line coordinate in the image. 
-      Angles 1 and 2 of the camera orientation stored in the cube labels will be 
-      adjusted to align the coordinate with the entered latitude/longitude.  To 
-      solve for all three camera angles, select the TWIST option.  A second 
-      coordinate point and desired latitude/longitude must be entered if the 
-      <b>TWIST</b> option is used. <b>deltack</b> will adjust the camera 
-      orientation to align both points with their corresponding 
+      Like <b>jigsaw</b>, <b>deltack</b> works on both framing cameras and line
+      scanners using the BUNDLE method.  The user must supply a
+      latitude/longitude for at least one sample/line coordinate in the image.
+      Angles 1 and 2 of the camera orientation stored in the cube labels will be
+      adjusted to align the coordinate with the entered latitude/longitude.  To
+      solve for all three camera angles, select the TWIST option.  A second
+      coordinate point and desired latitude/longitude must be entered if the
+      <b>TWIST</b> option is used. <b>deltack</b> will adjust the camera
+      orientation to align both points with their corresponding
       latitudes/longitudes with minimal residuals in sample and line.
     </p>
     <p>
-      The camera pointing is updated using an iterative least-squares bundle 
-      adjustment.  The number of iterations (<b>MAXIT</b>)and tolerance 
-      (<b>SIGMA0</b>) for  convergence are input parameters to <b>deltack</b>.  
-      Solving for two angles only is similar to a translation of the image in 
-      sample and line. Solving for the twist as well will result in both a 
+      The camera pointing is updated using an iterative least-squares bundle
+      adjustment.  The number of iterations (<b>MAXIT</b>)and tolerance
+      (<b>SIGMA0</b>) for  convergence are input parameters to <b>deltack</b>.
+      Solving for two angles only is similar to a translation of the image in
+      sample and line. Solving for the twist as well will result in both a
       translation and a rotation.
     </p>
 
     <p>
-      <b>deltack</b> creates a set of two output files for analyzing the 
-      results. <b>BUNDLEOUT.TXT</b> provides an overall summary of the 
-      resection.  It lists the user input parameters selected and tables of 
-      statistics for both the image and the point(s). <b>RESIDUALS.CSV</b> 
-      provides a table of the measured image coordinates and the final sample, 
+      <b>deltack</b> creates a set of two output files for analyzing the
+      results. <b>BUNDLEOUT.TXT</b> provides an overall summary of the
+      resection.  It lists the user input parameters selected and tables of
+      statistics for both the image and the point(s). <b>RESIDUALS.CSV</b>
+      provides a table of the measured image coordinates and the final sample,
       line, and overall residuals in both millimeters and pixels.
     </p>
    <h3>DIRECT Method</h3>
      <p>
-       The DIRECT method can be applied to cameras/instruments that are not 
-       supported by <b>jigsaw</b> or the viewing geometry conditions are not 
-       supported in BUNDLE. The DIRECT method is particularly useful for the 
-       Cassini VIMS (and other (spot) spectrometer type instruments) and for 
-       cases where the geometry is partially or completely off the target body. 
-       The DIRECT method primarily differs from the BUNDLE method in that it 
-       computes a rotation matrix directly from the SAMP1/LINE1 to the LAT1/LON1 
-       surface intercept vectors from the spacecraft position reference in the 
-       J2000 coordinate system. Essentially, these are the look direction 
-       vectors from those camera coordinates in J2000 which eliminates any 
-       peculiarities within the camera coordinate system. And, most importantly, 
-       it does not require all sample/line coordinates to map to valid geometric 
-       coordinates. It does not, however, support the TWIST option or the 
+       The DIRECT method can be applied to cameras/instruments that are not
+       supported by <b>jigsaw</b> or the viewing geometry conditions are not
+       supported in BUNDLE. The DIRECT method is particularly useful for the
+       Cassini VIMS (and other (spot) spectrometer type instruments) and for
+       cases where the geometry is partially or completely off the target body.
+       The DIRECT method primarily differs from the BUNDLE method in that it
+       computes a rotation matrix directly from the SAMP1/LINE1 to the LAT1/LON1
+       surface intercept vectors from the spacecraft position reference in the
+       J2000 coordinate system. Essentially, these are the look direction
+       vectors from those camera coordinates in J2000 which eliminates any
+       peculiarities within the camera coordinate system. And, most importantly,
+       it does not require all sample/line coordinates to map to valid geometric
+       coordinates. It does not, however, support the TWIST option or the
        two-point scenario as does the BUNDLE method.
      </p>
      <p>
-       This approach works in variable acquistion time instrument systems, such 
-       as line scan, pushbroom, pushframe and (spot) spectrometers (as well as 
-       framing camera instruments) because the rotation matrix is determined 
-       independent of spacecraft position. It also works for situations where 
-       the geometry is off the target body because the look vector is always 
-       properly set in the ISIS camera model even if it does not intersect the 
-       surface. Note, however, in the later case, the LAT1/LON1 position must 
-       intersect the target body to obtain a valid sample/line coordinate. 
+       This approach works in variable acquistion time instrument systems, such
+       as line scan, pushbroom, pushframe and (spot) spectrometers (as well as
+       framing camera instruments) because the rotation matrix is determined
+       independent of spacecraft position. It also works for situations where
+       the geometry is off the target body because the look vector is always
+       properly set in the ISIS camera model even if it does not intersect the
+       surface. Note, however, in the later case, the LAT1/LON1 position must
+       intersect the target body to obtain a valid sample/line coordinate.
      </p>
      <p>
-       The DIRECT method was designed to correct the pointing for the Cassini 
-       VIMS spectrometer but it is designed to be generally applicable to all 
-       cameras supported in the ISIS system. The BUNDLE method does not work on 
-       the VIMS instrument and likely many other complex camera systems with 
-       peculiar geometric configurations, such as (spot) spectrometers. The 
-       recommended procedure to determine an update to VIMS pointing is to first 
-       determine the geometric coordinate of a commmon feature in a reference 
-       image, such as a Cassini ISS observation for example, where the same 
-       latitude/longitude coordinate maps to a line/sample in the VIMS image. 
-       The VIMS geometric coordinate is expected not match the feature in the 
-       ISS image but <b>qview</b> and/or <b>campt</b> must report a valid 
-       line/sample coordinate from the latitude/longitude coordinate. The next 
-       step is to choose the best sample/line coordinate in the VIMS image that 
-       best matches the feature in the ISS image. To correctly update the 
-       pointing in the VIMS image, provide the latitude/longitude coordinate 
-       from the ISS image in the LAT1/LON1 parameters and the line/sample 
-       coordinate of the feature in the VIMS image in the SAMP1/LINE1 parameters 
-       to <b>deltack</b>. You may make a copy of the original image prior to 
+       The DIRECT method was designed to correct the pointing for the Cassini
+       VIMS spectrometer but it is designed to be generally applicable to all
+       cameras supported in the ISIS system. The BUNDLE method does not work on
+       the VIMS instrument and likely many other complex camera systems with
+       peculiar geometric configurations, such as (spot) spectrometers. The
+       recommended procedure to determine an update to VIMS pointing is to first
+       determine the geometric coordinate of a commmon feature in a reference
+       image, such as a Cassini ISS observation for example, where the same
+       latitude/longitude coordinate maps to a line/sample in the VIMS image.
+       The VIMS geometric coordinate is expected not match the feature in the
+       ISS image but <b>qview</b> and/or <b>campt</b> must report a valid
+       line/sample coordinate from the latitude/longitude coordinate. The next
+       step is to choose the best sample/line coordinate in the VIMS image that
+       best matches the feature in the ISS image. To correctly update the
+       pointing in the VIMS image, provide the latitude/longitude coordinate
+       from the ISS image in the LAT1/LON1 parameters and the line/sample
+       coordinate of the feature in the VIMS image in the SAMP1/LINE1 parameters
+       to <b>deltack</b>. You may make a copy of the original image prior to
        running <b>deltack</b> if desired.
-     </p> 
+     </p>
      <p>
-       A similar procedure to the one described for VIMS will also work to 
-       update the pointing of an image where the SPICE ephemeris data does not 
-       provide a valid latitude/longitude on the target body. The distinction is 
-       that the SAMP1/LINE1 coordinate need not intersect the body. Indeed, this 
-       is a common problem encountered typically with older data sets and 
-       generally with flyby images where the target is partially or fully in the 
-       field of view of the camera. There is an alternative technique for flyby 
-       images of this type that does not require a second reference image. The 
-       case where this technique is most effective is typically used for framing 
-       cameras where the center of the target body is in view and there is at 
-       least 1 pixel in the image that maps to the surface where geometric data 
-       can be computed. Using <b>campt</b>, provide the sample/line coordinate 
-       of any valid geometric point in the image - it does not have to visibly 
-       intersect the target body - any sample/line coordinate will suffice. 
-       <b>campt</b> reports the sub-spacecraft latitude/longitude coordinate for 
-       every valid geometric coordinate - it will always be the same coordinate 
-       for framing cameras. If the full disk of the target body is viewable and 
-       the image is relative free of noise/artifacts, the <b>center</b> program 
-       computes the centroid sample/line coordinate of the target body. If this 
-       condition is not met, use <b>qview</b> to manually approximate the center 
-       pixel coordinate of the body. Provide the centroid sample/line in the 
-       SAMP1/LINE1 coordinate and the 
-       SubSpacecraftLatitude/SubSpacecraftLongitude values computed by 
-       <b>campt</b> in the LAT1/LON1 parameter to <b>deltack</b>. 
+       A similar procedure to the one described for VIMS will also work to
+       update the pointing of an image where the SPICE ephemeris data does not
+       provide a valid latitude/longitude on the target body. The distinction is
+       that the SAMP1/LINE1 coordinate need not intersect the body. Indeed, this
+       is a common problem encountered typically with older data sets and
+       generally with flyby images where the target is partially or fully in the
+       field of view of the camera. There is an alternative technique for flyby
+       images of this type that does not require a second reference image. The
+       case where this technique is most effective is typically used for framing
+       cameras where the center of the target body is in view and there is at
+       least 1 pixel in the image that maps to the surface where geometric data
+       can be computed. Using <b>campt</b>, provide the sample/line coordinate
+       of any valid geometric point in the image - it does not have to visibly
+       intersect the target body - any sample/line coordinate will suffice.
+       <b>campt</b> reports the sub-spacecraft latitude/longitude coordinate for
+       every valid geometric coordinate - it will always be the same coordinate
+       for framing cameras. If the full disk of the target body is viewable and
+       the image is relative free of noise/artifacts, the <b>center</b> program
+       computes the centroid sample/line coordinate of the target body. If this
+       condition is not met, use <b>qview</b> to manually approximate the center
+       pixel coordinate of the body. Provide the centroid sample/line in the
+       SAMP1/LINE1 coordinate and the
+       SubSpacecraftLatitude/SubSpacecraftLongitude values computed by
+       <b>campt</b> in the LAT1/LON1 parameter to <b>deltack</b>.
      </p>
    </description>
 
@@ -135,7 +135,7 @@
       Original version
     </change>
     <change name="Tracie Sucharski" date="2007-05-02">
-      Added inclusion of TWIST to SAMP2,LINE2,LAT2,LON2,RAD2.  
+      Added inclusion of TWIST to SAMP2,LINE2,LAT2,LON2,RAD2.
       Without this inclusion, the AML was requiring these parameters
       even if TWIST was false.
     </change>
@@ -158,14 +158,14 @@
       Updated documentation, mostly to indicate units.
     </change>
     <change name="Debbie A. Cook" date="2011-10-04">
-      Added documentation for output files and removed creation of 
+      Added documentation for output files and removed creation of
       output csv tables because the tables are not useful for
       only one or two points.  The information is already listed
       in bundleout.txt.
     </change>
     <change name="Kimberly Oyama" date="2014-03-28">
-      Added check for history group in input cube. If it's there, add a new 
-      entry. If not, add a new history group. Added an app test. Fixes #1350. 
+      Added check for history group in input cube. If it's there, add a new
+      entry. If not, add a new history group. Added an app test. Fixes #1350.
     </change>
     <change name="Jeannie Backer" date="2014-07-23">
       Modified to create a bundle settings object for the bundle adjustment.
@@ -174,27 +174,27 @@
       Changed code to accommodate changes in Sensor and Camera relationships.
     </change>
     <change name="Jeannie Backer" date="2016-04-22">
-      Modified to use the FROM cube labels to set output control net's 'target' 
-      instead of the TargetName. Removed check for TargetName since this happens 
-      when the ControlNet target is set. References #3892 
+      Modified to use the FROM cube labels to set output control net's 'target'
+      instead of the TargetName. Removed check for TargetName since this happens
+      when the ControlNet target is set. References #3892
     </change>
     <change name="Jeannie Backer" date="2016-08-18">
-      Removed deprecated parameter from call to BundleSettings::setSolveOptions. 
-      References #4162. 
+      Removed deprecated parameter from call to BundleSettings::setSolveOptions.
+      References #4162.
     </change>
     <change name="Kris Becker" date="2017-08-01">
-      Added new DIRECT method to update the pointing for instrument with special 
-      conditions. The DIRECT method is intended for use with instrument camera 
-      models that do not work in jigsaw (more specifically, BundleAdjust) such 
-      as Cassini VIMS. Added the METHOD parameter to allow user to select which 
-      method to apply. The default is METHOD=BUNDLE which chooses pre-existing 
-      behavor. Updated documentation to reflect these new changes. Fixes #4868. 
+      Added new DIRECT method to update the pointing for instrument with special
+      conditions. The DIRECT method is intended for use with instrument camera
+      models that do not work in jigsaw (more specifically, BundleAdjust) such
+      as Cassini VIMS. Added the METHOD parameter to allow user to select which
+      method to apply. The default is METHOD=BUNDLE which chooses pre-existing
+      behavor. Updated documentation to reflect these new changes. Fixes #4868.
     </change>
     <change name="Ken Edmundson" date="2018-05-23">
       Modifed call to bundleAdjustment->solveCholeskyBR() to return a raw pointer to a
       BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
       ownership from BundleAdjust.
-    </change>    
+    </change>
   </history>
 
   <groups>
@@ -206,8 +206,8 @@
           Input camera cube
         </brief>
         <description>
-  	       The file specification for the input cube. The cube will have its 
-           camera pointing updated. 
+  	       The file specification for the input cube. The cube will have its
+           camera pointing updated.
         </description>
         <filter>
           *.cub
@@ -232,22 +232,22 @@
                   Use jigsaw bundle adjustment method
                 </brief>
                 <description>
-                    The BUNDLE method uses jigsaw photogrammetric techniques to 
-                    adjust the pointing differences from a point to a 
-                    latitude/longitude coordinate. BUNDLE is also more flexible 
-                    in that it can also correct for TWIST by providing a second 
+                    The BUNDLE method uses jigsaw photogrammetric techniques to
+                    adjust the pointing differences from a point to a
+                    latitude/longitude coordinate. BUNDLE is also more flexible
+                    in that it can also correct for TWIST by providing a second
                     set of SAMP2/LINE2 and LAT2/LON2 parameters.
                 </description>
             </option>
            <option value="DIRECT">
                 <brief>
-                    Use direct adjustment method 
+                    Use direct adjustment method
                 </brief>
                 <description>
-                   The DIRECT method computes the pointing differences in look 
-                   directions of the SAMP1/LINE1 point and LAT1/LON1 coordinate. 
-                   All entries in the InstrumentPointing table object are 
-                   adjusted by a constant linear rotation. This method does not 
+                   The DIRECT method computes the pointing differences in look
+                   directions of the SAMP1/LINE1 point and LAT1/LON1 coordinate.
+                   All entries in the InstrumentPointing table object are
+                   adjusted by a constant linear rotation. This method does not
                    currently support the TWIST option.
                 </description>
                 <exclusions>
@@ -270,7 +270,7 @@
       <parameter name="SIGMA0">
         <brief>Standard deviation of unit weight</brief>
         <description>
-           Convergence is reached when the solution parameters change by less 
+           Convergence is reached when the solution parameters change by less
            than Sigma0. Units:  unitless.
         </description>
         <type>double</type>
@@ -288,8 +288,8 @@
         <brief>Solve for camera twist</brief>
         <default><item>False</item></default>
         <description>
-          In addition to angle1 and angle2, if this parameter is set the program 
-          will solve for the camera twist.  This requires input of a second 
+          In addition to angle1 and angle2, if this parameter is set the program
+          will solve for the camera twist.  This requires input of a second
           fixed coordinate (SAMP2,LINE2) and (LAT2,LON2)
         </description>
         <inclusions>
@@ -346,7 +346,7 @@
        <brief>Radius, point #1</brief>
        <internalDefault>Computed</internalDefault>
        <description>
-          Desired radius at the image coordinate (SAMP1,LINE1).  It 
+          Desired radius at the image coordinate (SAMP1,LINE1).  It
           will be automatically computed using the shape model that was
           entered in the "spiceinit" application.  Units:  meters.
        </description>
@@ -407,8 +407,8 @@
        <brief>Radius, point #2</brief>
        <internalDefault>Computed</internalDefault>
        <description>
-         Radius at the image coordinate (SAMP2,LINE2). It will be automatically 
-         computed using the shape model that was initialized in the "spiceinit" 
+         Radius at the image coordinate (SAMP2,LINE2). It will be automatically
+         computed using the shape model that was initialized in the "spiceinit"
          application.  Units:  meters.
        </description>
        <minimum inclusive="no">0.0</minimum>

@@ -1,25 +1,10 @@
-/**
- * @file
- * $Revision: 1.9 $
- * $Date: 2009/07/15 17:33:52 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "ConcurrentControlNetReader.h"
 
@@ -53,9 +38,9 @@ namespace Isis {
    */
   ConcurrentControlNetReader::ConcurrentControlNetReader() {
     nullify();
-    
+
     m_mappedRunning = false;
-    
+
     m_progressBar = new ProgressBar("Reading Control Nets");
     m_watcher = new QFutureWatcher<Control *>;
 
@@ -92,13 +77,13 @@ namespace Isis {
    * @param filename The filename of the network to read
    */
   void ConcurrentControlNetReader::read(QString filename) {
-        
+
     m_backlog.append(filename);
-    
+
     if (!m_progressBar.isNull()) {
       m_progressBar->setRange(0, m_progressBar->maximum() + 1);
     }
-    
+
     start();
   }
 
@@ -109,11 +94,11 @@ namespace Isis {
   void ConcurrentControlNetReader::read(QStringList filenames) {
 
     m_backlog.append(filenames);
-    
+
     if (!m_progressBar.isNull()) {
       m_progressBar->setRange(0, m_progressBar->maximum() + filenames.size());
     }
-    
+
     start();
   }
 
@@ -136,7 +121,7 @@ namespace Isis {
 
 
   void ConcurrentControlNetReader::start() {
-        
+
     if (!m_backlog.isEmpty() && !m_mappedRunning) {
 
       QList< QPair<FileName, Progress *> > functorInput;
@@ -147,27 +132,27 @@ namespace Isis {
 
         functorInput.append(qMakePair(FileName(backlogFileName), progress));
       }
-      
+
       QFuture<Control *> networks = QtConcurrent::mapped(functorInput,
                                     FileNameToControlFunctor(QThread::currentThread()));
-            
+
       try {
         networks.result();
       }
       catch (IException &e) {
         throw e;
       }
-      
+
       if (!m_progressBar.isNull()) {
         m_progressBar->setVisible(true);
       }
-      
+
       delete m_progressUpdateTimer;
-      
+
       m_watcher->setFuture(networks);
       m_mappedRunning = true;
       m_backlog.clear();
-      
+
       m_progressUpdateTimer = new QTimer;
       connect(m_progressUpdateTimer, SIGNAL(timeout()),
               this, SLOT(updateProgressValue()));
@@ -175,7 +160,7 @@ namespace Isis {
     }
   }
 
-  
+
   void ConcurrentControlNetReader::updateProgressValue() {
     if (!m_mappedRunning) {
       foreach (Progress *progress, m_progress) {
@@ -273,4 +258,3 @@ namespace Isis {
     return *this;
   }
 }
-

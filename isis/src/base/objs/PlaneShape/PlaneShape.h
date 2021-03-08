@@ -23,7 +23,7 @@ namespace Isis {
   /**
    * @brief Define plane shape model
    *
-   * This class defines a plane shape model for Isis3 target bodies as well as
+   * This class defines a plane shape model for ISIS target bodies as well as
    * provide utilities to retrieve radii and photometric information.
    *
    *
@@ -38,7 +38,7 @@ namespace Isis {
    *                           errors were signaled. References #2248.
    *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor PlaneShape(Target, Pvl).
    *                           References #2214
-   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new
    *                           intersectSurface methods in ShapeModel are accessible by DemShape.
    */
   class PlaneShape : public Isis::ShapeModel {
@@ -52,8 +52,8 @@ namespace Isis {
       ~PlaneShape();
 
       // Make parent functions visible
-      using Isis::ShapeModel::intersectSurface; 
-      
+      using Isis::ShapeModel::intersectSurface;
+
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);

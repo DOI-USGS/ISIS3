@@ -26,28 +26,28 @@ namespace Isis {
    * @brief Import a PDS table file with a label description
    *
    * This class ingests a PDS table and converts it to an ISIS Table
-   * object. This class can handle importing PDS tables whose data is BINARY 
+   * object. This class can handle importing PDS tables whose data is BINARY
    * or ASCII format.
    *
    * The PDS label file should completely define the contents of a PDS
-   * table with ASCII data or BINARY data. The location of the table data is 
-   * determined from a label keyword, ^TABLE (or ^NAME_TABLE). This keyword 
+   * table with ASCII data or BINARY data. The location of the table data is
+   * determined from a label keyword, ^TABLE (or ^NAME_TABLE). This keyword
    * will indicate the name of the file containing the table data and the start
-   * record value where the table data begins. If the keyword only gives the 
+   * record value where the table data begins. If the keyword only gives the
    * start record, the table is attached to the file that contains the label.
-   * If the keyword only gives a file name, that file only contains the data 
-   * for the indicated table. PDS table files have the extension *.TAB if the 
-   * table data is ASCII format and *.DAT if the data is BINARY. When 
+   * If the keyword only gives a file name, that file only contains the data
+   * for the indicated table. PDS table files have the extension *.TAB if the
+   * table data is ASCII format and *.DAT if the data is BINARY. When
    * constructing an ImportPdsTable object, programmers can provide a different
    * name for the PDS table file.
    *
    * <p>
-   * @b NOTE: Depending on the INTERCHANGE_FORMAT value, programmers should 
+   * @b NOTE: Depending on the INTERCHANGE_FORMAT value, programmers should
    * choose the appropriate methods from this class.
    *
    * Example of PDS ASCII table import. Construct the ImportPdsTable object
-   * with a label name, set the data type for the specified PDS columns, and 
-   * import the PDS table to an Isis3 table with the comma separtated column
+   * with a label name, set the data type for the specified PDS columns, and
+   * import the PDS table to an Isis table with the comma separtated column
    * names.
    * <code>
    *   ImportPdsTable pdsTable(labelFileName, tableFileName);
@@ -58,9 +58,9 @@ namespace Isis {
    *   Table isisTable = pdsTable.importTable("ScetTimeClock,ShutterStatus,MirrorSin,MirrorCos",
    *                                          "VIRHouseKeeping");
    * </code>
-   * Example of PDS BINARY table import. If the default constructor is used, 
-   * the load method must be called to pass in the label file name. The PDS 
-   * table can then be imported and an Isis3 Table object is returned.
+   * Example of PDS BINARY table import. If the default constructor is used,
+   * the load method must be called to pass in the label file name. The PDS
+   * table can then be imported and an Isis Table object is returned.
    * <code>
    *   ImportPdsTable pdsTable;
    *   load(labelFileName, "", pdsTableName);
@@ -71,14 +71,14 @@ namespace Isis {
    *
    * @author 2011-07-20 Kris Becker
    *
-   * @internal 
+   * @internal
    *   @history 2011-08-02 Kris Becker - Modified to ensure the proper size of strings are
    *                         exported to the TableRecord
    *   @history 2012-10-04 Jeannie Backer - Changed references to TableField
    *                           methods to lower camel case. Added and ordered
    *                           includes. Moved method implementation to cpp.
    *                           References #1169.
-   *   @history 2012-11-21 Jeannie Backer - Added implementation for importing 
+   *   @history 2012-11-21 Jeannie Backer - Added implementation for importing
    *                           binary PDS tables. Changed method name from
    *                           "exportAsTable" to "importTable". Improved
    *                           unitTest coverage. References #700.
@@ -90,9 +90,9 @@ namespace Isis {
    *   @history 2016-03-10 Jeannie Backer - Removed non-UTF8 character. References #2397.
    *   @history 2018-02-12 Stuart Sides - Added detached table capabilities for label files
    *                                      without a "RECORD_BYTES" keyword. References #5525.
-   *  
-   *  
-   * @todo The binary table import methods were written after the ascii table 
+   *
+   *
+   * @todo The binary table import methods were written after the ascii table
    *       import. The class should be better organized so that the programmer
    *       does not need to know which methods to call based on
    *       INTERCHANGE_FORMAT.  The program should take care of this
@@ -101,7 +101,7 @@ namespace Isis {
   class ImportPdsTable {
     public:
       ImportPdsTable();
-      ImportPdsTable(const QString &pdsLabFile, 
+      ImportPdsTable(const QString &pdsLabFile,
                      const QString &pdsTabFile="",
                      const QString &pdsTableName ="TABLE");
       virtual ~ImportPdsTable();
@@ -112,11 +112,11 @@ namespace Isis {
       int columns() const;
       int rows() const;
 
-      void load(const QString &pdsLabFile, const QString &pdsTabFile = "", 
+      void load(const QString &pdsLabFile, const QString &pdsTabFile = "",
                 const QString &pdsTableName = "TABLE");
 
       bool hasColumn(const QString &colName) const;
-      QString getColumnName(const unsigned int &index = 0, 
+      QString getColumnName(const unsigned int &index = 0,
                                 const bool &formatted = true) const;
       QStringList getColumnNames(const bool &formatted = true) const;
       QString getFormattedName(const QString &colname) const;
@@ -138,7 +138,7 @@ namespace Isis {
         QString m_dataType;   //!< PDS table DATA_TYPE of column
         int     m_startByte;  //!< Starting byte of data
         int     m_numBytes;   //!< Number bytes in column
-        int     m_itemBytes;  //!< Number bytes per item 
+        int     m_itemBytes;  //!< Number bytes per item
         int     m_items;      //!< Number of items in column
       };
 
@@ -198,10 +198,9 @@ namespace Isis {
       QString  m_tableName;     //!< The name of the PDS table object
       QString  m_pdsTableFile;  //!< The name of the file containing the table data.
       int      m_pdsTableStart; //!< The start byte of the PDS table data.
-      QString  m_byteOrder;     /**< The byte order of the PDS table file, if 
+      QString  m_byteOrder;     /**< The byte order of the PDS table file, if
                                      binary. Valid values are "MSB" or "LSB".*/
   };
 
 }
 #endif
-

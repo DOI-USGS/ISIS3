@@ -10,7 +10,7 @@
     images are decompressed from Clementine 8-bit into a pixel type selected by
     the user.
   </description>
-  
+
   <category>
     <missionItem>Clementine</missionItem>
   </category>
@@ -62,18 +62,18 @@
       Checks if input file is rdr.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Tracie Sucharski" date="2009-02-17">
       Added BandBin keywords Center and Width to clementine.trn and
       alter the output values only if the filter is not the F filter.
     </change>
     <change name="Mackenzie Boyd" date="2009-05-26">
-      Modified label transfer to include MCP_Gain_Mode_ID when images is from 
+      Modified label transfer to include MCP_Gain_Mode_ID when images is from
       HIRES camera.
     </change>
     <change name="Jeff Anderson and Victor Silva" date="2017-12-27">
-      Modified Kernels group to support filter dependent focal length and optical distortion 
+      Modified Kernels group to support filter dependent focal length and optical distortion
       for UVVIS camera.
     </change>
     <change name="Jeannie Backer" date="2018-09-01">
@@ -115,7 +115,7 @@
       Using clem2isis
       </brief>
       <description>
-        The use of clem2isis to ingest PDS images and output Isis3 cubes
+        The use of clem2isis to ingest PDS images and output Isis cubes
       </description>
       <terminalInterface>
         <commandLine>
@@ -123,11 +123,11 @@
           to=lne4885r.cub
         </commandLine>
         <description>
-          This example shows the use of clem2isis create an Isis3 cube from a PDS 
+          This example shows the use of clem2isis create an Isis cube from a PDS
           image.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="448" height="550" src="assets/images/clem2isisGUI.jpg">
@@ -154,14 +154,14 @@
           <parameterName>FROM</parameterName>
         </dataFile>
       </dataFiles>
-      
+
       <outputImages>
         <image width="491" height="492" src="assets/images/lne4885r.jpg">
           <brief>
             Final output image after the conversion
           </brief>
           <description>
-            Converts from PDS format to a Isis3 cube.
+            Converts from PDS format to a Isis cube.
           </description>
           <thumbnail caption= "The cube image after conversion"
           src="assets/thumbs/lne4885r.jpg" width="200" height="200"/>

@@ -137,7 +137,7 @@ namespace Isis {
        * Defines the coordinate typ, units, and coordinate index  for some of the output methods
        */
       enum CoordinateType {
-        Latitudinal,                       /**< Planetocentric latitudinal (lat/lon/rad) coordinates */
+        Latitudinal,                  /**< Planetocentric latitudinal (lat/lon/rad) coordinates */
         Rectangular                   /**< Body-fixed rectangular x/y/z coordinates */
       }; 
       enum CoordUnits {

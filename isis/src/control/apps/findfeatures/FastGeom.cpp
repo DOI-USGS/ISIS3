@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <opencv2/opencv.hpp>
 
@@ -28,17 +15,17 @@
 namespace Isis {
 
 /* Constructor */
-FastGeom::FastGeom() : m_fastpts(25), m_tolerance(1.0), m_geomtype("camera"), 
-                       m_maxarea(3.0), m_parameters() { 
+FastGeom::FastGeom() : m_fastpts(25), m_tolerance(1.0), m_geomtype("camera"),
+                       m_maxarea(3.0), m_parameters() {
   validate(m_geomtype);
 }
 
 /* Construct with parameters */
-FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25), 
-                                                   m_tolerance(1.0), 
+FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25),
+                                                   m_tolerance(1.0),
                                                    m_geomtype("camera"),
                                                    m_maxarea(3.0),
-                                                   m_parameters(parameters) { 
+                                                   m_parameters(parameters) {
   m_fastpts   = toInt(m_parameters.get("FastGeomPoints", "25"));
   m_tolerance = toDouble(m_parameters.get("FastGeomTolerance", "1.0"));
   m_geomtype  = m_parameters.get("GeomType", "camera").toLower();
@@ -48,9 +35,9 @@ FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25),
 
 /* Construct with individual parameters to compute the fast geom transform */
 FastGeom::FastGeom(const int maxpts, const double tolerance, const bool crop,
-         const bool preserve, const double &maxarea) : 
+         const bool preserve, const double &maxarea) :
          m_fastpts(maxpts), m_tolerance(tolerance), m_geomtype("camera"),
-         m_maxarea(maxarea), m_parameters() { 
+         m_maxarea(maxarea), m_parameters() {
   validate(m_geomtype);
 }
 
@@ -58,19 +45,19 @@ FastGeom::FastGeom(const int maxpts, const double tolerance, const bool crop,
 FastGeom::~FastGeom() { }
 
 /**
- * @brief Compute train->query fast geom transformation 
- *  
+ * @brief Compute train->query fast geom transformation
+ *
  *  This method computes a fast geometric transform that "projects" the train
  *  image into the query image space. This method assumes both images have
  *  camera models or map projections that can compute longitude/latitude
  *  coordinates from sample/line coordinates and back.
- *  
+ *
  *  The query line/samples coordinates are converted to latitude/longitude
  *  coordinates. The latitude/longitude coordinates are then used in the train
  *  image to compute its corresponding line/sample. A minimum number of points
  *  (m_fastpts) are computed to create a perspective transform that maps image
  *  coordinates of the two images.
- *  
+ *
  * @param query            Query image
  * @param train            Train image
  * @return ImageTransform* Pointer to FastGeom transform
@@ -84,25 +71,25 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
   RectArea tSize(0.0f, 0.0f, train.source().samples(), train.source().lines() );
 
   // std::cout << "Train-to-query mapping...\n";
-  cv::Mat t_to_q = train.source().getGeometryMapping(query.source(), 
-                                                     m_fastpts, 
-                                                     m_tolerance); 
+  cv::Mat t_to_q = train.source().getGeometryMapping(query.source(),
+                                                     m_fastpts,
+                                                     m_tolerance);
 
   // The above matrix is for simply computing the direct fastgeom of the
   // training image into the image space of the query image, just like
   // cam2cam does.
-  // 
+  //
   // Now consider cropping to only the mininmum common coverage or
   // preserving all the train image in the transformation (this option can
   // be really big and is not recommended for some situations!).
-   
-  // Set up the transform pointer for applying the desired affect. Do 
+
+  // Set up the transform pointer for applying the desired affect. Do
   // preserve option first.
   QScopedPointer<GenericTransform> fastg(0);
   if ( "map" == m_geomtype ) {
     // Compute preserved image output size and translation matrix
     cv::Mat tMat;
-    RectArea tSizeFull = ImageTransform::transformedSize(t_to_q, 
+    RectArea tSizeFull = ImageTransform::transformedSize(t_to_q,
                                                          tSize.size(),
                                                          tMat);
     // std::cout << "FullTrain: " << tSizeFull << "\n";
@@ -111,7 +98,7 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
     // same size as the output image below.
     if ( tSizeFull.area()  < (m_maxarea * qSize.area()) ) {
       // std::cout << "Use direct full mapping of Train-to-Query...\n";
-      fastg.reset(new GenericTransform("FastGeomMap", t_to_q, 
+      fastg.reset(new GenericTransform("FastGeomMap", t_to_q,
                                        tSizeFull));
     }
   }
@@ -119,24 +106,24 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
 
     // Crop train image to only common area in query image using inverse
     // std::cout << "Compute train to query BB...\n";
-    RectArea qbbox = ImageTransform::boundingBox( t_to_q.inv(), qSize, 
+    RectArea qbbox = ImageTransform::boundingBox( t_to_q.inv(), qSize,
                                                    tSize.size());
     // std::cout << "TrainBB: " << qbbox << "\n";
 
 
     // std::cout << "Compute query to train BB...\n";
-    RectArea tbbox = ImageTransform::boundingBox( t_to_q, qbbox, 
+    RectArea tbbox = ImageTransform::boundingBox( t_to_q, qbbox,
                                                    qSize.size());
 
     // std::cout << "MapBB: " << tbbox << "\n";
-    fastg.reset(new GenericTransform("FastGeomCrop", t_to_q, tbbox)); 
+    fastg.reset(new GenericTransform("FastGeomCrop", t_to_q, tbbox));
   }
 
  // If a mapper has not been allocated, allocate mapping to query image size
  // (as cam2cam does).
   if ( fastg.isNull() ) {
     // std::cout << "FastGeom cam2map map created...\n";
-    fastg.reset(new GenericTransform("FastGeomCamera", t_to_q, qSize.size())); 
+    fastg.reset(new GenericTransform("FastGeomCamera", t_to_q, qSize.size()));
   }
 
   return ( fastg.take() );
@@ -149,12 +136,12 @@ void FastGeom::apply(MatchImage &query, MatchImage &train) {
 }
 
 /**
- * @brief Checks for valid fast geom transform options 
- *  
- * This method checks that geomtype is "camera", "crop" or "map". If some other 
- * value is found, an exception is thrown. 
- * 
- * @param geomtype String specification of geom type - must be camera, crop or 
+ * @brief Checks for valid fast geom transform options
+ *
+ * This method checks that geomtype is "camera", "crop" or "map". If some other
+ * value is found, an exception is thrown.
+ *
+ * @param geomtype String specification of geom type - must be camera, crop or
  *                 map
  */
 void FastGeom::validate( const QString &geomtype ) const {
@@ -168,4 +155,3 @@ void FastGeom::validate( const QString &geomtype ) const {
 }
 
 }  // namespace Isis
-

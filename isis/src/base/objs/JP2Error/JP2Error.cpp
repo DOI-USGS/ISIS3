@@ -16,7 +16,7 @@ namespace Isis {
 
   /**
    * This class is necessary to catch the error messages produced by
-   * Kakadu so that they can be output using ISIS3 methods. If these
+   * Kakadu so that they can be output using ISIS methods. If these
    * routines are not registered with the Kakadu error handling facility,
    * then the Kakadu errors will be lost and not reported to the user.
    *
@@ -46,7 +46,7 @@ namespace Isis {
   /**
    * Register flush routine with Kakadu error and warning handling
    * facility. This routine writes Kakadu error messages out using
-   * ISIS3 preferred method.
+   * ISIS preferred method.
    *
    */
   void JP2Error::flush(bool end_of_message) {

@@ -1,15 +1,15 @@
 
 #
-# This ISIS 3 translation file is used to create ISIS 3 band bin cube labels
-# from Voyager ".IMG" labels for the WA camera. Other sections of the ISIS 3
+# This ISIS translation file is used to create ISIS band bin cube labels
+# from Voyager ".IMG" labels for the WA camera. Other sections of the ISIS
 # labels are handled by other translation files.
 #
 
-# This translation contains the known filter names for the WA 
+# This translation contains the known filter names for the WA
 # camera. It translates them one for one. The (*,*) would have worked, but
 # they are listed for documentation purposes. Note the filter name does not
 # correspond directly to the filter number unless the camera is known (NA, WA).
-# Note: NAD is not listed in some references instead SODIUM is listed. 
+# Note: NAD is not listed in some references instead SODIUM is listed.
 Group = FilterName
   Auto
   InputKey       = FILTER_NAME
@@ -99,11 +99,10 @@ Group = BandWidth
   Translation    = (0.110000, 6)
   Translation    = (0.090000, 7)
   Translation    = (0.0, *)
-  
+
   Translation    = (0.010000, CH4_JS)
   Translation    = (0.010000, CH4_U)
   Translation    = (0.110000, GREEN)
   Translation    = ( ,NAD)
   Translation    = (0.002000, SODIUM)
 End_Group
-

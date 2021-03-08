@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "HayabusaAmicaCamera.h"
 
@@ -71,7 +59,7 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    
+
     // lines and samples added to the pvl in the order you
     // call getDouble()
     double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
@@ -91,7 +79,7 @@ namespace Isis {
     // line index is 1023.
     int actualFirstLine = 1023 - ((int) inst["LastLine"]);
 
-    //The detector line indexing is one-based. 
+    //The detector line indexing is one-based.
     detMap->SetStartingDetectorLine(actualFirstLine + 1);
 
     // Handle summing
@@ -113,9 +101,9 @@ namespace Isis {
   }
 
 
-  /** 
-   * Destructor 
-   */ 
+  /**
+   * Destructor
+   */
   HayabusaAmicaCamera::~HayabusaAmicaCamera() {
   }
 
@@ -154,8 +142,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Frame ID
    */
-  int HayabusaAmicaCamera::CkFrameId() const { 
-    return (-130000); 
+  int HayabusaAmicaCamera::CkFrameId() const {
+    return (-130000);
   }
 
 
@@ -165,8 +153,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Reference ID
    */
-  int HayabusaAmicaCamera::CkReferenceId() const { 
-    return (1); 
+  int HayabusaAmicaCamera::CkReferenceId() const {
+    return (1);
   }
 
 
@@ -176,8 +164,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Reference ID
    */
-  int HayabusaAmicaCamera::SpkReferenceId() const { 
-    return (1); 
+  int HayabusaAmicaCamera::SpkReferenceId() const {
+    return (1);
   }
 }
 

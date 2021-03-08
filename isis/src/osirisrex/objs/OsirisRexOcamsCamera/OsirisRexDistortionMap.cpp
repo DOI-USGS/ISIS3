@@ -1,25 +1,10 @@
-/**
- * @file
- * $Revision: 1.4 $
- * $Date: 2008/02/21 16:04:33 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QDebug>
 #include <QtGlobal>
@@ -30,22 +15,22 @@
 #include "CameraFocalPlaneMap.h"
 
 namespace Isis {
-  /** 
+  /**
    * OSIRIS REx Camera distortion map constructor
    *
-   * Create a camera distortion map for OSIRIS REx's. 
-   *  
-   * This class maps between distorted and undistorted 
-   * focal plane x/y's. The default mapping is the identity, that is, 
-   * the focal plane x/y and undistorted focal plane x/y will be 
-   * identical. 
+   * Create a camera distortion map for OSIRIS REx's.
+   *
+   * This class maps between distorted and undistorted
+   * focal plane x/y's. The default mapping is the identity, that is,
+   * the focal plane x/y and undistorted focal plane x/y will be
+   * identical.
    *
    * @param parent        the parent camera that will use this distortion map
    * @param zDirection    the direction of the focal plane Z-axis
    *                      (either 1 or -1)
    *
    */
-  OsirisRexDistortionMap::OsirisRexDistortionMap(Camera *parent, double zDirection) 
+  OsirisRexDistortionMap::OsirisRexDistortionMap(Camera *parent, double zDirection)
       : CameraDistortionMap(parent, zDirection) {
 
     m_detectorOriginSample = p_camera->FocalPlaneMap()->DetectorSampleOrigin();
@@ -61,7 +46,7 @@ namespace Isis {
    }
 
 
-  /** 
+  /**
    *  Load distortion coefficients and center-of-distortion for OCAMS
    *
    * This method loads the distortion coefficients from the instrument
@@ -72,15 +57,15 @@ namespace Isis {
    * INS-64361_OD_K_FILTER = (2.21E-05, 1.71E-04, 5.96E-05, 0.00E+00, 0.00E+00)
    * INS-64361_OD_CENTER_FILTER = (486.2, 450.3)
    * @endcode
-   *  
+   *
    * Or if the distortion is not filter-dependent:
-   *  
+   *
    * @code
    * INS-64361_OD_K = (2.21E-05, 1.71E-04, 5.96E-05, 0.00E+00, 0.00E+00)
    * INS-64361_OD_CENTER = (486.2, 450.3)
    * @endcode
-   *  
-   *  
+   *
+   *
    * @param naifIkCode    Code to search for in instrument kernel
    */
   void OsirisRexDistortionMap::SetDistortion(int naifIkCode, QString filter="UNKNOWN") {
@@ -98,29 +83,29 @@ namespace Isis {
       for (int i = 0; i < 5; ++i) {
          p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
       }
-    } 
+    }
     catch (IException &e) {
       // This means that this is an older image without a filter provided
-      // don't update p_odk, we will not apply the distortion in this case 
+      // don't update p_odk, we will not apply the distortion in this case
       m_distortionOriginSample = -1;
       m_distortionOriginLine = -1;
       return;
     }
 
     // Load center-of-distortion coordinates, including filter if we have it
-    QString odcenterkey; 
+    QString odcenterkey;
     if (filter.toUpper().compare("UNKNOWN") == 0) {
       odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER";
     }
     else {
-      odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER_" + filter.trimmed().toUpper(); 
+      odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER_" + filter.trimmed().toUpper();
     }
     m_distortionOriginSample = p_camera->Spice::getDouble(odcenterkey, 0);
     m_distortionOriginLine =   p_camera->Spice::getDouble(odcenterkey, 1);
   }
 
 
-  /** 
+  /**
    * Compute undistorted focal plane x/y
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
@@ -133,17 +118,17 @@ namespace Isis {
    * @return if the conversion was successful
    */
   bool OsirisRexDistortionMap::SetFocalPlane(double dx, double dy) {
-    p_focalPlaneX = dx; 
+    p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 
     // Only apply the distortion if we have the correct number of coefficients
     if (p_odk.size() < 2) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
-      return true; 
+      return true;
     }
 
-    double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch; 
+    double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch;
     double y0 = (m_distortionOriginSample - m_detectorOriginLine) * m_pixelPitch;
 
     double xt = dx;
@@ -169,7 +154,7 @@ namespace Isis {
       xx = (xt-x0) * (xt-x0);
       yy = (yt-y0) * (yt-y0);
       rr = xx + yy;
-      r = qSqrt(rr); 
+      r = qSqrt(rr);
       rrr = rr * r;
       rrrr = rr * rr;
 
@@ -204,11 +189,11 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Compute distorted focal plane x/y
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
-   *  
+   *
    * After calling this method, you can obtain the distorted x/y via the
    * FocalPlaneX and FocalPlaneY methods
    *
@@ -227,7 +212,7 @@ namespace Isis {
     if (p_odk.size() < 2) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
-      return true; 
+      return true;
     }
     double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch;
     double y0 = (m_distortionOriginSample - m_detectorOriginLine) * m_pixelPitch;
@@ -251,8 +236,7 @@ namespace Isis {
     double drOverR = p_odk[0] + p_odk[1]*r + p_odk[2]*r2 + p_odk[3]*r3 + p_odk[4]*r4;
 
     p_focalPlaneX = x + drOverR * (x-x0);
-    p_focalPlaneY = y + drOverR * (y-y0); 
+    p_focalPlaneY = y + drOverR * (y-y0);
     return true;
   }
 }
-

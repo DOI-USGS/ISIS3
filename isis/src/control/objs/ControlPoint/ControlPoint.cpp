@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 #include "ControlPoint.h"
 
@@ -839,7 +847,7 @@ namespace Isis {
   }
 
 
-  /**    
+  /**
    * Computes a priori lat/lon/radius point coordinates by determining the average lat/lon/radius of
    * all measures. Note that this does not change ignored, fixed or constrained points.
    *
@@ -1003,12 +1011,12 @@ namespace Isis {
    * @history 2012-01-18 Debbie A. Cook, Revised to call
    *                            ComputeResidualsMillimeters() to avoid duplication of code.
    * @history 2019-05-16 Debbie A. Cook, The calls to CameraGroundMap::GetXY
-   *                           were changed to allow not testing for points on the back side of the 
-   *                           planet during bundle adjustment.  Now, the instrument coordinates 
+   *                           were changed to allow not testing for points on the back side of the
+   *                           planet during bundle adjustment.  Now, the instrument coordinates
    *                           will be calculated and returned always to this method. In the future,
-   *                           a separate diagnostic tool may be helpful to check for non-visable  
+   *                           a separate diagnostic tool may be helpful to check for non-visable
    *                           points in a control net AFTER bundle adjustment. References #2591.
-   *                            
+   *
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (IsIgnored()) {

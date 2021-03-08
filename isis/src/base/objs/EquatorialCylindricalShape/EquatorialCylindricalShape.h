@@ -13,9 +13,9 @@ namespace Isis {
   class Pvl;
 
   /**
-   * @brief Define shapes and provide utilities for shapes stored as Isis3 EquatorialCylindrical map
+   * @brief Define shapes and provide utilities for shapes stored as ISIS EquatorialCylindrical map
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an
+   * This class will define shapes of ISIS target bodies with the shape defined by an
    * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric
    * information for the intersection point.
    *

@@ -3,13 +3,13 @@
 <application name="kaguyatc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Import L2B0 or L2B2 Kaguya TC image to ISIS3 cube.
+    Import L2B0 or L2B2 Kaguya TC image to ISIS cube.
   </brief>
 
   <description>
-    This program will import a "PDS-like" formatted Kaguya 
+    This program will import a "PDS-like" formatted Kaguya
     Terrain Camera (TC) level 2 image (including level 2B0 and 2B2)
-    from the JAXA Kaguya archive to ISIS3.
+    from the JAXA Kaguya archive to ISIS.
     Note that not all TC images may be supported by this program.
     Supported input images include radiometrically corrected
     unprojected images, TC maps, or TC Ortho maps.
@@ -33,10 +33,10 @@
       Added check for TARGET_NAME keyword. Fixes #2036.
     </change>
     <change name="Jeannie Backer" date="2018-10-02">
-      Added support for Kaguya L2B0 (TC1_Level2B and TC2_Level2B) files. 
+      Added support for Kaguya L2B0 (TC1_Level2B and TC2_Level2B) files.
     </change>
     <change name="Stuart Sides" date="2019-04-25">
-      Updated description provided by Lisa Gaddis. 
+      Updated description provided by Lisa Gaddis.
     </change>
   </history>
 
@@ -54,7 +54,7 @@
         </brief>
         <description>
           Use this parameter to select the Kaguya Terrain
-          Camera filename. This file must contain the PDS 
+          Camera filename. This file must contain the PDS
           labels.
         </description>
         <filter>
@@ -134,14 +134,14 @@
         <description>
       	  If this option is set to "yes" or "true", a range of input raw pixels
       	  defined by the HRSMIN and HRSMAX parameters are converted to HRS
-      	  pixels.  All other valid pixels that do not fall within the ranges 
-      	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file 
-      	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
-      	  file is changed, the NULL and HRS <def link="Special Pixels">special 
-      	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
-      	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
-      	  and "255" may be converted to actual values instead of retaining the 
-      	  special pixel property.  If the output file remains as 8-bit, then "0" 
+      	  pixels.  All other valid pixels that do not fall within the ranges
+      	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file
+      	  unchanged.  If the <def link="Bit Type">bit type</def> of the input
+      	  file is changed, the NULL and HRS <def link="Special Pixels">special
+      	  pixels</def> may be incorrectly set to valid pixel values.  For example,
+      	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0"
+      	  and "255" may be converted to actual values instead of retaining the
+      	  special pixel property.  If the output file remains as 8-bit, then "0"
       	  stays as NULL and "255" stays as HRS.
         </description>
         <inclusions>
@@ -181,9 +181,9 @@
         <description>
       	  If this option is set to "yes" or "true", a range of input raw pixels
       	  defined by the HISMIN and HISMAX parameters are converted to HIS
-      	  pixels.  All other valid pixels that do not fall within the ranges 
-      	  specified for LIS, LRS, HRS, and NULL pixels are transferred to the 
-      	  output file unchanged. 
+      	  pixels.  All other valid pixels that do not fall within the ranges
+      	  specified for LIS, LRS, HRS, and NULL pixels are transferred to the
+      	  output file unchanged.
         </description>
         <inclusions>
           <item>HISMIN</item>
@@ -222,8 +222,8 @@
         <description>
       	  If this option is set to "yes" or "true", a range of input raw pixels
       	  defined by the LRSMIN and LRSMAX parameters are converted to LRS
-      	  pixels.  All other valid pixels that do not fall within the ranges 
-      	  specified for LIS, HIS, HRS, and NULL pixels are transferred to the 
+      	  pixels.  All other valid pixels that do not fall within the ranges
+      	  specified for LIS, HIS, HRS, and NULL pixels are transferred to the
       	  output file unchanged.
         </description>
         <inclusions>
@@ -263,8 +263,8 @@
         <description>
       	  If this option is set to "yes" or "true", a range of input raw pixels
       	  defined by the LISMIN and LISMAX parameters are converted to LIS
-      	  pixels.  All other valid pixels that do not fall within the ranges 
-      	  specified for LRS, HIS, HRS, and NULL pixels are transferred to the 
+      	  pixels.  All other valid pixels that do not fall within the ranges
+      	  specified for LRS, HIS, HRS, and NULL pixels are transferred to the
       	  output file unchanged.
         </description>
         <inclusions>
