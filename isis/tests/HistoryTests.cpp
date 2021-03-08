@@ -33,12 +33,12 @@ TEST_F(HistoryBlob, HistoryTestsAddEntry) {
 TEST_F(HistoryBlob, HistoryTeststoBlob) {
   History history(historyBlob);
 
-  Blob *blob = history.toBlob();
+  Blob blob = history.toBlob();
 
   std::stringstream os;
-  char *blob_buffer = blob->getBuffer();
+  char *blob_buffer = blob.getBuffer();
   Pvl newHistoryPvl;
-  for (int i = 0; i < blob->Size(); i++) {
+  for (int i = 0; i < blob.Size(); i++) {
     os << blob_buffer[i];
   }
   os >> newHistoryPvl;

@@ -61,8 +61,8 @@ namespace Isis {
   CubeStretch::~CubeStretch() {
   }
 
-  Isis::Blob CubeStretch::toBlob(QString const& name) const {
-    Isis::Blob blob(name, "Stretch");
+  Isis::Blob CubeStretch::toBlob() const {
+    Isis::Blob blob("CubeStretch", "Stretch");
 
     blob.Label()["Name"] = getName();
     blob.Label() += PvlKeyword("StretchType", getType());

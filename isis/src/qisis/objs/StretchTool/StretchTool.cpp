@@ -569,7 +569,7 @@ namespace Isis {
         }
       }
 
-      bool cubeDeleted = icube->deleteBlob("Stretch", toDelete);
+      bool cubeDeleted = icube->deleteBlob(toDelete, "Stretch");
 
       if (!cubeDeleted) {
         QMessageBox msgBox;
@@ -704,7 +704,7 @@ namespace Isis {
 
         // Overwrite an existing stretch with the same name if it exists. The user was warned
         // and decided to overwrite.
-        icube->write(stretch.toBlob());
+        icube->write(stretch);
       }
       else {
         CubeStretch redStretch, greenStretch, blueStretch;

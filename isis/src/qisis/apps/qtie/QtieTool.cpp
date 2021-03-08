@@ -942,7 +942,7 @@ namespace Isis {
     history += results;
 
     h.AddEntry(history);
-    p_matchCube->write(*(h.toBlob()));
+    p_matchCube->write(h);
     p_matchCube->reopen("r");
 
   }

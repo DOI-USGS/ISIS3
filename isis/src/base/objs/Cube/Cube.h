@@ -261,11 +261,14 @@ namespace Isis {
       OriginalXmlLabel readOriginalXmlLabel() const;
       History readHistory(const QString &name = "IsisCube") const;
       ImagePolygon readFootprint() const;
+      Table readTable(const QString &name);
       void write(Blob &blob, bool overwrite=true);
       void write(const Table &table);
       void write(const CubeStretch &cubeStretch);
-      void write(OriginalLabel lab);
-      void write(OriginalXmlLabel lab);
+      void write(OriginalLabel &lab);
+      void write(const OriginalXmlLabel &lab);
+      void write(History &history, const QString &name = "IsisCube");
+      void write(const ImagePolygon &polygon);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);
@@ -312,13 +315,12 @@ namespace Isis {
 
       void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
-      bool deleteBlob(QString BlobType, QString BlobName);
+      bool deleteBlob(QString BlobName, QString BlobType);
       void deleteGroup(const QString &group);
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
-      Table readTable(const QString &name);
-      bool hasBlob(const QString &type, const QString &name);
+      bool hasBlob(const QString &name, const QString &type);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);

@@ -230,7 +230,7 @@ void IsisMain() {
 
     History history;
     history.AddEntry();
-    uveven->write(*(history.toBlob()));
+    uveven->write(history);
     uveven->write(origLabel);
 
     uveven->close();
@@ -245,7 +245,7 @@ void IsisMain() {
 
     History history;
     history.AddEntry();
-    uvodd->write(*(history.toBlob()));
+    uvodd->write(history);
     uvodd->write(origLabel);
 
     uvodd->close();
@@ -260,7 +260,7 @@ void IsisMain() {
 
     History history;
     history.AddEntry();
-    viseven->write(*(history.toBlob()));
+    viseven->write(history);
     viseven->write(origLabel);
 
     viseven->close();
@@ -275,7 +275,7 @@ void IsisMain() {
 
     History history;
     history.AddEntry();
-    visodd->write(*(history.toBlob()));
+    visodd->write(history);
     visodd->write(origLabel);
 
     visodd->close();

@@ -41,7 +41,7 @@ TEST(CubeStretch, CopyConstructor) {
 TEST(CubeStretch, BlobConstructor) {
   // Set Stretch
   Isis::CubeStretch cubeStretch("TestStretch", "testType", 2);
-  Isis::CubeStretch cubeStretchFromBlob(cubeStretch.toBlob());
+  Isis::CubeStretch cubeStretchFromBlob(cubeStretch);
 
 
   EXPECT_STREQ(cubeStretchFromBlob.getName().toLatin1().data(), cubeStretch.getName().toLatin1().data());

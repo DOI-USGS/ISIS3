@@ -305,7 +305,7 @@ void IsisMain() {
     PvlObject hEntry =  Isis::iApp->History();
     hEntry.addGroup(results);
     hist.AddEntry(hEntry);
-    c.write(*(hist.toBlob()));
+    c.write(hist);
 
     // clean up
     c.close();

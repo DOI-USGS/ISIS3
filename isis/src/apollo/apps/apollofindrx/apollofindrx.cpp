@@ -176,7 +176,7 @@ namespace Isis {
             History hist = cube->readHistory(histName);
             // add apollofindrx History PvlObject into the History Blob and write to cube
             hist.AddEntry();
-            cube->write(*(hist.toBlob(histName)));
+            cube->write(hist);
             cube->close();
         }
     }

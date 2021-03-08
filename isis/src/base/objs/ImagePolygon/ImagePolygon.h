@@ -233,7 +233,7 @@ namespace Isis {
         return p_pts->size();
       }
 
-      Blob *toBlob();
+      Blob toBlob() const;
 
     private:
       // Please do not add new polygon manipulation methods to this class.

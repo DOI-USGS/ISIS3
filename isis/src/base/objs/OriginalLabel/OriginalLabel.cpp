@@ -65,12 +65,12 @@ namespace Isis {
     m_originalLabel = pvl;
   }
 
-  Isis::Blob *OriginalLabel::toBlob() {
+  Isis::Blob OriginalLabel::toBlob() {
     std::stringstream sstream;
     sstream << m_originalLabel;
     string orglblStr = sstream.str();
-    Isis::Blob *blob = new Blob("IsisCube", "OriginalLabel");
-    blob->setData(orglblStr.c_str(), orglblStr.size());
+    Isis::Blob blob("IsisCube", "OriginalLabel");
+    blob.setData(orglblStr.c_str(), orglblStr.size());
     return blob;
   }
 
@@ -79,7 +79,7 @@ namespace Isis {
    *
    * @return (Isis::Pvl) original labels
    */
-  Pvl OriginalLabel::ReturnLabels() {
+  Pvl OriginalLabel::ReturnLabels() const {
     return m_originalLabel;
   }
 }

@@ -236,6 +236,6 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
 TEST_F(SmallCube, TestCubeHasBlob) {
   Blob testBlob("TestBlob", "SomeBlob");
   testCube->write(testBlob);
-  EXPECT_TRUE(testCube->hasBlob("SomeBlob", "TestBlob"));
-  EXPECT_FALSE(testCube->hasBlob("SomeBlob", "SomeOtherTestBlob"));
+  EXPECT_TRUE(testCube->hasBlob("TestBlob", "SomeBlob"));
+  EXPECT_FALSE(testCube->hasBlob("SomeOtherTestBlob", "SomeBlob"));
 }

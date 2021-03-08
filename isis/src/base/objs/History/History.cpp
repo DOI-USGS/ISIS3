@@ -67,7 +67,7 @@ namespace Isis {
    *
    * @return @b Blob
    */
-  Blob *History::toBlob(const QString &name) {
+  Blob History::toBlob(const QString &name) {
     ostringstream ostr;
     if (p_bufferSize > 0) ostr << std::endl;
     ostr << p_history;
@@ -80,8 +80,8 @@ namespace Isis {
     const char *ptr = histStr.c_str();
     memcpy(&blobBuffer[p_bufferSize], (void *)ptr, bytes);
 
-    Blob *newBlob = new Blob(name, "History");
-    newBlob->takeData(blobBuffer, blobBufferSize);
+    Blob newBlob(name, "History");
+    newBlob.takeData(blobBuffer, blobBufferSize);
     return newBlob;
   }
 

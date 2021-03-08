@@ -102,7 +102,7 @@ void IsisMain() {
   if(cube) {
     History hist = cube->readHistory();
     hist.AddEntry();
-    cube->write(*(hist.toBlob()));
+    cube->write(hist);
 
     // clean up
     cube->close();

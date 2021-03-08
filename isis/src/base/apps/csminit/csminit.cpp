@@ -364,7 +364,7 @@ namespace Isis {
 
     // Save off all old Blobs to restore in the case of csminit failure
     Blob originalCsmStateBlob("CSMState", "String");
-    if (cube->hasBlob("String", "CSMState")) {
+    if (cube->hasBlob("CSMState", "String")) {
       cube->read(originalCsmStateBlob);
     }
 
@@ -394,20 +394,20 @@ namespace Isis {
     }
 
     ImagePolygon originalFootprint;
-    if (cube->hasBlob("Polygon", "ImageFootprint")) {
+    if (cube->hasBlob("ImageFootprint", "Polygon")) {
       originalFootprint = cube->readFootprint();
     }
 
     // Remove blob from old csminit run
-    cube->deleteBlob("String", "CSMState");
+    cube->deleteBlob("CSMState", "String");
 
     // Remove tables from spiceinit before writing to the cube
-    cube->deleteBlob("Table", "InstrumentPointing");
-    cube->deleteBlob("Table", "InstrumentPosition");
-    cube->deleteBlob("Table", "BodyRotation");
-    cube->deleteBlob("Table", "SunPosition");
-    cube->deleteBlob("Table", "CameraStatistics");
-    cube->deleteBlob("Polygon", "Footprint");
+    cube->deleteBlob("InstrumentPointing", "Table");
+    cube->deleteBlob("InstrumentPosition", "Table");
+    cube->deleteBlob("BodyRotation", "Table");
+    cube->deleteBlob("SunPosition", "Table");
+    cube->deleteBlob("CameraStatistics", "Table");
+    cube->deleteBlob("Footprint", "Polygon");
 
     // Create our CSM State blob as a string and add the CSM string to the Blob.
     Blob csmStateBlob("CSMState", "String");
@@ -438,7 +438,7 @@ namespace Isis {
         cube->putGroup(originalCsmInfo);
       }
 
-      cube->deleteBlob("String", "CSMState");
+      cube->deleteBlob("CSMState", "String");
 
       // Restore the original blobs
       if (originalCsmStateBlob.Size() != 0) {
@@ -468,7 +468,7 @@ namespace Isis {
 
       if (originalFootprint.Polys() != NULL){
         if (originalFootprint.Polys()->getNumGeometries() != 0) {
-          cube->write(*(originalFootprint.toBlob()));
+          cube->write(originalFootprint);
         }
       }
 

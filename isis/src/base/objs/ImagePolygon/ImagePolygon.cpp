@@ -1336,7 +1336,7 @@ namespace Isis {
   }
 
 
-  Blob *ImagePolygon::toBlob() {
+  Blob ImagePolygon::toBlob() const {
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
     // Check to see p_polygons is valid data
@@ -1348,8 +1348,8 @@ namespace Isis {
     string polyStr = wkt->write(p_polygons);
     delete wkt;
 
-    Blob *newBlob = new Blob("Footprint", "Polygon");
-    newBlob->setData(polyStr.c_str(), polyStr.size());
+    Blob newBlob("Footprint", "Polygon");
+    newBlob.setData(polyStr.c_str(), polyStr.size());
     return newBlob;
   }
 

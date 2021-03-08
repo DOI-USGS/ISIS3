@@ -36,7 +36,7 @@ namespace Isis {
 
       bool operator==(CubeStretch& stretch2);
 
-      Isis::Blob toBlob(QString const& name="CubeStretch") const;
+      Isis::Blob toBlob() const;
 
       QString getType() const;
       void setType(QString stretchType);

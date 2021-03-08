@@ -914,6 +914,20 @@ namespace Isis {
     return origXmlLabel;
   }
 
+
+  Table Cube::readTable(const QString &name) {
+    Blob tableBlob(name, "Table");
+    try {
+      read(tableBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+    return Table(tableBlob);
+  }
+
+
   /**
    * This method will write a blob of data (e.g. History, Table, etc)
    * to the cube as specified by the contents of the Blob object.
@@ -976,13 +990,10 @@ namespace Isis {
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
-// Changed to work with mods to FileName class
-//      blob.Write(p_cube.label,detachedStream,blobFileName.baseName()+"."+
-//                 blob.Type()+"."+
-//                 blobFileName.extension());
       blob.Write(*m_label, detachedStream, blobFileName.name());
     }
   }
+
 
   /**
    * This method will write an OriginalLabel object.
@@ -990,8 +1001,9 @@ namespace Isis {
    *
    * @param Original label data to be written
    */
-  void Cube::write(OriginalLabel lab) {
-    write(*(lab.toBlob()));
+  void Cube::write(OriginalLabel &lab) {
+    Blob labelBlob = lab.toBlob();
+    write(labelBlob);
   }
 
 
@@ -1001,8 +1013,9 @@ namespace Isis {
    *
    * @param Original xml label data to be written
    */
-  void Cube::write(OriginalXmlLabel lab) {
-    write(*(lab.toBlob()));
+  void Cube::write(const OriginalXmlLabel &lab) {
+    Blob labelBlob = lab.toBlob();
+    write(labelBlob);
   }
 
 
@@ -1014,6 +1027,18 @@ namespace Isis {
   void Cube::write(const CubeStretch &cubeStretch) {
     Blob cubeStretchBlob = cubeStretch.toBlob();
     write(cubeStretchBlob);
+  }
+
+
+  void Cube::write(History &history, const QString &name) {
+    Blob histBlob = history.toBlob(name);
+    write(histBlob);
+  }
+
+
+  void Cube::write(const ImagePolygon &polygon) {
+    Blob polyBlob = polygon.toBlob();
+    write(polyBlob);
   }
 
 
@@ -1856,11 +1881,11 @@ namespace Isis {
    * Blob type and name. If blob does not exist it will do nothing and return
    * false.
    *
-   * @param BlobType type of blob to search for (Polygon, Table, etc)
    * @param BlobName blob to be deleted
+   * @param BlobType type of blob to search for (Polygon, Table, etc)
    * @return boolean if it found the blob and deleted it.
    */
-  bool Cube::deleteBlob(QString BlobType, QString BlobName) {
+  bool Cube::deleteBlob(QString BlobName, QString BlobType) {
     for(int i = 0; i < m_label->objects(); i++) {
       PvlObject obj = m_label->object(i);
       if (obj.name().compare(BlobType) == 0) {
@@ -1919,12 +1944,12 @@ namespace Isis {
   /**
    * Check to see if the cube contains a BLOB.
    *
-   * @param type The type of the BLOB to search for
    * @param name The name of the BLOB to search for
+   * @param type The type of the BLOB to search for
    *
    * @return bool True if the BLOB was found
    */
-  bool Cube::hasBlob(const QString &type, const QString &name) {
+  bool Cube::hasBlob(const QString &name, const QString &type) {
     for(int o = 0; o < label()->objects(); o++) {
       PvlObject &obj = label()->object(o);
       if (obj.isNamed(type)) {
@@ -1941,19 +1966,6 @@ namespace Isis {
   }
 
 
-  Table Cube::readTable(const QString &name) {
-    Blob tableBlob(name, "Table");
-    try {
-      read(tableBlob);
-    }
-    catch (IException &e) {
-      QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
-    }
-    return Table(tableBlob);
-  }
-
-
   /**
    * Check to see if the cube contains a pvl table by the provided name
    *
@@ -1962,7 +1974,7 @@ namespace Isis {
    * @return bool True if the pvl table was found
    */
   bool Cube::hasTable(const QString &name) {
-    return hasBlob("Table", name);
+    return hasBlob(name, "Table");
   }
 
 
