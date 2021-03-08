@@ -58,8 +58,9 @@ namespace Isis {
     p_ellipsoid = false;
   }
 
+
   /**
-   *  Constructs a Polygon object, setting the polygon name
+   *  Constructs a Polygon object from a Blob
    *
    */
   ImagePolygon::ImagePolygon(Blob &blob) : ImagePolygon() {
@@ -1336,6 +1337,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Serialize the ImagePolygon to a Blob.
+   *
+   * The polygon will be serialized as a WKT srtring.
+   *
+   * @return @b Blob
+   */
   Blob ImagePolygon::toBlob() const {
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 

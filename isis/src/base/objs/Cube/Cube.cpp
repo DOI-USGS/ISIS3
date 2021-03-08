@@ -836,6 +836,14 @@ namespace Isis {
     m_ioHandler->read(bufferToFill);
   }
 
+
+  /**
+   * Read the History from the Cube.
+   *
+   * @param name The name of the History Blob to read. This is used for reading
+   *             History from Cubes made prior to the History Blob name being
+   *             standardized.
+   */
   History Cube::readHistory(const QString &name) const {
     Blob historyBlob(name, "History");
     try {
@@ -849,6 +857,12 @@ namespace Isis {
     return history;
   }
 
+
+  /**
+   * Read the footprint polygon for the Cube.
+   *
+   * @return @b ImagePolygon
+   */
   ImagePolygon Cube::readFootprint() const {
     Blob footprintBlob("Footprint", "Polygon");
     try {
@@ -864,8 +878,13 @@ namespace Isis {
     return footprint;
   }
 
+
   /**
-   * This method will read an OriginalLabel from a cube.
+   * Read the original PDS3 label from a cube.
+   *
+   * @param name The name of the OriginalLabel Blob
+   *
+   * @return @b OriginalLabel The original PDS3 label as a PVL document
    */
   OriginalLabel Cube::readOriginalLabel(const QString &name) const {
     Blob origLabelBlob(name, "OriginalLabel");
@@ -882,7 +901,13 @@ namespace Isis {
 
 
   /**
-   * This method will read a StretchBlob from a cube.
+   * Read a Stretch from a cube.
+   *
+   * @param name The name of the Stretch Blob
+   * @param keywords A set of keywords and values to match in the Stretch Blob label.
+   *                 This can be used to read the stretch for a specific band.
+   *
+   * @return @b CubeStretch
    */
   CubeStretch Cube::readCubeStretch(QString name, const std::vector<PvlKeyword> keywords) const {
     Blob stretchBlob(name, "Stretch");
@@ -899,7 +924,9 @@ namespace Isis {
 
 
   /**
-   * This method will read an OriginalXmlLabel from a cube.
+   * Read the original PDS4 label from a cube.
+   *
+   * @return @b OriginalXmlLabel The original PDS4 label as an XML document
    */
   OriginalXmlLabel Cube::readOriginalXmlLabel() const {
     Blob origXmlLabelBlob("IsisCube", "OriginalXmlLabel");
@@ -915,6 +942,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Read a Table from the cube.
+   *
+   * @param name The name of the Table to read
+   *
+   * @return @b Table
+   */
   Table Cube::readTable(const QString &name) {
     Blob tableBlob(name, "Table");
     try {
@@ -1019,23 +1053,56 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a Table to the Cube.
+   *
+   * The Table will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readTable.
+   *
+   * @param table The table to write to the Cube
+   */
   void Cube::write(const Table &table) {
     Blob tableBlob = table.toBlob();
     write(tableBlob);
   }
 
+
+  /**
+   * Write a Stretch to the Cube
+   *
+   * The stretch will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readCubeStretch.
+   *
+   * @param cubeStretch The stretch to write to the Cube.
+   */
   void Cube::write(const CubeStretch &cubeStretch) {
     Blob cubeStretchBlob = cubeStretch.toBlob();
     write(cubeStretchBlob);
   }
 
 
+  /**
+   * Write an updated History to the Cube
+   *
+   * The History will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readHistory.
+   *
+   * @param history The history to write to the Cube.
+   * @param name The name for the history BLOB. This is used for backwards compatibility
+   *             with cubes from before the History BLOB name was standardized.
+   */
   void Cube::write(History &history, const QString &name) {
     Blob histBlob = history.toBlob(name);
     write(histBlob);
   }
 
 
+  /**
+   * Write a polygon to the Cube
+   *
+   * The polygon will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readFootprint.
+   */
   void Cube::write(const ImagePolygon &polygon) {
     Blob polyBlob = polygon.toBlob();
     write(polyBlob);

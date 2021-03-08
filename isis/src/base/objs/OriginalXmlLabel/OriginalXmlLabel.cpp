@@ -70,6 +70,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Serialize the OriginalXmlLabel to a Blob.
+   *
+   * @return @b Blob
+   */
   Blob OriginalXmlLabel::toBlob() const {
     std::stringstream sstream;
     sstream << m_originalLabel.toString();

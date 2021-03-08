@@ -20,11 +20,16 @@ namespace Isis {
     m_type(stretchType), m_bandNumber(bandNumber) {
   }
 
+
+  /**
+   * Copy constructor for a CubeStretch
+   */
   CubeStretch::CubeStretch(CubeStretch const& stretch): Stretch(stretch) {
     m_name = stretch.getName();
     m_type = stretch.getType();
     m_bandNumber = stretch.getBandNumber();
   }
+
 
   /**
    * Constructs a CubeStretch object from a normal Stretch.
@@ -48,6 +53,12 @@ namespace Isis {
     m_bandNumber = 1;
   }
 
+
+  /**
+   * Constructs a CubeStretch from a Blob.
+   *
+   * @param blob The Blob to read data from.
+   */
   CubeStretch::CubeStretch(Blob blob) : Stretch() {
     char *buff = blob.getBuffer();
     std::string stringFromBuffer(buff, blob.Size());
@@ -57,10 +68,19 @@ namespace Isis {
     setBandNumber(blob.Label()["BandNumber"][0].toInt());
   }
 
-  // Default destructor
+
+  // CubeStretch destructor
   CubeStretch::~CubeStretch() {
   }
 
+
+  /**
+   * Serialize the CubeStretch to a Blob.
+   *
+   * The stretch will be serialized as a string. See Stretch::Text for more information.
+   *
+   * @return @b Blob a Blob containing the stretch data.
+   */
   Isis::Blob CubeStretch::toBlob() const {
     Isis::Blob blob("CubeStretch", "Stretch");
 
@@ -85,6 +105,7 @@ namespace Isis {
            (getName() == stretch2.getName()) &&
            (Text() == stretch2.Text());
   }
+
 
   /**
    * Get the Type of Stretch.
