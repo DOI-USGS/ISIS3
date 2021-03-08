@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
-
+- The following calibration applications were updated to not require local mission-specific SPICE kernels when working with spiceinited cubes: amicacal, ctxcal, lrowaccal, moccal, mdiscal, hical, hicalbeta, vikcal, and gllssical. This makes it possible to first run spiceinit using the spice server and then run these calibration applications without ever needing to download mission-specific kernels. [#4303](https://github.com/USGS-Astrogeology/ISIS3/issues/4303)
 - Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
 - Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
 - Added the ability to use a Community Sensor Model (CSM) instead of an ISIS camera model. To use a CSM sensor model with a Cube run the csminit application on the Cube instead of spiceinit.
