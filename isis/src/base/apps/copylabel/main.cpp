@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "Cube.h"
 #include "History.h"
+#include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
@@ -227,22 +228,8 @@ void IsisMain() {
     subarea.UpdateLabel(&inOut, &inOut, results);
   }
 
-  // Add History
-  bool found = false;
-  for (int i = 0; i < mergeTo->objects() && !found; i++) {
-    if (mergeTo->object(i).isNamed("History")) {
-      History his((QString)mergeTo->object(i)["Name"]);
-      inOut.read(his);
-      his.AddEntry();
-      inOut.write(his);
-      found = true;
-    }
-  }
-  if (!found) {
-    History his("IsisCube");
-    his.AddEntry();
-    inOut.write(his);
-  }
+  Process process;
+  process.WriteHistory(inOut);
 
   inOut.close();
   sourceCube.close();
@@ -279,4 +266,3 @@ bool copyBlob(Cube * from, Cube * to, QString name, QString type, QString fname)
     return false;
   }
 }
-

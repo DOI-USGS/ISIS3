@@ -345,9 +345,7 @@ namespace Isis {
                                        SerialNumber::Compose(*(InputCubes[0])));
 
         //  Write the tracking table to the tracking cube, overwriting if need-be
-        if (m_trackingCube->hasTable(Isis::trackingTableName)) {
-         m_trackingCube->deleteBlob("Table", Isis::trackingTableName);
-        }
+        m_trackingCube->deleteBlob(Isis::trackingTableName, "Table");
         Table table = trackingTable->toTable();
         m_trackingCube->write(table);
       }

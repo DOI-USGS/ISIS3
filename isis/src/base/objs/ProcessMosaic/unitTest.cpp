@@ -20,20 +20,20 @@ void testIn(int iss, int isl, int isb, int ins = 0, int inl = 0, int inb = 0);
 void testOut(int piSamples, int piLines, int piBands, int piPriority,
              int originBand);
 /**
- * Unit test for ProcessMosaic. 
- *  
- * Tests for correct area drop, tracking origin,  origin band, 
- * priorities input, mosaic and band, options to allow HS, LS 
- * and NULL pixels from input to mosaic, each time displaying 
- * the contents of the input and mosaic pixels for the area 
- * under consideration 
+ * Unit test for ProcessMosaic.
+ *
+ * Tests for correct area drop, tracking origin,  origin band,
+ * priorities input, mosaic and band, options to allow HS, LS
+ * and NULL pixels from input to mosaic, each time displaying
+ * the contents of the input and mosaic pixels for the area
+ * under consideration
  *
  * Also tests for exceptions like number of input and output images to
  * be exactly one each, band cannot be priority if Track is set off and
  * more
  *
- * @author 2009-10-14 Sharmila Prasad 
- *  
+ * @author 2009-10-14 Sharmila Prasad
+ *
  *  @internal
  *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
  *                           test output.
@@ -64,7 +64,7 @@ void IsisMain() {
 
   m1.StartProcess(5, 2, 1); // This should be overwritten by the next StartProcess call
   m1.StartProcess(2, 2, 1);
-  
+
   // Test for "Tracking" group in the mosaic cube
   if (mosaicCube1->hasGroup("Tracking")) {
     qDebug() << "";
@@ -79,8 +79,7 @@ void IsisMain() {
   QString trackingBase = FileName(mosaicCube1->fileName()).removeExtension().expanded().split("/").last();
   Cube *trackingCube1 = new Cube(FileName(trackingBase + "_tracking.cub"));
   try {
-    Table trackTable(ProcessMosaic::TRACKING_TABLE_NAME);
-    trackingCube1->read(trackTable);
+    Table trackTable = trackingCube1->readTable(ProcessMosaic::TRACKING_TABLE_NAME);
     qDebug() << "b. SUCCESS - Track Table Exists in [" << trackingCube1->fileName() << "]";
     qDebug().noquote() << Table::toString( trackTable, "\t" );
   }
@@ -169,7 +168,7 @@ void IsisMain() {
   qDebug() << "5. Test for mosaic priority with existing mosaic";
   ProcessMosaic m5;
   m5.SetImageOverlay(ProcessMosaic::PlaceImagesBeneath);
-  
+
   m5.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
 
   m5.SetOutputCube("TO");
@@ -472,7 +471,7 @@ void IsisMain() {
     p.EndProcess();
     qDebug() << "";
   }
-  
+
   // ***********************************************************
   // Test tracking with ontop priotirty and multiple bands
   qDebug() << "Test tracking with ontop priotirty and multiple bands";
@@ -514,8 +513,8 @@ void IsisMain() {
   }
   remove("isisMosaic_01.cub");
   remove("isisMosaic_01_tracking.cub");
-  
-  
+
+
   // ***********************************************************
   // Testing errors that can occur
   qDebug() << "***********************************************************************************";
@@ -523,19 +522,19 @@ void IsisMain() {
   qDebug() << "    Create output mosaic";
   qDebug() << "    Modify Group [BandBin] so it will differ";
   qDebug() << "    Mosaic the same cube to verify proper error is thrown";
-  
+
   p.SetOutputCube("TO", 5, 5, 1);
   p.EndProcess();
-  
+
   ProcessMosaic m13;
-  m13.SetInputCube("FROM", 1, 1, 1, -1, -1, -1); 
+  m13.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
   Cube *c = m13.SetOutputCube("TO");
   m13.StartProcess(1, 1, 1);
   Pvl *pvl = c->label();
   PvlKeyword &key = pvl->findKeyword("OriginalBand", Pvl::Traverse);
   key[0] = "3";
   m13.EndProcess();
-  
+
   try {
     ProcessMosaic m;
     m.SetOutputCube("TO");
@@ -682,18 +681,18 @@ void testOut(int piSamples, int piLines,
       break;
     }
   }
-  
+
   // Test the tracking cube
   if (cOutCube.hasGroup("Tracking")) {
-    
+
     qDebug() << "";
-    
+
     qDebug() << "***  Tracking Cube  ***  ";
-    
+
     QString trackingBase = FileName(cOutCube.fileName()).removeExtension().expanded().split("/").last();
     trackingCube.open(trackingBase + "_tracking.cub");
     Portal trackingPortal(5, 1, trackingCube.pixelType());
-    
+
     for (int line = 1; line <= 5; line++) {
       trackingPortal.SetPosition(1, line, 1);  //sample, line, band position
       trackingCube.read(trackingPortal);
@@ -701,7 +700,7 @@ void testOut(int piSamples, int piLines,
 
         QString pixelString;
         QString fileIndex;
-        
+
         if (IsSpecial(trackingPortal[iPixel])) {
           if (trackingPortal[iPixel] == Isis::Null) {
             pixelString = "Null";
@@ -728,8 +727,8 @@ void testOut(int piSamples, int piLines,
           pixelString = Isis::toString((unsigned int)trackingPortal[iPixel]);
           fileIndex = Isis::toString((unsigned int)trackingPortal[iPixel] - 2);
         }
-        
-        qDebug() << "(" << Isis::toString(line) 
+
+        qDebug() << "(" << Isis::toString(line)
                  << "," << Isis::toString(iPixel + 1)
                  << ")=" << pixelString
                  << ", " << fileIndex;
@@ -738,7 +737,7 @@ void testOut(int piSamples, int piLines,
     }
     qDebug() << "";
   }
-  
+
   cOutCube.close();
   trackingCube.close();
 }

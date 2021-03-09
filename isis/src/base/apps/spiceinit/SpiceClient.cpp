@@ -11,6 +11,7 @@
 #include <QUrlQuery>
 
 #include "Application.h"
+#include "Blob.h"
 #include "Constants.h"
 #include "IException.h"
 #include "IString.h"
@@ -634,9 +635,9 @@ namespace Isis {
 
     Pvl lab;
     tableStream >> lab;
-
-    Table *table = new Table(tableName);
-    table->Read(lab, tableStream);
+    Blob tableBlob(tableName, "Table");
+    tableBlob.Read(lab, tableStream);
+    Table *table = new Table(tableBlob);
 
     return table;
 

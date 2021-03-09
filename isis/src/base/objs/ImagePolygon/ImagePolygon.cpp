@@ -37,7 +37,7 @@ namespace Isis {
    *  Constructs a Polygon object, setting the polygon name
    *
    */
-  ImagePolygon::ImagePolygon() : Blob("Footprint", "Polygon") {
+  ImagePolygon::ImagePolygon() {
     p_polygons = NULL;
 
     p_cube = NULL;
@@ -56,6 +56,29 @@ namespace Isis {
     p_subpixelAccuracy = 50; //An accuracte and quick number
 
     p_ellipsoid = false;
+  }
+
+
+  /**
+   *  Constructs a Polygon object from a Blob
+   *
+   */
+  ImagePolygon::ImagePolygon(Blob &blob) : ImagePolygon() {
+    p_polyStr = string(blob.getBuffer(), blob.Size());
+
+    geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
+    p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
+
+    p_pts = new geos::geom::CoordinateArraySequence;
+
+    for (auto poly : *p_polygons) {
+      geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
+      for (size_t i = 0; i < coordArray.getSize(); i++) {
+        p_pts->add(geos::geom::Coordinate(coordArray.getAt(i)));
+      }
+    }
+
+    delete wkt;
   }
 
 
@@ -255,6 +278,7 @@ namespace Isis {
       p_gMap->Camera()->IgnoreElevationModel(false);
   }
 
+
   void ImagePolygon::Create(std::vector<std::vector<double>> polyCoordinates) {
     p_pts = new geos::geom::CoordinateArraySequence();
 
@@ -271,6 +295,8 @@ namespace Isis {
 
     Fix360Poly();
   }
+
+
   /**
   * Finds the next point on the image using a left hand rule walking algorithm. To
   * initiate the walk pass it the same point for both currentPoint and lastPoint.
@@ -405,6 +431,7 @@ namespace Isis {
 
     return result;
   }
+
 
   /**
    * This method ensures sample/line after sinc/linc have been applied is inside
@@ -608,7 +635,6 @@ namespace Isis {
    * WARNING: Very large pixel increments for cubes that have cameras/projections
    * with no data at any of the 4 corners can still fail in this algorithm.
    */
-
   void ImagePolygon::WalkPoly() {
     vector<geos::geom::Coordinate> points;
     double lat, lon, prevLat, prevLon;
@@ -1312,56 +1338,13 @@ namespace Isis {
 
 
   /**
-   * Reads Multipolygon from cube blob
+   * Serialize the ImagePolygon to a Blob.
    *
-   * @param[in] is  (std::fstream)   Input stream to read from
+   * The polygon will be serialized as a WKT srtring.
    *
-   * throws Isis::IException::Io - Error reading data from stream
-   *
+   * @return @b Blob
    */
-  void ImagePolygon::ReadData(std::istream &is) {
-
-    streampos sbyte = p_startByte - 1;
-    is.seekg(sbyte, std::ios::beg);
-    if (!is.good()) {
-      QString msg = "Error preparing to read data from " + p_type +
-                   " [" + p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    char *buf = new char[p_nbytes+1];
-    memset(buf, 0, p_nbytes + 1);
-
-    is.read(buf, p_nbytes);
-
-    p_polyStr = buf;
-
-    delete [] buf;
-
-    if (!is.good()) {
-      QString msg = "Error reading data from " + p_type + " [" +
-                   p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
-    p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
-
-    p_pts = new geos::geom::CoordinateArraySequence;
-
-    for (auto poly : *p_polygons) {
-      geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(poly->getCoordinates()));
-      for (int i = 0; i < coordArray.getSize(); i++) {
-        p_pts->add(geos::geom::Coordinate(coordArray.getAt(i)));
-      }
-    }
-
-    delete wkt;
-  }
-
-
-  //!  Initializes for writing polygon to cube blob
-  void ImagePolygon::WriteInit() {
+  Blob ImagePolygon::toBlob() const {
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
     // Check to see p_polygons is valid data
@@ -1369,22 +1352,13 @@ namespace Isis {
       string msg = "Cannot write a NULL polygon!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    p_polyStr = wkt->write(p_polygons);
-    p_nbytes = p_polyStr.size();
 
+    string polyStr = wkt->write(p_polygons);
     delete wkt;
-  }
 
-
-  /**
-   * Writes polygon to cube blob
-   *
-   * @param[in] os   (std::fstream &)  Output steam blob data will be written to
-   *
-   * @throws Isis::iException::Io - Error writing data to stream
-   */
-  void ImagePolygon::WriteData(std::fstream &os) {
-    os.write(p_polyStr.c_str(), p_nbytes);
+    Blob newBlob("Footprint", "Polygon");
+    newBlob.setData(polyStr.c_str(), polyStr.size());
+    return newBlob;
   }
 
 

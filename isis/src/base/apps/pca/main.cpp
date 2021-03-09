@@ -68,8 +68,7 @@ void IsisMain() {
       QString m = "The input cube has not been transformed into its principal components";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-    Isis::Table table("Transform Matrix");
-    icube->read(table);
+    Isis::Table table = icube->readTable("Transform Matrix");
     numDimensions = table.Records();
     TNT::Array2D<double> transform(numDimensions, numDimensions);
     for(int i = 0; i < numDimensions; i++) {

@@ -223,9 +223,9 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
     Pvl &frameletLabel = *frameletCube->label();
     for(int i = 0; i < frameletLabel.objects(); i++) {
       if( frameletLabel.object(i).isNamed("History") ) {
-        History frameletHist( (QString) frameletLabel.object(i)["Name"] );
-        frameletCube->read(frameletHist);
-        frameCube.write(frameletHist);
+        Blob historyBlob((QString) frameletLabel.object(i)["Name"], "History" );
+        frameletCube->read(historyBlob);
+        frameCube.write(historyBlob);
       }
     }
   }

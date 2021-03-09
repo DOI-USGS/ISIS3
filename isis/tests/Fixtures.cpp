@@ -4,11 +4,11 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 
+#include "Blob.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
-#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "ControlNet.h"
 
@@ -508,7 +508,7 @@ namespace Isis {
 
   void MroCtxCube::SetUp() {
     TempTestingFiles::SetUp();
-    
+
     QString testPath = tempDir.path() + "/test.cub";
     QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
     testCube.reset(new Cube(testPath));
@@ -1019,7 +1019,8 @@ namespace Isis {
     loadablePlugin.registerModel(mockModelName, &mockModel);
 
     // CSMState BLOB
-    StringBlob csmStateBlob(mockModelName, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(mockModelName.c_str(), mockModelName.size());
     csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
     csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
     testCube->write(csmStateBlob);
@@ -1089,6 +1090,37 @@ namespace Isis {
         .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
 
     testCam = testCube->camera();
+  }
+
+  void HistoryBlob::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::istringstream hss(R"(
+      Object = mroctx2isis
+        IsisVersion       = "4.1.0  | 2020-07-01"
+        ProgramVersion    = 2016-06-10
+        ProgramPath       = /Users/acpaquette/repos/ISIS3/build/bin
+        ExecutionDateTime = 2020-07-01T16:48:40
+        HostName          = Unknown
+        UserName          = acpaquette
+        Description       = "Import an MRO CTX image as an Isis cube"
+
+        Group = UserParameters
+          FROM    = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W.IMG
+          TO      = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cub
+          SUFFIX  = 18
+          FILLGAP = true
+        End_Group
+      End_Object)");
+
+    hss >> historyPvl;
+
+    std::ostringstream ostr;
+    ostr << historyPvl;
+    std::string histStr = ostr.str();
+
+    historyBlob = Blob("IsisCube", "History");
+    historyBlob.setData(histStr.c_str(), histStr.size());
   }
 
 
