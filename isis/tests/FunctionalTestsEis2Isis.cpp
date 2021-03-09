@@ -16,8 +16,6 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/eis2isis.xml").expanded();
 
-// TODO replace expect with assert
-
 TEST(Eis2Isis, Eis2IsisTestNacDefault) {
   /*
   To test proper run with just the main image and an associated times file
@@ -46,33 +44,33 @@ TEST(Eis2Isis, Eis2IsisTestNacDefault) {
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
-  EXPECT_EQ(cube.sampleCount(), 3);
-  EXPECT_EQ(cube.lineCount(), 60);
-  EXPECT_EQ(cube.bandCount(), 1);
+  ASSERT_EQ(cube.sampleCount(), 3);
+  ASSERT_EQ(cube.lineCount(), 60);
+  ASSERT_EQ(cube.bandCount(), 1);
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "Clipper");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "EIS-NAC-RS" );
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Europa" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2025-01-01T00:00:00.000" );
-  EXPECT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][0].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][1].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][2].toStdString(), "0.0");
+  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Clipper");
+  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "EIS-NAC-RS" );
+  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Europa" );
+  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2025-01-01T00:00:00.000" );
+  ASSERT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][0].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][1].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][2].toStdString(), "0.0");
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kernels["NaifFrameCode"]), -159011 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159011 );
 
   Histogram *hist = cube.histogram();
 
-  EXPECT_NEAR(hist->Average(), 6.1489e+17, 1e+13);
-  EXPECT_NEAR(hist->Sum(), 1.1068e+20, 1e+16);
-  EXPECT_EQ(hist->ValidPixels(), 180);
-  EXPECT_NEAR(hist->StandardDeviation(),  1.2004e+19, 1e+15);
+  ASSERT_NEAR(hist->Average(), 6.1489e+17, 1e+13);
+  ASSERT_NEAR(hist->Sum(), 1.1068e+20, 1e+16);
+  ASSERT_EQ(hist->ValidPixels(), 180);
+  ASSERT_NEAR(hist->StandardDeviation(),  1.2004e+19, 1e+15);
 }
 
 TEST(Eis2Isis, Eis2IsisTestNacCheckline)
@@ -111,34 +109,34 @@ TEST(Eis2Isis, Eis2IsisTestNacCheckline)
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
-  EXPECT_EQ(cube.sampleCount(), 3);
-  EXPECT_EQ(cube.lineCount(), 60);
-  EXPECT_EQ(cube.bandCount(), 1);
+  ASSERT_EQ(cube.sampleCount(), 3);
+  ASSERT_EQ(cube.lineCount(), 60);
+  ASSERT_EQ(cube.bandCount(), 1);
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "Clipper");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "EIS-NAC-RS" );
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Europa" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2025-01-01T00:00:00.000" );
-  EXPECT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][0].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][1].toStdString(), "0.0");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][2].toStdString(), "0.0");
+  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Clipper");
+  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "EIS-NAC-RS" );
+  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Europa" );
+  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2025-01-01T00:00:00.000" );
+  ASSERT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][0].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][1].toStdString(), "0.0");
+  ASSERT_EQ(inst["JitterSampleCoefficients"][2].toStdString(), "0.0");
 
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kernels["NaifFrameCode"]), -159011 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159011 );
 
   Histogram *hist = cube.histogram();
 
-  EXPECT_NEAR(hist->Average(), 6.1489e+17, 1e+13);
-  EXPECT_NEAR(hist->Sum(), 1.1068e+20, 1e+16);
-  EXPECT_EQ(hist->ValidPixels(), 180);
-  EXPECT_NEAR(hist->StandardDeviation(),  1.2004e+19, 1e+15);
+  ASSERT_NEAR(hist->Average(), 6.1489e+17, 1e+13);
+  ASSERT_NEAR(hist->Sum(), 1.1068e+20, 1e+16);
+  ASSERT_EQ(hist->ValidPixels(), 180);
+  ASSERT_NEAR(hist->StandardDeviation(),  1.2004e+19, 1e+15);
   
 }
 
@@ -172,7 +170,7 @@ TEST(Eis2Isis, Eis2IsisTestNacChecklineError)
     FAIL();
   }
   catch (IException &e) {
-    EXPECT_TRUE(e.toString().contains("as the [CHECKLINEREADOUT] parameter"));
+    ASSERT_TRUE(e.toString().contains("as the [CHECKLINEREADOUT] parameter"));
   }
 
 }
@@ -204,19 +202,19 @@ TEST(Eis2Isis, Eis2IsisTestWacDefault) {
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
-  EXPECT_EQ(cube.sampleCount(), 3);
-  EXPECT_EQ(cube.lineCount(), 60);
-  EXPECT_EQ(cube.bandCount(), 1);
+  ASSERT_EQ(cube.sampleCount(), 3);
+  ASSERT_EQ(cube.lineCount(), 60);
+  ASSERT_EQ(cube.bandCount(), 1);
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kernels["NaifFrameCode"]), -159104 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159104 );
 
 
   Histogram *hist = cube.histogram();
 
-  EXPECT_NEAR(hist->Average(), -2.0496e+17, 1e+13);
-  EXPECT_NEAR(hist->Sum(), -3.6893e+19, 1e+16);
-  EXPECT_EQ(hist->ValidPixels(), 180);
-  EXPECT_NEAR(hist->StandardDeviation(),  1.3223e+19, 1e+15);
+  ASSERT_NEAR(hist->Average(), -2.0496e+17, 1e+13);
+  ASSERT_NEAR(hist->Sum(), -3.6893e+19, 1e+16);
+  ASSERT_EQ(hist->ValidPixels(), 180);
+  ASSERT_NEAR(hist->StandardDeviation(),  1.3223e+19, 1e+15);
 }
