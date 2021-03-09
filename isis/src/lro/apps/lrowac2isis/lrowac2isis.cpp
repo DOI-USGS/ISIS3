@@ -230,7 +230,7 @@ namespace Isis {
       }
 
       if(iApp) {
-        History history("IsisCube");
+        History history;
         history.AddEntry();
         uveven->write(history);
       }
@@ -247,7 +247,7 @@ namespace Isis {
       }
 
       if(iApp) {
-        History history("IsisCube");
+        History history;
         history.AddEntry();
         uvodd->write(history);
       }
@@ -264,7 +264,7 @@ namespace Isis {
       }
 
       if(iApp) {
-        History history("IsisCube");
+        History history;
         history.AddEntry();
         viseven->write(history);
       }
@@ -281,7 +281,7 @@ namespace Isis {
       }
 
       if(iApp) {
-        History history("IsisCube");
+        History history;
         history.AddEntry();
         visodd->write(history);
       }
