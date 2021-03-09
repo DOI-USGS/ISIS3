@@ -4,7 +4,7 @@ project (core VERSION 0.0.1)
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option (BUILD_CORE_TESTS "Build core module tests" ON)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Short and long name of this package
 set(PACKAGE            "CORE")

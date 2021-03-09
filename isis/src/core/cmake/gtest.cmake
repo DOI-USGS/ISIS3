@@ -1,5 +1,5 @@
 if (NOT TARGET gtest)
-  set(GOOGLETEST_ROOT ${CMAKE_SOURCE_DIR}/../../../gtest/googletest CACHE STRING "Google Test source root")
+  set(GOOGLETEST_ROOT ${PROJECT_SOURCE_DIR}/../../../gtest/googletest CACHE STRING "Google Test source root")
 
   include_directories(SYSTEM
       ${GOOGLETEST_ROOT}
@@ -19,7 +19,7 @@ if (NOT TARGET gtest)
 endif()
 
 if (NOT TARGET gmock)
-  set(GOOGLEMOCK_ROOT ${CMAKE_SOURCE_DIR}/../../../gtest/googlemock CACHE STRING "Google Mock source root")
+  set(GOOGLEMOCK_ROOT ${PROJECT_SOURCE_DIR}/../../../gtest/googlemock CACHE STRING "Google Mock source root")
 
   include_directories(SYSTEM
       ${GOOGLEMOCK_ROOT}
