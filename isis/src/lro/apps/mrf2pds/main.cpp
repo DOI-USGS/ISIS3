@@ -84,8 +84,7 @@ void IsisMain() {
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label for Level2 images only
   if(bLevel2) {
-    OriginalLabel cOriginalBlob;
-    cInCube->read(cOriginalBlob);
+    OriginalLabel cOriginalBlob = cInCube->readOriginalLabel();
     Pvl cOrigLabel;
     PvlObject cOrigLabelObj = cOriginalBlob.ReturnLabels();
     cOrigLabelObj.setName("OriginalLabelObject");

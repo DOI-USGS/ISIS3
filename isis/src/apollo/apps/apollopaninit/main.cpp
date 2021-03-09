@@ -261,8 +261,6 @@ void IsisMain() {
   //create a table from starttime to endtime (stretched by 3%) with NODES entries
   spPos->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);
   Table tableSunPos = spPos->Cache("SunPosition");
-  tableSunPos.Label() += PvlKeyword("SpkTableStartTime", toString(time0-0.015*(time1-time0)));
-  tableSunPos.Label() += PvlKeyword("SpkTablleEndTime", toString(time1+0.015*(time1-time0)));
   tableSunPos.Label() += PvlKeyword("Description", "Created by apollopaninit");
   panCube.write(tableSunPos);  //attach the table to the cube
 

@@ -26,7 +26,7 @@ using namespace Isis;
 namespace Isis {
     // Working functions and parameters
     static void Calibrate(Buffer &in, Buffer &out);
-    
+
     static Brick *flat;
     static vector <double> dcA;
     static vector <double> dcB;
@@ -35,7 +35,7 @@ namespace Isis {
     static int sum;             // Summing mode
     static int firstSamp;       // First sample
     static double iof;          // conversion from counts/ms to IOF
-    
+
     void ctxcal(UserInterface &ui) {
       Cube icube(ui.GetFileName("FROM"));
       ctxcal(&icube, ui);
@@ -44,7 +44,7 @@ namespace Isis {
     void ctxcal(Cube *icube, UserInterface &ui) {
       // We will be processing by line
       ProcessByLine p;
-    
+
       Isis::Pvl lab(icube->fileName());
       Isis::PvlGroup &inst =
           lab.findGroup("Instrument", Pvl::Traverse);
@@ -90,8 +90,7 @@ namespace Isis {
       if(firstSamp > 0) firstSamp -= 38;
 
       //  Read dark current info, if no dc exit?
-      Table dcTable("Ctx Prefix Dark Pixels");
-      icube->read(dcTable);
+      Table dcTable = icube->readTable("Ctx Prefix Dark Pixels");
       //  TODO::  make sure dc records match cube nlines.
 
       //  If summing mode = 1 , average odd & even dc pixels separately for
@@ -142,14 +141,14 @@ namespace Isis {
       //    iof = conversion factor from counts/ms to i/f
       bool convertIOF = ui.GetBoolean("IOF");
       if(convertIOF) {
-        double dist1 = 1; 
+        double dist1 = 1;
         try {
           Camera *cam;
           cam = icube->camera();
           cam->setTime(startTime);
           dist1 = cam->sunToBodyDist();
         }
-        catch(IException &e) { 
+        catch(IException &e) {
           // Get the distance between Mars and the Sun at the given time in
           // Astronomical Units (AU)
           QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
@@ -168,14 +167,14 @@ namespace Isis {
           NaifStatus::CheckErrors();
 
           dist1 = vnorm_c(sunpos);
-        
+
           NaifStatus::CheckErrors();
           unload_c(bspKernel.toLatin1().data());
           unload_c(satKernel.toLatin1().data());
           unload_c(pckKernel.toLatin1().data());
           NaifStatus::CheckErrors();
         }
-    
+
         double dist = 2.07E8;
         double w0 = 3660.5;
         double w1 = w0 * ((dist * dist) / (dist1 * dist1));
@@ -200,7 +199,7 @@ namespace Isis {
 
 
       ocube->putGroup(calgrp);
-    
+
       // Start the line-by-line calibration sequence
       p.StartProcess(Calibrate);
       p.EndProcess();

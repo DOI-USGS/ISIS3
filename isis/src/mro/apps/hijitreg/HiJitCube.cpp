@@ -12,10 +12,12 @@ find files of those names at the top level of this repository. **/
 
 #include <SpiceUsr.h>
 
+#include "Camera.h"
 #include "FileName.h"
 #include "HiJitCube.h"
 #include "IException.h"
 #include "Instrument.hh"
+#include "iTime.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "NaifStatus.h"
@@ -145,11 +147,13 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      NaifStatus::CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
+      NaifStatus::CheckErrors();
       furnsh_c(lsk.toLatin1().data());
+      NaifStatus::CheckErrors();
       furnsh_c(sClock.toLatin1().data());
+      NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once
       naifLoaded = true;
@@ -158,7 +162,6 @@ namespace Isis {
   }
 
   void HiJitCube::computeStartTime() {
-    loadNaifTiming();
 
 //  Compute the unbinned and binned linerates in seconds
     jdata.unBinnedRate = ((Instrument::LINE_TIME_PRE_OFFSET +
@@ -167,9 +170,27 @@ namespace Isis {
     jdata.linerate = jdata.unBinnedRate * ((double) jdata.summing);
 
     if(!jdata.scStartTime.isEmpty()) {
-      QString scStartTimeString = jdata.scStartTime;
-      scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
-      NaifStatus::CheckErrors();
+
+      try {
+        Camera *cam;
+        cam = camera();
+        // This SetImage at (1,1) is used to match the non-camera code below. (0.5, 0.5) should match the start
+        // clock count of the image, but instead (1, 1) matches. This suggests something odd in the Camera
+        cam->SetImage (1.0, 1.0);
+        jdata.obsStartTime = cam->time().Et();
+      } catch (IException &e) {
+        try {
+          loadNaifTiming();
+          QString scStartTimeString = jdata.scStartTime;
+          NaifStatus::CheckErrors();
+          scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
+          NaifStatus::CheckErrors();
+        } catch (IException &e) {
+            QString message = "Start time of the image can not be determined.";
+            throw IException(e, IException::User, message, _FILEINFO_);
+        }
+      }
+
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)

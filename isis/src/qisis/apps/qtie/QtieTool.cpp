@@ -916,18 +916,7 @@ namespace Isis {
 
     // Update the cube history
     p_matchCube->write(*cmatrix);
-    History h("IsisCube");
-    try {
-      p_matchCube->read(h);
-    }
-    catch (IException &e) {
-      QString message = "Could not read cube history, "
-                        "will not update history.\n";
-      QString errors = e.toString();
-      message += errors;
-      QMessageBox::warning((QWidget *)parent(), "Warning", message);
-      return;
-    }
+    History h = p_matchCube->readHistory();
     PvlObject history("qtie");
     history += PvlKeyword("IsisVersion", Application::Version());
     QString path = QCoreApplication::applicationDirPath();

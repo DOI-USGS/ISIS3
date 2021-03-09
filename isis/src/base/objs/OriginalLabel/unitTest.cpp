@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   cout << p << endl;
   Isis::OriginalLabel ol(p);
 
-  ol.Write("olTemp");
+  ol.toBlob().Write("olTemp");
 
   Isis::OriginalLabel ol2("olTemp");
 

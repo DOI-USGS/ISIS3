@@ -15,3 +15,10 @@ commands:
 	    TO=$(OUTPUT)/corrected_noiof_st_2459265790_w.cub \
 	    units=dn \
 	    > /dev/null;
+
+	# Test spiceinited data
+	$(APPNAME) \
+	    FROM=$(INPUT)/st_2459265790_w.spice.cub \
+	    TO=$(OUTPUT)/corrected_iof_st_2459265790_w.spice.cub \
+	    > /dev/null;
+

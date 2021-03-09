@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
-#include "OriginalLabel.h"
 #include "Message.h"
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
@@ -146,7 +145,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   }
 
   // Create holder for original label
-  OriginalLabel origLabel(*pdsLabel);
   //pdsLabel->write(fi.baseName()+".pvl");
 
   //QFileInfo inputFileInfo(inFile.expanded());

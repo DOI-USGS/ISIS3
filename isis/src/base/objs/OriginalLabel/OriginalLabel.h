@@ -32,15 +32,17 @@ namespace Isis {
    *   @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
    *
    */
-  class OriginalLabel : public Isis::Blob {
+  class OriginalLabel {
     public:
       OriginalLabel();
       OriginalLabel(const QString &file);
+      OriginalLabel(Isis::Blob &blob);
       OriginalLabel(Pvl pvl);
       ~OriginalLabel();
 
       // Return the original labels
-      Pvl ReturnLabels();
+      Pvl ReturnLabels() const;
+      Isis::Blob toBlob();
 
     protected:
       // prepare data for writing
@@ -49,8 +51,8 @@ namespace Isis {
     private:
       // labels of original source
       Pvl m_originalLabel;
+      void fromBlob(Isis::Blob blob);
   };
 };
 
 #endif
-

@@ -54,8 +54,7 @@ TEST_F(DefaultCube, FunctionalTestsSpkwriterDefault) {
     FAIL() << "Unable to generate camera with new spk kernel: " << e.toString().toStdString().c_str() << std::endl;
   }
 
-  Table oldInstPositionTable("InstrumentPosition");
-  testCube->read(oldInstPositionTable);
+  Table oldInstPositionTable = testCube->readTable("InstrumentPosition");
 
   Table newInstPositionTable = newKernelCube.camera()->instrumentPosition()->Cache("InstrumentPosition");
 
@@ -114,8 +113,7 @@ TEST_F(DefaultCube, FunctionalTestsSpkwriterFromlist) {
     FAIL() << "Unable to generate camera with new spk kernel: " << e.toString().toStdString().c_str() << std::endl;
   }
 
-  Table oldInstPositionTable("InstrumentPosition");
-  testCube->read(oldInstPositionTable);
+  Table oldInstPositionTable = testCube->readTable("InstrumentPosition");
 
   Table newInstPositionTable = newKernelCube.camera()->instrumentPosition()->Cache("InstrumentPosition");
 

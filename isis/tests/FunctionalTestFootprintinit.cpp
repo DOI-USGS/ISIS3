@@ -25,8 +25,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -48,8 +47,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitLincSinc) {
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(95, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -71,8 +69,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitVertices) {
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(43, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -94,8 +91,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitCamera) {
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(34, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -117,8 +113,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitTestXY) {
   footprintinit(testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
@@ -146,8 +141,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitPrecision) {
   ASSERT_EQ(100, log.findGroup("Results").findKeyword("LINC")[0].toInt());
   ASSERT_EQ(100, log.findGroup("Results").findKeyword("SINC")[0].toInt());
 
-  ImagePolygon poly;
-  testCube->read(poly);
+  ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();

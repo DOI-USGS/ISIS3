@@ -77,17 +77,17 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString inputName = ui.GetFileName("FROM");
   QString outputName = ui.GetFileName("TO");
-  
+
   // Confirm that the input mosaic is of pixel-type "Real" as trackextract does not work on other
   // bit types due to corruption of these files
   Cube inputCube = Cube(inputName);
   PixelType pixelType = inputCube.pixelType();
   if (pixelType != Real) {
-    QString msg = "The input mosaic [" + inputName + "] is of pixel type [" 
+    QString msg = "The input mosaic [" + inputName + "] is of pixel type ["
     + PixelTypeName(pixelType) + "]. This application only works for mosaics of pixel type Real.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   QVector<QString> copyBands;
   int trackBand;
   findTrackBand(inputName, copyBands, trackBand);
@@ -170,7 +170,7 @@ void createMosaicCube(QString inputName, QString outputName, QVector<QString> ba
                      _FILEINFO_);
   }
 
-  if (!mosaicCube.deleteBlob("Table", "InputImages")) {
+  if (!mosaicCube.deleteBlob("InputImages", "Table")) {
     QString msg = "The input cube [" + inputName + "] does not have a tracking table.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -255,8 +255,7 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
 
   // Create new tracking table with updated data and delete the old table
   if (trackCube.hasTable("InputImages")) {
-    Table oldTable("InputImages");
-    trackCube.read(oldTable);
+    Table oldTable = trackCube.readTable("InputImages");
     trackCube.deleteBlob("Table", "InputImages");
 
     TrackingTable newTrackTable(oldTable);

@@ -4,11 +4,11 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 
+#include "Blob.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
-#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "ControlNet.h"
 
@@ -508,7 +508,7 @@ namespace Isis {
 
   void MroCtxCube::SetUp() {
     TempTestingFiles::SetUp();
-    
+
     QString testPath = tempDir.path() + "/test.cub";
     QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
     testCube.reset(new Cube(testPath));
@@ -517,6 +517,123 @@ namespace Isis {
 
   void MroCtxCube::TearDown() {
     testCube.reset();
+  }
+
+
+  void GalileoSsiCube::SetUp() {
+    DefaultCube::SetUp();
+
+    // Change default dims 
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue("800");
+    dim.findKeyword("Lines").setValue("800");
+    dim.findKeyword("Bands").setValue("1");
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-77001");
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "Galileo Orbiter"
+        InstrumentId              = "SOLID STATE IMAGING SYSTEM"
+        TargetName                = IO
+        SpacecraftClockStartCount = 05208734.39
+        StartTime                 = 1999-10-11T18:05:15.815
+        ExposureDuration          = 0.04583 <seconds>
+        GainModeId                = 100000
+        TelemetryFormat           = IM4
+        LightFloodStateFlag       = ON
+        InvertedClockStateFlag    = "NOT INVERTED"
+        BlemishProtectionFlag     = OFF
+        ExposureType              = NORMAL
+        ReadoutMode               = Contiguous
+        FrameDuration             = 8.667 <seconds>
+        Summing                   = 1
+        FrameModeId               = FULL
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = testCube->label()->findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName   = RED
+        FilterNumber = 2
+        Center       = 0.671 <micrometers>
+        Width        = .06 <micrometers>
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE                  = 501
+        BODY501_RADII              = (1829.4, 1819.3, 1815.7)
+        BODY_FRAME_CODE            = 10023
+        INS-77001_FOCAL_LENGTH     = 1500.46655964
+        INS-77001_K1               = -2.4976983626e-05
+        INS-77001_PIXEL_PITCH      = 0.01524
+        INS-77001_TRANSX           = (0.0, 0.01524, 0.0)
+        INS-77001_TRANSY           = (0.0, 0.0, 0.01524)
+        INS-77001_ITRANSS          = (0.0, 65.6167979, 0.0)
+        INS-77001_ITRANSL          = (0.0, 0.0, 65.6167979)
+        INS-77001_BORESIGHT_SAMPLE = 400.0
+        INS-77001_BORESIGHT_LINE   = 400.0
+      End_Object
+    )");
+    
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    std::istringstream ar(R"(
+    Group = Archive
+      DataSetId     = GO-J/JSA-SSI-2-REDR-V1.0
+      ProductId     = 24I0146
+      ObservationId = 24ISGLOCOL01
+      DataType      = RADIANCE
+      CalTargetCode = 24
+    End_Group
+    )");
+
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
+    PvlGroup newArchive; 
+    ar >> newArchive;
+    archive = newArchive;
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+        for(int i = 0; i < line.size(); i++) {
+          line[i] = (double)(i+1);
+        }
+        testCube->write(line);
+    }
+
+    // need to remove old camera pointer
+    delete testCube;
+    testCube = new Cube(newCube, "rw");
+  }
+
+
+  void GalileoSsiCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
   }
 
 
@@ -902,7 +1019,8 @@ namespace Isis {
     loadablePlugin.registerModel(mockModelName, &mockModel);
 
     // CSMState BLOB
-    StringBlob csmStateBlob(mockModelName, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(mockModelName.c_str(), mockModelName.size());
     csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
     csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
     testCube->write(csmStateBlob);
@@ -972,6 +1090,37 @@ namespace Isis {
         .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
 
     testCam = testCube->camera();
+  }
+
+  void HistoryBlob::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::istringstream hss(R"(
+      Object = mroctx2isis
+        IsisVersion       = "4.1.0  | 2020-07-01"
+        ProgramVersion    = 2016-06-10
+        ProgramPath       = /Users/acpaquette/repos/ISIS3/build/bin
+        ExecutionDateTime = 2020-07-01T16:48:40
+        HostName          = Unknown
+        UserName          = acpaquette
+        Description       = "Import an MRO CTX image as an Isis cube"
+
+        Group = UserParameters
+          FROM    = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W.IMG
+          TO      = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cub
+          SUFFIX  = 18
+          FILLGAP = true
+        End_Group
+      End_Object)");
+
+    hss >> historyPvl;
+
+    std::ostringstream ostr;
+    ostr << historyPvl;
+    std::string histStr = ostr.str();
+
+    historyBlob = Blob("IsisCube", "History");
+    historyBlob.setData(histStr.c_str(), histStr.size());
   }
 
 

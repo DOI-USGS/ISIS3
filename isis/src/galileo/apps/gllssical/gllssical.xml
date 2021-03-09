@@ -128,6 +128,14 @@
     negative I/F values in the output. We will not be supporting this behavior
     as negative I/F are not useful and do not make sense. Thus, this app
     outputs LRS for any negative I/F values that are encountered.
+
+    <p> 
+    If run on a non-spiceinited cube, this program requires access to local mission-specific 
+    SPICE kernels, in order to find the distance between the sun and the target body. 
+    When run on a spiceinited cube, this can be determined using the camera model.
+    Using a spiceinited cube as input has the advantage of not requiring that local 
+    mission-specific kernels be available. (See spiceinit web=true.)
+    </p>
   </description>
 
   <history>

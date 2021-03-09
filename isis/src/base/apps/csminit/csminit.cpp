@@ -29,7 +29,6 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "StringBlob.h"
 
 using namespace std;
 
@@ -364,54 +363,55 @@ namespace Isis {
     }
 
     // Save off all old Blobs to restore in the case of csminit failure
-    StringBlob originalCsmStateBlob("", "CSMState");
-    if (cube->hasBlob("String", "CSMState")) {
+    Blob originalCsmStateBlob("CSMState", "String");
+    if (cube->hasBlob("CSMState", "String")) {
       cube->read(originalCsmStateBlob);
     }
 
     Table originalInstrumentPointing("InstrumentPointing");
     if (cube->hasTable("InstrumentPointing")) {
-      cube->read(originalInstrumentPointing);
+      originalInstrumentPointing = cube->readTable("InstrumentPointing");
     }
 
     Table originalInstrumentPosition("InstrumentPosition");
     if (cube->hasTable("InstrumentPosition")) {
-      cube->read(originalInstrumentPosition);
+      originalInstrumentPosition = cube->readTable("InstrumentPosition");
     }
 
     Table originalBodyRotation("BodyRotation");
     if (cube->hasTable("BodyRotation")) {
-      cube->read(originalBodyRotation);
+      originalBodyRotation = cube->readTable("BodyRotation");
     }
 
     Table originalSunPosition("SunPosition");
     if (cube->hasTable("SunPosition")) {
-      cube->read(originalSunPosition);
+      originalSunPosition = cube->readTable("SunPosition");
     }
 
     Table originalCameraStatistics("CameraStatistics");
     if (cube->hasTable("CameraStatistics")) {
-      cube->read(originalCameraStatistics);
+      originalCameraStatistics = cube->readTable("CameraStatistics");
     }
 
     ImagePolygon originalFootprint;
-    if (cube->hasBlob("Polygon", "ImageFootprint")) {
-      cube->read(originalFootprint);
+    if (cube->hasBlob("ImageFootprint", "Polygon")) {
+      originalFootprint = cube->readFootprint();
     }
 
     // Remove blob from old csminit run
-    cube->deleteBlob("String", "CSMState");
+    cube->deleteBlob("CSMState", "String");
 
     // Remove tables from spiceinit before writing to the cube
-    cube->deleteBlob("Table", "InstrumentPointing");
-    cube->deleteBlob("Table", "InstrumentPosition");
-    cube->deleteBlob("Table", "BodyRotation");
-    cube->deleteBlob("Table", "SunPosition");
-    cube->deleteBlob("Table", "CameraStatistics");
-    cube->deleteBlob("Polygon", "Footprint");
+    cube->deleteBlob("InstrumentPointing", "Table");
+    cube->deleteBlob("InstrumentPosition", "Table");
+    cube->deleteBlob("BodyRotation", "Table");
+    cube->deleteBlob("SunPosition", "Table");
+    cube->deleteBlob("CameraStatistics", "Table");
+    cube->deleteBlob("Footprint", "Polygon");
 
     // Create our CSM State blob as a string and add the CSM string to the Blob.
-    StringBlob csmStateBlob(modelState, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(modelState.c_str(), modelState.size());
     PvlObject &blobLabel = csmStateBlob.Label();
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);
@@ -438,7 +438,7 @@ namespace Isis {
         cube->putGroup(originalCsmInfo);
       }
 
-      cube->deleteBlob("String", "CSMState");
+      cube->deleteBlob("CSMState", "String");
 
       // Restore the original blobs
       if (originalCsmStateBlob.Size() != 0) {
@@ -465,7 +465,9 @@ namespace Isis {
         cube->write(originalCameraStatistics);
       }
 
-      if (originalFootprint.Size() != 0) {
+
+      if (originalFootprint.Polys() != NULL &&
+          originalFootprint.Polys()->getNumGeometries() != 0) {
         cube->write(originalFootprint);
       }
 

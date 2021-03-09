@@ -637,8 +637,7 @@ namespace Isis {
       inlab = *icube->label();
       for(int i = 0; i < inlab.objects(); i++) {
         if (inlab.object(i).isNamed("OriginalLabel")) {
-          OriginalLabel ol;
-          icube->read(ol);
+          OriginalLabel ol = icube->readOriginalLabel();
           ocube->write(ol);
         }
       }

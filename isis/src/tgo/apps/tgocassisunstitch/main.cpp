@@ -101,7 +101,7 @@ void IsisMain() {
 
   // Collect the tables and history from the input stitched cube
   QList<Blob> inputTables;
-  QScopedPointer<History> inputHistory;
+  History inputHistory;
   for(int i = 0; i < inputLabel->objects(); i++) {
     if(inputLabel->object(i).isNamed("Table")) {
       Blob table((QString)inputLabel->object(i)["Name"], inputLabel->object(i).name());
@@ -109,9 +109,8 @@ void IsisMain() {
       inputTables.append(table);
     }
     if(inputLabel->object(i).isNamed("History") && Isis::iApp != NULL) {
-      inputHistory.reset( new History((QString)inputLabel->object(i)["Name"]) );
-      cube->read(*inputHistory);
-      inputHistory->AddEntry();
+      inputHistory = cube->readHistory((QString)inputLabel->object(i)["Name"]);
+      inputHistory.AddEntry();
     }
   }
 
@@ -212,7 +211,7 @@ void IsisMain() {
     }
 
     // Propagate History
-    g_outputCubes[i]->write(*inputHistory);
+    g_outputCubes[i]->write(inputHistory);
 
     // Close output cube
     g_outputCubes[i]->close();

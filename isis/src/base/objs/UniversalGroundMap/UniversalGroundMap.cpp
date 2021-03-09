@@ -335,8 +335,7 @@ namespace Isis {
     // If we have a footprint, use it
     try {
       if (cube) {
-        ImagePolygon poly;
-        cube->read(poly);
+        ImagePolygon poly = cube->readFootprint();
         geos::geom::MultiPolygon *footprint = PolygonTools::MakeMultiPolygon(
             poly.Polys()->clone());
 

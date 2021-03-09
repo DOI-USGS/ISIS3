@@ -189,6 +189,11 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class GalileoSsiCube : public DefaultCube {
+    protected:
+      void SetUp() override;
+      void TearDown() override;
+  };
 
   class MgsMocCube : public DefaultCube {
     protected:
@@ -265,6 +270,14 @@ class CSMCameraDemFixture : public CSMCubeFixture {
   protected:
     Camera *testCam;
     double demRadius;
+
+    void SetUp() override;
+};
+
+class HistoryBlob : public TempTestingFiles {
+  protected:
+    Blob historyBlob;
+    PvlObject historyPvl;
 
     void SetUp() override;
 };

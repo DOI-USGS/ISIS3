@@ -118,12 +118,9 @@ namespace Isis {
     }
 
     // Concatenate all TDIs into one keyword
-    OriginalLabel redOrgLab;
-    redOrgLab.Blob::Read(redFile);
-    OriginalLabel irOrgLab;
-    irOrgLab.Blob::Read(irFile);
-    OriginalLabel bgOrgLab;
-    bgOrgLab.Blob::Read(bgFile);
+    OriginalLabel redOrgLab(redFile);
+    OriginalLabel irOrgLab(irFile);
+    OriginalLabel bgOrgLab(bgFile);
 
     PvlGroup redGrp = redOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
     PvlGroup irGrp = irOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);

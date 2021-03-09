@@ -119,7 +119,7 @@ namespace Isis {
 
     // Add History
     if (iApp) {
-        History history("IsisCube");
+        History history = g_ocube->readHistory();
         history.AddEntry();
         g_ocube->write(history);
     }

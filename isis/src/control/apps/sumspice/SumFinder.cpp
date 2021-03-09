@@ -180,14 +180,14 @@ namespace Isis {
     return ( m_closest );
   }
 
-  void SumFinder::setCube(const QString &name) {
-
+  void SumFinder::resetCube() {
     // Always close out the kernels and cubes.
     m_kernels.reset();
     m_cube.reset();
+  }
 
-    // Empty string clears cube from state
-    if ( name.isEmpty() ) {   return;  }
+  void SumFinder::setCube(const QString &name) {
+    resetCube();
 
     m_cubename =  name;
     m_cube.reset( new Cube(name, "rw") );
@@ -686,29 +686,6 @@ namespace Isis {
       }
     }
     return (ndeleted);
-  }
-
-  /**
-   * Writes out the History blob to m_cube
-   */
-  void SumFinder::writeHistory() {
-    bool addedHist = false;
-    Isis::Pvl &inlab = *m_cube->label();
-    for (int i = 0; i < inlab.objects(); i++) {
-      if ( inlab.object(i).isNamed("History") && Isis::iApp != NULL ) {
-        Isis::History h( (QString) inlab.object(i)["Name"] );
-        m_cube->read(h);
-        h.AddEntry();
-        m_cube->write(h);
-        addedHist = true;
-      }
-    }
-
-    if (!addedHist && Isis::iApp != NULL) {
-      Isis::History h("IsisCube");
-      h.AddEntry();
-      m_cube->write(h);
-    }
   }
 }
 // namespace Isis

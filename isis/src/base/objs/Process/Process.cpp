@@ -189,7 +189,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  void Process::SetInputCube(Cube *cube, 
+  void Process::SetInputCube(Cube *cube,
                                     int requirements) {
     // Test for same size or one in all dimensions
     if(requirements & Isis::AllMatchOrOne) {
@@ -628,8 +628,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
           if(inlab.object(i).isNamed("OriginalLabel")) {
-            Isis::OriginalLabel ol;
-            InputCubes[0]->read(ol);
+            Isis::OriginalLabel ol = InputCubes[0]->readOriginalLabel(inlab.object(i)["Name"]);
             cube->write(ol);
           }
         }
@@ -882,18 +881,19 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         Isis::Pvl & inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
           if(inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
-            Isis::History h((QString)inlab.object(i)["Name"]);
-            InputCubes[0]->read(h);
+            QString histBlobName = (QString)inlab.object(i)["Name"];
+            History h = InputCubes[0]->readHistory(histBlobName);
             h.AddEntry();
-            cube.write(h);
+            cube.write(h, histBlobName);
             addedHist = true;
           }
         }
       }
 
       if(!addedHist && Isis::iApp != NULL) {
-        Isis::History h("IsisCube");
+        Isis::History h = cube.readHistory();
         h.AddEntry();
+
         cube.write(h);
       }
     }
