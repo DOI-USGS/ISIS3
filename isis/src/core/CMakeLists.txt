@@ -95,6 +95,10 @@ target_include_directories(core PUBLIC ${GEOS_INCLUDE_DIR} ${CSPICE_INCLUDE_DIR}
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION  ${CMAKE_INSTALL_PREFIX}/include/isis)
 install(TARGETS core DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
+# Copy the preferences file
+EXECUTE_PROCESS(COMMAND cp -f ${PROJECT_SOURCE_DIR}/IsisPreferences ${CMAKE_BINARY_DIR}/)
+install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
+
 if (BUILD_CORE_TESTS)
   # Copy the test preferences file
   EXECUTE_PROCESS(COMMAND cp -f ${PROJECT_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
