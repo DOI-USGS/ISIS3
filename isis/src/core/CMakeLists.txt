@@ -104,10 +104,11 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION  ${CMAKE_INSTALL_PRE
 install(TARGETS core DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 if (BUILD_CORE_TESTS)
+  # Copy the test preferences file
+  EXECUTE_PROCESS(COMMAND cp -f ${PROJECT_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
   enable_testing()
   add_subdirectory(tests)
 endif()
-
 if(buildSwig)
   add_subdirectory(swig)
 endif()
