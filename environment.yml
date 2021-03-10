@@ -50,6 +50,7 @@ dependencies:
   - sqlite
   - suitesparse
   - superlu
+  - swig
   - tnt
   - x264=20131218
   - xalan-c
