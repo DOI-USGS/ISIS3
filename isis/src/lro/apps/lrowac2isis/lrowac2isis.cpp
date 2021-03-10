@@ -24,17 +24,17 @@ using namespace std;
 
 namespace Isis {
 
-  vector<Cube *> outputCubes;
-  vector<int> frameletLines;
+  static vector<Cube *> outputCubes;
+  static vector<int> frameletLines;
   static void separateFramelets(Buffer &in);
   static void writeNullsToFile();
   static void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
                        Pvl &isis3UvEven, Pvl &isis3UvOdd, UserInterface &ui);
   static void ValidateInputLabels(Pvl &pdsLab);
 
-  std::vector<int> padding;
-  int colorOffset = 0;
-  int inputCubeLines = 0;
+  static std::vector<int> padding;
+  static int colorOffset = 0;
+  static int inputCubeLines = 0;
 
   // Output UV Files
   static Cube *uveven = NULL;
@@ -44,9 +44,9 @@ namespace Isis {
   static Cube *viseven = NULL;
   static Cube *visodd = NULL;
 
-  Stretch lookupTable;
+  static Stretch lookupTable;
 
-  bool flip = false;
+  static bool flip = false;
 
   void lrowac2isis(UserInterface &ui) {
     colorOffset = 0;

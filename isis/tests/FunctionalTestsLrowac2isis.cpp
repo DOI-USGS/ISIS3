@@ -249,9 +249,9 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
   QTemporaryDir prefix;
 
-  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.";
+  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.cub";
   QVector<QString> args = {"from=data/lrowac2isis/wac0000a1c4_cropped.img",
-                           "to=" + cubeFileName + "cub",
+                           "to=" + cubeFileName,
                            "coloroffset=true"};
 
   UserInterface options(APP_XML, args);
@@ -407,9 +407,9 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
   QTemporaryDir prefix;
 
-  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.";
+  QString cubeFileName = prefix.path() + "/lrowac2isisTEMP.cub";;
   QVector<QString> args = {"from=data/lrowac2isis/wac0000a1c4_cropped.img",
-                           "to=" + cubeFileName + "cub",
+                           "to=" + cubeFileName,
                            "unlut=false"};
 
   UserInterface options(APP_XML, args);
