@@ -29,7 +29,6 @@
 #include <QDomDocument>
 
 #include "FileName.h"
-#include "PvlTokenizer.h"
 
 namespace Isis {
   class Pvl;

@@ -38,7 +38,6 @@
 #include "PixelType.h"
 #include "Process.h"
 #include "Pvl.h"
-#include "PvlTokenizer.h"
 #include "SpecialPixel.h"
 
 #define EXPONENT_MASK ((char) 0x7F)
@@ -1201,10 +1200,10 @@ namespace Isis {
 
 
   /**
-   * Given a CubeAttributeOutput object, set min/max to propagate if 
-   * propagating min/max attributes was requested and set the pixel 
-   * type to propagate if pixel type propagation was requested.  
-   * 
+   * Given a CubeAttributeOutput object, set min/max to propagate if
+   * propagating min/max attributes was requested and set the pixel
+   * type to propagate if pixel type propagation was requested.
+   *
    * @param parameter The parameter name that holds the output file name.
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
@@ -1992,7 +1991,7 @@ namespace Isis {
               break;
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
-              break;            
+              break;
           case Isis::UnsignedInteger:
             (*out)[samp] = (double)swapper.Uint32_t(&in[bufferIndex]);
             break;

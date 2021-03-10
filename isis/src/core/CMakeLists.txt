@@ -34,25 +34,17 @@ set(Pvl_source_files ${PROJECT_SOURCE_DIR}/src/ArraySubscriptNotInRange.cpp
                      ${PROJECT_SOURCE_DIR}/src/KeywordValueExpected.cpp
                      ${PROJECT_SOURCE_DIR}/src/KeywordValueNotInList.cpp
                      ${PROJECT_SOURCE_DIR}/src/KeywordValueNotInRange.cpp
-                     ${PROJECT_SOURCE_DIR}/src/LabelTranslationManager.cpp
                      ${PROJECT_SOURCE_DIR}/src/MemoryAllocationFailed.cpp
                      ${PROJECT_SOURCE_DIR}/src/MissingDelimiter.cpp
                      ${PROJECT_SOURCE_DIR}/src/Preference.cpp
                      ${PROJECT_SOURCE_DIR}/src/Pvl.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlContainer.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlFlatMap.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlFormat.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlFormatPds.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlGroup.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlKeyword.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlObject.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlSequence.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlToPvlTranslationManager.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlToXmlTranslationManager.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlToken.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlTokenizer.cpp
-                     ${PROJECT_SOURCE_DIR}/src/PvlTranslationTable.cpp
-                     ${PROJECT_SOURCE_DIR}/src/TextFile.cpp)
+                     ${PROJECT_SOURCE_DIR}/src/PvlSequence.cpp)
 # Define a target
 add_library(core "${Pvl_source_files}")
 

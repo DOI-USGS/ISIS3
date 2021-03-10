@@ -1,6 +1,16 @@
 # List of classes with old ISIS unitTests
-set(unitTestClasses PvlKeyword
-                    FileName)
+set(unitTestClasses "FileName"
+                    "IException"
+                    "IString"
+                    "Message"
+                    "Preference"
+                    "Pvl"
+                    "PvlContainer"
+                    "PvlFormat"
+                    "PvlFormatPds"
+                    "PvlGroup"
+                    "PvlKeyword"
+                    "PvlSequence")
 
 foreach (class ${unitTestClasses})
   set(testFile "${CMAKE_CURRENT_SOURCE_DIR}/${class}/unitTest.cpp")
@@ -14,7 +24,7 @@ foreach (class ${unitTestClasses})
   # Set up a cmake script which will run the executable
   # and then check the results against the truth file.
   set(testScript "${PROJECT_SOURCE_DIR}/cmake/RunUnitTest.cmake")
-  set(fullTestPath "${CMAKE_BINARY_DIR}/tests/unitTests/${executableName}") # The binary that the script will execute
+  set(fullTestPath "${CMAKE_BINARY_DIR}/tests/unitTests/${executableName}")
 
   set(testName ${executableName})
   add_test(NAME ${testName}

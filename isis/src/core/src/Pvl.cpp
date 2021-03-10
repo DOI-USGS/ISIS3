@@ -29,7 +29,6 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Message.h"
-#include "PvlTokenizer.h"
 #include "PvlFormat.h"
 
 using namespace std;
