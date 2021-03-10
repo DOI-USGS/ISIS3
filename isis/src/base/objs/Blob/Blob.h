@@ -54,6 +54,7 @@ namespace Isis {
       Blob(const QString &name, const QString &type,
            const QString &file);
       Blob(const Blob &other);
+      Blob() = default;
       Blob &operator=(const Blob &other);
 
       virtual ~Blob();
@@ -65,14 +66,19 @@ namespace Isis {
 
       void Read(const QString &file, const std::vector<PvlKeyword>
                 keywords=std::vector<PvlKeyword>());
-      void Read(const QString &file, const Pvl &pvlLabels, 
+      void Read(const QString &file, const Pvl &pvlLabels,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
-      virtual void Read(const Pvl &pvl, std::istream &is, 
+      virtual void Read(const Pvl &pvl, std::istream &is,
                         const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());
 
       void Write(const QString &file);
       void Write(Pvl &pvl, std::fstream &stm,
                  const QString &detachedFileName = "", bool overwrite=true);
+
+
+      char *getBuffer();
+      void setData(const char *buffer, int nbytes);
+      void takeData(char *buffer, int nbytes);
 
     protected:
       void Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>());

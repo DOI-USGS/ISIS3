@@ -13,10 +13,10 @@ find files of those names at the top level of this repository. **/
 #include <geos_c.h>
 
 #include "Cube.h"
-#include "GisBlob.h"
 #include "GisGeometry.h"
 #include "GisTopology.h"
 #include "IException.h"
+#include "ImagePolygon.h"
 #include "IString.h"
 #include "Preference.h"
 
@@ -37,7 +37,7 @@ void printTypes();
  *   @history 2016-02-23 Jeannie Backer - Original version.
  *   @history 2016-03-02 Ian Humphrey - Added tests for remaining untested methods.
  *                           References #2398.
- *   @history 2016-03-04 Ian Humphrey - Updated test and truthdata for equals() method. 
+ *   @history 2016-03-04 Ian Humphrey - Updated test and truthdata for equals() method.
  *                           References #2398.
  *
  *
@@ -47,12 +47,12 @@ void printTypes();
  *        For the other methods, if (0 != this->m_preparedGeom)'s else clause
  *          is untested. Only the default constructor will create a GisGeometry
  *          without a prepared geometry being instantiated. All the other constructors
- *          as well as setGeometry() instantiate prepared geometries. 
+ *          as well as setGeometry() instantiate prepared geometries.
  *          So, to test the else clause, the prepared geometry would have to be NULL after
- *          instantiation. 
+ *          instantiation.
  *          The prepared geometry is created with makePrepared(), which calls
  *          GisTopology::preparedGeometry(). This method throws an exception
- *          if the prepared geometry is NULL. 
+ *          if the prepared geometry is NULL.
  *
  * NOTE - setGeometry() is also untested.
  */
@@ -69,20 +69,20 @@ int main() {
     double xlongitude = 0;
     double ylatitude = 0;
     GisGeometry geomLatLon(xlongitude, ylatitude);
-    printBasicInfo(geomLatLon, 
+    printBasicInfo(geomLatLon,
                    "Construct Geometry from Lat/Lon");
 
     QString inputFile = "$ISISTESTDATA/isis/src/messenger/unitTestData/EW0211286081G.lev1.cub";
     Cube cube;
     cube.open(inputFile);
     GisGeometry geomCube(cube);
-    printBasicInfo(geomCube, 
+    printBasicInfo(geomCube,
                    "Construct Geometry from Cube");
 
-    GisBlob footprint(cube);
-    QString wkt = footprint.polygon();
+    ImagePolygon footprint = cube.readFootprint();
+    QString wkt = QString::fromStdString(footprint.polyStr());
     GisGeometry geomGisWKT(wkt, GisGeometry::WKT);
-    printBasicInfo(geomGisWKT, 
+    printBasicInfo(geomGisWKT,
                    "Construct Geometry from WKT GIS source");
 
     const GEOSGeometry *g = geomCube.geometry();
@@ -90,18 +90,18 @@ int main() {
     //QString wkb = topo->wkb(clone, GisTopology::DestroyGeometry);
     QString wkb = topo->wkb(clone);
     GisGeometry geomGisWKB(wkb, GisGeometry::WKB);
-    printBasicInfo(geomGisWKB, 
+    printBasicInfo(geomGisWKB,
                    "Construct Geometry from WKB GIS source");
 
 
     GisGeometry geomGisIsisCube("$ISISTESTDATA/isis/src/messenger/unitTestData/EW0213634118G.lev1.cub",
                                 GisGeometry::IsisCube);
-    printBasicInfo(geomGisIsisCube, 
+    printBasicInfo(geomGisIsisCube,
                    "Construct Geometry from IsisCube GIS source");
 
     GEOSGeometry *geos = topo->geomFromWKT(wkt);
     GisGeometry geomGEOS(geos);
-    printBasicInfo(geomGEOS, 
+    printBasicInfo(geomGEOS,
                    "Construct Geometry from GEOSGeometry");
 //???
     GisGeometry geomDefault;
@@ -152,7 +152,7 @@ int main() {
 
     // Test intersectRatio where target has area of 0
     qDebug() << "Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry: "
-             << geomGisWKT.intersectRatio(geomLatLon); 
+             << geomGisWKT.intersectRatio(geomLatLon);
     qDebug() << "";
 
     GisGeometry *envelopeGeom = geomCube.envelope();
@@ -179,14 +179,14 @@ int main() {
 
     // These two tests below should output empty geometries
     GisGeometry *intersectionInvalidSourceGeometry = geomDefault.intersection(geomGisWKT);
-    printBasicInfo(*intersectionInvalidSourceGeometry, 
+    printBasicInfo(*intersectionInvalidSourceGeometry,
                    "Intersection Geometry of Invalid Geometry with WKT Geometry as target");
 
     GisGeometry *intersectionInvalidTargetGeometry = geomGisWKT.intersection(geomDefault);
     printBasicInfo(*intersectionInvalidTargetGeometry,
                    "Intersection Geometry of WKT Geometry with Invalid Geometry as target");
 
-    
+
     GisGeometry *intersectionGeom = geomGisIsisCube.intersection(geomGisWKT);
     printBasicInfo(*intersectionGeom,
                    "Intersection Geometry of GisIsisCube Geometry with WKT Geometry");
@@ -204,7 +204,7 @@ int main() {
     GisGeometry *unionGeom = geomGisIsisCube.g_union(geomGisWKT);
     printBasicInfo(*unionGeom,
                    "Union Geometry of GisIsisCube Geometry with WKT Geometry");
-    
+
     GisGeometry *centroidInvalidGeom = geomDefault.centroid();
     printBasicInfo(*centroidInvalidGeom,
                    "Centroid Geometry of Invalid Geometry");
@@ -246,8 +246,8 @@ int main() {
 }
 
 
-/** 
- * Method to print basic information about the given geometry 
+/**
+ * Method to print basic information about the given geometry
  */
 void printBasicInfo(GisGeometry geom, QString description) {
   qDebug() << description;
@@ -263,8 +263,8 @@ void printBasicInfo(GisGeometry geom, QString description) {
 }
 
 
-/** 
- * Method to print information about this GisGeometry with relation to another 
+/**
+ * Method to print information about this GisGeometry with relation to another
  */
 void printTargetInfo(GisGeometry geom,  GisGeometry target, QString description) {
   qDebug() << description;
@@ -275,11 +275,11 @@ void printTargetInfo(GisGeometry geom,  GisGeometry target, QString description)
   qDebug() << "    overlaps?        " << toString(geom.overlaps(target));
   qDebug() << "    equals?          " << toString(geom.equals(target));
   qDebug() << "    intersect ratio? " << toString(geom.intersectRatio(target));
-  qDebug() << "";                            
+  qDebug() << "";
 }
 
 
-/** 
+/**
  * Method to test the static type() and typeToString() methods.
  */
 void printTypes() {
@@ -296,4 +296,3 @@ void printTypes() {
   qDebug() << "";
 
 }
-

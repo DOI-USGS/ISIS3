@@ -53,21 +53,13 @@ void IsisMain() {
     }
 
     //  Make sure cube has been run through footprintinit
-    ImagePolygon *poly = new ImagePolygon;
-    try {
-      cube.read(*poly);
-      cube.close();
-    }
-    catch(IException &e) {
-      QString msg = "Footprintinit must be run prior to running footprintmerge";
-      msg += " for cube [" + imageList[img].toString() + "]";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+    ImagePolygon poly = cube.readFootprint();
+    cube.close();
 
     //  If more than 1 poly, set conv360 for later conversion to 180 and merging
-    if(poly->Polys()->getNumGeometries() > 1) conv360 = true;
+    if(poly.Polys()->getNumGeometries() > 1) conv360 = true;
 
-    allPolys.push_back(PolygonTools::CopyMultiPolygon(poly->Polys()));
+    allPolys.push_back(PolygonTools::CopyMultiPolygon(poly.Polys()));
 
     files.push_back(imageList[img].toString());
 

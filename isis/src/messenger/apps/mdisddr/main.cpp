@@ -196,8 +196,7 @@ void IsisMain() {
     // output PDS file (required for 5 band IMAGE object).
     Cube from;
     from.open(input.expanded());
-    OriginalLabel origBlob;
-    from.read(origBlob);
+    OriginalLabel origBlob = from.readOriginalLabel();
     Pvl origLabel;
     PvlObject origLabelObj = origBlob.ReturnLabels();
     origLabelObj.setName("OriginalLabelObject");

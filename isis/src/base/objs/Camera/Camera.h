@@ -228,11 +228,14 @@ namespace Isis {
    *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to
    *                           collect the InstrumentId from the original cube label for
    *                           comparisons related to image imports in ipce. References #5460.
+   *   @history 2021-03-04 Victor Silva - Made changes to GetLocalNormal to calculate local normal
+   *                           accurately for LRO by changing 4 corner surrounding points from adding
+   *                           0.5 to line and sample and wrapping value with nexttoward.Fixes #4018.
    */
 
   class Camera : public Sensor {
     public:
-      // constructors
+      // constructors 
       Camera(Cube &cube);
 
       // destructor

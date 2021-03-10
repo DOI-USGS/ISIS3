@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-#include "StringBlob.h"
+#include "Blob.h"
 #include "Cube.h"
 #include "Camera.h"
 
@@ -234,8 +234,8 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
 }
 
 TEST_F(SmallCube, TestCubeHasBlob) {
-  StringBlob testBlob("Test String", "TestBlob");
+  Blob testBlob("TestBlob", "SomeBlob");
   testCube->write(testBlob);
-  EXPECT_TRUE(testCube->hasBlob("String", "TestBlob"));
-  EXPECT_FALSE(testCube->hasBlob("String", "SomeOtherTestBlob"));
+  EXPECT_TRUE(testCube->hasBlob("TestBlob", "SomeBlob"));
+  EXPECT_FALSE(testCube->hasBlob("SomeOtherTestBlob", "SomeBlob"));
 }

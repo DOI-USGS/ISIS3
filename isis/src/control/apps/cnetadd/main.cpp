@@ -397,15 +397,7 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
 
 
 QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
-  ImagePolygon poly;
-  try {
-    cube.read(poly);
-  }
-  catch (IException &e) {
-    QString msg = "Footprintinit must be run prior to running cnetadd";
-    msg += " with POLYGON=TRUE for cube [" + cube.fileName() + "]";
-    throw IException(e, IException::User, msg, _FILEINFO_);
-  }
+  ImagePolygon poly = cube.readFootprint();
 
   std::vector<void *> matches;
   MultiPolygon *polys = poly.Polys();

@@ -11,7 +11,6 @@
 #include "MockCsmPlugin.h"
 #include "Mocks.h"
 #include "TestUtilities.h"
-#include "StringBlob.h"
 #include "FileName.h"
 #include "Fixtures.h"
 

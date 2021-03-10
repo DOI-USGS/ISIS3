@@ -19,6 +19,7 @@ find files of those names at the top level of this repository. **/
 #include <QPointF>
 #include <QString>
 
+#include "Blob.h"
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -32,7 +33,6 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
-#include "StringBlob.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -52,12 +52,13 @@ namespace Isis {
    *             ISIS Camera Model.
    */
   CSMCamera::CSMCamera(Cube &cube) : Camera(cube) {
-    StringBlob state("","CSMState");
+    Blob state("CSMState", "String");
     cube.read(state);
     PvlObject &blobLabel = state.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];
-    init(cube, pluginName, modelName, QString::fromStdString(state.string()));
+    QString stateString = QString::fromUtf8(state.getBuffer(), state.Size());
+    init(cube, pluginName, modelName, stateString);
   }
 
 

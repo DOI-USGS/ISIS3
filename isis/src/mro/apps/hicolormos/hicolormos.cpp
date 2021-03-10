@@ -270,8 +270,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   mos += specialProcessingFlag;
 
   //get the orginal label
-  OriginalLabel from1OrgLab;
-  from1OrgLab.Blob::Read(from1->fileName());
+  OriginalLabel from1OrgLab(from1->fileName());
 
   Cube c;
   c.open(ui.GetFileName("TO"), "rw");

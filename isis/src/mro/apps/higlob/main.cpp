@@ -50,13 +50,13 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Get the cube prefix and suffix table
-  icube->read(hifix);
+  hifix = icube->readTable("HiRISE Ancillary");
 
   // Get the calibration prefix and suffix table
-  icube->read(calfix);
+  calfix = icube->readTable("HiRISE Calibration Ancillary");
 
   // Get the calibration image table
-  icube->read(calimg);
+  calimg = icube->readTable("HiRISE Calibration Image");
 
   // Add the number of buffer pixels and dark pixels to the ouput NS
   samples += hifix[0]["BufferPixels"].size() + hifix[0]["DarkPixels"].size();

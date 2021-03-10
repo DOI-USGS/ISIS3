@@ -13,7 +13,6 @@
 #include "iTime.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
-#include "Process.h"
 #include "ProgramLauncher.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -82,8 +81,7 @@ namespace Isis{
 
       // Add the orginal label blob
       if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
-        OriginalLabel orig;
-        incube->read(orig);
+        OriginalLabel orig = incube->readOriginalLabel();
         Pvl p = orig.ReturnLabels();
         p.setName("OriginalLabel");
         params.addObject(p);
@@ -372,7 +370,7 @@ namespace Isis{
           if (getFootBlob) {
             // Need to read history to obtain parameters that were used to
             // create the footprint
-            History hist("IsisCube", incube->fileName());
+            History hist = incube->readHistory();
             Pvl pvl = hist.ReturnHist();
             PvlObject::PvlObjectIterator objIter;
             bool found = false;

@@ -63,7 +63,7 @@ namespace Isis {
   // TODO: DOCUMENT EVERYTHING
   Spice::Spice(Cube &cube) {
     Pvl &lab = *cube.label();
-    if (cube.hasBlob("String", "CSMState")) {
+    if (cube.hasBlob("CSMState", "String")) {
       csmInit(cube, lab);
     }
     else {
