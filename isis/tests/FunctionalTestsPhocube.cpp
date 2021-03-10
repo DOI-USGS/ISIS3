@@ -27,6 +27,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   Pvl *isisLabel = cube.label();
 
   // Only need to check that the bands were set correctly, do not need to check the image data
+  // since the Camera tests should test for the correct output.
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
   ASSERT_EQ(cube.bandCount(), 5);
@@ -179,7 +180,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
 TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "emission=false", "radec=true", 
-                           "incidence=false", "latitude=false", "longitude=false",};
+                           "incidence=false", "latitude=false", "longitude=false"};
   UserInterface options(APP_XML, args);
   phocube(testCube, options);
 
@@ -242,5 +243,65 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
 
   EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Center"), 1.0);
   EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Width"), 1.0);
+  cube.close();
+}
+
+// Tests that we can process radar data.
+// Since the camera tests should test for exact output,
+// just test that the output is in a range.
+TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "phase=no", "emission=no", "incidence=no",
+                           "latitude=no", "longitude=no", "subspacecraftgroundazimuth=yes"};
+  UserInterface options(APP_XML, args);
+  phocube(testCube, options);
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "Sub Spacecraft Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "H RECEIVE INTENSITY");
+  
+  LineManager outLine(cube);
+  for (int i = 1; i <= cube.lineCount(); i++) { 
+    outLine.SetLine(i);
+    cube.read(outLine);
+    for (int j = 0; j < outLine.size(); j++) { 
+      if (i < 3) {
+        EXPECT_TRUE(outLine[j] > 1.0);
+      }
+      else {
+        EXPECT_TRUE(outLine[j] < 1.0);
+      }
+    }
+  }
+
+  cube.close();
+}
+
+TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "phase=no", "emission=no", "incidence=no",
+                           "latitude=no", "longitude=no", "dn=yes"};
+  UserInterface options(APP_XML, args);
+  resizeCube(5, 5, 1);
+  testCube->label()->findObject("IsisCube").deleteGroup("BandBin");
+  phocube(testCube, options);
+
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "DN");
   cube.close();
 }

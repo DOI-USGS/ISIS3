@@ -365,6 +365,21 @@ namespace Isis {
   }
 
 
+  void MiniRFCube::SetUp() {
+    TempTestingFiles::SetUp();
+    testCube = new Cube("data/miniRFImage/LSZ_04866_1CD_XKU_89N109_V1_lev1.crop.cub");
+  }
+
+
+  void MiniRFCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
+
+
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
 

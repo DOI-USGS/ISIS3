@@ -111,6 +111,14 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class MiniRFCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class ThreeImageNetwork : public TempTestingFiles {
     protected:
 
