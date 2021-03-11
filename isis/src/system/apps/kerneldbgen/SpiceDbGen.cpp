@@ -228,7 +228,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
   //finalize the filename so that it may be used in spice routines
   QString tmp = fileIn.expanded();
-//  const char* file = fileIn.expanded().c_str();
+  //  const char* file = fileIn.expanded().c_str();
   furnsh_c(tmp.toLatin1().data());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
