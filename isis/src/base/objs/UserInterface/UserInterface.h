@@ -9,7 +9,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "Gui.h"
 #include "IsisAml.h"
-#include "PvlTokenizer.h"
 
 class Gui;
 
@@ -199,7 +198,7 @@ namespace Isis {
     private:
       void loadBatchList(const QString file);
       void loadCommandLine(QVector<QString> &args, bool ignoreAppName=true);
-       
+
       void loadCommandLine(int argc, char *argv[]);
       void loadHistory(const QString file);
 
