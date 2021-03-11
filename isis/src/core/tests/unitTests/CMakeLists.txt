@@ -24,7 +24,7 @@ foreach (class ${unitTestClasses})
   # Set up a cmake script which will run the executable
   # and then check the results against the truth file.
   set(testScript "${PROJECT_SOURCE_DIR}/cmake/RunUnitTest.cmake")
-  set(fullTestPath "${CMAKE_BINARY_DIR}/tests/unitTests/${executableName}")
+  set(fullTestPath $<TARGET_FILE:${executableName}>)
 
   set(testName ${executableName})
   add_test(NAME ${testName}

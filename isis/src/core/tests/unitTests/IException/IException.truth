@@ -30,7 +30,6 @@ what():
 Test Error 5
 toPvl():
 Group = Error
-  Program = Unknown
   Class   = "USER ERROR"
   Code    = 2
   Message = "Testing user error"
@@ -39,7 +38,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Code    = 1
   Message = "Testing unknown error"
   File    = unitTest.cpp
@@ -47,17 +45,15 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
-  File    = unitTest.cpp
-  Line    = 38
+  Class = "USER ERROR"
+  Code  = 2
+  File  = unitTest.cpp
+  Line  = 38
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
+  Class = "USER ERROR"
+  Code  = 2
 End_Group
 End
 what():
@@ -167,7 +163,6 @@ Standard Format -- toString():
 
 Pvl Format -- print():
 Group = Error
-  Program = Unknown
   Class   = "I/O ERROR"
   Code    = 4
   Message = "Testing I/O error"
@@ -176,7 +171,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Class   = "PROGRAMMER ERROR"
   Code    = 3
   Message = "Testing programmer error"
@@ -185,7 +179,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Class   = "USER ERROR"
   Code    = 2
   Message = "Testing user error"
@@ -194,7 +187,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Code    = 1
   Message = "Testing unknown error"
   File    = unitTest.cpp
@@ -202,23 +194,20 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
-  File    = unitTest.cpp
-  Line    = 38
+  Class = "USER ERROR"
+  Code  = 2
+  File  = unitTest.cpp
+  Line  = 38
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
+  Class = "USER ERROR"
+  Code  = 2
 End_Group
 End
 
 Pvl Format -- toString():
 Group = Error
-  Program = Unknown
   Class   = "I/O ERROR"
   Code    = 4
   Message = "Testing I/O error"
@@ -227,7 +216,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Class   = "PROGRAMMER ERROR"
   Code    = 3
   Message = "Testing programmer error"
@@ -236,7 +224,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Class   = "USER ERROR"
   Code    = 2
   Message = "Testing user error"
@@ -245,7 +232,6 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
   Code    = 1
   Message = "Testing unknown error"
   File    = unitTest.cpp
@@ -253,17 +239,15 @@ Group = Error
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
-  File    = unitTest.cpp
-  Line    = 38
+  Class = "USER ERROR"
+  Code  = 2
+  File  = unitTest.cpp
+  Line  = 38
 End_Group
 
 Group = Error
-  Program = Unknown
-  Class   = "USER ERROR"
-  Code    = 2
+  Class = "USER ERROR"
+  Code  = 2
 End_Group
 End
 
