@@ -62,6 +62,7 @@ namespace Isis {
    */
   class PvlContainer {
     public:
+      PvlContainer() = default;
       PvlContainer(const QString &type);
       PvlContainer(const QString &type, const QString &name);
       PvlContainer(const PvlContainer &other);
