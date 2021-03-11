@@ -83,3 +83,51 @@ TEST_F(LargeCube, FunctionalTestCropSkip2) {
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 425);
   EXPECT_NEAR(oCubeStats->StandardDeviation(), 14.714259545157688, 0.0000000001);
 }
+
+TEST_F(LargeCube, FunctionalTestCropSkip5) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=5", "nsamples=10", "sinc=5", "line=5", "nlines=10", "linc=5"};
+
+    UserInterface options(APP_XML, args);
+    try {
+      crop(options);
+    }
+    catch (IException &e) {
+      FAIL() << "Unable to open image: " << e.what() << std::endl;
+    }
+
+    Cube oCube(outCubeFileName, "r");
+
+    Histogram *oCubeStats = oCube.histogram();
+
+    EXPECT_NEAR(oCubeStats->Average(), 6.5, 0.01);
+    EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 26);
+    EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 4);
+    EXPECT_NEAR(oCubeStats->StandardDeviation(), 2.8867513459481291, 0.0000000001);
+}
+
+TEST_F(LargeCube, FunctionalTestCropNoSpice) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=5", "nsamples=10", "sinc=5", "line=5", "nlines=10", "linc=5", "propspice=false"};
+
+    UserInterface options(APP_XML, args);
+    try {
+      crop(options);
+    }
+    catch (IException &e) {
+      FAIL() << "Unable to open image: " << e.what() << std::endl;
+    }
+
+    Cube oCube(outCubeFileName, "r");
+
+    Histogram *oCubeStats = oCube.histogram();
+
+    EXPECT_NEAR(oCubeStats->Average(), 6.5, 0.01);
+    EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 26);
+    EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 4);
+    EXPECT_NEAR(oCubeStats->StandardDeviation(), 2.8867513459481291, 0.0000000001);
+}
