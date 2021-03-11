@@ -26,7 +26,6 @@
 #include <fstream>
 
 #include "FileName.h"
-#include "PvlTokenizer.h"
 #include "PvlTranslationTable.h"
 
 namespace Isis {

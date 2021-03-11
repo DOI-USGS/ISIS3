@@ -27,7 +27,6 @@
 #include <string>
 
 #include "FileName.h"
-#include "PvlTokenizer.h"
 
 namespace Isis {
   class Pvl;
@@ -69,7 +68,7 @@ namespace Isis {
    *                          LabelTranslationManager. Fixes #4584.
    *  @history 2017-06-13 Adam Paquette - Changed PvlTranslationManager file name to
    *                          PvlToPvlTranslationManager. Fixes #4901.
-   *  @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect 
+   *  @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect
    *                          changes made to voy2isis. Fixes #4345, #4421.
    *  @history 2018-04-16 Jeannie Backer - Fixed indentation of history comments and
    *                          brought code closer to coding standards.

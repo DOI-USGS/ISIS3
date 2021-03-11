@@ -30,7 +30,6 @@
 #include "IString.h"
 #include "FileName.h"
 #include "Constants.h"
-#include "TextFile.h"
 
 #include "PvlFormatPds.h"
 

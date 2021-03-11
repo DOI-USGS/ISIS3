@@ -25,7 +25,6 @@
 #include "Message.h"
 #include "FileName.h"
 #include "PvlKeyword.h"
-#include "TextFile.h"
 #include "Pvl.h"
 #include "PvlFormat.h"
 

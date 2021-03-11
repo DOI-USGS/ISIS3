@@ -40,7 +40,6 @@
 #include "PvlKeyword.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
-#include "PvlTokenizer.h"
 #include "PvlToPvlTranslationManager.h"
 #include "SpecialPixel.h"
 #include "Table.h"
