@@ -1,3 +1,6 @@
+#ifndef eis2isis_h
+#define eis2isis_h
+
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.
@@ -6,14 +9,10 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "Isis.h"
 #include "UserInterface.h"
-#include "eis2isis.h"
 
-using namespace std;
-using namespace Isis;
-
-void IsisMain() {
-  UserInterface &ui = Application::GetUserInterface();
-  eis2isis(ui);
+namespace Isis {
+  extern void eis2isis(UserInterface &ui);
 }
+
+#endif
