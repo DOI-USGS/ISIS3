@@ -1,5 +1,3 @@
-SPICE Kernel Automated Updates
-
 SPICE kernels are required for the use of most ISIS applications. ISIS provides SPICE kernels for each mission
 in the ISISDATA area . For information on how to download the ISISDATA area, see: [Download Mission Data](https://github.com/USGS-Astrogeology/ISIS3#mission-specific-data-downloads)
 
