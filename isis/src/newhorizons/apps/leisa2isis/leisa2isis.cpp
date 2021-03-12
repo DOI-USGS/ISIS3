@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "leisa2isis.h"
 
 #include "Cube.h"
@@ -250,7 +258,7 @@ namespace Isis {
       PvlGroup extensionLabel = importFits.fitsImageLabel(5);
       importFits.SetOrganization(ProcessImport::BIL);
       importFits.setProcessFileStructure(5);
-      Cube *output = importFits.SetOutputCube("ERRORMAP");
+      Cube *output = importFits.SetOutputCube("ERRORMAP", ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl origLabel;
@@ -269,7 +277,7 @@ namespace Isis {
       PvlGroup extensionLabel = importFits.fitsImageLabel(6);
       importFits.SetOrganization(ProcessImport::BIL);
       importFits.setProcessFileStructure(6);
-      Cube *output = importFits.SetOutputCube("QUALITY");
+      Cube *output = importFits.SetOutputCube("QUALITY", ui);
 
       // Save the input FITS label in the Cube original labels
       Pvl origLabel;

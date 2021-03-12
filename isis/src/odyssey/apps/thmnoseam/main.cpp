@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QString>
@@ -100,7 +108,7 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    throw IException(e, IException::User, 
+    throw IException(e, IException::User,
                      "Unable to run thmnoseam with the given even input cube.", _FILEINFO_);
   }
 
@@ -118,7 +126,7 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    throw IException(e, IException::User, 
+    throw IException(e, IException::User,
                      "Unable to run thmnoseam with the given odd input cube.", _FILEINFO_);
   }
 

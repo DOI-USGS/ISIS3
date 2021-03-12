@@ -1,26 +1,13 @@
 #ifndef MatchPair_h
 #define MatchPair_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QString>
 #include <QSharedPointer>
@@ -34,21 +21,21 @@ namespace Isis {
 
 /**
  * @brief Container for a feature match pair of data sources
- *  
- *  
- * @author 2015-08-10 Kris Becker 
- * @internal 
- *   @history 2015-08-10 Kris Becker - Original Version 
+ *
+ *
+ * @author 2015-08-10 Kris Becker
+ * @internal
+ *   @history 2015-08-10 Kris Becker - Original Version
  */
 
 class MatchPair {
   public:
     MatchPair(const MatchImage &query,
-              const MatchImage &train, 
-              const Matches &matches, 
+              const MatchImage &train,
+              const Matches &matches,
               const cv::Mat &homography,
               const cv::Mat &fundamental,
-              const double &matchTime) { 
+              const double &matchTime) {
       m_data = new MatchData();
       m_data->m_query = query;
       m_data->m_train = train;
@@ -73,7 +60,7 @@ class MatchPair {
     QString target() const {
       QString v_target = m_data->m_query.target();
       if ( v_target.isEmpty() ) { v_target = m_data->m_train.target(); }
-      return ( v_target ); 
+      return ( v_target );
     }
 
     inline const MatchImage &query() const {
@@ -148,20 +135,20 @@ class MatchPair {
     inline int correspondence(double *p_repeatability = 0) const {
       float v_repeatability;
       int   v_correspondence;
-      evaluateFeatureDetector(m_data->m_query.image(), 
-                              m_data->m_train.image(), 
+      evaluateFeatureDetector(m_data->m_query.image(),
+                              m_data->m_train.image(),
                               m_data->m_homography,
-                              &m_data->m_query.keypoints(), 
-                              &m_data->m_train.keypoints(), 
+                              &m_data->m_query.keypoints(),
+                              &m_data->m_train.keypoints(),
                               v_repeatability, v_correspondence);
       if ( p_repeatability != 0 ) {  *p_repeatability =  v_repeatability; }
-      return (v_correspondence); 
+      return (v_correspondence);
     }
 
     inline double repeatability() const {
       double v_repeatability;
       (void) correspondence(&v_repeatability);
-      // return ( (double) correspondence() / (double) m_data->m_query.size() ); 
+      // return ( (double) correspondence() / (double) m_data->m_query.size() );
       return ( v_repeatability );
     }
 
@@ -178,11 +165,11 @@ class MatchPair {
     }
 
     inline double duration() const {
-      return ( query().time() + train().time() + this->time() ); 
+      return ( query().time() + train().time() + this->time() );
     }
 
     inline double speed() const {
-      return ( duration() / (double) (query().size() + train().size()) ); 
+      return ( duration() / (double) (query().size() + train().size()) );
     }
 
     inline double distance() const {
@@ -245,31 +232,31 @@ class MatchPair {
     }
 
   private:
-    /** 
+    /**
      *  Shared Image data pointer
-     *  
-     * @author 2015-08-10 Kris Becker 
-     * @internal 
-     *   @history 2015-08-10 Kris Becker - Original Version 
+     *
+     * @author 2015-08-10 Kris Becker
+     * @internal
+     *   @history 2015-08-10 Kris Becker - Original Version
      */
     class MatchData : public QSharedData {
       public:
-        MatchData() : QSharedData(), m_query(), m_train(), 
+        MatchData() : QSharedData(), m_query(), m_train(),
                       m_epipolar_matches(), m_homography_matches(), m_matches(),
                       m_duration(0), m_homography(cv::Mat::eye(3,3,CV_64F)),
                       m_homography_inverse(cv::Mat::eye(3,3,CV_64F)),
                       m_epipolar(cv::Mat::eye(3,3,CV_64F)), m_errors() { }
         MatchData(const MatchData &other) : QSharedData(other),
-                                            m_query(other.m_query), 
-                                            m_train(other.m_train), 
-                                            m_epipolar_matches(), 
+                                            m_query(other.m_query),
+                                            m_train(other.m_train),
+                                            m_epipolar_matches(),
                                             m_homography_matches(),
                                             m_matches(),
-                                            m_duration(0), 
+                                            m_duration(0),
                                             m_homography(cv::Mat::eye(3,3,CV_64F)),
-                                            m_homography_inverse(cv::Mat::eye(3,3,CV_64F)), 
-                                            m_epipolar(cv::Mat::eye(3,3,CV_64F)), 
-                                            m_errors() { } 
+                                            m_homography_inverse(cv::Mat::eye(3,3,CV_64F)),
+                                            m_epipolar(cv::Mat::eye(3,3,CV_64F)),
+                                            m_errors() { }
         ~MatchData() { }
 
         inline void addTime(const double &delta) {

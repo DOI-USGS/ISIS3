@@ -1,25 +1,11 @@
-/**
- * @file
- * $Revision: 1.5 $
- * $Date: 2010/05/12 23:28:12 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "RosettaOsirisCameraDistortionMap.h"
 
@@ -35,7 +21,7 @@ namespace Isis {
    * @param parent the parent camera that will use this distortion map
    *
    */
-  RosettaOsirisCameraDistortionMap::RosettaOsirisCameraDistortionMap(Camera *parent) : 
+  RosettaOsirisCameraDistortionMap::RosettaOsirisCameraDistortionMap(Camera *parent) :
                                                                    CameraDistortionMap(parent) {
     // Initialize to the identity transform
     m_toUnDistortedX = LinearAlgebra::zeroMatrix(4, 4);
@@ -50,23 +36,23 @@ namespace Isis {
 
   /**
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
-   * 
+   *
    * The distortion is modeled by pixelspace polynomials. The polynomials use
    * zero-based pixel space with the origin at the top left corner of the
    * image, so the input focal plane coordinates are converted to pixel
    * coordinates using the boresight location and pixel pitch. After
    * computation, they are converted back into focal plane coordinates by the
    * inverse process.
-   * 
+   *
    * Given a set of distorted pixel coordinates (dx, dy), the undistorted pixel
    * coordinates (ux, uy) are computed as:
    * @f[ (ux, uy) = F(dx, dy) = ( \sum_{i=0}^3 \sum_{j=0}^3 C_{i,j}^x dx^i dy^j,
    * \sum_{i=0}^3 \sum_{j=0}^3 C_{i,j}^y dx^i dy^j) @f] where @f$ C_{i,j}^y @f$
    * and @f$ C_{i,j}^y @f$ are the @f$ (i,j)^{\text{th}} @f$ coefficients of
    * the @f$ x @f$ and @f$ y @f$ polynomials respectively.
-   * 
+   *
    * This calculation is actually performed as follows:
-   * @f[ (ux, uy) = 
+   * @f[ (ux, uy) =
    * \left( C^x \begin{bmatrix} 1 \\ dx \\ dx^2 \\ dx^3 \end{bmatrix}
    *        \cdot \begin{bmatrix} 1 \\ dy \\ dy^2 \\ dy^3 \end{bmatrix},
    *        C^y \begin{bmatrix} 1 \\ dx \\ dx^2 \\ dx^3 \end{bmatrix}
@@ -115,12 +101,12 @@ namespace Isis {
 
   /**
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
-   * 
+   *
    * The conversion is performed using Newton's method to find distorted
    * coordinates whose undistorted coordinates are within @f$ 10^{-7} @f$
    * pixels of the input undistorted coordinates. The input undistorted
    * coordinates are used as an initial guess for the distorted coordinates.
-   * 
+   *
    * Given a set of undistorted pixel coordinates (ux, uy), the object function
    * is:
    * @f[
@@ -128,7 +114,7 @@ namespace Isis {
    * @f]
    * where @f$ F @f$ is the transformation from distorted to undistorted pixel
    * coordinates.
-   * 
+   *
    * Then, the negative jacobian is:
    * @f[
    * -J_G(dx, dy) = \begin{bmatrix}
@@ -283,7 +269,7 @@ namespace Isis {
 
   /**
    * Set the matrix for converting from distorted to undistorted samples.
-   * 
+   *
    * @param xMat The conversion matrix
    */
   void RosettaOsirisCameraDistortionMap::setUnDistortedXMatrix(LinearAlgebra::Matrix xMat) {
@@ -293,7 +279,7 @@ namespace Isis {
 
   /**
    * Set the matrix for converting from distorted to undistorted lines.
-   * 
+   *
    * @param yMat The conversion matrix
    */
   void RosettaOsirisCameraDistortionMap::setUnDistortedYMatrix(LinearAlgebra::Matrix yMat) {
@@ -304,7 +290,7 @@ namespace Isis {
   /**
    * Set the boresight location for converting from focal plane coordinates to
    * pixel coordinates.
-   * 
+   *
    * @param sample The sample location of the boresight
    * @param line The line location of the boresight
    */
@@ -317,7 +303,7 @@ namespace Isis {
   /**
    * Set the pixel pitch for converting from focal plane coordinates to
    * pixel coordinates.
-   * 
+   *
    * @param pitch The pixel pitch in mm per pixel.
    */
   void RosettaOsirisCameraDistortionMap::setPixelPitch(double pitch) {
@@ -327,9 +313,9 @@ namespace Isis {
 
   /**
    * Convert a focal plane x coordinate to a pixel space line coordinate.
-   * 
+   *
    * @param x The focal plane x coordinate in mm
-   * 
+   *
    * @return @b double The pixel space line coordinate
    */
   double RosettaOsirisCameraDistortionMap::focalXToLine(double x) {
@@ -339,9 +325,9 @@ namespace Isis {
 
   /**
    * Convert a focal plane y coordinate to a pixel space sample coordinate.
-   * 
+   *
    * @param y The focal plane y coordinate in mm
-   * 
+   *
    * @return @b double The pixel space sample coordinate
    */
   double RosettaOsirisCameraDistortionMap::focalYToSample(double y) {
@@ -351,7 +337,7 @@ namespace Isis {
 
   /**
    * Convert pixel space line coordinate to a focal plane x coordinate.
-   * 
+   *
    * @param line The pixel space line coordinate
    *
    * @return @b double The focal plane x coordinate in mm
@@ -363,7 +349,7 @@ namespace Isis {
 
   /**
    * Convert pixel space sample coordinate to a focal plane y coordinate.
-   * 
+   *
    * @param sample The pixel space sample coordinate
    *
    * @return @b double The focal plane y coordinate in mm

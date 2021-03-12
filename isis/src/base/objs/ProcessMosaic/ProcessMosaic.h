@@ -1,27 +1,11 @@
 #ifndef ProcessMosaic_h
 #define ProcessMosaic_h
-/**
- * @file
- * $Revision: 1.13 $
- * $Date: 2010/06/21 18:39:22 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Process.h"
 
 namespace Isis {
@@ -192,17 +176,17 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp to truncate paths before date
    *                           directory. Allows test to pass when not using the default data area.
    *                           Fixes #4738.
-   *   @history 2018-07-30 Jesse Mapel & Summer Stapleton - Refactoring of class to create a 
-   *                           separate tracking cube to keep track of input images for a mosaic 
-   *                           instead of storing this information within the mosaic cube itself. 
-   *                           The mosaic cube no longer contains a tracking band or a tracking 
-   *                           table; it now contains a tracking group containing the name of the 
-   *                           tracking file. The tracking file is named 
-   *                           <baseMosaicFileName>_tracking.cub. This tracking cube will contain 
-   *                           the tracking table as well as the tracking band; it will always be 
-   *                           of PixelType::UnsignedInteger regardless of the pixel type of the 
+   *   @history 2018-07-30 Jesse Mapel & Summer Stapleton - Refactoring of class to create a
+   *                           separate tracking cube to keep track of input images for a mosaic
+   *                           instead of storing this information within the mosaic cube itself.
+   *                           The mosaic cube no longer contains a tracking band or a tracking
+   *                           table; it now contains a tracking group containing the name of the
+   *                           tracking file. The tracking file is named
+   *                           <baseMosaicFileName>_tracking.cub. This tracking cube will contain
+   *                           the tracking table as well as the tracking band; it will always be
+   *                           of PixelType::UnsignedInteger regardless of the pixel type of the
    *                           mosaic cube or of the input images. References #971
-   *   @history 2018-08-13 Summer Stapleton - Error now being thrown with appropriate message if 
+   *   @history 2018-08-13 Summer Stapleton - Error now being thrown with appropriate message if
    *                           user attempts to add tracking capabilities to a mosaic that already
    *                           exists without tracking. Fixes #2052.
    */
@@ -269,6 +253,7 @@ namespace Isis {
       // ProcessMosaic objects and child objects, unless redifined in the
       // child class
       Isis::Cube *SetOutputCube(const QString &psParameter);
+      Isis::Cube *SetOutputCube(const QString &psParameter, UserInterface &ui);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
 

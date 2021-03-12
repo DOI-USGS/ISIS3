@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 1.17 $
- * $Date: 2010/06/21 18:39:22 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Preference.h"
 
 #include "Application.h"
@@ -128,7 +113,7 @@ namespace Isis {
     bool bTrackExists = false;
     if (!m_createOutputMosaic) {
       bTrackExists = GetTrackStatus();
-      if (m_trackingEnabled && 
+      if (m_trackingEnabled &&
             !(OutputCubes[0]->hasGroup("Tracking") || OutputCubes[0]->hasTable("InputImages"))) {
         QString m = "Cannot enable tracking while adding to a mosaic without tracking ";
         m += "information. Confirm that your mosaic was originally created with tracking enabled.";
@@ -274,7 +259,7 @@ namespace Isis {
       bandPriorityInputBandNumber = GetBandIndex(true);
       bandPriorityOutputBandNumber = GetBandIndex(false);
     }
-    
+
     // Set index of tracking image to the default offset of the Isis::UnsignedByte
     int iIndex = VALID_MINUI4;
     // Propogate tracking if adding to mosaic that was previouly tracked.
@@ -283,7 +268,7 @@ namespace Isis {
     }
 
     // Create tracking cube if need-be, add bandbin group, and update tracking table. Add tracking
-    // group to mosaic cube. 
+    // group to mosaic cube.
     if (m_trackingEnabled) {
       TrackingTable *trackingTable;
 
@@ -303,7 +288,7 @@ namespace Isis {
 
           // The tracking cube file name convention is "output_cube_file_name" + "_tracking.cub"
           QString trackingBase = FileName(OutputCubes[0]->fileName()).removeExtension().expanded().split("/").last();//toString();
-          m_trackingCube->create(FileName(OutputCubes[0]->fileName()).path() 
+          m_trackingCube->create(FileName(OutputCubes[0]->fileName()).path()
                                   + "/" + trackingBase + "_tracking.cub");
 
           // Add the tracking group to the mosaic cube label
@@ -313,7 +298,7 @@ namespace Isis {
           trackingFileName.setValue(trackingBase + "_tracking.cub");
           trackingFileGroup.addKeyword(trackingFileName);
           mosaicLabel->findObject("IsisCube").addGroup(trackingFileGroup);
-          
+
           // Write the bandbin group to the tracking cube label
           Pvl *trackingLabel = m_trackingCube->label();
           PvlGroup bandBin("BandBin");
@@ -325,7 +310,7 @@ namespace Isis {
           // Initialize an empty TrackingTable object to manage tracking table in tracking cube
           trackingTable = new TrackingTable();
         }
-        
+
         // An existing mosaic cube is being added to
         else {
           // Confirm tracking group exists in mosaic cube to address backwards compatibility
@@ -354,15 +339,13 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
-        
+
         // Add current file to the TrackingTable object
-        iIndex = trackingTable->fileNameToPixel(InputCubes[0]->fileName(), 
+        iIndex = trackingTable->fileNameToPixel(InputCubes[0]->fileName(),
                                        SerialNumber::Compose(*(InputCubes[0])));
-        
+
         //  Write the tracking table to the tracking cube, overwriting if need-be
-        if (m_trackingCube->hasTable(Isis::trackingTableName)) {
-         m_trackingCube->deleteBlob("Table", Isis::trackingTableName);
-        }
+        m_trackingCube->deleteBlob(Isis::trackingTableName, "Table");
         Table table = trackingTable->toTable();
         m_trackingCube->write(table);
       }
@@ -707,6 +690,11 @@ namespace Isis {
    * @throws IException::Message
    */
   Cube *ProcessMosaic::SetOutputCube(const QString &psParameter) {
+    return SetOutputCube(psParameter, Application::GetUserInterface());
+  }
+
+  Cube *ProcessMosaic::SetOutputCube(const QString &psParameter, UserInterface &ui) {
+    QString fname = ui.GetFileName(psParameter);
 
     // Make sure there is only one output cube
     if (OutputCubes.size() > 0) {
@@ -718,7 +706,6 @@ namespace Isis {
     // (e.g., "TO") and the cube size from an input cube
     Cube *cube = new Cube;
     try {
-      QString fname = Application::GetUserInterface().GetFileName(psParameter);
       cube->open(fname, "rw");
     }
     catch (IException &) {
@@ -1304,7 +1291,7 @@ namespace Isis {
           bFound = true;
       }
     }
-    
+
     //key name
     if (!m_bandPriorityBandNumber) {
       PvlKeyword cKeyName;
@@ -1533,4 +1520,3 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
   }
 
 }
-   

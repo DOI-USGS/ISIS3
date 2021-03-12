@@ -8,9 +8,9 @@
 
   <description>
     This program will import a merged JPEG2000 Apollo Panaramic Image.
-    JPEG2000 files (JP2) is supported in the ISIS3 library.  The JP2 file
-    can have any number of bands up to 16384. The output from a JP2 file 
-    will be a multi-spectral ISIS3 image file.
+    JPEG2000 files (JP2) is supported in the ISIS library.  The JP2 file
+    can have any number of bands up to 16384. The output from a JP2 file
+    will be a multi-spectral ISIS image file.
   </description>
 
   <history>
@@ -105,7 +105,7 @@
         <description>GMT is space deliniated Year Month Day Hour Minute Seconds</description>
       </parameter>
     </group>
-    
+
     <group name="Spacecraft Position">
       <parameter name="LON_NADIR">
         <type>double</type>
@@ -169,7 +169,7 @@
         <description>Nominally the V/H can be calucalated from the other input parameters.  However, during some periods of the mission the V/H sensor was stuck and did not adjust image to image.  In those cases this manual override can be used.</description>
         <internalDefault>None</internalDefault>
       </parameter>
-    </group>  
-    
+    </group>
+
   </groups>
 </application>

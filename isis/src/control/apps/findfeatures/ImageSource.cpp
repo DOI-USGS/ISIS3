@@ -1,27 +1,10 @@
-/**                                                                       
- 4 @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
 
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <string>
 #include <vector>
@@ -64,22 +47,22 @@ namespace Isis {
 
 ImageSource::ImageSource() :  m_data( new SourceData() ) { }
 
-ImageSource::ImageSource(const QString &name, 
+ImageSource::ImageSource(const QString &name,
                          const bool geometryOnly,
                          const double minPercent,
-                         const double maxPercent) : 
+                         const double maxPercent) :
                          m_data( new SourceData(name) ) {
 
   if ( geometryOnly == true) {
     initGeometry();
   }
   else {
-    load(name, minPercent, maxPercent); 
+    load(name, minPercent, maxPercent);
   }
 }
 
 ImageSource::ImageSource(const QString &name, const cv::Mat &image,
-                         const QString &identity) : 
+                         const QString &identity) :
                          m_data( new SourceData(name, image, identity) )  {
   if ( identity.isEmpty() ) {
     m_data->m_serialno = m_data->m_name;
@@ -87,7 +70,7 @@ ImageSource::ImageSource(const QString &name, const cv::Mat &image,
 }
 
 ImageSource::ImageSource(const ImageSource &other,
-                         const bool getGeometry) : m_data( other.m_data ) { 
+                         const bool getGeometry) : m_data( other.m_data ) {
   if ( getGeometry == true ) {
     initGeometry();
   }
@@ -140,7 +123,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
   QString name = m_data->m_name;
   FileName ifile(name);
 
-  // Handle ISIS cube specifically. If its not a cube, use OpenCV's image 
+  // Handle ISIS cube specifically. If its not a cube, use OpenCV's image
   // reader
   if ( "cub" == ifile.extension() ) {
     Cube cube;
@@ -150,7 +133,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
     cube.open(ifile.expanded(), "r");
 
     if( cube.bandCount() != 1 ) {
-      QString msg = "Input cube " + name + " must only have one band!"; 
+      QString msg = "Input cube " + name + " must only have one band!";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -195,9 +178,9 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
         }
       }
     }
-    catch (IException &ie) { 
-       throw IException(ie, IException::Programmer, 
-                         "Could not read and create grayscale image from " + 
+    catch (IException &ie) {
+       throw IException(ie, IException::Programmer,
+                         "Could not read and create grayscale image from " +
                           name, _FILEINFO_);
     }
   }
@@ -205,7 +188,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
     // Assume OpenCV can read it
     try {
       m_data->m_image = cv::imread(ifile.expanded().toStdString(),
-                                   CV_LOAD_IMAGE_GRAYSCALE); 
+                                   CV_LOAD_IMAGE_GRAYSCALE);
       if ( m_data->m_image.empty() ) {
         QString mess = "Failed to read image from " + name;
         throw IException(IException::User, mess, _FILEINFO_);
@@ -217,7 +200,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
     }
     catch (cv::Exception &e) {
       QString mess = "OpenCV cannot process file " + name + " " +
-                      QString::fromStdString(e.what()); 
+                      QString::fromStdString(e.what());
       throw IException(IException::User, mess, _FILEINFO_);
     }
   }
@@ -239,12 +222,12 @@ SurfacePoint ImageSource::getLatLon(const double &line, const double &sample) {
       double lat = m_data->m_projection->UniversalLatitude();
       double lon = m_data->m_projection->UniversalLongitude();
       double radius = m_data->m_projection->LocalRadius(lat);
-      point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+      point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
                                     Longitude(lon, Angle::Degrees),
                                     Distance(radius, Distance::Meters));
     }
   }
-  else if ( hasCamera() ) { 
+  else if ( hasCamera() ) {
     if ( m_data->m_camera->SetImage(sample, line) ) {
       point = m_data->m_camera->GetSurfacePoint();
     }
@@ -281,7 +264,7 @@ bool ImageSource::getLineSamp(const SurfacePoint &point,
     }
   }
   else if ( hasCamera() ) {
-    if ( m_data->m_camera->SetUniversalGround(lat, lon) ) { 
+    if ( m_data->m_camera->SetUniversalGround(lat, lon) ) {
       isGood = true;
       line   = m_data->m_camera->Line();
       samp   = m_data->m_camera->Sample();
@@ -293,7 +276,7 @@ bool ImageSource::getLineSamp(const SurfacePoint &point,
 }
 
 cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
-                                        const int &minpts, 
+                                        const int &minpts,
                                         const double &tol,
                                         const cv::Rect &subarea) {
 
@@ -307,7 +290,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
 
   cv::Rect iSize(0.0f, 0.0f, samples(), lines());
   if ( subarea.area() != 0.0 ) {  iSize = subarea;  }
-  
+
   int nsamps = iSize.width;
   int nlines = iSize.height;
 
@@ -320,7 +303,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
 
   while ( ((int) source.size() < v_minpts) && (!done) ) {
 
-    double sSpacing = qMax(1.0, (double) nsamps / (double)(increment)); 
+    double sSpacing = qMax(1.0, (double) nsamps / (double)(increment));
     double lSpacing = qMax(1.0, (double) nlines / (double) (increment));
     if ( qMax(sSpacing, lSpacing) <= 1 ) done = true;  // Last possible loop
 
@@ -377,7 +360,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
     mapper = cv::findHomography(source, train, CV_RANSAC, tol, inliers);
   }
 
-  return (mapper);  
+  return (mapper);
 }
 
 Histogram *ImageSource::getHistogram(Cube &cube) const {
@@ -405,7 +388,7 @@ bool ImageSource::initGeometry() {
   cube.open(ifile.expanded(), "r");
 
   if( cube.bandCount() != 1 ) {
-    QString msg = "Input cube " + m_data->m_name + 
+    QString msg = "Input cube " + m_data->m_name +
                   " must only have one band!";
    throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -423,9 +406,9 @@ bool ImageSource::initGeometry(Cube &cube) {
   try {
     if ( cube.isProjected() ) {
       int ns, nl;
-      m_data->m_projection =  ((TProjection *) ProjectionFactory::CreateForCube(*cube.label(), ns, nl, true) ); 
+      m_data->m_projection =  ((TProjection *) ProjectionFactory::CreateForCube(*cube.label(), ns, nl, true) );
       gotOne = true;
-    } 
+    }
 
     // Try camera also, independantly
     m_data->m_camera= ( CameraFactory::Create(cube) );

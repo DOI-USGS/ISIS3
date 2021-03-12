@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ControlNetVersioner.h"
 
 #include <QString>
@@ -16,82 +24,82 @@ using namespace Isis;
 
 void TestNetwork(const QString &filename, Progress *progress, bool printNetwork = true, bool pvlInput = false);
 
-/** 
+/**
  * Unit test for ControlNetVersioner class
- *  
- * @author ????-??-?? Unknown 
- *  
+ *
+ * @author ????-??-?? Unknown
+ *
  *  @internal
  *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
  *                           test output.
- *  
+ *
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
   Progress *testProgress = new Progress();
   cout << "Test ControlNetVersioner";
 
-  // No target                                                  
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", 
+  // No target
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net",
               testProgress, false); // no print network here because the datetimes will change
 
-  // Really odd keywords with target                            
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
-              testProgress);               
+  // Really odd keywords with target
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net",
+              testProgress);
 
-  // Another set of odd keywords                                
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net", 
-              testProgress);               
+  // Another set of odd keywords
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net",
+              testProgress);
 
-  // Binary V1                                                  
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
-              testProgress);           
+  // Binary V1
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net",
+              testProgress);
 
-  // Corrupted (based off of oldNetwork2.net)                   
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net", 
-              testProgress);              
+  // Corrupted (based off of oldNetwork2.net)
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net",
+              testProgress);
 
-  // Binary V2                                                  
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
-              testProgress, 
-              false);    
-
-  // Network with rejected jigsaw points                        
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl", 
-              testProgress, 
-              true, 
-              true);   
-
-  // Network full of weird test cases (based on PvlNetwork4)    
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", 
+  // Binary V2
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net",
               testProgress,
-              false, 
+              false);
+
+  // Network with rejected jigsaw points
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl",
+              testProgress,
+              true,
+              true);
+
+  // Network full of weird test cases (based on PvlNetwork4)
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl",
+              testProgress,
+              false,
               false);
 
   // Test Network 1 created for code coverage.
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork1_V2.net", 
-              testProgress, 
-              false, 
-              false); 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork1_V2.net",
+              testProgress,
+              false,
+              false);
 
   // Test Network 2 created for code coverage.
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork2_V3.net", 
-              testProgress, 
-              false, 
-              false); 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork2_V3.net",
+              testProgress,
+              false,
+              false);
 
   // Re-test each version without progress
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
-              0, 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net",
+              0,
               false);
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 
-              0, 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net",
+              0,
               false);
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 
-              0, 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net",
+              0,
               false);
-  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", 
-              0, 
+  TestNetwork("$ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl",
+              0,
               false);
 
   cout << endl << "Test writing from ControlNet objects" << endl << endl;
@@ -217,11 +225,11 @@ int main(int argc, char *argv[]) {
 
 
 /**
- * Runs various test on the given network. 
- *  
+ * Runs various test on the given network.
+ *
  * @param filename Name of the control network file.
- * @param progress 
- * @param printNetwork Indicates whether to print the network as 
+ * @param progress
+ * @param printNetwork Indicates whether to print the network as
  *                     a PVL.
  * @param pvlInput Indicates whether the given network is in PVL
  *                 format.

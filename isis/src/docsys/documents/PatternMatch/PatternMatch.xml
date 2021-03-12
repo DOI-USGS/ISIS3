@@ -72,7 +72,7 @@
         <h2><a name="Introduction">Introduction</a></h2>
         <p>
           This document attempts to describe how automatic registration is
-          accomplished in ISIS 3.  In simple terms, automatic registration is
+          accomplished in ISIS.  In simple terms, automatic registration is
           the attempt to match a pattern in a cube.  For example, given a reseau
           template pattern, we would like to find positions in a cube which
           match the reseau.  Similarly, if we extract from a cube a ground
@@ -85,7 +85,7 @@
         <p>
           Automatic registration is a tricky subject.  Algorithms and
           parameters that successfully work for one pattern are likely not to
-          work for other conditions.  In ISIS 3, we do not want to restrict our
+          work for other conditions.  In ISIS, we do not want to restrict our
           registration programs (e.g., coreg, pointreg) to a single algorithm.
           We would view this similar to map projections or camera models.  That
           is, if a particular registration algorithm meets our needs we can
@@ -102,8 +102,8 @@
         <h2><a name="Chips">Chips</a></h2>
         <p>
           In the simplest terms, automatic registration attempts to find some
-          sub-area of a cube (or "pattern" window) inside some subarea of another 
-          cube (or "search" window).  In ISIS, these "generally" small sub-areas 
+          sub-area of a cube (or "pattern" window) inside some subarea of another
+          cube (or "search" window).  In ISIS, these "generally" small sub-areas
           of a cube are called "chips".  There are two chips used in automatic
           registration, the "pattern" chip and the "search" chip, corresponding
           to the two sub-areas discussed above.   We will discuss each in more
@@ -208,7 +208,7 @@
           find the "best" match within the search area.
         </p>
         <p>
-          An objective of the ISIS 3 automatic registration design is to allow
+          An objective of the ISIS automatic registration design is to allow
           for a variety of match algorithms.  For example, an algorithm could
           be developed that works best for matching MGS/MOC wide angle and
           Odyssey Themis IR cameras.  For this objective to be met we will
@@ -456,7 +456,7 @@
           fit and Tolerance represent a one pixel accuracy level.  The
           MinimumDifference would use a test for "less than" Tolerance,
           MaximumCorrelation would use "greater than" Tolerance, and GruenAdaptive
-          would use "less than" Tolerance (the goodness of fit for Gruen is at 
+          would use "less than" Tolerance (the goodness of fit for Gruen is at
           a sub-pixel accuracy). This is represented in PVL in the following fashion:
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -518,11 +518,11 @@
           Upon walking the pattern chip through the search chip we will have
           created the fit chip.  The highest (or lowest) goodness of fit value
           generally represents the whole pixel position that best matched between the
-          pattern and search area. 
+          pattern and search area.
         </p>
         <p>
-          The Subpixel Algorithm option is on by default (SubpixelAccuracy=True), 
-          it is possible to turn it off by using the SubpixelAccuracy keyword. 
+          The Subpixel Algorithm option is on by default (SubpixelAccuracy=True),
+          it is possible to turn it off by using the SubpixelAccuracy keyword.
           Example:
           <pre style="padding-left:4em;">
             Group = Algorithm
@@ -538,32 +538,32 @@
         <p>
            As of ISIS3.4.0, the subpixel algorithm was replaced with the algorithm
            described under SurfaceModeling. To estimate the true registration postion,
-           the previous algorithm used a least squares fit to generate a 2nd degree 
+           the previous algorithm used a least squares fit to generate a 2nd degree
            2-dimentional polynomial given an NxN window of points from the fit chip.
-           This previous algorithm optionally applied two parameter tolerances that 
+           This previous algorithm optionally applied two parameter tolerances that
            are no longer needed and have been removed, Eccentricity Ratio and Residual Tolerance.
-           If a PVL definition file includes these parameters when applying the new subpixel 
+           If a PVL definition file includes these parameters when applying the new subpixel
            algorithm, they will simply be ignored.
         </p>
 
         <h3><a name="SurfaceModeling">Surface Modeling</a></h3>
         <p>
            When enabled, the subpixel accuracy algorithm analyzes a window size
-           (WindowSize x WindowSize) block containing fit chip pixel values centered 
-           at the whole pixel with the best registration (local extreme value of the fit chip; 
-           the highest or the lowest value). 
+           (WindowSize x WindowSize) block containing fit chip pixel values centered
+           at the whole pixel with the best registration (local extreme value of the fit chip;
+           the highest or the lowest value).
         </p>
         <p>
            The fit chip analysis is performed by using an adaptive flood fill and weighted average
            algorithm as follows:  (The figure below is based on a 5x5 WindowSize block of
-           a fit chip returned by the Maximum Correlation algorithm).  The best registration 
-           among the border pixels of the WindowSize block (light orange colored pixel cells) 
+           a fit chip returned by the Maximum Correlation algorithm).  The best registration
+           among the border pixels of the WindowSize block (light orange colored pixel cells)
            is found (0.76 in the example below).  A continuous flood fill is done selecting all
            continuous pixels with registration values on the interval (0.76,1.0)-(the green
            colored cells).  An average of the selected cell coordinates is then computed
            (weighting each coordinate by it's registration value) to reduce the selection
            to a single location.
-         </p> 
+         </p>
          <p>
           <img src="assets/fitchip_windowsize.png" alt="WindowSize Block of a FIT Chip"/>
          </p>
@@ -573,15 +573,15 @@
            avoid false positive registrations on image edges.
          </p>
          <p>
-           The dimensions of the WindowSize fit chip block must be an odd number in order 
-           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot 
-           be less than 5, but can be as large as the original fit chip 
-           (though this is not recommended). Recommended dimensions for 
-           (MaximumCorrelation and MinimumDifference) range from 5, 7, 9, 11, to 15.  
+           The dimensions of the WindowSize fit chip block must be an odd number in order
+           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot
+           be less than 5, but can be as large as the original fit chip
+           (though this is not recommended). Recommended dimensions for
+           (MaximumCorrelation and MinimumDifference) range from 5, 7, 9, 11, to 15.
          </p>
          <p>
            Optionally, the window size and tolerance may be supplied through PVL:
-  
+
            <pre style="padding-left:4em;">
              Group = SurfaceModel
                DistanceTolerance = 0.75
@@ -598,7 +598,7 @@
           pixels (with sub-pixel granularity) the sub-pixel accuracy
           computation can move the best fit before the registration is rejected
           entirely. The distance tolerance in pixels must be greater than 0 and is
-          defaulted to 1.0. 
+          defaulted to 1.0.
         </p>
         <p>
           For example:
@@ -611,10 +611,10 @@
 
           Here a registration will be rejected if the new position is more than
           3.5 pixels away from the original whole-pixel result.
-          The recommended value is 0.5 or 0.75, this assumes that the orignal 
+          The recommended value is 0.5 or 0.75, this assumes that the orignal
           starting position at the whole pixel level is accurate.
           This distance test is not a 2D check, but rather, two single dimension
-          checks (line direction and sample direction).  
+          checks (line direction and sample direction).
         </p>
 
         <h3><a name="WindowSize">Window Size</a></h3>
@@ -647,15 +647,15 @@
            outside the user specified 'ValidMinimum/ValidMaximum' parameter values.
          </p>
          <p>
-           The dimensions of the WindowSize fit chip block must be an odd number in order 
-           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot 
-           be less than 5, but can be as large as the original fit chip (though this is not recommended).  
-           Recommended dimensions for (MaximumCorrelation and MinimumDifference) range 
-           from 5, 7, 9, 11, to 15.  
+           The dimensions of the WindowSize fit chip block must be an odd number in order
+           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot
+           be less than 5, but can be as large as the original fit chip (though this is not recommended).
+           Recommended dimensions for (MaximumCorrelation and MinimumDifference) range
+           from 5, 7, 9, 11, to 15.
          </p>
         <p>
-          If an ideal goodness of fit is found (e.g. 0.0 for MinimumDifference or 1.0 for 
-          MaximumCorrelation), we have a perfect fit and, thus, know it is in the best position. 
+          If an ideal goodness of fit is found (e.g. 0.0 for MinimumDifference or 1.0 for
+          MaximumCorrelation), we have a perfect fit and, thus, know it is in the best position.
           In this case, the sub-pixel accuracy phase is omitted.
         </p>
 
@@ -1234,7 +1234,7 @@
       Added gradient filter section
     </change>
     <change name="Moses Millazo and Jeff Anderson" date="2011-10-05">
-      Updates to Gruen documentation, the eccentricity ratio, and the gradient 
+      Updates to Gruen documentation, the eccentricity ratio, and the gradient
       filters.
     </change>
     <change name="Jai Rideout" date="2011-10-14">

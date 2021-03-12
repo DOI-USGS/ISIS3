@@ -122,7 +122,11 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
     }
 
     void  k_close(SpiceInt &handle) {
-      if ( handle > 0 ) { spkcls_c(handle); }
+      if ( handle != 0 ) {
+        NaifStatus::CheckErrors();
+        spkcls_c(handle);
+        NaifStatus::CheckErrors();
+      }
       handle = 0;
     }
 

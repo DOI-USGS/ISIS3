@@ -2,13 +2,13 @@
 
 <application name="hideal2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-      Export an Isis3 mosaicked ideal cube from a HiRISE image to a PDS product 
-      containing related spice data. 
+      Export an Isis mosaicked ideal cube from a HiRISE image to a PDS product
+      containing related spice data.
   </brief>
 
   <description>
     <pre>
-      This application takes an Isis3 cube from the HiRISE instrument that
+      This application takes an Isis cube from the HiRISE instrument that
       has been jitter corrected and mosaicked and exports it to a PDS product
       with detached label and spice tables.
 
@@ -34,10 +34,10 @@
         </LI>
       </OL>
 
-      The output PDS image will be unsigned word 16 bit type, MSB, BSQ format 
+      The output PDS image will be unsigned word 16 bit type, MSB, BSQ format
       and the resolution will be in meters.
 
-      Note that the IMAGE_JITTER_CORRECTED keyword is copied from the input 
+      Note that the IMAGE_JITTER_CORRECTED keyword is copied from the input
       cube. If the input cube has been run through an older version of hijitter,
       this value will be set to UNK, since it is not known whether the image
       values have been jitter corrected.
@@ -47,7 +47,7 @@
 
   <category>
     <missionItem>Mars Reconnaissance Orbiter</missionItem>
-  </category>  
+  </category>
 
   <history>
     <change name="Jeannie Backer" date="2012-11-21">
@@ -60,7 +60,7 @@
       Added an option to control the output bits.  min = 8, max =16, default = 10.  Fixes #5527.
     </change>
     <change name="Timothy Giroux" date="2020-09-08">
-      Output label now has the correct SAMPLE_BIT_MASK value according to bits input. Fixes #3978. 
+      Output label now has the correct SAMPLE_BIT_MASK value according to bits input. Fixes #3978.
     </change>
   </history>
 
@@ -70,11 +70,11 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Isis3 ideal camera cube to be exported to PDS format
+          Isis ideal camera cube to be exported to PDS format
         </brief>
         <description>
-          The Ideal cube from a HiRISE image containing the related spice data 
-          to be exported to PDS. 
+          The Ideal cube from a HiRISE image containing the related spice data
+          to be exported to PDS.
         </description>
         <filter>
           *.cub *.lbl
@@ -88,8 +88,8 @@
           Output PDS file name.
         </brief>
         <description>
-          The file name of the output PDS image. This value will also be used 
-          for the name of the detached label and table files. 
+          The file name of the output PDS image. This value will also be used
+          for the name of the detached label and table files.
         </description>
         <filter>
           *.img
@@ -107,8 +107,8 @@
           Value for the output PDS keyword PRODUCT_VERSION_ID
         </brief>
         <description>
-          This parameter allows the user to specify the value of the standard 
-          PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This 
+          This parameter allows the user to specify the value of the standard
+          PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This
           keyword will be located in the Root of the PDS PVL label. This value
           defaults to 1.0.
         </description>
@@ -121,9 +121,9 @@
           Value for the output PDS keyword RATIONALE_DESC
         </brief>
         <description>
-          This parameter allows the user to specify the value of the standard 
+          This parameter allows the user to specify the value of the standard
           PDS keyword RATIONALE_DESC within the output PDS label. This keyword
-          will be located in the ROOT of the PDS PVL label. Note that if a 
+          will be located in the ROOT of the PDS PVL label. Note that if a
           keyword value is not entered, the value will be read from the input
           cube labels.  If it does not exist there, the program will throw an ]
           error.
@@ -146,7 +146,7 @@
             <brief>Automatically calculate stretch</brief>
             <description>Automatically calculate stretch</description>
             <exclusions>
-              <item>MIN</item> 
+              <item>MIN</item>
               <item>MAX</item>
             </exclusions>
           </option>
@@ -154,7 +154,7 @@
             <brief>User defined stretch</brief>
             <description>User defined stretch</description>
               <exclusions>
-              <item>MINPER</item> 
+              <item>MINPER</item>
               <item>MAXPER</item>
             </exclusions>
           </option>
@@ -187,7 +187,7 @@
             Minimum DN valid percentage
           </brief>
           <description>
-            The cumulative percentage value to be mapped to the minimum 
+            The cumulative percentage value to be mapped to the minimum
             valid pixel for the specified number of bits. For example: With BITS=10
             and MINPER=1.0, the DN which corresponds to the cummulative
             percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
@@ -211,10 +211,10 @@
             Mazimum DN valid percentage
           </brief>
           <description>
-            The cumulative percentage value to be mapped to the maximum 
+            The cumulative percentage value to be mapped to the maximum
             valid pixel for the specified number of bits. For example: With BITS=10
             and MINPER=99.0, the DN which corresponds to the cummulative
-            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
+            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2.
             Where 1023 represents HIS and 1022 represents HRS.
           </description>
           <minimum inclusive="yes">0.0</minimum>

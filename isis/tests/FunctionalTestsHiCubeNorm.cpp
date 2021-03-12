@@ -13,9 +13,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicubenorm.xml").expanded();
 
-TEST_F(MroCube, FunctionalTestsHiCubeNormSubtract) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
-
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormSubtract) {
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
   QString outStatsFile = prefix.path()+"/stats.csv";  
@@ -67,8 +65,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormSubtract) {
 }
 
 
-TEST_F(MroCube, FunctionalTestsHiCubeNormDivide) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormDivide) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -96,8 +93,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormDivide) {
 }
 
 
-TEST_F(MroCube, FunctionalTestsHiCubeNormAverage) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormAverage) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/outTEMP.cub";
@@ -124,8 +120,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormAverage) {
 }
 
 
-TEST_F(MroCube, FunctionalTestsHiCubeNormNewVersion) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormNewVersion) {
 
   QTemporaryDir prefix;
   QString tablePath = prefix.path() + "/stats.pvl"; // prefix.path() + "/stats.pvl"; 
@@ -172,8 +167,7 @@ TEST_F(MroCube, FunctionalTestsHiCubeNormNewVersion) {
 }
 
 
-TEST_F(MroCube, FunctionalTestsHiCubeNormPreserve) {
-  setInstrument("-74999", "HIRISE", "MARS RECONNAISSANCE ORBITER");    
+TEST_F(MroHiriseCube, FunctionalTestsHiCubeNormPreserve) {
 
   // force a 2D gradiant vs the default 1D gradiant 
   LineManager line(*testCube);

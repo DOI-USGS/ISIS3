@@ -26,7 +26,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 	  <h2>Introduction</h2>
 
         <h3>Control Network</h3>
-        <p>A Control Network in ISIS3 is a structure which holds a network of image correspondances, also known as tie points or control points, which identify common ground points across multiple images of the same body. A Control Network is made up of Control Points (the common tie point) and a Control Point has one or more Control Measures (measurements in image space of the common point in a particular image). There are two file formats for Control Networks in ISIS3 -- a binary google protocol buffer format and a human-readable pvl format. Both contain the same contents and information. This document describes the keywords present in the PVL format for convenience.</p>
+        <p>A Control Network in ISIS is a structure which holds a network of image correspondances, also known as tie points or control points, which identify common ground points across multiple images of the same body. A Control Network is made up of Control Points (the common tie point) and a Control Point has one or more Control Measures (measurements in image space of the common point in a particular image). There are two file formats for Control Networks in ISIS -- a binary google protocol buffer format and a human-readable pvl format. Both contain the same contents and information. This document describes the keywords present in the PVL format for convenience.</p>
 
 	<h2>Control Network</h2>
         <p>This section describes the keywords associated with the main Control Network object.</p>
@@ -471,13 +471,13 @@ The difference between the ''estimated'' line measurement (as determined at the 
   <tr><td><b> MinimumPixelZScore</b></td>
        <td>  No</td>
        <td>  None</td>
-       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS3.
+       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS.
        </td>
    </tr>
   <tr><td><b> MaximumPixelZScore</b></td>
        <td>  No</td>
        <td>  None</td>
-       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS3.
+       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS.
        </td>
    </tr>
   <tr><td> <b>GoodnessOfFit</b></td>
@@ -525,10 +525,10 @@ The difference between the ''estimated'' line measurement (as determined at the 
 
   <bibliography>
     <title>Control Networks</title>
-    <brief>Control Network format and keyword definitions in ISIS 3</brief>
+    <brief>Control Network format and keyword definitions in ISIS </brief>
     <description>
       This document describes the format of and defines the keywords that are part of
-      Control Networks in ISIS3.
+      Control Networks in ISIS.
     </description>
     <author>Kristin Berry</author>
     <date>2018-01-26</date>

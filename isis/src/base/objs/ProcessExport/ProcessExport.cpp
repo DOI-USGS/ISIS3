@@ -1,24 +1,9 @@
-/**
- * @file
- * $Revision: 1.10 $
- * $Date: 2010/03/05 17:47:10 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 #include <iomanip>
 #include <QCryptographicHash>
@@ -371,17 +356,21 @@ namespace Isis {
    *       </group>
    *  @endcode
    */
-  void ProcessExport::SetInputRange() {
+  void ProcessExport::SetInputRange(){
+    SetInputRange(Application::GetUserInterface());
+  }
+
+  void ProcessExport::SetInputRange(UserInterface &ui) {
     p_inputMinimum.clear();
     p_inputMiddle.clear();
     p_inputMaximum.clear();
 
     for (unsigned int i = 0; i < InputCubes.size(); i++) {
       // Get the manual stretch parameters if needed
-      QString strType = Application::GetUserInterface().GetString("STRETCH");
+      QString strType = ui.GetString("STRETCH");
       if (strType == "MANUAL") {
-        p_inputMinimum.push_back(Application::GetUserInterface().GetDouble("MINIMUM"));
-        p_inputMaximum.push_back(Application::GetUserInterface().GetDouble("MAXIMUM"));
+        p_inputMinimum.push_back(ui.GetDouble("MINIMUM"));
+        p_inputMaximum.push_back(ui.GetDouble("MAXIMUM"));
 
         p_inputMiddle.push_back(Isis::NULL8);
       }
@@ -390,14 +379,14 @@ namespace Isis {
       else if (strType != "NONE") {
         Isis::Histogram *hist = InputCubes[i]->histogram(0);
         p_inputMinimum.push_back(hist->Percent(
-                                   Application::GetUserInterface().GetDouble("MINPERCENT")));
+                                   ui.GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(
-                                   Application::GetUserInterface().GetDouble("MAXPERCENT")));
+                                    ui.GetDouble("MAXPERCENT")));
         p_inputMiddle.push_back(Isis::NULL8);
-        Application::GetUserInterface().Clear("MINIMUM");
-        Application::GetUserInterface().Clear("MAXIMUM");
-        Application::GetUserInterface().PutDouble("MINIMUM", p_inputMinimum[i]);
-        Application::GetUserInterface().PutDouble("MAXIMUM", p_inputMaximum[i]);
+        ui.Clear("MINIMUM");
+        ui.Clear("MAXIMUM");
+        ui.PutDouble("MINIMUM", p_inputMinimum[i]);
+        ui.PutDouble("MAXIMUM", p_inputMaximum[i]);
 
         if (strType == "PIECEWISE") {
           p_inputMiddle[i] = hist->Median();
@@ -417,6 +406,7 @@ namespace Isis {
       }
     }
   }
+
 
 
    bool ProcessExport::HasInputRange() const {

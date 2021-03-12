@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/xfeatures2d.hpp"
@@ -32,30 +19,30 @@
 namespace Isis {
 
   /**
-   * Constructs a default DaisyAlgorithm with default variables. Note the OpenCV 
+   * Constructs a default DaisyAlgorithm with default variables. Note the OpenCV
    * Daisy algorithm does not provide direct parameter access after construction
    * so all variable values must be know when constructed.
    */
   DaisyAlgorithm::DaisyAlgorithm() : Feature2DAlgorithm("DAISY", "Feature2D",
-                                                         DAISYType::create()) {  
+                                                         DAISYType::create()) {
     setupTypeMap();
     setupParameters();
   }
 
 
   /**
-   * Constructs a DaisyAlgorithm with input variables. 
-   *  
-   * This constuctor provides a custom Daisy algorithm that allows users to 
-   * provide specfic values for all algorithm parameters. 
-   *  
-   * H is an optional 3x3 homography matrix used to warp the grid of Daisy. If 
-   * not entereted, it will default to the identity matrix. 
-   *  
-   *  
-   * @throws IException::Programmer "Homography matrix, H, was not input as a string of the form 
-   *                   \"d,d,d,d,d,d,d,d,d\" where d is a double or integer numerical value." 
-   *  
+   * Constructs a DaisyAlgorithm with input variables.
+   *
+   * This constuctor provides a custom Daisy algorithm that allows users to
+   * provide specfic values for all algorithm parameters.
+   *
+   * H is an optional 3x3 homography matrix used to warp the grid of Daisy. If
+   * not entereted, it will default to the identity matrix.
+   *
+   *
+   * @throws IException::Programmer "Homography matrix, H, was not input as a string of the form
+   *                   \"d,d,d,d,d,d,d,d,d\" where d is a double or integer numerical value."
+   *
    * @param cvars Variables that are not included will be set to their default.
    * @param config The config string used to construct cvars.
    */
@@ -73,7 +60,7 @@ namespace Isis {
     int norm = m_typeMap.left.at(variables.get("norm"));
     cv::Mat H = cv::Mat::eye(3,3,CV_64FC1);
     if ( variables.exists("H")) {
-      // Convert H-string to a 3x3 matrix represented by a std::vector (opencv will accept this 
+      // Convert H-string to a 3x3 matrix represented by a std::vector (opencv will accept this
       // as an alternative to a cv::InputArray)
       QString Hparm = QString(variables.get("H"));
       QStringList elts = Hparm.split( "," );
@@ -81,7 +68,7 @@ namespace Isis {
       if (elts.size() != 9 ) {
         QString mess = "Homography matrix, H, was not input as a string of the form \"d,d,d,d,d,d,d,"
                        "d,d\" where d is a double or integer numerical value.";
-          throw IException(IException::Programmer, mess, _FILEINFO_); 
+          throw IException(IException::Programmer, mess, _FILEINFO_);
       }
 
       // potentially add a try/catch around this for failed .at's or .toDoubles
@@ -95,7 +82,7 @@ namespace Isis {
     bool interpolation = toBool(variables.get("interpolation"));
     bool use_orientation = toBool(variables.get("use_orientation"));
 
-    // Direct creation of DAISY algorithm, replacing default in constructor 
+    // Direct creation of DAISY algorithm, replacing default in constructor
     // initialization in FeatureAlgorithm::m_algorithm
     m_algorithm = DAISYType::create(radius, q_radius, q_theta, q_hist, norm, H,
                                     interpolation, use_orientation);
@@ -113,7 +100,7 @@ namespace Isis {
 
  /**
    * Returns a description of the DaisyAlgorithm.
-   * 
+   *
    * @return @b QString A description of the algorithm.
    */
   QString DaisyAlgorithm::description() const {
@@ -137,52 +124,52 @@ namespace Isis {
 
 /**
  * Creates and returns an instance of DaisyAlgorithm.
- *  
+ *
  * @param vars PvlFlatMap containing algorithm parameters and their values
- * @param config A configuration string input by the user 
- *  
+ * @param config A configuration string input by the user
+ *
  * @return @b Feature2DAlgorithm A DaisyAlgorithm instance
  */
-  Feature2DAlgorithm *DaisyAlgorithm::create(const PvlFlatMap &vars, 
+  Feature2DAlgorithm *DaisyAlgorithm::create(const PvlFlatMap &vars,
                                             const QString &config) {
     return ( new DaisyAlgorithm(vars, config) );
   }
 
 
   /**
-   * Returns true if the algorithm has a detector. 
-   *  
-   * @return @b true if the algorithm has a detector. 
+   * Returns true if the algorithm has a detector.
+   *
+   * @return @b true if the algorithm has a detector.
    */
-  bool DaisyAlgorithm::hasDetector() const { 
-    return false; 
+  bool DaisyAlgorithm::hasDetector() const {
+    return false;
   }
 
 
   /**
-   * Returns true if the algorithm has an extractor. 
-   *  
-   * @return @b true if the algorithm has an extractor. 
+   * Returns true if the algorithm has an extractor.
+   *
+   * @return @b true if the algorithm has an extractor.
    */
-  bool DaisyAlgorithm::hasExtractor() const { 
-    return true; 
+  bool DaisyAlgorithm::hasExtractor() const {
+    return true;
   }
 
 
   /**
-   * Returns true if the algorithm has a matcher. 
-   *  
-   * @return @b true if the algorithm has a matcher. 
+   * Returns true if the algorithm has a matcher.
+   *
+   * @return @b true if the algorithm has a matcher.
    */
-  bool DaisyAlgorithm::hasMatcher() const { 
-    return false; 
+  bool DaisyAlgorithm::hasMatcher() const {
+    return false;
   }
 
 
 /**
  * Get and return DAISY's parameters and what they're set to as a PvlFlatMap.
- *  
- * @return PvlFlatMap A PvlFlatMap of DAISY's currently set variables and their values. 
+ *
+ * @return PvlFlatMap A PvlFlatMap of DAISY's currently set variables and their values.
  */
   PvlFlatMap DaisyAlgorithm::getAlgorithmVariables( ) const {
     return ( variables() );
@@ -190,33 +177,33 @@ namespace Isis {
 
 
 /**
- * @brief Set parameters as provided by the variables, does not work for the 
+ * @brief Set parameters as provided by the variables, does not work for the
  * DAISY algorithm in OpenCV3, so calling this will throw an exception.
- * 
+ *
  * @param variables Container of parameters to set
- * 
+ *
  * @return int Number of variables actually set
  */
   int DaisyAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
     QString message = "DAISY does not have the ability to set algorithm parameters.";
-    throw IException(IException::Programmer, message, _FILEINFO_);   
+    throw IException(IException::Programmer, message, _FILEINFO_);
 
     return (-1);
   }
 
 
 /**
- * @brief Initiolize the Daisy default parameters according to documentation 
- *  
- * This methiod provides the Daisy algorithm parameter defaults according to the 
- * OpenCV documentation found at 
- * http://docs.opencv.org/3.1.0/d9/d37/classcv_1_1xfeatures2d_1_1DAISY.html. 
- *  
- * This will reset the Daisy parameters to the default conditions and cotnained 
- * in FeatureAlgorithm::m_variables. 
- *  
+ * @brief Initiolize the Daisy default parameters according to documentation
+ *
+ * This methiod provides the Daisy algorithm parameter defaults according to the
+ * OpenCV documentation found at
+ * http://docs.opencv.org/3.1.0/d9/d37/classcv_1_1xfeatures2d_1_1DAISY.html.
+ *
+ * This will reset the Daisy parameters to the default conditions and cotnained
+ * in FeatureAlgorithm::m_variables.
+ *
  * @author Kris Becker 2016-12-18
- * 
+ *
  * @return PvlFlatMap Container of all Daisy parameters
  */
   PvlFlatMap DaisyAlgorithm::setupParameters() {
@@ -226,7 +213,7 @@ namespace Isis {
     variables.add("q_theta", "8");
     variables.add("q_hist", "8");
     variables.add("norm", "NRM_NONE");
-    variables.add("H", "1,0,0,0,1,0,0,0,1"); 
+    variables.add("H", "1,0,0,0,1,0,0,0,1");
     variables.add("interpolation", "true");
     variables.add("use_orientation", "false");
     m_variables = variables;
@@ -235,4 +222,3 @@ namespace Isis {
 
 };
 // namespace Isis
-

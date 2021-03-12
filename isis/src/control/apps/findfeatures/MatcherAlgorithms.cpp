@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <QList>
 
@@ -32,10 +19,10 @@ namespace Isis {
   MatcherAlgorithms::MatcherAlgorithms() { }
 
 
-  MatcherAlgorithms::MatcherAlgorithms(FeatureAlgorithmPtr &detector, 
+  MatcherAlgorithms::MatcherAlgorithms(FeatureAlgorithmPtr &detector,
                                        FeatureAlgorithmPtr &extractor,
                                        MatcherAlgorithmPtr &matcher,
-                                       PvlFlatMap parameters)  : 
+                                       PvlFlatMap parameters)  :
                                        m_detector(detector),
                                        m_extractor(extractor),
                                        m_matcher(matcher),
@@ -53,18 +40,18 @@ namespace Isis {
 
 
 /**
- * @brief This method throughly vets the matcher algorithms for validity 
- *  
- * This method insures the contents of this container is valid for its intend 
- * operations. This includes ensuring that the detector, extractor and matcher 
- * algorithms have all been allocated. If this is valid  
- * 
+ * @brief This method throughly vets the matcher algorithms for validity
+ *
+ * This method insures the contents of this container is valid for its intend
+ * operations. This includes ensuring that the detector, extractor and matcher
+ * algorithms have all been allocated. If this is valid
+ *
  * @author 2016-12-23 Kris Becker
- * 
+ *
  * @param throwOnErrors Throw a cummulative exception reporting errors if true
- * 
- * @return bool Returns true if no errors are found. If errors are found and 
- *              the throwOnErrors parameters is false, it will return false. 
+ *
+ * @return bool Returns true if no errors are found. If errors are found and
+ *              the throwOnErrors parameters is false, it will return false.
  */
   bool MatcherAlgorithms::validate(const bool &throwOnErrors) const {
     // Accumulate errors for a comprehensive list of issues
@@ -72,16 +59,16 @@ namespace Isis {
     int nerrors(0);
 
     // Check the detector algorithm to ensure all are allocated properly
-    // and it contains the require functionality 
+    // and it contains the require functionality
     if ( m_detector.empty() ){
-      ie.append(IException(IException::Programmer, 
+      ie.append(IException(IException::Programmer,
                            "Required detector algorithm has not been allocated",
                            _FILEINFO_));
       nerrors++;
     }
     else {
       if ( !m_detector->isValid() )  {
-        ie.append(IException(IException::Programmer, 
+        ie.append(IException(IException::Programmer,
                              "Required detector algorithm is not present/valid",
                              _FILEINFO_));
         nerrors++;
@@ -96,16 +83,16 @@ namespace Isis {
     }
 
     // Check the extractor algorithm to ensure all are allocated properly and it
-    // contains the require functionality 
+    // contains the require functionality
     if ( m_extractor.empty() ) {
-      ie.append(IException(IException::Programmer, 
+      ie.append(IException(IException::Programmer,
                            "Required extractor algorithm has not been allocated",
                            _FILEINFO_));
       nerrors++;
     }
     else {
       if ( !m_extractor->isValid() ) {
-        ie.append(IException(IException::Programmer, 
+        ie.append(IException(IException::Programmer,
                              "Required extractor algorithm is not present",
                              _FILEINFO_));
         nerrors++;
@@ -119,17 +106,17 @@ namespace Isis {
       }
     }
 
-    // Check the matcher algorithm to ensure all are allocated properly and it 
-    // contains the require functionality 
+    // Check the matcher algorithm to ensure all are allocated properly and it
+    // contains the require functionality
     if ( m_matcher.empty() )  {
-      ie.append(IException(IException::Programmer, 
+      ie.append(IException(IException::Programmer,
                            "Required matcher algorithm has not been allocated",
                            _FILEINFO_));
       nerrors++;
     }
     else {
       if ( !m_matcher->isValid() ) {
-        ie.append(IException(IException::Programmer, 
+        ie.append(IException(IException::Programmer,
                              "Required matcher algorithm is not present",
                              _FILEINFO_));
         nerrors++;
@@ -145,7 +132,7 @@ namespace Isis {
 
     //  Shall we throw an exception to report the issues?
     if ( (0 < nerrors) && (true == throwOnErrors)) {
-      QString mess = "There were " + QString::number(nerrors) + 
+      QString mess = "There were " + QString::number(nerrors) +
                      " errors found in this matcher algorithm set";
       ie.append(IException(IException::Programmer, mess, _FILEINFO_));
       throw ie;

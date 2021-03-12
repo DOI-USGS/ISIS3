@@ -1,28 +1,14 @@
 #ifndef ZeroBufferSmooth_h
 #define ZeroBufferSmooth_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/06/13 22:28:55 $
- * $Id: ZeroBufferSmooth.h,v 1.2 2008/06/13 22:28:55 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+                                                                    
 #include <cmath>
 #include <string>
 #include <vector>
@@ -45,50 +31,50 @@ namespace Isis {
 
   /**
    * @brief Processes Buffer calibration data (ZeroBufferSmooth Module)
-   * 
-   * This class loads and processes the Buffer data from a HiRISE image for 
-   * drift correction purposes.  The config file contains parameter 
-   * (ZfFirstSample, ZfLastSample) that indicate which regions of the 
-   * calibration buffer to extract/use.  This region is averaged across the line 
-   * axis for each line resulting in a single value for each line.  The 
-   * resulting vector is then filtered with a lowpass filter. The filter width 
-   * (ZfFilterWidth) and number of interations (ZfFilterIterations) are 
-   * contained within the config file. A spline fit is applied if any missing 
-   * data remain after filtering. 
-   *  
+   *
+   * This class loads and processes the Buffer data from a HiRISE image for
+   * drift correction purposes.  The config file contains parameter
+   * (ZfFirstSample, ZfLastSample) that indicate which regions of the
+   * calibration buffer to extract/use.  This region is averaged across the line
+   * axis for each line resulting in a single value for each line.  The
+   * resulting vector is then filtered with a lowpass filter. The filter width
+   * (ZfFilterWidth) and number of interations (ZfFilterIterations) are
+   * contained within the config file. A spline fit is applied if any missing
+   * data remain after filtering.
+   *
    * @ingroup Utility
-   * 
-   * @author 2008-06-10 Kris Becker 
-   * @internal 
+   *
+   * @author 2008-06-10 Kris Becker
+   * @internal
    *   @history 2010-04-16 Kris Becker Completed documentation
    *   @history 2010-10-28 Kris Becker Renamed parameters removing the "Zf"
    *            prefix and replacing with "ZeroBufferSmooth".
    */
   class ZeroBufferSmooth : public Module {
 
-    public: 
+    public:
       //  Constructors and Destructor
       ZeroBufferSmooth() : Module("ZeroBufferSmooth") { }
       /**
        * @brief Construct with data parameters
-       *  
-       * This constructor completely computes drift from data collected in a 
-       * HiRISE image 
-       * 
+       *
+       * This constructor completely computes drift from data collected in a
+       * HiRISE image
+       *
        * @param cal   Calibration data collection
        * @param conf  All necessary parameters for computations
        */
-      ZeroBufferSmooth(HiCalData &cal, const HiCalConf &conf) : 
-                  Module("ZeroBufferSmooth") { 
+      ZeroBufferSmooth(HiCalData &cal, const HiCalConf &conf) :
+                  Module("ZeroBufferSmooth") {
         init(cal, conf);
       }
 
       /** Destructor */
       virtual ~ZeroBufferSmooth() { }
 
-      /** 
+      /**
        * @brief Return statistics for filtered - raw Buffer
-       * 
+       *
        * @return const Statistics&  Statistics class with all stats
        */
       const Statistics &Stats() const { return (_stats); }
@@ -98,13 +84,13 @@ namespace Isis {
       Statistics _stats;
 
       /**
-       * @brief Workhorse of the zero buffer computation 
-       *  
-       * The default module, assumed to be the Zf module, is retrieved to 
-       * provide parameter necessary to compute the drift correction for a 
-       * HiRISE image. 
-       * 
-       * 
+       * @brief Workhorse of the zero buffer computation
+       *
+       * The default module, assumed to be the Zf module, is retrieved to
+       * provide parameter necessary to compute the drift correction for a
+       * HiRISE image.
+       *
+       *
        * @param cal  Calibration data container/provider
        * @param conf Configuration parameter provider
        */
@@ -136,15 +122,15 @@ namespace Isis {
           }
         }
         _history.add("Statistics(Average["+ToString(_stats.Average())+
-                     "],StdDev["+ToString(_stats.StandardDeviation())+"])"); 
+                     "],StdDev["+ToString(_stats.StandardDeviation())+"])");
         return;
       }
 
       /**
-       * @brief Virtualized parameter reporting method 
-       *  
-       * This method is invoked when dumping the drift correction parameters. 
-       * 
+       * @brief Virtualized parameter reporting method
+       *
+       * This method is invoked when dumping the drift correction parameters.
+       *
        * @param o Output stream to write results to
        */
       virtual void printOn(std::ostream &o) const {
@@ -164,4 +150,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

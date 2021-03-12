@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "NewHorizonsLorriCamera.h"
 
@@ -36,16 +24,16 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Constructs a New Horizons LORRI Framing Camera object. The LORRI camera has two summing modes, 
-   * 1x1 and 4x4. The handeling of these two modes is done through two different Naif codes, 
-   * -98301 and -98302 respectivly. This camera model code handles both cameras. The 
-   * IK and IAK kernels must supply keyword values for both codes. The cube labels show a summing 
-   * mode, but the value is not used 
+   * Constructs a New Horizons LORRI Framing Camera object. The LORRI camera has two summing modes,
+   * 1x1 and 4x4. The handeling of these two modes is done through two different Naif codes,
+   * -98301 and -98302 respectivly. This camera model code handles both cameras. The
+   * IK and IAK kernels must supply keyword values for both codes. The cube labels show a summing
+   * mode, but the value is not used
    *
    * @param lab Pvl label from a New Horizons LORRI Framing Camera image.
    *
-   * @author Stuart Sides 
-   *  
+   * @author Stuart Sides
+   *
    * @internal
    */
 
@@ -54,19 +42,19 @@ namespace Isis {
     m_instrumentNameShort = "LORRI";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
-    
+
     NaifStatus::CheckErrors();
 
-    // The LORRI focal length is fixed and is designed not to change throught the operational 
-    // temperature. The NAIF code, set in the ISIS labels, will be used to read a single focal 
-    // length from the SPICE kernels. Version 100 of the Lorri IK uses meters for focal length, 
+    // The LORRI focal length is fixed and is designed not to change throught the operational
+    // temperature. The NAIF code, set in the ISIS labels, will be used to read a single focal
+    // length from the SPICE kernels. Version 100 of the Lorri IK uses meters for focal length,
     // units, version 200 uses mm, and has a units keyword.
     QString unitsKey = "INS" + toString(naifIkCode()) + "_FOCAL_LENGTH_UNITS";
     QString focalLengthUnits = Spice::getString(unitsKey);
     if (focalLengthUnits != "mm") {
       QString msg = QObject::tr("SPICE keyword [%1] is expected to be mm. [%2] was found instead").
                     arg(unitsKey).arg(focalLengthUnits);
-       throw IException(IException::User, msg, _FILEINFO_);      
+       throw IException(IException::User, msg, _FILEINFO_);
     }
     SetFocalLength(Spice::getDouble("INS" + toString(naifIkCode()) + "_FOCAL_LENGTH"));
 
@@ -87,7 +75,7 @@ namespace Isis {
     // out the affine transforms from detector samp,line to focal plane x,y.
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted 
+    // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted
     // for ISIS
     double boresightSample = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
     double boresightLine = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
@@ -103,7 +91,7 @@ namespace Isis {
     QString e2("INS" + toString(naifIkCode()) + "_OOC_EM");
     QString e5("INS" + toString(naifIkCode()) + "_OOC_EM");
     QString e6("INS" + toString(naifIkCode()) + "_OOC_EM");
-    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 1), 
+    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 1),
                                       getDouble(e6, 2), -1);
 
     // Setup the ground and sky map
@@ -126,10 +114,10 @@ namespace Isis {
   }
 
   /**
-   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and 
+   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and
    * end an observation, but this function is being used to get the observation start and end times,
-   * so we will simulate a shutter. 
-   * 
+   * so we will simulate a shutter.
+   *
    * @param exposureDuration ExposureDuration keyword value from the labels,
    *                         converted to seconds.
    * @param time The StartTime keyword value from the labels, converted to

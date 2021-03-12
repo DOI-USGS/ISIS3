@@ -1,5 +1,5 @@
-# Exports the display settings from ISIS3 to PDS4.
-# 
+# Exports the display settings from ISIS to PDS4.
+#
 # history 2017-10-26 Jeannie Backer - Original version.
 # history 2017-11-15 Kristin Berry - Moved HorizontalDisplayAxis into this file from pds4Export.trn
 #                        added LocalIdentifierReference and DisplaySettingsToArray
@@ -34,7 +34,7 @@ End_Group
 
 Group = HorizontalDisplayAxis
   Auto
-  InputDefault    = Sample 
+  InputDefault    = Sample
   OutputName      = disp:horizontal_display_axis
 #  OutputSiblings  = ("disp:horizontal_display_direction|Left To Right",
 #                     "disp:vertical_display_axis|Line",
@@ -48,16 +48,16 @@ Group = HorizontalDisplayDirection
   Auto
   InputDefault    = "Left to Right"
   OutputName      = disp:horizontal_display_direction
-  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings,
                      disp:Display_Direction)
   Translation     = (*, *)
 End_Group
 
 Group = VerticalDisplayAxis
   Auto
-  InputDefault    = Line 
+  InputDefault    = Line
   OutputName      = disp:vertical_display_axis
-  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings,
                      disp:Display_Direction)
   Translation     = (*, *)
 End_Group
@@ -66,7 +66,7 @@ Group = VerticalDisplayDirection
   Auto
   InputDefault    = "Top to Bottom"
   OutputName      = disp:vertical_display_direction
-  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings, 
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, disp:Display_Settings,
                      disp:Display_Direction)
   Translation     = (*, *)
 End_Group

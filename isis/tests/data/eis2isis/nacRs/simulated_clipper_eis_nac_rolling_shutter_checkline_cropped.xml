@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" href="http://pds.nasa.gov/pds4/geom/v1/PDS4_GEOM_1700_1401.sch" href="http://psa.esa.int/psa/em16/v1/PDS4_PSA_EM16_1000.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+-->
+<!--
+<Product_Observational xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd http://psa.esa.int/psa/v1 http://psa.esa.int/psa/v1/PDS4_PSA_1000.xsd http://psa.esa.int/psa/em16/cas/v1 http://psa.esa.int/psa/em16/cas/v1/PDS4_PSA_EM16_CAS_1000.xsd http://pds.nasa.gov/pds4/geom/v1 http://pds.nasa.gov/pds4/geom/v1/PDS4_GEOM_1700_1401.xsd " xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:cas="http://psa.esa.int/psa/em16/cas/v1" xmlns:geom="http://pds.nasa.gov/pds4/geom/v1" xmlns:psa="http://psa.esa.int/psa/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+-->
+<Product_Observational >
+    <Identification_Area>
+        <logical_identifier>urn:xxx:xxx:Clipper_EIS_NAC_RS:data_raw:EIS_raw_sc_20200101t000000-20200102t000001-8-1-1-20200101t000000000-xxx-x-0</logical_identifier>
+        <version_id>0.1</version_id>
+        <title>Europa Clipper Europa Imaging System experiment</title>
+        <information_model_version>1.8.0.0</information_model_version>
+        <product_class>Product_Observational</product_class>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2019-06-05</modification_date>
+                <version_id>0.5</version_id>
+                <description>First Test Version</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Observation_Area>
+        <comment>Observational Intent</comment>
+        <Time_Coordinates>
+            <start_date_time>2025-01-01T00:00:00.000Z</start_date_time>
+            <stop_date_time>2025-01-01T00:05:00.000Z</stop_date_time>
+        </Time_Coordinates>
+        <Primary_Result_Summary>
+            <purpose>Engineering</purpose>
+            <processing_level>Raw</processing_level>
+            <description>Summary of Results</description>
+            <Science_Facets>
+                <wavelength_range>Visible</wavelength_range>
+                <domain>Surface</domain>
+                <discipline_name>Imaging</discipline_name>
+            </Science_Facets>
+        </Primary_Result_Summary>
+        <Investigation_Area>
+            <name>Clipper EIS 2025</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>nasa:apl:context:investigation:mission.xxxx</lid_reference>
+                <reference_type>data_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <description>Observing System for Clipper+EISNACRS</description>
+            <Observing_System_Component>
+                <name>EIS-NAC-RS</name>
+                <type>Spacecraft</type>
+                <description>Instrument Host</description>
+                <Internal_Reference>
+                    <lid_reference>nasa:apl:context:instrument_host:spacecraft.EuropaClipper</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>EIS-NAC-RS</name>
+                <type>Instrument</type>
+                <description>Instrument EIS NAC</description>
+                <Internal_Reference>
+                    <lid_reference>nasa:apl:context:instrument:clipper.EISNAC</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Europa</name>
+            <type>Europa</type>
+            <description>Description</description>
+            <Internal_Reference>
+                <lid_reference>nasa:apl:context:target:europa.eisnacrs</lid_reference>
+                <reference_type>data_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+        <Mission_Area>
+            <apl:Mission_Information>
+                <apl:mission_phase_name>Europa pass 1</apl:mission_phase_name>
+                <apl:mission_phase_identifier>ep1</apl:mission_phase_identifier>
+                <apl:start_orbit_number>1</apl:start_orbit_number>
+                <apl:stop_orbit_number>1</apl:stop_orbit_number>
+            </apl:Mission_Information>
+            <apl:Sub-Instrument>
+                <apl:identifier>SCI</apl:identifier>
+                <apl:name>Clippper Science</apl:name>
+                <apl:type>Rolling Shutter</apl:type>
+            </apl:Sub-Instrument>
+            <apl:Observation_Context>
+                <apl:instrument_pointing_mode>No pointing</apl:instrument_pointing_mode>
+                <apl:instrument_pointing_description>No pointing</apl:instrument_pointing_description>
+                <apl:observation_identifier>1</apl:observation_identifier>
+            </apl:Observation_Context>
+            <apl:Processing_Context>
+                <apl:processing_software_title>APL Clipper Data Processing System</apl:processing_software_title>
+                <apl:processing_software_version>1.1.1-RC1</apl:processing_software_version>
+                <apl:Processing_Inputs>
+                    <apl:Processing_Input_Identification>
+                        <apl:type>telemetry</apl:type>
+                        <apl:file_name>SCI__DCAS__01000A01_2016-329T15-06-01_MANUAL_00001.EXM</apl:file_name>
+                    </apl:Processing_Input_Identification>
+                    <apl:Processing_Input_Identification>
+                        <apl:type>auxiliary</apl:type>
+                        <apl:file_name>CAS-MCO-2016-11-24T18.53.05.855-BLU-04000-00.xml</apl:file_name>
+                    </apl:Processing_Input_Identification>
+                    <apl:Processing_Input_Identification>
+                        <apl:type>SPICE kernel</apl:type>
+                        <apl:file_name>v300_20180406_001</apl:file_name>
+                    </apl:Processing_Input_Identification>
+                </apl:Processing_Inputs>
+            </apl:Processing_Context>
+        </Mission_Area>
+    </Observation_Area>
+
+    <File_Area_Observational>
+        <File>
+            <file_name>simulated_clisimulated_clipper_eis_nac_rolling_shutter_checkline.dat</file_name>
+            <local_identifier>simulated_clipper_eis_nac_rolling_shutter_checkline.dat</local_identifier>
+            <creation_date_time>2019-06-19T14:19:00.0000Z</creation_date_time>
+            <file_size unit="byte">32000000</file_size>
+            <md5_checksum>00000000000000000000000000000000</md5_checksum>
+            <comment>Image Data File</comment>
+        </File>
+        <Array_2D_Image>
+            <name>RAW_CLIPPER_EIS_NAC_ROLLING_SHUTTER</name>
+            <offset unit="byte">0</offset>
+            <axes>2</axes>
+            <axis_index_order>Last Index Fastest</axis_index_order>
+            <Element_Array>
+                <data_type>IEEE754LSBSingle</data_type>
+                <idl_data_type>4</idl_data_type>
+                <order>First_Index_Fastest</order>
+                <unit>DN</unit>
+                <scaling_factor> 1.00</scaling_factor>
+                <offset> 0.00</offset>
+            </Element_Array>
+            <Axis_Array>
+                <axis_name>Line</axis_name>
+                <local_identifier>line</local_identifier>
+                <elements>60</elements>
+                <sequence_number>1</sequence_number>
+            </Axis_Array>
+            <Axis_Array>
+                <axis_name>Sample</axis_name>
+                <local_identifier>sample</local_identifier>
+                <elements>3</elements>
+                <sequence_number>2</sequence_number>
+            </Axis_Array>
+        </Array_2D_Image>
+    </File_Area_Observational>
+</Product_Observational>

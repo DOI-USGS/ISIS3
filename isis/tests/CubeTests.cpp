@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include "Blob.h"
 #include "Cube.h"
 #include "Camera.h"
 
@@ -230,4 +231,11 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
   Camera *cam = testCube.camera();
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Visual Imaging Subsystem Camera B");
+}
+
+TEST_F(SmallCube, TestCubeHasBlob) {
+  Blob testBlob("TestBlob", "SomeBlob");
+  testCube->write(testBlob);
+  EXPECT_TRUE(testCube->hasBlob("TestBlob", "SomeBlob"));
+  EXPECT_FALSE(testCube->hasBlob("SomeOtherTestBlob", "SomeBlob"));
 }

@@ -6,7 +6,7 @@
 
   <description>
     <p>
-      After <b>jigsaw</b> has done a bundle adjustment on a group of overlapping Isis 3, level 
+      After <b>jigsaw</b> has done a bundle adjustment on a group of overlapping Isis, level 
       1, <def>cube</def>s every image measure in the network will have associated residuals.
       A historgram of the residuals is constructed in order to determine the magnitude at which
       the noise (bad data) starts to dominate the solution.  The points are segregated into three
@@ -15,7 +15,7 @@
       for measure rejection provided.  If guilty measures cannot be ingored a report is generated
       documenting why.  No additional action is taken if suspect measure cannot be elliminated.
     </p>
-    
+
     <h4>Known Issues</h4>
       <blockquote>
       Not spliting a network into <b>islands</b> is one of the primary considerations for whether
@@ -65,8 +65,8 @@
           Input control network
         </brief>
         <description>
-          This file is a <def>control network</def> generated from programs such as 
-          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s 
+          This file is a <def>control network</def> generated from programs such as
+          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s
           and associated measures.
         </description>
         <filter>
@@ -98,7 +98,7 @@
             </description>
         </parameter>
     </group>
-      
+
 
     <group name="Histogram Analysis Parameters--The user is advised to use caution if changing the defualts">
       <parameter name="BIN_WIDTH">
@@ -106,7 +106,7 @@
         <description>
             The program will build and analyze a histogram of the R^2 residual lengths.
             This prameter tells the software how wide to make each bin.  Unless the user
-            has studied the behaviour of residuals (particularly with regard to their 
+            has studied the behaviour of residuals (particularly with regard to their
             networks), we do not advise changing the default.
         </description>
         <type>double</type>
@@ -122,7 +122,7 @@
             If all of the measurements in network belong to Gaussian distribution (one of the typical assumptions in
             least squares analysis) then the residual histogram should be strictly decreasing in the tail.  There should
             be only one local maxima near the median (a results of using equal distance bins instead of equal area).  All
-            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The 
+            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The
             SUSPECT_BUMP_PERCENT is the minimum bump height (in percentage of the preceding local minima) for a bump to be
             considered suspect.  And barring user override will be the boundary between inocent and suspect points.
             Changing the default is not typically recomended.
@@ -141,7 +141,7 @@
             If all of the measurements in network belong to Gaussian distribution (one of the typical assumptions in
             least squares analysis) then the residual histogram should be strictly decreasing in the tail.  There should
             be only one local maxima near the median (a results of using equal distance bins instead of equal area).  All
-            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The 
+            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The
             GUILTY_BUMP_PERCENT is the minimum bump height (in percentage of the preceding local minima) for a bump to be
             considered guilty.  And barring user override will be the boundary between suspect and guilty points.
             Changing the default is not typically recomended.
@@ -166,7 +166,7 @@
         </default>
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
- 
+
       <parameter name="GUILTY_FLOOR">
         <brief>Every residual greater than user defined GUILTY_FLOOR is guilty</brief>
         <description>

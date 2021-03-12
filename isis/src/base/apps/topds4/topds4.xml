@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="topds4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert from ISIS cube to PDS 4 format using template XML files
+  </brief>
+
+  <description>
+    <p>
+      Writes a PDS4 compatible label file and image file. The contents of the label file are
+      generated useing the template file specified by the TEMPLATE parameter.
+    </p>
+    <p>
+      The image file is generated from the input ISIS cube specified by the FROM parameter.
+      The output image file will be a copy of the input ISIS cube with the image data stored in
+      Band Sequential format.
+    </p>
+    <p>
+      This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
+      to render the template file. The input data from the cube and extra data sources
+      is converted to JSON and then it is accessed via the Inja templating syntax.
+      See the <a href="https://pantor.github.io/inja">Inja documentation</a> for the full template
+      syntax. The data from the label of the input cube is accessible under "MainLabel",
+      the data from the originally ingested PVL or XML label stored on the input cube is accessible 
+      under "OriginalLabel",
+      and the extra data is accessible under "ExtraPvl", "ExtraXml", and "ExtraJson".
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2021-01-03">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This is the input cube that will be converted to PDS4 format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TEMPLATE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input template
+        </brief>
+        <description>
+          The file name of the input template. This file contains "inja" compatible
+          template syntax inside of a PDS4 XML label. The data used to replace the
+          template elements comes from the ISIS cube label, the original label
+          (PDS3, FITS, PDS4), and other input PVL, XML, or JSON files.
+        </description>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PDS4 label
+        </brief>
+        <description>
+          The output file name of the PDS4 label. The output image name will be derived from this
+          parameter by removing the last extension and adding .cub.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Data">
+      <parameter name="DATA">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output JSON data
+        </brief>
+        <description>
+          The output file name to store the template data source. This is a dump of the JSON data used
+          by the template engine to fill in the template elements. It is a combination of the ISIS
+          main cube lable, the original lable, and any other data sources supplied. The purpose of this
+          parameter is for debugging the templates.
+        </description>
+      </parameter>
+
+      <parameter name="EXTRAPVL">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra PVL data
+        </brief>
+        <description>
+          The PVL data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraPvl. If multiple PVL files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
+
+      <parameter name="EXTRAXML">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra XML data
+        </brief>
+        <description>
+          The XML data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraXml. If multiple XML files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
+
+      <parameter name="EXTRAJSON">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Extra JSON data
+        </brief>
+        <description>
+          The JSON data contained in the file(s) specified by this parameter will
+          be added to the template data source under ExtraJson. If multiple JSON files
+          are specified, then they will be merged together.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

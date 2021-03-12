@@ -1,5 +1,5 @@
 # Translates CaSSIS xml labels into the Instrument PvlGroup values
-# for the ingested ISIS3 cube labels.
+# for the ingested ISIS cube labels.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iostream>
 
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -18,9 +26,9 @@ using namespace boost::numeric::ublas;
 using namespace Isis;
 
 int main() {
-  Preference::Preferences(true);  
+  Preference::Preferences(true);
   qDebug() << "Test Default Constructor";
-  
+
   CorrelationMatrix corrMat;
 
   qDebug() << "Test Copy Constructor";
@@ -33,9 +41,9 @@ int main() {
                      "Failed to create object with copy constructor",
                      _FILEINFO_);
   }
-  
+
   qDebug() << "Test Equal Operator ( = )";
-  
+
   try {
     CorrelationMatrix corrMat3 = corrMat;
   }
@@ -108,7 +116,7 @@ int main() {
   }
 
   qDebug() << "Does the matrix exist?" << corrMat.isValid();
- 
+
   QMap<QString, QStringList> imgsAndParams;
 
   QStringList param;
@@ -222,9 +230,9 @@ int main() {
    }
 
 
-    
+
   //delete mat files
   covQFile.remove();
   QFile(corrMat.correlationFileName().expanded()).remove();
-  
+
 }

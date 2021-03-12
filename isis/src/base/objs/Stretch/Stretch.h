@@ -1,33 +1,16 @@
 #ifndef Stretch_h
 #define Stretch_h
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2009/07/16 21:14:39 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <vector>
 #include <string>
 #include "Pvl.h"
 #include "ImageHistogram.h"
 #include "Histogram.h"
-#include "Blob.h"
 
 namespace Isis {
   /**
@@ -72,7 +55,7 @@ namespace Isis {
    *  @history 2020-02-27 Kristin Berry - Updated to inherit from Blob so Stretches can be
    *               saved and restored from cubes.
    */
-  class Stretch : public Isis::Blob {
+  class Stretch {
     private:
       std::vector<double> p_input;   //!< Array for input side of stretch pairs
       std::vector<double> p_output;  //!< Array for output side of stretch pairs
@@ -91,13 +74,10 @@ namespace Isis {
       double p_minimum; //!<By default this value is set to p_lrs
       double p_maximum; //!<By default this value is set to p_hrs
 
-      QString p_type; //! Type of stretch. This is only currently used in the AdvancedStretchTool.
-
       std::pair<double, double> NextPair(QString &pairs);
 
     public:
       Stretch();
-      Stretch(QString name);
 
       //! Destroys the Stretch object
       ~Stretch() {};
@@ -183,9 +163,6 @@ namespace Isis {
         return p_pairs;
       };
 
-      QString getType();
-      void setType(QString type);
-
       double Input(const int index) const;
       double Output(const int index) const;
 
@@ -197,11 +174,6 @@ namespace Isis {
       };
 
       void CopyPairs(const Stretch &other);
-
-    protected:
-      void WriteInit();
-      void ReadData(std::istream &is);
-      void WriteData(std::fstream &os);
   };
 };
 

@@ -4,7 +4,7 @@
 xsi:noNamespaceSchemaLocation=
 "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS or ISIS2 image into ISIS3 cube format</brief>
+  <brief>Import PDS or ISIS2 image into ISIS cube format</brief>
 
   <description>
     <p>
@@ -23,7 +23,7 @@ xsi:noNamespaceSchemaLocation=
      </p>
      <p>
       The incoming <def link="Special Pixels">special pixel</def> values in the
-      PDS file are assigned equivalent values for special pixels in ISIS3.  The
+      PDS file are assigned equivalent values for special pixels in ISIS.  The
       order of precedence for special pixels in ISIS from highest to lowest
       priority is the following:
       <blockquote>
@@ -61,13 +61,13 @@ xsi:noNamespaceSchemaLocation=
       is propagated to the output file.
      </p>
      <p>
-      The best option to convert files from ISIS2 to ISIS3 is to maintain all the
+      The best option to convert files from ISIS2 to ISIS is to maintain all the
       input file settings, and do not change the <def link="Bit Type">bit type</def>
       or change any incoming pixel values to <def link="Special Pixels">special pixels</def>.
       When an ISIS2 <def>Level1</def> image is imported into ISIS3, it is
       important to note the label information is not propagated from the ISIS2 to
-      the ISIS3 cube file. For an ISIS2 <def>Level2</def> image or mosaic file,
-      a limited set of label information is transferred to the ISIS3 labels that
+      the ISIS cube file. For an ISIS2 <def>Level2</def> image or mosaic file,
+      a limited set of label information is transferred to the ISIS labels that
       include the "Instrument," "<def link="Band">BandBin</def>," and
       "<def link="Map Projection">Mapping</def>" groups.
     </p>
@@ -430,10 +430,10 @@ xsi:noNamespaceSchemaLocation=
   <examples>
     <example>
       <brief>
-        Convert PDS file to ISIS3 format with pds2isis
+        Convert PDS file to ISIS format with pds2isis
       </brief>
       <description>
-        The example ingests a PDS formatted file, and outputs an ISIS3 cube file
+        The example ingests a PDS formatted file, and outputs an ISIS cube file
 	using the default settings for the program.
       </description>
       <terminalInterface>
@@ -441,7 +441,7 @@ xsi:noNamespaceSchemaLocation=
 	   from=input.img to=out.cub
         </commandLine>
         <description>
-	   This example shows the use of pds2isis to create an ISIS3 cube file.
+	   This example shows the use of pds2isis to create an ISIS cube file.
         </description>
       </terminalInterface>
 
@@ -475,12 +475,12 @@ xsi:noNamespaceSchemaLocation=
       <outputImages>
         <image width="458" height="550" src="assets/images/out.jpg">
           <brief>
-	      The ISIS3 output cube file
+	      The ISIS output cube file
           </brief>
           <description>
 	      This screenshot displays the ouput of the pds2isis application.
           </description>
-          <thumbnail caption= "The ISIS3 image cube after conversion"
+          <thumbnail caption= "The ISIS image cube after conversion"
           src="assets/thumbs/out.jpg" width="167" height="200"/>
           <parameterName>TO</parameterName>
         </image>

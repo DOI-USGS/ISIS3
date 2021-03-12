@@ -1,0 +1,301 @@
+PDS_VERSION_ID             = PDS3
+RECORD_TYPE                = UNDEFINED
+FILE_NAME                  = MI_MAP_02_N65E328N64E329SC.img
+PRODUCT_ID                 = MI_MAP_02_N65E328N64E329SC
+DATA_FORMAT                = PDS
+^GEOMETRIC_DATA_ALTITUDE   = 19800 <BYTES>
+^IMAGE                     = 15769 <BYTES>
+SOFTWARE_NAME              = RGC_TC_MI
+SOFTWARE_VERSION           = 2.10.1
+PROCESS_VERSION_ID         = MAP
+PRODUCT_CREATION_TIME      = 2011-10-25T04:31:02
+PROGRAM_START_TIME         = 2011-10-25T04:25:07
+PRODUCER_ID                = LISM
+PRODUCT_SET_ID             = MI_MAP
+PRODUCT_VERSION_ID         = "02"
+REGISTERED_PRODUCT         = Y
+LEVEL2A_FILE_NAME = (MV52A0_02NM04884_004_0030.img,
+                    MV52A0_02NM04883_004_0030.img,
+                    MV52A0_02NM04884_004_0029.img,
+                    MV52A0_02NM04883_004_0029.img,
+                    MV52A0_02NM04884_004_0028.img,
+                    MV52A0_02NM04883_004_0028.img,
+                    {MV22A0_02NL01385_002_0045.img,
+                    MV22A0_02NL01385_002_0044.img},
+                    {MV22A0_02NL01384_003_0045.img,
+                    MV22A0_02NL01384_003_0046.img},
+                    {MV22A0_02NL01385_002_0046.img,
+                    MV22A0_02NL01385_002_0045.img},
+                    {MV22A0_02NL01384_003_0047.img,
+                    MV22A0_02NL01384_003_0046.img},
+                    {MV22A0_02NL01385_002_0046.img,
+                    MV22A0_02NL01385_002_0047.img})
+SPICE_METAKERNEL_FILE_NAME = (RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_04_LongCK_D_de421_101125.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_04_LongCK_D_de421_101125.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_04_LongCK_D_de421_101125.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_04_LongCK_D_de421_101125.mk,
+                             RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_04_LongCK_D_de421_101125.mk)
+MISSION_NAME               = SELENE
+SPACECRAFT_NAME            = SELENE-M
+DATA_SET_ID                = MI_MAP
+INSTRUMENT_NAME            = "Multiband Imager"
+INSTRUMENT_ID              = MI
+TARGET_NAME                = MOON
+OBSERVATION_MODE_ID        = NORMAL
+SENSOR_DESCRIPTION         = "MI is a multiband push-broom imaging camera consisting of VIS(V) and NIR(N) sensors (each has nadir-directed optics of f number 65 mm and F ratio 3.7). Detector pixel sizes in micron are 13(V) and 40(N)."
+SENSOR_DESCRIPTION2        = "Physical band arrangement [from satellite -x to +x] are VIS1>VIS2>VIS5>VIS4>VIS3 and NIR3>NIR4>NIR1>NIR2. Parallax between nearest band sets [degree] are 2.7 for VIS and 2.6 for NIR. Sampling time [msec] are 13 for VIS and 39 for NIR."
+FILTER_NAME                = (MV1, MV2, MV3, MV4, MV5, MN1, MN2, MN3, MN4)
+CENTER_FILTER_WAVELENGTH = (414.0, 749.0, 901.0, 950.0, 1001.0, 1000.0, 1049.0,
+                           1248.0, 1548.0) <nm>
+BANDWIDTH = (20.0, 12.0, 21.0, 30.0, 42.0, 27.0, 28.0, 33.0, 48.0) <nm>
+BASE_BAND                  = MV5
+Object = GEOMETRIC_DATA_ALTITUDE
+  BINNING_START_PIXEL_POSITION = (1, 1)
+  BINNING_INTERVAL             = 1
+  LINES                        = 2048
+  LINE_SAMPLES                 = 2048
+  SAMPLE_TYPE                  = IEEE_REAL
+  SAMPLE_BITS                  = 32
+  UNIT                         = km
+End_Object = GEOMETRIC_DATA_ALTITUDE
+Object = IMAGE
+  BANDS                          = 9
+  BAND_STORAGE_TYPE              = "BAND SEQUENTIAL"
+  LINES                          = 5
+  LINE_SAMPLES                   = 5
+  SAMPLE_TYPE                    = MSB_INTEGER
+  SAMPLE_BITS                    = 16
+  IMAGE_VALUE_TYPE               = REFLECTANCE
+  UNIT                           = ND
+  SCALING_FACTOR                 = 2e-05
+  OFFSET                         = 0.0
+  MIN_FOR_STATISTICAL_EVALUATION = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+  MAX_FOR_STATISTICAL_EVALUATION = (32767, 32767, 32767, 32767, 32767, 32767,
+                                   32767, 32767, 32767)
+  SCENE_MAXIMUM_DN = (32268, 32178, 32562, 31727, 32684, 32528, 32179, 32293,
+                     32433)
+  SCENE_MINIMUM_DN               = (0, 0, 0, 0, 0, 0, 0, 0, 1)
+  SCENE_AVERAGE_DN = (3096.5, 5582.3, 5993.3, 6101.0, 6480.5, 6425.4, 6767.4,
+                     8075.3, 9526.2)
+  SCENE_STDEV_DN = (1232.1, 1933.4, 2080.3, 2053.8, 2138.1, 2049.9, 2110.4,
+                   2367.1, 2629.7)
+  SCENE_MODE_DN = (2980, 5635, 3, 6095, 6324, 0, 0, 7965, 9305)
+  SHADOWED_AREA_MINIMUM          = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+  SHADOWED_AREA_MAXIMUM = (327, 327, 327, 327, 327, 327, 327, 327, 327)
+  SHADOWED_AREA_PERCENTAGE       = (2, 2, 2, 2, 1, 3, 2, 1, 1)
+  INVALID_TYPE                   = (SATURATION, MINUS, DUMMY_DEFECT, OTHER)
+  INVALID_VALUE                  = (-20000, -21000, -22000, -23000)
+  INVALID_PIXELS = ((94, 365, 0, 0), (176, 370, 0, 0), (147, 378, 0, 0), (228,
+                   340, 0, 0), (218, 386, 0, 0), (161, 989, 0, 0), (430, 774,
+                   0, 0), (162, 1245, 0, 0), (585, 952, 0, 0))
+  OUT_OF_IMAGE_BOUNDS_VALUE      = -30000
+  OUT_OF_IMAGE_BOUNDS_PIXELS     = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+  STRETCHED_FLAG                 = FALSE
+End_Object = IMAGE
+Object = IMAGE_MAP_PROJECTION
+  MAP_PROJECTION_TYPE          = "Simple Cylindrical"
+  COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
+  COORDINATE_SYSTEM_NAME       = PLANETOCENTRIC
+  A_AXIS_RADIUS                = 1737.4 <km>
+  B_AXIS_RADIUS                = 1737.4 <km>
+  C_AXIS_RADIUS                = 1737.4 <km>
+  FIRST_STANDARD_PARALLEL      = N/A
+  SECOND_STANDARD_PARALLEL     = N/A
+  POSITIVE_LONGITUDE_DIRECTION = EAST
+  CENTER_LATITUDE              = 0.0 <deg>
+  CENTER_LONGITUDE             = 0.0 <deg>
+  REFERENCE_LATITUDE           = N/A
+  REFERENCE_LONGITUDE          = N/A
+  LINE_FIRST_PIXEL             = 1
+  LINE_LAST_PIXEL              = 2048
+  SAMPLE_FIRST_PIXEL           = 1
+  SAMPLE_LAST_PIXEL            = 2048
+  MAP_PROJECTION_ROTATION      = 0.0 <deg>
+  MAP_RESOLUTION               = 2048.0 <pixel/deg>
+  MAP_SCALE                    = 0.01480632 <km/pixel>
+  MAXIMUM_LATITUDE             = 65.0 <deg>
+  MINIMUM_LATITUDE             = 64.00048828 <deg>
+  EASTERNMOST_LONGITUDE        = 328.99951172 <deg>
+  WESTERNMOST_LONGITUDE        = 328.0 <deg>
+  LINE_PROJECTION_OFFSET       = 133120.0 <pixel>
+  SAMPLE_PROJECTION_OFFSET     = -65536.0 <pixel>
+End_Object = IMAGE_MAP_PROJECTION
+Object = PROCESSING_PARAMETERS
+  DARK_FILE_NAME = ({MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIV_DRK_04724_05494_M___002.csv,
+                   MIN_DRK_04724_05494_M___002.csv},
+                   {MIN_DRK_01226_01571_L___002.csv,
+                   MIV_DRK_01226_01571_L___002.csv},
+                   {MIN_DRK_01226_01571_L___002.csv,
+                   MIV_DRK_01226_01571_L___002.csv},
+                   {MIN_DRK_01226_01571_L___002.csv,
+                   MIV_DRK_01226_01571_L___002.csv},
+                   {MIN_DRK_01226_01571_L___002.csv,
+                   MIV_DRK_01226_01571_L___002.csv},
+                   {MIN_DRK_01226_01571_L___002.csv,
+                   MIV_DRK_01226_01571_L___002.csv})
+  FT_FILE_NAME = (MIV_FTF_PRFLT_N___v01.csv, MIV_FTF_PRFLT_N___v01.csv,
+                 MIV_FTF_PRFLT_N___v01.csv, MIV_FTF_PRFLT_N___v01.csv,
+                 MIV_FTF_PRFLT_N___v01.csv, MIV_FTF_PRFLT_N___v01.csv,
+                 MIV_FTF_PRFLT_N___v01.csv, MIV_FTF_PRFLT_N___v01.csv,
+                 MIV_FTF_PRFLT_N___v01.csv, MIV_FTF_PRFLT_N___v01.csv,
+                 MIV_FTF_PRFLT_N___v01.csv)
+  FLAT_FILE_NAME = ({MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_04724_05494_N___002.csv,
+                   MIN_FLT_04724_05494_N___002.csv},
+                   {MIV_FLT_01226_01571_L___002.csv,
+                   MIN_FLT_01226_01571_L___002.csv},
+                   {MIV_FLT_01226_01571_L___002.csv,
+                   MIN_FLT_01226_01571_L___002.csv},
+                   {MIV_FLT_01226_01571_L___002.csv,
+                   MIN_FLT_01226_01571_L___002.csv},
+                   {MIV_FLT_01226_01571_L___002.csv,
+                   MIN_FLT_01226_01571_L___002.csv},
+                   {MIV_FLT_01226_01571_L___002.csv,
+                   MIN_FLT_01226_01571_L___002.csv})
+  EFFIC_FILE_NAME = ({MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv},
+                    {MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv})
+  NONLIN_FILE_NAME = ({MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv},
+                     {MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv})
+  RAD_CNV_COEF = ((1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085), (1.470593, 2.204781, 2.244315,
+                 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085),
+                 (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085), (1.470593, 2.204781, 2.244315,
+                 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085),
+                 (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085), (1.470593, 2.204781, 2.244315,
+                 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085),
+                 (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085), (1.470593, 2.204781, 2.244315,
+                 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085),
+                 (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085), (1.470593, 2.204781, 2.244315,
+                 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085),
+                 (1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924,
+                 3.312096, 4.788256, 7.969085)) <W/m**2/micron/sr>
+  REF_CNV_COEF = (0.002353311, 0.002450451, 0.003549924, 0.003886012,
+                 0.004316842, 0.004316842, 0.004893535, 0.007400877,
+                 0.01218292) <1/(W/m**2/micron/sr)>
+  STANDARD_GEOMETRY             = (30.0, 0.0, 30.0)
+  PHOTO_CORR_ID                 = "LISM ORIGINAL"
+  PHOTO_CORR_COEF = ((0.5, -0.019, 0.000242, -1.46e-06, 0.05678, 1.913, 0.0643,
+                    0.2448, 0.0, 0.0, 0.0, 0.06797, 1.3, -0.0144, 0.2441,
+                    -0.00265, 0.00174, -0.000381), (0.5, -0.019, 0.000242,
+                    -1.46e-06, 0.06921, 1.487, -0.0382, 0.2122, 0.0, 0.0, 0.0,
+                    0.08916, 0.997, -0.2526, 0.1986, -0.00265, 0.00174,
+                    -0.000381), (0.5, -0.019, 0.000242, -1.46e-06, 0.05908,
+                    1.43, 0.056, 0.227, 0.0, 0.0, 0.0, 0.09298, 0.918, -0.2251,
+                    0.198, -0.00265, 0.00174, -0.000381), (0.5, -0.019,
+                    0.000242, -1.46e-06, 0.05345, 1.413, 0.1263, 0.2409, 0.0,
+                    0.0, 0.0, 0.08705, 0.883, -0.1655, 0.2052, -0.00265,
+                    0.00174, -0.000381), (0.5, -0.019, 0.000242, -1.46e-06,
+                    0.05096, 1.377, 0.0736, 0.2383, 0.0, 0.0, 0.0, 0.09746,
+                    0.889, -0.2248, 0.1933, -0.00265, 0.00174, -0.000381),
+                    (0.5, -0.019, 0.000242, -1.46e-06, 0.05096, 1.377, 0.0736,
+                    0.2383, 0.0, 0.0, 0.0, 0.09746, 0.889, -0.2248, 0.1933,
+                    -0.00265, 0.00174, -0.000381), (0.5, -0.019, 0.000242,
+                    -1.46e-06, 0.03968, 1.335, 0.1809, 0.2632, 0.0, 0.0, 0.0,
+                    0.09486, 0.843, -0.2059, 0.1958, -0.00265, 0.00174,
+                    -0.000381), (0.5, -0.019, 0.000242, -1.46e-06, 0.06407,
+                    1.103, -0.0062, 0.2168, 0.0, 0.0, 0.0, 0.11201, 0.773,
+                    -0.3129, 0.175, -0.00265, 0.00174, -0.000381), (0.5,
+                    -0.019, 0.000242, -1.46e-06, 0.09175, 0.954, 0.0111,
+                    0.1967, 0.0, 0.0, 0.0, 0.12374, 0.692, -0.2914, 0.1648,
+                    -0.00265, 0.00174, -0.000381))
+  RESAMPLING_METHOD             = Bi-Linear
+  TCO_MOSAIC_FILE_NAME = (N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A,
+                         N/A)
+  DTM_MOSAIC_FILE_NAME = (N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A,
+                         N/A)
+  OVERLAP_SELECTION_ID          = "Prioritized order : nominal mission period and phase angle closer to the standard geometry"
+  MATCHING_MOSAIC               = N/A
+  L2A_DEAD_PIXEL_THRESHOLD      = (35, 35, 35, 35, 35, 200, 200, 200, 200)
+  L2A_SATURATION_THRESHOLD = (1023, 1023, 1023, 1023, 1023, 4095, 4095, 4095,
+                             4095)
+  DARK_VALID_MINIMUM            = (-3, -3, -3, -3, -3, -10, -10, -10, -10)
+  FT_VALID_MINIMUM              = -2
+  RADIANCE_SATURATION_THRESHOLD = 425.971 <W/m**2/micron/sr>
+  REF_SATURATION_THRESHOLD      = 0.65534 <ND>
+End_Object = PROCESSING_PARAMETERS
+END¯(Q≠p
+¨
+^
+#	Á	Ω	º	º	»
+àJ8FT≠B
+Ó
+æ
+é
+]
+&	Ó	µ	ê	l	I	∞
+F
+›
+Ê
+w
+	⁄
+/
+É
+Õ
+€
+Ë
+Ù
+„
+œ
+ª
+ò
+p
+H
+ 	ı	 	»
+0
+ò
+¸2L[hvç©≈—»ø√?|çú´q!œÕJf;Á«¶ÜV$
+Ò
+Ÿ
+—
+»
+À
+›
+Ô';$
+Ú@s≈5§Ê´o5iù— ¥û∑Ú-[qá§Î0v@¸∂Æ≈ﬁŸÆÇ`cgk∂MæcÔgﬁvP+;jôÊ7ãj¨©ñˇ-ZámR7/-+Dqü∂ßñF◊h˜ÖiklmopÑ∫Ò$9OdÄùπ∂ßóò¶¥ßa„!@zµÔâÁG

@@ -1,27 +1,13 @@
 #ifndef CubeViewport_h
 #define CubeViewport_h
 
-/**
- * @file
- * $Date: 2010/06/30 03:38:12 $
- * $Revision: 1.30 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 
 // parent of this class
@@ -37,6 +23,7 @@ namespace Isis {
   class Projection;
   class Pvl;
   class PvlKeyword;
+  class CubeStretch;
   class Stretch;
   class Tool;
   class UniversalGroundMap;
@@ -174,14 +161,14 @@ namespace Isis {
           const BandInfo &operator=(BandInfo other);
 
           //! @return The Stretch
-          Stretch getStretch() const;
+          CubeStretch getStretch() const;
           //! @param newStretch The new Stretch value
           void setStretch(const Stretch &newStretch);
           //! The band
           int band;
         private:
           //! The Stretch
-          Stretch *stretch;
+          CubeStretch *stretch;
       };
 
       //! @param cube The cube to set the CubeViewport window to
@@ -339,13 +326,13 @@ namespace Isis {
        */
       double grayPixel(int sample, int line);
       //! @return The gray Stretch
-      Stretch grayStretch() const;
+      CubeStretch grayStretch() const;
       //! @return The red Stretch
-      Stretch redStretch() const;
+      CubeStretch redStretch() const;
       //! @return The green Stretch
-      Stretch greenStretch() const;
+      CubeStretch greenStretch() const;
       //! @return The blue Strech
-      Stretch blueStretch() const;
+      CubeStretch blueStretch() const;
 
       //! @return The cube associated with viewport
       Cube *cube() const {

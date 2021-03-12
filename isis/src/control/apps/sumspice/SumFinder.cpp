@@ -1,26 +1,10 @@
-/**
- * @file
- * $Revision: 6565 $
- * $Date: 2016-02-10 17:15:35 -0700 (Wed, 10 Feb 2016) $
- * $Id: SumFile.cpp 6565 2016-02-11 00:15:35Z kbecker@GS.DOI.NET $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "SumFinder.h"
 
@@ -196,14 +180,14 @@ namespace Isis {
     return ( m_closest );
   }
 
-  void SumFinder::setCube(const QString &name) {
-
+  void SumFinder::resetCube() {
     // Always close out the kernels and cubes.
     m_kernels.reset();
     m_cube.reset();
+  }
 
-    // Empty string clears cube from state
-    if ( name.isEmpty() ) {   return;  }
+  void SumFinder::setCube(const QString &name) {
+    resetCube();
 
     m_cubename =  name;
     m_cube.reset( new Cube(name, "rw") );
@@ -702,29 +686,6 @@ namespace Isis {
       }
     }
     return (ndeleted);
-  }
-
-  /**
-   * Writes out the History blob to m_cube
-   */
-  void SumFinder::writeHistory() {
-    bool addedHist = false;
-    Isis::Pvl &inlab = *m_cube->label();
-    for (int i = 0; i < inlab.objects(); i++) {
-      if ( inlab.object(i).isNamed("History") && Isis::iApp != NULL ) {
-        Isis::History h( (QString) inlab.object(i)["Name"] );
-        m_cube->read(h);
-        h.AddEntry();
-        m_cube->write(h);
-        addedHist = true;
-      }
-    }
-
-    if (!addedHist && Isis::iApp != NULL) {
-      Isis::History h("IsisCube");
-      h.AddEntry();
-      m_cube->write(h);
-    }
   }
 }
 // namespace Isis

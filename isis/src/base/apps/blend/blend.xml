@@ -9,7 +9,7 @@
   <description>
     <p>
       This application is a translation of the Davinci script "blend" (Arizona
-      State University, http://davinci.asu.edu) into Isis 3.  The blending
+      State University, http://davinci.asu.edu) into ISIS.  The blending
       process itself takes a list of <def>Level2</def>
       <def link="Cube">cubes</def> and blends them together along their
       overlapping areas by creating a "ramp" from one image to the other.
@@ -21,7 +21,7 @@
       values of the overlapping area are changed, however.  Consequently, this
       application is best suited to blend images that are similar in contrast
       and/or brightness.  As part of the THEMIS mosaicking pipeline, it is
-      customary to use the Isis 3 application "sigmastretch" (itself a
+      customary to use the ISIS application "sigmastretch" (itself a
       translation of another Davinci script, "sstretch") to reduce and contrast
       differences between images.
     </p>
@@ -80,7 +80,7 @@
 
   <history>
     <change name="Travis Addair" date="2011-09-08">
-      Original translation of the Davinci "blend" script into Isis 3.
+      Original translation of the Davinci "blend" script into ISIS.
     </change>
     <change name="Travis Addair" date="2011-11-30">
       Added new queue technique to create the ramp, resulting in significant
@@ -256,7 +256,7 @@
           <brief>
             Mosaic of the output images for blend
           </brief>
-          <description> 
+          <description>
             This is the same subarea of a mosaic of the output images after
             being blended together.  The seam from the "before" mosaic is now
             gone, and there is a smooth transition from one image to the other,

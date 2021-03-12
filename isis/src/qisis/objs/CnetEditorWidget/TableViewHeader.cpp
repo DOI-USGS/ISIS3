@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "TableViewHeader.h"
@@ -27,7 +35,7 @@
 namespace Isis {
   /**
     * Constructor
-    * 
+    *
     * @param someModel The table model
     */
   TableViewHeader::TableViewHeader(AbstractTableModel *someModel) {
@@ -68,7 +76,7 @@ namespace Isis {
 
   /**
     * Sets the column list
-    * 
+    *
     * @param cols The column list
     */
   void TableViewHeader::setColumns(TableColumnList *cols) {
@@ -78,7 +86,7 @@ namespace Isis {
 
   /**
     * Returns the minimum size based on the font
-    * 
+    *
     * @return QSize Minimum size allowed
     */
   QSize TableViewHeader::minimumSizeHint() const {
@@ -90,9 +98,9 @@ namespace Isis {
 
   /**
     * Returns the minimum size based on the font
-    * 
+    *
     * @see minimumSizeHint
-    * 
+    *
     * @return QSize Minimum size allowed
     */
   QSize TableViewHeader::sizeHint() const {
@@ -102,7 +110,7 @@ namespace Isis {
 
   /**
     * Connects the table model to the functions that handle changes
-    * 
+    *
     * @param someModel The table model to connect
     */
   void TableViewHeader::setModel(AbstractTableModel *someModel) {
@@ -164,7 +172,7 @@ namespace Isis {
 
   /**
     * Updates the visible columns, and geometry when the filter count changes
-    * 
+    *
     * @param visibleTopLevelItemCount Number of visible top level items
     * @param topLevelItemCount Number of top level items
     */
@@ -190,8 +198,8 @@ namespace Isis {
 
 
   /**
-    * Updates the header offset 
-    * 
+    * Updates the header offset
+    *
     * @param newOffset The new header offset
     */
   void TableViewHeader::updateHeaderOffset(int newOffset) {
@@ -202,7 +210,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mousePressEvent
-    * 
+    *
     * @param event The mouse press event
     */
   void TableViewHeader::mousePressEvent(QMouseEvent *event) {
@@ -235,7 +243,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mouseMoveEvent
-    * 
+    *
     * @param event The mouse move event
     */
   void TableViewHeader::mouseMoveEvent(QMouseEvent *event) {
@@ -271,7 +279,7 @@ namespace Isis {
 
   /**
     * Overrides QWidget::mouseReleaseEvent
-    * 
+    *
     * @param event The mouse release event
     */
   void TableViewHeader::mouseReleaseEvent(QMouseEvent *event) {
@@ -311,7 +319,7 @@ namespace Isis {
 
   /**
     * Repaints the header
-    * 
+    *
     * @param event The paint event
     */
   void TableViewHeader::paintEvent(QPaintEvent *event) {
@@ -340,9 +348,9 @@ namespace Isis {
 
   /**
     * Returns the visible column rectangle
-    * 
+    *
     * @param column Column to check
-    * 
+    *
     * @return QRect The visible column rectangle
     */
   QRect TableViewHeader::getColumnRect(int column) const {
@@ -366,9 +374,9 @@ namespace Isis {
 
   /**
     * Returns the column under the mouse
-    * 
+    *
     * @param mousePos The mouse position
-    * 
+    *
     * @return int Index of the column under the mouse
     */
   int  TableViewHeader::getMousedColumn(QPoint mousePos) {
@@ -388,9 +396,9 @@ namespace Isis {
 
   /**
     * Returns the edge of the column under the mouse
-    * 
+    *
     * @param mousePos The mouse position
-    * 
+    *
     * @return int Index of the column edge under the mouse
     */
   int TableViewHeader::getMousedColumnEdge(QPoint mousePos) {
@@ -415,9 +423,9 @@ namespace Isis {
 
   /**
     * Returns if the mouse is at the edge of a resizeable column
-    * 
+    *
     * @param mousePos The mouse position
-    * 
+    *
     * @return bool True if the mouse is at the edge fo a resizable column
     */
   bool TableViewHeader::mouseAtResizableColumnEdge(QPoint mousePos) {
@@ -449,7 +457,7 @@ namespace Isis {
 
   /**
     * Repaints the header
-    * 
+    *
     * @param painter The QPainter
     * @param rowHeight The new row height
     */
@@ -588,7 +596,7 @@ namespace Isis {
 
   /**
     * Updates the progress bar
-    * 
+    *
     * @param painter The QPainter
     * @param rect The progress bar
     * @param min The minimum progress value
@@ -616,7 +624,7 @@ namespace Isis {
 
   /**
     * Updates the current filter progress value
-    * 
+    *
     * @param newProgress New progress value
     */
   void TableViewHeader::updateFilterProgress(int newProgress) {
@@ -627,7 +635,7 @@ namespace Isis {
 
   /**
     * Updates the range of the filter progress
-    * 
+    *
     * @param min The minimum progress
     * @param max The maximum progress
     */
@@ -640,7 +648,7 @@ namespace Isis {
 
   /**
     * Updates the current rebuild progress value
-    * 
+    *
     * @param newProgress New progress value
     */
   void TableViewHeader::updateRebuildProgress(int newProgress) {
@@ -651,7 +659,7 @@ namespace Isis {
 
   /**
     * Updates the range of the rebuild progress
-    * 
+    *
     * @param min The minimum progress
     * @param max The maximum progress
     */
@@ -664,7 +672,7 @@ namespace Isis {
 
   /**
     * Updates the current sort progress value
-    * 
+    *
     * @param newProgress New progress value
     */
   void TableViewHeader::updateSortProgress(int newProgress) {
@@ -675,7 +683,7 @@ namespace Isis {
 
   /**
     * Updates the range of the sort progress
-    * 
+    *
     * @param min The minimum progress
     * @param max The maximum progress
     */

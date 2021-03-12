@@ -1,25 +1,10 @@
-/**
- * @file
- * $Revision: 1.4 $
- * $Date: 2008/02/21 16:04:33 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QDebug>
 #include <QtGlobal>
@@ -28,21 +13,21 @@
 #include "Hyb2OncDistortionMap.h"
 
 namespace Isis {
-  /** 
+  /**
    * Hayabusa 2 ONC Camera distortion map constructor
    *
    * Create a camera distortion map for Hayabusa 2's ONC-T, ONC-W1, and
-   * ONC-W2. This class maps between distorted and undistorted 
-   * focal plane x/y's. The default mapping is the identity, that is, 
-   * the focal plane x/y and undistorted focal plane x/y will be 
-   * identical. 
+   * ONC-W2. This class maps between distorted and undistorted
+   * focal plane x/y's. The default mapping is the identity, that is,
+   * the focal plane x/y and undistorted focal plane x/y will be
+   * identical.
    *
    * @param parent        the parent camera that will use this distortion map
    * @param zDirection    the direction of the focal plane Z-axis
    *                      (either 1 or -1)
    *
    */
-  Hyb2OncDistortionMap::Hyb2OncDistortionMap(Camera *parent, double zDirection) 
+  Hyb2OncDistortionMap::Hyb2OncDistortionMap(Camera *parent, double zDirection)
       : CameraDistortionMap(parent, zDirection) {
   }
 
@@ -54,7 +39,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Compute undistorted focal plane x/y
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
@@ -101,7 +86,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Compute distorted focal plane x/y
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
@@ -140,14 +125,14 @@ namespace Isis {
       return true;
     }
     double rPrevious = r;
-    
+
     while (!converged && qAbs(r - rPrevious) > tolMilliMeters) {
       double r2 = r*r;
       double r4 = r2*r2;
       double dr = p_odk[0] + p_odk[1] * r2 + p_odk[2] * r4;
       rPrevious = r;
-      x = dr * x;  
-      y = dr * y;  
+      x = dr * x;
+      y = dr * y;
       r = x*x + y*y;
 
       iteration++;
@@ -165,4 +150,3 @@ namespace Isis {
   }
 
 }
-

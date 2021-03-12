@@ -1,3 +1,12 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
+
 // $Id: sumspice.cpp 6565 2016-02-11 00:15:35Z kbecker@GS.DOI.NET $
 #include "Isis.h"
 
@@ -22,6 +31,7 @@
 #include "IString.h"
 #include "Kernels.h"
 #include "NaifStatus.h"
+#include "Process.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -148,6 +158,7 @@ void IsisMain() {
 
   ListOfFinders resultSet;
   QStringList warnings;
+  Process process;
 
   for (int cubeIndex = 0; cubeIndex < cubeNameList.size(); cubeIndex++) {
 
@@ -172,11 +183,16 @@ void IsisMain() {
 
     // This will update the history blob and close the cube,
     // but retain all the pertinent info
-    cubesum->writeHistory();
-    cubesum->setCube();
+    cubesum->resetCube();
     resultSet.append(cubesum);
+
+    Isis::CubeAttributeInput att(filename);
+    Cube *cube = process.SetInputCube(filename, att, Isis::ReadWrite);
+    process.WriteHistory(*cube);
+
     progress.CheckStatus();
   }
+  process.EndProcess();
 
   if (warnings.size() > 0) {
     PvlKeyword message("Unmatched");

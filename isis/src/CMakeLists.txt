@@ -1,5 +1,5 @@
 #===============================================================================
-set(CORE_LIST base database control qisis system)
+set(CORE_LIST base database control qisis system socet dev)
 
 include_directories(".")
 get_subdirectory_list(${CMAKE_CURRENT_LIST_DIR} modules)

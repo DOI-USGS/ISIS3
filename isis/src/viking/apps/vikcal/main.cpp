@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "SpecialPixel.h"
 #include "ProcessByLine.h"
@@ -30,11 +38,10 @@ void IsisMain() {
 // linear = ui.GetBoolean("LINEAR");
   const QString in = ui.GetFileName("FROM");
 
-  calParam = new CalParameters(in);
-
   // Open the input cube
   Cube icube;
   icube.open(in, "r");
+  calParam = new CalParameters(in, &icube);
   Progress prog;
 
   // If the file has already been calibrated, throw an error
@@ -90,14 +97,12 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void cal(vector<Buffer *> &in,
-         vector<Buffer *> &out) {
+void cal(vector<Buffer *> &in, vector<Buffer *> &out) {
 
   Buffer &inp = *in[0];      // Input Cube
   Buffer &dcf = *in[1];      // Dark Current File
   Buffer &fff = *in[2];      // Flat Field File
   Buffer &outp = *out[0];    // Output Cube
-
 
   // Loop for each pixel in the line.
   for(int i = 0; i < inp.size(); i++) {
@@ -127,6 +132,3 @@ void cal(vector<Buffer *> &in,
   }
 
 }
-
-
-

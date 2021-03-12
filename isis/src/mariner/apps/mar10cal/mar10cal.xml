@@ -13,14 +13,14 @@
 
     MAR10CAL performs a dark curent correction and linearization of
     Mariner 10 images.  Key documents to refer to:
-    
+
       MVM 73 TV Subsystem Calibration Report, M. Benesh and M. Morrill,
         JPL 615-148, 1973.
       Acquisition and Description of Mariner 10 Television Science Data
         at Mercury, G.E. Danielson, K.P. Klaasen, J.L. Anderson, Jour.
-        Geophys. Research, Vol. 80, No. 17, pp 2357-2393, 1975 (and other 
+        Geophys. Research, Vol. 80, No. 17, pp 2357-2393, 1975 (and other
         articles in this issue).
-    
+
     It should be noted that the flat field and sensitivity fluctuates as
     a function of vidicon temperature (especially for camera A).
     The camera heater was  not functioning during encounters 2 and 3
@@ -32,11 +32,11 @@
     	the results are not reliable for any quantitative applications
     	such as albedo measurements (absolute or relative) or
     	photoclinometry.
-    
+
     The situation is not hopeless, much effort has gone into deriving a
     fix for the 2nd and 3rd encounter frames and a future update of mar10cal
     will incorporate this work.
-    
+
     </p>
   </description>
 
@@ -45,7 +45,7 @@
       Original version
     </change>
     <change name="Tracie Sucharski" date="2009-04-15">
-        Converted to Isis3
+        Converted to Isis
 
          Isis2 Change History:
                  Oct 25 1991 -  Tammy Becker, USGS,Flagstaff, Converted
@@ -59,7 +59,7 @@
                  Apr 23 1996 TLS, Added user parameter of EXPOFF, also bomb
                                neatly if EXPOSURE on labels is 0.
                  Apr 29 1996 TLS, Added new RFFCOEF values.
-                 May 02 1996 TLS, Added user parameter ABSCOEF 
+                 May 02 1996 TLS, Added user parameter ABSCOEF
                  May 03 1996 TLS, Changed name of WAVECOEF to RFFCOEF(Relative
                                Filter Factor Coefficient)
                  May 16 1996 TLS, Get rid of Relative Filter Factor, corrected
@@ -67,7 +67,7 @@
                  May 17 1996 TLS, Add new dark current files.
                  May 28 1996 TLS, If input pixel - dark current is &lt;, set
                                output pixel to NULL.  Also add new coefficient
-                               file.      
+                               file.
     </change>
     <change name="Travis Addair" date="2010-09-03">
       First commit, added exception handling, finished conversion.
@@ -132,18 +132,18 @@
            In most cases the default should be used and the files
            derived from the prelaunch calibration flat fields
            will be used.  These files are named -
-           
+
            $ISISMAR10DATA/mariner_10_"First 3 letters of FILTER_NAME"_
            	"INSTRUMENT_ID"_coef.cub.
-           
+
            See also
            1) Robinson et al., Jour. Geophys. Res., 97, p.18265-18274,
            	1992.
            2) Robinson and Lucey, Science, 275, p. 197-200, 1997.
            3) Robinson et al., abstracts of Lunar Planetary Sci. Conf.
-                   XXVIII, p. 1187-1188, Lunar and Planetary Inst, 
-                   Houston, TX, 1997. 
-          </p>           
+                   XXVIII, p. 1187-1188, Lunar and Planetary Inst,
+                   Houston, TX, 1997.
+          </p>
         </description>
       </parameter>
       <parameter name="DCCUBE">
@@ -159,7 +159,7 @@
           current file. In most cases, the default should be used for
           this parameter to indicate the derived dark current file is
           to be used.  The name of the derived dark current file is
-          $ISISDATA/mariner10//mariner_10_"InstrumentId"_dc.cub.  The 
+          $ISISDATA/mariner10//mariner_10_"InstrumentId"_dc.cub.  The
           InstrumentId wil have a value of "A" or "B".
         </description>
       </parameter>
@@ -199,7 +199,7 @@
         <description>
           Approximation for iterative solution.
         </description>
-      </parameter>      
+      </parameter>
       <parameter name="ABSCOEF">
         <type>double</type>
         <internalDefault>Internal Default</internalDefault>
@@ -214,13 +214,13 @@
            combination) are still being refined.  The values are being
            derived by forcing global mosaics (photometrically
            corrected) to Earth based measurements.
-           
-           for futher explanation see; 
-           
+
+           for futher explanation see;
+
            1) Robinson and Lucey, Science, 275, p. 197-200.
-           2) Robinson et al., abstract of Lunar Planetary Sci. Conf. 
-                   XXVIII, p. 1187-1188, 1997. 
-           
+           2) Robinson et al., abstract of Lunar Planetary Sci. Conf.
+                   XXVIII, p. 1187-1188, 1997.
+
            </p>
         </description>
       </parameter>
@@ -234,13 +234,13 @@
           <p>
           Offset to be added to Exposure time.  If the default of
           NULL is used the following values are added to the offset:
-          
+
             Camera A EXPOFF = 0.316 msecs
             Camera B EXPOFF = 3.060 msecs
-          
+
           These values are taken directly from the Benesh and Morrill
           JPL calibration document.  They state that there are some
-          unknowns with these values... Read the section on their 
+          unknowns with these values... Read the section on their
           page 38.
           </p>
         </description>

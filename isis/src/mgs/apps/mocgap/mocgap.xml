@@ -6,9 +6,9 @@
   </brief>
 
   <description>
-    Fixes data gaps in MOC images that occur around detector 371. The program 
-    calculates the average and standard deviation of the 5 pixels on a line 
-    centered at detector 371 and 
+    Fixes data gaps in MOC images that occur around detector 371. The program
+    calculates the average and standard deviation of the 5 pixels on a line
+    centered at detector 371 and
   </description>
 
   <category>
@@ -20,7 +20,7 @@
       Original version
     </change>
     <change name="Brendan George" date="2005-11-21">
-      Converted to Isis3
+      Converted to Isis
     </change>
   </history>
 
@@ -41,7 +41,7 @@
           *.cub
         </filter>
       </parameter>
-      
+
       <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>

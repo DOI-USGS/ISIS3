@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Isis.h"
 
 #include <string>
@@ -224,8 +230,7 @@ void IsisMain() {
   Isis::Process p5;
   p5.SetInputCube("FROM");
   Isis::Cube *ocube6 = p5.SetOutputCube("TO");
-  Isis::Table table("Table");
-  ocube6->read(table);
+  Isis::Table table = ocube6->readTable("Table");
 
   cout << "Number of record = " << table.Records() << endl;
   cout << "Record Size = " << table.RecordSize() << endl;
@@ -255,11 +260,10 @@ void IsisMain() {
   cout << "Does output cube have \"Table2\" ? " << std::boolalpha
        << ocubeTableNames->hasTable("Table2") << endl;
 
-  Isis::Table table2("Table2");
-  ocubeTableNames->read(table2);
+  Isis::Table table2 = ocubeTableNames->readTable("Table2");
   cout << "Number of records = " << table2.Records() << endl;
   cout << "Record Size = " << table2.RecordSize() << endl;
-  
+
   pTableNames.EndProcess();
   cout << endl;
 

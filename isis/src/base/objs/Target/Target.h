@@ -1,27 +1,11 @@
 #ifndef Target_h
 #define Target_h
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2008/06/19 23:35:38 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QSharedPointer>
 
@@ -42,7 +26,7 @@ namespace Isis {
   class Spice;
 
   /**
-   * This class is used to create and store valid Isis3 targets.
+   * This class is used to create and store valid Isis targets.
    *
    * @author 2012-03-20 Debbie A. Cook
    *
@@ -50,10 +34,10 @@ namespace Isis {
    *  @history 2015-07-31 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
    *                          NAIF errors were signaled. References #2248.
    *  @history 2016-05-18 Jeannie Backer - Moved TProjection::TargetRadii() methods to
-   *                          Target::radiiGroup() methods. Added overloaded 
-   *                          lookupNaifBodyCode(QString) to have a generic static method that 
-   *                          takes the TargetName as an input parameter. Added overloaded 
-   *                          lookupNaifBodyCode(Pvl) to use the label passed into Target's 
+   *                          Target::radiiGroup() methods. Added overloaded
+   *                          lookupNaifBodyCode(QString) to have a generic static method that
+   *                          takes the TargetName as an input parameter. Added overloaded
+   *                          lookupNaifBodyCode(Pvl) to use the label passed into Target's
    *                          constructor to find the code if not found using
    *                          the name or spice pointer provided. References #3934.
    *  @history 2016-05-18 Jeannie Backer - Removed unused lookupNaifBodyCode() method that takes no
@@ -66,18 +50,22 @@ namespace Isis {
    *                          up the Naif body code instead of the Naif body frame code.  We may
    *                          need to add a method to look up the Naif body frame code as well.
    *                          Also moved the try loop attempting to find the radii tagged with the
-   *                          Naif body code ahead of the try loop that attempts to find the radii 
+   *                          Naif body code ahead of the try loop that attempts to find the radii
    *                           tagged with the body frame code in the method radiiGroup.  Fixed
    *                           any mention of Naif body frame code that should be Naif body code.
    *                           These are not the same.  Naif tags the body radii keyword with the
    *                           Naif body code.  The Naif body frame code refers to the orientation
    *                           (SpiceRotation) of the body.  References #4649 and #501.
+   *  @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Added the ability to
+   *                          create a Target without SPICE data and later set the sensor
+   *                          model pointer.
    */
   class Target {
 
     public:
       // constructors
       Target(Spice *spice, Pvl &label);
+      Target(Pvl &label);
       Target();
 
       //! Destroys the Target
@@ -93,6 +81,9 @@ namespace Isis {
       void restoreShape();
       void setShapeEllipsoid();
       void setRadii(std::vector<Distance> radii);
+      void setName(QString name);
+      void setSpice(Spice *spice);
+
       ShapeModel *shape() const;
       Spice *spice() const;
 

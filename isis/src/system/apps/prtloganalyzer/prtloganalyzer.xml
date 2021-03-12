@@ -5,27 +5,27 @@
     Analyze program execution efficiency in ISIS print.prt logs
   </brief>
 
-  <description> 
+  <description>
       <p>
-          <b>prtloganalyzer</b> analyzes the content of an ISIS3 print.prt log file 
-          for application efficiency, frequency and validity.  It reads the full 
-          contents of the ISIS3 log file (generally named <i>print.prt</i> but can 
-          be changed with command line and/or IsisPreferences files) and categorizes 
-          them by application name.  Runtime statistics (run time, CPU 
-          utilization and I/O time) are computed for each applicaiton.  A 
-          running total for all applications as well as each unique program are 
-          maintained.  The results are provided in Pvl and comma separated value 
+          <b>prtloganalyzer</b> analyzes the content of an ISIS print.prt log file
+          for application efficiency, frequency and validity.  It reads the full
+          contents of the ISIS log file (generally named <i>print.prt</i> but can
+          be changed with command line and/or IsisPreferences files) and categorizes
+          them by application name.  Runtime statistics (run time, CPU
+          utilization and I/O time) are computed for each applicaiton.  A
+          running total for all applications as well as each unique program are
+          maintained.  The results are provided in Pvl and comma separated value
           (CSV) file format for easy evaluation.
       </p>
       <p>
-          The ISIS3 print log file contain Pvl objects that, at a minimum,  
-          describe for each program its parameters and accounting numbers for 
-          each run.  Nearly all ISIS3 applications write to this log at the end 
-          of their execution.  Here is an small example of the contents an ISIS3 
+          The ISIS print log file contain Pvl objects that, at a minimum,
+          describe for each program its parameters and accounting numbers for
+          each run.  Nearly all ISIS applications write to this log at the end
+          of their execution.  Here is an small example of the contents an ISIS
           print.prt log file:
       </p>
       <PRE>
-          
+
 Object = lrowac2isis
   IsisVersion       = "3.2.1beta | 2010-03-18"
   ProgramVersion    = 2010-01-19
@@ -255,8 +255,8 @@ Object = automos
 End_Object
       </PRE>
       <p>
-          In the above example,  there are 6 total programs of which 5 are 
-          unique (cam2map is run twice).   The output of this application with 
+          In the above example,  there are 6 total programs of which 5 are
+          unique (cam2map is run twice).   The output of this application with
           command line <b>prtloganalyzer from=print.prt</b> is:
       </p>
       <PRE>
@@ -290,17 +290,17 @@ Group = ProgramTotals
 End_Group
       </PRE>
       <p>
-          The following table summarizes the definitions of the keywords and 
-          values found in the <b>Results</b> group.   This group provides a 
-          count summary of applications categorized to indicate the applications 
+          The following table summarizes the definitions of the keywords and
+          values found in the <b>Results</b> group.   This group provides a
+          count summary of applications categorized to indicate the applications
           processing status as found in the log file.
       </p>
      <br><h1 align="center">Results Group Keywords</h1></br>
      <TABLE BORDER="1">
            <CAPTION>
-             Description of <b>Results</b> group keywords as produced 
+             Description of <b>Results</b> group keywords as produced
              by the <b>prtloganalyzer</b> application
-           </CAPTION> 
+           </CAPTION>
          <TR>
            <TH>Keyword</TH>
            <TH>Description</TH>
@@ -308,110 +308,110 @@ End_Group
          <TR>
             <TD>Programs</TD>
             <TD>
-                Provides the total number of all applications found 
+                Provides the total number of all applications found
                 in the print log file.
             </TD>
          </TR>
          <TR>
              <TD>Unique</TD>
              <TD>
-                 Count of the number of unique programs found in the 
-                 print log.  Programs with the same name are 
-                 tabulated together to form an indication of a single 
+                 Count of the number of unique programs found in the
+                 print log.  Programs with the same name are
+                 tabulated together to form an indication of a single
                  programs efficiency.
              </TD>
          </TR>
          <TR>
              <TD>Included</TD>
              <TD>
-                 The application provides two ways to include only 
-                 named applications (see the <b>INCLUDE</b> and 
-                 <b>INCLUDEFROM</b> parameters). This keyword 
-                 provides a count of all the included programs 
-                 analyzed. 
+                 The application provides two ways to include only
+                 named applications (see the <b>INCLUDE</b> and
+                 <b>INCLUDEFROM</b> parameters). This keyword
+                 provides a count of all the included programs
+                 analyzed.
              </TD>
          </TR>
          <TR>
              <TD>Excluded</TD>
              <TD>
-                 The application provides two ways to exclude 
-                 specific applications (see the <b>EXCLUDE</b> and 
-                 <b>EXCLUDEFROM</b> parameters).   This keyword 
-                 provides a count of all excluded programs from the 
+                 The application provides two ways to exclude
+                 specific applications (see the <b>EXCLUDE</b> and
+                 <b>EXCLUDEFROM</b> parameters).   This keyword
+                 provides a count of all excluded programs from the
                  print log file.
              </TD>
          </TR>
          <TR>
              <TD>Valid</TD>
              <TD>
-                 This keyword provides a count of the number of valid 
-                 programs that were found in the print log file.  
-                 These are application Pvl objects that do not 
+                 This keyword provides a count of the number of valid
+                 programs that were found in the print log file.
+                 These are application Pvl objects that do not
                  contain an <b>Errors</b> group.
              </TD>
          </TR>
          <TR>
              <TD>ZeroTime</TD>
              <TD>
-                 This keyword provides a count of the number of 
-                 applications that have 0 times for 
-                 <b>ConnectTime</b>  and <b>CpuTime</b> in the 
-                 <b>Accounting</b> group of an application.  These 
-                 occurances are not included in the efficiency 
-                 analysis as the statistical results are skewed by 
+                 This keyword provides a count of the number of
+                 applications that have 0 times for
+                 <b>ConnectTime</b>  and <b>CpuTime</b> in the
+                 <b>Accounting</b> group of an application.  These
+                 occurances are not included in the efficiency
+                 analysis as the statistical results are skewed by
                  them.
              </TD>
          </TR>
          <TR>
              <TD>NoData</TD>
              <TD>
-                 There are times when an application may not contain 
-                 an <b>Accounting</b> group.  These are rare 
-                 occasions and may not ever occur in the wild, but 
+                 There are times when an application may not contain
+                 an <b>Accounting</b> group.  These are rare
+                 occasions and may not ever occur in the wild, but
                  a count is provided here.
              </TD>
          </TR>
          <TR>
              <TD>BadData</TD>
              <TD>
-                 Occasionally something can go wrong with the print 
-                 log file and it can become corrupted or the 
-                 application did not format the contents properly.  
-                 This parameter counts the number of occurances where 
+                 Occasionally something can go wrong with the print
+                 log file and it can become corrupted or the
+                 application did not format the contents properly.
+                 This parameter counts the number of occurances where
                  some of the data is invalid or missing entitirely.
              </TD>
          </TR>
          <TR>
              <TD>Total</TD>
              <TD>
-                 This number provides the total number of valid 
-                 programs found in the given print log file.  This 
-                 number includes only those used in the 
+                 This number provides the total number of valid
+                 programs found in the given print log file.  This
+                 number includes only those used in the
                  <b>ProgramTotals</b> group in the results.
              </TD>
          </TR>
      </TABLE>
       <p>
-          The <b>ProgramTotals</b> group provides the runtime numbers for all 
-          the programs.  This will give an indication of performance for all 
-          applications included in the analysis.  The <b>SUMMARY</b> parameter 
-          indicates the name of a file that will included the <b>Results</b> and  
-          <b>ProgramTotals</b> groups and a <b>ProgramTotals</b> group for each 
-          unique set of applications, such as <b>cam2map</b>.  The following 
-          table describes the meaning of the keywords contained in the  
-          <b>ProgramTotals</b> group above. 
+          The <b>ProgramTotals</b> group provides the runtime numbers for all
+          the programs.  This will give an indication of performance for all
+          applications included in the analysis.  The <b>SUMMARY</b> parameter
+          indicates the name of a file that will included the <b>Results</b> and
+          <b>ProgramTotals</b> groups and a <b>ProgramTotals</b> group for each
+          unique set of applications, such as <b>cam2map</b>.  The following
+          table describes the meaning of the keywords contained in the
+          <b>ProgramTotals</b> group above.
       </p>
       <p>
-          All units of times are in seconds unless otherwise indicated. All 
-          these values are computed from the <b>Accounting</b> group in each 
-          application object entry in the log file.   These numbers are computed 
-          from keywords in this group.  The <i>ConnectTime</i> keyword is used 
-          to compute runtime values.  The <i>CpuTime</i> keyword is used to 
-          compute CPU values.  The I/O values are computed using the 
-          difference between the connect times and the cpu times.  Not real 
-          scientific but is the best we can do given the data to work with. I/O 
-          times may also include wait states during the run of the application 
-          other than disk I/O.  Our assumption is that I/O dominates this 
+          All units of times are in seconds unless otherwise indicated. All
+          these values are computed from the <b>Accounting</b> group in each
+          application object entry in the log file.   These numbers are computed
+          from keywords in this group.  The <i>ConnectTime</i> keyword is used
+          to compute runtime values.  The <i>CpuTime</i> keyword is used to
+          compute CPU values.  The I/O values are computed using the
+          difference between the connect times and the cpu times.  Not real
+          scientific but is the best we can do given the data to work with. I/O
+          times may also include wait states during the run of the application
+          other than disk I/O.  Our assumption is that I/O dominates this
           difference.
       </p>
       <br><h1 align="center">ProgramTotals Group Keywords</h1></br>
@@ -419,7 +419,7 @@ End_Group
             <CAPTION>
               Description of <b>ProgramTotals</b> group keywords as produced by
               the <b>prtloganalyzer</b> application.
-            </CAPTION> 
+            </CAPTION>
           <TR>
             <TH>Keyword</TH>
             <TH>Description</TH>
@@ -427,8 +427,8 @@ End_Group
           <TR>
              <TD>Hits</TD>
              <TD>
-                 Provides the total number of all applications found 
-                 in the print log file.  Should be the same as the <b>Total</b> 
+                 Provides the total number of all applications found
+                 in the print log file.  Should be the same as the <b>Total</b>
                  keyword in the <b>Results</b> group.
              </TD>
           </TR>
@@ -447,14 +447,14 @@ End_Group
           <TR>
               <TD>ConnectTimeAverage</TD>
               <TD>
-                  Indicates the average time an application took to 
+                  Indicates the average time an application took to
                   complete.
               </TD>
           </TR>
           <TR>
               <TD>ConnectTimeStdDev</TD>
-               <TD> 
-                   Indicates the standard deviation of the time an application 
+               <TD>
+                   Indicates the standard deviation of the time an application
                   took to complete.
               </TD>
           </TR>
@@ -478,8 +478,8 @@ End_Group
           </TR>
           <TR>
               <TD>CpuTimeStdDev</TD>
-               <TD> 
-                   Indicates the standard deviation of the cpu time an 
+               <TD>
+                   Indicates the standard deviation of the cpu time an
                    application used.
               </TD>
           </TR>
@@ -503,16 +503,16 @@ End_Group
           </TR>
           <TR>
               <TD>IOTimeStdDev</TD>
-               <TD> 
-                   Indicates the standard deviation of the I/O time an 
+               <TD>
+                   Indicates the standard deviation of the I/O time an
                    application used.
               </TD>
           </TR>
       </TABLE>
       <p>
-          Finally, the name of the file specified in the LOG parameter will 
-          contain a flat file of comma separated values (CSV) for each program.  
-          This files is intended to be used to plot the computed values for each 
+          Finally, the name of the file specified in the LOG parameter will
+          contain a flat file of comma separated values (CSV) for each program.
+          This files is intended to be used to plot the computed values for each
           of the applications.  The following is the contents of the LOG file.
       </p>
       <PRE>
@@ -525,13 +525,13 @@ cam2map,M109629168CE.vis.odd.cal.cub,M109629168CE.vis.odd.proj.cub,2010-05-04T15
 automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
       </PRE>
       <p>
-          As you can see the file contains certain fields from each application 
-          selected from the print log file.  The name of the program is provided 
-          as well as the FROM and TO parameters to the program if they exist.  
-          It either one does not exist, a NULL values is written (some programs 
-          don't have a FROM or a TO parameter).  The time the program was 
-          executed/started is also provided.  This parameter provides the 
-          ability to plot a time based parameter.  The connect, CPU and I/O 
+          As you can see the file contains certain fields from each application
+          selected from the print log file.  The name of the program is provided
+          as well as the FROM and TO parameters to the program if they exist.
+          It either one does not exist, a NULL values is written (some programs
+          don't have a FROM or a TO parameter).  The time the program was
+          executed/started is also provided.  This parameter provides the
+          ability to plot a time based parameter.  The connect, CPU and I/O
           times then follow.
       </p>
   </description>
@@ -548,7 +548,7 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
 
   <groups>
     <group name="Files">
- 
+
       <parameter name="FROM">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -559,12 +559,12 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
           Name of an ISIS print.prt log file
         </brief>
         <description>
-            This parameter provides the name of the ISIS3 print log file.  The 
-            name is typically "print.prt" but can vary.  Note that many 
-            different print.prt files can be concatenated together in one file 
-            so that analysis can be performed on many files.  One such way to 
-            concatenate print files is to use the UNIX <b>cat</b> command to 
-            combine two or more files to a single file.  The general form is 
+            This parameter provides the name of the ISIS print log file.  The
+            name is typically "print.prt" but can vary.  Note that many
+            different print.prt files can be concatenated together in one file
+            so that analysis can be performed on many files.  One such way to
+            concatenate print files is to use the UNIX <b>cat</b> command to
+            combine two or more files to a single file.  The general form is
             <b>cat file1 file2 file3 &gt; catfile</b>.
         </description>
       </parameter>
@@ -578,14 +578,14 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
         </brief>
         <description>
             <p>
-                This parameter is optional and can be used to list the names of 
-                programs that will be included in from the print file.  This is 
-                handy to limit the full-up analysis to a specific set of 
-                applications.  The file should contain the name of a single 
-                application on each line.  
+                This parameter is optional and can be used to list the names of
+                programs that will be included in from the print file.  This is
+                handy to limit the full-up analysis to a specific set of
+                applications.  The file should contain the name of a single
+                application on each line.
             </p>
             <p>
-                If applications of the same name exist in the exclude list as 
+                If applications of the same name exist in the exclude list as
                 well, exclusions always takes precedence over the inclusions.
             </p>
         </description>
@@ -593,7 +593,7 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
           *.lis
         </filter>
       </parameter>
-             
+
       <parameter name="EXCLUDEFROM">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -603,14 +603,14 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
         </brief>
         <description>
            <p>
-                This parameter is optional and can be used to list the names of 
-                programs that will be excluded in from the print file.  This is 
+                This parameter is optional and can be used to list the names of
+                programs that will be excluded in from the print file.  This is
                 handy to exlude programs that are mostly benign in nature
                 (.e.g., <b>getkey</b>) that may skew the analysis. The file
                 should contain the name of a single application on each line.
             </p>
             <p>
-                If applications of the same name exist in the include list as 
+                If applications of the same name exist in the include list as
                 well, exclusions always takes precedence over the inclusions.
             </p>
         </description>
@@ -618,20 +618,20 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
           *.lis
         </filter>
       </parameter>
-             
+
       <parameter name="SUMMARY">
         <type>filename</type>
         <fileMode>output</fileMode>
         <internalDefault>None</internalDefault>
         <filter>*.dat</filter>
         <brief>
-          Output file containing summarization of each unique program in print 
+          Output file containing summarization of each unique program in print
           file analysis
         </brief>
         <description>
-            If specifed the file name given for this parameter will contain the 
-            reported <b>Results</b> and <b>ProgramTotals</b> groups as well as a 
-            <b>ProgramTotals</b> group but with the name for each unique 
+            If specifed the file name given for this parameter will contain the
+            reported <b>Results</b> and <b>ProgramTotals</b> groups as well as a
+            <b>ProgramTotals</b> group but with the name for each unique
             application set.
         </description>
       </parameter>
@@ -644,9 +644,9 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
           Writes the specifics for all valid programs to this file
         </brief>
         <description>
-            If specified, the file name given for this parameter will contain a 
-            comma separated value format listing for each application included 
-            in the analysis.  See the main documentation for details on the 
+            If specified, the file name given for this parameter will contain a
+            comma separated value format listing for each application included
+            in the analysis.  See the main documentation for details on the
             contents of this file.
         </description>
       </parameter>
@@ -660,9 +660,9 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
              Application names to include in analysis
           </brief>
           <description>
-              This parameter is a convenient way to provided a list of 
-              applications to include in the analysis.  Expected is a comma 
-              separated list of ISIS3 application names.  All other applications 
+              This parameter is a convenient way to provided a list of
+              applications to include in the analysis.  Expected is a comma
+              separated list of ISIS application names.  All other applications
               that occur in the print log are excluded from the analysis.
           </description>
         </parameter>
@@ -674,9 +674,9 @@ automos,NULL,NULL,2010-05-04T16:31:56,3.00,1.50,1.50
              Application names to exclude in analysis
           </brief>
           <description>
-             This parameter is a convenient way to provided a list of 
-              applications to exclude in the analysis.  Expected is a comma 
-              separated list of ISIS3 application names.  All other applications 
+             This parameter is a convenient way to provided a list of
+              applications to exclude in the analysis.  Expected is a comma
+              separated list of ISIS application names.  All other applications 
               that occur in the print log are included in the analysis.
           </description>
         </parameter>

@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "4.3.0")
+set(VERSION            "4.4.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -45,7 +45,7 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
 string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
-set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
+set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
@@ -82,7 +82,7 @@ option(buildSwig       "Turn on to build swig wrappers"                 OFF )
 option(BUILD_CORE_TESTS "Turn on to build core tests"                   ON )
 
 # if cmake install prefix is not set, and conda env is activated, use the
-# conda env as the install directory
+# conda env as the install directory.
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
@@ -171,8 +171,7 @@ set(thirdPartyCppFlags -Wall
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
                        -DUSE_UNSTABLE_GEOS_CPP_API=1
-		               -Wno-strict-overflow
-                       -DGMM_USES_SUPERLU
+                       -Wno-strict-overflow
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
@@ -272,11 +271,11 @@ find_package(Ale               REQUIRED)
 find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
+find_package(CSM       3.0.3.3 REQUIRED)
 find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
-find_package(GMM       5.0     REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
@@ -297,6 +296,8 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+find_package(inja              REQUIRED)
+
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -350,6 +351,9 @@ foreach (_variableName ${_variableNames})
     endforeach()
   endif()
 endforeach()
+
+# add target based linkages to ALLLIBS variable
+list(APPEND ALLLIBS pantor::inja)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -500,6 +504,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
 		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
 		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
 	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
+	            ${CMAKE_BINARY_DIR}/appdata/templates/topds4
 	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
 		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
 	            ${CMAKE_BINARY_DIR}/appdata/images/icons
@@ -617,6 +622,10 @@ add_dependencies(isis labels)
 add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
+
+add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
+add_dependencies(isis topds4)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

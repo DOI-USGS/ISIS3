@@ -1,22 +1,10 @@
-/**
- * @file
- * $Date: 2010/06/28 08:42:54 $
- * $Revision: 1.1 $
- *
- *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
- *  individual third-party library and package descriptions for intellectual property information,
- *  user agreements, and related information.
- *
- *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
- *  USGS as to the accuracy and functioning of such software and related material nor shall the
- *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
- *  USGS in connection therewith.
- *
- *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *  http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "IndependentCubeViewport.h"
 
@@ -34,6 +22,7 @@
 #include "Projection.h"
 #include "RingPlaneProjection.h"
 #include "TProjection.h"
+#include "CubeStretch.h"
 #include "Stretch.h"
 #include "StretchTool.h"
 #include "ViewportBuffer.h"
@@ -84,7 +73,7 @@ namespace Isis
     }
   }
 
-  
+
   bool IndependentCubeViewport::eventFilter(QObject * o, QEvent * e)
   {
     // Handle standard mouse tracking on the viewport
@@ -106,7 +95,7 @@ namespace Isis
         {
           if (panning)
             emit synchronize(this);
-            
+
           handleMouseMove(currentPosition);
           break;
         }
@@ -162,12 +151,12 @@ namespace Isis
 
   void IndependentCubeViewport::restretch(ViewportBuffer * buffer)
   {
-    Stretch globalStretch = grayStretch();
+    CubeStretch globalStretch = grayStretch();
     globalStretch.CopyPairs(StretchTool::stretchBand(this, StretchTool::Gray));
     stretchGray(globalStretch);
   }
-  
-  
+
+
   void IndependentCubeViewport::showEvent(QShowEvent * event)
   {
     QAbstractScrollArea::show();
@@ -175,20 +164,20 @@ namespace Isis
     CubeViewport::showEvent(event);
     restretch(grayBuffer());
   }
-  
+
 
   void IndependentCubeViewport::resetKnownGlobal()
   {
-    
+
     p_globalStretches->clear();
     for (int i = 0; i < cubeBands(); i++)
       p_globalStretches->append(NULL);
-    
+
     if (isVisible())
       grayBuffer()->addStretchAction();
   }
-  
-  
+
+
   void IndependentCubeViewport::cubeDataChanged(int cubeId,
       const Isis::Brick * data)
   {
@@ -202,44 +191,44 @@ namespace Isis
     {
       // reset the global stretch
       Stretch *& globalStretch = (*p_globalStretches)[data->Band() - 1];
-      
+
       if (globalStretch)
       {
         delete globalStretch;
         globalStretch = NULL;
       }
-      
-    
+
+
       Stretch newGlobal = grayStretch();
       newGlobal.ClearPairs();
       Statistics stats;
       stats.AddData(data->DoubleBuffer(), data->size());
-  
+
       if (stats.ValidPixels() > 1 &&
           fabs(stats.Minimum() - stats.Maximum()) > DBL_EPSILON)
       {
         Histogram hist(stats.BestMinimum(), stats.BestMaximum(), 65536);
         hist.AddData(data->DoubleBuffer(), data->size());
-  
+
         if (fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON)
         {
           newGlobal.AddPair(hist.Percent(0.5), 0.0);
           newGlobal.AddPair(hist.Percent(99.5), 255.0);
         }
       }
-  
+
       if (newGlobal.Pairs() == 0)
       {
         newGlobal.AddPair(-DBL_MAX, 0.0);
         newGlobal.AddPair(DBL_MAX, 255.0);
       }
-      
-      globalStretch = new Stretch(newGlobal);
-      
+
+      globalStretch = new CubeStretch(newGlobal);
+
       if (isVisible())
         stretchGray(newGlobal);
     }
-    
+
     CubeViewport::cubeDataChanged(cubeId, data);
   }
 
@@ -352,7 +341,7 @@ namespace Isis
       setScale(other->scale(), thisCenterSamp, thisCenterLine);
   }
 
-  
+
   QRect IndependentCubeViewport::bandingRect()
   {
     QRect rect;
@@ -396,7 +385,7 @@ namespace Isis
      << "line: " << line << "\n";
      */
     // if sample and line in range then do tracking
-    
+
     double dn;
     if (sample >= 0.5 && sample <= cubeSamples() + 0.5 &&
         line >= 0.5 && line <= cubeLines() + 0.5 &&
@@ -409,12 +398,12 @@ namespace Isis
       // Determine the projection type if we have a projection
       Projection::ProjectionType projType = Projection::Triaxial;
       if (projSucceeds) projType = projection()->projectionType();
-      
+
       if (camSucceeds || projSucceeds)
       {
         double lat = 0.0;
         double lon = 0.0;
-        
+
         if (camSucceeds)
         {
           lat = camera()->UniversalLatitude();
@@ -434,7 +423,7 @@ namespace Isis
             lon = rproj->RingLongitude();
           }
         }
-        
+
         emit trackingChanged(sample, line, lat, lon, dn, this);
       }
       else
@@ -460,7 +449,7 @@ namespace Isis
       const int bufY = p.y() - rect.top();
       dn = buffer->getLine(bufY)[bufX];
     }
-    
+
     return success;
   }
 

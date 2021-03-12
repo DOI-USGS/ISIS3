@@ -1,26 +1,11 @@
 #ifndef EllipsoidShape_h
 #define EllipsoidShape_h
-/**
- * @file
- * $Revision: 1.20 $
- * $Date: 2010/03/27 07:04:26 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "ShapeModel.h"
 
@@ -30,9 +15,9 @@ namespace Isis {
   class Pvl;
 
   /**
-   * @brief Define shapes and provide utilities for Isis3 targets
+   * @brief Define shapes and provide utilities for ISIS targets
    *
-   * This class will define shapes of Isis3 target bodies as well as
+   * This class will define shapes of ISIS target bodies as well as
    * provide utilities to retrieve radii and photometric information.
    *
    *
@@ -46,7 +31,7 @@ namespace Isis {
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
    *                           were signaled. References #2248.
-   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor 
+   *   @history 2016-06-13 Kelvin Rodriguez - Removed redundant contructor
    *                           EllipsoidShape(Target, Pvl). References #2214
    *   @history 2017-05-19 Tyler Wilson - calculateSurfaceNormal() and calculateDefaultNormal()
    *                           now call calculateLocalNormal(), which calculates the normal
@@ -54,7 +39,7 @@ namespace Isis {
    *                           ShapeModel::calculateEllipsoidalSurfaceNormal() function
    *                           which was incorrectly returning the normal vector to a sphere and not
    *                           an ellipsoid.  Fixes #1028.
-   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
+   *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new
    *                            intersectSurface methods in ShapeModel are accessible by
    *                            EllipsoidShape.
    */
@@ -68,7 +53,7 @@ namespace Isis {
       ~EllipsoidShape() { };
 
       // Make parent functions visible
-      using Isis::ShapeModel::intersectSurface; 
+      using Isis::ShapeModel::intersectSurface;
 
       //! Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
