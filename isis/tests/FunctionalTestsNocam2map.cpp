@@ -13,12 +13,12 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/nocam2map.xml").expanded();
 
-TEST_F(MroHiriseCube, FunctionalTestsNoCam2MapDefault) {
-  
+TEST_F(MroHiriseCube, FunctionalTestNocam2mapDefault) {
+
   QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
-  QString lonFile = tempDir.path() + "/lons.cub"; 
-  QString latFile = tempDir.path() + "/lats.cub"; 
-  
+  QString lonFile = tempDir.path() + "/lons.cub";
+  QString latFile = tempDir.path() + "/lats.cub";
+
   Cube *latCube = new Cube();
   latCube->setDimensions(testCube->sampleCount(), testCube->lineCount(), 1);
   latCube->create(latFile);
@@ -32,7 +32,7 @@ TEST_F(MroHiriseCube, FunctionalTestsNoCam2MapDefault) {
     }
     latCube->write(latline);
   }
-  latCube->close(); 
+  latCube->close();
 
   Cube *lonCube = new Cube();
   lonCube->setDimensions(testCube->sampleCount(), testCube->lineCount(), 1);
@@ -47,17 +47,17 @@ TEST_F(MroHiriseCube, FunctionalTestsNoCam2MapDefault) {
     }
     lonCube->write(lonline);
   }
-  lonCube->close();    
+  lonCube->close();
 
   QVector<QString> args = {"latcub="+latFile, "lonCub="+lonFile, "to="+outCubeFileName};
   UserInterface options(APP_XML, args);
-  
+
   try {
     nocam2map(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to project image: " << e.what() << std::endl;
-  }      
+  }
 
   Cube oCube(outCubeFileName);
 
@@ -68,20 +68,20 @@ TEST_F(MroHiriseCube, FunctionalTestsNoCam2MapDefault) {
   EXPECT_NEAR((double)mapping.findKeyword("MaximumLongitude"), 128.14239501953, 0.01);
 
   std::unique_ptr<Histogram> hist (oCube.histogram());
-  
-  ASSERT_DOUBLE_EQ(hist->Average(), 572.05232892280969); 
-  ASSERT_DOUBLE_EQ(hist->Sum(),     44620.081655979156); 
-  ASSERT_EQ(hist->ValidPixels(),    78);  
-  ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 367.54352065771224);   
+
+  ASSERT_DOUBLE_EQ(hist->Average(), 572.05232892280969);
+  ASSERT_DOUBLE_EQ(hist->Sum(),     44620.081655979156);
+  ASSERT_EQ(hist->ValidPixels(),    78);
+  ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 367.54352065771224);
 }
 
 
-TEST_F(SmallCube, FunctionalTestsNoCam2MapSmall) {
-  
+TEST_F(SmallCube, FunctionalTestNocam2mapSmall) {
+
   QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
-  QString lonFile = tempDir.path() + "/lons.cub"; 
-  QString latFile = tempDir.path() + "/lats.cub"; 
-  
+  QString lonFile = tempDir.path() + "/lons.cub";
+  QString latFile = tempDir.path() + "/lats.cub";
+
   Cube *latCube = new Cube();
   latCube->setDimensions(testCube->sampleCount(), testCube->lineCount(), 1);
   latCube->create(latFile);
@@ -95,7 +95,7 @@ TEST_F(SmallCube, FunctionalTestsNoCam2MapSmall) {
     }
     latCube->write(latline);
   }
-  latCube->close(); 
+  latCube->close();
 
   Cube *lonCube = new Cube();
   lonCube->setDimensions(testCube->sampleCount(), testCube->lineCount(), 1);
@@ -110,20 +110,20 @@ TEST_F(SmallCube, FunctionalTestsNoCam2MapSmall) {
     }
     lonCube->write(lonline);
   }
-  lonCube->close();    
+  lonCube->close();
 
   QVector<QString> args = {"latcub="+latFile, "lonCub="+lonFile, "to="+outCubeFileName, "target=Mars"};
   UserInterface options(APP_XML, args);
-  
+
   try {
     nocam2map(testCube, options);
   }
   catch (IException &e) {
     FAIL() << "Unable to project image: " << e.what() << std::endl;
-  }      
+  }
 
   Cube oCube(outCubeFileName);
-  
+
   PvlGroup &mapping = oCube.label()->findObject("IsisCube").findGroup("Mapping");
   EXPECT_NEAR((double)mapping.findKeyword("MinimumLatitude"), -60, 0.01);
   EXPECT_NEAR((double)mapping.findKeyword("MaximumLatitude"), -59.990001678467003, 0.01);

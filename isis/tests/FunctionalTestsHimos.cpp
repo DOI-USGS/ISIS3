@@ -14,7 +14,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/himos.xml").expanded();
 
-TEST_F(MroHiriseCube, FunctionalTestsHimosDefault) {
+TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
 
   FileName mosFileList(tempDir.path() + "/himosFileList.lis");
 
@@ -53,7 +53,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosDefault) {
                       inputCubeLabel.findGroup("Mosaic"), outputCubeLabel.findGroup("Mosaic"));
 }
 
-TEST_F(MroHiriseCube, FunctionalTestsHimosError) {
+TEST_F(MroHiriseCube, FunctionalTestHimosError) {
 
   FileName mosFileList(tempDir.path() + "/himosFileList.lis");
 
@@ -74,7 +74,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosError) {
   }
 }
 
-TEST_F(MroHiriseCube, FunctionalTestsHimosMismatchObs) {
+TEST_F(MroHiriseCube, FunctionalTestHimosMismatchObs) {
   CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName()));
   Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path() + "/copyDejitteredCube.cub", cubeAtts);
   copyDejitteredCube->label()->findObject("IsisCube").findGroup("Archive")["ObservationId"] = "Banana";
@@ -100,7 +100,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosMismatchObs) {
   }
 }
 
-TEST_F(MroHiriseCube, FunctionalTestsHimosMismatchFilter) {
+TEST_F(MroHiriseCube, FunctionalTestHimosMismatchFilter) {
   CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName()));
   Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path() + "/copyDejitteredCube.cub", cubeAtts);
   copyDejitteredCube->label()->findObject("IsisCube").findGroup("BandBin")["Name"] = "Red";

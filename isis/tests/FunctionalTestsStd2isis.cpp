@@ -21,11 +21,11 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/std2isis.xml").expanded();
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisDefault) {
+TEST_F(TempTestingFiles, FunctionalTestStd2isisDefault) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
+
   QVector<QString> args = {"from=data/stdFormatImages/rgb.png", "to="+outCubeFileName};
-  
+
   UserInterface options(APP_XML, args);
   try {
     std2isis(options);
@@ -33,10 +33,10 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisDefault) {
   catch (IException &e) {
     FAIL() << "Unable to translate image: " << e.what() << std::endl;
   }
-  
+
   Cube outCube(outCubeFileName);
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -49,7 +49,7 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisDefault) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
 
@@ -61,11 +61,11 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisDefault) {
 }
 
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisArgb) {
+TEST_F(TempTestingFiles, FunctionalTestStd2isisArgb) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
+
   QVector<QString> args = {"from=data/stdFormatImages/rgb.png", "to="+outCubeFileName, "mode=argb" };
-  
+
   UserInterface options(APP_XML, args);
   try {
     std2isis(options);
@@ -73,10 +73,10 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisArgb) {
   catch (IException &e) {
     FAIL() << "Unable to translate image: " << e.what() << std::endl;
   }
-  
+
   Cube outCube(outCubeFileName);
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -89,7 +89,7 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisArgb) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
   ASSERT_EQ(bandbin["Name"][3].toStdString(), "Alpha");
@@ -102,11 +102,11 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisArgb) {
 }
 
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffGrayscale) {
+TEST_F(TempTestingFiles, FunctionalTestStd2isisTiffGrayscale) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
+
   QVector<QString> args = {"from=data/stdFormatImages/rgb.tif", "to="+outCubeFileName, "mode=grayscale"};
-  
+
   UserInterface options(APP_XML, args);
   try {
     std2isis(options);
@@ -114,7 +114,7 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffGrayscale) {
   catch (IException &e) {
     FAIL() << "Unable to translate image: " << e.what() << std::endl;
   }
-  
+
   Cube outCube(outCubeFileName);
   Pvl *outLabel = outCube.label();
 
@@ -130,7 +130,7 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffGrayscale) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Gray"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Gray");
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
   ASSERT_NEAR(hist->Average(), 96.403951009114579, .00001);
@@ -140,14 +140,14 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisTiffGrayscale) {
 }
 
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisSpecial) {
+TEST_F(TempTestingFiles, FunctionalTestStd2isisSpecial) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
+
   QVector<QString> args = {"from=data/stdFormatImages/rgb.png", "to="+outCubeFileName, "setnullrange=yes",
-                           "nullmin=100", "nullmax=240", "sethrsrange=yes", "mode=grayscale", 
+                           "nullmin=100", "nullmax=240", "sethrsrange=yes", "mode=grayscale",
 	                       "hrsmin=200", "hrsmax=260", "setlrsrange=yes", "lrsmin=0",
                            "lrsmax=100" };
-  
+
   UserInterface options(APP_XML, args);
   try {
     std2isis(options);
@@ -155,10 +155,10 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisSpecial) {
   catch (IException &e) {
     FAIL() << "Unable to translate image: " << e.what() << std::endl;
   }
-  
+
   Cube outCube(outCubeFileName);
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -171,10 +171,10 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisSpecial) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Gray"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Gray");
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-  
+
   ASSERT_EQ(hist->LrsPixels(), 5983);
   ASSERT_EQ(hist->HrsPixels(), 957);
   ASSERT_EQ(hist->NullPixels(), 8936);
@@ -185,11 +185,11 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisSpecial) {
 }
 
 
-TEST_F(TempTestingFiles, FunctionalTestsStd2IsisJp2) {
+TEST_F(TempTestingFiles, FunctionalTestStd2isisJp2) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  
+
   QVector<QString> args = {"from=data/stdFormatImages/rgb.jp2", "to="+outCubeFileName };
-  
+
   UserInterface options(APP_XML, args);
   try {
     std2isis(options);
@@ -197,10 +197,10 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisJp2) {
   catch (IException &e) {
     FAIL() << "Unable to translate image: " << e.what() << std::endl;
   }
-  
+
   Cube outCube(outCubeFileName);
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -213,15 +213,14 @@ TEST_F(TempTestingFiles, FunctionalTestsStd2IsisJp2) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-  
+
   ASSERT_NEAR(hist->Average(), 113.12452758881331, .00001);
   ASSERT_EQ(hist->Sum(), 1795965);
   ASSERT_EQ(hist->ValidPixels(), 15876);
   ASSERT_NEAR(hist->StandardDeviation(), 97.354405991298336, .0001);
 }
-

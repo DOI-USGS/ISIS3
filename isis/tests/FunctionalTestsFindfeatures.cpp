@@ -20,7 +20,7 @@ using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/findfeatures.xml").expanded();
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesDefault) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesDefault) {
   // Setup output file
   QVector<QString> args = {"algorithm=brisk/brisk",
                            "match=" + tempDir.path() + "/cube3.cub",
@@ -47,7 +47,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesDefault) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesGeomMatch) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesGeomMatch) {
   // Setup output file
   QVector<QString> args = {"algorithm=brisk/brisk",
                            "match=" + tempDir.path() + "/cube3.cub",
@@ -101,7 +101,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesGeomMatch) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMultiAlgo) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesMultiAlgo) {
   // Setup output file
   QVector<QString> args = {"algorithm=brisk/brisk|surf@hessianThreshold:100/surf",
                            "match=" + tempDir.path() + "/cube3.cub",
@@ -127,7 +127,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMultiAlgo) {
   ASSERT_EQ(network.GetNumPoints(), 50);
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesMaxPoints) {
   // Tests that decreasing maxpoints decreases output points + tests pointindex
   QVector<QString> args1 = { "algorithm=brisk/brisk",
                            "match=" + tempDir.path() + "/cube3.cub",
@@ -179,7 +179,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesMaxPoints) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorListspecNoAlg) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorListspecNoAlg) {
   QVector<QString> args = {"listspec=yes"};
   UserInterface options(APP_XML, args);
   try {
@@ -192,7 +192,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorListspecNoAlg) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorInputNoAlg) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorInputNoAlg) {
   QVector<QString> args = {"match=" + tempDir.path() + "/cube3.cub",
                            "from=" + tempDir.path() + "/cube2.cub"};
   UserInterface options(APP_XML, args);
@@ -206,7 +206,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorInputNoAlg) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorNoInput) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoInput) {
   QVector<QString> args = {"match=" + tempDir.path() + "/cube3.cub",
                            "algorithm=surf/surf"};
   UserInterface options(APP_XML, args);
@@ -221,7 +221,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorNoInput) {
 
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindFeaturesErrorNoMatch) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoMatch) {
   // Tests that decreasing maxpoints decreases output points + tests pointindex
   QVector<QString> args = { "algorithm=brisk/brisk",
                            "match=" + tempDir.path() + "/cube3.cub",

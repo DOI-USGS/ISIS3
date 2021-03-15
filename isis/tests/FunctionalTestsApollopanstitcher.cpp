@@ -19,7 +19,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apollopanstitcher.xml").expanded();
 
-TEST_F(TempTestingFiles, FunctionalTestsApolloPanStitcherDefault) {
+TEST_F(TempTestingFiles, FunctionalTestApollopanstitcherDefault) {
   QVector<QString> args = {"file_base=$ISISTESTDATA/isis/src/apollo/apps/apollopanstitcher/tsts/default/input/AS15_P_0177R10",
                            "to=" + tempDir.path() + "/reduced8.cub",
                            "microns=50"};
@@ -32,7 +32,7 @@ TEST_F(TempTestingFiles, FunctionalTestsApolloPanStitcherDefault) {
     FAIL() << "Unable to stitcher apollo images: " << e.toString().toStdString().c_str() << std::endl;
   }
   Cube outputCube(options.GetFileName("TO"));
-  
+
   std::unique_ptr<Histogram> hist (outputCube.histogram());
 
   EXPECT_DOUBLE_EQ(hist->Average(), 53214.457630315941);

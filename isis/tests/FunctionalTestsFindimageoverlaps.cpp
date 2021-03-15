@@ -28,7 +28,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsNoOverlap) {
   ImagePolygon fp1;
   fp1.Create(*cube1);
   cube1->write(fp1);
@@ -69,7 +69,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapsNoOverlap) {
 
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsTwoImageOverlap) {
 
   QVector<QString> args = {"OVERLAPLIST=" + tempDir.path() + "/overlaps.txt", "detailed=true", "errors=true"};
   UserInterface ui(APP_XML, args);
@@ -106,7 +106,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapTwoImageOverlap) {
   ASSERT_EQ((*poi)[1], "MGS/691204200:96/MOC-WA/RED");
 }
 
-TEST_F(ThreeImageNetwork, FunctionalTestFindImageOverlapFullOverlap) {
+TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsFullOverlap) {
 
   ImagePolygon poly;
   coords = {{31, 1},
