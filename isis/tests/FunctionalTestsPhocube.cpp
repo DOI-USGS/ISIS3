@@ -6,6 +6,7 @@
   
 #include "BandManager.h"
 #include "Fixtures.h"
+#include "Histogram.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -26,8 +27,6 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Only need to check that the bands were set correctly, do not need to check the image data
-  // since the Camera tests should test for the correct output.
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
   ASSERT_EQ(cube.bandCount(), 5);
@@ -45,6 +44,12 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
   }
+
+  std::unique_ptr<Histogram> hist (cube.histogram(0));
+  EXPECT_NEAR(hist->Average(), 85.320326568603519, .000001);
+  EXPECT_NEAR(hist->Sum(), 10665.040821075439, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 125);
+  EXPECT_NEAR(hist->StandardDeviation(), 90.340311076718081, .000001);
 
   cube.close();
 }
@@ -99,6 +104,13 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[24], "Body Fixed Y");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[25], "Body Fixed Z");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[26], "Local Solar Time");
+
+  std::unique_ptr<Histogram> hist (cube.histogram(0));
+  EXPECT_NEAR(hist->Average(), -56.952015115651818, .000001);
+  EXPECT_NEAR(hist->Sum(), -38442.610203064978, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 675);
+  EXPECT_NEAR(hist->StandardDeviation(), 667.22433030730758, .000001);
+
   cube.close();
 }
 
@@ -174,6 +186,12 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
     }
   }
 
+  std::unique_ptr<Histogram> hist (cube.histogram(0));
+  EXPECT_NEAR(hist->Average(), 41.383792877197266, .000001);
+  EXPECT_NEAR(hist->Sum(), 413.83792877197266, .0001);
+  EXPECT_EQ(hist->ValidPixels(), 10);
+  EXPECT_NEAR(hist->StandardDeviation(), 40.473798872303433, .0001);
+
   cube.close();
 }
 
@@ -219,6 +237,12 @@ TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
     }
   }
 
+  std::unique_ptr<Histogram> hist (cube.histogram(0));
+  EXPECT_NEAR(hist->Average(), 130.22882244403544, .000001);
+  EXPECT_NEAR(hist->Sum(), 8464.8734588623047, .0001);
+  EXPECT_EQ(hist->ValidPixels(), 65);
+  EXPECT_NEAR(hist->StandardDeviation(), 167.45747507650518, .0001);
+
   cube.close();
 }
 
@@ -243,12 +267,17 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
 
   EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Center"), 1.0);
   EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Width"), 1.0);
+
+  std::unique_ptr<Histogram> hist (cube.histogram(1));
+  EXPECT_NEAR(hist->Average(), 13, .000001);
+  EXPECT_NEAR(hist->Sum(), 325, .0001);
+  EXPECT_EQ(hist->ValidPixels(), 25);
+  EXPECT_NEAR(hist->StandardDeviation(), 7.3598007219398722, .0001);
+
   cube.close();
 }
 
 // Tests that we can process radar data.
-// Since the camera tests should test for exact output,
-// just test that the output is in a range.
 TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "phase=no", "emission=no", "incidence=no",
@@ -281,6 +310,12 @@ TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
     }
   }
 
+  std::unique_ptr<Histogram> hist (cube.histogram(1));
+  EXPECT_NEAR(hist->Average(), 144.00618486691266, .000001);
+  EXPECT_NEAR(hist->Sum(),  3600.1546216728166, .0001);
+  EXPECT_EQ(hist->ValidPixels(), 25);
+  EXPECT_NEAR(hist->StandardDeviation(), 179.9861282675883, .0001);
+
   cube.close();
 }
 
@@ -303,5 +338,12 @@ TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "DN");
+
+  std::unique_ptr<Histogram> hist (cube.histogram(1));
+  EXPECT_NEAR(hist->Average(), 13, .000001);
+  EXPECT_NEAR(hist->Sum(), 325, .0001);
+  EXPECT_EQ(hist->ValidPixels(), 25);
+  EXPECT_NEAR(hist->StandardDeviation(), 7.3598007219398722, .0001);
+
   cube.close();
 }

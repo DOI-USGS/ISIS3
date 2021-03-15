@@ -316,6 +316,9 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kristin Berry" date="2020-06-10">
       Added the LOCALTIME parameter to output a band with the local solar time for each pixel. Fixes #3850
     </change>
+    <change name="Kaitlyn Lee" date="2020-03-15">
+      Converted application and tests for Gtest conversion.
+    </change>
   </history>
 
   <category>
