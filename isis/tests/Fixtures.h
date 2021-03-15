@@ -238,6 +238,13 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
+  
+  class OsirisRexCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId);
+  };
+
+
   class ApolloCube : public LargeCube {
     protected:
       void SetUp() override;

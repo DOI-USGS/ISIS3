@@ -1049,6 +1049,72 @@ namespace Isis {
     cubeFileList.write(cubeListPath);
   }
 
+
+ void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");    
+    
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);
+    kernels["ShapeModel"] = "Null";
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        MissionName               = OSIRIS-REx
+        SpacecraftName            = OSIRIS-REX
+        InstrumentId              = PolyCam
+        TargetName                = Bennu
+        StartTime                 = 2019-01-13T23:36:05.000
+        ExposureDuration          = 100 <ms>
+        SpacecraftClockStartCount = 1/0600694569.00000
+        FocusPosition             = 21510
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName = Unknown
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    json nk;
+    nk["BODY2101955_RADII"] =  {2825, 2675, 254}; 
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0; 
+    nk["INS"+ikid.toStdString()+"_PIXEL_SIZE"] = 8.5;
+    nk["CLOCK_ET_-64_1/0600694569.00000_COMPUTED"] = "8ed6ae8930f3bd41";
+    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.0085, 0.0};
+    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, -0.0085};
+    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 117.64705882353, 0.0};
+    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, -117.64705882353};
+    nk["INS"+ikid.toStdString()+"_CCD_CENTER"] = {511.5, 511.5};
+    nk["BODY_FRAME_CODE"] = 2101955;
+    
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    PvlObject newNaifKeywords("NaifKeywords", nk);
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();  
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+ }
+
   void CSMCubeFixture::SetUp() {
     SmallCube::SetUp();
 
