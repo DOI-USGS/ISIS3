@@ -17,6 +17,7 @@ Group = Keyword2
   InputPosition  = (IsisCube, Instrument)
   OutputName     = Keyword2
   OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (TC1, TC)
   Translation    = (*, *)
 End_Group
 
