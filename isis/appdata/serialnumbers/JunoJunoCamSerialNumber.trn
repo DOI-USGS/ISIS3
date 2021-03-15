@@ -31,7 +31,7 @@ End_Group
 
 Group = Keyword4
   Auto
-  InputKey       = FrameletNumber
+  InputKey       = FrameNumber
   InputGroup     = "IsisCube,Instrument"
   InputPosition  = (IsisCube, Instrument)
   OutputName     = Keyword4
