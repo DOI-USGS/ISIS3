@@ -411,7 +411,7 @@ namespace Isis {
 
     // Create our CSM State blob as a string and add the CSM string to the Blob.
     Blob csmStateBlob("CSMState", "String");
-    csmStateBlob.setData(modelState.c_str(), modelState.size());
+    csmStateBlob.setData(modelState);
     PvlObject &blobLabel = csmStateBlob.Label();
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);

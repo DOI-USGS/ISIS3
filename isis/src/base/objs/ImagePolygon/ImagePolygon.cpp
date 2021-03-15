@@ -64,7 +64,7 @@ namespace Isis {
    *
    */
   ImagePolygon::ImagePolygon(Blob &blob) : ImagePolygon() {
-    p_polyStr = string(blob.getBuffer(), blob.Size());
+    p_polyStr = string(blob.getBuffer());
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(*globalFactory));
     p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
@@ -1357,7 +1357,7 @@ namespace Isis {
     delete wkt;
 
     Blob newBlob("Footprint", "Polygon");
-    newBlob.setData(polyStr.c_str(), polyStr.size());
+    newBlob.setData(polyStr);
     return newBlob;
   }
 

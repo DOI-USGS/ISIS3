@@ -57,7 +57,7 @@ namespace Isis {
     PvlObject &blobLabel = state.Label();
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];
-    QString stateString = QString::fromUtf8(state.getBuffer(), state.Size());
+    QString stateString(state.getBuffer());
     init(cube, pluginName, modelName, stateString);
   }
 

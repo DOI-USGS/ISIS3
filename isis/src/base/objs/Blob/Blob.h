@@ -77,6 +77,7 @@ namespace Isis {
 
 
       char *getBuffer();
+      void setData(const std::string data);
       void setData(const char *buffer, int nbytes);
       void takeData(char *buffer, int nbytes);
 

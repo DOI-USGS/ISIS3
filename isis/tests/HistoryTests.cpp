@@ -30,6 +30,40 @@ TEST_F(HistoryBlob, HistoryTestsAddEntry) {
   EXPECT_TRUE(newHistoryPvl.findObject("mroctx2isis").hasGroup("UserParameters"));
 }
 
+TEST_F(HistoryBlob, HistoryTestsAddSecondEntry) {
+  History history(historyBlob);
+
+  std::istringstream hss(R"(
+      Object = ctxcal
+        IsisVersion       = "4.1.0  | 2020-07-01"
+        ProgramVersion    = 2016-06-10
+        ProgramPath       = /Users/acpaquette/repos/ISIS3/build/bin
+        ExecutionDateTime = 2020-07-01T16:48:40
+        HostName          = Unknown
+        UserName          = acpaquette
+        Description       = "Import an MRO CTX image as an Isis cube"
+
+        Group = UserParameters
+          FROM    = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cub
+          TO      = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cal.cub
+        End_Group
+      End_Object)");
+
+  PvlObject secondHistoryPvl;
+  hss >> secondHistoryPvl;
+
+  history.AddEntry(secondHistoryPvl);
+
+  Blob blob = history.toBlob();
+
+  History reingestedHistory(blob);
+
+  Pvl newHistoryPvl = reingestedHistory.ReturnHist();
+
+  ASSERT_TRUE(newHistoryPvl.hasObject("ctxcal"));
+  EXPECT_TRUE(newHistoryPvl.findObject("ctxcal").hasGroup("UserParameters"));
+}
+
 TEST_F(HistoryBlob, HistoryTeststoBlob) {
   History history(historyBlob);
 

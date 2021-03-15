@@ -96,7 +96,7 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  std::string modelState(stateString.getBuffer(), stateString.Size());
+  std::string modelState(stateString.getBuffer());
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // Check blob label ModelName and Plugin Name
@@ -168,7 +168,7 @@ TEST_F(CSMPluginFixture, CSMInitRunTwice) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  std::string modelState(stateString.getBuffer(), stateString.Size());
+  std::string modelState(stateString.getBuffer());
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // Make sure there is only one CSMState Blob on the label
@@ -224,7 +224,7 @@ TEST_F(CSMPluginFixture, CSMInitMultiplePossibleModels) {
 
   // Check that the plugin can create a model from the state string
   std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  std::string modelState(stateString.getBuffer(), stateString.Size());
+  std::string modelState(stateString.getBuffer());
   EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
 
   // check blob label ModelName and Plugin Name
@@ -469,7 +469,7 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
   testCube->close();
 
   // Write the state out to a file
-  std::string stateBefore(state.getBuffer(), state.Size());
+  std::string stateBefore(state.getBuffer());
   QString statePath = tempDir.path() + "/state.json";
   std::ofstream stateFile(statePath.toStdString());
   stateFile << stateBefore;
@@ -490,6 +490,6 @@ TEST_F(CSMPluginFixture, CSMInitWithState) {
 
   Blob stateBlobAfter("CSMState", "String");
   testCube->read(stateBlobAfter);
-  std::string stateAfter(stateBlobAfter.getBuffer(), stateBlobAfter.Size());
+  std::string stateAfter(stateBlobAfter.getBuffer());
   EXPECT_EQ(stateBefore, stateAfter);
 }

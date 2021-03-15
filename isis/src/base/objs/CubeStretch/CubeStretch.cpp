@@ -60,8 +60,7 @@ namespace Isis {
    * @param blob The Blob to read data from.
    */
   CubeStretch::CubeStretch(Blob blob) : Stretch() {
-    char *buff = blob.getBuffer();
-    std::string stringFromBuffer(buff, blob.Size());
+    std::string stringFromBuffer(blob.getBuffer());
     setName(blob.Label()["Name"][0]);
     setType(blob.Label()["StretchType"][0]);
     Parse(QString::fromStdString(stringFromBuffer));
@@ -88,7 +87,7 @@ namespace Isis {
     blob.Label() += PvlKeyword("StretchType", getType());
     blob.Label() += PvlKeyword("BandNumber", QString::number(getBandNumber()));
     std::string blobString = Text().toStdString();
-    blob.setData(blobString.c_str(), blobString.size());
+    blob.setData(blobString);
     return blob;
   }
 

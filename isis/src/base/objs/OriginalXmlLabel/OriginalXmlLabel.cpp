@@ -80,7 +80,7 @@ namespace Isis {
     sstream << m_originalLabel.toString();
     string orglblStr = sstream.str();
     Isis::Blob blob("IsisCube", "OriginalXmlLabel");
-    blob.setData((char*)orglblStr.data(), orglblStr.length());
+    blob.setData(orglblStr);
     blob.Label() += Isis::PvlKeyword("ByteOrder", "NULL");
     if (Isis::IsLsb()) {
       blob.Label()["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);

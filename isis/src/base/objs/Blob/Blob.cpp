@@ -370,6 +370,18 @@ namespace Isis {
 
 
   /**
+   * Store a string in the BLOB.
+   *
+   * This function will copy the string as a null terminated C String.
+   *
+   * @param data The string to store in the BLOB.
+   */
+  void Blob::setData(const string data) {
+    setData(data.c_str(), data.size() + 1); // Add 1 to get the null terminator
+  }
+
+
+  /**
    * Set the data stored in the BLOB.
    *
    * This function will copy the data buffer, if you want to avoid that use

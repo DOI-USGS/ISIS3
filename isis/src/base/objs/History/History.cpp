@@ -77,7 +77,7 @@ namespace Isis {
     if (p_bufferSize > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
-    int bytes = histStr.size();
+    int bytes = histStr.size() + 1; // Add 1 for the null terminator
 
     int blobBufferSize = p_bufferSize+bytes;
     char *blobBuffer = new char[blobBufferSize];
