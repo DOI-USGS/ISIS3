@@ -45,6 +45,11 @@ namespace Isis {
    *                           in very large cubes.  This was caused by calling the wrong number
    *                           to string conversion function.  Introduced when refactoring the
    *                           IString class.  Fixes #1388.
+   *   @history 2021-03-08 Jesse Mapel, Adam Paquette, and Austin Sanders - Refactored
+   *                           subclasses to use Blob as an intermediate storage object
+   *                           when writing to cubes instead of inheriting from Blob. Added
+   *                           several new methods to more easily pass data in and out of
+   *                           Blob objects.
    *
    * @todo Write class description, history, etc.
    */
