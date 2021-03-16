@@ -699,7 +699,7 @@ Group = SpiderLeg30Temperature
   Translation    = (*, *)
 End_Group
 
-Group = SpiderLeg120Temperature
+Group = SpiderLeg150Temperature
   Auto
   InputKey       = MRO:SPIDER_LEG_150_TEMPERATURE
   InputGroup     = TEMPERATURE_PARAMETERS
@@ -710,7 +710,7 @@ Group = SpiderLeg120Temperature
   Translation    = (*, *)
 End_Group
 
-Group = SpiderLeg240Temperature
+Group = SpiderLeg270Temperature
   Auto
   InputKey       = MRO:SPIDER_LEG_270_TEMPERATURE
   InputGroup     = TEMPERATURE_PARAMETERS
