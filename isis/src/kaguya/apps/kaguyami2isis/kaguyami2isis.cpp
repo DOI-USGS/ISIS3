@@ -23,8 +23,6 @@ find files of those names at the top level of this repository. **/
 
 using namespace std;
 
-static double range(double x);
-
 namespace Isis {
 
   void kaguyami2isis(UserInterface &ui) {
@@ -147,21 +145,5 @@ namespace Isis {
     outcube->putGroup(kern);
 
     p.EndProcess();
-  }
-
-  double range(double x) {
-    double a,b,c;
-    b = x / 360;
-    if(b > 0) {
-      c = floor(b);
-    }
-    else {
-      c = ceil(b);
-    }
-    a = 360 * (b - c);
-    if(a < 0) {
-      a = a + 360;
-    }
-    return a;
   }
 }
