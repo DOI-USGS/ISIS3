@@ -274,6 +274,7 @@ Things that all new test additions need to have done.
 - [ ]  New GTests prefixed with `FunctionalTest<appname>`
 - [ ]  Old Makefile tests removed 
 - [ ]  New tests passing on Jenkins
+- [ ]  Old test data removed
 
 ## Main.cpp Templates 
 
