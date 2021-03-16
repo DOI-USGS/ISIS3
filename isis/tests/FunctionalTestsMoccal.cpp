@@ -12,7 +12,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/moccal.xml").expanded();
 
-TEST_F(MgsMocCube, FunctionalTestMromoccalDefault) {
+TEST_F(MgsMocCube, FunctionalTestMoccalDefault) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName};
 
@@ -48,7 +48,7 @@ TEST_F(MgsMocCube, FunctionalTestMromoccalDefault) {
 }
 
 
-TEST_F(MgsMocCube, FunctionalTestMromoccalIofFalse) {
+TEST_F(MgsMocCube, FunctionalTestMoccalIofFalse) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName, "iof=False"};
 
@@ -85,7 +85,7 @@ TEST_F(MgsMocCube, FunctionalTestMromoccalIofFalse) {
 }
 
 
-TEST_F(MgsMocCube, FunctionalTestMromoccalNullwagoTrue) {
+TEST_F(MgsMocCube, FunctionalTestMoccalNullwagoTrue) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName, "nullwag=True"};
 
@@ -121,7 +121,7 @@ TEST_F(MgsMocCube, FunctionalTestMromoccalNullwagoTrue) {
 }
 
 
-TEST_F(MgsMocCube, FunctionalTestMromoccalCameraComparison) {
+TEST_F(MgsMocCube, FunctionalTestMoccalCameraComparison) {
   QString outCubeFileNameCam = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileNameCam};
 

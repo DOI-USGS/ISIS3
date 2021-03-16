@@ -13,7 +13,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/camdev.xml").expanded();
 
-TEST_F(LineScannerCube, FunctionalTestCamDevDefault) {
+TEST_F(LineScannerCube, FunctionalTestCamdevDefault) {
   LineManager line(*testCube);
   double pixelValue = 0.0;
   for(line.begin(); !line.end(); line++) {
