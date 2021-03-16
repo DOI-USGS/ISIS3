@@ -8,7 +8,7 @@
 # The Group names can NOT be repeated.
 #
 # InputGroup is a comma delimited list of objects and/or
-# groups in the inut label. Traversing this list will
+# groups in the input label. Traversing this list will
 # lead to the correct level to find the output key.
 #
 # InputKey is the keyword within the group which holds
