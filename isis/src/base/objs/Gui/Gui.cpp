@@ -104,21 +104,21 @@ namespace Isis {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
-    
-    
+
+
     if (uiPref.hasKeyword("GuiFontName")) {
       QString fontString = uiPref["GuiFontName"];
       QFont font = QFont(fontString);
-      
+
       if (uiPref.hasKeyword("GuiFontSize")) {
         int pointSize = uiPref["GuiFontSize"];
         font.setPointSize(pointSize);
       }
-      
+
       QApplication::setFont(font);
     }
-    
-    
+
+
     // Create the main window
     p_gui = new Gui(ui);
     p_gui->show();
@@ -881,16 +881,11 @@ namespace Isis {
 
   // Show help for the current app
   void Gui::AboutProgram() {
-    Isis::FileName file((QString)
-                        "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
-                        Isis::Application::GetUserInterface().ProgramName() +
-                        "/" +
-                        Isis::Application::GetUserInterface().ProgramName() +
-                        ".html");
-
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
-                          (QString)" file:" + file.expanded() + " &";
+                      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      Isis::Application::GetUserInterface().ProgramName() + "/" +
+                      Isis::Application::GetUserInterface().ProgramName() + ".html";
     ProgramLauncher::RunSystemCommand(command);
   }
 
