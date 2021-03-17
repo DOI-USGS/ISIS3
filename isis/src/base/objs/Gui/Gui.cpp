@@ -883,7 +883,7 @@ namespace Isis {
   void Gui::AboutProgram() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
-                      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
                       Isis::Application::GetUserInterface().ProgramName() + "/" +
                       Isis::Application::GetUserInterface().ProgramName() + ".html";
     ProgramLauncher::RunSystemCommand(command);
