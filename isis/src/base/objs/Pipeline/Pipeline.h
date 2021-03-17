@@ -142,6 +142,11 @@ namespace Isis {
    *                           control statements. References # 795.
    *   @history 2016-08-28 Kelvin Rodriguez - Removed useless if statement comparing
    *                           a reference variable to Null. Part of porting to OS X 10.11.
+   *   @history 2021-17-03 Adam Paquette - Update SetInputListFile to use the
+   *                           FileList object rather than the TextFile object.
+   *                           Also updated SetInputListFile isisparameter
+   *                           function to chain into the SetInputListFile FileName
+   *                           function.
    */
   class Pipeline {
     public:
