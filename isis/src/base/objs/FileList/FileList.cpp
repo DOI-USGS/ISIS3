@@ -89,9 +89,10 @@ namespace Isis {
     Isis::IString s;
     bool bHasQuotes = false;
 
-    in.getline(buf, 65536);
     bool isComment = false;
-    while (!in.eof()) {
+    do {
+      in.getline(buf, 65536);
+
       s = buf;
       string::size_type loc = s.find("\"", 0);
 
@@ -108,7 +109,6 @@ namespace Isis {
 
       isComment = false;
       if(strlen(buf) == 0) {
-        in.getline(buf, 65536);
         continue;
       }
       for (int index = 0; index < (int)strlen(buf); index++) {
@@ -125,7 +125,6 @@ namespace Isis {
         }
       }
       if (isComment) {
-        in.getline(buf, 65536);
         continue;
       }
       else {
@@ -138,9 +137,9 @@ namespace Isis {
         }
 
         this->push_back(s.ToQt());
-        in.getline(buf, 65536);
       }
-    }
+
+    } while(!in.eof());
     if (this->size() == 0) {
       string msg = "Input Stream Empty";
       throw IException(IException::User, msg, _FILEINFO_);
