@@ -45,3 +45,16 @@ TEST(FileList, FileNameConstructor)
   fl1.write(output);
   EXPECT_STREQ(expectedOutput.c_str(), output.str().c_str());
 }
+
+TEST(FileList, FileNameNoNewLine)
+{
+  std::istringstream input(
+  "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.cpp\n"
+  "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.h");
+  std::ostringstream output;
+  std::string expectedOutput = "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.cpp\n"
+     "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.h\n";
+  Isis::FileList fl1(input);
+  fl1.write(output);
+  EXPECT_STREQ(expectedOutput.c_str(), output.str().c_str());
+}
