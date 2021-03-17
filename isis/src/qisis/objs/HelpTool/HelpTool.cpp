@@ -62,10 +62,17 @@ namespace Isis {
    */
   void HelpTool::aboutProgram() {
     PvlGroup &uig = Preference::Preferences().findGroup("UserInterface");
+#if defined(__linux__)
     QString command = (QString) uig["GuiHelpBrowser"] +
                       " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
                       QApplication::applicationName() + "/" +
                       QApplication::applicationName() + ".html";
+#elif defined(__APPLE__)
+    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      QApplication::applicationName() + "/" +
+                      QApplication::applicationName() + ".html";
+#endif
     ProgramLauncher::RunSystemCommand(command);
   }
 }

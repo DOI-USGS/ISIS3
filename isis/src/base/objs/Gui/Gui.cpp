@@ -882,10 +882,17 @@ namespace Isis {
   // Show help for the current app
   void Gui::AboutProgram() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
+#if defined(__linux__)
     QString command = (QString) uig["GuiHelpBrowser"] +
                       " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
                       Isis::Application::GetUserInterface().ProgramName() + "/" +
                       Isis::Application::GetUserInterface().ProgramName() + ".html";
+#elif defined(__APPLE__)
+    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      Isis::Application::GetUserInterface().ProgramName() + "/" +
+                      Isis::Application::GetUserInterface().ProgramName() + ".html";
+#endif
     ProgramLauncher::RunSystemCommand(command);
   }
 
