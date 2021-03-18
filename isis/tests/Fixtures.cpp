@@ -465,7 +465,7 @@ namespace Isis {
       cubeL = new Cube();
       cubeR = new Cube();
 
-      cubeLPath = tempDir.path() + "observationPairL.cub";
+      cubeLPath = tempDir.path() + "/observationPairL.cub";
       cubeRPath = tempDir.path() + "/observationPairR.cub";
 
       cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");

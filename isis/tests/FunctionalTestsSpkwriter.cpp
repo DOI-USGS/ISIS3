@@ -16,7 +16,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/spkwriter.xml").expanded();
 TEST_F(DefaultCube, FunctionalTestsSpkwriterDefault) {
   Pvl appLog;
   QVector<QString> args = {"from=" + testCube->fileName(),
-                           "to=" + tempDir.path() + "newKernel.bsp"};
+                           "to=" + tempDir.path() + "/newKernel.bsp"};
 
   UserInterface options(APP_XML, args);
   try {

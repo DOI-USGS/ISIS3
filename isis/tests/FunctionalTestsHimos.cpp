@@ -23,7 +23,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosDefault) {
   cubeList->write(mosFileList);
 
   QVector<QString> args = {"from=" + mosFileList.toString(),
-                           "to=" + tempDir.path() + "outputMos.cub"};
+                           "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -62,7 +62,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosError) {
   cubeList->write(mosFileList);
 
   QVector<QString> args = {"from=" + mosFileList.toString(),
-                           "to=" + tempDir.path() + "outputMos.cub"};
+                           "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -88,7 +88,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosMismatchObs) {
   cubeList->write(mosFileList);
 
   QVector<QString> args = {"from=" + mosFileList.toString(),
-                           "to=" + tempDir.path() + "outputMos.cub"};
+                           "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -114,7 +114,7 @@ TEST_F(MroHiriseCube, FunctionalTestsHimosMismatchFilter) {
   cubeList->write(mosFileList);
 
   QVector<QString> args = {"from=" + mosFileList.toString(),
-                           "to=" + tempDir.path() + "outputMos.cub"};
+                           "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
   try {
