@@ -315,12 +315,12 @@ TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
+  QVector<QString> args = {"to=" + tempDir.path() + "/level2.cub", "matchmap=yes"};
   UserInterface ui(APP_XML, args);
 
   Pvl log;
   MockProcessRubberSheet rs;
-  FileName fn(tempDir.path() + "level2.cub");
+  FileName fn(tempDir.path() + "/level2.cub");
   CubeAttributeOutput  outputAttr(fn);
   Cube outputCube;
   outputCube.setDimensions(1, 1, 1);
@@ -362,13 +362,13 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
+  QVector<QString> args = {"to=" + tempDir.path() + "/level2.cub", "matchmap=yes"};
 
   UserInterface ui(APP_XML, args);
 
   Pvl log;
   MockProcessRubberSheet rs;
-  FileName fn(tempDir.path() + "level2.cub");
+  FileName fn(tempDir.path() + "/level2.cub");
   CubeAttributeOutput outputAttr(fn);
   Cube outputCube;
   outputCube.setDimensions(1, 1, 1);
@@ -411,7 +411,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to=" + tempDir.path()+ "level2.cub",
+  QVector<QString> args = {"to=" + tempDir.path()+ "/level2.cub",
                           "matchmap=yes",
                           "warpalgorithm=forwardpatch",
                           "patchsize=0"};
@@ -419,7 +419,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
 
   Pvl log;
   MockProcessRubberSheet rs;
-  FileName fn(tempDir.path() + "level2.cub");
+  FileName fn(tempDir.path() + "/level2.cub");
   CubeAttributeOutput  outputAttr(fn);
   Cube outputCube;
   outputCube.setDimensions(1, 1, 1);
@@ -462,7 +462,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QVector<QString> args = {"to=" + tempDir.path() + "level2.cub",
+  QVector<QString> args = {"to=" + tempDir.path() + "/level2.cub",
                           "matchmap=yes",
                           "warpalgorithm=reversepatch",
                           "patchsize=3"};
@@ -470,7 +470,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
 
   Pvl log;
   MockProcessRubberSheet rs;
-  FileName fn(tempDir.path() + "level2.cub");
+  FileName fn(tempDir.path() + "/level2.cub");
   CubeAttributeOutput  outputAttr(fn);
   Cube outputCube;
   outputCube.setDimensions(1, 1, 1);

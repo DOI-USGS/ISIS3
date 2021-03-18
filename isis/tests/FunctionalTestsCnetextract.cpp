@@ -311,7 +311,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractInclusivePointlist) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetextractCubeCubelist) {
-  QString reducedCubeList = tempDir.path() + "reducedCubes.lis";
+  QString reducedCubeList = tempDir.path() + "/reducedCubes.lis";
   cubeList->pop_back();
   cubeList->pop_back();
   cubeList->write(reducedCubeList);
@@ -340,7 +340,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractCubeCubelist) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetextractCubeCubemeasures) {
-  QString reducedCubeList = tempDir.path() + "reducedCubes.lis";
+  QString reducedCubeList = tempDir.path() + "/reducedCubes.lis";
   cubeList->pop_back();
   cubeList->pop_back();
   cubeList->write(reducedCubeList);
@@ -374,7 +374,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractCubeCubemeasures) {
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestCnetextractCubeRetainreference) {
-  QString reducedCubeList = tempDir.path() + "reducedCubes.lis";
+  QString reducedCubeList = tempDir.path() + "/reducedCubes.lis";
   cubeList->pop_back();
   cubeList->pop_back();
   cubeList->write(reducedCubeList);
