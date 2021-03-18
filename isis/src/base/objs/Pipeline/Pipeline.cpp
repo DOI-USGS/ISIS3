@@ -375,7 +375,7 @@ namespace Isis {
     while (!filelist.isEmpty()) {
       filename = filelist.takeFirst();
       p_originalInput.push_back(filename.expanded());
-      p_inputBranches.push_back(inputFileName.expanded() + toString(branch));
+      p_inputBranches.push_back(inputFileName.name() + toString(branch));
       p_virtualBands.push_back("");
       p_finalOutput.push_back(filename.name());
 
