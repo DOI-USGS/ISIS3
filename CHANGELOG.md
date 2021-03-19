@@ -46,8 +46,13 @@ release.
 
 - Fixed relative paths not being properly converted to absolute paths in isisVarInit.py [4274](https://github.com/USGS-Astrogeology/ISIS3/issues/4274)
 - Fixed issue where serial numbers for Kaguya TC and MI image could not be generated. [4235](https://github.com/USGS-Astrogeology/ISIS3/issues/4235)
+- Fixed hardcoded file naming in the hijitter app dealing with output from
+pipeline. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
 
 ### Changed
+
+- Updated the FileList object to handle files that do not contain a trailing new line
+character. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
 
 - Refactored Blob class to be used by classes that serialize to a Cube instead of inherited from. Impacted classes are GisBlob, History, ImagePolygon, OriginalLabel, OriginalXmlLabel, StrethBlob, StringBlob, and Table. [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
 
