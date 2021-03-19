@@ -2,6 +2,7 @@
 #include <iostream>
 #include "FileList.h"
 #include "IException.h"
+#include "TestUtilities.h"
 
 TEST(FileList, NonExistantFileConstructor)
 {
@@ -11,8 +12,7 @@ TEST(FileList, NonExistantFileConstructor)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to open [FakeFile]"))
-      << e.toString().toStdString();
+    EXPECT_THAT(e.what(), testing::HasSubstr("Unable to open [FakeFile]"));
   }
   catch(...)
   {
