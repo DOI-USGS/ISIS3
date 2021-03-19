@@ -152,8 +152,8 @@ TEST_F(ObservationPair, FunctionalTestsCkwriterCantValidate) {
 
   UserInterface options(APP_XML, args);
   try {
-   ckwriter(options, &appLog);
-   FAIL() << "Should not have been able to generate new CK" << std::endl;
+    ckwriter(options, &appLog);
+    FAIL() << "Should not have been able to generate new CK" << std::endl;
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Time overlap conflicts are present in segment (image) list."));
