@@ -196,9 +196,9 @@ void IsisMain() {
   }
 
   // the outputs from this pipeline are temporary files created by cubeatt
+  std::vector<QString> outputs = mainPipeline.OriginalBranches();
   for (int i = 0; i < g_numFiles; i++) {
-    g_tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM"
-                                   + toString(i + 1) + ".cub").expanded());
+    g_tempFiles.push_back(FileName("$TEMPORARY/noproj."  + outputs[i] + ".cub").expanded());
   }
 
   // Do some calculations, delete the final outputs from the pipeline
@@ -508,6 +508,8 @@ void processNoprojFiles(Pipeline &p) {
   hijitregProg.SetMaximumSteps(1);
   hijitregProg.CheckStatus();
 
+  std::vector<QString> outputs = p.OriginalBranches();
+
   for (int i = 0; i < g_numFiles - 1; i++) {
     // If this CCD and the consecutive CCD are both in the input list,
     // use the current cubes in the pipeline to create an output flat
@@ -525,8 +527,8 @@ void processNoprojFiles(Pipeline &p) {
       QString flatFileName = tempDir + "/first" + toString(g_ccdNumbers[i])
                             + "-" + toString(g_ccdNumbers[i+1]) + ".flat";
       QString params = "";
-      params += "FROM=" + tempDir + "/noproj.FROM" + toString(i + 1) + ".cub";
-      params += " MATCH=" + tempDir + "/noproj.FROM" + toString(i + 2) + ".cub";
+      params += "FROM=" + tempDir + "/noproj." + outputs[i] + ".cub";
+      params += " MATCH=" + tempDir + "/noproj." + outputs[i + 1] + ".cub";
       params += " REGDEF=" + ui.GetFileName("REGDEF");
       params += " FLAT=" + flatFileName;
 
@@ -610,7 +612,7 @@ void processNoprojFiles(Pipeline &p) {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-  Cube cube(FileName("$TEMPORARY/noproj.FROM1.cub").expanded(), "r");
+  Cube cube(FileName("$TEMPORARY/noproj." + outputs[0] + ".cub").expanded(), "r");
   Camera *cam = CameraFactory::Create(cube);
 
   double lineRate = cam->DetectorMap()->LineRate();
