@@ -73,7 +73,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
   FileName labelFile("$ISISROOT/../isis/tests/data/footprintinit/cross.pvl");
 
   Cube crossCube;
-  crossCube.fromIsd(tempDir.path() + "footprintCube.cub", labelFile, isdFile, "rw");
+  crossCube.fromIsd(tempDir.path() + "/footprintCube.cub", labelFile, isdFile, "rw");
 
   ImagePolygon poly;
   try {
@@ -128,7 +128,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
   kernels["ShapeModel"] = "$base/dems/MSGR_DEM_USG_EQ_I_V02_prep.cub";
 
   Cube footprintCube;
-  footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
+  footprintCube.fromIsd(tempDir.path() + "/footprintCube.cub", label, isd, "rw");
 
   ImagePolygon poly;
   try {
@@ -165,7 +165,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
   cubeLabel >> footprintLabel;
 
   Cube footprintCube;
-  FileName footprintFile(tempDir.path() + "footprintCube.cub");
+  FileName footprintFile(tempDir.path() + "/footprintCube.cub");
   footprintCube.fromLabel(footprintFile, footprintLabel, "rw");
 
   LineManager line(footprintCube);
@@ -235,7 +235,7 @@ TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
   kernels["ShapeModel"] = "Null";
 
   Cube footprintCube;
-  footprintCube.fromIsd(tempDir.path() + "footprintCube.cub", label, isd, "rw");
+  footprintCube.fromIsd(tempDir.path() + "/footprintCube.cub", label, isd, "rw");
 
   ImagePolygon poly;
   poly.Emission(89);
