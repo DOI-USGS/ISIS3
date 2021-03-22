@@ -22,7 +22,7 @@ using ::testing::AtLeast;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded();
 
-TEST_F(DefaultCube, FunctionalTestCam2CamNoChange) {
+TEST_F(DefaultCube, FunctionalTestCam2camNoChange) {
 
   QVector<QString> args = {"to="+tempDir.path()+"/Cam2CamNoChange.cub", "INTERP=BILINEAR"};
   UserInterface ui(APP_XML, args);
@@ -49,5 +49,3 @@ TEST_F(DefaultCube, FunctionalTestCam2CamNoChange) {
   ASSERT_EQ(icubeInstrumentGroup.findKeyword("GainModeId"), ocubeInstrumentGroup.findKeyword("GainModeId"));
   ASSERT_EQ(icubeInstrumentGroup.findKeyword("OffsetModeId"), ocubeInstrumentGroup.findKeyword("OffsetModeId"));
 }
-
-

@@ -21,7 +21,7 @@ using testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/maptrim.xml").expanded();
 
-TEST_F(DefaultCube, FunctionalTestMapTrimDefault){
+TEST_F(DefaultCube, FunctionalTestMaptrimDefault){
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/maptrim.cub";
   QVector<QString> args = { "from=" + projTestCube->fileName(),
@@ -137,7 +137,7 @@ TEST_F(DefaultCube, FunctionalTestMapTrimDefault){
 
 
 
-TEST_F(DefaultCube, FunctionalTestMapTrimBoth){
+TEST_F(DefaultCube, FunctionalTestMaptrimBoth){
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/maptrim.cub";
   QVector<QString> args = { "from=" + projTestCube->fileName(),
@@ -172,7 +172,7 @@ TEST_F(DefaultCube, FunctionalTestMapTrimBoth){
 
 
 
-TEST_F(DefaultCube, FunctionalTestMapTrimCrop){
+TEST_F(DefaultCube, FunctionalTestMaptrimCrop){
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/maptrim.cub";
   QVector<QString> args = { "from=" + projTestCube->fileName(),
@@ -206,7 +206,7 @@ TEST_F(DefaultCube, FunctionalTestMapTrimCrop){
 }
 
 
-TEST_F(DefaultCube, FunctionalTestMapTrimLabelRanges){
+TEST_F(DefaultCube, FunctionalTestMaptrimLabelRanges){
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/maptrim.cub";
   QVector<QString> args = { "from=" + projTestCube->fileName(),
@@ -235,7 +235,7 @@ TEST_F(DefaultCube, FunctionalTestMapTrimLabelRanges){
 }
 
 
-TEST_F(DefaultCube, FunctionalTestMapTrimLevel1){
+TEST_F(DefaultCube, FunctionalTestMaptrimLevel1){
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path() + "/maptrim.cub";
   QVector<QString> args = { "from=" + testCube->fileName(),

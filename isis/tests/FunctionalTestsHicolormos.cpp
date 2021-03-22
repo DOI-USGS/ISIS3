@@ -13,10 +13,10 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/hicolormos.xml").expanded();
 
-TEST_F(MroHiriseCube, FunctionalTestsHicolormosDefault) {
+TEST_F(MroHiriseCube, FunctionalTestHicolormosDefault) {
   QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
   QVector<QString> args = {"to="+outCubeFileName};
-  
+
   UserInterface options(APP_XML, args);
   try {
     hicolormos(&dejitteredCube, nullptr, options);
@@ -29,8 +29,8 @@ TEST_F(MroHiriseCube, FunctionalTestsHicolormosDefault) {
   Pvl *label = oCube.label();
   PvlGroup group = label->findObject("IsisCube").findGroup("Mosaic");
 
-  EXPECT_NEAR((double)group.findKeyword("IncidenceAngle"),  59.687930340662, 0.0001); 
-  EXPECT_NEAR((double)group.findKeyword("EmissionAngle"),   0.0916725124399, 0.0001); 
+  EXPECT_NEAR((double)group.findKeyword("IncidenceAngle"),  59.687930340662, 0.0001);
+  EXPECT_NEAR((double)group.findKeyword("EmissionAngle"),   0.0916725124399, 0.0001);
   EXPECT_NEAR((double)group.findKeyword("PhaseAngle"),      59.597812369363, 0.0001);
   EXPECT_NEAR((double)group.findKeyword("LocalTime"),       15.486088288555, 0.0001);
   EXPECT_NEAR((double)group.findKeyword("SolarLongitude"),  113.54746578654, 0.0001);
@@ -57,9 +57,9 @@ TEST_F(MroHiriseCube, FunctionalTestsHicolormosDefault) {
   }
 
   Histogram *oCubeStats = oCube.histogram();
-  
-  ASSERT_DOUBLE_EQ(oCubeStats->Average(), 0.99336582359379422); 
-  ASSERT_DOUBLE_EQ(oCubeStats->Sum(),     802.63958546378569); 
-  ASSERT_EQ(oCubeStats->ValidPixels(),    808);  
-  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.079236816283481101);   
+
+  ASSERT_DOUBLE_EQ(oCubeStats->Average(), 0.99336582359379422);
+  ASSERT_DOUBLE_EQ(oCubeStats->Sum(),     802.63958546378569);
+  ASSERT_EQ(oCubeStats->ValidPixels(),    808);
+  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.079236816283481101);
 }

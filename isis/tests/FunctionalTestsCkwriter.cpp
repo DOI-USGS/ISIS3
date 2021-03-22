@@ -13,7 +13,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/ckwriter.xml").expanded();
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
+TEST_F(DefaultCube, FunctionalTestCkwriterDefault) {
   Pvl appLog;
   QVector<QString> args = {"from=" + testCube->fileName(),
                            "to=" + tempDir.path() + "/newKernel.bc"};
@@ -76,7 +76,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
   }
 }
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
+TEST_F(DefaultCube, FunctionalTestCkwriterFromlist) {
   Pvl appLog;
   FileList cubeList;
   cubeList.append(testCube->fileName());
@@ -145,7 +145,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
   }
 }
 
-TEST_F(ObservationPair, FunctionalTestsCkwriterCantValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterCantValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc"};
@@ -160,7 +160,7 @@ TEST_F(ObservationPair, FunctionalTestsCkwriterCantValidate) {
   }
 }
 
-TEST_F(ObservationPair, FunctionalTestsCkwriterWarnValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterWarnValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc",
@@ -177,7 +177,7 @@ TEST_F(ObservationPair, FunctionalTestsCkwriterWarnValidate) {
   EXPECT_TRUE(appLog.hasGroup("Overlaps"));
 }
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterComSum) {
+TEST_F(DefaultCube, FunctionalTestCkwriterComSum) {
   Pvl appLog;
 
   QString comFilePath = tempDir.path() + "/commfile.txt";

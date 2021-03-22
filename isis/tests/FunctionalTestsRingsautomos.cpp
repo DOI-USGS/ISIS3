@@ -11,9 +11,9 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/ringsautomos.xml").expanded();
 
-TEST_F(RingsCube, FunctionalTestRingsAutomos) {
-  QString outPath = tempDir.path() + "/mosaic.cub"; 
-  
+TEST_F(RingsCube, FunctionalTestRingsautomos) {
+  QString outPath = tempDir.path() + "/mosaic.cub";
+
   QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath};
   UserInterface options(APP_XML, args);
   Pvl appLog;
@@ -21,9 +21,9 @@ TEST_F(RingsCube, FunctionalTestRingsAutomos) {
   ringsautomos(options, &appLog);
 
   Cube mos(outPath);
-  Pvl label = *mos.label(); 
+  Pvl label = *mos.label();
 
-  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping"); 
+  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
@@ -40,32 +40,32 @@ TEST_F(RingsCube, FunctionalTestRingsAutomos) {
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterRingLongitude"), 180);
 
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
-  
-  EXPECT_NEAR(oCubeStats->Average(),           1336,    0.001); 
-  EXPECT_NEAR(oCubeStats->Sum(),               903136,  0.001); 
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       676,     0.001);  
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1152.5415021048376, 0.001);  
+
+  EXPECT_NEAR(oCubeStats->Average(),           1336,    0.001);
+  EXPECT_NEAR(oCubeStats->Sum(),               903136,  0.001);
+  EXPECT_NEAR(oCubeStats->ValidPixels(),       676,     0.001);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1152.5415021048376, 0.001);
 }
 
 
-TEST_F(RingsCube, FunctionalTestRingsAutomosSetRanges) {
+TEST_F(RingsCube, FunctionalTestRingsautomosSetRanges) {
   QString oFileListPath = tempDir.path() + "/outFileList.txt";
-  QString outPath = tempDir.path() + "/mosaic.cub"; 
-  
-  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath, 
-                           "tolist=" + oFileListPath, "priority=beneath", "grange=user", 
+  QString outPath = tempDir.path() + "/mosaic.cub";
+
+  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath,
+                           "tolist=" + oFileListPath, "priority=beneath", "grange=user",
                            "minringlon=0", "maxringlon=100", "minringrad=8000000", "maxringrad=100000000",
                            "track=true", "matchbandbin=false", "matchdem=true"};
-  
+
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
   ringsautomos(options, &appLog);
 
   Cube mos(outPath);
-  Pvl label = *mos.label(); 
+  Pvl label = *mos.label();
 
-  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping"); 
+  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
@@ -82,13 +82,13 @@ TEST_F(RingsCube, FunctionalTestRingsAutomosSetRanges) {
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterRingLongitude"), 180);
 
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
-  
-  EXPECT_NEAR(oCubeStats->Average(),           1079.2967741935483,    0.001); 
-  EXPECT_NEAR(oCubeStats->Sum(),               167291,  0.001); 
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       155,     0.001);  
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 753.01066871414162, 0.001);  
 
-  FileList lout; 
+  EXPECT_NEAR(oCubeStats->Average(),           1079.2967741935483,    0.001);
+  EXPECT_NEAR(oCubeStats->Sum(),               167291,  0.001);
+  EXPECT_NEAR(oCubeStats->ValidPixels(),       155,     0.001);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 753.01066871414162, 0.001);
+
+  FileList lout;
   lout.read(oFileListPath);
 
   EXPECT_EQ(lout.size(), cubeFileList.size());
@@ -97,22 +97,22 @@ TEST_F(RingsCube, FunctionalTestRingsAutomosSetRanges) {
 }
 
 
-TEST_F(RingsCube, FunctionalTestRingsAutomosPriority) {
-  QString outPath = tempDir.path() + "/mosaic.cub"; 
-  
-  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath, 
+TEST_F(RingsCube, FunctionalTestRingsautomosPriority) {
+  QString outPath = tempDir.path() + "/mosaic.cub";
+
+  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath,
                            "priority=average", "highsat=true", "lowsat=true", "null=true"};
-  
+
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
   ringsautomos(options, &appLog);
 
   Cube mos(outPath);
-  Pvl label = *mos.label(); 
-  
-  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping"); 
-  
+  Pvl label = *mos.label();
+
+  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
+
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -141593057.92723, 0.0001);
@@ -126,37 +126,37 @@ TEST_F(RingsCube, FunctionalTestRingsAutomosPriority) {
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumRingLongitude"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("CenterRingRadius"), 169014263.07462, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterRingLongitude"), 180);
-  
+
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
-  
-  EXPECT_NEAR(oCubeStats->Average(),           1434.8758620689655,    0.001); 
-  EXPECT_NEAR(oCubeStats->Sum(),               624171,  0.001); 
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       435,     0.001);  
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1167.5695079877848, 0.001);  
+
+  EXPECT_NEAR(oCubeStats->Average(),           1434.8758620689655,    0.001);
+  EXPECT_NEAR(oCubeStats->Sum(),               624171,  0.001);
+  EXPECT_NEAR(oCubeStats->ValidPixels(),       435,     0.001);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1167.5695079877848, 0.001);
 }
 
 
-TEST_F(RingsCube, FunctionalTestRingsAutomosBandSelect) {
-  QString outPath = tempDir.path() + "/mosaic.cub"; 
-  
-  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath, 
+TEST_F(RingsCube, FunctionalTestRingsautomosBandSelect) {
+  QString outPath = tempDir.path() + "/mosaic.cub";
+
+  QVector<QString> args = {"fromlist=" + cubeListPath, "mosaic=" + outPath,
                            "priority=band", "number=1", "criteria=lesser"};
-  
+
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
   ringsautomos(options, &appLog);
 
   Cube mos(outPath);
-  Pvl label = *mos.label(); 
-  
+  Pvl label = *mos.label();
+
   PvlGroup bandBin = label.findObject("IsisCube").findGroup("BandBin");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)bandBin.findKeyword("FilterName"), "CL1/CL2");
   ASSERT_EQ((int)bandBin.findKeyword("OriginalBand"), 1);
   ASSERT_DOUBLE_EQ((double)bandBin.findKeyword("Center"), 633.837);
   ASSERT_DOUBLE_EQ((double)bandBin.findKeyword("Width"), 285.938);
 
-  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping"); 
+  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -141593057.92723, 0.0001);
@@ -170,10 +170,10 @@ TEST_F(RingsCube, FunctionalTestRingsAutomosBandSelect) {
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumRingLongitude"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("CenterRingRadius"), 169014263.07462, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterRingLongitude"), 180);
-  
+
   std::unique_ptr<Histogram> oCubeStats(mos.histogram());
-  EXPECT_NEAR(oCubeStats->Average(),           1152.2840236686391,    0.001); 
-  EXPECT_NEAR(oCubeStats->Sum(),               778944,  0.001); 
-  EXPECT_NEAR(oCubeStats->ValidPixels(),       676,     0.001);  
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1054.3443835915498, 0.001);  
+  EXPECT_NEAR(oCubeStats->Average(),           1152.2840236686391,    0.001);
+  EXPECT_NEAR(oCubeStats->Sum(),               778944,  0.001);
+  EXPECT_NEAR(oCubeStats->ValidPixels(),       676,     0.001);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1054.3443835915498, 0.001);
 }
