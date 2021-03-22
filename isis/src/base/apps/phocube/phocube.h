@@ -1,5 +1,5 @@
-#ifndef grid_h
-#define grid_h
+#ifndef phocube_h
+#define phocube_h
 
 #include "Cube.h"
 #include "UserInterface.h"
