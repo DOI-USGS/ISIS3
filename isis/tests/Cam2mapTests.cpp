@@ -327,7 +327,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
   outputCube.create(fn.expanded(), outputAttr);
   outputCube.reopen("rw");
 
-  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetInputCube(testCube, 0)).Times(AtLeast(1));
   EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
   EXPECT_CALL(rs, SetTiling(4,4)).Times(AtLeast(1));
   EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));
@@ -375,7 +375,7 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
   outputCube.create(fn.expanded(), outputAttr);
   outputCube.reopen("rw");
 
-  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetInputCube(testCube, 0)).Times(AtLeast(1));
   EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
   EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
@@ -426,7 +426,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   outputCube.create(fn.expanded(), outputAttr);
   outputCube.reopen("rw");
 
-  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetInputCube(testCube, 0)).Times(AtLeast(1));
   EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
   EXPECT_CALL(rs, setPatchParameters(1, 1, 3, 3, 2, 2)).Times(AtLeast(1));
   EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
@@ -477,7 +477,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
   outputCube.create(fn.expanded(), outputAttr);
   outputCube.reopen("rw");
 
-  EXPECT_CALL(rs, SetInputCube(testCube)).Times(AtLeast(1));
+  EXPECT_CALL(rs, SetInputCube(testCube, 0)).Times(AtLeast(1));
   EXPECT_CALL(rs, SetOutputCube).Times(AtLeast(1)).WillOnce(Return(&outputCube));
   EXPECT_CALL(rs, SetTiling(4, 4)).Times(AtLeast(1));
   EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));

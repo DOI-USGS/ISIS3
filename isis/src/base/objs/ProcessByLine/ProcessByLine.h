@@ -108,8 +108,6 @@ namespace Isis {
                                Isis::CubeAttributeInput &att,
                                const int requirements = 0);
 
-      void SetInputCube(Isis::Cube *inCube);
-
       void StartProcess(void funct(Isis::Buffer &inout));
       virtual void StartProcess(std::function<void(Isis::Buffer &in)> funct );
       void StartProcess(std::function<void(Buffer &in, Buffer &out)> funct);

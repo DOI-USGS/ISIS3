@@ -70,19 +70,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Set the InputCube vector to an opened Cube. This is used if there already
-   * exists a valid opened cube
-   *
-   * @author 2011-05-07 Sharmila Prasad
-   *
-   * @param inCube - Pointer to input Cube
-   */
-  void ProcessByLine::SetInputCube(Isis::Cube *inCube) {
-    Process::SetInputCube(inCube);
-  }
-
-
   void ProcessByLine::SetBricks(IOCubes cn) {
 
       switch(cn){
