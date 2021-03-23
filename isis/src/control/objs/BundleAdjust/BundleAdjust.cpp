@@ -495,7 +495,12 @@ namespace Isis {
 
     if (m_bundleSettings->solveTargetBody()) {
       m_rank += m_bundleSettings->numberTargetBodyParameters();
-
+      
+      if (m_bundleTargetBody->solveMeanRadius() || m_bundleTargetBody->solveTriaxialRadii()) {
+        outputBundleStatus("Warning: Solving for the target body radii (triaxial or mean) "
+                           "is NOT possible and likely increases error in the solve.\n");
+      }
+      
       if (m_bundleTargetBody->solveMeanRadius()){
         // Check if MeanRadiusValue is abnormal compared to observation
         bool isMeanRadiusValid = true;
@@ -516,7 +521,8 @@ namespace Isis {
 
         // Warn user for abnormal MeanRadiusValue
         if (!isMeanRadiusValid) {
-          outputBundleStatus("Warning: User-entered MeanRadiusValue may be inaccurate\n");
+          outputBundleStatus("Warning: User-entered MeanRadiusValue appears to be inaccurate. "
+                             "This can cause a bundle failure.\n");
         }
       }
     }
