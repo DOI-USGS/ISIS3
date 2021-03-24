@@ -307,6 +307,15 @@ namespace Isis {
     return p_et;
   }
 
+  /**
+   * Accessor method to get current time bias.
+   *
+   * @return @b double The current time bias.
+   */
+  double SpiceRotation::TimeBias() const {
+    return p_timeBias;
+  }
+
 
   /**
    * Checks if the cache is empty.
