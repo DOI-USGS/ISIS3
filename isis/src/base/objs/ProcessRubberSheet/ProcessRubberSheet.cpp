@@ -174,8 +174,8 @@ namespace Isis {
         bool useLastTileMap = false;
         for (int band = 1; band <= OutputCubes[0]->bandCount(); band++) {
           otile.SetTile(tile, band);
-
-          if (p_startQuadSize <= 2) {
+          
+          if (p_startQuadSize <= 2 || OutputCubes[0]->lineCount() <= p_startQuadSize) {
             SlowGeom(otile, iportal, trans, interp);
           }
           else {
