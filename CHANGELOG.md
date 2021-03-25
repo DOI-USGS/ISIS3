@@ -57,6 +57,8 @@ release.
 
 - Fixed hi2isis MRO:ADC_TIMING_SETTINGS label conversion issue [4290](https://github.com/USGS-Astrogeology/ISIS3/issues/4290)
 
+- Changed csv2table to identify headers with arrays and create table fields as arrays instead of single fields for each element [3676](https://github.com/USGS-Astrogeology/ISIS3/issues/3676)
+
 ## [4.4.0] - 2021-02-11
 
 ### Added
