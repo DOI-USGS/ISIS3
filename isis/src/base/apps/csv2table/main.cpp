@@ -64,7 +64,7 @@ void IsisMain() {
 
   // Construct an empty table with the CSV header as field names
   // Collect identical field names together, including those with (###) at the end, so a single
-  // table field with multipal values can be created.
+  // table field with multiple values can be created.
   TableRecord tableRow;
   QRegularExpression rex(R"((?<name>\w+)(\((?<index>[0-9]*)\)|))");
   for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
