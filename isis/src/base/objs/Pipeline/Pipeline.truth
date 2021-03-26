@@ -420,20 +420,20 @@ PIPELINE -------> unitTest3 <------- PIPELINE
 
 Testing listing methods
 PIPELINE -------> unitTest4 <------- PIPELINE
-cubeatt FROM="fileA" TO="./fileA.jitter.copy.FROM1.cub"
-cubeatt FROM="fileB" TO="./fileB.jitter.copy.FROM2.cub"
-cubeatt FROM="fileC" TO="./fileC.jitter.copy.FROM3.cub"
-spiceinit FROM="./fileA.jitter.copy.FROM1.cub" ATTACH="NO"
-spiceinit FROM="./fileB.jitter.copy.FROM2.cub" ATTACH="NO"
-spiceinit FROM="./fileC.jitter.copy.FROM3.cub" ATTACH="NO"
-echo -e "\n./fileA.jitter.copy.FROM1.cub\n./fileB.jitter.copy.FROM2.cub\n./fileC.jitter.copy.FROM3.cub" > ./appjit.lis
+cubeatt FROM="fileA" TO="./fileA.jitter.copy.unitTest.lis1.cub"
+cubeatt FROM="fileB" TO="./fileB.jitter.copy.unitTest.lis2.cub"
+cubeatt FROM="fileC" TO="./fileC.jitter.copy.unitTest.lis3.cub"
+spiceinit FROM="./fileA.jitter.copy.unitTest.lis1.cub" ATTACH="NO"
+spiceinit FROM="./fileB.jitter.copy.unitTest.lis2.cub" ATTACH="NO"
+spiceinit FROM="./fileC.jitter.copy.unitTest.lis3.cub" ATTACH="NO"
+echo -e "\n./fileA.jitter.copy.unitTest.lis1.cub\n./fileB.jitter.copy.unitTest.lis2.cub\n./fileC.jitter.copy.unitTest.lis3.cub" > ./appjit.lis
 appjit FROMLIST="./appjit.lis" MASTER="MASTER.cub" DEGREE="1"
-noproj FROM="./fileA.jitter.copy.FROM1.cub" TO="./fileA.jitter.cub" MATCH="MATCH.cub"
-noproj FROM="./fileB.jitter.copy.FROM2.cub" TO="./fileB.jitter.cub" MATCH="MATCH.cub"
-noproj FROM="./fileC.jitter.copy.FROM3.cub" TO="./fileC.jitter.cub" MATCH="MATCH.cub"
-rm ./fileA.jitter.copy.FROM1.cub
-rm ./fileB.jitter.copy.FROM2.cub
-rm ./fileC.jitter.copy.FROM3.cub
+noproj FROM="./fileA.jitter.copy.unitTest.lis1.cub" TO="./fileA.jitter.cub" MATCH="MATCH.cub"
+noproj FROM="./fileB.jitter.copy.unitTest.lis2.cub" TO="./fileB.jitter.cub" MATCH="MATCH.cub"
+noproj FROM="./fileC.jitter.copy.unitTest.lis3.cub" TO="./fileC.jitter.cub" MATCH="MATCH.cub"
+rm ./fileA.jitter.copy.unitTest.lis1.cub
+rm ./fileB.jitter.copy.unitTest.lis2.cub
+rm ./fileC.jitter.copy.unitTest.lis3.cub
 rm ./appjit.lis
 PIPELINE -------> unitTest4 <------- PIPELINE
 

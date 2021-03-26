@@ -87,6 +87,7 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+      void resizeCube(int samples, int lines, int bands);
   };
 
   class LineScannerCube : public TempTestingFiles {
@@ -97,6 +98,22 @@ namespace Isis {
       Pvl label;
       Pvl projLabel;
       json isd;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class OffBodyCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MiniRFCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
 
       void SetUp() override;
       void TearDown() override;

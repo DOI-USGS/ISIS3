@@ -102,7 +102,7 @@ namespace Isis {
     for (int i = 0; i < p_bufferSize; i++) os << p_histBuffer[i];
 
     for (int i = 0; i < p_history.objects(); i++) {
-      os << p_history.object(i);
+      os << std::endl << p_history.object(i);
     }
     os >> pvl;
     return pvl;
