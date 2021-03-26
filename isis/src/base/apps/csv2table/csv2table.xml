@@ -36,7 +36,7 @@
       Original version
     </change>
     <change name="Stuart Sides" date="2021-03-20">
-      Added ability to convert CSV files with indexs into table field arrays
+      Added ability to convert CSV files with indicies into table field arrays
       instead of individual table fields.
     </change>
   </history>
