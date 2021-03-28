@@ -22,6 +22,8 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
   QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString expectedSN = "Viking1/VISB/33322515";
   QString expectedON = "Viking1/VISB/33322515";
+  QString expectedFilename = "default.cub";
+  
   QVector<QString> args = { "FILE=TRUE",
                            "SN=TRUE",
                            "OBSERVATION=TRUE"};
@@ -31,7 +33,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
   getsn( testCube, options, &appLog );
   PvlGroup results = appLog.findGroup("Results");
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), testCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), expectedFilename);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("SerialNumber"), expectedSN);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("ObservationNumber"), expectedON);
 }
