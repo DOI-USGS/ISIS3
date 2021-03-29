@@ -32,7 +32,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
   getsn( testCube, options, &appLog );
   PvlGroup results = appLog.findGroup("Results");
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), defaultCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), testCube->fileName());
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("SerialNumber"), expectedSN);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("ObservationNumber"), expectedON);
 }
