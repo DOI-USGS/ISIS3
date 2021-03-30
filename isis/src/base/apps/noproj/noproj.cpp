@@ -24,8 +24,8 @@ using namespace std;
 
 namespace Isis {
 
-  static void LoadMatchSummingMode();
-  static void LoadInputSummingMode();
+  static void LoadMatchSummingMode(Cube *icube, Cube *mcube, UserInterface &ui);
+  static void LoadInputSummingMode(Cube *icube, UserInterface &ui);
 
   static map <QString, void *> GuiHelpers() {
     map <QString, void *> helper;
@@ -51,12 +51,12 @@ namespace Isis {
     }
     icube.open(ui.GetFileName("FROM"));
 
-    Cube mcube;
+    Cube *mcube = NULL;
     if((ui.WasEntered("MATCH"))) {
-      mcube.open(ui.GetFileName("MATCH"));
+      mcube->open(ui.GetFileName("MATCH"));
     }
 
-    noproj(&icube, &mcube, ui);
+    noproj(&icube, mcube, ui);
   }
 
   /**
@@ -77,7 +77,7 @@ namespace Isis {
 
     // If a MATCH cube is entered, make sure to SetInputCube it first to get the SPICE blobs
     // from it propagated to the TO labels
-    if ((ui.WasEntered("MATCH"))) {
+    if (mcube != NULL) {
       p.SetInputCube(mcube);
       p.SetInputCube(icube);
     }
@@ -123,10 +123,10 @@ namespace Isis {
 
     // Get output summing mode
     if(ui.GetString("SOURCE") == "FROMMATCH") {
-      LoadMatchSummingMode();
+      LoadMatchSummingMode(icube, mcube, ui);
     }
     else if(ui.GetString("SOURCE") == "FROMINPUT") {
-      LoadInputSummingMode();
+      LoadInputSummingMode(icube, ui);
     }
 
     double pixPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
@@ -135,6 +135,7 @@ namespace Isis {
     int sampleExpansion = int((ui.GetDouble("SAMPEXP") / 100.) * detectorSamples + .5);
     int lineExpansion = int((ui.GetDouble("LINEEXP") / 100.) * numberLines + .5);
     QString instType;
+
 
     // Adjust translations for summing mode
     transl /= ui.GetDouble("SUMMINGMODE");
@@ -192,7 +193,6 @@ namespace Isis {
     //   1) the idealInstrument pvl if there or
     //   2) the input size expanded by user specified percentage
     Cube *ocube = p.SetOutputCube("match.cub", cao, 1, 1, 1);
-
     // Extract the times and the target from the instrument group
     QString startTime = inst["StartTime"];
     QString stopTime;
@@ -399,22 +399,16 @@ namespace Isis {
   }
 
   // Helper function to get output summing mode from cube to MATCH
-  void LoadMatchSummingMode() {
-    QString file;
-    UserInterface &ui = Application::GetUserInterface();
+  void LoadMatchSummingMode(Cube *icube, Cube *mcube, UserInterface &ui) {
+    Camera *cam;
 
     // Get camera from cube to match
-    if((ui.GetString("SOURCE") == "FROMMATCH") && (ui.WasEntered("MATCH"))) {
-      file = ui.GetFileName("MATCH");
+    if((ui.GetString("SOURCE") == "FROMMATCH") && (mcube != NULL)) {
+      cam = mcube->camera();
     }
     else {
-      file = ui.GetFileName("FROM");
+      cam = icube->camera();
     }
-
-  // Open the input cube and get the camera object
-    Cube c;
-    c.open(file);
-    Camera *cam = c.camera();
 
     ui.Clear("SUMMINGMODE");
     ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
@@ -449,15 +443,8 @@ namespace Isis {
 
 
   // Helper function to get output summing mode from input cube (FROM)
-  void LoadInputSummingMode() {
-    UserInterface &ui = Application::GetUserInterface();
-
-    // Get camera from cube to match
-    QString file = ui.GetFileName("FROM");
-    // Open the input cube and get the camera object
-    Cube c;
-    c.open(file);
-    Camera *cam = c.camera();
+  void LoadInputSummingMode(Cube *icube, UserInterface &ui) {
+    Camera *cam = icube->camera();
 
     ui.Clear("SUMMINGMODE");
     ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());

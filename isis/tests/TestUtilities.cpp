@@ -110,6 +110,56 @@ namespace Isis {
   }
 
 
+    /**
+   * Custom PvlGroup assertion that compares only the PvlKeywords in the groups.
+   */
+  ::testing::AssertionResult AssertPvlGroupKeywordsEqual(
+      const char* group1_expr,
+      const char* group2_expr,
+      PvlGroup group1,
+      PvlGroup group2) {
+
+    for (auto grp1KeyIt = group1.begin(); grp1KeyIt != group1.end(); grp1KeyIt++) {
+      if (!group2.hasKeyword(grp1KeyIt->name())) {
+        return ::testing::AssertionFailure() << "PvlGroup " << group1_expr
+            << " contains keyword " << grp1KeyIt->name().toStdString()
+            << " that is not in PvlGroup " << group2_expr;
+      }
+      const PvlKeyword &group2Key = group2.findKeyword(grp1KeyIt->name());
+      if (grp1KeyIt->size() != group2Key.size()) {
+        return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
+            << ") has size (" << grp1KeyIt->size() << ") in PvlGroup " << group1_expr
+            << " and size (" << group2Key.size() << ") in PvlGroup " << group2_expr;
+      }
+      for (int i = 0; i < grp1KeyIt->size(); i++) {
+        if (!grp1KeyIt->isEquivalent(group2Key[i], i)) {
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
+              << ") has value (" << (*grp1KeyIt)[i].toStdString() << ") in PvlGroup "
+              << group1_expr << " and value (" << group2Key[i].toStdString()
+              << ") in PvlGroup " << group2_expr << " at index " << i;
+        }
+        if (grp1KeyIt->unit(i) != group2Key.unit(i)) {
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
+              << ") has units (" << grp1KeyIt->unit(i).toStdString() << ") in PvlGroup "
+              << group1_expr << " and units (" << group2Key.unit(i).toStdString()
+              << ") in PvlGroup " << group2_expr << " at index " << i;
+        }
+      }
+    }
+
+    // The second time through you only have to check that the keys in group 2 exist in group 1
+    for (auto grp2KeyIt = group2.begin(); grp2KeyIt != group2.end(); grp2KeyIt++) {
+      if (!group1.hasKeyword(grp2KeyIt->name())) {
+        return ::testing::AssertionFailure() << "PvlGroup " << group2_expr
+            << " contains keyword " << grp2KeyIt->name().toStdString()
+            << " that is not in PvlGroup " << group1_expr;
+      }
+    }
+
+    return ::testing::AssertionSuccess();
+  }
+
+
   /**
    * Asserts that two vectors are within a given tolerance of each other.
    * If the vectors are not the same size, then they are not assumed to be equal.
