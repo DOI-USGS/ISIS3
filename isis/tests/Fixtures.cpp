@@ -145,6 +145,110 @@ namespace Isis {
     }
   }
 
+
+  void SmallGapCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    // Initialize horzCube
+    horzCube = new Cube();
+    horzCube->setDimensions(9, 9, 9);
+    horzCube->create(tempDir.path() + "/horzgap.cub");
+
+    // horizontal line of nulls through all bands
+    LineManager h_line(*horzCube);
+    double h_pixelValue = 0.0;
+    int h_lineNum = 0;
+    for(h_line.begin(); !h_line.end(); h_line++) {
+      for(int i = 0; i < h_line.size(); i++) {
+        if(h_lineNum == 4 || h_lineNum % 9 == 4) {
+          h_line[i] = NULL8;
+        }
+        else {
+          h_pixelValue = sin(h_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          h_line[i] = (double) h_pixelValue;
+        }
+      }
+      h_lineNum++;
+      horzCube->write(h_line);
+    }
+    horzCube->reopen("rw");
+
+
+    // Initialize vertCube
+    vertCube = new Cube();
+    vertCube->setDimensions(9, 9, 9);
+    vertCube->create(tempDir.path() + "/vertgap.cub");
+
+    // vertical line of nulls through all bands
+    LineManager v_line(*vertCube);
+    double v_pixelValue = 0.0;
+    int v_lineNum = 0;
+    for(v_line.begin(); !v_line.end(); v_line++) {
+      for(int i = 0; i < v_line.size(); i++) {
+        if(i == 4) { 
+          v_line[i] = NULL8;
+        }
+        else {
+          v_pixelValue = sin(v_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          v_line[i] = (double) v_pixelValue;
+        }
+      }
+      v_lineNum++;
+      vertCube->write(v_line);
+    }
+    vertCube->reopen("rw");
+
+
+    // Initialize bandCube
+    bandCube = new Cube();
+    bandCube->setDimensions(9, 9, 9);
+    bandCube->create(tempDir.path() + "/bandgap.cub");
+
+    // vertical line of nulls on just one band
+    LineManager b_line(*bandCube);
+    double b_pixelValue = 0.0;
+    int b_lineNum = 0;
+    for(b_line.begin(); !b_line.end(); b_line++) {
+      for(int i = 0; i < b_line.size(); i++) {
+        if( b_lineNum == 22 ) { 
+          b_line[i] = NULL8;
+        }
+        else {
+          b_pixelValue = sin(b_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          b_line[i] = (double) b_pixelValue;
+        }
+      }
+      b_lineNum++;
+      bandCube->write(b_line);
+    }
+    bandCube->reopen("rw");
+
+  }
+
+
+  void SmallGapCube::TearDown() {
+    if (horzCube->isOpen()) {
+      horzCube->close();
+    }
+    if (vertCube->isOpen()) {
+      vertCube->close();
+    }
+    if (bandCube->isOpen()) {
+      bandCube->close();
+    }
+
+    if (horzCube) {
+      delete horzCube;
+    }
+    if (vertCube) {
+      delete vertCube;
+    }
+    if (bandCube) {
+      delete bandCube;
+    }
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
