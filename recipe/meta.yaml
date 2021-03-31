@@ -76,6 +76,7 @@ requirements:
     - hdf5
     - icu
     - jama
+    - jasper
     - jpeg
     - kakadu==1
     - krb5
