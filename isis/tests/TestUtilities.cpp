@@ -110,7 +110,7 @@ namespace Isis {
   }
 
 
-    /**
+  /**
    * Custom PvlGroup assertion that compares only the PvlKeywords in the groups.
    */
   ::testing::AssertionResult AssertPvlGroupKeywordsEqual(

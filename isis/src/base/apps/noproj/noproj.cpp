@@ -24,7 +24,7 @@ using namespace std;
 
 namespace Isis {
 
-  static void LoadMatchSummingMode(Cube *icube, Cube *mcube, UserInterface &ui);
+  static void LoadMatchSummingMode(Cube *mcube, UserInterface &ui);
   static void LoadInputSummingMode(Cube *icube, UserInterface &ui);
 
   static map <QString, void *> GuiHelpers() {
@@ -123,7 +123,7 @@ namespace Isis {
 
     // Get output summing mode
     if(ui.GetString("SOURCE") == "FROMMATCH") {
-      LoadMatchSummingMode(icube, mcube, ui);
+      LoadMatchSummingMode(mcube, ui);
     }
     else if(ui.GetString("SOURCE") == "FROMINPUT") {
       LoadInputSummingMode(icube, ui);
@@ -399,16 +399,8 @@ namespace Isis {
   }
 
   // Helper function to get output summing mode from cube to MATCH
-  void LoadMatchSummingMode(Cube *icube, Cube *mcube, UserInterface &ui) {
-    Camera *cam;
-
-    // Get camera from cube to match
-    if((ui.GetString("SOURCE") == "FROMMATCH") && (mcube != NULL)) {
-      cam = mcube->camera();
-    }
-    else {
-      cam = icube->camera();
-    }
+  void LoadMatchSummingMode(Cube *mcube, UserInterface &ui) {
+    Camera *cam = mcube->camera();
 
     ui.Clear("SUMMINGMODE");
     ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
