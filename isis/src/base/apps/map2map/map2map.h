@@ -3,6 +3,9 @@
 
 #include "Transform.h"
 
+void map2map(Cube incube, UserInterface &ui);
+void map2map(UserInterface &ui);
+
 /**
  * @author ????-??-?? Unknown
  *
