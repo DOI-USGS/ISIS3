@@ -7,8 +7,10 @@
 #include "crop.h"
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/crop.xml").expanded();
 
@@ -158,4 +160,72 @@ TEST_F(DefaultCube, FunctionalTestCropProj) {
     EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 9);
     EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 3);
     EXPECT_NEAR(oCubeStats->StandardDeviation(), 2, 0.0000000001);
+}
+
+TEST_F(DefaultCube, FunctionalTestCropError1) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=2000", "nsamples=10", "sinc=5", "line=5", "nlines=10", "linc=5"};
+
+    UserInterface options(APP_XML, args);
+
+    try{
+        crop(options);
+        FAIL() << "Should throw an exception" << std::endl;
+    }
+    catch (IException &e){
+        EXPECT_THAT(e.what(), HasSubstr("exceeds number of samples in"));
+    }
+}
+
+TEST_F(DefaultCube, FunctionalTestCropError2) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=50", "nsamples=10", "sinc=5", "line=2000", "nlines=10", "linc=5"};
+
+    UserInterface options(APP_XML, args);
+
+    try{
+        crop(options);
+        FAIL() << "Should throw an exception" << std::endl;
+    }
+    catch (IException &e){
+        EXPECT_THAT(e.what(), HasSubstr("exceeds number of lines in"));
+    }
+}
+
+TEST_F(DefaultCube, FunctionalTestCropError3) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=1000", "nsamples=500", "sinc=5", "line=5", "nlines=10", "linc=5"};
+
+    UserInterface options(APP_XML, args);
+
+    try{
+        crop(options);
+        FAIL() << "Should throw an exception" << std::endl;
+    }
+    catch (IException &e){
+        EXPECT_THAT(e.what(), HasSubstr("exceeds number of samples in"));
+    }
+}
+
+TEST_F(DefaultCube, FunctionalTestCropError4) {
+    QTemporaryDir tempDir;
+    QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+      "sample=50", "nsamples=10", "sinc=5", "line=1000", "nlines=500", "linc=5"};
+
+    UserInterface options(APP_XML, args);
+
+    try{
+        crop(options);
+        FAIL() << "Should throw an exception" << std::endl;
+    }
+    catch (IException &e){
+        EXPECT_THAT(e.what(), HasSubstr("exceeds number of lines in"));
+    }
 }
