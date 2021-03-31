@@ -121,6 +121,7 @@ requirements:
     - eigen
     - embree
     - geos>=3.7,<3.8
+    - geotiff
     - gmm
     - inja
     - jama
