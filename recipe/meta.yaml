@@ -71,13 +71,14 @@ requirements:
     - embree
     - geos>=3.7,<3.8
     - geotiff
+    - gmm
     - gmp
     - gsl>=2.6
     - hdf5
     - icu
+    - inja
     - jama
-    - jasper
-    - jpeg
+    - jpeg==9b
     - kakadu==1
     - krb5
     - libpng>=1.6.34
@@ -90,6 +91,7 @@ requirements:
     - nlohmann_json
     - nn
     - opencv=3.2
+    - openssl>=1.0.0,<1.1.0
     - pcl
     - qhull
     - qt=5.9.6
@@ -119,6 +121,8 @@ requirements:
     - eigen
     - embree
     - geos>=3.7,<3.8
+    - gmm
+    - inja
     - jama
     - {{ pin_compatible('jasper', max_pin='x.x') }}
     - kakadu==1
