@@ -108,7 +108,7 @@ requirements:
   - xorg-libx11
   - xorg-libxi
   - zlib
-  
+
   run:
   - {{ pin_compatible('ale') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
@@ -121,6 +121,7 @@ requirements:
   - eigen
   - embree
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
+  - {{ pin_compatible('geotiff', max_pin='x.x') }}
   - geotiff
   - gmm
   - {{ pin_compatible('gsl', min_pin='x.x') }}
