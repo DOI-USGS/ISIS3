@@ -15,6 +15,9 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/fillgap.xml").expanded();
 
+
+// First 9 test cases are checking for EXPECTed output depending on
+// direction of gap in the cube and type of interpolation
 TEST_F( SmallGapCube, FillGapTestBandAkima )
 {
   QTemporaryDir prefix;
@@ -213,9 +216,7 @@ TEST_F( SmallGapCube, FillGapTestHorzCubic )
 TEST_F( SmallGapCube, FillGapTestHorzLinear )
 {
   QTemporaryDir prefix;
-  //QString cubeFileName = prefix.path() + "/fillgap_out.cub";
-  QString cubeFileName = "/home/tgiroux/Desktop/fillgaps_out0.cub"; // TODO remove these
-
+  QString cubeFileName = prefix.path() + "/fillgap_out.cub";
   QVector<QString> args = {"from=" + horzCube->fileName(),
                            "to=" + cubeFileName,
                            "direction=sample", "interp=linear" };
@@ -368,6 +369,8 @@ TEST_F( SmallGapCube, FillGapTestVertLinear )
   EXPECT_EQ( outHist->HrsPixels(), 0 );
 }
 
+// Testing for logged warning when the app cannot interpolate over
+// special pixels due to a gap taking place on the edge of the cube
 TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
 {
   QTemporaryDir prefix;
@@ -384,7 +387,7 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
   int lineNum = 0;
   for(line.begin(); !line.end(); line++) {
     for(int i = 0; i < line.size(); i++) {
-      if( lineNum == 0 ) { 
+      if( lineNum == 80 ) { 
         line[i] = NULL8;
       }
     }
@@ -392,6 +395,7 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
     vertCube->write(line);
   }
   vertCube->reopen("rw");
+
 
   try {
     fillgap(options, &log);
@@ -401,11 +405,5 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
   }
 
   PvlGroup &mess = log.findGroup("Messages", Pvl::Traverse);
-
-
-  // TODO this should be much less than 729.. thats all of the pixels
-  // must have to do with the added gap line
-  EXPECT_EQ(mess["Warning"][0].toStdString(), "Unable to fill 729 special pixels." ); 
-
+  EXPECT_EQ(mess["Warning"][0].toStdString(), "Unable to fill 9 special pixels." ); 
 }
- // TODO change expect to assert
