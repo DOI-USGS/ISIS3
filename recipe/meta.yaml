@@ -147,8 +147,8 @@ requirements:
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - superlu
   - tnt
-  - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
   - x264=20131218
+  - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
