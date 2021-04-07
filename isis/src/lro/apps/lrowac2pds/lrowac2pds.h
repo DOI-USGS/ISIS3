@@ -1,3 +1,6 @@
+#ifndef lrowac2pds_h
+#define lrowac2pds_h
+
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.
@@ -6,15 +9,11 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "Isis.h"
+#include "Pvl.h"
+#include "UserInterface.h"
 
-#include "lrowac2pds.h"
-#include "Application.h"
-
-using namespace std;
-using namespace Isis;
-
-void IsisMain() {
-  UserInterface &ui = Application::GetUserInterface();
-  lrowac2pds(ui);
+namespace Isis{
+  extern void lrowac2pds(UserInterface &ui);
 }
+
+#endif
