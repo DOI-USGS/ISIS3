@@ -13,48 +13,9 @@ using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apolloremrx.xml").expanded();
 
-TEST_F(LargeCube, FunctionalTestApolloremrxDefault) {
+TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
 
-  PvlGroup reseaus("Reseaus");
-  PvlKeyword samples = PvlKeyword("Sample", "100.8141");
-  samples += "192.8";
-  samples += "167.8";
-
-  PvlKeyword lines = PvlKeyword("Line",  "100.8141");
-  lines += "192.8";
-  lines += "275.8";
-
-  PvlKeyword types = PvlKeyword("Type", "5");
-  types += "5";
-  types += "5";
-
-  PvlKeyword valid = PvlKeyword("Valid", "1");
-  valid += "1";
-  valid += "1";
-
-  reseaus += lines;
-  reseaus += samples;
-  reseaus += types;
-  reseaus += valid;
-  reseaus += PvlKeyword("Status", "Refined");
-
-  std::istringstream instStr (R"(
-    Group = Instrument
-        SpacecraftName = "APOLLO 15"
-        InstrumentId   = METRIC
-        TargetName     = MOON
-        StartTime      = 1971-08-01T14:58:03.78
-    End_Group
-  )");
-
-  PvlGroup instGroup;
-  instStr >> instGroup;
-
-  Pvl *lab = testCube->label();
-  lab->findObject("IsisCube").addGroup(reseaus);
-  lab->findObject("IsisCube").addGroup(instGroup);
-
-  testCube->reopen("r");
+  testCube->label()->findObject("IsisCube").findGroup("Reseaus")["Status"] = "Refined";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -72,14 +33,14 @@ TEST_F(LargeCube, FunctionalTestApolloremrxDefault) {
 
   PvlGroup newReseaus = newLab.findObject("IsisCube").findGroup("Reseaus");
   PvlKeyword testKeyword = newReseaus.findKeyword("Line");
-  EXPECT_NEAR(testKeyword[0].toDouble(), 100.8141, 0.0001);
-  EXPECT_NEAR(testKeyword[1].toDouble(), 192.8, 0.0001);
-  EXPECT_NEAR(testKeyword[2].toDouble(), 275.8, 0.0001);
+  EXPECT_NEAR(testKeyword[0].toDouble(), 200, 0.0001);
+  EXPECT_NEAR(testKeyword[1].toDouble(), 400, 0.0001);
+  EXPECT_NEAR(testKeyword[2].toDouble(), 600, 0.0001);
 
   testKeyword = newReseaus.findKeyword("Sample");
-  EXPECT_NEAR(testKeyword[0].toDouble(), 100.8141, 0.0001);
-  EXPECT_NEAR(testKeyword[1].toDouble(), 192.8, 0.0001);
-  EXPECT_NEAR(testKeyword[2].toDouble(), 167.8, 0.0001);
+  EXPECT_NEAR(testKeyword[0].toDouble(), 200, 0.0001);
+  EXPECT_NEAR(testKeyword[1].toDouble(), 400, 0.0001);
+  EXPECT_NEAR(testKeyword[2].toDouble(), 600, 0.0001);
 
   testKeyword = newReseaus.findKeyword("Valid");
   EXPECT_EQ(testKeyword[0].toInt(), 1);
@@ -90,54 +51,15 @@ TEST_F(LargeCube, FunctionalTestApolloremrxDefault) {
 
   std::unique_ptr<Histogram> hist (testCube->histogram());
 
-  ASSERT_DOUBLE_EQ(hist->Average(), 499.5);
-  ASSERT_DOUBLE_EQ(hist->Sum(), 499500000);
-  ASSERT_EQ(hist->ValidPixels(), 1000000);
-  ASSERT_NEAR(hist->StandardDeviation(), 288.67513, 0.00001);
+  ASSERT_DOUBLE_EQ(hist->Average(), 11449.5);
+  ASSERT_DOUBLE_EQ(hist->Sum(), 6004232295000);
+  ASSERT_EQ(hist->ValidPixels(), 524410000);
+  ASSERT_NEAR(hist->StandardDeviation(), 6610.66055, 0.00001);
 }
 
-TEST_F(LargeCube, FunctionalTestApolloremrxRemovedError) {
+TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {
 
-  PvlGroup reseaus("Reseaus");
-  PvlKeyword samples = PvlKeyword("Sample", "100.8141");
-  samples += "192.8";
-  samples += "167.8";
-
-  PvlKeyword lines = PvlKeyword("Line",  "100.8141");
-  lines += "192.8";
-  lines += "275.8";
-
-  PvlKeyword types = PvlKeyword("Type", "5");
-  types += "5";
-  types += "5";
-
-  PvlKeyword valid = PvlKeyword("Valid", "1");
-  valid += "1";
-  valid += "1";
-
-  reseaus += lines;
-  reseaus += samples;
-  reseaus += types;
-  reseaus += valid;
-  reseaus += PvlKeyword("Status", "Removed");
-
-  std::istringstream instStr (R"(
-    Group = Instrument
-        SpacecraftName = "APOLLO 15"
-        InstrumentId   = METRIC
-        TargetName     = MOON
-        StartTime      = 1971-08-01T14:58:03.78
-    End_Group
-  )");
-
-  PvlGroup instGroup;
-  instStr >> instGroup;
-
-  Pvl *lab = testCube->label();
-  lab->findObject("IsisCube").addGroup(reseaus);
-  lab->findObject("IsisCube").addGroup(instGroup);
-
-  testCube->reopen("r");
+  testCube->label()->findObject("IsisCube").findGroup("Reseaus")["Status"] = "Removed";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -153,48 +75,9 @@ TEST_F(LargeCube, FunctionalTestApolloremrxRemovedError) {
   }
 }
 
-TEST_F(LargeCube, FunctionalTestApolloremrxSpacecraftError) {
+TEST_F(ApolloCube, FunctionalTestApolloremrxSpacecraftError) {
 
-  PvlGroup reseaus("Reseaus");
-  PvlKeyword samples = PvlKeyword("Sample", "100.8141");
-  samples += "192.8";
-  samples += "167.8";
-
-  PvlKeyword lines = PvlKeyword("Line",  "100.8141");
-  lines += "192.8";
-  lines += "275.8";
-
-  PvlKeyword types = PvlKeyword("Type", "5");
-  types += "5";
-  types += "5";
-
-  PvlKeyword valid = PvlKeyword("Valid", "1");
-  valid += "1";
-  valid += "1";
-
-  reseaus += lines;
-  reseaus += samples;
-  reseaus += types;
-  reseaus += valid;
-  reseaus += PvlKeyword("Status", "Refined");
-
-  std::istringstream instStr (R"(
-    Group = Instrument
-        SpacecraftName = "Galileo Orbiter"
-        InstrumentId   = METRIC
-        TargetName     = MOON
-        StartTime      = 1971-08-01T14:58:03.78
-    End_Group
-  )");
-
-  PvlGroup instGroup;
-  instStr >> instGroup;
-
-  Pvl *lab = testCube->label();
-  lab->findObject("IsisCube").addGroup(reseaus);
-  lab->findObject("IsisCube").addGroup(instGroup);
-
-  testCube->reopen("r");
+  testCube->label()->findObject("IsisCube").findGroup("Instrument")["SpacecraftName"] = "Galileo Orbiter";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -210,48 +93,7 @@ TEST_F(LargeCube, FunctionalTestApolloremrxSpacecraftError) {
   }
 }
 
-TEST_F(LargeCube, FunctionalTestApolloremrxNominalError) {
-
-  PvlGroup reseaus("Reseaus");
-  PvlKeyword samples = PvlKeyword("Sample", "100.8141");
-  samples += "192.8";
-  samples += "167.8";
-
-  PvlKeyword lines = PvlKeyword("Line",  "100.8141");
-  lines += "192.8";
-  lines += "275.8";
-
-  PvlKeyword types = PvlKeyword("Type", "5");
-  types += "5";
-  types += "5";
-
-  PvlKeyword valid = PvlKeyword("Valid", "1");
-  valid += "1";
-  valid += "1";
-
-  reseaus += lines;
-  reseaus += samples;
-  reseaus += types;
-  reseaus += valid;
-  reseaus += PvlKeyword("Status", "Nominal");
-
-  std::istringstream instStr (R"(
-    Group = Instrument
-        SpacecraftName = "APOLLO 15"
-        InstrumentId   = METRIC
-        TargetName     = MOON
-        StartTime      = 1971-08-01T14:58:03.78
-    End_Group
-  )");
-
-  PvlGroup instGroup;
-  instStr >> instGroup;
-
-  Pvl *lab = testCube->label();
-  lab->findObject("IsisCube").addGroup(reseaus);
-  lab->findObject("IsisCube").addGroup(instGroup);
-
-  testCube->reopen("r");
+TEST_F(ApolloCube, FunctionalTestApolloremrxNominalError) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
