@@ -47,7 +47,7 @@ TEST_F(Hayabusa2OncW2Cube, FunctionalTestHyb2Pds4GenDefault) {
   
   QDomDocument pds4lab;
 
-  QFile f("/tmp/output.xml");
+  QFile f(tempDir.path() + "/output.xml");
   if (!f.open(QFile::ReadOnly|QFile::Text)) {
     FAIL() << "Error while reading output cube." << std::endl;
   }  
