@@ -47,7 +47,12 @@ TEST(Sumspice, FunctionalTestSumspiceTimeUpdate) {
   EXPECT_EQ(sumTime["StartTime"][0].toStdString(), "2005-09-21T10:44:07");
   EXPECT_EQ(sumTime["StopTime"][0].toStdString(), "2005-09-21T10:44:07");
 
+  std::unique_ptr<Histogram> hist (cube.histogram());
 
+  EXPECT_NEAR(hist->Average(), 2.8611278533935547, 1e-11);
+  EXPECT_EQ(hist->Sum(), 3000110);
+  EXPECT_EQ(hist->ValidPixels(), 1048576);
+  EXPECT_NEAR(hist->StandardDeviation(), 18.463625088626337, 1e-11);
 }
 
 TEST(Sumspice, FunctionalTestSumspiceSpiceUpdate) {
@@ -116,6 +121,13 @@ TEST(Sumspice, FunctionalTestSumspiceSpiceUpdate) {
   EXPECT_EQ(csvLine[9].toStdString(), "2005-09-21T10:44:07.352");
   EXPECT_EQ(csvLine[10].toStdString(), "2005-09-21T10:44:07.3955");
   EXPECT_EQ(csvLine[11].toStdString(), "2005-09-21T10:44:07.439");
+
+  std::unique_ptr<Histogram> hist (cube.histogram());
+
+  EXPECT_NEAR(hist->Average(), 1.22291692076441, 1e-11);
+  EXPECT_NEAR(hist->Sum(), 1282321.3331074715, 1e-11);
+  EXPECT_EQ(hist->ValidPixels(), 1048576);
+  EXPECT_NEAR(hist->StandardDeviation(), 11.842834365508679, 1e-11);
 }
 
 TEST(Sumspice, FunctionalTestSumspiceNoCubeError) {
