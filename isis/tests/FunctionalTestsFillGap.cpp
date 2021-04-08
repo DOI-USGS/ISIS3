@@ -138,7 +138,7 @@ TEST_F( SmallGapCube, FillGapTestBandLinear )
 TEST_F( SmallGapCube, FillGapTestHorzAkima )
 {
   QTemporaryDir prefix;
-  QString cubeFileName = "/home/tgiroux/Desktop/fillgaps_out0.cub";
+  QString cubeFileName = prefix.path() + "/fillgap_out.cub";
   QVector<QString> args = {"from=" + horzCube->fileName(),
                            "to=" + cubeFileName,
                            "direction=sample", "interp=akima" };
