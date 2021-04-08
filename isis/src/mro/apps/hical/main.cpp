@@ -7,6 +7,8 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 //  $Id: hical.cpp 6715 2016-04-28 17:58:43Z tsucharski@GS.DOI.NET $
+//  @history 2021-02-28 Moses Milazzo Added ZeroDarkRate as an optional
+//  module to enable a new dark currrent rate calculation.
 #include "Isis.h"
 
 #include <cstdio>
@@ -31,9 +33,10 @@ find files of those names at the top level of this repository. **/
 #include "SplineFill.h"              // SpineFillComp.h
 #include "LowPassFilter.h"           // LowPassFilterComp.h
 #include "ZeroBufferSmooth.h"        // DriftBuffer.h  (Zf)
-#include "ZeroBufferFit.h"           // DriftCorrect.h (Zd)
+#include "ZeroBufferFit.h"           // DriftCorrect.h (Zb)
 #include "ZeroReverse.h"             // OffsetCorrect.h (Zz)
-#include "ZeroDark.h"                // DarkSubtractComp.h (Zb)
+#include "ZeroDark.h"                // DarkSubtractComp.h (Zd)
+#include "ZeroDarkRate.h"            // DarkSubtractComp.h (Zdr)
 #include "GainLineDrift.h"           // GainVLineComp.h (Zg)
 #include "GainNonLinearity.h"        // Non-linear gain (new)
 #include "GainChannelNormalize.h"    // ZggModule.h (Zgg)
@@ -66,6 +69,7 @@ void calibrate(Buffer &in, Buffer &out) {
   const HiVector &ZBF    = calVars->get("ZeroBufferFit");
   const HiVector &ZRev   = calVars->get("ZeroReverse");
   const HiVector &ZD     = calVars->get("ZeroDark");
+  const HiVector &ZDR     = calVars->get("ZeroDarkRate");
   const HiVector &GLD    = calVars->get("GainLineDrift");
   const HiVector &GCN    = calVars->get("GainChannelNormalize");
   const double GNL       = calVars->get("GainNonLinearity")[0];
@@ -259,6 +263,27 @@ void IsisMain(){
       ZdHist.add("Debug::SkipModule invoked!");
     }
 
+/////////////////////////////////////////////////////////////////
+// ZeroDarkRate removes dark current with a new approach compared
+// with ZeroDark.
+//
+    procStep = "ZeroDarkRate module";
+    hiconf.selectProfile("ZeroDarkRate");
+    hiprof =  hiconf.getMatrixProfile();
+    HiHistory ZdrHist;
+    ZdrHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      ZeroDarkRate zdr(hiconf);
+      calVars->add(hiconf.getProfileName(), zdr.ref());
+      ZdrHist = zdr.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      }
+    }
+    else {
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+      ZdrHist.add("Debug::SkipModule invoked!");
+    }
 ////////////////////////////////////////////////////////////////////
 // GainLineDrift correct for gain-based drift
 //
@@ -419,7 +444,8 @@ void IsisMain(){
         ofile << "CONF:     " << conf_file  << endl << endl;
 
         ofile << "/* " << hical_program << " application equation */\n"
-              << "/* hdn = (idn - ZeroBufferFit(ZeroBufferSmooth) - ZeroReverse - ZeroDark) */\n"
+              << "/* hdn = (idn - ZeroBufferFit(ZeroBufferSmooth) - ZeroReverse - 
+	      << "(ZeroDark OR ZeroDarkRate) */\n"
               << "/* odn = hdn / GainLineDrift * GainNonLinearity * GainChannelNormalize */\n"
               << "/*           * GainFlatField  * GainTemperature / GainUnitConversion */\n\n";
 
@@ -428,6 +454,7 @@ void IsisMain(){
         ofile << "\nZeroBufferFit   = " << ZbfHist << endl;
         ofile << "\nZeroReverse   = " << ZrHist << endl;
         ofile << "\nZeroDark   = " << ZdHist << endl;
+        ofile << "\nZeroDarkRate   = " << ZdrHist << endl;
         ofile << "\nGainLineDrift   = " << GldHist << endl;
         ofile << "\nGainNonLinearity   = " << GnlHist << endl;
         ofile << "\nGainChannelNormalize = " << GcnHist << endl;
@@ -455,7 +482,7 @@ void IsisMain(){
     PvlKeyword key("Conf", conf_file);
     key.addCommentWrapped("/* " + hical_program + " application equation */");
     key.addComment("/* hdn = idn - ZeroBufferFit(ZeroBufferSmooth) */");
-    key.addComment("/*           - ZeroReverse - ZeroDark */");
+    key.addComment("/*           - ZeroReverse - (ZeroDark OR ZeroDarkRate) */");
     key.addComment("/* odn = hdn / GainLineDrift * GainNonLinearity */");
     key.addComment("/*           * GainChannelNormalize * GainFlatField */");
     key.addComment("/*           * GainTemperature / GainUnitConversion */");
@@ -469,6 +496,7 @@ void IsisMain(){
       rcal += ZbfHist.makekey("ZeroBufferFit");
       rcal += ZrHist.makekey("ZeroReverse");
       rcal += ZdHist.makekey("ZeroDark");
+      rcal += ZdrHist.makekey("ZeroDarkRate");
       rcal += GldHist.makekey("GainLineDrift");
       rcal += GnlHist.makekey("GainNonLinearity");
       rcal += GcnHist.makekey("GainChannelNormalize");
