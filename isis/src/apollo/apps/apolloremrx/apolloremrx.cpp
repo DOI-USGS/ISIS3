@@ -21,23 +21,27 @@ using namespace std;
 namespace Isis {
 
   void cpy(Buffer &in, Buffer &out);
-  static int dim;
-  static bool resvalid;
-  static QString action;
 
   void apolloremrx(UserInterface &ui) {
-      Cube *cube = new Cube(ui.GetFileName("FROM"), "rw");
-      apolloremrx(cube, ui);
+    Cube cube;
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      cube.setVirtualBands(inAtt.bands());
+    }
+    cube.open(ui.GetFileName("FROM"));
+    apolloremrx(&cube, ui);
   }
 
   void apolloremrx(Cube *info, UserInterface &ui) {
+    int dim;
+    bool resvalid;
+    QString action;
     // We will be processing by line
     ProcessByTile p;
     p.SetTileSize(128, 128);
 
     // Setup the input and output cubes
-    CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-    p.SetInputCube(info->fileName(), inputAtt);
+    p.SetInputCube(info);
     PvlKeyword &status = info->group("RESEAUS")["STATUS"];
     QString in = info->fileName();
 

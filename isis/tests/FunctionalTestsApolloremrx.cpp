@@ -15,11 +15,11 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/apolloremrx.xml").expanded(
 
 TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
 
-  testCube->label()->findObject("IsisCube").findGroup("Reseaus")["Status"] = "Refined";
+  testCube->group("RESEAUS")["STATUS"] = "Refined";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
-  QVector<QString> args = {"to=" + outCubeFileName,"action=null"};
+  QVector<QString> args = {"to=" + outCubeFileName, "action=null"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -29,25 +29,26 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
     FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
   }
 
-  Pvl newLab = *testCube->label();
+  Cube cube(outCubeFileName);
+  Pvl *isisLabel = cube.label();
 
-  PvlGroup newReseaus = newLab.findObject("IsisCube").findGroup("Reseaus");
-  PvlKeyword testKeyword = newReseaus.findKeyword("Line");
-  EXPECT_NEAR(testKeyword[0].toDouble(), 200, 0.0001);
-  EXPECT_NEAR(testKeyword[1].toDouble(), 400, 0.0001);
-  EXPECT_NEAR(testKeyword[2].toDouble(), 600, 0.0001);
+  PvlGroup reseaus = isisLabel->findObject("IsisCube").findGroup("Reseaus");
+  PvlKeyword lineKey = reseaus.findKeyword("Line");
+  EXPECT_NEAR(lineKey[0].toDouble(), 200, 0.0001);
+  EXPECT_NEAR(lineKey[1].toDouble(), 400, 0.0001);
+  EXPECT_NEAR(lineKey[2].toDouble(), 600, 0.0001);
 
-  testKeyword = newReseaus.findKeyword("Sample");
-  EXPECT_NEAR(testKeyword[0].toDouble(), 200, 0.0001);
-  EXPECT_NEAR(testKeyword[1].toDouble(), 400, 0.0001);
-  EXPECT_NEAR(testKeyword[2].toDouble(), 600, 0.0001);
+  PvlKeyword sampleKey = reseaus.findKeyword("Sample");
+  EXPECT_NEAR(sampleKey[0].toDouble(), 200, 0.0001);
+  EXPECT_NEAR(sampleKey[1].toDouble(), 400, 0.0001);
+  EXPECT_NEAR(sampleKey[2].toDouble(), 600, 0.0001);
 
-  testKeyword = newReseaus.findKeyword("Valid");
-  EXPECT_EQ(testKeyword[0].toInt(), 1);
-  EXPECT_EQ(testKeyword[1].toInt(), 1);
-  EXPECT_EQ(testKeyword[2].toInt(), 1);
+  PvlKeyword validKey = reseaus.findKeyword("Valid");
+  EXPECT_EQ(validKey[0].toInt(), 1);
+  EXPECT_EQ(validKey[1].toInt(), 1);
+  EXPECT_EQ(validKey[2].toInt(), 1);
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, newReseaus.findKeyword("Status"), "Removed");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, reseaus.findKeyword("Status"), "Removed");
 
   std::unique_ptr<Histogram> hist (testCube->histogram());
 
@@ -59,7 +60,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
 
 TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {
 
-  testCube->label()->findObject("IsisCube").findGroup("Reseaus")["Status"] = "Removed";
+  testCube->group("RESEAUS")["STATUS"] = "Removed";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -77,7 +78,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {
 
 TEST_F(ApolloCube, FunctionalTestApolloremrxSpacecraftError) {
 
-  testCube->label()->findObject("IsisCube").findGroup("Instrument")["SpacecraftName"] = "Galileo Orbiter";
+  testCube->group("Instrument")["SpacecraftName"] = "Galileo Orbiter";
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
