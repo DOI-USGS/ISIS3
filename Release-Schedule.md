@@ -18,17 +18,11 @@ As described above, we will release on a three month cadence. Releases will be l
 ### Release Schedule
 | Version # / Label | Type | Date | 
 |-------------------|------|------------|
-| 3.10.0_RC | Release Candidate | 1.7.20* |
-| 4.0.0_RC | Release Candidate| 1.7.20*|
-| 3.10.x | Release | 2.7.20* |
-| 4.0.0 | Release | 2.7.20* |
-| 3.11.0_RC | Release Candidate | 4.1.20 |
-| 4.1.0_RC | Release Candidate | 4.1.20 |
-| 3.11.x | Release | 4.30.20 |
-| 4.1.x | Release | 4.30.20 |
-| 4.2.0_RC | Release Candidate | 7.1.20|
-| 4.2.x | Release | 7.31.20 |
-| 4.3.0_RC | Release Candidate | 10.1.20 |
-| 4.3.x | Release | 10.1.30 |
-
-* 3.10 and 4.0 were delayed one week due to both the holiday schedule and the complexity of getting two versions released concurrently.
+| 4.3.0 | Release | 10.26.21 |
+| 4.4.0 | Release | 2.8.21 |
+| 5.0.0_RC | Release Candidate | 4.1.21 |
+| 5.0.0 | Release | 4.26.21 |
+| 5.1.0_RC | Release Candidate | 6.28.21 | 
+| 5.1.0 | Release | 7.25.21 |
+| 5.2.0_RC | Release Candidate | 9.27.21 |
+| 5.2.0 | Release | 10.25.21 |
