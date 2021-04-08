@@ -83,6 +83,7 @@
           ZeroBufferFit             - Computes non-linear fit of ZeroBufferSmooth (ZBF)
           ZeroReverse               - Process Reverse Clocked data (ZR)
           ZeroDark                  - Dark current temperature correction (ZD) 
+          ZeroDarkRate              - Column-by-column dark current correction (ZDr) 
           GainLineDrift             - Time-base line drift correction (GLD)
           GainChannelNormalize      - Normalize gain for summing/TDI (GCN)
           GainNonLinearity          - Line-based non-linearity gain correction (GNL)
@@ -359,6 +360,21 @@ Object = Hical
     ZeroDarkFilterWidth      = 3
     ZeroDarkFilterIterations = 1
   End_Group
+
+/* This profile contains parameters pertinent to processing dark current. */
+/* Required label keywords:  Summing, Tdi, FpaPositiveYTemperature, */
+/*                           and FpaNegativeYTemperature, Lines */
+/* Also needs LineTime which is computed. */
+  Group = Profile
+    Name = ZeroDarkRate
+    Module = ZeroDarkRate
+
+/* Define the B matrix file reference */
+/* As of version NNNN, 28 February 2021, we have added a new, optional, dark current correction, which */
+/* we are calling ZeroDarkRate. The calibration files associated with this new module are called ZeroDarkRate */
+    DarkCoeffs = "$mro/calibration/matrices/darkrate/DarkRate_{CCD}_{CHANNEL}_TDI{TDI}_BIN{BIN}_ADC{adc}_hical_????.csv
+  End_Group
+
 
 /* This profile contains parameters pertinent to processing the nonlinear gain correction */
   Group = Profile
@@ -1039,6 +1055,24 @@ End_Object
                 </TR>
             </TABLE>
 
+            <br><h1 align="center">ZeroDarkRate Module Parameters</h1> </br>
+            <TABLE BORDER="1">
+                  <CAPTION>
+                      This dark current subtraction consists of a correction 
+		      based on an exponential fit to the dark calibration images and
+		      is dependent on FPA temperature. 
+                  </CAPTION>
+                <TR>
+                  <TH>Parameter</TH>
+                  <TH>Description</TH>
+                </TR>
+                <TR>
+                    <TD>DarkCoeffs</TD>
+                    <TD>
+			    This is the CCD, Channel, TDI, Binning, and ADC dependent coefficients file.
+                    </TD>
+                </TR>
+            </TABLE>
             
             <br><h1 align="center">GainLineDrift Module Parameters</h1> </br>
             <TABLE BORDER="1">
