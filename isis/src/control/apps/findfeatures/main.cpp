@@ -34,8 +34,8 @@ void IsisMain() {
   }
 
   Pvl results;
-  results.addObject(appLog.findObject("FeatureAlgorithms"));
-  if( ui.WasEntered("TO") && ui.IsInteractive() ) {
+  if( (ui.GetBoolean("LISTALL") || ui.GetBoolean("LISTSPEC")) && ui.IsInteractive() ) {
+    results.addObject(appLog.findObject("FeatureAlgorithms"));
     Application::GuiLog(results);
   }
 }
