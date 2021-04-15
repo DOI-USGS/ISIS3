@@ -50,7 +50,7 @@ Deborah Lee Soltesz
 
     <!-- Isis Workshop is only available on the website  -->
     <div>
-      <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
+      <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
       Tutorials</a>
     </div>
 

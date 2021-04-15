@@ -11,10 +11,12 @@
 * [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
 * [Installation](README.md#Installation)
+* [ISIS Tutorials](README.md#ISIS-Tutorials)
 * [Citing ISIS](README.md#Citing-ISIS)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
+
 
 ## Requests for Comment
 The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](https://astrodiscuss.usgs.gov).
@@ -117,7 +119,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 ### Installation with Docker
 The ISIS production Dockerfile automates the conda installation process above.
 You can either build the Dockerfile yourself or use the
-[usgsastro/isis](https://hub.docker.com/repository/docker/usgsastro/isis) 
+[usgsastro/isis](https://hub.docker.com/repository/docker/usgsastro/isis)
 image from DockerHub.
 
 #### To build the Dockerfile
@@ -324,6 +326,9 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
 -   [Building ISIS documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
+
+## ISIS Tutorials
+Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
 
 ## Citing ISIS
 This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org) (See 'Which DOI Should I Use in Citations?') to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
