@@ -1,6 +1,11 @@
 {
   "creators": [
     {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Laura, Jason",
+      "orcid": ""
+    },
+    {
       "name": "Acosta, Alex"
     },
     {
@@ -243,11 +248,6 @@
       "name": "Lambright, Steven"
     },
     {
-      "affiliation": "United States Geological Survey, Astro Geology Science Center",
-      "name": "Laura, Jason",
-      "orcid": ""
-    },
-    {
       "name": "Lee, Ella Mae"
     },
     {
@@ -414,14 +414,14 @@
       "name": "Takir, Driss"
     },
     {
-      "affiliation": "United States Geological Survey, Astro Geology Science Center",
-      "name": "Titus, Tim"
-    },
-    {
       "name": "Thomas, Orrin"
     },
     {
       "name": "Thompson, Teal"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Titus, Tim"
     },
     {
       "name": "Torson, Jim"
