@@ -421,7 +421,14 @@ namespace Isis{
           }
 
           bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
-
+         
+          // When getFootBlob is true, incube is closed in the above function call
+          // incube must be reopened before GeneratePVLOutput/GenerateCSVOutput
+          if( getFootBlob )
+          {
+            incube->open(ui.GetFileName("FROM"), "r");
+          }
+          
           // Check if the user requires valid image center geometry
           if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
             QString msg = "Image center does not project in camera model";
