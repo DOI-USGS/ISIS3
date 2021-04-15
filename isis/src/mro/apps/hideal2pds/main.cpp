@@ -197,6 +197,11 @@ void IsisMain() {
   image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK", toString((int)pow(2.0, (double)nbits) - 1)),
                    Pvl::Replace);
 
+  // SAMPLE_BITS defaults to 16 but should be 8 when BITS=8
+  if( nbits == 8 ) {
+    image.addKeyword(PvlKeyword("SAMPLE_BITS", toString(nbits)), Pvl::Replace);
+  }
+
   Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
 
