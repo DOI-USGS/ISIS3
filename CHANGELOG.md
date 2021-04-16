@@ -51,6 +51,7 @@ release.
 - Fixed "About Qview" to point to website documentation. [4333](https://github.com/USGS-Astrogeology/ISIS3/issues/4333)
 - Fixed bug where the time bias was not being added to the ephemeris times in ckwriter. [4129](https://github.com/USGS-Astrogeology/ISIS3/issues/4129)
 - Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
+- Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
 
 ### Changed
 
