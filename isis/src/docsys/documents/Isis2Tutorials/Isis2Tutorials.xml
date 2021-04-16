@@ -42,11 +42,18 @@
       <body>
 
         <h2>General</h2>
+          <p>
+            <b>NOTE</b> This page and the below tutorials are no longer maintained.
+            These resources remain available for historical purposes and because some
+            of this information may be useful to the community. However, we do
+            not guarantee that they are consistent with the current ISIS release.
+            Please see <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">
+            ISIS Online Workshops</a> for current ISIS tutorials.
+          </p>
           <ul>
             <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/idl_prog_notes.cgi">Accessing an ISIS Cube from an IDL Program</A></LI>
             <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/exchange_data.cgi">Exchanging Data with Other Software Systems</A></LI>
           </ul>
-
 
         <h2>Digital Image Processing Procedures</h2>
           <UL>
@@ -73,6 +80,7 @@
 
   <history>
     <change name="Deborah Lee Soltesz" date="2003-04-03">Created</change>
+    <change name="Amy Stamile" date="2021-04-15">Updated document</change>
   </history>
 
 </documentation>
