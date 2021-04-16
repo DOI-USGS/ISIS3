@@ -2303,14 +2303,14 @@ namespace Isis {
     if (sin(b) == 0.0 || sin(c) == 0.0) {
       return azimuth;
     }
-    double intermitent = (cos(a) - cos(b)*cos(c))/(sin(b)*sin(c));
-    if (intermitent < -1.0) {
-      intermitent = -1.0;
+    double intermediate = (cos(a) - cos(b)*cos(c))/(sin(b)*sin(c));
+    if (intermediate < -1.0) {
+      intermediate = -1.0;
     }
-    else if (intermitent > 1.0) {
-      intermitent = 1.0;
+    else if (intermediate > 1.0) {
+      intermediate = 1.0;
     }
-    double A = acos(intermitent) * 180.0 / PI;
+    double A = acos(intermediate) * 180.0 / PI;
     //double B = acos((cos(b) - cos(c)*cos(a))/(sin(c)*sin(a))) * 180.0 / PI;
     if (glat >= 0.0) {
       if (quad == 1 || quad == 4) {
