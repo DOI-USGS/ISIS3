@@ -3,7 +3,6 @@
 #include "Application.h"
 #include "Cube.h"
 #include "History.h"
-#include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
@@ -17,7 +16,6 @@ using namespace std;
 using namespace Isis;
 
 bool copyGroup(Pvl * source, Pvl * mergeTo, QString name);
-bool copyObject(Pvl * source, Pvl * mergeTo, QString name);
 bool copyBlob(Cube * from, Cube * to, QString type, QString name, QString fname);
 
 void IsisMain() {
@@ -96,7 +94,7 @@ void IsisMain() {
       // Can't copy Instrument group if the the scale factors don't match
       string msg = "Cannot copy Instruments group when the sample scaling"
                    " factor and line scaling factor do not match";
-//      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     bool success = copyGroup(source, mergeTo, "Instrument");
     results += PvlKeyword("Instrument", success ? "true" : "false");
@@ -109,7 +107,7 @@ void IsisMain() {
       if (inOut.bandCount() != sourceCube.bandCount()) {
         string msg = "Cannot copy BandBin group when the number of bands does"
                      " not match";
-//        throw IException(IException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     bool success = copyGroup(source, mergeTo, "Bandbin");
@@ -148,7 +146,7 @@ void IsisMain() {
       // Can't copy Mapping group if the the scale factors don't match
       string msg = "Cannot copy Mapping group when the sample scaling"
                    " factor and line scaling factor do not match";
-//      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     bool success = copyGroup(source, mergeTo, "Mapping");
     results += PvlKeyword("Mapping", success ? "true" : "false");
@@ -195,19 +193,6 @@ void IsisMain() {
     }
   }
 
-  // Any other requested groups
-  if (ui.WasEntered("Objects")) {
-    QString grps = QString(ui.GetString("Objects")).remove(" ");
-    QStringList list = grps.split(",");
-    QString grp;
-    foreach (grp, list) {
-      if (grp.size() != 0) {
-        bool success = copyObject(source, mergeTo, grp);
-        results += PvlKeyword(grp, success ? "true" : "false");
-      }
-    }
-  }
-
   // Any other requested blobs
   // Expected format is: <Object name>:<Name keyword>
   if (ui.WasEntered("Blobs")) {
@@ -220,7 +205,7 @@ void IsisMain() {
         if (brk.size() != 2) {
           string msg = "The blob name [" + blob.toStdString() + "] is"
                        " improperly formatted";
-//          throw IException(IException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
         bool success = copyBlob(&sourceCube, &inOut, brk[1],
                          brk[0], sourceFileName);
@@ -242,8 +227,22 @@ void IsisMain() {
     subarea.UpdateLabel(&inOut, &inOut, results);
   }
 
-  Process process;
-  process.WriteHistory(inOut);
+  // Add History
+  bool found = false;
+  for (int i = 0; i < mergeTo->objects() && !found; i++) {
+    if (mergeTo->object(i).isNamed("History")) {
+      History his((QString)mergeTo->object(i)["Name"]);
+      inOut.read(his);
+      his.AddEntry();
+      inOut.write(his);
+      found = true;
+    }
+  }
+  if (!found) {
+    History his("IsisCube");
+    his.AddEntry();
+    inOut.write(his);
+  }
 
   inOut.close();
   sourceCube.close();
@@ -269,24 +268,6 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, QString name) {
   }
 }
 
-
-bool copyObject(Pvl *source, Pvl *mergeTo, QString name) {
-  try {
-    // The call we're looking to get an exception on is the one just below.
-    PvlObject & toCopy = source->findObject(name, Pvl::Traverse);
-   // PvlObject & isiscube = mergeTo->findObject("IsisCube");
-    Pvl* isiscube = mergeTo;
-    if (isiscube->hasObject(name)) {
-      isiscube->deleteObject(name);
-    }
-    isiscube->addObject(toCopy);
-    return true;
-  }
-  catch (IException &) {
-    return false;
-  }
-}
-
 bool copyBlob(Cube * from, Cube * to, QString name, QString type, QString fname) {
   try {
     Blob blob(name, type, fname);
@@ -298,3 +279,4 @@ bool copyBlob(Cube * from, Cube * to, QString name, QString type, QString fname)
     return false;
   }
 }
+
