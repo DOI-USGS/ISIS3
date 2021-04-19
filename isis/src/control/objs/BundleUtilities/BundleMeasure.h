@@ -14,7 +14,7 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
   class BundleControlPoint;
   class BundleImage;
-  class BundleObservation;
+  class AbstractBundleObservation;
   class BundleObservationSolveSettings;
   class Camera;
   class ControlMeasure;
@@ -65,7 +65,7 @@ namespace Isis {
       ~BundleMeasure();
 
       BundleMeasure &operator=(const BundleMeasure &src);
-      void setParentObservation(QSharedPointer<BundleObservation> observation);
+      void setParentObservation(QSharedPointer<AbstractBundleObservation> observation);
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
@@ -73,7 +73,7 @@ namespace Isis {
       Camera *camera() const;
       BundleControlPoint *parentControlPoint();
       QSharedPointer<BundleImage> parentBundleImage();
-      QSharedPointer<BundleObservation> parentBundleObservation();
+      QSharedPointer<AbstractBundleObservation> parentBundleObservation();
       const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
       double sample() const;
@@ -93,7 +93,7 @@ namespace Isis {
       BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
                                                      bundle control measure **/
       QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
-      QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+      QSharedPointer<AbstractBundleObservation> m_parentObservation; /**< Parent bundle observation **/
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

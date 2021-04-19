@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
+#include "AbstractBundleObservation.h"
 
 namespace Isis {
   class BundleObservationSolveSettings;
@@ -81,7 +82,7 @@ namespace Isis {
    *                            that is written to the bundleout.txt file.
    *
    */
-  class BundleObservation : public QVector<BundleImageQsp> {
+  class BundleObservation : public AbstractBundleObservation {
 
     public:
       // default constructor

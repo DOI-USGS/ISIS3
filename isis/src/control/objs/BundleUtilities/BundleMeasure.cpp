@@ -7,7 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "BundleMeasure.h"
-#include "BundleObservation.h"
+#include "AbstractBundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
 
@@ -81,7 +81,7 @@ namespace Isis {
    *
    * @param observation Pointer to the parent BundleObservation
    */
-  void BundleMeasure::setParentObservation(QSharedPointer<BundleObservation> observation) {
+  void BundleMeasure::setParentObservation(QSharedPointer<AbstractBundleObservation> observation) {
     m_parentObservation = observation;
   }
 
@@ -155,7 +155,7 @@ namespace Isis {
    *
    * @return @b QSharedPointer<BundleObservation> Returns a pointer to the parent BundleObservation
    */
-  QSharedPointer<BundleObservation> BundleMeasure::parentBundleObservation() {
+  QSharedPointer<AbstractBundleObservation> BundleMeasure::parentBundleObservation() {
     return m_parentObservation;
   }
 
