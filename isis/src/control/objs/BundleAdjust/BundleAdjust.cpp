@@ -27,6 +27,7 @@ find files of those names at the top level of this repository. **/
 
 // Isis lib
 #include "Application.h"
+#include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
@@ -424,7 +425,7 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        BundleObservationQsp observation =
+        AbstractBundleObservationQsp observation =
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
@@ -461,7 +462,7 @@ namespace Isis {
           BundleMeasureQsp measure = bundleControlPoint->at(j);
           QString cubeSerialNumber = measure->cubeSerialNumber();
 
-          BundleObservationQsp observation =
+          AbstractBundleObservationQsp observation =
               m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
           BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
 
@@ -975,7 +976,6 @@ namespace Isis {
           cholmod_free_factor(&m_L, &m_cholmodCommon);
         }
 
-
         iterationSummary();
 
         m_iteration++;
@@ -1421,7 +1421,7 @@ namespace Isis {
         }
       }
       else {
-        BundleObservationQsp observation;
+        AbstractBundleObservationQsp observation;
 
         // get parameter weights for this observation
         if (m_bundleSettings->solveTargetBody()) {
@@ -1658,7 +1658,6 @@ namespace Isis {
         outputBundleStatus("\nTriplet allocation failure\n");
         return false;
       }
-
       m_cholmodTriplet->nnz = 0;
     }
 
@@ -1882,7 +1881,7 @@ namespace Isis {
 
     const BundleObservationSolveSettingsQsp observationSolveSettings =
         measure.observationSolveSettings();
-    BundleObservationQsp observation = measure.parentBundleObservation();
+    AbstractBundleObservationQsp observation = measure.parentBundleObservation();
 
     int numImagePartials = observation->numberParameters();
 
@@ -2158,14 +2157,15 @@ namespace Isis {
     // Update spice for each BundleObservation
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
-      BundleObservationQsp observation = m_bundleObservations.at(i);
+      AbstractBundleObservationQsp observation = m_bundleObservations.at(i);
 
       int numParameters = observation->numberParameters();
 
       observation->applyParameterCorrections(subrange(m_imageSolution,t,t+numParameters));
 
       if (m_bundleSettings->solveTargetBody()) {
-        observation->updateBodyRotation();
+        // TODO: needs to be updated for ISIS vs. CSM CSM has no updateBodyRotation
+//        observation->updateBodyRotation();
       }
 
       t += numParameters;
@@ -2275,7 +2275,7 @@ namespace Isis {
 
     // add vtpv from constrained image parameters
     for (int i = 0; i < m_bundleObservations.size(); i++) {
-      BundleObservationQsp observation = m_bundleObservations.at(i);
+      AbstractBundleObservationQsp observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
       const LinearAlgebra::Vector &weights = observation->parameterWeights();
@@ -2747,7 +2747,7 @@ namespace Isis {
       }
       // save adjusted image sigmas
       else {
-        BundleObservationQsp observation;
+        AbstractBundleObservationQsp observation;
         if (m_bundleSettings->solveTargetBody()) {
           observation = m_bundleObservations.at(i-1);
         }

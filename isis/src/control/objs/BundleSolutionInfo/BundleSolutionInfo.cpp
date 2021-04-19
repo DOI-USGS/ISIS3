@@ -1177,7 +1177,7 @@ namespace Isis {
     }
 
 
-    BundleObservationQsp observation;
+    AbstractBundleObservationQsp observation;
 
     int nObservations = m_statisticsResults->observations().size();
 
@@ -1259,7 +1259,7 @@ namespace Isis {
     m_txtBundleOutputFilename = ofname;
 
     char buf[4096];
-    BundleObservationQsp observation;
+    AbstractBundleObservationQsp observation;
 
     int nObservations = m_statisticsResults->observations().size();
 
