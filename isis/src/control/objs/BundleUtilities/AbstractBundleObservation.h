@@ -37,13 +37,13 @@ namespace Isis {
       AbstractBundleObservation(const AbstractBundleObservation &src);
 
       // destructor
-      ~AbstractBundleObservation();
+      virtual ~AbstractBundleObservation();
 
       // equals operator
-      AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
+      virtual AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
 
       // copy method
-      void copy(const AbstractBundleObservation &src);
+      virtual void copy(const AbstractBundleObservation &src);
 
       void append(const BundleImageQsp &value);
 

@@ -37,7 +37,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
   }
@@ -62,7 +61,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
@@ -74,14 +72,6 @@ namespace Isis {
       m_serialNumbers.append(image->serialNumber());
       m_imageNames.append(image->fileName());
       m_cubeSerialNumberToBundleImageMap.insert(image->serialNumber(), image);
-
-      // set the observations target body spice rotation object from the primary image in the
-      // observation (this is, by design at the moment, the first image added to the observation)
-      // if the image, camera, or instrument position/orientation is null, then set to null
-//      m_bodyRotation = (image->camera() ?
-//                           (image->camera()->bodyRotation() ?
-//                             image->camera()->bodyRotation() : NULL)
-//                           : NULL);
     }
   }
 
