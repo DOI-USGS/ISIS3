@@ -66,19 +66,12 @@ namespace Isis {
       bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
 
-      // FIXME: if this stays, needs to not use position/pointing
-      void bundleOutputFetchData(QVector<double> &finalParameterValues,
-                            int &nPositionCoefficients, int &nPointingCoefficients,
-                            bool &useDefaultPosition, bool &useDefaultPointing,
-                            bool &useDefaultTwist);
-
-
       void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       QString bundleOutputCSV(bool errorPropagation);
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
-      // CAN we have this for both? 
+      // CAN we have this for both?
       QStringList parameterList();
       QStringList imageNames();
 
