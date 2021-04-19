@@ -1,3 +1,6 @@
+#ifndef apolloremrx_h
+#define apolloremrx_h
+
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.
@@ -6,14 +9,12 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "Isis.h"
+#include "Cube.h"
+#include "UserInterface.h"
 
-#include "Application.h"
-#include "apolloremrx.h"
-
-using namespace Isis;
-
-void IsisMain() {
-  UserInterface &ui = Application::GetUserInterface();
-  apolloremrx(ui);
+namespace Isis{
+  extern void apolloremrx(Cube *cube, UserInterface &ui);
+  extern void apolloremrx(UserInterface &ui);
 }
+
+#endif
