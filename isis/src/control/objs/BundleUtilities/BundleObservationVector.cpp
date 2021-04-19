@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 
 #include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 #include "IException.h"
 
 namespace Isis {
@@ -96,6 +97,7 @@ namespace Isis {
     AbstractBundleObservationQsp bundleObservation;
     bool addToExisting = false;
 
+    // TODO it looks like this can just become 1 if statement
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
@@ -118,18 +120,17 @@ namespace Isis {
     }
     else {
       // create new BundleObservation and append to this vector
-      bundleObservation = AbstractBundleObservationQsp(new AbstractBundleObservation(bundleImage,
-                                                                     observationNumber,
-                                                                     instrumentId,
-                                               bundleSettings->bundleTargetBody()));
+      BundleObservation *isisObservation = new BundleObservation(bundleImage,
+                                                                 observationNumber,
+                                                                 instrumentId,
+                                                                 bundleSettings->bundleTargetBody());
 
-      if (!bundleObservation) {
+
+      if (!isisObservation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
-
-      bundleImage->setParentObservation(bundleObservation);
 
       // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
@@ -143,9 +144,13 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      bundleObservation->setSolveSettings(solveSettings);
+      isisObservation->setSolveSettings(solveSettings);
+
+      bundleObservation.reset(isisObservation);
 
       bundleObservation->setIndex(size());
+
+      bundleImage->setParentObservation(bundleObservation);
 
       append(bundleObservation);
 
