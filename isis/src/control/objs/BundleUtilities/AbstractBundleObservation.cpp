@@ -34,12 +34,9 @@ namespace Isis {
     m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
   }
@@ -61,45 +58,20 @@ namespace Isis {
     m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
     m_observationNumber = observationNumber;
     m_instrumentId = instrumentId;
 
-    m_bundleTargetBody = bundleTargetBody;
-
     if (image) {
       append(image);
       m_serialNumbers.append(image->serialNumber());
       m_imageNames.append(image->fileName());
       m_cubeSerialNumberToBundleImageMap.insert(image->serialNumber(), image);
-
-      // set the observations spice position and rotation objects from the primary image in the
-      // observation (this is, by design at the moment, the first image added to the observation)
-      // if the image, camera, or instrument position/orientation is null, then set to null
-      m_instrumentPosition = (image->camera() ?
-                               (image->camera()->instrumentPosition() ?
-                                 image->camera()->instrumentPosition() : NULL)
-                               : NULL);
-      m_instrumentRotation = (image->camera() ?
-                               (image->camera()->instrumentRotation() ?
-                                  image->camera()->instrumentRotation() : NULL)
-                               : NULL);
-
-      // set the observations target body spice rotation object from the primary image in the
-      // observation (this is, by design at the moment, the first image added to the observation)
-      // if the image, camera, or instrument position/orientation is null, then set to null
-//      m_bodyRotation = (image->camera() ?
-//                           (image->camera()->bodyRotation() ?
-//                             image->camera()->bodyRotation() : NULL)
-//                           : NULL);
     }
   }
 
@@ -115,9 +87,6 @@ namespace Isis {
 
     m_observationNumber = src.m_observationNumber;
     m_instrumentId = src.m_instrumentId;
-
-    m_instrumentPosition = src.m_instrumentPosition;
-    m_instrumentRotation = src.m_instrumentRotation;
 
     m_solveSettings = src.m_solveSettings;
 
@@ -151,9 +120,6 @@ namespace Isis {
 
       m_observationNumber = src.m_observationNumber;
       m_instrumentId = src.m_instrumentId;
-
-      m_instrumentPosition = src.m_instrumentPosition;
-      m_instrumentRotation = src.m_instrumentRotation;
 
       m_solveSettings = src.m_solveSettings;
     }
@@ -197,7 +163,7 @@ namespace Isis {
   }
 
 
-  // Need something that provides this functionality in child classes, but not here -- function signatures will be different. 
+  // Need something that provides this functionality in child classes, but not here -- function signatures will be different.
   /**
    * Set solve parameters
    *
@@ -210,7 +176,7 @@ namespace Isis {
    *         returns true.
    */
 //  bool AbstractBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
-    // different for both 
+    // different for both
 //  }
 
 
@@ -267,30 +233,11 @@ namespace Isis {
   /**
    * Accesses the solve settings
    *
-   * @return @b const AbstractBundleObservationSolveSettingsQsp Returns a pointer to the solve
+   * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
    *                                                    settings for this AbstractBundleObservation
    */
-  const AbstractBundleObservationSolveSettingsQsp AbstractBundleObservation::solveSettings() {
+  const BundleObservationSolveSettingsQsp AbstractBundleObservation::solveSettings() {
     return m_solveSettings;
-  }
-
-
-  /**
-   * Initializes the paramater weights for solving
-   *
-   * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
-   *         By the way, this seems klunky to me, would like to come up with a better way.
-   *         Also, apriori sigmas are in two places, the AbstractBundleObservationSolveSettings AND in the
-   *         the AbstractBundleObservation class too - this is unnecessary should only be in the
-   *         AbstractBundleObservationSolveSettings. But, they are split into position and pointing.
-   *
-   *   @todo always returns true?
-   */
-  bool AbstractBundleObservation::initParameterWeights() {
-    // will be different for ISIS and CSM
   }
 
 
@@ -373,15 +320,6 @@ QString AbstractBundleObservation::formatBundleOutputString(bool errorPropagatio
 }
 
 
-// FIXME: if this is going to stay, needs to not take position and pointing
-  void AbstractBundleObservation::bundleOutputFetchData(QVector<double> &finalParameterValues,
-                          int &nPositionCoefficients, int &nPointingCoefficients,
-                          bool &useDefaultPosition,
-                          bool &useDefaultPointing, bool &useDefaultTwist) {
-    // different for both, solve settings is a problem.
-  }
-
-
   /**
    * @brief Takes in an open std::ofstream and writes out information which goes into the
    * bundleout.txt file.
@@ -410,7 +348,7 @@ QString AbstractBundleObservation::formatBundleOutputString(bool errorPropagatio
   }
 
 
-// FIXME: will this work for both? CSM can list parameters, right? 
+// FIXME: will this work for both? CSM can list parameters, right?
   QStringList AbstractBundleObservation::parameterList() {
     return m_parameterNamesList;
   }
