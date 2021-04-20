@@ -335,7 +335,6 @@ namespace Isis {
       if (getFootBlob && band == 0) {
         // Read the footprint from the image labels
         ImagePolygon poly = cube.readFootprint();
-        cube.close();
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
         _combined = multiP->clone();
