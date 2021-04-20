@@ -43,13 +43,14 @@ namespace Isis {
       virtual AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
 
       // copy method
-      virtual void copy(const AbstractBundleObservation &src);
+      // not implementedn in BundleObservation either??? 
+//      virtual void copy(const AbstractBundleObservation &src);
 
-      void append(const BundleImageQsp &value);
+      virtual void append(const BundleImageQsp &value);
 
       BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
 
-      bool setSolveSettings(BundleObservationSolveSettings solveSettings);
+      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings);
 
       void setIndex(int n);
       int index();
@@ -61,19 +62,19 @@ namespace Isis {
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
 
-      const BundleObservationSolveSettingsQsp solveSettings();
+      virtual const BundleObservationSolveSettingsQsp solveSettings();
       int numberParameters();
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
 
-      void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
-      QString bundleOutputCSV(bool errorPropagation);
+      virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
+      virtual QString bundleOutputCSV(bool errorPropagation);
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
       // CAN we have this for both?
-      QStringList parameterList();
-      QStringList imageNames();
+      virtual QStringList parameterList();
+      virtual QStringList imageNames();
 
     private:
       QString m_observationNumber; /**< This is typically equivalent to serial number
@@ -103,7 +104,7 @@ namespace Isis {
   };
 
   //! Typdef for AbstractBundleObservation QSharedPointer.
-  typedef QSharedPointer<AbstractBundleObservation> AbstractBundleObservationQsp; // change name or no?
+  typedef QSharedPointer<AbstractBundleObservation> AbstractBundleObservationQsp;
 }
 
 #endif // AbstractBundleObservation_h
