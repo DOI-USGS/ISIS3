@@ -387,12 +387,14 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
   int lineNum = 0;
   for(line.begin(); !line.end(); line++) {
     for(int i = 0; i < line.size(); i++) {
-      if( lineNum == 80 ) { 
+      if( lineNum == 0 ) { 
         line[i] = NULL8;
       }
     }
+    if( lineNum == 0 ) {
+      vertCube->write(line);
+    }
     lineNum++;
-    vertCube->write(line);
   }
   vertCube->reopen("rw");
 
