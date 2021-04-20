@@ -50,8 +50,6 @@ namespace Isis {
 
       BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
 
-      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings);
-
       void setIndex(int n);
       int index();
 
@@ -72,7 +70,6 @@ namespace Isis {
 
       virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
-      // CAN we have this for both?
       virtual QStringList parameterList();
       virtual QStringList imageNames();
 

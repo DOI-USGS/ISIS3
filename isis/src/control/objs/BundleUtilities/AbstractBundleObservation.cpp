@@ -163,24 +163,6 @@ namespace Isis {
   }
 
 
-  // Need something that provides this functionality in child classes, but not here -- function signatures will be different.
-  /**
-   * Set solve parameters
-   *
-   * @param solveSettings The solve settings to use
-   *
-   * @return @b bool Returns true if settings were successfully set
-   *
-   * @internal
-   *   @todo initParameterWeights() doesn't return false, so this methods always
-   *         returns true.
-   */
-  bool AbstractBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
-    // different for both
-    return false;
-  }
-
-
   /**
    * Accesses the instrument id
    *
