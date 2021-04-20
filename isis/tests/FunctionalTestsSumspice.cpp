@@ -55,6 +55,84 @@ TEST(Sumspice, FunctionalTestSumspiceTimeUpdate) {
   EXPECT_NEAR(hist->StandardDeviation(), 18.463625088626337, 1e-11);
 }
 
+TEST(Sumspice, FunctionalTestSumspicePointingUpdate) {
+  QTemporaryDir prefix;
+  QString tempDest = prefix.path() + "/sumspiceTEMP.cub";
+  QString toLogPath = prefix.path() + "/log.txt";
+  QString cubeFileName = "data/sumspice/st_2395699394_updatedtime.cub";
+  QFile::copy(cubeFileName, tempDest);
+
+  QVector<QString> args = {"from=" + tempDest,
+                           "sumfile=data/sumspice/N2395699394.SUM",
+                           "sumtime=start",
+                           "update=pointing",
+                           "tolog=" + toLogPath
+                          };
+  UserInterface options(APP_XML, args);
+  sumspice(options);
+
+  Cube cube(tempDest);
+
+  // InstrumentPointing Table
+  Table ptTable = cube.readTable("InstrumentPointing");
+  EXPECT_DOUBLE_EQ(ptTable.Label()["CkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(ptTable.Label()["CkTableEndTime"], 180571511.57789);
+
+  // InstrumentPosition Table
+  Table posTable = cube.readTable("InstrumentPosition");
+  EXPECT_DOUBLE_EQ(posTable.Label()["SpkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(posTable.Label()["SpkTableEndTime"], 180571511.57789);
+
+  // SunPosition Table
+  Table sunTable = cube.readTable("SunPosition");
+  EXPECT_DOUBLE_EQ(sunTable.Label()["SpkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(sunTable.Label()["SpkTableEndTime"], 180571511.57789);
+
+  // BodyRotation Table
+  Table bodyTable = cube.readTable("BodyRotation");
+  EXPECT_DOUBLE_EQ(bodyTable.Label().findKeyword("CkTableStartTime"), 180571511.57789);
+  EXPECT_DOUBLE_EQ(bodyTable.Label().findKeyword("CkTableEndTime"), 180571511.57789);
+}
+
+TEST(Sumspice, FunctionalTestSumspicePositionUpdate) {
+  QTemporaryDir prefix;
+  QString tempDest = prefix.path() + "/sumspiceTEMP.cub";
+  QString toLogPath = prefix.path() + "/log.txt";
+  QString cubeFileName = "data/sumspice/st_2395699394_updatedtime.cub";
+  QFile::copy(cubeFileName, tempDest);
+
+  QVector<QString> args = {"from=" + tempDest,
+                           "sumfile=data/sumspice/N2395699394.SUM",
+                           "sumtime=start",
+                           "update=position",
+                           "tolog=" + toLogPath
+                          };
+  UserInterface options(APP_XML, args);
+  sumspice(options);
+
+  Cube cube(tempDest);
+
+  // InstrumentPointing Table
+  Table ptTable = cube.readTable("InstrumentPointing");
+  EXPECT_DOUBLE_EQ(ptTable.Label()["CkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(ptTable.Label()["CkTableEndTime"], 180571511.57789);
+
+  // InstrumentPosition Table
+  Table posTable = cube.readTable("InstrumentPosition");
+  EXPECT_DOUBLE_EQ(posTable.Label()["SpkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(posTable.Label()["SpkTableEndTime"], 180571511.57789);
+
+  // SunPosition Table
+  Table sunTable = cube.readTable("SunPosition");
+  EXPECT_DOUBLE_EQ(sunTable.Label()["SpkTableStartTime"], 180571511.57789);
+  EXPECT_DOUBLE_EQ(sunTable.Label()["SpkTableEndTime"], 180571511.57789);
+
+  // BodyRotation Table
+  Table bodyTable = cube.readTable("BodyRotation");
+  EXPECT_DOUBLE_EQ(bodyTable.Label().findKeyword("CkTableStartTime"), 180571511.57789);
+  EXPECT_DOUBLE_EQ(bodyTable.Label().findKeyword("CkTableEndTime"), 180571511.57789);
+}
+
 TEST(Sumspice, FunctionalTestSumspiceSpiceUpdate) {
   QTemporaryDir prefix;
   QString tempDest = prefix.path() + "/sumspiceTEMP.cub";
