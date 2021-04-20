@@ -175,9 +175,10 @@ namespace Isis {
    *   @todo initParameterWeights() doesn't return false, so this methods always
    *         returns true.
    */
-//  bool AbstractBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
+  bool AbstractBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
     // different for both
-//  }
+    return false;
+  }
 
 
   /**
@@ -317,6 +318,8 @@ namespace Isis {
  */
 QString AbstractBundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
   // different for both
+  // TODO: either remove or update. 
+  return "Test";
 }
 
 
@@ -345,6 +348,8 @@ QString AbstractBundleObservation::formatBundleOutputString(bool errorPropagatio
    */
   QString AbstractBundleObservation::bundleOutputCSV(bool errorPropagation) {
     // different in both
+    // TODO: either remove or update. 
+    return "Test";
   }
 
 
