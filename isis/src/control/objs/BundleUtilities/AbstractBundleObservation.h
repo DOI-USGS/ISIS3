@@ -66,7 +66,6 @@ namespace Isis {
       virtual int numberParameters();
       virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
-
       virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       virtual QString bundleOutputCSV(bool errorPropagation);
 

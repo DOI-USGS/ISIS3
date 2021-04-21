@@ -29,7 +29,7 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-    m_serialNumbers.clear();
+//    m_serialNumbers.clear();
     m_imageNames.clear();
     m_parameterNamesList.clear();
     m_observationNumber = "";
@@ -53,7 +53,7 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
-    m_serialNumbers.clear();
+//    m_serialNumbers.clear();
     m_imageNames.clear();
     m_parameterNamesList.clear();
     m_observationNumber = "";
@@ -69,8 +69,8 @@ namespace Isis {
 
     if (image) {
       append(image);
-      m_serialNumbers.append(image->serialNumber());
-      m_imageNames.append(image->fileName());
+//      m_serialNumbers.append(image->serialNumber());
+//      m_imageNames.append(image->fileName());
 
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
@@ -87,10 +87,10 @@ namespace Isis {
       // set the observations target body spice rotation object from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
-//      m_bodyRotation = (image->camera() ?
-//                           (image->camera()->bodyRotation() ?
-//                             image->camera()->bodyRotation() : NULL)
-//                           : NULL);
+      m_bodyRotation = (image->camera() ?
+                           (image->camera()->bodyRotation() ?
+                             image->camera()->bodyRotation() : NULL)
+                           : NULL);
     }
   }
 
@@ -101,7 +101,7 @@ namespace Isis {
    * @param src Reference to the BundleObservation to copy
    */
   BundleObservation::BundleObservation(const BundleObservation &src) {
-    m_serialNumbers = src.m_serialNumbers;
+//    m_serialNumbers = src.m_serialNumbers;
     m_observationNumber = src.m_observationNumber;
     m_instrumentPosition = src.m_instrumentPosition;
     m_instrumentRotation = src.m_instrumentRotation;
@@ -130,7 +130,7 @@ namespace Isis {
    */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
-      m_serialNumbers = src.m_serialNumbers;
+//      m_serialNumbers = src.m_serialNumbers;
       m_observationNumber = src.m_observationNumber;
       m_instrumentPosition = src.m_instrumentPosition;
       m_instrumentRotation = src.m_instrumentRotation;
