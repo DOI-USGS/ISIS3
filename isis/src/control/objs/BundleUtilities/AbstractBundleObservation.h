@@ -55,13 +55,14 @@ namespace Isis {
 
       QString instrumentId();
 
-      LinearAlgebra::Vector &parameterWeights();
-      LinearAlgebra::Vector &parameterCorrections();
-      LinearAlgebra::Vector &aprioriSigmas();
-      LinearAlgebra::Vector &adjustedSigmas();
+      virtual LinearAlgebra::Vector &parameterWeights();
+      virtual LinearAlgebra::Vector &parameterCorrections();
+      virtual LinearAlgebra::Vector &aprioriSigmas();
+      virtual LinearAlgebra::Vector &adjustedSigmas();
 
-      virtual const BundleObservationSolveSettingsQsp solveSettings();
-      int numberParameters();
+      // TODO: remove later
+      virtual const BundleObservationSolveSettingsQsp solveSettings();              
+      virtual int numberParameters();
       virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
 

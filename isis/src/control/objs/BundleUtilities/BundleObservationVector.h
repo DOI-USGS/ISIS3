@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleImage.h"
 #include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 #include "BundleSettings.h"
 
 namespace Isis {
@@ -60,6 +61,10 @@ namespace Isis {
                                           QString observationNumber,
                                           QString instrumentId,
                                           BundleSettingsQsp bundleSettings);
+//      BundleObservation addNewIsis(BundleImageQsp image,
+//                                   QString observationNumber,
+//                                   QString instrumentId,
+//                                   BundleSettingsQsp bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
