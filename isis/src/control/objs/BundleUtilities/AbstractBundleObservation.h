@@ -60,6 +60,7 @@ namespace Isis {
       virtual LinearAlgebra::Vector &aprioriSigmas();
       virtual LinearAlgebra::Vector &adjustedSigmas();
 
+
       // TODO: remove later
       virtual const BundleObservationSolveSettingsQsp solveSettings();              
       virtual int numberParameters();
