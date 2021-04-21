@@ -647,25 +647,6 @@ namespace Isis {
 
 
   /**
-   * Sets the index for the observation
-   *
-   * @param n Value to set the index of the observation to
-   */
-//  void BundleObservation::setIndex(int n) {
-//    m_index = n;
-//  }
-
-
-  /**
-   * Accesses the observation's index
-   *
-   * @return @b int Returns the observation's index
-   */
-//  int BundleObservation::index() {
-//    return m_index;
-//  }
-
-  /**
  * @brief Creates and returns a formatted QString representing the bundle coefficients and
  * parameters
  *
