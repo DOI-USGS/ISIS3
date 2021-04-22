@@ -112,7 +112,7 @@ namespace Isis {
 
       bundleImage->setParentObservation(bundleObservation);
 
-      // update observation number to observation ptr map
+      // updateo observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
 
       // update image serial number to observation ptr map
@@ -163,82 +163,7 @@ namespace Isis {
     return bundleObservation;
   }
 
-  // Does this make sense
-/*  BundleObservationQsp BundleObservationVector::addNewIsis(BundleImageQsp bundleImage,
-                                                           QString observationNumber,
-                                                           QString instrumentId,
-                                                           BundleSettingsQsp bundleSettings) {
-
-      BundleObservationQsp bundleObservation;
-      bool addToExisting = false;
-
-      // TODO it looks like this can just become 1 if statement
-      if (bundleSettings->solveObservationMode() &&
-          m_observationNumberToObservationMap.contains(observationNumber)) {
-        bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
-
-        addToExisting = true;
-      }
-
-      if (addToExisting) {
-        // if we have already added a BundleObservation with this number, we have to add the new
-        // BundleImage to this observation
-        bundleObservation->append(bundleImage);
-
-        bundleImage->setParentObservation(bundleObservation);
-
-        // update observation number to observation ptr map
-        m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
-
-        // update image serial number to observation ptr map
-        m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
-      }
-      else {
-        // create new BundleObservation and append to this vector
-        BundleObservation *isisObservation = new BundleObservation(bundleImage,
-                                                                   observationNumber,
-                                                                   instrumentId,
-                                                                   bundleSettings->bundleTargetBody());
-
-
-        if (!isisObservation) {
-          QString message = "Unable to allocate new BundleObservation ";
-          message += "for " + bundleImage->fileName();
-          throw IException(IException::Programmer, message, _FILEINFO_);
-        }
-
-        // Find the bundle observation solve settings for this new observation
-        BundleObservationSolveSettings solveSettings;
-        // When there is only one bundle observation solve setting, use it for all observations
-        if ( bundleSettings->numberSolveSettings() == 1) {
-          solveSettings = bundleSettings->observationSolveSettings(0);
-        }
-        // Otherwise, we want to grab the bundle observation solve settings that is associated with
-        // the observation number for this new observation
-        else {
-          solveSettings = bundleSettings->observationSolveSettings(observationNumber);
-        }
-
-        isisObservation->setSolveSettings(solveSettings);
-
-        bundleObservation.reset(isisObservation);
-
-        bundleObservation->setIndex(size());
-
-        bundleImage->setParentObservation(bundleObservation);
-
-        append(bundleObservation);
-
-        // update observation number to observation ptr map
-        m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
-
-        // update image serial number to observation ptr map
-        m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
-      }
-      return bundleObservation;
-    }*/
-
-
+  // addnewIsis vs. CSM?
   // getCsmObservations()
   // getIsisObservations()
 
@@ -325,20 +250,17 @@ namespace Isis {
   bool BundleObservationVector::initializeExteriorOrientation() {
     // get isis observations
     // get csm observations 
-
     int nObservations = size();
     // just do it for ISIS observations
     for (int i = 0; i < nObservations; i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
-//      AbstractBundleObservationQsp observation = at(i);
       // TODO: how to only do this if ISIS observations
+      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
       observation->initializeExteriorOrientation();
     }
     return true;
   }
 
 
-  // TODO: has to go
   /**
    * Initializes the body rotations for the contained BundleObservations.
    *
@@ -346,10 +268,10 @@ namespace Isis {
    */
   bool BundleObservationVector::initializeBodyRotation() {
     int nObservations = size();
-    // just do it for ISIS observations
+    //TODO: just do it for ISIS observations
     for (int i = 0; i < nObservations; i++) {
-//      BundleObservationQsp observation = at(i);
-//      observation->initializeBodyRotation();
+    QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
+      observation->initializeBodyRotation();
     }
 
     return true;

@@ -61,10 +61,6 @@ namespace Isis {
                                           QString observationNumber,
                                           QString instrumentId,
                                           BundleSettingsQsp bundleSettings);
-//      BundleObservation addNewIsis(BundleImageQsp image,
-//                                   QString observationNumber,
-//                                   QString instrumentId,
-//                                   BundleSettingsQsp bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
@@ -78,6 +74,7 @@ namespace Isis {
       // To add: 
       // getCsmObservations()
       // getIsisObservations()
+      // addNewIsis()?
 
   private:
       //! Map between observation number and pointer to observation.
