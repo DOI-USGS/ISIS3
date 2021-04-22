@@ -88,8 +88,6 @@ namespace Isis {
       QStringList m_imageNames;         //!< List of all cube names.
       QString m_instrumentId;      //!< Spacecraft instrument id.
 
-      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
-
       // TODO??? change these to LinearAlgebra vectors...
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
@@ -99,6 +97,7 @@ namespace Isis {
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_adjustedSigmas;
+      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
   };
 
   //! Typdef for AbstractBundleObservation QSharedPointer.

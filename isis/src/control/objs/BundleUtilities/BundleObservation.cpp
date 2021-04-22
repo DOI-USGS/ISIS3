@@ -29,16 +29,16 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-//    m_serialNumbers.clear();
-    m_imageNames.clear();
-    m_parameterNamesList.clear();
-    m_observationNumber = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
     m_weights.clear();
     m_corrections.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
+
+    m_parameterNamesList.clear();
+    m_instrumentPosition = NULL;
+    m_instrumentRotation = NULL;
+    // m_solveSettings?
+    // m_bundleTargetBody ? 
   }
 
 
@@ -52,26 +52,18 @@ namespace Isis {
    * @param bundleTargetBody QSharedPointer to the target body of the observation
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
-                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
-//    m_serialNumbers.clear();
-    m_imageNames.clear();
-    m_parameterNamesList.clear();
-    m_observationNumber = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
+                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
     m_weights.clear();
     m_corrections.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
-    m_observationNumber = observationNumber;
+    m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
+    m_instrumentRotation = NULL;
+    m_instrumentPosition = NULL;
 
     if (image) {
-      append(image);
-//      m_serialNumbers.append(image->serialNumber());
-//      m_imageNames.append(image->fileName());
-
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
@@ -87,10 +79,6 @@ namespace Isis {
       // set the observations target body spice rotation object from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
-      m_bodyRotation = (image->camera() ?
-                           (image->camera()->bodyRotation() ?
-                             image->camera()->bodyRotation() : NULL)
-                           : NULL);
     }
   }
 
@@ -100,12 +88,11 @@ namespace Isis {
    *
    * @param src Reference to the BundleObservation to copy
    */
-  BundleObservation::BundleObservation(const BundleObservation &src) {
-//    m_serialNumbers = src.m_serialNumbers;
-    m_observationNumber = src.m_observationNumber;
+  BundleObservation::BundleObservation(const BundleObservation &src) : AbstractBundleObservation(src) {
     m_instrumentPosition = src.m_instrumentPosition;
     m_instrumentRotation = src.m_instrumentRotation;
     m_solveSettings = src.m_solveSettings;
+    // why not m_targetBody?
   }
 
 
@@ -130,11 +117,11 @@ namespace Isis {
    */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
-//      m_serialNumbers = src.m_serialNumbers;
-      m_observationNumber = src.m_observationNumber;
+      AbstractBundleObservation::operator=(src);
       m_instrumentPosition = src.m_instrumentPosition;
       m_instrumentRotation = src.m_instrumentRotation;
       m_solveSettings = src.m_solveSettings;
+    // why not m_targetBody?
     }
     return *this;
   }
@@ -168,8 +155,6 @@ namespace Isis {
     m_weights.clear();
     m_corrections.resize(nParameters);
     m_corrections.clear();
-//    m_solution.resize(nParameters);
-//    m_solution.clear();
     m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
@@ -474,9 +459,6 @@ namespace Isis {
         m_weights[nCamPosCoeffsSolved + i] = angAccWeight;
       }
     }
-
-//    for ( int i = 0; i < (int)m_weights.size(); i++ )
-//      std::cout << m_weights[i] << std::endl;
 
     return true;
   }
