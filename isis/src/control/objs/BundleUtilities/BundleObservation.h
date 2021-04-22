@@ -138,6 +138,7 @@ namespace Isis {
       bool initParameterWeights();
 
     private:
+      QStringList m_parameterNamesList; //!< List of all cube parameters.
       BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).

@@ -31,7 +31,7 @@ namespace Isis {
 
       // constructor
       AbstractBundleObservation(BundleImageQsp image, QString observationNumber, QString instrumentId,
-                        BundleTargetBodyQsp bundleTargetBody); // target body and CSM question
+                        BundleTargetBodyQsp bundleTargetBody);
 
       // copy constructor
       AbstractBundleObservation(const AbstractBundleObservation &src);
@@ -61,15 +61,14 @@ namespace Isis {
       virtual LinearAlgebra::Vector &adjustedSigmas();
 
 
-      // TODO: remove later
-      virtual const BundleObservationSolveSettingsQsp solveSettings();              
+      virtual const BundleObservationSolveSettingsQsp solveSettings() = 0;              
       virtual int numberParameters();
       virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
-      virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
-      virtual QString bundleOutputCSV(bool errorPropagation);
+      virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation) = 0;
+      virtual QString bundleOutputCSV(bool errorPropagation) = 0;
 
-      virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false) = 0;
 
       virtual QStringList parameterList();
       virtual QStringList imageNames();
@@ -96,7 +95,6 @@ namespace Isis {
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_adjustedSigmas;
-      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
   };
 
   //! Typdef for AbstractBundleObservation QSharedPointer.
