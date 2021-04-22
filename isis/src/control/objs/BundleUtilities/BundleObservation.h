@@ -104,20 +104,11 @@ namespace Isis {
       // copy method
       void copy(const BundleObservation &src);
 
-      void append(const BundleImageQsp &value);
-
-      BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
-
       bool setSolveSettings(BundleObservationSolveSettings solveSettings);
-
-      void setIndex(int n);
-      int index();
 
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
-
-      QString instrumentId();
 
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
@@ -142,35 +133,15 @@ namespace Isis {
       QString bundleOutputCSV(bool errorPropagation);
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
-      QStringList parameterList();
-      QStringList imageNames();
 
-    private:
+   private:
       bool initParameterWeights();
 
     private:
-      QString m_observationNumber; /**< This is typically equivalent to serial number
-                                        except in the case of "observation mode" (e.g.
-                                        Lunar Orbiter) where for each image in the
-                                        observation, the observation number is the serial number
-                                        augmented with an additional integer. **/
-
-      int m_index; //!< Index of this observation.
-
-      //! Map between cube serial number and BundleImage pointers.
-      QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
-
-      QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
-      QStringList m_parameterNamesList; //!< List of all cube parameters.
-      QStringList m_imageNames;         //!< List of all cube names.
-
-      QString m_instrumentId;      //!< Spacecraft instrument id.
-
       BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
       SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image).
-//    SpiceRotation *m_bodyRotation;         //!< Instrument body rotation (in primary image).
 
       BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
 
@@ -178,7 +149,6 @@ namespace Isis {
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
       LinearAlgebra::Vector m_corrections;
-      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.

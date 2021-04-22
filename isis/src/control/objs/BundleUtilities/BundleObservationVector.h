@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleImage.h"
 #include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 #include "BundleSettings.h"
 
 namespace Isis {
@@ -73,6 +74,7 @@ namespace Isis {
       // To add: 
       // getCsmObservations()
       // getIsisObservations()
+      // addNewIsis()?
 
   private:
       //! Map between observation number and pointer to observation.

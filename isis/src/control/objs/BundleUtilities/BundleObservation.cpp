@@ -29,19 +29,16 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-    m_serialNumbers.clear();
-    m_imageNames.clear();
-    m_parameterNamesList.clear();
-    m_observationNumber = "";
-    m_instrumentId = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
-    m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
+
+    m_parameterNamesList.clear();
+    m_instrumentPosition = NULL;
+    m_instrumentRotation = NULL;
+    // m_solveSettings?
+    // m_bundleTargetBody ? 
   }
 
 
@@ -55,32 +52,18 @@ namespace Isis {
    * @param bundleTargetBody QSharedPointer to the target body of the observation
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
-                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
-    m_serialNumbers.clear();
-    m_imageNames.clear();
-    m_parameterNamesList.clear();
-    m_observationNumber = "";
-    m_instrumentId = "";
-    m_instrumentRotation = NULL;
-    m_instrumentPosition = NULL;
-    m_index = 0;
+                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
-    m_observationNumber = observationNumber;
-    m_instrumentId = instrumentId;
-
+    m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
+    m_instrumentRotation = NULL;
+    m_instrumentPosition = NULL;
 
     if (image) {
-      append(image);
-      m_serialNumbers.append(image->serialNumber());
-      m_imageNames.append(image->fileName());
-      m_cubeSerialNumberToBundleImageMap.insert(image->serialNumber(), image);
-
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
@@ -96,10 +79,6 @@ namespace Isis {
       // set the observations target body spice rotation object from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
-//      m_bodyRotation = (image->camera() ?
-//                           (image->camera()->bodyRotation() ?
-//                             image->camera()->bodyRotation() : NULL)
-//                           : NULL);
     }
   }
 
@@ -109,19 +88,11 @@ namespace Isis {
    *
    * @param src Reference to the BundleObservation to copy
    */
-  BundleObservation::BundleObservation(const BundleObservation &src) {
-    m_serialNumbers = src.m_serialNumbers;
-    m_cubeSerialNumberToBundleImageMap = src.m_cubeSerialNumberToBundleImageMap;
-
-    m_observationNumber = src.m_observationNumber;
-    m_instrumentId = src.m_instrumentId;
-
+  BundleObservation::BundleObservation(const BundleObservation &src) : AbstractBundleObservation(src) {
     m_instrumentPosition = src.m_instrumentPosition;
     m_instrumentRotation = src.m_instrumentRotation;
-
     m_solveSettings = src.m_solveSettings;
-
-    m_index = src.m_index;
+    // why not m_targetBody?
   }
 
 
@@ -146,54 +117,13 @@ namespace Isis {
    */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
-      m_serialNumbers = src.m_serialNumbers;
-      m_cubeSerialNumberToBundleImageMap = src.m_cubeSerialNumberToBundleImageMap;
-
-      m_observationNumber = src.m_observationNumber;
-      m_instrumentId = src.m_instrumentId;
-
+      AbstractBundleObservation::operator=(src);
       m_instrumentPosition = src.m_instrumentPosition;
       m_instrumentRotation = src.m_instrumentRotation;
-
       m_solveSettings = src.m_solveSettings;
+    // why not m_targetBody?
     }
     return *this;
-  }
-
-
-  /**
-   * Appends a BundleImage shared pointer to the BundleObservation.
-   * If the pointer is valid, then the BundleImage and its serial number will be inserted into
-   * the serial number to BundleImage map.
-   *
-   * @param value The BundleImage to be appended.
-   *
-   * @see QVector::append()
-   */
-  void BundleObservation::append(const BundleImageQsp &value) {
-    if (value) {
-      m_cubeSerialNumberToBundleImageMap.insert(value->serialNumber(), value);
-    }
-    QVector<BundleImageQsp>::append(value);
-  }
-
-
-  /**
-   * Returns the BundleImage shared pointer associated with the given serial number.
-   * If no BundleImage with that serial number is contained a NULL pointer is returned.
-   *
-   * @param cubeSerialNumber The serial number of the cube to be returned.
-   *
-   * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
-   */
-  BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
-    BundleImageQsp bundleImage;
-
-    if (m_cubeSerialNumberToBundleImageMap.contains(cubeSerialNumber)) {
-      bundleImage = m_cubeSerialNumberToBundleImageMap.value(cubeSerialNumber);
-    }
-
-    return bundleImage;
   }
 
 
@@ -225,8 +155,6 @@ namespace Isis {
     m_weights.clear();
     m_corrections.resize(nParameters);
     m_corrections.clear();
-//    m_solution.resize(nParameters);
-//    m_solution.clear();
     m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
@@ -240,16 +168,6 @@ namespace Isis {
     }
 
     return true;
-  }
-
-
-  /**
-   * Accesses the instrument id
-   *
-   * @return @b QString Returns the instrument id of the observation
-   */
-  QString BundleObservation::instrumentId() {
-    return m_instrumentId;
   }
 
 
@@ -294,15 +212,6 @@ namespace Isis {
 
 
   /**
-   * @internal
-   *   @todo
-   */
-//  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
-//    return m_solution;
-//  }
-
-
-  /**
    * Accesses the a priori sigmas
    *
    * @return @b LinearAlgebra::Vector Returns the a priori sigmas
@@ -342,81 +251,79 @@ namespace Isis {
    *   @todo Should this always return true?
    */
   bool BundleObservation::initializeExteriorOrientation() {
-    std::cout << "do something with states instead" << std::endl;
-//    if (m_solveSettings->instrumentPositionSolveOption() !=
-//        BundleObservationSolveSettings::NoPositionFactors) {
-//
-//      double positionBaseTime = 0.0;
-//      double positiontimeScale = 0.0;
-//      std::vector<double> posPoly1, posPoly2, posPoly3;
-//
-//      for (int i = 0; i < size(); i++) {
-//        BundleImageQsp image = at(i);
-//        SpicePosition *spicePosition = image->camera()->instrumentPosition();
-//
-//        if (i > 0) {
-//          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-//          spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-//          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
-//                                       m_solveSettings->positionInterpolationType());
-//        }
-//        else {
-//          // first, set the degree of the spk polynomial to be fit for a priori values
-//          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
-//
-//          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-//          // function, or polynomial function over constant hermite spline)
-//          // TODO: verify - I think this actually performs the a priori fit
-//          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
-//
-//          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-//          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-//
-//          if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
-//            positionBaseTime = m_instrumentPosition->GetBaseTime();
-//            positiontimeScale = m_instrumentPosition->GetTimeScale();
-//            m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
-//          }
-//        }
-//      }
-//    }
-//
-//    if (m_solveSettings->instrumentPointingSolveOption() !=
-//        BundleObservationSolveSettings::NoPointingFactors) {
-//
-//      double rotationBaseTime = 0.0;
-//      double rotationtimeScale = 0.0;
-//      std::vector<double> anglePoly1, anglePoly2, anglePoly3;
-//
-//      for (int i = 0; i < size(); i++) {
-//        BundleImageQsp image = at(i);
-//        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-//
-//        if (i > 0) {
-//          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-//          spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-//          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
-//                                       m_solveSettings->pointingInterpolationType());
-//        }
-//        else {
-//          // first, set the degree of the spk polynomial to be fit for a priori values
-//          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
-//
-//          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-//          // function, or polynomial function over constant hermite spline)
-//          // TODO: verify - I think this actually performs the a priori fit
-//          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-//
-//          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-//          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-//
-//          rotationBaseTime = spicerotation->GetBaseTime();
-//          rotationtimeScale = spicerotation->GetTimeScale();
-//          spicerotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
-//        }
-//      }
-//    }
-//
+    if (m_solveSettings->instrumentPositionSolveOption() !=
+        BundleObservationSolveSettings::NoPositionFactors) {
+
+      double positionBaseTime = 0.0;
+      double positiontimeScale = 0.0;
+      std::vector<double> posPoly1, posPoly2, posPoly3;
+
+      for (int i = 0; i < size(); i++) {
+        BundleImageQsp image = at(i);
+        SpicePosition *spicePosition = image->camera()->instrumentPosition();
+
+        if (i > 0) {
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+          spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
+          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
+                                       m_solveSettings->positionInterpolationType());
+        }
+        else {
+          // first, set the degree of the spk polynomial to be fit for a priori values
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
+
+          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+          // function, or polynomial function over constant hermite spline)
+          // TODO: verify - I think this actually performs the a priori fit
+          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
+
+          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+
+          if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
+            positionBaseTime = m_instrumentPosition->GetBaseTime();
+            positiontimeScale = m_instrumentPosition->GetTimeScale();
+            m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
+          }
+        }
+      }
+    }
+
+    if (m_solveSettings->instrumentPointingSolveOption() !=
+        BundleObservationSolveSettings::NoPointingFactors) {
+
+      double rotationBaseTime = 0.0;
+      double rotationtimeScale = 0.0;
+      std::vector<double> anglePoly1, anglePoly2, anglePoly3;
+
+      for (int i = 0; i < size(); i++) {
+        BundleImageQsp image = at(i);
+        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
+
+        if (i > 0) {
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+          spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
+          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
+                                       m_solveSettings->pointingInterpolationType());
+        }
+        else {
+          // first, set the degree of the spk polynomial to be fit for a priori values
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
+
+          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+          // function, or polynomial function over constant hermite spline)
+          // TODO: verify - I think this actually performs the a priori fit
+          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
+
+          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+
+          rotationBaseTime = spicerotation->GetBaseTime();
+          rotationtimeScale = spicerotation->GetTimeScale();
+          spicerotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
+        }
+      }
+    }
     return true;
   }
 
@@ -454,54 +361,6 @@ namespace Isis {
       image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
-
-
-/*
-  bool BundleObservation::initializeExteriorOrientation() {
-
-    if (m_solveSettings->instrumentPositionSolveOption() !=
-        BundleObservationSolveSettings::NoPositionFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpicePosition *spiceposition = image->camera()->instrumentPosition();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-      }
-    }
-
-    if (m_solveSettings->instrumentPointingSolveOption() !=
-        BundleObservationSolveSettings::NoPointingFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-      }
-    }
-
-    return true;
-  }
-*/
 
 
   /**
@@ -600,9 +459,6 @@ namespace Isis {
         m_weights[nCamPosCoeffsSolved + i] = angAccWeight;
       }
     }
-
-//    for ( int i = 0; i < (int)m_weights.size(); i++ )
-//      std::cout << m_weights[i] << std::endl;
 
     return true;
   }
@@ -771,25 +627,6 @@ namespace Isis {
     return numberPositionParameters() + numberPointingParameters();
   }
 
-
-  /**
-   * Sets the index for the observation
-   *
-   * @param n Value to set the index of the observation to
-   */
-  void BundleObservation::setIndex(int n) {
-    m_index = n;
-  }
-
-
-  /**
-   * Accesses the observation's index
-   *
-   * @return @b int Returns the observation's index
-   */
-  int BundleObservation::index() {
-    return m_index;
-  }
 
   /**
  * @brief Creates and returns a formatted QString representing the bundle coefficients and
@@ -1573,25 +1410,5 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
 
     return finalqStr;
-  }
-
-
-  /**
-   * Access to parameters for CorrelationMatrix to use.
-   *
-   * @return @b QStringList Returns a QStringList of the names of the parameters
-   */
-  QStringList BundleObservation::parameterList() {
-    return m_parameterNamesList;
-  }
-
-
-  /**
-   * Access to image names for CorrelationMatrix to use.
-   *
-   * @return @b QStringList Returns a QStringList of the image names
-   */
-  QStringList BundleObservation::imageNames() {
-    return m_imageNames;
   }
 }
