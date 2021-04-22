@@ -443,7 +443,6 @@ namespace Isis {
 
       // TODO
       if (m_bundleSettings->solveTargetBody()) {
-        std::cout << "in Target body" << std::endl;
         m_bundleObservations.initializeBodyRotation();
       }
 
@@ -505,7 +504,6 @@ namespace Isis {
     // m_rank will be the sum of observation, target, and self-cal parameters
     // TODO
     m_rank = m_bundleObservations.numberParameters();
-    std::cout << "Num parameters: " << m_rank << std::endl;
 
     if (m_bundleSettings->solveTargetBody()) {
       m_rank += m_bundleSettings->numberTargetBodyParameters();
@@ -646,7 +644,6 @@ namespace Isis {
   bool BundleAdjust::initializeNormalEquationsMatrix() {
 
     int nBlockColumns = m_bundleObservations.size();
-    std::cout << "blocks: " << nBlockColumns << std::endl; 
 
     if (m_bundleSettings->solveTargetBody())
       nBlockColumns += 1;
@@ -671,7 +668,6 @@ namespace Isis {
       for (int i = 0; i < nBlockColumns; i++) {
         m_sparseNormals.at(i)->setStartColumn(nParameters);
         nParameters += m_bundleObservations.at(i)->numberParameters();
-        std::cout << "numparms: " << nParameters << std::endl; 
       }
     }
 
