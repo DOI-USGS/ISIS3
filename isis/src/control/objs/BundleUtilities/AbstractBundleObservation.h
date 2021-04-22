@@ -55,15 +55,16 @@ namespace Isis {
 
       QString instrumentId();
 
-      LinearAlgebra::Vector &parameterWeights();
-      LinearAlgebra::Vector &parameterCorrections();
-      LinearAlgebra::Vector &aprioriSigmas();
-      LinearAlgebra::Vector &adjustedSigmas();
+      virtual LinearAlgebra::Vector &parameterWeights();
+      virtual LinearAlgebra::Vector &parameterCorrections();
+      virtual LinearAlgebra::Vector &aprioriSigmas();
+      virtual LinearAlgebra::Vector &adjustedSigmas();
 
-      virtual const BundleObservationSolveSettingsQsp solveSettings();
-      int numberParameters();
+
+      // TODO: remove later
+      virtual const BundleObservationSolveSettingsQsp solveSettings();              
+      virtual int numberParameters();
       virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
-
 
       virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       virtual QString bundleOutputCSV(bool errorPropagation);
@@ -87,17 +88,15 @@ namespace Isis {
       QStringList m_imageNames;         //!< List of all cube names.
       QString m_instrumentId;      //!< Spacecraft instrument id.
 
-      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
-
       // TODO??? change these to LinearAlgebra vectors...
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
       LinearAlgebra::Vector m_corrections;
-      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_adjustedSigmas;
+      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
   };
 
   //! Typdef for AbstractBundleObservation QSharedPointer.

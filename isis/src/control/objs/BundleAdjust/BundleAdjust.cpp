@@ -425,6 +425,7 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
+        // TODO ISIS vs. CSM (addNewIsisObservation?)
         AbstractBundleObservationQsp observation =
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
@@ -436,9 +437,11 @@ namespace Isis {
       }
 
       // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
+      // 
       // TODO!!! - should these initializations just be done when we add the new observation above?
       m_bundleObservations.initializeExteriorOrientation();
 
+      // TODO
       if (m_bundleSettings->solveTargetBody()) {
         m_bundleObservations.initializeBodyRotation();
       }
@@ -2164,8 +2167,10 @@ namespace Isis {
       observation->applyParameterCorrections(subrange(m_imageSolution,t,t+numParameters));
 
       if (m_bundleSettings->solveTargetBody()) {
-        // TODO: needs to be updated for ISIS vs. CSM CSM has no updateBodyRotation
-//        observation->updateBodyRotation();
+        // TODO: needs to be updated for ISIS vs. CSM CSM has no updateBodyRotation]
+        // TODO: this is no good. 
+        QSharedPointer<BundleObservation> isisObservation = qSharedPointerDynamicCast<BundleObservation>(observation);  
+        isisObservation->updateBodyRotation();
       }
 
       t += numParameters;

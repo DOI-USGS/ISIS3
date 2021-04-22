@@ -220,6 +220,7 @@ namespace Isis {
    *                                                    settings for this AbstractBundleObservation
    */
   const BundleObservationSolveSettingsQsp AbstractBundleObservation::solveSettings() {
+    // NEEDED for BundleMeasure
     return m_solveSettings;
   }
 
