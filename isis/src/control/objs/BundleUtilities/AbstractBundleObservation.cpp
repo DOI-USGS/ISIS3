@@ -88,8 +88,6 @@ namespace Isis {
     m_observationNumber = src.m_observationNumber;
     m_instrumentId = src.m_instrumentId;
 
-    m_solveSettings = src.m_solveSettings;
-
     m_index = src.m_index;
   }
 
@@ -121,8 +119,8 @@ namespace Isis {
       m_observationNumber = src.m_observationNumber;
       m_instrumentId = src.m_instrumentId;
 
-      m_solveSettings = src.m_solveSettings;
     }
+
     return *this;
   }
 
@@ -214,18 +212,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the solve settings
-   *
-   * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
-   *                                                    settings for this AbstractBundleObservation
-   */
-  const BundleObservationSolveSettingsQsp AbstractBundleObservation::solveSettings() {
-    // NEEDED for BundleMeasure
-    return m_solveSettings;
-  }
-
-
-  /**
    * Applies the parameter corrections
    *
    * @param corrections Vector of corrections to apply
@@ -241,8 +227,8 @@ namespace Isis {
    * @internal
    *   @todo always returns true?
    */
+// FIXME: can this work at parent level or should be pure virtual?
   bool AbstractBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
-    // Will be different for ISIS and CSM
     return false;
   }
 
@@ -250,13 +236,10 @@ namespace Isis {
   /**
    * Returns the number of total parameters there are for solving
    *
-   * The total number of parameters is equal to the number of position parameters and number of
-   * pointing parameters
-   *
    * @return @b int Returns the number of parameters there are
    */
+// FIXME: can this work at parent level or should be pure virtual?
   int AbstractBundleObservation::numberParameters() {
-    // different
     return 0;
   }
 
@@ -278,61 +261,6 @@ namespace Isis {
    */
   int AbstractBundleObservation::index() {
     return m_index;
-  }
-
-  /**
- * @brief Creates and returns a formatted QString representing the bundle coefficients and
- * parameters
- *
- * @depricated The function formatBundleOutputString is depricated as of ISIS 3.9
- * and will be removed in ISIS 4.0
- *
- * @param errorPropagation Boolean indicating whether or not to attach more information
- *     (corrections, sigmas, adjusted sigmas...) to the output QString
- * @param imageCSV Boolean which is set to true if the function is being
- *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
- *     for backwards compatibility.
- *
- * @return @b QString Returns a formatted QString representing the AbstractBundleObservation
- *
- * @internal
- *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
- *                           not being solved. Fixes #4464.
- */
-QString AbstractBundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
-  // different for both
-  // TODO: either remove or update. 
-  return "Test";
-}
-
-
-  /**
-   * @brief Takes in an open std::ofstream and writes out information which goes into the
-   * bundleout.txt file.
-   *
-   * @param fpOut The open std::ofstream object which is passed in from
-   * BundleSolutionInfo::outputText()
-   * @param errorPropagation Boolean indicating whether or not to attach more information
-   *     (corrections, sigmas, adjusted sigmas...) to the output.
-   */
-  void AbstractBundleObservation::bundleOutputString(std::ostream &fpOut, bool errorPropagation) {
-    // different in both
-  }
-
-  /**
-   * @brief Creates and returns a formatted QString representing the bundle coefficients and
-   * parameters in csv format.
-   *
-   * @param errorPropagation Boolean indicating whether or not to attach more information
-   *     (corrections, sigmas, adjusted sigmas...) to the output QString
-   *
-   * @return @b QString Returns a formatted QString representing the AbstractBundleObservation in
-   * csv format
-   */
-  QString AbstractBundleObservation::bundleOutputCSV(bool errorPropagation) {
-    // different in both
-    // TODO: either remove or update. 
-    return "Test";
   }
 
 
