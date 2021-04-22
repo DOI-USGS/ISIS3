@@ -138,16 +138,6 @@ namespace Isis {
       bool initParameterWeights();
 
     private:
-      QString m_observationNumber; /**< This is typically equivalent to serial number
-                                        except in the case of "observation mode" (e.g.
-                                        Lunar Orbiter) where for each image in the
-                                        observation, the observation number is the serial number
-                                        augmented with an additional integer. **/
-
-      QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
-      QStringList m_parameterNamesList; //!< List of all cube parameters.
-      QStringList m_imageNames;         //!< List of all cube names.
-
       BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
