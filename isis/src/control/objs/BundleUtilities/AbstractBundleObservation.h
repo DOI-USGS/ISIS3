@@ -92,7 +92,6 @@ namespace Isis {
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
       LinearAlgebra::Vector m_corrections;
-      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.

@@ -152,7 +152,6 @@ namespace Isis {
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
       SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image).
-      SpiceRotation *m_bodyRotation;         //!< Instrument body rotation (in primary image).
 
       BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
 
