@@ -39,19 +39,19 @@ TEST_F(SmallCube, FunctionalTestHistDefault) {
 
   csvLine = header.getRow(2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Average");
-  EXPECT_EQ(csvLine[1].toDouble(), 49.5);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 49.5);
 
   csvLine = header.getRow(3);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Std Deviation");
-  EXPECT_EQ(csvLine[1].toDouble(), 29.0115);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 29.0115);
 
   csvLine = header.getRow(4);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Variance");
-  EXPECT_EQ(csvLine[1].toDouble(), 841.667);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 841.667);
 
   csvLine = header.getRow(5);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Median");
-  EXPECT_EQ(csvLine[1].toDouble(), 49.0007);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 49.0007);
 
   csvLine = header.getRow(6);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Mode");
@@ -59,7 +59,7 @@ TEST_F(SmallCube, FunctionalTestHistDefault) {
 
   csvLine = header.getRow(7);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Skew");
-  EXPECT_EQ(csvLine[1].toDouble(), 0.0516279);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 0.0516279);
 
   csvLine = header.getRow(8);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Minimum");
@@ -219,19 +219,19 @@ TEST_F(SmallCube, FunctionalTestHistNbins) {
 
   csvLine = header.getRow(2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Average");
-  EXPECT_EQ(csvLine[1].toDouble(), 49.5);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 49.5);
 
   csvLine = header.getRow(3);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Std Deviation");
-  EXPECT_EQ(csvLine[1].toDouble(), 29.0115);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 29.0115);
 
   csvLine = header.getRow(4);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Variance");
-  EXPECT_EQ(csvLine[1].toDouble(), 841.667);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 841.667);
 
   csvLine = header.getRow(5);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Median");
-  EXPECT_EQ(csvLine[1].toDouble(), 49.5);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 49.5);
 
   csvLine = header.getRow(6);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Mode");
@@ -312,19 +312,19 @@ TEST_F(LargeCube, FunctionalTestHistMinMax) {
 
   csvLine = header.getRow(2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Average");
-  EXPECT_EQ(csvLine[1].toDouble(), 127.5);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 127.5);
 
   csvLine = header.getRow(3);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Std Deviation");
-  EXPECT_EQ(csvLine[1].toDouble(), 73.9004);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 73.9004);
 
   csvLine = header.getRow(4);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Variance");
-  EXPECT_EQ(csvLine[1].toDouble(), 5461.27);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 5461.27);
 
   csvLine = header.getRow(5);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Median");
-  EXPECT_EQ(csvLine[1].toDouble(), 127.5);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 127.5);
 
   csvLine = header.getRow(6);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "Mode");
