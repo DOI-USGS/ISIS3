@@ -18,7 +18,6 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 
 namespace Isis {
-  class BundleObservationSolveSettings;
 
   /**
    * @brief Class for bundle observations
@@ -43,7 +42,7 @@ namespace Isis {
       virtual AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
 
       // copy method
-      // not implementedn in BundleObservation either??? 
+      // not implementedn in BundleObservation either???
 //      virtual void copy(const AbstractBundleObservation &src);
 
       virtual void append(const BundleImageQsp &value);
@@ -61,7 +60,7 @@ namespace Isis {
       virtual LinearAlgebra::Vector &adjustedSigmas();
 
 
-      virtual const BundleObservationSolveSettingsQsp solveSettings() = 0;              
+      virtual const BundleObservationSolveSettingsQsp solveSettings() = 0;
       virtual int numberParameters();
       virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
 
@@ -73,7 +72,7 @@ namespace Isis {
       virtual QStringList parameterList();
       virtual QStringList imageNames();
 
-    private:
+    protected:
       QString m_observationNumber; /**< This is typically equivalent to serial number
                                         except in the case of "observation mode" (e.g.
                                         Lunar Orbiter) where for each image in the
