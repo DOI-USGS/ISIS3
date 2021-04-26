@@ -775,7 +775,7 @@ namespace Isis {
 
 
   /**
-   * Get the indices of the parameters in a set
+   * Get the indices of the parameters in a set.
    *
    * @param paramSet The set of indices to get
    *
@@ -787,7 +787,7 @@ namespace Isis {
 
 
   /**
-   * Adjust the value of a parameter
+   * Adjust the value of a parameter.
    *
    * @param index The index of the parameter to update
    * @param correction Value to add to the parameter's current value
@@ -798,6 +798,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the covariance between two parameters.
+   *
+   * @param index1 The index of the first parameter
+   * @param index2 The index of the second parameter
+   */
   double CSMCamera::getParameterCovariance(int index1, int index2) {
     return m_model->getParameterCovariance(index1, index2);
   }
