@@ -775,6 +775,41 @@ namespace Isis {
 
 
   /**
+   * Get the indices of the parameters in a set.
+   *
+   * @param paramSet The set of indices to get
+   *
+   * @returns @b std::vector<int> Vector of the parameter indices
+   */
+  std::vector<int> CSMCamera::getParameterIndices(csm::param::Set paramSet) const {
+    return m_model->getParameterSetIndices(paramSet);
+  }
+
+
+  /**
+   * Adjust the value of a parameter.
+   *
+   * @param index The index of the parameter to update
+   * @param correction Value to add to the parameter's current value
+   */
+  void CSMCamera::applyParameterCorrection(int index, double correction) {
+    double currentValue = m_model->getParameterValue(index);
+    m_model->setParameterValue(index, currentValue + correction);
+  }
+
+
+  /**
+   * Get the covariance between two parameters.
+   *
+   * @param index1 The index of the first parameter
+   * @param index2 The index of the second parameter
+   */
+  double CSMCamera::getParameterCovariance(int index1, int index2) {
+    return m_model->getParameterCovariance(index1, index2);
+  }
+
+
+  /**
    * Set the time and update the sensor position and orientation.
    *
    * This is not supported for CSM cameras because the time is a function of the

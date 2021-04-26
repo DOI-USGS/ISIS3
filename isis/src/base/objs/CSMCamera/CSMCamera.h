@@ -116,6 +116,10 @@ namespace Isis {
       virtual double RightAscension();
       virtual double Declination();
 
+      std::vector<int> getParameterIndices(csm::param::Set paramSet) const;
+      void applyParameterCorrection(int index, double correction);
+      double getParameterCovariance(int index1, int index2);
+
     protected:
       void setTarget(Pvl label);
 

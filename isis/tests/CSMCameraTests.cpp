@@ -4,6 +4,7 @@
 #include "csm/csm.h"
 #include "csm/Ellipsoid.h"
 
+#include "CSMCamera.h"
 #include "Fixtures.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -247,6 +248,49 @@ TEST_F(CSMCameraSetFixture, EmissionAngle) {
       .WillOnce(::testing::Return(imageLocus.point));
 
   EXPECT_DOUBLE_EQ(testCam->EmissionAngle(), 0.0);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndices) {
+  std::vector<int> paramIndices = {0, 1, 2};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .Times(1)
+      .WillOnce(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterType(0))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(1))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(2))
+      .Times(1)
+      .WillOnce(::testing::Return(csm::param::REAL));
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(csm::param::ADJUSTABLE);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, applyParameterCorrection) {
+  EXPECT_CALL(mockModel, getParameterValue(2))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+  EXPECT_CALL(mockModel, setParameterValue(2, 1.5))
+      .Times(1);
+
+  dynamic_cast<CSMCamera*>(testCam)->applyParameterCorrection(2, 1.0);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterCovariance) {
+  EXPECT_CALL(mockModel, getParameterCovariance(2, 3))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterCovariance(2, 3), 0.5);
 }
 
 
