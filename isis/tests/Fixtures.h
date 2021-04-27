@@ -75,6 +75,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class SmallGapCube : public TempTestingFiles {
+    protected:
+      Cube *horzCube;
+      Cube *vertCube;
+      Cube *bandCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 
   class DefaultCube : public TempTestingFiles {
     protected:
