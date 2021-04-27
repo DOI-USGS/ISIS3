@@ -43,14 +43,13 @@ namespace Isis {
     bool outputCubeSpecified = (ui.GetAsString("TO") != "none");
     bool logFileSpecified = (ui.GetAsString("LOG") != "none");
 
-    CubeAttributeOutput &att = ui.GetOutputAttribute("TO"); // TODO
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
 
     Cube *iCube = new Cube();
     iCube->open(ui.GetFileName("FROM"), "r");
 
     if (outputCubeSpecified || logFileSpecified) {
       ProcessByLine p;
-      // Cube *iCube = p.SetInputCube("FROM");
       p.SetInputCube(iCube);
 
       FindGapsFunctor gapsFunctor(iCube->lineCount(), corTol, bufferSizeBeforeGap,
@@ -59,9 +58,8 @@ namespace Isis {
 
       if (outputCubeSpecified) {
         gapsFunctor.setModification("NULL buffers added to output cube");
-        // p.setOutputCube("TO");
         
-        p.SetOutputCube(ui.GetFileName("TO"), att); // TODO
+        p.SetOutputCube(ui.GetFileName("TO"), att);
 
         p.ProcessCube(gapsFunctor, false);
       }
