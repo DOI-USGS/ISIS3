@@ -34,6 +34,7 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
+#include "SurfacePoint.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
