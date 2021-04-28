@@ -113,11 +113,6 @@ namespace Isis {
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
 
-      LinearAlgebra::Vector &parameterWeights();
-      LinearAlgebra::Vector &parameterCorrections();
-      LinearAlgebra::Vector &aprioriSigmas();
-      LinearAlgebra::Vector &adjustedSigmas();
-
       const BundleObservationSolveSettingsQsp solveSettings();
 
       bool applyParameterCorrections(LinearAlgebra::Vector corrections);
@@ -136,24 +131,12 @@ namespace Isis {
 
    private:
       bool initParameterWeights();
-
-    private:
-      QStringList m_parameterNamesList; //!< List of all cube parameters.
       BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
 
       SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
       SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image).
 
       BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
-
-    // TODO??? change these to LinearAlgebra vectors...
-      LinearAlgebra::Vector m_weights;     //!< Parameter weights.
-      //! Cumulative parameter correction vector.
-      LinearAlgebra::Vector m_corrections;
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_aprioriSigmas;
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_adjustedSigmas;
   };
 
   //! Typdef for BundleObservation QSharedPointer.

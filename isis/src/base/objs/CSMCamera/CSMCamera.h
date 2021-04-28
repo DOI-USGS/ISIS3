@@ -37,7 +37,7 @@ namespace Isis {
        * @return CameraType Camera::Point
        */
       virtual CameraType GetCameraType() const {
-        return Point;
+        return Csm;
       }
 
       /**
