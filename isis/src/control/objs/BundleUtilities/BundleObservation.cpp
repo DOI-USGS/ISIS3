@@ -29,10 +29,10 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-    m_weights.clear();
+/*    m_weights.clear();
     m_corrections.clear();
     m_aprioriSigmas.clear();
-    m_adjustedSigmas.clear();
+    m_adjustedSigmas.clear();*/
 
     m_parameterNamesList.clear();
     m_instrumentPosition = NULL;
@@ -53,10 +53,10 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
-    m_weights.clear();
+/*    m_weights.clear();
     m_corrections.clear();
     m_aprioriSigmas.clear();
-    m_adjustedSigmas.clear();
+    m_adjustedSigmas.clear();*/
 
     m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
@@ -102,7 +102,6 @@ namespace Isis {
    * Contained BundleImages will remain until all shared pointers are deleted.
    */
   BundleObservation::~BundleObservation() {
-    clear();
   }
 
 
@@ -188,46 +187,6 @@ namespace Isis {
    */
   SpicePosition *BundleObservation::spicePosition() {
     return m_instrumentPosition;
-  }
-
-
-  /**
-   * Accesses the solve parameter weights
-   *
-   * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
-   */
-  LinearAlgebra::Vector &BundleObservation::parameterWeights() {
-    return m_weights;
-  }
-
-
-  /**
-   * Accesses the parameter corrections
-   *
-   * @return @b LinearAlgebra::Vector Returns the parameter corrections
-   */
-  LinearAlgebra::Vector &BundleObservation::parameterCorrections() {
-    return m_corrections;
-  }
-
-
-  /**
-   * Accesses the a priori sigmas
-   *
-   * @return @b LinearAlgebra::Vector Returns the a priori sigmas
-   */
-  LinearAlgebra::Vector &BundleObservation::aprioriSigmas() {
-    return m_aprioriSigmas;
-  }
-
-
-  /**
-   * Accesses the adjusted sigmas
-   *
-   * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
-   */
-  LinearAlgebra::Vector &BundleObservation::adjustedSigmas() {
-    return m_adjustedSigmas;
   }
 
 
