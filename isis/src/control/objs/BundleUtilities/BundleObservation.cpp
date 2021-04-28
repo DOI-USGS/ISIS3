@@ -29,11 +29,6 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-/*    m_weights.clear();
-    m_corrections.clear();
-    m_aprioriSigmas.clear();
-    m_adjustedSigmas.clear();*/
-
     m_parameterNamesList.clear();
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
@@ -53,11 +48,6 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
-/*    m_weights.clear();
-    m_corrections.clear();
-    m_aprioriSigmas.clear();
-    m_adjustedSigmas.clear();*/
-
     m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
     m_instrumentRotation = NULL;
