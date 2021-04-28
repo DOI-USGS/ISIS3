@@ -234,17 +234,6 @@ namespace Isis {
 
 
   /**
-   * Returns the number of total parameters there are for solving
-   *
-   * @return @b int Returns the number of parameters there are
-   */
-// FIXME: can this work at parent level or should be pure virtual?
-  int AbstractBundleObservation::numberParameters() {
-    return 0;
-  }
-
-
-  /**
    * Sets the index for the observation
    *
    * @param n Value to set the index of the observation to

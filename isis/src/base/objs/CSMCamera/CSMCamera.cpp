@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "CSMCamera.h"
-#include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 
 #include <fstream>
@@ -231,7 +230,7 @@ namespace Isis {
       latitude = Latitude(0.,Angle::Degrees);
     }
 
-      if (!localRadius.isValid()) {
+    if (!localRadius.isValid()) {
       target()->shape()->clearSurfacePoint();
       return false;
     }
@@ -738,8 +737,8 @@ namespace Isis {
 
 
   /**
-   * Compute the slant distance form the sensor to the ground point at the
-   * currently set time.
+   * Compute the slant distance from the sensor to the ground
+   * point at the currently set time.
    *
    * @returns @b double The distance from the sensor to the ground point in kilometers
    */
