@@ -109,9 +109,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointStats) {
     QStringList values = line.split(",");
 
     if(lineNumber == 0) {
-      // The output adds a comma at the end of the first line, increasing the size by 1.
-      // This is a bug in ControlNetStatistics. Once that is fixed, this test wil fail.
-      ASSERT_DOUBLE_EQ(values.size() - 1, 8);
+      ASSERT_DOUBLE_EQ(values.size() - 1, 7);
     }
     else {
       ASSERT_DOUBLE_EQ(values.size(), 8);
@@ -151,9 +149,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
     QStringList values = line.split(",");
 
     if(lineNumber == 0) {
-      // The output adds a comma at the end of the first line, increasing the size by 1.
-      // This is a bug in ControlNetFilter. Once that is fixed, this test wil fail.
-      ASSERT_DOUBLE_EQ(values.size() - 1, 9);
+      ASSERT_DOUBLE_EQ(values.size() - 1, 8);
     }
     else {
       ASSERT_DOUBLE_EQ(values.size(), 9);

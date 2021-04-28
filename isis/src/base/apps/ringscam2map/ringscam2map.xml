@@ -15,7 +15,7 @@
     specified with the MAP parameter.  The system default is to use the Planar projection
     ($ISISROOT/appdata/templates/maps/planar.map).  To learn more about using map projections in
     ISIS, refer to the ISIS Workshop
-    <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
+    <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
     <p>If you need to generate your own map file you can use the <i>maptemplate</i> program or
@@ -120,8 +120,8 @@
      depending on the pixel resolution.  The RINGLONSEAM parameter allows you to selectively handle
      this case. If you are making mosaics near the seam you will need to understand and alter the
      default for this parameter.
-     <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams">
-     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to
+     <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams-">
+     Problems at the Longitude Seams</a> of The ISIS Workshop "Learning About Map Projections" includes an example to
      help illustrate the problem. Note that if the user chooses to match the map file, then the
      user can not set this parameter. The program will behave as if RINGLONSEAM="CONTINUE".
    </p>
@@ -923,7 +923,7 @@
        <description>
          This example is the first of two different runs of <i>cam2map</i>
          demonstrating usage of MATCHMAP.  In both this example and the next,
-         MATCHMAP is set to YES.  In this case MAP is an Isis level 2 image.  
+         MATCHMAP is set to YES.  In this case MAP is an Isis level 2 image.
          The mapping parameters of the output file will be read from the
          mapping group of the MAP level 2 image.
        </description>

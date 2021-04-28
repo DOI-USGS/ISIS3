@@ -421,7 +421,7 @@ namespace Isis{
           }
 
           bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
-
+          
           // Check if the user requires valid image center geometry
           if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
             QString msg = "Image center does not project in camera model";
@@ -433,6 +433,8 @@ namespace Isis{
           GeneratePVLOutput(incube, general, camstats, statistics, bandGeom, ui);
         else
           GenerateCSVOutput(incube, general, camstats, statistics, bandGeom, ui);
+
+        incube->close();
 
         // Clean the data
         delete general;

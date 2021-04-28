@@ -75,6 +75,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class SmallGapCube : public TempTestingFiles {
+    protected:
+      Cube *horzCube;
+      Cube *vertCube;
+      Cube *bandCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 
   class DefaultCube : public TempTestingFiles {
     protected:
@@ -238,7 +248,7 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
-  
+
   class OsirisRexCube : public DefaultCube {
     protected:
       void setInstrument(QString ikid, QString instrumentId);
@@ -304,6 +314,14 @@ class HistoryBlob : public TempTestingFiles {
     PvlObject historyPvl;
 
     void SetUp() override;
+};
+
+class NullPixelCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+
+    void SetUp() override;
+    void TearDown() override;
 };
 }
 

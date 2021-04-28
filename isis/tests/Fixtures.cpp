@@ -145,6 +145,110 @@ namespace Isis {
     }
   }
 
+
+  void SmallGapCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    // Initialize horzCube
+    horzCube = new Cube();
+    horzCube->setDimensions(9, 9, 9);
+    horzCube->create(tempDir.path() + "/horzgap.cub");
+
+    // horizontal line of nulls through all bands
+    LineManager h_line(*horzCube);
+    double h_pixelValue = 0.0;
+    int h_lineNum = 0;
+    for(h_line.begin(); !h_line.end(); h_line++) {
+      for(int i = 0; i < h_line.size(); i++) {
+        if(h_lineNum == 4 || h_lineNum % 9 == 4) {
+          h_line[i] = NULL8;
+        }
+        else {
+          h_pixelValue = sin(h_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          h_line[i] = (double) h_pixelValue;
+        }
+      }
+      h_lineNum++;
+      horzCube->write(h_line);
+    }
+    horzCube->reopen("rw");
+
+
+    // Initialize vertCube
+    vertCube = new Cube();
+    vertCube->setDimensions(9, 9, 9);
+    vertCube->create(tempDir.path() + "/vertgap.cub");
+
+    // vertical line of nulls through all bands
+    LineManager v_line(*vertCube);
+    double v_pixelValue = 0.0;
+    int v_lineNum = 0;
+    for(v_line.begin(); !v_line.end(); v_line++) {
+      for(int i = 0; i < v_line.size(); i++) {
+        if(i == 4) { 
+          v_line[i] = NULL8;
+        }
+        else {
+          v_pixelValue = sin(v_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          v_line[i] = (double) v_pixelValue;
+        }
+      }
+      v_lineNum++;
+      vertCube->write(v_line);
+    }
+    vertCube->reopen("rw");
+
+
+    // Initialize bandCube
+    bandCube = new Cube();
+    bandCube->setDimensions(9, 9, 9);
+    bandCube->create(tempDir.path() + "/bandgap.cub");
+
+    // vertical line of nulls on just one band
+    LineManager b_line(*bandCube);
+    double b_pixelValue = 0.0;
+    int b_lineNum = 0;
+    for(b_line.begin(); !b_line.end(); b_line++) {
+      for(int i = 0; i < b_line.size(); i++) {
+        if( b_lineNum == 22 ) { 
+          b_line[i] = NULL8;
+        }
+        else {
+          b_pixelValue = sin(b_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          b_line[i] = (double) b_pixelValue;
+        }
+      }
+      b_lineNum++;
+      bandCube->write(b_line);
+    }
+    bandCube->reopen("rw");
+
+  }
+
+
+  void SmallGapCube::TearDown() {
+    if (horzCube->isOpen()) {
+      horzCube->close();
+    }
+    if (vertCube->isOpen()) {
+      vertCube->close();
+    }
+    if (bandCube->isOpen()) {
+      bandCube->close();
+    }
+
+    if (horzCube) {
+      delete horzCube;
+    }
+    if (vertCube) {
+      delete vertCube;
+    }
+    if (bandCube) {
+      delete bandCube;
+    }
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
@@ -268,9 +372,9 @@ namespace Isis {
     LineManager line(*testCube);
     int pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= testCube->lineCount(); i++) { 
+      for (int i = 1; i <= testCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -294,9 +398,9 @@ namespace Isis {
     line = LineManager(*projTestCube);
     pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= projTestCube->lineCount(); i++) { 
+      for (int i = 1; i <= projTestCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -605,7 +709,7 @@ namespace Isis {
   void GalileoSsiCube::SetUp() {
     DefaultCube::SetUp();
 
-    // Change default dims 
+    // Change default dims
     PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
     dim.findKeyword("Samples").setValue("800");
     dim.findKeyword("Lines").setValue("800");
@@ -620,7 +724,7 @@ namespace Isis {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue("-77001");
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-    
+
     std::istringstream iss(R"(
       Group = Instrument
         SpacecraftName            = "Galileo Orbiter"
@@ -678,7 +782,7 @@ namespace Isis {
         INS-77001_BORESIGHT_LINE   = 400.0
       End_Object
     )");
-    
+
     PvlObject newNaifKeywords;
     nk >> newNaifKeywords;
     naifKeywords = newNaifKeywords;
@@ -693,8 +797,8 @@ namespace Isis {
     End_Group
     )");
 
-    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
-    PvlGroup newArchive; 
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive");
+    PvlGroup newArchive;
     ar >> newArchive;
     archive = newArchive;
 
@@ -1056,8 +1160,8 @@ namespace Isis {
 
     FileName newCube(tempDir.path() + "/testing.cub");
 
-    testCube->fromIsd(newCube, label, isd, "rw");    
-    
+    testCube->fromIsd(newCube, label, isd, "rw");
+
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
     kernels["ShapeModel"] = "Null";
@@ -1095,8 +1199,8 @@ namespace Isis {
     bandBin = newBandBin;
 
     json nk;
-    nk["BODY2101955_RADII"] =  {2825, 2675, 254}; 
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0; 
+    nk["BODY2101955_RADII"] =  {2825, 2675, 254};
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0;
     nk["INS"+ikid.toStdString()+"_PIXEL_SIZE"] = 8.5;
     nk["CLOCK_ET_-64_1/0600694569.00000_COMPUTED"] = "8ed6ae8930f3bd41";
     nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.0085, 0.0};
@@ -1105,12 +1209,12 @@ namespace Isis {
     nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, -117.64705882353};
     nk["INS"+ikid.toStdString()+"_CCD_CENTER"] = {511.5, 511.5};
     nk["BODY_FRAME_CODE"] = 2101955;
-    
+
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
     PvlObject newNaifKeywords("NaifKeywords", nk);
     naifKeywords = newNaifKeywords;
 
-    QString fileName = testCube->fileName();  
+    QString fileName = testCube->fileName();
     delete testCube;
     testCube = new Cube(fileName, "rw");
  }
@@ -1283,6 +1387,33 @@ namespace Isis {
 
   void MgsMocCube::TearDown() {
     testCube.reset();
+  }
+
+  void NullPixelCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(10, 10, 10);
+    QString path = tempDir.path() + "/null.cub";
+    testCube->create(path);
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] =  NULL8;
+      }
+      testCube->write(line);
+    }
+  }
+
+  void NullPixelCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
   }
 
 }

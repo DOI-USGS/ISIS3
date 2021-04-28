@@ -168,7 +168,7 @@ namespace Isis {
    * @author Sharmila Prasad (8/31/2010)
    */
   void ControlNetFilter::CubeStatsHeader(void) {
-    mOstm << "FileName, SerialNumber, ImageTotalPoints, ImagePointsIgnored, ImagePointsEditLocked, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ImageConvexHullRatio,";
+    mOstm << "FileName, SerialNumber, ImageTotalPoints, ImagePointsIgnored, ImagePointsEditLocked, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ImageConvexHullRatio";
   }
 
   /**
@@ -198,7 +198,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference";
       mOstm << endl;
     }
 
@@ -386,7 +386,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference";
       mOstm << endl;
     }
 
@@ -1037,7 +1037,7 @@ namespace Isis {
     if (pbLastFilter) {
       PointStatsHeader();
       CubeStatsHeader();
-      mOstm << "ImageMeasureIgnored, ImageMeasureEditLocked, ";
+      mOstm << ", ImageMeasureIgnored, ImageMeasureEditLocked";
       mOstm << endl;
     }
 
@@ -1314,7 +1314,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       CubeStatsHeader();
-      mOstm << "Distance_PointIDs >>, " << endl;
+      mOstm << ", Distance_PointIDs >>, " << endl;
     }
 
     int iNumCubes = mSerialNumFilter.size();

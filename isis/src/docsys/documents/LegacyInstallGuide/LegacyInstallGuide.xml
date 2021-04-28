@@ -431,7 +431,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           </pre>
           This should list the packages available for download.  If you do not receive this list then 1) either both of our servers
           are down or 2) your firewall does not allow access.  In the former case please post a message on our
-          <a href="https://isis.astrogeology.usgs.gov/fixit">ISIS support board</a>.  In the latter case, see your local
+          <a href="https://github.com/USGS-Astrogeology/ISIS3">ISIS support board</a>.  In the latter case, see your local
           system administrator.  </p>
 
           <p>
@@ -516,7 +516,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 	       as others may have posted the problem with similar issues to you.
              </p>
              <p>
-               <a href="https://isis.astrogeology.usgs.gov/fixit">ISIS Support Center</a>
+               <a href="https://github.com/USGS-Astrogeology/ISIS3">ISIS Support Center</a>
              </p>
 
         <h2>Example ISIS 3 Download</h2>

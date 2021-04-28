@@ -81,8 +81,7 @@ namespace Isis{
         }
         else {
           if (log){
-            PvlGroup results = data.findGroup("Results");
-            log->addGroup(results);
+            log->addObject(data);
           }
         }
       }

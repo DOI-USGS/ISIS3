@@ -115,9 +115,11 @@ namespace Isis {
     el = sl + (nl - 1) * linc;
 
     // Allocate the output file and make sure things get propogated nicely
-    p.SetInputCube("FROM");
+    CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
+    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.PropagateTables(false);
-    Cube *ocube = p.SetOutputCube("TO", ns, nl, nb);
     p.ClearInputCubes();
 
     // propagate tables manually

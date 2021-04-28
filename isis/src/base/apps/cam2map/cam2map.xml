@@ -14,7 +14,7 @@
     <def>PVL</def> file which is specified in <i>cam2map</i> in the MAP parameter.  Note: the system defaults
       to the Sinusoidal projection (ISIS projection based templates are located in $ISISROOT/appdata/templates/maps).
     To learn more about using map projections in ISIS, refer to the ISIS Workshop
-    <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
+    <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
     <p>
@@ -131,8 +131,8 @@
      MinimumLongitude=0 and MaximumLongitude=360.  A larger than necessary output image will be
      created, with size inversely proportional to pixel resolution.  The LONSEAM parameter allows you
      to selectively handle this case. If you are making mosaics near the seam you will need to understand
-     and alter the default for this parameter. <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams">
-     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help
+     and alter the default for this parameter. <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections#Problems-at-the-Longitude-Seams-">
+     Problems at the Longitude Seams</a> of The ISIS Workshop "Learning About Map Projections" includes an example to help
      illustrate the problem.
    </p>
   </description>

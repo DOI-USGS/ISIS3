@@ -402,7 +402,7 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock," << endl;
+    ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock" << endl;
 
     int iNumPoints = mCNet->GetNumPoints();
 
