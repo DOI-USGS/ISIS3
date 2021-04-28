@@ -23,6 +23,8 @@ find files of those names at the top level of this repository. **/
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "Constants.h"
+#include "Displacement.h"
+#include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
