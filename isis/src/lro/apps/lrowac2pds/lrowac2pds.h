@@ -12,7 +12,7 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "UserInterface.h"
 
-namespace Isis{
+namespace Isis {
   extern void lrowac2pds(UserInterface &ui);
 }
 
