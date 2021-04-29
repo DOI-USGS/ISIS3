@@ -13,7 +13,6 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
-#include "CsmBundleObservationSolveSettings.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
@@ -54,7 +53,7 @@ namespace Isis {
       // copy method
       void copy(const CsmBundleObservation &src);
 
-      bool setSolveSettings(CsmBundleObservationSolveSettingsQsp solveSettings);
+      bool setSolveSettings(BundleObservationSolveSettingsQsp solveSettings);
 
       int numberParameters();
 
@@ -71,7 +70,7 @@ namespace Isis {
       bool initParameterWeights();
 
     private:
-      CsmBundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
+      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
       std::vector<int> m_paramIndices; //!< The indices of the parameters the observation is solving for
   };
 }
