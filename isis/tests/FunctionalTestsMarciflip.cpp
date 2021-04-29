@@ -17,7 +17,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/marciflip.xml").expanded();
 TEST(Marciflip, MarciflipTestDefault) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/marciflip_out.cub";
-  QVector<QString> args = {"from=data/marci2isis/T02_001002_1200_MC_00N284W_cropped.cub", "to=" + cubeFileName };
+  QVector<QString> args = {"from=data/marciflip/T02_001002_1200_MC_00N284W_cropped.cub", "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   marciflip(options);
 
