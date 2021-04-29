@@ -777,7 +777,7 @@ namespace Isis {
 
 
   /**
-   * Get the indices of the parameters in a set.
+   * Get the indices of the parameters that belong to a set.
    *
    * @param paramSet The set of indices to get
    *
@@ -785,6 +785,44 @@ namespace Isis {
    */
   std::vector<int> CSMCamera::getParameterIndices(csm::param::Set paramSet) const {
     return m_model->getParameterSetIndices(paramSet);
+  }
+
+
+  /**
+   * Get the indices of all parameters of a specific type
+   *
+   * @param paramType The type of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices
+   */
+  std::vector<int> CSMCamera::getParameterIndices(csm::param::Type paramType) const {
+    std::vector<int> parameterIndices;
+    for (int i = 0; i < m_model->getNumParameters(); i++) {
+      if (m_model->getParameterType(i) == paramType) {
+        parameterIndices.push_back(i);
+      }
+    }
+    return parameterIndices;
+  }
+
+
+  /**
+   * Get the indices of a list of parameters
+   *
+   * @param paramType The list of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices in the same order as the input list
+   */
+  std::vector<int> CSMCamera::getParameterIndices(QStringList paramList) const {
+    std::vector<int> parameterIndices;
+    for (int i = 0; i < paramList.size(); i++) {
+      for (int j = 0; j < m_model->getNumParameters(); j++) {
+        if (m_model->getParameterName(j) == paramList[i].toStdString()) {
+          parameterIndices.push_back(i);
+        }
+      }
+    }
+    return parameterIndices;
   }
 
 

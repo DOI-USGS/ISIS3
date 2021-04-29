@@ -95,27 +95,35 @@ namespace Isis {
    * @param solveSettings The solve settings to use
    *
    * @return @b bool Returns true if settings were successfully set
-   *
-   * @internal
-   *   @todo initParameterWeights() doesn't return false, so this methods always
-   *         returns true.
    */
-  bool CsmBundleObservation::setSolveSettings(CsmBundleObservationSolveSettingsQsp solveSettings) {
-    // TODO implement for CSM
-
+  bool CsmBundleObservation::setSolveSettings(BundleObservationSolveSettingsQsp solveSettings) {
     m_solveSettings = solveSettings;
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
-    m_paramIndices = csmCamera->getParameterIndices(solveSettings->solveSet());
+    m_paramIndices.clear();
+    m_weights.clear();
+    m_corrections.clear();
+    m_adjustedSigmas.clear();
+
+    if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Set) {
+      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterSet());
+    }
+    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Type) {
+      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterType());
+    }
+    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::List) {
+      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterList());
+    }
+    else {
+      return false;
+    }
+
     int nParams = m_paramIndices.size();
 
     m_weights.resize(nParams);
-    m_weights.clear();
     m_corrections.resize(nParams);
-    m_corrections.clear();
     m_adjustedSigmas.resize(nParams);
-    m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParams);
 
     for (int i = 0; i < nParams; i++) {
