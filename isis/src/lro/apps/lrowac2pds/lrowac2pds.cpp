@@ -35,7 +35,7 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  vector<int> frameletLines;
+  static vector<int> frameletLines;
 
   static void ResetGlobals ();
   static void mergeFramelets ();
@@ -43,19 +43,19 @@ namespace Isis {
   static void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &pdsLab );
   static void CopyData ( std::ifstream &fin, std::ofstream &fout );
 
-  std::vector<int> padding;
-  int colorOffset = 0;
-  int inputCubeLines = 0;
+  static std::vector<int> padding;
+  static int colorOffset = 0;
+  static int inputCubeLines = 0;
 
   // Output UV Files
-  Cube *uveven = NULL;
-  Cube *uvodd = NULL;
+  static Cube *uveven = NULL;
+  static Cube *uvodd = NULL;
 
   // Output VIS Files
-  Cube *viseven = NULL;
-  Cube *visodd = NULL;
+  static Cube *viseven = NULL;
+  static Cube *visodd = NULL;
 
-  Cube* out = NULL;
+  static Cube* out = NULL;
 
   static QString instrumentModeId = "";
   static QString productId = "";
@@ -63,13 +63,13 @@ namespace Isis {
 
   static QString g_md5Checksum;
 
-  int numFramelets = 0;
-  int numSamples = 0;
-  int numLines = 0;
-  int numUVFilters = 0;
-  int numVisFilters = 0;
+  static int numFramelets = 0;
+  static int numSamples = 0;
+  static int numLines = 0;
+  static int numUVFilters = 0;
+  static int numVisFilters = 0;
 
-  bool g_isIoF;
+  static bool g_isIoF;
 
   void lrowac2pds(UserInterface &ui) {
       ResetGlobals();
