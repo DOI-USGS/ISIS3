@@ -19,14 +19,17 @@ using namespace std;
 Isis::Cube *outputCube = NULL;
 int currentLine;
 int filterHeight = 16;
-Isis::ProcessByBrick p;
-QString cubeFn;
-Isis::Cube *icube;
-Isis::CubeAttributeInput inAtt;
+
+void flipCube(Isis::Buffer &data);
 
 namespace Isis {
 
     void marciflip(UserInterface &ui) {
+
+        Isis::ProcessByBrick p;
+        QString cubeFn;
+        Isis::Cube *icube;
+        Isis::CubeAttributeInput inAtt;
 
         cubeFn = ui.GetFileName("FROM");
         icube = new Cube(cubeFn);
@@ -70,13 +73,12 @@ namespace Isis {
         outputCube->close();
         delete outputCube;
     }
+}
 
-    void flipCube(Isis::Buffer &data) {
-        cout << "flipping data" << endl;
-        currentLine -= filterHeight;
-        Brick outBrick(data.SampleDimension(), data.LineDimension(), data.BandDimension(), data.PixelType());
-        outBrick.Copy(data);
-        outBrick.SetBasePosition(1, currentLine + 1, data.Band());
-        outputCube->write(outBrick);
-    }
+void flipCube(Isis::Buffer &data) {
+    currentLine -= filterHeight;
+    Isis::Brick outBrick(data.SampleDimension(), data.LineDimension(), data.BandDimension(), data.PixelType());
+    outBrick.Copy(data);
+    outBrick.SetBasePosition(1, currentLine + 1, data.Band());
+    outputCube->write(outBrick);
 }

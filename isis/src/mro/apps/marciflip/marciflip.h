@@ -13,7 +13,6 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis{
   extern void marciflip(UserInterface &ui);
-  extern void flipCube(Isis::Buffer &data);
 }
 
 #endif
