@@ -22,26 +22,23 @@ TEST_F( SmallCube, FindGapsDefault )
   QString cubeFileName = prefix.path() + "/findgaps_out.cub";
   QString logFileName = prefix.path() + "/findgaps_log.txt";
   QVector<QString> args = {"from=" + testCube->fileName(),
-                          "to=" + cubeFileName,
+                           "to=" + cubeFileName,
                            "log=" + logFileName,
                            "above=1", "below=1" };
   UserInterface options(APP_XML, args);
 
   // fill with nulls from line 4 to line 5 through all bands
   LineManager line(*testCube);
-  int lineNum = 0;
   int startGap = 4;
   int endGap = 5;
-  for(line.begin(); !line.end(); line.next()) {
-    for(int i = 0; i < line.size(); i++) {
-      if(line.Line() == startGap || line.Line() == endGap)
+  for(line.begin(); !line.end(); line.next())
+  {
+    if(line.Line() == startGap || line.Line() == endGap)
+    {
+      for(int i = 0; i < line.size(); i++)
       {
         line[i] = NULL8;
       }
-    }
-    lineNum++;
-    if(line.Line() == startGap || line.Line() == endGap)
-    {
       testCube->write(line);
     }
   }
@@ -75,7 +72,7 @@ TEST_F( SmallCube, FindGapsEndOfBand )
   QString cubeFileName = prefix.path() + "/findgaps_out.cub";
   QString logFileName = prefix.path() + "/findgaps_log.txt";
   QVector<QString> args = {"from=" + testCube->fileName(),
-                          "to=" + cubeFileName,
+                           "to=" + cubeFileName,
                            "log=" + logFileName,
                            "above=1", "below=2" };
 
@@ -85,15 +82,14 @@ TEST_F( SmallCube, FindGapsEndOfBand )
   LineManager line(*testCube);
   int startGap = 4;
   int endGap = 5;
-  for(line.begin(); !line.end(); line++) {
-    for(int i = 0; i < line.size(); i++) {
-      if( line.Band() == 1 && (line.Line() == startGap || line.Line() == endGap) )
+  for(line.begin(); line.Band() < 2; line.next())
+  {
+    if(line.Line() == startGap || line.Line() == endGap)
+    {
+      for(int i = 0; i < line.size(); i++)
       {
         line[i] = NULL8;
       }
-    }
-    if( line.Band() == 1 && (line.Line() == startGap || line.Line() == endGap) )
-    {
       testCube->write(line);
     }
   }
@@ -129,7 +125,7 @@ TEST_F( SmallCube, FindGapsCorTol )
   QString cubeFileName = prefix.path() + "/findgaps_out.cub";
   QString logFileName = prefix.path() + "/findgaps_log.txt";
   QVector<QString> args = {"from=" + testCube->fileName(),
-                          "to=" + cubeFileName,
+                           "to=" + cubeFileName,
                            "log=" + logFileName,
                            "above=2", "below=1", "cortol=0.9" };
   UserInterface options(APP_XML, args);
@@ -139,32 +135,25 @@ TEST_F( SmallCube, FindGapsCorTol )
   int pixelValue = 0;
   int startGap = 4;
   int endGap = 5;
-  for(line.begin(); !line.end(); line++) {
-    for(int i = 0; i < line.size(); i++) {
-      if( line.Line() == startGap || line.Line() == endGap )
-      {
-        // startgap must be different from endgap
-        // otherwise findgaps detects two one-line gaps
-        if( line.Line() == startGap )
-        {
-          line[0] = 99;
-        }
+  for(line.begin(); line.Band() < 2; line.next())
+  {
+    for(int i = 0; i < line.size(); i++)
+    {
+      line[i] = pixelValue;
 
-        if( i > 5 )
+      if(line.Line() == startGap || line.Line() == endGap)
+      {
+        if( i > 5 || (i == 0 && line.Line() == startGap) )
         {
+          // startgap must be different from endgap
+          // otherwise findgaps detects two one-line gaps
           line[i] = 99;
         }
-        else
-        {
-          line[i] = pixelValue;
-        }
-      }
-      pixelValue++;
-    }
 
-    if( line.Line() == startGap || line.Line() == endGap )
-    {
-      testCube->write(line);
+        testCube->write(line);
+      }
+      
+      pixelValue++;
     }
   }
   testCube->reopen("rw");
