@@ -597,6 +597,10 @@ namespace Isis {
    */
   double Statistics::BestMinimum(const double percent) const {
     if (m_validPixels < 1) return Isis::NULL8;
+    // ChebyshevMinimum can return erroneous values when the data is all a
+    // single value
+    // In this case, we just want to return the minimum
+    if (Minimum() == Maximum()) return Minimum();
     double min = ChebyshevMinimum(percent);
     if (Minimum() > min) min = Minimum();
     return min;
@@ -620,6 +624,10 @@ namespace Isis {
    */
   double Statistics::BestMaximum(const double percent) const {
     if (m_validPixels < 1) return Isis::NULL8;
+    // ChebyshevMaximum can return erroneous values when the data is all a
+    // single value
+    // In this case, we just want to return the maximum
+    if (Minimum() == Maximum()) return Maximum();
     double max = ChebyshevMaximum(percent);
     if (Maximum() < max) max = Maximum();
     return max;
