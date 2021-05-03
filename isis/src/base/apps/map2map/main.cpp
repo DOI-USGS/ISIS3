@@ -1,8 +1,10 @@
-#define GUIHELPERS
+//#define GUIHELPERS
 
 #include "Isis.h"
 #include "map2map.h"
 #include "UserInterface.h"
+#include "Pvl.h"
+#include "Application.h"
 
 using namespace std;
 using namespace Isis;
@@ -17,11 +19,12 @@ map <QString, void *> GuiHelpers() {
   return helper;
 }*/
 
-
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Pvl results = map2map(ui);
-  for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
-    Application::Log(results.group(resultIndex));
+  Pvl app_log;
+  map2map(ui, &app_log);
+  //Pvl results = map2map(ui);
+  for (int resultIndex = 0; resultIndex < app_log.groups(); resultIndex++) {
+    Application::Log(app_log.group(resultIndex));
   }
 }

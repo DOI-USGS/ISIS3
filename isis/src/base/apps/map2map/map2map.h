@@ -2,9 +2,10 @@
 #define map2map_h
 
 #include "Transform.h"
+#include "UserInterface.h"
+#include "TProjection.h"
 
-void map2map(Cube incube, UserInterface &ui);
-void map2map(UserInterface &ui);
+using namespace Isis;
 
 /**
  * @author ????-??-?? Unknown
@@ -13,7 +14,7 @@ void map2map(UserInterface &ui);
  *   @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
  *                          References #775.
  */
-class map2map : public Isis::Transform {
+class Map2map : public Isis::Transform {
   private:
     Isis::TProjection *p_inmap;
     Isis::TProjection *p_outmap;
@@ -26,12 +27,12 @@ class map2map : public Isis::Transform {
 
   public:
     // constructor
-    map2map(const int inputSamples, const int inputLines, Isis::TProjection *inmap,
+    Map2map(const int inputSamples, const int inputLines, Isis::TProjection *inmap,
             const int outputSamples, const int outputLines, Isis::TProjection *outmap,
             bool trim);
 
     // destructor
-    ~map2map() {};
+    ~Map2map() {};
 
     // Implementations for parent's pure virtual members
     bool Xform(double &inSample, double &inLine,
@@ -39,5 +40,8 @@ class map2map : public Isis::Transform {
     int OutputSamples() const;
     int OutputLines() const;
 };
+
+extern void map2map(Cube *incube, UserInterface &ui, Pvl *log);
+extern void map2map(UserInterface &ui, Pvl *log);
 
 #endif

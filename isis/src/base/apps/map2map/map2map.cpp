@@ -14,8 +14,10 @@ using namespace std;
 void PrintMap();
 void LoadMapRange();
 
-Pvl map2map(Cube incube, UserInterface &ui)
+void map2map(Cube *incube, UserInterface &ui, Pvl *log)
 {
+    //Pvl app_log;
+
     // We will be warping a cube
     ProcessRubberSheet p;
 
@@ -25,6 +27,7 @@ Pvl map2map(Cube incube, UserInterface &ui)
 
     // Open the input cube and get the projection
     Cube *icube = p.SetInputCube("FROM");
+
 
     // Get the mapping group
     PvlGroup fromMappingGrp = icube->group("Mapping");
@@ -322,7 +325,7 @@ Pvl map2map(Cube incube, UserInterface &ui)
 
     // Set up the transform object which will simply map
     // output line/samps -> output lat/lons -> input line/samps
-    Transform *transform = new map2map(icube->sampleCount(),
+    Transform *transform = new Map2map(icube->sampleCount(),
                                        icube->lineCount(),
                                        (TProjection *) icube->projection(),
                                        samples,
@@ -367,22 +370,38 @@ Pvl map2map(Cube incube, UserInterface &ui)
     p.StartProcess(*transform, *interp);
     p.EndProcess();
 
-    Application::Log(cleanOutGrp);
+    //Application::Log(cleanOutGrp);
+    if (log){
+        log->addGroup(cleanOutGrp);
+    }
 
     // Cleanup
     delete transform;
     delete interp;
+
+    //return app_log;
 }
 
-Pvl map2map(UserInterface &ui)
+void map2map(UserInterface &ui, Pvl *log)
 {
-    Cube *icube = p.SetInputCube("FROM");
-    Pvl log = map2map(icube, ui);
+    /*ProcessRubberSheet p;
+    // this is copied from map2cam
+    file_name = ui.GetFileName("FROM");
+    input = ui.GetInputAttribute("FROM");
+    Cube *icube = rub.SetInputCube(file_name, input);
+
+    icube->open(ui.GetFileName("FROM"));
+    //Cube *icube = p.SetInputCube("FROM");
+    */
+    Cube *icube = new Cube();
+    icube->open(ui.GetFileName("FROM"));
+    //Pvl log = map2map(icube, ui);
+    map2map(icube, ui, log);
 }
 
 
 // Transform object constructor
-map2map::map2map(const int inputSamples, const int inputLines, TProjection *inmap,
+Map2map::Map2map(const int inputSamples, const int inputLines, TProjection *inmap,
                  const int outputSamples, const int outputLines, TProjection *outmap,
                  bool trim) {
   p_inputSamples = inputSamples;
@@ -410,7 +429,7 @@ map2map::map2map(const int inputSamples, const int inputLines, TProjection *inma
 }
 
 // Transform method mapping output line/samps to lat/lons to input line/samps
-bool map2map::Xform(double &inSample, double &inLine,
+bool Map2map::Xform(double &inSample, double &inLine,
                     const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
   if(!p_outmap->SetWorld(outSample, outLine)) return false;
@@ -455,11 +474,11 @@ bool map2map::Xform(double &inSample, double &inLine,
   return true;
 }
 
-int map2map::OutputSamples() const {
+int Map2map::OutputSamples() const {
   return p_outputSamples;
 }
 
-int map2map::OutputLines() const {
+int Map2map::OutputLines() const {
   return p_outputLines;
 }
 
