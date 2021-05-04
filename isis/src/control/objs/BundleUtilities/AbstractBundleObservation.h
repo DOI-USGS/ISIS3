@@ -75,11 +75,11 @@ namespace Isis {
       virtual QStringList parameterList();
       virtual QStringList imageNames();
 
-      virtual bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleControlPoint &point,
+      virtual bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure,
                                          BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) = 0;
       virtual bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) = 0;
-      virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, BundleControlPoint &point, SurfacePoint::CoordinateType coordType) = 0;
-      virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure, BundleControlPoint &point) = 0;
+    virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType = SurfacePoint::Rectangular) = 0;
+      virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) = 0;
 
     protected:
       QString m_observationNumber; /**< This is typically equivalent to serial number

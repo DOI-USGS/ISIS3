@@ -1365,69 +1365,70 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
-  bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure, BundleControlPoint &point,
-                                                BundleSettingsQsp &m_bundleSettings, BundleTargetBodyQsp &m_bundleTargetBody) {
-    if (m_bundleSettings->solveTargetBody()) {
+  bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure,
+                                                BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
+    if (bundleSettings->solveTargetBody()) {
       coeffTarget.clear();
     }
 
     Camera *measureCamera = measure.camera();
-    SurfacePoint surfacePoint = point.adjustedSurfacePoint();
+    BundleControlPoint *point = measure.parentControlPoint();
+    SurfacePoint surfacePoint = point->adjustedSurfacePoint();
 
     int index = 0;
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRA()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleRA()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRAVelocity()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleRAVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDec()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleDec()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDecVelocity()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleDecVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePM()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePM()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePMVelocity()) {
+    if (bundleSettings->solveTargetBody() && bundleSettings->solvePMVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveMeanRadius()) {
+    if (bundleSettings->solveTargetBody() && bundleTargetBody->solveMeanRadius()) {
       std::vector<double> lookBWRTMeanRadius =
           measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
-                                                        m_bundleTargetBody->meanRadius());
+                                                        bundleTargetBody->meanRadius());
 
       measureCamera->GroundMap()->GetdXYdPoint(lookBWRTMeanRadius, &coeffTarget(0, index),
                                                &coeffTarget(1, index));
       index++;
     }
 
-    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveTriaxialRadii()) {
+    if (bundleSettings->solveTargetBody() && bundleTargetBody->solveTriaxialRadii()) {
 
       std::vector<double> lookBWRTRadiusA =
           measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
@@ -1538,15 +1539,16 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
-  bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, BundleControlPoint &point, SurfacePoint::CoordinateType coordType) {
+  bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
     Camera *measureCamera = measure.camera();
+    BundleControlPoint* point = measure.parentControlPoint();
 
     // These vectors are either body-fixed latitudinal (lat/lon/radius) or rectangular (x/y/z)
     // depending on the value of coordinate type in SurfacePoint
-    std::vector<double> lookBWRTCoord1 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::One);
-    std::vector<double> lookBWRTCoord2 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::Two);
-    std::vector<double> lookBWRTCoord3 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::Three);
+    std::vector<double> lookBWRTCoord1 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::One);
+    std::vector<double> lookBWRTCoord2 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::Two);
+    std::vector<double> lookBWRTCoord3 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::Three);
 
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
                                              &coeffPoint3D(0, 0),
@@ -1561,18 +1563,18 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
   
 
-  bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure, BundleControlPoint &point) {
+  bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
     coeffRHS.clear();
     Camera *measureCamera = measure.camera();
-
+    BundleControlPoint* point = measure.parentControlPoint();
     // Compute the look vector in instrument coordinates based on time of observation and apriori
     // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
     // bool argument was added CameraGroundMap::GetXY to turn off the test.
     double computedX, computedY;
-    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
+    if (!(measureCamera->GroundMap()->GetXY(point->adjustedSurfacePoint(),
                                             &computedX, &computedY, false))) {
       QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
+      msg += measure.cubeSerialNumber() + " on point " + point->id() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
