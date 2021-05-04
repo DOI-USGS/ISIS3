@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
+#include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
@@ -1364,49 +1365,106 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
-  bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure) {
-//    if (m_solveSettings->solveTargetBody()) {
+  bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure, BundleControlPoint &point,
+                                                BundleSettingsQsp &m_bundleSettings, BundleTargetBodyQsp &m_bundleTargetBody) {
+    if (m_bundleSettings->solveTargetBody()) {
       coeffTarget.clear();
-//    }
+    }
 
-    return false;
+    Camera *measureCamera = measure.camera();
+    SurfacePoint surfacePoint = point.adjustedSurfacePoint();
+
+    int index = 0;
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRA()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRAVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDec()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDecVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePM()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePMVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveMeanRadius()) {
+      std::vector<double> lookBWRTMeanRadius =
+          measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
+                                                        m_bundleTargetBody->meanRadius());
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTMeanRadius, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveTriaxialRadii()) {
+
+      std::vector<double> lookBWRTRadiusA =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_MajorAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusA, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+
+      std::vector<double> lookBWRTRadiusB =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_MinorAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusB, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+
+      std::vector<double> lookBWRTRadiusC =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_PolarAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusC, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+    }
+
+    return true;
   }
 
 
   bool BundleObservation::computeImagePartials(matrix<double> &coeffImage, BundleMeasure &measure) {
-    // we're saving the number of image partials in m_previousNumberImagePartials
-    // to compare to the previous computePartials call to avoid unnecessary resizing of the
-    // coeffImage matrix
-/*    if (numberParameters() != m_previousNumberImagePartials) {
-      coeffImage.resize(2, numImagePartials);
-      m_previousNumberImagePartials = numImagePartials;
-    } SKIP FOR NOW*/
-
     coeffImage.clear(); 
 
     const BundleObservationSolveSettingsQsp observationSolveSettings =
         measure.observationSolveSettings();
 
     Camera *measureCamera = measure.camera();
-
-  //  if (measureCamera->GetCameraType() != 0) {
-      // Set the Spice to the measured point.  A framing camera exposes the entire image at one time.
-      // It will have a single set of Spice for the entire image.  Scanning cameras may populate a single
-      // image with multiple exposures, each with a unique set of Spice.  SetImage needs to be called
-      // repeatedly for these images to point to the Spice for the current pixel.
-//      measureCamera->SetImage(measure.sample(), measure.line());
-//    }
-
-    // Compute the look vector in instrument coordinates based on time of observation and apriori
-    // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
-    // bool argument was added CameraGroundMap::GetXY to turn off the test.
-/*    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
-                                            &computedX, &computedY, false))) {
-      QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }*/
-
     int index = 0;
 
     // Parials for X, Y, Z position coordinates
@@ -1480,38 +1538,15 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
-  bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure) {
+  bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, BundleControlPoint &point, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
-/*    double computedX, computedY; 
-    std::vector<double> lookBWRTCoord1;
-    std::vector<double> lookBWRTCoord2;
-    std::vector<double> lookBWRTCoord3;
     Camera *measureCamera = measure.camera();
 
-//    SurfacePoint::CoordinateType type = m_bundleSettings->controlPointCoordTypeBundle();
-//    lookBWRTCoord1 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::One);
-//    lookBWRTCoord2 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::Two);
-//    lookBWRTCoord3 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::Three);
-
-
-
-    if (measureCamera->GetCameraType() != 0) {
-      // Set the Spice to the measured point.  A framing camera exposes the entire image at one time.
-      // It will have a single set of Spice for the entire image.  Scanning cameras may populate a single
-      // image with multiple exposures, each with a unique set of Spice.  SetImage needs to be called
-      // repeatedly for these images to point to the Spice for the current pixel.
-      measureCamera->SetImage(measure.sample(), measure.line());
-    }
-
-    // Compute the look vector in instrument coordinates based on time of observation and apriori
-    // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
-    // bool argument was added CameraGroundMap::GetXY to turn off the test.
-//    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
-//                                            &computedX, &computedY, false))) {
-//      QString msg = "Unable to map apriori surface point for measure ";
-//      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
+    // These vectors are either body-fixed latitudinal (lat/lon/radius) or rectangular (x/y/z)
+    // depending on the value of coordinate type in SurfacePoint
+    std::vector<double> lookBWRTCoord1 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::One);
+    std::vector<double> lookBWRTCoord2 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::Two);
+    std::vector<double> lookBWRTCoord3 = point.adjustedSurfacePoint().Partial(coordType, SurfacePoint::Three);
 
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
                                              &coeffPoint3D(0, 0),
@@ -1521,15 +1556,36 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
                                              &coeffPoint3D(1, 1));
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord3,
                                              &coeffPoint3D(0, 2),
-                                             &coeffPoint3D(1, 2));*/
-    return false;
+                                             &coeffPoint3D(1, 2));
+    return true;
   }
   
 
-  bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
+  bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure, BundleControlPoint &point) {
     coeffRHS.clear();
+    Camera *measureCamera = measure.camera();
 
-    return false;
+    // Compute the look vector in instrument coordinates based on time of observation and apriori
+    // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
+    // bool argument was added CameraGroundMap::GetXY to turn off the test.
+    double computedX, computedY;
+    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
+                                            &computedX, &computedY, false))) {
+      QString msg = "Unable to map apriori surface point for measure ";
+      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    double measuredX = measure.focalPlaneMeasuredX();
+    double measuredY = measure.focalPlaneMeasuredY();
+
+    double deltaX = measuredX - computedX;
+    double deltaY = measuredY - computedY;
+
+    coeffRHS(0) = deltaX;
+    coeffRHS(1) = deltaY;
+
+    return true;
   }
 
 }
