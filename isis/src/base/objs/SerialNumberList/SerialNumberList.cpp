@@ -286,19 +286,30 @@ namespace Isis {
                       + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
-      // group for use in bundle adjustment
-      if (!cubeObj.hasGroup("Instrument")) {
-        QString msg = "Unable to find Instrument group in " + filename
-                      + " needed for performing bundle adjustment.";
-        throw IException(IException::User, msg, _FILEINFO_);
+      // Check if it is not a CSM label before checking SpacecraftName and InstrumentId
+      if (!cubeObj.hasGroup("CsmInfo")) {
+        // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+        // group for use in bundle adjustment
+        if (!cubeObj.hasGroup("Instrument")) {
+          QString msg = "Unable to find Instrument group in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
+          QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
-      PvlGroup instGroup = cubeObj.findGroup("Instrument");
-      if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
-        QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
-                      + " needed for performing bundle adjustment.";
-        throw IException(IException::User, msg, _FILEINFO_);
+      // Check if CSM label has CSMPlatformID and CSMInstrumentId
+      else {
+        PvlGroup csmGroup = cubeObj.findGroup("CSMInfo");
+        if (!csmGroup.hasKeyword("CSMPlatformID") || !csmGroup.hasKeyword("CSMInstrumentId")) {
+          QString msg = "Unable to find CSMPlatformID or CSMInstrumentId keywords in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       Pair nextpair;
@@ -306,9 +317,19 @@ namespace Isis {
       nextpair.serialNumber = serialNumber;
       nextpair.observationNumber = observationNumber;
 
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // If it's a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
-      if (cubeObj.hasGroup("Instrument")) {
+      if (cubeObj.hasGroup("CsmInfo")) {
+        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
+          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+        }
+      }
+
+      // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      else if (cubeObj.hasGroup("Instrument")) {
         PvlGroup instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
           nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
