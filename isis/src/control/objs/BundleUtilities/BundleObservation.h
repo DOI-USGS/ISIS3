@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
 #include "AbstractBundleObservation.h"
+#include "BundleMeasure.h"
 
 namespace Isis {
   class BundleObservationSolveSettings;
@@ -128,6 +129,11 @@ namespace Isis {
       QString bundleOutputCSV(bool errorPropagation);
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+
+      bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure);
+      bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure);
+      bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure);
+      bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure);
 
    private:
       bool initParameterWeights();

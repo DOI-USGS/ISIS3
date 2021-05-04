@@ -67,6 +67,11 @@ namespace Isis {
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
+      bool computeTargetPartials(matrix<double> &coeffTarget, QString serialNumber);
+      bool computeImagePartials(matrix<double> &coeffImage, QString serialNumber);
+      bool computePoint3DPartials(matrix<double> &coeffPoint3D, QString serialNumber);
+      bool computeRHSPartials(vector<double> &coeffRHS, QString serialNumber);
+
    private:
       bool initParameterWeights();
 

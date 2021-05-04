@@ -873,4 +873,24 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
     return "";
   }
+
+  bool CsmBundleObservation::computeTargetPartials(matrix<double> &coeffTarget, QString serialNumber) {
+    return false;
+  }
+
+
+  bool CsmBundleObservation::computeImagePartials(matrix<double> &coeffImage, QString serialNumber) {
+    return false;
+  }
+
+
+  bool CsmBundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, QString serialNumber) {
+    return false;
+  }
+  
+
+  bool CsmBundleObservation::computeRHSPartials(vector<double> &coeffRHS, QString serialNumber) {
+    return false;
+  }
+
 }
