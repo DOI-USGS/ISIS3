@@ -912,7 +912,9 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
   bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
     coeffImage.clear(); 
     // loop over parameters and populate matrix
-
+//    loop
+//    coeffImage(0, index) = sample wrt parameter;
+//    coeffImage(1, index) = line wrt parameter;
 
     return true;
   }
