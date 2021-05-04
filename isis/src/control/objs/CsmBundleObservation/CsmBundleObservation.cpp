@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
+#include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
@@ -874,23 +875,94 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     return "";
   }
 
-  bool CsmBundleObservation::computeTargetPartials(matrix<double> &coeffTarget, QString serialNumber) {
+  /**
+   * Cannot compute target body parameters for a CSM observation, 
+   * so always throws an exception. 
+   * 
+   * @param coeffTarget Matrix for target body partial derivatives
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param bundleSettings The settings for the bundle adjustment
+   * @param bundleTargetBody QSharedPointer to the target body of 
+   *                         the observation
+   * 
+   * @return bool Always false
+   */
+  bool CsmBundleObservation::computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
+    if (bundleTargetBody) {
+      QString msg = "Target body parameters cannot be solved for with CSM observations.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
     return false;
   }
 
 
-  bool CsmBundleObservation::computeImagePartials(matrix<double> &coeffImage, QString serialNumber) {
-    return false;
+  /**
+   * Calculates the sensor partials with respect to the solve 
+   * parameters and populates the coeffImage matrix. 
+   * 
+   * @param coeffImage A matrix that will be populated with the 
+   *                   sensor partials with respect to the solve
+   *                   parameters.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
+  bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
+    coeffImage.clear(); 
+    // loop over parameters and populate matrix
+
+
+    return true;
   }
 
 
-  bool CsmBundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, QString serialNumber) {
-    return false;
-  }
-  
+  bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
+    coeffPoint3D.clear();
 
-  bool CsmBundleObservation::computeRHSPartials(vector<double> &coeffRHS, QString serialNumber) {
-    return false;
+    // do ground partials 
+    return true;
+  }
+
+
+  /**
+   * Calculates the sample, line residuals between the values 
+   * measured in the image and the ground-to-image sample, line 
+   * calculated by the sensor model. 
+   * 
+   * @param coeffRHS  A vector that will contain the sample, line 
+   *                  residuals.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
+  bool CsmBundleObservation::computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) {
+    // Clear old values
+    coeffRHS.clear();
+
+    Camera *measureCamera = measure.camera();
+    BundleControlPoint* point = measure.parentControlPoint();
+
+    // Get ground-to-image computed coordinates for this point. 
+    if (!(measureCamera->SetGround(point->adjustedSurfacePoint()))) {
+      QString msg = "Unable to map apriori surface point for measure ";
+      msg += measure.cubeSerialNumber() + " on point " + point->id() + " back into image.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    double computedSample = measureCamera->Sample();
+    double computedLine = measureCamera->Line();
+
+    // The RHS is the difference between the measured coordinates on the image
+    // and the coordinates calculated by the ground to image call. 
+    double deltaSample = measure.sample() - computedSample;
+    double deltaLine = measure.line() - computedLine;
+
+    coeffRHS(0) = deltaSample;
+    coeffRHS(1) = deltaLine;
+
+    return true;
   }
 
 }
