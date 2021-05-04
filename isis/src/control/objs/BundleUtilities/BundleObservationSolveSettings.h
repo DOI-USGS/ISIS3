@@ -12,6 +12,9 @@ find files of those names at the top level of this repository. **/
 #include <QList>
 #include <QSet>
 #include <QString>
+#include <QStringList>
+
+#include <csm.h>
 
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
@@ -97,7 +100,23 @@ class BundleObservationSolveSettings {
       bool removeObservationNumber(QString observationNumber);
       QSet<QString> observationNumbers() const;
 
+      //! Options for how to solve for CSM parameters.
+      enum CSMSolveOption {
+        NoCSMParameters = 0, /**< Do not solve for CSM parameters.*/
+        Set             = 1, /**< Solve for all CSM parameters belonging to a specific set.*/
+        Type            = 2, /**< Solve for all CSM parameters of a specific type.*/
+        List            = 3  /**< Solve for an explicit list of CSM parameters.*/
+      };
 
+      static CSMSolveOption stringToCSMSolveOption(QString option);
+      static QString csmSolveOptionToString(CSMSolveOption option);
+      void setCSMSolveSet(csm::param::Set set);
+      void setCSMSolveType(csm::param::Type type);
+      void setCSMSolveParameterList(QStringList list);
+      CSMSolveOption csmSolveOption() const;
+      csm::param::Set csmParameterSet() const;
+      csm::param::Type csmParameterType() const;
+      QStringList csmParameterList() const;
 
       //! Options for how to solve for instrument pointing.
       enum InstrumentPointingSolveOption {
@@ -202,6 +221,12 @@ class BundleObservationSolveSettings {
       QUuid *m_id;
       QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
       QSet<QString> m_observationNumbers;  //!< Associated observation numbers for these settings.
+
+      // CSM related parameters
+      CSMSolveOption m_csmSolveOption;
+      csm::param::Set m_csmSolveSet;
+      csm::param::Type m_csmSolveType;
+      QStringList m_csmSolveList;
 
       // pointing related parameters
       //! Option for how to solve for instrument pointing.

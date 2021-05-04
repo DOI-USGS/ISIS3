@@ -23,6 +23,8 @@ find files of those names at the top level of this repository. **/
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "Constants.h"
+#include "Displacement.h"
+#include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
@@ -32,7 +34,7 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
-#include "CameraGroundMap.h"
+#include "SurfacePoint.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -821,7 +823,7 @@ namespace Isis {
 
 
   /**
-   * Get the indices of the parameters in a set.
+   * Get the indices of the parameters that belong to a set.
    *
    * @param paramSet The set of indices to get
    *
@@ -829,6 +831,44 @@ namespace Isis {
    */
   std::vector<int> CSMCamera::getParameterIndices(csm::param::Set paramSet) const {
     return m_model->getParameterSetIndices(paramSet);
+  }
+
+
+  /**
+   * Get the indices of all parameters of a specific type
+   *
+   * @param paramType The type of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices
+   */
+  std::vector<int> CSMCamera::getParameterIndices(csm::param::Type paramType) const {
+    std::vector<int> parameterIndices;
+    for (int i = 0; i < m_model->getNumParameters(); i++) {
+      if (m_model->getParameterType(i) == paramType) {
+        parameterIndices.push_back(i);
+      }
+    }
+    return parameterIndices;
+  }
+
+
+  /**
+   * Get the indices of a list of parameters
+   *
+   * @param paramType The list of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices in the same order as the input list
+   */
+  std::vector<int> CSMCamera::getParameterIndices(QStringList paramList) const {
+    std::vector<int> parameterIndices;
+    for (int i = 0; i < paramList.size(); i++) {
+      for (int j = 0; j < m_model->getNumParameters(); j++) {
+        if (m_model->getParameterName(j) == paramList[i].toStdString()) {
+          parameterIndices.push_back(i);
+        }
+      }
+    }
+    return parameterIndices;
   }
 
 
@@ -852,6 +892,17 @@ namespace Isis {
    */
   double CSMCamera::getParameterCovariance(int index1, int index2) {
     return m_model->getParameterCovariance(index1, index2);
+  }
+
+  
+  vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
+    // csm::SensorPartials holds (line, sample) in order for each parameter
+    //   typedef std::pair<double,double> SensorPartials;
+   csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+   std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
+   vector<double> partialsVector = {partials.first, partials.second};
+
+   return partialsVector; 
   }
 
 
