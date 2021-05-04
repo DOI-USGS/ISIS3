@@ -181,9 +181,19 @@ namespace Isis {
       nextpair.serialNumber = sn;
       nextpair.observationNumber = on;
 
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
-      if (cubeObj.hasGroup("Instrument")) {
+      if (cubeObj.hasGroup("CsmInfo")) {
+        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
+          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+        }
+      }
+
+      // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      else if (cubeObj.hasGroup("Instrument")) {
         PvlGroup instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
           nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
@@ -286,8 +296,10 @@ namespace Isis {
                       + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
       // Check if it is not a CSM label before checking SpacecraftName and InstrumentId
       if (!cubeObj.hasGroup("CsmInfo")) {
+
         // Need to obtain the SpacecraftName and InstrumentId from the Instrument
         // group for use in bundle adjustment
         if (!cubeObj.hasGroup("Instrument")) {
@@ -317,7 +329,7 @@ namespace Isis {
       nextpair.serialNumber = serialNumber;
       nextpair.observationNumber = observationNumber;
 
-      // If it's a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
+      // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
       if (cubeObj.hasGroup("CsmInfo")) {
         PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");

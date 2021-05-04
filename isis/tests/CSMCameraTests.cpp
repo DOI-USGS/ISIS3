@@ -515,7 +515,7 @@ TEST_F(CSMCameraSetFixture, SerialNumber) {
   QString sn = SerialNumber::Compose(*testCube);
   SerialNumberList snl;
 
-  snl.add(sn, testCube->fileName());
+  snl.add(testCube->fileName());
   QString instId = snl.spacecraftInstrumentId(sn);
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, sn, "TestPlatform/TestInstrument/2000-01-01T11:58:55.816");
