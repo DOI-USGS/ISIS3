@@ -32,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
+#include "CameraGroundMap.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -593,6 +594,52 @@ namespace Isis {
                                     imageMatrix(2,0),
                                     imageMatrix(2,1)};
     return imagePartials;
+  }
+
+
+  /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @return @b std::vector<double> The partial derivatives of the 
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials() {
+    return GroundPartials(GetSurfacePoint());
+  }
+
+
+  /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @param groundPoint The ground point to compute the partials at
+  *
+  * @return @b std::vector<double> The partial derivatives of the 
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials(SurfacePoint groundPoint) {
+    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+    vector<double> groundPartials = m_model->computeGroundPartials(groundCoord);
+    return groundPartials;
   }
 
 

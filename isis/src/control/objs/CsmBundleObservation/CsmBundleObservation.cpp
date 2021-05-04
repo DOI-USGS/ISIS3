@@ -921,7 +921,26 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
   bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
 
+    CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
+    BundleControlPoint* point = measure.parentControlPoint();
+
     // do ground partials 
+    vector<double> groundPartials = measureCamera->GroundPartials();
+    
+    // groundPartials is:
+    //  line WRT x
+    // line WRT y
+    // line WRT z
+    // sample WRT x
+    // sample WRT y
+    // sample WRT z
+    coeffPoint3D(0,0) = groundPartials[0];
+    coeffPoint3D(1,0) = groundPartials[3];
+    coeffPoint3D(0,1) = groundPartials[1];
+    coeffPoint3D(1,1) = groundPartials[4];
+    coeffPoint3D(0,2) = groundPartials[2];
+    coeffPoint3D(1,2) = groundPartials[5];
+
     return true;
   }
 

@@ -120,6 +120,9 @@ namespace Isis {
       void applyParameterCorrection(int index, double correction);
       double getParameterCovariance(int index1, int index2);
 
+      virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
+      virtual std::vector<double> GroundPartials();
+
     protected:
       void setTarget(Pvl label);
 
@@ -141,7 +144,6 @@ namespace Isis {
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();
-
   };
 };
 #endif
