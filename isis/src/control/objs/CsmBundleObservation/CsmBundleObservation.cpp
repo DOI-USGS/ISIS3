@@ -934,6 +934,20 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
   }
 
 
+  /**
+   * Calculates the ground partials for the line, sample currently 
+   * set in the sensor model.  
+   * 
+   * @param coeffPoint3D A matrix that will be populated with the 
+   *                     (line, sample) partials with respect to
+   *                     the ground point.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param coordType Not used in this class. Coordinates are 
+   *                  x,y,z
+   * 
+   * @return bool 
+   */
   bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
 

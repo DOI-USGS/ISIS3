@@ -1365,11 +1365,21 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
+  /**
+   * Computes any needed partials for the target body parameters. 
+   *  
+   * @param coeffTarget Matrix for target body partial derivatives
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param bundleSettings The settings for the bundle adjustment
+   * @param bundleTargetBody QSharedPointer to the target body of 
+   *                         the observation
+   * 
+   * @return bool 
+   */
   bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure,
                                                 BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
-    if (bundleSettings->solveTargetBody()) {
-      coeffTarget.clear();
-    }
+    coeffTarget.clear();
 
     Camera *measureCamera = measure.camera();
     BundleControlPoint *point = measure.parentControlPoint();
@@ -1459,26 +1469,36 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
 
+  /**
+   * Calculates the sensor partials with respect to the selected 
+   * solve parameters and populates the coeffImage matrix. 
+   * 
+   * @param coeffImage A matrix that will be populated with the 
+   *                   sensor partials with respect to the
+   *                   specified solve parameters.
+   * @param measure The measure that the partials are being 
+   *                 computed for.
+   * 
+   * @return bool 
+   */
   bool BundleObservation::computeImagePartials(matrix<double> &coeffImage, BundleMeasure &measure) {
     coeffImage.clear(); 
 
-    const BundleObservationSolveSettingsQsp observationSolveSettings =
-        measure.observationSolveSettings();
+    Camera *camera = measure.camera();
 
-    Camera *measureCamera = measure.camera();
     int index = 0;
 
     // Parials for X, Y, Z position coordinates
-    if (observationSolveSettings->instrumentPositionSolveOption() !=
+    if (solveSettings()->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
 
       int numCamPositionCoefficients =
-          observationSolveSettings->numberCameraPositionCoefficientsSolved();
+          solveSettings()->numberCameraPositionCoefficientsSolved();
 
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -1486,7 +1506,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
       // Add the partial for the y coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -1494,7 +1514,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
       // Add the partial for the z coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -1502,15 +1522,15 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
 
     // Partials for RA, DEC, twist
-    if (observationSolveSettings->instrumentPointingSolveOption() !=
+    if (solveSettings() ->instrumentPointingSolveOption() !=
         BundleObservationSolveSettings::NoPointingFactors) {
 
       int numCamAngleCoefficients =
-          observationSolveSettings->numberCameraAngleCoefficientsSolved();
+          solveSettings()->numberCameraAngleCoefficientsSolved();
 
       // Add the partials for ra
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+        camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
                                                        cameraCoef, &coeffImage(0, index),
                                                        &coeffImage(1, index));
         index++;
@@ -1518,27 +1538,40 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
       // Add the partials for dec
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+        camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
                                                        cameraCoef, &coeffImage(0, index),
                                                        &coeffImage(1, index));
         index++;
       }
 
       // Add the partial for twist if necessary
-      if (observationSolveSettings->solveTwist()) {
+      if (solveSettings()->solveTwist()) {
         for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-          measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+          camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
                                                          cameraCoef, &coeffImage(0, index),
                                                          &coeffImage(1, index));
           index++;
         }
       }
     }
-
     return true;
   }
 
 
+  /**
+   * Calculates the ground partials for the ground point currently
+   * set in the sensor model. 
+   * 
+   * @param coeffPoint3D A matrix that will be populated with the 
+   *                     (line, sample) partials with respect to
+   *                     the ground point.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param coordType Specifies whether latitudinal or (x, y, z) 
+   *                  coordinates are used.
+   * 
+   * @return bool 
+   */
   bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
     Camera *measureCamera = measure.camera();
@@ -1563,6 +1596,18 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
   
 
+  /**
+   * Calculates the sample, line residuals between the measured 
+   * focal plane values and the focal plane coordinates calculated
+   * for the ground point by the sensor model. 
+   * 
+   * @param coeffRHS  A vector that will contain the focal plane 
+   *                  x, y residuals.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
   bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
     coeffRHS.clear();
     Camera *measureCamera = measure.camera();
