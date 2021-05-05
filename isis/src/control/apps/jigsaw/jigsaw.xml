@@ -1020,7 +1020,7 @@
       </parameter>
     </group>
 
-    <group name="Communit Sensor Model Options">
+    <group name="Community Sensor Model Options">
       <parameter name="CSMSOLVESET">
         <type>string</type>
         <brief>Specify a set of a CSM parameters to solve for.</brief>
