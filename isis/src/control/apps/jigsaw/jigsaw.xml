@@ -1018,7 +1018,84 @@
           <item>No</item>
         </default>
       </parameter>
-      </group>
+    </group>
+
+    <group name="Community Sensor Model Options">
+      <parameter name="CSMSOLVESET">
+        <type>string</type>
+        <brief>Specify a set of a CSM parameters to solve for.</brief>
+        <description>
+          Specify one of the parameter sets from the CSM GeometricModel API to solve for.
+          All parameters belonging to the specified set will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVETYPE</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="VALID">
+            <brief> Solves for CSM parameters that are not NONE.</brief>
+          </option>
+          <option value="ADJUSTABLE">
+            <brief>Solves for real or fictitous CSM parameters.</brief>
+          </option>
+          <option value="NONADJUSTABLE">
+            <brief>Solves for fixed CSM parameters.</brief>
+            <description>
+              Solve for fixed CSM parameters. These parameters are generally not adjusted
+              but do have uncertainty which can help constrain the solutions and improve
+              a posteriori uncertainties for other parameters.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVETYPE">
+        <type>string</type>
+        <brief>Specify a type of a CSM parameters to solve for.</brief>
+        <description>
+          Specify a parameter type from the CSM GeometricModel API to solve for.
+          All parameters of the specified type will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="NONE">
+            <brief>Solve for unitialized CSM parameters</brief>
+          </option>
+          <option value="FICTITIOUS">
+            <brief>Solve for CSM parameters calculted by resection</brief>
+          </option>
+          <option value="REAL">
+            <brief>Solve for measured CSM parameters</brief>
+          </option>
+          <option value="FIXED">
+            <brief>Solve for fixed CSM parameters</brief>
+          </option>
+          <description>
+            Solve for fixed CSM parameters. These parameters are generally not adjusted
+            but do have uncertainty which can help constrain the solutions and improve
+            a posteriori uncertainties for other parameters.
+          </description>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVELIST">
+        <type>string</type>
+        <brief>Specify an explicit list of CSM parameters to solve for.</brief>
+        <description>
+          All CSM parameters in this list will be solved for. Trailing and leading whitespace
+          will be stripped off. Use standard ISIS parameter array notation to specify multiple
+          parameters.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVETYPE</item>
+        </exclusions>
+      </parameter>
+    </group>
 
     <group name="Target Body">
       <parameter name="SOLVETARGETBODY">
