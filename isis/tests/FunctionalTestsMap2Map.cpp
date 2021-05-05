@@ -22,17 +22,16 @@ TEST_F(DefaultCube, FunctionalTestMap2MapDefault) {
   UserInterface options(APP_XML, args);
   Pvl appLog;
   try {
-    //map2map(options, &appLog);
     map2map(options, &appLog);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  /*Pvl pvlobject = Pvl(outCubeFileName);
+  Pvl pvlobject = Pvl(outCubeFileName);
 
   ASSERT_TRUE(pvlobject.hasObject("Mapping"));
-  PvlObject mapobj = pvlobject.findObject("Mapping");*/
+  PvlObject mapobj = pvlobject.findObject("Mapping");
 
   Cube oCube(outCubeFileName, "r");
 
