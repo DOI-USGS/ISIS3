@@ -237,6 +237,22 @@ namespace Isis {
         }
       }
     }
+
+    // CSM settings
+    if (scParameterGroup.hasKeyword("CSMSOLVESET")) {
+      setCSMSolveSet(stringToCSMSolveSet(scParameterGroup.findKeyword("CSMSOLVESET")));
+    }
+    else if (scParameterGroup.hasKeyword("CSMSOLVETYPE")) {
+      setCSMSolveType(stringToCSMSolveType(scParameterGroup.findKeyword("CSMSOLVETYPE")));
+    }
+    else if (scParameterGroup.hasKeyword("CSMSOLVELIST")) {
+      PvlKeyword csmSolveListKey = scParameterGroup.findKeyword("CSMSOLVELIST");
+      QStringList csmSolveList;
+      for (int i = 0; i < csmSolveListKey.size(); i++) {
+        csmSolveList.append(csmSolveListKey[i]);
+      }
+      setCSMSolveParameterList(csmSolveList);
+    }
   }
 
 
