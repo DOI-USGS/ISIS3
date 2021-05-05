@@ -14,6 +14,8 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "Fixtures.h"
+#include "SerialNumber.h"
+#include "SerialNumberList.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -506,4 +508,17 @@ TEST_F(CSMCameraFixture, Declination) {
       FAIL() << "Expected an IException with message \""
       " Declination is not supported for CSM camera models\"";
   }
+}
+
+
+TEST_F(CSMCameraSetFixture, SerialNumber) {
+  QString sn = SerialNumber::Compose(*testCube);
+  SerialNumberList snl;
+
+  snl.add(testCube->fileName());
+  QString instId = snl.spacecraftInstrumentId(sn);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, sn, "TestPlatform/TestInstrument/2000-01-01T11:58:55.816");
+  EXPECT_TRUE(snl.hasSerialNumber(sn));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instId, "TESTPLATFORM/TESTINSTRUMENT");
 }
