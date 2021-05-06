@@ -1635,4 +1635,20 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     return true;
   }
 
+ double BundleObservation::computeObsValue(BundleMeasure &measure, double deltaVal) {
+   Camera *measureCamera = measure.camera();
+   double obsValue = deltaVal / measureCamera->PixelPitch();
+   return obsValue;
+ }
+
+
+ double BundleObservation::computeObservationWeight(BundleMeasure &measure, double deltaX, double deltaY) {
+   Camera *measureCamera = measure.camera();
+
+   double observationSigma = 1.4 * measureCamera->PixelPitch();
+   double observationWeight = 1.0 / observationSigma;
+
+   return observationWeight;
+ }
 }
+
