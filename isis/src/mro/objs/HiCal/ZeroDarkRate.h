@@ -109,12 +109,12 @@ namespace Isis {
 	// # exponential equation: DC_Rate = a * exp(b * FPA Temperature) + c 
 	// # a, b, c 
 	// Then the coefficients begin.
-	// Three columns (a, b, c), and 128/binning rows
+	// Three columns (a, b, c), and 1024/binning rows
 	// 2.483618177203812394e+00,2.255885064806690821e-01,5.617339162650616345e+03
 	// I don't know how loadCsv can be used to load this into memory.
 	// Later in this file, I assume I have three coefficient variables:
 	// _coeff_a, _coeff_b, and _coeff_c
-	// Each of these variables is a vector with 128/binning elements.
+	// Each of these variables is a vector with 1024/binning elements.
         _coeffs = loadCsv("DarkRate", conf, prof, samples);
 	_coeff_a = _coeffs[0];
 	_coeff_b = _coeffs[1];
