@@ -1386,49 +1386,50 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     SurfacePoint surfacePoint = point->adjustedSurfacePoint();
 
     int index = 0;
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleRA()) {
+
+    if (bundleSettings->solvePoleRA()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleRAVelocity()) {
+    if (bundleSettings->solvePoleRAVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleDec()) {
+    if (bundleSettings->solvePoleDec()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePoleDecVelocity()) {
+    if (bundleSettings->solvePoleDecVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePM()) {
+    if (bundleSettings->solvePM()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleSettings->solvePMVelocity()) {
+    if (bundleSettings->solvePMVelocity()) {
       measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleTargetBody->solveMeanRadius()) {
+    if (bundleTargetBody->solveMeanRadius()) {
       std::vector<double> lookBWRTMeanRadius =
           measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
                                                         bundleTargetBody->meanRadius());
@@ -1438,7 +1439,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       index++;
     }
 
-    if (bundleSettings->solveTargetBody() && bundleTargetBody->solveTriaxialRadii()) {
+    if (bundleTargetBody->solveTriaxialRadii()) {
 
       std::vector<double> lookBWRTRadiusA =
           measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
@@ -1464,6 +1465,12 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
                                                &coeffTarget(1, index));
       index++;
     }
+
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    // Multiply coefficients by observation weight
+    coeffTarget *= observationWeight;
 
     return true;
   }
@@ -1554,6 +1561,12 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         }
       }
     }
+
+    // Multiply coefficients by observation weight
+    double observationSigma = 1.4 * camera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+    coeffImage *= observationWeight;
+
     return true;
   }
 
@@ -1592,6 +1605,13 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord3,
                                              &coeffPoint3D(0, 2),
                                              &coeffPoint3D(1, 2));
+
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    // Multiply coefficients by observation weight
+    coeffPoint3D *= observationWeight;
+
     return true;
   }
   
@@ -1632,23 +1652,31 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     coeffRHS(0) = deltaX;
     coeffRHS(1) = deltaY;
 
+    // Multiply coefficients by observation weight
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    coeffRHS *= observationWeight;
+
     return true;
   }
 
- double BundleObservation::computeObsValue(BundleMeasure &measure, double deltaVal) {
-   Camera *measureCamera = measure.camera();
-   double obsValue = deltaVal / measureCamera->PixelPitch();
-   return obsValue;
- }
 
-
- double BundleObservation::computeObservationWeight(BundleMeasure &measure, double deltaX, double deltaY) {
-   Camera *measureCamera = measure.camera();
-
-   double observationSigma = 1.4 * measureCamera->PixelPitch();
-   double observationWeight = 1.0 / observationSigma;
-
-   return observationWeight;
- }
+  /**
+   * Converts the observed value from a focal plane coordinate to 
+   * an image sample or line. 
+   * 
+   * @param measure measure The measure that the partials are 
+   *                being computed for.
+   * @param deltaVal The difference between the measured and 
+   *                 calculated focal plane coordinate
+   * 
+   * @return double The The difference between the measured and 
+   *                calculated (line, sample) coordinate
+   */
+  double BundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
+    Camera *measureCamera = measure.camera();
+    return deltaVal / measureCamera->PixelPitch();
+  }
 }
 

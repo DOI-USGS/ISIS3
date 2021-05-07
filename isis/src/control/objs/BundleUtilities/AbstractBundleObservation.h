@@ -80,8 +80,7 @@ namespace Isis {
       virtual bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) = 0;
     virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType = SurfacePoint::Rectangular) = 0;
       virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) = 0;
-      virtual double computeObsValue(BundleMeasure &measure, double deltaVal) = 0;
-      virtual double computeObservationWeight(BundleMeasure &measure, double deltaX, double deltaY) = 0;
+      virtual double computeObservationValue(BundleMeasure &measure, double deltaVal) = 0;
 
     protected:
       QString m_observationNumber; /**< This is typically equivalent to serial number

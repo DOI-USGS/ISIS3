@@ -1860,16 +1860,16 @@ namespace Isis {
    *
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
-bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
-                                     matrix<double> &coeffImage,
-                                     matrix<double> &coeffPoint3D,
-                                     vector<double> &coeffRHS,
-                                     BundleMeasure &measure,
-                                     BundleControlPoint &point) {
+  bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
+                                       matrix<double> &coeffImage,
+                                       matrix<double> &coeffPoint3D,
+                                       vector<double> &coeffRHS,
+                                       BundleMeasure &measure,
+                                       BundleControlPoint &point) {
+
     Camera *measureCamera = measure.camera();
-    const BundleObservationSolveSettingsQsp observationSolveSettings =
-        measure.observationSolveSettings();
     AbstractBundleObservationQsp observation = measure.parentBundleObservation();
+
     int numImagePartials = observation->numberParameters();
 
     // we're saving the number of image partials in m_previousNumberImagePartials
@@ -1880,8 +1880,8 @@ bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
       m_previousNumberImagePartials = numImagePartials;
     }
 
-    // No need to call SetImage for framing camera TODO: use enum values
-    if (measureCamera->GetCameraType() != 0 && measureCamera->GetCameraType() != 6) {
+    // No need to call SetImage for framing camera
+    if (measureCamera->GetCameraType() != Camera::Framing) {
       // Set the Spice to the measured point.  A framing camera exposes the entire image at one time.
       // It will have a single set of Spice for the entire image.  Scanning cameras may populate a single
       // image with multiple exposures, each with a unique set of Spice.  SetImage needs to be called
@@ -1889,7 +1889,8 @@ bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
       measureCamera->SetImage(measure.sample(), measure.line());
     }
 
-    if (measureCamera->GetCameraType() != 6) {
+    // CSM Cameras do not have a ground map
+    if (measureCamera->GetCameraType() != Camera::Csm) {
       // Compute the look vector in instrument coordinates based on time of observation and apriori
       // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
       // bool argument was added CameraGroundMap::GetXY to turn off the test.
@@ -1909,7 +1910,6 @@ bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
     observation->computeImagePartials(coeffImage, measure);
 
     // Complete partials calculations for 3D point (latitudinal or rectangular)
-
     // Retrieve the coordinate type (latitudinal or rectangular) and compute the partials for
     // the fixed point with respect to each coordinate in Body-Fixed
     SurfacePoint::CoordinateType coordType = m_bundleSettings->controlPointCoordTypeBundle();
@@ -1918,34 +1918,27 @@ bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
     // right-hand side (measured - computed)
     observation->computeRHSPartials(coeffRHS, measure);
 
-    double observationWeight = 1;
-    if (measureCamera->GetCameraType() != 6) {
-      // residual prob distribution is calculated even if there is no maximum likelihood estimation
-      double deltaX = coeffRHS(0);
-      double deltaY = coeffRHS(1);
-      double obsValue = deltaX / measureCamera->PixelPitch();
-      m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
+    double deltaX = coeffRHS(0);
+    double deltaY = coeffRHS(1);
 
-      obsValue = deltaY / measureCamera->PixelPitch();
-      m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
+    m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaX));
+    m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaY));
 
-      double observationSigma = 1.4 * measureCamera->PixelPitch();
-      observationWeight = 1.0 / observationSigma;
+    double observationWeight = 1.0; 
+    if (m_bundleResults.numberMaximumLikelihoodModels()
+          > m_bundleResults.maximumLikelihoodModelIndex()) {
+      // If maximum likelihood estimation is being used
+      double residualR2ZScore
+                 = sqrt(deltaX * deltaX + deltaY * deltaY) / sqrt(2.0);
 
-      if (m_bundleResults.numberMaximumLikelihoodModels()
-            > m_bundleResults.maximumLikelihoodModelIndex()) {
-        // If maximum likelihood estimation is being used
-        double residualR2ZScore
-                   = sqrt(deltaX * deltaX + deltaY * deltaY) / observationSigma / sqrt(2.0);
-        // Dynamically build the cumulative probability distribution of the R^2 residual Z Scores
-        m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
-        int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
-        observationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
-                              .sqrtWeightScaler(residualR2ZScore);
-      }
+      // Dynamically build the cumulative probability distribution of the R^2 residual Z Scores
+      m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
+
+      int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
+      observationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
+                            .sqrtWeightScaler(residualR2ZScore);
     }
 
-    // multiply coefficients by observation weight
     coeffImage *= observationWeight;
     coeffPoint3D *= observationWeight;
     coeffRHS *= observationWeight;

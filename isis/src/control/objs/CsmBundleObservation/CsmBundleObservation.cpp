@@ -1013,4 +1013,20 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     return true;
   }
 
+
+  /**
+   * Returns the observed value in (sample, line) coordinates. 
+   * This requires no modification for Csm.  
+   * 
+   * @param measure measure The measure that the partials are 
+   *                being computed for.
+   * @param deltaVal The difference between the measured and 
+   *                 calculate sample, line coordinates
+   * 
+   * @return double The The difference between the measured and 
+   *                calculated (line, sample) coordinate
+   */
+  double CsmBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
+    return deltaVal;
+  }
 }
