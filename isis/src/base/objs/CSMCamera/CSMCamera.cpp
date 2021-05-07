@@ -86,7 +86,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
-      QString msg = "CSM state string attached to image [" + cube.fileName() + "]. cannot "
+      QString msg = "CSM state string attached to image [" + cube.fileName() + "] cannot "
                     "be converted to a [" + modelName + "] using [" + pluginName + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -600,6 +600,52 @@ namespace Isis {
 
 
   /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @return @b std::vector<double> The partial derivatives of the 
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials() {
+    return GroundPartials(GetSurfacePoint());
+  }
+
+
+  /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @param groundPoint The ground point to compute the partials at
+  *
+  * @return @b std::vector<double> The partial derivatives of the 
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials(SurfacePoint groundPoint) {
+    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+    vector<double> groundPartials = m_model->computeGroundPartials(groundCoord);
+    return groundPartials;
+  }
+
+
+  /**
    * Set the Target object for the camera model.
    *
    * @param label The label containing information to create the Target from
@@ -846,6 +892,16 @@ namespace Isis {
    */
   double CSMCamera::getParameterCovariance(int index1, int index2) {
     return m_model->getParameterCovariance(index1, index2);
+  }
+
+  
+  vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
+    // csm::SensorPartials holds (line, sample) in order for each parameter
+   csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+   std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
+   vector<double> partialsVector = {partials.first, partials.second};
+
+   return partialsVector; 
   }
 
 
