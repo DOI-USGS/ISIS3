@@ -1924,27 +1924,24 @@ namespace Isis {
     m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaX));
     m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaY));
 
-    double observationWeight = 1.0; 
     if (m_bundleResults.numberMaximumLikelihoodModels()
           > m_bundleResults.maximumLikelihoodModelIndex()) {
       // If maximum likelihood estimation is being used
-      double residualR2ZScore
-                 = sqrt(deltaX * deltaX + deltaY * deltaY) / sqrt(2.0);
+      double residualR2ZScore = sqrt(deltaX * deltaX + deltaY * deltaY) / sqrt(2.0);
 
       // Dynamically build the cumulative probability distribution of the R^2 residual Z Scores
       m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
 
       int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
-      observationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
+      double observationWeight = m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
                             .sqrtWeightScaler(residualR2ZScore);
-    }
+      coeffImage *= observationWeight;
+      coeffPoint3D *= observationWeight;
+      coeffRHS *= observationWeight;
 
-    coeffImage *= observationWeight;
-    coeffPoint3D *= observationWeight;
-    coeffRHS *= observationWeight;
-
-    if (m_bundleSettings->solveTargetBody()) {
-      coeffTarget *= observationWeight;
+      if (m_bundleSettings->solveTargetBody()) {
+        coeffTarget *= observationWeight;
+      }
     }
 
     return true;
