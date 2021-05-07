@@ -1861,11 +1861,11 @@ namespace Isis {
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
   bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
-                                       matrix<double> &coeffImage,
-                                       matrix<double> &coeffPoint3D,
-                                       vector<double> &coeffRHS,
-                                       BundleMeasure &measure,
-                                       BundleControlPoint &point) {
+                                     matrix<double> &coeffImage,
+                                     matrix<double> &coeffPoint3D,
+                                     vector<double> &coeffRHS,
+                                     BundleMeasure &measure,
+                                     BundleControlPoint &point) {
 
     Camera *measureCamera = measure.camera();
     AbstractBundleObservationQsp observation = measure.parentBundleObservation();

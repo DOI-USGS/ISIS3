@@ -86,7 +86,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
-      QString msg = "CSM state string attached to image [" + cube.fileName() + "]. cannot "
+      QString msg = "CSM state string attached to image [" + cube.fileName() + "] cannot "
                     "be converted to a [" + modelName + "] using [" + pluginName + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -897,7 +897,6 @@ namespace Isis {
   
   vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
     // csm::SensorPartials holds (line, sample) in order for each parameter
-    //   typedef std::pair<double,double> SensorPartials;
    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
    std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
    vector<double> partialsVector = {partials.first, partials.second};
