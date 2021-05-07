@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
+#include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
@@ -880,5 +881,152 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     // }
 
     return "";
+  }
+
+  /**
+   * Cannot compute target body parameters for a CSM observation, 
+   * so always throws an exception. 
+   * 
+   * @param coeffTarget Matrix for target body partial derivatives
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param bundleSettings The settings for the bundle adjustment
+   * @param bundleTargetBody QSharedPointer to the target body of 
+   *                         the observation
+   * 
+   * @return bool Always false
+   */
+  bool CsmBundleObservation::computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
+    if (bundleTargetBody) {
+      QString msg = "Target body parameters cannot be solved for with CSM observations.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    return false;
+  }
+
+
+  /**
+   * Calculates the sensor partials with respect to the solve 
+   * parameters and populates the coeffImage matrix. 
+   * 
+   * @param coeffImage A matrix that will be populated with the 
+   *                   sensor partials with respect to the solve
+   *                   parameters.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
+  bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
+    coeffImage.clear(); 
+
+    CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(measure.camera());
+    SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
+
+    // Loop over parameters and populate matrix
+    for (size_t i = 0; i < m_paramIndices.size(); i++) {
+      vector<double> partials = csmCamera->getSensorPartials(m_paramIndices[i], groundPoint);
+      coeffImage(0, i) = partials[1];
+      coeffImage(1, i) = partials[0];
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Calculates the ground partials for the line, sample currently 
+   * set in the sensor model.  
+   * 
+   * @param coeffPoint3D A matrix that will be populated with the 
+   *                     (line, sample) partials with respect to
+   *                     the ground point.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param coordType Not used in this class. Coordinates are 
+   *                  x,y,z
+   * 
+   * @return bool 
+   */
+  bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
+    coeffPoint3D.clear();
+
+    CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
+
+    // do ground partials 
+    vector<double> groundPartials = measureCamera->GroundPartials();
+    
+    // groundPartials is:
+    //  line WRT x
+    // line WRT y
+    // line WRT z
+    // sample WRT x
+    // sample WRT y
+    // sample WRT z
+    coeffPoint3D(0,0) = groundPartials[0];
+    coeffPoint3D(1,0) = groundPartials[3];
+    coeffPoint3D(0,1) = groundPartials[1];
+    coeffPoint3D(1,1) = groundPartials[4];
+    coeffPoint3D(0,2) = groundPartials[2];
+    coeffPoint3D(1,2) = groundPartials[5];
+
+    return true;
+  }
+
+
+  /**
+   * Calculates the sample, line residuals between the values 
+   * measured in the image and the ground-to-image sample, line 
+   * calculated by the sensor model. 
+   * 
+   * @param coeffRHS  A vector that will contain the sample, line 
+   *                  residuals.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
+  bool CsmBundleObservation::computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) {
+    // Clear old values
+    coeffRHS.clear();
+
+    Camera *measureCamera = measure.camera();
+    BundleControlPoint* point = measure.parentControlPoint();
+
+    // Get ground-to-image computed coordinates for this point. 
+    if (!(measureCamera->SetGround(point->adjustedSurfacePoint()))) {
+      QString msg = "Unable to map apriori surface point for measure ";
+      msg += measure.cubeSerialNumber() + " on point " + point->id() + " back into image.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    double computedSample = measureCamera->Sample();
+    double computedLine = measureCamera->Line();
+
+    // The RHS is the difference between the measured coordinates on the image
+    // and the coordinates calculated by the ground to image call. 
+    double deltaSample = measure.sample() - computedSample;
+    double deltaLine = measure.line() - computedLine;
+
+    coeffRHS(0) = deltaSample;
+    coeffRHS(1) = deltaLine;
+
+    return true;
+  }
+
+
+  /**
+   * Returns the observed value in (sample, line) coordinates. 
+   * This requires no modification for Csm.  
+   * 
+   * @param measure measure The measure that the partials are 
+   *                being computed for.
+   * @param deltaVal The difference between the measured and 
+   *                 calculate sample, line coordinates
+   * 
+   * @return double The The difference between the measured and 
+   *                calculated (line, sample) coordinate
+   */
+  double CsmBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
+    return deltaVal;
   }
 }

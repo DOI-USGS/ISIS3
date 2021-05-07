@@ -14,14 +14,17 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
+#include "BundleControlPoint.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
 #include "LinearAlgebra.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
+#include "CameraGroundMap.h"
 
 using namespace std;
+using namespace boost::numeric::ublas;
 
 namespace Isis {
 
@@ -1360,4 +1363,320 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
     return finalqStr;
   }
+
+
+  /**
+   * Computes any needed partials for the target body parameters. 
+   *  
+   * @param coeffTarget Matrix for target body partial derivatives
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param bundleSettings The settings for the bundle adjustment
+   * @param bundleTargetBody QSharedPointer to the target body of 
+   *                         the observation
+   * 
+   * @return bool 
+   */
+  bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure,
+                                                BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
+    coeffTarget.clear();
+
+    Camera *measureCamera = measure.camera();
+    BundleControlPoint *point = measure.parentControlPoint();
+    SurfacePoint surfacePoint = point->adjustedSurfacePoint();
+
+    int index = 0;
+
+    if (bundleSettings->solvePoleRA()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleSettings->solvePoleRAVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleSettings->solvePoleDec()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleSettings->solvePoleDecVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleSettings->solvePM()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleSettings->solvePMVelocity()) {
+      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
+                                                      &coeffTarget(0, index),
+                                                      &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleTargetBody->solveMeanRadius()) {
+      std::vector<double> lookBWRTMeanRadius =
+          measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
+                                                        bundleTargetBody->meanRadius());
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTMeanRadius, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+    }
+
+    if (bundleTargetBody->solveTriaxialRadii()) {
+
+      std::vector<double> lookBWRTRadiusA =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_MajorAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusA, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+
+      std::vector<double> lookBWRTRadiusB =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_MinorAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusB, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+
+      std::vector<double> lookBWRTRadiusC =
+          measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+                                                       CameraGroundMap::WRT_PolarAxis);
+
+      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusC, &coeffTarget(0, index),
+                                               &coeffTarget(1, index));
+      index++;
+    }
+
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    // Multiply coefficients by observation weight
+    coeffTarget *= observationWeight;
+
+    return true;
+  }
+
+
+  /**
+   * Calculates the sensor partials with respect to the selected 
+   * solve parameters and populates the coeffImage matrix. 
+   * 
+   * @param coeffImage A matrix that will be populated with the 
+   *                   sensor partials with respect to the
+   *                   specified solve parameters.
+   * @param measure The measure that the partials are being 
+   *                 computed for.
+   * 
+   * @return bool 
+   */
+  bool BundleObservation::computeImagePartials(matrix<double> &coeffImage, BundleMeasure &measure) {
+    coeffImage.clear(); 
+
+    Camera *camera = measure.camera();
+
+    int index = 0;
+
+    // Parials for X, Y, Z position coordinates
+    if (solveSettings()->instrumentPositionSolveOption() !=
+        BundleObservationSolveSettings::NoPositionFactors) {
+
+      int numCamPositionCoefficients =
+          solveSettings()->numberCameraPositionCoefficientsSolved();
+
+      // Add the partial for the x coordinate of the position (differentiating
+      // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
+                                                    &coeffImage(0, index),
+                                                    &coeffImage(1, index));
+        index++;
+      }
+
+      // Add the partial for the y coordinate of the position
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
+                                                    &coeffImage(0, index),
+                                                    &coeffImage(1, index));
+        index++;
+      }
+
+      // Add the partial for the z coordinate of the position
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        camera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
+                                                    &coeffImage(0, index),
+                                                    &coeffImage(1, index));
+        index++;
+      }
+    }
+
+    // Partials for RA, DEC, twist
+    if (solveSettings() ->instrumentPointingSolveOption() !=
+        BundleObservationSolveSettings::NoPointingFactors) {
+
+      int numCamAngleCoefficients =
+          solveSettings()->numberCameraAngleCoefficientsSolved();
+
+      // Add the partials for ra
+      for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+        camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+                                                       cameraCoef, &coeffImage(0, index),
+                                                       &coeffImage(1, index));
+        index++;
+      }
+
+      // Add the partials for dec
+      for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+        camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+                                                       cameraCoef, &coeffImage(0, index),
+                                                       &coeffImage(1, index));
+        index++;
+      }
+
+      // Add the partial for twist if necessary
+      if (solveSettings()->solveTwist()) {
+        for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+          camera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+                                                         cameraCoef, &coeffImage(0, index),
+                                                         &coeffImage(1, index));
+          index++;
+        }
+      }
+    }
+
+    // Multiply coefficients by observation weight
+    double observationSigma = 1.4 * camera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+    coeffImage *= observationWeight;
+
+    return true;
+  }
+
+
+  /**
+   * Calculates the ground partials for the ground point currently
+   * set in the sensor model. 
+   * 
+   * @param coeffPoint3D A matrix that will be populated with the 
+   *                     (line, sample) partials with respect to
+   *                     the ground point.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * @param coordType Specifies whether latitudinal or (x, y, z) 
+   *                  coordinates are used.
+   * 
+   * @return bool 
+   */
+  bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
+    coeffPoint3D.clear();
+    Camera *measureCamera = measure.camera();
+    BundleControlPoint* point = measure.parentControlPoint();
+
+    // These vectors are either body-fixed latitudinal (lat/lon/radius) or rectangular (x/y/z)
+    // depending on the value of coordinate type in SurfacePoint
+    std::vector<double> lookBWRTCoord1 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::One);
+    std::vector<double> lookBWRTCoord2 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::Two);
+    std::vector<double> lookBWRTCoord3 = point->adjustedSurfacePoint().Partial(coordType, SurfacePoint::Three);
+
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
+                                             &coeffPoint3D(0, 0),
+                                             &coeffPoint3D(1, 0));
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord2,
+                                             &coeffPoint3D(0, 1),
+                                             &coeffPoint3D(1, 1));
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord3,
+                                             &coeffPoint3D(0, 2),
+                                             &coeffPoint3D(1, 2));
+
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    // Multiply coefficients by observation weight
+    coeffPoint3D *= observationWeight;
+
+    return true;
+  }
+  
+
+  /**
+   * Calculates the sample, line residuals between the measured 
+   * focal plane values and the focal plane coordinates calculated
+   * for the ground point by the sensor model. 
+   * 
+   * @param coeffRHS  A vector that will contain the focal plane 
+   *                  x, y residuals.
+   * @param measure The measure that the partials are being 
+   *                computed for.
+   * 
+   * @return bool 
+   */
+  bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
+    coeffRHS.clear();
+    Camera *measureCamera = measure.camera();
+    BundleControlPoint* point = measure.parentControlPoint();
+    // Compute the look vector in instrument coordinates based on time of observation and apriori
+    // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
+    // bool argument was added CameraGroundMap::GetXY to turn off the test.
+    double computedX, computedY;
+    if (!(measureCamera->GroundMap()->GetXY(point->adjustedSurfacePoint(),
+                                            &computedX, &computedY, false))) {
+      QString msg = "Unable to map apriori surface point for measure ";
+      msg += measure.cubeSerialNumber() + " on point " + point->id() + " into focal plane";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    double measuredX = measure.focalPlaneMeasuredX();
+    double measuredY = measure.focalPlaneMeasuredY();
+
+    double deltaX = measuredX - computedX;
+    double deltaY = measuredY - computedY;
+
+    coeffRHS(0) = deltaX;
+    coeffRHS(1) = deltaY;
+
+    // Multiply coefficients by observation weight
+    double observationSigma = 1.4 * measureCamera->PixelPitch();
+    double observationWeight = 1.0 / observationSigma;
+
+    coeffRHS *= observationWeight;
+
+    return true;
+  }
+
+
+  /**
+   * Converts the observed value from a focal plane coordinate to 
+   * an image sample or line. 
+   * 
+   * @param measure measure The measure that the partials are 
+   *                being computed for.
+   * @param deltaVal The difference between the measured and 
+   *                 calculated focal plane coordinate
+   * 
+   * @return double The The difference between the measured and 
+   *                calculated (line, sample) coordinate
+   */
+  double BundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
+    Camera *measureCamera = measure.camera();
+    return deltaVal / measureCamera->PixelPitch();
+  }
 }
+

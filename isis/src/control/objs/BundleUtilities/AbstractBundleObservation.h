@@ -14,8 +14,11 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
+#include "BundleSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
+#include "BundleMeasure.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
 
@@ -71,6 +74,13 @@ namespace Isis {
 
       virtual QStringList parameterList();
       virtual QStringList imageNames();
+
+      virtual bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure,
+                                         BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) = 0;
+      virtual bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) = 0;
+    virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType = SurfacePoint::Rectangular) = 0;
+      virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) = 0;
+      virtual double computeObservationValue(BundleMeasure &measure, double deltaVal) = 0;
 
     protected:
       QString m_observationNumber; /**< This is typically equivalent to serial number
