@@ -443,6 +443,29 @@ namespace Isis {
                                                               positionVelocityAprioriSigma,
                                                               positionAccelerationAprioriSigma);
 
+      if ((ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVETYPE")) ||
+          (ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVELIST")) ||
+          (ui.WasEntered("CSMSOLVETYPE") && ui.WasEntered("CSMSOLVELIST")) ) {
+        QString msg = "Only one of CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST "
+                      "can be specified at a time.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      if (ui.WasEntered("CSMSOLVESET")) {
+        observationSolveSettings.setCSMSolveSet(
+            BundleObservationSolveSettings::stringToCSMSolveSet(ui.GetString("CSMSOLVESET")));
+      }
+      else if (ui.WasEntered("CSMSOLVETYPE")) {
+        observationSolveSettings.setCSMSolveType(
+            BundleObservationSolveSettings::stringToCSMSolveType(ui.GetString("CSMSOLVETYPE")));
+      }
+      else if (ui.WasEntered("CSMSOLVELIST")) {
+        std::vector<QString> csmParamVector;
+        ui.GetString("CSMSOLVELIST", csmParamVector);
+        QStringList csmParamList = QStringList::fromVector(QVector<QString>::fromStdVector(csmParamVector));
+        observationSolveSettings.setCSMSolveParameterList(csmParamList);
+      }
+
       // add all image observation numbers to this BOSS.
       for (int sn = 0; sn < cubeSNs.size(); sn++) {
         observationSolveSettings.addObservationNumber(cubeSNs.observationNumber(sn));
@@ -450,6 +473,7 @@ namespace Isis {
 
       // append the GUI acquired solve parameters to BOSS list.
       observationSolveSettingsList.append(observationSolveSettings);
+
     }
 
 
