@@ -947,28 +947,28 @@ QStringList BundleObservation::parameterList() {
       1);
   for (int i = 0; i < numberCamPosCoefSolved; i++) {
     if (numberCamPosCoefSolved == 1) {
-      paramList.push_back("X,");
+      paramList.push_back("X");
     }
     else {
-      QString str = "X(t" + toString(i) + "),";
+      QString str = "X(t" + toString(i) + ")";
       paramList.push_back(str);
     }
   }
   for (int i = 0; i < numberCamPosCoefSolved; i++) {
     if (numberCamPosCoefSolved == 1) {
-      paramList.push_back("Y,");
+      paramList.push_back("Y");
     }
     else {
-      QString str = "Y(t" + toString(i) + "),";
+      QString str = "Y(t" + toString(i) + ")";
       paramList.push_back(str);
     }
   }
   for (int i = 0; i < numberCamPosCoefSolved; i++) {
     if (numberCamPosCoefSolved == 1) {
-      paramList.push_back("Z,");
+      paramList.push_back("Z");
     }
     else {
-      QString str = "Z(t" + toString(i) + "),";
+      QString str = "Z(t" + toString(i) + ")";
       paramList.push_back(str);
     }
   }
@@ -980,29 +980,29 @@ QStringList BundleObservation::parameterList() {
       1);
   for (int i = 0; i < numberCamAngleCoefSolved; i++) {
     if (numberCamAngleCoefSolved == 1) {
-      paramList.push_back("RA,");
+      paramList.push_back("RA");
     }
     else {
-      QString str = "RA(t" + toString(i) + "),";
+      QString str = "RA(t" + toString(i) + ")";
       paramList.push_back(str);
     }
   }
   for (int i = 0; i < numberCamAngleCoefSolved; i++) {
     if (numberCamAngleCoefSolved == 1) {
-      paramList.push_back("DEC,");
+      paramList.push_back("DEC");
     }
     else {
-      QString str = "DEC(t" + toString(i) + "),";
+      QString str = "DEC(t" + toString(i) + ")";
       paramList.push_back(str);
     }
   }
   if (solveSettings()->solveTwist()) {
     for (int i = 0; i < numberCamAngleCoefSolved; i++) {
       if (numberCamAngleCoefSolved == 1) {
-        paramList.push_back("TWIST,");
+        paramList.push_back("TWIST");
       }
       else {
-        QString str = "TWIST(t" + toString(i) + "),";
+        QString str = "TWIST(t" + toString(i) + ")";
         paramList.push_back(str);
       }
     }
