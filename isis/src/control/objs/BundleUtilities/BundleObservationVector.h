@@ -68,8 +68,8 @@ namespace Isis {
 
       AbstractBundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
-      QList<QString> instrumentIds();
-      QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId);
+      QList<QString> instrumentIds() const;
+      QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();

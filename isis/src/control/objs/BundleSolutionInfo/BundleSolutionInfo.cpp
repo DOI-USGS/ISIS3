@@ -1090,76 +1090,98 @@ namespace Isis {
     QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
     QList<Statistics> rmsImageResiduals = m_statisticsResults->rmsImageResiduals();
 
-    QString ofname = "bundleout_images.csv";
-    ofname = m_settings->outputFilePrefix() + ofname;
-    m_csvSavedImagesFilename = ofname;
-
-    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
-    if (!fpOut) {
-      return false;
-    }
-
-
-    AbstractBundleObservationQsp observation;
-
-    int nObservations = m_statisticsResults->observations().size();
-
-    outputImagesCSVHeader(fpOut);
-
     bool errorProp = false;
     if (m_statisticsResults->converged() && m_settings->errorPropagation()) {
       errorProp = true;
     }
 
-    for (int i = 0; i < nObservations;i++ ) {
-      observation = m_statisticsResults->observations().at(i);
+    QList<QString> outputCsvFileNames;
+    QList<QString> instrumentIds = m_statisticsResults->observations().instrumentIds();
+    // If there's just a single instrumentId just call it bundleout_images.csv
+    if (instrumentIds.size() == 1) {
+      QString ofname = "bundleout_images.csv";
+      ofname = m_settings->outputFilePrefix() + ofname;
+      m_csvSavedImagesFilename = ofname;
+      outputCsvFileNames.push_back(ofname);
+    }
+    // Otherwise append the instrument IDs so it's bundleout_images_spacecraft_sensor.csv
+    else {
+      for (int i = 0; i < instrumentIds.size(); i++) {
+        // Replace and "/" or " " characters with "_" to make the filename safer
+        QString updatedInstrumentId = instrumentIds[i].replace("/", "_").replace(" ", "_");
+        QString ofname = "bundleout_images" + updatedInstrumentId + ".csv";
+        ofname = m_settings->outputFilePrefix() + ofname;
+        m_csvSavedImagesFilename = ofname;
+        outputCsvFileNames.push_back(ofname);
+      }
+    }
 
-      if(!observation) {
-        continue;
+    for (int i = 0; i < instrumentIds.size(); i++) {
+
+      std::ofstream fpOut(outputCsvFileNames[i].toLatin1().data(), std::ios::out);
+      if (!fpOut) {
+        return false;
       }
 
-      int numImages = observation->size();
+      QList<AbstractBundleObservationQsp> observations =
+          m_statisticsResults->observations().observationsByInstId(instrumentIds[i]);
 
-      for (int j = 0; j < numImages; j++) {
+      int nObservations = observations.size();
 
-        BundleImageQsp image = observation->at(j);
+      outputImagesCSVHeader(fpOut);
 
 
-        sprintf(buf, "%s", image->fileName().toLatin1().data());
-        fpOut << buf;
-        sprintf(buf,",");
-        fpOut << buf;
 
-        fpOut << toString(rmsImageSampleResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
+      for (int j = 0; j < nObservations; j++ ) {
+        AbstractBundleObservationQsp observation = observations[j];
 
-        fpOut << toString(rmsImageLineResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
-
-        fpOut << toString(rmsImageResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
-
-        QString observationString =
-            observation->bundleOutputCSV(errorProp);
-
-        //Removes trailing commas
-        if (observationString.right(1)==",") {
-            observationString.truncate(observationString.length()-1);
+        if(!observation) {
+          continue;
         }
 
-        fpOut << (const char*) observationString.toLatin1().data();
+        int numImages = observation->size();
 
-        sprintf(buf,"\n");
-        fpOut << buf;
-        imgIndex++;
+        for (int k = 0; k < numImages; k++) {
 
+          BundleImageQsp image = observation->at(k);
+
+
+          sprintf(buf, "%s", image->fileName().toLatin1().data());
+          fpOut << buf;
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageSampleResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageLineResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          QString observationString =
+              observation->bundleOutputCSV(errorProp);
+
+          //Removes trailing commas
+          if (observationString.right(1)==",") {
+              observationString.truncate(observationString.length()-1);
+          }
+
+          fpOut << (const char*) observationString.toLatin1().data();
+
+          sprintf(buf,"\n");
+          fpOut << buf;
+          imgIndex++;
+
+        }
       }
-  }
+      fpOut.close();
+    }
 
-    fpOut.close();
     return true;
   }
 

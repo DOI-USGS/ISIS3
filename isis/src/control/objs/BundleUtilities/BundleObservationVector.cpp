@@ -209,7 +209,7 @@ namespace Isis {
   /**
    * Get a list of all instrument IDs that there are observations for
    */
-  QList<QString> BundleObservationVector::instrumentIds() {
+  QList<QString> BundleObservationVector::instrumentIds() const {
     return m_instIdToObservationMap.uniqueKeys();
   }
 
@@ -218,7 +218,7 @@ namespace Isis {
    * Get all of the observations with a specific instrument ID
    */
   QList<AbstractBundleObservationQsp> BundleObservationVector::
-      observationsByInstId(QString instrumentId) {
+      observationsByInstId(QString instrumentId) const {
     return m_instIdToObservationMap.values(instrumentId);
   }
 
