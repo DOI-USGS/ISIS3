@@ -424,12 +424,12 @@ Serializing test XML object to file...
         <correlationMatrix correlationFileName="" covarianceFileName="">
             <imagesAndParameters>
                 <image id="TestImageFileName">
-                    <parameter>  X  (km)  </parameter>
-                    <parameter>  Y  (km)  </parameter>
-                    <parameter>  Z  (km)  </parameter>
-                    <parameter> RA  (dd)  </parameter>
-                    <parameter>DEC  (dd)  </parameter>
-                    <parameter>TWI  (dd)  </parameter>
+                    <parameter>X</parameter>
+                    <parameter>Y</parameter>
+                    <parameter>Z</parameter>
+                    <parameter>RA</parameter>
+                    <parameter>DEC</parameter>
+                    <parameter>TWIST</parameter>
                 </image>
             </imagesAndParameters>
         </correlationMatrix>
@@ -528,12 +528,12 @@ Testing XML: Object deserialized as (should match object above):
         <correlationMatrix correlationFileName="" covarianceFileName="">
             <imagesAndParameters>
                 <image id="TestImageFileName">
-                    <parameter>  X  (km)  </parameter>
-                    <parameter>  Y  (km)  </parameter>
-                    <parameter>  Z  (km)  </parameter>
-                    <parameter> RA  (dd)  </parameter>
-                    <parameter>DEC  (dd)  </parameter>
-                    <parameter>TWI  (dd)  </parameter>
+                    <parameter>X</parameter>
+                    <parameter>Y</parameter>
+                    <parameter>Z</parameter>
+                    <parameter>RA</parameter>
+                    <parameter>DEC</parameter>
+                    <parameter>TWIST</parameter>
                 </image>
             </imagesAndParameters>
         </correlationMatrix>
