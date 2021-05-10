@@ -415,78 +415,11 @@ namespace Isis {
     outputColumns.push_back("rms,");
     outputColumns.push_back("rms,");
 
-    BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
+    QStringList observationParameters = bundleResults().observations().at(0)->parameterList();
 
-    int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
-    int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
-
-    int nCoeff = 1;
-    if (numberCamPosCoefSolved > 0)
-      nCoeff = numberCamPosCoefSolved;
-
-    for (int i = 0; i < nCoeff; i++) {
+    for (int i = 0; i < observationParameters.size(); i++) {
       for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("X,");
-        else {
-          QString str = "X(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("Y,");
-        else {
-          QString str = "Y(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1) {
-          outputColumns.push_back("Z,");
-        }
-        else {
-          QString str = "Z(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-      if (!i)
-        break;
-    }
-
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("RA,");
-        else {
-          QString str = "RA(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("DEC,");
-        else {
-          QString str = "DEC(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1) {
-          outputColumns.push_back("TWIST,");
-        }
-        else {
-          QString str = "TWIST(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
+        outputColumns.push_back(observationParameters[i] + ",");
       }
     }
 
@@ -501,23 +434,13 @@ namespace Isis {
     fpOut << buf;
 
     outputColumns.clear();
-    outputColumns.push_back("Filename,");
 
+    outputColumns.push_back("Filename,");
     outputColumns.push_back("sample res,");
     outputColumns.push_back("line res,");
     outputColumns.push_back("total res,");
 
-    // Initially account for X,Y,Z (3)
-    int nparams = 3;
-    // See how many position coeffients we solved for to make more headers (t0, t1, ...)
-    if (numberCamPosCoefSolved)
-      nparams = 3 * numberCamPosCoefSolved;
-
-    // Initially account for RA,DEC,TWIST (3)
-    int numCameraAnglesSolved = 3;
-    // See how many angle coefficients we solved for to make more headers (t0, t1, ...)
-    nparams += numCameraAnglesSolved*numberCamAngleCoefSolved;
-    for (int i = 0; i < nparams; i++) {
+    for (int i = 0; i < observationParameters.size(); i++) {
       outputColumns.push_back("Initial,");
       outputColumns.push_back("Correction,");
       outputColumns.push_back("Final,");
