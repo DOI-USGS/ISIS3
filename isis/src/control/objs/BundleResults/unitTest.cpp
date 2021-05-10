@@ -62,7 +62,7 @@ namespace Isis {
 
         if (!m_file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
-                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlFile.expanded()),
                            _FILEINFO_);
         }
 
