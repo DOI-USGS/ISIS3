@@ -541,9 +541,6 @@ namespace Isis {
       }
     }
     return defaultSolveSettings;
-    //QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
-    //              + observationNumber + "].";
-   // throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 

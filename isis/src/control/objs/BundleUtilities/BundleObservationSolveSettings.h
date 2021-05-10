@@ -110,6 +110,10 @@ class BundleObservationSolveSettings {
 
       static CSMSolveOption stringToCSMSolveOption(QString option);
       static QString csmSolveOptionToString(CSMSolveOption option);
+      static csm::param::Set stringToCSMSolveSet(QString set);
+      static QString csmSolveSetToString(csm::param::Set set);
+      static csm::param::Type stringToCSMSolveType(QString type);
+      static QString csmSolveTypeToString(csm::param::Type type);
       void setCSMSolveSet(csm::param::Set set);
       void setCSMSolveType(csm::param::Type type);
       void setCSMSolveParameterList(QStringList list);
