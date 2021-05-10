@@ -817,7 +817,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
    *
    * @return @b QStringList List of observation parameter names
    */
-  QStringList BundleObservation::parameterList() {
+  QStringList CsmBundleObservation::parameterList() {
     QStringList paramList;
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
