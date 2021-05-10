@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleObservationVector.h"
 
+#include <algorithm>
+
 #include <QDebug>
 
 #include "AbstractBundleObservation.h"
@@ -219,7 +221,10 @@ namespace Isis {
    */
   QList<AbstractBundleObservationQsp> BundleObservationVector::
       observationsByInstId(QString instrumentId) const {
-    return m_instIdToObservationMap.values(instrumentId);
+    QList<AbstractBundleObservationQsp> list = m_instIdToObservationMap.values(instrumentId);
+    // multimap returns them in reverse order they were put in, so invert them to preserve order
+    std::reverse(std::begin(list), std::end(list));
+    return list;
   }
 
 
