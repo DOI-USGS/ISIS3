@@ -1107,9 +1107,12 @@ namespace Isis {
     // Otherwise append the instrument IDs so it's bundleout_images_spacecraft_sensor.csv
     else {
       for (int i = 0; i < instrumentIds.size(); i++) {
+        QString updatedInstrumentId = instrumentIds[i];
         // Replace and "/" or " " characters with "_" to make the filename safer
-        QString updatedInstrumentId = instrumentIds[i].replace("/", "_").replace(" ", "_");
-        QString ofname = "bundleout_images" + updatedInstrumentId + ".csv";
+        // This line must be separate to avoid modifying the instrumentId in the list
+        // we will iterate over later
+        updatedInstrumentId.replace("/", "_").replace(" ", "_");
+        QString ofname = "bundleout_images_" + updatedInstrumentId + ".csv";
         ofname = m_settings->outputFilePrefix() + ofname;
         m_csvSavedImagesFilename = ofname;
         outputCsvFileNames.push_back(ofname);
