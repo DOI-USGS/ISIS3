@@ -392,6 +392,7 @@ namespace Isis {
   /**
    * @brief Outputs the header for the bundleout_images.csv file
    * @param fpOut The output file stream.
+   * @param observation An observation for the instrument that this header is for.
    * @return True if the write is successful, False otherwise.
    *
    * @internal
@@ -399,7 +400,7 @@ namespace Isis {
    *                           than the other headers. The number of TWIST headers will be the same
    *                           as each of the other angle headers. Fixes #4557.
    */
-  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut) {
+  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut, AbstractBundleObservationQsp observation) {
 
     if (!fpOut) {
       return false;
@@ -415,7 +416,7 @@ namespace Isis {
     outputColumns.push_back("rms,");
     outputColumns.push_back("rms,");
 
-    QStringList observationParameters = bundleResults().observations().at(0)->parameterList();
+    QStringList observationParameters = observation->parameterList();
 
     for (int i = 0; i < observationParameters.size(); i++) {
       for (int j = 0; j < 5; j++) {
@@ -1131,7 +1132,7 @@ namespace Isis {
 
       int nObservations = observations.size();
 
-      outputImagesCSVHeader(fpOut);
+      outputImagesCSVHeader(fpOut, observations.front());
 
 
 
