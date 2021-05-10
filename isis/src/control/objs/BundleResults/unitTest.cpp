@@ -58,8 +58,7 @@ namespace Isis {
       BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
                                      FileName xmlFile) : BundleResults(project, reader) {
 
-        QString xmlPath(xmlFile.expanded());
-        m_file = QFile(xmlPath);
+        m_file.setFileName(xmlFile.expanded());
 
         if (!m_file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
@@ -71,7 +70,7 @@ namespace Isis {
         bool success = reader->parse(xmlInputSource);
         if (!success) {
           throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                           QString("Failed to parse xml file, [%1]").arg(m_file.fileName()),
                             _FILEINFO_);
         }
 
