@@ -29,7 +29,6 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-    m_parameterNamesList.clear();
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
     // m_solveSettings?
@@ -48,7 +47,6 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
-    m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
@@ -751,9 +749,6 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
   }//end else
 
-  // Save the list of parameter names we've accumulated above
-  m_parameterNamesList = parameterNamesList;
-
   QString finalqStr = "";
   QString qStr = "";
 
@@ -1229,9 +1224,6 @@ QStringList BundleObservation::parameterList() {
     correctionUnitList.append(correctionUnitListDEC);
     correctionUnitList.append(correctionUnitListRA);
     correctionUnitList.append(correctionUnitListTWI);
-
-    // Save the list of parameter names we've accumulated above
-    m_parameterNamesList = parameterNamesList;
 
     // Set up default values when we are using default position
     QString sigma = "N/A";
