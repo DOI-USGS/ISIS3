@@ -569,34 +569,35 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     QVector<double> finalParameterValues;
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
-    int nParameters = m_paramIndices.size();
+    int nParameters = numberParameters();
 
     QStringList parameterNamesList;
-    QStringList correctionUnitList;
+    QStringList parameterUnitList;
 
     QString str("%1(%2)  ");
     QString str2("%1(%2) ");
     QString strN("%1(%2)");
 
     for (int i = 0; i < nParameters; i++) {
-      parameterNamesList.append(csmCamera->getParameterName(i));
-      correctionUnitList.append(csmCamera->getParameterUnits(i));
-      finalParameterValues.append(csmCamera->getParameterValue(i));
+      parameterNamesList.append(csmCamera->getParameterName(m_paramIndices[i]));
+      parameterUnitList.append(csmCamera->getParameterUnits(m_paramIndices[i]));
+      finalParameterValues.append(csmCamera->getParameterValue(m_paramIndices[i]));
     }
 
     // Save the list of parameter names we've accumulated above
     m_parameterNamesList = parameterNamesList;
 
 
-    // // Set up default values when we are using default position
+    // Set up default values when we are using default position
     QString sigma;
     QString adjustedSigma;
     double correction;
 
     for (int i = 0; i < nParameters; i++) {
+
       correction = m_corrections(i);
       adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+      sigma = (IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8));
 
       sprintf(buf,"%s",parameterNamesList.at(i).toStdString().c_str());
       fpOut << buf;
@@ -621,7 +622,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
       fpOut<<buf;
       sprintf(buf,"        ");
       fpOut<<buf;
-      sprintf(buf,"%s\n",correctionUnitList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s\n",parameterUnitList.at(i).toStdString().c_str());
       fpOut<<buf;
 
     }
@@ -734,16 +735,16 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
   }
 
   /**
-   * Cannot compute target body parameters for a CSM observation, 
-   * so always throws an exception. 
-   * 
+   * Cannot compute target body parameters for a CSM observation,
+   * so always throws an exception.
+   *
    * @param coeffTarget Matrix for target body partial derivatives
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
    * @param bundleSettings The settings for the bundle adjustment
-   * @param bundleTargetBody QSharedPointer to the target body of 
+   * @param bundleTargetBody QSharedPointer to the target body of
    *                         the observation
-   * 
+   *
    * @return bool Always false
    */
   bool CsmBundleObservation::computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
@@ -756,19 +757,19 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Calculates the sensor partials with respect to the solve 
-   * parameters and populates the coeffImage matrix. 
-   * 
-   * @param coeffImage A matrix that will be populated with the 
+   * Calculates the sensor partials with respect to the solve
+   * parameters and populates the coeffImage matrix.
+   *
+   * @param coeffImage A matrix that will be populated with the
    *                   sensor partials with respect to the solve
    *                   parameters.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
-    coeffImage.clear(); 
+    coeffImage.clear();
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(measure.camera());
     SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
@@ -785,27 +786,27 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Calculates the ground partials for the line, sample currently 
-   * set in the sensor model.  
-   * 
-   * @param coeffPoint3D A matrix that will be populated with the 
+   * Calculates the ground partials for the line, sample currently
+   * set in the sensor model.
+   *
+   * @param coeffPoint3D A matrix that will be populated with the
    *                     (line, sample) partials with respect to
    *                     the ground point.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * @param coordType Not used in this class. Coordinates are 
+   * @param coordType Not used in this class. Coordinates are
    *                  x,y,z
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
 
     CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
 
-    // do ground partials 
+    // do ground partials
     vector<double> groundPartials = measureCamera->GroundPartials();
-    
+
     // groundPartials is:
     //  line WRT x
     // line WRT y
@@ -825,16 +826,16 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Calculates the sample, line residuals between the values 
-   * measured in the image and the ground-to-image sample, line 
-   * calculated by the sensor model. 
-   * 
-   * @param coeffRHS  A vector that will contain the sample, line 
+   * Calculates the sample, line residuals between the values
+   * measured in the image and the ground-to-image sample, line
+   * calculated by the sensor model.
+   *
+   * @param coeffRHS  A vector that will contain the sample, line
    *                  residuals.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool CsmBundleObservation::computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) {
     // Clear old values
@@ -843,7 +844,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     Camera *measureCamera = measure.camera();
     BundleControlPoint* point = measure.parentControlPoint();
 
-    // Get ground-to-image computed coordinates for this point. 
+    // Get ground-to-image computed coordinates for this point.
     if (!(measureCamera->SetGround(point->adjustedSurfacePoint()))) {
       QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.cubeSerialNumber() + " on point " + point->id() + " back into image.";
@@ -853,7 +854,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     double computedLine = measureCamera->Line();
 
     // The RHS is the difference between the measured coordinates on the image
-    // and the coordinates calculated by the ground to image call. 
+    // and the coordinates calculated by the ground to image call.
     double deltaSample = measure.sample() - computedSample;
     double deltaLine = measure.line() - computedLine;
 
@@ -865,15 +866,15 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Returns the observed value in (sample, line) coordinates. 
-   * This requires no modification for Csm.  
-   * 
-   * @param measure measure The measure that the partials are 
+   * Returns the observed value in (sample, line) coordinates.
+   * This requires no modification for Csm.
+   *
+   * @param measure measure The measure that the partials are
    *                being computed for.
-   * @param deltaVal The difference between the measured and 
+   * @param deltaVal The difference between the measured and
    *                 calculate sample, line coordinates
-   * 
-   * @return double The The difference between the measured and 
+   *
+   * @return double The The difference between the measured and
    *                calculated (line, sample) coordinate
    */
   double CsmBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
