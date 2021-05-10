@@ -1085,7 +1085,6 @@ namespace Isis {
   bool BundleSolutionInfo::outputImagesCSV() {
 
     char buf[1056];
-    int imgIndex = 0;
 
     QList<Statistics> rmsImageSampleResiduals = m_statisticsResults->rmsImageSampleResiduals();
     QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
@@ -1149,6 +1148,13 @@ namespace Isis {
 
           BundleImageQsp image = observation->at(k);
 
+          // TODO this is a bad linear search, can we change the rms vectors to maps?
+          int observationIndex = m_statisticsResults->observations().indexOf(observation);
+          int imgIndex = k; // Start at k to account for the images in this observation
+          // Accumulate all of the images from previous observations
+          for (int obsIndex = 0; obsIndex < observationIndex; obsIndex++) {
+            imgIndex += m_statisticsResults->observations().at(obsIndex)->size();
+          }
 
           sprintf(buf, "%s", image->fileName().toLatin1().data());
           fpOut << buf;
