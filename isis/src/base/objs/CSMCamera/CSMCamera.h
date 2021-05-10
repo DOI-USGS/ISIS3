@@ -124,6 +124,10 @@ namespace Isis {
       QString getParameterName(int index) const;
       double getParameterValue(int index) const;
       double getParameterCovariance(int index1, int index2);
+      std::vector<double> getSensorPartials(int index, SurfacePoint groundPoint);
+
+      virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
+      virtual std::vector<double> GroundPartials();
 
     protected:
       void setTarget(Pvl label);
@@ -146,7 +150,6 @@ namespace Isis {
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();
-
   };
 };
 #endif
