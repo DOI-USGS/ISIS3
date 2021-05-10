@@ -940,6 +940,8 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 QStringList BundleObservation::parameterList() {
   QStringList paramList;
 
+  std::cout << "Output position params" << std::endl;
+
   // We still want to output the center postion even if not solving for it
   // so always do at least 1
   int numberCamPosCoefSolved = std::max(
@@ -973,9 +975,11 @@ QStringList BundleObservation::parameterList() {
     }
   }
 
+  std::cout << "Output pointing params" << std::endl;
+
   // We still want to output the center pointing even if not solving for it
   // so always do at least 1
-  int numberCamAngleCoefSolved  = std::max(
+  int numberCamAngleCoefSolved = std::max(
       solveSettings()->numberCameraAngleCoefficientsSolved(),
       1);
   for (int i = 0; i < numberCamAngleCoefSolved; i++) {
