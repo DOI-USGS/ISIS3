@@ -18,7 +18,7 @@ dependencies:
   - doxygen
   - eigen
   - embree
-  - geos>=3.7,<3.8
+  - geos>=3.9,<3.10
   - geotiff
   - gmp
   - gsl>=2.6
