@@ -418,6 +418,8 @@ namespace Isis {
 
     QStringList observationParameters = observation->parameterList();
 
+    std::cout << "Observation parameters: " << observationParameters.join(", ") << std::endl;
+
     for (int i = 0; i < observationParameters.size(); i++) {
       for (int j = 0; j < 5; j++) {
         outputColumns.push_back(observationParameters[i] + ",");
@@ -1122,6 +1124,8 @@ namespace Isis {
 
     for (int i = 0; i < instrumentIds.size(); i++) {
 
+      std::cout << "Processing instrument ID: " << instrumentIds[i] << std::endl;
+
       std::ofstream fpOut(outputCsvFileNames[i].toLatin1().data(), std::ios::out);
       if (!fpOut) {
         return false;
@@ -1131,6 +1135,8 @@ namespace Isis {
           m_statisticsResults->observations().observationsByInstId(instrumentIds[i]);
 
       int nObservations = observations.size();
+
+      std::cout << "Number of observations: " << toString(nObservations) << std::endl;
 
       outputImagesCSVHeader(fpOut, observations.front());
 
