@@ -59,15 +59,15 @@ namespace Isis {
                                      FileName xmlFile) : BundleResults(project, reader) {
 
         QString xmlPath(xmlFile.expanded());
-        QFile file(xmlPath);
+        m_file = QFile(xmlPath);
 
-        if (!file.open(QFile::ReadOnly) ) {
+        if (!m_file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
                            QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
+        QXmlInputSource xmlInputSource(&m_file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
           throw IException(IException::Unknown,
@@ -81,7 +81,12 @@ namespace Isis {
        * Destroys the tester object
        */
       ~BundleResultsXmlHandlerTester() {
+        if (m_file.exists()) {
+          m_file.remove();
+        }
       }
+
+      QFile m_file;
 
   };
 }
