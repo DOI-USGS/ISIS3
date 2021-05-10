@@ -129,7 +129,7 @@ namespace Isis {
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
-      virtual QStringList parameterList() = 0;
+      virtual QStringList parameterList();
 
    private:
       bool initParameterWeights();
