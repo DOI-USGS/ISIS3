@@ -121,6 +121,8 @@ namespace Isis {
       std::vector<int> getParameterIndices(csm::param::Type paramType) const;
       std::vector<int> getParameterIndices(QStringList paramList) const;
       void applyParameterCorrection(int index, double correction);
+      QString getParameterName(int index) const;
+      double getParameterValue(int index) const;
       double getParameterCovariance(int index1, int index2);
 
     protected:

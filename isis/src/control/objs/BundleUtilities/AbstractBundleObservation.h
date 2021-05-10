@@ -69,7 +69,7 @@ namespace Isis {
 
       virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false) = 0;
 
-      virtual QStringList parameterList();
+      virtual QStringList parameterList() = 0;
       virtual QStringList imageNames();
 
     protected:
@@ -82,7 +82,6 @@ namespace Isis {
       //! Map between cube serial number and BundleImage pointers.
       QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
-      QStringList m_parameterNamesList; //!< List of all cube parameters.
       QStringList m_imageNames;         //!< List of all cube names.
       QString m_instrumentId;      //!< Spacecraft instrument id.
 

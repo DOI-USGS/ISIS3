@@ -33,7 +33,7 @@ namespace Isis {
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
     // m_solveSettings?
-    // m_bundleTargetBody ? 
+    // m_bundleTargetBody ?
   }
 
 
@@ -930,6 +930,88 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
   return finalqStr;
+}
+
+
+/**
+ * Returns the list of observation parameter names.
+ *
+ * This will always return at least one set of positions and pointings
+ * because we always output at least the center values even when not solving
+ * for them.
+ *
+ * @return @b QStringList List of observation parameter names
+ */
+QStringList BundleObservation::parameterList() {
+  QStringList paramList;
+
+  // We still want to output the center postion even if not solving for it
+  // so always do at least 1
+  int numberCamPosCoefSolved = std::max(
+      solveSettings()->numberCameraPositionCoefficientsSolved(),
+      1);
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("X,");
+    }
+    else {
+      QString str = "X(t" + toString(i) + "),";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("Y,");
+    }
+    else {
+      QString str = "Y(t" + toString(i) + "),";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("Z,");
+    }
+    else {
+      QString str = "Z(t" + toString(i) + "),";
+      paramList.push_back(str);
+    }
+  }
+
+  // We still want to output the center pointing even if not solving for it
+  // so always do at least 1
+  int numberCamAngleCoefSolved  = std::max(
+      solveSettings()->numberCameraAngleCoefficientsSolved(),
+      1);
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("RA,");
+    }
+    else {
+      QString str = "RA(t" + toString(i) + "),";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("DEC,");
+    }
+    else {
+      QString str = "DEC(t" + toString(i) + "),";
+      paramList.push_back(str);
+    }
+  }
+  if (solveSettings()->solveTwist()) {
+    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+      if (numberCamAngleCoefSolved == 1) {
+        paramList.push_back("TWIST,");
+      }
+      else {
+        QString str = "TWIST(t" + toString(i) + "),";
+        paramList.push_back(str);
+      }
+    }
+  }
 }
 
 

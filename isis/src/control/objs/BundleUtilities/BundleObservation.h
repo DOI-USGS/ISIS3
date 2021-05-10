@@ -129,6 +129,8 @@ namespace Isis {
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
+      virtual QStringList parameterList() = 0;
+
    private:
       bool initParameterWeights();
       BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
