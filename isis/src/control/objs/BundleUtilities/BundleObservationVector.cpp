@@ -165,7 +165,14 @@ namespace Isis {
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
 
       // update instrument ID to observation ptr map
-      m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
+      // separate held observations out into their own entry
+      if (bundleObservation->numberParameters() == 0) {
+        m_instIdToObservationMap.insertMulti("held", bundleObservation);
+      }
+      else {
+        m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
+      }
+
     }
     return bundleObservation;
   }
