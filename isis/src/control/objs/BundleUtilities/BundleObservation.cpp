@@ -999,15 +999,13 @@ QStringList BundleObservation::parameterList() {
       paramList.push_back(str);
     }
   }
-  if (solveSettings()->solveTwist()) {
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      if (numberCamAngleCoefSolved == 1) {
-        paramList.push_back("TWIST");
-      }
-      else {
-        QString str = "TWIST(t" + toString(i) + ")";
-        paramList.push_back(str);
-      }
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("TWIST");
+    }
+    else {
+      QString str = "TWIST(t" + toString(i) + ")";
+      paramList.push_back(str);
     }
   }
 
@@ -1442,16 +1440,16 @@ QStringList BundleObservation::parameterList() {
 
 
   /**
-   * Computes any needed partials for the target body parameters. 
-   *  
+   * Computes any needed partials for the target body parameters.
+   *
    * @param coeffTarget Matrix for target body partial derivatives
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
    * @param bundleSettings The settings for the bundle adjustment
-   * @param bundleTargetBody QSharedPointer to the target body of 
+   * @param bundleTargetBody QSharedPointer to the target body of
    *                         the observation
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure,
                                                 BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
@@ -1553,19 +1551,19 @@ QStringList BundleObservation::parameterList() {
 
 
   /**
-   * Calculates the sensor partials with respect to the selected 
-   * solve parameters and populates the coeffImage matrix. 
-   * 
-   * @param coeffImage A matrix that will be populated with the 
+   * Calculates the sensor partials with respect to the selected
+   * solve parameters and populates the coeffImage matrix.
+   *
+   * @param coeffImage A matrix that will be populated with the
    *                   sensor partials with respect to the
    *                   specified solve parameters.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                 computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeImagePartials(matrix<double> &coeffImage, BundleMeasure &measure) {
-    coeffImage.clear(); 
+    coeffImage.clear();
 
     Camera *camera = measure.camera();
 
@@ -1649,17 +1647,17 @@ QStringList BundleObservation::parameterList() {
 
   /**
    * Calculates the ground partials for the ground point currently
-   * set in the sensor model. 
-   * 
-   * @param coeffPoint3D A matrix that will be populated with the 
+   * set in the sensor model.
+   *
+   * @param coeffPoint3D A matrix that will be populated with the
    *                     (line, sample) partials with respect to
    *                     the ground point.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * @param coordType Specifies whether latitudinal or (x, y, z) 
+   * @param coordType Specifies whether latitudinal or (x, y, z)
    *                  coordinates are used.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
@@ -1690,19 +1688,19 @@ QStringList BundleObservation::parameterList() {
 
     return true;
   }
-  
+
 
   /**
-   * Calculates the sample, line residuals between the measured 
+   * Calculates the sample, line residuals between the measured
    * focal plane values and the focal plane coordinates calculated
-   * for the ground point by the sensor model. 
-   * 
-   * @param coeffRHS  A vector that will contain the focal plane 
+   * for the ground point by the sensor model.
+   *
+   * @param coeffRHS  A vector that will contain the focal plane
    *                  x, y residuals.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
     coeffRHS.clear();
@@ -1739,15 +1737,15 @@ QStringList BundleObservation::parameterList() {
 
 
   /**
-   * Converts the observed value from a focal plane coordinate to 
-   * an image sample or line. 
-   * 
-   * @param measure measure The measure that the partials are 
+   * Converts the observed value from a focal plane coordinate to
+   * an image sample or line.
+   *
+   * @param measure measure The measure that the partials are
    *                being computed for.
-   * @param deltaVal The difference between the measured and 
+   * @param deltaVal The difference between the measured and
    *                 calculated focal plane coordinate
-   * 
-   * @return double The The difference between the measured and 
+   *
+   * @return double The The difference between the measured and
    *                calculated (line, sample) coordinate
    */
   double BundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
