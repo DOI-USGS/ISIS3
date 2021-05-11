@@ -906,6 +906,42 @@ namespace Isis {
 
 
   /**
+   * Get the name of the parameter.
+   *
+   * @param index The index of parameter
+   *
+   * @returns @b QString name of the parameter at index
+   */
+  QString CSMCamera::getParameterName(int index) {
+    return QString::fromStdString(m_model->getParameterName(index));
+  }
+
+
+  /**
+   * Get the value of a parameter.
+   *
+   * @param index The index of the parameter
+   *
+   * @returns @b double value of the parameter at index
+   */
+  double CSMCamera::getParameterValue(int index) {
+    return m_model->getParameterValue(index);
+  }
+
+
+  /**
+   * Get the units of the parameter at a particular index.
+   *
+   * @param index The index of parameter
+   *
+   * @returns @b QString units of the parameter at index
+   */
+  QString CSMCamera::getParameterUnits(int index) {
+    return QString::fromStdString(m_model->getParameterUnits(index));
+  }
+
+
+  /**
    * Set the time and update the sensor position and orientation.
    *
    * This is not supported for CSM cameras because the time is a function of the
