@@ -296,6 +296,33 @@ TEST_F(CSMCameraFixture, getParameterCovariance) {
 }
 
 
+TEST_F(CSMCameraFixture, getParameterName) {
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .Times(1)
+      .WillOnce(::testing::Return("Omega Bias"));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterName(2), "Omega Bias");
+}
+
+
+TEST_F(CSMCameraFixture, getParameterValue) {
+  EXPECT_CALL(mockModel, getParameterValue(2))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+
+  EXPECT_DOUBLE_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterValue(2), 0.5);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterUnits) {
+  EXPECT_CALL(mockModel, getParameterUnits(2))
+      .Times(1)
+      .WillOnce(::testing::Return("m"));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterUnits(2), "m");
+}
+
+
 TEST_F(CSMCameraFixture, SetTime) {
   try
   {

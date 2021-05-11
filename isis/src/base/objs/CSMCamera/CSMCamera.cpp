@@ -611,7 +611,7 @@ namespace Isis {
   * sample WRT y
   * sample WRT z
   *
-  * @return @b std::vector<double> The partial derivatives of the 
+  * @return @b std::vector<double> The partial derivatives of the
   *                                sample, line with respect to
   *                                the ground coordinate.
   */
@@ -634,7 +634,7 @@ namespace Isis {
   *
   * @param groundPoint The ground point to compute the partials at
   *
-  * @return @b std::vector<double> The partial derivatives of the 
+  * @return @b std::vector<double> The partial derivatives of the
   *                                sample, line with respect to
   *                                the ground coordinate.
   */
@@ -894,38 +894,50 @@ namespace Isis {
     return m_model->getParameterCovariance(index1, index2);
   }
 
-  
+
   vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
     // csm::SensorPartials holds (line, sample) in order for each parameter
    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
    std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
    vector<double> partialsVector = {partials.first, partials.second};
 
-   return partialsVector; 
+   return partialsVector;
   }
 
 
   /**
-   * Get the name of a parameters.
+   * Get the name of the parameter.
    *
-   * @param index The index of the parameter
+   * @param index The index of parameter
    *
-   * @return @b QString The parameter name
+   * @returns @b QString name of the parameter at index
    */
-  QString CSMCamera::getParameterName(int index) const {
+  QString CSMCamera::getParameterName(int index) {
     return QString::fromStdString(m_model->getParameterName(index));
   }
 
 
   /**
-   * Get the value of a parameters.
+   * Get the value of a parameter.
    *
    * @param index The index of the parameter
    *
-   * @return @b double The parameter value
+   * @returns @b double value of the parameter at index
    */
-  double CSMCamera::getParameterValue(int index) const {
+  double CSMCamera::getParameterValue(int index) {
     return m_model->getParameterValue(index);
+  }
+
+
+  /**
+   * Get the units of the parameter at a particular index.
+   *
+   * @param index The index of parameter
+   *
+   * @returns @b QString units of the parameter at index
+   */
+  QString CSMCamera::getParameterUnits(int index) {
+    return QString::fromStdString(m_model->getParameterUnits(index));
   }
 
 
