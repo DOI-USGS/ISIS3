@@ -28,7 +28,7 @@ int main() {
     cout << "One ----------------------------------------------" << endl;
 
     // Create coordinate sequence so we can later create a multi polygon
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     pts->add(geos::geom::Coordinate(0, 0));
     pts->add(geos::geom::Coordinate(0, 10));
     pts->add(geos::geom::Coordinate(5, 15));
@@ -43,7 +43,7 @@ int main() {
     vector<geos::geom::Geometry *> polys;
     polys.push_back(globalFactory->createPolygon(
                       globalFactory->createLinearRing(pts), NULL));
-    geos::geom::MultiPolygon *mPolygon = globalFactory->createMultiPolygon(polys);
+    geos::geom::MultiPolygon *mPolygon = globalFactory->createMultiPolygon(&polys);
 
     // Add more coordinates so we can make sure we did a deep copy when we
     // created the multipolygon
@@ -67,7 +67,7 @@ int main() {
 
     // Create a new multipolygon and test the SetPolygon method
     cout << "Three --------------------------------------------" << endl;
-    geos::geom::CoordinateSequence *pts3 = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts3 = new geos::geom::CoordinateArraySequence();
     pts3->add(geos::geom::Coordinate(0.123456789, 0.123456789));
     pts3->add(geos::geom::Coordinate(0.123456789, 10.123456789));
     pts3->add(geos::geom::Coordinate(5.123456789, 15.123456789));
@@ -78,7 +78,7 @@ int main() {
       vector<geos::geom::Geometry *> polys3;
       polys3.push_back(globalFactory->createPolygon(
                          globalFactory->createLinearRing(pts3), NULL));
-      geos::geom::MultiPolygon *mPolygon3 = globalFactory->createMultiPolygon(polys3);
+      geos::geom::MultiPolygon *mPolygon3 = globalFactory->createMultiPolygon(&polys3);
       a.SetPolygon(*mPolygon3);
       delete mPolygon3;
     }
@@ -90,7 +90,7 @@ int main() {
     PrintImageOverlap(a);
 
 
-    geos::geom::CoordinateSequence *pts4 = new geos::geom::DefaultCoordinateSequence();
+    geos::geom::CoordinateArraySequence *pts4 = new geos::geom::DefaultCoordinateSequence();
     pts4->add(geos::geom::Coordinate(10.123456789, 10.123456789));
     pts4->add(geos::geom::Coordinate(10.123456789, 110.123456789));
     pts4->add(geos::geom::Coordinate(15.123456789, 115.123456789));
@@ -101,7 +101,7 @@ int main() {
       vector<geos::geom::Geometry *> polys4;
       polys4.push_back(globalFactory->createPolygon(
                          globalFactory->createLinearRing(pts4), NULL));
-      geos::geom::MultiPolygon *mPolygon4 = globalFactory->createMultiPolygon(polys4);
+      geos::geom::MultiPolygon *mPolygon4 = globalFactory->createMultiPolygon(&polys4);
       a.SetPolygon(mPolygon4);
       delete mPolygon4;
     }
@@ -118,7 +118,7 @@ int main() {
   {
     //
     cout << "Four ---------------------------------------------" << endl;
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     pts->add(geos::geom::Coordinate(0.123456789, 0.123456789));
     pts->add(geos::geom::Coordinate(0.123456789, 10.123456789));
     pts->add(geos::geom::Coordinate(5.123456789, 15.123456789));
@@ -130,7 +130,7 @@ int main() {
       polys.push_back(globalFactory->createPolygon(
                         globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mPolygon = globalFactory->createMultiPolygon(polys);
+      geos::geom::MultiPolygon *mPolygon = globalFactory->createMultiPolygon(&polys);
 
       ImageOverlap a("idFour", *mPolygon);
       PrintImageOverlap(a);
