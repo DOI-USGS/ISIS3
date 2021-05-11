@@ -73,7 +73,7 @@ int main() {
   vector<QString> sns;
 
   // Reusable variables
-  geos::geom::CoordinateSequence *pts;
+  geos::geom::CoordinateArraySequence *pts;
   vector<geos::geom::Geometry *> polys;
 
   // Create the A polygon
@@ -87,7 +87,7 @@ int main() {
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
 
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -103,7 +103,7 @@ int main() {
 
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -119,7 +119,7 @@ int main() {
 
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -135,7 +135,7 @@ int main() {
 
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -151,7 +151,7 @@ int main() {
 
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -167,7 +167,7 @@ int main() {
 
   polys.push_back(globalFactory->createPolygon(
                     globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(&polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
