@@ -54,7 +54,7 @@ namespace Isis {
 
     // Convert the Lat/Lon poly coordinates to X/Y coordinates
     if(lonLatPolygon.isEmpty()) {
-      return globalFactory->createMultiPolygon();
+      return globalFactory->createMultiPolygon().release();
     }
     else {
       vector<geos::geom::Geometry *> *xyPolys = new vector<geos::geom::Geometry *>;
@@ -69,7 +69,7 @@ namespace Isis {
         for(unsigned int h = 0; h < poly->getNumInteriorRing(); ++h) {
           geos::geom::CoordinateArraySequence *xycoords = new geos::geom::CoordinateArraySequence();
           geos::geom::CoordinateSequence *llcoords =
-            poly->getInteriorRingN(h)->getCoordinates();
+            poly->getInteriorRingN(h)->getCoordinates().release();
 
           // Convert each coordinate in this hole
           for(unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
@@ -92,7 +92,7 @@ namespace Isis {
         // Convert the exterior ring of this polygon
         geos::geom::CoordinateArraySequence *xycoords = new geos::geom::CoordinateArraySequence();
         geos::geom::CoordinateSequence *llcoords =
-          poly->getExteriorRing()->getCoordinates();
+          poly->getExteriorRing()->getCoordinates().release();
 
         // Convert each coordinate in the exterior ring of this polygon
         for (unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
@@ -161,7 +161,7 @@ namespace Isis {
 
     // Convert the X/Y poly coordinates to Lat/Lon coordinates
     if(xYPolygon.isEmpty()) {
-      return globalFactory->createMultiPolygon();
+      return globalFactory->createMultiPolygon().release();
     }
     else {
       vector<geos::geom::Geometry *> *llPolys = new vector<geos::geom::Geometry *>;
@@ -172,11 +172,11 @@ namespace Isis {
               xYPolygon.getGeometryN(g));
 
         // Convert each hole inside this polygon
-        vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
+        vector<geos::geom::LinearRing *> *holes = new vector<geos::geom::LinearRing *>;
         for(unsigned int h = 0; h < poly->getNumInteriorRing(); ++h) {
           geos::geom::CoordinateArraySequence *llcoords = new geos::geom::CoordinateArraySequence();
           geos::geom::CoordinateSequence *xycoords =
-            poly->getInteriorRingN(h)->getCoordinates();
+            poly->getInteriorRingN(h)->getCoordinates().release();
 
           // Convert each coordinate in this hole
           for(unsigned int cord = 0; cord < xycoords->getSize(); ++cord) {
@@ -191,7 +191,7 @@ namespace Isis {
         // Convert the exterior ring of this polygon
         geos::geom::CoordinateArraySequence *llcoords = new geos::geom::DefaultCoordinateSequence();
         geos::geom::CoordinateSequence *xycoords =
-          poly->getExteriorRing()->getCoordinates();
+          poly->getExteriorRing()->getCoordinates().release();
 
         // Convert each coordinate in the exterior ring of this polygon
         for(unsigned int cord = 0; cord < xycoords->getSize(); ++cord) {
@@ -253,7 +253,7 @@ namespace Isis {
 
     // Convert the Lon/Lat poly coordinates to Sample/Line coordinates
     if(lonLatPolygon.isEmpty()) {
-      return globalFactory->createMultiPolygon();
+      return globalFactory->createMultiPolygon().release();
     }
     else {
       vector<geos::geom::Geometry *> *slPolys = new vector<geos::geom::Geometry *>;
@@ -268,7 +268,7 @@ namespace Isis {
         for(unsigned int h = 0; h < poly->getNumInteriorRing(); ++h) {
           geos::geom::CoordinateArraySequence *slcoords = new geos::geom::DefaultCoordinateSequence();
           geos::geom::CoordinateSequence *llcoords =
-            poly->getInteriorRingN(h)->getCoordinates();
+            poly->getInteriorRingN(h)->getCoordinates().release();
 
           // Convert each coordinate in this hole
           for(unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
@@ -285,7 +285,7 @@ namespace Isis {
         // Convert the exterior ring of this polygon
         geos::geom::CoordinateArraySequence *slcoords = new geos::geom::CoordinateArraySequence();
         geos::geom::CoordinateSequence *llcoords =
-          poly->getExteriorRing()->getCoordinates();
+          poly->getExteriorRing()->getCoordinates().release();
 
         // Convert each coordinate in the exterior ring of this polygon
         for(unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
@@ -355,7 +355,7 @@ namespace Isis {
 
     vector<geos::geom::Geometry *> *polys = new vector<geos::geom::Geometry *>;
     for(unsigned int i = 0; i < mpolygon->getNumGeometries(); ++i) {
-      polys->push_back((mpolygon->getGeometryN(i))->clone());
+      polys->push_back((mpolygon->getGeometryN(i))->clone().release());
     }
     return globalFactory->createMultiPolygon(polys);
   }
@@ -377,7 +377,7 @@ namespace Isis {
 
     vector<geos::geom::Geometry *> *polys = new vector<geos::geom::Geometry *>;
     for(unsigned int i = 0; i < mpolygon.getNumGeometries(); ++i) {
-      polys->push_back((mpolygon.getGeometryN(i))->clone());
+      polys->push_back((mpolygon.getGeometryN(i))->clone().release());
     }
     return globalFactory->createMultiPolygon(polys);
   }
@@ -431,7 +431,7 @@ namespace Isis {
 
 
     for(unsigned int polyN = 0; polyN < mpolygon->getNumGeometries(); polyN++) {
-      geos::geom::CoordinateSequence *pts = mpolygon->getGeometryN(polyN)->getCoordinates();
+      geos::geom::CoordinateSequence *pts = mpolygon->getGeometryN(polyN)->getCoordinates().release();
 
       for(unsigned int i = 0; i < pts->getSize(); i++) {
         double lon = pts->getAt(i).x;
@@ -563,7 +563,7 @@ namespace Isis {
       geos::geom::Geometry *preserved = Intersect(leftOf180Poly, poly360);
       geos::geom::Geometry *moving = Intersect(rightOf180Poly, poly360);
 
-      geos::geom::CoordinateSequence *movingPts = moving->getCoordinates();
+      geos::geom::CoordinateSequence *movingPts = moving->getCoordinates().release();
       geos::geom::CoordinateArraySequence *movedPts =
           new geos::geom::CoordinateArraySequence();
 
@@ -713,7 +713,7 @@ namespace Isis {
         // Sometimes despike and fix fail, but the input is really valid. We can just go
         // with the non-despiked polygon.
         if(ls->isValid() && ls->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
-          lr = dynamic_cast<geos::geom::LinearRing *>(ls->clone());
+          lr = dynamic_cast<geos::geom::LinearRing *>(ls->clone().release());
         }
         else {
           throw;
@@ -726,7 +726,7 @@ namespace Isis {
 
         if(tp->isEmpty() || !tp->isValid()) {
           delete tp;
-          newPolys->push_back(poly->clone());
+          newPolys->push_back(poly->clone().release());
         }
         else {
           newPolys->push_back(tp);
@@ -926,7 +926,7 @@ namespace Isis {
     }
 
     if(!spiked) {
-      geos::geom::CoordinateSequence *coords = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *coords = new geos::geom::CoordinateArraySequence();
       coords->add(first);
       coords->add(middle);
       coords->add(last);
@@ -1006,7 +1006,7 @@ namespace Isis {
     geos::geom::Geometry *geomSecond = MakeMultiPolygon(geom2);
 
     geos::operation::overlay::snap::GeometrySnapper snap(*geomFirst);
-    geos::geom::Geometry *geomSnapped = snap.snapTo(*geomSecond, 1.0e-10)->clone();
+    geos::geom::Geometry *geomSnapped = snap.snapTo(*geomSecond, 1.0e-10)->clone().release();
     if(!geomSnapped->isValid()) {
       delete geomSnapped;
     }
@@ -1021,9 +1021,9 @@ namespace Isis {
       try {
         // C++11: the geos BinaryOp returns an auto_ptr, we use release() to create a unique_ptr.
         std::unique_ptr< geos::geom::Geometry > resultAuto(
-          BinaryOp(geomFirst, geomSecond, geos::operation::overlay::overlayOp(code)));
+          geos::operation::overlay::OverlayOp::overlayOp(geomFirst, geomSecond, code));
         failed = false;
-        result = resultAuto->clone();
+        result = resultAuto->clone().release();
       }
       catch(geos::util::GEOSException *exc) {
         // Just in case the clone failed....
@@ -1161,7 +1161,7 @@ namespace Isis {
 
       // We hope they are all linear rings (closed/simple), but if not just leave it be
       if(thisHole->getGeometryTypeId() != geos::geom::GEOS_LINEARRING) {
-        holes->push_back(dynamic_cast<geos::geom::LinearRing *>(thisHole->clone()));
+        holes->push_back(dynamic_cast<geos::geom::LinearRing *>(thisHole->clone().release()));
 //      newRing = dynamic_cast<geos::geom::LinearRing *>(ring->clone());
         continue;
       }
@@ -1217,7 +1217,7 @@ namespace Isis {
    */
   geos::geom::LinearRing *PolygonTools::FixGeometry(const geos::geom::LinearRing *ring) {
 
-    geos::geom::CoordinateSequence *coords = ring->getCoordinates();
+    geos::geom::CoordinateSequence *coords = ring->getCoordinates().release();
 
     // Check this, just in case
     if(coords->getSize() < 4) {
@@ -1297,7 +1297,7 @@ namespace Isis {
         delete newRing;
       }
 
-      newRing = dynamic_cast<geos::geom::LinearRing *>(ring->clone());
+      newRing = dynamic_cast<geos::geom::LinearRing *>(ring->clone().release());
     }
 
     return newRing;
@@ -1381,20 +1381,20 @@ namespace Isis {
   geos::geom::MultiPolygon *PolygonTools::MakeMultiPolygon(const geos::geom::Geometry *geom) {
     // The area of the geometry is too small, so just ignore it.
     if(geom->isEmpty()) {
-      return Isis::globalFactory->createMultiPolygon();
+      return Isis::globalFactory->createMultiPolygon().release();
     }
 
     else if(geom->getArea() - DBL_EPSILON <= DBL_EPSILON) {
-      return Isis::globalFactory->createMultiPolygon();
+      return Isis::globalFactory->createMultiPolygon().release();
     }
 
     else if(geom->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
-      return dynamic_cast<geos::geom::MultiPolygon *>(geom->clone());
+      return dynamic_cast<geos::geom::MultiPolygon *>(geom->clone().release());
     }
 
     else if(geom->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
       vector<geos::geom::Geometry *> *polys = new vector<geos::geom::Geometry *>;
-      polys->push_back(geom->clone());
+      polys->push_back(geom->clone().release());
       geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
       return mp;
     }
@@ -1414,7 +1414,7 @@ namespace Isis {
           const geos::geom::Polygon *poly =
               dynamic_cast<const geos::geom::Polygon *>(
                 subMultiPoly->getGeometryN(subPoly));
-          polys->push_back(dynamic_cast<geos::geom::Polygon *>(poly->clone()));
+          polys->push_back(dynamic_cast<geos::geom::Polygon *>(poly->clone().release()));
         }
       }
 
@@ -1422,7 +1422,7 @@ namespace Isis {
           Isis::globalFactory->createMultiPolygon(polys);
       if(mp->getArea() - DBL_EPSILON <= DBL_EPSILON) {
         delete mp;
-        mp = Isis::globalFactory->createMultiPolygon();
+        mp = Isis::globalFactory->createMultiPolygon().release();
       }
 
       return mp;
@@ -1430,15 +1430,15 @@ namespace Isis {
 
     // All other geometry types are invalid so ignore them
     else {
-      return Isis::globalFactory->createMultiPolygon();
+      return Isis::globalFactory->createMultiPolygon().release();
     }
   }
 
 
   geos::geom::MultiPolygon *PolygonTools::FixSeam(
       const geos::geom::Polygon *polyA, const geos::geom::Polygon *polyB) {
-    geos::geom::CoordinateSequence *polyAPoints = polyA->getCoordinates();
-    geos::geom::CoordinateSequence *polyBPoints = polyB->getCoordinates();
+    geos::geom::CoordinateSequence *polyAPoints = polyA->getCoordinates().release();
+    geos::geom::CoordinateSequence *polyBPoints = polyB->getCoordinates().release();
 
     unsigned int aIntersectionBegin = 0;
     unsigned int aIntersectionEnd = 0;
@@ -1522,7 +1522,7 @@ namespace Isis {
     for(unsigned int copyIndex = 0;
         copyIndex < poly->getNumGeometries();
         copyIndex ++) {
-      polys->push_back(poly->getGeometryN(copyIndex)->clone());
+      polys->push_back(poly->getGeometryN(copyIndex)->clone().release());
     }
 
     unsigned int outerPolyIndex = 0;
@@ -1540,7 +1540,7 @@ namespace Isis {
           geos::geom::Geometry *oldOuterPoly = polys->at(outerPolyIndex);
 
           polys->erase(polys->begin() + innerPolyIndex);
-          (*polys)[outerPolyIndex] = fixedPair->getGeometryN(0)->clone();
+          (*polys)[outerPolyIndex] = fixedPair->getGeometryN(0)->clone().release();
           innerPolyIndex = outerPolyIndex + 1;
 
           delete fixedPair;
@@ -1650,7 +1650,7 @@ namespace Isis {
 
       // We hope they are all linear rings (closed/simple), but if not just leave it be
       if(thisHole->getGeometryTypeId() != geos::geom::GEOS_LINEARRING) {
-        holes->push_back(thisHole->clone());
+        holes->push_back(dynamic_cast<geos::geom::LinearRing *>(thisHole->clone().release()));
         continue;
       }
 
@@ -1659,7 +1659,7 @@ namespace Isis {
                                                           precision);
 
         if(!newHole->isEmpty()) {
-          holes->push_back(dynamic_cast<geos::geom::LinearRing *>(thisHole->clone()));
+          holes->push_back(newHole);
         }
         else {
           delete newHole;
@@ -1707,11 +1707,12 @@ namespace Isis {
    */
   geos::geom::LinearRing *PolygonTools::ReducePrecision(const geos::geom::LinearRing *ring, 
                                                         unsigned int precision) {
-    geos::geom::CoordinateSequence *coords = ring->getCoordinates();
+    geos::geom::CoordinateSequence *coords = ring->getCoordinates().release();
 
     // Check this, just in case
-    if(coords->getSize() <= 0) return dynamic_cast<geos::geom::LinearRing *>(
-        ring->clone());
+    if(coords->getSize() <= 0) {
+      return dynamic_cast<geos::geom::LinearRing *>(ring->clone().release());
+    }
 
     geos::geom::CoordinateArraySequence *newCoords = new geos::geom::DefaultCoordinateSequence();
     geos::geom::Coordinate *coord = ReducePrecision(&coords->getAt(0), precision);
@@ -1921,8 +1922,8 @@ namespace Isis {
   bool PolygonTools::Equal(const geos::geom::LineString *lineString1, 
                            const geos::geom::LineString *lineString2) {
 
-    geos::geom::CoordinateSequence *coords1 = lineString1->getCoordinates();
-    geos::geom::CoordinateSequence *coords2 = lineString2->getCoordinates();
+    geos::geom::CoordinateSequence *coords1 = lineString1->getCoordinates().release();
+    geos::geom::CoordinateSequence *coords2 = lineString2->getCoordinates().release();
     bool isEqual = true;
 
     if(coords1->getSize() != coords2->getSize()) isEqual = false;
@@ -2012,7 +2013,7 @@ namespace Isis {
     geos::geom::CoordinateArraySequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
     double lon, lat;
     double lonOffset = 0;
-    geos::geom::CoordinateSequence *inPolyCoords = inPoly->getCoordinates();
+    geos::geom::CoordinateSequence *inPolyCoords = inPoly->getCoordinates().release();
     double prevLon = inPolyCoords->getAt(0).x;
     double prevLat = inPolyCoords->getAt(0).y;
 
@@ -2144,8 +2145,8 @@ namespace Isis {
       geos::geom::Geometry *newGeom = NULL;
 
       for (unsigned int i = 0; i < convertPoly->getNumGeometries(); i++) {
-        newGeom = (convertPoly->getGeometryN(i))->clone();
-        geos::geom::CoordinateSequence *pts3 = convertPoly->getGeometryN(i)->getCoordinates();
+        newGeom = (convertPoly->getGeometryN(i))->clone().release();
+        geos::geom::CoordinateSequence *pts3 = convertPoly->getGeometryN(i)->getCoordinates().release();
         geos::geom::CoordinateArraySequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
 
         // fix the points
@@ -2169,7 +2170,7 @@ namespace Isis {
 
       // This loop is over polygons that will always be in 0-360 space no need to convert
       for (unsigned int i = 0; i < convertPoly2->getNumGeometries(); i++) {
-        newGeom = (convertPoly2->getGeometryN(i))->clone();
+        newGeom = (convertPoly2->getGeometryN(i))->clone().release();
         finalpolys->push_back(newGeom);
       }
 
