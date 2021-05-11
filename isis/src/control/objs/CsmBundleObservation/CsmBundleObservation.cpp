@@ -574,10 +574,6 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     QStringList parameterNamesList;
     QStringList parameterUnitList;
 
-    QString str("%1(%2)  ");
-    QString str2("%1(%2) ");
-    QString strN("%1(%2)");
-
     for (int i = 0; i < nParameters; i++) {
       parameterNamesList.append(csmCamera->getParameterName(m_paramIndices[i]));
       parameterUnitList.append(csmCamera->getParameterUnits(m_paramIndices[i]));
