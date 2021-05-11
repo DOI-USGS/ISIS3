@@ -11,7 +11,7 @@ find files of those names at the top level of this repository. **/
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/LineString.h"
-#include "geos/geosAlgorithm.h"
+//#include "geos/geosAlgorithm.h"
 
 #include "Application.h"
 #include "BoxcarCachingAlgorithm.h"
@@ -54,7 +54,7 @@ namespace Isis {
 
     if (crosses) {
       // Make a polygon from the lat/lon vectors and split it on 360
-      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
       for (unsigned int i = 0; i < lat.size(); i++) {
         pts->add(geos::geom::Coordinate(lon[i], lat[i]));
       }
@@ -78,10 +78,11 @@ namespace Isis {
       if (splitPoly != NULL) {
         // Process the polygons in the split multipolygon as if we were still using the lat/lon vectors
         for (unsigned int g = 0; g < splitPoly->getNumGeometries(); ++g) {
-          const geos::geom::Polygon *poly = 
+          const geos::geom::Polygon *poly =
               dynamic_cast<const geos::geom::Polygon *>(splitPoly->getGeometryN(g));
 
-          geos::geom::CoordinateSequence *llcoords = poly->getExteriorRing()->getCoordinates();
+          geos::geom::CoordinateSequence *llcoords =
+              poly->getExteriorRing()->getCoordinates().release();
 
           // Move each coordinate in the exterior ring of this lat/lon polygon to vectors
           // Ignore any holes in the polygon
