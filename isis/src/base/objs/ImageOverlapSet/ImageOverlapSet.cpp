@@ -86,7 +86,7 @@ namespace Isis {
         cube.open(sns.fileName(i));
       }
       catch (IException &error) {
-        QString msg = "Unable to open cube for se geos::geom::CoordinateArraySequence *llcoords = poly->getExteriorRing()->getCoordinates();rial number [";
+        QString msg = "Unable to open cube for serial number [";
         msg += sns.serialNumber(i) + "] filename [" + sns.fileName(i) + "]";
 
         HandleError(error, &sns, msg);
