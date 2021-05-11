@@ -57,10 +57,10 @@ int main() {
     std::cout << "MinimumThickness = " << ps->MinimumThickness() << std::endl;
     std::cout << "MinimumArea = " << ps->MinimumArea() << std::endl;
 
-    cout << "Test 2, test a square polygon" << endl;
+    std::cout << "Test 2, test a square polygon" << std::endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence *pts;
+      geos::geom::CoordinateArraySequence *pts;
       vector<geos::geom::Geometry *> polys;
 
       // Create the A polygon
@@ -74,7 +74,7 @@ int main() {
       polys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(&polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
@@ -136,7 +136,7 @@ int main() {
     cout << "Test 3, test for too thin" << endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence *pts;
+      geos::geom::CoordinateArraySequence *pts;
       vector<geos::geom::Geometry *> polys;
 
       // Create the A polygon
@@ -150,7 +150,7 @@ int main() {
       polys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(&polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
