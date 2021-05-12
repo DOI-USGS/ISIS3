@@ -21,7 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Blob.h"
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/CoordinateArraySequence.h"
 
 namespace Isis {
 
@@ -230,7 +230,7 @@ namespace Isis {
       }
 
       int numVertices() const {
-        return p_pts->size();
+        return p_pts->getSize();
       }
 
       Blob toBlob() const;
