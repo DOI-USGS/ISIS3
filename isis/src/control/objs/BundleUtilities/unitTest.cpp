@@ -491,8 +491,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "index = " << toString(bo3.index());
     qDebug() << "instrument id = " << bo3.instrumentId();
     qDebug() << "number parameters =     " << toString(bo3.numberParameters());
-    qDebug() << "number position param = " << toString(bo3.numberPositionParameters());
-    qDebug() << "number pointing param = " << toString(bo3.numberPointingParameters());
     qDebug() << "parameter list: " << bo3.parameterList();
     qDebug() << "image names:    " << bo3.imageNames();
 
@@ -620,8 +618,6 @@ int main(int argc, char *argv[]) {
     //obs1 = bov.observationByCubeSerialNumber("obs1");
     //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
     //qDebug() << obs2->formatBundleOutputString(true);
-    qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
-    qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
 
 #if 0

@@ -32,11 +32,10 @@ namespace Isis {
    * Constructs a BundleObservation initialized to a default state.
    */
   BundleObservation::BundleObservation() {
-    m_parameterNamesList.clear();
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
     // m_solveSettings?
-    // m_bundleTargetBody ? 
+    // m_bundleTargetBody ?
   }
 
 
@@ -51,7 +50,6 @@ namespace Isis {
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
-    m_parameterNamesList.clear();
     m_bundleTargetBody = bundleTargetBody;
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
@@ -754,9 +752,6 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
   }//end else
 
-  // Save the list of parameter names we've accumulated above
-  m_parameterNamesList = parameterNamesList;
-
   QString finalqStr = "";
   QString qStr = "";
 
@@ -933,6 +928,88 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   }
 
   return finalqStr;
+}
+
+
+/**
+ * Returns the list of observation parameter names.
+ *
+ * This will always return at least one set of positions and pointings
+ * because we always output at least the center values even when not solving
+ * for them.
+ *
+ * @return @b QStringList List of observation parameter names
+ */
+QStringList BundleObservation::parameterList() {
+  QStringList paramList;
+
+  // We still want to output the center postion even if not solving for it
+  // so always do at least 1
+  int numberCamPosCoefSolved = std::max(
+      solveSettings()->numberCameraPositionCoefficientsSolved(),
+      1);
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("X");
+    }
+    else {
+      QString str = "X(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("Y");
+    }
+    else {
+      QString str = "Y(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamPosCoefSolved; i++) {
+    if (numberCamPosCoefSolved == 1) {
+      paramList.push_back("Z");
+    }
+    else {
+      QString str = "Z(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+
+  // We still want to output the center pointing even if not solving for it
+  // so always do at least 1
+  int numberCamAngleCoefSolved = std::max(
+      solveSettings()->numberCameraAngleCoefficientsSolved(),
+      1);
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("RA");
+    }
+    else {
+      QString str = "RA(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("DEC");
+    }
+    else {
+      QString str = "DEC(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+  for (int i = 0; i < numberCamAngleCoefSolved; i++) {
+    if (numberCamAngleCoefSolved == 1) {
+      paramList.push_back("TWIST");
+    }
+    else {
+      QString str = "TWIST(t" + toString(i) + ")";
+      paramList.push_back(str);
+    }
+  }
+
+  return paramList;
 }
 
 
@@ -1151,9 +1228,6 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     correctionUnitList.append(correctionUnitListRA);
     correctionUnitList.append(correctionUnitListTWI);
 
-    // Save the list of parameter names we've accumulated above
-    m_parameterNamesList = parameterNamesList;
-
     // Set up default values when we are using default position
     QString sigma = "N/A";
     QString adjustedSigma = "N/A";
@@ -1366,16 +1440,16 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
 
   /**
-   * Computes any needed partials for the target body parameters. 
-   *  
+   * Computes any needed partials for the target body parameters.
+   *
    * @param coeffTarget Matrix for target body partial derivatives
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
    * @param bundleSettings The settings for the bundle adjustment
-   * @param bundleTargetBody QSharedPointer to the target body of 
+   * @param bundleTargetBody QSharedPointer to the target body of
    *                         the observation
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeTargetPartials(matrix<double> &coeffTarget, BundleMeasure &measure,
                                                 BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
@@ -1477,19 +1551,19 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
 
   /**
-   * Calculates the sensor partials with respect to the selected 
-   * solve parameters and populates the coeffImage matrix. 
-   * 
-   * @param coeffImage A matrix that will be populated with the 
+   * Calculates the sensor partials with respect to the selected
+   * solve parameters and populates the coeffImage matrix.
+   *
+   * @param coeffImage A matrix that will be populated with the
    *                   sensor partials with respect to the
    *                   specified solve parameters.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                 computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeImagePartials(matrix<double> &coeffImage, BundleMeasure &measure) {
-    coeffImage.clear(); 
+    coeffImage.clear();
 
     Camera *camera = measure.camera();
 
@@ -1573,17 +1647,17 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
   /**
    * Calculates the ground partials for the ground point currently
-   * set in the sensor model. 
-   * 
-   * @param coeffPoint3D A matrix that will be populated with the 
+   * set in the sensor model.
+   *
+   * @param coeffPoint3D A matrix that will be populated with the
    *                     (line, sample) partials with respect to
    *                     the ground point.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * @param coordType Specifies whether latitudinal or (x, y, z) 
+   * @param coordType Specifies whether latitudinal or (x, y, z)
    *                  coordinates are used.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computePoint3DPartials(matrix<double> &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
@@ -1614,19 +1688,19 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
     return true;
   }
-  
+
 
   /**
-   * Calculates the sample, line residuals between the measured 
+   * Calculates the sample, line residuals between the measured
    * focal plane values and the focal plane coordinates calculated
-   * for the ground point by the sensor model. 
-   * 
-   * @param coeffRHS  A vector that will contain the focal plane 
+   * for the ground point by the sensor model.
+   *
+   * @param coeffRHS  A vector that will contain the focal plane
    *                  x, y residuals.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool BundleObservation::computeRHSPartials(boost::numeric::ublas::vector<double> &coeffRHS, BundleMeasure &measure) {
     coeffRHS.clear();
@@ -1663,15 +1737,15 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
 
 
   /**
-   * Converts the observed value from a focal plane coordinate to 
-   * an image sample or line. 
-   * 
-   * @param measure measure The measure that the partials are 
+   * Converts the observed value from a focal plane coordinate to
+   * an image sample or line.
+   *
+   * @param measure measure The measure that the partials are
    *                being computed for.
-   * @param deltaVal The difference between the measured and 
+   * @param deltaVal The difference between the measured and
    *                 calculated focal plane coordinate
-   * 
-   * @return double The The difference between the measured and 
+   *
+   * @return double The The difference between the measured and
    *                calculated (line, sample) coordinate
    */
   double BundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
