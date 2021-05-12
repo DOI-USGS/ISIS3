@@ -122,7 +122,7 @@ int main() {
     cout << "Test 3, test for too thin" << endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinatArraySequence *pts;
+      geos::geom::CoordinateArraySequence *pts;
       vector<geos::geom::Geometry *> polys;
 
       // Create the A polygon
