@@ -45,8 +45,10 @@ namespace Isis {
       virtual AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
 
       // copy method
-      // not implementedn in BundleObservation either???
-//      virtual void copy(const AbstractBundleObservation &src);
+
+      void copy(const AbstractBundleObservation &src);
+
+      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings) = 0;
 
       virtual void append(const BundleImageQsp &value);
 

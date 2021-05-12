@@ -97,8 +97,9 @@ namespace Isis {
    *
    * @return @b bool Returns true if settings were successfully set
    */
-  bool CsmBundleObservation::setSolveSettings(BundleObservationSolveSettingsQsp solveSettings) {
-    m_solveSettings = solveSettings;
+  bool CsmBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
+    m_solveSettings = BundleObservationSolveSettingsQsp(
+                        new BundleObservationSolveSettings(solveSettings));
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
@@ -107,14 +108,14 @@ namespace Isis {
     m_corrections.clear();
     m_adjustedSigmas.clear();
 
-    if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Set) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterSet());
+    if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::Set) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterSet());
     }
-    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Type) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterType());
+    else if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::Type) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterType());
     }
-    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::List) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterList());
+    else if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::List) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterList());
     }
     else {
       return false;

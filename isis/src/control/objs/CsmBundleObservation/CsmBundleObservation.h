@@ -53,7 +53,7 @@ namespace Isis {
       // copy method
       void copy(const CsmBundleObservation &src);
 
-      bool setSolveSettings(BundleObservationSolveSettingsQsp solveSettings);
+      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings);
 
       int numberParameters();
 

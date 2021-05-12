@@ -57,9 +57,9 @@ TEST_F(CSMCameraFixture, CsmBundleOutputString) {
   QString sn = SerialNumber::Compose(*testCube);
 
   BundleImageQsp bi = BundleImageQsp(new BundleImage(testCam, sn, testCube->fileName()));
-  BundleObservationSolveSettingsQsp bundleSolSetting(new BundleObservationSolveSettings());
+  BundleObservationSolveSettings bundleSolSetting;
 
-  bundleSolSetting->setCSMSolveSet(csm::param::ADJUSTABLE);
+  bundleSolSetting.setCSMSolveSet(csm::param::ADJUSTABLE);
 
   CsmBundleObservation observation(bi,
                                    "ObservationNumber",
@@ -116,9 +116,9 @@ TEST_F(CSMCameraFixture, CsmBundleOutputCSVString) {
   QString sn = SerialNumber::Compose(*testCube);
 
   BundleImageQsp bi = BundleImageQsp(new BundleImage(testCam, sn, testCube->fileName()));
-  BundleObservationSolveSettingsQsp bundleSolSetting(new BundleObservationSolveSettings());
+  BundleObservationSolveSettings bundleSolSetting;
 
-  bundleSolSetting->setCSMSolveSet(csm::param::ADJUSTABLE);
+  bundleSolSetting.setCSMSolveSet(csm::param::ADJUSTABLE);
 
   CsmBundleObservation observation(bi,
                                    "ObservationNumber",
@@ -163,7 +163,7 @@ TEST_F(CSMCameraFixture, CsmBundleSetSolveSettings) {
   QString sn = SerialNumber::Compose(*testCube);
 
   BundleImageQsp bi = BundleImageQsp(new BundleImage(testCam, sn, testCube->fileName()));
-  BundleObservationSolveSettingsQsp bundleSolSetting(new BundleObservationSolveSettings());
+  BundleObservationSolveSettings bundleSolSetting;
 
   CsmBundleObservation observation(bi,
                                    "ObservationNumber",
@@ -172,7 +172,7 @@ TEST_F(CSMCameraFixture, CsmBundleSetSolveSettings) {
 
   QStringList paramList;
 
-  bundleSolSetting->setCSMSolveSet(csm::param::ADJUSTABLE);
+  bundleSolSetting.setCSMSolveSet(csm::param::ADJUSTABLE);
 
   ASSERT_TRUE(observation.setSolveSettings(bundleSolSetting));
   ASSERT_EQ(observation.numberParameters(), 2);
@@ -181,7 +181,7 @@ TEST_F(CSMCameraFixture, CsmBundleSetSolveSettings) {
   EXPECT_EQ(paramList[0].toStdString(), "Parameter 1");
   EXPECT_EQ(paramList[1].toStdString(), "Parameter 3");
 
-  bundleSolSetting->setCSMSolveType(csm::param::FIXED);
+  bundleSolSetting.setCSMSolveType(csm::param::FIXED);
 
   ASSERT_TRUE(observation.setSolveSettings(bundleSolSetting));
   ASSERT_EQ(observation.numberParameters(), 1);
@@ -192,7 +192,7 @@ TEST_F(CSMCameraFixture, CsmBundleSetSolveSettings) {
   paramList.clear();
   paramList.push_back("Parameter 2");
   paramList.push_back("Parameter 3");
-  bundleSolSetting->setCSMSolveParameterList(paramList);
+  bundleSolSetting.setCSMSolveParameterList(paramList);
 
   ASSERT_TRUE(observation.setSolveSettings(bundleSolSetting));
   ASSERT_EQ(observation.numberParameters(), 2);
@@ -239,7 +239,7 @@ TEST_F(CSMCameraFixture, CsmBundleApplyParameterCorrections) {
   QString sn = SerialNumber::Compose(*testCube);
 
   BundleImageQsp bi = BundleImageQsp(new BundleImage(testCam, sn, testCube->fileName()));
-  BundleObservationSolveSettingsQsp bundleSolSetting(new BundleObservationSolveSettings());
+  BundleObservationSolveSettings bundleSolSetting;
 
   CsmBundleObservation observation(bi,
                                    "ObservationNumber",
@@ -248,7 +248,7 @@ TEST_F(CSMCameraFixture, CsmBundleApplyParameterCorrections) {
 
   QStringList paramList;
 
-  bundleSolSetting->setCSMSolveSet(csm::param::ADJUSTABLE);
+  bundleSolSetting.setCSMSolveSet(csm::param::ADJUSTABLE);
 
   ASSERT_TRUE(observation.setSolveSettings(bundleSolSetting));
 

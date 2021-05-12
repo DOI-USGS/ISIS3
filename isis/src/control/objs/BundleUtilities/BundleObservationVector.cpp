@@ -103,8 +103,6 @@ namespace Isis {
     AbstractBundleObservationQsp bundleObservation;
     bool addToExisting = false;
 
-    // TODO it looks like this can just become 1 if statement
-
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
@@ -129,6 +127,8 @@ namespace Isis {
       // create new BundleObservation and append to this vector
 
       bool isIsisObservation = true;
+
+      // This NULL check is needed solely for the unit test
       if (bundleImage->camera() != NULL) {
         isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
       }
@@ -166,15 +166,19 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      if (isIsisObservation) {
-        BundleObservation* isisObs = dynamic_cast<BundleObservation*>(observation);
-        isisObs->setSolveSettings(solveSettings);
-        bundleObservation.reset(isisObs);
-      }
-      else {
-//        csmObservation->setSolveSettings(solveSettings); different type
-        bundleObservation.reset(observation);
-      }
+      observation->setSolveSettings(solveSettings);
+      bundleObservation.reset(observation);
+
+//      if (isIsisObservation) {
+//        BundleObservation* isisObs = dynamic_cast<BundleObservation*>(observation);
+//        observation->setSolveSettings(solveSettings);
+//        bundleObservation.reset(isisObs);
+//      }
+//      else {
+//        BundleObservation* csmObs = dynamic_cast<BundleObservation*>(observation);
+//        oservation->setSolveSettings(solveSettings);
+//        bundleObservation.reset(observation);
+//      }
 
       bundleObservation->setIndex(size());
 
