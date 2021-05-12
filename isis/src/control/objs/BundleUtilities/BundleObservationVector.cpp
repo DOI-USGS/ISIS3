@@ -128,7 +128,10 @@ namespace Isis {
     else {
       // create new BundleObservation and append to this vector
 
-      bool isis = bundleImage->camera()->GetCameraType() != Camera::Csm;
+      bool isis = true;
+      if (bundleImage->camera() != NULL) {
+        isis = bundleImage->camera()->GetCameraType() != Camera::Csm;
+      }
 
       BundleObservation *isisObservation = NULL;
       CsmBundleObservation *csmObservation = NULL;
@@ -302,6 +305,3 @@ namespace Isis {
   }
 
 }
-
-
-
