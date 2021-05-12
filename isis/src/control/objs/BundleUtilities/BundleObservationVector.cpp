@@ -101,7 +101,6 @@ namespace Isis {
 
     // TODO it looks like this can just become 1 if statement
 
-    // TODO: this one
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
@@ -109,7 +108,6 @@ namespace Isis {
       addToExisting = true;
     }
 
-    // TODO: also this
     if (addToExisting) {
       // if we have already added a BundleObservation with this number, we have to add the new
       // BundleImage to this observation
@@ -123,7 +121,6 @@ namespace Isis {
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
     }
-    // TODO: and this
     else {
       // create new BundleObservation and append to this vector
 
@@ -304,13 +301,13 @@ namespace Isis {
   }
 
 
-/*  QVector<QSharedPointer<BundleObservation>> BundleObservationVector::getIsisObservations() {
+  QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getIsisObservations() {
     return m_isisObservations;
   }
 
-  QVector<QSharedPointer<BundleObservation>> BundleObservationVector::getCsmObservations() {
+  QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getCsmObservations() {
     return m_csmObservations;
-  }*/
+  }
 
 }
 

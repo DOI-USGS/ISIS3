@@ -73,8 +73,8 @@ namespace Isis {
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();
 
-     QVector<QSharedPointer<CsmBundleObservation>> getCsmObservations();
-     QVector<QSharedPointer<BundleObservation>> getIsisObservations();
+     QVector<QSharedPointer<AbstractBundleObservation>> getCsmObservations();
+     QVector<QSharedPointer<AbstractBundleObservation>> getIsisObservations();
 
 
   private:
