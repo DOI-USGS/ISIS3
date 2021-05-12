@@ -79,12 +79,14 @@ namespace Isis {
      QVector<QSharedPointer<AbstractBundleObservation>> getIsisObservations();
 
   private:
+      void addCsmObservations();
+      void addIsisObservations();
 
       //! Map between observation number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_imageSerialToObservationMap;
-      //! Vectors containing the ISIS and CSM observations
+      //! Vectors for ISIS and CSM observations
       QVector<AbstractBundleObservationQsp> m_csmObservations;
       QVector<AbstractBundleObservationQsp> m_isisObservations;
       //! Map between instrument ID and pointer to observation.

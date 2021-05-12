@@ -439,12 +439,12 @@ namespace Isis {
       // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
       // 
       // TODO!!! - should these initializations just be done when we add the new observation above?
-      m_bundleObservations.initializeExteriorOrientation();
+//      m_bundleObservations.initializeExteriorOrientation();
 
       // TODO
-      if (m_bundleSettings->solveTargetBody()) {
-        m_bundleObservations.initializeBodyRotation();
-      }
+//      if (m_bundleSettings->solveTargetBody()) {
+//        m_bundleObservations.initializeBodyRotation();
+//      }
 
       // set up vector of BundleControlPoints
       int numControlPoints = m_controlNet->GetNumPoints();

@@ -172,7 +172,7 @@ namespace Isis {
         bundleObservation.reset(isisObservation);
       }
       else {
-//        csmObservation->setSolveSettings(solveSettings); doesn't exist
+//        csmObservation->setSolveSettings(solveSettings); different type
         bundleObservation.reset(csmObservation);
       }
 
@@ -184,6 +184,13 @@ namespace Isis {
 
       if (isis) {
         m_isisObservations.append(bundleObservation);
+        QSharedPointer<BundleObservation> isisObs = qSharedPointerDynamicCast<BundleObservation>(bundleObservation);
+        if (bundleImage->camera() != NULL) {
+          isisObs->initializeExteriorOrientation();
+          if (bundleSettings->solveTargetBody()) {
+            isisObs->initializeBodyRotation();
+          }
+        }
       }
       else {
         m_csmObservations.append(bundleObservation);
