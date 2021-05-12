@@ -864,7 +864,7 @@ namespace Isis {
     for (int i = 0; i < paramList.size(); i++) {
       for (int j = 0; j < m_model->getNumParameters(); j++) {
         if (m_model->getParameterName(j) == paramList[i].toStdString()) {
-          parameterIndices.push_back(i);
+          parameterIndices.push_back(j);
         }
       }
     }

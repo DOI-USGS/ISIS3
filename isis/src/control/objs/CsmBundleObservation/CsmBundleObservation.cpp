@@ -635,7 +635,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     QString finalqStr = "";
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
-    for (int i = 0; i < m_paramIndices.size(); i++) {
+    for (size_t i = 0; i < m_paramIndices.size(); i++) {
       double finalValue = csmCamera->getParameterValue(m_paramIndices[i]);
       finalqStr += toString(finalValue - m_corrections[i]) + ",";
       finalqStr += toString(m_corrections[i]) + ",";
