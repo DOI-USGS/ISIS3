@@ -268,9 +268,9 @@ namespace Isis {
     LineManager line(*testCube);
     int pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= testCube->lineCount(); i++) { 
+      for (int i = 1; i <= testCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -294,9 +294,9 @@ namespace Isis {
     line = LineManager(*projTestCube);
     pixelValue = 1;
     for(int band = 1; band <= bands; band++) {
-      for (int i = 1; i <= projTestCube->lineCount(); i++) { 
+      for (int i = 1; i <= projTestCube->lineCount(); i++) {
         line.SetLine(i, band);
-        for (int j = 0; j < line.size(); j++) { 
+        for (int j = 0; j < line.size(); j++) {
           line[j] = (double) (pixelValue % 255);
           pixelValue++;
         }
@@ -605,7 +605,7 @@ namespace Isis {
   void GalileoSsiCube::SetUp() {
     DefaultCube::SetUp();
 
-    // Change default dims 
+    // Change default dims
     PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
     dim.findKeyword("Samples").setValue("800");
     dim.findKeyword("Lines").setValue("800");
@@ -620,7 +620,7 @@ namespace Isis {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue("-77001");
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-    
+
     std::istringstream iss(R"(
       Group = Instrument
         SpacecraftName            = "Galileo Orbiter"
@@ -678,7 +678,7 @@ namespace Isis {
         INS-77001_BORESIGHT_LINE   = 400.0
       End_Object
     )");
-    
+
     PvlObject newNaifKeywords;
     nk >> newNaifKeywords;
     naifKeywords = newNaifKeywords;
@@ -693,8 +693,8 @@ namespace Isis {
     End_Group
     )");
 
-    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive"); 
-    PvlGroup newArchive; 
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive");
+    PvlGroup newArchive;
     ar >> newArchive;
     archive = newArchive;
 
@@ -1056,8 +1056,8 @@ namespace Isis {
 
     FileName newCube(tempDir.path() + "/testing.cub");
 
-    testCube->fromIsd(newCube, label, isd, "rw");    
-    
+    testCube->fromIsd(newCube, label, isd, "rw");
+
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
     kernels["ShapeModel"] = "Null";
@@ -1095,8 +1095,8 @@ namespace Isis {
     bandBin = newBandBin;
 
     json nk;
-    nk["BODY2101955_RADII"] =  {2825, 2675, 254}; 
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0; 
+    nk["BODY2101955_RADII"] =  {2825, 2675, 254};
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0;
     nk["INS"+ikid.toStdString()+"_PIXEL_SIZE"] = 8.5;
     nk["CLOCK_ET_-64_1/0600694569.00000_COMPUTED"] = "8ed6ae8930f3bd41";
     nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.0085, 0.0};
@@ -1105,12 +1105,12 @@ namespace Isis {
     nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, -117.64705882353};
     nk["INS"+ikid.toStdString()+"_CCD_CENTER"] = {511.5, 511.5};
     nk["BODY_FRAME_CODE"] = 2101955;
-    
+
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
     PvlObject newNaifKeywords("NaifKeywords", nk);
     naifKeywords = newNaifKeywords;
 
-    QString fileName = testCube->fileName();  
+    QString fileName = testCube->fileName();
     delete testCube;
     testCube = new Cube(fileName, "rw");
  }
@@ -1283,6 +1283,47 @@ namespace Isis {
 
   void MgsMocCube::TearDown() {
     testCube.reset();
+  }
+
+  void MiniRFNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/miniRFImage/LSZ_00455_1CD_XKU_87S324_V1_S1_Null.crop.cub");
+    testCube2 = new Cube("data/miniRFImage/LSZ_00457_1CD_XKU_87S321_V1_S1_Null.crop.cub");
+    testCube3 = new Cube("data/miniRFImage/LSZ_00459_1CD_XKU_88S327_V1_S1_Null.crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/miniRFImage/Cabeus_Orbit400_withSS_AprioriPts.net");
+    controlNetPath = tempDir.path() + "/miniRFNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void MiniRFNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+
+    if (cubeList) {
+      delete cubeList;
+    }
   }
 
 }

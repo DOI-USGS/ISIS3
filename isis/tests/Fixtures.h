@@ -238,7 +238,7 @@ namespace Isis {
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
 
-  
+
   class OsirisRexCube : public DefaultCube {
     protected:
       void setInstrument(QString ikid, QString instrumentId);
@@ -304,6 +304,22 @@ class HistoryBlob : public TempTestingFiles {
     PvlObject historyPvl;
 
     void SetUp() override;
+};
+
+class MiniRFNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
 };
 }
 
