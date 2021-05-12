@@ -169,17 +169,6 @@ namespace Isis {
       observation->setSolveSettings(solveSettings);
       bundleObservation.reset(observation);
 
-//      if (isIsisObservation) {
-//        BundleObservation* isisObs = dynamic_cast<BundleObservation*>(observation);
-//        observation->setSolveSettings(solveSettings);
-//        bundleObservation.reset(isisObs);
-//      }
-//      else {
-//        BundleObservation* csmObs = dynamic_cast<BundleObservation*>(observation);
-//        oservation->setSolveSettings(solveSettings);
-//        bundleObservation.reset(observation);
-//      }
-
       bundleObservation->setIndex(size());
 
       bundleImage->setParentObservation(bundleObservation);
