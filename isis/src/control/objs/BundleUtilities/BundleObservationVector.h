@@ -73,9 +73,6 @@ namespace Isis {
       QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
   private:
-      void addCsmObservations();
-      void addIsisObservations();
-
       //! Map between observation number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
