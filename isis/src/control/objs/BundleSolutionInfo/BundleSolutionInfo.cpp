@@ -392,6 +392,7 @@ namespace Isis {
   /**
    * @brief Outputs the header for the bundleout_images.csv file
    * @param fpOut The output file stream.
+   * @param observation An observation for the instrument that this header is for.
    * @return True if the write is successful, False otherwise.
    *
    * @internal
@@ -399,7 +400,7 @@ namespace Isis {
    *                           than the other headers. The number of TWIST headers will be the same
    *                           as each of the other angle headers. Fixes #4557.
    */
-  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut) {
+  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut, AbstractBundleObservationQsp observation) {
 
     if (!fpOut) {
       return false;
@@ -415,78 +416,11 @@ namespace Isis {
     outputColumns.push_back("rms,");
     outputColumns.push_back("rms,");
 
-    BundleObservationSolveSettings obsSettings = m_settings->observationSolveSettings(0);
+    QStringList observationParameters = observation->parameterList();
 
-    int numberCamPosCoefSolved = obsSettings.numberCameraPositionCoefficientsSolved();
-    int numberCamAngleCoefSolved  = obsSettings.numberCameraAngleCoefficientsSolved();
-
-    int nCoeff = 1;
-    if (numberCamPosCoefSolved > 0)
-      nCoeff = numberCamPosCoefSolved;
-
-    for (int i = 0; i < nCoeff; i++) {
+    for (int i = 0; i < observationParameters.size(); i++) {
       for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("X,");
-        else {
-          QString str = "X(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1)
-          outputColumns.push_back("Y,");
-        else {
-          QString str = "Y(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < nCoeff; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (nCoeff == 1) {
-          outputColumns.push_back("Z,");
-        }
-        else {
-          QString str = "Z(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-      if (!i)
-        break;
-    }
-
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("RA,");
-        else {
-          QString str = "RA(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1)
-          outputColumns.push_back("DEC,");
-        else {
-          QString str = "DEC(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
-      }
-    }
-    for (int i = 0; i < numberCamAngleCoefSolved; i++) {
-      for (int j = 0; j < 5; j++) {
-        if (numberCamAngleCoefSolved == 1) {
-          outputColumns.push_back("TWIST,");
-        }
-        else {
-          QString str = "TWIST(t" + toString(i) + "),";
-          outputColumns.push_back(str);
-        }
+        outputColumns.push_back(observationParameters[i] + ",");
       }
     }
 
@@ -501,23 +435,13 @@ namespace Isis {
     fpOut << buf;
 
     outputColumns.clear();
-    outputColumns.push_back("Filename,");
 
+    outputColumns.push_back("Filename,");
     outputColumns.push_back("sample res,");
     outputColumns.push_back("line res,");
     outputColumns.push_back("total res,");
 
-    // Initially account for X,Y,Z (3)
-    int nparams = 3;
-    // See how many position coeffients we solved for to make more headers (t0, t1, ...)
-    if (numberCamPosCoefSolved)
-      nparams = 3 * numberCamPosCoefSolved;
-
-    // Initially account for RA,DEC,TWIST (3)
-    int numCameraAnglesSolved = 3;
-    // See how many angle coefficients we solved for to make more headers (t0, t1, ...)
-    nparams += numCameraAnglesSolved*numberCamAngleCoefSolved;
-    for (int i = 0; i < nparams; i++) {
+    for (int i = 0; i < observationParameters.size(); i++) {
       outputColumns.push_back("Initial,");
       outputColumns.push_back("Correction,");
       outputColumns.push_back("Final,");
@@ -1161,82 +1085,113 @@ namespace Isis {
   bool BundleSolutionInfo::outputImagesCSV() {
 
     char buf[1056];
-    int imgIndex = 0;
 
     QList<Statistics> rmsImageSampleResiduals = m_statisticsResults->rmsImageSampleResiduals();
     QList<Statistics> rmsImageLineResiduals = m_statisticsResults->rmsImageLineResiduals();
     QList<Statistics> rmsImageResiduals = m_statisticsResults->rmsImageResiduals();
-
-    QString ofname = "bundleout_images.csv";
-    ofname = m_settings->outputFilePrefix() + ofname;
-    m_csvSavedImagesFilename = ofname;
-
-    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
-    if (!fpOut) {
-      return false;
-    }
-
-
-    AbstractBundleObservationQsp observation;
-
-    int nObservations = m_statisticsResults->observations().size();
-
-    outputImagesCSVHeader(fpOut);
 
     bool errorProp = false;
     if (m_statisticsResults->converged() && m_settings->errorPropagation()) {
       errorProp = true;
     }
 
-    for (int i = 0; i < nObservations;i++ ) {
-      observation = m_statisticsResults->observations().at(i);
+    QList<QString> outputCsvFileNames;
+    QList<QString> instrumentIds = m_statisticsResults->observations().instrumentIds();
+    // If there's just a single instrumentId just call it bundleout_images.csv
+    if (instrumentIds.size() == 1) {
+      QString ofname = "bundleout_images.csv";
+      ofname = m_settings->outputFilePrefix() + ofname;
+      m_csvSavedImagesFilename = ofname;
+      outputCsvFileNames.push_back(ofname);
+    }
+    // Otherwise append the instrument IDs so it's bundleout_images_spacecraft_sensor.csv
+    else {
+      for (int i = 0; i < instrumentIds.size(); i++) {
+        QString updatedInstrumentId = instrumentIds[i];
+        // Replace and "/" or " " characters with "_" to make the filename safer
+        // This line must be separate to avoid modifying the instrumentId in the list
+        // we will iterate over later
+        updatedInstrumentId.replace("/", "_").replace(" ", "_");
+        QString ofname = "bundleout_images_" + updatedInstrumentId + ".csv";
+        ofname = m_settings->outputFilePrefix() + ofname;
+        m_csvSavedImagesFilename = ofname;
+        outputCsvFileNames.push_back(ofname);
+      }
+    }
 
-      if(!observation) {
-        continue;
+    for (int i = 0; i < instrumentIds.size(); i++) {
+
+      std::ofstream fpOut(outputCsvFileNames[i].toLatin1().data(), std::ios::out);
+      if (!fpOut) {
+        return false;
       }
 
-      int numImages = observation->size();
+      QList<AbstractBundleObservationQsp> observations =
+          m_statisticsResults->observations().observationsByInstId(instrumentIds[i]);
 
-      for (int j = 0; j < numImages; j++) {
+      int nObservations = observations.size();
 
-        BundleImageQsp image = observation->at(j);
+      outputImagesCSVHeader(fpOut, observations.front());
 
 
-        sprintf(buf, "%s", image->fileName().toLatin1().data());
-        fpOut << buf;
-        sprintf(buf,",");
-        fpOut << buf;
 
-        fpOut << toString(rmsImageSampleResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
+      for (int j = 0; j < nObservations; j++ ) {
+        AbstractBundleObservationQsp observation = observations[j];
 
-        fpOut << toString(rmsImageLineResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
-
-        fpOut << toString(rmsImageResiduals[imgIndex].Rms()).toLatin1().data();
-        sprintf(buf,",");
-        fpOut << buf;
-
-        QString observationString =
-            observation->bundleOutputCSV(errorProp);
-
-        //Removes trailing commas
-        if (observationString.right(1)==",") {
-            observationString.truncate(observationString.length()-1);
+        if(!observation) {
+          continue;
         }
 
-        fpOut << (const char*) observationString.toLatin1().data();
+        int numImages = observation->size();
 
-        sprintf(buf,"\n");
-        fpOut << buf;
-        imgIndex++;
+        for (int k = 0; k < numImages; k++) {
 
+          BundleImageQsp image = observation->at(k);
+
+          // TODO this is a bad linear search, can we change the rms vectors to maps?
+          int observationIndex = m_statisticsResults->observations().indexOf(observation);
+          int imgIndex = k; // Start at k to account for the images in this observation
+          // Accumulate all of the images from previous observations
+          for (int obsIndex = 0; obsIndex < observationIndex; obsIndex++) {
+            imgIndex += m_statisticsResults->observations().at(obsIndex)->size();
+          }
+
+          sprintf(buf, "%s", image->fileName().toLatin1().data());
+          fpOut << buf;
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageSampleResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageLineResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          fpOut << toString(rmsImageResiduals[imgIndex].Rms()).toLatin1().data();
+          sprintf(buf,",");
+          fpOut << buf;
+
+          QString observationString =
+              observation->bundleOutputCSV(errorProp);
+
+          //Removes trailing commas
+          if (observationString.right(1)==",") {
+              observationString.truncate(observationString.length()-1);
+          }
+
+          fpOut << (const char*) observationString.toLatin1().data();
+
+          sprintf(buf,"\n");
+          fpOut << buf;
+          imgIndex++;
+
+        }
       }
-  }
+      fpOut.close();
+    }
 
-    fpOut.close();
     return true;
   }
 

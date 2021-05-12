@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleObservationVector.h"
 
+#include <algorithm>
+
 #include <QDebug>
 
 #include "AbstractBundleObservation.h"
@@ -36,6 +38,7 @@ namespace Isis {
       :QVector<AbstractBundleObservationQsp>(src) {
     m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
     m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+    m_instIdToObservationMap = src.m_instIdToObservationMap;
   }
 
 
@@ -63,6 +66,7 @@ namespace Isis {
       QVector<AbstractBundleObservationQsp>::operator=(src);
       m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
       m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+      m_instIdToObservationMap = src.m_instIdToObservationMap;
     }
     return *this;
   }
@@ -165,7 +169,7 @@ namespace Isis {
         bundleObservation.reset(isisObservation);
       }
       else {
-//        csmObservation->setSolveSettings(solveSettings); doesn't exsit in my PR at least
+//        csmObservation->setSolveSettings(solveSettings); doesn't exist
         bundleObservation.reset(csmObservation);
       }
 
@@ -187,57 +191,20 @@ namespace Isis {
 
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
+
+      // update instrument ID to observation ptr map
+      // separate held observations out into their own entry
+      if (bundleObservation->numberParameters() == 0) {
+        m_instIdToObservationMap.insertMulti("held", bundleObservation);
+      }
+      else {
+        m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
+      }
+
     }
     return bundleObservation;
   }
 
-  // TODO: if we break API anyway just remove this
-  /**
-   * Accesses the number of ISIS position parameters for the
-   * contained BundleObservations.
-   *
-   * @return @b int Returns the total number of position parameters for the BundleObservations
-   */
-  int BundleObservationVector::numberPositionParameters() {
-    int positionParameters = 0;
-
-    // loop over isis observations 
-    for (int i = 0; i < m_isisObservations.size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
-      positionParameters += observation->numberPositionParameters();
-    }
-    return positionParameters;
-  }
-
-
-  // TODO: if we break API anyway just remove this
-  /**
-   * Accesses the number of ISIS pointing parameters for the
-   * contained BundleObservations.
-   *
-   * @return @b int Returns the total number of pointing parameters for the BundleObservations
-   */
-  int BundleObservationVector::numberPointingParameters() {
-    int pointingParameters = 0;
-
-    // loop over just isis observations
-    for (int i = 0; i < m_isisObservations.size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
-      pointingParameters += observation->numberPointingParameters();
-    }
-    return pointingParameters;
-  }
-
-
-  int BundleObservationVector::numberCsmParameters() {
-    int parameters = 0;
-    
-    for (int i = 0; i < m_csmObservations.size(); i++) {
-      QSharedPointer<CsmBundleObservation> observation = qSharedPointerDynamicCast<CsmBundleObservation>( m_csmObservations.at(i) );
-       parameters += observation->numberParameters();
-    }
-    return parameters;
-  }
 
   /**
    * Returns the sum of the position parameters and pointing parameters for the contained
@@ -246,7 +213,12 @@ namespace Isis {
    * @return @b int Returns the total number of parameters for the contained BundleObservations
    */
   int BundleObservationVector::numberParameters() {
-    return numberPositionParameters() + numberPointingParameters() + numberCsmParameters();
+    int numParameters = 0;
+
+    for (int i = 0; i < size(); i++) {
+      numParameters += at(i)->numberParameters();
+    }
+    return numParameters;
   }
 
 
@@ -268,6 +240,26 @@ namespace Isis {
       bundleObservation = m_imageSerialToObservationMap.value(cubeSerialNumber);
 
     return bundleObservation;
+  }
+
+
+  /**
+   * Get a list of all instrument IDs that there are observations for
+   */
+  QList<QString> BundleObservationVector::instrumentIds() const {
+    return m_instIdToObservationMap.uniqueKeys();
+  }
+
+
+  /**
+   * Get all of the observations with a specific instrument ID
+   */
+  QList<AbstractBundleObservationQsp> BundleObservationVector::
+      observationsByInstId(QString instrumentId) const {
+    QList<AbstractBundleObservationQsp> list = m_instIdToObservationMap.values(instrumentId);
+    // multimap returns them in reverse order they were put in, so invert them to preserve order
+    std::reverse(std::begin(list), std::end(list));
+    return list;
   }
 
 

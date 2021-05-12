@@ -9,7 +9,9 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <QList>
 #include <QMap>
+#include <QMultiMap>
 #include <QSharedPointer>
 #include <QString>
 #include <QVector>
@@ -63,19 +65,18 @@ namespace Isis {
                                           QString instrumentId,
                                           BundleSettingsQsp bundleSettings);
 
-      int numberPositionParameters();
-      int numberPointingParameters();
-      int numberCsmParameters();
       int numberParameters();
 
       AbstractBundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
+
+      QList<QString> instrumentIds() const;
+      QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();
 
      QVector<QSharedPointer<AbstractBundleObservation>> getCsmObservations();
      QVector<QSharedPointer<AbstractBundleObservation>> getIsisObservations();
-
 
   private:
       void addCsmObservations();
@@ -85,8 +86,11 @@ namespace Isis {
       QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_imageSerialToObservationMap;
+      //! Vectors containing the ISIS and CSM observations
       QVector<AbstractBundleObservationQsp> m_csmObservations;
       QVector<AbstractBundleObservationQsp> m_isisObservations;
+      //! Map between instrument ID and pointer to observation.
+      QMultiMap<QString, AbstractBundleObservationQsp> m_instIdToObservationMap;
   };
 }
 
