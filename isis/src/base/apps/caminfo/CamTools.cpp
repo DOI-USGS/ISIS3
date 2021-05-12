@@ -317,9 +317,9 @@ namespace Isis {
         poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1,
             increasePrecision);
         geos::geom::MultiPolygon *multiP = poly.Polys();
-        _polys.push_back(multiP->clone());
+        _polys.push_back(multiP->clone().release());
         if(_combined == 0) {
-          _combined = multiP->clone();
+          _combined = multiP->clone().release();
         }
         else {
           //  Construct composite (union) polygon
@@ -336,8 +336,8 @@ namespace Isis {
         // Read the footprint from the image labels
         ImagePolygon poly = cube.readFootprint();
         geos::geom::MultiPolygon *multiP = poly.Polys();
-        _polys.push_back(multiP->clone());
-        _combined = multiP->clone();
+        _polys.push_back(multiP->clone().release());
+        _combined = multiP->clone().release();
         _mapping = getProjGeometry(camera, multiP, g);
       }
 
