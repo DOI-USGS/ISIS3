@@ -1212,7 +1212,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawScconfig) {
       Spacecraft_position_sigma=1000.0
       Camera_Angles_Sigma=2.0
     EndGroup
-    Group = "LUNARRECONNAISSANCEORBITER/NACL"
+    Group = "LUNARRECONNAISSANCEORBITER/NACR"
       CamSolve=accelerations
       Twist=yes
       OverExisting=yes
@@ -1254,7 +1254,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawScconfig) {
      FAIL() << "Failed to bundle: " << e.what() << std::endl;
    }
 
-   CSVReader header = CSVReader(prefix.path() + "/scconfig_bundleout_images.csv",
+   CSVReader header = CSVReader(prefix.path()+"/scconfig_bundleout_images.csv",
                       false, 0, ',', false, true);
 
    // Cube 1
@@ -1324,7 +1324,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawScconfigHeld) {
       Spacecraft_position_sigma=1000.0
       Camera_Angles_Sigma=2.0
     EndGroup
-    Group = "LUNARRECONNAISSANCEORBITER/NACL"
+    Group = "LUNARRECONNAISSANCEORBITER/NACR"
       CamSolve=accelerations
       Twist=yes
       OverExisting=yes
@@ -1366,10 +1366,28 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawScconfigHeld) {
    FAIL() << "Failed to bundle: " << e.what() << std::endl;
  }
 
- CSVReader header = CSVReader(prefix.path() + "/bundleout_images.csv",
+ CSVReader heldHeader = CSVReader(prefix.path() + "/bundleout_images_held.csv",
                               false, 0, ',', false, true);
 
- CSVReader::CSVAxis csvLine = header.getRow(7);
+ CSVReader::CSVAxis csvLine = heldHeader.getRow(2);
+ // sample res
+ EXPECT_NEAR(csvLine[1].toDouble(), 7.75E-10, 0.0001);
+ // line res
+ EXPECT_NEAR(csvLine[2].toDouble(), 6.87E-10, 0.0001);
+ // total res
+ EXPECT_NEAR(csvLine[3].toDouble(), 7.32E-10, 0.0001);
+ // final X
+ EXPECT_NEAR(csvLine[6].toDouble(), 657.4955708, 0.0001);
+ // final Y
+ EXPECT_NEAR(csvLine[11].toDouble(), 1126.218168, 0.0001);
+ // final Z
+ EXPECT_NEAR(csvLine[16].toDouble(), 1301.314774, 0.0001);
+ // final RA
+ EXPECT_NEAR(csvLine[21].toDouble(), 118.2110421, 0.0001);
+ // final DEC
+ EXPECT_NEAR(csvLine[26].toDouble(), 53.3173841, 0.0001);
+ // final TWIST
+ EXPECT_NEAR(csvLine[31].toDouble(), -150.2844053, 0.0001);
 
  // assert corrections are very small
  // X Correction
@@ -1384,6 +1402,30 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawScconfigHeld) {
  EXPECT_LE(std::abs(csvLine[25].toDouble()), 1e-10);
  // TWIST Correction
  EXPECT_LE(std::abs(csvLine[30].toDouble()), 1e-10);
+
+
+ CSVReader header = CSVReader(prefix.path() + "/bundleout_images_APOLLO15_METRIC.csv",
+                              false, 0, ',', false, true);
+ csvLine = header.getRow(7);
+
+ // sample res
+ EXPECT_NEAR(csvLine[1].toDouble(), 25.14815953, 0.0001);
+ // line res
+ EXPECT_NEAR(csvLine[2].toDouble(), 25.09472279, 0.0001);
+ // total res
+ EXPECT_NEAR(csvLine[3].toDouble(), 25.12145537, 0.0001);
+ // final X
+ EXPECT_NEAR(csvLine[6].toDouble(), 489.9720415, 0.0001);
+ // final Y
+ EXPECT_NEAR(csvLine[11].toDouble(), 1197.738961, 0.0001);
+ // final Z
+ EXPECT_NEAR(csvLine[16].toDouble(), 1313.318673, 0.0001);
+ // final RA
+ EXPECT_NEAR(csvLine[21].toDouble(), 159.2335927, 0.0001);
+ // final DEC
+ EXPECT_NEAR(csvLine[26].toDouble(), 84.61360831, 0.0001);
+ // final TWIST
+ EXPECT_NEAR(csvLine[31].toDouble(), -178.2983689, 0.0001);
 }
 
 // These tests exercise the bundle adjustment of images from the MiniRF radar
