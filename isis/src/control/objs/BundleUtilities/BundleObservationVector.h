@@ -72,12 +72,6 @@ namespace Isis {
       QList<QString> instrumentIds() const;
       QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
-      bool initializeExteriorOrientation();
-      bool initializeBodyRotation();
-
-     QVector<QSharedPointer<AbstractBundleObservation>> getCsmObservations();
-     QVector<QSharedPointer<AbstractBundleObservation>> getIsisObservations();
-
   private:
       void addCsmObservations();
       void addIsisObservations();
@@ -86,9 +80,6 @@ namespace Isis {
       QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_imageSerialToObservationMap;
-      //! Vectors for ISIS and CSM observations
-      QVector<AbstractBundleObservationQsp> m_csmObservations;
-      QVector<AbstractBundleObservationQsp> m_isisObservations;
       //! Map between instrument ID and pointer to observation.
       QMultiMap<QString, AbstractBundleObservationQsp> m_instIdToObservationMap;
   };

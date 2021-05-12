@@ -128,28 +128,27 @@ namespace Isis {
     else {
       // create new BundleObservation and append to this vector
 
-      bool isis = true;
+      bool isIsisObservation = true;
       if (bundleImage->camera() != NULL) {
-        isis = bundleImage->camera()->GetCameraType() != Camera::Csm;
+        isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
       }
 
-      BundleObservation *isisObservation = NULL;
-      CsmBundleObservation *csmObservation = NULL;
+      AbstractBundleObservation *observation = NULL;
 
-      if (isis) {
-        isisObservation = new BundleObservation(bundleImage,
-                                                observationNumber,
-                                                instrumentId,
-                                                bundleSettings->bundleTargetBody());
+      if (isIsisObservation) {
+        observation = new BundleObservation(bundleImage,
+                                            observationNumber,
+                                            instrumentId,
+                                            bundleSettings->bundleTargetBody());
       }
       else {
-        csmObservation = new CsmBundleObservation(bundleImage,
-                                                  observationNumber,
-                                                  instrumentId,
-                                                  bundleSettings->bundleTargetBody());
+        observation = new CsmBundleObservation(bundleImage,
+                                               observationNumber,
+                                               instrumentId,
+                                               bundleSettings->bundleTargetBody());
       }
 
-      if (!isisObservation && !csmObservation) {
+      if (!observation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -167,13 +166,14 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      if (isis) {
-        isisObservation->setSolveSettings(solveSettings);
-        bundleObservation.reset(isisObservation);
+      if (isIsisObservation) {
+        BundleObservation* isisObs = dynamic_cast<BundleObservation*>(observation);
+        isisObs->setSolveSettings(solveSettings);
+        bundleObservation.reset(isisObs);
       }
       else {
 //        csmObservation->setSolveSettings(solveSettings); different type
-        bundleObservation.reset(csmObservation);
+        bundleObservation.reset(observation);
       }
 
       bundleObservation->setIndex(size());
@@ -182,18 +182,15 @@ namespace Isis {
 
       append(bundleObservation);
 
-      if (isis) {
-        m_isisObservations.append(bundleObservation);
+      if (isIsisObservation) {
         QSharedPointer<BundleObservation> isisObs = qSharedPointerDynamicCast<BundleObservation>(bundleObservation);
+        // This check is needed for the current unit test
         if (bundleImage->camera() != NULL) {
           isisObs->initializeExteriorOrientation();
           if (bundleSettings->solveTargetBody()) {
             isisObs->initializeBodyRotation();
           }
         }
-      }
-      else {
-        m_csmObservations.append(bundleObservation);
       }
 
       // update observation number to observation ptr map
@@ -271,58 +268,4 @@ namespace Isis {
     std::reverse(std::begin(list), std::end(list));
     return list;
   }
-
-
-  /**
-   * Initializes the exterior orientations for the contained ISIS
-   * BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
-   */
-  bool BundleObservationVector::initializeExteriorOrientation() {
-    // just do it for ISIS observations
-    for (int i = 0; i < m_isisObservations.size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
-      observation->initializeExteriorOrientation();
-    }
-    return true;
-  }
-
-
-  /**
-   * Initializes the body rotations for the contained BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
-   */
-  bool BundleObservationVector::initializeBodyRotation() {
-    for (int i = 0; i < m_isisObservations.size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
-      observation->initializeBodyRotation();
-    }
-    return true;
-  }
-
-  /**
-   * Returns a QVector of ISIS Observations only
-   * 
-   * @return 
-   *         QVector&lt;QSharedPointer&lt;AbstractBundleObservation&gt;&gt;
-   *         Vector of ISIS observations
-   */
-  QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getIsisObservations() {
-    return m_isisObservations;
-  }
-
-
-  /**
-   * Returns a QVector of CSM Observations only
-   * 
-   * @return 
-   *         QVector&lt;QSharedPointer&lt;AbstractBundleObservation&gt;&gt;
-   *         Vector of CSM observations
-   */
-  QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getCsmObservations() {
-    return m_csmObservations;
-  }
-
 }
