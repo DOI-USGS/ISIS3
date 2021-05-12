@@ -501,9 +501,7 @@ TWI  (dd)          0.00000000            0.00000000               0.00000000    
 index =  "1"
 instrument id =  "InstrumentId2"
 number parameters =      "3"
-number position param =  "0"
-number pointing param =  "3"
-parameter list:  ()
+parameter list:  ("X", "Y", "Z", "RA", "DEC", "TWIST")
 image names:     ()
 parameter weights :     0.0     0.0     0.0     
 parameter corrections : 0.0     0.0     0.0     
@@ -539,8 +537,6 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleObservationVector...
 
-number of position parameters:  "0"
-number of pointing parameters:  "0"
 number of parameters:  "0"
 init exterior orientiation successful?   "Yes"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

@@ -611,7 +611,7 @@ namespace Isis {
   * sample WRT y
   * sample WRT z
   *
-  * @return @b std::vector<double> The partial derivatives of the 
+  * @return @b std::vector<double> The partial derivatives of the
   *                                sample, line with respect to
   *                                the ground coordinate.
   */
@@ -634,7 +634,7 @@ namespace Isis {
   *
   * @param groundPoint The ground point to compute the partials at
   *
-  * @return @b std::vector<double> The partial derivatives of the 
+  * @return @b std::vector<double> The partial derivatives of the
   *                                sample, line with respect to
   *                                the ground coordinate.
   */
@@ -864,7 +864,7 @@ namespace Isis {
     for (int i = 0; i < paramList.size(); i++) {
       for (int j = 0; j < m_model->getNumParameters(); j++) {
         if (m_model->getParameterName(j) == paramList[i].toStdString()) {
-          parameterIndices.push_back(i);
+          parameterIndices.push_back(j);
         }
       }
     }
@@ -894,14 +894,14 @@ namespace Isis {
     return m_model->getParameterCovariance(index1, index2);
   }
 
-  
+
   vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
     // csm::SensorPartials holds (line, sample) in order for each parameter
    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
    std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
    vector<double> partialsVector = {partials.first, partials.second};
 
-   return partialsVector; 
+   return partialsVector;
   }
 
 

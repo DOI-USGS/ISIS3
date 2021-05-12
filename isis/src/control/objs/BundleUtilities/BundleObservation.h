@@ -132,6 +132,8 @@ namespace Isis {
 
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
 
+      virtual QStringList parameterList();
+
       bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody);
       bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure);
       bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType);
