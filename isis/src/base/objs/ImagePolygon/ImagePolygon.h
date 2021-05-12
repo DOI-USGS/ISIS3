@@ -269,7 +269,7 @@ namespace Isis {
 
       Brick *p_brick;     //!< Used to check for valid DNs
 
-      geos::geom::CoordinateSequence *p_pts; //!< The sequence of coordinates that compose the boundry of the image
+      geos::geom::CoordinateArraySequence *p_pts; //!< The sequence of coordinates that compose the boundary of the image
 
       geos::geom::MultiPolygon *p_polygons;  //!< The multipolygon of the image
 
