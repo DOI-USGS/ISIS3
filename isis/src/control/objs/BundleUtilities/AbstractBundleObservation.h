@@ -94,7 +94,7 @@ namespace Isis {
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
       QStringList m_parameterNamesList; //!< List of all cube parameters.
       QStringList m_imageNames;         //!< List of all cube names.
-      QString m_instrumentId;      //!< Spacecraft instrument id.
+      QString m_instrumentId;           //!< Spacecraft instrument id.
 
       // TODO??? change these to LinearAlgebra vectors...
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.

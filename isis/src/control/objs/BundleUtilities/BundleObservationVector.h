@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleImage.h"
 #include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "CsmBundleObservation.h"
 #include "BundleSettings.h"
 
 namespace Isis {
@@ -64,6 +65,7 @@ namespace Isis {
 
       int numberPositionParameters();
       int numberPointingParameters();
+      int numberCsmParameters();
       int numberParameters();
 
       AbstractBundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
@@ -71,16 +73,20 @@ namespace Isis {
       bool initializeExteriorOrientation();
       bool initializeBodyRotation();
 
-      // To add: 
-      // getCsmObservations()
-      // getIsisObservations()
-      // addNewIsis()?
+     QVector<QSharedPointer<CsmBundleObservation>> getCsmObservations();
+     QVector<QSharedPointer<BundleObservation>> getIsisObservations();
+
 
   private:
+      void addCsmObservations();
+      void addIsisObservations();
+
       //! Map between observation number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
       QMap<QString, AbstractBundleObservationQsp> m_imageSerialToObservationMap;
+      QVector<AbstractBundleObservationQsp> m_csmObservations;
+      QVector<AbstractBundleObservationQsp> m_isisObservations;
   };
 }
 

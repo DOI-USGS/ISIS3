@@ -12,6 +12,8 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "Camera.h"
+#include "CsmBundleObservation.h"
 #include "IException.h"
 
 namespace Isis {
@@ -98,6 +100,8 @@ namespace Isis {
     bool addToExisting = false;
 
     // TODO it looks like this can just become 1 if statement
+
+    // TODO: this one
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
@@ -105,6 +109,7 @@ namespace Isis {
       addToExisting = true;
     }
 
+    // TODO: also this
     if (addToExisting) {
       // if we have already added a BundleObservation with this number, we have to add the new
       // BundleImage to this observation
@@ -113,20 +118,34 @@ namespace Isis {
       bundleImage->setParentObservation(bundleObservation);
 
       // updateo observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
+      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
     }
+    // TODO: and this
     else {
       // create new BundleObservation and append to this vector
-      BundleObservation *isisObservation = new BundleObservation(bundleImage,
-                                                                 observationNumber,
-                                                                 instrumentId,
-                                                                 bundleSettings->bundleTargetBody());
 
+      bool isis = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
-      if (!isisObservation) {
+      BundleObservation *isisObservation = NULL;
+      CsmBundleObservation *csmObservation = NULL;
+
+      if (isis) {
+        isisObservation = new BundleObservation(bundleImage,
+                                                observationNumber,
+                                                instrumentId,
+                                                bundleSettings->bundleTargetBody());
+      }
+      else {
+        csmObservation = new CsmBundleObservation(bundleImage,
+                                                  observationNumber,
+                                                  instrumentId,
+                                                  bundleSettings->bundleTargetBody());
+      }
+
+      if (!isisObservation && !csmObservation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -144,15 +163,27 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      isisObservation->setSolveSettings(solveSettings);
-
-      bundleObservation.reset(isisObservation);
+      if (isis) {
+        isisObservation->setSolveSettings(solveSettings);
+        bundleObservation.reset(isisObservation);
+      }
+      else {
+//        csmObservation->setSolveSettings(solveSettings); doesn't exsit in my PR at least
+        bundleObservation.reset(csmObservation);
+      }
 
       bundleObservation->setIndex(size());
 
       bundleImage->setParentObservation(bundleObservation);
 
       append(bundleObservation);
+
+      if (isis) {
+        m_isisObservations.append(bundleObservation);
+      }
+      else {
+        m_csmObservations.append(bundleObservation);
+      }
 
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
@@ -162,10 +193,6 @@ namespace Isis {
     }
     return bundleObservation;
   }
-
-  // addnewIsis vs. CSM?
-  // getCsmObservations()
-  // getIsisObservations()
 
   // TODO: if we break API anyway just remove this
   /**
@@ -178,13 +205,11 @@ namespace Isis {
     int positionParameters = 0;
 
     // loop over isis observations 
-    for (int i = 0; i < size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
+    for (int i = 0; i < m_isisObservations.size(); i++) {
+      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
       positionParameters += observation->numberPositionParameters();
     }
-
     return positionParameters;
-    // return 0 only CSM observations
   }
 
 
@@ -199,14 +224,23 @@ namespace Isis {
     int pointingParameters = 0;
 
     // loop over just isis observations
-    for (int i = 0; i < size(); i++) {
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
+    for (int i = 0; i < m_isisObservations.size(); i++) {
+      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
       pointingParameters += observation->numberPointingParameters();
     }
     return pointingParameters;
-    // return 0 only CSM observations
   }
 
+
+  int BundleObservationVector::numberCsmParameters() {
+    int parameters = 0;
+    
+    for (int i = 0; i < m_csmObservations.size(); i++) {
+      QSharedPointer<CsmBundleObservation> observation = qSharedPointerDynamicCast<CsmBundleObservation>( m_csmObservations.at(i) );
+       parameters += observation->numberParameters();
+    }
+    return parameters;
+  }
 
   /**
    * Returns the sum of the position parameters and pointing parameters for the contained
@@ -215,8 +249,7 @@ namespace Isis {
    * @return @b int Returns the total number of parameters for the contained BundleObservations
    */
   int BundleObservationVector::numberParameters() {
-    //TODO: change this to include CSM parameters
-    return numberPositionParameters() + numberPointingParameters();
+    return numberPositionParameters() + numberPointingParameters() + numberCsmParameters();
   }
 
 
@@ -248,13 +281,9 @@ namespace Isis {
    * @return @b bool Returns true upon successful initialization
    */
   bool BundleObservationVector::initializeExteriorOrientation() {
-    // get isis observations
-    // get csm observations 
-    int nObservations = size();
     // just do it for ISIS observations
-    for (int i = 0; i < nObservations; i++) {
-      // TODO: how to only do this if ISIS observations
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
+    for (int i = 0; i < m_isisObservations.size(); i++) {
+      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
       observation->initializeExteriorOrientation();
     }
     return true;
@@ -267,13 +296,23 @@ namespace Isis {
    * @return @b bool Returns true upon successful initialization
    */
   bool BundleObservationVector::initializeBodyRotation() {
-    int nObservations = size();
-    //TODO: just do it for ISIS observations
-    for (int i = 0; i < nObservations; i++) {
-    QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
+    for (int i = 0; i < m_isisObservations.size(); i++) {
+      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( m_isisObservations.at(i) );
       observation->initializeBodyRotation();
     }
-
     return true;
   }
+
+
+/*  QVector<QSharedPointer<BundleObservation>> BundleObservationVector::getIsisObservations() {
+    return m_isisObservations;
+  }
+
+  QVector<QSharedPointer<BundleObservation>> BundleObservationVector::getCsmObservations() {
+    return m_csmObservations;
+  }*/
+
 }
+
+
+
