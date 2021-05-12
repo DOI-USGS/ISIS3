@@ -295,11 +295,25 @@ namespace Isis {
     return true;
   }
 
-
+  /**
+   * Returns a QVector of ISIS Observations only
+   * 
+   * @return 
+   *         QVector&lt;QSharedPointer&lt;AbstractBundleObservation&gt;&gt;
+   *         Vector of ISIS observations
+   */
   QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getIsisObservations() {
     return m_isisObservations;
   }
 
+
+  /**
+   * Returns a QVector of CSM Observations only
+   * 
+   * @return 
+   *         QVector&lt;QSharedPointer&lt;AbstractBundleObservation&gt;&gt;
+   *         Vector of CSM observations
+   */
   QVector<QSharedPointer<AbstractBundleObservation>> BundleObservationVector::getCsmObservations() {
     return m_csmObservations;
   }
