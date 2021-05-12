@@ -656,7 +656,7 @@ namespace Isis {
       if (polygon != NULL) {
         // pix area = screenpix^2 / scale^2
         m_pixArea = polygon->getArea() / pow(cvp->scale(), 2);
-        geos::geom::Point *center = polygon->getCentroid();
+        geos::geom::Point *center = polygon->getCentroid().release();
         double line, sample;
         cvp->viewportToCube((int)center->getX(), (int)center->getY(), sample, line);
 

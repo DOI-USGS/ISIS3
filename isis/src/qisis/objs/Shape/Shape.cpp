@@ -655,7 +655,7 @@ namespace Isis {
         _FILEINFO_);
     e.print();
 
-    return PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone());
+    return PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone().release());
   }
 
 
@@ -814,7 +814,7 @@ namespace Isis {
 
   void Shape::initQuickFootprint() {
     ImagePolygon poly = cube()->readFootprint();
-    m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
+    m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone().release());
   }
 
 
@@ -1062,7 +1062,7 @@ namespace Isis {
       geos::io::WKTReader wktReader(*globalFactory);
       try {
         m_shape->m_footprint = PolygonTools::MakeMultiPolygon(
-            wktReader.read(m_characters.toStdString()));
+            wktReader.read(m_characters.toStdString()).release());
       }
       catch (IException &e) {
         e.print();
