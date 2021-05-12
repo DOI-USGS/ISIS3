@@ -12,9 +12,9 @@ find files of those names at the top level of this repository. **/
 #include <QPointF>
 #include <QScopedPointer>
 
-#include <geos/geom/CoordinateArraySequence.h> 
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/CoordinateSequence.h>
-#include <geos/geom/LineString.h> 
+#include <geos/geom/LineString.h>
 #include <geos/geom/MultiPolygon.h>
 #include <geos/geom/Polygon.h>
 
@@ -44,23 +44,23 @@ namespace Isis {
 
   /**
    * @brief Produces an fov for the given line sample.
-   * 
+   *
    * This produces instantaneous fovs at several times during a pixel's exposure.
    * Then, it combines those instantaneous fovs into a full fov for the entire duration of
    * the pixel.  By default produces an instantaneous fov.  A full fov can be produced by
    * using numIfovs > 1.
-   * 
+   *
    * @param camera A pointer to the cube's camera.
    * @param sample The sample of the pixel.
    * @param line The line of the pixel.
    * @param numIfovs The number of instantaneous fovs that will be combined.
    *                 Defaults to 1, ie. an instantaneous fov.
-   * 
+   *
    * @return @b QList<QList<QPointF>> A list of points defining the boundary of the full fov.
    *                                  If the pixel crosses the 360/0 boundary, this
    *                                  will contain 2 lists of points, one on each side of the
    *                                  boundary.
-   * 
+   *
    * @throws IException::Programmer "The number of instantaneous field of views must be a
    *                                 positive integer."
    */
@@ -76,7 +76,7 @@ namespace Isis {
     // average longitude less than 180.  upperVertices contains the rest.
     QList<QPointF> lowerVertices;
     QList<QPointF> upperVertices;
-    
+
 
     if (numIfovs < 1) {
       QString msg = "The number of instantaneous field of views must be a positive integer.";
@@ -178,11 +178,11 @@ namespace Isis {
    * is set to.  By default the fov will be defined by the four corner points of the pixel,
    * but individual camera models may override this in Camera::PixelIfovOffsets().
    * The longitude coordinates will always been in 0-360 domain.
-   * 
+   *
    * @param camera The camera used to compute the fov.
-   * 
+   *
    * @return @b QList<QPointF> The lat, lon points defining the boundary of the fov.
-   * 
+   *
    * @see Camera::PixelIfovOffsets
    */
   QList<QPointF> PixelFOV::instantaneousFov(Camera &camera) const {
@@ -223,15 +223,15 @@ namespace Isis {
 
   /**
    * Produces a list of boundary points for the convex hull containing the input vertices.
-   * 
+   *
    * @param vertices The list of points to be enveloped.
-   * 
+   *
    * @return @b QList<QPointF> A List of points defining the enveloping polygon.
    */
   QList<QPointF> PixelFOV::envelope(QList<QPointF> vertices) const{
 
     //Put the vertices in a line string
-    QScopedPointer<geos::geom::CoordinateSequence> points(new geos::geom::CoordinateArraySequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> points(new geos::geom::CoordinateArraySequence());
 
     for (int i = 0; i < vertices.size(); i++) {
       points->add(geos::geom::Coordinate(vertices[i].x(), vertices[i].y()));
@@ -240,10 +240,10 @@ namespace Isis {
                                                                            points.take()));
 
     //Compute a convex hull for the line string
-    QScopedPointer<geos::geom::Geometry> boundingHull(pointString->convexHull());
+    QScopedPointer<geos::geom::Geometry> boundingHull(pointString->convexHull().release());
 
     //Get the points
-    geos::geom::CoordinateSequence *boundingPoints = boundingHull->getCoordinates();
+    geos::geom::CoordinateSequence *boundingPoints = boundingHull->getCoordinates().release();
 
     QList<QPointF> boundingVertices;
     for (unsigned int i = 0; i < boundingPoints->getSize(); i++) {
@@ -256,13 +256,13 @@ namespace Isis {
 
   /**
    * Split an instantaneous field of view across the 360/0 boundary.
-   * 
+   *
    * @param vertices A list of points defining the boundary of the unsplit IFOV
-   * 
+   *
    * @return @b QList<QList<QPointF>> A list of point clouds defining the boundaries of the pieces
    *                                  of the split IFOV.  Each point cloud represents a component
    *                                  of the IFOV.
-   * 
+   *
    * @see PolygonTools::SplitPolygonOn360
    */
   QList< QList<QPointF> > PixelFOV::splitIfov(QList<QPointF> vertices) const{
@@ -270,7 +270,7 @@ namespace Isis {
     QList< QList<QPointF> > splitPoints;
 
     // Create a polygon to split.
-    QScopedPointer<geos::geom::CoordinateSequence> pts(new geos::geom::CoordinateArraySequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> pts(new geos::geom::CoordinateArraySequence());
     for (int i = 0; i < vertices.size(); i++) {
       pts->add(geos::geom::Coordinate(vertices[i].y(), vertices[i].x()));
     }
@@ -289,17 +289,16 @@ namespace Isis {
       QList<QPointF> subVertices;
       // The following objects don't need to be deleted, as the splitPolygons object will
       // delete them when it is deleted.
-      const geos::geom::Polygon *subPolygon = 
+      const geos::geom::Polygon *subPolygon =
           dynamic_cast<const geos::geom::Polygon *>(splitPolygons->getGeometryN(i));
-      geos::geom::CoordinateSequence *subCoordinates = subPolygon->
-                                                           getExteriorRing()->getCoordinates();
+      geos::geom::CoordinateSequence *subCoordinates = subPolygon->getExteriorRing()->getCoordinates().release();
       for (unsigned int j = 0; j < subCoordinates->getSize(); j++) {
         subVertices.append(QPointF(subCoordinates->getAt(j).y,subCoordinates->getAt(j).x));
       }
 
       // Put the vertices in the output list.
       splitPoints.append(subVertices);
-      
+
     }
 
     return splitPoints;
