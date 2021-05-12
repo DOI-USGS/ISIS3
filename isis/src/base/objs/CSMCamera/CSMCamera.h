@@ -122,6 +122,9 @@ namespace Isis {
       std::vector<int> getParameterIndices(QStringList paramList) const;
       void applyParameterCorrection(int index, double correction);
       double getParameterCovariance(int index1, int index2);
+      QString getParameterName(int index);
+      QString getParameterUnits(int index);
+      double getParameterValue(int index);
       std::vector<double> getSensorPartials(int index, SurfacePoint groundPoint);
 
       virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
