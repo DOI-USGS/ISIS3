@@ -595,7 +595,7 @@ namespace Isis {
 
     if (rubberBandTool()->currentMode() == RubberBandTool::PolygonMode) {
 //       samps = 1;
-      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
       for (int i = 0; i < vertices.size(); i++) {
         viewport->viewportToCube(vertices[i].x(), vertices[i].y(), x, y);
         // add the x,y vertices (double) to the pts CoordinateSequence
