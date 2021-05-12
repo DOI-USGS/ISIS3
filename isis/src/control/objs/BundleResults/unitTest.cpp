@@ -58,20 +58,19 @@ namespace Isis {
       BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
                                      FileName xmlFile) : BundleResults(project, reader) {
 
-        QString xmlPath(xmlFile.expanded());
-        QFile file(xmlPath);
+        m_file.setFileName(xmlFile.expanded());
 
-        if (!file.open(QFile::ReadOnly) ) {
+        if (!m_file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
-                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlFile.expanded()),
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
+        QXmlInputSource xmlInputSource(&m_file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
           throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                           QString("Failed to parse xml file, [%1]").arg(m_file.fileName()),
                             _FILEINFO_);
         }
 
@@ -81,7 +80,12 @@ namespace Isis {
        * Destroys the tester object
        */
       ~BundleResultsXmlHandlerTester() {
+        if (m_file.exists()) {
+          m_file.remove();
+        }
       }
+
+      QFile m_file;
 
   };
 }

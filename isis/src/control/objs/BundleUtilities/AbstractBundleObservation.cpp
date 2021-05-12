@@ -31,7 +31,6 @@ namespace Isis {
   AbstractBundleObservation::AbstractBundleObservation() {
     m_serialNumbers.clear();
     m_imageNames.clear();
-    m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
     m_index = 0;
@@ -55,7 +54,6 @@ namespace Isis {
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
     m_serialNumbers.clear();
     m_imageNames.clear();
-    m_parameterNamesList.clear();
     m_observationNumber = "";
     m_instrumentId = "";
     m_index = 0;
@@ -250,12 +248,6 @@ namespace Isis {
    */
   int AbstractBundleObservation::index() {
     return m_index;
-  }
-
-
-// FIXME: will this work for both? CSM can list parameters, right?
-  QStringList AbstractBundleObservation::parameterList() {
-    return m_parameterNamesList;
   }
 
 

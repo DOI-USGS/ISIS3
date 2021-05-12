@@ -546,16 +546,16 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   EXPECT_NEAR(a2.at(2), -0.00456569, 0.0001);
   EXPECT_NEAR(a2.at(3), 0.00637157,  0.0001);
 
-  QFile file(prefix.path() + "/bundleout_images.csv");
-  if (!file.open(QIODevice::ReadOnly)) {
-    FAIL() << file.errorString().toStdString();
+  QFile leftFile(prefix.path() + "/bundleout_images_LUNARRECONNAISSANCEORBITER_NACL.csv");
+  if (!leftFile.open(QIODevice::ReadOnly)) {
+    FAIL() << leftFile.errorString().toStdString();
   }
 
   // skip the first two lines, we don't want to compare the header.
-  file.readLine();
-  file.readLine();
+  leftFile.readLine();
+  leftFile.readLine();
 
-  QString line = file.readLine();
+  QString line = leftFile.readLine();
   QStringList elems = line.split(",");
 
   // RA(t0) final
@@ -577,7 +577,16 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   EXPECT_NEAR(elems.at(56).toDouble(), 0.365064224,       0.00001);
 
 
-  line = file.readLine();
+  QFile rightFile(prefix.path() + "/bundleout_images_LUNARRECONNAISSANCEORBITER_NACR.csv");
+  if (!rightFile.open(QIODevice::ReadOnly)) {
+    FAIL() << rightFile.errorString().toStdString();
+  }
+
+  // skip the first two lines, we don't want to compare the header.
+  rightFile.readLine();
+  rightFile.readLine();
+
+  line = rightFile.readLine();
   elems = line.split(",");
 
   // RA(t0) final
