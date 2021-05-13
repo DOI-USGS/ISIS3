@@ -321,6 +321,23 @@ class MiniRFNetwork : public TempTestingFiles {
     void SetUp() override;
     void TearDown() override;
 };
+
+class VikThmNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+    Cube *testCube4;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
 }
 
 #endif
