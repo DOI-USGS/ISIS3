@@ -863,7 +863,9 @@ namespace Isis {
     std::vector<int> parameterIndices;
     for (int i = 0; i < paramList.size(); i++) {
       for (int j = 0; j < m_model->getNumParameters(); j++) {
-        if (m_model->getParameterName(j) == paramList[i].toStdString()) {
+        if (QString::compare(QString::fromStdString(m_model->getParameterName(j)).trimmed(),
+                             paramList[i].trimmed(),
+                             Qt::CaseInsensitive) == 0) {
           parameterIndices.push_back(j);
         }
       }
