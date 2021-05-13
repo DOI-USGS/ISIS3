@@ -1,10 +1,10 @@
 #
-# This translation file is used to produce the ISIS 3 Instrument label group
+# This translation file is used to produce the ISIS Instrument label group
 # for the OSIRIS-REx MapCam, SamCam and PolyCan cameras.
 # Translation = (left,right) convert the input "right" to "left"
 #
 # history 2017-08-28 Jeannie Backer - Added output keyword PolyCamFocusPositionNaifId
-#                        from input PCNAIFID. References #5127,5128. 
+#                        from input PCNAIFID. References #5127,5128.
 
 Group = MissionName
   Auto

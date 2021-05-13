@@ -1,25 +1,11 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.3 $                                                             
- * $Date: 2010/02/25 18:39:05 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+                                                                     
 #include <memory>
 #include <cmath>
 #include <cstdlib>
@@ -45,7 +31,7 @@ ProgramAnalyzer::ProgramAnalyzer() {
 
 /**
  * Analyzes the given log file on construction
- * 
+ *
  * @param logfile A print.prt file
  */
 ProgramAnalyzer::ProgramAnalyzer(const QString &logfile) {
@@ -54,16 +40,16 @@ ProgramAnalyzer::ProgramAnalyzer(const QString &logfile) {
 }
 
 /**
- * @brief Set the list of program exclusions 
- *  
+ * @brief Set the list of program exclusions
+ *
  *  When provided, the QString should contain names of ISIS programs that will be
  *  excluded in the analysis.  If more than one program is desired, separate
  *  them by commas.
- *  
+ *
  *  The exclusion list takes precedence over any applications added in the
  *  inclusion list.  In other words, if the same program is included in both the
  *  inclusion and exclusion list, it will be excluded.
- *  
+ *
  *  Note this method can be called repeatedly to add names.
  *
  * @param name Comma separated list of names of programs to exclude
@@ -76,16 +62,16 @@ void ProgramAnalyzer::setExclude(const QString &name) {
 
 /**
  * @brief Loads a list of excluded program names from a file
- *  
- * The file is expected to contain the name of an ISIS program, one per line. 
- * These programs will be logged but not included in the analysis. 
- *  
+ *
+ * The file is expected to contain the name of an ISIS program, one per line.
+ * These programs will be logged but not included in the analysis.
+ *
  * The exclusion list takes precedence over any applications added in the
  * inclusion list.  In other words, if the same program is included in both the
  * inclusion and exclusion list, it will be excluded.
- *  
+ *
  * Note this method can be called repeatedly to add names.
- *  
+ *
  * @param name  Name of file containing program list to exclude
  */
 void ProgramAnalyzer::exclude(const QString &name) {
@@ -98,23 +84,23 @@ void ProgramAnalyzer::exclude(const QString &name) {
 
 
 /**
- * @brief Set the list of program inclusions 
- *  
+ * @brief Set the list of program inclusions
+ *
  * When provided, the QString should contain names of ISIS programs that will be
  * included in the analysis.  If more than one program is desired, separate
  * them by commas.
- *  
- * If this option is used, it will only included programs given in this list. 
- * It operates as both an inclusive and exclusive list, so there is no need to 
- * also utilize the exclude features of this class. 
- *  
- * However, if you do use the exclusion features of this clas, the exclusion 
- * list takes precedence over any applications added in the inclusion list.  In 
- * other words, if the same program is included in both the inclusion and 
- * exclusion list, it will be excluded. 
- *  
+ *
+ * If this option is used, it will only included programs given in this list.
+ * It operates as both an inclusive and exclusive list, so there is no need to
+ * also utilize the exclude features of this class.
+ *
+ * However, if you do use the exclusion features of this clas, the exclusion
+ * list takes precedence over any applications added in the inclusion list.  In
+ * other words, if the same program is included in both the inclusion and
+ * exclusion list, it will be excluded.
+ *
  * Note this method can be called repeatedly to add names.
- *  
+ *
  * @param name Comma separated list of names of programs to include
  */
 void ProgramAnalyzer::setInclude(const QString &name) {
@@ -125,21 +111,21 @@ void ProgramAnalyzer::setInclude(const QString &name) {
 
 /**
  * @brief Loads a list of included program names from a file
- *  
- * The file is expected to contain the name of an ISIS program, one per line. 
- * These programs will be included in the analysis. 
- *  
- * If this option is used, it will only included programs given in this list. 
- * It operates as both an inclusive and exclusive list, so there is no need to 
- * also utilize the exclude features of this class. 
- *  
- * However, if you do use the exclusion feartures, the exclusion list takes 
- * precedence over any applications added in the inclusion list.  In other 
- * words, if the same program is included in both the inclusion and exclusion 
- * list, it will be excluded. 
- *  
+ *
+ * The file is expected to contain the name of an ISIS program, one per line.
+ * These programs will be included in the analysis.
+ *
+ * If this option is used, it will only included programs given in this list.
+ * It operates as both an inclusive and exclusive list, so there is no need to
+ * also utilize the exclude features of this class.
+ *
+ * However, if you do use the exclusion feartures, the exclusion list takes
+ * precedence over any applications added in the inclusion list.  In other
+ * words, if the same program is included in both the inclusion and exclusion
+ * list, it will be excluded.
+ *
  * Note this method can be called repeatedly to add names.
- *  
+ *
  * @param name  Name of file containing program list to include
  */
 void ProgramAnalyzer::include(const QString &name) {
@@ -151,13 +137,13 @@ void ProgramAnalyzer::include(const QString &name) {
 }
 
 /**
- * @brief Adds a print.prt file to the analysis 
- *  
- * The programs contained in the log file, assumed to be a print.prt file, will 
- * be added to the list of programs to be analyzed.  They are subject to the 
- * exclude and include program lists. 
- * 
- * @param logfile An ISIS3 print.prt file
+ * @brief Adds a print.prt file to the analysis
+ *
+ * The programs contained in the log file, assumed to be a print.prt file, will
+ * be added to the list of programs to be analyzed.  They are subject to the
+ * exclude and include program lists.
+ *
+ * @param logfile An ISIS print.prt file
  */
 void ProgramAnalyzer::add(const QString &logfile) {
   Pvl plog(logfile);
@@ -167,14 +153,14 @@ void ProgramAnalyzer::add(const QString &logfile) {
 }
 
 /**
- * @brief Adds a program object originating from a print.prt file 
- *  
- * The PvlObject provided is assumed to orginate from an ISIS3 print.prt log 
- * file.  It contains information that will be extracted and analyzed according 
- * to the features of this class. 
- * 
- * 
- * @param program Pvl object containing the output log of an ISIS3 application
+ * @brief Adds a program object originating from a print.prt file
+ *
+ * The PvlObject provided is assumed to orginate from an ISIS print.prt log
+ * file.  It contains information that will be extracted and analyzed according
+ * to the features of this class.
+ *
+ *
+ * @param program Pvl object containing the output log of an ISIS application
  */
 void ProgramAnalyzer::add(PvlObject &program) {
   _count++;
@@ -200,17 +186,17 @@ void ProgramAnalyzer::add(PvlObject &program) {
   analyze(pdata);
   return;
 }
- 
+
 /**
  * @brief Reports program counters for the current state
- *  
- * This method reports counts of programs as they were added to the object.  It 
- * reports total programs, numbers for analyzed, included, excluded, unique, 
- * valid, errors, zero CPU/Connect times and incomplete or invalid (typcially 
- * negative times) for programs it evaluted. 
- * 
+ *
+ * This method reports counts of programs as they were added to the object.  It
+ * reports total programs, numbers for analyzed, included, excluded, unique,
+ * valid, errors, zero CPU/Connect times and incomplete or invalid (typcially
+ * negative times) for programs it evaluted.
+ *
  * @param name Name of Pvl group to create
- * 
+ *
  * @return PvlGroup Pvl group containing program numbers/counts
  */
 PvlGroup ProgramAnalyzer::review(const QString &name) const {
@@ -231,14 +217,14 @@ PvlGroup ProgramAnalyzer::review(const QString &name) const {
 
 
 /**
- * @brief Reports cumulative runtime performance statistics for programs 
- *  
- * This method formats the contents of the program analysis in a Pvl group that 
- * provides information for all programs regardin CPU, connect and I/O times. 
- * 
- * 
+ * @brief Reports cumulative runtime performance statistics for programs
+ *
+ * This method formats the contents of the program analysis in a Pvl group that
+ * provides information for all programs regardin CPU, connect and I/O times.
+ *
+ *
  * @param name Name of Pvl group to create
- * 
+ *
  * @return PvlGroup Pvl group containing cumulative program analysis
  */
 PvlGroup ProgramAnalyzer::cumulative(const QString &name) const {
@@ -246,14 +232,14 @@ PvlGroup ProgramAnalyzer::cumulative(const QString &name) const {
 }
 
 /**
- * @brief Reports analysis for a specific program 
- *  
- * This object maintains individual statistics for each unique program.  This 
- * method reports the analysis for a particular program. 
- * 
- * 
+ * @brief Reports analysis for a specific program
+ *
+ * This object maintains individual statistics for each unique program.  This
+ * method reports the analysis for a particular program.
+ *
+ *
  * @param name Name of the program to analyze
- * 
+ *
  * @return PvlGroup Pvl group containing program analysis
  */
 PvlGroup ProgramAnalyzer::summarize(const QString &name) const {
@@ -262,13 +248,13 @@ PvlGroup ProgramAnalyzer::summarize(const QString &name) const {
 
 /**
  * @brief Reports analysis for the nth occuring application in the list
- * 
- * This object maintains individual statistics for each unique program.  This 
- * method reports the analysis for a program that occurs in the list at the 
- * given index. 
- 
+ *
+ * This object maintains individual statistics for each unique program.  This
+ * method reports the analysis for a program that occurs in the list at the
+ * given index.
+
  * @param index Index of the application to summerize
- * 
+ *
  * @return PvlGroup Pvl group containing the program analysis
  */
 PvlGroup ProgramAnalyzer::summarize(const int index) const {
@@ -277,9 +263,9 @@ PvlGroup ProgramAnalyzer::summarize(const int index) const {
 
 /**
  * @brief Writes a header in CVS format to a ostream
- * 
+ *
  * @param out Output stream to write the header
- * 
+ *
  * @return ostream& Returns the stream
  */
 ostream &ProgramAnalyzer::header(ostream &out) const {
@@ -288,18 +274,18 @@ ostream &ProgramAnalyzer::header(ostream &out) const {
 }
 
 /**
- * @brief Writes the analysis to the stream in CSV format 
- *  
- * This method provides the analysis in CSV format for more traditional 
- * manipulation.  This format is well suited to be plotted for further analysis 
- * of the program/system performance. 
- *  
- * The columns provided are:  Program name, FROM file, TO file, runtime, connect 
- * time, CPU time, and I/O time (difference in runtime and CPU time). 
- * 
- * 
+ * @brief Writes the analysis to the stream in CSV format
+ *
+ * This method provides the analysis in CSV format for more traditional
+ * manipulation.  This format is well suited to be plotted for further analysis
+ * of the program/system performance.
+ *
+ * The columns provided are:  Program name, FROM file, TO file, runtime, connect
+ * time, CPU time, and I/O time (difference in runtime and CPU time).
+ *
+ *
  * @param out Output stream to write data to
- * 
+ *
  * @return ostream& The output stream
  */
 ostream &ProgramAnalyzer::listify(ostream &out) const {
@@ -322,7 +308,7 @@ ostream &ProgramAnalyzer::listify(ostream &out) const {
 
 /**
  * @brief Initializes the class
- * 
+ *
  * This init function is reintrant and will reset all internal parameters to the
  * empty state.
  */
@@ -338,15 +324,15 @@ void ProgramAnalyzer::init() {
 
 /**
  * @brief Provides a count of analyzed programs
- *  
- * Iterates through all programs included in the analysis and provides a count 
- * fo the total.  It will search through for a given status and only includes 
- * those which have the indicated status.  The valid status to check are those 
- * defined in the Status enum list. 
- * 
+ *
+ * Iterates through all programs included in the analysis and provides a count
+ * fo the total.  It will search through for a given status and only includes
+ * those which have the indicated status.  The valid status to check are those
+ * defined in the Status enum list.
+ *
  * @param status Status of the program to count
- * 
- * @return int 
+ *
+ * @return int
  */
 int ProgramAnalyzer::getCount (ProgramAnalyzer::Status status) const {
   vector<ProgramData>::const_iterator progs = _pdata.begin();
@@ -357,20 +343,20 @@ int ProgramAnalyzer::getCount (ProgramAnalyzer::Status status) const {
   }
   return (n);
 }
- 
- 
+
+
 /**
- * @brief Extracts a keyword value from the Pvl object 
- * 
- * 
+ * @brief Extracts a keyword value from the Pvl object
+ *
+ *
  * @param obj Pvl object to search for the keyword
  * @param key Name of keyword to find
  * @param grp Optional group within the object to find the keyword
- *  
- * @return QString Value of the keyword if the keyword exists, otherwise an empty 
+ *
+ * @return QString Value of the keyword if the keyword exists, otherwise an empty
  *                QString is returned.
  */
-QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key, 
+QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key,
                                const QString &grp) const {
 
   QString value("");
@@ -385,20 +371,20 @@ QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key,
 }
 
 /**
- * @brief Converts times represented in text to digital values 
- *  
- * The text QString, atime, is expected to be of the format "HH:MM:SS.sss" where 
- * "HH" is hours, "MM" is minutes and "SS.sss" is seconds.milliseconds.  The 
- * units returned are in seconds. 
- * 
+ * @brief Converts times represented in text to digital values
+ *
+ * The text QString, atime, is expected to be of the format "HH:MM:SS.sss" where
+ * "HH" is hours, "MM" is minutes and "SS.sss" is seconds.milliseconds.  The
+ * units returned are in seconds.
+ *
  * @param atime Text QString containing time to convert
  * @param dtime Time in seconds
- * 
- * @return ProgramAnalyzer::Status Returns BADDATA if the text QString is empty 
+ *
+ * @return ProgramAnalyzer::Status Returns BADDATA if the text QString is empty
  *                                 or malformed, or VALID if the conversion
  *                                 succeeds.
  */
-ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime, 
+ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime,
                                                      double &dtime) const {
   if ( atime.isEmpty() ) return (BADDATA);
   QStringList t = atime.split(":");
@@ -418,23 +404,23 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime,
 }
 
 /**
- * @brief Compute analysis of program entry 
- *  
- * This method accepts a Pvl object that is assumed to orignate from an ISIS3 
- * print.prt log file and conforms to the format in the log file. 
- *  
- * Data is extracted from certain keywords in the object.  Invalid objects or 
- * error conditions are detected and are indicated in the status of the program 
- * analysis structure, pdata.  Other conditions of no time for runtimes or CPU 
- * times is also detected and indicated. 
- * 
- * 
+ * @brief Compute analysis of program entry
+ *
+ * This method accepts a Pvl object that is assumed to orignate from an ISIS
+ * print.prt log file and conforms to the format in the log file.
+ *
+ * Data is extracted from certain keywords in the object.  Invalid objects or
+ * error conditions are detected and are indicated in the status of the program
+ * analysis structure, pdata.  Other conditions of no time for runtimes or CPU
+ * times is also detected and indicated.
+ *
+ *
  * @param obj   Object containing program data
  * @param pdata Structure to return derived values from the program data
- * 
+ *
  * @return bool True if successful, false otherwise.
  */
-bool ProgramAnalyzer::accounting(PvlObject &obj, 
+bool ProgramAnalyzer::accounting(PvlObject &obj,
                                  ProgramAnalyzer::ProgramData &pdata) const {
 
   //  Assume an error occured if the Accounting group is missing
@@ -442,7 +428,7 @@ bool ProgramAnalyzer::accounting(PvlObject &obj,
     pdata.status = ERRORS;
     return (false);
   }
-  
+
   PvlGroup &acc = obj.findGroup("Accounting");
   Status status = convertTime(findKey(acc,"ConnectTime"), pdata.connectTime);
   pdata.status = convertTime(findKey(acc, "CpuTime"), pdata.cpuTime);
@@ -457,13 +443,13 @@ bool ProgramAnalyzer::accounting(PvlObject &obj,
 
 
 /**
- * @brief Performs the analysis of a program 
- *  
- * This method accepts a program data structure, determines validity for 
- * inclusion in the analysis and computes statistics from the data content. 
- * 
+ * @brief Performs the analysis of a program
+ *
+ * This method accepts a program data structure, determines validity for
+ * inclusion in the analysis and computes statistics from the data content.
+ *
  * @param data Structure containing program data
- * 
+ *
  * @return bool True if valid and included, false otherwize
  */
 bool ProgramAnalyzer::analyze(const ProgramAnalyzer::ProgramData &data) {
@@ -490,17 +476,17 @@ bool ProgramAnalyzer::analyze(const ProgramAnalyzer::ProgramData &data) {
 
 /**
  * @brief Produces report of run time statistics for the given structure
- * 
- *  
- * The data contained with the RunTimeStats is externalized to a Pvl group with 
- * some resonable formatting. 
- *  
+ *
+ *
+ * The data contained with the RunTimeStats is externalized to a Pvl group with
+ * some resonable formatting.
+ *
  * @param stats Run time stats for the given data
  * @param name  Optional name of the PvlGroup results
- * 
+ *
  * @return PvlGroup Pvl group of runtime statistics
  */
-PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats, 
+PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats,
                                 const QString &name) const {
   PvlGroup pvl((name.isEmpty() ? stats.pname : name));
 
@@ -525,9 +511,9 @@ PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats,
 
 /**
  * @brief Returns NULL for empty QStrings to ensure meaningful content
- * 
+ *
  * @param s  String to test for content
- * 
+ *
  * @return QString Returns existing content if present, NULL if empty
  */
 QString ProgramAnalyzer::format(const QString &s) const {
@@ -547,7 +533,7 @@ QString ProgramAnalyzer::format(const QString &s) const {
    *
    * @return QString Returns the converted QString
    */
-  QString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
+  QString ProgramAnalyzer::DblToStr(const double &value, const int precision)
                                     const {
     if(IsSpecial(value)) {
       return (QString("0.0"));
@@ -561,18 +547,18 @@ QString ProgramAnalyzer::format(const QString &s) const {
   }
 
   /**
-   * @brief Returns the count of all programs in the log list 
-   *  
-   * This method computes a count of all programs that exist in the list of 
-   * applications that encurred a limit in the analysis.  It is not enough to 
-   * just report the number of entries in the list - each list contains a count 
-   * of occurances.  These occurances are summed and return to the caller. 
-   * 
+   * @brief Returns the count of all programs in the log list
+   *
+   * This method computes a count of all programs that exist in the list of
+   * applications that encurred a limit in the analysis.  It is not enough to
+   * just report the number of entries in the list - each list contains a count
+   * of occurances.  These occurances are summed and return to the caller.
+   *
    * @param limit List of applications incurring a limit
-   * 
+   *
    * @return int Total number of occurances all programs in the list
    */
-  int ProgramAnalyzer::LimitTotals(const ProgramAnalyzer::LogList &limit) 
+  int ProgramAnalyzer::LimitTotals(const ProgramAnalyzer::LogList &limit)
                                    const {
     int total(0);
     for ( int i = 0 ; i < limit.size() ; i++ ) {
@@ -582,5 +568,3 @@ QString ProgramAnalyzer::format(const QString &s) const {
   }
 
 } // namespace Isis
-
-

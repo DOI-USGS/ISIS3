@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2010/05/14 19:16:39 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Blob.h"
 
 #include <cstring>
@@ -62,7 +46,7 @@ namespace Isis {
    * @param type The blob type
    * @param file The filename to read from.
    */
-  Blob::Blob(const QString &name, const QString &type, 
+  Blob::Blob(const QString &name, const QString &type,
              const QString &file) {
     p_blobName = name;
     p_buffer = NULL;
@@ -103,7 +87,7 @@ namespace Isis {
    *
    * @param other Blob to be copied
    *
-   * @return Copied Blob 
+   * @return Copied Blob
    */
   Blob &Blob::operator=(const Blob &other) {
     p_blobPvl = other.p_blobPvl;
@@ -132,54 +116,54 @@ namespace Isis {
     if (p_buffer != NULL) delete [] p_buffer;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a string containing the Blob type.
-   *  
+   *
    *  @return @b string Type of blob.
-   */ 
+   */
   QString Blob::Type() const {
     return p_type;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a string containing the Blob name.
-   *  
+   *
    *  @return @b string The name of the blob.
-   */ 
+   */
   QString Blob::Name() const {
     return p_blobName;
   }
 
-  /** 
+  /**
    *  Accessor method that returns the number of bytes in the blob data.
-   *  
+   *
    *  @return @b int Number of bytes in the blob data.
-   */ 
+   */
   int Blob::Size() const {
     return p_nbytes;
   }
 
-  /** 
+  /**
    *  Accessor method that returns a PvlObject containing the Blob label.
-   *  
+   *
    *  @return @b PvlObject The label of the blob.
-   */ 
+   */
   PvlObject &Blob::Label() {
     return p_blobPvl;
   }
 
-  /** 
+  /**
    *  This method searches the given Pvl for the Blob by the Blob's type and
    *  name. If found, the start byte, number of bytes are read from the Pvl.
    *  Also, if a keyword label pointer is found, the filename for the detached
    *  blob is stored and the pointer is removed from the blob pvl.
-   *  
+   *
    *  @param pvl The Pvl to be searched
    *  @param keywords A list of keyword, value pairs to match inside the blob's
    *  PVL object. Only if all the keyword match is the blob processed. This is used
-   *  when there are multiple blobs with the same name, but different keywords that 
+   *  when there are multiple blobs with the same name, but different keywords that
    *  define the exact blob (see Stretch with a band number)
-   */ 
+   */
   void Blob::Find(const Pvl &pvl, const std::vector<PvlKeyword> keywords) {
     bool found = false;
     try {
@@ -319,7 +303,7 @@ namespace Isis {
   }
 
   /**
-   * This method reads the Blob data from an open input file stream. 
+   * This method reads the Blob data from an open input file stream.
    *
    * @param pvl A Pvl containing the label information.
    * @param istm The input file stream containing the blob data to be read.
@@ -351,9 +335,9 @@ namespace Isis {
 
 
  /**
-  * This virtual method for classes that inherit Blob. It is not defined in 
+  * This virtual method for classes that inherit Blob. It is not defined in
   * the Blob class.
-  */ 
+  */
   void Blob::ReadInit(){
   }
 
@@ -382,6 +366,43 @@ namespace Isis {
       QString msg = "Error reading data from " + p_type + " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
+  }
+
+
+  /**
+   * Set the data stored in the BLOB.
+   *
+   * This function will copy the data buffer, if you want to avoid that use
+   * takeData which will take ownership of the buffer.
+   *
+   * @param buffer The buffer of data. The BLOB does not take ownership of this,
+   *               the caller is still responsible for cleaning it up.
+   * @param nbytes The amount of data in the buffer
+   */
+  void Blob::setData(const char *buffer, int nbytes) {
+    char *buf = new char[nbytes];
+    memcpy(buf, buffer, nbytes);
+    takeData(buf, nbytes);
+  }
+
+
+  /**
+   * Set the data stored in the BLOB without copying it.
+   *
+   * This function takes ownership of the data buffer and will delete is when the BLOB
+   * is cleaned up.
+   *
+   * @param buffer The buffer of data. The BLOB takes ownership of this.
+   * @param nbytes The amount of data in the buffer
+   */
+  void Blob::takeData(char *buffer, int nbytes) {
+    p_nbytes = nbytes;
+
+    if (p_buffer != NULL) {
+      delete [] p_buffer;
+    }
+
+    p_buffer = buffer;
   }
 
   /**
@@ -465,9 +486,9 @@ namespace Isis {
     p_blobPvl["StartByte"] = toString((BigInt)sbyte);
     p_blobPvl["Bytes"] = toString(p_nbytes);
 
-    
+
     // See if the blob is already in the file
-    bool found = false; 
+    bool found = false;
     if (overwrite) {
 
       for (int i = 0; i < pvl.objects(); i++) {
@@ -518,9 +539,18 @@ namespace Isis {
   }
 
   /**
-   * This virtual method for classes that inherit Blob. It is not defined in 
+   * Get the internal data buff of the Blob.
+   *
+   * @return @b char* A data buffer containing Blob::Size bytes
+   */
+  char *Blob::getBuffer() {
+    return p_buffer;
+  }
+
+  /**
+   * This virtual method for classes that inherit Blob. It is not defined in
    * the Blob class.
-   */ 
+   */
   void Blob::WriteInit(){
   }
 
@@ -552,4 +582,3 @@ namespace Isis {
     return false;
   }
 } // end namespace isis
-

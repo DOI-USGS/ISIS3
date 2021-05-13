@@ -179,9 +179,7 @@ void IsisMain() {
   }
 
   // Delete any tracking tables from the input label if necessary
-  if (ocube->hasTable("InputImages")) {
-    ocube->deleteBlob("Table", "InputImages");
-  }
+  ocube->deleteBlob("InputImages", "Table");
 
   // Delete the Tracking group if it exists (3.6.0 and up)
   // The tracking group could be transfered from the first input cube, but it does not
@@ -220,9 +218,7 @@ void IsisMain() {
     Cube *icube = m.SetInputCube(newcubeList[i].toString(), attrib, 1, 1, 1, -1, -1, -1);
 
     // Delete any tracking tables from the input cube if necessary
-    if (icube->hasTable("InputImages")) {
-      icube->deleteBlob("Table", "InputImages");
-    }
+    icube->deleteBlob("InputImages", "Table");
 
     m.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
     m.StartProcess(1, 1, sband);

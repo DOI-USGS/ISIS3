@@ -3,18 +3,18 @@
 <application name="junocam2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted JunoCam images into ISIS3 cube format</brief>
+  <brief>Import PDS formatted JunoCam images into ISIS cube format</brief>
 
   <description>
     <p>
-      This program converts a PDS formatted JunoCam image to an ISIS3
+      This program converts a PDS formatted JunoCam image to an ISIS
       <def link="Cube">cube</def> format.
      </p>
 
      <p>
      PDS-formatted JunoCam images contain several framelets and filters in the same image.
-     For ease in processing with ISIS3, by default one input JunoCam image is converted to several output
-     ISIS3 cubes and associated lists of cubes. There is one output cube for each framelet of the
+     For ease in processing with ISIS, by default one input JunoCam image is converted to several output
+     ISIS cubes and associated lists of cubes. There is one output cube for each framelet of the
      PDS formatted JunoCam image, each of which is named with the prefix specified with the "TO"
      user parameter, the filter name, and the 0-indexed framelet number. In the following example,
      if the input image "JunoCamTest.IMG" had 2 framelets for each filter (Red, Blue, Green,
@@ -24,7 +24,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
      junocam2isis fr=JunoCamTest.LBL to=JunoCamTest.cub
      </pre>
 
-     This application will output eight ISIS3 cubes, each containing one framelet for one filter,
+     This application will output eight ISIS cubes, each containing one framelet for one filter,
      <pre>
      JunoCamTest_RED_0001.cub
      JunoCamTest_RED_0002.cub
@@ -53,8 +53,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
      </pre>
 
      <p>
-     If the FULLCCD parameter is set to yes, instead of outputting one ISIS3 Cube per filter and
-     framelet, junocam2isis will output one ISIS3 Cube for each original observation and will
+     If the FULLCCD parameter is set to yes, instead of outputting one ISIS Cube per filter and
+     framelet, junocam2isis will output one ISIS Cube for each original observation and will
      contain all the filters that were part of that observation. If the above example was modified
      changed to set the FULLCCD parameter to true,
      </p>
@@ -89,7 +89,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       Added missionItem under category to classify the program under Juno.
     </change>
     <change name="Kristin Berry" date="2018-03-27">
-      Fixed problem with having too many open files. See #5232 for more information. 
+      Fixed problem with having too many open files. See #5232 for more information.
     </change>
   </history>
 

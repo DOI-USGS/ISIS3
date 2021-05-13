@@ -1,4 +1,4 @@
-# Translate ISIS3 Instrument group values to PDS4.
+# Translate ISIS Instrument group values to PDS4.
 #
 # history 2017-10-31 Jeannie Backer - Original version
 # history 2017-11-17 Kristin Berry - Added reference_type
@@ -8,7 +8,7 @@
 # Time Coordinate
 Group = StartDateTime
   Auto
-  InputKey        = StartTime 
+  InputKey        = StartTime
   InputPosition   = (IsisCube, Instrument)
   InputDefault    = ""
   OutputName      = start_date_time
@@ -30,7 +30,7 @@ End_Group
 # Investigation Area
 Group = MissionName
   Auto
-  InputKey        = SpacecraftName 
+  InputKey        = SpacecraftName
   InputPosition   = (IsisCube, Instrument)
   InputDefault    = TBD
   OutputName      = name
@@ -50,7 +50,7 @@ End_Group
 Group = MissionInternalReference
   Auto
   InputDefault    = data_to_investigation
-  OutputName      = reference_type 
+  OutputName      = reference_type
   OutputPosition  = (Product_Observational, Observation_Area, Investigation_Area, Internal_Reference)
   Translation     = (*, *)
 End_Group
@@ -58,10 +58,10 @@ End_Group
 # Observing System
 Group = SpacecraftName
   Auto
-  InputKey        = SpacecraftName 
+  InputKey        = SpacecraftName
   InputPosition   = (IsisCube, Instrument)
   InputDefault    = TBD
-  OutputName      = name 
+  OutputName      = name
   OutputSiblings  = (type|Spacecraft)
   OutputPosition  = (Product_Observational, Observation_Area, Observing_System, new@Observing_System_Component)
   Translation     = (*, *)
@@ -69,10 +69,10 @@ End_Group
 
 Group = InstrumentName
   Auto
-  InputKey        = InstrumentId 
+  InputKey        = InstrumentId
   InputPosition   = (IsisCube, Instrument)
   InputDefault    = TBD
-  OutputName      = name 
+  OutputName      = name
   OutputSiblings  = (type|Instrument)
   OutputPosition  = (Product_Observational, Observation_Area, Observing_System, new@Observing_System_Component)
   Translation     = (*, *)
@@ -81,7 +81,7 @@ End_Group
 Group = ExposureDuration
   Auto
   Optional
-  InputKey        = ExposureDuration 
+  InputKey        = ExposureDuration
   InputPosition   = (IsisCube, Instrument)
   OutputName      = img:exposure_duration
   OutputAttributes = unit|s

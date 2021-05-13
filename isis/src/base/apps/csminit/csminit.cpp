@@ -21,13 +21,14 @@ find files of those names at the top level of this repository. **/
 #include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "CSMCamera.h"
 #include "Cube.h"
 #include "IException.h"
+#include "ImagePolygon.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "StringBlob.h"
 
 using namespace std;
 
@@ -46,100 +47,185 @@ namespace Isis {
     // Get the cube here so that we check early if it doesn't exist
     Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
-    // We have to call this to get the plugin list loaded right now
-    try {
-      Camera *cam = CameraFactory::Create(*cube);
-      delete cam;
+    // We have to call this to get the plugin list loaded.
+    CameraFactory::initPlugin();
+
+    // These three variables are the main product of the following if/else statement
+    QString pluginName;
+    QString modelName;
+    csm::Model *model = nullptr;
+
+    if (ui.WasEntered("ISD") && ui.WasEntered("STATE")) {
+      QString message = "Cannot enter both [ISD] and [STATE]. Please enter either [ISD] or [STATE].";
+      throw IException(IException::User, message, _FILEINFO_);
     }
-    catch(...) {
-      // Noop
+
+    else if (!ui.WasEntered("ISD") && !ui.WasEntered("STATE")) {
+      QString message = "Either an ISD or a State string must be entered.";
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
-    QString isdFilePath = ui.GetFileName("ISD");
+    else if (ui.WasEntered("ISD")) {
+      QString isdFilePath = ui.GetFileName("ISD");
 
-    QList<QStringList> possibleModels;
-    for (const csm::Plugin * plugin : csm::Plugin::getList()) {
-      QString pluginName = QString::fromStdString(plugin->getPluginName());
-      if (ui.WasEntered("PLUGINNAME") && pluginName != ui.GetString("PLUGINNAME")) {
-        continue;
-      }
-
-      for (size_t modelIndex = 0; modelIndex < plugin->getNumModels(); modelIndex++) {
-        QString modelName = QString::fromStdString(plugin->getModelName(modelIndex));
-        if (ui.WasEntered("MODELNAME") && modelName != ui.GetString("MODELNAME")) {
+      QList<QStringList> possibleModels;
+      for (const csm::Plugin * plugin : csm::Plugin::getList()) {
+        QString currentPluginName = QString::fromStdString(plugin->getPluginName());
+        if (ui.WasEntered("PLUGINNAME") && currentPluginName != ui.GetString("PLUGINNAME")) {
           continue;
         }
 
-        csm::Isd fileIsd(isdFilePath.toStdString());
-        if (plugin->canModelBeConstructedFromISD(fileIsd, modelName.toStdString())) {
-          QStringList modelSpec = {pluginName, modelName, QString::fromStdString(fileIsd.format())};
-          possibleModels.append(modelSpec);
-          continue; // If the file ISD works, don't check the others
-        }
-
-        csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
-        if (plugin->canModelBeConstructedFromISD(nitf21Isd, modelName.toStdString())) {
-          QStringList modelSpec = {pluginName, modelName, QString::fromStdString(nitf21Isd.format())};
-          possibleModels.append(modelSpec);
-          continue; // If the NITF 2.1 ISD works, don't check the others
-        }
-      }
-    }
-
-    if (possibleModels.size() > 1) {
-      QString message = "Multiple models can be created from the ISD [" + isdFilePath + "]. "
-                        "Re-run with the PLUGINNAME and MODELNAME parameters. "
-                        "Possible plugin & model names:\n";
-      for (const QStringList &modelSpec : possibleModels) {
-        message += "Plugin [" + modelSpec[0] + "], Model [" + modelSpec[1] + "]\n";
-      }
-      throw IException(IException::User, message, _FILEINFO_);
-    }
-
-    if (possibleModels.empty()) {
-      QString message = "No loaded model could be created from the ISD [" + isdFilePath + "]."
-                        "Loaded plugin & model names:\n";
-      for (const csm::Plugin * plugin : csm::Plugin::getList()) {
-        QString pluginName = QString::fromStdString(plugin->getPluginName());
         for (size_t modelIndex = 0; modelIndex < plugin->getNumModels(); modelIndex++) {
-          QString modelName = QString::fromStdString(plugin->getModelName(modelIndex));
-          message += "Plugin [" + pluginName + "], Model [" + modelName + "]\n";
+          QString currentModelName = QString::fromStdString(plugin->getModelName(modelIndex));
+          if (ui.WasEntered("MODELNAME") && currentModelName != ui.GetString("MODELNAME")) {
+            continue;
+          }
+
+          csm::Isd fileIsd(isdFilePath.toStdString());
+          if (plugin->canModelBeConstructedFromISD(fileIsd, currentModelName.toStdString())) {
+            QStringList modelSpec = {
+                currentPluginName,
+                currentModelName,
+                QString::fromStdString(fileIsd.format())};
+            possibleModels.append(modelSpec);
+            continue; // If the file ISD works, don't check the other ISD formats
+          }
+
+          csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
+          if (plugin->canModelBeConstructedFromISD(nitf21Isd, currentModelName.toStdString())) {
+            QStringList modelSpec = {
+                currentPluginName,
+                currentModelName,
+                QString::fromStdString(nitf21Isd.format())};
+            possibleModels.append(modelSpec);
+            continue; // If the NITF 2.1 ISD works, don't check the other ISD formats
+          }
         }
       }
-      throw IException(IException::User, message, _FILEINFO_);
-    }
 
-    // If we are here, then we have exactly 1 model
-    QStringList modelSpec = possibleModels.front();
-    if (modelSpec.size() != 3) {
-      QString message = "Model specification [" + modelSpec.join(" ") + "] has [" + modelSpec.size() + "] elements "
-                        "when it should have 3 elements.";
-      throw IException(IException::Programmer, message, _FILEINFO_);
-    }
-    const csm::Plugin *plugin = csm::Plugin::findPlugin(modelSpec[0].toStdString());
-    csm::Model *model;
-    csm::Isd fileIsd(isdFilePath.toStdString());
-    csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
-    if (modelSpec[2] == QString::fromStdString(fileIsd.format())) {
-      model = plugin->constructModelFromISD(fileIsd, modelSpec[1].toStdString());
-    }
-    else if (modelSpec[2] == QString::fromStdString(nitf21Isd.format())) {
-      model = plugin->constructModelFromISD(nitf21Isd, modelSpec[1].toStdString());
-    }
-    else {
-      QString message = "Invalid ISD format specifications [" + modelSpec[2] + "].";
-      throw IException(IException::Programmer, message, _FILEINFO_);
-    }
+      if (possibleModels.size() > 1) {
+        QString message = "Multiple models can be created from the ISD [" + isdFilePath + "]. "
+                          "Re-run with the PLUGINNAME and MODELNAME parameters. "
+                          "Possible plugin & model names:\n";
+        for (const QStringList &modelSpec : possibleModels) {
+          message += "Plugin [" + modelSpec[0] + "], Model [" + modelSpec[1] + "]\n";
+        }
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+
+      if (possibleModels.empty()) {
+        QString message = "No loaded model could be created from the ISD [" + isdFilePath + "]."
+                          "Loaded plugin & model names:\n";
+        for (const csm::Plugin * plugin : csm::Plugin::getList()) {
+          QString currentPluginName = QString::fromStdString(plugin->getPluginName());
+          for (size_t modelIndex = 0; modelIndex < plugin->getNumModels(); modelIndex++) {
+            QString modelName = QString::fromStdString(plugin->getModelName(modelIndex));
+            message += "Plugin [" + currentPluginName + "], Model [" + modelName + "]\n";
+          }
+        }
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+
+      // If we are here, then we have exactly 1 model
+      QStringList modelSpec = possibleModels.front();
+
+      if (modelSpec.size() != 3) {
+        QString message = "Model specification [" + modelSpec.join(" ") + "] has [" + modelSpec.size() + "] elements "
+          "when it should have 3 elements.";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+
+      pluginName = modelSpec[0];
+      modelName = modelSpec[1];
+      QString isdFormat = modelSpec[2];
+
+      const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
+      if (plugin == NULL) {
+        QString message = "Cannot find requested Plugin: [" + pluginName + "].";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+
+      csm::Isd fileIsd(isdFilePath.toStdString());
+      csm::Nitf21Isd nitf21Isd(isdFilePath.toStdString());
+      if (isdFormat == QString::fromStdString(fileIsd.format())) {
+        model = plugin->constructModelFromISD(fileIsd, modelName.toStdString());
+      }
+      else if (isdFormat == QString::fromStdString(nitf21Isd.format())) {
+        model = plugin->constructModelFromISD(nitf21Isd, modelName.toStdString());
+      }
+      else {
+        QString message = "Invalid ISD format specifications [" + isdFormat + "].";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+    } // end of ISD if statement
+
+    else if (ui.WasEntered("STATE")) {
+      FileName stateFilePath = ui.GetFileName("STATE");
+
+      std::ifstream file(stateFilePath.expanded().toStdString());
+      std::stringstream buffer;
+      buffer << file.rdbuf();
+      QString stateString = QString::fromStdString(buffer.str());
+
+      if (!ui.WasEntered("PLUGINNAME") && !ui.WasEntered("MODELNAME")) {
+        QString message = "When using a State string, PLUGINNAME and MODELNAME must be specified";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+      pluginName = ui.GetString("PLUGINNAME");
+      modelName = ui.GetString("MODELNAME");
+
+      const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
+      if (plugin == NULL) {
+        QString message = "Cannot find requested Plugin: [" + pluginName + "].";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+
+      // TODO: Add warning argument and use message from csm::Warning for Isis::IException error.
+      if (plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())){
+        model = plugin->constructModelFromState(stateString.toStdString());
+      }
+      else {
+        QString message = "Could not construct sensor model using STATE string and MODELNAME: [" + modelName + "]";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+    } // end of State else statement
 
     string modelState = model->getModelState();
 
-    // Add the TargetName to the instrument group, if specified:
+    // Making copies of original Pvl Groups from input label so they can be restored if csminit fails.
+    PvlGroup originalInstrument;
+    PvlGroup originalKernels;
+    PvlGroup originalCsmInfo;
+    if (cube->hasGroup("Instrument")) {
+      originalInstrument = cube->group("Instrument");
+    }
+
+    if (cube->hasGroup("Kernels")) {
+      originalKernels = cube->group("Kernels");
+    }
+
+    if (cube->hasGroup("CsmInfo")) {
+      originalCsmInfo = cube->group("CsmInfo");
+    }
+
+    if (!cube->hasGroup("Instrument")) {
+      cube->putGroup(PvlGroup("Instrument"));
+    }
+    PvlGroup &instrumentGroup = cube->group("Instrument");
     if (ui.WasEntered("TARGETNAME")) {
-      if (!cube->hasGroup("Instrument")) {
-        cube->putGroup(PvlGroup("Instrument"));
-      }
-      PvlGroup &instrumentGroup = cube->group("Instrument");
       instrumentGroup.addKeyword(PvlKeyword("TargetName", ui.GetString("TARGETNAME")), Pvl::Replace);
+    }
+    // If the user doesn't specify a target name, then we will still need
+    // something on the label for the Target & ShapeModel so add Unknown
+    else if (!instrumentGroup.hasKeyword("TargetName")) {
+      PvlKeyword targetKey("TargetName", "Unknown");
+      targetKey.addComment("Radii will come from the CSM model");
+      instrumentGroup.addKeyword(targetKey, Pvl::Replace);
+    }
+
+    if (!instrumentGroup.hasKeyword("InstrumentId")) {
+      PvlKeyword instrumentIdKey("InstrumentId", QString::fromStdString(model->getSensorIdentifier()));
+      instrumentGroup.addKeyword(instrumentIdKey, Pvl::Replace);
     }
 
     // Populate the CsmInfo group with useful information
@@ -152,6 +238,7 @@ namespace Isis {
     infoGroup += PvlKeyword("ReferenceTime",
                             QString::fromStdString(model->getReferenceDateAndTime()));
     csm::GeometricModel *modelWithParams = dynamic_cast<csm::GeometricModel*>(model);
+
     if (modelWithParams) {
       PvlKeyword paramNames("ModelParameterNames");
       PvlKeyword paramUnits("ModelParameterUnits");
@@ -167,15 +254,15 @@ namespace Isis {
           case csm::param::FICTITIOUS:
             paramTypes += "FICTITIOUS";
             break;
-        
+
           case csm::param::REAL:
             paramTypes += "REAL";
             break;
-        
+
           case csm::param::FIXED:
             paramTypes += "FIXED";
             break;
-        
+
           default:
             paramTypes += "UNKNOWN";
             break;
@@ -196,10 +283,10 @@ namespace Isis {
 
     if (ui.WasEntered("SHAPEMODEL")) {
       // TODO validate the shapemodel
-      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetString("SHAPEMODEL")), Pvl::Replace);
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", ui.GetFileName("SHAPEMODEL")), Pvl::Replace);
     }
     else {
-      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Ellipsoid"), Pvl::Replace);
+      kernelsGroup.addKeyword(PvlKeyword("ShapeModel", "Null"), Pvl::Replace);
     }
 
     // Get rid of keywords from spiceinit
@@ -270,33 +357,122 @@ namespace Isis {
       kernelsGroup.deleteKeyword("Tolerance");
     }
 
-    // Remove tables from spiceinit
-    cube->deleteBlob("Table", "InstrumentPointing");
-    cube->deleteBlob("Table", "InstrumentPosition");
-    cube->deleteBlob("Table", "BodyRotation");
-    cube->deleteBlob("Table", "SunPosition");
-    cube->deleteBlob("Table", "CameraStatistics");
-    cube->deleteBlob("Polygon", "Footprint");
 
     if (cube->label()->hasObject("NaifKeywords")) {
       cube->label()->deleteObject("NaifKeywords");
     }
 
-    cube->deleteBlob("String", "CSMState");
+    // Save off all old Blobs to restore in the case of csminit failure
+    Blob originalCsmStateBlob("CSMState", "String");
+    if (cube->hasBlob("CSMState", "String")) {
+      cube->read(originalCsmStateBlob);
+    }
 
-    // Create our CSM State blob as a string
-    // Add the CSM string to the Blob.
-    StringBlob csmStateBlob(modelState, "CSMState");
+    Table originalInstrumentPointing("InstrumentPointing");
+    if (cube->hasTable("InstrumentPointing")) {
+      originalInstrumentPointing = cube->readTable("InstrumentPointing");
+    }
+
+    Table originalInstrumentPosition("InstrumentPosition");
+    if (cube->hasTable("InstrumentPosition")) {
+      originalInstrumentPosition = cube->readTable("InstrumentPosition");
+    }
+
+    Table originalBodyRotation("BodyRotation");
+    if (cube->hasTable("BodyRotation")) {
+      originalBodyRotation = cube->readTable("BodyRotation");
+    }
+
+    Table originalSunPosition("SunPosition");
+    if (cube->hasTable("SunPosition")) {
+      originalSunPosition = cube->readTable("SunPosition");
+    }
+
+    Table originalCameraStatistics("CameraStatistics");
+    if (cube->hasTable("CameraStatistics")) {
+      originalCameraStatistics = cube->readTable("CameraStatistics");
+    }
+
+    ImagePolygon originalFootprint;
+    if (cube->hasBlob("ImageFootprint", "Polygon")) {
+      originalFootprint = cube->readFootprint();
+    }
+
+    // Remove blob from old csminit run
+    cube->deleteBlob("CSMState", "String");
+
+    // Remove tables from spiceinit before writing to the cube
+    cube->deleteBlob("InstrumentPointing", "Table");
+    cube->deleteBlob("InstrumentPosition", "Table");
+    cube->deleteBlob("BodyRotation", "Table");
+    cube->deleteBlob("SunPosition", "Table");
+    cube->deleteBlob("CameraStatistics", "Table");
+    cube->deleteBlob("Footprint", "Polygon");
+
+    // Create our CSM State blob as a string and add the CSM string to the Blob.
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(modelState.c_str(), modelState.size());
     PvlObject &blobLabel = csmStateBlob.Label();
-    blobLabel += PvlKeyword("ModelName", QString::fromStdString(model->getModelName()));
-    blobLabel += PvlKeyword("PluginName", QString::fromStdString(plugin->getPluginName()));
-
-    // Write CSM State blob to cube
+    blobLabel += PvlKeyword("ModelName", modelName);
+    blobLabel += PvlKeyword("PluginName", pluginName);
     cube->write(csmStateBlob);
 
-    // TODO attempt to get the CSM Model from the cube
+    try {
+      CameraFactory::Create(*cube);
+      p.WriteHistory(*cube);
+    }
+    catch (IException &e) {
+      // Restore the original groups on the label
+      cube->deleteGroup("Instrument");
+      if (originalInstrument.keywords() != 0) {
+        cube->putGroup(originalInstrument);
+      }
 
-    p.WriteHistory(*cube);
+      cube->deleteGroup("Kernels");
+      if (originalKernels.keywords() != 0) {
+        cube->putGroup(originalKernels);
+      }
+
+      cube->deleteGroup("CsmInfo");
+      if (originalCsmInfo.keywords() != 0) {
+        cube->putGroup(originalCsmInfo);
+      }
+
+      cube->deleteBlob("CSMState", "String");
+
+      // Restore the original blobs
+      if (originalCsmStateBlob.Size() != 0) {
+        cube->write(originalCsmStateBlob);
+      }
+
+      if (originalInstrumentPointing.Records() != 0) {
+        cube->write(originalInstrumentPointing);
+      }
+
+      if (originalInstrumentPosition.Records() != 0) {
+        cube->write(originalInstrumentPosition);
+      }
+
+      if (originalBodyRotation.Records() != 0) {
+        cube->write(originalBodyRotation);
+      }
+
+      if (originalSunPosition.Records() != 0) {
+        cube->write(originalSunPosition);
+      }
+
+      if (originalCameraStatistics.Records() != 0) {
+        cube->write(originalCameraStatistics);
+      }
+
+
+      if (originalFootprint.Polys() != NULL &&
+          originalFootprint.Polys()->getNumGeometries() != 0) {
+        cube->write(originalFootprint);
+      }
+
+      QString message = "Failed to create a CSMCamera.";
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    }
   }
-
 }

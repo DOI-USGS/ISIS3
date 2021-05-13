@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.5 $
- * $Date: 2010/05/14 19:20:28 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -32,9 +16,18 @@ namespace Isis {
   /**
    * Constructor for creating an original blob with a given name
    */
-  OriginalLabel::OriginalLabel() : Isis::Blob("IsisCube", "OriginalLabel") {
+  OriginalLabel::OriginalLabel() {
     m_originalLabel.setTerminator("");
   }
+
+
+  /**
+   * Constructor for creating an original label from a blob object.
+   */
+  OriginalLabel::OriginalLabel(Isis::Blob &blob) {
+    fromBlob(blob);
+  }
+
 
   /**
    * Constructor for creating an original blob with a given name and file to
@@ -42,10 +35,12 @@ namespace Isis {
    *
    * @param file File to read labels from
    */
-  OriginalLabel::OriginalLabel(const QString &file) :
-    Isis::Blob("IsisCube", "OriginalLabel") {
-    Blob::Read(file);
+  OriginalLabel::OriginalLabel(const QString &file){
+    Blob blob = Blob("IsisCube", "OriginalLabel");
+    blob.Read(file);
+    fromBlob(blob);
   }
+
 
   /**
    * Constructor for creating an original blob with a given name and Pvl
@@ -53,7 +48,7 @@ namespace Isis {
    *
    * @param pvl  Pvl containing labels of the source
    */
-  OriginalLabel::OriginalLabel(Pvl pvl) : Isis::Blob("IsisCube", "OriginalLabel") {
+  OriginalLabel::OriginalLabel(Pvl pvl){
     m_originalLabel = pvl;
   }
 
@@ -61,39 +56,45 @@ namespace Isis {
   OriginalLabel::~OriginalLabel() {
   }
 
+
   /**
-   * Prepare labels for writing to the output cube.
+   * Initialize the OriginalLabel from a Blob.
+   *
+   * @param blob The Blob to extract data from
    */
-  void OriginalLabel::WriteInit() {
-    ostringstream ostr;
-    if(p_nbytes > 0) ostr << std::endl;
-
-    // store labels
-    ostr << m_originalLabel;
-    string orglblStr = ostr.str();
-    int bytes = orglblStr.size();
-
-    // Copy label data to bytes variable
-    char *temp = p_buffer;
-    p_buffer = new char[p_nbytes+bytes];
-    if(temp != NULL) memcpy(p_buffer, temp, p_nbytes);
-    const char *ptr = orglblStr.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
-
-    if(temp != NULL) delete [] temp;
+  void OriginalLabel::fromBlob(Isis::Blob blob) {
+    Pvl pvl;
+    stringstream os;
+    char *buff = blob.getBuffer();
+    for(int i = 0; i < blob.Size(); i++){
+      os << buff[i];
+    }
+    os >> pvl;
+    m_originalLabel = pvl;
   }
+
+
+  /**
+   * Serialize the OriginalLabel data to a Blob.
+   *
+   * @return @b Blob
+   */
+  Isis::Blob OriginalLabel::toBlob() {
+    std::stringstream sstream;
+    sstream << m_originalLabel;
+    string orglblStr = sstream.str();
+    Isis::Blob blob("IsisCube", "OriginalLabel");
+    blob.setData(orglblStr.c_str(), orglblStr.size());
+    return blob;
+  }
+
 
   /**
    * Returns the labels in a Pvl object
    *
    * @return (Isis::Pvl) original labels
    */
-  Pvl OriginalLabel::ReturnLabels() {
-    Pvl pvl;
-    stringstream os;
-    for(int i = 0; i < p_nbytes; i++) os << p_buffer[i];
-    os >> pvl;
-    return pvl;
+  Pvl OriginalLabel::ReturnLabels() const {
+    return m_originalLabel;
   }
 }

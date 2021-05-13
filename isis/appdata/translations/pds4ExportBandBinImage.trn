@@ -1,5 +1,5 @@
-# Initial ISIS3 to PDS4 export of ISIS3 BandBin group to PDS4 imaging discipline. 
-# This can be used for Array_3D_Image or Array_2D_Image objects. 
+# Initial ISIS to PDS4 export of ISIS BandBin group to PDS4 imaging discipline. 
+# This can be used for Array_3D_Image or Array_2D_Image objects.
 # Note that the LocalIdentifierReference value (written to img:local_identifier_reference)
 # is required to match the local_identifier value in the File_Area_Observational>File section.
 #
@@ -50,7 +50,7 @@ Group = FilterName1
   Optional
   InputKey         = FilterName
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_name 
+  OutputName       = img:filter_name
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group
@@ -61,7 +61,7 @@ Group = FilterName2
   Optional
   InputKey         = Name
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_name 
+  OutputName       = img:filter_name
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group
@@ -72,7 +72,7 @@ Group = FilterName3
   Optional
   InputKey         = FilterId
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_name 
+  OutputName       = img:filter_name
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group
@@ -83,7 +83,7 @@ Group = FilterId1
   Optional
   InputKey         = FilterId
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_id 
+  OutputName       = img:filter_id
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group
@@ -94,7 +94,7 @@ Group = FilterId2
   Optional
   InputKey         = FilterName
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_id 
+  OutputName       = img:filter_id
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group
@@ -105,7 +105,7 @@ Group = FilterId3
   Optional
   InputKey         = Name
   InputPosition    = (IsisCube, BandBin)
-  OutputName       = img:filter_id 
+  OutputName       = img:filter_id
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
   Translation      = (*, *)
 End_Group

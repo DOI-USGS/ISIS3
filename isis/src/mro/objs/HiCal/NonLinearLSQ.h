@@ -1,28 +1,13 @@
 #ifndef NonLinearLSQ_h
 #define NonLinearLSQ_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/02/08 21:31:01 $
- * $Id: NonLinearLSQ.h,v 1.2 2008/02/08 21:31:01 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */                                                                    
 
 #include <iostream>
 #include <sstream>
@@ -46,11 +31,11 @@ namespace Isis {
 
   /**
    * @brief NonLinearLSQ Computes a fit using a Levenberg-Marquardt algorithm
-   *  
-   * This virtual base class uses the GSL toolkit to apply the 
-   * Levenberg-Marquardt algorithm to fit data to a non-linear equation using 
-   * least squares. 
-   *  
+   *
+   * This virtual base class uses the GSL toolkit to apply the
+   * Levenberg-Marquardt algorithm to fit data to a non-linear equation using
+   * least squares.
+   *
    * @ingroup Utility
    * @author 2007-11-15 Kris Becker
    */
@@ -69,17 +54,17 @@ namespace Isis {
       virtual int nSize() const = 0;
       virtual int nParms() const = 0;
 
-      /** 
+      /**
        * @brief Sets the maximum number of iterations
-       * 
+       *
        * @param m User provides the maximum number iterations
        */
       void setMaxIters(int m) { _maxIters = m; }
 
-      /** 
+      /**
        * @brief Maximum number iterations for valid solution
-       * 
-       * 
+       *
+       *
        * @return int Maximum resolutions
        */
       int maxIters() const { return (_maxIters); }
@@ -99,18 +84,18 @@ namespace Isis {
       /** Check status for success of the given condition  */
       inline bool success(int status) const { return (status == GSL_SUCCESS); }
       /** Return error message pertaining to last fit procesing */
-      inline std::string statusstr() const { 
+      inline std::string statusstr() const {
         return (std::string(gsl_strerror(_status)));
       }
       /** Return error message given status condition */
-      inline std::string statusstr(int status) const { 
+      inline std::string statusstr(int status) const {
         return (std::string(gsl_strerror(status)));
       }
 
       /** Default interation test simply returns input status */
-      virtual int checkIteration(const int Iter, const NLVector &fitcoefs, 
+      virtual int checkIteration(const int Iter, const NLVector &fitcoefs,
                                  const NLVector &uncerts, double cplxconj,
-                                 int Istatus) { 
+                                 int Istatus) {
         return (Istatus);
       }
 
@@ -142,7 +127,7 @@ namespace Isis {
       };
       static int f(const gsl_vector *x, void *params, gsl_vector *fx);
       static int df(const gsl_vector *x, void *params, gsl_matrix *J);
-      static int fdf(const gsl_vector *x, void *params, gsl_vector *fx, 
+      static int fdf(const gsl_vector *x, void *params, gsl_vector *fx,
                      gsl_matrix *J);
 
       NLVector gslToNlsq(const gsl_vector *v) const;
@@ -154,4 +139,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

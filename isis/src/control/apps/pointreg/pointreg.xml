@@ -11,7 +11,7 @@
       algorithm (DEFFILE) to subpixel (or, less commonly, whole pixel) register
       individual <def>control point</def> coordinates (<def link="Control
         Measure">measures</def>) that have been collected between images and
-      stored within an input <def>control network</def>. 
+      stored within an input <def>control network</def>.
     </p>
 
     <p>
@@ -22,17 +22,17 @@
 
     <p>
       Most often the input control point network (CNET) contains
-      <def>A priori</def>  <def>sample</def> and <def>line</def> positions based 
-      on the original <def>SPICE</def> of the images.  For creating an initial 
-      control network, refer to applications such as "autoseed", "seedgrid" 
-      and/or "qnet".   
+      <def>A priori</def>  <def>sample</def> and <def>line</def> positions based
+      on the original <def>SPICE</def> of the images.  For creating an initial
+      control network, refer to applications such as "autoseed", "seedgrid"
+      and/or "qnet".
     </p>
 
     <p>
       Due to many factors, often including inaccuracies with the camera
       pointing, the control point's initial measure coordinates between images
       are not registered to one another with subpixel -- or even whole pixel --
-      accuracy.  
+      accuracy.
     </p>
 
     <p>
@@ -40,17 +40,17 @@
       "pointreg" (POINTS, MEASURES) in order to know whether or not to work on a
       control point and the associated measures.  "Pointreg" in turn adds or
       updates fields in the output control network that reflect the successes
-      and failures of the pattern matching for each measure.  
+      and failures of the pattern matching for each measure.
     </p>
 
     <p>
-      For every control point within the input network, there are control measures.  
-      For each control point there is always one and only one associated 
-      <def link="Reference Measure">reference measure</def>, either set explicitly 
-      or chosen at runtime implicitly.  Explicit references are chosen and defined 
-      as such either manually by users ("qnet") or automatically with an interest 
-      operator ("cnetref").  Implicit references are determined when no explicit 
-      reference is set for a point. In such a case, the control point will provide 
+      For every control point within the input network, there are control measures.
+      For each control point there is always one and only one associated
+      <def link="Reference Measure">reference measure</def>, either set explicitly
+      or chosen at runtime implicitly.  Explicit references are chosen and defined
+      as such either manually by users ("qnet") or automatically with an interest
+      operator ("cnetref").  Implicit references are determined when no explicit
+      reference is set for a point. In such a case, the control point will provide
       its first valid (Ignore=False) measure to act as the reference.
     </p>
 
@@ -63,14 +63,14 @@ every other measure in the point to that reference location.  An
 
     <p>
       With every successful subpixel registration for each control measure, the
-      sample and line values within the output control network 
-      are updated with the resulting subpixel coordinates.  Note that the reference 
+      sample and line values within the output control network
+      are updated with the resulting subpixel coordinates.  Note that the reference
       measure coordinates are "fixed" while the coordinates of the remaining measures
-      are adjusted based on the pattern matching output.  The a priori sample and 
-      line fields are assigned the original starting input pixel coordinates.  
-      Applications such as "qnet", will report the sample and line shift as a result 
-      of "pointreg".  "Pointreg" will also update the control network with the 
-      pattern match coefficient results such as minimum and maximum "pixel z-score" 
+      are adjusted based on the pattern matching output.  The a priori sample and
+      line fields are assigned the original starting input pixel coordinates.
+      Applications such as "qnet", will report the sample and line shift as a result
+      of "pointreg".  "Pointreg" will also update the control network with the
+      pattern match coefficient results such as minimum and maximum "pixel z-score"
       and "goodness of fit".
     </p>
 
@@ -84,7 +84,7 @@ every other measure in the point to that reference location.  An
 
   <category>
     <categoryItem>Control Networks</categoryItem>
-  </category>  
+  </category>
 
   <seeAlso>
       <applications>
@@ -95,7 +95,7 @@ every other measure in the point to that reference location.  An
       </applications>
       <documents>
         <document>
-          <title>Pattern Matching in ISIS 3</title>
+          <title>Pattern Matching in ISIS</title>
           <source>
             <filename>PatternMatch.html</filename>
             <path>../../../../documents/PatternMatch/</path>
@@ -105,11 +105,11 @@ every other measure in the point to that reference location.  An
   </seeAlso>
 
   <history>
-    <change name="Jacob Danton" date="2006-01-11"> 
+    <change name="Jacob Danton" date="2006-01-11">
       Original Version
     </change>
     <change name="Brendan George" date="2006-10-02">
-      Modified call to get current time to use Time class, instead of 
+      Modified call to get current time to use Time class, instead of
       Application class
     </change>
     <change name="Steven Lambright" date="2007-07-23">
@@ -120,48 +120,48 @@ every other measure in the point to that reference location.  An
     </change>
     <change name="Steven Koechle" date="2008-11-13">
       Added option to process ignored points (new parameters PROCESSIGNORED and
-      PROCESSVALID), Added FlatFile output parameter. Renamed IGNORED   
-      parameter to OUTPUTIGNORED Renamed UNMEASURED parameter to   
+      PROCESSVALID), Added FlatFile output parameter. Renamed IGNORED
+      parameter to OUTPUTIGNORED Renamed UNMEASURED parameter to
       OUTPUTUNMEASURED.
     </change>
     <change name="Steven Koechle" date="2008-11-13">
       Fixed pointreg to modify ChooserName and DateTime of measures it alters
     </change>
-    <change name="Jeannie Walldren" date="2008-11-14"> 
-      Changed PROCESSIGNORED parameter name to REGISTERIGNOREDONLY.  Removed 
-      PROCESSVALID parameter since "valid" points are only processed if 
-      REGISTERIGNOREDONLY is false.  Changed extension filters for CNET, 
-      TEMPLATE and TO from (*.txt *.lis *.lst) to *.net, *.def, and *.net, 
+    <change name="Jeannie Walldren" date="2008-11-14">
+      Changed PROCESSIGNORED parameter name to REGISTERIGNOREDONLY.  Removed
+      PROCESSVALID parameter since "valid" points are only processed if
+      REGISTERIGNOREDONLY is false.  Changed extension filters for CNET,
+      TEMPLATE and TO from (*.txt *.lis *.lst) to *.net, *.def, and *.net,
       respectively.   Fixed bug in program so ignored control points only are
       included in the output when the OUTPUTIGNORED parameter is selected.  And
-      valid points are always included in the output. 
+      valid points are always included in the output.
     </change>
     <change name="Jeannie Walldren" date="2008-11-17">
-      Added examples to xml file. Fixed bug so that, when registering ignored 
-      points, any unmeasured ControlMeasure is omitted if OUTPUTUNMEASURED=no.  
+      Added examples to xml file. Fixed bug so that, when registering ignored
+      points, any unmeasured ControlMeasure is omitted if OUTPUTUNMEASURED=no.
       Added appTest cases for new parameters.
     </change>
     <change name="Steven Koechle" date="2008-11-18">
       Added PointId to the FlatFile output
     </change>
     <change name="Jeff Anderson" date="2008-12-04">
-      Modified to allow control points to have measures which can't be 
+      Modified to allow control points to have measures which can't be
       registered to not be ignored.  The point is not ignored so long as at
-      least two measures can be registered.     
+      least two measures can be registered.
     </change>
     <change name="Jeannie Walldren" date="2008-12-22">
-      Modified to set successfully registered measures to Ignore=False and 
-      Ignore=True otherwise.  
+      Modified to set successfully registered measures to Ignore=False and
+      Ignore=True otherwise.
     </change>
     <change name="Jeannie Walldren" date="2008-12-23">
-      Modified code that sets point's "Ignore" Keyword to "True" only if it is 
-      neither a ground point nor a held point. Modified app test truth files to 
+      Modified code that sets point's "Ignore" Keyword to "True" only if it is
+      neither a ground point nor a held point. Modified app test truth files to
       reflect changes.
     </change>
     <change name="Jeannie Walldren" date="2008-12-24">
-      Modified flatfile parameter to output the lines and samples of the 
-      original and registered measurements, rather than the original and 
-      reference measurements. Modified app test truth files to 
+      Modified flatfile parameter to output the lines and samples of the
+      original and registered measurements, rather than the original and
+      reference measurements. Modified app test truth files to
       reflect changes.
     </change>
     <change name="Steven Lambright" date="2009-02-13">
@@ -174,23 +174,23 @@ every other measure in the point to that reference location.  An
       Auto registration parameters are now placed into the print file.
     </change>
     <change name="Jeannie Walldren" date="2010-03-18">
-      Added REGISTERNEWONLY parameter to allow user to choose to keep 
-      previously registered points unchanged.  If checked, this will only 
-      process new points that do not have ChooserName = "Application 
+      Added REGISTERNEWONLY parameter to allow user to choose to keep
+      previously registered points unchanged.  If checked, this will only
+      process new points that do not have ChooserName = "Application
       pointreg".
     </change>
     <change name="Travis Addair" date="2010-04-13">
-      Template now defaults to a def file containing all keywords with their 
+      Template now defaults to a def file containing all keywords with their
       default values (except for ValidMinimum and ValidMaximum).
     </change>
     <change name="Travis Addair" date="2010-04-23">
-      Parameter REGISTERNEWONLY will now only process new points that have 
-      MeasureType = Estimated 
+      Parameter REGISTERNEWONLY will now only process new points that have
+      MeasureType = Estimated
     </change>
     <change name="Travis Addair" date="2010-04-29">
-      Groups PointsToRegister and MeasuresToRegister have been condensed into 
-      WhatToRegister with radio buttons allowing the user to specify whether 
-      to process non-ignored, ignored, or all Control Points, and estimated or 
+      Groups PointsToRegister and MeasuresToRegister have been condensed into
+      WhatToRegister with radio buttons allowing the user to specify whether
+      to process non-ignored, ignored, or all Control Points, and estimated or
       all Control Measures.
     </change>
     <change name="Travis Addair" date="2010-05-25">
@@ -263,7 +263,7 @@ every other measure in the point to that reference location.  An
           registered.
         </description>
         <filter>
-          *.net 
+          *.net
         </filter>
       </parameter>
 
@@ -324,11 +324,11 @@ every other measure in the point to that reference location.  An
           </brief>
           <description>
             This file will contain data collected from the pointreg application.
-            The data will be comma-separated and contain a line for each 
-            measurement of all non-ignored points in the output control net.     
+            The data will be comma-separated and contain a line for each
+            measurement of all non-ignored points in the output control net.
             This will include the point id, orignal sample position, original
             line position, new sample position, new line position, sample
-            difference, line difference, minimum z-score, maximum z-score, and 
+            difference, line difference, minimum z-score, maximum z-score, and
             goodness of fit.
           </description>
           <internalDefault>None</internalDefault>
@@ -364,7 +364,7 @@ every other measure in the point to that reference location.  An
           run of "pointreg" will remain in the output control network.
         </description>
         <default><item>True</item></default>
-      </parameter> 
+      </parameter>
     </group>
 
     <group name="WhatToRegister">
@@ -374,14 +374,14 @@ every other measure in the point to that reference location.  An
           How to handle "ignored" points
         </brief>
         <description>
-          If this parameter is set to IGNORED, ignored points will be 
-          reprocessed. It may set them to "valid" if they are acceptable in a 
-          new tolerance range. If this parameter is set to the default value of 
-          NOTIGNORED, only the "valid" or "non-ignored" points will be 
-          registered.  Otherwise, if it is set to ALL, every point will be 
-          registered.  Note that if certain Control Points will not be 
-          processed, it implies that all their measures will not be 
-          processed as well.  
+          If this parameter is set to IGNORED, ignored points will be
+          reprocessed. It may set them to "valid" if they are acceptable in a
+          new tolerance range. If this parameter is set to the default value of
+          NOTIGNORED, only the "valid" or "non-ignored" points will be
+          registered.  Otherwise, if it is set to ALL, every point will be
+          registered.  Note that if certain Control Points will not be
+          processed, it implies that all their measures will not be
+          processed as well.
         </description>
         <default><item>NONIGNORED</item></default>
         <list>
@@ -392,7 +392,7 @@ every other measure in the point to that reference location.  An
             <description>
               This option will result in all Control Points being processed
               regardless of "Ignored" status.
-            </description>      
+            </description>
           </option>
           <option value="NONIGNORED">
             <brief>
@@ -431,7 +431,7 @@ every other measure in the point to that reference location.  An
           selected -- will be processed.  A measure is considered a "candidate"
           if it has never been run through "pointreg" before, or if it was
           unsuccessfully registed in a previous run.
-        </description>     
+        </description>
         <default><item>ALL</item></default>
         <list>
           <option value="ALL">
@@ -452,11 +452,11 @@ every other measure in the point to that reference location.  An
               successfully registered before ("candidates") being processed.
             </description>
           </option>
-        </list>  
+        </list>
       </parameter>
-    </group> 
+    </group>
 
-    <group name="Validation">                           
+    <group name="Validation">
       <parameter name="VALIDATE">
         <type>string</type>
         <brief>
@@ -628,25 +628,25 @@ every other measure in the point to that reference location.  An
   <examples>
     <example>
       <brief>
-        Default registration settings include ignored and unmeasured points in 
+        Default registration settings include ignored and unmeasured points in
         the output control net.
       </brief>
       <description>
         In this example, the pointreg application is used to register valid, i.e.
-        "non-ignored", points from two images and output a new control network 
+        "non-ignored", points from two images and output a new control network
         that includes ignored control points and unmeasured control measures.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net 
-          template=../IN/autoRegTemplate.def 
-          to=../OUT/outputIgnoredAndUnmeasured.net 
+          files=../IN/fileList.lis cnet=../IN/controlNet.net
+          template=../IN/autoRegTemplate.def
+          to=../OUT/outputIgnoredAndUnmeasured.net
           flatfile=../OUT/outputIgnoredAndUnmeasured.txt
         </commandLine>
         <description>
-           This example shows the use of pointreg with the OUTPUTIGNORED and 
-           OUTPUTUNMEASURED parameters left with the default values of "True" and 
-           REGISTERIGNOREDONLY with the default value of "False".  This implies 
+           This example shows the use of pointreg with the OUTPUTIGNORED and
+           OUTPUTUNMEASURED parameters left with the default values of "True" and
+           REGISTERIGNOREDONLY with the default value of "False".  This implies
            that only "non-ignored" points will be registered but all control
            points and control measures will be included in the output.
         </description>
@@ -657,10 +657,10 @@ every other measure in the point to that reference location.  An
             <brief>
               Example GUI
             </brief>
-            <description> 
-              Screen shot of GUI with parameters filled in to perform point 
-              registration that includes ignored control points and unmeasured 
-              control measures in the output but does not register the ignore 
+            <description>
+              Screen shot of GUI with parameters filled in to perform point
+              registration that includes ignored control points and unmeasured
+              control measures in the output but does not register the ignore
               points.
             </description>
             <thumbnail src="assets/thumbs/outputIgnoredAndUnmeasuredGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
@@ -673,8 +673,8 @@ every other measure in the point to that reference location.  An
             View Input File List
           </brief>
           <description>
-               Input text file containing a list of all files in the control 
-               network.  All cubes in this list should be located in the same 
+               Input text file containing a list of all files in the control
+               network.  All cubes in this list should be located in the same
                directory that the application is run in.
           </description>
           <parameterName>
@@ -686,8 +686,8 @@ every other measure in the point to that reference location.  An
             View Entire Input ControlNet
           </brief>
           <description>
-              Input text file containing the initial control network.  There are 
-              10 control points, one is passed in as an ignored point and two 
+              Input text file containing the initial control network.  There are
+              10 control points, one is passed in as an ignored point and two
               are unmeasured.
           </description>
           <parameterName>
@@ -699,8 +699,8 @@ every other measure in the point to that reference location.  An
             View Auto Registration Template
           </brief>
           <description>
-              Input auto registration template file in PVL format containing the 
-              registration algorithm information to be used to register the 
+              Input auto registration template file in PVL format containing the
+              registration algorithm information to be used to register the
               points.
           </description>
           <parameterName>
@@ -712,8 +712,8 @@ every other measure in the point to that reference location.  An
             View resulting ControlNet
           </brief>
           <description>
-            Output control network file containing the registered information. 
-            Notice that all ignored points and unmeasured control measures are 
+            Output control network file containing the registered information.
+            Notice that all ignored points and unmeasured control measures are
             kept in this network.
           </description>
           <parameterName>
@@ -725,8 +725,8 @@ every other measure in the point to that reference location.  An
             View resulting flat file
           </brief>
           <description>
-            Output flat file containing the data collected from the pointreg 
-            application. 
+            Output flat file containing the data collected from the pointreg
+            application.
           </description>
           <parameterName>
             TO
@@ -737,7 +737,7 @@ every other measure in the point to that reference location.  An
             View resulting application log.
           </brief>
           <description>
-            This log is output to the screeen and contains a count of the 
+            This log is output to the screeen and contains a count of the
             following:  "ignore" points upon completion; validated, registered,
             unregistered and unmeasured ControlMeasures; successful and failed
             registrations; PatternChip and SurfaceModel statistics.
@@ -751,21 +751,21 @@ every other measure in the point to that reference location.  An
         unmeasured points in the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register "ignore" 
-        points from two images and output a new control network that includes 
+        In this example, the pointreg application is used to register "ignore"
+        points from two images and output a new control network that includes
         valid and ignored points and unmeasured control measures.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net 
-          template=../IN/autoRegTemplate.def 
-          to=../OUT/outputIgnoredAndUnmeasuredRegIgnored.net 
-          flatfile=../OUT/outputIgnoredAndUnmeasuredRegIgnored.txt 
+          files=../IN/fileList.lis cnet=../IN/controlNet.net
+          template=../IN/autoRegTemplate.def
+          to=../OUT/outputIgnoredAndUnmeasuredRegIgnored.net
+          flatfile=../OUT/outputIgnoredAndUnmeasuredRegIgnored.txt
           registerignoredonly=yes
         </commandLine>
         <description>
-           This example shows the use of pointreg with the OUTPUTIGNORED,   
-           OUTPUTUNMEASURED and REGISTERIGNOREDONLY parameters as "True". This 
+           This example shows the use of pointreg with the OUTPUTIGNORED,
+           OUTPUTUNMEASURED and REGISTERIGNOREDONLY parameters as "True". This
            implies that only "ignored" points will be registered but all control
            points and control measures will be included in the output.
         </description>
@@ -776,10 +776,10 @@ every other measure in the point to that reference location.  An
             <brief>
               Example GUI
             </brief>
-            <description> 
+            <description>
               Screen shot of GUI with parameters filled in to perform ignored
-              point registration that includes ignored control points and 
-              unmeasured control measures in the output but does not register 
+              point registration that includes ignored control points and
+              unmeasured control measures in the output but does not register
               the "valid" points.
             </description>
             <thumbnail src="assets/thumbs/outputIgnoredAndUnmeasuredRegIgnoreGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
@@ -792,8 +792,8 @@ every other measure in the point to that reference location.  An
             View Input File List
           </brief>
           <description>
-               Input text file containing a list of all files in the control 
-               network.  All cubes in this list should be located in the same 
+               Input text file containing a list of all files in the control
+               network.  All cubes in this list should be located in the same
                directory that the application is run in.
           </description>
           <parameterName>
@@ -805,8 +805,8 @@ every other measure in the point to that reference location.  An
             View Entire Input ControlNet
           </brief>
           <description>
-              Input text file containing the initial control network.  There are 
-              10 control points, one is passed in as an ignored point and two 
+              Input text file containing the initial control network.  There are
+              10 control points, one is passed in as an ignored point and two
               are unmeasured.
           </description>
           <parameterName>
@@ -818,8 +818,8 @@ every other measure in the point to that reference location.  An
             View Auto Registration Template
           </brief>
           <description>
-              Input auto registration template file in PVL format containing the 
-              registration algorithm information to be used to register the 
+              Input auto registration template file in PVL format containing the
+              registration algorithm information to be used to register the
               points.
           </description>
           <parameterName>
@@ -831,8 +831,8 @@ every other measure in the point to that reference location.  An
             View resulting ControlNet
           </brief>
           <description>
-            Output control network file containing the registered information. 
-            Notice that all ignored points and unmeasured control measures are 
+            Output control network file containing the registered information.
+            Notice that all ignored points and unmeasured control measures are
             kept in this network.
           </description>
           <parameterName>
@@ -844,8 +844,8 @@ every other measure in the point to that reference location.  An
             View resulting flat file
           </brief>
           <description>
-            Output flat file containing the data collected from the pointreg 
-            application. 
+            Output flat file containing the data collected from the pointreg
+            application.
           </description>
           <parameterName>
             TO
@@ -856,36 +856,36 @@ every other measure in the point to that reference location.  An
             View resulting application log.
           </brief>
           <description>
-            This log is output to the screeen and contains a count of the 
+            This log is output to the screeen and contains a count of the
             following:  "ignore" points upon completion; validated, registered,
             unregistered and unmeasured ControlMeasures; successful and failed
             registrations; PatternChip and SurfaceModel statistics.
           </description>
         </dataFile>
       </dataFiles>
-    </example> 
+    </example>
     <example>
       <brief>
         Register "valid" points in a control network and omit ignored points and
         unmeasured measures from the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register "valid" 
-        points from two images and output a new control network that omits 
+        In this example, the pointreg application is used to register "valid"
+        points from two images and output a new control network that omits
         ignored control points and unmeasured control measures.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net 
-          template=../IN/autoRegTemplate.def 
-          to=../OUT/discardIgnoredAndUnmeasured.net 
-          flatfile=../OUT/discardIgnoredAndUnmeasured.txt 
+          files=../IN/fileList.lis cnet=../IN/controlNet.net
+          template=../IN/autoRegTemplate.def
+          to=../OUT/discardIgnoredAndUnmeasured.net
+          flatfile=../OUT/discardIgnoredAndUnmeasured.txt
           outputignored=no outputunmeasured=no
         </commandLine>
         <description>
-           This example shows the use of pointreg with the OUTPUTIGNORED,   
-           OUTPUTUNMEASURED and REGISTERIGNOREDONLY parameters set to "False". 
-           This implies that only "valid" points will be  registered and 
+           This example shows the use of pointreg with the OUTPUTIGNORED,
+           OUTPUTUNMEASURED and REGISTERIGNOREDONLY parameters set to "False".
+           This implies that only "valid" points will be  registered and
            included inthe output control network.
         </description>
       </terminalInterface>
@@ -895,9 +895,9 @@ every other measure in the point to that reference location.  An
             <brief>
               Example GUI
             </brief>
-            <description> 
-              Screen shot of GUI with parameters filled in to perform point 
-              registration that omits ignored control points and unmeasured 
+            <description>
+              Screen shot of GUI with parameters filled in to perform point
+              registration that omits ignored control points and unmeasured
               control measures from the output.
             </description>
             <thumbnail src="assets/thumbs/discardIgnoredAndUnmeasuredGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
@@ -910,8 +910,8 @@ every other measure in the point to that reference location.  An
             View Input File List
           </brief>
           <description>
-               Input text file containing a list of all files in the control 
-               network.  All cubes in this list should be located in the same 
+               Input text file containing a list of all files in the control
+               network.  All cubes in this list should be located in the same
                directory that the application is run in.
           </description>
           <parameterName>
@@ -923,8 +923,8 @@ every other measure in the point to that reference location.  An
             View Entire Input ControlNet
           </brief>
           <description>
-              Input text file containing the initial control network.  There are 
-              10 control points, one is passed in as an ignored point and two 
+              Input text file containing the initial control network.  There are
+              10 control points, one is passed in as an ignored point and two
               are unmeasured.
           </description>
           <parameterName>
@@ -936,8 +936,8 @@ every other measure in the point to that reference location.  An
             View Auto Registration Template
           </brief>
           <description>
-              Input auto registration template file in PVL format containing the 
-              registration algorithm information to be used to register the 
+              Input auto registration template file in PVL format containing the
+              registration algorithm information to be used to register the
               points.
           </description>
           <parameterName>
@@ -949,8 +949,8 @@ every other measure in the point to that reference location.  An
             View resulting ControlNet
           </brief>
           <description>
-            Output control network file containing the registered information. 
-            Notice that all ignored points and unmeasured control measures are 
+            Output control network file containing the registered information.
+            Notice that all ignored points and unmeasured control measures are
             omitted from this network.
           </description>
           <parameterName>
@@ -962,8 +962,8 @@ every other measure in the point to that reference location.  An
             View resulting flat file
           </brief>
           <description>
-            Output flat file containing the data collected from the pointreg 
-            application. 
+            Output flat file containing the data collected from the pointreg
+            application.
           </description>
           <parameterName>
             TO
@@ -974,37 +974,37 @@ every other measure in the point to that reference location.  An
             View resulting application log.
           </brief>
           <description>
-            This log is output to the screeen and contains a count of the 
+            This log is output to the screeen and contains a count of the
             following:  "ignore" points upon completion; validated, registered,
             unregistered and unmeasured ControlMeasures; successful and failed
             registrations; PatternChip and SurfaceModel statistics.
           </description>
         </dataFile>
       </dataFiles>
-    </example> 
+    </example>
     <example>
       <brief>
         Register "ignored" points in a control network and omit ignored and
         unmeasured points in the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register "ignore" 
-        points from two images and output a new control network that omits 
+        In this example, the pointreg application is used to register "ignore"
+        points from two images and output a new control network that omits
         ignored control points and unmeasured control measures.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net 
-          template=../IN/autoRegTemplate.def 
-          to=../OUT/discardIgnoredAndUnmeasuredRegIgnored.net 
-          flatfile=../OUT/discardIgnoredAndUnmeasuredRegIgnored.txt 
+          files=../IN/fileList.lis cnet=../IN/controlNet.net
+          template=../IN/autoRegTemplate.def
+          to=../OUT/discardIgnoredAndUnmeasuredRegIgnored.net
+          flatfile=../OUT/discardIgnoredAndUnmeasuredRegIgnored.txt
           outputignored=no outputunmeasured=no registerignoredonly=yes
         </commandLine>
         <description>
-           This example shows the use of pointreg with the OUTPUTIGNORED and   
-           OUTPUTUNMEASURED parameters set to "False" and REGISTERIGNOREDONLY 
-           set to "True". This implies that only "ignored" points will be  
-           registered while ignored control points and unmeasured control 
+           This example shows the use of pointreg with the OUTPUTIGNORED and
+           OUTPUTUNMEASURED parameters set to "False" and REGISTERIGNOREDONLY
+           set to "True". This implies that only "ignored" points will be
+           registered while ignored control points and unmeasured control
            measures are omitted from the output.
         </description>
       </terminalInterface>
@@ -1014,9 +1014,9 @@ every other measure in the point to that reference location.  An
             <brief>
               Example GUI
             </brief>
-            <description> 
+            <description>
               Screen shot of GUI with parameters filled in to perform ignored
-              point registration that omits ignored control points and 
+              point registration that omits ignored control points and
               unmeasured control measures from the output.
             </description>
             <thumbnail src="assets/thumbs/discardIgnoredAndUnmeasuredRegIgnoreGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
@@ -1029,8 +1029,8 @@ every other measure in the point to that reference location.  An
             View Input File List
           </brief>
           <description>
-               Input text file containing a list of all files in the control 
-               network.  All cubes in this list should be located in the same 
+               Input text file containing a list of all files in the control
+               network.  All cubes in this list should be located in the same
                directory that the application is run in.
           </description>
           <parameterName>
@@ -1042,8 +1042,8 @@ every other measure in the point to that reference location.  An
             View Entire Input ControlNet
           </brief>
           <description>
-              Input text file containing the initial control network.  There are 
-              10 control points, one is passed in as an ignored point and two 
+              Input text file containing the initial control network.  There are
+              10 control points, one is passed in as an ignored point and two
               are unmeasured.
           </description>
           <parameterName>
@@ -1055,8 +1055,8 @@ every other measure in the point to that reference location.  An
             View Auto Registration Template
           </brief>
           <description>
-              Input auto registration template file in PVL format containing the 
-              registration algorithm information to be used to register the 
+              Input auto registration template file in PVL format containing the
+              registration algorithm information to be used to register the
               points.
           </description>
           <parameterName>
@@ -1068,8 +1068,8 @@ every other measure in the point to that reference location.  An
             View resulting ControlNet
           </brief>
           <description>
-            Output control network file containing the registered information. 
-            Notice that all ignored points and unmeasured control measures are 
+            Output control network file containing the registered information.
+            Notice that all ignored points and unmeasured control measures are
             omitted from this network.
           </description>
           <parameterName>
@@ -1081,8 +1081,8 @@ every other measure in the point to that reference location.  An
             View resulting flat file
           </brief>
           <description>
-            Output flat file containing the data collected from the pointreg 
-            application. 
+            Output flat file containing the data collected from the pointreg
+            application.
           </description>
           <parameterName>
             TO
@@ -1093,36 +1093,36 @@ every other measure in the point to that reference location.  An
             View resulting application log.
           </brief>
           <description>
-            This log is output to the screeen and contains a count of the 
+            This log is output to the screeen and contains a count of the
             following:  "ignore" points upon completion; validated, registered,
             unregistered and unmeasured ControlMeasures; successful and failed
             registrations; PatternChip and SurfaceModel statistics.
           </description>
         </dataFile>
       </dataFiles>
-    </example> 
+    </example>
     <example>
       <brief>
-        Register "new" measures in a control network only and leave previously 
+        Register "new" measures in a control network only and leave previously
         processed as they are in the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register only "new" 
-        measures that have been added to the control net after a prior run in 
+        In this example, the pointreg application is used to register only "new"
+        measures that have been added to the control net after a prior run in
         pointreg.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net 
-          template=../IN/autoRegTemplate.def 
-          to=../OUT/registerNewOnly.net 
-          flatfile=../OUT/registerNewOnly.txt 
+          files=../IN/fileList.lis cnet=../IN/controlNet.net
+          template=../IN/autoRegTemplate.def
+          to=../OUT/registerNewOnly.net
+          flatfile=../OUT/registerNewOnly.txt
           registernewonly=yes
         </commandLine>
         <description>
-           This example shows the use of pointreg with the REGISTERNEWONLY set 
-           to "True". This implies that only "new" measurements will be 
-           registered while measures that have been previously registered are 
+           This example shows the use of pointreg with the REGISTERNEWONLY set
+           to "True". This implies that only "new" measurements will be
+           registered while measures that have been previously registered are
            not reprocessed.
         </description>
       </terminalInterface>
@@ -1132,8 +1132,8 @@ every other measure in the point to that reference location.  An
             <brief>
               Example GUI
             </brief>
-            <description> 
-              Screen shot of GUI with parameters filled in to perform new 
+            <description>
+              Screen shot of GUI with parameters filled in to perform new
                measure registration only.
             </description>
             <thumbnail src="assets/thumbs/registerNewOnlyThumb.jpg" width="200" height="151" caption="pointreg GUI" />
@@ -1146,8 +1146,8 @@ every other measure in the point to that reference location.  An
             View Input File List
           </brief>
           <description>
-               Input text file containing a list of all files in the control 
-               network.  All cubes in this list should be located in the same 
+               Input text file containing a list of all files in the control
+               network.  All cubes in this list should be located in the same
                directory that the application is run in.
           </description>
           <parameterName>
@@ -1159,9 +1159,9 @@ every other measure in the point to that reference location.  An
             View Entire Input ControlNet
           </brief>
           <description>
-              Input text file containing the initial control network.  There are 
-              10 control points, each with the first as reference, the second 
-              previously run through pointreg, and the third added with 
+              Input text file containing the initial control network.  There are
+              10 control points, each with the first as reference, the second
+              previously run through pointreg, and the third added with
               cnetadd.
           </description>
           <parameterName>
@@ -1173,8 +1173,8 @@ every other measure in the point to that reference location.  An
             View Auto Registration Template
           </brief>
           <description>
-              Input auto registration template file in PVL format containing the 
-              registration algorithm information to be used to register the 
+              Input auto registration template file in PVL format containing the
+              registration algorithm information to be used to register the
               points.
           </description>
           <parameterName>
@@ -1186,8 +1186,8 @@ every other measure in the point to that reference location.  An
             View resulting ControlNet
           </brief>
           <description>
-            Output control network file containing the registered information. 
-            Notice that all middle points have not been changed, but the third 
+            Output control network file containing the registered information.
+            Notice that all middle points have not been changed, but the third
             points have now been registered by pointreg.
           </description>
           <parameterName>
@@ -1199,8 +1199,8 @@ every other measure in the point to that reference location.  An
             View resulting flat file
           </brief>
           <description>
-            Output flat file containing the data collected from the pointreg 
-            application. 
+            Output flat file containing the data collected from the pointreg
+            application.
           </description>
           <parameterName>
             TO
@@ -1211,13 +1211,13 @@ every other measure in the point to that reference location.  An
             View resulting application log.
           </brief>
           <description>
-            This log is output to the screeen and contains a count of the 
+            This log is output to the screeen and contains a count of the
             following:  "ignore" points upon completion; validated, registered,
             unregistered and unmeasured ControlMeasures; successful and failed
             registrations; PatternChip and SurfaceModel statistics.
           </description>
         </dataFile>
       </dataFiles>
-    </example> 
+    </example>
   </examples>
 </application>

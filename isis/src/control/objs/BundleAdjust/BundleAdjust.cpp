@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleAdjust.h"
 
 // std lib
@@ -495,6 +503,36 @@ namespace Isis {
 
     if (m_bundleSettings->solveTargetBody()) {
       m_rank += m_bundleSettings->numberTargetBodyParameters();
+      
+      if (m_bundleTargetBody->solveMeanRadius() || m_bundleTargetBody->solveTriaxialRadii()) {
+        outputBundleStatus("Warning: Solving for the target body radii (triaxial or mean) "
+                           "is NOT possible and likely increases error in the solve.\n");
+      }
+      
+      if (m_bundleTargetBody->solveMeanRadius()){
+        // Check if MeanRadiusValue is abnormal compared to observation
+        bool isMeanRadiusValid = true;
+        double localRadius, aprioriRadius;
+
+        // Arbitrary control point containing an observed localRadius
+        BundleControlPointQsp point = m_bundleControlPoints.at(0);
+        SurfacePoint surfacepoint = point->adjustedSurfacePoint();
+
+        localRadius = surfacepoint.GetLocalRadius().meters();
+        aprioriRadius = m_bundleTargetBody->meanRadius().meters();
+
+        // Ensure aprioriRadius is within some threshold
+        // Considered potentially inaccurate if it's off by atleast a factor of two
+        if (aprioriRadius >= 2 * localRadius || aprioriRadius <= localRadius / 2) {
+            isMeanRadiusValid = false;
+        }
+
+        // Warn user for abnormal MeanRadiusValue
+        if (!isMeanRadiusValid) {
+          outputBundleStatus("Warning: User-entered MeanRadiusValue appears to be inaccurate. "
+                             "This can cause a bundle failure.\n");
+        }
+      }
     }
 
     int num3DPoints = m_bundleControlPoints.size();
@@ -3062,7 +3100,7 @@ namespace Isis {
     std::ostringstream ostr;
     ostr << summaryGroup << std::endl;
     m_iterationSummary += QString::fromStdString( ostr.str() );
-    
+
     if (m_printSummary && iApp != NULL) {
       Application::Log(summaryGroup);
     }

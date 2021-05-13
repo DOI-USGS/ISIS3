@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "EquatorialCylindricalShape.h"
 
 #include <QDebug>
@@ -30,9 +36,9 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Initialize the Isis3 Equatorial Cylindrical shape model.
+   * Initialize the ISIS Equatorial Cylindrical shape model.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) :
       DemShape(target, pvl) {
@@ -64,7 +70,7 @@ namespace Isis {
 
 
   /**
-   * Destructor for Isis3 Equatorial Cylindrical shape model
+   * Destructor for ISIS Equatorial Cylindrical shape model
    */
   EquatorialCylindricalShape::~EquatorialCylindricalShape() {
 

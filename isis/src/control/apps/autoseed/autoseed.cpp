@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "autoseed.h"
 
 #include <map>
@@ -9,6 +17,7 @@
 
 #include "Application.h"
 #include "Brick.h"
+#include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -18,12 +27,12 @@
 #include "IException.h"
 #include "ImageOverlap.h"
 #include "ImageOverlapSet.h"
-#include "ImagePolygon.h"
 #include "IString.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
 #include "PolygonTools.h"
-#include "Process.h"
+#include "Progress.h"
+#include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"

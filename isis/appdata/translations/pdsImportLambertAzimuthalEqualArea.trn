@@ -1,5 +1,5 @@
-# Translation file for importing PDS IMAGE_MAP_PROJECTION labels for 
-# Lambert Azimuthal Equal-Area projection in ISIS3.
+# Translation file for importing PDS IMAGE_MAP_PROJECTION labels for
+# Lambert Azimuthal Equal-Area projection in ISIS.
 #   2011-06-30 Jeannie Backer - Original Version
 Group = CenterLatitude
   Auto

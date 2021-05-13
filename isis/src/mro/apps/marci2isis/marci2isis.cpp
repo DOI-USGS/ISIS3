@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "marci2isis.h"
 
 #include "ProcessImportPds.h"
@@ -158,7 +166,7 @@ namespace Isis{
       outputCubes[i]->write(origLabel);
     }
 
-    QString prodId = outputCubes[0]->label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0]; 
+    QString prodId = outputCubes[0]->label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0];
     prodId = prodId.toUpper();
     vector<int> frameseq;
     vector<double> exptime;
@@ -168,15 +176,15 @@ namespace Isis{
     double exposure = instInitial["ExposureDuration"][0].toDouble() * 1000.0;
 
     frameseq.push_back(0);
-    exptime.push_back(exposure); 
+    exptime.push_back(exposure);
 
     QString varExpFile = "$mro/calibration/marci/varexp.tab";
-    
+
     // Load the MARCI exposure duration calibration tables.
     bool header=false;
     int skip=0;
     FileName csvfile(varExpFile);
-      
+
     CSVReader csv(csvfile.expanded(), header, skip);
       // There may be multiple entries in the file for this productID,
       // so we *must* loop through the entire file.
@@ -191,7 +199,7 @@ namespace Isis{
         // Now, compare product ids from the input image and from the calibration table.
         if(fileProdId == prodId ) {
           if((row.dim1() - 1) != 2) {
-            QString msg = "This appears to be a malformed calibration file."; 
+            QString msg = "This appears to be a malformed calibration file.";
                     msg += " There are not enough columns in the CSV";
                     msg += " file to perform the exposure time correction.";
             throw IException(IException::User, msg, _FILEINFO_);
@@ -209,18 +217,18 @@ namespace Isis{
     }
 
     // If exptime < 2, no additional exposure durations were found in the varexp file, so
-    // assume a single exposure duration and warn the user. 
-    // Using single exposure duration is correct in many cases, but there is no way to check 
-    // using only the information in the label. 
+    // assume a single exposure duration and warn the user.
+    // Using single exposure duration is correct in many cases, but there is no way to check
+    // using only the information in the label.
     if (exptime.size() < 2) {
       PvlGroup missing("NoExposureTimeDataFound");
       PvlKeyword message("Message", "No variable exposure information found in the varexp file."
                                     " Assuming exposure time is fixed for [" + inFile.toString() +  "]" );
-      missing.addKeyword(message); 
+      missing.addKeyword(message);
       missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
       log->addGroup(missing);
     }
-          
+
     // Translate labels to every image and close output cubes before calling EndProcess
 
       // Add these values to the label

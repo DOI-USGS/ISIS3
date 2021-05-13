@@ -3,12 +3,12 @@
 <application name="vims2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
     <brief>
-        Converts Vims images to Isis 3 format
+        Converts Vims images to Isis format
     </brief>
 
     <description>
-        This program takes the BIL formatted vims cubes and translates them into Isis 3 
-        standard BSQ format. It also separates them into two cubes, one containing the 
+        This program takes the BIL formatted vims cubes and translates them into Isis
+        standard BSQ format. It also separates them into two cubes, one containing the
         data from the Infrared camera, and one containing the data from the visual camera.
     </description>
 
@@ -39,7 +39,7 @@
           Checks if input file is rdr.
         </change>
         <change name="Steven Lambright" date="2008-05-13">
-          Removed references to CubeInfo 
+          Removed references to CubeInfo
         </change>
         <change name="Steven Lambright" date="2008-07-14">
           Added support for more raw data
@@ -50,18 +50,18 @@
         </change>
         <change name="Steven Lambright" date="2009-08-21">
           Saturation values are now set when present and if IR or VIS
-          was turned off then files will not be imported for those channels. 
+          was turned off then files will not be imported for those channels.
         </change>
-        <change name="Sharmila Prasad" date="2009-09-10"> 
-            Added the ability  to translate Vims label for both  IR and VIS 
+        <change name="Sharmila Prasad" date="2009-09-10">
+            Added the ability  to translate Vims label for both  IR and VIS
             cubes
         </change>
         <change name="Tracie Sucharski" date="2009-10-20">
           Corrected indexing for SAMPLING_MODE_ID and GAIN_MODE_ID values.
         </change>
         <change name="Mackenzie Boyd" date="2010-01-28">
-            Changed DATA_SET_ID check to be INSTRUMENT_ID check instead, 
-            DATA_SET_ID was too specific and wasn't allowing imports of 
+            Changed DATA_SET_ID check to be INSTRUMENT_ID check instead,
+            DATA_SET_ID was too specific and wasn't allowing imports of
             appropriate data.
         </change>
         <change name="Tracie Sucharski" date="2011-12-16">

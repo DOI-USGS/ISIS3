@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "4.4.0")
+set(VERSION            "5.1.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -45,7 +45,7 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
 string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
-set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
+set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
@@ -168,8 +168,7 @@ set(thirdPartyCppFlags -Wall
                        -Wno-overloaded-virtual
                        -Wno-strict-aliasing
                        -DUSE_UNSTABLE_GEOS_CPP_API=1
-		               -Wno-strict-overflow
-                       -DGMM_USES_SUPERLU
+                       -Wno-strict-overflow
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
@@ -273,7 +272,6 @@ find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
-find_package(GMM       5.0     REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)

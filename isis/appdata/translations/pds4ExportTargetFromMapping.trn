@@ -1,8 +1,8 @@
-# Translate ISIS3 TargetName to PDS4 Target name and type.
+# Translate ISIS TargetName to PDS4 Target name and type.
 # Translations are alphabetically sorted by output value, then by input value.
 #
 # history 2017-11-03 Jeannie Backer - Original version
- 
+
 Group = TargetName
   Auto
   InputKey        = TargetName

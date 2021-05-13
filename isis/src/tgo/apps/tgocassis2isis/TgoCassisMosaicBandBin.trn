@@ -1,6 +1,6 @@
 # Translates CaSSIS xml labels into the BandBin PvlGroup values
-# for the ingested ISIS3 cube labels, for exported mosaics which have been
-# generated using tgocassisrdrgen. 
+# for the ingested ISIS cube labels, for exported mosaics which have been
+# generated using tgocassisrdrgen.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.
@@ -36,7 +36,7 @@
 # axis_name tag with a value of Sample.
 #
 # history:
-#   2018-06-13 Kristin Berry - Original Version. 
+#   2018-06-13 Kristin Berry - Original Version.
 #   2020-12-22 Kaitlyn Lee - Updated Center and Width translations to match
                              TgoCassisBandBin.trn.
 

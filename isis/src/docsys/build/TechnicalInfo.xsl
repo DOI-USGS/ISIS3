@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        ISIS 3 Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -179,7 +179,7 @@ Deborah Lee Soltesz
               <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">Installing ISIS</a>
             </th>
             <td>
-              Downloading and installing ISIS3
+              Downloading and installing ISIS
               <br/>
             </td>
           </tr>
@@ -219,8 +219,8 @@ Deborah Lee Soltesz
           </p>
           <p>
                   <a href="../documents/CodingStandards/CodingStandards.html" target="_blank">
-                  ISIS 3 Coding Standards and Style Guide</a><br/>
-                  Coding standards for ISIS 3 developers
+                  ISIS Coding Standards and Style Guide</a><br/>
+                  Coding standards for ISIS developers
           </p>
 
 

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -197,16 +205,16 @@ void IsisMain() {
 
     if(g_iof) {
       iTime startTime((QString) inst["StartTime"]);
-      
+
       try {
-        Camera *cam; 
+        Camera *cam;
         cam = iCube->camera();
         cam->setTime(startTime);
-        g_solarDistance = cam->sunToBodyDist() / KM_PER_AU; 
-        
+        g_solarDistance = cam->sunToBodyDist() / KM_PER_AU;
+
       }
       catch(IException &e) {
-        // Failed to instantiate a camera, try furnishing kernels directly 
+        // Failed to instantiate a camera, try furnishing kernels directly
         try {
 
           double etStart = startTime.Et();

@@ -2,31 +2,31 @@
 
 <application name="smtk" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Generate a digital elevation map (DEM) from two images using the Stereo 
+    Generate a digital elevation map (DEM) from two images using the Stereo
     Matcher ToolKit (SMTK)
   </brief>
 
   <description>
     <p>
-      This application creates a digital elevation model (DEM) from two images.  
-      It uses coregistration of selected corresponding points to determine match 
-      points.  Each coregistered match point is then used to add additional 
-      match points in the nearby (SUBCBOX) neighborhood.  Additionally, 
-      potential match point candidate are grown from the seed match points that 
+      This application creates a digital elevation model (DEM) from two images.
+      It uses coregistration of selected corresponding points to determine match
+      points.  Each coregistered match point is then used to add additional
+      match points in the nearby (SUBCBOX) neighborhood.  Additionally,
+      potential match point candidate are grown from the seed match points that
       provide full DEM coverage.
-    </p> 
-    <p>
-      Initially, seed points are required to provide a starting point to DEM 
-      generation.  Seed points can come either from a control net file (see the
-      ISIS qnet application) or is created automatically by the application.  
     </p>
     <p>
-      Automatic seed point generatation is accomplished using the Gruen 
-      co-registration algorithm.  A grid of control points is created using the 
-      SPACE parameter to determine line and sample increments of the center of 
-      each point.  The sizes of the "chips" are defined by the contents of the 
-      REGDEF parameter.  This REGDEF file follows the ISIS3 AutoRegistration 
-      design for generic specifications of matching algorithm definitions. 
+      Initially, seed points are required to provide a starting point to DEM
+      generation.  Seed points can come either from a control net file (see the
+      ISIS qnet application) or is created automatically by the application.
+    </p>
+    <p>
+      Automatic seed point generatation is accomplished using the Gruen
+      co-registration algorithm.  A grid of control points is created using the
+      SPACE parameter to determine line and sample increments of the center of
+      each point.  The sizes of the "chips" are defined by the contents of the
+      REGDEF parameter.  This REGDEF file follows the ISIS AutoRegistration 
+      design for generic specifications of matching algorithm definitions.
     </p>
     <p>
       Here is an example of a REGDEF file:
@@ -48,31 +48,31 @@
 #    DefaultRadioShift = 0.0
 #    DefaultRadioGain = 0.0
    EndGroup
- 
+
    Group = PatternChip
-     Samples = 21 
+     Samples = 21
      Lines   = 21
      ValidPercent = 75.0
      MinimumZScore = 1.7
    EndGroup
- 
+
    Group = SearchChip
-     Samples = 31 
-     Lines   = 31 
+     Samples = 31
+     Lines   = 31
      ValidPercent = 75.0
    EndGroup
  EndObject
       </PRE>
       <br/>
-      Here is a description of all the parameters that are utilized by the 
-      <b>smtk</b> application.  Defaults that are set within the program are 
-      indicated where applicable.  If a default is provided, the presence of the 
-      keyword is not required in the REGDEF file.   The ISIS2 equivalent is 
+      Here is a description of all the parameters that are utilized by the
+      <b>smtk</b> application.  Defaults that are set within the program are
+      indicated where applicable.  If a default is provided, the presence of the
+      keyword is not required in the REGDEF file.   The ISIS2 equivalent is
       provided where applicable:
    <br><h1 align="center">Gruen AutoReg Parameters</h1></br>
     <TABLE BORDER="1">
           <CAPTION>
-          </CAPTION> 
+          </CAPTION>
         <TR>
           <TH>Parameter</TH>
           <TH>Description</TH>
@@ -80,24 +80,24 @@
         <TR>
             <TD>Name</TD>
             <TD>
-              Name of the algorithm that the set of parameters description apply 
+              Name of the algorithm that the set of parameters description apply
               to.  This should be <em>AdaptiveGruen</em>.
             </TD>
         </TR>
         <TR>
             <TD>Tolerance</TD>
             <TD>
-              This constrains the eigenvalues of the registration result.  
-              Registrations with <b>GoodnessOfFit</b> larger than this value are 
-              rejected.  It is highly recommended this value be utilized as it 
-              will result in better fits.  (Default: Unbounded) (ISIS2 
+              This constrains the eigenvalues of the registration result.
+              Registrations with <b>GoodnessOfFit</b> larger than this value are
+              rejected.  It is highly recommended this value be utilized as it
+              will result in better fits.  (Default: Unbounded) (ISIS2
               Equivalent: MAXEV)
             </TD>
         </TR>
       <TR>
         <TD>MaximumIterations</TD>
         <TD>
-          Maximum number of iterations allowed for the registration processing 
+          Maximum number of iterations allowed for the registration processing
           to converge.  (Default: 30) (ISIS2 Equivalent: GITER)
         </TD>
       </TR>
@@ -105,103 +105,103 @@
         <TD>AffineTolerance</TD>
         <TD>
           The amount of offset in pixels an Affine derived points is allowed to
-          deviate from the orginal match point. (Default: Unbounded)(ISIS2 
+          deviate from the orginal match point. (Default: Unbounded)(ISIS2
           Equivalent: DAFFINE)
         </TD>
       </TR>
       <TR>
         <TD>SpiceTolerance</TD>
         <TD>
-          The amount of offset in pixels a registration is allowed to deviate 
-          from a registered point. (Default: Unbounded)(ISIS2 Equivalent: 
+          The amount of offset in pixels a registration is allowed to deviate
+          from a registered point. (Default: Unbounded)(ISIS2 Equivalent:
           DSPICE)
         </TD>
       </TR>
       <TR>
         <TD>AffineTranslationTolerance</TD>
         <TD>
-          Specifies the threshold convergence value of the Affine translation 
-          shift in line/sample between each Gruen match iteration.  If the 
-          amout of this value computed in the Gruen algorithm is less than this 
-          value, it is deemed a match point concerning the translation portion 
+          Specifies the threshold convergence value of the Affine translation
+          shift in line/sample between each Gruen match iteration.  If the
+          amout of this value computed in the Gruen algorithm is less than this
+          value, it is deemed a match point concerning the translation portion
           of the registered point.  (Default: 0.1) (ISIS2 Eqivalent: THRESH1)
         </TD>
       </TR>
       <TR>
         <TD>AffineScaleTolerance</TD>
         <TD>
-          Specifies the threshold convergence value of the Affine scale in 
-          line/sample between each Gruen match iteration.  If the amout of this 
-          value computed in the Gruen algorithm is less than this value, it is 
-          deemed a match point concerning the scaling portion of the registered 
+          Specifies the threshold convergence value of the Affine scale in
+          line/sample between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the scaling portion of the registered
           point. (Default: 0.3) (ISIS2 Eqivalent: THRESH2)
         </TD>
       </TR>
       <TR>
         <TD>AffineShearTolerance</TD>
         <TD>
-          Specifies the threshold convergence value of the Affine shear in 
-          line/sample between each Gruen match iteration.  If the amout of this 
-          value computed in the Gruen algorithm is less than this value, it is 
-          deemed a match point concerning the shearing portion of the registered 
+          Specifies the threshold convergence value of the Affine shear in
+          line/sample between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the shearing portion of the registered
           point. (Default: AffineScaleTolerance) (ISIS2 Eqivalent: THRESH2)
         </TD>
       </TR>
       <TR>
         <TD>RadioShiftTolerance</TD>
         <TD>
-          Specifies the threshold convergence value for the radiometric shift of 
-          the pixel value between each Gruen match iteration.  If the amout of this 
-          value computed in the Gruen algorithm is less than this value, it is 
-          deemed a match point concerning the radiometric shift portion of the 
+          Specifies the threshold convergence value for the radiometric shift of
+          the pixel value between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the radiometric shift portion of the
           registered point. (Default: Unbounded) (ISIS2 Equivalent: 256)
         </TD>
       </TR>
       <TR>
         <TD>RadioGainMinTolerance</TD>
         <TD>
-          Specifes the threshold convergence minimum value for the radiometric 
-          gain of the pixel value between each Gruen match iteration.  If the amout of this 
+          Specifes the threshold convergence minimum value for the radiometric
+          gain of the pixel value between each Gruen match iteration.  If the amout of this
           value computed in the Gruen algorithm is greater than this value and
           less than RadioGainMaxTolerance, it is deemed a match point concerning
-           the radiometric gain portion of the registered point. (Default: 
+           the radiometric gain portion of the registered point. (Default:
            Unbounded) (ISIS2 Equivalent: 0.25)
         </TD>
       </TR>
       <TR>
         <TD>RadioGainMaxTolerance</TD>
         <TD>
-          Specifes the threshold convergence maximum value for the radiometric 
-          gain of the pixel value between each Gruen match iteration.  If the amout of this 
-          value computed in the Gruen algorithm is less than this value and 
-          greater than RadioGainMinTolerance, it is deemed a match point 
-          concerning the radiometric gain portion of the registered point.  
+          Specifes the threshold convergence maximum value for the radiometric
+          gain of the pixel value between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value and
+          greater than RadioGainMinTolerance, it is deemed a match point
+          concerning the radiometric gain portion of the registered point.
           (Default: Unbounded) (ISIS2 Equivalent: 4.0)
         </TD>
       </TR>
       <TR>
         <TD>DefaultRadioShift</TD>
         <TD>
-          Sets the default value for the radiometric shift value used as a 
+          Sets the default value for the radiometric shift value used as a
           starting point in the Gruen algorithm.  (Default: 0)
         </TD>
       </TR>
       <TR>
         <TD>DefaultRadioGain</TD>
         <TD>
-          Sets the default value for the radiometric gain value used as a 
+          Sets the default value for the radiometric gain value used as a
           starting point in the Gruen algorithm.  (Default: 0)
         </TD>
       </TR>
     </TABLE>
-      <br/> Other ISIS2 parameters CBOX (Samples, Lines), LOW (ValidMinimum), 
-      HIGH (ValidMaximum), GMPTS (ValidPercent) are specified in the PatternChip 
-      and SearchChip groups. See the                              
-      <b>coreg</b> application documentation for the details on these and other 
-      additional parameters that may be used to refine or constrain match 
+      <br/> Other ISIS2 parameters CBOX (Samples, Lines), LOW (ValidMinimum),
+      HIGH (ValidMaximum), GMPTS (ValidPercent) are specified in the PatternChip
+      and SearchChip groups. See the
+      <b>coreg</b> application documentation for the details on these and other
+      additional parameters that may be used to refine or constrain match
       conditions.
     </p>
-    <p> 
+    <p>
       Once the full grid of control points is generated, a subset of points are
       selected using various algorithms. The NSEED parameter determines the
       total number of seed points that will be selected from the result of the
@@ -211,62 +211,62 @@
       selected.  Otherwise, 5% of the control points will be selected.
     </p>
     <p>
-      The seed point selection process is governed by SEEDSAMPLE.  If SEEDSAMPLE 
-      &lt;= 0.0, then the points are selected from the best matching points as 
-      registered by the Gruen algorithm.  Otherwise, a specially crafted 
-      randomized selection algorithm is used.  This algorithm uses the range of 
-      control point goodness of fit (or eigenvalues in the case of the Gruen 
-      algorithm measure of registration) to compute a randomized value that is 
-      added to each eigenvalue and tested against the best (smallest) one.   
+      The seed point selection process is governed by SEEDSAMPLE.  If SEEDSAMPLE
+      &lt;= 0.0, then the points are selected from the best matching points as
+      registered by the Gruen algorithm.  Otherwise, a specially crafted
+      randomized selection algorithm is used.  This algorithm uses the range of
+      control point goodness of fit (or eigenvalues in the case of the Gruen
+      algorithm measure of registration) to compute a randomized value that is
+      added to each eigenvalue and tested against the best (smallest) one.
       This algorithm is repeated until all seed points are selected.
     </p>
     <p>
-      A random number generator is required to make this algorithm work.  
-      <b>smtk</b> uses the 
+      A random number generator is required to make this algorithm work.
+      <b>smtk</b> uses the
       <a href="http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generation.html">GSL Random Number Generator</a>.  The default GSL random number generator used is the <em>Mersenne Twister</em>.
       <a href="http://www.gnu.org/software/gsl/manual/html_node/Random-number-generator-algorithms.htmll">Other GSL</a> algorithms can be selected with the use of
 <a href="http://www.gnu.org/software/gsl/manual/html_node/Random-number-environment-variables.html">environment variables</a>
     </p>
     <p>
-      Once the seed points are selected, generation of the DEM begins.  The best 
-      registering points are selected first off the list of seed points.  Each 
-      seed point is added to the final DEM point if a  point does not already 
-      exist for the given line/sample coordinate.  The list of final DEM match 
+      Once the seed points are selected, generation of the DEM begins.  The best
+      registering points are selected first off the list of seed points.  Each
+      seed point is added to the final DEM point if a  point does not already
+      exist for the given line/sample coordinate.  The list of final DEM match
       points are continually added to with points cloned from registered points
-      at intervals SUBCBOX lines and samples if and only if the current 
-      registration point is better than the existing one at those surrounding 
+      at intervals SUBCBOX lines and samples if and only if the current
+      registration point is better than the existing one at those surrounding
       points.
     </p>
     <p>
-      The candidate list of points are grown at adjacent line/sample coordinates 
-      by cloning the points using the Affine parameters computed for the 
-      original match point.  These points are tested for validity in terms of 
-      points within the image boundary and geometric mapping.  The progress of 
+      The candidate list of points are grown at adjacent line/sample coordinates
+      by cloning the points using the Affine parameters computed for the
+      original match point.  These points are tested for validity in terms of
+      points within the image boundary and geometric mapping.  The progress of
       the growth stack is reported as it grows.
     </p>
     <p>
-      The DEM generation is complete when the (growth) match point stack is 
+      The DEM generation is complete when the (growth) match point stack is
       depleted.
     </p>
     <p>
-      The DEM is created by computing stereo elevations from the left (FROM) and 
-      right (MATCH) points.  Vectors from the target (planet center) to the 
-      spacecraft and target to the surface registration points are computed for 
+      The DEM is created by computing stereo elevations from the left (FROM) and
+      right (MATCH) points.  Vectors from the target (planet center) to the
+      spacecraft and target to the surface registration points are computed for
       each point.  From these points, the elevation is computed.
     </p>
     <p>
-      From these points, a three band cube is generated from the FROM file.  The 
-      first band is elevation, second is the error in the elevation and the 
+      From these points, a three band cube is generated from the FROM file.  The
+      first band is elevation, second is the error in the elevation and the
       third is the goodness of fit (eigenvalue).
     </p>
     <p>
-      This application works best on level2 projected images that have not been 
+      This application works best on level2 projected images that have not been
       mosaiced.
     </p>
     <p>
  <br><h2 align="left">Acknowledgements</h2></br>
-      This application is derived from the ISIS2 application SMTK suite 
-      (matcher, stereo, and xyzplot).  ISIS2 SMTK was developed by Sarah Andre 
+      This application is derived from the ISIS2 application SMTK suite
+      (matcher, stereo, and xyzplot).  ISIS2 SMTK was developed by Sarah Andre
       and Troy Andre.
     </p>
   </description>
@@ -290,7 +290,7 @@
       Implemented growing algorithm
     </change>
    <change name="Kris Becker" date="2011-06-03">
-     Made significant changes to Gruen and smtk to better implement the ISIS2 
+     Made significant changes to Gruen and smtk to better implement the ISIS2
      version of the application.
    </change>
     <change name="Debbie A. Cook" date="2012-07-06">
@@ -300,7 +300,7 @@
        Updated to use new Target class. References Mantis numbers #775 and #1114.
     </change>
     <change name="Jeannie Backer" date="2016-04-22">
-      Modified to use the FROM cube labels to set output control net target instead of the 
+      Modified to use the FROM cube labels to set output control net target instead of the
       TargetName. References #3892
     </change>
   </history>
@@ -314,7 +314,7 @@
           Input Image to be matched
         </brief>
         <description>
-          This cube will be used as the pattern or fixed image.  It will 
+          This cube will be used as the pattern or fixed image.  It will
           correspond to the output image DEM generated by smtk.
         </description>
         <filter>
@@ -329,7 +329,7 @@
           The file that will be geometrically (affined) matched
         </brief>
         <description>
-          This cube will be geometrically matched to the FROM image using an 
+          This cube will be geometrically matched to the FROM image using an
           interative (AdaptiveGruen) algorithm.
         </description>
         <filter>
@@ -344,8 +344,8 @@
           The Gruen Auto Registration paramter file
         </brief>
         <description>
-          File containing parameters that are provided to the Gruen algorithm 
-          that provide definitions, defaults and constraints for registration 
+          File containing parameters that are provided to the Gruen algorithm
+          that provide definitions, defaults and constraints for registration
           processing.
         </description>
         <helpers>
@@ -382,18 +382,18 @@
 
       <parameter name="SPACE">
         <type>integer</type>
-        <brief> 
+        <brief>
             Growth spacing value
         </brief>
         <description>
-          This parameter specifies the spacing of lines and samples around a 
-          seed point to grow a seed point.  This value added to the surrounding 
-          sample and line of a 3x3 box around a match point.  The FROM image 
-          latitude and longitude values is used at that line/sample location to 
-          determine the MATCH line/sample point.  The affine of the match point 
-          is then applied to the MATCH line/sample point and its parameters are 
-          added to the grow stack for futher population considerations.  As 
-          such, it should not to large a value as the affine translation 
+          This parameter specifies the spacing of lines and samples around a
+          seed point to grow a seed point.  This value added to the surrounding
+          sample and line of a 3x3 box around a match point.  The FROM image
+          latitude and longitude values is used at that line/sample location to
+          determine the MATCH line/sample point.  The affine of the match point
+          is then applied to the MATCH line/sample point and its parameters are
+          added to the grow stack for futher population considerations.  As
+          such, it should not to large a value as the affine translation
           validity is not too strong very far away from the match point.
         </description>
         <default><item>3</item></default>
@@ -401,31 +401,31 @@
 
       <parameter name="NSEED">
         <type>double</type>
-        <brief> 
+        <brief>
             Specify how to select seed points
         </brief>
         <description>
-            When computing seed values not coming from a control net, this 
-            parameter specifies how many to keep from the succesful list 
-            generated from the first pass.  If 0, then save 5 percent of the 
-            total number computed seed points.  If &gt; 0 and &lt; 1, this is 
-            the percentage to use.  If &gt; 1, specifies the number of points to 
-            select. 
+            When computing seed values not coming from a control net, this
+            parameter specifies how many to keep from the succesful list
+            generated from the first pass.  If 0, then save 5 percent of the
+            total number computed seed points.  If &gt; 0 and &lt; 1, this is
+            the percentage to use.  If &gt; 1, specifies the number of points to
+            select.
         </description>
         <default><item>0.0</item></default>
       </parameter>
 
       <parameter name="SEEDSAMPLE">
         <type>double</type>
-        <brief> 
+        <brief>
             Specify method for choosing best seed point
         </brief>
         <description>
-            This parameter specifies what process to use to select the best 
-            seed points from the first pass (automatic seed point generation) of 
-            the matcher.  If 0, use the smallest eigen value to the largest 
-            (essentially preferring the best points).  If &gt; 0, sample from 
-            minimum to maximum eigen with exponetial distribution where 
+            This parameter specifies what process to use to select the best
+            seed points from the first pass (automatic seed point generation) of
+            the matcher.  If 0, use the smallest eigen value to the largest
+            (essentially preferring the best points).  If &gt; 0, sample from
+            minimum to maximum eigen with exponetial distribution where
             SEEDSAMPLE is the curvature.
         </description>
         <default><item>0.0</item></default>
@@ -433,19 +433,19 @@
 
       <parameter name="SUBCBOX">
         <type>integer</type>
-        <brief> 
+        <brief>
             Growth replication box size
         </brief>
         <description>
-          This parameter specifies the number of lines and samples around a seed 
-          point to replicate in the growth algorithm.  These points are added to 
-          the final point set when comparison against existing points results in 
+          This parameter specifies the number of lines and samples around a seed
+          point to replicate in the growth algorithm.  These points are added to
+          the final point set when comparison against existing points results in
           the new point having a better registration value.
         </description>
         <default><item>5</item></default>
       </parameter>
     </group>
-  
+
     <group name="Output Options">
       <parameter name="TO">
         <type>cube</type>
@@ -464,15 +464,15 @@
       <parameter name="PLOTDIST">
         <type>double</type>
         <brief>
-          Plot tolerance from match pixel for DEM determination 
+          Plot tolerance from match pixel for DEM determination
         </brief>
         <description>
-          This parameter provides a tolerance when determining 
-          searching for points that fall within the output plot 
-          buffer.  smtk plots by tile so points on the border my fall 
-          outside the boundary of a tile.  To ensure all possible 
-          points are included in the appropriate output tile, this 
-          parameter will include matchpoints that are outside the 
+          This parameter provides a tolerance when determining
+          searching for points that fall within the output plot
+          buffer.  smtk plots by tile so points on the border my fall
+          outside the boundary of a tile.  To ensure all possible
+          points are included in the appropriate output tile, this
+          parameter will include matchpoints that are outside the
           boundary of the output tile by this amount.
         </description>
         <default><item>5.0</item></default>
@@ -484,18 +484,18 @@
           Size of box around box around center match pixel
         </brief>
         <description>
-          This parameter specifies the size of the box around the 
-          match pixel to compute DEM output values for.  If the 
-          BOXSIZE is 1, then only the center pixel is used.  If the 
-          BOXSIZE is 3, then a 3x3 box around the center pixel is used 
-          to computed output pixel values and each match pixel may add 
+          This parameter specifies the size of the box around the
+          match pixel to compute DEM output values for.  If the
+          BOXSIZE is 1, then only the center pixel is used.  If the
+          BOXSIZE is 3, then a 3x3 box around the center pixel is used
+          to computed output pixel values and each match pixel may add
           9 total pixels to the DEM.
         </description>
         <default><item>3</item></default>
         <minimum inclusive="true">1</minimum>
       </parameter>
     </group>
-  
+
     <group name= "Other Output Files">
       <parameter name="OSEEDNET">
         <type>filename</type>
@@ -504,15 +504,15 @@
             Control network of selected seed points
         </brief>
         <description>
-          This file will be created from the set of chosen seed points generated 
-          by this application.  It can be used to discern the quality of the 
-          automatic and randomly generated point set from which all others are 
-          defined.  It will  not be created if one is provided.  To evaluate the 
-          points, create a list of FROM and MATCH files.  Then use the ISIS 
-          program <b>qnet</b> to select the list and then this file.  It will 
-          display the two images and plot all the seed points on the two images.  
-          Points can be updated, deleted and added to the control network and 
-          then provided in subsequent runs of <b>smtk</b> as the seed control 
+          This file will be created from the set of chosen seed points generated
+          by this application.  It can be used to discern the quality of the
+          automatic and randomly generated point set from which all others are
+          defined.  It will  not be created if one is provided.  To evaluate the
+          points, create a list of FROM and MATCH files.  Then use the ISIS
+          program <b>qnet</b> to select the list and then this file.  It will
+          display the two images and plot all the seed points on the two images.
+          Points can be updated, deleted and added to the control network and
+          then provided in subsequent runs of <b>smtk</b> as the seed control
           network file, CNET.
         </description>
         <internalDefault>None</internalDefault>
@@ -528,7 +528,7 @@
             Pvl file of ControlNet
         </brief>
         <description>
-            This file will be created that contains all the DEM points created 
+            This file will be created that contains all the DEM points created
             by the <b>smtk</b> application. The data will be in Pvl format.
         </description>
         <internalDefault>None</internalDefault>

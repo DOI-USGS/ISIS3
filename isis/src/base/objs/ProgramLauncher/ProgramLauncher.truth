@@ -30,11 +30,11 @@ Group = Results
   HrsPixels               = 0
 End_Group
 
-Testing non-existant Isis 3 program... 
+Testing non-existant Isis program... 
 
-**ERROR** Program [chocolatelab] does not appear to be a valid Isis 3 program.
+**ERROR** Program [chocolatelab] does not appear to be a valid Isis program.
 
-Testing using Isis 3 program as a system program without pid... 
+Testing using Isis program as a system program without pid... 
 
 Group = Results
   From                    = unitTest.cub

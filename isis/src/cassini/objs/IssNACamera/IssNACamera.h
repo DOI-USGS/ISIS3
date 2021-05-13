@@ -1,41 +1,32 @@
 // $Id: IssNACamera.h,v 1.7 2009/08/31 15:12:29 slambright Exp $
 #ifndef IssNACamera_h
 #define IssNACamera_h
-/**
- * @file
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "FramingCamera.h"
 
 namespace Isis {
   /**
    * @brief Cassini ISS Narrow Angle Camera Model
    *
-   *     * This is the camera model for the Cassini Imaging Science Subsystem Narrow 
-   * Angle Camera 
+   *     * This is the camera model for the Cassini Imaging Science Subsystem Narrow
+   * Angle Camera
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Cassini-Huygens
-   *  
-   * @see 
+   *
+   * @see
    *      http://saturn.jpl.nasa.gov/spacecraft/cassiniorbiterinstruments/instrumentscassiniiss
    * @see http://pds-imaging.jpl.nasa.gov/portal/cassini_mission.html
    * @see http://astrogeology.usgs.gov/Missions/Cassini
-   *  
+   *
    * @author  2007-07-10 Steven Koechle
    *
    * @internal
@@ -51,13 +42,13 @@ namespace Isis {
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer inherit directly
    *                           from Camera
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods, pure virtual in
-   *                           Camera, implemented in mission specific cameras 
+   *                           Camera, implemented in mission specific cameras
    *   @history 2011-02-09 Steven Lambright - Major changes to camera classes documentation.
    *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes() method. Updated
    *                           unitTest to test for new methods. Updated documentation. Replaced
-   *                           Cassini namespace wrap with Isis namespace. Added Isis Disclaimer
+   *                           Cassini namespace wrap with ISISnamespace. Added ISISDisclaimer
    *                           to files. Added NAIF error check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-09-12 Stuart C. Sides -  Added ability for the camera to use the default
    *                           focal length if the observation was taken using a filter
@@ -65,7 +56,7 @@ namespace Isis {
    *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
    */
@@ -74,37 +65,37 @@ namespace Isis {
       IssNACamera(Cube &cube);
       //! Destroys the IssNACamera object.
       ~IssNACamera() {};
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-82000); }
 
-      /** 
+      /**
        * CK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (1); }
 
-      /** 
+      /**
        *  SPK Center ID - 6 (Saturn)
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Center ID
        */
       virtual int SpkCenterId() const { return 6; }
 
-      /** 
+      /**
        *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }

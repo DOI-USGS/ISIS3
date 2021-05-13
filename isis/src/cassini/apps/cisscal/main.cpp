@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include <algorithm>// sort, unique
 #include <cmath>
@@ -661,8 +669,7 @@ vector<double> gbl::OverclockFit() {
   //     -col 3 is the "average" of the overclocked pixels
   //       -if there are 2 overclocks, columns 1 and 2 contain them
   //       -otherwise column 1 is all null and we use column 2
-  Table overClkTable("ISS Prefix Pixels");
-  gbl::incube->read(overClkTable);
+  Table overClkTable = gbl::incube->readTable("ISS Prefix Pixels");
   for(int i = 0; i < overClkTable.Records(); i++) {
     overclocks.push_back(overClkTable[i]["OverclockPixels"]);
   }

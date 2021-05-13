@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ControlMeasureEditWidget.h"
 
 #include <QApplication>
@@ -760,8 +768,8 @@ namespace Isis {
    * Set the tack position of the measure in the left ChipViewport
    *
    * @param sample[in]  Sample of the tack position for the right ChipViewport
-   * @param line[in]    Line of the tack position for the left ChipViewport 
-   *  
+   * @param line[in]    Line of the tack position for the left ChipViewport
+   *
    */
   void ControlMeasureEditWidget::setLeftPosition(double sample, double line) {
 
@@ -774,8 +782,8 @@ namespace Isis {
    * Set the tack position of the measure in the right ChipViewport
    *
    * @param sample[in]  Sample of the tack position for the right ChipViewport
-   * @param line[in]    Line of the tack position for the left ChipViewport 
-   *  
+   * @param line[in]    Line of the tack position for the left ChipViewport
+   *
    */
   void ControlMeasureEditWidget::setRightPosition(double sample, double line) {
 
@@ -1726,8 +1734,8 @@ namespace Isis {
    * Set the Control Point for this widget
    *
    * @param editPoint[in]  ControlPoint for this widget
-   * @param snList[in]     SerialNumberList associated with the control net containing the ControlPoint 
-   *  
+   * @param snList[in]     SerialNumberList associated with the control net containing the ControlPoint
+   *
    */
   void ControlMeasureEditWidget::setPoint(ControlPoint *editPoint, SerialNumberList *snList) {
 
@@ -1790,7 +1798,7 @@ namespace Isis {
       else {
         blinkViewport->zoom(m_leftView->zoomFactor());
       }
-      m_blinkChipViewportListRight.append(blinkViewport); 
+      m_blinkChipViewportListRight.append(blinkViewport);
     }
 
     m_blinkIndexRight = 0;

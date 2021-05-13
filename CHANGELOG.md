@@ -35,14 +35,34 @@ release.
 
 ## [Unreleased]
 
-### Added
+### Fixed
+- Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
+- Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
+- Fixed hist outputs to N/A when all DNs are special pixels. [#3709](https://github.com/USGS-Astrogeology/ISIS3/issues/3709)
+- Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
 
+## [5.0.0] - 2021-04-01
+
+### Added
+- The following calibration applications were updated to not require local mission-specific SPICE kernels when working with spiceinited cubes: amicacal, ctxcal, lrowaccal, moccal, mdiscal, hical, hicalbeta, vikcal, and gllssical. This makes it possible to first run spiceinit using the spice server and then run these calibration applications without ever needing to download mission-specific kernels. If spiceinit has not been run on the input cube, these apps will still require the kernels area to run. [#4303](https://github.com/USGS-Astrogeology/ISIS3/issues/4303)
 - Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
 - Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
+- Added the ability to use a Community Sensor Model (CSM) instead of an ISIS camera model. To use a CSM sensor model with a Cube run the csminit application on the Cube instead of spiceinit.
 
 ### Fixed
 
 - Fixed relative paths not being properly converted to absolute paths in isisVarInit.py [4274](https://github.com/USGS-Astrogeology/ISIS3/issues/4274)
+- Fixed issue where serial numbers for Kaguya TC and MI image could not be generated. [4235](https://github.com/USGS-Astrogeology/ISIS3/issues/4235)
+- Fixed hardcoded file naming in the hijitter app dealing with output from pipeline. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
+- Fixed "About Qview" to point to website documentation. [4333](https://github.com/USGS-Astrogeology/ISIS3/issues/4333)
+- Fixed bug where the time bias was not being added to the ephemeris times in ckwriter. [4129](https://github.com/USGS-Astrogeology/ISIS3/issues/4129)
+
+### Changed
+
+- Updated the FileList object to handle files that do not contain a trailing new line character. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
+- Refactored Blob class to be used by classes that serialize to a Cube instead of inherited from. Impacted classes are GisBlob, History, ImagePolygon, OriginalLabel, OriginalXmlLabel, StrethBlob, StringBlob, and Table. [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
+- Fixed hi2isis MRO:ADC_TIMING_SETTINGS label conversion issue [4290](https://github.com/USGS-Astrogeology/ISIS3/issues/4290)
+- Changed csv2table to identify headers with arrays and create table fields as arrays instead of single fields for each element [3676](https://github.com/USGS-Astrogeology/ISIS3/issues/3676)
 
 ## [4.4.0] - 2021-02-11
 
@@ -51,7 +71,7 @@ release.
 - Added warning to ocams2isis about the model being out of date. [#4200](https://github.com/USGS-Astrogeology/ISIS3/issues/4200)
 - Added documentation to lronaccal and lrowaccal to describe why there are negative DNs in I/F calibrated images. [#3860](https://github.com/USGS-Astrogeology/ISIS3/issues/3860)
 - Update qview MeasureTool to add an option to calculate distances using RA/DEC and update qview to show DEC/RA rather than LAT/LON in lower-right corner [#3371](https://github.com/USGS-Astrogeology/ISIS3/issues/3371)
-- Updated spiceinit so that a user can specify a shape model and use the spice web service without any errors. [#1986](https://github.com/USGS-Astrogeology/ISIS3/issues/1986) 
+- Updated spiceinit so that a user can specify a shape model and use the spice web service without any errors. [#1986](https://github.com/USGS-Astrogeology/ISIS3/issues/1986)
 
 ### Fixed
 
@@ -59,6 +79,8 @@ release.
 - Fixed not being able to enable USECOORDLIST argument in mappt. [#4150](https://github.com/USGS-Astrogeology/ISIS3/issues/4150)
 - Fixed history entry not being added to a cube when running spiceinit with web=true. [4040](https://github.com/USGS-Astrogeology/ISIS3/issues/4040)
 - Updated wavelength and bandbin values in translation files for the TGO CaSSIS BandBin group. [4147](https://github.com/USGS-Astrogeology/ISIS3/issues/4147)
+- Fixed the JunoCam serialNumber translation using an old keyword. [4341](https://github.com/USGS-Astrogeology/ISIS3/issues/4341)
+- Fixed map2map bug where small images would return all null image [#632](https://github.com/USGS-Astrogeology/ISIS3/issues/631)
 
 ## [4.3.0] - 2020-10-02
 
@@ -68,6 +90,7 @@ release.
  - The isis3VarInit script is now just called isisVarInit and allows for more robust paths. [#3945](https://github.com/USGS-Astrogeology/ISIS3/pull/3945)
  - Isis2raw will now output straight to a 32bit file (no stretch) when stretch is set to None and bittype is set to 32bit. [#3878](https://github.com/USGS-Astrogeology/ISIS3/issues/3878)
  - Findimageoverlaps can now have calculations and writes happen at the same time or sequentially. [#4047](https://github.com/USGS-Astrogeology/ISIS3/pull/4047)
+ - IsisPreferences has had the default path to Osirisrex updated to point to new kernels released by NAIF [#4060](https://github.com/USGS-Astrogeology/ISIS3/issues/4060)
 
 ### Fixed
 

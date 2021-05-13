@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "BundleObservationVector.h"
 
 #include <QDebug>
@@ -16,9 +24,9 @@ namespace Isis {
 
   /**
    * Copy constructor.
-   * 
+   *
    * Constructs a BundleObservationVector as a copy of another BundleObservationVector.
-   * 
+   *
    * @param src A reference to the BundleObservationVector to copy from.
    */
   BundleObservationVector::BundleObservationVector(const BundleObservationVector &src)
@@ -40,11 +48,11 @@ namespace Isis {
 
   /**
    * Assignment operator.
-   * 
+   *
    * Assigns the state of the source BundleObservationVector to this BundleObservationVector.
-   * 
+   *
    * @param src The BundleObservationVector to assign from.
-   * 
+   *
    * @return @b BundleObservationVector& A reference to this BundleObservationVector.
    */
   BundleObservationVector &BundleObservationVector::operator=(const BundleObservationVector &src) {
@@ -70,14 +78,14 @@ namespace Isis {
    * @param observationNumber Observation number of the observation to add or fetch
    * @param instrumentId Instrument id of the observation
    * @param bundleSettings Qsp to BundleSettings for the observation
-   * 
+   *
    * @throws IException::Programmer "Unable to allocate new BundleObservation"
    *
    * @return @b BundleObservationQsp Returns a pointer to the BundleObservation that was added
-   * 
+   *
    * @internal
-   *   @history 2016-10-13 Ian Humphrey - When appending a new BundleObservation and there are 
-   *                           multiple BundleObservationSolveSettings, we set the settings 
+   *   @history 2016-10-13 Ian Humphrey - When appending a new BundleObservation and there are
+   *                           multiple BundleObservationSolveSettings, we set the settings
    *                           according to the observation number passed. References #4293.
    */
   BundleObservationQsp BundleObservationVector::addNew(BundleImageQsp bundleImage,
@@ -90,7 +98,7 @@ namespace Isis {
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
-    
+
       addToExisting = true;
     }
 
@@ -121,7 +129,7 @@ namespace Isis {
       }
 
       bundleImage->setParentObservation(bundleObservation);
-  
+
       // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
       // When there is only one bundle observation solve setting, use it for all observations
@@ -131,7 +139,7 @@ namespace Isis {
       // Otherwise, we want to grab the bundle observation solve settings that is associated with
       // the observation number for this new observation
       else {
-        solveSettings = bundleSettings->observationSolveSettings(observationNumber);        
+        solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
       bundleObservation->setSolveSettings(solveSettings);
@@ -154,7 +162,7 @@ namespace Isis {
   /**
    * Accesses the number of position parameters for the contained BundleObservations.
    *
-   * @return @b int Returns the total number of position parameters for the BundleObservations 
+   * @return @b int Returns the total number of position parameters for the BundleObservations
    */
   int BundleObservationVector::numberPositionParameters() {
     int positionParameters = 0;
@@ -171,7 +179,7 @@ namespace Isis {
   /**
    * Accesses the number of pointing parameters for the contained BundleObservations.
    *
-   * @return @b int Returns the total number of pointing parameters for the BundleObservations 
+   * @return @b int Returns the total number of pointing parameters for the BundleObservations
    */
   int BundleObservationVector::numberPointingParameters() {
     int pointingParameters = 0;
@@ -189,7 +197,7 @@ namespace Isis {
    * Returns the sum of the position parameters and pointing parameters for the contained
    * BundleObservations.
    *
-   * @return @b int Returns the total number of parameters for the contained BundleObservations 
+   * @return @b int Returns the total number of parameters for the contained BundleObservations
    */
   int BundleObservationVector::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
@@ -220,7 +228,7 @@ namespace Isis {
   /**
    * Initializes the exterior orientations for the contained BundleObservations.
    *
-   * @return @b bool Returns true upon successful initialization 
+   * @return @b bool Returns true upon successful initialization
    */
   bool BundleObservationVector::initializeExteriorOrientation() {
     int nObservations = size();
@@ -236,7 +244,7 @@ namespace Isis {
   /**
    * Initializes the body rotations for the contained BundleObservations.
    *
-   * @return @b bool Returns true upon successful initialization 
+   * @return @b bool Returns true upon successful initialization
    */
   bool BundleObservationVector::initializeBodyRotation() {
     int nObservations = size();
@@ -248,5 +256,3 @@ namespace Isis {
     return true;
   }
 }
-
-

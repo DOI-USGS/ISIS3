@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "LoCameraFiducialMap.h"
 
 #include "Affine.h"
@@ -40,7 +48,7 @@ namespace Isis {
    *
    * @throws IException::User - "Unable to read fiducial mapping from cube
    *             labels - Input cube must be processed in Isis 2 through
-   *             lofixlabel and converted to Isis 3 with pds2isis"
+   *             lofixlabel and converted to Isis with pds2isis"
    */
   void LoCameraFiducialMap::ReadFiducials(PvlGroup &inst) {
 
@@ -62,7 +70,7 @@ namespace Isis {
     catch(IException &e) {
       string msg = "Unable to read fiducial mapping from cube labels - ";
       msg += "Input cube must be processed in Isis 2 through lofixlabel ";
-      msg += "and converted to Isis 3 with pds2isis";
+      msg += "and converted to Isis with pds2isis";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }

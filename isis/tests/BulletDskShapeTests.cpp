@@ -15,7 +15,7 @@ TEST(BulletDskShapeTests, DefaultConstructor) {
 }
 
 TEST(BulletDskShapeTests, SingleSegment) {
-  QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
+  QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
 
   BulletDskShape itokawaShape(dskfile);
   EXPECT_EQ(itokawaShape.name(), "");
@@ -43,7 +43,7 @@ TEST(BulletDskShapeTests, BadFile) {
 
 
 TEST(BulletDskShapeTests, MutiSegment) {
-  QString dskfile("$base/testData/test_shape.bds");
+  QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/test_shape.bds");
 
   BulletDskShape multiseg(dskfile);
   EXPECT_EQ(multiseg.name(), "");

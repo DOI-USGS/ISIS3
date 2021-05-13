@@ -3,9 +3,10 @@
 
 #include <string>
 
-#include "csm/GeometricModel.h"
+#include "csm/RasterGM.h"
 #include "csm/Plugin.h"
 #include "csm/Version.h"
+#include "csm/CorrelationModel.h"
 
 #include <nlohmann/json.hpp>
 
@@ -15,7 +16,7 @@
  * 
  * @author 2020-12-08 Kristin Berry
  */
-class TestCsmModel : public csm::GeometricModel {
+class TestCsmModel : public csm::RasterGM {
   public:
     // Static variables that describe the model
     static const std::string SENSOR_MODEL_NAME;
@@ -26,6 +27,7 @@ class TestCsmModel : public csm::GeometricModel {
 
     TestCsmModel();
     ~TestCsmModel();
+
     // csm::Model methods
     std::string getFamily() const;
     csm::Version getVersion() const;
@@ -44,6 +46,7 @@ class TestCsmModel : public csm::GeometricModel {
     std::string getModelState() const;
     void replaceModelState(const std::string& argState);
     std::string constructStateFromIsd(const csm::Isd stringIsd);
+
     // csm::GeometricModel methods
     csm::EcefCoord getReferencePoint() const;
     void setReferencePoint(const csm::EcefCoord& groundPt);
@@ -73,7 +76,86 @@ class TestCsmModel : public csm::GeometricModel {
           csm::param::Set pSet = csm::param::VALID,
           const csm::GeometricModel::GeometricModelList& otherModels = GeometricModel::GeometricModelList()) const;
 
+    // csm::RasterGM methods
+    virtual csm::ImageCoord groundToImage(const csm::EcefCoord& groundPt,
+                                    double desiredPrecision = 0.001,
+                                    double* achievedPrecision = NULL,
+                                    csm::WarningList* warnings = NULL) const;
+
+    virtual csm::ImageCoordCovar groundToImage(const csm::EcefCoordCovar& groundPt,
+                                         double desiredPrecision = 0.001,
+                                         double* achievedPrecision = NULL,
+                                         csm::WarningList* warnings = NULL) const;
+  
+    virtual csm::EcefCoord imageToGround(const csm::ImageCoord& imagePt,
+                                   double height,
+                                   double desiredPrecision = 0.001,
+                                   double* achievedPrecision = NULL,
+                                   csm::WarningList* warnings = NULL) const;
+
+    virtual csm::EcefCoordCovar imageToGround(const csm::ImageCoordCovar& imagePt,
+                                        double height,
+                                        double heightVariance,
+                                        double desiredPrecision = 0.001,
+                                        double* achievedPrecision = NULL,
+                                       csm:: WarningList* warnings = NULL) const;
+
+    virtual csm::EcefLocus imageToProximateImagingLocus(
+      const csm::ImageCoord& imagePt,
+      const csm::EcefCoord& groundPt,
+      double desiredPrecision = 0.001,
+      double* achievedPrecision = NULL,
+      csm::WarningList* warnings = NULL) const;
+
+    virtual csm::EcefLocus imageToRemoteImagingLocus(
+      const csm::ImageCoord& imagePt,
+      double desiredPrecision = 0.001,
+      double* achievedPrecision = NULL,
+      csm::WarningList* warnings = NULL) const;
+
+   virtual csm::ImageCoord getImageStart() const;
+
+   virtual csm::ImageVector getImageSize() const;
+
+   virtual std::pair<csm::ImageCoord, csm::ImageCoord> getValidImageRange() const; 
+
+   virtual std::pair<double,double> getValidHeightRange() const;
+
+   virtual csm::EcefVector getIlluminationDirection(const csm::EcefCoord& groundPt) const;
+
+   virtual double getImageTime(const csm::ImageCoord& imagePt) const;
+
+   virtual csm::EcefCoord getSensorPosition(const csm::ImageCoord& imagePt) const;
+
+   virtual csm::EcefCoord getSensorPosition(double time) const;
+
+   virtual csm::EcefVector getSensorVelocity(const csm::ImageCoord& imagePt) const;
+
+   virtual csm::EcefVector getSensorVelocity(double time) const;
+
+   virtual SensorPartials computeSensorPartials(
+                int index,
+                const csm::EcefCoord& groundPt,
+                double desiredPrecision   = 0.001,
+                double* achievedPrecision = NULL,
+                csm::WarningList* warnings     = NULL) const;
+
+   virtual SensorPartials computeSensorPartials(
+                int index,
+                const csm::ImageCoord& imagePt,
+                const csm::EcefCoord& groundPt,
+                double desiredPrecision   = 0.001,
+                double* achievedPrecision = NULL,
+                csm::WarningList* warnings     = NULL) const;
+
+   virtual std::vector<double> computeGroundPartials(const csm::EcefCoord& groundPt) const;
+   virtual const csm::CorrelationModel& getCorrelationModel() const;
+   virtual std::vector<double> getUnmodeledCrossCovariance(
+                const csm::ImageCoord& pt1,
+                const csm::ImageCoord& pt2) const;
+
   private:
     std::vector<double> m_param_values; //! Parameter values associated with the sensor model
+    csm::NoCorrelationModel m_correlationModel;
 };
 #endif

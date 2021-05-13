@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
@@ -34,7 +23,7 @@ using namespace std;
 using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
-int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownLon); 
+int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownLon);
 
 /**
  *
@@ -46,8 +35,8 @@ int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownL
  *   @history 2018-08-28 Kris Becker - Initial unit test for Rosetta VIRTIS
  *            instrument
  *   @history 2019-07-02 Krisitn Berry - Update to test only level 3 (calibrated) images, as only
- *            calibrated images are currently supported by the camera model. 
- */  
+ *            calibrated images are currently supported by the camera model.
+ */
 int main(void) {
   Preference::Preferences(true);
 
@@ -68,7 +57,7 @@ int main(void) {
     cout << endl << "Teting Level 3 (Calibrated) VIRTIS-M-IR Cube ..." << endl;
     knownLat = 29.1974649731145028;
     knownLon = 346.8749209987247468;
-    lines = 67; 
+    lines = 67;
     Cube irCube("$ISISTESTDATA/isis/src/rosetta/unitTestData/I1_00382172310.cub", "r");
     RosettaVirtisCamera *cam2 = (RosettaVirtisCamera *) CameraFactory::Create(irCube);
     TestCamera(cam2, irCube, lines, knownLat, knownLon);
@@ -83,60 +72,60 @@ int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownL
   cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
   cout.setf(std::ios::fixed);
   cout << setprecision(9);
-  
+
   // Test kernel IDs
   cout << "Kernel IDs: " << endl;
   cout << "CK Frame ID = " << cam->CkFrameId() << endl;
   cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
   cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
   cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-  
+
   // Test name methods
   cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
   cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
   cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
   cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
-  
-  // Test Shutter Open/Close 
+
+  // Test Shutter Open/Close
   std::pair< double, double > imgTimes = cam->StartEndEphemerisTimes();
   cout << "Start Time: " << imgTimes.first << "\n";
   cout << "End Time:   " << imgTimes.second << "\n";
-  
+
   // Test all four corners to make sure the conversions are right
-  // For Rosetta, could not find images with the comet at all 4 corners, so these are 
+  // For Rosetta, could not find images with the comet at all 4 corners, so these are
   // actually corners of the comet, not the image. Values were chosen to approximate
-  // the corners on two different images (VIS and IR). 
-  
+  // the corners on two different images (VIS and IR).
+
   // good.
   cout << "For upper left corner ..." << endl;
   TestLineSamp(cam, 138.0, 10.0);
-  
+
   cout << "For upper right corner ..." << endl;
   TestLineSamp(cam, 165.0, 19.0);
-  
-  // fixme? 
+
+  // fixme?
   cout << "For lower left corner ..." << endl;
   TestLineSamp(cam, 138.0, 55.0);
-  
+
   cout << "For lower right corner ..." << endl;
   TestLineSamp(cam, 130.0, 55.0);
 
   double samp = 128.0;
   double line = lines/2.0;
   cout << "For center pixel position ..." << endl;
-  
+
   if(!cam->SetImage(samp, line)) {
     cout << "ERROR" << endl;
     return 0;
   }
-  
+
   if(abs(cam->UniversalLatitude() - knownLat) < 6E-12) {
     cout << "Latitude OK" << endl;
   }
   else {
     cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
   }
-  
+
   if(abs(cam->UniversalLongitude() - knownLon) < 6E-12) {
     cout << "Longitude OK" << endl;
   }
@@ -166,4 +155,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = ERROR" << endl << endl;
   }
 }
-

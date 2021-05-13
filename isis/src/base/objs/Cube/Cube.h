@@ -1,27 +1,11 @@
 #ifndef Cube_h
 #define Cube_h
-/**
- * @file
- * $Revision: 1.17 $
- * $Date: 2010/03/22 19:44:53 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <vector>
 
@@ -47,12 +31,19 @@ namespace Isis {
   class CubeAttributeOutput;
   class CubeCachingAlgorithm;
   class CubeIoHandler;
+  class CubeStretch;
   class FileName;
   class Projection;
   class Pvl;
   class PvlGroup;
   class Statistics;
+  class Table;
   class Histogram;
+  class History;
+  class OriginalLabel;
+  class OriginalXmlLabel;
+  class ImagePolygon;
+
 
   /**
    * @brief IO Handler for Isis Cubes.
@@ -171,6 +162,7 @@ namespace Isis {
    *                           an IsisPreference file cannot be found. Fixes #5145.
    *   @history 2018-11-16 Jesse Mapel - Made several methods virtual for mocking.
    *   @history 2019-06-15 Kristin Berry - Added latLonRange method to return the valid lat/lon rage of the cube. The values in the mapping group are not sufficiently accurate for some purposes.
+   *   @history 2021-02-17 Jesse Mapel - Added hasBlob method to check for any type of BLOB.
    */
   class Cube {
     public:
@@ -180,7 +172,7 @@ namespace Isis {
       virtual ~Cube();
 
       /**
-       * These are the possible storage formats of Isis3 cubes. There is an
+       * These are the possible storage formats of ISIS cubes. There is an
        *   internal IO handler for each one of these.
        */
       enum Format {
@@ -260,10 +252,23 @@ namespace Isis {
       void open(const QString &cfile, QString access = "r");
       void reopen(QString access = "r");
 
-      void read(Blob &blob, 
+      void read(Blob &blob,
                 const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
       void read(Buffer &rbuf) const;
+      OriginalLabel readOriginalLabel(const QString &name="IsisCube") const;
+      CubeStretch readCubeStretch(QString name="CubeStretch",
+                                  const std::vector<PvlKeyword> keywords = std::vector<PvlKeyword>()) const;
+      OriginalXmlLabel readOriginalXmlLabel() const;
+      History readHistory(const QString &name = "IsisCube") const;
+      ImagePolygon readFootprint() const;
+      Table readTable(const QString &name);
       void write(Blob &blob, bool overwrite=true);
+      void write(const Table &table);
+      void write(const CubeStretch &cubeStretch);
+      void write(OriginalLabel &lab);
+      void write(const OriginalXmlLabel &lab);
+      void write(History &history, const QString &name = "IsisCube");
+      void write(const ImagePolygon &polygon);
       void write(Buffer &wbuf);
 
       void setBaseMultiplier(double base, double mult);
@@ -310,14 +315,16 @@ namespace Isis {
 
       void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
-      bool deleteBlob(QString BlobType, QString BlobName);
+      bool deleteBlob(QString BlobName, QString BlobType);
       void deleteGroup(const QString &group);
       PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
+      bool hasBlob(const QString &name, const QString &type);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
+
 
     private:
       void applyVirtualBandsToLabel();
@@ -396,7 +403,7 @@ namespace Isis {
 
       /**
        * If open was called with an Isis 2 cube, then this will be
-       *   the name of the imported Isis3 cube. m_labelFileName and
+       *   the name of the imported ISIS cube. m_labelFileName and
        *   m_dataFileName will store the Isis 2 cube's information.
        */
       FileName *m_tempCube;

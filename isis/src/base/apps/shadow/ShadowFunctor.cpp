@@ -38,8 +38,7 @@ namespace Isis {
     m_inputDem = inputDem;
 
     try {
-      Table shapeModelStats("ShapeModelStatistics");
-      inputDem->read(shapeModelStats);
+      Table shapeModelStats = inputDem->readTable("ShapeModelStatistics");
 
       // We store this in KM, not M, in this class.
       m_inputDemMax = (double)shapeModelStats[0]["MaximumRadius"] * 1000.0;

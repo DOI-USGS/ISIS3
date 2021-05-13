@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -14,8 +14,8 @@ Deborah Lee Soltesz
 
 -->
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -69,7 +69,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        Isis 3 Application Documentation</p>
+        Isis Application Documentation</p>
         <hr/>
 
 
@@ -111,9 +111,9 @@ Deborah Lee Soltesz
 
 
 <p>
-Several applications have been renamed or evolved into multiple applications in 
-the newest version of ISIS. The following table cross-references the current 
-application names in ISIS 3 to the names of applications in previous versions of ISIS.
+Several applications have been renamed or evolved into multiple applications in
+the newest version of ISIS. The following table cross-references the current
+application names in ISIS to the names of applications in previous versions of ISIS.
 </p>
 
 
@@ -127,7 +127,7 @@ application names in ISIS 3 to the names of applications in previous versions of
             Previous Versions
           </th>
           <th class="tableCellLevel1_th">
-            ISIS 3
+            ISIS
           </th>
         </tr>
 
@@ -176,4 +176,3 @@ application names in ISIS 3 to the names of applications in previous versions of
   </xsl:template>
 
 </xsl:stylesheet>
-

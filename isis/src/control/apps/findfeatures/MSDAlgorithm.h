@@ -1,26 +1,13 @@
 #ifndef MSDAlgorithm_h
 #define MSDAlgorithm_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "FeatureAlgorithm.h"
 #include "opencv2/xfeatures2d.hpp"
@@ -30,15 +17,15 @@
 namespace Isis {
 
 /**
- * @brief MSD Feature matcher algorithm 
- *  
- * This class provides the OpenCV3 MSDDetector Feature2D algortithm. Only the 
- * necesary methods are implemented here. 
- *  
+ * @brief MSD Feature matcher algorithm
+ *
+ * This class provides the OpenCV3 MSDDetector Feature2D algortithm. Only the
+ * necesary methods are implemented here.
+ *
  * @author  2016-12-12 Jesse Mapel
- *  
- * @internal 
- *   @history 2016-12-12 Jesse Mapel - Original Version 
+ *
+ * @internal
+ *   @history 2016-12-12 Jesse Mapel - Original Version
  */
 
 class MSDAlgorithm : public Feature2DAlgorithm {  // See FeatureAlgorithm.h
@@ -46,7 +33,7 @@ class MSDAlgorithm : public Feature2DAlgorithm {  // See FeatureAlgorithm.h
   public:
     MSDAlgorithm();
     MSDAlgorithm( const PvlFlatMap &cvars, const QString &config = QString() );
-                 
+
     virtual ~MSDAlgorithm();
 
     QString description() const;
@@ -59,7 +46,7 @@ class MSDAlgorithm : public Feature2DAlgorithm {  // See FeatureAlgorithm.h
     virtual bool hasExtractor() const;
     virtual bool hasMatcher() const;
 
-  protected:    
+  protected:
     virtual PvlFlatMap setupParameters();
     virtual PvlFlatMap getAlgorithmVariables() const;
     virtual int setAlgorithmVariables(const PvlFlatMap &variables);

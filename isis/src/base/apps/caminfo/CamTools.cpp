@@ -334,14 +334,7 @@ namespace Isis {
 
       if (getFootBlob && band == 0) {
         // Read the footprint from the image labels
-        ImagePolygon poly;
-        try {
-          cube.read(poly);
-        }
-        catch (IException &e) {
-          QString msg = "Error reading footprint blob from image labels";
-          throw IException(e, IException::User, msg, _FILEINFO_);
-        }
+        ImagePolygon poly = cube.readFootprint();
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
         _combined = multiP->clone();

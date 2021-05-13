@@ -1,6 +1,14 @@
 #ifndef QtieTool_h
 #define QtieTool_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QAction>
 #include <QPushButton>
 #include <QToolButton>
@@ -51,9 +59,9 @@ namespace Isis {
    *                            ControlPointEdit
    *   @history 2012-05-10 Tracie Sucharski - Reset pointers to NULL, when creating
    *                            new control point, if doesn't exist on basemap, return.
-   *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
+   *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class
    *                            and into the QtieFileTool class.
-   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                            coding standards. References #972.
    *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis
    *                            tickets #775 and #1114.

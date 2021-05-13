@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        ISIS 3 Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -125,7 +125,7 @@ Deborah Lee Soltesz
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
             ISIS Workshop</a>
           </th>
           <td>
@@ -221,7 +221,7 @@ Deborah Lee Soltesz
             Old vs. New Program Names</a>
           </th>
           <td>
-          A useful table cross-referencing the current application names in ISIS 3 to the names of applications in previous versions of ISIS.
+          A useful table cross-referencing the current application names in ISIS to the names of applications in previous versions of ISIS.
 
           </td>
         </tr>

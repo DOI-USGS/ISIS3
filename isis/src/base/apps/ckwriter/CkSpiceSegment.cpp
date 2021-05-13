@@ -216,7 +216,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
     _quats = getQuaternions(spice);
     _avvs = getAngularVelocities(spice);
-    _times = getTimes(spice);
+    _times = getTimes(spice, camera->instrumentRotation()->TimeBias());
 
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
@@ -303,13 +303,13 @@ CkSpiceSegment::SMatrix CkSpiceSegment::getAngularVelocities(const SMatrix &spic
 }
 
 
-CkSpiceSegment::SVector CkSpiceSegment::getTimes(const SMatrix &spice) const {
+CkSpiceSegment::SVector CkSpiceSegment::getTimes(const SMatrix &spice, const double timeBias) const {
   int nrecs = size(spice);
   SVector etdp(nrecs);
   int tcol = spice.dim2() - 1;
 
   for ( int i = 0 ; i < nrecs ; i++ ) {
-    etdp[i] = spice[i][tcol];
+    etdp[i] = spice[i][tcol] + timeBias;
   }
   return (etdp);
 }

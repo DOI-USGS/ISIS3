@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "kaguyami2isis.h"
 
 #include <cstdio>
@@ -14,8 +22,6 @@
 #include "IString.h"
 
 using namespace std;
-
-static double range(double x);
 
 namespace Isis {
 
@@ -139,21 +145,5 @@ namespace Isis {
     outcube->putGroup(kern);
 
     p.EndProcess();
-  }
-
-  double range(double x) {
-    double a,b,c;
-    b = x / 360;
-    if(b > 0) {
-      c = floor(b);
-    }
-    else {
-      c = ceil(b);
-    }
-    a = 360 * (b - c);
-    if(a < 0) {
-      a = a + 360;
-    }
-    return a;
   }
 }

@@ -23,7 +23,7 @@
         RED4_0 and RED5_1 are overlapping channel files, but RED4_1 and
         RED3_1 are not.  Furthermore, this application can be used to
         characterize offsets of the color sets as well.  I will describe these
-        scenarios in more detail below. 
+        scenarios in more detail below.
       </p>
       <p>
         The offsets are determined using HiRISE focal plane locations for
@@ -36,12 +36,20 @@
         appropriate localized adjustments to determine the final overlap used to
         characterize the two image sections.  See the documentation for the
         SHIFTDEF parameter for <i>hiccdstitch</i> for further details.
-     </p>
+      </p>
       <p>
-          The type of registration algorithm and appropriate parameters for its
-          use is determined by the REGDEF parameter.  This follows the Isis
-          standard.  Below is an example of the PVL-format that is expected
-          in the file provided.
+        For this program to work properly, the image starting time is required. The
+        starting time can be determined using the camera model if the image has been
+        run through spiceinit or it can be determined using the starting clock count
+        and the SPICE clock kernel. Both ways produce identical results. Using the
+        camera model has the advantage of not requiring local mission specific kernels
+        be available. See spiceinit web=true.
+      </p>
+      <p>
+        The type of registration algorithm and appropriate parameters for its
+        use is determined by the REGDEF parameter.  This follows the Isis
+        standard.  Below is an example of the PVL-format that is expected
+        in the file provided.
       </p>
      <pre>
          Object = AutoRegistration
@@ -68,7 +76,7 @@
          follows:  ROWS = (line overlap - 1) / search chip lines + 1.  The
          default for COLUMNS is set to 1.  This default condition assumes
          processing of overlapping regions that are approximately 48 pixels.
-         However, if you specify 0, then the computation for 
+         However, if you specify 0, then the computation for
          COLUMNS is the same as it is for ROWS only using sample overlap.
          Conceptually,  the chip grid defined by ROWS and COLUMNS will be
          laid on top of both images with even spacing between the rows (or
@@ -92,7 +100,7 @@
          don't go too small with the pattern chip size, 17x45 is the nomimal
          starting point.  Also, the larger the translation, the larger the search
          chip size will need to be.  So if your translation is only a couple of
-         pixels keep the search chip slightly bigger than the pattern 
+         pixels keep the search chip slightly bigger than the pattern
          (e.g., 25x55 vs 17x45).  However if the translation is large you will
          need to expand the search area.  For example,  if the translation is
          roughly 45 pixels and your pattern is 20x20 the search area should
@@ -131,7 +139,7 @@
          must be the same number.  Note that both samples and lines must be
          increased or decreased in order to yield appropriate results.
          Once equivalent summing modes are achieved, you will likely have to get
-         the images lined up using sample and line offsets.  This is done via the 
+         the images lined up using sample and line offsets.  This is done via the
          SHIFTDEF parameter.  Further adjustments should be considered.  For
          example, now a much large portion of the images are overlapping.  You
          may wish to specify 3 columns, evenly spaced, to register.  Set the
@@ -141,7 +149,7 @@
 
   <category>
       <missionItem>Mars Reconnaissance Orbiter</missionItem>
-  </category>  
+  </category>
 
   <seeAlso>
       <applications>
@@ -166,7 +174,7 @@
      </change>
      <change name="Kris Becker" date="2006-06-16">
           Added specification of reference image in the control net file to
-          support subsequent use (e.g., 1-D transform). 
+          support subsequent use (e.g., 1-D transform).
       </change>
     <change name="Brendan George" date="2006-09-28">
         Documentation fixes
@@ -185,7 +193,7 @@
 	also required to have 20000 samples. This will be fixed later.
     </change>
     <change name="Janet Barrett" date="2007-08-08">
-        Modified program so that noproj'ed files are no longer 
+        Modified program so that noproj'ed files are no longer
 	required to have a summing mode of 1. Support was also added
 	for noproj'ed IR and BG files.
     </change>
@@ -212,7 +220,7 @@
       or the instrument group. References #1094.
     </change>
     <change name="Jeannie Backer" date="2016-04-22">
-      Modified to use the FROM cube labels to set output control net's' target instead of the 
+      Modified to use the FROM cube labels to set output control net's' target instead of the
       TargetName. References #3892
     </change>
   </history>
@@ -244,7 +252,7 @@
         </brief>
         <description>
           This HiRISE cube will be held fixed in the registration process. The
-          FROM cube will be translated to match this cube. 
+          FROM cube will be translated to match this cube.
           It corresponds to the pattern chip (the smaller sized chip).
           This file can be either a stitched
           CCD or an individual CCD channel.  If a channel is provided, be sure it
@@ -289,7 +297,7 @@
                 is the same as it is for <i>hiccdstitch</i>.
             </p>
             <p>
-                This file contains groups for each CCD that requires a 
+                This file contains groups for each CCD that requires a
                 modification to its placement into the HiRISE
                 focal plane.  The name of each group is the CCD name for
                 which the shift in line or sample is needed.  For example, the
@@ -301,7 +309,7 @@
             </p>
             <p>
                 Offsets for both line and sample can be supplied.  None, one or
-                both can be provided for any CCD.  Negative values shift the 
+                both can be provided for any CCD.  Negative values shift the
                 image left if a sample offset is given or up if a line offset is given.
                 Positive values in sample and line shift the image right and down,
                 respectively.
@@ -392,7 +400,7 @@
               adjacent CCD overlap.  The user can have the application compute the
               number of grid columns similar to how ROWS is done.  To use this
               option, set COLUMNS = 0.  The application will then compute
-              the number of grid columns as 
+              the number of grid columns as
               COLUMNS = (samples of overlap - 1) / search chip samples + 1.
           </description>
           <default><item>1</item></default>
@@ -409,7 +417,7 @@
           </brief>
           <description>
               <p>
-               This file will contain the data collected from the application. 
+               This file will contain the data collected from the application.
                Data pertaining to the input images that may have relevance
                to the analysis is provided in free form.  This includes lines,
                samples, offsets, CPMM number, summing, TDI mode, overlap
@@ -526,7 +534,7 @@
                               </PRE>
                               Here, <i>y</i> is the output FROM Dn and <i>x</i> is the
                               FROM input Dn.   In theory, one could use <i>poly</i> to
-                              apply this to the FROM image and it will adjust FROM 
+                              apply this to the FROM image and it will adjust FROM
                               to look closer to MATCH in brightness levels.
                           </TD>
                       </TR>

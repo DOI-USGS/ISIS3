@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "AdvancedTrackTool.h"
 
 #include <QAction>
@@ -640,8 +648,7 @@ namespace Isis {
 
           unsigned int currentPixel = trackingPortal[0];
           if (currentPixel != NULLUI4) {  // If from an image
-            Table table(trackingTableName); // trackingTableName from TrackingTable
-            trackingCube->read(table);
+            Table table = trackingCube->readTable(trackingTableName); // trackingTableName from TrackingTable
             TrackingTable trackingTable(table);
 
             FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);
@@ -686,8 +693,7 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(trackingTableName);
-            cCube->read(cFileTable);
+            Table cFileTable = cCube->readTable(trackingTableName);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {
               psSrcFileName = QString(cFileTable[piOrigin][0]);

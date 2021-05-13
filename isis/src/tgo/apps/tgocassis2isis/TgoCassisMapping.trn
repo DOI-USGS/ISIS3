@@ -1,5 +1,5 @@
 # Translates CaSSIS xml labels into the Mapping PvlGroup values
-# for the ingested ISIS3 cube labels.
+# for the ingested ISIS cube labels.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.
@@ -29,13 +29,13 @@
 #   </Axis_Array>
 # </Array_2D_Image>
 #
-# 
+#
 # history 2018-08-09 Jeannie Backer - Changed group name from MapProjection
 #                        to ProjectionName.
 
 Group = ProjectionName
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection) 
+  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection)
   InputKey             = cart:map_projection_name
   OutputName           = ProjectionName
   OutputPosition       = (Object,IsisCube,Group,Mapping)
@@ -44,7 +44,7 @@ End_Group
 
 Group = CenterLongitude
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cart:Equirectangular) 
+  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cart:Equirectangular)
   InputKey             = cart:longitude_of_central_meridian
   OutputName           = CenterLongitude
   OutputPosition       = (Object,IsisCube,Group,Mapping)
@@ -53,7 +53,7 @@ End_Group
 
 Group = CenterLatitude
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cart:Equirectangular) 
+  InputPosition        = (Observation_Area, Discipline_Area, cart:Cartography, cart:Spatial_Reference_Information, cart:Horizontal_Coordinate_System_Definition, cart:Planar, cart:Map_Projection, cart:Equirectangular)
   InputKey             = cart:latitude_of_projection_origin
   OutputName           = CenterLatitude
   OutputPosition       = (Object,IsisCube,Group,Mapping)
@@ -105,7 +105,7 @@ Group = MaximumLongitude
   OutputName           = MaximumLongitude
   OutputPosition       = (Object,IsisCube,Group,Mapping)
   Translation          = (*, *)
-End_Group 
+End_Group
 
 Group = MinimumLongitude
   Auto
@@ -181,7 +181,7 @@ Group = TargetName
   Translation          = (*, *)
 End_Group
 
-# Does not exist in xml label 
+# Does not exist in xml label
 Group = LongitudeDomain
   Auto
   InputDefault         = 360

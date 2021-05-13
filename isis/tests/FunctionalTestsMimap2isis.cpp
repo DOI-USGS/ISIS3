@@ -14,7 +14,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/mimap2isis.xml").expanded();
 
-TEST(FunctionalTestsMiMap2Isis, Default) {
+TEST(FunctionalTestMimap2Isis, Default) {
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
    QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName};
@@ -35,7 +35,7 @@ TEST(FunctionalTestsMiMap2Isis, Default) {
   EXPECT_EQ(int(dimensions["Samples"]), 5);
   EXPECT_EQ(int(dimensions["Lines"]), 5);
   EXPECT_EQ(int(dimensions["Bands"]), 9);
-  
+
   // Pixels Group
   PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, pixels.findKeyword("Type"), "SignedWord");
@@ -50,9 +50,9 @@ TEST(FunctionalTestsMiMap2Isis, Default) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("InstrumentId"), "MI");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("TargetName"), "MOON");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("ObservationModeId"), "NORMAL");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("SensorDescription"), 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("SensorDescription"),
                                            "MI is a multiband push-broom imaging camera consisting of VIS(V) and NIR(N) sensors (each has nadir-directed optics of f number 65 mm and F ratio 3.7). Detector pixel sizes in micron are 13(V) and 40(N).");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("SensorDescription2"), 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, inst.findKeyword("SensorDescription2"),
                                            "Physical band arrangement [from satellite -x to +x] are VIS1>VIS2>VIS5>VIS4>VIS3 and NIR3>NIR4>NIR1>NIR2. Parallax between nearest band sets [degree] are 2.7 for VIS and 2.6 for NIR. Sampling time [msec] are 13 for VIS and 39 for NIR.");
 
   // Archive Group
@@ -247,7 +247,7 @@ TEST(FunctionalTestsMiMap2Isis, Default) {
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DtmMosaicFileName")[i], "N/A");
   }
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("OverlapSelectionId"), 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("OverlapSelectionId"),
                                            "Prioritized order : nominal mission period and phase angle closer to the standard geometry");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("MatchingMosaic"), "N/A");
@@ -318,7 +318,7 @@ TEST(FunctionalTestsMiMap2Isis, Default) {
   EXPECT_DOUBLE_EQ(mapping.findKeyword("Scale"), 2048.0);
 }
 
-TEST(FunctionalTestsMiMap2Isis, L3C) {
+TEST(FunctionalTestMimap2Isis, L3C) {
    QTemporaryDir prefix;
    QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
    QVector<QString> args = {"from=data/mimap2isis/MIA_3C5_03_01351S791E0024SC_cropped.img", "to=" + cubeFileName};
@@ -458,7 +458,7 @@ TEST(FunctionalTestsMiMap2Isis, L3C) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("EfficFileName")[1], "MIN_EFF_PRFLT_N___v01.csv");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[0], "MIN_NLT_PRFLT_N___v01.csv");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[1], "MIV_NLT_PRFLT_N___v01.csv");
-  
+
   EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[0].toDouble(), 1.470593, .000001);
   EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[1].toDouble(), 2.204781, .000001);
   EXPECT_NEAR(archive.findKeyword("RadCnvCoef")[2].toDouble(), 2.244315, .000001);
@@ -545,11 +545,11 @@ TEST(FunctionalTestsMiMap2Isis, L3C) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("BaseBand"), "MV5");
 }
 
-TEST(FunctionalTestsMiMap2Isis, SpecialPixels) {
+TEST(FunctionalTestMimap2Isis, SpecialPixels) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/mimap2isisTEMP.cub";
-  QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName, 
-                            "setnullrange=yes", "nullmin=-31000", "nullmax=-20000", "sethrsrange=yes", 
+  QVector<QString> args = {"from=data/mimap2isis/MI_MAP_02_N65E328N64E329SC_cropped.img", "to=" + cubeFileName,
+                            "setnullrange=yes", "nullmin=-31000", "nullmax=-20000", "sethrsrange=yes",
                             "hrsmin=-19000", "hrsmax=-10000", "setlrsrange=yes", "lrsmin=-9000", "lrsmax=0",
                             "setlisrange=yes", "lismin=1000", "lismax=10000", "sethisrange=yes", "hismin=11000", "hismax=20000"};
 
@@ -563,7 +563,7 @@ TEST(FunctionalTestsMiMap2Isis, SpecialPixels) {
 
   Cube outCube(cubeFileName);
   std::unique_ptr<Histogram> hist(outCube.histogram());
-  
+
   EXPECT_EQ(hist->LrsPixels(), 2);
   EXPECT_EQ(hist->HrsPixels(), 5);
   EXPECT_EQ(hist->NullPixels(), 4);

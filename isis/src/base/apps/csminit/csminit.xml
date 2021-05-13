@@ -40,6 +40,15 @@
     <change name="Jesse Mapel" date="2020-11-18">
       Original Version
     </change>
+    <change name="Jesse Mapel and Stuart Sides" date="2021-02-03">
+      Modified to always add a TargetName and Instrument group to the label for the camera model.
+    </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-10">
+      Modified to revert label and Cube changes on failure.
+    </change>
+    <change name="Kristin Berry and Stuart Sides" date="2021-02-12">
+      Added the ability to take a state string instead of an ISD.
+    </change>
   </history>
 
   <groups>
@@ -61,6 +70,7 @@
       <parameter name="ISD">
         <type>filename</type>
         <fileMode>input</fileMode>
+        <internalDefault>none</internalDefault>
         <brief>
           The Instrument Support Data (ISD) file that will be used.
         </brief>
@@ -69,18 +79,30 @@
           model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
         </description>
       </parameter>
+
+      <parameter name="STATE">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          A Community Sensor Model (CSM) state string
+        </brief>
+        <description>
+          A file containing a Community Sensor Model (CSM) state string that will be used to create the
+          model for the input cube.
+        </description>
+      </parameter>
     </group>
 
     <group name="Target Specification">
       <parameter name="TARGETNAME">
         <type>string</type>
-        <internalDefault>none</internalDefault>
+        <internalDefault>Current TargetName in input label or Unknown if not present.</internalDefault>
         <brief>
           The name of the body observed by the image.
         </brief>
         <description>
-          The name of the body observed by the image. If not entered, then the
-          target already listed on the label will be used.
+          The name of the body observed by the image.
         </description>
       </parameter>
 

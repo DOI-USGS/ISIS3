@@ -1,24 +1,10 @@
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2009/12/29 23:03:52 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
 #include <sstream>
@@ -26,10 +12,12 @@
 
 #include <SpiceUsr.h>
 
+#include "Camera.h"
 #include "FileName.h"
 #include "HiJitCube.h"
 #include "IException.h"
 #include "Instrument.hh"
+#include "iTime.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "NaifStatus.h"
@@ -159,11 +147,13 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      NaifStatus::CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
+      NaifStatus::CheckErrors();
       furnsh_c(lsk.toLatin1().data());
+      NaifStatus::CheckErrors();
       furnsh_c(sClock.toLatin1().data());
+      NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once
       naifLoaded = true;
@@ -172,7 +162,6 @@ namespace Isis {
   }
 
   void HiJitCube::computeStartTime() {
-    loadNaifTiming();
 
 //  Compute the unbinned and binned linerates in seconds
     jdata.unBinnedRate = ((Instrument::LINE_TIME_PRE_OFFSET +
@@ -181,9 +170,27 @@ namespace Isis {
     jdata.linerate = jdata.unBinnedRate * ((double) jdata.summing);
 
     if(!jdata.scStartTime.isEmpty()) {
-      QString scStartTimeString = jdata.scStartTime;
-      scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
-      NaifStatus::CheckErrors();
+
+      try {
+        Camera *cam;
+        cam = camera();
+        // This SetImage at (1,1) is used to match the non-camera code below. (0.5, 0.5) should match the start
+        // clock count of the image, but instead (1, 1) matches. This suggests something odd in the Camera
+        cam->SetImage (1.0, 1.0);
+        jdata.obsStartTime = cam->time().Et();
+      } catch (IException &e) {
+        try {
+          loadNaifTiming();
+          QString scStartTimeString = jdata.scStartTime;
+          NaifStatus::CheckErrors();
+          scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
+          NaifStatus::CheckErrors();
+        } catch (IException &e) {
+            QString message = "Start time of the image can not be determined.";
+            throw IException(e, IException::User, message, _FILEINFO_);
+        }
+      }
+
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)
