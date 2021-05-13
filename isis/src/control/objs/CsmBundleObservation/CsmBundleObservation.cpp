@@ -171,6 +171,13 @@ namespace Isis {
       IException(IException::Programmer, msg, _FILEINFO_);
     }
 
+    std::cout << "Applying corrections to [" << front()->serialNumber() << "]." << std::endl;
+    std::cout << corrections[0];
+    for (size_t i = 1; i < corrections.size(); i++) {
+      std::cout << ", " << corrections[0];
+    }
+    std::cout << std::endl;
+
     // Apply the corrections to the CSM camera
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
     for (size_t i = 0; i < corrections.size(); i++) {
