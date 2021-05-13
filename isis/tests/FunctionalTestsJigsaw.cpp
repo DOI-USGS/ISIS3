@@ -1194,6 +1194,400 @@ End)");
   EXPECT_NEAR(columns[3].toDouble(), 1699.84329956, 0.0001);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 5.34723296, 0.0001);
-
 }
 
+
+TEST_F(VikThmNetwork, FunctionalTestJigsawScconfig) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+  QString scconfigPath = "data/vikingThemisNetwork/themis_vo.pvl";
+
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
+                           "onet="+outCnetFileName, "scconfig="+scconfigPath,
+                           "radius=true", "point_radius_sigma=50",
+                           "bundleout_txt=no", "output_csv=no",
+                           "residuals_csv=no", "file_prefix="+prefix.path()+"/"};
+
+   UserInterface options(APP_XML, args);
+
+   try {
+     jigsaw(options);
+   }
+   catch (IException &e) {
+     FAIL() << "Failed to bundle: " << e.what() << std::endl;
+   }
+
+   CSVReader header = CSVReader(prefix.path()+"/bundleout_images_MARS_ODYSSEY_THEMIS_IR.csv",
+                      false, 0, ',', false, true);
+
+   // Cube 1
+   CSVReader::CSVAxis csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/I28234014RDR_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.098907844, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.215695753, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.167790672, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 2830.732839, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 1273.737178, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 2222.226081, 0.0001);
+   // Final RA(t0)
+   EXPECT_NEAR(csvLine[21].toDouble(), -0.293061477, 0.0001);
+   // Final RA(t1)
+   EXPECT_NEAR(csvLine[26].toDouble(), -0.006286268, 0.0001);
+   // Final RA(t2)
+   EXPECT_NEAR(csvLine[31].toDouble(), -0.001770652, 0.0001);
+   // Final DEC(t0)
+   EXPECT_NEAR(csvLine[36].toDouble(), 0.280832383, 0.0001);
+   // Final DEC(t1)
+   EXPECT_NEAR(csvLine[41].toDouble(), 0.03537654, 0.0001);
+   // Final DEC(t2)
+   EXPECT_NEAR(csvLine[46].toDouble(), -0.008331205, 0.0001);
+   // Final TWIST(t0)
+   EXPECT_NEAR(csvLine[51].toDouble(), 0.140615905, 0.0001);
+   // Final TWIST(t1)
+   EXPECT_NEAR(csvLine[56].toDouble(), -0.01323743, 0.0001);
+   // Final TWIST(t2)
+   EXPECT_NEAR(csvLine[61].toDouble(), 0.014712461, 0.0001);
+
+   // Cube 2
+   csvLine = header.getRow(3);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/I52634011RDR_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.127427856, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.339851251, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.256648331, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 3638.299799, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 265.2465868, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 1122.429048, 0.0001);
+   // Final RA(t0)
+   EXPECT_NEAR(csvLine[21].toDouble(), -0.043427688, 0.0001);
+   // Final RA(t1)
+   EXPECT_NEAR(csvLine[26].toDouble(), -0.00150114, 0.0001);
+   // Final RA(t2)
+   EXPECT_NEAR(csvLine[31].toDouble(), -0.001761841, 0.0001);
+   // Final DEC(t0)
+   EXPECT_NEAR(csvLine[36].toDouble(), 0.217420457, 0.0001);
+   // Final DEC(t1)
+   EXPECT_NEAR(csvLine[41].toDouble(), -0.012838311, 0.0001);
+   // Final DEC(t2)
+   EXPECT_NEAR(csvLine[46].toDouble(), -0.00276288, 0.0001);
+   // Final TWIST(t0)
+   EXPECT_NEAR(csvLine[51].toDouble(), -0.029666148, 0.0001);
+   // Final TWIST(t1)
+   EXPECT_NEAR(csvLine[56].toDouble(), -0.006404881, 0.0001);
+   // Final TWIST(t2)
+   EXPECT_NEAR(csvLine[61].toDouble(), 0.009706339, 0.0001);
+
+
+   header = CSVReader(prefix.path()+"/bundleout_images_VIKING_ORBITER_2_VISUAL_IMAGING_SUBSYSTEM_CAMERA_A.csv",
+                      false, 0, ',', false, true);
+
+   csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/F704b51.lev1_slo_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.462520744, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.270902588, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.379020877, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 3194.402972, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 1260.005005, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 11151.90611, 0.0001);
+   // Final RA
+   EXPECT_NEAR(csvLine[21].toDouble(), -93.38593055, 0.0001);
+   // Final DEC
+   EXPECT_NEAR(csvLine[26].toDouble(), 163.6079355, 0.0001);
+   // Final TWIST
+   EXPECT_NEAR(csvLine[31].toDouble(), 63.04898685, 0.0001);
+
+
+   header = CSVReader(prefix.path()+"/bundleout_images_VIKING_ORBITER_1_VISUAL_IMAGING_SUBSYSTEM_CAMERA_B.csv",
+                   false, 0, ',', false, true);
+
+   csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/F857a32.lev1_slo_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.326314933, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.24252818, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.287490307, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 13478.98055, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), -813.5504098, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 1067.407005, 0.0001);
+   // Final RA
+   EXPECT_NEAR(csvLine[21].toDouble(), -94.26870465, 0.0001);
+   // Final DEC
+   EXPECT_NEAR(csvLine[26].toDouble(), 91.72112715, 0.0001);
+   // Final TWIST
+   EXPECT_NEAR(csvLine[31].toDouble(), -22.90143017, 0.0001);
+ }
+
+
+TEST_F(VikThmNetwork, FunctionalTestJigsawScconfigHeld) {
+   QTemporaryDir prefix;
+   QString heldListPath = prefix.path() + "/heldlist.lis";
+   FileList heldList;
+   heldList.append("data/vikingThemisNetwork/I28234014RDR_crop.cub");
+   heldList.write(heldListPath);
+
+   QString outCnetFileName = prefix.path() + "/outTemp.net";
+   QString scconfigPath = "data/vikingThemisNetwork/themis_vo.pvl";
+
+   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
+                           "onet="+outCnetFileName, "heldlist="+heldListPath, "scconfig="+scconfigPath,
+                           "radius=true", "point_radius_sigma=50",
+                           "bundleout_txt=no", "output_csv=no",
+                           "residuals_csv=no", "file_prefix="+prefix.path()+"/"};
+
+   UserInterface options(APP_XML, args);
+
+   try {
+    jigsaw(options);
+   }
+   catch (IException &e) {
+    FAIL() << "Failed to bundle: " << e.what() << std::endl;
+   }
+
+   CSVReader heldHeader = CSVReader(prefix.path() + "/bundleout_images_held.csv",
+                                    false, 0, ',', false, true);
+
+   CSVReader::CSVAxis csvLine = heldHeader.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/I28234014RDR_crop.cub");
+   // sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 1.30E-11, 0.0001);
+   // line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 1.41E-11, 0.0001);
+   // total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 1.35E-11, 0.0001);
+   // final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 2830.732839, 0.0001);
+   // final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 1273.737178, 0.0001);
+   // final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 2222.226081, 0.0001);
+   // final RA
+   EXPECT_NEAR(csvLine[21].toDouble(), -126.5131868, 0.0001);
+   // final DEC
+   EXPECT_NEAR(csvLine[26].toDouble(), 55.60096761, 0.0001);
+   // final TWIST
+   EXPECT_NEAR(csvLine[31].toDouble(), 151.8463271, 0.0001);
+
+   // assert corrections are very small
+   // X Correction
+   EXPECT_LE(std::abs(csvLine[5].toDouble()), 1e-10);
+   // Y Correction
+   EXPECT_LE(std::abs(csvLine[10].toDouble()), 1e-10);
+   // Z Correction
+   EXPECT_LE(std::abs(csvLine[15].toDouble()), 1e-10);
+   // RA Correction
+   EXPECT_LE(std::abs(csvLine[20].toDouble()), 1e-10);
+   // DEC Correction
+   EXPECT_LE(std::abs(csvLine[25].toDouble()), 1e-10);
+   // TWIST Correction
+   EXPECT_LE(std::abs(csvLine[30].toDouble()), 1e-10);
+
+   CSVReader header = CSVReader(prefix.path()+"/bundleout_images_MARS_ODYSSEY_THEMIS_IR.csv",
+                                false, 0, ',', false, true);
+
+   // Cube 1
+   csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/I52634011RDR_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.402714712, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.990233446, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.755890672, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 3638.299799, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 265.2465868, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 1122.429048, 0.0001);
+   // Final RA(t0)
+   EXPECT_NEAR(csvLine[21].toDouble(), -0.181038886, 0.0001);
+   // Final RA(t1)
+   EXPECT_NEAR(csvLine[26].toDouble(), 0.004969535, 0.0001);
+   // Final RA(t2)
+   EXPECT_NEAR(csvLine[31].toDouble(), -4.95E-04, 0.0001);
+   // Final DEC(t0)
+   EXPECT_NEAR(csvLine[36].toDouble(), 0.545011107, 0.0001);
+   // Final DEC(t1)
+   EXPECT_NEAR(csvLine[41].toDouble(), 0.060712178, 0.0001);
+   // Final DEC(t2)
+   EXPECT_NEAR(csvLine[46].toDouble(), -0.01481148, 0.0001);
+   // Final TWIST(t0)
+   EXPECT_NEAR(csvLine[51].toDouble(), 0.059124183, 0.0001);
+   // Final TWIST(t1)
+   EXPECT_NEAR(csvLine[56].toDouble(), -0.004663389, 0.0001);
+   // Final TWIST(t2)
+   EXPECT_NEAR(csvLine[61].toDouble(), 0.018341326, 0.0001);
+
+   header = CSVReader(prefix.path()+"/bundleout_images_VIKING_ORBITER_2_VISUAL_IMAGING_SUBSYSTEM_CAMERA_A.csv",
+                      false, 0, ',', false, true);
+
+   csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/F704b51.lev1_slo_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.573332032, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.376017989, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.484819114, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 3194.402972, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), 1260.005005, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 11151.90611, 0.0001);
+   // Final RA
+   EXPECT_NEAR(csvLine[21].toDouble(), -93.385133891536, 0.0001);
+   // Final DEC
+   EXPECT_NEAR(csvLine[26].toDouble(), 163.6079355, 0.0001);
+   // Final TWIST
+   EXPECT_NEAR(csvLine[31].toDouble(), 63.100333749725003, 0.0001);
+
+   header = CSVReader(prefix.path()+"/bundleout_images_VIKING_ORBITER_1_VISUAL_IMAGING_SUBSYSTEM_CAMERA_B.csv",
+                      false, 0, ',', false, true);
+
+   csvLine = header.getRow(2);
+   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "data/vikingThemisNetwork/F857a32.lev1_slo_crop.cub");
+   // Sample res
+   EXPECT_NEAR(csvLine[1].toDouble(), 0.561652424, 0.0001);
+   // Line res
+   EXPECT_NEAR(csvLine[2].toDouble(), 0.326697864, 0.0001);
+   // Total res
+   EXPECT_NEAR(csvLine[3].toDouble(), 0.459448005, 0.0001);
+   // Final X
+   EXPECT_NEAR(csvLine[6].toDouble(), 13478.98055, 0.0001);
+   // Final Y
+   EXPECT_NEAR(csvLine[11].toDouble(), -813.5504098, 0.0001);
+   // Final Z
+   EXPECT_NEAR(csvLine[16].toDouble(), 1067.407005, 0.0001);
+   // Final RA
+   EXPECT_NEAR(csvLine[21].toDouble(), -94.268452130639005, 0.0001);
+   // Final DEC
+   EXPECT_NEAR(csvLine[26].toDouble(), 91.720551340206001, 0.0001);
+   // Final TWIST
+   EXPECT_NEAR(csvLine[31].toDouble(), -22.86701551000799, 0.0001);
+}
+
+// These tests exercise the bundle adjustment of images from the MiniRF radar
+// instrument onboard LRO.
+TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  // solving for position only, with error propagation
+  QVector<QString> args1 = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
+                           "onet="+outCnetFileName, "maxits=10", "errorprop=yes",
+                           "bundleout_txt=no", "spsolve=accelerations",
+                           "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse_poh"};
+
+ UserInterface options1(APP_XML, args1);
+
+ try {
+   jigsaw(options1);
+ }
+ catch (IException &e) {
+   FAIL() << "Failed to bundle: " << e.what() << std::endl;
+ }
+
+ CSVReader line = CSVReader(prefix.path() + "/radar_sparse_poh_bundleout_images.csv",
+                    false, 0, ',', false, true);
+
+ compareCsvLine(line.getRow(2),
+  "crop.cub,9.8139190988466,4.8931845871077,7.7542331497775,42.739839720201,"
+   "1.7158245398686,44.45566426007,FREE,0.03708163,1.665220622852,0.0019502310020231,"
+   "1.6671708538541,FREE,0.00054302,-1.86715747234976e-05,-1.28312272946101e-05,"
+   "-3.15028020181077e-05,FREE,0.00000677,692.90383188675,-0.1098533109018,"
+   "692.79397857585,FREE,0.30619406,0.24237983300688,-0.0072287435477999,"
+   "0.23515108945908,FREE,0.00485910,-3.00885428043456e-04,4.44355023463745e-05,"
+   "-2.56449925697081e-04,FREE,0.00004580,-1638.4392469801,0.28515208655059,"
+   "-1638.1540948936,FREE,0.13905870,0.14114990073144,0.0042010473963839,"
+   "0.14535094812783,FREE,0.00195111,7.11893629983806e-04,-1.94289168875697e-05,"
+   "6.92464713096237e-04,FREE,0.00001960,-3.5174543904688,0.0,-3.5174543904688,"
+   "N/A,N/A,22.963021964112,0.0,22.963021964112,N/A,N/A,-167.27682369046,0.0,"
+   "-167.27682369046,N/A,N/A", 1);
+  compareCsvLine(line.getRow(3),
+   "crop.cub,9.4726337699208,4.4502293176623,7.4005179385914,43.334861031865,"
+   "1.6979463834046,45.03280741527,FREE,0.03324825,1.665259796398,0.0018842183991388,"
+   "1.6671440147971,FREE,0.00055998,-1.89435136303748e-05,-9.30674560525859e-06,"
+   "-2.82502592356334e-05,FREE,0.00000531,691.77793318689,0.14530608015382,"
+   "691.92323926704,FREE,0.24468876,0.24222242028266,-9.61881250584634e-04,"
+   "0.24126053903208,FREE,0.00327354,-3.00398354003216e-04,7.06472600669352e-05,"
+   "-2.29751093936281e-04,FREE,0.00003782,-1638.8768398909,0.1787933435063,"
+   "-1638.6980465474,FREE,0.11974833,0.14111215838631,0.0016775200513291,"
+   "0.14278967843764,FREE,0.00148666,7.12115647093142e-04,-2.79125310626517e-05,"
+   "6.84203116030491e-04,FREE,0.00001795,-3.5715716179672,0.0,-3.5715716179672,"
+   "N/A,N/A,22.925340565245,0.0,22.925340565245,N/A,N/A,-167.232707452,0.0,"
+   "-167.232707452,N/A,N/A", 1);
+  compareCsvLine(line.getRow(4),
+   "crop.cub,7.7843773766903,3.7525948190357,6.1105850382177,18.252351060798,"
+   "1.6293808986805,19.881731959478,FREE,0.05126731,1.6664421546381,0.0011330852282056,"
+   "1.6675752398663,FREE,0.00084377,-8.03729008106401e-06,-1.00999933057467e-05,"
+   "-1.81372833868107e-05,FREE,0.00000802,687.11638998215,0.84171392566316,"
+   "687.95810390782,FREE,0.35116896,0.25146497467017,0.0062984499626118,"
+   "0.25776342463279,FREE,0.00531669,-2.98460449098946e-04,7.8687578071165e-05,"
+   "-2.19772871027781e-04,FREE,0.00006324,-1641.3198305082,-0.16249776415743,"
+   "-1641.4823282724,FREE,0.17712610,0.1192736170679,-0.0019411382629964,"
+   "0.1173324788049,FREE,0.00243224,7.13385968670405e-04,-3.00026391718403e-05,"
+   "6.83383329498565e-04,FREE,0.00002969,-1.5077677229935,0.0,-1.5077677229935,"
+   "N/A,N/A,22.723572340278,0.0,22.723572340278,N/A,N/A,-169.13683247633,0.0,"
+   "-169.13683247633,N/A,N/A", 1);
+
+  // solving for position, velocity, acceleration, using polynomial over a constant hermite
+  // spline, with error propagation
+  QVector<QString> args2 = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
+                           "onet="+outCnetFileName,"maxits=10", "errorprop=yes",
+                           "spsolve=position", "overhermite=yes", "bundleout_txt=no",
+                           "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse"};
+
+ UserInterface options2(APP_XML, args2);
+
+ try {
+   jigsaw(options2);
+ }
+ catch (IException &e) {
+   FAIL() << "Failed to bundle: " << e.what() << std::endl;
+ }
+
+ line = CSVReader(prefix.path() + "/radar_sparse_bundleout_images.csv",
+                    false, 0, ',', false, true);
+
+ compareCsvLine(line.getRow(2),
+  "crop.cub,10.395150034381,4.1153054682532,7.9055323455898,0.0,1.6654573414268,"
+  "1.6654573414268,FREE,0.02693579,0.0,0.1230110379916,0.1230110379916,FREE,"
+  "0.18157895,0.0,0.18002883109547,0.18002883109547,FREE,0.08185824,-3.5174543904688,"
+  "0.0,-3.5174543904688,N/A,N/A,22.963021964112,0.0,22.963021964112,N/A,N/A,-167.27682369046,"
+  "0.0,-167.27682369046,N/A,N/A", 1);
+  compareCsvLine(line.getRow(3),
+   "crop.cub,9.9765857703763,3.7759501192875,7.5428795210126,0.0,1.6377191835121,"
+   "1.6377191835121,FREE,0.02317939,0.0,0.34307587759526,0.34307587759526,FREE,"
+   "0.15780215,0.0,0.084476381186715,0.084476381186715,FREE,0.07459370,-3.5715716179672,"
+   "0.0,-3.5715716179672,N/A,N/A,22.925340565245,0.0,22.925340565245,N/A,N/A,-167.232707452,"
+   "0.0,-167.232707452,N/A,N/A", 1);
+  compareCsvLine(line.getRow(4),
+   "crop.cub,8.3956138816403,3.3226339162902,6.3845997756819,0.0,1.5871768717531,"
+   "1.5871768717531,FREE,0.03193788,0.0,0.71840477660901,0.71840477660901,FREE,"
+   "0.21557003,0.0,-0.095359125080397,-0.095359125080397,FREE,0.10479701,-1.5077677229935,"
+   "0.0,-1.5077677229935,N/A,N/A,22.723572340278,0.0,22.723572340278,N/A,N/A,-169.13683247633,"
+   "0.0,-169.13683247633,N/A,N/A", 1);
+}
