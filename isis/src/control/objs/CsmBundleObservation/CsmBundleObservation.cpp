@@ -721,6 +721,18 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
       coeffImage(1, i) = partials[0];
     }
 
+    std::cout << "Image Partials" << std::endl;
+    std::cout << coeffImage(0, 0);
+    for (size_t i = 1; i < m_paramIndices.size(); i++) {
+    std::cout << ", " << coeffImage(0, i);
+    }
+    std::cout << std::endl;
+    std::cout << coeffImage(1, 0);
+    for (size_t i = 1; i < m_paramIndices.size(); i++) {
+    std::cout << ", " << coeffImage(1, i);
+    }
+    std::cout << std::endl;
+
     return true;
   }
 
@@ -767,6 +779,9 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     coeffPoint3D(0,1) = groundPartials[4];
     coeffPoint3D(1,2) = groundPartials[2];
     coeffPoint3D(0,2) = groundPartials[5];
+    std::cout << "Point Partials" << std::endl;
+    std::cout << coeffPoint3D(0, 0) << ", " << coeffPoint3D(0, 1) << ", " << coeffPoint3D(0, 2) << std::endl;;
+    std::cout << coeffPoint3D(1, 0) << ", " << coeffPoint3D(1, 1) << ", " << coeffPoint3D(1, 2) << std::endl;;
 
     return true;
   }
@@ -804,6 +819,10 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     // and the coordinates calculated by the ground to image call.
     double deltaSample = measure.sample() - computedSample;
     double deltaLine = measure.line() - computedLine;
+
+    std::cout << "RHS" << std::endl;
+    std::cout << coeffRHS(0) << std::endl;
+    std::cout << coeffRHS(1) << std::endl;
 
     coeffRHS(0) = deltaSample;
     coeffRHS(1) = deltaLine;
