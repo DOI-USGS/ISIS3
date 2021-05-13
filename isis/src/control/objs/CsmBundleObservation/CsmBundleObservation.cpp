@@ -171,13 +171,6 @@ namespace Isis {
       IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    std::cout << "Applying corrections to [" << front()->serialNumber() << "]." << std::endl;
-    std::cout << corrections[0];
-    for (size_t i = 1; i < corrections.size(); i++) {
-      std::cout << ", " << corrections[i];
-    }
-    std::cout << std::endl;
-
     // Apply the corrections to the CSM camera
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
     for (size_t i = 0; i < corrections.size(); i++) {
@@ -728,18 +721,6 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
       coeffImage(1, i) = partials[0];
     }
 
-    std::cout << "Image Partials" << std::endl;
-    std::cout << coeffImage(0, 0);
-    for (size_t i = 1; i < m_paramIndices.size(); i++) {
-    std::cout << ", " << coeffImage(0, i);
-    }
-    std::cout << std::endl;
-    std::cout << coeffImage(1, 0);
-    for (size_t i = 1; i < m_paramIndices.size(); i++) {
-    std::cout << ", " << coeffImage(1, i);
-    }
-    std::cout << std::endl;
-
     return true;
   }
 
@@ -768,28 +749,19 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     vector<double> groundPartials = measureCamera->GroundPartials(groundPoint);
 
     // groundPartials is:
-    //  line WRT x
+    // line WRT x
     // line WRT y
     // line WRT z
     // sample WRT x
     // sample WRT y
     // sample WRT z
-    // coeffPoint3D(0,0) = groundPartials[0];
-    // coeffPoint3D(1,0) = groundPartials[3];
-    // coeffPoint3D(0,1) = groundPartials[1];
-    // coeffPoint3D(1,1) = groundPartials[4];
-    // coeffPoint3D(0,2) = groundPartials[2];
-    // coeffPoint3D(1,2) = groundPartials[5];
     // Scale from WRT m to WRT Km
     coeffPoint3D(1,0) = groundPartials[0] * 1000;
-    coeffPoint3D(0,0) = groundPartials[3] * 1000;
     coeffPoint3D(1,1) = groundPartials[1] * 1000;
-    coeffPoint3D(0,1) = groundPartials[4] * 1000;
     coeffPoint3D(1,2) = groundPartials[2] * 1000;
+    coeffPoint3D(0,0) = groundPartials[3] * 1000;
+    coeffPoint3D(0,1) = groundPartials[4] * 1000;
     coeffPoint3D(0,2) = groundPartials[5] * 1000;
-    std::cout << "Point Partials" << std::endl;
-    std::cout << coeffPoint3D(0, 0) << ", " << coeffPoint3D(0, 1) << ", " << coeffPoint3D(0, 2) << std::endl;;
-    std::cout << coeffPoint3D(1, 0) << ", " << coeffPoint3D(1, 1) << ", " << coeffPoint3D(1, 2) << std::endl;;
 
     return true;
   }
@@ -827,10 +799,6 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     // and the coordinates calculated by the ground to image call.
     double deltaSample = measure.sample() - computedSample;
     double deltaLine = measure.line() - computedLine;
-
-    std::cout << "RHS" << std::endl;
-    std::cout << coeffRHS(0) << std::endl;
-    std::cout << coeffRHS(1) << std::endl;
 
     coeffRHS(0) = deltaSample;
     coeffRHS(1) = deltaLine;

@@ -395,9 +395,6 @@ namespace Isis {
       // subtract product of Q and nj from NIC
       productAlphaAV(-1.0, sparseNormals, imageSolution);
 
-      std::cout << "Applying corrections to [" << id() << "]." << std::endl;
-      std::cout << m_nicVector[0] << ", " << m_nicVector[1] << ", " << m_nicVector[2] << std::endl;
-
       // update adjusted surface point appropriately for the coordinate type
       switch (m_coordTypeBundle) {
         case SurfacePoint::Latitudinal:
