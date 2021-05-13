@@ -107,7 +107,7 @@ namespace Isis {
       // copy method
       void copy(const BundleObservation &src);
 
-      bool setSolveSettings(BundleObservationSolveSettings solveSettings);
+      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
