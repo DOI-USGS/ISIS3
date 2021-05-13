@@ -316,9 +316,43 @@ class HistoryBlob : public TempTestingFiles {
     void SetUp() override;
 };
 
+
 class NullPixelCube : public TempTestingFiles {
   protected:
     Cube *testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+
+class MiniRFNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class VikThmNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+    Cube *testCube4;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
 
     void SetUp() override;
     void TearDown() override;

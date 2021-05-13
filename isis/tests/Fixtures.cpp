@@ -185,7 +185,7 @@ namespace Isis {
     int v_lineNum = 0;
     for(v_line.begin(); !v_line.end(); v_line++) {
       for(int i = 0; i < v_line.size(); i++) {
-        if(i == 4) { 
+        if(i == 4) {
           v_line[i] = NULL8;
         }
         else {
@@ -210,7 +210,7 @@ namespace Isis {
     int b_lineNum = 0;
     for(b_line.begin(); !b_line.end(); b_line++) {
       for(int i = 0; i < b_line.size(); i++) {
-        if( b_lineNum == 22 ) { 
+        if( b_lineNum == 22 ) {
           b_line[i] = NULL8;
         }
         else {
@@ -1389,6 +1389,7 @@ namespace Isis {
     testCube.reset();
   }
 
+
   void NullPixelCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -1406,6 +1407,7 @@ namespace Isis {
     }
   }
 
+
   void NullPixelCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
@@ -1413,6 +1415,95 @@ namespace Isis {
 
     if (testCube) {
       delete testCube;
+    }
+  }
+
+
+  void MiniRFNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/miniRFImage/LSZ_00455_1CD_XKU_87S324_V1_S1_Null.crop.cub");
+    testCube2 = new Cube("data/miniRFImage/LSZ_00457_1CD_XKU_87S321_V1_S1_Null.crop.cub");
+    testCube3 = new Cube("data/miniRFImage/LSZ_00459_1CD_XKU_88S327_V1_S1_Null.crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/miniRFImage/Cabeus_Orbit400_withSS_AprioriPts.net");
+    controlNetPath = tempDir.path() + "/miniRFNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void MiniRFNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void VikThmNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/vikingThemisNetwork/F704b51.lev1_slo_crop.cub");
+    testCube2 = new Cube("data/vikingThemisNetwork/F857a32.lev1_slo_crop.cub");
+    testCube3 = new Cube("data/vikingThemisNetwork/I28234014RDR_crop.cub");
+    testCube4 = new Cube("data/vikingThemisNetwork/I52634011RDR_crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+    cubeList->append(testCube4->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/vikingThemisNetwork/themis_dayir_VO_arcadia_extract_hand.net");
+    controlNetPath = tempDir.path() + "/vikThmNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void VikThmNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+    if (testCube4->isOpen()) {
+      testCube4->close();
+    }
+    delete testCube4;
+
+    if (cubeList) {
+      delete cubeList;
     }
   }
 

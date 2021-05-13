@@ -1,0 +1,24 @@
+Object = SensorParameters
+  Group = MARS_ODYSSEY/THEMIS_IR
+    CamSolve=accelerations
+    OverExisting=yes
+    Twist=yes
+    camera_angles_sigma=.25
+    camera_angular_velocity_sigma=.1
+    camera_angular_acceleration_sigma=.01
+    SPSolve=none
+  EndGroup
+  Group = VIKING_ORBITER_1/VISUAL_IMAGING_SUBSYSTEM_CAMERA_B
+    camsolve=angles
+    Twist=yes
+    camera_angles_sigma=1.0
+    SPSolve=none
+  EndGroup
+  Group = VIKING_ORBITER_2/VISUAL_IMAGING_SUBSYSTEM_CAMERA_A
+    camsolve=angles
+    Twist=yes
+    camera_angles_sigma=1.0
+    SPSolve=none
+  EndGroup
+EndObject
+End
