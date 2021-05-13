@@ -934,8 +934,15 @@ namespace Isis {
       }
 
       bool setImageSuccess = cam->SetImage(m->GetSample(), m->GetLine());
-      m->SetFocalPlaneMeasured(cam->DistortionMap()->UndistortedFocalPlaneX(),
-                               cam->DistortionMap()->UndistortedFocalPlaneY());
+      // CSM cameras do not have focal planes so use sample and line instead
+      if (cam->GetCameraType() == Camera::Csm) {
+        m->SetFocalPlaneMeasured(m->GetSample(),
+                                 m->GetLine());
+      }
+      else {
+        m->SetFocalPlaneMeasured(cam->DistortionMap()->UndistortedFocalPlaneX(),
+                                 cam->DistortionMap()->UndistortedFocalPlaneY());
+      }
 
       // TODO: Seems like we should be able to skip this computation if point is fixed or
       // constrained in any coordinate. Currently we are always summing coordinates here. We could
@@ -1033,12 +1040,7 @@ namespace Isis {
       if (m->IsIgnored()) {
         continue;
       }
-      // The following lines actually check for Candidate measures
-      // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured()) {
-//         continue;
 
-      // TODO:  Should we use crater diameter?
       Camera *cam = m->Camera();
 
       double cuSamp;
@@ -1051,24 +1053,8 @@ namespace Isis {
       // instead of using the measured time.
       ComputeResiduals_Millimeters();
 
-      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
-
-        // Now things get tricky.  We want to produce errors in pixels not mm
-        // but some of the camera maps could fail.  One that won't is the
-        // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
-        // distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
-          QString msg = "Sanity check #1 for ControlPoint [" + GetId() +
-              "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-          // This error shouldn't happen but check anyways
-        }
-
-        cuSamp = fpmap->DetectorSample();
-        cuLine = fpmap->DetectorLine();
-      }
-
-      else {
+      // Convert the residuals in millimeters to undistorted pixels
+      if (cam->GetCameraType()  ==  Isis::Camera::Radar) {
         // For radar line is calculated from time in the camera.  Use the
         // closest line to scale the focal plane y (doppler shift) to image line
         // for computing the line residual.  Get a local ratio
@@ -1129,11 +1115,40 @@ namespace Isis {
         cuSamp = fpmap->DetectorSample();
         cuLine = m->GetLine() + deltaLine;
       }
+      else if (cam->GetCameraType()  ==  Isis::Camera::Csm) {
+        //
+        cuSamp = m->GetFocalPlaneComputedX();
+        cuLine = m->GetFocalPlaneComputedY();
+      }
+      else {
+        // Now things get tricky.  We want to produce errors in pixels not mm
+        // but some of the camera maps could fail.  One that won't is the
+        // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
+        // distortion map and have residuals in undistorted pixels.
+        if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
+          QString msg = "Sanity check #1 for ControlPoint [" + GetId() +
+              "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          // This error shouldn't happen but check anyways
+        }
+
+        cuSamp = fpmap->DetectorSample();
+        cuLine = fpmap->DetectorLine();
+      }
+
+      // Compute the measures sample and line
 
       double muSamp;
       double muLine;
 
-      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
+      if (cam->GetCameraType()  ==  Isis::Camera::Radar ||
+          cam->GetCameraType()  ==  Isis::Camera::Csm) {
+        // For CSM and Radar we use distorted pixels
+        muSamp = m->GetSample();
+        muLine = m->GetLine();
+      }
+      else {
+        // For other sensors conver to undistorted pixels
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneMeasuredX(), m->GetFocalPlaneMeasuredY())) {
           QString msg = "Sanity check #2 for ControlPoint [" + GetId() +
@@ -1144,14 +1159,10 @@ namespace Isis {
         muSamp = fpmap->DetectorSample();
         muLine = fpmap->DetectorLine();
       }
-      else {
-        muSamp = m->GetSample();
-        muLine = m->GetLine();
-      }
 
       // The units are in detector sample/lines.  We will apply the instrument
       // summing mode to get close to real pixels.  Note however we are in
-      // undistorted pixels except for radar instruments.
+      // undistorted pixels except for radar and CSM instruments.
       double sampResidual = muSamp - cuSamp;
       double lineResidual = muLine - cuLine;
       m->SetResidual(sampResidual, lineResidual);
@@ -1193,35 +1204,36 @@ namespace Isis {
       if (m->IsIgnored()) {
         continue;
       }
-      // The following lines actually check for Candidate measures
-      // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured()) {
-//         continue;
 
-      // TODO:  Should we use crater diameter?
       Camera *cam = m->Camera();
       double cudx, cudy;
 
       // Map the coordinates of the control point through the Spice of the
       // measurement sample/line to get the computed undistorted focal plane
-      // coordinates (mm if not radar).  This works for radar too because in
-      // the undistorted focal plane, y has not been set to 0 (set to 0 when
-      // going to distorted focal plane or ground range in this case), so we
-      // can hold the Spice to calculate residuals in undistorted focal plane
-      // coordinates.
-      if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
+      // coordinates (mm if not radar).
+      // This works for radar too because in the undistorted focal plane,
+      // y has not been set to 0 (set to 0 when going to distorted focal plane
+      // or ground range in this case), so we can hold the Spice to calculate
+      // residuals in undistorted focal plane coordinates.
+      // This does not work with CSM as it does not have a focal plane so
+      // just use the sample and line
+      if (cam->GetCameraType() == Camera::Csm) {
+        cam->SetGround(GetAdjustedSurfacePoint());
+        cudx = cam->Sample();
+        cudy = cam->Line();
+        // Reset to measure
         cam->SetImage(m->GetSample(), m->GetLine());
       }
-
-      // The default bool value is true.  Turn back-of-planet test off for bundle adjustment.
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
-      // double mudx = m->GetFocalPlaneMeasuredX();
-      // double mudy = m->GetFocalPlaneMeasuredY();
+      else {
+        // no need to call setimage for framing camera
+        if (cam->GetCameraType() != 0) {
+          cam->SetImage(m->GetSample(), m->GetLine());
+        }
+        // The default bool value is true.  Turn back-of-planet test off for bundle adjustment.
+        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
+      }
 
       m->SetFocalPlaneComputed(cudx, cudy);
-
-      // This is wrong.  The stored residual is in pixels (sample,line), not x and y
-      // m->SetResidual(mudx - cudx, mudy - cudy);
     }
 
     return Success;
