@@ -14,6 +14,8 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "Camera.h"
+#include "CsmBundleObservation.h"
 #include "IException.h"
 
 namespace Isis {
@@ -101,7 +103,6 @@ namespace Isis {
     AbstractBundleObservationQsp bundleObservation;
     bool addToExisting = false;
 
-    // TODO it looks like this can just become 1 if statement
     if (bundleSettings->solveObservationMode() &&
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
@@ -117,20 +118,37 @@ namespace Isis {
       bundleImage->setParentObservation(bundleObservation);
 
       // updateo observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
+      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
     }
     else {
       // create new BundleObservation and append to this vector
-      BundleObservation *isisObservation = new BundleObservation(bundleImage,
-                                                                 observationNumber,
-                                                                 instrumentId,
-                                                                 bundleSettings->bundleTargetBody());
 
+      bool isIsisObservation = true;
 
-      if (!isisObservation) {
+      // This NULL check is needed solely for the unit test
+      if (bundleImage->camera() != NULL) {
+        isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
+      }
+
+      AbstractBundleObservation *observation = NULL;
+
+      if (isIsisObservation) {
+        observation = new BundleObservation(bundleImage,
+                                            observationNumber,
+                                            instrumentId,
+                                            bundleSettings->bundleTargetBody());
+      }
+      else {
+        observation = new CsmBundleObservation(bundleImage,
+                                               observationNumber,
+                                               instrumentId,
+                                               bundleSettings->bundleTargetBody());
+      }
+
+      if (!observation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -148,15 +166,25 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      isisObservation->setSolveSettings(solveSettings);
-
-      bundleObservation.reset(isisObservation);
+      observation->setSolveSettings(solveSettings);
+      bundleObservation.reset(observation);
 
       bundleObservation->setIndex(size());
 
       bundleImage->setParentObservation(bundleObservation);
 
       append(bundleObservation);
+
+      if (isIsisObservation) {
+        QSharedPointer<BundleObservation> isisObs = qSharedPointerDynamicCast<BundleObservation>(bundleObservation);
+        // This check is needed for the current unit test
+        if (bundleImage->camera() != NULL) {
+          isisObs->initializeExteriorOrientation();
+          if (bundleSettings->solveTargetBody()) {
+            isisObs->initializeBodyRotation();
+          }
+        }
+      }
 
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
@@ -232,42 +260,5 @@ namespace Isis {
     // multimap returns them in reverse order they were put in, so invert them to preserve order
     std::reverse(std::begin(list), std::end(list));
     return list;
-  }
-
-
-  /**
-   * Initializes the exterior orientations for the contained ISIS
-   * BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
-   */
-  bool BundleObservationVector::initializeExteriorOrientation() {
-    // get isis observations
-    // get csm observations
-    int nObservations = size();
-    // just do it for ISIS observations
-    for (int i = 0; i < nObservations; i++) {
-      // TODO: how to only do this if ISIS observations
-      QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
-      observation->initializeExteriorOrientation();
-    }
-    return true;
-  }
-
-
-  /**
-   * Initializes the body rotations for the contained BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
-   */
-  bool BundleObservationVector::initializeBodyRotation() {
-    int nObservations = size();
-    //TODO: just do it for ISIS observations
-    for (int i = 0; i < nObservations; i++) {
-    QSharedPointer<BundleObservation> observation = qSharedPointerDynamicCast<BundleObservation>( at(i) );
-      observation->initializeBodyRotation();
-    }
-
-    return true;
   }
 }

@@ -97,8 +97,9 @@ namespace Isis {
    *
    * @return @b bool Returns true if settings were successfully set
    */
-  bool CsmBundleObservation::setSolveSettings(BundleObservationSolveSettingsQsp solveSettings) {
-    m_solveSettings = solveSettings;
+  bool CsmBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
+    m_solveSettings = BundleObservationSolveSettingsQsp(
+                        new BundleObservationSolveSettings(solveSettings));
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(front()->camera());
 
@@ -107,14 +108,14 @@ namespace Isis {
     m_corrections.clear();
     m_adjustedSigmas.clear();
 
-    if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Set) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterSet());
+    if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::Set) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterSet());
     }
-    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::Type) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterType());
+    else if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::Type) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterType());
     }
-    else if (solveSettings->csmSolveOption() == BundleObservationSolveSettings::List) {
-      m_paramIndices = csmCamera->getParameterIndices(solveSettings->csmParameterList());
+    else if (m_solveSettings->csmSolveOption() == BundleObservationSolveSettings::List) {
+      m_paramIndices = csmCamera->getParameterIndices(m_solveSettings->csmParameterList());
     }
     else {
       return false;
@@ -696,19 +697,19 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Calculates the sensor partials with respect to the solve
-   * parameters and populates the coeffImage matrix.
-   *
-   * @param coeffImage A matrix that will be populated with the
+   * Calculates the sensor partials with respect to the solve 
+   * parameters and populates the coeffImage matrix. 
+   * 
+   * @param coeffImage A matrix that will be populated with the 
    *                   sensor partials with respect to the solve
    *                   parameters.
-   * @param measure The measure that the partials are being
+   * @param measure The measure that the partials are being 
    *                computed for.
-   *
-   * @return bool
+   * 
+   * @return bool 
    */
   bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
-    coeffImage.clear();
+    coeffImage.clear(); 
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(measure.camera());
     SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
@@ -743,8 +744,8 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
     CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
 
-    // do ground partials
-    vector<double> groundPartials = measureCamera->GroundPartials();
+    // do ground partials 
+    vector<double> groundPartials = measureCamera->GroundPartials();    
 
     // groundPartials is:
     //  line WRT x
@@ -805,15 +806,15 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Returns the observed value in (sample, line) coordinates.
-   * This requires no modification for Csm.
-   *
-   * @param measure measure The measure that the partials are
+   * Returns the observed value in (sample, line) coordinates. 
+   * This requires no modification for Csm.  
+   * 
+   * @param measure measure The measure that the partials are 
    *                being computed for.
-   * @param deltaVal The difference between the measured and
+   * @param deltaVal The difference between the measured and 
    *                 calculate sample, line coordinates
-   *
-   * @return double The The difference between the measured and
+   * 
+   * @return double The The difference between the measured and 
    *                calculated (line, sample) coordinate
    */
   double CsmBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {

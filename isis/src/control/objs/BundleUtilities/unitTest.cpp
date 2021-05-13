@@ -626,7 +626,7 @@ int main(int argc, char *argv[]) {
     qDebug() << obs1b.formatBundleOutputString(true);
 #endif
     // Following segfaults (see #4157)
-    qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
+//    qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";

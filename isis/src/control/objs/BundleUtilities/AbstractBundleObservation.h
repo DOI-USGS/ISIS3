@@ -45,8 +45,10 @@ namespace Isis {
       virtual AbstractBundleObservation &operator=(const AbstractBundleObservation &src);
 
       // copy method
-      // not implementedn in BundleObservation either???
-//      virtual void copy(const AbstractBundleObservation &src);
+
+      void copy(const AbstractBundleObservation &src);
+
+      virtual bool setSolveSettings(BundleObservationSolveSettings solveSettings) = 0;
 
       virtual void append(const BundleImageQsp &value);
 
@@ -93,7 +95,7 @@ namespace Isis {
       QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
       QStringList m_imageNames;         //!< List of all cube names.
-      QString m_instrumentId;      //!< Spacecraft instrument id.
+      QString m_instrumentId;           //!< Spacecraft instrument id.
 
       // TODO??? change these to LinearAlgebra vectors...
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.

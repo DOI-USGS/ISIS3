@@ -19,6 +19,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleImage.h"
 #include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "CsmBundleObservation.h"
 #include "BundleSettings.h"
 
 namespace Isis {
@@ -70,14 +71,6 @@ namespace Isis {
 
       QList<QString> instrumentIds() const;
       QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
-
-      bool initializeExteriorOrientation();
-      bool initializeBodyRotation();
-
-      // To add:
-      // getCsmObservations()
-      // getIsisObservations()
-      // addNewIsis()?
 
   private:
       //! Map between observation number and pointer to observation.
