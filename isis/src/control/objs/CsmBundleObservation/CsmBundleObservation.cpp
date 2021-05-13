@@ -697,19 +697,19 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Calculates the sensor partials with respect to the solve 
-   * parameters and populates the coeffImage matrix. 
-   * 
-   * @param coeffImage A matrix that will be populated with the 
+   * Calculates the sensor partials with respect to the solve
+   * parameters and populates the coeffImage matrix.
+   *
+   * @param coeffImage A matrix that will be populated with the
    *                   sensor partials with respect to the solve
    *                   parameters.
-   * @param measure The measure that the partials are being 
+   * @param measure The measure that the partials are being
    *                computed for.
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
   bool CsmBundleObservation::computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) {
-    coeffImage.clear(); 
+    coeffImage.clear();
 
     CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(measure.camera());
     SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
@@ -744,8 +744,9 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
     CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
 
-    // do ground partials 
-    vector<double> groundPartials = measureCamera->GroundPartials();    
+    // do ground partials
+    SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
+    vector<double> groundPartials = measureCamera->GroundPartials(groundPoint);
 
     // groundPartials is:
     //  line WRT x
@@ -754,12 +755,18 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     // sample WRT x
     // sample WRT y
     // sample WRT z
-    coeffPoint3D(0,0) = groundPartials[0];
-    coeffPoint3D(1,0) = groundPartials[3];
-    coeffPoint3D(0,1) = groundPartials[1];
-    coeffPoint3D(1,1) = groundPartials[4];
-    coeffPoint3D(0,2) = groundPartials[2];
-    coeffPoint3D(1,2) = groundPartials[5];
+    // coeffPoint3D(0,0) = groundPartials[0];
+    // coeffPoint3D(1,0) = groundPartials[3];
+    // coeffPoint3D(0,1) = groundPartials[1];
+    // coeffPoint3D(1,1) = groundPartials[4];
+    // coeffPoint3D(0,2) = groundPartials[2];
+    // coeffPoint3D(1,2) = groundPartials[5];
+    coeffPoint3D(1,0) = groundPartials[0];
+    coeffPoint3D(0,0) = groundPartials[3];
+    coeffPoint3D(1,1) = groundPartials[1];
+    coeffPoint3D(0,1) = groundPartials[4];
+    coeffPoint3D(1,2) = groundPartials[2];
+    coeffPoint3D(0,2) = groundPartials[5];
 
     return true;
   }
@@ -806,15 +813,15 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
 
   /**
-   * Returns the observed value in (sample, line) coordinates. 
-   * This requires no modification for Csm.  
-   * 
-   * @param measure measure The measure that the partials are 
+   * Returns the observed value in (sample, line) coordinates.
+   * This requires no modification for Csm.
+   *
+   * @param measure measure The measure that the partials are
    *                being computed for.
-   * @param deltaVal The difference between the measured and 
+   * @param deltaVal The difference between the measured and
    *                 calculate sample, line coordinates
-   * 
-   * @return double The The difference between the measured and 
+   *
+   * @return double The The difference between the measured and
    *                calculated (line, sample) coordinate
    */
   double CsmBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
