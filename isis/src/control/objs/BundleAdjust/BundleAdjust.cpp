@@ -497,12 +497,12 @@ namespace Isis {
 
     if (m_bundleSettings->solveTargetBody()) {
       m_rank += m_bundleSettings->numberTargetBodyParameters();
-      
+
       if (m_bundleTargetBody->solveMeanRadius() || m_bundleTargetBody->solveTriaxialRadii()) {
         outputBundleStatus("Warning: Solving for the target body radii (triaxial or mean) "
                            "is NOT possible and likely increases error in the solve.\n");
       }
-      
+
       if (m_bundleTargetBody->solveMeanRadius()){
         // Check if MeanRadiusValue is abnormal compared to observation
         bool isMeanRadiusValid = true;
@@ -1857,6 +1857,8 @@ namespace Isis {
                                      BundleMeasure &measure,
                                      BundleControlPoint &point) {
 
+    std::cout << "Computing partials for [" << measure.cubeSerialNumber() << "] in [" << point.id() << "]." << std::endl;
+
     Camera *measureCamera = measure.camera();
     AbstractBundleObservationQsp observation = measure.parentBundleObservation();
 
@@ -1933,6 +1935,7 @@ namespace Isis {
         coeffTarget *= observationWeight;
       }
     }
+    std::cout << std::endl;
 
     return true;
   }
@@ -1967,8 +1970,8 @@ namespace Isis {
 
       if (m_bundleSettings->solveTargetBody()) {
         // TODO: needs to be updated for ISIS vs. CSM CSM has no updateBodyRotation]
-        // TODO: this is no good. 
-        QSharedPointer<BundleObservation> isisObservation = qSharedPointerDynamicCast<BundleObservation>(observation);  
+        // TODO: this is no good.
+        QSharedPointer<BundleObservation> isisObservation = qSharedPointerDynamicCast<BundleObservation>(observation);
         isisObservation->updateBodyRotation();
       }
 
