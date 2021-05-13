@@ -174,7 +174,7 @@ namespace Isis {
     std::cout << "Applying corrections to [" << front()->serialNumber() << "]." << std::endl;
     std::cout << corrections[0];
     for (size_t i = 1; i < corrections.size(); i++) {
-      std::cout << ", " << corrections[0];
+      std::cout << ", " << corrections[i];
     }
     std::cout << std::endl;
 
