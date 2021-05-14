@@ -33,7 +33,7 @@ void IsisMain() {
   prog.CheckStatus();
 
   //  For this first loop union all image polygons
-  vector<geos::geom::Geometry *> allPolys;
+  vector<const geos::geom::Geometry *> allPolys;
   vector<QString> files;
   bool conv360 = false;
 
@@ -83,7 +83,7 @@ void IsisMain() {
 
   //  Create union poly
   geos::geom::GeometryCollection *polyCollection =
-    Isis::globalFactory->createGeometryCollection(&allPolys);
+    Isis::globalFactory->createGeometryCollection(allPolys);
   geos::geom::Geometry *unionPoly = polyCollection->buffer(0).release();
 
 
