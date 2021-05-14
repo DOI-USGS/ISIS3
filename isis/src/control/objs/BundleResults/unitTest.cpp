@@ -254,7 +254,14 @@ int main(int argc, char *argv[]) {
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
+
+    // Need to create a camera
+    QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub";
+    Cube cube;
+    cube.open(inputFile);
     Camera *camera = NULL;
+    camera = cube.camera();
+
     BundleImage bundleImage(camera,
                             "TestImageSerialNumber",
                             "TestImageFileName");
