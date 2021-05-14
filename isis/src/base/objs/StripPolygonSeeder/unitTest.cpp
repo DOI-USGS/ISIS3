@@ -61,7 +61,7 @@ int main() {
     try {
       // Call the seed member with a polygon
       geos::geom::CoordinateArraySequence *pts;
-      vector<geos::geom::Geometry *> polys;
+      vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
       pts = new geos::geom::CoordinateArraySequence();
@@ -74,7 +74,7 @@ int main() {
       polys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(&polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
@@ -137,7 +137,7 @@ int main() {
     try {
       // Call the seed member with a polygon
       geos::geom::CoordinateArraySequence *pts;
-      vector<geos::geom::Geometry *> polys;
+      vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
       pts = new geos::geom::DefaultCoordinateSequence();
@@ -150,7 +150,7 @@ int main() {
       polys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(&polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
