@@ -1243,31 +1243,31 @@ QStringList BundleObservation::parameterList() {
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
 
-      sprintf(buf,"%s",parameterNamesList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s", parameterNamesList.at(i).toStdString().c_str() );
       fpOut << buf;
-      sprintf(buf,"%18.8lf  ",finalParameterValues[i] - correction);
+      sprintf(buf,"%18.8lf  ", finalParameterValues[i] - correction);
       fpOut << buf;
-      sprintf(buf,"%20.8lf  ",correction);
+      sprintf(buf,"%20.8lf  ", correction);
       fpOut << buf;
-      sprintf(buf,"%23.8lf  ",finalParameterValues[i]);
+      sprintf(buf,"%23.8lf  ", finalParameterValues[i]);
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
-      sprintf(buf,"%6s",sigma.toStdString().c_str());
+      sprintf(buf,"%6s", sigma.toStdString().c_str());
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
       if (errorPropagation) {
-        sprintf(buf,"%s",adjustedSigma.toStdString().c_str());
+        sprintf(buf,"%s", adjustedSigma.toStdString().c_str());
       }
       else {
-        sprintf(buf,"%s","N/A");
+        sprintf(buf,"%s", "N/A");
       }
-      fpOut<<buf;
+      fpOut << buf;
       sprintf(buf,"        ");
-      fpOut<<buf;
-      sprintf(buf,"%s\n",correctionUnitList.at(i).toStdString().c_str() );
-      fpOut<<buf;
+      fpOut << buf;
+      sprintf(buf,"%s\n", correctionUnitList.at(i).toStdString().c_str() );
+      fpOut << buf;
 
     }
 
