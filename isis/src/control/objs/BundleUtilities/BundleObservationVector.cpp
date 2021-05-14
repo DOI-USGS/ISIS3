@@ -128,10 +128,7 @@ namespace Isis {
 
       bool isIsisObservation = true;
 
-      // This NULL check is needed solely for the unit test
-      if (bundleImage->camera() != NULL) {
-        isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
-      }
+      isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
       AbstractBundleObservation *observation = NULL;
 
@@ -177,12 +174,9 @@ namespace Isis {
 
       if (isIsisObservation) {
         QSharedPointer<BundleObservation> isisObs = qSharedPointerDynamicCast<BundleObservation>(bundleObservation);
-        // This check is needed for the current unit test
-        if (bundleImage->camera() != NULL) {
-          isisObs->initializeExteriorOrientation();
-          if (bundleSettings->solveTargetBody()) {
-            isisObs->initializeBodyRotation();
-          }
+        isisObs->initializeExteriorOrientation();
+        if (bundleSettings->solveTargetBody()) {
+          isisObs->initializeBodyRotation();
         }
       }
 
