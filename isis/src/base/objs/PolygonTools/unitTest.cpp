@@ -41,7 +41,7 @@ int main() {
     cout << "Coordinates of polygon 1:" << pts->toString() << endl << endl;
 
     // Create the first polygon
-    vector<geos::geom::Geometry *> polys;
+    vector<const geos::geom::Geometry *> polys;
     polys.push_back(Isis::globalFactory->createPolygon(
                       Isis::globalFactory->createLinearRing(pts), NULL));
 
@@ -71,7 +71,7 @@ int main() {
                       Isis::globalFactory->createLinearRing(pts2), hole2));
 
     // Create a multipolygon from the two polygons
-    geos::geom::MultiPolygon *mPolygon = Isis::globalFactory->createMultiPolygon(&polys);
+    geos::geom::MultiPolygon *mPolygon = Isis::globalFactory->createMultiPolygon(polys);
 
     // Create a copy of the multipolygon
     geos::geom::MultiPolygon *tmpMp = PolygonTools::CopyMultiPolygon(mPolygon);
@@ -143,11 +143,11 @@ int main() {
     cout << "Coordinates of Lon/Lat polygon:" << llpts->toString() << endl << endl;
 
     // Create the L/L polygon
-    vector<geos::geom::Geometry *> llpolys;
+    vector<const geos::geom::Geometry *> llpolys;
     llpolys.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(llpts), NULL));
 
-    geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory->createMultiPolygon(&llpolys);
+    geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory->createMultiPolygon(llpolys);
 
     geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(*llmPolygon, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
@@ -164,11 +164,11 @@ int main() {
     llpts2->add(geos::geom::Coordinate(175, 0));
 
     // Create the L/L polygon
-    vector<geos::geom::Geometry *> llpolys2;
+    vector<const geos::geom::Geometry *> llpolys2;
     llpolys2.push_back(Isis::globalFactory->createPolygon(
                         Isis::globalFactory->createLinearRing(llpts2), NULL));
 
-    geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory->createMultiPolygon(&llpolys2);
+    geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory->createMultiPolygon(llpolys2);
 
     geos::geom::MultiPolygon *slmPolygon2 = PolygonTools::LatLonToSampleLine(*llmPolygon2, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
