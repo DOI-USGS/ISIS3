@@ -731,10 +731,10 @@ namespace Isis {
 
   geos::geom::MultiPolygon *BandGeometry::makeMultiPolygon(
     geos::geom::Geometry *g) const {
-    vector<geos::geom::Geometry *> polys;
+    vector<const geos::geom::Geometry *> polys;
     polys.push_back(g);
     const geos::geom::GeometryFactory *gfactory = geos::geom::GeometryFactory::getDefaultInstance();
-    return (gfactory->createMultiPolygon(&polys));
+    return (gfactory->createMultiPolygon(polys));
   }
 
 
