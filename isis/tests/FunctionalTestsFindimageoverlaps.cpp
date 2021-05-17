@@ -29,28 +29,21 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/findimageoverlaps.xml").expanded();
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsNoOverlap) {
-  std::cout << "1 ------------" << std::endl;
   ImagePolygon fp1;
-  std::cout << "1.1 ------------" << std::endl;
   fp1.Create(*cube1);
-  std::cout << "1.2 ------------" << std::endl;
   cube1->write(fp1);
-  std::cout << "2 ------------" << std::endl;
 
   Cube newCube2;
   json newIsd2;
   std::ifstream i(isdPath2->expanded().toStdString());
   i >> newIsd2;
-  std::cout << "3 ------------" << std::endl;
 
   newIsd2["instrument_position"]["positions"] = {{1,1,1}, {2,2,2}, {3,3,3}};
   newCube2.fromIsd(tempDir.path()+"/new2.cub", *cube2->label(), newIsd2, "rw");
-  std::cout << "4 ------------" << std::endl;
 
   ImagePolygon fp2;
   fp2.Create(newCube2);
   newCube2.write(fp2);
-  std::cout << "5 ------------" << std::endl;
 
   FileList cubes;
   cubes.append(cube1->fileName());
@@ -58,14 +51,12 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsNoOverlap) {
   cube1->close();
   cube2->close();
   newCube2.close();
-  std::cout << "6 ------------" << std::endl;
 
   QString cubeListPath = tempDir.path() + "/cubes.lis";
   cubes.write(cubeListPath);
   QVector<QString> args = {"from="+cubeListPath, "overlapList="+tempDir.path()+"/overlaps.txt"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
-  std::cout << "7 ------------" << std::endl;
 
   try {
     findimageoverlaps(options, false, &appLog);
@@ -75,8 +66,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsNoOverlap) {
     EXPECT_TRUE(e.toString().toLatin1().contains("No overlaps were found"))
       << e.toString().toStdString();
   }
-  std::cout << "8 ------------" << std::endl;
-
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsTwoImageOverlap) {

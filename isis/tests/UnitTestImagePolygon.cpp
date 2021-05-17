@@ -77,6 +77,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
 
   ImagePolygon poly;
   try {
+    std::cout << "cross 1=====" << std::endl;
     poly.Create(crossCube, 100, 100);
   }
   catch(IException &e) {
@@ -85,13 +86,18 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
   }
   ASSERT_EQ(40, poly.numVertices());
 
+  std::cout << "cross 1=====" << std::endl;
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
+  std::cout << "cross 1.1 =====" << std::endl;
+
   geos::geom::Point* centroid = poly.Polys()->getCentroid().release();
+  std::cout << "cross 2=====" << std::endl;
 
   std::vector<double> lons = {0.000000, 360.000000, 360.000000, 0.000000, 0.000000};
   std::vector<double> lats = {54.208706, 54.208706, 77.858556, 77.858556, 54.208706};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
+  std::cout << "cross 3=====" << std::endl;
   for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
