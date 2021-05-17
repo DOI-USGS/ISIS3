@@ -185,7 +185,7 @@ namespace Isis {
     int v_lineNum = 0;
     for(v_line.begin(); !v_line.end(); v_line++) {
       for(int i = 0; i < v_line.size(); i++) {
-        if(i == 4) { 
+        if(i == 4) {
           v_line[i] = NULL8;
         }
         else {
@@ -210,7 +210,7 @@ namespace Isis {
     int b_lineNum = 0;
     for(b_line.begin(); !b_line.end(); b_line++) {
       for(int i = 0; i < b_line.size(); i++) {
-        if( b_lineNum == 22 ) { 
+        if( b_lineNum == 22 ) {
           b_line[i] = NULL8;
         }
         else {
