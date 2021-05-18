@@ -39,14 +39,14 @@
                 <value_offset>WHAT IS THIS</value_offset>
             </Element_Array>
             <Axis_Array>
-                <axis_name>Line</axis_name>
-                <elements>{{MainLabel.IsisCube.Core.Dimensions.Lines.Value}}</elements>
+                }}</elements>
                 <sequence_number>1</sequence_number>
             </Axis_Array>
             <Axis_Array>
                 <axis_name>Sample</axis_name>
                 <elements>{{MainLabel.IsisCube.Core.Dimensions.Samples.Value}}</elements>
-                <sequence_number>2</sequence_number>
+                <sequence_number>2</sequence_number><axis_name>Line</axis_name>
+                <elements>{{MainLabel.IsisCube.Core.Dimensions.Lines.Value
             </Axis_Array>
         </Array_2D_Image>
     </File_Area_Observational>
