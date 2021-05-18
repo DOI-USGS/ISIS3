@@ -83,7 +83,7 @@ namespace Isis {
       HiVector _coeff_b;
       HiVector _coeff_c;
       HiVector _adc_set;
-      //HiVector _coeffs; // I'm not sure if this is needed yet.
+      HiVector _coeffMat; 
 
       Statistics _stats;
 
@@ -95,30 +95,29 @@ namespace Isis {
         _bin = ToInteger(prof("Summing"));
         int samples = ToInteger(prof("Samples"));
 
-	// Cause this file not to compile so that someone who knows what they're doing
-	// can make this next part work.
-	DEBUG
 	// Load the coefficients 
-	// I don't really know how loadCsv works. The CSV files for this module are named:
-	// file: DarkRate_CCD_Ch_TDI${tdi}_BIN{$binning}_hical_????.csv
+	// The CSV files for this module are named:
+	// file: DarkRate_CCD_Ch_TDI${tdi}_BIN{$binning}_ADC{$adc}_hical_????.csv
 	// Example:
-	// DarkRate_RED1_1_TDI64_BIN2_hical_0002.csv
+	// DarkRate_RED1_1_TDI64_BIN2_54_hical_0002.csv
 	// The format of the file is as follows:
-	// There are three header lines, with a '#' sign as a comment:
+	// There are three comment lines
 	// # Number of files used to generate these values = 40 
 	// # exponential equation: DC_Rate = a * exp(b * FPA Temperature) + c 
 	// # a, b, c 
 	// Then the coefficients begin.
 	// Three columns (a, b, c), and 1024/binning rows
 	// 2.483618177203812394e+00,2.255885064806690821e-01,5.617339162650616345e+03
-	// I don't know how loadCsv can be used to load this into memory.
-	// Later in this file, I assume I have three coefficient variables:
-	// _coeff_a, _coeff_b, and _coeff_c
-	// Each of these variables is a vector with 1024/binning elements.
-        _coeffs = loadCsv("DarkRate", conf, prof, samples);
-	_coeff_a = _coeffs[0];
-	_coeff_b = _coeffs[1];
-	_coeff_c = _coeffs[2];
+	_coeffMat = loadCsv("DarkRate", conf, prof).getMatrix();
+	//
+	// Gather all of the rows into each coefficient array.
+	// I'm not a very efficient coder, so this for loop will have to do until it's 
+	// optimized by someone else.
+	for (int k=0; k < samples; k++) {
+		_coeff_a = _coeffMat[k][0];
+		_coeff_b = _coeffMat[k][1];
+		_coeff_c = _coeffMat[k][2];
+	}
 
         //  Set average FPA temperature
         double fpa_py_temp = ToDouble(prof("FpaPositiveYTemperature"));

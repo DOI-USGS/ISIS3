@@ -69,7 +69,7 @@ void calibrate(Buffer &in, Buffer &out) {
   const HiVector &ZBF    = calVars->get("ZeroBufferFit");
   const HiVector &ZRev   = calVars->get("ZeroReverse");
   const HiVector &ZD     = calVars->get("ZeroDark");
-  const HiVector &ZDR     = calVars->get("ZeroDarkRate");
+  const HiVector &ZDR    = calVars->get("ZeroDarkRate");
   const HiVector &GLD    = calVars->get("GainLineDrift");
   const HiVector &GCN    = calVars->get("GainChannelNormalize");
   const double GNL       = calVars->get("GainNonLinearity")[0];
@@ -84,6 +84,10 @@ void calibrate(Buffer &in, Buffer &out) {
     if ( line > lastline ) { line = lastline; }
   }
 
+  // If both the ZeroDark and ZeroDarkRate modules are enabled
+  // we should exit with a user error. 
+
+
   //  Apply correction to point of non-linearity accumulating average
   vector<double> data;
   for (int i = 0 ; i < in.size() ; i++) {
@@ -92,6 +96,7 @@ void calibrate(Buffer &in, Buffer &out) {
     }
     else {
       double hdn;
+      if (
       hdn = (in[i] - ZBF[line] - ZRev[i] - ZD[i]); // Drift, Reverse, Dark
       hdn = hdn / GLD[line];  // GainLineDrift
       data.push_back(hdn);   // Accumulate average for non-linearity
@@ -266,7 +271,6 @@ void IsisMain(){
 /////////////////////////////////////////////////////////////////
 // ZeroDarkRate removes dark current with a new approach compared
 // with ZeroDark.
-//
     procStep = "ZeroDarkRate module";
     hiconf.selectProfile("ZeroDarkRate");
     hiprof =  hiconf.getMatrixProfile();
@@ -284,6 +288,23 @@ void IsisMain(){
       calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
       ZdrHist.add("Debug::SkipModule invoked!");
     }
+
+    // If both ZeroDarkRate and ZeroDark are active, then we'll get erronious results.
+    // Check and cause a user error if both are not skipped. 
+    //
+
+    bool zdark = SkipModule(hiconf.getMatrixProfile("ZeroDark"));  // Will return True if the module is skipped
+    bool zrate = SkipModule(hiconf.getMatrixProfile("ZeroDarkRate"));  // Will return True if the module is skipped
+    // If one or the other is skipped, things are fine. If both are skipped, then we have an issue. 
+    if ( (zdark == zrate) && (false == zdark) ) {
+        QString mess = "You have enabled both the ZeroDark and the ZeroDarkRate modules." +
+		"This means you are attempting to remove the dark current twice with two " +
+		"different algorithms. This is not approved use of hical. Please disable one "+
+		"or the other module using the Debug::SkipModule in your configuration file. " +
+                      hdump.expanded();
+        IException(IException::User, mess, _FILEINFO_).print();
+    }
+
 ////////////////////////////////////////////////////////////////////
 // GainLineDrift correct for gain-based drift
 //
