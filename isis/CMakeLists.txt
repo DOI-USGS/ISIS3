@@ -487,26 +487,26 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/appdata DESTINATION ${CMAKE_INSTALL_PREFIX
 # Create the appdata directory with translations directory, images directory, templates directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
                     ${CMAKE_BINARY_DIR}/appdata/templates/apollo
-		    ${CMAKE_BINARY_DIR}/appdata/templates/autoseed
-		    ${CMAKE_BINARY_DIR}/appdata/templates/autoreg
-		    ${CMAKE_BINARY_DIR}/appdata/templates/noproj
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetref
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
-		    ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
+        ${CMAKE_BINARY_DIR}/appdata/templates/autoseed
+        ${CMAKE_BINARY_DIR}/appdata/templates/autoreg
+        ${CMAKE_BINARY_DIR}/appdata/templates/noproj
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnetref
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
+        ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
         ${CMAKE_BINARY_DIR}/appdata/export
-	            ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
+        ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
         ${CMAKE_BINARY_DIR}/appdata/import
-		    ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
-		    ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
-		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
-		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
-	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
-	            ${CMAKE_BINARY_DIR}/appdata/templates/topds4
-	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
-		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
-	            ${CMAKE_BINARY_DIR}/appdata/images/icons
-	            ${CMAKE_BINARY_DIR}/appdata/images/targets)
+        ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
+        ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
+        ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
+        ${CMAKE_BINARY_DIR}/appdata/templates/kernels
+        ${CMAKE_BINARY_DIR}/appdata/templates/labels
+        ${CMAKE_BINARY_DIR}/appdata/templates/topds4
+        ${CMAKE_BINARY_DIR}/appdata/templates/maps
+        ${CMAKE_BINARY_DIR}/appdata/templates/photometry
+        ${CMAKE_BINARY_DIR}/appdata/images/icons
+        ${CMAKE_BINARY_DIR}/appdata/images/targets)
 
 
 # Have CMake process all of the source code and tests.
