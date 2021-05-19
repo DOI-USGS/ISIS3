@@ -55,6 +55,7 @@
 
       <parameter name="TEMPLATE">
         <type>filename</type>
+        <internalDefault>None</internalDefault>
         <fileMode>input</fileMode>
         <brief>
           Input template
