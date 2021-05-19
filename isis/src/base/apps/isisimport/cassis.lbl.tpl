@@ -8,7 +8,7 @@ Object = IsisCube
     Group = Dimensions
       Samples = {{Product_Observational.File_Area_Observational.Array_2D_Image.Axis_Array.0.elements}}
       Lines   = {{Product_Observational.File_Area_Observational.Array_2D_Image.Axis_Array.1.elements}}
-      Bands   = {{1}}
+      Bands   = 1
     End_Group
 
     Group = Pixels
@@ -20,25 +20,24 @@ Object = IsisCube
   End_Object
 
   Group = Instrument
-    SpacecraftName            = "TRACE GAS ORBITER"
-    InstrumentId              = CaSSIS
-    TargetName                = Mars
-    StartTime                 = 2016-11-22T15:45:50.984
+    SpacecraftName            = "{{Product_Observational.Observation_Area.Investigation_Area.name}}"
+    InstrumentId              = {{Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name}}
+    TargetName                = {{Product_Observational.Observation_Area.Target_Identification.name}}
+    StartTime                 = {{Product_Observational.Observation_Area.Time_Coordinates.start_date_time}}
     SpacecraftClockStartCount = 2f014e8bf23d21d1
     ExposureDuration          = 2.880e-003 <seconds>
-    Filter                    = PAN
+    Filter                    = RED
     Expanded                  = 1
     SummingMode               = 0
   End_Group
 
   Group = Archive
-    DataSetId                    = TBD
+    DataSetId                    = {{Product_Observational.Identification_Area.logical_identifier}}
     ProductVersionId             = UNK
     ProducerId                   = UBE
     ProducerName                 = "Nicolas Thomas"
-    ProductCreationTime          = 2017-10-03T09:38:00
-    FileName                     = CAS-MCO-2016-11-22T15.45.50.984-PAN-00000--
-                                   B1
+    ProductCreationTime          = 2017-10-03T09:38:01
+    FileName                     = {{Product_Observational.File_Area_Observational.File.file_name}}
     ScalingFactor                = 1.00
     Offset                       = 0.00
     PredictMaximumExposureTime   = 423.6358 <ms>
