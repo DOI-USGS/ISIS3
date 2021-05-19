@@ -502,7 +502,6 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
         ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
         ${CMAKE_BINARY_DIR}/appdata/templates/kernels
         ${CMAKE_BINARY_DIR}/appdata/templates/labels
-        ${CMAKE_BINARY_DIR}/appdata/templates/topds4
         ${CMAKE_BINARY_DIR}/appdata/templates/maps
         ${CMAKE_BINARY_DIR}/appdata/templates/photometry
         ${CMAKE_BINARY_DIR}/appdata/images/icons
@@ -620,10 +619,6 @@ add_dependencies(isis labels)
 add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
-
-add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
-add_dependencies(isis topds4)
 
 add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/import/* ${CMAKE_BINARY_DIR}/appdata/import)
