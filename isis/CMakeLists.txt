@@ -494,7 +494,9 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
 		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
 		    ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
 		    ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
+        ${CMAKE_BINARY_DIR}/appdata/export
 	            ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
+        ${CMAKE_BINARY_DIR}/appdata/import
 		    ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
 		    ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
 		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
@@ -622,6 +624,14 @@ add_dependencies(isis hidtmgen)
 add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
 add_dependencies(isis topds4)
+
+add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/import/* ${CMAKE_BINARY_DIR}/appdata/import)
+add_dependencies(isis import)
+
+add_custom_target(export ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export)
+add_dependencies(isis export)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
