@@ -771,7 +771,7 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
 
       // Line w.r.t (lat, lon, radius)
       coeffPoint3D(1,0) = 1000 * (groundPartials[0]*latDerivative[0] + groundPartials[1]*latDerivative[1] + groundPartials[2]*latDerivative[2]);
-      coeffPoint3D(1,1) = 1000 * (groundPartials[0]*lonDerivative[0] + groundPartials[1]*lonDerivative[1] + groundpartials[2]*lonDerivative[2]);
+      coeffPoint3D(1,1) = 1000 * (groundPartials[0]*lonDerivative[0] + groundPartials[1]*lonDerivative[1] + groundPartials[2]*lonDerivative[2]);
       coeffPoint3D(1,2) = 1000 * (groundPartials[0]*radDerivative[0] + groundPartials[1]*radDerivative[1] + groundPartials[2]*radDerivative[2]);
 
       // Sample w.r.t (lat, lon, radius)
