@@ -253,25 +253,112 @@ TEST_F(CSMCameraSetFixture, EmissionAngle) {
 }
 
 
-TEST_F(CSMCameraFixture, getParameterIndices) {
+TEST_F(CSMCameraFixture, getParameterIndicesSet) {
   std::vector<int> paramIndices = {0, 1, 2};
   EXPECT_CALL(mockModel, getNumParameters())
-      .Times(1)
-      .WillOnce(::testing::Return(3));
+      .WillRepeatedly(::testing::Return(3));
   EXPECT_CALL(mockModel, getParameterType(0))
-      .Times(1)
-      .WillOnce(::testing::Return(csm::param::REAL));
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
   EXPECT_CALL(mockModel, getParameterType(1))
-      .Times(1)
-      .WillOnce(::testing::Return(csm::param::REAL));
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
   EXPECT_CALL(mockModel, getParameterType(2))
-      .Times(1)
-      .WillOnce(::testing::Return(csm::param::REAL));
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
 
   std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(csm::param::ADJUSTABLE);
   ASSERT_EQ(indices.size(), paramIndices.size());
   for (size_t i = 0; i < paramIndices.size(); i++) {
     EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesType) {
+  std::vector<int> paramIndices = {1, 2};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterType(0))
+      .WillRepeatedly(::testing::Return(csm::param::FIXED));
+  EXPECT_CALL(mockModel, getParameterType(1))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(2))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(csm::param::REAL);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesList) {
+  std::vector<int> paramIndices = {2, 0};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1"));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"Parameter 3", "Parameter 1"};
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesListComparison) {
+  std::vector<int> paramIndices = {2, 0, 1};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1  "));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("  Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"PARAMETER 3", "  Parameter 1", "parameter 2  "};
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesListError) {
+  std::vector<int> paramIndices = {3, 1};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1"));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"Parameter 4", "Parameter 1", "Parameter 0"};
+
+  try
+  {
+    dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Failed to find indices for the following parameters ["
+        "Parameter 4,Parameter 0].")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IException with message \""
+      "Failed to find indices for the following parameters [Parameter 4,Parameter 0].\"";
   }
 }
 
