@@ -748,21 +748,41 @@ QString CsmBundleObservation::formatBundleOutputString(bool errorPropagation, bo
     SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
     vector<double> groundPartials = measureCamera->GroundPartials(groundPoint);
 
-    // groundPartials is:
-    // line WRT x
-    // line WRT y
-    // line WRT z
-    // sample WRT x
-    // sample WRT y
-    // sample WRT z
-    // Scale from WRT m to WRT Km
-    coeffPoint3D(1,0) = groundPartials[0] * 1000;
-    coeffPoint3D(1,1) = groundPartials[1] * 1000;
-    coeffPoint3D(1,2) = groundPartials[2] * 1000;
-    coeffPoint3D(0,0) = groundPartials[3] * 1000;
-    coeffPoint3D(0,1) = groundPartials[4] * 1000;
-    coeffPoint3D(0,2) = groundPartials[5] * 1000;
+    if (coordType == SurfacePoint::Rectangular) {
+      // groundPartials is:
+      // line WRT x
+      // line WRT y
+      // line WRT z
+      // sample WRT x
+      // sample WRT y
+      // sample WRT z
+      // Scale from WRT m to WRT Km
+      coeffPoint3D(1,0) = groundPartials[0] * 1000;
+      coeffPoint3D(1,1) = groundPartials[1] * 1000;
+      coeffPoint3D(1,2) = groundPartials[2] * 1000;
+      coeffPoint3D(0,0) = groundPartials[3] * 1000;
+      coeffPoint3D(0,1) = groundPartials[4] * 1000;
+      coeffPoint3D(0,2) = groundPartials[5] * 1000;
+    }
+    else if (coordType == SurfacePoint::Latitudinal) {
+      std::vector<double> latDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::One);
+      std::vector<double> lonDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::Two);
+      std::vector<double> radDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::Three);
 
+      // Line w.r.t (lat, lon, radius)
+      coeffPoint3D(1,0) = 1000 * (groundPartials[0]*latDerivative[0] + groundPartials[1]*latDerivative[1] + groundPartials[2]*latDerivative[2]);
+      coeffPoint3D(1,1) = 1000 * (groundPartials[0]*lonDerivative[0] + groundPartials[1]*lonDerivative[1] + groundPartials[2]*lonDerivative[2]);
+      coeffPoint3D(1,2) = 1000 * (groundPartials[0]*radDerivative[0] + groundPartials[1]*radDerivative[1] + groundPartials[2]*radDerivative[2]);
+
+      // Sample w.r.t (lat, lon, radius)
+      coeffPoint3D(0,0) = 1000 * (groundPartials[3]*latDerivative[0] + groundPartials[4]*latDerivative[1] + groundPartials[5]*latDerivative[2]);
+      coeffPoint3D(0,1) = 1000 * (groundPartials[3]*lonDerivative[0] + groundPartials[4]*lonDerivative[1] + groundPartials[5]*lonDerivative[2]);
+      coeffPoint3D(0,2) = 1000 * (groundPartials[3]*radDerivative[0] + groundPartials[4]*radDerivative[1] + groundPartials[5]*radDerivative[2]);
+    }
+    else {
+      IString msg ="Unknown surface point coordinate type enum [" + toString(coordType) + "]." ;
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     return true;
   }
 

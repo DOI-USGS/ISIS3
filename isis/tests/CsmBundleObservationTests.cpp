@@ -9,8 +9,9 @@
 #include "Mocks.h"
 #include "TestUtilities.h"
 #include "SerialNumber.h"
-#include "BundleTargetBody.h"
+#include "BundleControlPoint.h"
 #include "BundleImage.h"
+#include "BundleTargetBody.h"
 
 
 #include "gmock/gmock.h"
@@ -257,4 +258,84 @@ TEST_F(CSMCameraFixture, CsmBundleApplyParameterCorrections) {
   corrections[1] = 10.0;
 
   ASSERT_TRUE(observation.applyParameterCorrections(corrections));
+}
+
+
+TEST_F(CSMCameraFixture, CsmBundleComputePoint3DPartials) {
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterType(0))
+      .WillRepeatedly(::testing::Return(csm::param::FICTITIOUS));
+  EXPECT_CALL(mockModel, getParameterType(1))
+      .WillRepeatedly(::testing::Return(csm::param::FIXED));
+  EXPECT_CALL(mockModel, getParameterType(2))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1"));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+  EXPECT_CALL(mockModel, getParameterCovariance(0, 0))
+      .WillRepeatedly(::testing::Return(0.112));
+  EXPECT_CALL(mockModel, getParameterCovariance(1, 1))
+      .WillRepeatedly(::testing::Return(0.0123));
+  EXPECT_CALL(mockModel, getParameterCovariance(2, 2))
+      .WillRepeatedly(::testing::Return(0.342));
+  EXPECT_CALL(mockModel, computeGroundPartials)
+      .WillRepeatedly(::testing::Return(std::vector<double>{1, 2, 3, 4, 5, 6}));
+
+
+  QString sn = SerialNumber::Compose(*testCube);
+
+  BundleImageQsp bi = BundleImageQsp(new BundleImage(testCam, sn, testCube->fileName()));
+  BundleObservationSolveSettings bundleSolSetting;
+
+  CsmBundleObservation observation(bi,
+                                   "ObservationNumber",
+                                   "InstrumentId",
+                                   nullptr);
+
+  QStringList paramList;
+
+  bundleSolSetting.setCSMSolveSet(csm::param::ADJUSTABLE);
+
+  ASSERT_TRUE(observation.setSolveSettings(bundleSolSetting));
+
+  BundleSettingsQsp testBundleSettings(new BundleSettings());
+
+  SurfacePoint testSurfacePoint(Displacement(1000.0, Displacement::Kilometers),
+                                Displacement(0.0, Displacement::Kilometers),
+                                Displacement(0.0, Displacement::Kilometers));
+
+  ControlPoint testPoint("testPoint");
+  testPoint.SetAdjustedSurfacePoint(testSurfacePoint);
+
+  ControlMeasure *testMeasure = new ControlMeasure();
+  testMeasure->SetCubeSerialNumber(sn);
+  testMeasure->SetCamera(testCam);
+  testPoint.Add(testMeasure);
+
+  BundleControlPointQsp testBundlePoint(new BundleControlPoint(testBundleSettings, &testPoint));
+  BundleMeasureQsp testBundleMeasure = testBundlePoint->front();
+
+  LinearAlgebra::Matrix coeffPoint3D(2, 3);
+
+  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, SurfacePoint::Rectangular));
+
+  EXPECT_EQ(coeffPoint3D(0,0), 4000);
+  EXPECT_EQ(coeffPoint3D(0,1), 5000);
+  EXPECT_EQ(coeffPoint3D(0,2), 6000);
+  EXPECT_EQ(coeffPoint3D(1,0), 1000);
+  EXPECT_EQ(coeffPoint3D(1,1), 2000);
+  EXPECT_EQ(coeffPoint3D(1,2), 3000);
+
+  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, SurfacePoint::Latitudinal));
+
+  EXPECT_EQ(coeffPoint3D(0,0), 6000000);
+  EXPECT_EQ(coeffPoint3D(0,1), 5000000);
+  EXPECT_EQ(coeffPoint3D(0,2), 4000);
+  EXPECT_EQ(coeffPoint3D(1,0), 3000000);
+  EXPECT_EQ(coeffPoint3D(1,1), 2000000);
+  EXPECT_EQ(coeffPoint3D(1,2), 1000);
 }
