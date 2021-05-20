@@ -22,7 +22,7 @@ TEST(XmlToJson, XmlNoAttributeWithTextValue) {
 }
 
 // XML: <tag attributeName="attributeValue">textValue</tag>
-// JSON: {tag: {@attributeName: "attributeValue, "#text":textValue } }
+// JSON: {tag: {attrib_attributeName: "attributeValue, "_text":textValue } }
 TEST(XmlToJson, XmlAttributeWithTextValue) {
   QString xmlInput = R"(<Tag>
     <TagWithAttribute attribute="attributeValue">textValue</TagWithAttribute>
@@ -32,12 +32,12 @@ TEST(XmlToJson, XmlAttributeWithTextValue) {
   xmlDocument.setContent(xmlInput);
   json result = xmlToJson(xmlDocument);
 
-  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["@attribute"], "attributeValue");
-  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["#text"], "textValue");
+  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["attrib_attribute"], "attributeValue");
+  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["_text"], "textValue");
 }
 
 // XML: <tag attributeName="attributeValue" />
-//  JSON: {tag: {@attributeName: "attributeValue"} }
+//  JSON: {tag: {attrib_attributeName: "attributeValue"} }
 TEST(XmlToJson, XmlAttributeButNoText) {
   QString xmlInput = R"(<Tag>
     <TagWithAttribute attribute="attributeValue" />>
@@ -47,8 +47,8 @@ TEST(XmlToJson, XmlAttributeButNoText) {
   xmlDocument.setContent(xmlInput);
   json result = xmlToJson(xmlDocument);
 
-  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["@attribute"], "attributeValue");
-  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["#text"], nullptr);
+  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["attrib_attribute"], "attributeValue");
+  EXPECT_EQ(result["Tag"]["TagWithAttribute"]["_text"], nullptr);
 }
 
 //  XML: <tag />
@@ -111,9 +111,9 @@ TEST(XmlToJson, TestRepeatedTagNoChildren){
 
   EXPECT_EQ(result["Tag"]["A"][0], "A1");
   EXPECT_EQ(result["Tag"]["A"][1], "A2");
-  EXPECT_EQ(result["Tag"]["A"][2]["@attribute"], "value");
-  EXPECT_EQ(result["Tag"]["A"][3]["@otherAttribute"], "otherValue");
-  EXPECT_EQ(result["Tag"]["A"][3]["#text"], "textValue");
+  EXPECT_EQ(result["Tag"]["A"][2]["attrib_attribute"], "value");
+  EXPECT_EQ(result["Tag"]["A"][3]["attrib_otherAttribute"], "otherValue");
+  EXPECT_EQ(result["Tag"]["A"][3]["_text"], "textValue");
   EXPECT_EQ(result["Tag"]["A"][4]["B"][0], "b1");
   EXPECT_EQ(result["Tag"]["A"][4]["B"][1], "b2");
   EXPECT_EQ(result["Tag"]["A"][4]["C"], "c1");
@@ -204,12 +204,12 @@ TEST(XmlToJson, TestXMLEverythingTogether) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2C"]["TagLevel3"]["TagLevel4C"]["TagLevel4D"]["TagLevel4E"], "DeepValue");
 
   // Test attributes (uncomplicated)
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["@attributeTag2D"], "Attribute value");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["#text"], "TagLevel2DValue");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["attrib_attributeTag2D"], "Attribute value");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2D"]["_text"], "TagLevel2DValue");
 
   // Test no-text value cases <tag /> and <tag attributeName="attributeValue" /> 
   EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2ExtraExtra"], nullptr);
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2Extra"]["@attr"], "justAnAttribute");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1A"]["TagLevel2Extra"]["attrib_attr"], "justAnAttribute");
 
   // Test list creation for repeated tags at the same level
   
@@ -223,9 +223,9 @@ TEST(XmlToJson, TestXMLEverythingTogether) {
   // including lots of possible combinations
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][0], "A1");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][1], "A2");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["@attribute"], "value");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["@attr"], "val");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["#text"], "zoom");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][2]["attrib_attribute"], "value");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["attrib_attr"], "val");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][3]["_text"], "zoom");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][5], "A3");
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["A"][6], nullptr);
 
@@ -237,21 +237,21 @@ TEST(XmlToJson, TestXMLEverythingTogether) {
   EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["First"][0]["ten"][1], "TEN");
 
   // Test many attributes at one level
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeA"], "A");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeB"], "B");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["@attributeC"], "C");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["#text"], "ElementValue");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["attrib_attributeA"], "A");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["attrib_attributeB"], "B");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["attrib_attributeC"], "C");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Second"]["A"]["_text"], "ElementValue");
 
   // Test multiple attributes at multiple levels
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["@otherattr"], "firstLetter");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["@attr"], "alphabet");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["@attr2"], "attr2");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["@attr1"], "attr1");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["#text"], "AlphaValue");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Beta"]["#text"], "BetaValue");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Beta"]["@attrbeta2"], "beta2");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["AnotherLevel"]["Gamma"]["@attrgamma"], "gamma");
-  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["AnotherLevel"]["Gamma"]["#text"], "GammaValue");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["attrib_otherattr"], "firstLetter");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["attrib_attr"], "alphabet");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["attrib_attr2"], "attr2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["attrib_attr1"], "attr1");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Alpha"]["_text"], "AlphaValue");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Beta"]["_text"], "BetaValue");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["Beta"]["attrib_attrbeta2"], "beta2");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["AnotherLevel"]["Gamma"]["attrib_attrgamma"], "gamma");
+  EXPECT_EQ(result["TagLevel0"]["TagLevel1B"]["Third"]["Greek"]["AnotherLevel"]["Gamma"]["_text"], "GammaValue");
 }
 
 
