@@ -459,6 +459,13 @@ namespace Isis {
   // =============================================================================================//
 
 
+  /**
+   * Convert a string to a CSM solve option enumeration value.
+   *
+   * @param option The option as a string
+   *
+   * @return @b CSMSolveOption The option's enumeration value
+   */
   BundleObservationSolveSettings::CSMSolveOption
       BundleObservationSolveSettings::stringToCSMSolveOption(QString option) {
     if (option.compare("NoCSMParameters", Qt::CaseInsensitive) == 0) {
@@ -481,6 +488,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert a CSM solve option enumeration value to a string.
+   *
+   * @param option The option's enumeration value
+   *
+   * @return @b QString The option as a string
+   */
   QString BundleObservationSolveSettings::csmSolveOptionToString(CSMSolveOption option) {
     if (option == BundleObservationSolveSettings::NoCSMParameters) {
       return "NoCSMParameters";
@@ -502,7 +516,13 @@ namespace Isis {
   }
 
 
-
+  /**
+   * Convert a string to its CSM parameter set enumeration value.
+   *
+   * @param set The set name
+   *
+   * @return @b csm::param::Set The set's enumeration value
+   */
   csm::param::Set BundleObservationSolveSettings::stringToCSMSolveSet(QString set) {
     if (set.compare("VALID", Qt::CaseInsensitive) == 0) {
       return csm::param::VALID;
@@ -520,6 +540,14 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * Convert a CSM parameter set enumeration value to a string.
+   *
+   * @param set The set's enumeration value
+   *
+   * @return @b QString The set's name
+   */
   QString BundleObservationSolveSettings::csmSolveSetToString(csm::param::Set set) {
     if (set == csm::param::VALID) {
       return "VALID";
@@ -538,6 +566,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert a string to its CSM parameter type enumeration value.
+   *
+   * @param type The type name
+   *
+   * @return @b csm::param::Type The types's enumeration value
+   */
   csm::param::Type BundleObservationSolveSettings::stringToCSMSolveType(QString type) {
     if (type.compare("NONE", Qt::CaseInsensitive) == 0) {
       return csm::param::NONE;
@@ -559,6 +594,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Convert a CSM parameter type enumeration value to a string.
+   *
+   * @param type The type's enumeration value
+   *
+   * @return @b QString The type's name
+   */
   QString BundleObservationSolveSettings::csmSolveTypeToString(csm::param::Type type) {
     if (type == csm::param::NONE) {
       return "NONE";
@@ -580,40 +622,76 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the set of CSM parameters to solve for. See the CSM API documentation
+   * for what the different set values mean.
+   *
+   * @param set The set to solve for
+   */
   void BundleObservationSolveSettings::setCSMSolveSet(csm::param::Set set) {
     m_csmSolveOption = BundleObservationSolveSettings::Set;
     m_csmSolveSet = set;
   }
 
 
+  /**
+   * Set the type of CSM parameters to solve for.
+   *
+   * @param type The parameter type to solve for
+   */
   void BundleObservationSolveSettings::setCSMSolveType(csm::param::Type type) {
     m_csmSolveOption = BundleObservationSolveSettings::Type;
     m_csmSolveType = type;
   }
 
 
+  /**
+   * Set an explicit list of CSM parameters to solve for.
+   *
+   * @param list The names of the parameters to solve for
+   */
   void BundleObservationSolveSettings::setCSMSolveParameterList(QStringList list) {
     m_csmSolveOption = BundleObservationSolveSettings::List;
     m_csmSolveList = list;
   }
 
 
+  /**
+   * Get how the CSM parameters to solve for are specified for this observation.
+   *
+   * @return @b CSMSolveOption
+   */
   BundleObservationSolveSettings::CSMSolveOption
       BundleObservationSolveSettings::csmSolveOption() const {
     return m_csmSolveOption;
   }
 
 
+  /**
+   * Get the set of CSM parameters to solve for
+   *
+   * @return @b csm::param::Set The CSM parameter set to solve for
+   */
   csm::param::Set BundleObservationSolveSettings::csmParameterSet() const {
     return m_csmSolveSet;
   }
 
 
+  /**
+   * Get the type of CSM parameters to solve for
+   *
+   * @return @b csm::param::Type The CSM parameter type to solve for
+   */
   csm::param::Type BundleObservationSolveSettings::csmParameterType() const {
     return m_csmSolveType;
   }
 
 
+  /**
+   * Get the list of CSM parameters to solve for
+   *
+   * @return @b QStringList The names of the CSM parameters to solve for
+   */
   QStringList BundleObservationSolveSettings::csmParameterList() const {
     return m_csmSolveList;
   }

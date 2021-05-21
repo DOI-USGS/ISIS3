@@ -210,28 +210,6 @@ namespace Isis {
 
 
   /**
-   * Applies the parameter corrections
-   *
-   * @param corrections Vector of corrections to apply
-   *
-   * @throws IException::Unknown "Instrument position is NULL, but position solve option is
-   *                              [not NoPositionFactors]"
-   * @throws IException::Unknown "Instrument position is NULL, but pointing solve option is
-   *                              [not NoPointingFactors]"
-   * @throws IException::Unknown "Unable to apply parameter corrections to AbstractBundleObservation."
-   *
-   * @return @b bool Returns true upon successful application of corrections
-   *
-   * @internal
-   *   @todo always returns true?
-   */
-// FIXME: can this work at parent level or should be pure virtual?
-  bool AbstractBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
-    return false;
-  }
-
-
-  /**
    * Sets the index for the observation
    *
    * @param n Value to set the index of the observation to
