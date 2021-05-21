@@ -613,27 +613,11 @@ int main(int argc, char *argv[]) {
     */
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
-    // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs1->formatBundleOutputString(true);
-    //obs1 = bov.observationByCubeSerialNumber("obs1");
-    //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs2->formatBundleOutputString(true);
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
-
-#if 0
-    BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");
-    qDebug() << "same observation?" << toString((obs1 == obs1b));
-    qDebug() << obs1b.formatBundleOutputString(true);
-#endif
-    // Following segfaults (see #4157)
-//    qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleControlPoint...";
-    #if 0
-    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
-    #endif
     // #1 Test free point with default settings (solveRadius=false), apriori coordinates set, but no
     //       sigmas (other settings: observation mode = false, update =false, errorProp = false)
     qDebug() << "BCP test 1 - Create FreePoint with free point containing 2 measures "
