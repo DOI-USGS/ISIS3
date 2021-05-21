@@ -253,6 +253,37 @@ TEST_F(CSMCameraSetFixture, EmissionAngle) {
 }
 
 
+TEST_F(CSMCameraSetFixture, GroundPartials) {
+  std::vector<double> expectedPartials = {1, 2, 3, 4, 5, 6};
+  EXPECT_CALL(mockModel, computeGroundPartials(MatchEcefCoord(groundPt)))
+      .Times(1)
+      .WillOnce(::testing::Return(expectedPartials));
+
+  std::vector<double> groundPartials = dynamic_cast<CSMCamera*>(testCam)->GroundPartials();
+  ASSERT_EQ(groundPartials.size(), 6);
+  EXPECT_EQ(groundPartials[0], expectedPartials[0]);
+  EXPECT_EQ(groundPartials[1], expectedPartials[1]);
+  EXPECT_EQ(groundPartials[2], expectedPartials[2]);
+  EXPECT_EQ(groundPartials[3], expectedPartials[3]);
+  EXPECT_EQ(groundPartials[4], expectedPartials[4]);
+  EXPECT_EQ(groundPartials[5], expectedPartials[5]);
+}
+
+
+TEST_F(CSMCameraSetFixture, SensorPartials) {
+  std::pair<double,double> expectedPartials = {1.23, -5.43};
+  EXPECT_CALL(mockModel, computeSensorPartials(1, MatchEcefCoord(groundPt), 0.001, NULL, NULL))
+      .Times(1)
+      .WillOnce(::testing::Return(expectedPartials));
+
+  std::vector<double> groundPartials =
+      dynamic_cast<CSMCamera*>(testCam)->getSensorPartials(1, testCam->GetSurfacePoint());
+  ASSERT_EQ(groundPartials.size(), 2);
+  EXPECT_EQ(groundPartials[0], expectedPartials.first);
+  EXPECT_EQ(groundPartials[1], expectedPartials.second);
+}
+
+
 TEST_F(CSMCameraFixture, getParameterIndicesSet) {
   std::vector<int> paramIndices = {0, 1, 2};
   EXPECT_CALL(mockModel, getNumParameters())
