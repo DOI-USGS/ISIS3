@@ -67,7 +67,7 @@ namespace Isis {
 
       virtual const BundleObservationSolveSettingsQsp solveSettings() = 0;
       virtual int numberParameters() = 0;
-      virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections) = 0;
 
       virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation) = 0;
       virtual QString bundleOutputCSV(bool errorPropagation) = 0;
@@ -87,9 +87,9 @@ namespace Isis {
     protected:
       QString m_observationNumber; /**< This is typically equivalent to serial number
                                         except in the case of "observation mode" (e.g.
-                                        Lunar Orbiter) where for each image in the
-                                        observation, the observation number is the serial number
-                                        augmented with an additional integer. **/
+                                        Lunar Orbiter) where the observation number is
+                                        the portion of the serial number shared between
+                                        all of the images in the observation. **/
       int m_index; //!< Index of this observation.
       //! Map between cube serial number and BundleImage pointers.
       QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
@@ -97,7 +97,6 @@ namespace Isis {
       QStringList m_imageNames;         //!< List of all cube names.
       QString m_instrumentId;           //!< Spacecraft instrument id.
 
-      // TODO??? change these to LinearAlgebra vectors...
       LinearAlgebra::Vector m_weights;     //!< Parameter weights.
       //! Cumulative parameter correction vector.
       LinearAlgebra::Vector m_corrections;

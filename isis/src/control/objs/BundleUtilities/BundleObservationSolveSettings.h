@@ -227,10 +227,13 @@ class BundleObservationSolveSettings {
       QSet<QString> m_observationNumbers;  //!< Associated observation numbers for these settings.
 
       // CSM related parameters
-      CSMSolveOption m_csmSolveOption;
-      csm::param::Set m_csmSolveSet;
-      csm::param::Type m_csmSolveType;
-      QStringList m_csmSolveList;
+      CSMSolveOption m_csmSolveOption;  //!< How the CSM solution is specified
+      csm::param::Set m_csmSolveSet;    /**< The CSM parameter set to solve for. Only valid
+                                             if the solve option is Set.*/
+      csm::param::Type m_csmSolveType;  /**< The CSM parameter type to solve for. Only valid
+                                             if the solve option is Type.*/
+      QStringList m_csmSolveList;       /**< The names of the CSM parameters to solve for. Only
+                                             valid if the solve option is List.*/
 
       // pointing related parameters
       //! Option for how to solve for instrument pointing.
