@@ -861,14 +861,28 @@ namespace Isis {
    */
   std::vector<int> CSMCamera::getParameterIndices(QStringList paramList) const {
     std::vector<int> parameterIndices;
+    QStringList failedParams;
     for (int i = 0; i < paramList.size(); i++) {
+      bool found = false;
       for (int j = 0; j < m_model->getNumParameters(); j++) {
         if (QString::compare(QString::fromStdString(m_model->getParameterName(j)).trimmed(),
                              paramList[i].trimmed(),
                              Qt::CaseInsensitive) == 0) {
           parameterIndices.push_back(j);
+          found = true;
+          break;
         }
       }
+
+      if (!found) {
+        failedParams.push_back(paramList[i]);
+      }
+    }
+
+    if (!failedParams.empty()) {
+      QString msg = "Failed to find indices for the following parameters [" +
+                    failedParams.join(",") + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     return parameterIndices;
   }

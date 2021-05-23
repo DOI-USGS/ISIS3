@@ -126,26 +126,22 @@ namespace Isis {
     else {
       // create new BundleObservation and append to this vector
 
-      bool isIsisObservation = true;
-
-      isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
-
-      AbstractBundleObservation *observation = NULL;
+      bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
       if (isIsisObservation) {
-        observation = new BundleObservation(bundleImage,
-                                            observationNumber,
-                                            instrumentId,
-                                            bundleSettings->bundleTargetBody());
+        bundleObservation.reset(new BundleObservation(bundleImage,
+                                                      observationNumber,
+                                                      instrumentId,
+                                                      bundleSettings->bundleTargetBody()));
       }
       else {
-        observation = new CsmBundleObservation(bundleImage,
-                                               observationNumber,
-                                               instrumentId,
-                                               bundleSettings->bundleTargetBody());
+        bundleObservation.reset(new CsmBundleObservation(bundleImage,
+                                                         observationNumber,
+                                                         instrumentId,
+                                                         bundleSettings->bundleTargetBody()));
       }
 
-      if (!observation) {
+      if (!bundleObservation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -163,8 +159,7 @@ namespace Isis {
         solveSettings = bundleSettings->observationSolveSettings(observationNumber);
       }
 
-      observation->setSolveSettings(solveSettings);
-      bundleObservation.reset(observation);
+      bundleObservation->setSolveSettings(solveSettings);
 
       bundleObservation->setIndex(size());
 

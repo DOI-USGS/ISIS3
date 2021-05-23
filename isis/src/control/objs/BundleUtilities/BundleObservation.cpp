@@ -34,8 +34,6 @@ namespace Isis {
   BundleObservation::BundleObservation() {
     m_instrumentPosition = NULL;
     m_instrumentRotation = NULL;
-    // m_solveSettings?
-    // m_bundleTargetBody ?
   }
 
 
@@ -49,7 +47,8 @@ namespace Isis {
    * @param bundleTargetBody QSharedPointer to the target body of the observation
    */
   BundleObservation::BundleObservation(BundleImageQsp image, QString observationNumber,
-                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
+                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) :
+        AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
     m_bundleTargetBody = bundleTargetBody;
     m_instrumentRotation = NULL;
     m_instrumentPosition = NULL;
@@ -66,10 +65,6 @@ namespace Isis {
                                (image->camera()->instrumentRotation() ?
                                   image->camera()->instrumentRotation() : NULL)
                                : NULL);
-
-      // set the observations target body spice rotation object from the primary image in the
-      // observation (this is, by design at the moment, the first image added to the observation)
-      // if the image, camera, or instrument position/orientation is null, then set to null
     }
   }
 
@@ -83,7 +78,7 @@ namespace Isis {
     m_instrumentPosition = src.m_instrumentPosition;
     m_instrumentRotation = src.m_instrumentRotation;
     m_solveSettings = src.m_solveSettings;
-    // why not m_targetBody?
+    m_bundleTargetBody = src.m_bundleTargetBody;
   }
 
 
@@ -111,7 +106,7 @@ namespace Isis {
       m_instrumentPosition = src.m_instrumentPosition;
       m_instrumentRotation = src.m_instrumentRotation;
       m_solveSettings = src.m_solveSettings;
-    // why not m_targetBody?
+      m_bundleTargetBody = src.m_bundleTargetBody;
     }
     return *this;
   }
@@ -148,12 +143,11 @@ namespace Isis {
     m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
-    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
+    for ( int i = 0; i < nParameters; i++) {
       m_aprioriSigmas[i] = Isis::Null;
+    }
 
     if (!initParameterWeights()) {
-      // TODO: some message here!!!!!!!!!!!
-      // TODO:  do we need this??? initParameterWeights() never returns false...
       return false;
     }
 
@@ -212,25 +206,26 @@ namespace Isis {
         BundleImageQsp image = at(i);
         SpicePosition *spicePosition = image->camera()->instrumentPosition();
 
+        // If this image isn't the first, copy the position from the first
         if (i > 0) {
           spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
           spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
           spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
                                        m_solveSettings->positionInterpolationType());
         }
+        // Otherwise we need to fit the initial position
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
           spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
+          // now, set what kind of interpolation to use (polynomial function or
+          // polynomial function over hermite spline)
           spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+          // finally, set the degree of the position polynomial actually used in the bundle adjustment
           spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
 
-          if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
+          if (m_instrumentPosition) {
             positionBaseTime = m_instrumentPosition->GetBaseTime();
             positiontimeScale = m_instrumentPosition->GetTimeScale();
             m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
@@ -250,22 +245,23 @@ namespace Isis {
         BundleImageQsp image = at(i);
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
+        // If this image isn't the first, copy the pointing from the first
         if (i > 0) {
           spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
           spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
           spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
                                        m_solveSettings->pointingInterpolationType());
         }
+        // Otherwise we need to fit the initial pointing
         else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
+          // first, set the degree of the polynomial to be fit for a priori values
           spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
+          // now, set what kind of interpolation to use (polynomial function or
+          // polynomial function over a pointing cache)
           spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
 
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+          // finally, set the degree of the pointing polynomial actually used in the bundle adjustment
           spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
 
           rotationBaseTime = spicerotation->GetBaseTime();
