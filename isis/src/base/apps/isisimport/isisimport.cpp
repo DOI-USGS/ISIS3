@@ -39,16 +39,23 @@ namespace Isis {
     importer.SetInputFile(xmlFileName.removeExtension().addExtension("img").expanded());
 
     // Set everything needed by ProcessImport
-    // TODO: cassis-specific
-    int ns = toInt(QString::fromStdString(pds4Data["Product_Observational"]["File_Area_Observational"]["Array_2D_Image"]["Axis_Array"][0]["elements"]));
-    int nl = toInt(QString::fromStdString(pds4Data["Product_Observational"]["File_Area_Observational"]["Array_2D_Image"]["Axis_Array"][1]["elements"]));
-    int nb = 1; 
+    PvlGroup dimensions = newLabel.findObject("IsisCube").findGroup("Dimensions");
+    int ns = toInt(dimensions["Samples"]);
+    int nl = toInt(dimensions["Lines"]);
+    int nb = toInt(dimensions["Bands"]);
     importer.SetDimensions(ns, nl, nb);
 
-    importer.SetPixelType(PixelTypeEnumeration("Real"));
-    importer.SetByteOrder(ByteOrderEnumeration("Lsb"));
-    importer.SetBase(0.0);
-    importer.SetMultiplier(1.0);
+    PvlGroup pixels = newLabel.findObject("IsisCube").findGroup("Pixels");
+    QString pixelType = pixels["Type"];
+    QString byteOrder = pixels["ByteOrder"];
+    double base = pixels["Base"];
+    double multiplier = pixels["Multiplier"];
+    importer.SetPixelType(PixelTypeEnumeration(pixelType));
+    importer.SetByteOrder(ByteOrderEnumeration(byteOrder));
+    importer.SetBase(base);
+    importer.SetMultiplier(multiplier);
+
+    // TODO: how to handle this? 
     importer.SetFileHeaderBytes(0); 
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
