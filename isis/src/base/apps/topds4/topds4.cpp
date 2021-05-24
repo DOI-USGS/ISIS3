@@ -61,6 +61,30 @@ namespace Isis {
     // Add the input cube PVL label to template engine data
     dataSource["MainLabel"].update(pvlToJSON(cubeLabel));
 
+
+    // Handle TEMPLATE argument
+    FileName templateFn;
+    if(ui.WasEntered("TEMPLATE")) {
+      templateFn = ui.GetFileName("TEMPLATE");
+    }
+    else {
+      PvlGroup &inst = cubeLabel.findGroup("Instrument", Pvl::Traverse);
+      templateFn = FileName( "$ISISROOT/appdata/export/" +
+                                  inst["SpacecraftId"][0] +
+                                  inst["InstrumentId"][0] + ".tpl" );
+    }
+
+    if(!templateFn.fileExists()) {
+      QString msg = "File does not exist: " + templateFn.expanded();
+
+      if(!ui.WasEntered("TEMPLATE")) {
+        msg += ". Unsupported Spacecraft/Instrument for PDS4 export.";
+      }
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    
+    
     // Add the original label (from an ingestion app) to the template engine data
     // Wrap it in an OriginalLabel so existing elements don't get overwritten
     if (cubeLabel.hasObject("OriginalLabel")) {
@@ -148,6 +172,9 @@ namespace Isis {
     }
 
     Environment env;
+    env.set_trim_blocks(true);
+    env.set_lstrip_blocks(true);
+
     // Template engine call back functions
     /**
      * Renders to the current UTC time formatted as YYYY-MM-DDTHH:MM:SS
@@ -183,9 +210,14 @@ namespace Isis {
       return md5.getHashFromFile(outputCubePath).toStdString();
     });
 
-    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
-    std::string result = env.render_file(inputTemplate, dataSource);
+    /***
+     * Renders the pixel type of the input cube as a PDS4 compliant type
+     */
+    env.add_callback("pixelType", 0, [icube](Arguments& args) {
+      return PDS4PixelType(icube->pixelType(), icube->byteOrder()).toStdString();
+    });
 
+    std::string result = env.render_file(templateFn.expanded().toStdString(), dataSource);
     std::ofstream outFile(ui.GetFileName("TO").toStdString());
     outFile << result;
     outFile.close();
@@ -196,4 +228,35 @@ namespace Isis {
       jsonDataFile.close();
     }
   }
+}
+
+
+QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder) {
+  QString pds4Type("UNK");
+  if(ipixelType == Isis::UnsignedByte) {
+    pds4Type = "UnsignedByte";
+  }
+  else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Msb)) {
+    pds4Type = "UnsignedMSB2";
+  }
+  else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Lsb)) {
+    pds4Type = "UnsignedLSB2";
+  }
+  else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Msb)) {
+    pds4Type = "SignedMSB2";
+  }
+  else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Lsb)) {
+    pds4Type = "SignedLSB2";
+  }
+  else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Msb)) {
+    pds4Type = "IEEE754MSBSingle";
+  }
+  else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Lsb)) {
+    pds4Type = "IEEE754LSBSingle";
+  }
+  else {
+    QString msg = "Unsupported PDS pixel type or sample size";
+    throw Isis::IException(Isis::IException::User, msg, _FILEINFO_);
+  }
+  return pds4Type;
 }

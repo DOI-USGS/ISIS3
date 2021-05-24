@@ -10,4 +10,6 @@ namespace Isis {
   extern void topds4(UserInterface &ui, Pvl *log=nullptr);
 }
 
+extern QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder);
+
 #endif
