@@ -35,21 +35,14 @@ namespace Isis {
    *
    * @ingroup Utility
    *
-   * @author 2008-01-10 Kris Becker
+   * @author 2021-02-28 Moses Milazzo
    * @internal
-   * @history 2008-06-13 Kris Becker - Added PrintOn method to produce more
-   *          detailed data dump;  Added computation of statistics
-   * @history 2010-04-16 Kris Becker - Implemented standardized access to CSV
-   *          files.
-   * @history 2010-10-28 Kris Becker Renamed parameters replacing "Zb" with
-   *            "ZeroDarkRate"
-   * @history 2021-02-28 Moses Milazzo Copied "ZeroDarkRate.h" to new file 
-   * 		"ZeroDarkRate.h" to add new dark current correction model.
-   * 		This model no longer uses the B matrices and instead uses
-   * 		a temperature-dependent exponential model to calculate
-   * 		the correction on a per-image basis.
-   * 		dc_rate = a * exp(b*FPA_T) + c
-   *
+   * @history 2021-02-28 Moses Milazzo Copied - "ZeroDarkRate.h" to new file
+   *                         "ZeroDarkRate.h" to add new dark current correction model.
+   *                         This model no longer uses the B matrices and instead uses
+   *                         a temperature-dependent exponential model to calculate
+   *                         the correction on a per-image basis.
+   *                         dc_rate = a * exp(b*FPA_T) + c
    */
   class ZeroDarkRate : public Module {
 
@@ -73,17 +66,13 @@ namespace Isis {
     private:
       int _tdi;
       int _bin;
+      int _temp;
 
       /**
        * The coefficients are stored in a csv text file as a 3-column, 1024/bin row
-       * matrix. 
-       * Each coefficient has 1024/bin elements, so must be treated as a vector.
+       * matrix..
        */
-      HiVector _coeff_a;
-      HiVector _coeff_b;
-      HiVector _coeff_c;
-      HiVector _adc_set;
-      HiVector _coeffMat; 
+      HiMatrix _coeffMat;
 
       Statistics _stats;
 
@@ -95,40 +84,41 @@ namespace Isis {
         _bin = ToInteger(prof("Summing"));
         int samples = ToInteger(prof("Samples"));
 
-	// Load the coefficients 
-	// The CSV files for this module are named:
-	// file: DarkRate_CCD_Ch_TDI${tdi}_BIN{$binning}_ADC{$adc}_hical_????.csv
-	// Example:
-	// DarkRate_RED1_1_TDI64_BIN2_54_hical_0002.csv
-	// The format of the file is as follows:
-	// There are three comment lines
-	// # Number of files used to generate these values = 40 
-	// # exponential equation: DC_Rate = a * exp(b * FPA Temperature) + c 
-	// # a, b, c 
-	// Then the coefficients begin.
-	// Three columns (a, b, c), and 1024/binning rows
-	// 2.483618177203812394e+00,2.255885064806690821e-01,5.617339162650616345e+03
-	_coeffMat = loadCsv("DarkRate", conf, prof).getMatrix();
-	//
-	// Gather all of the rows into each coefficient array.
-	// I'm not a very efficient coder, so this for loop will have to do until it's 
-	// optimized by someone else.
-	for (int k=0; k < samples; k++) {
-		_coeff_a = _coeffMat[k][0];
-		_coeff_b = _coeffMat[k][1];
-		_coeff_c = _coeffMat[k][2];
-	}
+        // Load the coefficients
+        // The CSV files for this module are named:
+        // file: DarkRate_CCD_Ch_TDI${tdi}_BIN{$binning}_ADC{$adc}_hical_????.csv
+        // Example:
+        // DarkRate_RED1_1_TDI64_BIN2_54_hical_0002.csv
+        // The format of the file is as follows:
+        // There are three comment lines
+        // # Number of files used to generate these values = 40
+        // # exponential equation: DC_Rate = a * exp(b * FPA Temperature) + c
+        // # a, b, c
+        // Then the coefficients begin.
+        // Three columns (a, b, c), and 1024/binning rows
+        // 2.483618177203812394e+00,2.255885064806690821e-01,5.617339162650616345e+03
+        _coeffMat = LoadCSV("DarkRate", conf, prof).getMatrix();
+        if (_coeffMat.dim2() != 3) {
+          QString msg = "Zero Dark Rate coefficient CSV has [" + toString(_coeffMat.dim2()) +
+                        "] columns, expected 3.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        if (_coeffMat.dim1() != samples) {
+          QString msg = "Zero Dark Rate coefficient CSV has [" + toString(_coeffMat.dim1()) +
+                        "] rows, expected " + toString(samples) + ".";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
 
         //  Set average FPA temperature
         double fpa_py_temp = ToDouble(prof("FpaPositiveYTemperature"));
         double fpa_my_temp = ToDouble(prof("FpaNegativeYTemperature"));
-        double temp = (fpa_py_temp+fpa_my_temp) / 2.0;
-        _history.add("BaseTemperature[" + ToString(temp) + "]");
+        _temp = (fpa_py_temp+fpa_my_temp) / 2.0;
+        _history.add("BaseTemperature[" + ToString(_temp) + "]");
 
-	// Calculate the dark rate for each column.
-        HiVector dc(samples);
+        // Calculate the dark rate for each column.
+        _data = HiVector(samples);
         for (int j = 0 ; j < samples ; j++) {
-          dc[j] = _coeff_a[j] * exp(_coeff_b[j]*temp) + _coeff_c[j];
+          _data[j] = _coeffMat[j][0] * exp(_coeffMat[j][1]*_temp) + _coeffMat[j][2];
         }
 
         //  Compute statistics and record to history
@@ -146,7 +136,7 @@ namespace Isis {
       virtual void printOn(std::ostream &o) const {
         o << "#  History = " << _history << std::endl;
         //  Write out the header
-        o << std::setw(_fmtWidth+1) << "FPA_Temperature\n";
+        o << std::setw(_fmtWidth+1) << "FPA_Temperature\n"
           << std::setw(_fmtWidth+1) << "ZeroDarkRate\n";
 
         for (int i = 0 ; i < _data.dim() ; i++) {
