@@ -2,14 +2,47 @@
 {% set CassHeader="Product_Observational.CaSSIS_Header" %}
 {% set IdArea="Product_Observational.Identification_Area" %}
 {% set FileArea="Product_Observational.File_Area_Observational" %}
+{% set threeDArray="Product_Observational.File_Area_Observational.Array_3D_Image" %}
 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
-    Format      = Tile
-    TileSamples = 512
-    TileLines   = 280
 
+    {% if exists(threeDArray) %}
+    Group = Dimensions
+      Samples = {{ PO.File_Area_Observational.Array_3D_Image.Axis_Array.0.elements }}
+      Lines   = {{ PO.File_Area_Observational.Array_3D_Image.Axis_Array.1.elements }}
+      Bands   = {% if exists(FileArea + ".Array_3D_Image.Axis_Array.2.elements") %}
+                {{ PO.File_Area_Observational.Array_3D_Image.Axis_Array.2.elements }}
+                {% else %}
+                1
+                {% endif %}
+    End_Group
+
+    Group = Pixels
+      {% if exists("Product_Observational.File_Area_Observational.Array_3D_Image.Element_Array.idl_data_type") %}
+      {% set type=PO.File_Area_Observational.Array_3D_Image.Element_Array.idl_data_type %}
+      Type       = {% if type == "1" %} UnsignedByte
+                   {% else if type == "2" %} SignedWord
+                   {% else if type == "3" %} SignedInteger
+                   {% else if type == "4" or type == "5" %} Real
+                   {% else if type == "12" %} UnsignedWord
+                   {% else if type == "13" %} UnsignedInteger
+                   {% else if type == "14" %} SignedInteger
+                   {% else if type == "14" %} UnsignedInteger
+                   {% endif %}
+      {% else %}
+      Type       = Real
+      {% endif %}
+      ByteOrder  = Lsb
+                   {% if exists("Product_Observational.File_Area_Observational.Array_3D_Image.Element_Array.offset") %}
+      Base       = {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.offset }}
+                   {% else %}
+                   {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.value_offset }}
+                   {% endif %}
+      Multiplier = {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.scaling_factor }}
+    End_Group
+
+    {% else %}
     Group = Dimensions
       Samples = {{ PO.File_Area_Observational.Array_2D_Image.Axis_Array.0.elements }}
       Lines   = {{ PO.File_Area_Observational.Array_2D_Image.Axis_Array.1.elements }}
@@ -21,11 +54,29 @@ Object = IsisCube
     End_Group
 
     Group = Pixels
+      {% if exists("Product_Observational.File_Area_Observational.Array_2D_Image.Element_Array.idl_data_type") %}
+      {% set type=PO.File_Area_Observational.Array_2D_Image.Element_Array.idl_data_type %}
+      Type       = {% if type == "1" %} UnsignedByte
+                   {% else if type == "2" %} SignedWord
+                   {% else if type == "3" %} SignedInteger
+                   {% else if type == "4" or type == "5" %} Real
+                   {% else if type == "12" %} UnsignedWord
+                   {% else if type == "13" %} UnsignedInteger
+                   {% else if type == "14" %} SignedInteger
+                   {% else if type == "14" %} UnsignedInteger
+                   {% endif %}
+      {% else %}
       Type       = Real
+      {% endif %}
       ByteOrder  = Lsb
-      Base       = 0.0
-      Multiplier = 1.0
+                   {% if exists("Product_Observational.File_Area_Observational.Array_2D_Image.Element_Array.offset") %}
+      Base       = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.offset }}
+                   {% else %}
+                   {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.value_offset }}
+                   {% endif %}
+      Multiplier = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.scaling_factor }}
     End_Group
+    {% endif %}
   End_Object
 
   Group = Instrument
