@@ -516,7 +516,7 @@ TEST(FunctionalTestMimap2Isis, L3C) {
   for (int i = 0; i < 5; i++) {
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1)) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
+  for (int i = 5; i < 9; i++) {
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4)) << "Error at index: " << i;
   }
 
@@ -743,7 +743,7 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
   for (int i = 0; i < 5; i++) {
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1)) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
+  for (int i = 5; i < 9; i++) {
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4)) << "Error at index: " << i;
   }
 
