@@ -23,11 +23,6 @@ namespace Isis {
   QString labelFile = ui.GetFileName("FROM");
   label.read(labelFile);
 
-  QString imageFile("");
-  if(ui.WasEntered("IMAGE")) {
-    imageFile = ui.GetFileName("IMAGE");
-  }
-
   // The Kaguya MI MAP files have an incorrect SAMPLE_PROJECTION_OFFSET
   // keyword value in their labels. The following code creates a temporary
   // detached PDS label with the correct (negated) keyword value.
@@ -39,8 +34,10 @@ namespace Isis {
   QString fn(tempFileName.expanded());
   label.write(fn);
 
+  QString imageFile("");
   QString datafile = labelFile;
   if (ui.WasEntered("IMAGE")) {
+    imageFile = ui.GetFileName("IMAGE");
     datafile = imageFile;
   }
 
@@ -85,7 +82,7 @@ namespace Isis {
   instXlater.Auto(otherLabels);
 
   PvlKeyword processId = label.findKeyword("PROCESS_VERSION_ID");
-  PvlKeyword processVersion = label.findKeyword("PRODUCT_VERSION_ID");
+  PvlKeyword productVersion = label.findKeyword("PRODUCT_VERSION_ID");
 
   if (processId[0] == "L3C") {
     transFile = transDir + "KaguyaMil3cArchive.trn";;
@@ -93,7 +90,7 @@ namespace Isis {
   else if (processId[0] == "MAP") {
     transFile = transDir + "KaguyaMiMapArchive.trn";
 
-    if (int(processVersion) == 3) {
+    if (int(productVersion) == 3) {
       transFile = transDir + "KaguyaMiMap3Archive.trn";
     }
   }

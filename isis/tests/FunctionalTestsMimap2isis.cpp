@@ -93,10 +93,9 @@ TEST(FunctionalTestMimap2Isis, Default) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageValueType"), "REFLECTANCE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageUnit"), "ND");
 
-  int i;
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[0].toDouble(), 32268);
@@ -352,10 +351,9 @@ TEST(FunctionalTestMimap2Isis, L3C) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageValueType"), "REFLECTANCE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageUnit"), "ND");
 
-  int i;
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[0].toDouble(), 20866);
@@ -580,10 +578,9 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageValueType"), "REFLECTANCE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ImageUnit"), "ND");
 
-  int i;
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("MinForStatisticalEvaluation")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ((double) archive.findKeyword("MaxForStatisticalEvaluation")[i].toDouble(), 32767) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[0].toDouble(), 11914);
