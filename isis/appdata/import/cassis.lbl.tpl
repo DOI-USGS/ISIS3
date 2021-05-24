@@ -5,7 +5,6 @@
 {% set threeDArray="Product_Observational.File_Area_Observational.Array_3D_Image" %}
 
 Object = IsisCube
-  Object = Core
 
     {% if exists(threeDArray) %}
     Group = Dimensions
@@ -77,7 +76,6 @@ Object = IsisCube
       Multiplier = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.scaling_factor }}
     End_Group
     {% endif %}
-  End_Object
 
   Group = Instrument
     SpacecraftName            = {% if exists("Product_Observational.Observation_Area.Investigation_Area.name") %}
