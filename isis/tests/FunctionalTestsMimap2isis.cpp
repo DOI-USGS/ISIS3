@@ -108,8 +108,8 @@ TEST(FunctionalTestMimap2Isis, Default) {
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[7].toDouble(), 32293);
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMaximumDn")[8].toDouble(), 32433);
 
-  for (i = 0; i < 7; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[i].toDouble(), 0);
+  for (int i = 0; i < 7; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[i].toDouble(), 0) << "Error at index: " << i;;
   }
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneMinimumDn")[8].toDouble(), 1);
 
@@ -143,9 +143,9 @@ TEST(FunctionalTestMimap2Isis, Default) {
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[7].toDouble(), 7965);
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[8].toDouble(), 9305);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 327);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 327) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[0].toDouble(), 2);
@@ -180,37 +180,37 @@ TEST(FunctionalTestMimap2Isis, Default) {
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsValue"), -30000);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 0);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 0) << "Error at index: " << i;
   }
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("StretchedFlag"), "FALSE");
 
-  for (i = 0; i < 6; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[i], "{MIV_DRK_04724_05494_M___002.csv, MIN_DRK_04724_05494_M___002.csv}");
+  for (int i = 0; i < 6; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[i], "{MIV_DRK_04724_05494_M___002.csv, MIN_DRK_04724_05494_M___002.csv}") << "Error at index: " << i;
   }
-  for (i = 6; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[i], "{MIN_DRK_01226_01571_L___002.csv, MIV_DRK_01226_01571_L___002.csv}");
-  }
-
-  for (i = 0; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FtFileName")[i], "MIV_FTF_PRFLT_N___v01.csv");
+  for (int i = 6; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[i], "{MIN_DRK_01226_01571_L___002.csv, MIV_DRK_01226_01571_L___002.csv}") << "Error at index: " << i;
   }
 
-  for (i = 0; i < 6; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[i], "{MIV_FLT_04724_05494_N___002.csv, MIN_FLT_04724_05494_N___002.csv}");
-  }
-  for (i = 6; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[i], "{MIV_FLT_01226_01571_L___002.csv, MIN_FLT_01226_01571_L___002.csv}");
+  for (int i = 0; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FtFileName")[i], "MIV_FTF_PRFLT_N___v01.csv") << "Error at index: " << i;
   }
 
-  for (i = 0; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("EfficFileName")[i], "{MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv}");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[i], "{MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv}");
+  for (int i = 0; i < 6; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[i], "{MIV_FLT_04724_05494_N___002.csv, MIN_FLT_04724_05494_N___002.csv}") << "Error at index: " << i;
+  }
+  for (int i = 6; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("FlatFileName")[i], "{MIV_FLT_01226_01571_L___002.csv, MIN_FLT_01226_01571_L___002.csv}") << "Error at index: " << i;
   }
 
-  for (i = 0; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("RadCnvCoef")[i], "(1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085)");
+  for (int i = 0; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("EfficFileName")[i], "{MIN_EFF_PRFLT_N___v01.csv, MIV_EFF_PRFLT_N___v01.csv}") << "Error at index: " << i;
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("NonlinFileName")[i], "{MIV_NLT_PRFLT_N___v01.csv, MIN_NLT_PRFLT_N___v01.csv}") << "Error at index: " << i;
+  }
+
+  for (int i = 0; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("RadCnvCoef")[i], "(1.470593, 2.204781, 2.244315, 2.734361, 1.885889, 3.04924, 3.312096, 4.788256, 7.969085)") << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("RefCnvCoef")[0].toDouble(), 0.002353311);
@@ -241,9 +241,9 @@ TEST(FunctionalTestMimap2Isis, Default) {
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ResamplingMethod"), "Bi-Linear");
 
-  for (i = 0; i < 11; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("TcoMosaicFileName")[i], "N/A");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DtmMosaicFileName")[i], "N/A");
+  for (int i = 0; i < 11; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("TcoMosaicFileName")[i], "N/A") << "Error at index: " << i;
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DtmMosaicFileName")[i], "N/A") << "Error at index: " << i;
   }
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("OverlapSelectionId"),
@@ -251,15 +251,15 @@ TEST(FunctionalTestMimap2Isis, Default) {
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("MatchingMosaic"), "N/A");
 
-  for (i = 0; i < 5; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3);
+  for (int i = 0; i < 5; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10);
+  for (int i = 5; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("FtValidMinimum"), -2);
@@ -268,11 +268,11 @@ TEST(FunctionalTestMimap2Isis, Default) {
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  for (i = 0; i < 5; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1));
+  for (int i = 0; i < 5; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1)) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4));
+  for (int i = 5; i < 9; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4)) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[0].toDouble(), 414.0);
@@ -406,9 +406,9 @@ TEST(FunctionalTestMimap2Isis, L3C) {
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[7].toDouble(), 0);
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[8].toDouble(), 13310);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 500);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 500) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[0].toDouble(), 1);
@@ -443,8 +443,8 @@ TEST(FunctionalTestMimap2Isis, L3C) {
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsValue"), -30000);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 1642126);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 1642126) << "Error at index: " << i;
   }
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[0], "MIN_DRK_01313_01398_L___003.csv");
@@ -496,15 +496,15 @@ TEST(FunctionalTestMimap2Isis, L3C) {
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ResamplingMethod"), "Bi-Linear");
 
-  for (i = 0; i < 5; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3);
+  for (int i = 0; i < 5; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10);
+  for (int i = 5; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("FtValidMinimum"), -2);
@@ -513,11 +513,11 @@ TEST(FunctionalTestMimap2Isis, L3C) {
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  for (i = 0; i < 5; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1));
+  for (int i = 0; i < 5; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1)) << "Error at index: " << i;
   }
   for (i = 5; i < 9; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4)) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[0].toDouble(), 414.0);
@@ -633,9 +633,9 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[7].toDouble(), 9429);
   EXPECT_DOUBLE_EQ(archive.findKeyword("SceneModeDn")[8].toDouble(), 11274);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 500);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMinimum")[i].toDouble(), 0) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaMaximum")[i].toDouble(), 500) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("ShadowedAreaPercentage")[0].toDouble(), 0);
@@ -670,8 +670,8 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsValue"), -30000);
 
-  for (i = 0; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 0);
+  for (int i = 0; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("OutOfImageBoundsPixel")[i].toDouble(), 0) << "Error at index: " << i;
   }
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("DarkFileName")[0], "MIV_DRK_04375_04723_S___002.csv");
@@ -723,15 +723,15 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, archive.findKeyword("ResamplingMethod"), "Bi-Linear");
 
-  for (i = 0; i < 5; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3);
+  for (int i = 0; i < 5; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 35) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 1023) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -3) << "Error at index: " << i;
   }
-  for (i = 5; i < 9; i++) {
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095);
-    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10);
+  for (int i = 5; i < 9; i++) {
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aDeadPixelThreshold")[i].toDouble(), 200) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("L2aSaturationThreshold")[i].toDouble(), 4095) << "Error at index: " << i;
+    EXPECT_DOUBLE_EQ(archive.findKeyword("DarkValidMinimum")[i].toDouble(), -10) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(archive.findKeyword("FtValidMinimum"), -2);
@@ -740,11 +740,11 @@ TEST(FunctionalTestMimap2Isis, MAPv3) {
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  for (i = 0; i < 5; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1));
+  for (int i = 0; i < 5; i++) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MV" + QString::number(i + 1)) << "Error at index: " << i;
   }
   for (i = 5; i < 9; i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandbin.findKeyword("FilterName")[i], "MN" + QString::number(i - 4)) << "Error at index: " << i;
   }
 
   EXPECT_DOUBLE_EQ(bandbin.findKeyword("Center")[0].toDouble(), 414.0);
