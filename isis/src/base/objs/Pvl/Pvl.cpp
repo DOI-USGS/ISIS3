@@ -51,8 +51,11 @@ namespace Isis {
     m_internalTemplate = false;
   }
 
+
   /**
-   * Load PVL information from a string
+   * Load PVL information from a string 
+   *  
+   * TODO: fully document 
    */
   void Pvl::fromString(const std::string &str) {
     stringstream stm;
