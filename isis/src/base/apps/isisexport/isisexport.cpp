@@ -228,7 +228,7 @@ namespace Isis {
       result = env.render_file(templateFn.expanded().toStdString(), dataSource);
     }
     catch (const std::exception &ex) {
-      throw IException(ex.what(), IException::Io,msg, _FILEINFO_);
+      throw IException(IException::ErrorType::Unknown, ex.what(), _FILEINFO_);
     }  
     std::ofstream outFile(ui.GetFileName("TO").toStdString());
     outFile << result;
