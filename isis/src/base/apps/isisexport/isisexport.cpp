@@ -223,7 +223,13 @@ namespace Isis {
       return PDS4PixelType(icube->pixelType(), icube->byteOrder()).toStdString();
     });
 
-    std::string result = env.render_file(templateFn.expanded().toStdString(), dataSource);
+    std::string result;
+    try {
+      result = env.render_file(templateFn.expanded().toStdString(), dataSource);
+    }
+    catch (const std::exception &ex) {
+      throw IException(ex.what(), IException::Io,msg, _FILEINFO_);
+    }  
     std::ofstream outFile(ui.GetFileName("TO").toStdString());
     outFile << result;
     outFile.close();

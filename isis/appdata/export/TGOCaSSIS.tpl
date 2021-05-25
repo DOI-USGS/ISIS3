@@ -28,7 +28,9 @@
   <FSW_HEADER>
   <PEHK_HEADER>
   <DERIVED_HEADER_DATA>
+    {% if exists("MainLabel.IsisCube.Archive.PixelsPossiblySaturated") -%}
    <PixelsPossiblySaturated>{{MainLabel.IsisCube.Archive.PixelsPossiblySaturated.Value}}</PixelsPossiblySaturated>
+   {% endif -%}
    <Filter>{{MainLabel.IsisCube.BandBin.FilterName.Value}}</Filter>
   </DERIVED_HEADER_DATA>
  </CaSSIS_Header>
@@ -47,7 +49,7 @@
                       {% else -%}
                         TBD:
                       {% endif -%}
-                      {{lower(productId)}}
+                      {{lower("productId")}}
   </logical_identifier>
   <version_id>1.0</version_id>
   <title>PDS4 product exported from ISIS3 cube.</title>
@@ -76,8 +78,12 @@
    {% else %}
    <stop_date_time>{{targetGroup.StartTime.Value}}Z</stop_date_time>
    {% endif %}
+   {% if exists("targetGroup.LocalTime") %}
    <local_true_solar_time>{{targetGroup.LocalTime.Value}}</local_true_solar_time>
+   {% endif %}
+   {% if exists("targetGroup.SolarLongitude") %}
    <solar_longitude unit="{{targetGroup.SolarLongitude.Units}}">{{targetGroup.SolarLongitude.Value}}</solar_longitude>
+   {% endif %}
   </Time_Coordinates>
   <Investigation_Area>
    <name>{{targetGroup.SpacecraftName.Value}}</name>
@@ -172,7 +178,9 @@
       <img:filter_name>{{MainLabel.IsisCube.BandBin.FilterName.Value}}</img:filter_name>
       <img:filter_id>{{MainLabel.IsisCube.BandBin.FilterName.Value}}</img:filter_id>
       <img:bandwidth unit="{{MainLabel.IsisCube.BandBin.Width.Units}}">{{MainLabel.IsisCube.BandBin.Width.Value}}</img:bandwidth>
+      {% if exists("MainLabel.IsisCube.BandBin.Venter") -%}
       <img:center_filter_wavelength unit="{{MainLabel.IsisCube.BandBin.Venter.Units}}">{{MainLabel.IsisCube.BandBin.Center.Value}}</img:center_filter_wavelength>
+      {% endif -%}
      </img:Filter>
     </img:Image_Product_Information>
    </img:Imaging>
@@ -194,9 +202,9 @@
   <cart:Spatial_Reference_Information>
     <cart:Horizontal_Coordinate_System_Definition>
     <cart:Planar>
-      <cart:Map_Projection>
-      {# TODO Map Projection Generation Here #}
-      </cart:Map_Projection>
+        <cart:Map_Projection>
+          <cart:map_projection_name>{{MainLabel.IsisCube.Mapping.ProjectionName.Value}}</cart:map_projection_name>
+        </cart:Map_Projection>
       <cart:Planar_Coordinate_Information>
       <cart:planar_coordinate_encoding_method>Coordinate Pair</cart:planar_coordinate_encoding_method>
       <cart:Coordinate_Representation>
