@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include "topds4.h"
+#include "isisexport.h"
 
 using namespace std;
 using namespace Isis;
@@ -10,7 +10,7 @@ void IsisMain() {
   Pvl appLog;
 
   try {
-    topds4(ui, &appLog);
+    isisexport(ui, &appLog);
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

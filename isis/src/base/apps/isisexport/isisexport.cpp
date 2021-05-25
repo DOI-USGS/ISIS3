@@ -18,7 +18,7 @@
 #include "PvlToJSON.h"
 #include "XmlToJson.h"
 
-#include "topds4.h"
+#include "isisexport.h"
 
 using namespace std;
 using namespace inja;
@@ -27,17 +27,17 @@ using json = nlohmann::json;
 
 namespace Isis {
 
-  void topds4(UserInterface &ui, Pvl *log) {
+  void isisexport(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();
     icube->open(ui.GetFileName("FROM"));
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube->setVirtualBands(inAtt.bands());
     }
-    topds4(icube, ui);
+    isisexport(icube, ui);
   }
 
-  void topds4(Cube *icube, UserInterface &ui, Pvl *log) {
+  void isisexport(Cube *icube, UserInterface &ui, Pvl *log) {
 
     Process p;
     p.SetInputCube(icube);
@@ -89,8 +89,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    
-    
+
+
     // Add the original label (from an ingestion app) to the template engine data
     // Wrap it in an OriginalLabel so existing elements don't get overwritten
     if (cubeLabel.hasObject("OriginalLabel")) {
