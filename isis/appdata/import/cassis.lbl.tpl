@@ -3,9 +3,10 @@
 {% set IdArea="Product_Observational.Identification_Area" %}
 {% set FileArea="Product_Observational.File_Area_Observational" %}
 {% set threeDArray="Product_Observational.File_Area_Observational.Array_3D_Image" %}
+{% set cart="Product_Observational.Observation_Area.Discipline_Area.cart_Cartography" %}
 
 Object = IsisCube
-
+  Object = Core
     {% if exists(threeDArray) %}
     Group = Dimensions
       Samples = {{ PO.File_Area_Observational.Array_3D_Image.Axis_Array.0.elements }}
@@ -33,8 +34,9 @@ Object = IsisCube
       Type       = Real
       {% endif %}
       ByteOrder  = Lsb
-                   {% if exists("Product_Observational.File_Area_Observational.Array_3D_Image.Element_Array.offset") %}
-      Base       = {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.offset }}
+
+      Base       = {% if exists("Product_Observational.File_Area_Observational.Array_3D_Image.Element_Array.offset") %}
+                   {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.offset }}
                    {% else %}
                    {{ PO.File_Area_Observational.Array_3D_Image.Element_Array.value_offset }}
                    {% endif %}
@@ -68,14 +70,15 @@ Object = IsisCube
       Type       = Real
       {% endif %}
       ByteOrder  = Lsb
-                   {% if exists("Product_Observational.File_Area_Observational.Array_2D_Image.Element_Array.offset") %}
-      Base       = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.offset }}
+      Base       = {% if exists("Product_Observational.File_Area_Observational.Array_2D_Image.Element_Array.offset") %}
+                   {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.offset }}
                    {% else %}
                    {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.value_offset }}
                    {% endif %}
       Multiplier = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.scaling_factor }}
     End_Group
     {% endif %}
+  End_Object 
 
   Group = Instrument
     SpacecraftName            = {% if exists("Product_Observational.Observation_Area.Investigation_Area.name") %}
@@ -133,6 +136,9 @@ Object = IsisCube
     {% endif %}
     {%  if exists(IdArea + ".Producer_data") %}
     ProducerName                 = "{{ PO.Identification_Area.Producer_data.Producer_full_name }}"
+    {% endif %}
+    {%  if exists(IdArea + ".Product_Id") %}
+    ProductId                    = "{{ PO.Identification_Area.Product_Id }}"
     {% endif %}
     {%  if exists(FileArea + ".File.creation_date_time") %}
     ProductCreationTime          = {{ PO.File_Area_Observational.File.creation_date_time }}
@@ -193,7 +199,7 @@ Object = IsisCube
     {%  if exists(CassHeader) %}
     ExposureTimePEHK             = {{ PO.CaSSIS_Header.PEHK_HEADER.attrib_Exposure_Time }} <ms>
     {% endif %}
-    {%  if exists(CassHeader) %}
+    {%  if exists(CassHeader + ".DERIVED_HEADER_DATA.PixelsPossiblySaturated") %}
     PixelsPossiblySaturated      = {{ PO.CaSSIS_Header.DERIVED_HEADER_DATA.PixelsPossiblySaturated._text }}
     {% endif %}
     {%  if exists(CassHeader) %}
@@ -206,13 +212,7 @@ Object = IsisCube
     FiltersAvailable             = "{{ PO.CaSSIS_Header.CaSSIS_General.FILTERS_AVAILABLE }}"
     {% endif %}
     {%  if exists(CassHeader) %}
-    FocalLength                  = {{ PO.CaSSIS_Header.CaSSIS_General.TELESCOPE_FOCAL_LENGTH._text }}
-    {% endif %}
-    {%  if exists(CassHeader) %}
     FocalLengthUnit              = {{ PO.CaSSIS_Header.CaSSIS_General.TELESCOPE_FOCAL_LENGTH.attrib_Unit }}
-    {% endif %}
-    {%  if exists(CassHeader) %}
-    TelescopeFNumber              = {{ PO.CaSSIS_Header.CaSSIS_General.TELESCOPE_F_NUMBER }}
     {% endif %}
     {%  if exists(CassHeader) %}
     TelescopeType                = "{{ PO.CaSSIS_Header.CaSSIS_General.TELESCOPE_TYPE }}"
@@ -365,6 +365,30 @@ Object = IsisCube
     NaifFrameCode = -143400
   End_Group
 
+  {% if exists(cart) %}
+  Group = Mapping
+    ProjectionName     = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_map_projection_name }}
+    CenterLongitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_longitude_of_central_meridian }}
+    CenterLatitude     = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_latitude_of_projection_origin }}
+    Scale              = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_scale_x }}
+    PixelResolution    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_resolution_x }} <meters/pixel>
+    MaximumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_north_bounding_coordinate }}
+    MinimumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_south_bounding_coordinate }}
+    MaximumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_west_bounding_coordinate }}
+    MinimumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_east_bounding_coordinate }}
+    UpperLeftCornerX   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_x }} <meters>
+    UpperLeftCornerY   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_y }} <meters>
+    EquatorialRadius   = {% if exists(cart + ".cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_semi_major_radius") %}
+                         {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_semi_major_radius }}
+                         {% endif %}
+    PolarRadius        = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_polar_radius }} <meters>
+    LatitudeType       = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_latitude_type }}
+    LongitudeDirection = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_longitude_direction }}
+    TargetName         = {{ PO.Observation_Area.Target_Identification.name }}
+    LongitudeDomain    = 360
+  End_Group
+  {% endif %}
+
   {% if exists(CassHeader) %}
     {% set windowNumber=int(PO.CaSSIS_Header.FSW_HEADER.attrib_WindowCounter) + 1  %}
     {% if windowNumber == 1 %}
@@ -417,3 +441,4 @@ Object = IsisCube
   {% endif %}
 End_Object
 End
+
