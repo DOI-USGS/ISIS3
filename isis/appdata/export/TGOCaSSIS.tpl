@@ -34,7 +34,7 @@
  </CaSSIS_Header>
  <Identification_Area>
   <logical_identifier>urn:esa:psa:em16_tgo_cas:
-                      {% if exists("MainLabel.IsisCube.Instrument") -%} 
+                      {% if exists("MainLabel.IsisCube.Instrument") -%}
                         {% set targetGroup = MainLabel.IsisCube.Instrument -%}
                         {% if exists("MainLabel.IsisCube.Mapping") -%}
                           data_projected:
@@ -64,7 +64,7 @@
    <Modification_Detail>
     <modification_date>{{currentTime}}</modification_date>
     <version_id>1.0</version_id>
-    <description>Created PDS4 output product from ISIS cube with the topds4 application from ISIS. </description>
+    <description>Created PDS4 output product from ISIS cube with the isisexport application from ISIS. </description>
    </Modification_Detail>
   </Modification_History>
  </Identification_Area>
@@ -300,7 +300,7 @@
     <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
     <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
-  </Array_3D_Image> 
+  </Array_3D_Image>
  </File_Area_Observational>
 </Product_Observational>
 
