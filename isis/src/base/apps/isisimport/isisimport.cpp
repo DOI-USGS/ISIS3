@@ -25,21 +25,6 @@ namespace Isis {
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName xmlFileName = ui.GetFileName("FROM");
 
-    // Convert xml file to json so inja can use it
-    json pds4Data = xmlToJson(xmlFileName.toString());
-
-    // std::cout << pds4Data.dump(4);
-    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
-
-    Environment env;
-
-    // Use inja to get number of lines, samples, and bands from the input PDS4 label
-    std::string result = env.render_file(inputTemplate, pds4Data);
-
-    // Turn this into a Pvl label
-    Pvl newLabel;
-    newLabel.fromString(result);
-
     // To read the DN data
     ProcessImport importer;
     if(xmlFileName.removeExtension().addExtension("dat").fileExists()){
@@ -53,6 +38,92 @@ namespace Isis {
         ".dat or .img file for this XML exists and is located in the same directory.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+
+    // Convert xml file to json so inja can use it
+    json pds4Data = xmlToJson(xmlFileName.toString());
+
+    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
+
+    Environment env;
+
+    // Template engine call back functions
+    /**
+     * Renders YearDoy using StartTime to format to YYYYDOY
+     */
+    env.add_callback("YearDoy", 1, [](Arguments& args) {
+      std::string startTime = args.at(0)->get<string>();
+      std::string yearString = startTime.substr(0, 4);
+
+      int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+      int year = stoi(startTime.substr(0, 4));
+      int month = stoi(startTime.substr(5, 7));
+      int day = stoi(startTime.substr(8, 10));
+      int doy = day;
+
+      if (month > 2 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
+        doy++;
+      }
+      // Add the days in the previous months
+      while (month-- > 0) {
+        doy = doy + daysInMonth[month - 1];
+      }
+      return yearString.append(to_string(doy));
+    });
+
+    /**
+     * Converts UniqueId To ObservationId
+     * Logic from convertUniqueIdToObservationId in tgocassis2isis app
+     */
+    env.add_callback("UniqueIdtoObservId", 2, [](Arguments& args) {
+      std::string uniqueId = args.at(0)->get<string>();
+      std::string target = args.at(1)->get<string>();
+      std::string observationId = "";
+
+      long long operationPeriod = (stoll(uniqueId) & 1879048192);
+      operationPeriod /= pow(2,28);
+
+      // previously pulled from TgoCassisOperationPeriod.trn
+      if ((int)operationPeriod == 0) observationId = "CRUS";
+      else if ((int)operationPeriod == 1) observationId = "MY34";
+      else if ((int)operationPeriod == 2) observationId = "MY35";
+      else if ((int)operationPeriod == 3) observationId = "MY36";
+      else if ((int)operationPeriod == 4) observationId = "MY37";
+      else if ((int)operationPeriod == 5) observationId = "MY38";
+      else if ((int)operationPeriod == 5) observationId = "MY38";
+      else if ((int)operationPeriod == 6) observationId = "TBD";
+      else if ((int)operationPeriod == 7) observationId = "TEST";
+      else observationId = "UNK";
+
+      long long orbitNumber = (stoll(uniqueId) & 268433408);
+      orbitNumber /= pow(2,11);
+      observationId += "_";
+      observationId += to_string(orbitNumber);
+
+      int orbitPhase = (stoll(uniqueId) & 2044);
+      transform(target.begin(), target.end(), target.begin(), ::tolower);
+      if (target.compare("mars") == 0) {
+        orbitPhase /= pow(2,2);
+      }
+      else {
+        orbitPhase = 900;
+      }
+      observationId += "_";
+      observationId += to_string(orbitPhase);
+
+      int imageType = (stoll(uniqueId) & 3);
+      observationId += "_";
+      observationId += to_string(imageType);
+
+      return observationId;
+    });
+
+    // Use inja to get number of lines, samples, and bands from the input PDS4 label
+    std::string result = env.render_file(inputTemplate, pds4Data);
+
+    // Turn this into a Pvl label
+    Pvl newLabel;
+    newLabel.fromString(result);
 
     // Set everything needed by ProcessImport
     PvlGroup dimensions = newLabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
@@ -93,74 +164,8 @@ namespace Isis {
       outCubeLabel.addGroup(newCubeLabel.group(g));
     }
 
-    // Remove trailing "Z" from PDS4 .xml (on re-ingestion) and create YearDoy keyword in Archive group
-    PvlKeyword *startTime = &outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"];
-    QString startTimeString = startTime[0];
-    if (startTimeString.endsWith("Z", Qt::CaseInsensitive)) {
-      startTimeString.chop(1);
-      startTime->setValue(startTimeString);
-    }
-    iTime stime(startTimeString);
-    PvlGroup &archive = outLabel.findGroup("Archive", Pvl::Traverse);
-    PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
-    archive.addKeyword(yeardoy);
-
-    if (!outputCube->group("Archive").hasKeyword("ObservationId")){
-      convertUniqueIdToObservationId(outLabel);
-    }
-
     importer.EndProcess();
 
     return;
-  }
-
-  QString convertUniqueIdToObservationId(Pvl &outputLabel) {
-    if (outputLabel.findObject("IsisCube").hasGroup("Mosaic")) {
-      return ""; // translation file should auto translate this case to Mosaic group.
-                 // For any other product, this ID goes in the Archive group.
-    }
-
-    QString target = "";
-    if (outputLabel.findObject("IsisCube").hasGroup("Instrument")) {
-      target = outputLabel.findGroup("Instrument", Pvl::Traverse)
-                          .findKeyword("TargetName")[0];
-    }
-    else {
-      target = outputLabel.findGroup("Mapping", Pvl::Traverse)
-                          .findKeyword("TargetName")[0];
-    }
-
-    PvlGroup &archiveGroup = outputLabel.findGroup("Archive", Pvl::Traverse);
-    QString uniqueId = archiveGroup.findKeyword("UniqueIdentifier")[0];
-
-    QString observationId = "";
-    BigInt uniqueIdDecimalValue = uniqueId.toLongLong();
-    BigInt operationPeriod = (uniqueIdDecimalValue & 1879048192);
-    operationPeriod /= qPow(2,28);
-    FileName transFile("$ISISROOT/appdata/translations/TgoCassisOperationPeriod.trn");
-    PvlTranslationTable transTable(transFile);
-    observationId = transTable.Translate("OperationPeriod", toString(operationPeriod));
-    BigInt orbitNumber = (uniqueIdDecimalValue & 268433408);
-    orbitNumber /= qPow(2,11);
-    observationId += "_";
-    observationId += QString("%1").arg(orbitNumber, 6, 10, QChar('0'));
-
-    int orbitPhase = (uniqueIdDecimalValue & 2044);
-    if (target.compare("mars", Qt::CaseInsensitive) == 0) {
-      orbitPhase /= qPow(2,2);
-    }
-    else {
-      orbitPhase = 900;
-    }
-    observationId += "_";
-    observationId += QString("%1").arg(orbitPhase, 3, 10, QChar('0'));
-
-    int imageType = (uniqueIdDecimalValue & 3);
-    observationId += "_";
-    observationId += toString(imageType);
-
-    archiveGroup += PvlKeyword("ObservationId", observationId);
-
-    return observationId;
   }
 }

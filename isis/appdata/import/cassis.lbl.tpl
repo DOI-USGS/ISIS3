@@ -4,6 +4,8 @@
 {% set FileArea="Product_Observational.File_Area_Observational" %}
 {% set threeDArray="Product_Observational.File_Area_Observational.Array_3D_Image" %}
 {% set cart="Product_Observational.Observation_Area.Discipline_Area.cart_Cartography" %}
+{% set date="Product_Observational.Observation_Area.Discipline_Area.cart_Cartography" %}
+
 
 Object = IsisCube
   Object = Core
@@ -78,7 +80,7 @@ Object = IsisCube
       Multiplier = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.scaling_factor }}
     End_Group
     {% endif %}
-  End_Object 
+  End_Object
 
   Group = Instrument
     SpacecraftName            = {% if exists("Product_Observational.Observation_Area.Investigation_Area.name") %}
@@ -88,14 +90,18 @@ Object = IsisCube
                                 {% endif %}
     InstrumentId              = {{ PO.Observation_Area.Observing_System.Observing_System_Component.1.name }}
     TargetName                = {% if exists("Product_Observational.Observation_Area.Target_Identification.name") %}
-                                {{ PO.Observation_Area.Target_Identification.name }}
+                                {% set target=PO.Observation_Area.Target_Identification.name %}
+                                {{ target }}
                                 {% else %}
-                                {{ PO.CaSSIS_Header.GEOMETRIC_DATA.TARGET }}
+                                {% set target=PO.CaSSIS_Header.GEOMETRIC_DATA.TARGET %}
+                                {{ target }}
                                 {% endif %}
     StartTime                 = {% if exists("Product_Observational.Observation_Area.Time_Coordinates.start_date_time") %}
-                                {{ PO.Observation_Area.Time_Coordinates.start_date_time }}
+                                {% set startTime=PO.Observation_Area.Time_Coordinates.start_date_time %}
+                                {{ startTime }}
                                 {% else %}
-                                {{ PO.CaSSIS_Header.DERIVED_HEADER_DATA.OnboardImageAcquisitionTime._text }}
+                                {% set startTime=PO.CaSSIS_Header.DERIVED_HEADER_DATA.OnboardImageAcquisitionTime._text %}
+                                {{ startTime }}
                                 {% endif %}
                                 {% if exists(CassHeader) %}
     SpacecraftClockStartCount = {{ PO.CaSSIS_Header.FSW_HEADER.attrib_ExposureTimestamp }}
@@ -188,7 +194,8 @@ Object = IsisCube
     NumberOfWindows              = {{ PO.CaSSIS_Header.IMAGE_COMMAND.Num_win._text }}
     {% endif %}
     {%  if exists(CassHeader + ".IMAGE_COMMAND") %}
-    UniqueIdentifier             = {{ PO.CaSSIS_Header.IMAGE_COMMAND.Unique_Identifier._text }}
+    UniqueIdentifier             = {% set uniqueId=PO.CaSSIS_Header.IMAGE_COMMAND.Unique_Identifier._text %}
+                                   {{ uniqueId }}
     {% endif %}
     {%  if exists(CassHeader) %}
     UID                          = {{ PO.CaSSIS_Header.FSW_HEADER.attrib_UID }}
@@ -335,6 +342,10 @@ Object = IsisCube
     {% if exists(CassHeader) %}
     Window6EndLine               = {{ PO.CaSSIS_Header.PEHK_HEADER.attrib_Window6_End_Row }}
     {% endif %}
+    YearDoy                      = {{ YearDoy(startTime) }}
+    {%  if exists(CassHeader + ".IMAGE_COMMAND") %}
+    ObservationId                = {{ UniqueIdtoObservId(uniqueId, target) }}
+    {% endif %}
   End_Group
 
   Group = BandBin
@@ -441,4 +452,3 @@ Object = IsisCube
   {% endif %}
 End_Object
 End
-
