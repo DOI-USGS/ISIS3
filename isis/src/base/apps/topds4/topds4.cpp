@@ -68,10 +68,16 @@ namespace Isis {
       templateFn = ui.GetFileName("TEMPLATE");
     }
     else {
-      PvlGroup &inst = cubeLabel.findGroup("Instrument", Pvl::Traverse);
-      templateFn = FileName( "$ISISROOT/appdata/export/" +
-                                  inst["SpacecraftId"][0] +
-                                  inst["InstrumentId"][0] + ".tpl" );
+      if(cubeLabel.hasGroup("Instrument")) {
+        PvlGroup &inst = cubeLabel.findGroup("Instrument", Pvl::Traverse);
+        templateFn = FileName( "$ISISROOT/appdata/export/" +
+                                    inst["SpacecraftId"][0] +
+                                    inst["InstrumentId"][0] + ".tpl" );
+      }
+      else {
+        QString msg = "Cannot locate a template because Input Cube label has no Instrument group. Provide a template file to use.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
     if(!templateFn.fileExists()) {
