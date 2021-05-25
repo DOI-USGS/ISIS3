@@ -77,8 +77,8 @@ Object = IsisCube
                    {% endif %}
       Multiplier = {{ PO.File_Area_Observational.Array_2D_Image.Element_Array.scaling_factor }}
     End_Group
-  End_Object
     {% endif %}
+  End_Object 
 
   Group = Instrument
     SpacecraftName            = {% if exists("Product_Observational.Observation_Area.Investigation_Area.name") %}
@@ -441,3 +441,4 @@ Object = IsisCube
   {% endif %}
 End_Object
 End
+
