@@ -33,11 +33,13 @@ End_Group
 Group = SpacecraftName
   Auto
   InputKey       = SPACECRAFT_NAME
+  InputKey       = MISSION_NAME
   InputGroup     = ROOT
   InputPosition  = ROOT
   OutputName     = SpacecraftName
   OutputPosition = (Group, Instrument)
   Translation    = (KAGUYA, SELENE-M)
+  Translation    = (*, *)
 End_Group
 
 Group = InstrumentName
