@@ -5,10 +5,14 @@
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational xmlns:psa="http://psa.esa.int/psa/v1" xmlns:cas="http://psa.esa.int/psa/em16/cas/v1" xmlns:img="http://pds.nasa.gov/pds4/img/v1" xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd http://pds.nasa.gov/pds4/disp/v1 http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.xsd http://pds.nasa.gov/pds4/img/v1 http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.xsd http://pds.nasa.gov/pds4/cart/v1 http://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1900.xsd http://psa.esa.int/psa/v1 http://psa.esa.int/psa/v1/PDS4_PSA_1000.xsd http://psa.esa.int/psa/em16/cas/v1 http://psa.esa.int/psa/em16/cas/v1/PDS4_PSA_EM16_CAS_1000.xsd http://pds.nasa.gov/pds4/geom/v1 http://pds.nasa.gov/pds4/geom/v1/PDS4_GEOM_1B00_1610.xsd" xmlns:disp="http://pds.nasa.gov/pds4/disp/v1" xmlns:cart="http://pds.nasa.gov/pds4/cart/v1" xmlns:geom="http://pds.nasa.gov/pds4/geom/v1">
-{% if exists("MainLabel.IsisCube.Archive.ObservationId.Value") -%}
+{% if exists("MainLabel.IsisCube.Mosaic.ObservationId.Value") -%}
   {% set productId = MainLabel.IsisCube.Mosaic.ObservationId.Value -%}
+  {% set sProductId = "MainLabel.IsisCube.Mosaic.ObservationId.Value" -%}
 {% else if exists("MainLabel.IsisCube.Archive.ObservationId.Value") -%}
   {% set productId = MainLabel.IsisCube.Archive.ObservationId.Value -%}
+  {% set sProductId = "MainLabel.IsisCube.Archive.ObservationId.Value" -%}
+{% else -%}
+  {% set sProductId = "None" -%}
 {% endif -%}
  <CaSSIS_Header>
   <IDENTIFICATION_DATA/>
@@ -35,23 +39,24 @@
   </DERIVED_HEADER_DATA>
  </CaSSIS_Header>
  <Identification_Area>
-  <logical_identifier>urn:esa:psa:em16_tgo_cas:
-                      {% if exists("MainLabel.IsisCube.Instrument") -%}
-                        {% set targetGroup = MainLabel.IsisCube.Instrument -%}
-                        {% set sTargetGroup = "MainLabel.IsisCube.Instrument" -%}
-                        {% if exists("MainLabel.IsisCube.Mapping") -%}
-                          data_projected:
-                        {% else -%}
-                          data_raw:
-                        {% endif -%}
-                      {% else if exists("MainLabel.IsisCube.Mosaic") -%}
-                        {% set targetGroup = MainLabel.IsisCube.Mosaic -%}
-                        {% set sTargetGroup = "MainLabel.IsisCube.Mosaic" -%}
-                        data_derived:
-                      {% else -%}
-                        TBD:
-                      {% endif -%}
-                      {% if exists("productId") -%}{{lower("productId")-}}{% endif -%}
+  <logical_identifier>urn:esa:psa:em16_tgo_cas:{% if exists("MainLabel.IsisCube.Instrument") -%}
+                                                  {% set targetGroup = MainLabel.IsisCube.Instrument -%}
+                                                  {% set sTargetGroup = "MainLabel.IsisCube.Instrument" -%}
+                                                  {% if exists("MainLabel.IsisCube.Mapping") -%}
+                                                    data_projected:
+                                                  {% else -%}
+                                                    data_raw:
+                                                  {% endif -%}
+                                                {% else if exists("MainLabel.IsisCube.Mosaic") -%}
+                                                  {% set targetGroup = MainLabel.IsisCube.Mosaic -%}
+                                                  {% set sTargetGroup = "MainLabel.IsisCube.Mosaic" -%}
+                                                  data_derived:
+                                                {% else -%}
+                                                  {% set sTargetGroup = "None" -%}
+                                                  TBD:
+                                                {% endif -%}
+                                                {% if exists(sProductId) -%}{{lower(productId)-}}{% endif -%}
+                      
   </logical_identifier>
   <version_id>1.0</version_id>
   <title>PDS4 product exported from ISIS3 cube.</title>
@@ -59,7 +64,7 @@
   <product_class>Product_Observational</product_class>
   <Alias_List>
    <Alias>
-    <alternate_id>{% if exists("productId") -%}{{productId}}{% endif -%}
+    <alternate_id>{% if exists(sProductId) -%}{{productId}}{% endif -%}
   </logical_identifier></alternate_id>
     <comment>CaSSIS Internal Identifier</comment>
    </Alias>
@@ -112,7 +117,6 @@
    <name>{{targetGroup.TargetName.Value}}</name>
    <type>Planet</type>
   </Target_Identification>
-
   {# TODO - seems like none of these values are consistently included in the Archive group. May require coordination with isisimport 
   {% if exists("MainLabel.IsisCube.Archive") -%}
   <Mission_Area>
@@ -160,7 +164,6 @@
   </Mission_Area>
   {% endif -%}
   #}
-  
   <Discipline_Area>
   <disp:Display_Settings>
   <Local_Internal_Reference>
@@ -241,7 +244,7 @@
   <File>
    <file_name>{{MainLabel.IsisCube.Archive.FileName.Value}}.img</file_name>
   </File>
-  <Array_3D_Image> {# TODO - Can this be 2D if there are no Bands ?? -#}
+  <Array_3D_Image> {# TODO - Can this be 2D if there are no Bands ?? #}
    <local_identifier>Array_3D_Image</local_identifier>
    <offset unit="byte">0</offset>
    <axes>3</axes>
