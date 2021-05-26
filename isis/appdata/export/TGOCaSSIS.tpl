@@ -242,7 +242,6 @@
    <file_name>{{MainLabel.IsisCube.Archive.FileName.Value}}.img</file_name>
   </File>
   <Array_3D_Image> {# TODO - Can this be 2D if there are no Bands ?? -#}
-  <Array_3D_Image>
    <local_identifier>Array_3D_Image</local_identifier>
    <offset unit="byte">0</offset>
    <axes>3</axes>
