@@ -47,6 +47,7 @@ namespace Isis {
 
     // Name for output image
     FileName outputFileName(outputFile);
+    FileName genDefaultTemplate = ("$ISISROOT/appdata/export/pvl2template.tpl");
     QString path(outputFileName.originalPath());
     QString name(outputFileName.baseName());
     QString outputCubePath = path + "/" + name + ".cub";
@@ -55,6 +56,8 @@ namespace Isis {
     cubeatt(icube, outputCubePath, outputAttributes);
 
     json dataSource;
+
+    Environment env;
 
     Pvl &cubeLabel = *icube->label();
 
@@ -68,16 +71,9 @@ namespace Isis {
       templateFn = ui.GetFileName("TEMPLATE");
     }
     else {
-      if(cubeLabel.hasGroup("Instrument")) {
-        PvlGroup &inst = cubeLabel.findGroup("Instrument", Pvl::Traverse);
-        templateFn = FileName( "$ISISROOT/appdata/export/" +
-                                    inst["SpacecraftId"][0] +
-                                    inst["InstrumentId"][0] + ".tpl" );
-      }
-      else {
-        QString msg = "Cannot locate a template because Input Cube label has no Instrument group. Provide a template file to use.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
+         std::string templateFnStd = env.render_file(genDefaultTemplate.expanded().toStdString(), dataSource);
+         templateFn = FileName(QString::fromStdString(templateFnStd));
+     
     }
 
     if(!templateFn.fileExists()) {
@@ -177,7 +173,6 @@ namespace Isis {
       }
     }
 
-    Environment env;
     env.set_trim_blocks(true);
     env.set_lstrip_blocks(true);
 
