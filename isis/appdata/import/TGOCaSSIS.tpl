@@ -98,10 +98,10 @@ Object = IsisCube
                                 {% endif %}
     StartTime                 = {% if exists("Product_Observational.Observation_Area.Time_Coordinates.start_date_time") %}
                                 {% set startTime=PO.Observation_Area.Time_Coordinates.start_date_time %}
-                                {{ startTime }}
+                                {{ RemoveStartTimeZ(startTime) }}
                                 {% else %}
                                 {% set startTime=PO.CaSSIS_Header.DERIVED_HEADER_DATA.OnboardImageAcquisitionTime._text %}
-                                {{ startTime }}
+                                {{ RemoveStartTimeZ(startTime) }}
                                 {% endif %}
                                 {% if exists(CassHeader) %}
     SpacecraftClockStartCount = {{ PO.CaSSIS_Header.FSW_HEADER.attrib_ExposureTimestamp }}
@@ -379,22 +379,27 @@ Object = IsisCube
   {% if exists(cart) %}
   Group = Mapping
     ProjectionName     = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_map_projection_name }}
-    CenterLongitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_longitude_of_central_meridian }}
-    CenterLatitude     = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_latitude_of_projection_origin }}
-    Scale              = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_scale_x }}
-    PixelResolution    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_resolution_x }} <meters/pixel>
-    MaximumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_north_bounding_coordinate }}
-    MinimumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_south_bounding_coordinate }}
-    MaximumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_west_bounding_coordinate }}
-    MinimumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_east_bounding_coordinate }}
-    UpperLeftCornerX   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_x }} <meters>
-    UpperLeftCornerY   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_y }} <meters>
+    CenterLongitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_longitude_of_central_meridian._text }}
+    CenterLatitude     = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Map_Projection.cart_Equirectangular.cart_latitude_of_projection_origin._text }}
+    Scale              = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_scale_x._text }}
+    PixelResolution    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Planar_Coordinate_Information.cart_Coordinate_Representation.cart_pixel_resolution_x._text }}
+    MaximumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_north_bounding_coordinate._text }}
+    MinimumLatitude    = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_south_bounding_coordinate._text }}
+    MaximumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_west_bounding_coordinate._text }}
+    MinimumLongitude   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Domain.cart_Bounding_Coordinates.cart_east_bounding_coordinate._text }}
+    UpperLeftCornerX   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_x._text }}
+    UpperLeftCornerY   = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Planar.cart_Geo_Transformation.cart_upperleft_corner_y._text }}
     EquatorialRadius   = {% if exists(cart + ".cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_semi_major_radius") %}
-                         {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_semi_major_radius }}
+                         {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_semi_major_radius._text }}
                          {% endif %}
-    PolarRadius        = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_polar_radius }} <meters>
+    PolarRadius        = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_polar_radius._text }}
     LatitudeType       = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_latitude_type }}
-    LongitudeDirection = {{ PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_longitude_direction }}
+    LongitudeDirection = {% set LongDir=PO.Observation_Area.Discipline_Area.cart_Cartography.cart_Spatial_Reference_Information.cart_Horizontal_Coordinate_System_Definition.cart_Geodetic_Model.cart_longitude_direction %}
+                         {% if LongDir == "Positive East" %}
+                         PositiveEast
+                         {% else if LongDir == "Positive West" %}
+                         PositiveWest
+                         {% endif %}
     TargetName         = {{ PO.Observation_Area.Target_Identification.name }}
     LongitudeDomain    = 360
   End_Group
