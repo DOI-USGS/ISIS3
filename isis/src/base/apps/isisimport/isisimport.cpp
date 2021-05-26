@@ -20,14 +20,13 @@ using json = nlohmann::json;
 
 namespace Isis {
 
-  static QString convertUniqueIdToObservationId(Pvl &outputLabel);
-
   void isisimport(UserInterface &ui, Pvl *log) {
+    FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
     FileName xmlFileName = ui.GetFileName("FROM");
 
     // To read the DN data
     ProcessImport importer;
-    if(xmlFileName.removeExtension().addExtension("dat").fileExists()){
+    if (xmlFileName.removeExtension().addExtension("dat").fileExists()){
       importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
     }
     else if (xmlFileName.removeExtension().addExtension("img").fileExists()) {
@@ -38,13 +37,25 @@ namespace Isis {
         ".dat or .img file for this XML exists and is located in the same directory.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+    Environment env;
 
     // Convert xml file to json so inja can use it
     json pds4Data = xmlToJson(xmlFileName.toString());
 
-    std::string inputTemplate = ui.GetFileName("TEMPLATE").toStdString();
-
-    Environment env;
+    FileName inputTemplate;
+    if (ui.WasEntered("TEMPLATE")) {
+      inputTemplate = ui.GetFileName("TEMPLATE");
+    }
+    else {
+      try {
+        std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), pds4Data);
+        inputTemplate = FileName(QString::fromStdString(templateFile));
+      }
+      catch(...) {
+         QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
+         throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
 
     // Template engine call back functions
     /**
@@ -98,7 +109,9 @@ namespace Isis {
       long long orbitNumber = (stoll(uniqueId) & 268433408);
       orbitNumber /= pow(2,11);
       observationId += "_";
-      observationId += to_string(orbitNumber);
+      std::string orbitString = to_string(orbitNumber);
+      orbitString.insert(orbitString.begin(), 6 - orbitString.length(), '0');
+      observationId += orbitString;
 
       int orbitPhase = (stoll(uniqueId) & 2044);
       transform(target.begin(), target.end(), target.begin(), ::tolower);
@@ -119,7 +132,7 @@ namespace Isis {
     });
 
     // Use inja to get number of lines, samples, and bands from the input PDS4 label
-    std::string result = env.render_file(inputTemplate, pds4Data);
+    std::string result = env.render_file(inputTemplate.expanded().toStdString(), pds4Data);
 
     // Turn this into a Pvl label
     Pvl newLabel;
