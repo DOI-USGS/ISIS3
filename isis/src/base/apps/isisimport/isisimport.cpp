@@ -131,6 +131,19 @@ namespace Isis {
       return observationId;
     });
 
+     /**
+      * Removes 'Z' that is added to StartTime when image has been reingested
+      */
+      env.add_callback("RemoveStartTimeZ", 1, [](Arguments& args) {
+      std::string startTime = args.at(0)->get<string>();
+
+      if(startTime.back() == 'Z') {
+        startTime.pop_back();
+      }
+
+      return startTime;
+      });
+
     // Use inja to get number of lines, samples, and bands from the input PDS4 label
     std::string result = env.render_file(inputTemplate.expanded().toStdString(), pds4Data);
 
