@@ -66,7 +66,7 @@ namespace Isis {
     private:
       int _tdi;
       int _bin;
-      int _temp;
+      double _temp;
 
       /**
        * The coefficients are stored in a csv text file as a 3-column, 1024/bin row
