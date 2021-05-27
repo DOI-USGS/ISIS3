@@ -244,7 +244,40 @@
   <File>
    <file_name>{{MainLabel.IsisCube.Archive.FileName.Value}}.img</file_name>
   </File>
-  {# still need to include possible 3DArray #}
+  {# still need to include possible 3DArray
+  <Array_3D_Image>
+   <local_identifier>Array_3D_Image</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>3</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>{{pixelType}}</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Band</axis_name>
+    <elements>{{MainLabel.IsisCube.Core.Dimensions.Bands.Value}}</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>{{MainLabel.IsisCube.Core.Dimensions.Lines.Value}}</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>{{MainLabel.IsisCube.Core.Dimensions.Samples.Value}}</elements>
+    <sequence_number>3</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+     <missing_constant>-3.40282265508890445e+38</missing_constant>
+     <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+     <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+     <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+     <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+  </Array_3D_Image> #}
   <Array_2D_Image>
     <axes>2</axes>
     <Axis_Array>
