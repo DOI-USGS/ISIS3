@@ -14,31 +14,32 @@
 {% else -%}
   {% set sProductId = "None" -%}
 {% endif -%}
- <CaSSIS_Header>
-  <IDENTIFICATION_DATA/>
-  <GEOMETRIC_DATA>
-   <PREDICTED_MAXIMUM_EXPOSURE_TIME unit="{{MainLabel.IsisCube.Archive.PredictMaximumExposureTime.Units}}">{{MainLabel.IsisCube.Archive.PredictMaximumExposureTime.Value}}</PREDICTED_MAXIMUM_EXPOSURE_TIME>
-   <CASSIS_OFF_NADIR_ANGLE unit="{{MainLabel.IsisCube.Archive.CassisOffNadirAngle.Units}}">{{MainLabel.IsisCube.Archive.CassisOffNadirAngle.Value}}</CASSIS_OFF_NADIR_ANGLE>
-   <PREDICTED_REQUIRED_REPETITION_FREQUENCY unit="{{MainLabel.IsisCube.Archive.PredictedRepetitionFrequency.Units}}">{{MainLabel.IsisCube.Archive.PredictedRepetitionFrequency.Value}}</PREDICTED_REQUIRED_REPETITION_FREQUENCY>
-   <TGO_GROUND_TRACK_VELOCITY unit="{{MainLabel.IsisCube.Archive.GroundTrackVelocity.Units}}">{{MainLabel.IsisCube.Archive.GroundTrackVelocity.Value}}</TGO_GROUND_TRACK_VELOCITY>
-   <FORWARD_ROTATION_ANGLE_REQUIRED unit="{{MainLabel.IsisCube.Archive.ForwardRotationAngle.Units}}">{{MainLabel.IsisCube.Archive.ForwardRotationAngle.Value}}</FORWARD_ROTATION_ANGLE_REQUIRED>
-   <SPICE_KERNEL_MISALIGNMENT_PREDICT unit="{{MainLabel.IsisCube.Archive.SpiceMisalignment.Units}}">{{MainLabel.IsisCube.Archive.SpiceMisalignment.Value}}</SPICE_KERNEL_MISALIGNMENT_PREDICT>
-  </GEOMETRIC_DATA>
-  <CaSSIS_General>
-   <TELESCOPE_FOCAL_LENGTH unit="{{MainLabel.IsisCube.Archive.FocalLength.Units}}">{{MainLabel.IsisCube.Archive.FocalLength.Value}}</TELESCOPE_FOCAL_LENGTH>
-   <TELESCOPE_F_NUMBER>{{MainLabel.IsisCube.Archive.FNumber.Value}}</TELESCOPE_F_NUMBER>
-  </CaSSIS_General>
-  <IMAGE_COMMAND/>
-  <FSW_HEADER>
-  <PEHK_HEADER>
-  <DERIVED_HEADER_DATA>
-    {% if exists("MainLabel.IsisCube.Archive.PixelsPossiblySaturated") -%}
-   <PixelsPossiblySaturated>{{MainLabel.IsisCube.Archive.PixelsPossiblySaturated.Value}}</PixelsPossiblySaturated>
-   {% endif -%}
-   <Filter>{{MainLabel.IsisCube.BandBin.FilterName.Value}}</Filter>
-  </DERIVED_HEADER_DATA>
- </CaSSIS_Header>
- <Identification_Area>
+{# Cassis Header is removed when converting back to PDS4 with tgocassisrdrgen
+<CaSSIS_Header>
+ <IDENTIFICATION_DATA/>
+ <GEOMETRIC_DATA>
+  <PREDICTED_MAXIMUM_EXPOSURE_TIME unit="{{MainLabel.IsisCube.Archive.PredictMaximumExposureTime.Units}}">{{MainLabel.IsisCube.Archive.PredictMaximumExposureTime.Value}}</PREDICTED_MAXIMUM_EXPOSURE_TIME>
+  <CASSIS_OFF_NADIR_ANGLE unit="{{MainLabel.IsisCube.Archive.CassisOffNadirAngle.Units}}">{{MainLabel.IsisCube.Archive.CassisOffNadirAngle.Value}}</CASSIS_OFF_NADIR_ANGLE>
+  <PREDICTED_REQUIRED_REPETITION_FREQUENCY unit="{{MainLabel.IsisCube.Archive.PredictedRepetitionFrequency.Units}}">{{MainLabel.IsisCube.Archive.PredictedRepetitionFrequency.Value}}</PREDICTED_REQUIRED_REPETITION_FREQUENCY>
+  <TGO_GROUND_TRACK_VELOCITY unit="{{MainLabel.IsisCube.Archive.GroundTrackVelocity.Units}}">{{MainLabel.IsisCube.Archive.GroundTrackVelocity.Value}}</TGO_GROUND_TRACK_VELOCITY>
+  <FORWARD_ROTATION_ANGLE_REQUIRED unit="{{MainLabel.IsisCube.Archive.ForwardRotationAngle.Units}}">{{MainLabel.IsisCube.Archive.ForwardRotationAngle.Value}}</FORWARD_ROTATION_ANGLE_REQUIRED>
+  <SPICE_KERNEL_MISALIGNMENT_PREDICT unit="{{MainLabel.IsisCube.Archive.SpiceMisalignment.Units}}">{{MainLabel.IsisCube.Archive.SpiceMisalignment.Value}}</SPICE_KERNEL_MISALIGNMENT_PREDICT>
+ </GEOMETRIC_DATA>
+ <CaSSIS_General>
+  <TELESCOPE_FOCAL_LENGTH unit="{{MainLabel.IsisCube.Archive.FocalLength.Units}}">{{MainLabel.IsisCube.Archive.FocalLength.Value}}</TELESCOPE_FOCAL_LENGTH>
+  <TELESCOPE_F_NUMBER>{{MainLabel.IsisCube.Archive.FNumber.Value}}</TELESCOPE_F_NUMBER>
+ </CaSSIS_General>
+ <IMAGE_COMMAND/>
+ <FSW_HEADER/>
+ <PEHK_HEADER/>
+ <DERIVED_HEADER_DATA>
+   {% if exists("MainLabel.IsisCube.Archive.PixelsPossiblySaturated") -%}
+  <PixelsPossiblySaturated>{{MainLabel.IsisCube.Archive.PixelsPossiblySaturated.Value}}</PixelsPossiblySaturated>
+  {% endif -%}
+  <Filter>{{MainLabel.IsisCube.BandBin.FilterName.Value}}</Filter>
+ </DERIVED_HEADER_DATA>
+</CaSSIS_Header> -#}
+<Identification_Area>
   <logical_identifier>urn:esa:psa:em16_tgo_cas:{% if exists("MainLabel.IsisCube.Instrument") -%}
                                                   {% set targetGroup = MainLabel.IsisCube.Instrument -%}
                                                   {% set sTargetGroup = "MainLabel.IsisCube.Instrument" -%}
@@ -56,7 +57,6 @@
                                                   TBD:
                                                 {% endif -%}
                                                 {% if exists(sProductId) -%}{{lower(productId)-}}{% endif -%}
-                      
   </logical_identifier>
   <version_id>1.0</version_id>
   <title>PDS4 product exported from ISIS3 cube.</title>
@@ -64,8 +64,7 @@
   <product_class>Product_Observational</product_class>
   <Alias_List>
    <Alias>
-    <alternate_id>{% if exists(sProductId) -%}{{productId}}{% endif -%}
-  </logical_identifier></alternate_id>
+    <alternate_id>{% if exists(sProductId) -%}{{productId}}{% endif -%}</alternate_id>
     <comment>CaSSIS Internal Identifier</comment>
    </Alias>
   </Alias_List>
@@ -117,7 +116,7 @@
    <name>{{targetGroup.TargetName.Value}}</name>
    <type>Planet</type>
   </Target_Identification>
-  {# TODO - seems like none of these values are consistently included in the Archive group. May require coordination with isisimport 
+  {# TODO - seems like none of these values are consistently included in the Archive group. May require coordination with isisimport
   {% if exists("MainLabel.IsisCube.Archive") -%}
   <Mission_Area>
    <psa:Mission_Information>
@@ -177,8 +176,10 @@
     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
   </disp:Display_Direction>
   </disp:Display_Settings>
-  {% if exists("MainLabel.IsisCube.BandBin") -%}
   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.488e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
     <Local_Internal_Reference>
      <local_identifier_reference>Image_Array_Object</local_identifier_reference>
      <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
@@ -194,7 +195,6 @@
      </img:Filter>
     </img:Image_Product_Information>
    </img:Imaging>
-  {% endif -%}
   {% if exists("MainLabel.IsisCube.Mapping") -%}
     {% include "mappingGroup.tpl" %}
   {% endif -%}
@@ -244,7 +244,8 @@
   <File>
    <file_name>{{MainLabel.IsisCube.Archive.FileName.Value}}.img</file_name>
   </File>
-  <Array_3D_Image> {# TODO - Can this be 2D if there are no Bands ?? #}
+  {# still need to include possible 3DArray
+  <Array_3D_Image>
    <local_identifier>Array_3D_Image</local_identifier>
    <offset unit="byte">0</offset>
    <axes>3</axes>
@@ -270,13 +271,33 @@
     <sequence_number>3</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-3.40282265508890445e+38</missing_constant>
-    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
-    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
-    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
-    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+     <missing_constant>-3.40282265508890445e+38</missing_constant>
+     <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+     <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+     <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+     <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
-  </Array_3D_Image>
+  </Array_3D_Image> #}
+  <Array_2D_Image>
+    <axes>2</axes>
+    <Axis_Array>
+      <axis_name>Sample</axis_name>
+      <sequence_number>1</sequence_number>
+      <elements>2048</elements>
+    </Axis_Array>
+    <Axis_Array>
+      <axis_name>Line</axis_name>
+      <sequence_number>2</sequence_number>
+      <elements>256</elements>
+    </Axis_Array>
+    <Element_Array>
+      <data_type>IEEE754LSBSingle</data_type>
+      <idl_data_type>4</idl_data_type>
+      <order>First_Index_Fastest</order>
+      <unit>DN</unit>
+      <scaling_factor> 1.00</scaling_factor>
+      <offset> 0.00</offset>
+    </Element_Array>
+  </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
-
