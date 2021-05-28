@@ -442,6 +442,10 @@ namespace Isis {
       }
     }
 
+    for (int i = 0; i < p_label.comments(); i++){
+      blobLabel.addComment(p_label.comment(i));
+    }
+
     for (int g = 0; g < p_label.groups(); g++) {
       blobLabel += p_label.group(g);
     }
