@@ -19,8 +19,6 @@ using namespace Isis;
 using json = nlohmann::json;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
-static QString STD_APP_XML = FileName("$ISISROOT/bin/xml/isis2std.xml").expanded();
-static QString MAKECUBE_APP_XML = FileName("$ISISROOT/bin/xml/makecube.xml").expanded();
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelXmlInput) {
   QString labelFileName = "data/isisimport/pds4.xml";
