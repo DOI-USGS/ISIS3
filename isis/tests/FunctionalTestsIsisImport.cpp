@@ -12,8 +12,6 @@
 #include "PvlKeyword.h"
 
 #include "isisimport.h"
-//#include "makecube.h"
-//#include "isis2std.h"
 
 #include "gmock/gmock.h"
 
@@ -24,25 +22,21 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded()
 static QString STD_APP_XML = FileName("$ISISROOT/bin/xml/isis2std.xml").expanded();
 static QString MAKECUBE_APP_XML = FileName("$ISISROOT/bin/xml/makecube.xml").expanded();
 
-TEST(IsisImport, FunctionalTestIsisImportLabelXmlInput) {
-  QString labelFileName = "data/isisimport/temp.xml";
-  QString imageFileName = "data/isisimport/temp.img";
+TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelXmlInput) {
+  QString labelFileName = "data/isisimport/pds4.xml";
+
   std::ofstream ofxml;
   ofxml.open(labelFileName.toStdString());
   ofxml << R"(<Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions>)";
   ofxml.close();
 
-  QString templateFile = "data/isisimport/test_result.tpl";
-  QString renderedCube = "data/isisimport/test_result.cub";
+  QString templateFile = tempDir.path() + "/test_result.tpl";
+  QString renderedCube = tempDir.path() + "/test_result.cub";
+
   std::ofstream of;
   of.open(templateFile.toStdString());
   of << R"(Object = IsisCube
   Object = Core
-    StartByte   = 65537
-    Format      = Tile
-    TileSamples = 1
-    TileLines   = 1
-
     Group = Dimensions
       Samples = {{Dimensions.Samples}}
       Lines   = {{Dimensions.Lines}}
@@ -82,13 +76,153 @@ End)";
   EXPECT_EQ(cube.statistics()->Minimum(), 1);
   EXPECT_EQ(cube.statistics()->Maximum(), 1);
   EXPECT_EQ(cube.statistics()->StandardDeviation(), 0);
+}
 
-/*  QVector<QString> makeCubeArgs = {"lines=1", "samples=2", "bands=3", "to=input.cub"}; // update with args
-  UserInterface makeCubeOptions(MAKECUBE_APP_XML, makeCubeArgs);
-  makecube(makeCubeOptions);
+TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4ErrorNoImage) {
+  QString labelFileName = tempDir.path() + "/doesNotExist.xml";
+  QString templateFile = tempDir.path() + "/test_result.tpl"; 
+  QString renderedCube = tempDir.path() + "/test_result.cub"; 
 
-  QVector<QString> stdArgs = {"from=input.cub", "to=" + imageFileName};
-  UserInterface stdOption(STD_APP_XML, stdArgs);
-  isis2std(stdOption); */
+  QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
+  UserInterface options(APP_XML, args);
+  EXPECT_ANY_THROW(isisimport(options));
+}
+
+TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4RemoveStartTimeZ) {
+  QString labelFileName = "data/isisimport/pds4.xml";
+  std::ofstream ofxml;
+  ofxml.open(labelFileName.toStdString());
+  ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><StartTime>2021-01-01T00:00:00Z</StartTime></Cube>)";
+  ofxml.close();
+
+  QString templateFile = tempDir.path() + "/test_result.tpl";
+  QString renderedCube = tempDir.path() + "/test_result.cub";
+
+  std::ofstream of;
+  of.open(templateFile.toStdString());
+  of << R"(Object = IsisCube
+  Object = Core
+    Group = Dimensions
+      Samples = {{Cube.Dimensions.Samples}}
+      Lines   = {{Cube.Dimensions.Lines}}
+      Bands   = {{Cube.Dimensions.Bands}}
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+    Group = Instrument
+      StartTime = {{RemoveStartTimeZ(Cube.StartTime)}}
+    End_Group
+End_Object
+End)";
+  of.close();
+  QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
+  UserInterface options(APP_XML, args);
+
+  isisimport(options);
+
+  Cube cube;
+  cube.open(renderedCube);
+  Pvl *label = cube.label();
+  PvlGroup instrumentGroup = label->findObject("IsisCube").findGroup("Instrument");
+
+  EXPECT_EQ(instrumentGroup["StartTime"][0].toStdString(), "2021-01-01T00:00:00");
+}
+
+TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4YearDoy) {
+QString labelFileName = "data/isisimport/pds4.xml";
+  std::ofstream ofxml;
+  ofxml.open(labelFileName.toStdString());
+  ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><StartTime>2021-02-01T00:00:00Z
+</StartTime></Cube>)";
+  ofxml.close();
+
+  QString templateFile = tempDir.path() + "/test_result.tpl";
+  QString renderedCube = tempDir.path() + "/test_result.cub";
+  std::ofstream of;
+  of.open(templateFile.toStdString());
+  of << R"(Object = IsisCube
+  Object = Core
+    Group = Dimensions
+      Samples = {{Cube.Dimensions.Samples}}
+      Lines   = {{Cube.Dimensions.Lines}}
+      Bands   = {{Cube.Dimensions.Bands}}
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+    Group = Archive
+      YearDoy = {{YearDoy(Cube.StartTime)}}
+    End_Group
+End_Object
+End)";
+  of.close();
+  QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
+  UserInterface options(APP_XML, args);
+
+  isisimport(options);
+
+  Cube cube;
+  cube.open(renderedCube);
+  Pvl *label = cube.label();
+  PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+
+  EXPECT_EQ(archiveGroup["YearDoy"][0].toStdString(), "202132");
+}
+
+TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelObservationId) {
+QString labelFileName = "data/isisimport/pds4.xml";
+  std::ofstream ofxml;
+  ofxml.open(labelFileName.toStdString());
+  ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><UniqueIdentifier>2021
+</UniqueIdentifier><Target>Mars</Target></Cube>)";
+  ofxml.close();
+
+  QString templateFile = tempDir.path() + "/test_result.tpl";
+  QString renderedCube = tempDir.path() + "/test_result.cub";
+  std::ofstream of;
+  of.open(templateFile.toStdString());
+  of << R"(Object = IsisCube
+  Object = Core
+    Group = Dimensions
+      Samples = {{Cube.Dimensions.Samples}}
+      Lines   = {{Cube.Dimensions.Lines}}
+      Bands   = {{Cube.Dimensions.Bands}}
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+    Group = Archive
+      ObservationId = {{UniqueIdtoObservId(Cube.UniqueIdentifier, Cube.Target)}}
+    End_Group
+End_Object
+End)";
+  of.close();
+  QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
+  UserInterface options(APP_XML, args);
+
+  isisimport(options);
+
+  Cube cube;
+  cube.open(renderedCube);
+  Pvl *label = cube.label();
+  PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+
+  EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
 
