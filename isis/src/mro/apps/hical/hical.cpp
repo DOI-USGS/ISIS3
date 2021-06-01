@@ -341,7 +341,7 @@ namespace Isis {
       HiHistory GucHist;
       GucHist.add("Profile["+ hiprof.Name()+"]");
       if ( !SkipModule(hiprof) ) {
-        GainUnitConversion guc(hiconf, units);
+        GainUnitConversion guc(hiconf, units, hifrom);
         calVars->add(hiconf.getProfileName(), guc.ref());
         GucHist = guc.History();
         if ( hiprof.exists("DumpModuleFile") ) {
