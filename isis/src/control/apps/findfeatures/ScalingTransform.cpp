@@ -1,27 +1,10 @@
-/**                                                                       
- * @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
 
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <string>
 #include <vector>
@@ -33,25 +16,25 @@
 
 namespace Isis {
 
-ScalingTransform::ScalingTransform() : ImageTransform("ScaleTransform"), 
+ScalingTransform::ScalingTransform() : ImageTransform("ScaleTransform"),
                                        m_scale(1.0) { }
 
-ScalingTransform::ScalingTransform(const double &scale, const QString &name) : 
+ScalingTransform::ScalingTransform(const double &scale, const QString &name) :
                                    ImageTransform(name), m_scale(scale) { }
-                                                  
+
 
 /**
  * @brief Implementation of scaling transform
- *  
+ *
  * @author 2014-07-02 Kris Becker
- * 
+ *
  * @param scale   Scale to apply to source image
  * @param source  Input images to apply transform to
- * 
+ *
  * @return cv::Mat Returns the scaled image
  */
 cv::Mat ScalingTransform::render(const cv::Mat &image) const {
-  cv::Size dstSize(static_cast<int>(image.cols * m_scale + 0.5), 
+  cv::Size dstSize(static_cast<int>(image.cols * m_scale + 0.5),
                    static_cast<int>(image.rows * m_scale + 0.5));
   cv::Mat scaled;
   cv::resize(image, scaled, dstSize, cv::INTER_AREA);

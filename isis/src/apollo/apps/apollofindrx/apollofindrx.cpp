@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "PvlGroup.h"
 #include "UserInterface.h"
 #include "Cube.h"
@@ -161,15 +169,14 @@ namespace Isis {
         }
 
         if (cube->label()->hasObject("History")) {
-            PvlObject histObj = cube->label()->findObject("History");
             // Record apollofindrx history to the cube
+            QString histName = (QString)cube->label()->findObject("History")["Name"];
             // create a History Blob with value found in the History PvlObject's Name keyword
-            Isis::History histBlob( (QString)histObj["Name"] );
             // read cube's History PvlObject data into the History Blob
-            cube->read(histBlob);
+            History hist = cube->readHistory(histName);
             // add apollofindrx History PvlObject into the History Blob and write to cube
-            histBlob.AddEntry();
-            cube->write(histBlob);
+            hist.AddEntry();
+            cube->write(hist);
             cube->close();
         }
     }
@@ -192,7 +199,7 @@ namespace Isis {
                 fitChip.SetValue(s, l, fit);
             }
         }
-        
+
         if (bestFit == Isis::Null || bestFit > tolerance) return false;
 
         GoodnessOfFit = bestFit;

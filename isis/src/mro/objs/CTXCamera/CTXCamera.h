@@ -1,25 +1,13 @@
 #ifndef CTXCamera_h
 #define CTXCamera_h
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "LineScanCamera.h"
 
@@ -28,7 +16,7 @@ namespace Isis {
    * @brief MRO CTX Camera Model
    *
    * This is the camera model for the Mars Reconnaissance Orbiter Context Camera
-   * (CTX). 
+   * (CTX).
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsReconnaissanceOrbiter
@@ -55,19 +43,19 @@ namespace Isis {
    *                           methods. Updated documentation. Removed Mro namespace wrap
    *                           inside Isis namespace. Added Isis Disclaimer to files. Added
    *                           NAIF error check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2012-12-27 Tracie Sucharski, Fixed bug for images with a SpatialSumming=2.
-   *                           The images were compressed in the y-direction.  There was a line of 
-   *                           code commented out, "lineRate *= csum;".  From the 
-   *                           MRO_ctx_pds_sis.pdf, "Note that CTX implements downtrack summing by 
-   *                           increasing the line time; for example, a 2X2 summed image has an 
-   *                           actual line time twice that given by this field.".  Uncommenting 
+   *                           The images were compressed in the y-direction.  There was a line of
+   *                           code commented out, "lineRate *= csum;".  From the
+   *                           MRO_ctx_pds_sis.pdf, "Note that CTX implements downtrack summing by
+   *                           increasing the line time; for example, a 2X2 summed image has an
+   *                           actual line time twice that given by this field.".  Uncommenting
    *                           the line fixed the y-direction scale problem.  Fixes #826.
    *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
    */
@@ -80,23 +68,23 @@ namespace Isis {
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-74000); }
 
-      /** 
+      /**
        *  CK Reference ID - MRO_MME_OF_DATE
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (-74900); }
 
-      /** 
+      /**
        * SPK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */

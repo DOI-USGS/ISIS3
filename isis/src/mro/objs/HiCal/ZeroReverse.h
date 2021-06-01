@@ -1,28 +1,14 @@
 #ifndef ZeroReverse_h
 #define ZeroReverse_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.3 $
- * $Date: 2008/11/18 07:29:12 $
- * $Id: ZeroReverse.h,v 1.3 2008/11/18 07:29:12 kbecker Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+                                                                      
 #include <cmath>
 #include <string>
 #include <vector>
@@ -44,45 +30,45 @@ namespace Isis {
 
   /**
    * @brief Processes Reverse Clock calibration data (ZeroReverse Module)
-   * 
+   *
    * This class loads and processes the Reverse Clock data from a  HiRISE image
-   * for offset correction purposes.   Additional processing may occur in 
-   * subsequent modules. 
-   *  
+   * for offset correction purposes.   Additional processing may occur in
+   * subsequent modules.
+   *
    * @ingroup Utility
-   * 
-   * @author 2008-06-13 Kris Becker 
-   * @internal 
+   *
+   * @author 2008-06-13 Kris Becker
+   * @internal
    *   @history 2010-04-16 Kris Becker Renamed from Zf to ZeroReverse
    *   @history 2010-10-28 Kris Becker Renamed parameters replacing "Zz" with
    *            "ZeroReverse".
    */
   class ZeroReverse : public Module {
 
-    public: 
+    public:
       //  Constructors and Destructor
       ZeroReverse() : Module("ZeroReverse") { }
-      ZeroReverse(HiCalData &cal, const HiCalConf &conf) : 
-                  Module("ZeroReverse") { 
+      ZeroReverse(HiCalData &cal, const HiCalConf &conf) :
+                  Module("ZeroReverse") {
         init(cal, conf);
       }
 
       /** Destructor */
       virtual ~ZeroReverse() { }
 
-      /** 
+      /**
        * @brief Return statistics for raw Reverse Clock buffer
-       * 
+       *
        * @return const Statistics&  Statistics class with all stats
        */
       const Statistics &Stats() const { return (_stats); }
 
       /**
        * @brief Specifies if the input trigger conditions were met
-       *  
-       * If trigger conditions where met, the reverse clock correction becomes a 
-       * constant as opposed to processed reverse clock pixels. 
-       * 
+       *
+       * If trigger conditions where met, the reverse clock correction becomes a
+       * constant as opposed to processed reverse clock pixels.
+       *
        * @return bool True if triggered, false otherwise
        */
       bool wasTriggered() const { return (_triggered); }
@@ -94,12 +80,12 @@ namespace Isis {
 
 
       /**
-       * @brief Initialize and compute data solution 
-       *  
-       * 
+       * @brief Initialize and compute data solution
+       *
+       *
        * @author Kris Becker - 4/16/2010
-       * 
-       * @param cal  HiRISE calibration data provided 
+       *
+       * @param cal  HiRISE calibration data provided
        * @param conf Configuration data provider
        */
       void init(HiCalData &cal, const HiCalConf &conf) {
@@ -117,14 +103,14 @@ namespace Isis {
 
         _revClock = averageLines(revclk);
        _history.add("RevClock(CropLines["+ToString(line0)+","+ToString(lineN) +
-                    "],Mean["+ToString(_stats.Average()) + 
+                    "],Mean["+ToString(_stats.Average()) +
                      "],StdDev["+ToString(_stats.StandardDeviation()) +
                      "],LisPixels["+ToString(_stats.LisPixels())+
                      "],HisPixels["+ToString(_stats.HisPixels()) +
                      "],NulPixels["+ToString(_stats.NullPixels())+ "])");
 
        DbAccess triggers(Pvl(tfile).findObject("ReverseClockStatistics"));
-       QString tprofName = conf.resolve("{FILTER}{CCD}_{CHANNEL}_{BIN}",prof); 
+       QString tprofName = conf.resolve("{FILTER}{CCD}_{CHANNEL}_{BIN}",prof);
        _history.add("ReverseClockStatistics(File["+tfile+
                     "],Profile["+tprofName+"])");
 
@@ -144,12 +130,12 @@ namespace Isis {
                       "],RevNulTolerance["+ToString(nulTol)+ "])");
 
          if ((_stats.LisPixels() > lisTol) || (_stats.HisPixels() > hisTol) ||
-             (_stats.NullPixels() > nulTol) || 
-             (_stats.StandardDeviation() > revstddev)) { 
+             (_stats.NullPixels() > nulTol) ||
+             (_stats.StandardDeviation() > revstddev)) {
            _triggered = true;
            _data = HiVector(_revClock.dim1(), revmean);
            _history.add("Trigger(True - Reverse Clock set to constant,"
-                        "ReverseClock["+ToString(revmean)+"])"); 
+                        "ReverseClock["+ToString(revmean)+"])");
          }
          else {
            _history.add("Trigger(False - Reverse Clock processing invoked)");
@@ -188,4 +174,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

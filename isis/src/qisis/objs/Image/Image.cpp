@@ -104,7 +104,7 @@ namespace Isis {
 
   /**
    * @brief Create an image from a cube file on disk including the footprint
-   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub 
+   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub
    * @param footprint The calculated footprint
    * @param parent The Qt-relationship parent
    */
@@ -253,12 +253,12 @@ namespace Isis {
   bool Image::isFootprintable() const {
     bool result = false;
 
-    if (m_footprint)
+    if (m_footprint) {
       result = true;
+    }
 
     if (!result && m_cube) {
-      // TODO: Move this to Blob!
-      ImagePolygon example;
+      Blob example = ImagePolygon().toBlob();
 
       QString blobType = example.Type();
       QString blobName = example.Name();
@@ -361,7 +361,7 @@ namespace Isis {
   QString Image::serialNumber() {
     if (m_serialNumber.isEmpty()) {
       m_serialNumber = SerialNumber::Compose(*(cube()));
-    } 
+    }
     return m_serialNumber;
   }
 
@@ -542,8 +542,8 @@ namespace Isis {
 
       if (m_fileName != newExternalLabelFileName.toString()) {
         // This cube copy creates a filename w/ecub extension in the new project root, but looks to
-        // be a cube(internal vs external). It changes the DnFile pointer to the old ecub, 
-        // /tmp/tsucharski_ipce/tmpProject/images/import1/AS15-.ecub, but doing a less on file 
+        // be a cube(internal vs external). It changes the DnFile pointer to the old ecub,
+        // /tmp/tsucharski_ipce/tmpProject/images/import1/AS15-.ecub, but doing a less on file
         // immediately after the following call indicates it is a binary file.
         QScopedPointer<Cube> newExternalLabel(
             origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
@@ -566,10 +566,10 @@ namespace Isis {
             if (origImage.externalCubeFileName().toString().contains(project->projectRoot())) {
               QString newExternalCubeFileName = origImage.externalCubeFileName().toString();
               newExternalCubeFileName.replace(project->projectRoot(), project->newProjectRoot());
-              newExternalLabel->relocateDnData(newExternalCubeFileName); 
+              newExternalLabel->relocateDnData(newExternalCubeFileName);
             }
             else {
-              newExternalLabel->relocateDnData(origImage.externalCubeFileName()); 
+              newExternalLabel->relocateDnData(origImage.externalCubeFileName());
             }
           }
         }
@@ -815,8 +815,7 @@ namespace Isis {
    * @see Isis::ImagePolygon
    */
   void Image::initQuickFootprint() {
-    ImagePolygon poly;
-    cube()->read(poly);
+    ImagePolygon poly = cube()->readFootprint();
     m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
   }
 

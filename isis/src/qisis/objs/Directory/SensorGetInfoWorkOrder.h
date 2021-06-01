@@ -36,7 +36,7 @@ namespace Isis {
    *
    * @internal
    *   @author 2016-06-06 Tyler Wilson - Added documentation for the functions and
-   *              brought the code into compliance with ISIS3 coding standards.
+   *              brought the code into compliance with ISIS coding standards.
    *              References #3944.
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction

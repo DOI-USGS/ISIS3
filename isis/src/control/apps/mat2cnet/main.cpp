@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <map>
@@ -39,23 +47,23 @@ void IsisMain() {
   // Prepare the ISIS2 list of file names
   FileList list2(ui.GetFileName("LIST2"));
 
-  // Prepare the ISIS3 SNs, pass the progress object to SerialNumberList
+  // Prepare the ISIS SNs, pass the progress object to SerialNumberList
   SerialNumberList snl(ui.GetFileName("LIST3"), true, &progress);
   progress.CheckStatus();
 
   if (list2.size() != snl.size()) {
     QString msg = "Invalid input file number of lines. The ISIS2 file list [";
     msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
-    msg += "as the ISIS3 file list [" + ui.GetAsString("LIST3") + "]";
+    msg += "as the ISIS file list [" + ui.GetAsString("LIST3") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  progress.SetText("Mapping ISIS2 fsc numbers to ISIS3 serial numbers.");
+  progress.SetText("Mapping ISIS2 fsc numbers to ISIS serial numbers.");
   progress.SetMaximumSteps(list2.size());
-  // Setup a map between ISIS2 image number (fsc) and ISIS3 sn
+  // Setup a map between ISIS2 image number (fsc) and ISIS sn
   // **NOTE:
-  //   The order of the ISIS2 and ISIS3 lists MUST correspond so that we can map
-  //   each ISIS2 FSC to the proper ISIS3 Serial Number.
+  //   The order of the ISIS2 and ISIS lists MUST correspond so that we can map
+  //   each ISIS2 FSC to the proper ISIS Serial Number.
   //   Otherwise, we would be required to write a separate routine for each
   //   mission to determine the corresponding serial number for a given FSC.
   //   Jeannie Backer 2011-06-30

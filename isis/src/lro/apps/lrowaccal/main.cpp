@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <vector>
@@ -126,7 +134,7 @@ void IsisMain () {
   Isis::PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
   QString filterNum = (QString) bandBin["FilterNumber"][0];
-  //We have to pay special attention incase we are passed a 
+  //We have to pay special attention incase we are passed a
   //single band image that has been "exploded" from a multiband wac
   if (instModeId == "COLOR" && g_bands.size() == 1)
    g_bands[0] = (toInt(filterNum) -2);
@@ -197,43 +205,53 @@ void IsisMain () {
     if (g_iof) {
       responsivity = radPvl["IOF"];
 
-      for (int i = 0; i < bands.size(); i++)
+      for (int i = 0; i < bands.size(); i++) {
         g_iofResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
+      }
 
       try {
+        Camera *cam;
+        cam = icube->camera();
         iTime startTime((QString) inst["StartTime"]);
-        double etStart = startTime.Et();
-        // Get the distance between the Moon and the Sun at the given time in
-        // Astronomical Units (AU)
-        QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-        QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
-        NaifStatus::CheckErrors();
-        furnsh_c(bspKernel1.toLatin1().data());
-        NaifStatus::CheckErrors();
-        furnsh_c(bspKernel2.toLatin1().data());
-        NaifStatus::CheckErrors();
-        QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-        QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
-        QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
-        NaifStatus::CheckErrors();
-        furnsh_c(pckKernel1.toLatin1().data());
-        NaifStatus::CheckErrors();
-        furnsh_c(pckKernel2.toLatin1().data());
-        NaifStatus::CheckErrors();
-        furnsh_c(pckKernel3.toLatin1().data());
-        NaifStatus::CheckErrors();
-        double sunpos[6], lt;
-        spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
-        g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
-        unload_c(bspKernel1.toLatin1().data());
-        unload_c(bspKernel2.toLatin1().data());
-        unload_c(pckKernel1.toLatin1().data());
-        unload_c(pckKernel2.toLatin1().data());
-        unload_c(pckKernel3.toLatin1().data());
+        cam->setTime(startTime);
+        g_solarDistance = cam->sunToBodyDist() / KM_PER_AU;
       }
-      catch (IException &e) {
-        QString msg = "Can not find necessary SPICE kernels for converting to IOF";
-        throw IException(e, IException::User, msg, _FILEINFO_);
+      catch(IException &e) {
+        try {
+          iTime startTime((QString) inst["StartTime"]);
+          double etStart = startTime.Et();
+          // Get the distance between the Moon and the Sun at the given time in
+          // Astronomical Units (AU)
+          QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+          QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
+          NaifStatus::CheckErrors();
+          furnsh_c(bspKernel1.toLatin1().data());
+          NaifStatus::CheckErrors();
+          furnsh_c(bspKernel2.toLatin1().data());
+          NaifStatus::CheckErrors();
+          QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+          QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
+          QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
+          NaifStatus::CheckErrors();
+          furnsh_c(pckKernel1.toLatin1().data());
+          NaifStatus::CheckErrors();
+          furnsh_c(pckKernel2.toLatin1().data());
+          NaifStatus::CheckErrors();
+          furnsh_c(pckKernel3.toLatin1().data());
+          NaifStatus::CheckErrors();
+          double sunpos[6], lt;
+          spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
+          g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
+          unload_c(bspKernel1.toLatin1().data());
+          unload_c(bspKernel2.toLatin1().data());
+          unload_c(pckKernel1.toLatin1().data());
+          unload_c(pckKernel2.toLatin1().data());
+          unload_c(pckKernel3.toLatin1().data());
+        }
+        catch (IException &e) {
+          QString msg = "Can not find necessary SPICE kernels for converting to IOF";
+          throw IException(e, IException::User, msg, _FILEINFO_);
+        }
       }
     }
     else {
@@ -259,7 +277,7 @@ void IsisMain () {
   PvlKeyword temperaturePvl("TemperatureFile");
   if (g_temprature) {
     if (tempFile.toLower() == "default" || tempFile.length() == 0)
-      tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl"; 
+      tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl";
 
     FileName tempFileName(tempFile);
     if (tempFileName.isVersioned())
@@ -518,15 +536,15 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
               //
               // Where:
               //  'a' and 'b' are band dependant constants read in via a pvl file
-              //  
+              //
               //  AND
-              //  
+              //
               // frameTemp: (Pre-Calculated as it is used in multiple places)
               //
               //    (WAC end temp - WAC start temp)
               //    -------------------------------   *   frame   +   WAC start temp
               //         (WAC num framelets)
-              // 
+              //
               //
               //
               if (correctBand != -1)
@@ -771,7 +789,7 @@ void GetMask(QString &fileString, double temp, Buffer* &data) {
  * LRO calibration directory
  *
  * @param calibrationType The type of calibration data
- * 
+ *
  * @return @b QString Path of the calibration directory
  *
  * @internal

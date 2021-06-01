@@ -7,8 +7,8 @@
     </brief>
 
     <description>
-        This program takes an image from the Lunar Reconnaissance Orbiter Narrow Angle Camera
-        and produces an Isis cube containing the image data.
+        This program takes a raw EDR image from the Lunar Reconnaissance Orbiter Narrow Angle Camera
+        and produces an Isis cube containing the image data. LRO NAC images in the CDR or RDR format should be ingested using pds2isis.
     </description>
 
     <history>

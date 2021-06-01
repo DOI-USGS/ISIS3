@@ -1,26 +1,13 @@
 #ifndef FindTool_h
 #define FindTool_h
-/**
- * @file
- * $Revision: 1.13 $
- * $Date: 2010/06/28 09:06:59 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 // The only includes allowed in this file are parents of classes defined here.
 #include <QWidget>
@@ -119,7 +106,7 @@ namespace Isis {
    *                          to work in more cases. Fixes #953.
    *  @history 2014-05-19 Ian Humphrey - Fixed CTRL+F shortcut and menu option to open Find Tool's
    *                          Find Latitude/Longitude Coordinate dialog window. Added help text
-   *                          to Find Tool menu option. Minor coding standards fixes. 
+   *                          to Find Tool menu option. Minor coding standards fixes.
    *                          Fixes #2087.
    *  @history 2016-03-23 Makayla Shepherd - Added a check on the latitude
    *                          entered that caused an error message to pop up
@@ -133,7 +120,7 @@ namespace Isis {
       ~FindTool();
       void addTo(QMenu *menu);
       void paintViewport(MdiCubeViewport *vp, QPainter *painter);
-      
+
       /**
        * This method returns the menu name associated with this tool.
        *

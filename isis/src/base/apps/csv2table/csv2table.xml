@@ -6,10 +6,19 @@
   </brief>
 
   <description>
-    This application converts a CSV file to a table and attaches it to a cube
+    <p>
+    This application converts a CSV file to a table and attaches it to a cube.
     The first row of the CSV will be used as the fieldnames for the table.
     The contents of the CSV file will be converted to floating point numbers
     before they are inserted into the table.
+    </p>
+    <p>
+    A single table field with multiple values will be created for consecutive CSV columns
+    with the same column name followed by an index inside parentheses.
+    The index must start at zero and increase from left to right.
+    For example a CSV header line like: "A, B(0), B(1), B(2), C", will create three
+    table fields, A with size=1, B with size=3, and C with size=1.
+    </p>
   </description>
 
   <category>
@@ -25,6 +34,10 @@
   <history>
     <change name="Jesse Mapel" date="2018-09-04">
       Original version
+    </change>
+    <change name="Stuart Sides" date="2021-03-20">
+      Added ability to convert CSV files with indicies into table field arrays
+      instead of individual table fields.
     </change>
   </history>
 

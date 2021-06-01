@@ -1,27 +1,14 @@
 #ifndef HiCalTypes_h
 #define HiCalTypes_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2008/01/13 08:12:58 $
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+                                                                       
 #include <string>
 #include <vector>
 #include <iostream>
@@ -46,7 +33,7 @@ class HiHistory {
      * @brief Output operator for history events
      * @param o Output stream
      * @param h History class to write contents of
-     * 
+     *
      * @return std::ostream& Returns new state of stream
      */
     friend std::ostream &operator<<(std::ostream &o, const HiHistory &h) {
@@ -66,8 +53,8 @@ class HiHistory {
 
     inline int size() const { return (_events.size()); }
     void add(const QString &event) { _events.push_back(event); }
-    QString get(unsigned int index = 0) const { 
-      if (index < _events.size()) { 
+    QString get(unsigned int index = 0) const {
+      if (index < _events.size()) {
         return (_events[index]);
       }
       else {
@@ -82,7 +69,7 @@ class HiHistory {
       for (unsigned int i = 0 ; i < _events.size() ; i++) {
         key.addValue(_events[i]);
       }
-      return (key); 
+      return (key);
     }
 
   private:

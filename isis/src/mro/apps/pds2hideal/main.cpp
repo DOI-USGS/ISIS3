@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QString>
@@ -37,7 +45,7 @@ void IsisMain() {
 
   Cube *outputCube = p.SetOutputCube("TO");
   Pvl otherGroups;
-  // translate the band bin and archive groups to this pvl  
+  // translate the band bin and archive groups to this pvl
   p.TranslatePdsLabels(otherGroups);
 
   p.ImportTable("INSTRUMENT_POINTING_TABLE");
@@ -65,10 +73,10 @@ void IsisMain() {
 
 
   Pvl *isisLabel = outputCube->label();
-  PvlToPvlTranslationManager labelXlater(pdsLabelPvl, 
+  PvlToPvlTranslationManager labelXlater(pdsLabelPvl,
                                  "$ISISROOT/appdata/translations/MroHiriseIdealPdsImportLabel.trn");
   labelXlater.Auto(*isisLabel);
-  
+
   PvlObject &naifKeywords = isisLabel->findObject("NaifKeywords");
   PvlKeyword bodyRadii("BODY499_RADII");
   bodyRadii.addValue(QString(pdsLabelPvl["A_AXIS_RADIUS"]));
@@ -82,7 +90,7 @@ void IsisMain() {
             Application::GetUserInterface().ProgramName();
   PvlGroup &archiveGroup = isisCubeObject.findGroup("Archive");
   archiveGroup += PvlKeyword("SOFTWARE_NAME", sfname);
-  
+
   PvlObject &pdsImageObj = pdsLabelPvl.findObject("IMAGE");
   double samples = double(pdsImageObj["LINE_SAMPLES"]);
   double lines = double(pdsImageObj["LINES"]);
@@ -189,4 +197,3 @@ void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
      }
    }
 }
-

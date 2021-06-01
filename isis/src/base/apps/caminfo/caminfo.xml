@@ -3,12 +3,12 @@
 <application name="caminfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Outputs a PVL file that contains camera information. 
+    Outputs a PVL file that contains camera information.
   </brief>
 
   <description>
   <p>
-    This program compiles and outputs various spacecraft and instrument-related information such as 
+    This program compiles and outputs various spacecraft and instrument-related information such as
     geometric, polygon, and mapping information.
   </p>
   <p>
@@ -20,22 +20,22 @@
     running the spiceinit program from within caminfo.
   </p>
   <p>
-    Some information in the output PVL file will consist of a compilation of information for all the 
-    bands in the cube and will be listed in the "Common" object of the PVL. Other information for a given 
+    Some information in the output PVL file will consist of a compilation of information for all the
+    bands in the cube and will be listed in the "Common" object of the PVL. Other information for a given
     band will be placed in the "BandSet" object of the PVL. The user can select the check boxes to control
-    the information that will be output to the PVL file. If the POLYGON or USELABEL option is chosen, 
+    the information that will be output to the PVL file. If the POLYGON or USELABEL option is chosen,
     the image polygon is output in Well-Known Text format (WKT).
   </p>
-  <p>  
+  <p>
     The output file can be in PVL or CSV (Comma Separated Value) format. The "APPEND" option allows
-    the new generated information to be appended to the output file. This is especially useful for 
-    CSV file format. If the CSV format is chosen, only Camstats, Statistics and Geometry options 
-    are allowed. Isis Label, Original Label and Polygon options are disabled for CSV format. 
+    the new generated information to be appended to the output file. This is especially useful for
+    CSV file format. If the CSV format is chosen, only Camstats, Statistics and Geometry options
+    are allowed. Isis Label, Original Label and Polygon options are disabled for CSV format.
   </p>
-  <p> 
+  <p>
     The following is an example of caminfo output generated when in PVL format:
   </p>
-<pre> 
+<pre>
 Object = Caminfo
   Object = Parameters
     Program     = caminfo
@@ -204,14 +204,14 @@ End
 
   <p>
     Output values that do not have a minimum/maximum range associated with them
-    are calculated at the center of the image.  
+    are calculated at the center of the image.
   </p>
   <p>
     Definitions for most of the values output in the PVL file can be found in
-    the ISIS 3 documentation glossary including: <def><b>SubSpacecraftLatitude</b></def>,
+    the ISIS documentation glossary including: <def><b>SubSpacecraftLatitude</b></def>,
     <def><b>SubSpacecraftLongitude</b></def>, <def><b>SubSolarLatitude</b></def>,
-    <def><b>SubSolarLongitude</b></def>, <def><b>NorthAzimuth</b></def>, 
-    <def><b>SpacecraftAzimuth</b></def>, <def><b>SubSolarAzimuth</b></def>, 
+    <def><b>SubSolarLongitude</b></def>, <def><b>NorthAzimuth</b></def>,
+    <def><b>SpacecraftAzimuth</b></def>, <def><b>SubSolarAzimuth</b></def>,
     <def><b>ObliqueLineResolution</b></def>, <def><b>ObliqueSampleResolution</b></def>,
     <def><b>ObliquePixelResolution</b></def>, and <def><b>ObliqueDetectorResolution</b></def>
   </p>
@@ -228,85 +228,85 @@ End
       Fixed WKT calls
     </change>
     <change name="Tracie Sucharski" date="2007-11-09">
-      Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now 
-      has a method to return a WKT string, so the ToWKT method has been 
+      Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now
+      has a method to return a WKT string, so the ToWKT method has been
       removed from the PolygonTools class.
     </change>
-    <change name="Kris Becker" date="2007-12-07"> 
-      Made the following modifications:  fixed typo in PercentNull and 
-      MaximumLongitude keywords; use the base file name for generation of 
-      temporary files to further ensure uniqueness; run camstats once if 
-      there is only one band - doubles execution speed for single band 
-      images when CAMSTATS option is used; substitute the NULL string for 
-      all special pixel values; added corner pixel keywords for PDS 
-      compatibility; added phase, emission, incidence angles 
-      and line and sample pixel resolution at the center pixel; added test 
-      for intersection of longitude domain, north and south poles and 
-      keywords that report them; added option to output ISIS cube labels; 
+    <change name="Kris Becker" date="2007-12-07">
+      Made the following modifications:  fixed typo in PercentNull and
+      MaximumLongitude keywords; use the base file name for generation of
+      temporary files to further ensure uniqueness; run camstats once if
+      there is only one band - doubles execution speed for single band
+      images when CAMSTATS option is used; substitute the NULL string for
+      all special pixel values; added corner pixel keywords for PDS
+      compatibility; added phase, emission, incidence angles
+      and line and sample pixel resolution at the center pixel; added test
+      for intersection of longitude domain, north and south poles and
+      keywords that report them; added option to output ISIS cube labels;
       corrected computations for parallax and shadow keywords.
      </change>
-     <change name="Kris Becker" date="2007-12-19"> 
-       Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.  
+     <change name="Kris Becker" date="2007-12-19">
+       Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.
        Makes more sense.
      </change>
-     <change name="Kris Becker" date="2008-02-27"> 
-       Corrected method call to compute polygon with proper parameters as 
-       well as correct band number.  Added code to better honor specific 
-       cube attributes (such as band numbers) in computations.  Also will 
-       produce NULL valued keywords where NULLs are a produced instead of 
+     <change name="Kris Becker" date="2008-02-27">
+       Corrected method call to compute polygon with proper parameters as
+       well as correct band number.  Added code to better honor specific
+       cube attributes (such as band numbers) in computations.  Also will
+       produce NULL valued keywords where NULLs are a produced instead of
        the real value for the ISIS NULL pixel value.
      </change>
      <change name="Steven Lambright" date="2008-05-12">
-       Removed references to CubeInfo 
+       Removed references to CubeInfo
      </change>
      <change name="Bob Sucharski" date="2008-07-31">
-       Added Camera Test option  to test for a valid camera at center of image 
+       Added Camera Test option  to test for a valid camera at center of image
        and return an error and end if a valid camera cannot be created.
      </change>
-     <change name="Kris Becker" date="2008-09-22"> 
-       Reworked the output PVL format;  added more keywords to the Common object 
+     <change name="Kris Becker" date="2008-09-22">
+       Reworked the output PVL format;  added more keywords to the Common object
        that indicate versions and dates;  added more values to Geometry and
        Polygon object.
      </change>
-     <change name="Kris Becker" date="2008-10-22"> 
-       Corrected generation of polygon for multi-band data.  It created a 
+     <change name="Kris Becker" date="2008-10-22">
+       Corrected generation of polygon for multi-band data.  It created a
        POLYGON union instead of the required MULTIPOLYGON.
      </change>
-     <change name="Kris Becker" date="2008-10-30"> 
-       The target center distance and subspacecraft latitude were not properly 
-       propagated to the output PVL file and consequently were invalid.  This 
+     <change name="Kris Becker" date="2008-10-30">
+       The target center distance and subspacecraft latitude were not properly
+       propagated to the output PVL file and consequently were invalid.  This
        has been corrected.
      </change>
-     <change name="Kris Becker" date="2008-12-29"> 
+     <change name="Kris Becker" date="2008-12-29">
        Added RightAscension, Declination, SubSolarGroundAzimuth, and
-       SubSpacecraftGroundAzimuth computations; added center line/sample image 
-       coordinate used to compute center geometry; added check of valid image 
-       line/sample coordinates when testing for north/south poles (some camera 
-       models return valid states when coordinates are outside of image 
+       SubSpacecraftGroundAzimuth computations; added center line/sample image
+       coordinate used to compute center geometry; added check of valid image
+       line/sample coordinates when testing for north/south poles (some camera
+       models return valid states when coordinates are outside of image
        boundaries).
      </change>
-     <change name="Kris Becker" date="2009-02-26"> 
-       Modified to actually exclude the unconditional computation of the image 
-       polygon to assist in some geometry values.  It is no longer computed if 
-       the user does not select the POLYGON option.  The implications of this 
-       are that some of the keywords in the output Geometry group are no 
-       longer ever relevant.  These keywords were all moved to the Polygon 
-       group.  These keywords are:   CentroidLine, CentroidSample, 
-       CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.  
-       User will no longer see these values if the POLYGON option is not 
-       selected.  Also the Radius keyword in the Polygon group has been 
+     <change name="Kris Becker" date="2009-02-26">
+       Modified to actually exclude the unconditional computation of the image
+       polygon to assist in some geometry values.  It is no longer computed if
+       the user does not select the POLYGON option.  The implications of this
+       are that some of the keywords in the output Geometry group are no
+       longer ever relevant.  These keywords were all moved to the Polygon
+       group.  These keywords are:   CentroidLine, CentroidSample,
+       CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.
+       User will no longer see these values if the POLYGON option is not
+       selected.  Also the Radius keyword in the Polygon group has been
        removed as it is redundant with CentroidRadius.
      </change>
-     <change name="Kris Becker" date="2009-05-29"> 
-       Added PIXINC parameter to allow user to specify number of pixels to 
+     <change name="Kris Becker" date="2009-05-29">
+       Added PIXINC parameter to allow user to specify number of pixels to
        skip around the perimeter of the image to compute the polygon.
      </change>
-     <change name="Kris Becker" date="2009-05-29"> 
-       Fixed bug where image was a 0 longitude boundary crosser.  It would 
-       typically fail when determining centroid information unless converted 
-       to 180 domain.  This will also be used at the poles as it seems to work 
-       better in the 180 domain as well.  (This process projects the footprint 
-       to a Sinusoidal projection to determine area which requires an equal 
+     <change name="Kris Becker" date="2009-05-29">
+       Fixed bug where image was a 0 longitude boundary crosser.  It would
+       typically fail when determining centroid information unless converted
+       to 180 domain.  This will also be used at the poles as it seems to work
+       better in the 180 domain as well.  (This process projects the footprint
+       to a Sinusoidal projection to determine area which requires an equal
        area projection, such as Sinusoidal.)
      </change>
      <change name="Kris Becker" date="2009-07-08">
@@ -314,21 +314,21 @@ End
        control limb and terminator polygon generation.
      </change>
      <change name="Kris Becker" date="2009-08-24">
-       Allow disabling of shape model use when constructing polygons that 
+       Allow disabling of shape model use when constructing polygons that
        contain limbs.
      </change>
      <change name="Mackenzie Boyd" date="2010-06-14">
-       Removed polygon options group and placed the options within output 
-       options. Added inclusion for parameters related to polygons to only be 
-       available when polygons are selected. Made TO option not have a 
-       default of None, updated documentation and modified formatting. 
+       Removed polygon options group and placed the options within output
+       options. Added inclusion for parameters related to polygons to only be
+       available when polygons are selected. Made TO option not have a
+       default of None, updated documentation and modified formatting.
      </change>
      <change name="Jai Rideout" date="2011-02-17">
        Replaced PIXINC with POLYSINC and POLYLINC. Renamed SINC and LINC to
        STATSSINC and STATSLINC.
      </change>
      <change name="Sharmila Prasad" date="2011-02-24">
-       Added option for the output file to be in CSV format and also ability 
+       Added option for the output file to be in CSV format and also ability
        to append to the existing output file.
      </change>
      <change name="Jai Rideout" date="2011-03-01">
@@ -360,7 +360,7 @@ End
     </change>
     <change name="Kris Becker" date="2012-11-23">
         The computation of ParallaxX/ParallaxY and ShadowX/ShadowY values was
-        not properly implemented. Updated documentation with a new example. 
+        not properly implemented. Updated documentation with a new example.
         Fixes #1296.
     </change>
     <change name="Janet Barrett" date="2013-01-29">
@@ -414,7 +414,7 @@ End
         </filter>
       </parameter>
       </group>
-    
+
     <group name="General Output Options">
       <parameter name="FORMAT">
         <type>string</type>
@@ -434,7 +434,7 @@ End
             <brief> Create CSV output </brief>
             <description>
               Caminfo data to be generated in Comma Separated Value (CSV) format
-            </description> 
+            </description>
              <exclusions>
                <item>ISISLABEL</item>
                <item>ORIGINALLABEL</item>
@@ -444,27 +444,27 @@ End
            </option>
          </list>
       </parameter>
-      
+
       <parameter name="APPEND">
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>Append caminfo information to existing data file</brief>
-        <description> Append caminfo information to existing file. This will append the 
-          caminfo data to the filename specified for the TO parameter beginning at a 
-          new line. 
+        <description> Append caminfo information to existing file. This will append the
+          caminfo data to the filename specified for the TO parameter beginning at a
+          new line.
          </description>
       </parameter>
-      
+
       <parameter name="GEOMETRY">
         <type>boolean</type>
         <brief>
           Include geometry information
         </brief>
         <description>
-          Get geometry information from the camera at the center of the image.  
-          These data are listed under the Geometry Object heading.  The keyword/values 
+          Get geometry information from the camera at the center of the image.
+          These data are listed under the Geometry Object heading.  The keyword/values
           contained therein are listed here:
-          
+
           <UL>
             <LI>BandsUsed</LI>
             <LI>ReferenceBand</LI>
@@ -528,7 +528,7 @@ End
       <parameter name="ISISLABEL">
         <type>boolean</type>
         <brief>
-          Include ISIS label 
+          Include ISIS label
         </brief>
         <description>
           This option will extract the ISIS label and write it to the output PVL
@@ -540,7 +540,7 @@ End
       <parameter name="ORIGINALLABEL">
         <type>boolean</type>
         <brief>
-          Include the original label 
+          Include the original label
         </brief>
         <description>
           Include the original labels of the cube in the PVL.
@@ -555,7 +555,7 @@ End
         </brief>
         <description>
           Include DN statistics for all bands within the cube.  These data are
-          contained in the Statistics object.  The keyword/values contained 
+          contained in the Statistics object.  The keyword/values contained
           therein are:
           <UL>
             <LI>MeanValue</LI>
@@ -579,7 +579,7 @@ End
           Get camera statistics information
         </brief>
         <description>
-          Run camstats to get camera information that can be expressed as a range.  
+          Run camstats to get camera information that can be expressed as a range.
           Camstats will run on the entire cube (common object), and for each band (bandset object).
           The default linc and sinc for camstats is "1". The user can select a different linc and sinc.
           Output values are:
@@ -633,7 +633,7 @@ End
         <minimum inclusive="true">1</minimum>
       </parameter>
     </group>
-      
+
     <group name="Polygon Output  Options">
       <parameter name="USELABEL">
         <type>boolean</type>
@@ -660,12 +660,12 @@ End
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>
-          Create polygon information 
+          Create polygon information
         </brief>
         <description>
-          Use the imagePolygon class to gather polygon information.  The output 
-          polygon will be in well-known text format (WKT).  These data are 
-          contained within the Polygon object.   The keyword/values contained 
+          Use the imagePolygon class to gather polygon information.  The output
+          polygon will be in well-known text format (WKT).  These data are
+          contained within the Polygon object.   The keyword/values contained
           therein are:
             <UL>
               <LI>CentroidLine</LI>
@@ -748,7 +748,7 @@ End
           as well as a change to user input values.
         </description>
       </parameter>
-          
+
       <parameter name="POLYLINC">
         <type>integer</type>
         <internalDefault>10% of the cube's total lines</internalDefault>
@@ -794,7 +794,7 @@ End
         </description>
         <minimum inclusive="true">4</minimum>
       </parameter>
-      
+
       <parameter name="MAXEMISSION">
         <type>double</type>
         <brief>
@@ -802,17 +802,17 @@ End
         </brief>
         <description>
             <p>
-                Specifies the maximum emission angle that a polygon point is 
-                allowed to have.  This limit is useful for eliminating limb data 
-                that cause numerous ragged spikes.  Limb data will generally 
-                result in odd polygon footprints as the geometry becomes 
-                unstable at the limb due to obliqueness particularly when using 
-                a DEM for the shape model (see spiceinit).  This parameter 
-                restricts the emission angle to create better behaved polygons 
+                Specifies the maximum emission angle that a polygon point is
+                allowed to have.  This limit is useful for eliminating limb data
+                that cause numerous ragged spikes.  Limb data will generally
+                result in odd polygon footprints as the geometry becomes
+                unstable at the limb due to obliqueness particularly when using
+                a DEM for the shape model (see spiceinit).  This parameter
+                restricts the emission angle to create better behaved polygons
                 at the limb while sacrificing some (very oblique) data.
             </p>
             <p>
-                Note: For images that have been run through spiceinit with a DEM, the 
+                Note: For images that have been run through spiceinit with a DEM, the
                 emission angle range may need to be decreased. This will avoid the
                 instability that occurs at the limb and will avoid spiking of the
                 data.
@@ -827,11 +827,11 @@ End
           Maximum incidence angle to include in polygon
         </brief>
         <description>
-            Specifies the maximum incidence angle that a polygon point is 
-            allowed to have.  This limit is useful for eliminating 
-            terminator data that will typically be lost in photometric 
-            corrections.  This parameter restricts the incidence angle to 
-            create more data relevant polygons at the terminator while 
+            Specifies the maximum incidence angle that a polygon point is
+            allowed to have.  This limit is useful for eliminating
+            terminator data that will typically be lost in photometric
+            corrections.  This parameter restricts the incidence angle to
+            create more data relevant polygons at the terminator while
             sacrificing some (non-photometric) data.
         </description>
         <default><item>120.0</item></default>
@@ -846,12 +846,12 @@ End
             Run spiceinit on the input
           </brief>
           <description>
-              If the user sets this to true then the spiceinit program will be 
-              run on the input file.  Spiceinit will use the system SPICE kernels, 
-              so any updates to SPICE information will be lost.  Spiceinit is in 
+              If the user sets this to true then the spiceinit program will be
+              run on the input file.  Spiceinit will use the system SPICE kernels,
+              so any updates to SPICE information will be lost.  Spiceinit is in
               this program to facilitate UPC processing.
           </description>
-        </parameter> 
+        </parameter>
         </group>
 
     <group name="Camera Test">
@@ -859,11 +859,11 @@ End
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>
-          Test image center for valid camera 
+          Test image center for valid camera
         </brief>
         <description>
-          If the user sets this parameter to true, a test will determine if a 
-          valid camera can be created at the center of the image band.  If a 
+          If the user sets this parameter to true, a test will determine if a
+          valid camera can be created at the center of the image band.  If a
           valid camera cannot be created the program will end.  The default is to
           output any available information without testing the camera.
         </description>

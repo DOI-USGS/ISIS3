@@ -1,5 +1,5 @@
 # Translates CaSSIS xml labels into the Mosaic PvlGroup values
-# for the ingested ISIS3 cube labels.
+# for the ingested ISIS cube labels.
 #
 # The Dependencies keyword specifies a tag or attribute at the same level as
 # the InputKey that uniquely identifies the InputKey.
@@ -29,12 +29,12 @@
 #   </Axis_Array>
 # </Array_2D_Image>
 #
-# 
-# history: 
+#
+# history:
 #   ????-??-?? Makayla Shepherd - Original Version
 #   2018-06-13 Kristin Berry - Updated for changes to exported mosaic format.
 #   2018-06-17 Kristin Berry - Added additional geometrical, time, and mission-related
-#                keywords to ingest. 
+#                keywords to ingest.
 
 Group = SpacecraftName
   Auto
@@ -87,7 +87,7 @@ End_Group
 Group = LocalTime
   Auto
   InputKey        = local_true_solar_time
-  InputPosition   = (Observation_Area, Time_Coordinates) 
+  InputPosition   = (Observation_Area, Time_Coordinates)
   OutputName      = LocalTime
   OutputPosition  = (Object, IsisCube, Group, Mosaic)
   Translation     = (*, *)
@@ -147,5 +147,3 @@ Group = NorthAzimuth
   OutputPosition  = (Object, IsisCube, Group, Mosaic)
   Translation     = (*, *)
 End_Group
-
-

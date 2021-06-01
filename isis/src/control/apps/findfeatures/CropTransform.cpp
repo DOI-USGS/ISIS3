@@ -1,26 +1,10 @@
-/**                                                                       
- * @file                                                                  
- * $Revision$
- * $Date$
- * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 
 #include <string>
@@ -40,7 +24,7 @@
 namespace Isis {
 
 /* Constructor */
-CropTransform::CropTransform() : GenericTransform("CropTransform"), m_crop() { 
+CropTransform::CropTransform() : GenericTransform("CropTransform"), m_crop() {
 }
 
 /* Constructor with name of transform */
@@ -51,16 +35,16 @@ CropTransform::~CropTransform() { }
 
 /**
  * @brief Construct a full crop transform with specified region
- *  
- * This constructor will create an object that will crop a specified region of 
- * an image. 
- * 
+ *
+ * This constructor will create an object that will crop a specified region of
+ * an image.
+ *
  * @param name    Name of the transform
  * @param orgSize Original size of the image
  * @param tfSize  New size and starting line/samples of image
  * @param tform   Transformation of the crop
  */
-CropTransform::CropTransform(const QString &name, const cv::Size &orgSize, 
+CropTransform::CropTransform(const QString &name, const cv::Size &orgSize,
                              const cv::Size &tfSize, const cv::Mat &tform) :
                              GenericTransform(name, tform, orgSize) {
 
@@ -76,16 +60,16 @@ CropTransform::CropTransform(const QString &name, const cv::Size &orgSize,
 }
 
 /**
- * @brief Crop and image as specified in as a region 
- *  
- * The starting coordinates of the image region and size are provided to create 
- * a crop transform. 
- * 
+ * @brief Crop and image as specified in as a region
+ *
+ * The starting coordinates of the image region and size are provided to create
+ * a crop transform.
+ *
  * @param name   Name of transform
  * @param region Region of the image to crop
  */
-CropTransform::CropTransform(const QString &name, 
-                             const CropTransform::RectArea &region) : 
+CropTransform::CropTransform(const QString &name,
+                             const CropTransform::RectArea &region) :
                              GenericTransform(name), m_crop(region) {
   setMatrix(translation(-m_crop.x, -m_crop.y));
 
@@ -98,9 +82,9 @@ CropTransform::CropTransform(const QString &name,
 
 /**
  * @brief Crop the input image as specfied in the contructor
- * 
+ *
  * @param image Image to crop
- * 
+ *
  * @return cv::Mat Cropped region of the image
  */
 cv::Mat CropTransform::render(const cv::Mat &image) const {
@@ -112,14 +96,14 @@ cv::Mat CropTransform::render(const cv::Mat &image) const {
 
 /**
  * @brief Determine the crop elements of a given specification
- * 
+ *
  * @param tform  Matrix specification of the transform
  * @param imSize Input image size
  * @param tfSize Desired size of the cropped image
- * 
+ *
  * @return CropTransform::RectArea Specs of the region of the cropped image
  */
-CropTransform::RectArea CropTransform::findCrop(const cv::Mat &tform, 
+CropTransform::RectArea CropTransform::findCrop(const cv::Mat &tform,
                                                 const cv::Size &imSize,
                                                 const cv::Size &tfSize) const {
 
@@ -127,7 +111,7 @@ CropTransform::RectArea CropTransform::findCrop(const cv::Mat &tform,
   cv::perspectiveTransform(corners(imSize), t_corners, tform);
 
   double xmin(qMax(0.0f, t_corners[0].x)), xmax(xmin);
-  double ymin(qMax(0.0f, t_corners[0].y)), ymax(ymin); 
+  double ymin(qMax(0.0f, t_corners[0].y)), ymax(ymin);
   for (unsigned int i = 1 ; i < t_corners.size() ; i++) {
     if ( t_corners[i].x < xmin) xmin = t_corners[i].x;
     if ( t_corners[i].x > xmax) xmax = t_corners[i].x;

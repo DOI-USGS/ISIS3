@@ -9,12 +9,13 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "Stretch.h"
+#include "Blob.h"
 
 namespace Isis {
   /**
-   * @brief Stores stretch information for a cube. Stores stretch pairs, 
-   * band number associated with the stretch, and the stretch type from 
-   * the Advanced Stretch Tool (or 'Default' if not specified) 
+   * @brief Stores stretch information for a cube. Stores stretch pairs,
+   * band number associated with the stretch, and the stretch type from
+   * the Advanced Stretch Tool (or 'Default' if not specified)
    *
    * @ingroup Utility
    *
@@ -23,31 +24,34 @@ namespace Isis {
    * @internal
    *  @history 2020-07-28 Kristin Berry - Original Version
    */
-  class CubeStretch : public Stretch { 
-    public: 
+  class CubeStretch : public Stretch {
+    public:
       CubeStretch(QString name="DefaultStretch", QString stretchType="Default", int bandNumber = 1);
-      ~CubeStretch();
 
+      CubeStretch(CubeStretch const& stretch);
       CubeStretch(Stretch const& stretch);
       CubeStretch(Stretch const& stretch, QString type);
+      CubeStretch(Blob blob);
+      ~CubeStretch();
 
       bool operator==(CubeStretch& stretch2);
 
-      QString getType();
+      Isis::Blob toBlob() const;
+
+      QString getType() const;
       void setType(QString stretchType);
 
-      QString getName();
+      QString getName() const;
       void setName(QString name);
 
-      int getBandNumber();
+      int getBandNumber() const;
       void setBandNumber(int bandNumber);
-           
-    private:                      
-      QString m_name; //! The name of the stretch. 
+
+    private:
+      QString m_name; //! The name of the stretch.
       QString m_type; //! Type of  stretch. This is only currently used in the AdvancedStretchTool.
       int m_bandNumber; //! The band number associated with this stretch
   };
-};                                
+};
 
 #endif
-

@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "EllipsoidShape.h"
 
 #include <QVector>
@@ -23,7 +29,7 @@ namespace Isis {
   /**
    * Initialize the EllipsoidShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
     setName("Ellipsoid");
@@ -33,7 +39,7 @@ namespace Isis {
   /**
    * Initialize the EllipsoidShape.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl Valid ISIS cube label.
    */
   EllipsoidShape::EllipsoidShape() : ShapeModel () {
     setName("Ellipsoid");
@@ -81,8 +87,8 @@ namespace Isis {
 
 
   /**
-   * Calculates the unit normal to an ellipsoid at the point of intersection.  
-   * In the event that the three axial radii of the body are equal, this 
+   * Calculates the unit normal to an ellipsoid at the point of intersection.
+   * In the event that the three axial radii of the body are equal, this
    * method returns the normal vector for a sphere.
    *
    * The implicit equation for an ellipsoid is:

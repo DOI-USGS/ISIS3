@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -15,8 +15,8 @@ Deborah Lee Soltesz
 -->
 
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -72,7 +72,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -92,7 +92,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        ISIS 3 Application Documentation</p>
+        ISIS Application Documentation</p>
 
         <hr/>
 
@@ -293,4 +293,3 @@ Deborah Lee Soltesz
   </xsl:template>
 
 </xsl:stylesheet>
-

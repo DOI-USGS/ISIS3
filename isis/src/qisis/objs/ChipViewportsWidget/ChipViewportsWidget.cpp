@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ChipViewportsWidget.h"
@@ -151,11 +159,11 @@ namespace Isis {
   /**
    * New control network being edited
    *
-   * @param cnet ControlNet * 
-   * @param filename Qstring,  Need filename to write to widget label.  ControlNet doesn't 
-   *                       contain a filename. 
+   * @param cnet ControlNet *
+   * @param filename Qstring,  Need filename to write to widget label.  ControlNet doesn't
+   *                       contain a filename.
    * @internal
-  */  
+  */
   void ChipViewportsWidget::setControlNet(ControlNet *cnet, QString cnetFilename) {
 //    qDebug()<<"ChipViewportsWidget::setControlNet cnet = "<<cnet<<"   filename = "<<cnetFilename;
     //  TODO  more error checking
@@ -375,4 +383,3 @@ namespace Isis {
     }
   }
 }
-

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <fstream>
@@ -174,8 +182,7 @@ void IsisMain() {
 
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label
-  OriginalLabel origBlob;
-  icube2->read(origBlob);
+  OriginalLabel origBlob = icube2->readOriginalLabel();
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
@@ -393,7 +400,7 @@ void IsisMain() {
      *  the input(x axis) values are the unsigned Xbit values from the PDS file
      */
     // ??? unneccessary calculation - this is done by ProcessExportPds class.
-    double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum()); 
+    double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum());
     double intercept = maxmax - slope * p.GetOutputMaximum();
     image.addKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
     image.addKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);

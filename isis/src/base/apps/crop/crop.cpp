@@ -10,7 +10,7 @@ namespace Isis {
 
   /**
    * Crop a cube along a line, sample range. This is the programmatic interface to
-   * the ISIS3 stats application.
+   * the ISIS stats application.
    *
    * @param ui The User Interface to parse the parameters from
    */
@@ -23,7 +23,7 @@ namespace Isis {
 
   /**
    * Compute the stats for an ISIS cube. This is the programmatic interface to
-   * the ISIS3 stats application.
+   * the ISIS stats application.
    *
    * @param cube input cube to be cropped
    * @param ui The User Interface to parse the parameters from

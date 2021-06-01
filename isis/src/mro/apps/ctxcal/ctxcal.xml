@@ -120,7 +120,13 @@
     exposure = line exposure duration in milliseconds
     </pre>
     </p>
-
+    <p>
+    If run on a non-spiceinited cube, this program requires access to local mission-specific 
+    SPICE kernels, in order to find the distance between the sun and the target body. 
+    When run on a spiceinited cube, this can be determined using the camera model.
+    Using a spiceinited cube as input has the advantage of not requiring that local 
+    mission-specific kernels be available. (See spiceinit web=true.)
+    </p>
   </description>
 
   <history>
@@ -151,6 +157,9 @@
     <change name="Jesse Mapel" date="2019-05-15">
       Now loads latest Mars satellites kernel because the planets kernel (de430)
       only provides Mars Barycenter.
+    </change>    
+    <change name="Kelvin Rodriguez" date="2021-02-24">
+      Added ability to get the sun distance from the camera.
     </change>
   </history>
 

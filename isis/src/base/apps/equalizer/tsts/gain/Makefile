@@ -6,8 +6,10 @@ APPNAME = equalizer
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) fromlist=$(INPUT)/FromList.lst \
-	  holdlist=$(INPUT)/HoldList.lst \
+	$(LS) $(INPUT)/I0*.cub > $(OUTPUT)/FromList.lst;
+	$(ECHO) $(INPUT)/I01523019RDR.lev2.cub > $(OUTPUT)/HoldList.lst;
+	$(APPNAME) fromlist=$(OUTPUT)/FromList.lst \
+	  holdlist=$(OUTPUT)/HoldList.lst \
 	  tolist=$(INPUT)/ToList.lst \
 	  solvemethod=qrd adjust=gain \
 	  > /dev/null;
@@ -22,3 +24,6 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/files.lis holdlist=$(OUTPUT)/hold.lis \
 	  adjust=gain tolist=$(OUTPUT)/tolist.lis > /dev/null;
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/hold.lis $(OUTPUT)/tolist.lis;
+	$(RM) $(OUTPUT)/FromList.lst;
+	$(RM) $(OUTPUT)/HoldList.lst;
+

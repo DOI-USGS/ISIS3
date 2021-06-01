@@ -16,7 +16,7 @@
 #include "History.h"
 
 #include "Spectel.h"
-#include "SpectralDefinition.h" 
+#include "SpectralDefinition.h"
 #include "SpectralDefinitionFactory.h"
 #include "SpectralDefinition1D.h"
 #include "SpectralDefinition2D.h"
@@ -40,14 +40,14 @@ void IsisMain() {
   Cube *inCube = procSpectra.SetInputCube("FROM");
 
   // Get the spectral information for the input cube
-  FileName smileDef = ui.GetFileName("SMILEDEF"); 
+  FileName smileDef = ui.GetFileName("SMILEDEF");
   // TODO: May want to add the cube to the constructor args so some error checks can be done
-  SpectralDefinition* inputSpectralDef = SpectralDefinitionFactory::NewSpectralDefinition(smileDef); 
+  SpectralDefinition* inputSpectralDef = SpectralDefinitionFactory::NewSpectralDefinition(smileDef);
 
   // Get the spectral information for the output cube
   FileName smileObjective = ui.GetFileName("OBJECTIVE");
-  SpectralDefinition* outputSpectralDef = 
-      SpectralDefinitionFactory::NewSpectralDefinition(smileObjective); 
+  SpectralDefinition* outputSpectralDef =
+      SpectralDefinitionFactory::NewSpectralDefinition(smileObjective);
 
   // Set up the output cube. It may have a different number of bands than the input cube.
   Cube *outCube = procSpectra.SetOutputCube("TO", inCube->sampleCount(), inCube->lineCount(),
@@ -98,17 +98,15 @@ void IsisMain() {
     // Record apollofindrx history to the cube
 
   // create a History Blob with value found in the History PvlObject's Name keyword
-  PvlObject &histObj = inCube->label()->findObject("History");
-  Isis::History histBlob( (QString)histObj["Name"] );
-  // read cube's History PvlObject data into the History Blob
-  inCube->read(histBlob);
+  QString histName = (QString)inCube->label()->findObject("History")["Name"];
+  // read cube's History PvlObject data into the History Object
+  History histBlob = inCube->readHistory(histName);
   histBlob.AddEntry();
-  outCube->write(histBlob);
+  outCube->write(histBlob, histName);
 
   procSpectra.Finalize();
   delete outputSpectralDef;
   outputSpectralDef = NULL;
-  delete inputSpectralDef; 
+  delete inputSpectralDef;
   inputSpectralDef = NULL;
 }
-

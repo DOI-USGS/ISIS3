@@ -1,7 +1,7 @@
-# Initial ISIS3 to PDS4 export of ISIS3 BandBin group for PDS4 spectral arrays.
-# 
-# See https://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.xsd 
-# and https://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.sch 
+# Initial ISIS to PDS4 export of ISIS BandBin group for PDS4 spectral arrays.
+#
+# See https://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.xsd
+# and https://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.sch
 # for requirements.
 #
 # Sections of an example PDS4 output label are included above the relevant translation groups.
@@ -10,14 +10,14 @@
 
 
 # The entire Spectral_Characteristics class is optional
- 
+
 #        <sp:Spectral_Characteristics>
 #          <sp:bin_width_desc>
 #             Description
-#    
+#
  Group = BinWidthDescription
   Auto
-  InputDefault      = UNK 
+  InputDefault      = UNK
   OutputName        = sp:bin_width_desc
   OutputPosition    = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics)
   Translation       = (*, *)
@@ -57,7 +57,7 @@ End_Group
 # enumerated value
 Group = BinSetLocalReferenceType
   Auto
-  InputDefault     = spectral_characteristics_to_array_axis 
+  InputDefault     = spectral_characteristics_to_array_axis
   OutputName       = sp:local_reference_type
   OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, sp:Spectral_Characteristics, sp:Axis_Bin_Set, sp:Local_Internal_Reference)
   Translation      = (*, *)

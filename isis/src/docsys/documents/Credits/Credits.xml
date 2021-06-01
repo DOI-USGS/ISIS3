@@ -7,222 +7,21 @@
         <p>
         ISIS has been a staple for the cartographic and scientific analysis of
         planetary image data since 1992 with a heritage reaching back to 1971.
-        Contributors from the USGS and other institutions have been involved 
-        in the design and development of ISIS during the course of its evolution.  
+        Contributors from the USGS and other institutions have been involved
+        in the design and development of ISIS during the course of its evolution.
         These include scientists, programmers, image processors, and students.
-        Below are the names of those who have contributed to ISIS:
         </p>
     <br />
 
-    <h2>Current USGS Astrogeology Contributors</h2>
-
-        <table class="tableGeneralInformation" align="center" width="90%">
-          <tr>
-            <td>Brent Archinal</td>
-            <td>Jeannie Walldren-Backer</td>
-            <td>Tammy Becker</td>
-            <td>Kristin Berry</td>
-          </tr>
-          <tr>
-            <td>Christopher Ryan Combs</td>
-            <td>Debbie Cook</td>
-            <td>Kenneth Edmundson</td>
-            <td>Robin Fergason</td>
-          </tr>
-          <tr>
-            <td>Lisa Gaddis</td>
-            <td>Paul Geissler</td>
-            <td>Adam Goins</td>
-            <td>Trent Hare</td>
-          </tr>
-          <tr>
-            <td>Ken Herkenhoff</td>
-            <td>Ian Humphrey</td>
-            <td>Chris Isbell</td>
-            <td>Laszlo Keszthelyi</td>
-          </tr>
-          <tr>
-            <td>Randy Kirk</td>
-            <td>Jesse Mapel</td>
-            <td>Moses Milazzo</td>
-            <td>Cole Neubauer</td>
-          </tr>
-          <tr>
-            <td>Adam Paquette</td>
-            <td>Bonnie Redding</td>
-            <td>Janet Richie</td>
-            <td>Kelvin Rodriguez</td>
-          </tr>
-          <tr>
-            <td>Makayla Shepherd</td>
-            <td>Jac Shinaman</td>
-            <td>Stuart Sides</td>
-            <td>Larry Soderblom</td>
-          </tr>
-          <tr>
-            <td>Summer Stapleton</td>
-            <td>Robert Sucharski</td>
-            <td>Tracie Sucharski</td>
-            <td>Tim Titus</td>
-          </tr>
-          <tr>
-            <td>Lynn Weller</td>
-            <td>Kaj Williams</td>
-            <td>Tyler Wilson</td>
-          </tr>
-        </table>
-        <br />
-
-        <h2>Former Astrogeology and other USGS Contributors</h2>
-
-        <table class="tableGeneralInformation" align="center" width="90%">
-          <tr>
-            <td>Alex Acosta</td>
-            <td>Travis Addair</td>
-            <td>James Alexander</td>
-            <td>Stacey Alley</td>
-          </tr>
-          <tr>
-            <td>James Anderson</td>
-            <td>Jeff Anderson</td>
-            <td>Christopher Austin</td>
-            <td>Janet Barrett</td>
-          </tr>
-          <tr>
-            <td>Joni Bauers</td>
-            <td>Kris Becker</td>
-            <td>Glenn Bennett</td>
-            <td>John Bonn</td>
-          </tr>
-          <tr>
-            <td>MacKenzie Boyd</td>
-            <td>Sasha Brownsberger</td>
-            <td>Pat Chavez</td>
-            <td>Way Christensen</td>
-          </tr>
-          <tr>
-            <td>Jim Crawforth</td>
-            <td>Sean Crosby</td>
-            <td>Norm Cushing</td>
-            <td>Leah Dahmer</td>
-          </tr>
-          <tr>
-            <td>Jacob Danton</td>
-            <td>Drew Davidson</td>
-            <td>Phil Davis</td>
-            <td>Kay Edwards</td>
-          </tr>
-          <tr>
-            <td>Mathew Eis</td>
-            <td>Eric Eliason</td>
-            <td>Patrica Eliason</td>
-            <td>Brendan George</td>
-          </tr>
-          <tr>
-            <td>Verna Gregg</td>
-            <td>Marjorie Hahn</td>
-            <td>Rae Harvey</td>
-            <td>Noah Hilt</td>
-          </tr>
-          <tr>
-            <td>Annie Howington-Kraus</td>
-            <td>Eric Hyer</td>
-            <td>Jeff Johnson</td>
-            <td>Tom Kelleher</td>
-          </tr>
-          <tr>
-            <td>Hugh Kieffer</td>
-            <td>Steven Koechle</td>
-            <td>Steven Lambright</td>
-            <td>Ella Lee</td>
-          </tr>
-          <tr>
-            <td>Brian Lipkowitz</td>
-            <td>Mike Martin</td>
-            <td>Phillip Martinez</td>
-            <td>Jim Mathews</td>
-          </tr>
-          <tr>
-            <td>Jason Mawhinney</td>
-            <td>Alfred McEwen</td>
-            <td>Dennis McMacken</td>
-            <td>David Miller</td>
-          </tr>
-          <tr>
-            <td>Elizabeth Miller-Ribelin</td>
-            <td>Kimberly Oyama</td>
-            <td>Wendy Parker</td>
-            <td>Sharmila Prasad</td>
-          </tr>
-          <tr>
-            <td>Jai Rideout</td>
-            <td>Mark Robinson</td>
-            <td>Curtis Rose</td>
-            <td>Ra'ad Saleh</td>
-          </tr>
-          <tr>
-            <td>Bill Scott</td>
-            <td>Kim Sides</td>
-            <td>Deborah Lee Soltesz</td>
-            <td>Jim Stapleton</td>
-          </tr>
-          <tr>
-            <td>Andrew Stebenne</td>
-            <td>Driss Takir</td>
-            <td>Orrin Thomas</td>
-            <td>Teal Thompson</td>
-          </tr>
-          <tr>
-            <td>Jim Torson</td>
-            <td>Robert Wallace</td>
-            <td>Aaron Young</td>
-          </tr>
-        </table>
-        <br />
-
-        <h2>Non-USGS Contributors</h2>
-
-        <table class="tableGeneralInformation" align="center" width="90%">
-          <tr>
-            <td>Don Anderson, ASU</td>
-            <td>Bob Dean, JPL</td>
-          </tr>
-          <tr>
-            <td>Pierre Drossary, Observatoire de Paris</td>
-            <td>Roger Clark, USGS</td>
-          </tr>
-          <tr>
-            <td>Paul Jensen, University of Colorado</td>
-            <td>Mike Jones, University of Colorado</td>
-          </tr>
-          <tr>
-            <td>Lucas Kamp, Oxford University</td>
-            <td>Ralph Lewis, University of Hawaii</td>
-          </tr>
-          <tr>
-            <td>Adam Licht, ASU</td>
-            <td>John Lindelow, University of Hawaii</td>
-          </tr>
-          <tr>
-            <td>Julianna Lo, University of Hawaii</td>
-            <td>Bob Mehlman, UCLA</td>
-          </tr>
-          <tr>
-            <td>Victor Silva, ASU</td>
-            <td>Bill Smythe, JPL</td>
-          </tr>
-        </table>
-        <br />
-
-        <h2>Are we missing an ISIS contributor?</h2>
+    <h2>ISIS Contributors</h2>
         <p>
-        There are undoubtedly individuals that we failed to acknowledge for their
-        contributions to this image processing system.  Their exclusion was not
-        intentional or deliberate, and we apologize for any oversight. Please 
-        feel free to contact us by email and include your name as you 
-        would like it to appear in the credits.
+        <a href="https://doi.org/10.5281/zenodo.3962369">
+  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3962369.svg" alt="DOI"/></a>
         </p>
-
+        <p>
+        This project uses a <a href="https://doi.org/10.5281/zenodo.2563341">Zenodo</a>
+  generated DOI. The badge above links to the DOI for the latest release.
+      </p>
       </body>
 
       <type>HTML</type>
@@ -256,6 +55,7 @@
     <change date="2003-03-25" name="Jeff Anderson">Original document</change>
     <change date="2013-12-11" name="Ella Mae Lee">Updated document</change>
     <change date="2017-09-18" name="Summer Stapleton">Updated document</change>
+    <change date="2021-04-14" name="Amy Stamile">Updated document</change>
   </history>
 
 

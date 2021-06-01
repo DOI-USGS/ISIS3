@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Gui.h"
 
 #include <clocale>
@@ -98,21 +104,21 @@ namespace Isis {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
-    
-    
+
+
     if (uiPref.hasKeyword("GuiFontName")) {
       QString fontString = uiPref["GuiFontName"];
       QFont font = QFont(fontString);
-      
+
       if (uiPref.hasKeyword("GuiFontSize")) {
         int pointSize = uiPref["GuiFontSize"];
         font.setPointSize(pointSize);
       }
-      
+
       QApplication::setFont(font);
     }
-    
-    
+
+
     // Create the main window
     p_gui = new Gui(ui);
     p_gui->show();
@@ -868,23 +874,30 @@ namespace Isis {
   // Show help for Isis
   void Gui::AboutIsis() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
+#if defined(__linux__)
     QString command = (QString) uig["GuiHelpBrowser"] +
                           " http://isis.astrogeology.usgs.gov >> /dev/null &";
+#elif defined(__APPLE__)
+    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+                      " http://isis.astrogeology.usgs.gov >> /dev/null &";
+#endif                  
     ProgramLauncher::RunSystemCommand(command);
   }
 
   // Show help for the current app
   void Gui::AboutProgram() {
-    Isis::FileName file((QString)
-                        "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
-                        Isis::Application::GetUserInterface().ProgramName() +
-                        "/" +
-                        Isis::Application::GetUserInterface().ProgramName() +
-                        ".html");
-
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
+#if defined(__linux__)
     QString command = (QString) uig["GuiHelpBrowser"] +
-                          (QString)" file:" + file.expanded() + " &";
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      Isis::Application::GetUserInterface().ProgramName() + "/" +
+                      Isis::Application::GetUserInterface().ProgramName() + ".html";
+#elif defined(__APPLE__)
+    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      Isis::Application::GetUserInterface().ProgramName() + "/" +
+                      Isis::Application::GetUserInterface().ProgramName() + ".html";
+#endif
     ProgramLauncher::RunSystemCommand(command);
   }
 

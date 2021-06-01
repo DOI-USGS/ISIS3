@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "mimap2isis.h"
 
 #include "FileName.h"
@@ -9,19 +17,15 @@ using namespace std;
 
 namespace Isis {
   void mimap2isis(UserInterface &ui, Pvl *log) {
-  ProcessImportPds p, ptmp;
+  ProcessImportPds p;
   Pvl label;
 
   QString labelFile = ui.GetFileName("FROM");
-  QString imageFile("");
-  if(ui.WasEntered("IMAGE")) {
-    imageFile = ui.GetFileName("IMAGE");
-  }
+  label.read(labelFile);
 
   // The Kaguya MI MAP files have an incorrect SAMPLE_PROJECTION_OFFSET
   // keyword value in their labels. The following code creates a temporary
   // detached PDS label with the correct (negated) keyword value.
-  ptmp.SetPdsFile(labelFile, imageFile, label);
   PvlObject obj = label.findObject("IMAGE_MAP_PROJECTION");
   double soff = toDouble(obj.findKeyword("SAMPLE_PROJECTION_OFFSET")[0]);
   soff = -soff;
@@ -29,7 +33,15 @@ namespace Isis {
   FileName tempFileName = FileName::createTempFile("TEMPORARYlabel.pvl").name();
   QString fn(tempFileName.expanded());
   label.write(fn);
-  p.SetPdsFile(label, labelFile);
+
+  QString imageFile("");
+  QString datafile = labelFile;
+  if (ui.WasEntered("IMAGE")) {
+    imageFile = ui.GetFileName("IMAGE");
+    datafile = imageFile;
+  }
+
+  p.SetPdsFile(label, datafile);
   QFile::remove(fn);
 
   Cube *ocube = p.SetOutputCube("TO", ui);
@@ -70,13 +82,19 @@ namespace Isis {
   instXlater.Auto(otherLabels);
 
   PvlKeyword processId = label.findKeyword("PROCESS_VERSION_ID");
+  PvlKeyword productVersion = label.findKeyword("PRODUCT_VERSION_ID");
 
   if (processId[0] == "L3C") {
     transFile = transDir + "KaguyaMil3cArchive.trn";;
   }
-  else {
+  else if (processId[0] == "MAP") {
     transFile = transDir + "KaguyaMiMapArchive.trn";
+
+    if (int(productVersion) == 3) {
+      transFile = transDir + "KaguyaMiMap3Archive.trn";
+    }
   }
+
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 
@@ -111,4 +129,3 @@ namespace Isis {
   return;
   }
 }
-    

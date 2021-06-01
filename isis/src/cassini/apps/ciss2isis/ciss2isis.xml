@@ -109,14 +109,14 @@
           Use this parameter to select the Cassini PDS Image Label. The file must
           contain PDS labels for Cassini ISS data.  This can be a detached label file with
           pointer to the cube data.
-          
-          <strong>NOTE:</strong> While we support most Cassini ISS Targets for ingestion, some of 
-          the smaller bodies do not currently have support for parameters such as their body radii. 
-          Therefore, spiceinit will fail when run on cubes created with these targets. The current 
+
+          <strong>NOTE:</strong> While we support most Cassini ISS Targets for ingestion, some of
+          the smaller bodies do not currently have support for parameters such as their body radii.
+          Therefore, spiceinit will fail when run on cubes created with these targets. The current
           list of these target bodies is : ANTHE, AEGAEON, BERGELMIR, BESTLA, ERRIAPO, ERRIAPUS,
           FORNJOT, GREIP, HATI, HYROKKIN, IJIRAQ, JARNSAXA, K07S4, KARI, KIVIUQ, LOGE, MUNDILFARI,
           NARVI, PAALIAQ, SIARNAQ, SKADI, SKATHI, SKOLL, SURTUR, SUTTUNG, SUTTUNGR, TARVOS, TARQEQ,
-          THRYM, THRYMR, YMIR. 
+          THRYM, THRYMR, YMIR.
         </description>
         <filter>
           *.lbl *.LBL
@@ -131,7 +131,7 @@
          </brief>
          <description>
            Use this parameter to select the output filename
-           
+
            <strong>NOTE:</strong> The following TARGET_NAMEs will be translated to 'Sky' in the
            output cube's PVL: SKY, DARK SKY, S8_2004, S12_2004, S13_2004, S14_2004, S18_2004.
          </description>
@@ -148,7 +148,7 @@
       Using ciss2isis
       </brief>
       <description>
-        The use of ciss2isis to ingest PDS images and output Isis3 cubes.
+        The use of ciss2isis to ingest PDS images and output Isis cubes.
       </description>
       <terminalInterface>
         <commandLine>
@@ -156,7 +156,7 @@
 	  to= N1472853667_1.cub
         </commandLine>
         <description>
-	This example shows the use of ciss2isis create an Isis3 cube from a PDS image.
+	This example shows the use of ciss2isis create an Isis cube from a PDS image.
         </description>
       </terminalInterface>
 
@@ -203,7 +203,7 @@
 	  Final output image after the conversion
           </brief>
           <description>
-	    Converts from PDS format to a Isis3 cube.
+	    Converts from PDS format to a Isis cube.
           </description>
           <thumbnail caption= "The cube image after conversion"
           src="assets/thumbs/N1472853667_1.jpg" width="200" height="200"/>

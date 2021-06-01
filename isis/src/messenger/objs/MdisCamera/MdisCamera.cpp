@@ -1,24 +1,10 @@
-/**
- * @file
- * $Revision: 6403 $
- * $Date: 2015-10-23 12:32:20 -0700 (Fri, 23 Oct 2015) $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <cmath>
 
@@ -64,15 +50,15 @@ namespace Isis {
   MdisCamera::MdisCamera(Cube &cube) : FramingCamera(cube) {
     m_spacecraftNameLong = "Messenger";
     m_spacecraftNameShort = "Messenger";
-    
+
     NaifStatus::CheckErrors();
-    
+
     // Set up detector constants
     // Note that Wac has filters, -236800 through -236812
     // http://naif.jpl.nasa.gov/pub/naif/pds/data/mess-e_v_h-spice-6-v1.0/messsp_1000/data/ik/msgr_mdis_v160.ti
     const int MdisWac(-236800);
     const int MdisNac(-236820);
-    
+
     if (naifIkCode() == MdisNac) {
       m_instrumentNameLong = "Mercury Dual Imaging System Narrow Angle Camera";
       m_instrumentNameShort = "MDIS-NAC";
@@ -86,7 +72,7 @@ namespace Isis {
       msg += " is not a supported instrument kernel code for Messenger.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
@@ -250,15 +236,15 @@ namespace Isis {
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
-   * the SpacecraftClockCount keyword value, converted to ephemeris time. The 
-   * StartTime keyword value from the labels represents the shutter open time of 
-   * the observation. This method uses the FramingCamera class implementation, 
-   * returning the given time value as the shutter open and the sum of the time 
-   * value and exposure duration as the shutter close. 
+   * the SpacecraftClockCount keyword value, converted to ephemeris time. The
+   * StartTime keyword value from the labels represents the shutter open time of
+   * the observation. This method uses the FramingCamera class implementation,
+   * returning the given time value as the shutter open and the sum of the time
+   * value and exposure duration as the shutter close.
    *
    * @param exposureDuration Exposure duration value from the labels, converted
    *                         to seconds.
-   * @param time The SpacecraftClockCount value from the labels, converted to 
+   * @param time The SpacecraftClockCount value from the labels, converted to
    *             ephemeris time
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
@@ -275,32 +261,32 @@ namespace Isis {
 
 
 /**
- * @brief Computes temperature-dependent focal length 
- *  
- * This method computes temperature dependent focal lengths based upon a 5th 
+ * @brief Computes temperature-dependent focal length
+ *
+ * This method computes temperature dependent focal lengths based upon a 5th
  * order polynomial using the FocalPlaneTemperature keyword value stored in the
- * ISIS label (it is the FOCAL_PLANE_TEMPERATURE PDS keyword).  At the time of 
- * this writing, only (the two) linear terms are used. 
- *  
- * In addition, this method is initially coded to be backword compatible but 
- * this feature is likely to be removed when the kernels become fully adopted. 
- *  
- * IMPORTANT:  The computed temperature dependent focal length is stored in the 
+ * ISIS label (it is the FOCAL_PLANE_TEMPERATURE PDS keyword).  At the time of
+ * this writing, only (the two) linear terms are used.
+ *
+ * In addition, this method is initially coded to be backword compatible but
+ * this feature is likely to be removed when the kernels become fully adopted.
+ *
+ * IMPORTANT:  The computed temperature dependent focal length is stored in the
  * label of the cube during spiceinit.  This implementation uses the special
- * recording of keywords as retrieved from kernels and stores them as a string 
- * value so (SOCET) folks can easily read and apply the focal lengths in their 
- * environments.  String storage is preferred over storing as double since 
- * these values are stored in hexidecimal format. 
- *  
+ * recording of keywords as retrieved from kernels and stores them as a string
+ * value so (SOCET) folks can easily read and apply the focal lengths in their
+ * environments.  String storage is preferred over storing as double since
+ * these values are stored in hexidecimal format.
+ *
  * @author Kris Becker (8/13/2012)
  * @internal
  *  @history 2012-10-22 Kris Becker - Store temperature dependant keyword in instrument
  *                                    neutral keyword called TempDependentFocalLength.
- * 
+ *
  * @param filterCode Integer MDIS instrument/filter code
- * @param label      Pvl label from cube being initialized where temperature 
+ * @param label      Pvl label from cube being initialized where temperature
  *                   keywords are extracted from.
- * 
+ *
  * @return double    Computed temperature dependant focal length
  */
   double MdisCamera::computeFocalLength(const QString &filterCode,
@@ -334,14 +320,14 @@ namespace Isis {
         tdfl_disabled = false;
       }
 #endif
-      
+
       // Attempt to retrieve parameters necessary for temperature-dependent focal
       // length and computed it
       if ( !tdfl_disabled ) {
         // Wrap a try clause all around this so that if it fails, will return
         // default
         try {
-          PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);      
+          PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
           double fpTemp = inst["FocalPlaneTemperature"];
           double fl(0.0);
           QString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";

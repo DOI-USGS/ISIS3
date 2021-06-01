@@ -1,5 +1,5 @@
 #
-# This translation file is used to produce the ISIS 3 Archive label group
+# This translation file is used to produce the ISIS Archive label group
 # for the Hayabusa 2 ONC-W1, ONC-W2, and ONC-T cameras.
 #
 
@@ -14,7 +14,7 @@ Group = ProducerId
 End_Group
 
 Group = L0FileName
-  Auto  
+  Auto
   InputKey       = P_L0NAME
   InputKey       = L0FILE
   InputPosition  = FitsLabels
@@ -67,7 +67,7 @@ Group = ImageType
   Auto
   Optional
   InputKey       = P_IMGTYP
-  InputPosition  = FitsExtras 
+  InputPosition  = FitsExtras
   OutputName     = ImageType
   OutputPosition = (Object, IsisCube, Group, Archive)
   Translation    = (*, *)
@@ -104,4 +104,3 @@ Group = ImageNumber
 End_Group
 
 End
-

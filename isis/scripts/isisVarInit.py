@@ -5,10 +5,11 @@ variables that are sourced during conda environment activation and
 removed at deactivation.
 
 If the directories don't exist, they are created.  If their path is
-not specified, they are placed in $ISISROOT.
+not specified, they are placed in $CONDA_PREFIX (which is $ISISROOT).
 """
 
 import argparse
+import logging
 import os
 from pathlib import Path
 
@@ -21,6 +22,26 @@ from pathlib import Path
 # SPDX-License-Identifier: CC0-1.0
 
 
+class ResolveAction(argparse.Action):
+    """A custom action that returns the absolute version of the provided
+    pathlib.Path argument.
+    """
+
+    def __init__(self, option_strings, dest, type=None, **kwargs):
+        if issubclass(Path, type):
+            super(ResolveAction, self).__init__(
+                option_strings, dest, type=type, **kwargs
+            )
+        else:
+            raise TypeError(
+                f"The type= parameter of argument {dest} must be a "
+                f"class or subclass of pathlib.Path."
+            )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values.resolve())
+
+
 def mkdir(p: Path) -> str:
     """Returns a string with a message about the creation or existance
     of the path, *p*."""
@@ -31,7 +52,7 @@ def mkdir(p: Path) -> str:
         return f"Created {p}"
 
 
-def activate_text(shell: dict, env_vars: dict) -> str:
+def activate_text(shell: dict, env_vars: dict, cat=False) -> str:
     """Returns the formatted text to write to the activation script
     based on the passed dictionaries."""
 
@@ -42,7 +63,8 @@ def activate_text(shell: dict, env_vars: dict) -> str:
     if shell["activate_extra"] != "":
         lines.append(shell["activate_extra"])
 
-    lines.append("cat $ISISROOT/version")
+    if cat:
+        lines.append("cat $ISISROOT/version")
 
     return "\n".join(lines)
 
@@ -64,40 +86,59 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument(
     "-d",
     "--data-dir",
-    default=os.environ["CONDA_PREFIX"] + "/data",
+    default=Path(os.environ["CONDA_PREFIX"] + "/data"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Data Directory, default: %(default)s",
 )
 parser.add_argument(
     "-t",
     "--test-dir",
-    default=os.environ["CONDA_PREFIX"] + "/testData",
+    default=Path(os.environ["CONDA_PREFIX"] + "/testData"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Test Data Directory, default: %(default)s",
 )
 
 parser.add_argument(
     "-a",
     "--ale-dir",
-    default=os.environ["CONDA_PREFIX"] + "/aleData",
+    default=Path(os.environ["CONDA_PREFIX"] + "/aleData"),
     type=Path,
+    action=ResolveAction,
     help="ISIS Ale Data Directory, default: %(default)s",
+)
+parser.add_argument(
+    "-c", "--cat",
+    action="store_true",
+    help="If given, the activation script will include a 'cat' action that "
+         "will print the ISIS version information to STDOUT every time the "
+         "ISIS environment is activated."
+)
+parser.add_argument(
+    "-q", "--quiet",
+    action="store_true",
+    help="If given, will suppress all regular text output."
 )
 args = parser.parse_args()
 
-print("-- ISIS Data Directories --")
-# Create the data directories:
-print(mkdir(args.data_dir))
-print(mkdir(args.test_dir))
-print(mkdir(args.ale_dir))
+log_lvl = {False: "INFO", True: "ERROR"}
 
-print("-- Conda activation and deactivation scripts --")
+logging.basicConfig(format="%(message)s", level=log_lvl[args.quiet])
+
+logging.info("-- ISIS Data Directories --")
+# Create the data directories:
+logging.info(mkdir(args.data_dir))
+logging.info(mkdir(args.test_dir))
+logging.info(mkdir(args.ale_dir))
+
+logging.info("-- Conda activation and deactivation scripts --")
 # Create the conda activation and deactivation directories:
 activate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/activate.d"
 deactivate_dir = Path(os.environ["CONDA_PREFIX"]) / "etc/conda/deactivate.d"
 
-print(mkdir(activate_dir))
-print(mkdir(deactivate_dir))
+logging.info(mkdir(activate_dir))
+logging.info(mkdir(deactivate_dir))
 
 # Set the environment variables to manage
 env_vars = dict(
@@ -138,9 +179,9 @@ fish = dict(
 # each:
 for shell in (sh, csh, fish):
     a_path = activate_dir / ("isis-activate" + shell["extension"])
-    a_path.write_text(activate_text(shell, env_vars))
-    print(f"Wrote {a_path}")
+    a_path.write_text(activate_text(shell, env_vars, cat=args.cat))
+    logging.info(f"Wrote {a_path}")
 
     d_path = deactivate_dir / ("isis-deactivate" + shell["extension"])
     d_path.write_text(deactivate_text(shell, env_vars))
-    print(f"Wrote {d_path}")
+    logging.info(f"Wrote {d_path}")

@@ -232,8 +232,7 @@ TEST_F(DemCube, FunctionalTestShadowErrors) {
   shadowArgs.push_back("match=" + testCube->fileName());
   shadowUi = UserInterface(APP_XML, shadowArgs);
 
-  Table shapeModelStats("ShapeModelStatistics");
-  demCube->read(shapeModelStats);
+  Table shapeModelStats = demCube->readTable("ShapeModelStatistics");
 
   TableRecord originalRecord = shapeModelStats[0];
   TableRecord badRecord = shapeModelStats[0];

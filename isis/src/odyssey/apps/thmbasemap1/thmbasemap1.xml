@@ -3,43 +3,43 @@
 <application name="thmbasemap1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Mars Odyssey Themis RDR image cleanup 
+    Mars Odyssey Themis RDR image cleanup
   </brief>
 
   <description><pre>
-    Themis image cleanup procedure developed for the Mars geologic base 
+    Themis image cleanup procedure developed for the Mars geologic base
     map production and the ancillary datasets.  The RDR's or radiometrically
-    calibrated images are required as input to the program.  The 12.57um 
+    calibrated images are required as input to the program.  The 12.57um
     wavelength band is selected for the mosaic, and the 14.88um atmosphere
     band is used as input to "thmdriftcor" program.  The following programs
     are run:
-        thm2isis - converts to isis3 format
+        thm2isis - converts to isis format
 	spiceinit - updates SPICE information
 	camstats - collects camera staistics
 	thmdriftcor - applies atmosphere correction using 14.88um band
-	cosi - applies a basic photometric normalization using the incidence 
+	cosi - applies a basic photometric normalization using the incidence
 	     angles for improved tone matching
 	cubenorm - used to cleanup banding(column) effect on the RDRs
 	lineeq - normalize base on line averages for signal drifts and/or
-	     correcting for photometric changes during crossover from day to 
+	     correcting for photometric changes during crossover from day to
 	     night.
 	findgaps - find gaps in the input image
-        Generate statistics file and footprint information for input into GIS 
+        Generate statistics file and footprint information for input into GIS
 	     packages
-    
-    The InstrumentId must be "THEMIS," DETECTOR_ID must be "IR," 
-    BandBinCenter must have "12.57um," and "14.88um" for the 
-    atmospheric correction. 
- 
+
+    The InstrumentId must be "THEMIS," DETECTOR_ID must be "IR,"
+    BandBinCenter must have "12.57um," and "14.88um" for the
+    atmospheric correction.
+
     If NIGHT is checked then the night time IR images are processed, and
     the incidence angle test is not performed.
-   
+
     The spiceinit program will automatically use nadir pointing if it fails
-    to update with reconstructed or predicted ck kernels. 
-    
+    to update with reconstructed or predicted ck kernels.
+
     If RMINPUT is checked then the input file is deleted after processing.
-    
-    If RMHIGHINC is checked then the input RDR file is deleted from 
+
+    If RMHIGHINC is checked then the input RDR file is deleted from
     processing if the incidence angle test is not meant.
 
   </pre></description>
@@ -65,7 +65,7 @@
   </history>
 
   <category>
-    <missionItem>Mars Odyssey</missionItem> 
+    <missionItem>Mars Odyssey</missionItem>
   </category>
 
   <groups>
@@ -103,7 +103,7 @@
           Process night time IR image
         </brief>
         <description>
-          If checked, this option will process a night time image.  For night images 
+          If checked, this option will process a night time image.  For night images
           the program cosi will be skipped.
         </description>
         <default><item>FALSE</item></default>
@@ -124,7 +124,7 @@
       <parameter name="INFO">
         <type>boolean</type>
         <brief>
-          Output selected camera statistics infomation 
+          Output selected camera statistics infomation
         </brief>
         <description>
           A selected subset of camera statistics information required for the
@@ -158,7 +158,7 @@
         </brief>
         <description>
           A footprint polygon information will be output for input into a GIS
-	  program.  This is normally required for the geologic base map 
+	  program.  This is normally required for the geologic base map
 	  packages, but not needed if the files will not be imported into
 	  a GIS package.
         </description>
@@ -173,7 +173,7 @@
         </brief>
         <description>
           If selected, delete input files after processing is completed.
-        </description> 
+        </description>
         <default><item>FALSE</item></default>
       </parameter>
       <parameter name="RMHIGHINC">
@@ -198,7 +198,7 @@
           angle
         </brief>
         <description>
-          Output list file that will contain the names of files that 
+          Output list file that will contain the names of files that
           were deleted because of their high incidence angles.
         </description>
         <filter>
@@ -213,7 +213,7 @@
           Output list of files where there is no matching RDR
         </brief>
         <description>
-          Output list file that will contain the names of files that 
+          Output list file that will contain the names of files that
           do not have matching RDR files for the EDR files.
         </description>
         <filter>
@@ -228,7 +228,7 @@
           Output list of files that have Nadir pointing
         </brief>
         <description>
-          Output list file that will contain the names of files that 
+          Output list file that will contain the names of files that
           have only Nadir pointing available to them.
         </description>
         <filter>
@@ -243,8 +243,8 @@
           Output list of files that have gaps
         </brief>
         <description>
-          Output list file that will contain the names of files that 
-          gaps meaning that special pixels were detected by the stats 
+          Output list file that will contain the names of files that
+          gaps meaning that special pixels were detected by the stats
           program.
         </description>
         <filter>

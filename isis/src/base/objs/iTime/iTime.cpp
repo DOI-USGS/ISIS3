@@ -1,27 +1,14 @@
-/**
- * @file
- * $Revision: 1.4 $
- * $Date: 2010/01/15 01:37:59 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
+#include <QString>
 
 #include "Preference.h"
 
@@ -47,8 +34,8 @@ namespace Isis {
   }
 
   /**
-   * Constructs a iTime object and initializes it to the time from the argument.  
-   *  
+   * Constructs a iTime object and initializes it to the time from the argument.
+   *
    * @param time A time string formatted in standard UTC or similar format.
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
@@ -431,7 +418,7 @@ namespace Isis {
 
     if(Second() < 10) utc += "0" + SecondString(precision);
     else utc += SecondString(precision);
-    
+
     return utc;
   }
 
@@ -443,6 +430,29 @@ namespace Isis {
   }
 
   void iTime::setUtc(QString utcString) {
+    // If the time string is in ISO basic format add separators for utc2et
+    if ( utcString.contains("T") && // Check for ISO T format
+         !utcString.contains("-") && // Check for missing data separator
+         !utcString.contains(":")) { // Check for missing time separator
+      QString dateString = utcString.split("T").front();
+      dateString.insert(4, "-");
+      // If format is YYYYDOY we are done with the date string
+      // Otherwise we are in YYYYMMDD format
+      if (dateString.size() > 8) {
+        dateString.insert(7, "-");
+      }
+
+      QString timeString = utcString.split("T").back();
+      // If the format is hh or hhmm, resize and pad with 0s out to hh0000 or hhmm00
+      if (timeString.size() < 6) {
+        timeString.resize(6, '0');
+      }
+      timeString.insert(2, ":");
+      timeString.insert(5, ":");
+
+      utcString = dateString + "T" + timeString;
+    }
+
     NaifStatus::CheckErrors();
     LoadLeapSecondKernel();
 

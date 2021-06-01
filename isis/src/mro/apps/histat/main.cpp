@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <vector>
@@ -65,8 +73,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Get statistics from the cube prefix and suffix data
-  Table hifix("HiRISE Ancillary");
-  icube->read(hifix);
+  Table hifix = icube->readTable("HiRISE Ancillary");
   Statistics darkStats, bufStats, rampDarkStats;
   int tdi = icube->group("Instrument")["Tdi"];
   int binning_mode = icube->group("Instrument")["Summing"];
@@ -126,8 +133,7 @@ void IsisMain() {
   int rampStart = maskLines;
   int rampLines = tdi / binning_mode;
 
-  Table calimg("HiRISE Calibration Image");
-  icube->read(calimg);
+  Table calimg = icube->readTable("HiRISE Calibration Image");
   Statistics calStats;
   //Statistics for the Reverse readout lines of the cal image
   Statistics reverseStats;
@@ -204,8 +210,7 @@ void IsisMain() {
   }
 
   // Get statistics from the calibration prefix and suffix data
-  Table calfix("HiRISE Calibration Ancillary");
-  icube->read(calfix);
+  Table calfix = icube->readTable("HiRISE Calibration Ancillary");
   Statistics calDarkStats, calBufStats;
   int rampLine0 = rampStart + 1;
   int rampLineN = (rampStart + rampLines - 1) - 1;

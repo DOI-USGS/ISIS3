@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "hicubeit.h"
 
 #include "TextFile.h"
@@ -110,12 +118,9 @@ namespace Isis {
     }
 
     // Concatenate all TDIs into one keyword
-    OriginalLabel redOrgLab;
-    redOrgLab.Blob::Read(redFile);
-    OriginalLabel irOrgLab;
-    irOrgLab.Blob::Read(irFile);
-    OriginalLabel bgOrgLab;
-    bgOrgLab.Blob::Read(bgFile);
+    OriginalLabel redOrgLab(redFile);
+    OriginalLabel irOrgLab(irFile);
+    OriginalLabel bgOrgLab(bgFile);
 
     PvlGroup redGrp = redOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
     PvlGroup irGrp = irOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);

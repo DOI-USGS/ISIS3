@@ -1,5 +1,5 @@
-# Translates ISIS3 cube information to Array_2D_Image section of PDS4 label
-# 
+# Translates ISIS cube information to Array_2D_Image section of PDS4 label
+#
 # history 2018-05-11 Jeannie Backer - Original version.
 
 Group = ImageLocalId
@@ -54,4 +54,3 @@ Group = Lines
   OutputPosition  = (Product_Observational, File_Area_Observational, Array_2D_Image, new@Axis_Array)
   Translation     = (*, *)
 End_Group
-

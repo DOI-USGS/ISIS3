@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include "FileName.h"
@@ -42,13 +50,13 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Get the cube prefix and suffix table
-  icube->read(hifix);
+  hifix = icube->readTable("HiRISE Ancillary");
 
   // Get the calibration prefix and suffix table
-  icube->read(calfix);
+  calfix = icube->readTable("HiRISE Calibration Ancillary");
 
   // Get the calibration image table
-  icube->read(calimg);
+  calimg = icube->readTable("HiRISE Calibration Image");
 
   // Add the number of buffer pixels and dark pixels to the ouput NS
   samples += hifix[0]["BufferPixels"].size() + hifix[0]["DarkPixels"].size();
@@ -162,4 +170,3 @@ double int2ToDouble(int value) {
   else return value;
 
 }
-

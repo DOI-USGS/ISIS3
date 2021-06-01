@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "CubePlotCurveConfigureDialog.h"
 
 #include <iostream>
@@ -24,24 +32,24 @@ namespace Isis {
    */
   CubePlotCurveConfigureDialog::CubePlotCurveConfigureDialog(
       CubePlotCurve *curve, QWidget *parent) : QDialog(parent) {
-    m_plotCurve = curve; 
+    m_plotCurve = curve;
     m_parent = parent;
     // initially set selected curve index to 0 (first curve)
     m_selectedCurve = 0;
-    
+
     // we can grab the CubePlotCurve QList from the parent widget (PlotWindow)
     if (parent) {
       connect( parent, SIGNAL( plotChanged() ),
                this, SLOT( updateCurvesList() ) );
       m_plotCurvesList = qobject_cast<PlotWindow *>(parent)->plotCurves();
-    }    
+    }
     else {
       m_plotCurvesList.append(curve);
     }
 
     QGridLayout *optionsLayout = new QGridLayout;
-    int row = 0; 
-    
+    int row = 0;
+
     // only create a combo box if instantiating this dialog with the configure tool button
     if (parent) {
       QLabel *curvesLabel = new QLabel("Curves: ");
@@ -52,7 +60,7 @@ namespace Isis {
       optionsLayout->addWidget(m_curvesCombo, row, 1);
       row++;
     }
-    
+
     QLabel *nameLabel = new QLabel("Curve Name: ");
     m_nameEdit = new QLineEdit( m_plotCurve->title().text() );
     optionsLayout->addWidget(nameLabel, row, 0);
@@ -154,8 +162,8 @@ namespace Isis {
 
     readSettingsFromCurve();
   }
-   
- 
+
+
   /**
    * This destroys the configuration dialog, which happens when the user closes
    *   it or clicks ok or cancel.
@@ -216,9 +224,9 @@ namespace Isis {
     if (m_selectedCurve > m_plotCurvesList.size() - 1 || m_selectedCurve < 0) {
       throw IException(IException::Programmer, "Curves combobox index out of bounds", _FILEINFO_);
     }
-    
+
     m_plotCurve = m_plotCurvesList[m_selectedCurve];
-    
+
     setWindowTitle( "Configure " + m_plotCurve->title().text() );
 
     // see if the curves combo box exists in the dialog (right-clicking a curve will not create
@@ -234,7 +242,7 @@ namespace Isis {
 //       m_curvesCombo->setItemText( m_curvesCombo->currentIndex(), m_plotCurve->title().text() );
       m_curvesCombo->blockSignals(false);
     }
-    
+
     m_nameEdit->setText( m_plotCurve->title().text() );
 
     QPalette colorPalette;
@@ -267,13 +275,13 @@ namespace Isis {
     }
   }
 
-  
+
   void CubePlotCurveConfigureDialog::updateComboIndex(int selected) {
     m_selectedCurve = selected;
     readSettingsFromCurve();
   }
-  
-  
+
+
   void CubePlotCurveConfigureDialog::updateCurvesList() {
     QList<CubePlotCurve*> newPlotCurveList = qobject_cast<PlotWindow*>(m_parent)->plotCurves();
     // if we deleted a plot curve, the new list will be smaller in size, reset m_selectedCurve

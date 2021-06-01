@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision: 1.4 $
- * $Date: 2009/12/29 23:03:54 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <vector>
 
 #include <QString>
@@ -28,9 +15,12 @@
 #include <SpiceZmc.h>
 
 #include "CalParameters.h"
+#include "Camera.h"
+#include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "iTime.h"
 #include "LeastSquares.h"
 #include "Pvl.h"
 #include "TextFile.h"
@@ -39,7 +29,7 @@
 using namespace std;
 namespace Isis {
 
-  CalParameters::CalParameters(const QString &fname) {
+  CalParameters::CalParameters(const QString &fname, Cube *icube) {
     try {
       // Extract Pvl Information from the file
       Pvl pvl(fname.toLatin1().data());
@@ -89,7 +79,7 @@ namespace Isis {
       }
 
       QString startTime = instrument["STARTTIME"];
-      CalcSunDist(startTime);
+      p_dist1 = CalcSunDist(startTime, icube);
       p_labexp = (double)instrument["EXPOSUREDURATION"] * 1000.0;  // convert to msec
       QString target = " ";
       PvlKeyword cs1 = instrument["FLOODMODEID"];
@@ -373,24 +363,44 @@ namespace Isis {
   }
 
   /**
-   * Calculates the distance from the sun at the specified time
+   * Calculates the distance from Mars to the sun at the specified time.
+   * Try to useing the camera assiciated with the cube first, if that
+   * doesn't work fall back to using the SPICE data.
    *
-   * @param t iTime
+   * @param t The UTC time at which the sun distance is being requested
+   * @param iCube The cube we are calibrating
+   *
+   * @return Distance from the Sun to Mars in km
    */
-  void CalParameters::CalcSunDist(QString t) {
-    NaifStatus::CheckErrors();
-    double sunv[3];
-    SpiceDouble lt, et;
-    FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
-    FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
-    QString tempfname1 = fname1.expanded();
-    QString tempfname2 = fname2.expanded();
-    furnsh_c(tempfname1.toLatin1().data());
-    furnsh_c(tempfname2.toLatin1().data());
-    utc2et_c(t.toLatin1().data(), &et);
-    spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
-    p_dist1 = sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
-    NaifStatus::CheckErrors();
+  double CalParameters::CalcSunDist(QString t, Cube *iCube) {
+    try {
+      Camera *cam;
+      cam = iCube->camera();
+      iTime startTime(t);
+      cam->setTime(startTime);
+      return cam->sunToBodyDist();
+    }
+    catch(IException &e) {
+      // Failed to instantiate a camera, try furnishing kernels directly
+      try {
+        NaifStatus::CheckErrors();
+        double sunv[3];
+        SpiceDouble lt, et;
+        FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
+        FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
+        QString tempfname1 = fname1.expanded();
+        QString tempfname2 = fname2.expanded();
+        furnsh_c(tempfname1.toLatin1().data());
+        furnsh_c(tempfname2.toLatin1().data());
+        utc2et_c(t.toLatin1().data(), &et);
+        spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
+        return sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
+        NaifStatus::CheckErrors();
+      }
+      catch(IException &e) {
+        QString msg = "Unable to determine the distance from Mars to the Sun";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
   }
-
 } // end namespace isis

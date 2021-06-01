@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ControlNetDiff.h"
@@ -99,12 +107,12 @@ namespace Isis {
 
     Pvl net1Pvl = cnv1.toPvl();
     Pvl net2Pvl = cnv2.toPvl();
-    
+
     PvlObject &net1Obj = net1Pvl.findObject("ControlNetwork");
     PvlObject &net2Obj = net2Pvl.findObject("ControlNetwork");
-    
+
     QMap< QString, QMap<int, PvlObject> > pointMap;
-     
+
     for (int p = 0; p < net1NumPts; p++) {
       PvlObject &point = net1Obj.object(p);
       pointMap[point.findKeyword("PointId")[0]].insert(
@@ -118,7 +126,7 @@ namespace Isis {
     }
 
     QList<QString> pointNames = pointMap.keys();
- 
+
     for (int i = 0; i < pointNames.size(); i++) {
       QMap<int, PvlObject> idMap = pointMap[pointNames[i]];
       if (idMap.size() == 2) {
@@ -416,4 +424,3 @@ namespace Isis {
     m_ignoreKeys->insert("DateTime");
   }
 }
-

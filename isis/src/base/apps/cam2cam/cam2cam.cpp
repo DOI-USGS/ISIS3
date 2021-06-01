@@ -27,16 +27,16 @@ namespace Isis {
    */
   void cam2cam(UserInterface &ui) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));  
+    icube->open(ui.GetFileName("FROM"));
     Cube *mcube = new Cube();
-    mcube->open(ui.GetFileName("MATCH"));  
+    mcube->open(ui.GetFileName("MATCH"));
     return cam2cam(icube, mcube, ui);
   }
 
 
   /**
    * Convert the pixels of a camera image to the geometry of a different camera
-   * image. This is the programmatic interface to the ISIS3 cam2cam
+   * image. This is the programmatic interface to the ISIS cam2cam
    * application.
    *
    * @param icube input cube to be transformed
@@ -44,10 +44,10 @@ namespace Isis {
    * @param ui The User Interface to parse the parameters from
    */
   void cam2cam(Cube *icube, Cube *mcube, UserInterface &ui) {
-    
+
     ProcessRubberSheet m;
     m.SetInputCube(mcube);
-    Cube *ocube = m.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+    Cube *ocube = m.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
                                   mcube->sampleCount(), mcube->lineCount(), mcube->bandCount());
 
     // Set up the default reference band to the middle of the cube

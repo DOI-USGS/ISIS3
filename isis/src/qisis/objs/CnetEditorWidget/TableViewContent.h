@@ -1,6 +1,14 @@
 #ifndef TableViewContent_H
 #define TableViewContent_H
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QAbstractScrollArea>
 
 #include <QPoint>
@@ -39,15 +47,15 @@ namespace Isis {
     *   @history 2017-07-18 Christopher Combs - Fixed bug in which trying to edit a selected row
     *                           would cause a segfault from m_activeCell being null. Fixes #4958.
     *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when 
-    *                           attempting to edit a control point when there is not an active 
+    *   @history 2017-08-08 Makayla Shepherd - Fixed a seg fault in ipce that occurs when
+    *                           attempting to edit a control point when there is not an active
     *                           control network. Fixes #5048.
     *   @history 2017-09-20 Ian Humphrey - Modified showContextMenu so single line if statements
     *                           have braces. This prevents a misleading-indentation warning from
     *                           occuring during Fedora25 (c++14) builds. No functionality has been
     *                           changed. References #4809.
-    *   @history 2018-07-17 Kaitlyn Lee - Modified showContextMenu() to enable 
-                                m_deleteSelectedRowsAct regardless if an active control is set. 
+    *   @history 2018-07-17 Kaitlyn Lee - Modified showContextMenu() to enable
+                                m_deleteSelectedRowsAct regardless if an active control is set.
     */
   class TableViewContent : public QAbstractScrollArea {
       Q_OBJECT
@@ -184,7 +192,7 @@ namespace Isis {
       * This action edits selected control point or if measure selected, edit parent control pt
       */
       QAction *m_editControlPointAct;
-      
+
       bool m_activeControlNet;
 
 

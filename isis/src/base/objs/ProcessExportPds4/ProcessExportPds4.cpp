@@ -1,21 +1,9 @@
-/**
- *   Unless noted otherwise, the portions of Isis written by the
- *   USGS are public domain. See individual third-party library
- *   and package descriptions for intellectual property
- *   information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "ProcessExportPds4.h"
 
 #include <cmath>
@@ -56,7 +44,7 @@ namespace Isis {
 
     m_domDoc = new QDomDocument("");
 
-    // base xml file 
+    // base xml file
     // <?xml version="1.0" encoding="UTF-8"?>
     QString xmlVersion = "version=\"1.0\" encoding=\"utf-8\"";
     QDomProcessingInstruction xmlHeader =
@@ -64,7 +52,7 @@ namespace Isis {
     m_domDoc->appendChild(xmlHeader);
 
     // base pds4 schema location
-    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd"; 
+    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd";
 
     QString xmlModel;
     xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch\" ";
@@ -88,7 +76,7 @@ namespace Isis {
 
   /**
    * Create a standard PDS4 image label from the input cube.
-   * 
+   *
    * @return @b QDomDocument The output PDS4 label.
    */
   QDomDocument &ProcessExportPds4::StandardPds4Label() {
@@ -100,7 +88,7 @@ namespace Isis {
 
   /**
    * Create a standard PDS4 image label from the input cube.
-   * 
+   *
    * @return @b QDomDocument The output PDS4 label.
    */
   void ProcessExportPds4::setImageType(ImageType imageType) {
@@ -110,12 +98,12 @@ namespace Isis {
 
   /**
    * Creates a PDS4 label. The image label will be
-   * stored internally in the class. 
-   *  
-   * This method has a similar function to 
-   * ProcessExportPds::CreateImageLabel. However, it will create 
-   * images of object type Array_3D_Image, Array_2D_Image, or 
-   * Array_3D_Spectrum. 
+   * stored internally in the class.
+   *
+   * This method has a similar function to
+   * ProcessExportPds::CreateImageLabel. However, it will create
+   * images of object type Array_3D_Image, Array_2D_Image, or
+   * Array_3D_Spectrum.
    */
   void ProcessExportPds4::CreateImageLabel() {
     if (InputCubes.size() == 0) {
@@ -167,13 +155,13 @@ namespace Isis {
       //     <Discipline_Area>
       //       <sp:Spectral_Characteristics> OR <img:Imaging>
       standardBandBin();
-    } 
+    }
     catch (IException &e) {
       QString msg = "Unable to translate and export spectral information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
-    try { 
+    try {
       // <Product_Observational>
       //   <Observation_Area>
       //     <Discipline_Area>
@@ -197,25 +185,25 @@ namespace Isis {
 
 
   /**
-   * This method translates the information from the ISIS 
-   * Instrument group to the PDS4 labels. 
+   * This method translates the information from the ISIS
+   * Instrument group to the PDS4 labels.
    */
   void ProcessExportPds4::standardInstrument() {
     Pvl *inputLabel = InputCubes[0]->label();
     FileName translationFileName;
 
     if (inputLabel->findObject("IsisCube").hasGroup("Instrument")) {
-      
+
       // Translate the Instrument group
       translationFileName = "$ISISROOT/appdata/translations/pds4ExportInstrument.trn";
       PvlToXmlTranslationManager instXlator(*inputLabel, translationFileName.expanded());
       instXlator.Auto(*m_domDoc);
-      
+
       // If instrument and spacecraft values were translated, create the combined name
       QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
-      
+
       if ( !obsAreaNode.isNull() ) {
-      
+
         // fix start/stop times, if needed
         QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
         if (!timeNode.isNull()) {
@@ -225,9 +213,9 @@ namespace Isis {
           }
           else {
             QString timeValue = startTime.text();
-            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
           }
-          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
+          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time");
           if (stopTime.text() == "") {
             stopTime.setAttribute("xsi:nil", "true");
           }
@@ -236,7 +224,7 @@ namespace Isis {
             PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
           }
         }
-      
+
         QDomElement obsSysNode = obsAreaNode.firstChildElement("Observing_System");
         if ( !obsSysNode.isNull() ) {
           QString instrumentName;
@@ -247,7 +235,7 @@ namespace Isis {
             if ( compTypeNode.text().compare("Spacecraft") == 0 ) {
               QString componentName = obsSysCompNode.firstChildElement("name").text();
               if (QString::compare(componentName, "TBD", Qt::CaseInsensitive) != 0) {
-                spacecraftName = componentName; 
+                spacecraftName = componentName;
               }
             }
             else if ( compTypeNode.text().compare("Instrument") == 0 ) {
@@ -267,19 +255,19 @@ namespace Isis {
           obsSysNode.insertBefore( combinedNode, obsSysNode.firstChild() );
         }
       }
-      
+
       // Translate the Target name
-      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromInstrument.trn"; 
+      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromInstrument.trn";
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
 
-      // Move target to just below Observing_System. 
+      // Move target to just below Observing_System.
       QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
       obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
     }
     else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
 
-      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromMapping.trn"; 
+      translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromMapping.trn";
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
     }
@@ -307,18 +295,18 @@ namespace Isis {
           else {
             QString timeValue = startTime.text();
             if (!timeValue.contains("Z")) {
-              PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
+              PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
             }
           }
 
-          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
+          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time");
           if (stopTime.text() == "") {
             stopTime.setAttribute("xsi:nil", "true");
           }
           else {
             QString timeValue = stopTime.text();
             if (!timeValue.contains("Z")) {
-              PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z"); 
+              PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
             }
           }
           QStringList xmlPath;
@@ -374,7 +362,7 @@ namespace Isis {
         identificationAreaNode.insertAfter(aliasListNode, identificationAreaNode.firstChildElement("product_class"));
       }
 
-      // Put Reference list in correct place: 
+      // Put Reference list in correct place:
       QDomElement referenceListNode = m_domDoc->documentElement().firstChildElement("Reference_List");
       if ( !referenceListNode.isNull() && !identificationAreaNode.isNull() ) {
          m_domDoc->documentElement().insertAfter(referenceListNode, obsAreaNode);
@@ -389,31 +377,31 @@ namespace Isis {
   }
 
   /**
-   * Allows mission specific programs to set logical_identifier 
-   * required for PDS4 labels. This value is added to the xml file 
-   * by the identificationArea() method. 
-   *  
-   * The input value will be converted to all-lowercase if not already 
-   * in line with PDS4 requirements.  
-   *  
-   * The input string should be colon separated string with 6 
-   * identifiers: 
-   *  
-   * <ol> 
+   * Allows mission specific programs to set logical_identifier
+   * required for PDS4 labels. This value is added to the xml file
+   * by the identificationArea() method.
+   *
+   * The input value will be converted to all-lowercase if not already
+   * in line with PDS4 requirements.
+   *
+   * The input string should be colon separated string with 6
+   * identifiers:
+   *
+   * <ol>
    *   <li> urn </li>
    *   <li> space_agency (ususally nasa) </li>
    *   <li> archiving_organization (usually pds) </li>
    *   <li> bundle_id </li>
    *   <li> collection_id </li>
    *   <li> product_id </li>
-   * </ol> 
-   *  
-   * Example: 
-   * urn:esa:psa:em16_tgo_frd:data_raw:frd_raw_sc_d_20150625T133700-20150625T135700 
-   * 
+   * </ol>
+   *
+   * Example:
+   * urn:esa:psa:em16_tgo_frd:data_raw:frd_raw_sc_d_20150625T133700-20150625T135700
+   *
    * @author 2018-05-21 Jeannie Backer
-   * 
-   * @param lid The logical identifier value required for PDS4 
+   *
+   * @param lid The logical identifier value required for PDS4
    *            compliant labels.
    */
   void ProcessExportPds4::setLogicalId(QString lid) {
@@ -423,15 +411,15 @@ namespace Isis {
 
   /**
    * Allows mission specific programs to set version_id
-   * required for PDS4 labels. This value is added to the xml file 
-   * by the identificationArea() method. 
-   *  
-   * The input string should be colon separated string with 6 
-   * identifiers: 
-   *  
+   * required for PDS4 labels. This value is added to the xml file
+   * by the identificationArea() method.
+   *
+   * The input string should be colon separated string with 6
+   * identifiers:
+   *
    * @author 2019-03-01 Kristin Berry
-   * 
-   * @param versiondId The version_id value required for PDS4 
+   *
+   * @param versiondId The version_id value required for PDS4
    *            compliant labels.
    */
    void ProcessExportPds4::setVersionId(QString versionId) {
@@ -441,12 +429,12 @@ namespace Isis {
 
   /**
    * Allows mission specific programs to set the title
-   * required for PDS4 labels. This value is added to the xml file 
-   * by the identificationArea() method. 
-   *  
+   * required for PDS4 labels. This value is added to the xml file
+   * by the identificationArea() method.
+   *
    * @author 2019-03-01 Kristin Berry
-   * 
-   * @param title The title value required for PDS4 
+   *
+   * @param title The title value required for PDS4
    *            compliant labels.
    */
    void ProcessExportPds4::setTitle(QString title) {
@@ -455,11 +443,11 @@ namespace Isis {
 
 
  /**
-   * Allows mission specific programs to use specified 
-   * versions of dictionaries. 
-   * 
+   * Allows mission specific programs to use specified
+   * versions of dictionaries.
+   *
    * @author 2018-05-21 Jeannie Backer
-   *  
+   *
    * @param schema The string of schema to be set.
    */
   void ProcessExportPds4::setSchemaLocation(QString schema) {
@@ -469,10 +457,10 @@ namespace Isis {
 
   /**
    * This method writes the identification information to the PDS4
-   * labels. 
+   * labels.
    */
   void ProcessExportPds4::identificationArea() {
-    Pvl *inputLabel = InputCubes[0]->label(); 
+    Pvl *inputLabel = InputCubes[0]->label();
     FileName translationFileName;
     translationFileName = "$ISISROOT/appdata/translations/pds4ExportIdentificationArea.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
@@ -502,12 +490,12 @@ namespace Isis {
     PvlToXmlTranslationManager::resetElementValue(lidElement, m_lid);
 
     if (m_versionId != "") {
-      QDomElement versionElement = identificationElement.firstChildElement("version_id"); 
+      QDomElement versionElement = identificationElement.firstChildElement("version_id");
       PvlToXmlTranslationManager::resetElementValue(versionElement, m_versionId);
     }
 
     if (m_title != "") {
-      QDomElement titleElement = identificationElement.firstChildElement("title"); 
+      QDomElement titleElement = identificationElement.firstChildElement("title");
       PvlToXmlTranslationManager::resetElementValue(titleElement, m_title);
     }
 
@@ -525,48 +513,48 @@ namespace Isis {
     addHistory(historyDescription, historyDate);
   }
 
-  
+
   /**
-   * This method writes the display direction information to 
-   * the PDS4 labels. 
+   * This method writes the display direction information to
+   * the PDS4 labels.
    */
   void ProcessExportPds4::displaySettings() {
     // Add header info
-    addSchema("PDS4_DISP_1B00.sch", 
+    addSchema("PDS4_DISP_1B00.sch",
               "PDS4_DISP_1B00.xsd",
-              "xmlns:disp", 
-              "http://pds.nasa.gov/pds4/disp/v1"); 
+              "xmlns:disp",
+              "http://pds.nasa.gov/pds4/disp/v1");
 
-    Pvl *inputLabel = InputCubes[0]->label(); 
+    Pvl *inputLabel = InputCubes[0]->label();
     FileName translationFileName;
     translationFileName = "$ISISROOT/appdata/translations/pds4ExportDisplaySettings.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
   }
 
-  
+
  /**
-  * Export bandbin group to sp:Spectral Characteristics 
-  * 
+  * Export bandbin group to sp:Spectral Characteristics
+  *
   */
   void ProcessExportPds4::standardBandBin() {
-    Pvl *inputLabel = InputCubes[0]->label(); 
+    Pvl *inputLabel = InputCubes[0]->label();
     if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
     // Add header info
-    addSchema("PDS4_IMG_1A10_1510.sch", 
+    addSchema("PDS4_IMG_1A10_1510.sch",
               "PDS4_IMG_1A10_1510.xsd",
-              "xmlns:img", 
-              "http://pds.nasa.gov/pds4/img/v1"); 
-    
+              "xmlns:img",
+              "http://pds.nasa.gov/pds4/img/v1");
+
     // Get the input Isis cube label and find the BandBin group if it has one
     if (m_imageType == StandardImage) {
       translateBandBinImage(*inputLabel);
     }
     else {
       // Add header info
-      addSchema("PDS4_SP_1100.sch", 
+      addSchema("PDS4_SP_1100.sch",
                 "PDS4_SP_1100.xsd",
-                "xmlns:sp", 
+                "xmlns:sp",
                 "http://pds.nasa.gov/pds4/sp/v1");
       if (m_imageType == UniformlySampledSpectrum) {
         translateBandBinSpectrumUniform(*inputLabel);
@@ -728,7 +716,7 @@ namespace Isis {
         }
       }
     }
-    
+
   }
 
 
@@ -757,15 +745,15 @@ namespace Isis {
     //            sampling_interval (units Hz, Angstrom, cm**-1, respectively)
     //            bin_width  (units Hz, Angstrom, cm**-1, respectively)
     //            first_center_value  (units Hz, Angstrom, cm**-1, respectively)
-    //            last_center_value  (units Hz, Angstrom, cm**-1, respectively) 
-    //            Local_Internal_Reference 
+    //            last_center_value  (units Hz, Angstrom, cm**-1, respectively)
+    //            Local_Internal_Reference
     //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
-    //            Local_Internal_Reference:local_identifier_reference, 
-    //                1. At least one Axis_Array:axis_name must match the 
-    //                   value of the local_identifier_reference in the 
+    //            Local_Internal_Reference:local_identifier_reference,
+    //                1. At least one Axis_Array:axis_name must match the
+    //                   value of the local_identifier_reference in the
     //                   Axis_Uniformly_Sampled.
     //                   Set Axis_Uniformly_Sampled:local_identifier_reference = Axis_Array:axis_name = Band
-    //                2. At least one Array_3D_Spectrum:local_identifier must match 
+    //                2. At least one Array_3D_Spectrum:local_identifier must match
     //                   the value of the local_identifier_reference in the
     //                   Spectral_Characteristics.
     //                   Set Spectral_Characteristics:local_identifier_reference = Array_3D_Spectrum:local_identifier = Spectral_Array_Object
@@ -793,13 +781,13 @@ namespace Isis {
     QDomElement lastCenterElement = m_domDoc->createElement("sp:last_center_value");
     PvlToXmlTranslationManager::setElementValue(lastCenterElement, lastCenter);
     spectralCharElement.appendChild(lastCenterElement);
-    
+
   }
 
  /**
-  * Sets the description string which describes the pixel vales in 
-  * File_Area_Observational 
-  *  
+  * Sets the description string which describes the pixel vales in
+  * File_Area_Observational
+  *
   * @param description Description of pixel values to use.
   */
   void ProcessExportPds4::setPixelDescription(QString description) {
@@ -807,12 +795,12 @@ namespace Isis {
   }
 
   /**
-   * Create and internalize an image output label from the input 
-   * image. This method has a similar function to 
-   * ProcessExportPds::StandardImageImage. 
+   * Create and internalize an image output label from the input
+   * image. This method has a similar function to
+   * ProcessExportPds::StandardImageImage.
    */
   void ProcessExportPds4::fileAreaObservational() {
-    Pvl *inputLabel = InputCubes[0]->label(); 
+    Pvl *inputLabel = InputCubes[0]->label();
     QString imageObject = "";
 
     QString translationFile = "$ISISROOT/appdata/translations/pds4Export";
@@ -877,13 +865,13 @@ namespace Isis {
                       fileAreaObservationalElement.firstChildElement(imageObject);
       if (!arrayImageElement.isNull()) {
 
-        // reorder axis elements. 
+        // reorder axis elements.
         // Translation order:  elements, axis_name, sequence_number
         // Correct order:      axis_name, elements, sequence_number
         QDomElement axisArrayElement = arrayImageElement.firstChildElement("Axis_Array");
         while( !axisArrayElement.isNull() ) {
           QDomElement axisNameElement = axisArrayElement.firstChildElement("axis_name");
-          axisArrayElement.insertBefore(axisNameElement, 
+          axisArrayElement.insertBefore(axisNameElement,
                                         axisArrayElement.firstChildElement("elements"));
           axisArrayElement = axisArrayElement.nextSiblingElement("Axis_Array");
         }
@@ -909,16 +897,16 @@ namespace Isis {
       }
 
       // Add the Special_Constants class to define ISIS special pixel values if pixel type is
-      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants"); 
+      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants");
       arrayImageElement.insertAfter(specialConstantElement,
                                     arrayImageElement.lastChildElement("Axis_Array"));
 
       switch (p_pixelType) {
-        case Real: 
+        case Real:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
           PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
           specialConstantElement.appendChild(nullElement);
-        
+
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
           PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
           specialConstantElement.appendChild(highInstrumentSatElement);
@@ -933,14 +921,14 @@ namespace Isis {
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
           PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
-          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          specialConstantElement.appendChild(lowRepresentationSatElement);
           break;}
 
         case UnsignedByte:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
           PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL1, 'g', 18));
           specialConstantElement.appendChild(nullElement);
-        
+
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
           PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT1, 'g', 18));
           specialConstantElement.appendChild(highInstrumentSatElement);
@@ -962,7 +950,7 @@ namespace Isis {
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
           PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL2, 'g', 18));
           specialConstantElement.appendChild(nullElement);
-        
+
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
           PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT2, 'g', 18));
           specialConstantElement.appendChild(highInstrumentSatElement);
@@ -977,14 +965,14 @@ namespace Isis {
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
           PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT2, 'g', 18));
-          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          specialConstantElement.appendChild(lowRepresentationSatElement);
           break; }
 
         case UnsignedWord:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
           PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULLU2, 'g', 18));
           specialConstantElement.appendChild(nullElement);
-        
+
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
           PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SATU2, 'g', 18));
           specialConstantElement.appendChild(highInstrumentSatElement);
@@ -999,7 +987,7 @@ namespace Isis {
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
           PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SATU2, 'g', 18));
-          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          specialConstantElement.appendChild(lowRepresentationSatElement);
           break; }
 
         case None:
@@ -1012,7 +1000,7 @@ namespace Isis {
 
 
       if (!m_pixelDescription.isEmpty()) {
-        QDomElement descriptionElement = m_domDoc->createElement("description"); 
+        QDomElement descriptionElement = m_domDoc->createElement("description");
         PvlToXmlTranslationManager::setElementValue(descriptionElement,
                                                     m_pixelDescription);
         arrayImageElement.insertAfter(descriptionElement, arrayImageElement.lastChildElement());
@@ -1022,11 +1010,11 @@ namespace Isis {
 
 
   /**
-   * Adds necessary information to the xml header for a pds4 class for schema which lack 
-   * schematron files (.sch) 
-   * 
+   * Adds necessary information to the xml header for a pds4 class for schema which lack
+   * schematron files (.sch)
+   *
    * @param xsd Schema filename without path
-   * @param xmlns The xml namespace used 
+   * @param xmlns The xml namespace used
    * @param xmlnsURI Full URL to the xml namespace URI. Also used as the location of the sch and xsd
    */
   void ProcessExportPds4::addSchema(QString xsd, QString xmlns, QString xmlnsURI) {
@@ -1035,7 +1023,7 @@ namespace Isis {
     root.setAttribute(xmlns, xmlnsURI);
 
     // Add to xsi:schemaLocation
-    m_schemaLocation += " "; 
+    m_schemaLocation += " ";
     m_schemaLocation += xmlnsURI;
     m_schemaLocation += " ";
     m_schemaLocation += xmlnsURI;
@@ -1046,11 +1034,11 @@ namespace Isis {
 
 
   /**
-   * Adds necessary information to the xml header for a pds4 class. 
-   * 
+   * Adds necessary information to the xml header for a pds4 class.
+   *
    * @param sch Schematron filename without path
    * @param xsd Schema filename without path
-   * @param xmlns The xml namespace used 
+   * @param xmlns The xml namespace used
    * @param xmlnsURI Full URL to the xml namespace URI. Also used as the location of the sch and xsd
    */
   void ProcessExportPds4::addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) {
@@ -1095,7 +1083,7 @@ namespace Isis {
   /**
    * Return the internalized PDS4 label. If no label is internalized yet, an
    * empty label will be returned.
-   * 
+   *
    * @return @b QDomDocument The PDS4 Xml label
    */
   QDomDocument &ProcessExportPds4::GetLabel() {
@@ -1109,18 +1097,18 @@ namespace Isis {
     }
     return *m_domDoc;
   }
-  
-  
+
+
   /**
    * This method write out the labels and image data to the specified output file.
    * Creates an IMG and XML file.
-   * 
-   * @param outFile QString of the name of the output image file. Will create an XML 
+   *
+   * @param outFile QString of the name of the output image file. Will create an XML
    *        and an IMG file with the output file name.
    *
    */
   void ProcessExportPds4::WritePds4(QString outFile) {
-    
+
     FileName outputFile(outFile);
 
     // Name for output label
@@ -1132,7 +1120,7 @@ namespace Isis {
     QString imageName = outputFile.expanded();
 
     // If input file ends in .xml, the user entered a label name for the output file, not an
-    // image name with a unique file extension. 
+    // image name with a unique file extension.
     if (QString::compare(outputFile.extension(), "xml", Qt::CaseInsensitive) == 0) {
       imageName = path + "/" + name + ".img";
     }
@@ -1142,7 +1130,7 @@ namespace Isis {
                     rootElement.firstChildElement("File_Area_Observational");
 
     QDomElement fileElement = m_domDoc->createElement("File");
-    fileAreaObservationalElement.insertBefore(fileElement, 
+    fileAreaObservationalElement.insertBefore(fileElement,
                                               fileAreaObservationalElement.firstChildElement());
 
     QDomElement fileNameElement = m_domDoc->createElement("file_name");
@@ -1156,7 +1144,7 @@ namespace Isis {
     ofstream outputLabel(labelName.toLatin1().data());
     OutputLabel(outputLabel);
     outputLabel.close();
-    
+
     ofstream outputImageFile(imageName.toLatin1().data());
     StartProcess(outputImageFile);
     outputImageFile.close();
@@ -1170,8 +1158,8 @@ namespace Isis {
    * label
    *
    *
-   * @throws IException::User "Unable to export projection [" + projName + "] to PDS4 product. " + 
-                              "This projection is not supported in ISIS3."
+   * @throws IException::User "Unable to export projection [" + projName + "] to PDS4 product. " +
+                              "This projection is not supported in ISIS."
    */
   void ProcessExportPds4::StandardAllMapping() {
     // Cartography
@@ -1181,33 +1169,33 @@ namespace Isis {
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
 
-    addSchema("PDS4_CART_1900.sch", 
+    addSchema("PDS4_CART_1900.sch",
               "PDS4_CART_1900.xsd",
-              "xmlns:cart", 
-              "http://pds.nasa.gov/pds4/cart/v1"); 
+              "xmlns:cart",
+              "http://pds.nasa.gov/pds4/cart/v1");
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
-    Projection *proj = ProjectionFactory::Create(*inputLabel); 
+    Projection *proj = ProjectionFactory::Create(*inputLabel);
     QString projName = proj->Name();
     try {
-      PvlToXmlTranslationManager xlatorSpecProj(*inputLabel, 
+      PvlToXmlTranslationManager xlatorSpecProj(*inputLabel,
                                                 "$ISISROOT/appdata/translations/pds4Export" + projName + ".trn");
       xlatorSpecProj.Auto(*m_domDoc);
-    } 
+    }
     catch (IException &e) {
-      QString msg = "Unable to export projection [" + projName + "] to PDS4 product. " + 
+      QString msg = "Unable to export projection [" + projName + "] to PDS4 product. " +
                      "This projection is not supported in ISIS3.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     // convert units.
     QStringList xmlPath;
-    xmlPath << "Product_Observational" 
-            << "Observation_Area" 
-            << "Discipline_Area" 
-            << "cart:Cartography" 
-            << "cart:Map_Projection" 
-            << "cart:Spatial_Reference_Information" 
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "cart:Cartography"
+            << "cart:Map_Projection"
+            << "cart:Spatial_Reference_Information"
             << "cart:Horizontal_Coordinate_System_Definition"
             << "cart:Geodetic_Model";
 
@@ -1217,7 +1205,7 @@ namespace Isis {
     if (!semiMajorRadElement.isNull()) {
 
       QString units = semiMajorRadElement.attribute("unit");
-      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) { 
+      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
 
         //if no units, assume in meters
         double dValue = toDouble(semiMajorRadElement.text());
@@ -1230,7 +1218,7 @@ namespace Isis {
     if (!semiMinorRadElement.isNull()) {
 
       QString units = semiMinorRadElement.attribute("unit");
-      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) { 
+      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
         // If no units, assume in meters
         double dValue = toDouble(semiMinorRadElement.text());
         dValue /= 1000.0;
@@ -1241,7 +1229,7 @@ namespace Isis {
     QDomElement polarRadElement = geodeticModelElement.firstChildElement("cart:polar_radius");
     if (!polarRadElement.isNull()) {
       QString units = polarRadElement.attribute("unit");
-      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) { 
+      if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
         // If no units, assume in meters
         double dValue = toDouble(polarRadElement.text());
         dValue /= 1000.0;
@@ -1252,16 +1240,16 @@ namespace Isis {
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
-    
+
     // Add Lat/Lon range
-    double maxLon, minLon, maxLat, minLat; 
-    InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
-    
+    double maxLon, minLon, maxLat, minLat;
+    InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon);
+
     xmlPath.clear();
     xmlPath << "Product_Observational"
-            << "Observation_Area" 
+            << "Observation_Area"
             << "Discipline_Area"
-            << "cart:Cartography" 
+            << "cart:Cartography"
             << "cart:Spatial_Domain"
             << "cart:Bounding_Coordinates";
     QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
@@ -1288,9 +1276,9 @@ namespace Isis {
     // longitude_of_central_meridian and latitude_of_projection_origin need to be converted to floats.
     xmlPath.clear();
     xmlPath << "Product_Observational"
-            << "Observation_Area" 
+            << "Observation_Area"
             << "Discipline_Area"
-            << "cart:Cartography" 
+            << "cart:Cartography"
             << "cart:Spatial_Reference_Information"
             << "cart:Horizontal_Coordinate_System_Definition"
             << "cart:Planar"
@@ -1301,29 +1289,29 @@ namespace Isis {
     QDomElement tempElement = projectionElement.firstChildElement();
     QDomElement nameElement = tempElement.nextSiblingElement();
 
-    QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian"); 
+    QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian");
     QDomElement originElement = nameElement.firstChildElement("cart:latitude_of_projection_origin");
 
-    double longitudeElementValue = longitudeElement.text().toDouble(); 
-    double originElementValue = originElement.text().toDouble(); 
+    double longitudeElementValue = longitudeElement.text().toDouble();
+    double originElementValue = originElement.text().toDouble();
 
-    // Only update the ouput formatting if there are no digits after the decimal point. 
+    // Only update the ouput formatting if there are no digits after the decimal point.
     if (!longitudeElement.text().contains('.')) {
-      QString toset1 = QString::number(longitudeElementValue, 'f', 1); 
-      PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg"); 
+      QString toset1 = QString::number(longitudeElementValue, 'f', 1);
+      PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg");
     }
 
     if (!originElement.text().contains('.')) {
-      QString toset2 = QString::number(originElementValue, 'f', 1); 
+      QString toset2 = QString::number(originElementValue, 'f', 1);
       PvlToXmlTranslationManager::resetElementValue(originElement, toset2, "deg");
     }
   }
 
 
 /**
-  * Convenience method to get an element given a path and its parent. 
-  * 
-  * @param xmlPath The XML path to the element to retrieve, 
+  * Convenience method to get an element given a path and its parent.
+  *
+  * @param xmlPath The XML path to the element to retrieve,
   *                starting at the parent element. Note: The
   *                first element of this path must be the same as
   *                the parent element passed in, unless the
@@ -1333,22 +1321,22 @@ namespace Isis {
   *                given.
   * @param parent The parent QDomElement of the given path. Defaults to
   *               the root element of the document.
-  * 
-  * @return QDomElement 
+  *
+  * @return QDomElement
   */
   QDomElement ProcessExportPds4::getElement(QStringList xmlPath, QDomElement parent) {
     QDomElement baseElement = parent;
     if (baseElement.isNull()) {
       baseElement = m_domDoc->documentElement();
     }
-    if (baseElement.isNull()) { 
-      QString msg = "Unable to get element from empty XML document."; 
+    if (baseElement.isNull()) {
+      QString msg = "Unable to get element from empty XML document.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     QString parentName = xmlPath[0];
     if (parentName != baseElement.tagName()) {
       QString msg = "The tag name of the parent element passed in "
-                    "must be the first value in the given XML path."; 
+                    "must be the first value in the given XML path.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     for (int i = 1; i < xmlPath.size(); i++) {
@@ -1362,10 +1350,10 @@ namespace Isis {
 
   /**
    * Helper function for converting ISIS pixel type and byte order to a PDS4 data_type value.
-   * 
+   *
    * @param pixelType The ISIS pixel type of the data
    * @param endianType The byte order of the data
-   * 
+   *
    * @return @b QString The PDS4 data_type value for the given pixel type and byte order.
    */
   QString ProcessExportPds4::PDS4PixelType(PixelType pixelType, ByteOrder endianType) {
@@ -1403,7 +1391,7 @@ namespace Isis {
    * Add a modification history instance by adding a Modification_Detail entry
    * to the Modification_History element. If there are no existing entries,
    * this will create a Modification_History element also.
-   * 
+   *
    * @param description The description of the modification.
    * @param date The date of the modification. Expected format is "YYYY-MM-DD". Defaults to "tbd".
    * @param version The product version. Expected format is "m.n". Defaults to "tbd".
@@ -1459,15 +1447,15 @@ namespace Isis {
   /**
    * This function will go through an XML document and attempt to convert all
    * "units" attributes to the appropriate PDS4 units format.
-   * 
+   *
    * This method uses a pvl config file to determine what the proper PDS4
    * format is and what potential input formats are. The file is converted to
    * a map which is then used to convert all of the input units. See
    * $ISISROOT/appdata/translations/pds4ExportUnits.pvl for more information on this file.
-   * 
+   *
    * This method is automatically called in StandardPds4Label(), but may need
    * to be called again if the label is changed afterwards.
-   * 
+   *
    * @param[in,out] label A reference to the label that the units will be
    *                      translated in.
    * @param transMapFile The path to the config file that will be used to
@@ -1506,12 +1494,12 @@ namespace Isis {
 
   /**
    * Helper function for creating the unit translation map from a PVL object.
-   * 
+   *
    * @param configPvl The config PVL that defines the map.
-   * 
+   *
    * @return @b QMap<QString,QString> The map that converts lower case ISIS
    *                                  units to PDS4 units.
-   * 
+   *
    * @see ProcessExportPds4::translateUnits
    */
   QMap<QString, QString> ProcessExportPds4::createUnitMap(Pvl configPvl) {
@@ -1538,7 +1526,7 @@ namespace Isis {
         }
       }
     }
-    return transMap; 
+    return transMap;
   }
 
 
@@ -1546,12 +1534,12 @@ namespace Isis {
    * Recursive method that will translate the "unit" attribute of any child
    * elements of a given element. Returns void if the given element has no
    * children.
-   * 
+   *
    * @param parent The element whose children's units will be translated. This
    *               method will be recursively called on all child elements.
    * @param transMap The translation map with lowercase ISIS units as keys and
    *                 PDS4 units as values.
-   * 
+   *
    * @see ProcessExportPds4::translateUnits
    */
   void ProcessExportPds4::translateChildUnits(QDomElement parent, QMap<QString, QString> transMap) {

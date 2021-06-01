@@ -1,10 +1,10 @@
-# Translation for Identification Area section of export from ISIS3 cube to PDS4 product.
+# Translation for Identification Area section of export from ISIS cube to PDS4 product.
 # For now, these are hardcoded values.
 #
 # Note these translations must be are ordered based on the required PDS4 order.
 #
-# history 2017-11-07 Jeannie Backer - Original version. 
-# history 2017-11-15 Kristin Berry - Updated order groups are output in for PDS4 compliancy.  
+# history 2017-11-07 Jeannie Backer - Original version.
+# history 2017-11-15 Kristin Berry - Updated order groups are output in for PDS4 compliancy.
 
 # Could be DataSetId for some missions
 Group = LogicalId
@@ -29,7 +29,7 @@ Group = ProductTitle
   Auto
   InputKey        = ProductDescription
   InputPosition   = (IsisCube, Archive)
-  InputDefault    = "PDS4 product exported from ISIS3 cube."
+  InputDefault    = "PDS4 product exported from ISIS cube."
   OutputName      = title
   OutputPosition  = (Product_Observational, Identification_Area)
   Translation     = (*, *)
@@ -50,6 +50,3 @@ Group = ProductClass
   OutputPosition  = (Product_Observational, Identification_Area)
   Translation     = (*, *)
 End_Group
-
-
-

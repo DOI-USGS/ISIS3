@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // Qt library includes
 #include <QtCore/qmath.h>
 #include <QString>
@@ -29,10 +37,10 @@ namespace Isis {
 
   // start process by line method
   void crop(Buffer &out);
-  // methods for converting between label clock count times and actual times 
-  iTime actualTime(iTime timeFromInputClockCount, double tdiMode, 
+  // methods for converting between label clock count times and actual times
+  iTime actualTime(iTime timeFromInputClockCount, double tdiMode,
                    double unbinnedRate, double binMode);
-  iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode, 
+  iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode,
                             double unbinnedRate, double binMode);
   pair<double, double> ckBeginEndTimes(IString ckFileName);
   // methods for converting between lines/times/clock counts
@@ -42,16 +50,16 @@ namespace Isis {
   iTime clock2time(QString spacecraftClockCount);
   // method to validate calculated or user-entered cropped line and time values
   void validateCropLines();
-  void validateCropTimes(double cropStart, double  cropStop, 
-                         double ckFirstTime, double ckLastTime); 
-  
+  void validateCropTimes(double cropStart, double  cropStop,
+                         double ckFirstTime, double ckLastTime);
+
   // declare and initialize global variables needed in crop method.
   LineManager *g_in = NULL;
-  Cube *g_cube = NULL; 
+  Cube *g_cube = NULL;
   int g_cropStartLine = 0;
   int g_cropEndLine = 0;
   int g_cropLineCount = 0;
-  
+
   void hicrop(UserInterface &ui, Pvl *log) {
     QString inputFileName = ui.GetFileName("FROM");
     CubeAttributeInput inAtt(inputFileName);
@@ -59,25 +67,25 @@ namespace Isis {
     g_cube->setVirtualBands(inAtt.bands());
     inputFileName = ui.GetFileName("FROM");
     g_cube->open(inputFileName);
-    
+
     hicrop(g_cube, ui, log);
-    delete g_cube; 
+    delete g_cube;
     g_cube = NULL;
   }
-  
+
   void hicrop(Cube *cube, UserInterface &ui, Pvl *log) {
     //   Isis::Preference::Preferences(true); // delete ???
     cout << setprecision(25);// ???
 
-    g_cube = cube; 
+    g_cube = cube;
     QString inputFileName = g_cube->fileName();
     // get user inputs for input cube and open
     try {
-  
-      // read kernel files and furnish these kernels for naif routines used in 
+
+      // read kernel files and furnish these kernels for naif routines used in
       // originalStartTime() and time2clock()
       IString ckFileName = ui.GetFileName("CK");
-  
+
       IString lskFileName = "";
       if (ui.WasEntered("LSK")) {
         lskFileName = ui.GetFileName("LSK");
@@ -86,7 +94,7 @@ namespace Isis {
         FileName lskFile("$base/kernels/lsk/naif????.tls");
         lskFileName = lskFile.highestVersion().expanded();
       }
-  
+
       IString sclkFileName = "";
       if (ui.WasEntered("SCLK")) {
         sclkFileName = ui.GetFileName("SCLK");
@@ -95,7 +103,7 @@ namespace Isis {
         FileName sclkFile("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
         sclkFileName = sclkFile.highestVersion().expanded();
       }
-  
+
       // furnish these kernels
       NaifStatus::CheckErrors();
       furnsh_c(ckFileName.c_str());
@@ -104,7 +112,7 @@ namespace Isis {
       NaifStatus::CheckErrors();
       furnsh_c(lskFileName.c_str());
       NaifStatus::CheckErrors();
-  
+
       // get values from the labels needed to compute the line rate and the
       // actual start time of the input cube
       Pvl &inLabels = *g_cube->label();
@@ -119,19 +127,19 @@ namespace Isis {
       QString labelStartClockCount = inputInst["SpacecraftClockStartCount"];
       double binMode = inputInst["Summing"];
       double deltaLineTimerCount = inputInst["DeltaLineTimerCount"];
-  
+
       // Compute the line rate using the product of the
       // unbinned line rate (converted to seconds) and the downtrack summing
       double unbinnedRate = (74.0 + (deltaLineTimerCount / 16.0)) / 1000000.0;
       double lineRate = unbinnedRate * binMode;
-  
+
       // get the actual original start time by making adjustments to the
       // spacecraft clock start count in the labels
       iTime timeFromLabelClockCount = clock2time(labelStartClockCount);
-      iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode, 
+      iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode,
                                        unbinnedRate, binMode);
       double originalStartEt = originalStart.Et();
-       
+
       pair<double, double> ckCoverage = ckBeginEndTimes(ckFileName);
       // find the values of the first and last lines to be kept from user inputs
       if (ui.GetString("SOURCE") == "LINEVALUES") {
@@ -180,37 +188,37 @@ namespace Isis {
           firstValidTime = ckCoverage.first;
           lastValidTime = ckCoverage.second;
         }
-        validateCropTimes(firstValidTime, lastValidTime, 
+        validateCropTimes(firstValidTime, lastValidTime,
                           ckCoverage.first, ckCoverage.second);
-  
+
         // to get the integer value of the start line, we will always round up
         if (originalStartEt > firstValidTime) {
           g_cropStartLine = 1;
         }
         else {
-          // get the exact line number associated with this time and find its 
+          // get the exact line number associated with this time and find its
           // decimal value.
           double startTime2Line = et2line(firstValidTime, lineRate, originalStartEt);
           double decimalValue = startTime2Line - qFloor(startTime2Line);
-          // notice that for each line, n, it covers times corresponding to the 
+          // notice that for each line, n, it covers times corresponding to the
           // exact line values that are between (n-1)+0.5 and n+0.5
-          // we need to be sure that the entire first line has coverage, 
+          // we need to be sure that the entire first line has coverage,
           if (decimalValue <= 0.5) {
             // if the decimal value is between 0 and 0.5, the time corresponds to
-            // the second half of the nth line, from n to n+0.5. 
-            // round up to the next line number since the first half of the 
-            // nth line is not covered 
+            // the second half of the nth line, from n to n+0.5.
+            // round up to the next line number since the first half of the
+            // nth line is not covered
             g_cropStartLine = qCeil(startTime2Line);
           }
           else {
-            // if the decimal value is above 0.5, the time corresponds to the 
-            // first half of the nth line from (n-1)+0.5 to n. 
-            // round up to get the nth line and add 1 since the nth line is not 
+            // if the decimal value is above 0.5, the time corresponds to the
+            // first half of the nth line from (n-1)+0.5 to n.
+            // round up to get the nth line and add 1 since the nth line is not
             // entirely covered
             g_cropStartLine = qCeil(startTime2Line) + 1;
           }
         }
-  
+
         // Now, to get the integer value of the end line, always round down.
         // Get the exact line number associated with this time and find its
         // decimal value.
@@ -224,7 +232,7 @@ namespace Isis {
           if (decimalValue >= 0.5) {
             // if the decimal value is above 0.5, the time corresponds to the
             // first half of the nth line.  Round down to the previous line
-            // since the second half of this line is not covered 
+            // since the second half of this line is not covered
             g_cropEndLine = qFloor(stopTime2Line);
           }
           else {
@@ -234,30 +242,30 @@ namespace Isis {
             g_cropEndLine = qFloor(stopTime2Line) - 1;
           }
         }
-  
+
       }
-  
+
       g_cropLineCount = (g_cropEndLine - g_cropStartLine + 1);
-  
+
       // The following error check has been commented out since it is redundant.
       // Error should be caught when the validateCropTimes() method is called.
       // validateCropLines();
-      
-      // update start and stop times of the cropped image based on the 
+
+      // update start and stop times of the cropped image based on the
       // the first and last line values that will be kept.
       // subtract 0.5 to get the time at the beginning of the first line
-      iTime cropStartTime = line2time((double) g_cropStartLine - 0.5, 
+      iTime cropStartTime = line2time((double) g_cropStartLine - 0.5,
                                       lineRate, originalStartEt);
       // add 0.5 to get the time at the end of the last line
-      iTime cropStopTime = line2time((double) g_cropEndLine + 0.5, 
+      iTime cropStopTime = line2time((double) g_cropEndLine + 0.5,
                                      lineRate, originalStartEt);
-      validateCropTimes(cropStartTime.Et(), cropStopTime.Et(), 
+      validateCropTimes(cropStartTime.Et(), cropStopTime.Et(),
                         ckCoverage.first, ckCoverage.second);
-  
+
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
       IString actualCropStartClockCount = time2clock(cropStartTime);//???
       IString actualCropStopClockCount = time2clock(cropStopTime); //???
-  
+
   //???
    // UTC
    // cout << "labelStartClock2time = " << timeFromLabelClockCount.UTC() << endl;
@@ -265,29 +273,29 @@ namespace Isis {
    // cout << "cropped starttime = " << cropStartTime.UTC() << endl;
    // cout << "cropped stoptime = " << cropStopTime.UTC() << endl;
    // cout << "time at 80000.5 = " << line2time(80000.5, lineRate, originalStartEt).UTC() << endl << endl;
-   // 
+   //
    // // ET
-   // cout << "labelStartClockEt = " << timeFromLabelClockCount.Et() << endl;// should this be 
-   // cout << "adjustedStartClockEt = " << originalStartEt << endl;// should this be 
+   // cout << "labelStartClockEt = " << timeFromLabelClockCount.Et() << endl;// should this be
+   // cout << "adjustedStartClockEt = " << originalStartEt << endl;// should this be
    // cout << "cropped starttime = " << cropStartTime.Et() << endl;//??? 264289109.970381856
    // cout << "cropped stoptime = " << cropStopTime.Et() << endl;//??? 264289117.285806835
    // cout << "time at 80000.5 = " << line2time(80000.5, lineRate, originalStartEt).Et() << endl << endl;
-   
-  
+
+
       // readjust the time to get the appropriate label value for the
       // spacecraft clock start count for the labels of the cropped cube
-      iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode, 
+      iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode,
                                                         unbinnedRate, binMode);
       QString adjustedCropStartClockCount = time2clock(adjustedCropStartTime);
-      iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode, 
+      iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode,
                                                        unbinnedRate, binMode);
       QString adjustedCropStopClockCount = time2clock(adjustedCropStopTime);
-  
-  
-  
+
+
+
   //???    string stopClockCount = inputInst["SpacecraftClockStopCount"];
   //???    iTime labelStopTime = clock2time(stopClockCount);
-  //???    iTime origStop = actualTime(labelStopTime, tdiMode, 
+  //???    iTime origStop = actualTime(labelStopTime, tdiMode,
   //???                                unbinnedRate, binMode);
   //???    double endline = et2line(origStop.Et(),  lineRate,  originalStartEt);
   //???    cout << std::setprecision(20);
@@ -302,8 +310,8 @@ namespace Isis {
   //???    cout << "Actual Stop Count = " << actualCropStopClockCount << endl;
   //???    cout << "Label Stop Time   = " << adjustedCropStopTime.Et() << endl;
   //???    cout << "Label Stop Count  = " << adjustedCropStopClockCount << endl;
-  
-  
+
+
       // Allocate the output file and make sure things get propogated nicely
       ProcessByLine p;
       p.SetInputCube(g_cube);
@@ -311,25 +319,25 @@ namespace Isis {
       int numSamps = g_cube->sampleCount();
       int numBands = g_cube->bandCount();
       int inputLineCount = g_cube->lineCount();
-      
+
       Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
       FileName outFileName = ui.GetFileName("TO");
       Cube *ocube = p.SetOutputCube(outFileName.expanded(), atts, numSamps, g_cropLineCount, numBands);
-      
+
       p.ClearInputCubes();
       // Loop through the labels looking for object = Table
       for (int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
         PvlObject &obj = inLabels.object(labelObj);
-  
+
         if (obj.name() != "Table") continue;
-  
+
         // Read the table into a table object
         Table table(obj["Name"], inputFileName);
-  
+
         // Write the table
         ocube->write(table);
       }
-  
+
       // test to see what happens if I don't have this code ???
       Pvl &outLabels = *ocube->label();
       // Change the start/end times and spacecraft start/stop counts in the labels
@@ -338,12 +346,12 @@ namespace Isis {
       outputInst["StopTime"][0] = cropStopTime.UTC(); // adjustedCropStopTime ???
       outputInst["SpacecraftClockStartCount"][0] = adjustedCropStartClockCount;
       outputInst["SpacecraftClockStopCount"][0] = adjustedCropStopClockCount;
-  
+
       // Create a buffer for reading the input cube
       // Crop the input cube
       g_in = new LineManager(*g_cube);
       p.StartProcess(crop);
-  
+
       // Construct a label with the results
       PvlGroup results("Results");
       results += PvlKeyword("InputLines", toString(inputLineCount));
@@ -355,18 +363,18 @@ namespace Isis {
       results += PvlKeyword("OututStopTime", cropStopTime.UTC()); //??? adjustedCropStopTime
       results += PvlKeyword("OututStartClock", adjustedCropStartClockCount);
       results += PvlKeyword("OututStopClock", adjustedCropStopClockCount);
-  
+
       // Cleanup
       p.EndProcess();
-      
+
       delete g_in;
       g_in = NULL;
-       
+
       // Write the results to the log
       if(log) {
         log->addGroup(results);
       }
-      
+
       // Unfurnishes kernel files to prevent file table overflow
       NaifStatus::CheckErrors();
       unload_c(ckFileName.c_str());
@@ -375,7 +383,7 @@ namespace Isis {
       NaifStatus::CheckErrors();
     }
     catch (IException &e) {
-      IString msg = "Unable to crop the given cube [" + inputFileName 
+      IString msg = "Unable to crop the given cube [" + inputFileName
                     + "] using the hicrop program.";
       // clean up before throwing exception
       delete g_in;
@@ -383,8 +391,8 @@ namespace Isis {
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
-  
-  /** 
+
+  /**
    *  Line processing routine.
    */
   void crop(Buffer &out) {
@@ -393,29 +401,29 @@ namespace Isis {
     int band = 1;
     g_in->SetLine(iline, 1);
     g_cube->read(*g_in);
-  
+
     // Loop and move appropriate samples
     for (int i = 0; i < out.size(); i++) {
       out[i] = (*g_in)[i];
     }
-  
+
     if (out.Line() == g_cropLineCount) band++;
   }
-  
-  /** 
-   * This method is used to determine the actual start or stop time for the input 
-   * image.  This is found by using the time corresponding to clock count 
-   * read from the label of the input cube. 
-   *  
-   * @param timeFromInputClockCount This value is passed in after converting the 
+
+  /**
+   * This method is used to determine the actual start or stop time for the input
+   * image.  This is found by using the time corresponding to clock count
+   * read from the label of the input cube.
+   *
+   * @param timeFromInputClockCount This value is passed in after converting the
    *                                clock count value from the labels to time
-   * @param tdiMode The Tdi keyword value from the labels of the input cube. 
+   * @param tdiMode The Tdi keyword value from the labels of the input cube.
    * @param unbinnedRate Calculated using values from the input label.
-   * @param binMode The Summing keyword value from the labels of the input cube. 
-   * 
+   * @param binMode The Summing keyword value from the labels of the input cube.
+   *
    * @see HiriseCamera::HiriseCamera(Pvl &lab)
    */
-  iTime actualTime(iTime timeFromInputClockCount, double tdiMode, 
+  iTime actualTime(iTime timeFromInputClockCount, double tdiMode,
                    double unbinnedRate, double binMode) {
     SpiceDouble adjustedTime = timeFromInputClockCount.Et();
     // Adjust the start time so that it is the effective time for
@@ -429,7 +437,7 @@ namespace Isis {
     adjustedTime += unbinnedRate * (((double) binMode / 2.0) - 0.5);
     // Effective observation time of the first line
     // in the image file, which is possibly binned
-  
+
     // Compute effective line number within the CCD (in pixels) for the
     // given TDI mode.
     //   This is the "centered" 0-based line number, where line 0 is the
@@ -439,35 +447,35 @@ namespace Isis {
     iTime actualStartTime = adjustedTime;
     return actualStartTime;
   }
-  
-  /** 
-   * This method is used to determine the time value that corresponds to the 
+
+  /**
+   * This method is used to determine the time value that corresponds to the
    * start or stop clock count that will be written to the output cube. This
-   * is found by using the actual start/stop time of the output cube. This 
-   * is done so that when a HiriseCamera object is created from this image, 
-   * the correct values will be calculated for the start time. 
-   *  
-   * @param actualCalculatedTime This value is the actual start/stop time of 
+   * is found by using the actual start/stop time of the output cube. This
+   * is done so that when a HiriseCamera object is created from this image,
+   * the correct values will be calculated for the start time.
+   *
+   * @param actualCalculatedTime This value is the actual start/stop time of
    *                             the output cube that will be adjusted for
    *                             the labels.
-   * @param tdiMode The Tdi keyword value from the labels of the input cube. 
+   * @param tdiMode The Tdi keyword value from the labels of the input cube.
    * @param unbinnedRate Calculated using values from the input label.
-   * @param binMode The Summing keyword value from the labels of the input cube. 
-   * 
+   * @param binMode The Summing keyword value from the labels of the input cube.
+   *
    * @see HiriseCamera::HiriseCamera(Pvl &lab)
    */
-  iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode, 
+  iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode,
                             double unbinnedRate, double binMode) {
-    iTime labelStartTime = actualCalculatedTime.Et() 
+    iTime labelStartTime = actualCalculatedTime.Et()
                            + unbinnedRate * ((tdiMode / 2.0) - 0.5)
                            - unbinnedRate * ((binMode / 2.0) - 0.5);
     return labelStartTime;
   }
-  
-  /** 
+
+  /**
    * Returns the first and last times that are covered by the given CK file. The
    * SCLK and LSK files must be furnished before this method is called.
-   * 
+   *
    * @param ckFileName String containing the name of the ck file provided by the
    *                   user.
    * @return A pair of doubles, the first is the earliest time covered by the CK
@@ -493,7 +501,7 @@ namespace Isis {
                     "single body CK files.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-  
+
     //get the NAIF body code
     int body = SPICE_CELL_ELEM_I(&currCell, numberOfBodies-1);
     NaifStatus::CheckErrors();
@@ -525,63 +533,63 @@ namespace Isis {
     pair< double, double > coverage(startTime.toDouble(),  stopTime.toDouble());
     return coverage;
   }
-  
+
   /**
-   * Returns the corresponding time for the given line number. 
-   *  
-   * Notice that this method takes an exact double line value, not an int line 
-   * value. For example, if the ET at the beginning of a starting line is 
-   * desired, the value passed in should be the integer line number minus 0.5 and 
+   * Returns the corresponding time for the given line number.
+   *
+   * Notice that this method takes an exact double line value, not an int line
+   * value. For example, if the ET at the beginning of a starting line is
+   * desired, the value passed in should be the integer line number minus 0.5 and
    * if the ET at the end of the last line is desired, the integer end line number
-   * plus 0.5 should be passed in. 
-   *  
-   * @param lineNumber The exact line number value for which the image time will 
+   * plus 0.5 should be passed in.
+   *
+   * @param lineNumber The exact line number value for which the image time will
    *                   be found
-   * @param lineRate The line rate for this image, calculated by using label 
+   * @param lineRate The line rate for this image, calculated by using label
    *                 values.
-   * @param originalStartEt The actual start time for the image, calculated by 
+   * @param originalStartEt The actual start time for the image, calculated by
    *                        using label values.
-   *  
+   *
    * @return The image time corresponding to the given exact line number value.
-   *  
-   * @see LineScanDetectorMap::SetParent() 
-   *  
+   *
+   * @see LineScanDetectorMap::SetParent()
+   *
    */
   iTime line2time(double lineNumber, double lineRate, double originalStartEt) {
     iTime et = (double) (originalStartEt + lineRate * (lineNumber - 0.5));
     return et;
   }
-  
+
   /**
-   * Returns the corresponding line number for the given ephemeris time.  Note 
+   * Returns the corresponding line number for the given ephemeris time.  Note
    * that this return value is not an integer line, number, it is the exact double
    * line value associated with this time.
-   *  
-   * @param et The ephemeris time of the image whose exact line value will be 
+   *
+   * @param et The ephemeris time of the image whose exact line value will be
    *           found.
-   * @param lineRate The line rate for this image, calculated by using label 
+   * @param lineRate The line rate for this image, calculated by using label
    *                 values.
-   * @param originalStartEt The actual start time for the image, calculated by 
+   * @param originalStartEt The actual start time for the image, calculated by
    *                        using label values.
-   *  
+   *
    * @return The exact line number value corresponding to the given image time.
-   *  
-   * @see LineScanDetectorMap::SetDetector() 
+   *
+   * @see LineScanDetectorMap::SetDetector()
    */
   double et2line(double et, double lineRate, double originalStartEt) {
     return (et - originalStartEt) / lineRate + 0.5;
   }
-  
-  /** 
-   * Returns the corresponding clock count, in string format, for the given time. 
-   *  
-   * HiRise is high precision, so the spacecraft clock format is 
-   * P/SSSSSSSSSS:FFFFF and the clock id = -74999. (See any mro sclk file 
+
+  /**
+   * Returns the corresponding clock count, in string format, for the given time.
+   *
+   * HiRise is high precision, so the spacecraft clock format is
+   * P/SSSSSSSSSS:FFFFF and the clock id = -74999. (See any mro sclk file
    * for documentation on these values.)
-   *  
+   *
    * @param time The time of the image to be converted.
-   *  
-   * @return A string containing the spacecraft clock count corresponding 
+   *
+   * @return A string containing the spacecraft clock count corresponding
    *         to the given time.
    */
   QString time2clock(iTime time) {
@@ -593,14 +601,14 @@ namespace Isis {
     NaifStatus::CheckErrors();
     return stringOutput;
   }
-  
-  /** 
-   * Returns the corresponding time for the given spacecraft clock count. 
-   *  
+
+  /**
+   * Returns the corresponding time for the given spacecraft clock count.
+   *
    * @param spacecraftClockCount The clock count of the image to be converted.
-   *  
+   *
    * @return The image time corresponding to the given spacecraft clock count.
-   *  
+   *
    * @see Spice::getClockTime(clockCountString, sclkCode)
    */
   iTime clock2time(QString spacecraftClockCount) {
@@ -615,8 +623,8 @@ namespace Isis {
     iTime time = clockTime.toDouble();
     return time;
   }
-  
-  
+
+
   /**
    * This method is used to verify that the values found for the start and end
    * lines is valid.
@@ -629,7 +637,7 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
-  
+
   /**
    * This method is used to verify that the values found for the start and end
    * lines is valid.
@@ -637,22 +645,22 @@ namespace Isis {
   void validateCropTimes(double cropStart, double  cropStop, double ckFirstTime, double ckLastTime) {
     if (cropStart < ckFirstTime ||
         cropStop > ckLastTime) {
-      IString msg = "Invalid start/stop times [" + IString(cropStart) + ", " 
+      IString msg = "Invalid start/stop times [" + IString(cropStart) + ", "
                     + IString(cropStop) + "]. These times fall outside of the "
                     "given CK file's time coverage [" + IString(ckFirstTime)
                     + ", " + IString(ckLastTime) + "].";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-  
-    // Now, for user inputs other than line/nlines, use the start and end 
+
+    // Now, for user inputs other than line/nlines, use the start and end
     // times we found to calculate the cropped start/end line numbers
     if (cropStart >= cropStop) {
       IString msg = "Invalid start/stop times. The start ET "
                     "value [" + IString(cropStart) + "] is greater "
-                    "than or equal to the stop ET value [" 
+                    "than or equal to the stop ET value ["
                     + IString(cropStop) + "].";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-  
+
   }
 }

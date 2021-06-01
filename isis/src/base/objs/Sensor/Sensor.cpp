@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.17 $
- * $Date: 2010/05/22 00:08:59 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "Sensor.h"
 
 #include <iomanip>
@@ -59,6 +43,7 @@ namespace Isis {
    * @param cube Cube whose label contains Instrument and Kernels groups.
    */
   Sensor::Sensor(Cube &cube) : Spice(cube) {
+    m_newLookB = false;
   }
 
 
@@ -367,7 +352,7 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion tests
    */
@@ -409,7 +394,7 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool True if the look direction intersects the target.
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion test
    */
@@ -430,7 +415,7 @@ namespace Isis {
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
 
-    shape->intersectSurface(SurfacePoint(lat, lon, rad), 
+    shape->intersectSurface(SurfacePoint(lat, lon, rad),
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
                             backCheck);
 
@@ -450,10 +435,10 @@ namespace Isis {
    *                  Defaults to true.
    *
    * @return bool
-   * 
+   *
    * @internal
    *   @history 2017-03-23 Kris Becker - Added support for occlusion test
-   * 
+   *
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     //std::cout << "Sensor::SetGround()\n";
@@ -465,7 +450,7 @@ namespace Isis {
       return false;
     }
 
-    shape->intersectSurface(surfacePt, 
+    shape->intersectSurface(surfacePt,
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()),
                             backCheck);
 
@@ -539,7 +524,7 @@ namespace Isis {
     vector<double> lookC = instrumentRotation()->ReferenceVector(lookDirectionJ2000());
     v[0] = lookC[0];
     v[1] = lookC[1];
-    v[2] = lookC[2]; 
+    v[2] = lookC[2];
   }
 
  /**
@@ -554,8 +539,8 @@ namespace Isis {
     lookB[2] = m_lookB[2];
     return lookB;
   }
-  
-  
+
+
    /**
    * Returns the look direction in the camera coordinate system.
    *
@@ -574,7 +559,9 @@ namespace Isis {
    * @return @b double The angle of right ascension, in degrees.
    */
   double Sensor::RightAscension() {
-    if (m_newLookB) computeRaDec();
+    if (m_newLookB) {
+      computeRaDec();
+    }
     return m_ra;
   }
 
@@ -585,7 +572,9 @@ namespace Isis {
    * @return @b double Declination angle, in degrees.
    */
   double Sensor::Declination() {
-    if (m_newLookB) computeRaDec();
+    if (m_newLookB) {
+      computeRaDec();
+    }
     return m_dec;
   }
 

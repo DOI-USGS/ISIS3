@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "Blob.h"
 #include "Cube.h"
@@ -20,7 +28,7 @@ void IsisMain() {
   }
 
   icube.open(FileName(ui.GetFileName("FROM")).expanded());
-  
+
   // Make sure it is a Themis EDR/RDR
   FileName inFileName = ui.GetFileName("FROM");
   try {
@@ -35,7 +43,7 @@ void IsisMain() {
     msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
-  
+
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
   int summing = toInt(icube.group("Instrument")["SpatialSumming"][0]);
@@ -146,4 +154,3 @@ void IsisMain() {
   fcubeMgrs.clear();
   flatcubes.clear();
 }
-

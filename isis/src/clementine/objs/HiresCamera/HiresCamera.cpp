@@ -1,22 +1,10 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include "HiresCamera.h"
 
@@ -44,14 +32,14 @@ namespace Isis {
    *                          call to ShutterOpenCloseTimes() method. Changed
    *                          centertime to add half exposure duration to start
    *                          time to maintain consistency with other Clementine
-   *                          models. 
+   *                          models.
    */
   HiresCamera::HiresCamera(Cube &cube) : FramingCamera(cube) {
     m_instrumentNameLong = "High Resolution Camera";
     m_instrumentNameShort = "HiRES";
     m_spacecraftNameLong = "Clementine 1";
     m_spacecraftNameShort = "Clementine1";
-    
+
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     // Get the camera characteristics
@@ -76,7 +64,7 @@ namespace Isis {
      * clementine camera models. Not sure why the following was originally
      * commented out:
      * 2010-08-05 Jeannie Walldren
-     ***********************************************************************/ 
+     ***********************************************************************/
     // Do not correct time for center of the exposure duration. This is because
     // the kernels were built to accept the start times of the images.
     iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
@@ -142,7 +130,7 @@ namespace Isis {
  * @param lab Cube labels
  *
  * @return Isis::Camera* HiresCamera
- * @internal 
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Clementine namespace.
  */

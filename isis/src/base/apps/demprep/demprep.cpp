@@ -5,7 +5,6 @@
 #include "TProjection.h"
 #include "SpecialPixel.h"
 #include "LineManager.h"
-#include "OriginalLabel.h"
 #include "History.h"
 #include "Table.h"
 #include "Pvl.h"

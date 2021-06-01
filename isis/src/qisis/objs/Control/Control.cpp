@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Control.h"
 
 #include <QDebug>
@@ -172,13 +180,13 @@ namespace Isis {
 
 
   /**
-   * @description Write control net to disk.  This method is used instead of calling 
-   * ControlNet::Write directly so that Control knows the modification state of the control net. 
+   * @description Write control net to disk.  This method is used instead of calling
+   * ControlNet::Write directly so that Control knows the modification state of the control net.
    * Note that if there is not a control net opened, there should no be any changes to write.
-   *  
-   * @return @b bool Returns false if there is not a control net open to write 
-   *  
-   * @throws IException::Programmer "Cannot write control net to disk" 
+   *
+   * @return @b bool Returns false if there is not a control net open to write
+   *
+   * @throws IException::Programmer "Cannot write control net to disk"
    */
   bool Control::write() {
 
@@ -213,10 +221,10 @@ namespace Isis {
 
 
   /**
-   * @description Has this control been modified? 
-   *  
-   * @return @b bool Has this control been modified? 
-   *  
+   * @description Has this control been modified?
+   *
+   * @return @b bool Has this control been modified?
+   *
    */
   bool Control::isModified() {
     return m_modified;
@@ -224,14 +232,14 @@ namespace Isis {
 
 
   /**
-   * @description Sets the modification state of this control. This is needed for now since many 
-   * classes make changes to the control net contained in this object, but the control does not 
-   * know the state of the control net. 
+   * @description Sets the modification state of this control. This is needed for now since many
+   * classes make changes to the control net contained in this object, but the control does not
+   * know the state of the control net.
    * TODO:  Change this class to always know the state of the control Net.
-   *  
+   *
    */
   void Control::setModified(bool modified) {
-    
+
     m_modified = modified;
   }
 
@@ -286,7 +294,7 @@ namespace Isis {
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
 
     if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
-  
+
       QString newNetworkPath =  project->cnetRoot(newProjectRoot.toString()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
 

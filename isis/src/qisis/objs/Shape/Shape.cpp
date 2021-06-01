@@ -155,7 +155,7 @@ namespace Isis {
 
           PvlGroup kernels = cube()->group("Kernels");
           if (kernels.hasKeyword("ShapeModel")) {
-            QString shapeFile = kernels["ShapeModel"]; 
+            QString shapeFile = kernels["ShapeModel"];
             if (shapeFile.contains("dem")) {
               m_radiusSource = ControlPoint::RadiusSource::DEM;
             }
@@ -201,7 +201,7 @@ namespace Isis {
       initQuickFootprint();
     }
     catch (IException &e) {
-      
+
     }
   }
 
@@ -298,8 +298,7 @@ namespace Isis {
       result = true;
 
     if (!result && m_cube) {
-      // TODO: Move this to Blob!
-      ImagePolygon example;
+      Blob example = ImagePolygon().toBlob();
 
       QString blobType = example.Type();
       QString blobName = example.Name();
@@ -814,8 +813,7 @@ namespace Isis {
 
 
   void Shape::initQuickFootprint() {
-    ImagePolygon poly;
-    cube()->read(poly);
+    ImagePolygon poly = cube()->readFootprint();
     m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
   }
 
@@ -1072,7 +1070,7 @@ namespace Isis {
     }
     else if (localName == "shape" && !m_shape->m_footprint) {
       try {
-        QMutex mutex; 
+        QMutex mutex;
         m_shape->initFootprint(&mutex);
         m_shape->closeCube();
       }

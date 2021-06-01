@@ -8,6 +8,7 @@
 #include "Cube.h"
 #include "History.h"
 #include "IException.h"
+#include "Process.h"
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "UserInterface.h"
@@ -15,13 +16,11 @@
 using namespace std;
 using namespace Isis;
 
-void writeHistory(Cube &cube);
-
 void IsisMain() {
   // Import cube data & PVL information
-  Cube cube;
   UserInterface &ui = Application::GetUserInterface();
-  cube.open(ui.GetFileName("FROM"), "rw");
+  Process process;
+  Cube *cube = process.SetInputCube("FROM", Isis::ReadWrite);
   Pvl *regdef;
   // If regdef was supplied by the user, use it. else, use the template.
   if (ui.WasEntered("REGDEF")) {
@@ -30,7 +29,7 @@ void IsisMain() {
   else {
     regdef = new Pvl("$ISISROOT/appdata/templates/autoreg/findrx.def");
   }
-  PvlGroup &reseaus = cube.label()->findGroup("Reseaus", Pvl::Traverse);
+  PvlGroup &reseaus = cube->label()->findGroup("Reseaus", Pvl::Traverse);
 
   // If the Keyword sizes don't match up, throw errors.
   int nres = reseaus["Line"].size();
@@ -79,7 +78,7 @@ void IsisMain() {
   for (int res = 0; res < nres; ++res) {
     // Output chips
     ar->SearchChip()->TackCube(toDouble(reseaus["Sample"][res]), toDouble(reseaus["Line"][res]));
-    ar->SearchChip()->Load(cube);
+    ar->SearchChip()->Load(*cube);
     ar->PatternChip()->Load(pattern, 0, 1.0, res + 1);
     int type = toInt(reseaus["Type"][res]);
     // If the reseaus is in the center (type 5) use full percent value
@@ -114,7 +113,7 @@ void IsisMain() {
       double line = toDouble(reseaus["Line"][res]);
       double sample = toDouble(reseaus["Sample"][res]);
       white->SetBasePosition(int(sample), int(line), 1);
-      cube.write(*white);
+      cube->write(*white);
     }
     prog.CheckStatus();
 
@@ -124,32 +123,6 @@ void IsisMain() {
   reseaus["Status"] = "Refined";
 
   pattern.close();
-  writeHistory(cube);
-  cube.close();
-}
-
-
-/**
- * Writes out the History blob to a cube
- *
- * @param cube Cube to add History blob to
- */
-void writeHistory(Cube &cube) {
-  bool addedHist = false;
-  Isis::Pvl *inlabel = cube.label();
-  for (int i = 0; i < inlabel->objects(); i++) {
-    if (inlabel->object(i).isNamed("History") && Isis::iApp != NULL) {
-      Isis::History h( (QString)inlabel->object(i)["Name"] );
-      cube.read(h);
-      h.AddEntry();
-      cube.write(h);
-      addedHist = true;
-    }
-  }
-
-  if (!addedHist && Isis::iApp != NULL) {
-    Isis::History h("IsisCube");
-    h.AddEntry();
-    cube.write(h);
-  }
+  process.WriteHistory(*cube);
+  cube->close();
 }
