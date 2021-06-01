@@ -33,10 +33,9 @@ void IsisMain() {
     Application::Log(*grpIt);
   }
 
-  PvlGroup results = appLog.findGroup("Results");
-  if( ui.WasEntered("TO") && ui.IsInteractive() ) {
+  Pvl results;
+  if( (ui.GetBoolean("LISTALL") || ui.GetBoolean("LISTSPEC")) && ui.IsInteractive() ) {
+    results.addObject(appLog.findObject("FeatureAlgorithms"));
     Application::GuiLog(results);
   }
-
-  SessionLog::TheLog().AddResults(results);
 }

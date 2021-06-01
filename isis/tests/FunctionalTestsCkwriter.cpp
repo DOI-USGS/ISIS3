@@ -13,7 +13,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/ckwriter.xml").expanded();
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
+TEST_F(DefaultCube, FunctionalTestCkwriterDefault) {
   Pvl appLog;
   QVector<QString> args = {"from=" + testCube->fileName(),
                            "to=" + tempDir.path() + "/newKernel.bc"};
@@ -57,8 +57,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
   SpiceRotation *newKernelRotation = newCamera->instrumentRotation();
   SpiceRotation *originalRotation = testCube->camera()->instrumentRotation();
 
-  Table instPointingTable("InstrumentPointing");
-  testCube->read(instPointingTable);
+  Table instPointingTable = testCube->readTable("InstrumentPointing");
   double startTime = double(instPointingTable.Label()["CkTableStartTime"]);
 
   newKernelRotation->SetEphemerisTime(startTime);
@@ -77,7 +76,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterDefault) {
   }
 }
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
+TEST_F(DefaultCube, FunctionalTestCkwriterFromlist) {
   Pvl appLog;
   FileList cubeList;
   cubeList.append(testCube->fileName());
@@ -127,8 +126,7 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
   SpiceRotation *newKernelRotation = newCamera->instrumentRotation();
   SpiceRotation *originalRotation = origCamera->instrumentRotation();
 
-  Table instPointingTable("InstrumentPointing");
-  testCube->read(instPointingTable);
+  Table instPointingTable = testCube->readTable("InstrumentPointing");
   double startTime = double(instPointingTable.Label()["CkTableStartTime"]);
 
   newKernelRotation->SetEphemerisTime(startTime);
@@ -147,22 +145,22 @@ TEST_F(DefaultCube, FunctionalTestsCkwriterFromlist) {
   }
 }
 
-TEST_F(ObservationPair, FunctionalTestsCkwriterCantValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterCantValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc"};
 
   UserInterface options(APP_XML, args);
   try {
-   ckwriter(options, &appLog);
-   FAIL() << "Should not have been able to generate new CK" << std::endl;
+    ckwriter(options, &appLog);
+    FAIL() << "Should not have been able to generate new CK" << std::endl;
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), HasSubstr("Time overlap conflicts are present in segment (image) list."));
   }
 }
 
-TEST_F(ObservationPair, FunctionalTestsCkwriterWarnValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterWarnValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc",
@@ -179,7 +177,7 @@ TEST_F(ObservationPair, FunctionalTestsCkwriterWarnValidate) {
   EXPECT_TRUE(appLog.hasGroup("Overlaps"));
 }
 
-TEST_F(DefaultCube, FunctionalTestsCkwriterComSum) {
+TEST_F(DefaultCube, FunctionalTestCkwriterComSum) {
   Pvl appLog;
 
   QString comFilePath = tempDir.path() + "/commfile.txt";

@@ -1520,10 +1520,10 @@ namespace Isis {
 
       // order of points in vector is top, bottom, left, right
       QList< QPair< double, double > > surroundingPoints;
-      surroundingPoints.append(qMakePair(samp, line - 0.5));
-      surroundingPoints.append(qMakePair(samp, line + 0.5 - DBL_MIN));
-      surroundingPoints.append(qMakePair(samp - 0.5, line));
-      surroundingPoints.append(qMakePair(samp + 0.5 - DBL_MIN, line));
+      surroundingPoints.append(qMakePair(samp, std::nexttoward(line - 0.5, line)));
+      surroundingPoints.append(qMakePair(samp, std::nexttoward(line + 0.5, line)));
+      surroundingPoints.append(qMakePair(std::nexttoward(samp - 0.5, samp), line));
+      surroundingPoints.append(qMakePair(std::nexttoward(samp + 0.5, samp), line));
 
       // save input state to be restored on return
       double originalSample = samp;
@@ -2303,7 +2303,14 @@ namespace Isis {
     if (sin(b) == 0.0 || sin(c) == 0.0) {
       return azimuth;
     }
-    double A = acos((cos(a) - cos(b)*cos(c))/(sin(b)*sin(c))) * 180.0 / PI;
+    double intermediate = (cos(a) - cos(b)*cos(c))/(sin(b)*sin(c));
+    if (intermediate < -1.0) {
+      intermediate = -1.0;
+    }
+    else if (intermediate > 1.0) {
+      intermediate = 1.0;
+    }
+    double A = acos(intermediate) * 180.0 / PI;
     //double B = acos((cos(b) - cos(c)*cos(a))/(sin(c)*sin(a))) * 180.0 / PI;
     if (glat >= 0.0) {
       if (quad == 1 || quad == 4) {
@@ -3078,5 +3085,3 @@ namespace Isis {
 
 // end namespace isis
 }
-
-

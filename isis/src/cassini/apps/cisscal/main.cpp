@@ -669,8 +669,7 @@ vector<double> gbl::OverclockFit() {
   //     -col 3 is the "average" of the overclocked pixels
   //       -if there are 2 overclocks, columns 1 and 2 contain them
   //       -otherwise column 1 is all null and we use column 2
-  Table overClkTable("ISS Prefix Pixels");
-  gbl::incube->read(overClkTable);
+  Table overClkTable = gbl::incube->readTable("ISS Prefix Pixels");
   for(int i = 0; i < overClkTable.Records(); i++) {
     overclocks.push_back(overClkTable[i]["OverclockPixels"]);
   }

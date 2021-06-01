@@ -8,6 +8,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
@@ -74,7 +75,7 @@ namespace Isis {
       // Get the single line of encoded XML from the input file that the client, spiceinit, sent us.
       TextFile inFile( ui.GetFileName("FROM") );
       QString hexCode;
-      
+
       // GetLine returns false if it was the last line... so we can't check for problems really
       inFile.GetLine(hexCode);
 
@@ -159,7 +160,7 @@ namespace Isis {
         }
 
       }
-      
+
       // This next section looks a lot like spiceinit, its semi-duplicated because
       //   I did not want users to be able to spiceinit a label without cube
       //   data.
@@ -247,7 +248,7 @@ namespace Isis {
       }
 
       FileName inputLabels;
-      
+
       while (ck.at(0).size() != 0 && !kernelSuccess) {
         // create an empty kernel
         Kernel realCkKernel;
@@ -282,7 +283,7 @@ namespace Isis {
         }
 
         realCkKernel.setKernels(ckKernelList);
-        
+
         /*
          * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
          * classes take a cube instead of a pvl as input.
@@ -455,7 +456,7 @@ namespace Isis {
 
         if (errPvl.groups() > 0)
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
-        
+
         if (log) {
           log->addGroup(currentKernels);
         }
@@ -468,7 +469,7 @@ namespace Isis {
       for (int i = 0; i < ckKeyword.size(); i++)
         ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
 
-      ckTable.Write(ui.GetFileName("TO") + ".pointing");
+      ckTable.toBlob().Write(ui.GetFileName("TO") + ".pointing");
 
       Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
       spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -476,7 +477,7 @@ namespace Isis {
       for (int i = 0; i < spkKeyword.size(); i++)
         spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
 
-      spkTable.Write(ui.GetFileName("TO") + ".position");
+      spkTable.toBlob().Write(ui.GetFileName("TO") + ".position");
 
       Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
       bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -488,7 +489,7 @@ namespace Isis {
         bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
       bodyTable.Label() += PvlKeyword( "SolarLongitude", toString( cam->solarLongitude().degrees() ) );
-      bodyTable.Write(ui.GetFileName("TO") + ".bodyrot");
+      bodyTable.toBlob().Write(ui.GetFileName("TO") + ".bodyrot");
 
       Table sunTable = cam->sunPosition()->Cache("SunPosition");
       sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -496,7 +497,7 @@ namespace Isis {
       for (int i = 0; i < targetSpkKeyword.size(); i++)
         sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
-      sunTable.Write(ui.GetFileName("TO") + ".sun");
+      sunTable.toBlob().Write(ui.GetFileName("TO") + ".sun");
 
       //  Save original kernels in keyword before changing to Table
       PvlKeyword origCk = currentKernels["InstrumentPointing"];

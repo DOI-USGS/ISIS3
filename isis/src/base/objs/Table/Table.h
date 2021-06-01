@@ -6,12 +6,12 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "Blob.h"
+#include "Pvl.h"
 #include <vector>
 #include "TableRecord.h"
 
 namespace Isis {
-  class Pvl;
+  class Blob;
   /**
    * @brief Class for storing Table blobs information.
    *
@@ -19,7 +19,7 @@ namespace Isis {
    * general, records correspond to rows and fields correspond to columns. Thus
    * the TableRecord class corresponds to a vector of row entries and
    * TableField class corresponds to a specific entry of the table for a given
-   * record. Isis Table objects are record based, N records in a table. Each 
+   * record. Isis Table objects are record based, N records in a table. Each
    * record will have the same number of fields, F. The fields can be of
    * different types including Integer, Double, Text, and Real. The class
    * uses PVL to store the structure of the table N, F, and Field types and
@@ -58,7 +58,7 @@ namespace Isis {
    *                           overhaul of the mosaic tracking now being handled in a separate
    *                           tracking cube.
    */
-  class Table : public Isis::Blob {
+  class Table {
     public:
       /**
        *
@@ -72,6 +72,7 @@ namespace Isis {
 
       // Constructors and Destructors
       Table();
+      Table(Blob &blob);
       Table(const QString &tableName, TableRecord &rec);
       Table(const QString &tableName);// Only use this constructor for reading in an existing table
       Table(const QString &tableName, const QString &file);
@@ -83,8 +84,10 @@ namespace Isis {
       ~Table();
 
 
-      friend std::istream&operator>>(std::istream &is, Table &table);
-      friend std::ostream&operator<<(std::ostream &os, Table &table);
+      void Write(const QString &file);
+
+      QString Name() const;
+      PvlObject &Label();
 
       void SetAssociation(const Table::Association assoc);
       bool IsSampleAssociated();
@@ -109,14 +112,15 @@ namespace Isis {
 
       void Clear();
 
+      Blob toBlob() const;
+
 
       static QString toString(Table table, QString fieldDelimiter=",");
 
+
     protected:
-      void ReadInit();
-      void ReadData(std::istream &stream);
-      void WriteInit();
-      void WriteData(std::fstream &os);
+
+      void initFromBlob(Blob &blob);
 
       TableRecord p_record;          //!< The current table record
       std::vector<char *> p_recbufs; //!< Buffers containing record values
@@ -126,6 +130,9 @@ namespace Isis {
 
       Association p_assoc; //!< Association Type of the table
       bool p_swap;         //!< Only used for reading
+
+      QString p_name; //!< The name of the Table
+      PvlObject p_label; //!< The label for storing additional information
   };
 };
 

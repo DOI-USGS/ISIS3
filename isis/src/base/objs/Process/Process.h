@@ -221,9 +221,7 @@ namespace Isis {
       virtual Isis::Cube *SetInputCube(const QString &fname,
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
-      virtual void SetInputCube(Isis::Cube *inCube);
-      virtual void SetInputCube(Cube *cube, 
-                                    int requirements);
+      virtual void SetInputCube(Isis::Cube *inCube, int requirements = 0);
 
       virtual Isis::Cube *SetOutputCube(const QString &parameter);
       virtual Isis::Cube *SetOutputCubeStretch(const QString &parameter, UserInterface *ui=nullptr);
@@ -238,6 +236,8 @@ namespace Isis {
 
       void AddInputCube(Cube *cube, bool owned = true);
       void AddOutputCube(Cube *cube, bool owned = true);
+
+      void CheckRequirements(const Cube *cube, const int requirements);
 
       void ClearCubes();
       void ClearInputCubes();

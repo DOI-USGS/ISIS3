@@ -22,9 +22,9 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/mvic2isis.xml").expanded();
 TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   Pvl appLog;
   QString cubeFileName = tempDir.path() + "/mvic2isisTEMP.cub";
-  QString undistortedCubeName = tempDir.path() + "mvic2isisUndistorted.cub";
-  QString errorCubeName = tempDir.path() + "mvic2isisError.cub";
-  QString qualityCubeName = tempDir.path() + "mvic2isisQuality.cub";
+  QString undistortedCubeName = tempDir.path() + "/mvic2isisUndistorted.cub";
+  QString errorCubeName = tempDir.path() + "/mvic2isisError.cub";
+  QString qualityCubeName = tempDir.path() + "/mvic2isisQuality.cub";
   QVector<QString> args = {"from=data/mvic2isis/mc3_0034948318_0x536_sci_1_cropped.fits",
                            "to=" + cubeFileName,
                            "undistorted="+undistortedCubeName,

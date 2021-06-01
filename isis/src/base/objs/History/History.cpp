@@ -16,28 +16,35 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-
   /**
-   *  Constructor for reading a history blob
-   *  @param name
+   *  Default Constructor for history
    */
-  History::History(const QString &name) : Isis::Blob(name, "History") {
+  History::History() {
     p_history.setTerminator("");
   }
 
+
   /**
-   *  Constructor for reading a history blob
-   *  @param name
-   *  @param file
+   *  Constructor for reading a blob
+   *  @param blob
    */
-  History::History(const QString &name, const QString &file) :
-    Isis::Blob(name, "History") {
-    Blob::Read(file);
+  History::History(Isis::Blob &blob) {
+    p_history.setTerminator("");
+
+    char *blob_buffer = blob.getBuffer();
+    p_bufferSize = blob.Size();
+    p_histBuffer = new char[p_bufferSize];
+    memcpy(p_histBuffer, blob_buffer, p_bufferSize);
   }
+
 
   //! Destructor
   History::~History() {
+    if (p_histBuffer != NULL) {
+      delete [] p_histBuffer;
+    }
   }
+
 
   /**
    *   Adds History PvlObject
@@ -46,6 +53,7 @@ namespace Isis {
     PvlObject hist = Isis::iApp->History();
     AddEntry(hist);
   }
+
 
   /**
    * Adds given PvlObject to History Pvl
@@ -56,50 +64,47 @@ namespace Isis {
     p_history.addObject(obj);
   }
 
+
   /**
+   * Converts a history object into a new blob object
    *
+   * @param name Name of the History object to create
+   *
+   * @return @b Blob
    */
-  void History::WriteInit() {
+  Blob History::toBlob(const QString &name) {
     ostringstream ostr;
-    if (p_nbytes > 0) ostr << std::endl;
+    if (p_bufferSize > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
     int bytes = histStr.size();
 
-    char *temp = p_buffer;
-    p_buffer = new char[p_nbytes+bytes];
-    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
+    int blobBufferSize = p_bufferSize+bytes;
+    char *blobBuffer = new char[blobBufferSize];
+    if (p_histBuffer != NULL) memcpy(blobBuffer, p_histBuffer, p_bufferSize);
     const char *ptr = histStr.c_str();
-    memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
-    p_nbytes += bytes;
+    memcpy(&blobBuffer[p_bufferSize], (void *)ptr, bytes);
 
-    if (temp != NULL) delete [] temp;
+    Blob newBlob(name, "History");
+    newBlob.takeData(blobBuffer, blobBufferSize);
+    return newBlob;
   }
 
+
   /**
-   * Reads p_buffer into a pvl
+   * Reads p_histBuffer into a pvl
    *
    * @return @b Pvl
    */
   Pvl History::ReturnHist() {
     Pvl pvl;
     stringstream os;
-    for (int i = 0; i < p_nbytes; i++) os << p_buffer[i];
+    for (int i = 0; i < p_bufferSize; i++) os << p_histBuffer[i];
+
+    for (int i = 0; i < p_history.objects(); i++) {
+      os << std::endl << p_history.object(i);
+    }
     os >> pvl;
     return pvl;
-  }
-
-  /**
-   * Reads input stream into Pvl.
-   *
-   * @param pvl Pvl into which the input stream will be read.
-   * @param is Input stream.
-   */
-  void History::Read(const Isis::Pvl &pvl, std::istream &is) {
-    try {
-      Blob::Read(pvl, is);
-    }
-    catch (IException &e) {
-    }
   }
 }

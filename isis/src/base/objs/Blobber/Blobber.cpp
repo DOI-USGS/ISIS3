@@ -138,8 +138,7 @@ namespace Isis {
    *                         opened or created in the Cube object.
    */
   void Blobber::load(Cube &cube) {
-    Table tbl(getBlobName());
-    cube.read(tbl);
+    Table tbl = cube.readTable(getBlobName());
     TableField data = tbl[0][getFieldName()];
     if (data.isDouble()) {
       loadDouble(tbl);

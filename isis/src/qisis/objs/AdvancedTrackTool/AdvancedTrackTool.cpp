@@ -648,8 +648,7 @@ namespace Isis {
 
           unsigned int currentPixel = trackingPortal[0];
           if (currentPixel != NULLUI4) {  // If from an image
-            Table table(trackingTableName); // trackingTableName from TrackingTable
-            trackingCube->read(table);
+            Table table = trackingCube->readTable(trackingTableName); // trackingTableName from TrackingTable
             TrackingTable trackingTable(table);
 
             FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);
@@ -694,8 +693,7 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(trackingTableName);
-            cCube->read(cFileTable);
+            Table cFileTable = cCube->readTable(trackingTableName);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {
               psSrcFileName = QString(cFileTable[piOrigin][0]);

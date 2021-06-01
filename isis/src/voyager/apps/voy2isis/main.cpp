@@ -78,7 +78,7 @@ void IsisMain() {
 
   // Preparse the IMG to fix messed up labels
 
-  History *hist = new History("IsisCube");
+  History *hist = new History();
   QByteArray pdsData = fixLabels(in.expanded(), hist);
 
   QTextStream pdsTextStream(&pdsData);

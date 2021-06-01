@@ -22,6 +22,7 @@ TEST_F(DefaultCube, FunctionalTestGetsnAllTrue) {
   QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
   QString expectedSN = "Viking1/VISB/33322515";
   QString expectedON = "Viking1/VISB/33322515";
+  
   QVector<QString> args = { "FILE=TRUE",
                            "SN=TRUE",
                            "OBSERVATION=TRUE"};

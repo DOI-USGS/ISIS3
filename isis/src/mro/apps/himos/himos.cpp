@@ -183,8 +183,7 @@ namespace Isis {
       QString startTime;
       QString stopTime;
       for(int i = 0; i < (int)clist.size(); i++) {
-        OriginalLabel origLab;
-        clist[i]->read(origLab);
+        OriginalLabel origLab = clist[i]->readOriginalLabel();
         PvlGroup timegrp = origLab.ReturnLabels().findGroup("TIME_PARAMETERS", Pvl::Traverse);
         if(i == 0) {
           startClock = (QString)timegrp["SpacecraftClockStartCount"];
@@ -219,8 +218,7 @@ namespace Isis {
       for(int i = 0; i < (int)clist.size(); i++) {
         Pvl *clab = clist[i]->label();
         PvlGroup cInst = clab->findGroup("Instrument", Pvl::Traverse);
-        OriginalLabel cOrgLab;
-        clist[i]->read(cOrgLab);
+        OriginalLabel cOrgLab = clist[i]->readOriginalLabel();
         PvlGroup cGrp = cOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
         cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:TDI"];
         cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:BINNING"];
@@ -236,8 +234,7 @@ namespace Isis {
       }
 
       // Get the blob of original labels from first image in list
-      OriginalLabel org;
-      clist[0]->read(org);
+      OriginalLabel org = clist[0]->readOriginalLabel();
 
       //close all cubes
       for(int i = 0; i < (int)clist.size(); i++) {

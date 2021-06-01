@@ -39,7 +39,8 @@ namespace Isis {
   void lronac2isis(UserInterface &ui) {
     // Initialize variables
     ResetGlobals();
-    //Check that the file comes from the right camera
+
+    // Check that the file comes from the right camera
     FileName inFile = ui.GetFileName("FROM");
     QString id;
     try {
@@ -50,10 +51,10 @@ namespace Isis {
         QString msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
-      //Checks if in file is rdr
+      // Checks if in file is RDR
       bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
       if(projected) {
-        QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
+        QString msg = "[" + inFile.name() + "] appears to be an RDR file.";
         msg += " Use pds2isis.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -90,7 +91,8 @@ namespace Isis {
     id = id.simplified().trimmed();
     if(id.mid(13, 3) != "EDR") {
       QString msg = "Input file [" + inFile.expanded() + "] does not appear to be "
-                   + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]";
+                   + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]"
+                   + " Use pds2isis for RDR or CDR.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -119,7 +121,7 @@ namespace Isis {
 
     // Add History
     if (iApp) {
-        History history("IsisCube");
+        History history = g_ocube->readHistory();
         history.AddEntry();
         g_ocube->write(history);
     }

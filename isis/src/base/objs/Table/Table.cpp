@@ -9,107 +9,118 @@ find files of those names at the top level of this repository. **/
 #include <fstream>
 #include <string>
 
+#include "Blob.h"
 #include "Endian.h"
 #include "IException.h"
-#include "Pvl.h"
 #include "TableField.h"
 
 using namespace std;
 namespace Isis {
 
+  Table::Table(Blob &blob) {
+    initFromBlob(blob);
+  }
+
+
   /**
-   * This constructor creates a new table using the given name and record. 
-   *  
-   * Note that the record is not added to this table.  It is used to read the 
-   * TableField names and set the record size (i.e. the number of bytes per 
-   * record). Thus any records added to this table will be required to match 
-   * this size. 
-   *  
+   * This constructor creates a new table using the given name and record.
+   *
+   * Note that the record is not added to this table.  It is used to read the
+   * TableField names and set the record size (i.e. the number of bytes per
+   * record). Thus any records added to this table will be required to match
+   * this size.
+   *
    * In this constructor, the Table::Association is set to None, the ByteOrder
-   * keyword in the labels is set to NULL, and the record information is added 
-   * to the table. 
-   *  
-   * This constructor also calls the parent constructor Blob(tableName, 
-   * "Table"). 
+   * keyword in the labels is set to NULL, and the record information is added
+   * to the table.
+   *
+   * This constructor also calls the parent constructor Blob(tableName,
+   * "Table").
    *
    * @param tableName Name of the Table to be read
    * @param rec Name of the TableRecord to be read into the Table
    */
-  Table::Table(const QString &tableName, Isis::TableRecord &rec) :
-    Blob(tableName, "Table") {
+  Table::Table(const QString &tableName, Isis::TableRecord &rec) {
+    p_name = tableName;
     p_assoc = Table::None;
-    p_blobPvl += Isis::PvlKeyword("Records", 0);
-    p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
-    for (int f = 0; f < rec.Fields(); f++) p_blobPvl.addGroup(rec[f].pvlGroup());
+    p_label += Isis::PvlKeyword("Records", 0);
+    p_label += Isis::PvlKeyword("ByteOrder", "NULL");
+    for (int f = 0; f < rec.Fields(); f++) {
+      p_label.addGroup(rec[f].pvlGroup());
+    }
     p_record = rec;
   }
 
+
   /**
-   * This constructor creates an empty table from an existing table name 
-   * to be read in when the Read() method is called. It should not be 
-   * used to construct a new table object whose data will be filled 
-   * in later since the record size will be set to 0. This constructor 
-   * sets the Table::Association to None. 
-   *  
-   * This constructor also calls the parent constructor 
+   * This constructor creates an empty table from an existing table name
+   * to be read in when the Read() method is called. It should not be
+   * used to construct a new table object whose data will be filled
+   * in later since the record size will be set to 0. This constructor
+   * sets the Table::Association to None.
+   *
+   * This constructor also calls the parent constructor
    * Blob(tableName, "Table").
    *
    * @param tableName Name of the Table to be read
    */
-  Table::Table(const QString &tableName) :
-    Isis::Blob(tableName, "Table") {
+  Table::Table(const QString &tableName) {
+    p_name = tableName;
     p_assoc = Table::None;
   }
 
+
   /**
-   * This constructor reads an existing table using the given table name and 
+   * This constructor reads an existing table using the given table name and
    * file containing the table. This constructor sets the Table::Association
    * to the Association keyword value in the Blob Pvl read from the file, if
    * the keyword exists.
-   *  
-   * This constructor also calls the parent constructor 
+   *
+   * This constructor also calls the parent constructor
    * Blob(tableName, "Table").
-   *  
+   *
    * @param tableName Name of the Table to be read
-   * @param file Name of the file to be read into the Table 
-   *  
-   * @see Blob::Read() 
+   * @param file Name of the file to be read into the Table
+   *
+   * @see Blob::Read()
    */
-  Table::Table(const QString &tableName, const QString &file) :
-    Blob(tableName, "Table") {
-    p_assoc = Table::None;
-    Read(file);
+  Table::Table(const QString &tableName, const QString &file) {
+    Blob blob(tableName, "Table", file);
+    initFromBlob(blob);
   }
 
+
   /**
-   * This constructor reads an existing table using the given table name and 
-   * file containing the table and pvl labels. This constructor sets the 
-   * Table::Association to the Association keyword value in the Blob Pvl 
-   * read from the file, if the keyword exists. 
-   *  
-   * This constructor also calls the parent constructor 
+   * This constructor reads an existing table using the given table name and
+   * file containing the table and pvl labels. This constructor sets the
+   * Table::Association to the Association keyword value in the Blob Pvl
+   * read from the file, if the keyword exists.
+   *
+   * This constructor also calls the parent constructor
    * Blob(tableName, "Table").
    *
    * @param tableName The name of the Table to be read
    * @param file The name of the file to be read into the Table
    * @param fileHeader Pvl labels.
-   *  
-   * @see Blob::Read() 
+   *
+   * @see Blob::Read()
    */
-  Table::Table(const QString &tableName, const QString &file,
-      const Pvl &fileHeader) : Blob(tableName, "Table") {
-    p_assoc = Table::None;
-    Read(file, fileHeader);
+  Table::Table(const QString &tableName, const QString &file, const Pvl &fileHeader) {
+    Blob blob(tableName, "Table");
+    blob.Read(file, fileHeader);
+    initFromBlob(blob);
   }
 
 
   /**
    * Copy constructor for an Table object.  This constructor copies TableRecords
-   * and the member variable values for record, records, assoc, and swap. 
+   * and the member variable values for record, records, assoc, and swap.
    *
    * @param other The table to copy from
    */
-  Table::Table(const Table &other) : Blob(other) {
+  Table::Table(const Table &other) {
+    p_name = other.p_name;
+    p_label = other.p_label;
     p_record = other.p_record;
     p_records = other.p_records;
     p_assoc = other.p_assoc;
@@ -126,18 +137,70 @@ namespace Isis {
     }
   }
 
+
   /**
-   * Sets the Table equal to the input Table object.  This method copies 
-   * TableRecords and the member variable values for record, records, assoc, and 
-   * swap. 
+   * Initialize a Table from a Blob that has been read from a file.
    *
-   * @param other The table to copy from 
-   *  
+   * @param blob The blob to extract the data for the Table from.
+   */
+  void Table::initFromBlob(Blob &blob) {
+    Clear();
+
+    p_label = blob.Label();
+
+    p_name = p_label["Name"][0];
+    p_records = p_label["Records"];
+
+    Isis::TableRecord rec;
+    for (int g = 0; g < p_label.groups(); g++) {
+      if (p_label.group(g).isNamed("Field")) {
+        Isis::TableField f(p_label.group(g));
+        rec += f;
+      }
+    }
+
+    p_record = rec;
+
+    p_assoc = Table::None;
+    if (p_label.hasKeyword("Association")) {
+      QString temp = (QString) p_label["Association"];
+      temp = temp.toUpper();
+      if (temp == "SAMPLES") p_assoc = Table::Samples;
+      if (temp == "LINES") p_assoc = Table::Lines;
+      if (temp == "BANDS") p_assoc = Table::Bands;
+    }
+
+    // Determine if we need to swap stuff when we read the data
+    Isis::ByteOrder bo = Isis::ByteOrderEnumeration(p_label["ByteOrder"]);
+    p_swap = false;
+    if (Isis::IsLsb() && (bo == Isis::Msb)) p_swap = true;
+    if (Isis::IsMsb() && (bo == Isis::Lsb)) p_swap = true;
+
+    for (int rec = 0; rec < p_records; rec++) {
+      size_t bufferPos = rec * RecordSize();
+
+      char *buf = new char[RecordSize()];
+      memcpy(buf, &blob.getBuffer()[bufferPos], RecordSize());
+
+      if (p_swap) p_record.Swap(buf);
+      p_recbufs.push_back(buf);
+    }
+  }
+
+
+  /**
+   * Sets the Table equal to the input Table object.  This method copies
+   * TableRecords and the member variable values for record, records, assoc, and
+   * swap.
+   *
+   * @param other The table to copy from
+   *
    * @return @b Table The copied table.
    */
   Table &Table::operator=(const Isis::Table &other) {
     Clear();
-    *((Isis::Blob *)this) = *((Isis::Blob *)&other);
+    p_name = other.p_name;
+    p_label = other.p_label;
     p_record = other.p_record;
     p_records = other.p_records;
     p_assoc = other.p_assoc;
@@ -156,10 +219,48 @@ namespace Isis {
     return *this;
   }
 
+
   //! Destroys the Table object
   Table::~Table() {
     Clear();
   }
+
+
+  /**
+   * Write the Table to a file.
+   *
+   * This uses a Blob to serialize the Table data, see Blob::Write.
+   *
+   * @param file The file to write the Table to.
+   */
+  void Table::Write(const QString &file) {
+    Blob blob = toBlob();
+    blob.Write(file);
+  }
+
+
+  /**
+   * The Table's name
+   *
+   * @return @b QString the name of the Table
+   */
+  QString Table::Name() const {
+    return p_name;
+  }
+
+
+  /**
+   * The Table's label
+   *
+   * Additional information can be stored on the Table's label and will be serialized
+   * in the Blob's label when written out to a file.
+   *
+   * @return @b PvlObject A reference to the label that can be modified
+   */
+  PvlObject &Table::Label() {
+    return p_label;
+  }
+
 
   /**
    * Sets the association to the input parameter
@@ -170,35 +271,39 @@ namespace Isis {
     p_assoc = assoc;
   }
 
+
   /**
    * Checks to see if association is Samples
    *
-   * @return @b bool Returns true if association is Samples, and false if it is 
+   * @return @b bool Returns true if association is Samples, and false if it is
    *         not
    */
   bool Table::IsSampleAssociated() {
     return (p_assoc == Table::Samples);
   }
 
+
   /**
    * Checks to see if association is Lines
    *
-   * @return @b bool Returns true if association is Lines, and false if it is 
+   * @return @b bool Returns true if association is Lines, and false if it is
    *         not
    */
   bool Table::IsLineAssociated() {
     return (p_assoc == Table::Lines);
   }
 
+
   /**
    * Checks to see if association is Bands
    *
-   * @return @b bool Returns true if association is Bands, and false if it is 
+   * @return @b bool Returns true if association is Bands, and false if it is
    *         not
    */
   bool Table::IsBandAssociated() {
     return (p_assoc == Table::Bands);
   }
+
 
   /**
    * Returns the number of records
@@ -209,6 +314,7 @@ namespace Isis {
     return p_recbufs.size();
   }
 
+
   /**
    * Returns the number of fields per record
    *
@@ -218,6 +324,7 @@ namespace Isis {
     return p_record.Fields();
   }
 
+
   /**
    * Returns the number of bytes per record
    *
@@ -226,6 +333,7 @@ namespace Isis {
   int Table::RecordSize() const {
     return p_record.RecordSize();
   }
+
 
   /**
    * Reads a TableRecord from the Table
@@ -239,6 +347,7 @@ namespace Isis {
     return p_record;
   }
 
+
   /**
    * Adds a TableRecord to the Table
    *
@@ -246,15 +355,15 @@ namespace Isis {
    */
   void Table::operator+=(Isis::TableRecord &rec) {
     if (RecordSize() == 0) {
-      IString msg = "Unable to add records to Isis Table [" 
-                    + p_blobName + "]. Bytes per record = [0 bytes].";
+      IString msg = "Unable to add records to Isis Table ["
+                    + p_name + "]. Bytes per record = [0 bytes].";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
      if (RecordSize() != rec.RecordSize()) {
-       QString msg = "Unable to add the given record with size = [" 
-                     + Isis::toString(rec.RecordSize()) + " bytes] to to Isis Table [" 
-                     + p_blobName + "] with record size = [" 
+       QString msg = "Unable to add the given record with size = ["
+                     + Isis::toString(rec.RecordSize()) + " bytes] to to Isis Table ["
+                     + p_name + "] with record size = ["
                      + Isis::toString(RecordSize()) + " bytes]. Record sizes must match.";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
@@ -262,6 +371,7 @@ namespace Isis {
     rec.Pack(newbuf);
     p_recbufs.push_back(newbuf);
   }
+
 
   /**
    * Updates a TableRecord
@@ -272,6 +382,7 @@ namespace Isis {
   void Table::Update(const Isis::TableRecord &rec, const int index) {
     rec.Pack(p_recbufs[index]);
   }
+
 
   /**
    * Deletes a TableRecord from the Table
@@ -285,6 +396,7 @@ namespace Isis {
     p_recbufs.erase(it);
   }
 
+
   /**
    * Clear the table of all records
    */
@@ -293,107 +405,78 @@ namespace Isis {
     p_recbufs.clear();
   }
 
-  //! Virtual function to validate PVL table information
-  void Table::ReadInit() {
-    p_records = p_blobPvl["Records"];
-
-    Isis::TableRecord rec;
-    for (int g = 0; g < p_blobPvl.groups(); g++) {
-      if (p_blobPvl.group(g).isNamed("Field")) {
-        Isis::TableField f(p_blobPvl.group(g));
-        rec += f;
-      }
-    }
-
-    p_record = rec;
-
-    if (p_blobPvl.hasKeyword("Association")) {
-      QString temp = (QString) p_blobPvl["Association"];
-      temp = temp.toUpper();
-      if (temp == "SAMPLES") p_assoc = Table::Samples;
-      if (temp == "LINES") p_assoc = Table::Lines;
-      if (temp == "BANDS") p_assoc = Table::Bands;
-    }
-
-    // Determine if we need to swap stuff when we read the data
-    Isis::ByteOrder bo = Isis::ByteOrderEnumeration(p_blobPvl["ByteOrder"]);
-    p_swap = false;
-    if (Isis::IsLsb() && (bo == Isis::Msb)) p_swap = true;
-    if (Isis::IsMsb() && (bo == Isis::Lsb)) p_swap = true;
-
-    // Cleanup in case of a re-read
-    Clear();
-  }
 
   /**
-   * Virtual function to Read the data
+   * Serialze the Table to a Blob that can be written to a file.
    *
-   * @param stream InputStream to read data in from
-   *
-   * @throws Isis::IException::Io - Error reading or preparing to read a record
+   * @return @b Blob The Blob contaning the Table's data
    */
-  void Table::ReadData(std::istream &stream) {
-    for (int rec = 0; rec < p_records; rec++) {
-      streampos sbyte = (streampos)(p_startByte - 1) +
-                        (streampos)(rec * RecordSize());
-      stream.seekg(sbyte, std::ios::beg);
-      if (!stream.good()) {
-        QString msg = "Error preparing to read record [" + Isis::toString(rec + 1) + 
-                     "] from Table [" + p_blobName + "]";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
+  Blob Table::toBlob() const {
+    Blob tableBlob(Name(), "Table");
+    PvlObject &blobLabel = tableBlob.Label();
 
-      char *buf = new char[RecordSize()];
-      stream.read(buf, RecordSize());
-      if (!stream.good()) {
-        QString msg = "Error reading record [" + Isis::toString(rec + 1) + 
-                      "] from Table [" + p_blobName + "]";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      if (p_swap) p_record.Swap(buf);
-      p_recbufs.push_back(buf);
-    }
-  }
-
-  //! Virtual Function to prepare labels for writing
-  void Table::WriteInit() {
-    p_blobPvl["Records"] = Isis::toString(Records());
-    p_nbytes = Records() * RecordSize();
+    // Label setup
+    blobLabel += PvlKeyword("Records", Isis::toString(Records()));
+    int nbytes = Records() * RecordSize();
 
     if (Isis::IsLsb()) {
-      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
+      blobLabel+= PvlKeyword("ByteOrder", Isis::ByteOrderName(Isis::Lsb));
     }
     else {
-      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
+      blobLabel+= PvlKeyword("ByteOrder", Isis::ByteOrderName(Isis::Msb));
     }
 
-    if (p_blobPvl.hasKeyword("Association")) {
-      p_blobPvl.deleteKeyword("Association");
-    }
     if (p_assoc == Samples) {
-      p_blobPvl += Isis::PvlKeyword("Association", "Samples");
+      blobLabel += Isis::PvlKeyword("Association", "Samples");
     }
     else if (p_assoc == Lines) {
-      p_blobPvl += Isis::PvlKeyword("Association", "Lines");
+      blobLabel += Isis::PvlKeyword("Association", "Lines");
     }
     else if (p_assoc == Bands) {
-      p_blobPvl += Isis::PvlKeyword("Association", "Bands");
+      blobLabel += Isis::PvlKeyword("Association", "Bands");
     }
+
+    for (int i = 0; i < p_label.keywords(); i++) {
+      if (!blobLabel.hasKeyword(p_label[i].name())) {
+        blobLabel += p_label[i];
+      }
+    }
+
+    for (int i = 0; i < p_label.comments(); i++){
+      blobLabel.addComment(p_label.comment(i));
+    }
+
+    for (int g = 0; g < p_label.groups(); g++) {
+      blobLabel += p_label.group(g);
+    }
+
+    // Binary data setup
+    char *buf = new char[nbytes];
+
+    for (int rec = 0; rec < Records(); rec++) {
+      size_t bufferPos = rec * RecordSize();
+
+      memcpy(&buf[bufferPos], p_recbufs[rec], RecordSize());
+    }
+
+    tableBlob.takeData(buf, nbytes);
+
+    return tableBlob;
   }
+
 
   /**
-   * Virtual function to write the data
+   * Convert the data from a Table into a string.
    *
-   * @param os Outputstream to write the data to
+   * This method will convert all of the Table's records and fields into a
+   * string but will not serialze any label information. See TableRecord::toString
+   * for how the records are converted into a string.
+   *
+   * @param table The Table to serialize
+   * @param fieldDelimiter The delimiter to use between fields
+   *
+   * @return @b QString The Table data as a string
    */
-  void Table::WriteData(std::fstream &os) {
-    for (int rec = 0; rec < Records(); rec++) {
-      os.write(p_recbufs[rec], RecordSize());
-    }
-  }
-
-
   QString Table::toString(Table table, QString fieldDelimiter) {
     QString tableValues;
     // add the first record with header, the given delimiter, and a new line after each record

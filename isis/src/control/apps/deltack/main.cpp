@@ -82,14 +82,7 @@ void IsisMain() {
     // we will check for target name inside the SetTarget() call
 
     // Prepare for update to the cube history
-    History hist = History("IsisCube");
-    try {
-      // read history from cube, if it exists.
-      c.read(hist);
-    }
-    catch (IException &e) {
-    // if the history does not exist in the cube, the cube's write method will add it.
-    }
+    History hist = c.readHistory();
 
     //----------------------------------------------------------------------------------
     // Execute the requested method

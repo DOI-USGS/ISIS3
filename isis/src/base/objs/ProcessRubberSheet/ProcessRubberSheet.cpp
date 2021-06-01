@@ -6,6 +6,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 #include <QVector>
 
@@ -175,7 +176,8 @@ namespace Isis {
         for (int band = 1; band <= OutputCubes[0]->bandCount(); band++) {
           otile.SetTile(tile, band);
 
-          if (p_startQuadSize <= 2) {
+          // If either image or quad sizes are small, skip to SlowGeom. 
+          if (p_startQuadSize <= 2 || min(OutputCubes[0]->lineCount(), OutputCubes[0]->sampleCount()) <= p_startQuadSize) {
             SlowGeom(otile, iportal, trans, interp);
           }
           else {

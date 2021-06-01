@@ -4,11 +4,11 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 
+#include "Blob.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
 #include "SpecialPixel.h"
-#include "StringBlob.h"
 #include "TestUtilities.h"
 #include "ControlNet.h"
 
@@ -145,6 +145,110 @@ namespace Isis {
     }
   }
 
+
+  void SmallGapCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    // Initialize horzCube
+    horzCube = new Cube();
+    horzCube->setDimensions(9, 9, 9);
+    horzCube->create(tempDir.path() + "/horzgap.cub");
+
+    // horizontal line of nulls through all bands
+    LineManager h_line(*horzCube);
+    double h_pixelValue = 0.0;
+    int h_lineNum = 0;
+    for(h_line.begin(); !h_line.end(); h_line++) {
+      for(int i = 0; i < h_line.size(); i++) {
+        if(h_lineNum == 4 || h_lineNum % 9 == 4) {
+          h_line[i] = NULL8;
+        }
+        else {
+          h_pixelValue = sin(h_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          h_line[i] = (double) h_pixelValue;
+        }
+      }
+      h_lineNum++;
+      horzCube->write(h_line);
+    }
+    horzCube->reopen("rw");
+
+
+    // Initialize vertCube
+    vertCube = new Cube();
+    vertCube->setDimensions(9, 9, 9);
+    vertCube->create(tempDir.path() + "/vertgap.cub");
+
+    // vertical line of nulls through all bands
+    LineManager v_line(*vertCube);
+    double v_pixelValue = 0.0;
+    int v_lineNum = 0;
+    for(v_line.begin(); !v_line.end(); v_line++) {
+      for(int i = 0; i < v_line.size(); i++) {
+        if(i == 4) { 
+          v_line[i] = NULL8;
+        }
+        else {
+          v_pixelValue = sin(v_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          v_line[i] = (double) v_pixelValue;
+        }
+      }
+      v_lineNum++;
+      vertCube->write(v_line);
+    }
+    vertCube->reopen("rw");
+
+
+    // Initialize bandCube
+    bandCube = new Cube();
+    bandCube->setDimensions(9, 9, 9);
+    bandCube->create(tempDir.path() + "/bandgap.cub");
+
+    // vertical line of nulls on just one band
+    LineManager b_line(*bandCube);
+    double b_pixelValue = 0.0;
+    int b_lineNum = 0;
+    for(b_line.begin(); !b_line.end(); b_line++) {
+      for(int i = 0; i < b_line.size(); i++) {
+        if( b_lineNum == 22 ) { 
+          b_line[i] = NULL8;
+        }
+        else {
+          b_pixelValue = sin(b_lineNum * 180 / M_PI) + cos(i * 180 / M_PI);
+          b_line[i] = (double) b_pixelValue;
+        }
+      }
+      b_lineNum++;
+      bandCube->write(b_line);
+    }
+    bandCube->reopen("rw");
+
+  }
+
+
+  void SmallGapCube::TearDown() {
+    if (horzCube->isOpen()) {
+      horzCube->close();
+    }
+    if (vertCube->isOpen()) {
+      vertCube->close();
+    }
+    if (bandCube->isOpen()) {
+      bandCube->close();
+    }
+
+    if (horzCube) {
+      delete horzCube;
+    }
+    if (vertCube) {
+      delete vertCube;
+    }
+    if (bandCube) {
+      delete bandCube;
+    }
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
@@ -251,6 +355,59 @@ namespace Isis {
     projTestCube->reopen("rw");
   }
 
+  void DefaultCube::resizeCube(int samples, int lines, int bands) {
+    label = Pvl();
+    PvlObject &isisCube = testCube->label()->findObject("IsisCube");
+    label.addObject(isisCube);
+
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue(QString::number(samples));
+    dim.findKeyword("Lines").setValue(QString::number(lines));
+    dim.findKeyword("Bands").setValue(QString::number(bands));
+
+    delete testCube;
+    testCube = new Cube();
+    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(int band = 1; band <= bands; band++) {
+      for (int i = 1; i <= testCube->lineCount(); i++) {
+        line.SetLine(i, band);
+        for (int j = 0; j < line.size(); j++) {
+          line[j] = (double) (pixelValue % 255);
+          pixelValue++;
+        }
+        testCube->write(line);
+      }
+    }
+
+    projLabel = Pvl();
+    PvlObject &isisProjCube= projTestCube->label()->findObject("IsisCube");
+    projLabel.addObject(isisProjCube);
+
+    PvlGroup &projDim = projLabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    projDim.findKeyword("Samples").setValue(QString::number(samples));
+    projDim.findKeyword("Lines").setValue(QString::number(lines));
+    projDim.findKeyword("Bands").setValue(QString::number(bands));
+
+    delete projTestCube;
+    projTestCube = new Cube();
+    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(int band = 1; band <= bands; band++) {
+      for (int i = 1; i <= projTestCube->lineCount(); i++) {
+        line.SetLine(i, band);
+        for (int j = 0; j < line.size(); j++) {
+          line[j] = (double) (pixelValue % 255);
+          pixelValue++;
+        }
+        projTestCube->write(line);
+      }
+    }
+  }
 
   void DefaultCube::TearDown() {
     if (testCube->isOpen()) {
@@ -295,6 +452,35 @@ namespace Isis {
 
     delete testCube;
     delete projTestCube;
+  }
+
+  void OffBodyCube::SetUp() {
+    TempTestingFiles::SetUp();
+    testCube = new Cube("data/offBodyImage/EW0131773041G.cal.crop.cub");
+  }
+
+
+  void OffBodyCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
+  }
+
+
+  void MiniRFCube::SetUp() {
+    TempTestingFiles::SetUp();
+    testCube = new Cube("data/miniRFImage/LSZ_04866_1CD_XKU_89N109_V1_lev1.crop.cub");
+  }
+
+
+  void MiniRFCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    delete testCube;
   }
 
 
@@ -465,7 +651,7 @@ namespace Isis {
       cubeL = new Cube();
       cubeR = new Cube();
 
-      cubeLPath = tempDir.path() + "observationPairL.cub";
+      cubeLPath = tempDir.path() + "/observationPairL.cub";
       cubeRPath = tempDir.path() + "/observationPairR.cub";
 
       cubeL->fromIsd(cubeLPath, labelPathL, *isdPathL, "rw");
@@ -504,6 +690,138 @@ namespace Isis {
     delete isdPathL;
     delete isdPathR;
   }
+
+
+  void MroCtxCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mroCtxImage/ctxTestImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MroCtxCube::TearDown() {
+    testCube.reset();
+  }
+
+
+  void GalileoSsiCube::SetUp() {
+    DefaultCube::SetUp();
+
+    // Change default dims
+    PvlGroup &dim = label.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Samples").setValue("800");
+    dim.findKeyword("Lines").setValue("800");
+    dim.findKeyword("Bands").setValue("1");
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-77001");
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = "Galileo Orbiter"
+        InstrumentId              = "SOLID STATE IMAGING SYSTEM"
+        TargetName                = IO
+        SpacecraftClockStartCount = 05208734.39
+        StartTime                 = 1999-10-11T18:05:15.815
+        ExposureDuration          = 0.04583 <seconds>
+        GainModeId                = 100000
+        TelemetryFormat           = IM4
+        LightFloodStateFlag       = ON
+        InvertedClockStateFlag    = "NOT INVERTED"
+        BlemishProtectionFlag     = OFF
+        ExposureType              = NORMAL
+        ReadoutMode               = Contiguous
+        FrameDuration             = 8.667 <seconds>
+        Summing                   = 1
+        FrameModeId               = FULL
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = testCube->label()->findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName   = RED
+        FilterNumber = 2
+        Center       = 0.671 <micrometers>
+        Width        = .06 <micrometers>
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE                  = 501
+        BODY501_RADII              = (1829.4, 1819.3, 1815.7)
+        BODY_FRAME_CODE            = 10023
+        INS-77001_FOCAL_LENGTH     = 1500.46655964
+        INS-77001_K1               = -2.4976983626e-05
+        INS-77001_PIXEL_PITCH      = 0.01524
+        INS-77001_TRANSX           = (0.0, 0.01524, 0.0)
+        INS-77001_TRANSY           = (0.0, 0.0, 0.01524)
+        INS-77001_ITRANSS          = (0.0, 65.6167979, 0.0)
+        INS-77001_ITRANSL          = (0.0, 0.0, 65.6167979)
+        INS-77001_BORESIGHT_SAMPLE = 400.0
+        INS-77001_BORESIGHT_LINE   = 400.0
+      End_Object
+    )");
+
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    std::istringstream ar(R"(
+    Group = Archive
+      DataSetId     = GO-J/JSA-SSI-2-REDR-V1.0
+      ProductId     = 24I0146
+      ObservationId = 24ISGLOCOL01
+      DataType      = RADIANCE
+      CalTargetCode = 24
+    End_Group
+    )");
+
+    PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive");
+    PvlGroup newArchive;
+    ar >> newArchive;
+    archive = newArchive;
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+        for(int i = 0; i < line.size(); i++) {
+          line[i] = (double)(i+1);
+        }
+        testCube->write(line);
+    }
+
+    // need to remove old camera pointer
+    delete testCube;
+    testCube = new Cube(newCube, "rw");
+  }
+
+
+  void GalileoSsiCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
 
   void MroHiriseCube::SetUp() {
     DefaultCube::SetUp();
@@ -835,6 +1153,72 @@ namespace Isis {
     cubeFileList.write(cubeListPath);
   }
 
+
+ void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue(ikid);
+    kernels["ShapeModel"] = "Null";
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        MissionName               = OSIRIS-REx
+        SpacecraftName            = OSIRIS-REX
+        InstrumentId              = PolyCam
+        TargetName                = Bennu
+        StartTime                 = 2019-01-13T23:36:05.000
+        ExposureDuration          = 100 <ms>
+        SpacecraftClockStartCount = 1/0600694569.00000
+        FocusPosition             = 21510
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+
+    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
+
+    inst = newInstGroup;
+
+    PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
+    std::istringstream bss(R"(
+      Group = BandBin
+        FilterName = Unknown
+      End_Group
+    )");
+
+    PvlGroup newBandBin;
+    bss >> newBandBin;
+    bandBin = newBandBin;
+
+    json nk;
+    nk["BODY2101955_RADII"] =  {2825, 2675, 254};
+    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 630.0;
+    nk["INS"+ikid.toStdString()+"_PIXEL_SIZE"] = 8.5;
+    nk["CLOCK_ET_-64_1/0600694569.00000_COMPUTED"] = "8ed6ae8930f3bd41";
+    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.0085, 0.0};
+    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, -0.0085};
+    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 117.64705882353, 0.0};
+    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, -117.64705882353};
+    nk["INS"+ikid.toStdString()+"_CCD_CENTER"] = {511.5, 511.5};
+    nk["BODY_FRAME_CODE"] = 2101955;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    PvlObject newNaifKeywords("NaifKeywords", nk);
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+ }
+
   void CSMCubeFixture::SetUp() {
     SmallCube::SetUp();
 
@@ -887,7 +1271,8 @@ namespace Isis {
     loadablePlugin.registerModel(mockModelName, &mockModel);
 
     // CSMState BLOB
-    StringBlob csmStateBlob(mockModelName, "CSMState");
+    Blob csmStateBlob("CSMState", "String");
+    csmStateBlob.setData(mockModelName.c_str(), mockModelName.size());
     csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
     csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
     testCube->write(csmStateBlob);
@@ -957,6 +1342,78 @@ namespace Isis {
         .WillRepeatedly(::testing::Return("2000-01-01T11:58:55.816"));
 
     testCam = testCube->camera();
+  }
+
+  void HistoryBlob::SetUp() {
+    TempTestingFiles::SetUp();
+
+    std::istringstream hss(R"(
+      Object = mroctx2isis
+        IsisVersion       = "4.1.0  | 2020-07-01"
+        ProgramVersion    = 2016-06-10
+        ProgramPath       = /Users/acpaquette/repos/ISIS3/build/bin
+        ExecutionDateTime = 2020-07-01T16:48:40
+        HostName          = Unknown
+        UserName          = acpaquette
+        Description       = "Import an MRO CTX image as an Isis cube"
+
+        Group = UserParameters
+          FROM    = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W.IMG
+          TO      = /Users/acpaquette/Desktop/J03_045994_1986_XN_18N282W_isis.cub
+          SUFFIX  = 18
+          FILLGAP = true
+        End_Group
+      End_Object)");
+
+    hss >> historyPvl;
+
+    std::ostringstream ostr;
+    ostr << historyPvl;
+    std::string histStr = ostr.str();
+
+    historyBlob = Blob("IsisCube", "History");
+    historyBlob.setData(histStr.c_str(), histStr.size());
+  }
+
+
+  void MgsMocCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/mgsImages/mocImage.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+
+  void MgsMocCube::TearDown() {
+    testCube.reset();
+  }
+
+  void NullPixelCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube = new Cube();
+    testCube->setDimensions(10, 10, 10);
+    QString path = tempDir.path() + "/null.cub";
+    testCube->create(path);
+
+    LineManager line(*testCube);
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] =  NULL8;
+      }
+      testCube->write(line);
+    }
+  }
+
+  void NullPixelCube::TearDown() {
+    if (testCube->isOpen()) {
+      testCube->close();
+    }
+
+    if (testCube) {
+      delete testCube;
+    }
   }
 
 }

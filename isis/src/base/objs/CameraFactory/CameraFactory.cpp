@@ -50,7 +50,7 @@ namespace Isis {
 
     try {
       // Is there a CSM blob on the cube?
-      if (cube.hasBlob("String", "CSMState")) {
+      if (cube.hasBlob("CSMState", "String")) {
         // Create ISIS CSM Camera Model
         try {
           return new CSMCamera(cube);

@@ -20,8 +20,7 @@ namespace Isis {
   /**
    * Constructors a default OriginalXmlLabel with an empty label.
    */
-  OriginalXmlLabel::OriginalXmlLabel() : Isis::Blob("IsisCube", "OriginalXmlLabel") {
-    p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
+  OriginalXmlLabel::OriginalXmlLabel() {
   }
 
 
@@ -30,10 +29,19 @@ namespace Isis {
    *
    * @param file Xml file to read labels from
    */
-  OriginalXmlLabel::OriginalXmlLabel(const QString &file) :
-                    Isis::Blob("IsisCube", "OriginalXmlLabel") {
-    p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
-    Blob::Read(file);
+  OriginalXmlLabel::OriginalXmlLabel(const QString &file) {
+    Blob blob = Blob("IsisCube", "OriginalXmlLabel");
+    blob.Read(file);
+    fromBlob(blob);
+  }
+
+  /**
+   * Constructs an OriginalXmlLabel from a blob
+   *
+   * @param blob Blob from which to create the OriginalXmlLabel
+   */
+  OriginalXmlLabel::OriginalXmlLabel(Isis::Blob &blob) {
+    fromBlob(blob);
   }
 
 
@@ -44,11 +52,51 @@ namespace Isis {
   }
 
 
+  /*
+   * Load blob data into m_originalLabel
+   */
+  void OriginalXmlLabel::fromBlob(Isis::Blob blob) {
+    QString errorMessage;
+    int errorLine;
+    int errorColumn;
+
+    if ( !m_originalLabel.setContent( QByteArray(blob.getBuffer(), blob.Size()) ) ) {
+      QString msg = "XML read/parse error when parsing original label. "
+                    "Error at line [" + toString(errorLine) +
+                    "], column [" + toString(errorColumn) +
+                    "]. Error message: " + errorMessage;
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Serialize the OriginalXmlLabel to a Blob.
+   *
+   * @return @b Blob
+   */
+  Blob OriginalXmlLabel::toBlob() const {
+    std::stringstream sstream;
+    sstream << m_originalLabel.toString();
+    string orglblStr = sstream.str();
+    Isis::Blob blob("IsisCube", "OriginalXmlLabel");
+    blob.setData((char*)orglblStr.data(), orglblStr.length());
+    blob.Label() += Isis::PvlKeyword("ByteOrder", "NULL");
+    if (Isis::IsLsb()) {
+      blob.Label()["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
+    }
+    else {
+      blob.Label()["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
+    }
+    return blob;
+  }
+
+
   /**
    * Read the original label from an Xml file.
-   * 
+   *
    * @param FileName The Xml file containing the original label.
-   * 
+   *
    * @throws IException::Io "Could not open label file."
    * @throws IException::Unknown "XML read/parse error in file."
    */
@@ -75,70 +123,11 @@ namespace Isis {
 
 
   /**
-   * Read the xml file data from an input stream.
-   * 
-   * @param stream The input stream to read from.
-   * 
-   * @throws IException::Unknown "XML read/parse error when parsing original label."
-   * 
-   * @see Blob::Read(const Pvl &pvl, std::istream &is)
-   */
-  void OriginalXmlLabel::ReadData(std::istream &stream) {
-    // Use Blob's ReadData to fill p_buffer
-    Blob::ReadData(stream);
-
-    // Setup variables for error reproting in QT's xml parser
-    QString errorMessage;
-    int errorLine;
-    int errorColumn;
-
-    // Attempt to use QT's xml parser to internalize the label
-    if ( !m_originalLabel.setContent( QByteArray(p_buffer, p_nbytes) ) ) {
-      QString msg = "XML read/parse error when parsing original label. "
-                    "Error at line [" + toString(errorLine) +
-                    "], column [" + toString(errorColumn) +
-                    "]. Error message: " + errorMessage;
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-    }
-  }
-
-
-  /**
-   * Prepare to write the label out.
-   * 
-   * @see Blob::Write
-   */
-  void OriginalXmlLabel::WriteInit() {
-    p_nbytes = m_originalLabel.toByteArray(0).size();
-
-    if (Isis::IsLsb()) {
-      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
-    }
-    else {
-      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
-    }
-  }
-
-
-  /**
-   * Write the label out to a stream.
-   * 
-   * @param os The stream to write the label out to.
-   * 
-   * @see Blob::Write
-   */
-  void OriginalXmlLabel::WriteData(std::fstream &os) {
-    QByteArray labelByteArray = m_originalLabel.toByteArray(0);
-    os.write( labelByteArray.data(), labelByteArray.size() );
-  }
-
-
-  /**
    * Returns the original Xml label.
    *
    * @return @b QDomDocument The parsed original label
    */
-  const QDomDocument &OriginalXmlLabel::ReturnLabels() const {
+  const QDomDocument &OriginalXmlLabel::ReturnLabels() const{
     return m_originalLabel;
   }
 }

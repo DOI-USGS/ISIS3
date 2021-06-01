@@ -6,6 +6,9 @@
       "orcid": ""
     },
     {
+      "name": "Acosta, Alex"
+    },
+    {
       "name": "Addair, Travis"
     },
     {
@@ -13,13 +16,30 @@
       "name": "Adoram-Kershner, Lauren"
     },
     {
+      "name": "Alexander, James"
+    },
+    {
       "name": "Alexandrov, Oleg"
+    },
+    {
+      "name": "Alley, Stacey"
+    },
+    {
+      "affiliation": "Arizona State University",
+      "name": "Anderson, Don"
+    },
+    {
+      "name": "Anderson, James"
     },
     {
       "name": "Anderson, Jeff"
     },
     {
       "name": "Annex, Andrew"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Archinal, Brent"
     },
     {
       "name": "Austin, Christopher"
@@ -31,7 +51,16 @@
       "name": "Barrett, Janet"
     },
     {
+      "name": "Bauers, Joni"
+    },
+    {
       "name": "Becker, Kris"
+    },
+    {
+      "name": "Becker, Tammy"
+    },
+    {
+      "name": "Bennett, Glenn"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -52,6 +81,16 @@
       "name": "Brownsberger, Sasha"
     },
     {
+      "name": "Chaves, Pat"
+    },
+    {
+      "name": "Christensen, Way"
+    },
+    {
+      "affiliation": "United States Geological Survey",
+      "name": "Clark, Roger"
+    },
+    {
       "name": "Combs, Christopher"
     },
     {
@@ -61,10 +100,39 @@
       "name": "Covington, Jeffrey"
     },
     {
+      "name": "Crawforth, Jim"
+    },
+    {
+      "name": "Crosby, Sean"
+    },
+    {
       "name": "Crough, James Alexander"
     },
     {
       "name": "Curtis, Aaron"
+    },
+    {
+      "name": "Cushing, Norm"
+    },
+    {
+      "name": "Dahmer, Leah"
+    },
+    {
+      "name": "Danton, Jacob"
+    },
+    {
+      "name": "Davidson, Drew"
+    },
+    {
+      "name": "Davis, Phil"
+    },
+    {
+      "affiliation": "JPL",
+      "name": "Dean, Bob"
+    },
+    {
+      "affiliation": "Observatoire de Paris",
+      "name": "Drossary, Pierre"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -74,10 +142,33 @@
       "name": "Edmundson, Kenneth"
     },
     {
+      "name": "Edwards, Kay"
+    },
+    {
       "name": "Eis, Mathew"
     },
     {
+      "name": "Eliason, Eric"
+    },
+    {
+      "name": "Eliason, Patrica"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Fergason, Robin"
+    },
+    {
+      "name": "Gaddis, Lisa"
+    },
+    {
       "name": "Gault, Eric"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Geissler, Paul"
+    },
+    {
+      "name": "George, Brendan"
     },
     {
       "name": "Giroux, Aaron"
@@ -90,16 +181,68 @@
       "name": "Goins, Adam"
     },
     {
+      "name": "Gregg, Verna"
+    },
+    {
       "name": "Hahn, Marjorie"
     },
     {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Hare, Trent"
+    },
+    {
+      "name": "Harvey, Rae"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Herkenhoff, Ken"
+    },
+    {
       "name": "Heyer, Eric"
+    },
+    {
+      "name": "Hilt, Noah"
     },
     {
       "name": "Howington-Kraus, Elpitha"
     },
     {
       "name": "Humphrey, Ian"
+    },
+    {
+      "name": "Isbell, Chris"
+    },
+    {
+      "affiliation": "University of Colorado",
+      "name": "Jensen, Paul"
+    },
+    {
+      "name": "Johnson, Jeff"
+    },
+    {
+      "affiliation": "University of Colorado",
+      "name": "Jones, Mike"
+    },
+    {
+      "affiliation": "Oxford University",
+      "name": "Kamp, Lucas"
+    },
+    {
+      "name": "Kelleher, Tom"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Keszthelyi, Laszlo"
+    },
+    {
+      "name": "Kieffer, Hugh"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Kirk, Randy"
+    },
+    {
+      "name": "Koechle, Steven"
     },
     {
       "name": "Lambright, Steven"
@@ -116,14 +259,58 @@
       "name": "Leggett, Rebecca"
     },
     {
+      "affiliation": "University of Hawaii",
+      "name": "Lewis, Ralph"
+    },
+    {
+      "affiliation": "Arizona State University",
+      "name": "Licht, Adam"
+    },
+    {
+      "affiliation": "University of Hawaii",
+      "name": "Lindelow, John"
+    },
+    {
+      "name": "Lipkowitz, Brian"
+    },
+    {
+      "affiliation": "University of Hawaii",
+      "name": "Lo, Julianna"
+    },
+    {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Mapel, Jesse"
+    },
+    {
+      "name": "Martin, Mike"
+    },
+    {
+      "name": "Martinez, Phillip"
+    },
+    {
+      "name": "Mathews, Jim"
+    },
+    {
+      "name": "Mawhinney, Jason"
+    },
+    {
+      "name": "McEwin, Alfred"
+    },
+    {
+      "name": "McMacken, Dennis"
+    },
+    {
+      "affiliation": "University of California, Los Angeles",
+      "name": "Mehlman, Bob"
     },
     {
       "name": "Milazzo, Moses"
     },
     {
       "name": "Miller, David"
+    },
+    {
+      "name": "Miller-Ribelin, Elizabeth"
     },
     {
       "name": "Neubauer, Cole"
@@ -136,10 +323,24 @@
       "name": "Paquette, Adam"
     },
     {
+      "name": "Parker, Wendy"
+    },
+    {
       "name": "Prasad, Sharmilla"
     },
     {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Redding, Bonnie"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Richie, Janet"
+    },
+    {
       "name": "Rideout, Jai"
+    },
+    {
+      "name": "Robinson, Mark"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -156,6 +357,9 @@
       "name": "Sanders, Austin"
     },
     {
+      "name": "Scott, Bill"
+    },
+    {
       "name": "Seignovert, Benoit"
     },
     {
@@ -166,16 +370,33 @@
       "name": "Shinaman, John"
     },
     {
+      "name": "Sides, Kim"
+    },
+    {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Sides, Stuart",
       "orcid": ""
     },
     {
+      "affiliation": "Arizona State University",
       "name": "Silva, Victor"
+    },
+    {
+      "affiliation": "JPL",
+      "name": "Smythe, Bill"
+    },
+    {
+      "name": "Soderblom, Larry"
+    },
+    {
+      "name": "Soltesz, Deborah Lee"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Stamile, Amy"
+    },
+    {
+      "name": "Stapleton, Jim"
     },
     {
       "name": "Stapleton, Summer"
@@ -184,10 +405,29 @@
       "name": "Stebenne, Andrew"
     },
     {
+      "name": "Sucharski, Robert"
+    },
+    {
       "name": "Sucharski, Tracie"
     },
     {
+      "name": "Takir, Driss"
+    },
+    {
       "name": "Thomas, Orrin"
+    },
+    {
+      "name": "Thompson, Teal"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Titus, Tim"
+    },
+    {
+      "name": "Torson, Jim"
+    },
+    {
+      "name": "Wallace, Robert"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -199,6 +439,9 @@
     },
     {
       "name": "Wilson, Tyler"
+    },
+    {
+      "name": "Young, Aaron"
     }
   ],
   "title": "Integrated Software for Imagers and Spectrometers",

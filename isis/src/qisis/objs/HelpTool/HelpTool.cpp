@@ -11,6 +11,7 @@
 #include "MainWindow.h"
 #include "Workspace.h"
 #include "Preference.h"
+#include "ProgramLauncher.h"
 
 
 namespace Isis {
@@ -60,17 +61,18 @@ namespace Isis {
    * @author  2007-06-12 Tracie Sucharski
    */
   void HelpTool::aboutProgram() {
-    FileName file(
-                  "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
-                  QApplication::applicationName() + "/" +
-                  QApplication::applicationName() + ".html");
-
     PvlGroup &uig = Preference::Preferences().findGroup("UserInterface");
+#if defined(__linux__)
     QString command = (QString) uig["GuiHelpBrowser"] +
-                      (QString)" file:" + file.expanded() + " &";
-    if(system(command.toLatin1().data()) != 0) {
-      IString msg = "Failed to execute [" + command + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      QApplication::applicationName() + "/" +
+                      QApplication::applicationName() + ".html";
+#elif defined(__APPLE__)
+    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+                      " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
+                      QApplication::applicationName() + "/" +
+                      QApplication::applicationName() + ".html";
+#endif
+    ProgramLauncher::RunSystemCommand(command);
   }
 }

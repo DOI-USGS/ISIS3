@@ -15,7 +15,7 @@ find files of those names at the top level of this repository. **/
 #include "Application.h"
 #include "Preference.h"
 #include "Progress.h"
-#include "TextFile.h"
+#include "FileList.h"
 #include "FileName.h"
 
 using namespace Isis;
@@ -236,13 +236,13 @@ namespace Isis {
 
             QStringList listData = cmd.split(" ");
             QString listFileName = listData.takeFirst();
-            TextFile listFile(listFileName, "overwrite");
+            FileList listFile;
 
             while (!listData.isEmpty()) {
-              listFile.PutLine(listData.takeFirst());
+              listFile.push_back(listData.takeFirst());
             }
 
-            listFile.Close();
+            listFile.write(listFileName);
           }
           else {
             // Nothing special is happening, just execute the program
@@ -353,21 +353,9 @@ namespace Isis {
    */
   void Pipeline::SetInputListFile(const QString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
+    FileName inputFileName = FileName(ui.GetFileName(inputParam));
 
-    TextFile filelist(FileName(ui.GetFileName(inputParam)).expanded());
-    QString filename;
-    int branch = 1;
-
-    while (filelist.GetLineNoFilter(filename)) {
-      p_originalInput.push_back(filename);
-      p_inputBranches.push_back(inputParam + toString(branch));
-      p_virtualBands.push_back("");
-      p_finalOutput.push_back(FileName(filename).name());
-
-      branch ++;
-    }
-
-    p_outputListNeedsModifiers = true;
+    SetInputListFile(inputFileName);
   }
 
 
@@ -380,15 +368,16 @@ namespace Isis {
    *                                       to p_inputBranches
    */
   void Pipeline::SetInputListFile(const FileName &inputFileName) {
-    TextFile filelist(inputFileName.expanded());
-    QString filename;
+    FileList filelist(inputFileName.expanded());
+    FileName filename;
     int branch = 1;
 
-    while (filelist.GetLineNoFilter(filename)) {
-      p_originalInput.push_back(filename);
-      p_inputBranches.push_back(FileName(inputFileName).expanded() + " " + QString(branch));
-      p_finalOutput.push_back(FileName(filename).name());
+    while (!filelist.isEmpty()) {
+      filename = filelist.takeFirst();
+      p_originalInput.push_back(filename.expanded());
+      p_inputBranches.push_back(inputFileName.name() + toString(branch));
       p_virtualBands.push_back("");
+      p_finalOutput.push_back(filename.name());
 
       branch ++;
     }
@@ -536,10 +525,11 @@ namespace Isis {
   void Pipeline::SetOutputListFile(const FileName &outputFileNameList) {
     p_finalOutput.clear();
 
-    TextFile filelist(outputFileNameList.expanded());
+    FileList filelist(outputFileNameList.expanded());
     QString filename;
 
-    while (filelist.GetLineNoFilter(filename)) {
+    while (!filelist.isEmpty()) {
+      filename = filelist.takeFirst().expanded();
       p_finalOutput.push_back(filename);
     }
 

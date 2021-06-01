@@ -182,8 +182,7 @@ void IsisMain() {
 
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label
-  OriginalLabel origBlob;
-  icube2->read(origBlob);
+  OriginalLabel origBlob = icube2->readOriginalLabel();
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");

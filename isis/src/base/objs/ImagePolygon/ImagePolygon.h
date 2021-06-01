@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "Cube.h"
 #include "Brick.h"
+#include "Blob.h"
 #include "Camera.h"
 #include "Projection.h"
 #include "UniversalGroundMap.h"
@@ -149,10 +150,11 @@ namespace Isis {
    *                          Fixes #994.
    */
 
-  class ImagePolygon : public Isis::Blob {
+  class ImagePolygon {
 
     public:
       ImagePolygon();
+      ImagePolygon(Blob &blob);
       ~ImagePolygon();
 
       void Create(Cube &cube, int sinc = 1, int linc = 1,
@@ -209,6 +211,11 @@ namespace Isis {
         return p_polygons;
       };
 
+      //!  Return a geos Multipolygon
+      std::string polyStr() const {
+        return p_polyStr;
+      };
+
       double validSampleDim();
       double validLineDim();
 
@@ -226,10 +233,7 @@ namespace Isis {
         return p_pts->size();
       }
 
-    protected:
-      void ReadData(std::istream &is);
-      void WriteInit();
-      void WriteData(std::fstream &os);
+      Blob toBlob() const;
 
     private:
       // Please do not add new polygon manipulation methods to this class.

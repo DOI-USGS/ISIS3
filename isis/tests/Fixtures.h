@@ -75,6 +75,16 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class SmallGapCube : public TempTestingFiles {
+    protected:
+      Cube *horzCube;
+      Cube *vertCube;
+      Cube *bandCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 
   class DefaultCube : public TempTestingFiles {
     protected:
@@ -87,6 +97,7 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+      void resizeCube(int samples, int lines, int bands);
   };
 
   class LineScannerCube : public TempTestingFiles {
@@ -97,6 +108,22 @@ namespace Isis {
       Pvl label;
       Pvl projLabel;
       json isd;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class OffBodyCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MiniRFCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
 
       void SetUp() override;
       void TearDown() override;
@@ -180,6 +207,30 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class MroCtxCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class GalileoSsiCube : public DefaultCube {
+    protected:
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MgsMocCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
@@ -196,6 +247,13 @@ namespace Isis {
     protected:
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
+
+
+  class OsirisRexCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId);
+  };
+
 
   class ApolloCube : public LargeCube {
     protected:
@@ -248,6 +306,22 @@ class CSMCameraDemFixture : public CSMCubeFixture {
     double demRadius;
 
     void SetUp() override;
+};
+
+class HistoryBlob : public TempTestingFiles {
+  protected:
+    Blob historyBlob;
+    PvlObject historyPvl;
+
+    void SetUp() override;
+};
+
+class NullPixelCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+
+    void SetUp() override;
+    void TearDown() override;
 };
 }
 
