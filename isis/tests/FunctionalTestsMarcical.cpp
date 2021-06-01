@@ -17,7 +17,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/marcical.xml").expanded();
 TEST(Marcical, MarcicalTestDefault) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/marcical_out.cub";
-  QVector<QString> args = {"from=data/marci2isis/P12_005901_3391_MA_00N096W_cropped.cub", "to=" + cubeFileName };
+  QVector<QString> args = {"from=data/marcical/P12_005901_3391_MA_00N096W_cropped.cub", "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   marcical(options);
 
@@ -44,7 +44,7 @@ TEST(Marcical, MarcicalTestDefault) {
 TEST(Marcical, MarcicalTestDefaultNoIof) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/marcical_out.cub";
-  QVector<QString> args = {"from=data/marci2isis/P12_005901_3391_MA_00N096W_cropped.cub", "to=" + cubeFileName, "iof=no" };
+  QVector<QString> args = {"from=data/marcical/P12_005901_3391_MA_00N096W_cropped.cub", "to=" + cubeFileName, "iof=no" };
   UserInterface options(APP_XML, args);
   marcical(options);
 
@@ -71,7 +71,7 @@ TEST(Marcical, MarcicalTestDefaultNoIof) {
 TEST(Marcical, MarcicalTestSingleDuration) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/marcical_out.cub";
-  QVector<QString> args = {"from=data/marci2isis/K14_059003_3475_MA_00N112W_cropped.cub", "to=" + cubeFileName };
+  QVector<QString> args = {"from=data/marcical/K14_059003_3475_MA_00N112W_cropped.cub", "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   marcical(options);
 
@@ -96,7 +96,7 @@ TEST(Marcical, MarcicalTestSingleDuration) {
 TEST(Marcical, MarcicalTestSingleDurationNoIof) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/marcical_out.cub";
-  QVector<QString> args = {"from=data/marci2isis/K14_059003_3475_MA_00N112W_cropped.cub", "to=" + cubeFileName, "iof=no" };
+  QVector<QString> args = {"from=data/marcical/K14_059003_3475_MA_00N112W_cropped.cub", "to=" + cubeFileName, "iof=no" };
   UserInterface options(APP_XML, args);
   marcical(options);
 

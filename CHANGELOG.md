@@ -35,9 +35,20 @@ release.
 
 ## [Unreleased]
 
+### Changed
+- isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+
+### Fixed
+- Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
+- Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
+- Fixed hist outputs to N/A when all DNs are special pixels. [#3709](https://github.com/USGS-Astrogeology/ISIS3/issues/3709)
+- Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
+- Fixed SolarLon to compute from Table if cube is spiceinited. [#3703](https://github.com/USGS-Astrogeology/ISIS3/issues/3703)
+
 ## [5.0.0] - 2021-04-01
 
 ### Added
+- Added the ability to read MiMAP v3 images through mimap2isis from the Kaguya data set. [#2067](https://github.com/USGS-Astrogeology/ISIS3/issues/2067)
 - The following calibration applications were updated to not require local mission-specific SPICE kernels when working with spiceinited cubes: amicacal, ctxcal, lrowaccal, moccal, mdiscal, hical, hicalbeta, vikcal, and gllssical. This makes it possible to first run spiceinit using the spice server and then run these calibration applications without ever needing to download mission-specific kernels. If spiceinit has not been run on the input cube, these apps will still require the kernels area to run. [#4303](https://github.com/USGS-Astrogeology/ISIS3/issues/4303)
 - Added the new csminit application and CSM Library loading to the IsisPreferences file. Together these allow users to get CSM state strings from ISD files. Once CSM camera model support is added, these will be used to setup a Cube to use a CSM camera model.
 - Added a new application, topds4, which generates an output PDS4 XML label and a PDS4-compliant ISIS Cube from an input Cube, a PDS4 label template, and optionally additional input XML, PVL, or JSON data. The Inja templating engine is used to render the output PDS4 label from the label template. [#4246](https://github.com/USGS-Astrogeology/ISIS3/pull/4246)
@@ -50,19 +61,12 @@ release.
 - Fixed hardcoded file naming in the hijitter app dealing with output from pipeline. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
 - Fixed "About Qview" to point to website documentation. [4333](https://github.com/USGS-Astrogeology/ISIS3/issues/4333)
 - Fixed bug where the time bias was not being added to the ephemeris times in ckwriter. [4129](https://github.com/USGS-Astrogeology/ISIS3/issues/4129)
-- Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
-- Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
-- Fixed SolarLon to compute from Table if cube is spiceinited. [#3703](https://github.com/USGS-Astrogeology/ISIS3/issues/3703)
-- Fixed hist outputs to N/A when all DNs are special pixels. [#3709](https://github.com/USGS-Astrogeology/ISIS3/issues/3709)
 
 ### Changed
 
 - Updated the FileList object to handle files that do not contain a trailing new line character. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
-
 - Refactored Blob class to be used by classes that serialize to a Cube instead of inherited from. Impacted classes are GisBlob, History, ImagePolygon, OriginalLabel, OriginalXmlLabel, StrethBlob, StringBlob, and Table. [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
-
 - Fixed hi2isis MRO:ADC_TIMING_SETTINGS label conversion issue [4290](https://github.com/USGS-Astrogeology/ISIS3/issues/4290)
-
 - Changed csv2table to identify headers with arrays and create table fields as arrays instead of single fields for each element [3676](https://github.com/USGS-Astrogeology/ISIS3/issues/3676)
 
 ## [4.4.0] - 2021-02-11
