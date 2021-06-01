@@ -268,34 +268,38 @@ void IsisMain(){
 // ZeroDarkRate removes dark current with a new approach compared
 // with ZeroDark.
 
-    // If both ZeroDarkRate and ZeroDark are active, then we'll get erronious results.
-    // Check and cause a user error if both are not skipped.
-    if ( !SkipModule(hiconf.getMatrixProfile("ZeroDark")) &&
-         !SkipModule(hiconf.getMatrixProfile("ZeroDarkRate")) ) {
-      QString mess = "You have enabled both the ZeroDark and the ZeroDarkRate modules."
-                      "This means you are attempting to remove the dark current twice with "
-                      "two different algorithms. This is not approved use of hical. "
-                      "Please disable one or the other module using the Debug::SkipModule "
-                      "in your configuration file.";
-      throw IException(IException::User, mess, _FILEINFO_);
-    }
-
     procStep = "ZeroDarkRate module";
-    hiconf.selectProfile("ZeroDarkRate");
-    hiprof =  hiconf.getMatrixProfile();
     HiHistory ZdrHist;
-    ZdrHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
-      ZeroDarkRate zdr(hiconf);
-      calVars->add(hiconf.getProfileName(), zdr.ref());
-      ZdrHist = zdr.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
-      }
+    ZdrHist.add("Profile[ZeroDarkRate]");
+    // Check for backwards compatibility with old config files
+    if (!hiconf.profileExists("ZeroDarkRate")) {
+      calVars->add("ZeroDarkRate", HiVector(nsamps, 0.0));
+      ZdrHist.add("Skipped, module not in config file");
     }
     else {
-      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
-      ZdrHist.add("Debug::SkipModule invoked!");
+      hiconf.selectProfile("ZeroDarkRate");
+      hiprof =  hiconf.getMatrixProfile();
+      if ( !SkipModule(hiprof) ) {
+        // Make sure we aren't applying ZeroDark and ZeroDarkRate
+        if ( !SkipModule(hiconf.getMatrixProfile("ZeroDark")) ){
+          QString mess = "You have enabled both the ZeroDark and the ZeroDarkRate modules."
+                          "This means you are attempting to remove the dark current twice with "
+                          "two different algorithms. This is not approved use of hical. "
+                          "Please disable one or the other module using the Debug::SkipModule "
+                          "in your configuration file.";
+          throw IException(IException::User, mess, _FILEINFO_);
+        }
+        ZeroDarkRate zdr(hiconf);
+        calVars->add(hiconf.getProfileName(), zdr.ref());
+        ZdrHist = zdr.History();
+        if ( hiprof.exists("DumpModuleFile") ) {
+          zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+        }
+      }
+      else {
+        calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+        ZdrHist.add("Debug::SkipModule invoked!");
+      }
     }
 
 ////////////////////////////////////////////////////////////////////
