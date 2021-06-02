@@ -366,6 +366,7 @@ TEST(HicalTest, Default) {
   EXPECT_EQ(gainUnitConversionParams[11].toStdString(), " Units[I/F]");
 }
 
+
 TEST(HicalTest, Dns) {
   QTemporaryDir prefix;
   QString outFileName = prefix.path() + "/out.cub";
@@ -399,13 +400,14 @@ TEST(HicalTest, Dns) {
   }
   ASSERT_EQ(logText.size(), 37);
 
-  // The only difference for DNs is the GainUnitConversion
+  // The only difference for DNs is the GainUnitConversion line
   EXPECT_TRUE(logText[36].startsWith("GainUnitConversion")) << logText[36].toStdString();
   QStringList gainUnitConversionParams = logText[36].split(";", QString::SplitBehavior::SkipEmptyParts);
   ASSERT_EQ(gainUnitConversionParams.size(), 4);
   EXPECT_EQ(gainUnitConversionParams[1].toStdString(), " DN_Factor[1.0]");
   EXPECT_EQ(gainUnitConversionParams[2].toStdString(), " Units[DN]");
 }
+
 
 TEST(HicalTest, DnsPerMicrosecond) {
   QTemporaryDir prefix;
@@ -449,7 +451,7 @@ TEST(HicalTest, DnsPerMicrosecond) {
   QRegularExpressionMatch parameterValues;
   QString paramString;
 
-  // The only difference for DNs per microsecond is the GainUnitConversion
+  // The only difference for DNs per microsecond is the GainUnitConversion line
   EXPECT_TRUE(logText[36].startsWith("GainUnitConversion")) << logText[36].toStdString();
   QStringList gainUnitConversionParams = logText[36].split(";", QString::SplitBehavior::SkipEmptyParts);
   ASSERT_EQ(gainUnitConversionParams.size(), 5);
@@ -467,4 +469,68 @@ TEST(HicalTest, DnsPerMicrosecond) {
   EXPECT_NEAR(parameterValues.captured(0).toDouble(), 86.1875, 0.00001);
   // Units[DNs/microsecond]
   EXPECT_EQ(gainUnitConversionParams[3].toStdString(), " Units[DNs/microsecond]");
+}
+
+
+TEST(HicalTest, DarkRate) {
+  QTemporaryDir prefix;
+  QString outFileName = prefix.path() + "/out.cub";
+  QVector<QString> args = { "FROM=data/hical/mroHical.cub",
+                            "TO=" + outFileName,
+                            "CONF=data/hical/hical.0023_darkrate.conf",
+                            "OPATH=" + prefix.path() + "/" };
+  UserInterface options(APP_XML, args);
+
+  try {
+    hical(options);
+  }
+  catch (IException &e) {
+    FAIL() << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  // Check calibrated cube
+  Cube outCube(outFileName);
+
+  std::unique_ptr<Statistics> stats (outCube.statistics());
+  EXPECT_NEAR(stats->Average(), 0.029009951796252, .00001);
+  EXPECT_NEAR(stats->StandardDeviation(), 0.0045240528853485, .00001);
+
+  // Check log file
+  QFile logFile(prefix.path() + "/ESP_044492_1605_RED3_0.hical.log");
+  ASSERT_TRUE(logFile.open(QIODevice::ReadOnly)) << "Failed to open log file: " << logFile.fileName().toStdString();
+  QTextStream logStream(&logFile);
+  QStringList logText;
+  while (!logStream.atEnd()) {
+    logText.push_back(logStream.readLine());
+  }
+  ASSERT_EQ(logText.size(), 37);
+
+  // We need to parse some numbers out of the parameter generation strings
+  // so we'll use the following regex to capture values between brackets.
+  // The part of the parameter generation string we are checking is commented
+  // above each match call.
+  QRegularExpression valueBetweenBracketsRegex("(?<=\\[)[^]]*");
+  QRegularExpressionMatchIterator patameterMatches;
+  QRegularExpressionMatch parameterValues;
+  QString paramString;
+
+  // The only difference for ZeroDarkRate is the ZeroDarkRate line
+  EXPECT_TRUE(logText[24].startsWith("ZeroDarkRate")) << logText[24].toStdString();
+  QStringList zeroDarkRateParams = logText[24].split(";", QString::SplitBehavior::SkipEmptyParts);
+  ASSERT_EQ(zeroDarkRateParams.size(), 4);
+  // BaseTemperature[ ]
+  paramString = zeroDarkRateParams[1];
+  patameterMatches = valueBetweenBracketsRegex.globalMatch(paramString);
+  ASSERT_TRUE(patameterMatches.hasNext()) << "Failed to find bracketed value in " << paramString.toStdString();
+  parameterValues = patameterMatches.next();
+  EXPECT_NEAR(parameterValues.captured(0).toDouble(), 35.3167, 0.00001);
+  // Statistics(Average[ ],StdDev[ ])
+  paramString = zeroDarkRateParams[2];
+  patameterMatches = valueBetweenBracketsRegex.globalMatch(paramString);
+  ASSERT_TRUE(patameterMatches.hasNext()) << "Failed to find bracketed value in " << paramString.toStdString();
+  parameterValues = patameterMatches.next();
+  EXPECT_NEAR(parameterValues.captured(0).toDouble(), 2404.2733410374, 0.00001);
+  ASSERT_TRUE(patameterMatches.hasNext()) << "Failed to find second bracketed value in " << paramString.toStdString();
+  parameterValues = patameterMatches.next();
+  EXPECT_NEAR(parameterValues.captured(0).toDouble(), 163.44824721503, 0.00001);
 }
