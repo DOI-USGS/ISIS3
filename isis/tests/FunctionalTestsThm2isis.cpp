@@ -135,7 +135,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
 
 TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
-  QString outCubeFileName = tempDir.path() + "/test.cub+msb+8bit+0:1";
+  QString outCubeFileName = tempDir.path() + "/test.cub+msb+8bit+0.0012:0.0013";
   QVector<QString> args = {"from=data/thm2isis/V00821003RDR.QUB",  "to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
@@ -152,15 +152,15 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   // Pixels Group
   EXPECT_EQ(PixelTypeName(evenCube.pixelType()).toStdString(), "UnsignedByte");
   EXPECT_EQ(ByteOrderName(evenCube.byteOrder()).toStdString(), "Msb");
-  EXPECT_DOUBLE_EQ(evenCube.base(), -0.0039525691699605001);
-  EXPECT_DOUBLE_EQ(evenCube.multiplier(), 0.0039525691699605001);
+  EXPECT_DOUBLE_EQ(evenCube.base(), 0.001199604743083);
+  EXPECT_DOUBLE_EQ(evenCube.multiplier(), 3.95256916996048e-07);
 
   std::unique_ptr<Histogram> hist (evenCube.histogram());
    
-  EXPECT_NEAR(hist->Minimum(), 0.0, 0.0001);
-  EXPECT_NEAR(hist->Maximum(), 0.0, 0.0001); 
-  EXPECT_NEAR(hist->Average(), 0.0, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 0.0, .00001);
-  EXPECT_EQ(hist->ValidPixels(), 188100);
-  EXPECT_NEAR(hist->StandardDeviation(), 0, .00001);
+  EXPECT_NEAR(hist->Minimum(), 0.0012, 0.0001);
+  EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001); 
+  EXPECT_NEAR(hist->Average(), 0.00122, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 157.94891, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 129380);
+  EXPECT_NEAR(hist->StandardDeviation(), 1.5069986471567319e-05, .00001);
 }
