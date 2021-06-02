@@ -1,0 +1,13 @@
+Group = Mapping
+  TargetName       = Moon
+  ProjectionName   = Orthographic
+  CenterLongitude  = 0.0
+  CenterLatitude   = 0.0
+  MinimumLongitude = -180
+  MaximumLongitude = 180
+  MinimumLatitude  = -90
+  MaximumLatitude  = 90
+  LatitudeType     = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+End_Group
