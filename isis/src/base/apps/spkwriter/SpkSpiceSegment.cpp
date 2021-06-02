@@ -220,6 +220,7 @@ bool SpkSpiceSegment::getImageTimes(Pvl &lab, double &start, double &end) const 
   return (true);
 }
 
+
 /**
  * @brief Add elements to top and bottom of a matrix
  *
