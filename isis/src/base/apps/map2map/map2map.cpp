@@ -1,19 +1,24 @@
-#define GUIHELPERS
-
-#include "UserInterface.h"
 #include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
 #include "TProjection.h"
+
 #include "map2map.h"
 
-using namespace Isis;
 using namespace std;
 
-void PrintMap();
-void LoadMapRange();
+namespace Isis {
 
-void map2map(Cube *incube, UserInterface &ui, Pvl *log)
-{
+  void map2map(UserInterface &ui, Pvl *log) {
+    Cube cube;
+    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
+    if (inAtt.bands().size() != 0) {
+      cube.setVirtualBands(inAtt.bands());
+    }
+    cube.open(ui.GetFileName("FROM"));
+    map2map(&cube, ui);
+  }
+
+  void map2map(Cube *icube, UserInterface &ui, Pvl *log) {
     // We will be warping a cube
     ProcessRubberSheet p;
 
@@ -21,9 +26,8 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
     Pvl userPvl(ui.GetFileName("MAP"));
     PvlGroup &userMappingGrp = userPvl.findGroup("Mapping", Pvl::Traverse);
 
-    // Open the input cube and get the projection
-    Cube *icube = p.SetInputCube("FROM");
-
+    CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
+    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
 
     // Get the mapping group
     PvlGroup fromMappingGrp = icube->group("Mapping");
@@ -68,12 +72,12 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
     }
 
     /**
-     * If the user is changing from positive east to positive west, or vice-versa, the output minimum is really
-     * the input maximum. However, the user mapping group must be left unaffected (an input minimum must be the
-     * output minimum). To accomplish this, we swap the minimums/maximums in the output group ahead of time. This
-     * causes the minimums and maximums to correlate to the output minimums and maximums. That way when we copy
-     * the user mapping group into the output group a mimimum overrides a minimum and a maximum overrides a maximum.
-     */
+    * If the user is changing from positive east to positive west, or vice-versa, the output minimum is really
+    * the input maximum. However, the user mapping group must be left unaffected (an input minimum must be the
+    * output minimum). To accomplish this, we swap the minimums/maximums in the output group ahead of time. This
+    * causes the minimums and maximums to correlate to the output minimums and maximums. That way when we copy
+    * the user mapping group into the output group a mimimum overrides a minimum and a maximum overrides a maximum.
+    */
     bool sameDirection = true;
     if(userMappingGrp.hasKeyword("LongitudeDirection")) {
       if(((QString)userMappingGrp["LongitudeDirection"]).compare(fromMappingGrp["LongitudeDirection"]) != 0) {
@@ -184,25 +188,25 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
 
 
     /**
-     * The user specified map template file overrides what ever is in the
-     * cube's mapping group.
-     */
+    * The user specified map template file overrides what ever is in the
+    * cube's mapping group.
+    */
     for(int keyword = 0; keyword < userMappingGrp.keywords(); keyword ++) {
       outMappingGrp.addKeyword(userMappingGrp[keyword], Pvl::Replace);
     }
 
     /**
-     * Now, we have to deal with unit conversions. We convert only if the following are true:
-     *   1) We used values from the input cube
-     *   2) The values are longitudes or latitudes
-     *   3) The map file or user-specified information uses a different measurement system than
-     *        the input cube for said values.
-     *
-     * The data is corrected for:
-     *   1) Positive east/positive west
-     *   2) Longitude domain
-     *   3) planetographic/planetocentric.
-     */
+    * Now, we have to deal with unit conversions. We convert only if the following are true:
+    *   1) We used values from the input cube
+    *   2) The values are longitudes or latitudes
+    *   3) The map file or user-specified information uses a different measurement system than
+    *        the input cube for said values.
+    *
+    * The data is corrected for:
+    *   1) Positive east/positive west
+    *   2) Longitude domain
+    *   3) planetographic/planetocentric.
+    */
 
     // First, the longitude direction
     if(!sameDirection) {
@@ -242,7 +246,6 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
             }
           }
         }
-
       }
     }
 
@@ -268,29 +271,28 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
             }
           }
         }
-
       }
     }
 
     // Try a couple equivalent longitudes to fix the ordering of min,max for border cases
     if ((double)outMappingGrp["MinimumLongitude"] >=
-        (double)outMappingGrp["MaximumLongitude"]) {
+      (double)outMappingGrp["MaximumLongitude"]) {
 
-      if ((QString)outMappingGrp["MinimumLongitude"] == "180.0" &&
-          (int)userMappingGrp["LongitudeDomain"] == 180)
-        outMappingGrp["MinimumLongitude"] = "-180";
+    if ((QString)outMappingGrp["MinimumLongitude"] == "180.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 180)
+      outMappingGrp["MinimumLongitude"] = "-180";
 
-      if ((QString)outMappingGrp["MaximumLongitude"] == "-180.0" &&
-          (int)userMappingGrp["LongitudeDomain"] == 180)
-        outMappingGrp["MaximumLongitude"] = "180";
+    if ((QString)outMappingGrp["MaximumLongitude"] == "-180.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 180)
+      outMappingGrp["MaximumLongitude"] = "180";
 
-      if ((QString)outMappingGrp["MinimumLongitude"] == "360.0" &&
-          (int)userMappingGrp["LongitudeDomain"] == 360)
-        outMappingGrp["MinimumLongitude"] = "0";
+    if ((QString)outMappingGrp["MinimumLongitude"] == "360.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 360)
+      outMappingGrp["MinimumLongitude"] = "0";
 
-      if ((QString)outMappingGrp["MaximumLongitude"] == "0.0" &&
-          (int)userMappingGrp["LongitudeDomain"] == 360)
-        outMappingGrp["MaximumLongitude"] = "360";
+    if ((QString)outMappingGrp["MaximumLongitude"] == "0.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 360)
+      outMappingGrp["MaximumLongitude"] = "360";
     }
 
     // If MinLon/MaxLon out of order, we weren't able to calculate the correct values
@@ -317,22 +319,23 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
     // *NOTE: The UpperLeftX,UpperLeftY keywords will not be used in the CreateForCube
     //   method, and they will instead be recalculated. This is correct.
     TProjection *outproj = (TProjection *) ProjectionFactory::CreateForCube(mapData, samples, lines,
-                          ui.GetBoolean("MATCHMAP"));
+                        ui.GetBoolean("MATCHMAP"));
 
     // Set up the transform object which will simply map
     // output line/samps -> output lat/lons -> input line/samps
     Transform *transform = new Map2map(icube->sampleCount(),
-                                       icube->lineCount(),
-                                       (TProjection *) icube->projection(),
-                                       samples,
-                                       lines,
-                                       outproj,
-                                       ui.GetBoolean("TRIM"));
+                                     icube->lineCount(),
+                                     (TProjection *) icube->projection(),
+                                     samples,
+                                     lines,
+                                     outproj,
+                                     ui.GetBoolean("TRIM"));
 
     // Allocate the output cube and add the mapping labels
-    Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
-                                  transform->OutputLines(),
-                                  icube->bandCount());
+    CubeAttributeOutput & att = ui.GetOutputAttribute("TO");
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att, transform->OutputSamples(),
+                                transform->OutputLines(),
+                                icube->bandCount());
 
     PvlGroup cleanOutGrp = outproj->Mapping();
 
@@ -366,102 +369,94 @@ void map2map(Cube *incube, UserInterface &ui, Pvl *log)
     p.StartProcess(*transform, *interp);
     p.EndProcess();
 
-    //Application::Log(cleanOutGrp);
     if (log){
-        log->addGroup(cleanOutGrp);
+      log->addGroup(cleanOutGrp);
     }
 
     // Cleanup
     delete transform;
     delete interp;
-}
-
-void map2map(UserInterface &ui, Pvl *log)
-{
-    Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));
-    map2map(icube, ui, log);
-}
-
-
-// Transform object constructor
-Map2map::Map2map(const int inputSamples, const int inputLines, TProjection *inmap,
-                 const int outputSamples, const int outputLines, TProjection *outmap,
-                 bool trim) {
-  p_inputSamples = inputSamples;
-  p_inputLines = inputLines;
-  p_inmap = inmap;
-
-  p_outputSamples = outputSamples;
-  p_outputLines = outputLines;
-  p_outmap = outmap;
-
-  p_trim = trim;
-
-  p_inputWorldSize = 0;
-  bool wrapPossible = inmap->IsEquatorialCylindrical();
-
-  if(inmap->IsEquatorialCylindrical()) {
-    // Figure out how many samples 360 degrees is
-    wrapPossible = wrapPossible && inmap->SetUniversalGround(0, 0);
-    int worldStart = (int)(inmap->WorldX() + 0.5);
-    wrapPossible = wrapPossible && inmap->SetUniversalGround(0, 180);
-    int worldEnd = (int)(inmap->WorldX() + 0.5);
-
-    p_inputWorldSize = abs(worldEnd - worldStart) * 2;
-  }
-}
-
-// Transform method mapping output line/samps to lat/lons to input line/samps
-bool Map2map::Xform(double &inSample, double &inLine,
-                    const double outSample, const double outLine) {
-  // See if the output image coordinate converts to lat/lon
-  if(!p_outmap->SetWorld(outSample, outLine)) return false;
-
-  // See if we should trim
-  if((p_trim) && (p_outmap->HasGroundRange())) {
-    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
-    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
-    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
-    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
   }
 
-  // Get the universal lat/lon and see if it can be converted to input line/samp
-  double lat = p_outmap->UniversalLatitude();
-  double lon = p_outmap->UniversalLongitude();
-  if(!p_inmap->SetUniversalGround(lat, lon)) return false;
+  // Transform object constructor
+  Map2map::Map2map(const int inputSamples, const int inputLines, TProjection *inmap,
+               const int outputSamples, const int outputLines, TProjection *outmap,
+               bool trim) {
+    p_inputSamples = inputSamples;
+    p_inputLines = inputLines;
+    p_inmap = inmap;
 
-  inSample = p_inmap->WorldX();
-  inLine = p_inmap->WorldY();
+    p_outputSamples = outputSamples;
+    p_outputLines = outputLines;
+    p_outmap = outmap;
 
-  if(p_inputWorldSize != 0) {
-    // Try to correct the sample if we can,
-    //   this is the simplest way to code the
-    //   translation although it probably could
-    //   be done in one "if"
-    while(inSample < 0.5) {
-      inSample += p_inputWorldSize;
-    }
+    p_trim = trim;
 
-    while(inSample > p_inputSamples + 0.5) {
-      inSample -= p_inputWorldSize;
+    p_inputWorldSize = 0;
+    bool wrapPossible = inmap->IsEquatorialCylindrical();
+
+    if(inmap->IsEquatorialCylindrical()) {
+      // Figure out how many samples 360 degrees is
+      wrapPossible = wrapPossible && inmap->SetUniversalGround(0, 0);
+      int worldStart = (int)(inmap->WorldX() + 0.5);
+      wrapPossible = wrapPossible && inmap->SetUniversalGround(0, 180);
+      int worldEnd = (int)(inmap->WorldX() + 0.5);
+
+      p_inputWorldSize = abs(worldEnd - worldStart) * 2;
     }
   }
 
-  // Make sure the point is inside the input image
-  if(inSample < 0.5) return false;
-  if(inLine < 0.5) return false;
-  if(inSample > p_inputSamples + 0.5) return false;
-  if(inLine > p_inputLines + 0.5) return false;
+  // Transform method mapping output line/samps to lat/lons to input line/samps
+  bool Map2map::Xform(double &inSample, double &inLine,
+                  const double outSample, const double outLine) {
+    // See if the output image coordinate converts to lat/lon
+    if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
-  // Everything is good
-  return true;
-}
+    // See if we should trim
+    if((p_trim) && (p_outmap->HasGroundRange())) {
+      if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
+      if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
+      if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
+      if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
+    }
 
-int Map2map::OutputSamples() const {
-  return p_outputSamples;
-}
+    // Get the universal lat/lon and see if it can be converted to input line/samp
+    double lat = p_outmap->UniversalLatitude();
+    double lon = p_outmap->UniversalLongitude();
+    if(!p_inmap->SetUniversalGround(lat, lon)) return false;
 
-int Map2map::OutputLines() const {
-  return p_outputLines;
+    inSample = p_inmap->WorldX();
+    inLine = p_inmap->WorldY();
+
+    if(p_inputWorldSize != 0) {
+      // Try to correct the sample if we can,
+      //   this is the simplest way to code the
+      //   translation although it probably could
+      //   be done in one "if"
+      while(inSample < 0.5) {
+        inSample += p_inputWorldSize;
+      }
+
+      while(inSample > p_inputSamples + 0.5) {
+        inSample -= p_inputWorldSize;
+      }
+    }
+
+    // Make sure the point is inside the input image
+    if(inSample < 0.5) return false;
+    if(inLine < 0.5) return false;
+    if(inSample > p_inputSamples + 0.5) return false;
+    if(inLine > p_inputLines + 0.5) return false;
+
+    // Everything is good
+    return true;
+  }
+
+  int Map2map::OutputSamples() const {
+    return p_outputSamples;
+  }
+
+  int Map2map::OutputLines() const {
+    return p_outputLines;
+  }
 }

@@ -13,48 +13,48 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/map2map.xml").expanded();
 
 
-TEST_F(DefaultCube, FunctionalTestMap2MapDefault) {
-  // tempDir exists if the fixture subclasses TempTestingFiles, which most do
+TEST_F(ThreeImageNetwork, FunctionalTestMap2mapDefault) {
+
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
-    "defaultrange=map", "INTERP=NEARESTNEIGHBOR"};
+  QVector<QString> args = {"from=" + cube1map->fileName(),
+                           "to=" + outCubeFileName,
+                           "map=" + cube2map->fileName(),
+                           "defaultrange=map",
+                           "INTERP=NEARESTNEIGHBOR"};
 
   UserInterface options(APP_XML, args);
-  Pvl appLog;
   try {
-    map2map(options, &appLog);
+    map2map(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  Pvl pvlobject = Pvl(outCubeFileName);
+  Cube ocube(outCubeFileName);
 
-  ASSERT_TRUE(pvlobject.hasObject("Mapping"));
-  PvlObject mapobj = pvlobject.findObject("Mapping");
+  PvlGroup mapping = ocube.label()->findGroup("Mapping", Pvl::Traverse);
 
-  Cube oCube(outCubeFileName, "r");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Equirectangular");
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterLongitude"), 0.25400668736684);
 
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Mars");
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("EquatorialRadius"), 3396190.0);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("PolarRadius"), 3376200.0);
 
-  Histogram *oCubeStats = oCube.histogram();
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("LatitudeType"), "Planetocentric");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("LongitudeDirection"), "PositiveEast");
+  EXPECT_EQ((int)mapping.findKeyword("LongitudeDomain"), 180);
 
-  EXPECT_NEAR(oCubeStats->Average(), 73, 0.01);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 31025);
-  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 425);
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 14.714259545157688, 0.0000000001);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumLatitude"), 0.47920860194551);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumLatitude"), 3.3932951263901);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumLongitude"), -0.94830771139743);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumLongitude"), 1.4318179715731);
 
-
-  //ASSERT_TRUE(pvlobject.hasObject("UserParameters"));
-  //PvlObject userparameters = pvlObject.findObject("UserParameters");
-  //EXPECT_EQ(userparameters.findKeyword("INTERP"), "NEARESTNEIGHBOR");
-  /*ASSERT_TRUE(pvlobj.hasObject("Camstats"));
-  PvlObject camstats = camobj.findObject("Camstats");*/
-
-  // check statistics
-  // pick lat/lon in input, and check pixel value for input and output are close
-  // should account for diff projection, so only diff should be interpolation error, which is small
-
-  // Assert some stuff
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("UpperLeftCornerX"), -71250.037709109);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("UpperLeftCornerY"), 201236.66564437);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("PixelResolution"), 255.37647924412);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("Scale"), 232.10614255659);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterLatitude"), 1.5210901942398);
 }
 
 /*
@@ -96,5 +96,5 @@ TEST_F(DefaultCube, FunctionalTestMap2MapUnits) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  // Assert some stuff
+  // EXPECT some stuff
 }*/
