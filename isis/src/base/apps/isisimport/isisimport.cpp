@@ -71,13 +71,12 @@ namespace Isis {
       int month = stoi(startTime.substr(5, 7));
       int day = stoi(startTime.substr(8, 10));
       int doy = day;
-
       if (month > 2 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
         doy++;
       }
       // Add the days in the previous months
-      while (month-- > 0) {
-        doy = doy + daysInMonth[month - 1];
+      while (--month > 0) {
+        doy = doy + daysInMonth[month-1];
       }
       return yearString.append(to_string(doy));
     });
