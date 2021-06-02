@@ -35,6 +35,19 @@ release.
 
 ## [Unreleased]
 
+<<<<<<< HEAD
+=======
+### Changed
+- isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+
+### Fixed
+- Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
+- Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
+- Fixed hist outputs to N/A when all DNs are special pixels. [#3709](https://github.com/USGS-Astrogeology/ISIS3/issues/3709)
+- Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
+- Fixed SolarLon to compute from Table if cube is spiceinited. [#3703](https://github.com/USGS-Astrogeology/ISIS3/issues/3703)
+
+>>>>>>> 561e21e9c... Fixed SolarLon to compute from Table if cube is spiceinited (#4418)
 ## [5.0.0] - 2021-04-01
 
 ### Added
