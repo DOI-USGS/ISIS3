@@ -76,9 +76,6 @@ namespace Isis {
 
       even->setDimensions(p.Samples(), p.Lines(), p.Bands());
       odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
-      
-      // even->setPixelType(Isis::Real);
-      // odd->setPixelType(Isis::Real);
 
       QString evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
       QString oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
@@ -94,8 +91,6 @@ namespace Isis {
     else {
       Cube *outCube = new Cube();
       outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
-      
-      // outCube->setPixelType(Isis::Real);
 
       outCube->create(outFile.expanded(), outAttr);
       outputCubes.push_back(outCube);
