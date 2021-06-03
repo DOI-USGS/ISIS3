@@ -58,6 +58,20 @@ for (lbl in labels) {
                                 error stageStatus
                             }
 
+
+                            // TEMPORARY Repeat Bandnorm tests
+                            stageStatus = "Running Bandnorm gtests on ${label}"
+                            try {
+                                loginShell "ctest -R Bandnorm --repeat-until-fail 100"
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
+
+                            if (osFailed) {
+                                error "Failed on ${label}"
+                            }
+
                             // Unit tests
                             stageStatus = "Running unit tests on ${label}"
                             try {
@@ -87,19 +101,6 @@ for (lbl in labels) {
                             stageStatus = "Running gtests on ${label}"
                             try {
                                 loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
-
-                            if (osFailed) {
-                                error "Failed on ${label}"
-                            }
-
-                            // TEMPORARY Repeat Bandnorm tests
-                            stageStatus = "Running Bandnorm gtests on ${label}"
-                            try {
-                                loginShell "ctest -R Bandnorm --repeat-until-fail 100"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
