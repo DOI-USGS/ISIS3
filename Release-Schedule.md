@@ -18,7 +18,7 @@ As described above, we will release on a three month cadence. Releases will be l
 ### Release Schedule
 | Version # / Label | Type | Date | 
 |-------------------|------|------------|
-| 4.3.0 | Release | 10.26.21 |
+| 4.3.0 | Release | 10.26.20 |
 | 4.4.0 | Release | 2.8.21 |
 | 5.0.0_RC | Release Candidate | 4.1.21 |
 | 5.0.0 | Release | 4.26.21 |
