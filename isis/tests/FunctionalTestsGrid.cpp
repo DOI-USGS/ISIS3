@@ -263,7 +263,15 @@ TEST_F(NewHorizonsCube, FunctionalTestGridBandDependent) {
 TEST_F(DefaultCube, FunctionalTestGridExtend) {
   QVector<QString> args = {"to=" + tempDir.path() + "/output.cub", "extendgrid=true"};
   UserInterface options(APP_XML, args);
-  grid(testCube, options);
+
+  // change mapping group of cube to one that extends past longitude domain
+  Pvl newMap;
+  newMap.read("data/defaultImage/extendProj.map");
+  PvlGroup &newMapGrp = newMap.findGroup("Mapping", Pvl::Traverse);
+
+  projTestCube->putGroup(newMapGrp);
+
+  grid(projTestCube, options);
 
   Cube outputCube;
   try {
@@ -275,13 +283,13 @@ TEST_F(DefaultCube, FunctionalTestGridExtend) {
 
   // Check beginning and end of gridline
   LineManager line(outputCube);
-  line.SetLine(579);
+  line.SetLine(1);
   outputCube.read(line);
   EXPECT_EQ(line[0], Isis::Hrs);
 
-  line.SetLine(1056);
+  line.SetLine(1);
   outputCube.read(line);
-  EXPECT_EQ(line[247], Isis::Hrs);
+  EXPECT_EQ(line[2], Isis::Hrs);
 
   outputCube.close();
 }
