@@ -57,6 +57,13 @@ TEST_F(ThreeImageNetwork, FunctionalTestMap2mapDefault) {
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 255.37647924412, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 232.10614255659, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("CenterLatitude"), 1.5210901942398, 0.0001);
+
+  std::unique_ptr<Histogram> hist (ocube.histogram());
+
+  EXPECT_NEAR(hist->Average(), -1.7976931348623149e+308, .00001);
+  EXPECT_EQ(hist->Sum(), 0);
+  EXPECT_EQ(hist->ValidPixels(), 0);
+  EXPECT_NEAR(hist->StandardDeviation(), -1.7976931348623149e+308, .0001);
 }
 
 
@@ -102,6 +109,13 @@ TEST_F(ThreeImageNetwork, FunctionalTestMap2mapKeywords) {
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 232.10614255659, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("CenterLatitude"), 1.5210901942398, 0.0001);
 
+  std::unique_ptr<Histogram> hist (ocube.histogram());
+
+  EXPECT_NEAR(hist->Average(), -1.7976931348623149e+308, .00001);
+  EXPECT_EQ(hist->Sum(), 0);
+  EXPECT_EQ(hist->ValidPixels(), 0);
+  EXPECT_NEAR(hist->StandardDeviation(), -1.7976931348623149e+308, .0001);
+
 
   QString noScaleFile = tempDir.path() + "/outTempNoScale.cub";
   QVector<QString> argsNoScale = {"from=" + cube1map->fileName(),
@@ -146,6 +160,13 @@ TEST_F(ThreeImageNetwork, FunctionalTestMap2mapKeywords) {
   EXPECT_NEAR((double)mapNoScale.findKeyword("PixelResolution"), 255.37647924412, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 232.10614255659, 0.0001);
   EXPECT_NEAR((double)mapNoScale.findKeyword("CenterLatitude"), 1.5210901942398, 0.0001);
+
+  std::unique_ptr<Histogram> histNoScale (ocubeNoScale.histogram());
+
+  EXPECT_NEAR(histNoScale->Average(), -1.7976931348623149e+308, .00001);
+  EXPECT_EQ(histNoScale->Sum(), 0);
+  EXPECT_EQ(histNoScale->ValidPixels(), 0);
+  EXPECT_NEAR(histNoScale->StandardDeviation(), -1.7976931348623149e+308, .0001);
 }
 
 
@@ -190,6 +211,13 @@ TEST_F(ThreeImageNetwork, FunctionalTestMap2mapUnits) {
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 255.37647924412, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 232.10614255659, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("CenterLatitude"), 1.5210901942398, 0.0001);
+
+  std::unique_ptr<Histogram> hist (ocube.histogram());
+
+  EXPECT_NEAR(hist->Average(), -1.7976931348623149e+308, .00001);
+  EXPECT_EQ(hist->Sum(), 0);
+  EXPECT_EQ(hist->ValidPixels(), 0);
+  EXPECT_NEAR(hist->StandardDeviation(), -1.7976931348623149e+308, .0001);
 }
 
 
@@ -234,4 +262,11 @@ TEST(Map2mapTest, FunctionalTestMap2mapProjection) {
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("PixelResolution"), 10000.0);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 3.0323350424149, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("CenterLatitude"), 0.0);
+
+  std::unique_ptr<Histogram> hist (ocube.histogram());
+
+  EXPECT_NEAR(hist->Average(), -1.7976931348623149e+308, .00001);
+  EXPECT_EQ(hist->Sum(), 0);
+  EXPECT_EQ(hist->ValidPixels(), 0);
+  EXPECT_NEAR(hist->StandardDeviation(), -1.7976931348623149e+308, .0001);
 }
