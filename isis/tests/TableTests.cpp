@@ -144,6 +144,9 @@ TEST(TableTests, ToFromBlob) {
   rec[3] = -0.55;
   t += rec;
 
+  QString comment = "test comment";
+  t.Label().addComment(comment);
+
   Blob tableBlob = t.toBlob();
 
   Table t2(tableBlob);
@@ -153,6 +156,7 @@ TEST(TableTests, ToFromBlob) {
   EXPECT_EQ(t.IsSampleAssociated(), t2.IsSampleAssociated());
   EXPECT_EQ(t.IsLineAssociated(), t2.IsLineAssociated());
   EXPECT_EQ(t.IsBandAssociated(), t2.IsBandAssociated());
+  EXPECT_EQ(t.Label().comments(), t2.Label().comments());
 
   ASSERT_EQ(t.Records(), t2.Records());
   for (int i = 0; i < t.Records(); i++) {
