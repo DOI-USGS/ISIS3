@@ -133,39 +133,6 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
 }
 
 
-TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
-  // tempDir exists if the fixture subclasses TempTestingFiles, which most do
-  QString outCubeFileName = tempDir.path() + "/test.cub+msb+8bit+0.0012:0.0013";
-  QVector<QString> args = {"from=data/thm2isis/V00821003RDR.QUB",  "to="+outCubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    thm2isis(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to open image: " << e.what() << std::endl;
-  }
-  
-  // open even cube
-  Cube evenCube( tempDir.path() + "/test.even.cub");
-
-  // Pixels Group
-  EXPECT_EQ(PixelTypeName(evenCube.pixelType()).toStdString(), "UnsignedByte");
-  EXPECT_EQ(ByteOrderName(evenCube.byteOrder()).toStdString(), "Msb");
-  EXPECT_DOUBLE_EQ(evenCube.base(), 0.001199604743083);
-  EXPECT_DOUBLE_EQ(evenCube.multiplier(), 3.95256916996048e-07);
-
-  std::unique_ptr<Histogram> hist (evenCube.histogram());
-   
-  EXPECT_NEAR(hist->Minimum(), 0.0012, 0.0001);
-  EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001); 
-  EXPECT_NEAR(hist->Average(), 0.00122, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 157.94891, .00001);
-  EXPECT_EQ(hist->ValidPixels(), 129380);
-  EXPECT_NEAR(hist->StandardDeviation(), 1.5069986471567319e-05, .00001);
-}
-
-
 TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
   QString newLabelPath = "data/thm2isis/I00831002RDR_cropped.QUB" ;
 
@@ -229,3 +196,37 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
   EXPECT_EQ(hist->ValidPixels(), 50);
   EXPECT_NEAR(hist->StandardDeviation(), 0.00011232993701816659, .00001);
 }
+
+
+TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
+  // tempDir exists if the fixture subclasses TempTestingFiles, which most do
+  QString outCubeFileName = tempDir.path() + "/test.cub+msb+8bit+0.0012:0.0013";
+  QVector<QString> args = {"from=data/thm2isis/V00821003RDR.QUB",  "to="+outCubeFileName};
+
+  UserInterface options(APP_XML, args);
+  try {
+    thm2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+  
+  // open even cube
+  Cube evenCube( tempDir.path() + "/test.even.cub");
+
+  // Pixels Group
+  EXPECT_EQ(PixelTypeName(evenCube.pixelType()).toStdString(), "UnsignedByte");
+  EXPECT_EQ(ByteOrderName(evenCube.byteOrder()).toStdString(), "Msb");
+  EXPECT_DOUBLE_EQ(evenCube.base(), 0.001199604743083);
+  EXPECT_DOUBLE_EQ(evenCube.multiplier(), 3.95256916996048e-07);
+
+  std::unique_ptr<Histogram> hist (evenCube.histogram());
+   
+  EXPECT_NEAR(hist->Minimum(), 0.0012, 0.0001);
+  EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001); 
+  EXPECT_NEAR(hist->Average(), 0.00122, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 157.94891, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 129380);
+  EXPECT_NEAR(hist->StandardDeviation(), 1.5069986471567319e-05, .00001);
+}
+
