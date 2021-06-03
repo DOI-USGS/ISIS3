@@ -164,3 +164,68 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   EXPECT_EQ(hist->ValidPixels(), 129380);
   EXPECT_NEAR(hist->StandardDeviation(), 1.5069986471567319e-05, .00001);
 }
+
+
+TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
+  QString newLabelPath = "data/thm2isis/I00831002RDR_cropped.QUB" ;
+
+  // tempDir exists if the fixture subclasses TempTestingFiles, which most do
+  QString outCubeFileName = tempDir.path() + "/test.cub";
+  QVector<QString> args = {"from=" + newLabelPath,  "to="+outCubeFileName};
+
+  UserInterface options(APP_XML, args);
+  try {
+    thm2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+  
+  Cube oCube(outCubeFileName);
+  Pvl *isisLabel = oCube.label();
+
+  // Dimensions Group
+  EXPECT_EQ(oCube.sampleCount(), 10);
+  EXPECT_EQ(oCube.lineCount(), 5);
+  EXPECT_EQ(oCube.bandCount(), 10);
+
+  // Pixels Group
+  EXPECT_EQ(PixelTypeName(oCube.pixelType()), "Real");
+  EXPECT_EQ(ByteOrderName(oCube.byteOrder()), "Lsb");
+  EXPECT_DOUBLE_EQ(oCube.base(), 0.0);
+  EXPECT_DOUBLE_EQ(oCube.multiplier(), 1.0);
+
+  // Instrument Group
+  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
+
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "MARS_ODYSSEY");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "THEMIS_IR" );
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MARS" );
+  EXPECT_EQ(inst["SpacecraftClockCount"][0].toStdString(), "698713127.000" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2002-02-20T22:57:57.253000" );
+  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2002-02-20T23:00:56.983000" );
+  EXPECT_EQ((int)inst["GainNumber"], 16);
+
+  // Archive Group
+  PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "ODY-M-THM-3-IRRDR-V1.0" );
+  EXPECT_EQ(archive["ProductId"][0].toStdString(), "I00831002RDR" );
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2003-03-12T12:59:33" );
+  EXPECT_EQ(double(archive["ProductVersionId"]), 1.4);
+
+  // BandBin Group
+  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["OriginalBand"].size(), 10);
+  EXPECT_EQ(bandbin["Center"].size(), 10);
+  EXPECT_EQ(bandbin["Width"].size(), 10);
+  EXPECT_EQ(bandbin["FilterNumber"].size(), 10);
+
+  std::unique_ptr<Histogram> hist (oCube.histogram());
+ 
+  EXPECT_NEAR(hist->Minimum(), 0.00029065093258395791, 0.0001);
+  EXPECT_NEAR(hist->Maximum(), 0.00064912717789411545, 0.0001); 
+  EXPECT_NEAR(hist->Average(), 0.00047608536842744795, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 0.023804268421372399, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 50);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.00011232993701816659, .00001);
+}
