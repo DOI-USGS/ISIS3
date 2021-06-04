@@ -13,15 +13,8 @@ namespace Isis {
 /**
  * @brief Apply a generic transform using a matrix with various options
  *
- * This class privides a generic interface to the ImageTransform image and point
- * transform conversion transform. It supports the transform with a specified
- * 3x3 matrix and optional sizing operations.
- *
- * @author 2014-07-01 Kris Becker
- * @internal
- *   @history 2014-07-01 Kris Becker - Original Version
- *   @history 2016-03-08 Kris Becker Created .cpp from header and completed
- *                           documentation
+ * This class duplicates the functionality of GenericTransform, but allows for
+ * tiled processing via the specification of a tile size.
  */
 class GenericTiledTransform : public GenericTransform {
   public:

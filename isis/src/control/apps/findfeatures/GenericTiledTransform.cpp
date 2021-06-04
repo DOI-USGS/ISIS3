@@ -34,7 +34,7 @@ GenericTiledTransform::GenericTiledTransform(const QString &name, const cv::Mat 
   setSize(cv::Size(0,0));
 }
 
-/** Construct named transfrom with 3x3 matrix with a size specification */
+/** Construct named transfrom with 3x3 matrix with a size specification and a tilesize*/
 GenericTiledTransform::GenericTiledTransform(const QString &name, const cv::Mat &matrix,
                                    const cv::Size &size,
                                    const int tileSize) :
@@ -43,7 +43,7 @@ GenericTiledTransform::GenericTiledTransform(const QString &name, const cv::Mat 
   setSize(size);
 }
 
-/** Construct named transfrom with 3x3 matrix with a subarea specification */
+/** Construct named transfrom with 3x3 matrix with a subarea specification and tilesize */
 GenericTiledTransform::GenericTiledTransform(const QString &name, const cv::Mat &matrix,
                                    const GenericTransform::RectArea &subarea,
                                    const int tileSize) :
