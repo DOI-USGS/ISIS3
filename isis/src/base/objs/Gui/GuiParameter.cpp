@@ -36,7 +36,7 @@ namespace Isis {
     p_label = new QLabel(p_name);
     p_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     p_label->setToolTip(p_ui->ParamBrief(group, param));
-    grid->addWidget(p_label, param, 0, Qt::AlignCenter);
+    grid->addWidget(p_label, param, 0, Qt::AlignTop);
 
     QString whatsThis;
     whatsThis  = (QString)("<b>Parameter:</b> " + p_ui->ParamName(group, param));
