@@ -12,6 +12,8 @@
 #include "Brick.h"
 #include "OriginalLabel.h"
 
+#include "thm2isis.h"
+
 using namespace std;
 
 namespace Isis { 

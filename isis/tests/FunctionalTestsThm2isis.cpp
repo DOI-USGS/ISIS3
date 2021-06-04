@@ -15,7 +15,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/thm2isis.xml").expanded();
 TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
   QString outCubeFileName = tempDir.path() + "/test.cub";
-  QVector<QString> args = {"from=data/thm2isis/V00821003RDR.QUB",  "to="+outCubeFileName};
+  QVector<QString> args = {"from=data/thm2isis/V00821003RDR_cropped.QUB",  "to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
@@ -31,7 +31,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
 
   // Dimensions Group
   EXPECT_EQ(evenCube.sampleCount(), 1024);
-  EXPECT_EQ(evenCube.lineCount(), 576);
+  EXPECT_EQ(evenCube.lineCount(), 200);
   EXPECT_EQ(evenCube.bandCount(), 5);
 
   // Pixels Group
@@ -46,12 +46,12 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "THEMIS_VIS" );
   EXPECT_EQ(inst["TargetName"][0].toStdString(), "MARS" );
   EXPECT_EQ(inst["SpacecraftClockCount"][0].toStdString(), "698642092.025" );
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "6.000" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2002-02-20T03:14:02.471" );
-  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2002-02-20T03:14:09.471" );
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "6.0" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2002-02-20T03:14:02.471000" );
+  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2002-02-20T03:14:09.471000" );
   EXPECT_EQ(inst["Framelets"][0].toStdString(), "Even" );
-  EXPECT_EQ(inst["InterframeDelay"][0].toStdString(), "1.000" );
-  EXPECT_EQ(int(inst["NumFramelets"]), 3);
+  EXPECT_EQ(inst["InterframeDelay"][0].toStdString(), "1.0" );
+  EXPECT_EQ(int(inst["NumFramelets"]), 1);
 
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
@@ -74,8 +74,8 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   std::unique_ptr<Histogram> hist (evenCube.histogram());
 
   EXPECT_NEAR(hist->Average(), 0.0012095900723426705, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 227.52389260765631, .00001);
-  EXPECT_EQ(hist->ValidPixels(), 188100);
+  EXPECT_NEAR(hist->Sum(), 9.5743556655943394, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 7920);
   EXPECT_NEAR(hist->StandardDeviation(), 2.241887e-05, .00001);
 
   // open odd cube
@@ -84,7 +84,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
 
   // Dimensions Group
   EXPECT_EQ(oddCube.sampleCount(), 1024);
-  EXPECT_EQ(oddCube.lineCount(), 576);
+  EXPECT_EQ(oddCube.lineCount(), 200);
   EXPECT_EQ(oddCube.bandCount(), 5);
 
   // Pixels Group
@@ -99,12 +99,12 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "THEMIS_VIS" );
   EXPECT_EQ(inst["TargetName"][0].toStdString(), "MARS" );
   EXPECT_EQ(inst["SpacecraftClockCount"][0].toStdString(), "698642092.025" );
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "6.000" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2002-02-20T03:14:02.471" );
-  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2002-02-20T03:14:09.471" );
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "6.0" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2002-02-20T03:14:02.471000" );
+  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2002-02-20T03:14:09.471000" );
   EXPECT_EQ(inst["Framelets"][0].toStdString(), "Odd" );
-  EXPECT_EQ(inst["InterframeDelay"][0].toStdString(), "1.000" );
-  EXPECT_EQ(int(inst["NumFramelets"]), 3);
+  EXPECT_EQ(inst["InterframeDelay"][0].toStdString(), "1.0" );
+  EXPECT_EQ(int(inst["NumFramelets"]), 1);
 
   // Archive Group
   archive = isisLabel->findGroup("Archive", Pvl::Traverse);
@@ -127,8 +127,8 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   hist.reset(oddCube.histogram());
 
   EXPECT_NEAR(hist->Average(), 0.0012095900723426705, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 457.42227419186383, .00001);
-  EXPECT_EQ(hist->ValidPixels(), 376200);
+  EXPECT_NEAR(hist->Sum(), 228.48262293543667, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 188100);
   EXPECT_NEAR(hist->StandardDeviation(), 2.241887e-05, .00001);
 }
 
