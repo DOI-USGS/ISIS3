@@ -16,7 +16,7 @@ find files of those names at the top level of this repository. **/
 
 #include <opencv2/opencv.hpp>
 
-#include "GenericTransform.h"
+#include "GenericTiledTransform.h"
 #include "MatchImage.h"
 #include "PvlFlatMap.h"
 
@@ -56,7 +56,7 @@ class ImageTransform;
 
 class FastGeom {
   public:
-    typedef GenericTransform::RectArea   RectArea;
+    typedef GenericTiledTransform::RectArea   RectArea;
     FastGeom();
     FastGeom(const PvlFlatMap &parameters);
     FastGeom(const int maxpts, const double tolerance, const bool crop = false,

@@ -85,7 +85,7 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
 
   // Set up the transform pointer for applying the desired affect. Do
   // preserve option first.
-  QScopedPointer<GenericTransform> fastg(0);
+  QScopedPointer<GenericTiledTransform> fastg(0);
   if ( "map" == m_geomtype ) {
     // Compute preserved image output size and translation matrix
     cv::Mat tMat;
@@ -98,8 +98,8 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
     // same size as the output image below.
     if ( tSizeFull.area()  < (m_maxarea * qSize.area()) ) {
       // std::cout << "Use direct full mapping of Train-to-Query...\n";
-      fastg.reset(new GenericTransform("FastGeomMap", t_to_q,
-                                       tSizeFull));
+      fastg.reset(new GenericTiledTransform("FastGeomMap", t_to_q,
+                                       tSizeFull, 30000));
     }
   }
   else if ( "crop" == m_geomtype ) {
@@ -116,14 +116,14 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
                                                    qSize.size());
 
     // std::cout << "MapBB: " << tbbox << "\n";
-    fastg.reset(new GenericTransform("FastGeomCrop", t_to_q, tbbox));
+    fastg.reset(new GenericTiledTransform("FastGeomCrop", t_to_q, tbbox, 30000));
   }
 
  // If a mapper has not been allocated, allocate mapping to query image size
  // (as cam2cam does).
   if ( fastg.isNull() ) {
     // std::cout << "FastGeom cam2map map created...\n";
-    fastg.reset(new GenericTransform("FastGeomCamera", t_to_q, qSize.size()));
+    fastg.reset(new GenericTiledTransform("FastGeomCamera", t_to_q, qSize.size(), 30000));
   }
 
   return ( fastg.take() );
