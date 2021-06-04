@@ -248,3 +248,34 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoMatch) {
     EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** No control points found!"));
   }
 }
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesTiled) {
+  // Setup output file
+  QVector<QString> args = {"algorithm=brisk/brisk",
+                           "match=" + tempDir.path() + "/cube2.cub",
+                           "from=" + tempDir.path() + "/cube1.cub",
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "maxpoints=25000",
+                           "epitolerance=300.0",
+                           "epiconfidence=.2",
+                           "ratio=1",
+                           "hmgtolerance=300.0",
+                           "onet=" + tempDir.path() + "/network.net",
+                           "networkid=new",
+                           "pointid=test_network_????",
+                           "target=MARS",
+                           "description=new",
+                           "fastgeom=true",
+                           "debug=false"
+                         };
+
+
+  UserInterface options(APP_XML, args);
+  findfeatures(options);
+  ControlNet network(options.GetFileName("ONET"));
+
+  ASSERT_EQ(network.GetNetworkId(), "new");
+  ASSERT_EQ(network.Description().toStdString(), "brisk/brisk/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  ASSERT_EQ(network.GetNumPoints(), 21);
+}
