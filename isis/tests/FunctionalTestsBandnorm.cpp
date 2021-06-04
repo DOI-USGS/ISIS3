@@ -14,7 +14,7 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/bandnorm.xml").expanded();
 
 TEST_F(SmallCube, FunctionalTestBandnormDefault) {
-  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
 
   // force all bands to be normalized to 1's
   LineManager line(*testCube);
@@ -49,8 +49,8 @@ TEST_F(SmallCube, FunctionalTestBandnormDefault) {
 
 
 TEST_F(SmallCube, FunctionalTestBandnormPencil) {
-  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
-  QString pencilPath = "/tmp/pencil.txt";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
+  QString pencilPath = tempDir.path() + "/pencil.txt";
 
   QVector<QString> args = {"to="+outCubeFileName, "SPECTRUM="+pencilPath, "AVERAGE=PENCIL"};
 
@@ -137,8 +137,8 @@ TEST_F(SmallCube, FunctionalTestBandnormPencil) {
 
 
 TEST_F(SmallCube, FunctionalTestBandnormByNumber) {
-  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
-  QString pencilPath = "/tmp/pencil.txt";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
+  QString pencilPath = tempDir.path() + "/pencil.txt";
 
   QVector<QString> args = {"to="+outCubeFileName, "SPECTRUM="+pencilPath, "AVERAGE=PENCIL",
                            "method=number", "number=1"};
@@ -183,8 +183,8 @@ TEST_F(SmallCube, FunctionalTestBandnormByNumber) {
 
 
 TEST_F(SmallCube, FunctionalTestBandnormByBandAvg) {
-  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
-  QString pencilPath = "/tmp/pencil.txt";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
+  QString pencilPath = tempDir.path() + "/pencil.txt";
 
   QVector<QString> args = {"to="+outCubeFileName, "AVERAGE=Band"};
 
@@ -213,8 +213,8 @@ TEST_F(SmallCube, FunctionalTestBandnormByBandAvg) {
 
 
 TEST_F(SmallCube, FunctionalTestBandnormByCubeAvg) {
-  QString outCubeFileName = tempDir.path()+"/outTEMP.cub";
-  QString pencilPath = "/tmp/pencil.txt";
+  QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
+  QString pencilPath = tempDir.path() + "/pencil.txt";
 
   QVector<QString> args = {"to="+outCubeFileName, "AVERAGE=Cube"};
 
