@@ -678,3 +678,91 @@ End_Group
 #  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
 #  Translation     = (*, *)
 #End_Group
+
+# Export Footprint Coordinates 
+
+Group = Corner1Lattiude
+  Auto
+  Optional
+  InputKey        = Corner1Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputSiblings =  (geom:reference_pixel_location|LowerLeftCorner)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+
+  Translation     = (*, *)
+End_Group
+
+Group = Corner1Longitude
+  Auto
+  Optional
+  InputKey        = Corner1Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner2Lattiude
+  Auto
+  Optional
+  InputKey        = Corner2Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
+  OutputSiblings = (geom:reference_pixel_location|UpperLeftCorner)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner2Longitude
+  Auto
+  Optional
+  InputKey        = Corner2Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner3Lattiude
+  Auto
+  Optional
+  InputKey        = Corner3Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
+  OutputSiblings  = (geom:reference_pixel_location|LowerRightCorner)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner3Longitude
+  Auto
+  Optional
+  InputKey        = Corner3Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner4Lattiude
+  Auto
+  Optional
+  InputKey        = Corner4Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
+  OutputSiblings  = (geom:reference_pixel_location|UpperRightCorner)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner4Longitude
+  Auto
+  Optional
+  InputKey        = Corner4Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
