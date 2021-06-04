@@ -184,7 +184,7 @@ namespace Isis {
       try {
         QString thisTypeName = DataTypeToName((NumericLogDataType) i);
 
-        if (name == thisTypeName) {
+        if (name.compare(thisTypeName, Qt::CaseInsensitive) == 0) {
           return (NumericLogDataType) i;
         }
       }
