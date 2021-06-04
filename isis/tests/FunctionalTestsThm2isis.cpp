@@ -201,7 +201,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
 TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
   QString outCubeFileName = tempDir.path() + "/test.cub+msb+8bit+0.0012:0.0013";
-  QVector<QString> args = {"from=data/thm2isis/V00821003RDR.QUB",  "to="+outCubeFileName};
+  QVector<QString> args = {"from=data/thm2isis/V00821003RDR_cropped.QUB",  "to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
   try {
@@ -225,8 +225,8 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   EXPECT_NEAR(hist->Minimum(), 0.0012, 0.0001);
   EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001); 
   EXPECT_NEAR(hist->Average(), 0.00122, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 157.94891, .00001);
-  EXPECT_EQ(hist->ValidPixels(), 129380);
+  EXPECT_NEAR(hist->Sum(), 6.6702830039524876, .00001);
+  EXPECT_EQ(hist->ValidPixels(), 5472);
   EXPECT_NEAR(hist->StandardDeviation(), 1.5069986471567319e-05, .00001);
 }
 
