@@ -71,7 +71,7 @@ TEST_F(SmallCube, FunctionalTestIsisexportOriginalLabel) {
   EXPECT_EQ(testKey[0].toStdString(), line);
 }
 
-TEST_F(SmallCube, FunctionalTestIsisexport4NoOriginalLabel) {
+TEST_F(SmallCube, FunctionalTestIsisexportNoOriginalLabel) {
   QString templateFile = tempDir.path()+"/bad_value.tpl";
   QString renderedFile = tempDir.path()+"/bad_value.txt";
   std::ofstream of;

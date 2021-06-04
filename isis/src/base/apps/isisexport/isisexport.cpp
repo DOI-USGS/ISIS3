@@ -24,8 +24,8 @@ using namespace std;
 using namespace inja;
 using json = nlohmann::json;
 
-
 namespace Isis {
+  extern QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder);
 
   void isisexport(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();

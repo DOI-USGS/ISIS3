@@ -2,22 +2,22 @@
 
 <application name="isisimport" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Convert from PDS 4 format (other formats will be supported in the future) using template XML files to an ISIS Cube.
+    Convert from an external format, non-ISIS format using template files to an ISIS Cube.
   </brief>
 
   <description>
     <p>
       NOTE: This program and the associated template files are incomplete. The documentation
-      describes what the eventual intended capabilities are. Many capabiliteis are not implemented
+      describes what the eventual intended capabilities are. Many capabilities are not implemented
       at this time.
     </p>
     <p>
-      Reads a PDS4 compatible label file and image file. The contents of the ISIS cube label file are
+      Reads an input label file and image file. The contents of the ISIS cube label file are
       generated using the template file specified by the TEMPLATE parameter.
     </p>
     <p>
       This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
-      to render the template file. The input data from the PDS4 label
+      to render the template file. The input data from the input label
       is converted to JSON and then it is accessed via the Inja templating syntax.
       See the <a href="https://pantor.github.io/inja">Inja documentation</a> for the full template
       syntax.
@@ -40,10 +40,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS4 label
+          Input label
         </brief>
         <description>
-          This is the PDS4 label to be ingested to an ISIS Cube. It's assumed that the PDS4 image is located in the same directory with a .img file extension.
+          This is the label to be ingested to an ISIS Cube. It's assumed that the image is located in the same directory.
         </description>
         <filter>
           *.xml
