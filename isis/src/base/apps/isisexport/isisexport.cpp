@@ -25,7 +25,7 @@ using namespace inja;
 using json = nlohmann::json;
 
 namespace Isis {
-  extern QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder);
+  QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder);
 
   void isisexport(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();
@@ -235,35 +235,34 @@ namespace Isis {
       jsonDataFile.close();
     }
   }
-}
 
-
-QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder) {
-  QString pds4Type("UNK");
-  if(ipixelType == Isis::UnsignedByte) {
-    pds4Type = "UnsignedByte";
+  QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder) {
+    QString pds4Type("UNK");
+    if(ipixelType == Isis::UnsignedByte) {
+      pds4Type = "UnsignedByte";
+    }
+    else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Msb)) {
+      pds4Type = "UnsignedMSB2";
+    }
+    else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Lsb)) {
+      pds4Type = "UnsignedLSB2";
+    }
+    else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Msb)) {
+      pds4Type = "SignedMSB2";
+    }
+    else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Lsb)) {
+      pds4Type = "SignedLSB2";
+    }
+    else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Msb)) {
+      pds4Type = "IEEE754MSBSingle";
+    }
+    else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Lsb)) {
+      pds4Type = "IEEE754LSBSingle";
+    }
+    else {
+      QString msg = "Unsupported PDS pixel type or sample size";
+      throw Isis::IException(Isis::IException::User, msg, _FILEINFO_);
+    }
+    return pds4Type;
   }
-  else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Msb)) {
-    pds4Type = "UnsignedMSB2";
-  }
-  else if((ipixelType == Isis::UnsignedWord) && (ibyteOrder == Isis::Lsb)) {
-    pds4Type = "UnsignedLSB2";
-  }
-  else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Msb)) {
-    pds4Type = "SignedMSB2";
-  }
-  else if((ipixelType == Isis::SignedWord) && (ibyteOrder == Isis::Lsb)) {
-    pds4Type = "SignedLSB2";
-  }
-  else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Msb)) {
-    pds4Type = "IEEE754MSBSingle";
-  }
-  else if((ipixelType == Isis::Real) && (ibyteOrder == Isis::Lsb)) {
-    pds4Type = "IEEE754LSBSingle";
-  }
-  else {
-    QString msg = "Unsupported PDS pixel type or sample size";
-    throw Isis::IException(Isis::IException::User, msg, _FILEINFO_);
-  }
-  return pds4Type;
 }
