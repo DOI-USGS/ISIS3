@@ -191,6 +191,36 @@ void IsisMain() {
     focalLengthNode.removeAttribute("unit");
   }
 
+  // Fix the footprint section's output structure
+  QStringList xmlPath2;
+  xmlPath2 << "Observation_Area"
+          << "Discipline_Area"
+          << "geom:Geometry"
+          << "geom:Geometry_Orbiter"
+          << "geom:Surface_Geometry"
+          << "geom:Surface_Geometry_Specific"
+          << "geom:Footprint_Vertices"
+          << "geom:Pixel_Intercept";
+
+  QDomElement pixelInterceptNode = process.getElement(xmlPath2, observationNode);
+  QDomNodeList nodeList = pixelInterceptNode.childNodes();
+  QDomNode longitude2 = nodeList.item(3);
+  QDomNode longitude3 = nodeList.item(4);
+  QDomNode longitude4 = nodeList.item(5);
+
+  QDomElement pixelInterceptNode2 = pixelInterceptNode.nextSiblingElement();
+  QDomElement pixelInterceptNode3 = pixelInterceptNode2.nextSiblingElement();
+  QDomElement pixelInterceptNode4 = pixelInterceptNode3.nextSiblingElement();
+
+  QDomElement latitude2 = pixelInterceptNode2.firstChildElement(); 
+  pixelInterceptNode2.insertAfter(latitude2, longitude2);
+
+  QDomElement latitude3 = pixelInterceptNode3.firstChildElement(); 
+  pixelInterceptNode3.insertAfter(latitude3, longitude3);
+
+  QDomElement latitude4 = pixelInterceptNode4.firstChildElement(); 
+  pixelInterceptNode4.insertAfter(latitude4, longitude4);
+
   QString outFile = ui.GetFileName("TO");
 
   process.WritePds4(outFile);
