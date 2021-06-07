@@ -686,7 +686,7 @@ Group = Corner1Lattiude
   Optional
   InputKey        = Corner1Latitude
   InputPosition   = (IsisCube, Archive)
-  OutputSiblings =  (geom:reference_pixel_location|LowerLeftCorner)
+  OutputSiblings =  ("geom:reference_pixel_location|Lower Left Corner")
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
 
@@ -710,7 +710,7 @@ Group = Corner2Lattiude
   InputPosition   = (IsisCube, Archive)
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
-  OutputSiblings = (geom:reference_pixel_location|UpperLeftCorner)
+  OutputSiblings = ("geom:reference_pixel_location|Upper Left Corner")
   Translation     = (*, *)
 End_Group
 
@@ -731,7 +731,7 @@ Group = Corner3Lattiude
   InputPosition   = (IsisCube, Archive)
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
-  OutputSiblings  = (geom:reference_pixel_location|LowerRightCorner)
+  OutputSiblings  = ("geom:reference_pixel_location|Lower Right Corner")
   Translation     = (*, *)
 End_Group
 
@@ -752,7 +752,7 @@ Group = Corner4Lattiude
   InputPosition   = (IsisCube, Archive)
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept)
-  OutputSiblings  = (geom:reference_pixel_location|UpperRightCorner)
+  OutputSiblings  = ("geom:reference_pixel_location|Upper Right Corner")
   Translation     = (*, *)
 End_Group
 
