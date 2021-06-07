@@ -203,23 +203,18 @@ void IsisMain() {
           << "geom:Pixel_Intercept";
 
   QDomElement pixelInterceptNode = process.getElement(xmlPath2, observationNode);
-  QDomNodeList nodeList = pixelInterceptNode.childNodes();
-  QDomNode longitude2 = nodeList.item(3);
-  QDomNode longitude3 = nodeList.item(4);
-  QDomNode longitude4 = nodeList.item(5);
-
   QDomElement pixelInterceptNode2 = pixelInterceptNode.nextSiblingElement();
   QDomElement pixelInterceptNode3 = pixelInterceptNode2.nextSiblingElement();
   QDomElement pixelInterceptNode4 = pixelInterceptNode3.nextSiblingElement();
 
-  QDomElement latitude2 = pixelInterceptNode2.firstChildElement(); 
-  pixelInterceptNode2.insertAfter(latitude2, longitude2);
-
-  QDomElement latitude3 = pixelInterceptNode3.firstChildElement(); 
-  pixelInterceptNode3.insertAfter(latitude3, longitude3);
-
-  QDomElement latitude4 = pixelInterceptNode4.firstChildElement(); 
-  pixelInterceptNode4.insertAfter(latitude4, longitude4);
+  pixelInterceptNode.insertAfter(pixelInterceptNode.firstChildElement("geom:pixel_latitude"), pixelInterceptNode.firstChildElement("geom:reference_pixel_location"));
+  pixelInterceptNode2.insertAfter(pixelInterceptNode2.firstChildElement("geom:pixel_latitude"), pixelInterceptNode2.firstChildElement("geom:reference_pixel_location"));
+  pixelInterceptNode3.insertAfter(pixelInterceptNode3.firstChildElement("geom:pixel_latitude"), pixelInterceptNode3.firstChildElement("geom:reference_pixel_location"));
+  pixelInterceptNode4.insertAfter(pixelInterceptNode4.firstChildElement("geom:pixel_latitude"), pixelInterceptNode4.firstChildElement("geom:reference_pixel_location"));
+  
+  pixelInterceptNode2.setTagName("geom:Pixel_Intercept");
+  pixelInterceptNode3.setTagName("geom:Pixel_Intercept");
+  pixelInterceptNode4.setTagName("geom:Pixel_Intercept");
 
   QString outFile = ui.GetFileName("TO");
 
