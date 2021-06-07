@@ -230,7 +230,7 @@ Group = Corner2Lattiude
   InputPosition   = (IsisCube, Archive)
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept2)
-  OutputSiblings = ("geom:reference_pixel_location|Upper Left Corner")
+  OutputSiblings = ("geom:reference_pixel_location|Lower Right Corner")
   Translation     = (*, *)
 End_Group
 
@@ -251,7 +251,7 @@ Group = Corner3Lattiude
   InputPosition   = (IsisCube, Archive)
   OutputName      = geom:pixel_latitude
   OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept3)
-  OutputSiblings  = ("geom:reference_pixel_location|Lower Right Corner")
+  OutputSiblings  = ("geom:reference_pixel_location|Upper Left Corner")
   Translation     = (*, *)
 End_Group
 
