@@ -58,54 +58,54 @@ namespace Isis {
     QString procStep("prepping phase");
     MatrixList *calVars = nullptr;
     try {
-//  The output from the last processing is the input into subsequent processing
+      // The output from the last processing is the input into subsequent processing
       ProcessByLine p;
 
       Cube *hifrom = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"));
       int nsamps = hifrom->sampleCount();
       int nlines = hifrom->lineCount();
 
-//  Initialize the configuration file
+      // Initialize the configuration file
       QString conf(ui.GetAsString("CONF"));
       HiCalConf hiconf(*(hifrom->label()), conf);
       DbProfile hiprof = hiconf.getMatrixProfile();
 
-// Check for label propagation and set the output cube
+      // Check for label propagation and set the output cube
       Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"));
       if ( !IsTrueValue(hiprof,"PropagateTables", "TRUE") ) {
         RemoveHiBlobs(*(ocube->label()));
       }
 
-//  Set specified profile if entered by user
+      // Set specified profile if entered by user
       if (ui.WasEntered("PROFILE")) {
         hiconf.selectProfile(ui.GetAsString("PROFILE"));
       }
 
 
-//  Add OPATH parameter to profiles
+      // Add OPATH parameter to profiles
       if (ui.WasEntered("OPATH")) {
         hiconf.add("OPATH",ui.GetAsString("OPATH"));
       }
       else {
-        //  Set default to output directory
+        // Set default to output directory
         hiconf.add("OPATH", FileName(ocube->fileName()).path());
       }
 
-//  Do I/F output DN conversions
+      // Do I/F output DN conversions
       QString units = ui.GetString("UNITS");
 
-//  Allocate the calibration list
+      // Allocate the calibration list
       calVars = new MatrixList;
 
-//  Set up access to HiRISE ancillary data (tables, blobs) here.  Note it they
-//  are gone, this will error out. See PropagateTables in conf file.
+      // Set up access to HiRISE ancillary data (tables, blobs) here.  Note it they
+      // are gone, this will error out. See PropagateTables in conf file.
       HiCalData caldata(*hifrom);
 
-////////////////////////////////////////////////////////////////////////////
-//  Drift Correction (Zf) using buffer pixels
-//    Extracts specified regions of the calibration buffer pixels and runs
-//    series of lowpass filters.  Apply spline fit if any missing data
-//    remains.  Config file contains parameters for this operation.
+      ////////////////////////////////////////////////////////////////////////////
+      //  Drift Correction (Zf) using buffer pixels
+      //    Extracts specified regions of the calibration buffer pixels and runs
+      //    series of lowpass filters.  Apply spline fit if any missing data
+      //    remains.  Config file contains parameters for this operation.
       procStep = "ZeroBufferSmooth module";
       hiconf.selectProfile("ZeroBufferSmooth");
       hiprof = hiconf.getMatrixProfile();
@@ -126,11 +126,11 @@ namespace Isis {
         ZbsHist.add("Debug::SkipModule invoked!");
       }
 
-/////////////////////////////////////////////////////////////////////
-// ZeroBufferFit
-//  Compute second level of drift correction.  The high level noise
-//  is removed from a modeled non-linear fit.
-//
+      /////////////////////////////////////////////////////////////////////
+      //  ZeroBufferFit
+      //    Compute second level of drift correction.  The high level noise
+      //    is removed from a modeled non-linear fit.
+      //
       procStep = "ZeroBufferFit module";
       HiHistory ZbfHist;
       hiconf.selectProfile("ZeroBufferFit");
@@ -152,8 +152,8 @@ namespace Isis {
       }
 
 
-////////////////////////////////////////////////////////////////////
-//  ZeroReverse
+      ////////////////////////////////////////////////////////////////////
+      //  ZeroReverse
       procStep = "ZeroReverse module";
       hiconf.selectProfile("ZeroReverse");
       hiprof = hiconf.getMatrixProfile();
@@ -172,9 +172,9 @@ namespace Isis {
         ZrHist.add("Debug::SkipModule invoked!");
       }
 
-/////////////////////////////////////////////////////////////////
-// ZeroDark removes dark current
-//
+      /////////////////////////////////////////////////////////////////
+      //  ZeroDark removes dark current
+      //
       procStep = "ZeroDark module";
       hiconf.selectProfile("ZeroDark");
       hiprof =  hiconf.getMatrixProfile();
@@ -193,10 +193,9 @@ namespace Isis {
         ZdHist.add("Debug::SkipModule invoked!");
       }
 
-/////////////////////////////////////////////////////////////////
-// ZeroDarkRate removes dark current with a new approach compared
-// with ZeroDark.
-
+      /////////////////////////////////////////////////////////////////
+      //  ZeroDarkRate removes dark current with a new approach compared
+      //    with ZeroDark.
       procStep = "ZeroDarkRate module";
       HiHistory ZdrHist;
       ZdrHist.add("Profile[ZeroDarkRate]");
@@ -231,9 +230,9 @@ namespace Isis {
         }
       }
 
-////////////////////////////////////////////////////////////////////
-// GainLineDrift correct for gain-based drift
-//
+      ////////////////////////////////////////////////////////////////////
+      //  GainLineDrift correct for gain-based drift
+      //
       procStep = "GainLineDrift module";
       hiconf.selectProfile("GainLineDrift");
       hiprof = hiconf.getMatrixProfile();
@@ -252,8 +251,8 @@ namespace Isis {
         GldHist.add("Debug::SkipModule invoked!");
       }
 
-////////////////////////////////////////////////////////////////////
-//  GainNonLinearity  Correct for non-linear gain
+      ////////////////////////////////////////////////////////////////////
+      //  GainNonLinearity  Correct for non-linear gain
       procStep = "GainNonLinearity module";
       hiconf.selectProfile("GainNonLinearity");
       hiprof =  hiconf.getMatrixProfile();
@@ -272,8 +271,8 @@ namespace Isis {
         GnlHist.add("Debug::SkipModule invoked!");
       }
 
-////////////////////////////////////////////////////////////////////
-//  GainChannelNormalize  Correct for sample gain with the G matrix
+      ////////////////////////////////////////////////////////////////////
+      //  GainChannelNormalize  Correct for sample gain with the G matrix
       procStep = "GainChannelNormalize module";
       hiconf.selectProfile("GainChannelNormalize");
       hiprof =  hiconf.getMatrixProfile();
@@ -292,8 +291,8 @@ namespace Isis {
         GcnHist.add("Debug::SkipModule invoked!");
       }
 
-////////////////////////////////////////////////////////////////////
-//  GainFlatField  Flat field correction with A matrix
+      ////////////////////////////////////////////////////////////////////
+      //  GainFlatField  Flat field correction with A matrix
       procStep = "GainFlatField module";
       hiconf.selectProfile("GainFlatField");
       hiprof =  hiconf.getMatrixProfile();
@@ -312,8 +311,8 @@ namespace Isis {
         GffHist.add("Debug::SkipModule invoked!");
       }
 
-////////////////////////////////////////////////////////////////////
-// GainTemperature -  Temperature-dependant gain correction
+      ////////////////////////////////////////////////////////////////////
+      //  GainTemperature -  Temperature-dependant gain correction
       procStep = "GainTemperature module";
       hiconf.selectProfile("GainTemperature");
       hiprof =  hiconf.getMatrixProfile();
@@ -332,9 +331,9 @@ namespace Isis {
         GtHist.add("Debug::SkipModule invoked!");
       }
 
-////////////////////////////////////////////////////////////////////
-//  GainUnitConversion converts to requested units
-//
+      ////////////////////////////////////////////////////////////////////
+      //  GainUnitConversion converts to requested units
+      //
       procStep = "GainUnitConversion module";
       hiconf.selectProfile("GainUnitConversion");
       hiprof = hiconf.getMatrixProfile();
@@ -354,13 +353,13 @@ namespace Isis {
         GucHist.add("Units[Unknown]");
       }
 
-      //  Reset the profile selection to default
+      // Reset the profile selection to default
       hiconf.selectProfile();
 
-//----------------------------------------------------------------------
-//
-/////////////////////////////////////////////////////////////////////////
-//  Call the processing function
+      //----------------------------------------------------------------------
+      //
+      /////////////////////////////////////////////////////////////////////////
+      //  Main processing function
       /**
        * @brief Apply calibration to each HiRISE image line
        *
@@ -383,7 +382,7 @@ namespace Isis {
         const HiVector &GT     = calVars->get("GainTemperature");
         const double GUC       = calVars->get("GainUnitConversion")[0];
 
-        //  Set current line (index)
+        // Set current line (index)
         int line(in.Line()-1);
         if (calVars->exists("LastGoodLine")) {
           int lastline = ((int) (calVars->get("LastGoodLine"))[0]) - 1;
@@ -391,7 +390,7 @@ namespace Isis {
         }
 
 
-        //  Apply correction to point of non-linearity accumulating average
+        // Apply correction to point of non-linearity accumulating average
         vector<double> data;
         for (int i = 0 ; i < in.size() ; i++) {
           if (IsSpecial(in[i])) {
@@ -475,7 +474,7 @@ namespace Isis {
         }
       }
 
-//  Ensure the RadiometricCalibration group is out there
+      // Ensure the RadiometricCalibration group is out there
       const QString rcalGroup("RadiometricCalibration");
       if (!ocube->hasGroup(rcalGroup)) {
         PvlGroup temp(rcalGroup);
@@ -497,9 +496,9 @@ namespace Isis {
       key.addComment("/*           * GainTemperature / GainUnitConversion */");
       rcal += key;
 
-      //  Record parameter generation history.  Controllable in configuration
-      //  file.  Note this is optional because of a BUG!! in the ISIS label
-      //  writer as this application was initially developed
+      // Record parameter generation history.  Controllable in configuration
+      // file.  Note this is optional because of a BUG!! in the ISIS label
+      // writer as this application was initially developed
       if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",QString("TRUE")),"TRUE")) {
         rcal += ZbsHist.makekey("ZeroBufferSmooth");
         rcal += ZbfHist.makekey("ZeroBufferFit");
@@ -523,7 +522,7 @@ namespace Isis {
       throw IException(ie, IException::User, mess.toLatin1().data(), _FILEINFO_);
     }
 
-// Clean up parameters
+    // Clean up parameters
     delete calVars;
     calVars = 0;
   }
