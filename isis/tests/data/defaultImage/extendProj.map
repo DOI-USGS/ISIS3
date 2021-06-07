@@ -1,0 +1,18 @@
+Group = Mapping
+  ProjectionName     = Sinusoidal
+  CenterLongitude    = 370.0 <degrees>
+  TargetName         = MARS
+  EquatorialRadius   = 3396190.0 <meters>
+  PolarRadius        = 3376200.0 <meters>
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360 <degrees>
+  MinimumLatitude    = 0 <degrees>
+  MaximumLatitude    = 10 <degrees>
+  MinimumLongitude   = 361 <degrees>
+  MaximumLongitude   = 380 <degrees>
+  UpperLeftCornerX   = 0.0 <meters>
+  UpperLeftCornerY   = 600000.0 <meters>
+  PixelResolution    = 100000.0 <meters/pixel>
+  Scale              = 0.59274697523306 <pixels/degree>
+End_Group
