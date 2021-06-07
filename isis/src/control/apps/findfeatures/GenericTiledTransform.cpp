@@ -76,7 +76,8 @@ GenericTiledTransform::RectArea GenericTiledTransform::transformedSize(const cv:
 }
 
 std::tuple<int, int> GenericTiledTransform::getNumTiles(const cv::Size size) const{
-  auto [width, height] = size;
+  int width = size.width;
+  int height = size.height;
   int tileSize = getTileSize();
   int nxTiles = (width + tileSize - 1) / tileSize;
   int nyTiles = (height + tileSize - 1) / tileSize;
@@ -85,8 +86,10 @@ std::tuple<int, int> GenericTiledTransform::getNumTiles(const cv::Size size) con
 
 std::pair<cv::Range, cv::Range> GenericTiledTransform::getTile(int tileID, cv::Size size) const{
   int tileSize = getTileSize();
-  auto [width, height] = size;
-  auto [nxTiles, nyTiles] = getNumTiles(size);
+  int width = size.width;
+  int height = size.height;
+  std::tuple<int, int> xyTiles = getNumTiles(size);
+  int nxTiles = std::get<0>(xyTiles);
 
   int xTile = tileID % nxTiles;
   int yTile = tileID / nxTiles;
@@ -156,7 +159,9 @@ cv::Mat_<cv::Vec2f> GenericTiledTransform::computeMapping(const GenericTiledTran
 cv::Mat GenericTiledTransform::render(const cv::Mat &image) const{
   cv::Size tFormSize = transformedSize(getMatrix(), image.size()).size();
   cv::Mat result = cv::Mat(tFormSize, image.type());
-  auto [nxTiles, nyTiles] = getNumTiles(tFormSize);
+  std::tuple<int, int> xyTiles = getNumTiles(tFormSize);
+  int nxTiles = std::get<0>(xyTiles);
+  int nyTiles = std::get<1>(xyTiles);
   int n_tiles = nxTiles*nyTiles;
   for (int i = 0; i < n_tiles; i++){
     const std::pair<cv::Range, cv::Range> dstRangeXY = getTile(i, tFormSize);
