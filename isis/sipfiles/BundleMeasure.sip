@@ -12,7 +12,7 @@ namespace Isis {
       // Camera *camera() const;
       // Isis::BundleControlPoint *parentControlPoint();
       QSharedPointer<Isis::BundleImage> parentBundleImage() throw(Isis::IException);
-      // QSharedPointer<BundleObservation> parentBundleObservation();
+      // QSharedPointer<IsisBundleObservation> parentBundleObservation();
       // const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
       double sample() const throw(Isis::IException);

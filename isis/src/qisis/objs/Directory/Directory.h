@@ -34,7 +34,7 @@ class QTabWidget;
 
 namespace Isis {
   class AbstractProjectItemView;
-  class BundleObservation;
+  class IsisBundleObservation;
   class BundleObservationView;
   class ChipViewportsWidget;
   class CnetEditorView;

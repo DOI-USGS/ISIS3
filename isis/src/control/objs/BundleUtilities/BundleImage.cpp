@@ -8,7 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleImage.h"
 
-#include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 #include "Camera.h"
 
 namespace Isis {
@@ -72,7 +72,7 @@ namespace Isis {
    *
    * @param parentObservation The parent BundleObservation.
    */
-  void BundleImage::setParentObservation(QSharedPointer<AbstractBundleObservation> parentObservation) {
+  void BundleImage::setParentObservation(QSharedPointer<BundleObservation> parentObservation) {
 
 
     // TODO: BundleImage's setParentObservation should take a QSharedPointer. JAM
@@ -96,7 +96,7 @@ namespace Isis {
    *
    * @return @b QSharedPointer<BundleObservation> A pointer to the parent BundleObservation.
    */
-  QSharedPointer<AbstractBundleObservation> BundleImage::parentObservation() {
+  QSharedPointer<BundleObservation> BundleImage::parentObservation() {
     return m_parentObservation;
   }
 

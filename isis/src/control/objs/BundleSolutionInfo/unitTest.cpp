@@ -17,7 +17,7 @@ find files of those names at the top level of this repository. **/
 #include <QXmlInputSource>
 
 #include "BundleControlPoint.h"
-#include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"

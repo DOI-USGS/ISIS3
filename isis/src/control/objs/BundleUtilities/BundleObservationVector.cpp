@@ -12,8 +12,8 @@ find files of those names at the top level of this repository. **/
 
 #include <QDebug>
 
-#include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "Camera.h"
 #include "CsmBundleObservation.h"
 #include "IException.h"
@@ -35,7 +35,7 @@ namespace Isis {
    * @param src A reference to the BundleObservationVector to copy from.
    */
   BundleObservationVector::BundleObservationVector(const BundleObservationVector &src)
-      :QVector<AbstractBundleObservationQsp>(src) {
+      :QVector<BundleObservationQsp>(src) {
     m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
     m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
     m_instIdToObservationMap = src.m_instIdToObservationMap;
@@ -63,7 +63,7 @@ namespace Isis {
    */
   BundleObservationVector &BundleObservationVector::operator=(const BundleObservationVector &src) {
     if (&src != this) {
-      QVector<AbstractBundleObservationQsp>::operator=(src);
+      QVector<BundleObservationQsp>::operator=(src);
       m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
       m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
       m_instIdToObservationMap = src.m_instIdToObservationMap;
@@ -95,12 +95,12 @@ namespace Isis {
    *                           multiple BundleObservationSolveSettings, we set the settings
    *                           according to the observation number passed. References #4293.
    */
-  AbstractBundleObservationQsp BundleObservationVector::addNew(BundleImageQsp bundleImage,
+  BundleObservationQsp BundleObservationVector::addNew(BundleImageQsp bundleImage,
                                                        QString observationNumber,
                                                        QString instrumentId,
                                                        BundleSettingsQsp bundleSettings) {
 
-    AbstractBundleObservationQsp bundleObservation;
+    BundleObservationQsp bundleObservation;
     bool addToExisting = false;
 
     if (bundleSettings->solveObservationMode() &&
@@ -129,7 +129,7 @@ namespace Isis {
       bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
       if (isIsisObservation) {
-        bundleObservation.reset(new BundleObservation(bundleImage,
+        bundleObservation.reset(new IsisBundleObservation(bundleImage,
                                                       observationNumber,
                                                       instrumentId,
                                                       bundleSettings->bundleTargetBody()));
@@ -168,7 +168,7 @@ namespace Isis {
       append(bundleObservation);
 
       if (isIsisObservation) {
-        QSharedPointer<BundleObservation> isisObs = qSharedPointerDynamicCast<BundleObservation>(bundleObservation);
+        QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
         isisObs->initializeExteriorOrientation();
         if (bundleSettings->solveTargetBody()) {
           isisObs->initializeBodyRotation();
@@ -221,9 +221,9 @@ namespace Isis {
    *
    * @return @b BundleObservationQsp Pointer to the associated BundleObservation (NULL if not found)
    */
-  AbstractBundleObservationQsp BundleObservationVector::
+  BundleObservationQsp BundleObservationVector::
       observationByCubeSerialNumber(QString cubeSerialNumber) {
-    AbstractBundleObservationQsp bundleObservation;
+    BundleObservationQsp bundleObservation;
 
     if (m_imageSerialToObservationMap.contains(cubeSerialNumber))
       bundleObservation = m_imageSerialToObservationMap.value(cubeSerialNumber);
@@ -243,9 +243,9 @@ namespace Isis {
   /**
    * Get all of the observations with a specific instrument ID
    */
-  QList<AbstractBundleObservationQsp> BundleObservationVector::
+  QList<BundleObservationQsp> BundleObservationVector::
       observationsByInstId(QString instrumentId) const {
-    QList<AbstractBundleObservationQsp> list = m_instIdToObservationMap.values(instrumentId);
+    QList<BundleObservationQsp> list = m_instIdToObservationMap.values(instrumentId);
     // multimap returns them in reverse order they were put in, so invert them to preserve order
     std::reverse(std::begin(list), std::end(list));
     return list;

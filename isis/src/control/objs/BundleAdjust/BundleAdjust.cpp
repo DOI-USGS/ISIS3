@@ -27,8 +27,8 @@ find files of those names at the top level of this repository. **/
 
 // Isis lib
 #include "Application.h"
-#include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
@@ -426,7 +426,7 @@ namespace Isis {
         }
 
         // TODO ISIS vs. CSM (addNewIsisObservation?)
-        AbstractBundleObservationQsp observation =
+        BundleObservationQsp observation =
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
@@ -455,7 +455,7 @@ namespace Isis {
           BundleMeasureQsp measure = bundleControlPoint->at(j);
           QString cubeSerialNumber = measure->cubeSerialNumber();
 
-          AbstractBundleObservationQsp observation =
+          BundleObservationQsp observation =
               m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
           BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
 
@@ -1414,7 +1414,7 @@ namespace Isis {
         }
       }
       else {
-        AbstractBundleObservationQsp observation;
+        BundleObservationQsp observation;
 
         // get parameter weights for this observation
         if (m_bundleSettings->solveTargetBody()) {
@@ -1860,7 +1860,7 @@ namespace Isis {
     std::cout << "Computing partials for [" << measure.cubeSerialNumber() << "] in [" << point.id() << "]." << std::endl;
 
     Camera *measureCamera = measure.camera();
-    AbstractBundleObservationQsp observation = measure.parentBundleObservation();
+    BundleObservationQsp observation = measure.parentBundleObservation();
 
     int numImagePartials = observation->numberParameters();
 
@@ -1962,7 +1962,7 @@ namespace Isis {
     // Update spice for each BundleObservation
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
-      AbstractBundleObservationQsp observation = m_bundleObservations.at(i);
+      BundleObservationQsp observation = m_bundleObservations.at(i);
 
       int numParameters = observation->numberParameters();
 
@@ -1971,7 +1971,7 @@ namespace Isis {
       if (m_bundleSettings->solveTargetBody()) {
         // TODO: needs to be updated for ISIS vs. CSM CSM has no updateBodyRotation]
         // TODO: this is no good.
-        QSharedPointer<BundleObservation> isisObservation = qSharedPointerDynamicCast<BundleObservation>(observation);
+        QSharedPointer<IsisBundleObservation> isisObservation = qSharedPointerDynamicCast<IsisBundleObservation>(observation);
         isisObservation->updateBodyRotation();
       }
 
@@ -2082,7 +2082,7 @@ namespace Isis {
 
     // add vtpv from constrained image parameters
     for (int i = 0; i < m_bundleObservations.size(); i++) {
-      AbstractBundleObservationQsp observation = m_bundleObservations.at(i);
+      BundleObservationQsp observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
       const LinearAlgebra::Vector &weights = observation->parameterWeights();
@@ -2554,7 +2554,7 @@ namespace Isis {
       }
       // save adjusted image sigmas
       else {
-        AbstractBundleObservationQsp observation;
+        BundleObservationQsp observation;
         if (m_bundleSettings->solveTargetBody()) {
           observation = m_bundleObservations.at(i-1);
         }
