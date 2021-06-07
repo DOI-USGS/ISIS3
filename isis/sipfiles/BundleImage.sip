@@ -9,7 +9,7 @@ namespace Isis {
   public:
 
 
-    // QSharedPointer<IsisBundleObservation> parentObservation();
+    // QSharedPointer<BundleObservation> parentObservation();
     QString serialNumber() throw(Isis::IException);
     QString fileName() throw(Isis::IException);
   };
