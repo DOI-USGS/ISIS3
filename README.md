@@ -537,13 +537,13 @@ For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of
 **New Horizons Mission:**
 
     cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/osirisrex .
+    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/newhorizons .
 
 
 **OSIRIS-REx Mission:**
 
     cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/newhorizons .
+    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/osirisrex .
 
 
 **Rolo Mission:**
