@@ -10,7 +10,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
 #include "BundleMeasure.h"
-#include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleSettings.h"
@@ -385,7 +385,7 @@ int main(int argc, char *argv[]) {
     Camera *camera = NULL;
     BundleImage bi(camera, "TestImageSerialNumber", "TestImageFileName");
     qDebug() << "setting null parentBundleObservation to BundleImage...";
-    BundleObservationQsp parentObservation;
+    IsisBundleObservationQsp parentObservation;
     bi.setParentObservation(parentObservation);
     qDebug() << "Access camera and parentObservation ...";
 //    Camera *cam = bi.camera();
@@ -412,8 +412,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "Testing BundleObservation...";
-    qDebug() << "Constructing empty BundleObservation object...";
+    qDebug() << "Testing IsisBundleObservation...";
+    qDebug() << "Constructing empty IsisBundleObservation object...";
     /**
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: ??% (need to re-run SquishCoco)
     NEED:
@@ -429,29 +429,29 @@ int main(int argc, char *argv[]) {
                                                     pntsigma[1]  > 0, pntsigma[2] == 0
         6) formatBundleOutputString - with instrumentPosition/instrumentRotation not NULL
     */
-    BundleObservation bo;
+    IsisBundleObservation bo;
     BundleTargetBodyQsp bundleTargetBody = BundleTargetBodyQsp(new BundleTargetBody);
-    qDebug() << "Constructing BundleObservation object from BundleImage...";
-    BundleObservation bo2(bi2,
+    qDebug() << "Constructing IsisBundleObservation object from BundleImage...";
+    IsisBundleObservation bo2(bi2,
                           "ObservationNumber2",
                           "InstrumentId2",
                           bundleTargetBody);
 
     BundleImageQsp nullImage;
-    BundleObservation nullBO(nullImage,
+    IsisBundleObservation nullBO(nullImage,
                              "NullObservationNumber",
                              "NullInstrumentId",
                              bundleTargetBody);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
     {
-      BundleObservation &tbo2 = bo2;
+      IsisBundleObservation &tbo2 = bo2;
       bo2 = tbo2;
     }
     qDebug() << "Testing assignment operator to create a new object...";
     bo = bo2;
     qDebug() << "Testing copy constructor...";
-    BundleObservation bo3(bo);
+    IsisBundleObservation bo3(bo);
 
     qDebug() << "Testing mutators and accessors...";
     qDebug() << "    Set/get solve settings using with CAMESOLVE=NONE...";
@@ -1078,7 +1078,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     catch (IException &e) {
       e.print();
     }
-    bundleMeasure.setParentObservation(BundleObservationQsp(new BundleObservation(bo2)));
+    bundleMeasure.setParentObservation(IsisBundleObservationQsp(new IsisBundleObservation(bo2)));
     // const BundleObservationSolveSettings *solveSettings =
     bundleMeasure.observationSolveSettings();
     // Camera *cam =

@@ -17,8 +17,8 @@ find files of those names at the top level of this repository. **/
 #include <QVector>
 
 #include "BundleImage.h"
-#include "AbstractBundleObservation.h"
 #include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "CsmBundleObservation.h"
 #include "BundleSettings.h"
 
@@ -52,7 +52,7 @@ namespace Isis {
    *                           on the BundleObsevation's observation number. Renamed addnew to
    *                           addNew(). References #4293.
    */
-  class BundleObservationVector : public QVector<AbstractBundleObservationQsp> {
+  class BundleObservationVector : public QVector<BundleObservationQsp> {
 
     public:
       BundleObservationVector();
@@ -60,25 +60,25 @@ namespace Isis {
       ~BundleObservationVector();
 
       BundleObservationVector &operator=(const BundleObservationVector &src);
-      AbstractBundleObservationQsp addNew(BundleImageQsp image,
+      BundleObservationQsp addNew(BundleImageQsp image,
                                           QString observationNumber,
                                           QString instrumentId,
                                           BundleSettingsQsp bundleSettings);
 
       int numberParameters();
 
-      AbstractBundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
+      BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
       QList<QString> instrumentIds() const;
-      QList<AbstractBundleObservationQsp> observationsByInstId(QString instrumentId) const;
+      QList<BundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
   private:
       //! Map between observation number and pointer to observation.
-      QMap<QString, AbstractBundleObservationQsp> m_observationNumberToObservationMap;
+      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
-      QMap<QString, AbstractBundleObservationQsp> m_imageSerialToObservationMap;
+      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
       //! Map between instrument ID and pointer to observation.
-      QMultiMap<QString, AbstractBundleObservationQsp> m_instIdToObservationMap;
+      QMultiMap<QString, BundleObservationQsp> m_instIdToObservationMap;
   };
 }
 

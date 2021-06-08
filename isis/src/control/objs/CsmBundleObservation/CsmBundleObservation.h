@@ -16,7 +16,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
-#include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 
 namespace Isis {
 
@@ -31,7 +31,7 @@ namespace Isis {
    * @author 2021-04-19 Jesse Mapel
    *
    */
-  class CsmBundleObservation : public AbstractBundleObservation {
+  class CsmBundleObservation : public BundleObservation {
 
     public:
       // default constructor

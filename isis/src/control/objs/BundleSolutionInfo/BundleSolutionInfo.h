@@ -13,7 +13,7 @@ find files of those names at the top level of this repository. **/
 #include <QObject>
 #include <QString>
 
-#include "AbstractBundleObservation.h"
+#include "BundleObservation.h"
 #include "BundleSettings.h"
 #include "SurfacePoint.h"
 
@@ -196,7 +196,7 @@ namespace Isis {
       QString name() const;
 
 
-      bool outputImagesCSVHeader(std::ofstream &fpOut, AbstractBundleObservationQsp observations);
+      bool outputImagesCSVHeader(std::ofstream &fpOut, BundleObservationQsp observations);
       bool outputHeader(std::ofstream &fpOut);
       bool outputText();
       bool outputImagesCSV();
