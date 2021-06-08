@@ -57,6 +57,17 @@ int GenericTiledTransform::getTileSize() const{
   return m_tileSize;
 }
 
+
+/**
+ * Computes the size of the image after applying the transformation matrix.
+ *
+ * @param tmat The transformation matrix
+ * @param imSize The size of the input image for which to calculate the
+ *               transformed size
+ *
+ * @return GenericTiledTransform::RectArea The bounding box of the transformed
+ *         image.
+ */
 GenericTiledTransform::RectArea GenericTiledTransform::transformedSize(const cv::Mat &tmat,
                                                         const cv::Size &imSize) {
 
@@ -75,87 +86,109 @@ GenericTiledTransform::RectArea GenericTiledTransform::transformedSize(const cv:
   return ( RectArea(xmin, ymin, (int) (xmax-xmin+0.5), (int) (ymax-ymin+0.5)) );
 }
 
+
+/**
+ * Returns the number of tiles in an image with the specified size.
+ *
+ * @param size The size of the input image for which to calculate the number of
+ *             tiles.
+ *
+ * @return  std::tuple<int, int> A tuple storing the number of xTiles and yTiles
+ *          in the image.
+ */
 std::tuple<int, int> GenericTiledTransform::getNumTiles(const cv::Size size) const{
-  int width = size.width;
-  int height = size.height;
   int tileSize = getTileSize();
-  int nxTiles = (width + tileSize - 1) / tileSize;
-  int nyTiles = (height + tileSize - 1) / tileSize;
+  int nxTiles = std::ceil(size.width/double(tileSize));
+  int nyTiles = std::ceil(size.height/double(tileSize));
   return {nxTiles, nyTiles};
 }
 
-std::pair<cv::Range, cv::Range> GenericTiledTransform::getTile(int tileID, cv::Size size) const{
+
+/**
+ * Returns the rectangle bounds of the specified tile. Tiles are laid out such
+ *  that x increases first, e.g.:
+ *                          0 1 2 3
+ *                          4 5 6 7
+ *
+ * @param tileID The numeric identifier of the tile for which to calculate the
+ *               bounds
+ * @param size The size of the image
+ *
+ * @return GenericTiledTransform::RectArea The rectangular boundary of the tile.
+ */
+GenericTiledTransform::RectArea GenericTiledTransform::getTile(int tileID, cv::Size size) const{
   int tileSize = getTileSize();
-  int width = size.width;
-  int height = size.height;
   std::tuple<int, int> xyTiles = getNumTiles(size);
   int nxTiles = std::get<0>(xyTiles);
 
   int xTile = tileID % nxTiles;
   int yTile = tileID / nxTiles;
 
-  int xStart = xTile * tileSize;
-  int yStart = yTile * tileSize;
-  // cv::Range is [start, stop)
-  int yStop = std::min(yStart + m_tileSize, height);
-  int xStop = std::min(xStart + m_tileSize, width);
-  cv::Range xRange(xStart, xStop);
-  cv::Range yRange(yStart, yStop);
-  return std::make_pair(xRange, yRange);
+  int ulx = xTile * tileSize;
+  int uly = yTile * tileSize;
+
+  return RectArea(ulx, uly, std::min(getTileSize(), size.width - ulx), std::min(getTileSize(), size.height - uly));
 }
 
-std::pair<cv::Range, cv::Range> GenericTiledTransform::computeSourceRange(std::pair<cv::Range, cv::Range> dstROI) const{
-    const cv::Range& dstRangeX = dstROI.first;
-		const cv::Range& dstRangeY = dstROI.second;
-		cv::Point2f dstCorner00 = cv::Point2i(dstRangeX.start,   dstRangeY.start);
-		cv::Point2f dstCorner01 = cv::Point2i(dstRangeX.start,   dstRangeY.end - 1);
-		cv::Point2f dstCorner10 = cv::Point2i(dstRangeX.end - 1, dstRangeY.start);
-		cv::Point2f dstCorner11 = cv::Point2i(dstRangeX.end - 1, dstRangeY.end - 1);
-		cv::Point2f srcCorner00 = inverse(dstCorner00);
-		cv::Point2f srcCorner01 = inverse(dstCorner01);
-		cv::Point2f srcCorner10 = inverse(dstCorner10);
-		cv::Point2f srcCorner11 = inverse(dstCorner11);
-		int srcMinX = (int)floor(std::min(std::min(srcCorner00.x, srcCorner01.x), std::min(srcCorner10.x, srcCorner11.x)));
-		int srcMinY = (int)floor(std::min(std::min(srcCorner00.y, srcCorner01.y), std::min(srcCorner10.y, srcCorner11.y)));
-		int srcMaxX = (int)ceil(std::max(std::max(srcCorner00.x, srcCorner01.x), std::max(srcCorner10.x, srcCorner11.x)));
-		int srcMaxY = (int)ceil(std::max(std::max(srcCorner00.y, srcCorner01.y), std::max(srcCorner10.y, srcCorner11.y)));
-		cv::Range srcRangeX(srcMinX, srcMaxX);
-		cv::Range srcRangeY(srcMinY, srcMaxY);
-		return std::make_pair(srcRangeX, srcRangeY);
+
+/**
+ * Computes the region of interest (ROI) in the source image that maps to the
+ * specified destination ROI.
+ *
+ * @param destROI The region of interest in the destination image for which we
+ *                wish to calculate the source ROI.
+ *
+ * @return GenericTiledTransform::RectArea The rectangular boundary of the
+ *         source ROI.
+ */
+GenericTiledTransform::RectArea GenericTiledTransform::computeSourceRect(RectArea destROI) const{
+  std::vector<cv::Point2f> dstCorners = corners(destROI);
+  std::vector<cv::Point2f> srcCorners;
+  for (auto & corner : dstCorners) {
+    srcCorners.push_back(inverse(corner));
+  }
+  int xmin(srcCorners[0].x), xmax(srcCorners[0].x);
+  int ymin(srcCorners[0].y), ymax(srcCorners[0].y);
+  for (unsigned int i = 1 ; i < srcCorners.size() ; i++) {
+    if ( srcCorners[i].x < xmin) xmin = int(srcCorners[i].x);
+    if ( srcCorners[i].x > xmax) xmax = int(srcCorners[i].x);
+    if ( srcCorners[i].y < ymin) ymin = int(ceil(srcCorners[i].y));
+    if ( srcCorners[i].y > ymax) ymax = int(ceil(srcCorners[i].y));
+  }
+  return RectArea(xmin, ymin, xmax-xmin, ymax-ymin);
 }
 
-std::pair<cv::Range, cv::Range> GenericTiledTransform::addSourceInterpMargin(const std::pair<cv::Range, cv::Range>& srcRangeXY,
-                                                                             const cv::Mat &image,
-                                                                             const int margin) const {
-	const cv::Range& srcRangeX = srcRangeXY.first;
-	const cv::Range& srcRangeY = srcRangeXY.second;
-	int srcMinX = std::max(srcRangeX.start - margin, 0);
-	int srcMaxX = std::min(srcRangeX.end   + margin, GenericTransform::getSize(image).width);
-	int srcMinY = std::max(srcRangeY.start - margin, 0);
-	int srcMaxY = std::min(srcRangeY.end   + margin, GenericTransform::getSize(image).height);
-	return std::make_pair(cv::Range(srcMinX, srcMaxX), cv::Range(srcMinY, srcMaxY));
-}
 
-cv::Mat_<cv::Vec2f> GenericTiledTransform::computeMapping(const GenericTiledTransform::RangeXY& srcRangeXY,
-                                                          const GenericTiledTransform::RangeXY& dstRangeXY) const {
-  const cv::Range& dstRangeX = dstRangeXY.first;
-  const cv::Range& dstRangeY = dstRangeXY.second;
-  const cv::Range& srcRangeX = srcRangeXY.first;
-  const cv::Range& srcRangeY = srcRangeXY.second;
-  cv::Mat_<cv::Vec2f> mapXY(cv::Size(dstRangeX.size(), dstRangeY.size()));
-  const cv::Point2f sourceTileOffset = cv::Point2i(srcRangeX.start, srcRangeY.start);
-  for (int dstY = dstRangeY.start; dstY < dstRangeY.end; ++dstY)
-  {
-    for (int dstX = dstRangeX.start; dstX < dstRangeX.end; ++dstX)
-    {
-      cv::Point2f dstXY = cv::Point2i(dstX, dstY);
-      cv::Point2f srcXY = inverse(dstXY) - sourceTileOffset;
-      mapXY(dstY - dstRangeY.start, dstX - dstRangeX.start) = srcXY;
+/**
+ * Compute the mapping between source / destination pixels their respective ROI
+ *
+ * @param srcROI The region of interest in the source image
+ * @param destROI The region of interest in the destination image
+ *
+ * @return cv::Mat_<cv::Vec2f> The matrix that stores the mapping between src
+ *         and destination ROI.
+ */
+cv::Mat_<cv::Vec2f> GenericTiledTransform::computeMapping(const RectArea &srcROI,
+                                                          const RectArea &destROI) const {
+  cv::Mat_<cv::Vec2f> mapXY(destROI.size());
+  const cv::Point2f offset = cv::Point2i(srcROI.x, srcROI.y);
+  for (int y = destROI.y; y < destROI.y + destROI.height; ++y){
+    for (int x = destROI.x; x < destROI.x + destROI.width; ++x){
+      cv::Point2f srcPt = inverse(cv::Point2i(x,y)) - offset;
+      mapXY(y - destROI.y, x - destROI.x) = srcPt;
     }
   }
   return mapXY;
 }
 
+
+/**
+ * Perform the transformation on an image matrix.
+ *
+ * @param image The input image data matrix to transform.
+ *
+ * @return @b cv::Mat The transformed matrix.
+ */
 cv::Mat GenericTiledTransform::render(const cv::Mat &image) const{
   cv::Size tFormSize = transformedSize(getMatrix(), image.size()).size();
   cv::Mat result = cv::Mat(tFormSize, image.type());
@@ -164,16 +197,17 @@ cv::Mat GenericTiledTransform::render(const cv::Mat &image) const{
   int nyTiles = std::get<1>(xyTiles);
   int n_tiles = nxTiles*nyTiles;
   for (int i = 0; i < n_tiles; i++){
-    const std::pair<cv::Range, cv::Range> dstRangeXY = getTile(i, tFormSize);
-    const std::pair<cv::Range, cv::Range> srcRangeXY = addSourceInterpMargin(computeSourceRange(dstRangeXY), image, 3);
-    const cv::Range& dstRangeX = dstRangeXY.first;
-		const cv::Range& dstRangeY = dstRangeXY.second;
-		const cv::Range& srcRangeX = srcRangeXY.first;
-		const cv::Range& srcRangeY = srcRangeXY.second;
-		const cv::Mat_<cv::Vec2f> mapXY = computeMapping(srcRangeXY, dstRangeXY);
-    const cv::Mat roiSrc = image(srcRangeY, srcRangeX).clone(); // note: clone to ensure source matrix width less than 32768
-    cv::Mat roiDst = result(dstRangeY, dstRangeX);
-    cv::remap(roiSrc, roiDst, mapXY, cv::noArray(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT, cv::Scalar(0));
+    const RectArea destROI = getTile(i, tFormSize);
+    RectArea srcROI= computeSourceRect(destROI);
+    // Ensure that we don't attempt to access outside the source image.
+    srcROI.x = std::max(srcROI.x, 0);
+    srcROI.y = std::max(srcROI.y, 0);
+    srcROI.width = std::min(srcROI.width, image.size().width);
+    srcROI.height= std::min(srcROI.height, image.size().height);
+    const cv::Mat_<cv::Vec2f> mapXY = computeMapping(srcROI, destROI);
+    const cv::Mat roiSrc = image(srcROI).clone();
+    cv::Mat outputROI = result(destROI);
+    cv::remap(roiSrc, outputROI, mapXY, cv::noArray(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT, cv::Scalar(0));
   }
   return result;
 }

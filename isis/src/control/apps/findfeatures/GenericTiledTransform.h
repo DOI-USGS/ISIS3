@@ -32,12 +32,10 @@ class GenericTiledTransform : public GenericTransform {
     int getTileSize() const;
     static RectArea transformedSize(const cv::Mat &tmat, const cv::Size &imSize);
 
-    std::pair<cv::Range, cv::Range> getTile(int tileID, cv::Size tForm) const;
+    RectArea getTile(int tileID, cv::Size tForm) const;
     std::tuple<int, int> getNumTiles(const cv::Size area) const;
-    std::pair<cv::Range, cv::Range> computeSourceRange(std::pair<cv::Range, cv::Range> destROI) const;
-    std::pair<cv::Range, cv::Range> addSourceInterpMargin(const std::pair<cv::Range, cv::Range> &srcRangeXY,
-                                                          const cv::Mat &image, const int margin) const;
-    cv::Mat_<cv::Vec2f> computeMapping(const RangeXY& srcRangeXY, const RangeXY& dstRangeXY) const;
+    RectArea computeSourceRect(const RectArea destROI) const;
+    cv::Mat_<cv::Vec2f> computeMapping(const RectArea &srcROI, const RectArea &destROI) const;
     virtual cv::Mat render(const cv::Mat &image) const;
 
   protected:
