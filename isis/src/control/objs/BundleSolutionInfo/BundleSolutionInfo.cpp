@@ -400,7 +400,7 @@ namespace Isis {
    *                           than the other headers. The number of TWIST headers will be the same
    *                           as each of the other angle headers. Fixes #4557.
    */
-  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut, AbstractBundleObservationQsp observation) {
+  bool BundleSolutionInfo::outputImagesCSVHeader(std::ofstream &fpOut, BundleObservationQsp observation) {
 
     if (!fpOut) {
       return false;
@@ -1126,7 +1126,7 @@ namespace Isis {
         return false;
       }
 
-      QList<AbstractBundleObservationQsp> observations =
+      QList<BundleObservationQsp> observations =
           m_statisticsResults->observations().observationsByInstId(instrumentIds[i]);
 
       int nObservations = observations.size();
@@ -1136,7 +1136,7 @@ namespace Isis {
 
 
       for (int j = 0; j < nObservations; j++ ) {
-        AbstractBundleObservationQsp observation = observations[j];
+        BundleObservationQsp observation = observations[j];
 
         if(!observation) {
           continue;
@@ -1214,7 +1214,7 @@ namespace Isis {
     m_txtBundleOutputFilename = ofname;
 
     char buf[4096];
-    AbstractBundleObservationQsp observation;
+    BundleObservationQsp observation;
 
     int nObservations = m_statisticsResults->observations().size();
 

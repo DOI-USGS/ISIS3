@@ -13,7 +13,7 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
 
-  class AbstractBundleObservation;
+  class BundleObservation;
   class Camera;
 
   /**
@@ -48,17 +48,17 @@ namespace Isis {
     BundleImage &operator=(const BundleImage &other);
 
     // mutators
-    void setParentObservation(QSharedPointer<AbstractBundleObservation> parentObservation);
+    void setParentObservation(QSharedPointer<BundleObservation> parentObservation);
 
     // accessors
     Camera *camera();
-    QSharedPointer<AbstractBundleObservation> parentObservation();
+    QSharedPointer<BundleObservation> parentObservation();
     QString serialNumber();
     QString fileName();
 
     private:
       Camera *m_camera; //!< The camera model for the image
-      QSharedPointer<AbstractBundleObservation> m_parentObservation; //!< parent BundleObservation
+      QSharedPointer<BundleObservation> m_parentObservation; //!< parent BundleObservation
       QString m_serialNumber; //!< The serial number for the image
       QString m_fileName; //!< The file name of the image
   };

@@ -44,7 +44,7 @@ namespace Isis {
    * @param bundleTargetBody QSharedPointer to the target body of the observation
    */
   CsmBundleObservation::CsmBundleObservation(BundleImageQsp image, QString observationNumber,
-                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : AbstractBundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
+                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : BundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
     if (bundleTargetBody) {
       QString msg = "Target body parameters cannot be solved for with CSM observations.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -57,7 +57,7 @@ namespace Isis {
    *
    * @param src Reference to the CsmBundleObservation to copy
    */
-  CsmBundleObservation::CsmBundleObservation(const CsmBundleObservation &src) : AbstractBundleObservation(src) {
+  CsmBundleObservation::CsmBundleObservation(const CsmBundleObservation &src) : BundleObservation(src) {
     m_solveSettings = src.m_solveSettings;
     m_paramIndices = src.m_paramIndices;
   }
