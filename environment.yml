@@ -22,6 +22,7 @@ dependencies:
   - geos>=3.7,<3.8
   - geotiff
   - gmp
+  - graphviz
   - gsl>=2.6
   - hdf5
   - icu
