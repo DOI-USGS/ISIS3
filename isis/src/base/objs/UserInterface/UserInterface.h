@@ -133,6 +133,7 @@ namespace Isis {
    *   @history 2018-04-20 Adam Goins - Modified loadHistory() to print out the last command
    *                           so that users can see the actual command that the -last arg loads.
    *                           Fixes #4779.
+   *   @history 2021-06-05 Kris Becker - Fixed path to ISIS documentation when -WEBHELP is used
    *
    */
 
