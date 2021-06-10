@@ -33,11 +33,6 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
 
-## [Unreleased]
-
-### Changed
-- isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
-
 ## [5.0.1] - 2021-06-10
 
 ### Fixed
