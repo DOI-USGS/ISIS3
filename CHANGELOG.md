@@ -35,8 +35,6 @@ release.
 
 ## [Unreleased]
 
-<<<<<<< HEAD
-=======
 ### Changed
 - isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
 
@@ -51,7 +49,6 @@ release.
 - Fixed Thm2isis to properly use output attributes [#4213](https://github.com/USGS-Astrogeology/ISIS3/issues/4213)
 - Fixed caminfo uselabel SegFault. [#4401](https://github.com/USGS-Astrogeology/ISIS3/issues/4401)
 
->>>>>>> 561e21e9c... Fixed SolarLon to compute from Table if cube is spiceinited (#4418)
 ## [5.0.0] - 2021-04-01
 
 ### Added
