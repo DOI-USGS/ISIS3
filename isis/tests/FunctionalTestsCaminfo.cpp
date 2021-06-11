@@ -206,7 +206,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(geometry.findKeyword("IncidenceAngle"), 70.127983086993, 0.0001);
     EXPECT_NEAR(geometry.findKeyword("NorthAzimuth"), 332.65918485196, 0.0001);
     EXPECT_NEAR(geometry.findKeyword("OffNadir"), 9.9273765164008, 0.0001);
-    EXPECT_NEAR(geometry.findKeyword("SolarLongitude"), -1.7976931348623099e+308, 0.0001);
+    EXPECT_NEAR(geometry.findKeyword("SolarLongitude"), 294.73518830594998, 0.0001);
     EXPECT_NEAR(geometry.findKeyword("LocalTime"), 7.7862975334032, 0.0001);
     EXPECT_NEAR(geometry.findKeyword("TargetCenterDistance"), 4160.7294345949, 0.0001);
     EXPECT_NEAR(geometry.findKeyword("SlantDistance"), 762.37204489156, 0.0001);
