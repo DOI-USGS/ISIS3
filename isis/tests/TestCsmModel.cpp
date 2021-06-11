@@ -1,6 +1,7 @@
 #include "TestCsmModel.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -9,24 +10,47 @@ const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModel";
 
 // Sensor model Parameter names
 const std::vector<std::string> TestCsmModel::PARAM_NAMES = {
-  "test_param_one",
-  "test_param_two"
+  "reference_time",
+  "center_latitude",
+  "center_longitude",
+  "scale",
+  "center_longitude_sigma",
+  "center_latitude_sigma",
+  "scale_sigma"
 };
 
 // Sensor model Parameter units
 const std::vector<std::string> TestCsmModel::PARAM_UNITS = {
-  "m",
-  "rad"
+  "unitless", // Are these used/defined in an enum or anything like this? 
+  "rad", // TODO: or degree? 
+  "rad",
+  "unitless",
+  "rad",
+  "rad",
+  "unitless"
 };
 
 // Sensor model Parameter Types
 const std::vector<csm::param::Type> TestCsmModel::PARAM_TYPES = {
-  csm::param::FICTITIOUS,
+  // TODO: what makes sense for these? 
+  csm::param::REAL,
+  csm::param::REAL,
+  csm::param::REAL,
+  csm::param::REAL,
+  csm::param::REAL,
+  csm::param::REAL,
+  csm::param::REAL,
   csm::param::REAL
 };
 
 // Sensor model Parameter sharing criteria
 const std::vector<csm::SharingCriteria> TestCsmModel::PARAM_SHARING_CRITERIA = {
+  // TODO: what makes the most sense for this? 
+  csm::SharingCriteria(),
+  csm::SharingCriteria(),
+  csm::SharingCriteria(),
+  csm::SharingCriteria(),
+  csm::SharingCriteria(),
   csm::SharingCriteria(),
   csm::SharingCriteria()
 };
@@ -175,7 +199,9 @@ std::string TestCsmModel::getSensorMode() const {
  * @return std::string reference date and time
  */
 std::string TestCsmModel::getReferenceDateAndTime() const {
-  return "20000101T115959Z";
+  std::string timeString; 
+  timeString = "20000101T12000" + std::to_string(m_param_values[0]) + "Z";
+  return timeString;
 }
 
 
@@ -202,7 +228,8 @@ void TestCsmModel::replaceModelState(const std::string& argState) {
   // Get the JSON substring
   json state = json::parse(argState.substr(argState.find("\n") + 1));
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
-    m_param_values[param_index] = state.at(TestCsmModel::PARAM_NAMES[param_index]);
+    // No error-checking, but that's probably fine for now. 
+    m_param_values[param_index] = double(state.at(TestCsmModel::PARAM_NAMES[param_index]));
   }
 }
 
@@ -224,6 +251,7 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
 
   json parsedIsd;
   isdFile >> parsedIsd;
+  // TODO: modified this so no longer true. Breaks existing tests? 
   // Only extract the first 2 parameters from the file
   json state;
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
@@ -489,7 +517,11 @@ csm::ImageCoord TestCsmModel::groundToImage(const csm::EcefCoord& groundPt,
                          double desiredPrecision,
                          double* achievedPrecision,
                          csm::WarningList* warnings) const {
-  return csm::ImageCoord(0.0,0.0);
+   csm::ImageCoord imageCoord;
+   imageCoord.samp = m_param_values[0] * groundPt.x;
+   imageCoord.line = m_param_values[0] * groundPt.y;
+//   m_param_values[0] * groundPt.z;
+   return imageCoord;
 }
 
 
@@ -497,6 +529,7 @@ csm::ImageCoordCovar TestCsmModel::groundToImage(const csm::EcefCoordCovar& grou
                               double desiredPrecision,
                               double* achievedPrecision,
                               csm::WarningList* warnings) const {
+  // TODO
   return csm::ImageCoordCovar(0.0, 0.0, 0.0, 0.0, 0.0);
 }
   
@@ -506,7 +539,9 @@ csm::EcefCoord TestCsmModel::imageToGround(const csm::ImageCoord& imagePt,
                                double desiredPrecision,
                                double* achievedPrecision,
                                csm::WarningList* warnings) const {
-  return csm::EcefCoord(0.0, 0.0, 0.0);
+  csm::EcefCoord groundPt; 
+  // how to access these values? and actually use imagePt, rotation, and scale? 
+  return groundPt;
 }
 
 csm::EcefCoordCovar TestCsmModel::imageToGround(const csm::ImageCoordCovar& imagePt,
@@ -515,7 +550,8 @@ csm::EcefCoordCovar TestCsmModel::imageToGround(const csm::ImageCoordCovar& imag
                                     double desiredPrecision,
                                     double* achievedPrecision,
                                     csm::WarningList* warnings) const {
-  return csm::EcefCoordCovar(0.0, 0.0, 0.0);
+  csm::EcefCoordCovar groundPt; 
+  return groundPt;
 }
 
 
