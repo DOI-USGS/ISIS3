@@ -57,8 +57,7 @@ class CSMPluginFixture : public TempTestingFiles {
       std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
       testCube = new Cube();
-      // TODO set back
-      filename = "/scratch/csminitCube.cub";
+      filename = tempDir.path() + "/csminitCube.cub";
       testCube->fromLabel(filename, label, "rw");
       testCube->close();
 
@@ -136,19 +135,6 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   PvlGroup &kernGroup = testCube->group("Kernels");
   EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
 }
-
-// TODO: remove when done
-TEST_F(CSMPluginFixture, CSMInitTESTME) {
-  // Run csminit with defaults for everything besides FROM and ISD
-  QVector<QString> args = {
-    "from="+filename,
-    "isd=/scratch/isd.isd",
-  };
-
-  UserInterface options(APP_XML, args);
-  csminit(options);
-}
-
 
 TEST_F(CSMPluginFixture, CSMInitRunTwice) {
   // Run csminit twice in a row. Verify that end result is as if csminit were
