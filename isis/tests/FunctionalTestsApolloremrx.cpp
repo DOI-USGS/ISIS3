@@ -72,7 +72,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("appears to already have reseaus removed."));
+    EXPECT_THAT(e.what(), HasSubstr("appears to already have reseaus removed"));
   }
 }
 
@@ -90,7 +90,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxSpacecraftError) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("This application is for use with Apollo spacecrafts only."));
+    EXPECT_THAT(e.what(), HasSubstr("This application is for use with Apollo spacecrafts only"));
   }
 }
 
