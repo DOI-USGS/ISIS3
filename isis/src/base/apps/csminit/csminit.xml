@@ -18,8 +18,32 @@
     </p>
     <p>
       Information about the CSM model will also be added to the CsmInfo group on
-      the cube label. These are just for users to reference and are not used
+      the cube label. The group includes names, units, and types for model
+      parameter. These are just for users to reference and are not used
       programmatically.
+    </p>
+    <pre>
+Group = CsmInfo
+CSMPlatformID       = Mars_Reconnaissance_Orbiter
+CSMInstrumentId     = "CONTEXT CAMERA"
+ReferenceTime       = 2014-05-21T15:48:56Z
+ModelParameterNames = ("IT Pos. Bias   ", "CT Pos. Bias   ",
+                        "Rad Pos. Bias  ", "IT Vel. Bias   ",
+                        "CT Vel. Bias   ", "Rad Vel. Bias  ",
+                        "Omega Bias     ", "Phi Bias       ",
+                        "Kappa Bias     ", "Omega Rate     ",
+                        "Phi Rate       ", "Kappa Rate     ",
+                        "Omega Accl     ", "Phi Accl       ",
+                        "Kappa Accl     ", "Focal Bias     ")
+ModelParameterUnits = (m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m)
+ModelParameterTypes = (REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL,
+                        REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL)
+End_Group
+    </pre>
+    <p>
+      The ModelParameter keywords contain information that can be used
+      when running jigsaw. This information is unique for each model. For
+      more detail, see the CSMSOLVELIST parameter in the jigsaw documentation.
     </p>
     <p>
       This program can be run on any Cube file, but if the Cube has spice data
@@ -148,4 +172,17 @@
       </parameter>
     </group>
   </groups>
+  <example>
+  <brief>Simple csminit Example</brief>
+  <description>
+    This example uses a calibrated MRO CTX image and an isd generated using ALE or Abstraction Layer for Ephemerides.
+  </description>
+  <terminalInterface>
+    <commandLine> csminit from= F02_036648_2021_XN_22N022W.cal.csm.cub isd= F02_036648_2021_XN_22N022W.cal.csm.json
+    </commandLine>
+    <description>
+      Simple csminit example
+    </description>
+  </terminalInterface>
+</example>
 </application>
