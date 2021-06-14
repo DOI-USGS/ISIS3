@@ -733,10 +733,10 @@ csm::RasterGM::SensorPartials TestCsmModel::computeSensorPartials(
     delta = 0.0035;
   }
 
-  std::vector<double> adj(getNumParameters(), 0.0);
-  adj[index] = delta;
+  std::vector<double> parameterAdjustments(getNumParameters(), 0.0);
+  parameterAdjustments[index] = delta;
 
-  csm::ImageCoord imagePt1 = groundToImage(groundPt, adj, desiredPrecision, achievedPrecision);
+  csm::ImageCoord imagePt1 = groundToImage(groundPt, parameterAdjustments, desiredPrecision, achievedPrecision);
 
   csm::RasterGM::SensorPartials partials;
 
