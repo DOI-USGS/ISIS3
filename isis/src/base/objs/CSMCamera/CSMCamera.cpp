@@ -957,6 +957,11 @@ namespace Isis {
   }
 
 
+  QString CSMCamera::getModelState() const {
+    return QString::fromStdString(m_model->getModelState());
+  }
+
+
   /**
    * Set the time and update the sensor position and orientation.
    *
