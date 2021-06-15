@@ -957,6 +957,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the CSM Model state string to re-create the CSM Model.
+   *
+   * @returns @b QString The CSM Model state string
+   */
   QString CSMCamera::getModelState() const {
     return QString::fromStdString(m_model->getModelState());
   }
