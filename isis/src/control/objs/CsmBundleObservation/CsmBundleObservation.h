@@ -64,8 +64,6 @@ namespace Isis {
       void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       QString bundleOutputCSV(bool errorPropagation);
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
-
       virtual QStringList parameterList();
 
       bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody);

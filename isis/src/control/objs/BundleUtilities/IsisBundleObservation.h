@@ -84,6 +84,7 @@ namespace Isis {
    *   @history 2019-09-10  Adam Paquette - Changed how bundleOutputString formats the text
    *                            that is written to the bundleout.txt file.
    *   @history 2021-06-07  Tim Giroux - Rename BundleObservation to IsisBundleObservation
+   *                            and removed formatBundleOutputString
    *
    */
   class IsisBundleObservation : public BundleObservation {
