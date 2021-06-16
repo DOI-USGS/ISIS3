@@ -9,6 +9,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "ControlPoint.h"
+#include "CSMCamera.h"
 
 #include "jigsaw.h"
 
@@ -1590,4 +1591,81 @@ TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
    "0.21557003,0.0,-0.095359125080397,-0.095359125080397,FREE,0.10479701,-1.5077677229935,"
    "0.0,-1.5077677229935,N/A,N/A,22.723572340278,0.0,22.723572340278,N/A,N/A,-169.13683247633,"
    "0.0,-169.13683247633,N/A,N/A", 1);
+}
+
+
+TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  // solving for position only, with error propagation
+  QVector<QString> args1 = {"fromlist="+cubeListFile,
+                            "cnet=data/CSMNetwork/test.net",
+                            "onet="+outCnetFileName,
+                            "maxits=10",
+                            "errorprop=yes",
+                            "bundleout_txt=yes",
+                            "csmsolveset=adjustable",
+                            "POINT_LATITUDE_SIGMA=1125",
+                            "POINT_LONGITUDE_SIGMA=1125",
+                            "file_prefix="+tempDir.path()+"/"
+                         };
+
+  UserInterface options1(APP_XML, args1);
+  try {
+   jigsaw(options1);
+
+  }
+  catch (IException &e) {
+   FAIL() << "Failed to bundle: " << e.what() << std::endl;
+  }
+
+  CSVReader line = CSVReader(tempDir.path() + "/bundleout_points.csv", false, 0,
+                              ',', false, true);
+
+  compareCsvLine(line.getRow(25),
+                 "csm_test_019,	FREE,	5,	0, 0,	1.5,	358.5,	1000,	0,	0,	0,"
+                 "	950.4447199,	-1195.518876,	0,	999.3147674,	-26.16797812,	26.17694831", 1);
+  compareCsvLine(line.getRow(28),
+                 "csm_test_022,	FREE,	5,	0,	0,	1.5,	1.5,	1000, 0, 0, 0,"
+                 "	288.1013812,	-1391.568893,	0,	999.3147674,"
+                 " 26.16797812,	26.17694831", 1);
+  compareCsvLine(line.getRow(49),
+                 "csm_test_043,	FREE,	5,	0,	0,	-1.5,	358.5,	1000, 0, 0, 0,"
+                 "	1392.108941,	-833.2591342,	0,	999.3147674,	-26.16797812,"
+                 "	-26.17694831", 1);
+  compareCsvLine(line.getRow(52),
+                 "csm_test_046,	FREE,	5,	0,	0,	-1.5,	1.5,	1000, 0, 0, 0,	51.85037177,"
+                 "	-597.070682,	0,	999.3147674,	26.16797812,	-26.17694831", 1);
+  compareCsvLine(line.getRow(11),
+                 "csm_test_005,	FREE,	2,	0,	0,	3.5,	0.5,	1000, 0, 0, 0,	684.8038438,"
+                 "	233.517266,	0,	998.0967925,	8.71025875,	61.04853953", 1);
+
+
+  line = CSVReader(tempDir.path() + "/bundleout_images.csv", false, 0, ',', false, true);
+  compareCsvLine(line.getRow(3),
+                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-BGU8tK/Test_B.cub,"
+                 "	6.65E-12,	1.41E-13,	4.70E-12,	2.875,	0.125,	3,	0.004162598,	0,"
+                 "	-0.0078125,	0.0078125,	6.29E-15,	0.004162598,	0,	258,	-2,	256,	68.2,	0",
+                 1);
+
+  compareCsvLine(line.getRow(5),
+                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_D.cub,"
+                 "3.96E-12,	1.31E-13,	2.80E-12,	-0.125,	0.125,	2.23E-17,"
+                 "	0.004162598,	0,	-2.875,	-0.125,	-3,	0.004162598,	0,	254,	2,	256,	68.2,	0", 1);
+  compareCsvLine(line.getRow(7),
+                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-BGU8tK/Test_F.cub,"
+                 "	1.55E-13,	8.46E-14,	1.25E-13,	0,	1.39E-17,	1.39E-17,	0.004162598,	0,	3.03125,"
+                 "	-0.03125,	3,	0.004162598,	0,	272,	-16,	256,	68.2,	0", 1);
+                 /*
+  compareCsvLine(line.getRow(9),
+                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_H.cub,"
+                 "6.65E-12,	1.10E-13,	4.70E-12,	-3.03125,	0.03125,	-3,	0.004162598,	0,	0,	6.17E-15,"
+                 "	6.17E-15,	0.004162598",1);
+  compareCsvLine(line.getRow(11),
+                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_J.cub,"
+                 "2.76E-12,	9.95E-14,	1.96E-12,	-0.0625,	0.0625,	-2.63E-17,	0.016650391,"
+                 "	0,	-0.03125,	0.03125, 6.23E-15,	0.016650391", 1);
+                 */
+
 }
