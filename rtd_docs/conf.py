@@ -56,7 +56,7 @@ html_static_path = ['_static']
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    subprocess.call('doxygen', shell=True)
+    subprocess.call('doxygen Doxyfile', shell=True)
 
 # -- Breathe Configuration ----------------------------------------------------
 
