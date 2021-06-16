@@ -7,8 +7,7 @@ Library Reference
 
 -----------------------------------------
 
-   capi/index
-   python/index
-
 .. toctree::
-  :maxdepth: 3
+   :maxdepth: 3
+
+   library/index

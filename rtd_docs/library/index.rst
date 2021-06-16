@@ -11,4 +11,3 @@ Library Reference
    :maxdepth: 2
 
    capi/index
-   python/index
