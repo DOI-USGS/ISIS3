@@ -1,10 +1,14 @@
-Welcome to ISIS's documentation!
-================================
+#################
+Library Reference
+#################
 
-Placeholder for future documentation. 
+:Release: |version|
+:Date: |today|
 
-For current documentation, please go to: https://isis.astrogeology.usgs.gov/
+-----------------------------------------
 
-Or for Github: https://github.com/USGS-Astrogeology/ISIS3
+   capi/index
+   python/index
 
-
+.. toctree::
+  :maxdepth: 3
