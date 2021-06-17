@@ -1644,25 +1644,23 @@ TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
 
   line = CSVReader(tempDir.path() + "/bundleout_images.csv", false, 0, ',', false, true);
   compareCsvLine(line.getRow(3),
-                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-BGU8tK/Test_B.cub,"
-                 "	6.65E-12,	1.41E-13,	4.70E-12,	2.875,	0.125,	3,	0.004162598,	0,"
+                 "Test_B.cub,	6.65E-12,	1.41E-13,	4.70E-12,	2.875,	0.125,	3,	0.004162598,	0,"
                  "	-0.0078125,	0.0078125,	6.29E-15,	0.004162598,	0,	258,	-2,	256,	68.2,	0",
                  1);
 
   compareCsvLine(line.getRow(5),
-                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_D.cub,"
-                 "3.96E-12,	1.31E-13,	2.80E-12,	-0.125,	0.125,	2.23E-17,"
-                 "	0.004162598,	0,	-2.875,	-0.125,	-3,	0.004162598,	0,	254,	2,	256,	68.2,	0", 1);
+                 "Test_D.cub, 3.96E-12,	1.31E-13,	2.80E-12,	-0.125,	0.125,	2.23E-17,"
+                 "	0.004162598,	0,	-2.875,	-0.125,	-3,	0.004162598,	0,	254,"
+                 "	2,	256,	68.2,	0", 1);
   compareCsvLine(line.getRow(7),
-                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-BGU8tK/Test_F.cub,"
-                 "	1.55E-13,	8.46E-14,	1.25E-13,	0,	1.39E-17,	1.39E-17,	0.004162598,	0,	3.03125,"
-                 "	-0.03125,	3,	0.004162598,	0,	272,	-16,	256,	68.2,	0", 1);
+                 "Test_F.cub,	1.55E-13,	8.46E-14,	1.25E-13,	0,	1.39E-17,	1.39E-17,"
+                 "	0.004162598,	0,	3.03125,	-0.03125,	3,	0.004162598,	0,"
+                 "	272,	-16,	256,	68.2,	0", 1);
   compareCsvLine(line.getRow(9),
-                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_H.cub,"
-                 "6.65E-12,	1.10E-13,	4.70E-12,	-3.03125,	0.03125,	-3,	0.004162598,	0,	0,	6.17E-15,"
+                 "Test_H.cub, 6.65E-12,	1.10E-13,	4.70E-12,	-3.03125,	0.03125,"
+                 "	-3,	0.004162598,	0,	0,	6.17E-15,"
                  "	6.17E-15,	0.004162598",1);
   compareCsvLine(line.getRow(11),
-                 "/var/folders/nb/f0fd1pkn2l7gqjdf_5wyzh18002c5k/T/qt_temp-NXcUte/Test_J.cub,"
-                 "2.76E-12,	9.95E-14,	1.96E-12,	-0.0625,	0.0625,	-2.63E-17,	0.016650391,"
-                 "	0,	-0.03125,	0.03125, 6.23E-15,	0.016650391", 1);
+                 "Test_J.cub, 2.76E-12,	9.95E-14,	1.96E-12,	-0.0625,	0.0625,"
+                 "-2.63E-17,	0.016650391, 0,	-0.03125,	0.03125, 6.23E-15,	0.016650391", 1);
 }
