@@ -72,8 +72,6 @@ namespace Isis {
       virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation) = 0;
       virtual QString bundleOutputCSV(bool errorPropagation) = 0;
 
-      virtual QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false) = 0;
-
       virtual QStringList parameterList() = 0;
       virtual QStringList imageNames();
 

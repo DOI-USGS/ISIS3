@@ -1,0 +1,11 @@
+TestCsmModel
+{
+    "reference_time": 9,
+    "name": "Test_J",
+    "center_latitude": -0.0625,
+    "center_latitude_sigma": 0.129036393,
+    "center_longitude": -0.03125,
+    "center_longitude_sigma": 0.129036393,
+    "scale": 124,
+    "scale_sigma": 4.129164564
+}

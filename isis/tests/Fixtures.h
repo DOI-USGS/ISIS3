@@ -75,7 +75,6 @@ namespace Isis {
       void TearDown() override;
   };
 
-
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
@@ -334,6 +333,20 @@ class VikThmNetwork : public TempTestingFiles {
 
     ControlNet *network;
     QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class CSMNetwork : public TempTestingFiles {
+  protected:
+
+    QVector<FileName> stateStringFiles;
+    QVector<FileName> labelFiles;
+    QVector<Cube*> cubes;
+
+    FileList *cubeList;
+    QString cubeListFile;
 
     void SetUp() override;
     void TearDown() override;
