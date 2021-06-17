@@ -191,6 +191,45 @@ void IsisMain() {
     focalLengthNode.removeAttribute("unit");
   }
 
+  // Fix the footprint section's output structure
+  QStringList xmlPath2;
+  xmlPath2 << "Observation_Area"
+          << "Discipline_Area"
+          << "geom:Geometry"
+          << "geom:Geometry_Orbiter"
+          << "geom:Surface_Geometry"
+          << "geom:Surface_Geometry_Specific"
+          << "geom:Footprint_Vertices"
+          << "geom:Pixel_Intercept";
+  QDomElement pixelInterceptNode = process.getElement(xmlPath2, observationNode);
+
+  if(pixelInterceptNode.hasChildNodes()) {
+    QDomElement pixelInterceptNode2 = pixelInterceptNode.nextSiblingElement();
+    QDomElement pixelInterceptNode3 = pixelInterceptNode2.nextSiblingElement();
+    QDomElement pixelInterceptNode4 = pixelInterceptNode3.nextSiblingElement();
+
+    pixelInterceptNode.insertAfter(pixelInterceptNode.firstChildElement("geom:pixel_latitude"), pixelInterceptNode.firstChildElement("geom:reference_pixel_location"));
+    pixelInterceptNode2.insertAfter(pixelInterceptNode2.firstChildElement("geom:pixel_latitude"), pixelInterceptNode2.firstChildElement("geom:reference_pixel_location"));
+    pixelInterceptNode3.insertAfter(pixelInterceptNode3.firstChildElement("geom:pixel_latitude"), pixelInterceptNode3.firstChildElement("geom:reference_pixel_location"));
+    pixelInterceptNode4.insertAfter(pixelInterceptNode4.firstChildElement("geom:pixel_latitude"), pixelInterceptNode4.firstChildElement("geom:reference_pixel_location"));
+    
+    pixelInterceptNode2.setTagName("geom:Pixel_Intercept");
+    pixelInterceptNode3.setTagName("geom:Pixel_Intercept");
+    pixelInterceptNode4.setTagName("geom:Pixel_Intercept");
+  }
+  else {
+  QStringList xmlPathFootprint;
+  xmlPathFootprint << "Observation_Area"
+                   << "Discipline_Area"
+                   << "geom:Geometry"
+                   << "geom:Geometry_Orbiter"
+                   << "geom:Surface_Geometry"
+                   << "geom:Surface_Geometry_Specific"
+                   << "geom:Footprint_Vertices";
+    QDomElement footprintNode = process.getElement(xmlPathFootprint, observationNode);
+    footprintNode.parentNode().removeChild(footprintNode);
+  }
+
   QString outFile = ui.GetFileName("TO");
 
   process.WritePds4(outFile);
