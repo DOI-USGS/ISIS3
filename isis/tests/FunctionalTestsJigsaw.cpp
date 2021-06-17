@@ -1594,7 +1594,7 @@ TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
 }
 
 
-TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
+TEST_F(CSMNetwork, unctionalTestJigsawCSM) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
 
@@ -1605,6 +1605,7 @@ TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
                             "maxits=10",
                             "errorprop=yes",
                             "bundleout_txt=yes",
+                            "update=yes",
                             "csmsolveset=adjustable",
                             "POINT_LATITUDE_SIGMA=1125",
                             "POINT_LONGITUDE_SIGMA=1125",
@@ -1647,7 +1648,6 @@ TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
                  "Test_B.cub,	6.65E-12,	1.41E-13,	4.70E-12,	2.875,	0.125,	3,	0.004162598,	0,"
                  "	-0.0078125,	0.0078125,	6.29E-15,	0.004162598,	0,	258,	-2,	256,	68.2,	0",
                  1);
-
   compareCsvLine(line.getRow(5),
                  "Test_D.cub, 3.96E-12,	1.31E-13,	2.80E-12,	-0.125,	0.125,	2.23E-17,"
                  "	0.004162598,	0,	-2.875,	-0.125,	-3,	0.004162598,	0,	254,"
@@ -1663,4 +1663,34 @@ TEST_F(CSMNetwork, FunctionalTestCSMNetwork) {
   compareCsvLine(line.getRow(11),
                  "Test_J.cub, 2.76E-12,	9.95E-14,	1.96E-12,	-0.0625,	0.0625,"
                  "-2.63E-17,	0.016650391, 0,	-0.03125,	0.03125, 6.23E-15,	0.016650391", 1);
+
+  Cube testB(tempDir.path() + "/Test_B.cub");
+  CSMCamera *camB = dynamic_cast<CSMCamera*>(testB.camera());
+  EXPECT_NEAR(camB->getParameterValue(0), 3.0, 0.00000001);
+  EXPECT_NEAR(camB->getParameterValue(1), 0.0, 0.00000001);
+  EXPECT_NEAR(camB->getParameterValue(2), 256.0, 0.00000001);
+
+  Cube testD(tempDir.path() + "/Test_D.cub");
+  CSMCamera *camD = dynamic_cast<CSMCamera*>(testD.camera());
+  EXPECT_NEAR(camD->getParameterValue(0), 0.0, 0.00000001);
+  EXPECT_NEAR(camD->getParameterValue(1), -3.0, 0.00000001);
+  EXPECT_NEAR(camD->getParameterValue(2), 256.0, 0.00000001);
+
+  Cube testF(tempDir.path() + "/Test_F.cub");
+  CSMCamera *camF = dynamic_cast<CSMCamera*>(testF.camera());
+  EXPECT_NEAR(camF->getParameterValue(0), 0.0, 0.00000001);
+  EXPECT_NEAR(camF->getParameterValue(1), 3.0, 0.00000001);
+  EXPECT_NEAR(camF->getParameterValue(2), 256.0, 0.00000001);
+
+  Cube testH(tempDir.path() + "/Test_H.cub");
+  CSMCamera *camH = dynamic_cast<CSMCamera*>(testH.camera());
+  EXPECT_NEAR(camH->getParameterValue(0), -3.0, 0.00000001);
+  EXPECT_NEAR(camH->getParameterValue(1), 0.0, 0.00000001);
+  EXPECT_NEAR(camH->getParameterValue(2), 256.0, 0.00000001);
+
+  Cube testJ(tempDir.path() + "/Test_J.cub");
+  CSMCamera *camJ = dynamic_cast<CSMCamera*>(testJ.camera());
+  EXPECT_NEAR(camJ->getParameterValue(0), 0.0, 0.00000001);
+  EXPECT_NEAR(camJ->getParameterValue(1), 0.0, 0.00000001);
+  EXPECT_NEAR(camJ->getParameterValue(2), 128.0, 0.00000001);
 }
