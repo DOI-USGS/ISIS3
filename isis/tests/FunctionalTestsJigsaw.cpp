@@ -1594,7 +1594,7 @@ TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
 }
 
 
-TEST_F(CSMNetwork, unctionalTestJigsawCSM) {
+TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
 
