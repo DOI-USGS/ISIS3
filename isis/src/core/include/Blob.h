@@ -19,6 +19,8 @@ namespace Isis {
   bool IsBlob(PvlObject &obj);
   class Pvl;
   /**
+   * @brief Interface for pvl cube data reading and write.
+   *
    * @author ????-??-?? Unknown
    *
    * @internal
