@@ -5,6 +5,7 @@
 #include "FileName.h"
 
 #include "Blob.h"
+#include "csminit.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
@@ -1507,4 +1508,46 @@ namespace Isis {
     }
   }
 
+  void CSMNetwork::SetUp(){
+    QString APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+    QVector<QString> fNames = {"/Test_A", "/Test_B",
+                               "/Test_C", "/Test_D",
+                               "/Test_E", "/Test_F",
+                               "/Test_G", "/Test_H",
+                               "/Test_I", "/Test_J"
+                              };
+
+    cubes.fill(nullptr, 10);
+
+    cubeList = new FileList();
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    // Create CSMInit-ed cubes
+    for (int i = 0; i < cubes.size() ; i++){
+      cubes[i] = new Cube();
+      cubes[i]->setDimensions(1024,1024,1);
+      FileName cubName = FileName(tempDir.path()+fNames[i]+".cub");
+      cubes[i]->create(cubName.expanded());
+      cubeList->append(cubes[i]->fileName());
+      QVector<QString> args = {"from="+cubName.expanded(),
+                               "state=data/CSMNetwork/"+fNames[i]+".json",
+                               "modelname=TestCsmModel",
+                               "pluginname=TestCsmPlugin"
+                              };
+      UserInterface ui(APP_XML, args);
+      csminit(ui);
+    }
+    cubeList->write(cubeListFile);
+  }
+
+  void CSMNetwork::TearDown() {
+    for(int i = 0; i < cubes.size(); i++) {
+      if(cubes[i] && cubes[i]->isOpen()) {
+        delete cubes[i];
+      }
+    }
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
 }
