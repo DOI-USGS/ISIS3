@@ -958,6 +958,16 @@ namespace Isis {
 
 
   /**
+   * Get the CSM Model state string to re-create the CSM Model.
+   *
+   * @returns @b QString The CSM Model state string
+   */
+  QString CSMCamera::getModelState() const {
+    return QString::fromStdString(m_model->getModelState());
+  }
+
+
+  /**
    * Set the time and update the sensor position and orientation.
    *
    * This is not supported for CSM cameras because the time is a function of the

@@ -39,6 +39,7 @@ find files of those names at the top level of this repository. **/
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
+#include "CSMCamera.h"
 #include "Control.h"
 #include "ControlPoint.h"
 #include "CorrelationMatrix.h"
@@ -2829,6 +2830,7 @@ namespace Isis {
     return m_controlNet->Camera(i)->instrumentRotation()->Cache("InstrumentPointing");
   }
 
+
   /**
    * Return a table spacecraft vector for the ith cube in the cube list given to the
    * constructor.
@@ -2839,6 +2841,27 @@ namespace Isis {
    */
   Table BundleAdjust::spVector(int i) {
     return m_controlNet->Camera(i)->instrumentPosition()->Cache("InstrumentPosition");
+  }
+
+
+  /**
+   * Return the updated model state for the ith cube in the cube list given to the
+   * constructor. This is only valid for CSM cubes.
+   *
+   * @param i The index of the cube to get the model state for
+   *
+   * @return @b QString The updated CSM model state string
+   */
+  QString BundleAdjust::modelState(int i) {
+    Camera *imageCam = m_controlNet->Camera(i);
+    if (imageCam->GetCameraType() != Camera::Csm) {
+      QString msg = "Cannot get model state for image [" + toString(i) +
+                    "] because it is not a CSM camera model.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    CSMCamera *csmCamera = dynamic_cast<CSMCamera*>(imageCam);
+    return csmCamera->getModelState();
   }
 
 

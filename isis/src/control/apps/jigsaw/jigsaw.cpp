@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 #include <QString>
 
+#include "Blob.h"
 #include "BundleAdjust.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
@@ -148,15 +149,26 @@ namespace Isis {
               break;
             }
 
-            //  Get Kernel group and add or replace LastModifiedInstrumentPointing
-            //  keyword.
-            Table cmatrix = bundleAdjustment->cMatrix(i);
+            //  Update the image parameters
             QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-            cmatrix.Label().addComment(jigComment);
-            Table spvector = bundleAdjustment->spVector(i);
-            spvector.Label().addComment(jigComment);
-            c->write(cmatrix);
-            c->write(spvector);
+            if (c->hasBlob("CSMState", "String")) {
+              Blob csmStateBlob("CSMState", "String");
+              // Read the BLOB from the cube to prepropagate things like the model
+              // and plugin name
+              c->read(csmStateBlob);
+              std::string modelState = bundleAdjustment->modelState(i).toStdString();
+              csmStateBlob.setData(modelState.c_str(), modelState.size());
+              csmStateBlob.Label().addComment(jigComment);
+              c->write(csmStateBlob);
+            }
+            else {
+              Table cmatrix = bundleAdjustment->cMatrix(i);
+              cmatrix.Label().addComment(jigComment);
+              Table spvector = bundleAdjustment->spVector(i);
+              spvector.Label().addComment(jigComment);
+              c->write(cmatrix);
+              c->write(spvector);
+            }
             p.WriteHistory(*c);
           }
           gp += PvlKeyword("Status", "Camera pointing updated");

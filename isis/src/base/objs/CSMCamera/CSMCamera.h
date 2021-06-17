@@ -130,6 +130,8 @@ namespace Isis {
       virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
       virtual std::vector<double> GroundPartials();
 
+      QString getModelState() const;
+
     protected:
       void setTarget(Pvl label);
 
