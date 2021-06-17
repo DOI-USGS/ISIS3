@@ -1857,8 +1857,6 @@ namespace Isis {
                                      BundleMeasure &measure,
                                      BundleControlPoint &point) {
 
-    std::cout << "Computing partials for [" << measure.cubeSerialNumber() << "] in [" << point.id() << "]." << std::endl;
-
     Camera *measureCamera = measure.camera();
     BundleObservationQsp observation = measure.parentBundleObservation();
 
@@ -1935,7 +1933,6 @@ namespace Isis {
         coeffTarget *= observationWeight;
       }
     }
-    std::cout << std::endl;
 
     return true;
   }
