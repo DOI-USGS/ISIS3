@@ -569,8 +569,8 @@ csm::EcefCoord TestCsmModel::imageToGround(const csm::ImageCoord& imagePt,
 
   double lon = center_longitude + (imagePt.samp - getImageSize().samp/2.0)/scale;
   double lat = center_lat + (imagePt.line - getImageSize().line/2.0)/scale;
-  lon*=M_PI/180;
-  lat*=M_PI/180;
+  lon *= M_PI/180;
+  lat *= M_PI/180;
 
   double R = 1000000.0; // TODO: getfromElliposid?
   groundPt.x = R * cos(lat) * cos(lon);
@@ -661,10 +661,8 @@ csm::EcefCoord TestCsmModel::getSensorPosition(const csm::ImageCoord& imagePt) c
   // Convert: center lat, lon, radius+altitude to x,y,z and use that for s/c position
   csm::EcefCoord sensorPosition;
 
-  double lon = m_param_values[1];
-  double lat = m_param_values[0];
-  lon*=M_PI/180;
-  lat*=M_PI/180;
+  double lon = m_param_values[1] * M_PI/180;
+  double lat = m_param_values[0] * M_PI/180;
 
   double altitude = 10000; // TODO: more realistic value?
   double R = 1000000.0 + altitude; // TODO: getfromElliposid?  // only line different from imageToGround.
