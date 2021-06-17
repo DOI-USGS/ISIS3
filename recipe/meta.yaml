@@ -68,6 +68,7 @@ requirements:
   - curl
   - eigen
   - embree
+  - ffmpeg>=3.4.1
   - geos>=3.7,<3.8
   - geotiff
   - gmm
@@ -120,6 +121,7 @@ requirements:
   - curl
   - eigen
   - embree
+  - {{ pin_compatible('ffmpeg', min_pin='x.x') }}
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('geotiff', max_pin='x.x') }}
   - geotiff
