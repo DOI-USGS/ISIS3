@@ -345,9 +345,6 @@ class CSMNetwork : public TempTestingFiles {
     QVector<FileName> labelFiles;
     QVector<Cube*> cubes;
 
-    ControlNet *network;
-    QString controlNetPath;
-
     FileList *cubeList;
     QString cubeListFile;
 
