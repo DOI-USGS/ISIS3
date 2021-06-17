@@ -37,9 +37,12 @@ release.
 
 ### Added
 - Added a new dark current correction to hical that works with the higher temperatures recent images are captured at. Use the new config file, $ISISDATA/mro/calibration/hical.0023_darkrate.conf, to enable the new dark current correction over the old dark current correction. Runs of hical without the new dark current correction will also produce an extra line in the output log indicating that the ZeroDarkRate module is disabled. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
+- Added the ability to bundle adjust CSM models in jigsaw. Use the new CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST arguments to specify what you solve for. [#4537](https://github.com/USGS-Astrogeology/ISIS3/pull/4537)
 
 ### Changed
 - isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+- Changed how the images.csv file is output in jigsaw when there are multiple models. Now each sensor model will have its own images.csv file so that column headers can all be correct. For example, a solution involving LRONAC pairs and Apollo Metric images would generate three images.csv files: LRONAC Left, LRONAC Right, and Apollo Metric. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
+- Changed the API of many Bundle utility classes as part of CSM support in jigsaw. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
 
 ### Fixed
 - Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
