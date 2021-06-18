@@ -153,7 +153,7 @@ namespace Isis {
             QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
             if (c->hasBlob("CSMState", "String")) {
               Blob csmStateBlob("CSMState", "String");
-              // Read the BLOB from the cube to prepropagate things like the model
+              // Read the BLOB from the cube to propagate things like the model
               // and plugin name
               c->read(csmStateBlob);
               std::string modelState = bundleAdjustment->modelState(i).toStdString();

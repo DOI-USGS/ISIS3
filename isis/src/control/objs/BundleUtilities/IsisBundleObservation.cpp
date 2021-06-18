@@ -118,10 +118,6 @@ namespace Isis {
    * @param solveSettings The solve settings to use
    *
    * @return @b bool Returns true if settings were successfully set
-   *
-   * @internal
-   *   @todo initParameterWeights() doesn't return false, so this methods always
-   *         returns true.
    */
   bool IsisBundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
     m_solveSettings = BundleObservationSolveSettingsQsp(
@@ -190,9 +186,6 @@ namespace Isis {
    * Initializes the exterior orientation
    *
    * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Should this always return true?
    */
   bool IsisBundleObservation::initializeExteriorOrientation() {
     if (m_solveSettings->instrumentPositionSolveOption() !=
@@ -276,8 +269,6 @@ namespace Isis {
 
   /**
    * Intializes the body rotation
-   *
-   * @todo check to make sure m_bundleTargetBody is valid
    */
   void IsisBundleObservation::initializeBodyRotation() {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
@@ -293,9 +284,6 @@ namespace Isis {
 
   /**
    * Updates the body rotation
-   *
-   * @internal
-   *   @todo Is this a duplicate of initializeBodyRotation?
    */
   void IsisBundleObservation::updateBodyRotation() {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
@@ -313,15 +301,6 @@ namespace Isis {
    * Initializes the paramater weights for solving
    *
    * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
-   *         By the way, this seems klunky to me, would like to come up with a better way.
-   *         Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
-   *         the IsisBundleObservation class too - this is unnecessary should only be in the
-   *         BundleObservationSolveSettings. But, they are split into position and pointing.
-   *
-   *   @todo always returns true?
    */
   bool IsisBundleObservation::initParameterWeights() {
 
@@ -422,9 +401,6 @@ namespace Isis {
    * @throws IException::Unknown "Unable to apply parameter corrections to IsisBundleObservation."
    *
    * @return @b bool Returns true upon successful application of corrections
-   *
-   * @internal
-   *   @todo always returns true?
    */
   bool IsisBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
 
