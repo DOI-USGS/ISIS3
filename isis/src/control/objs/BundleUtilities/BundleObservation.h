@@ -23,7 +23,14 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
 
   /**
-   * @brief Class for bundle observations
+   * @brief Abstract base class for an observation in bundle adjustment.
+   *
+   * This class is the abstract base class that represents an observation in bundle
+   * adjustment. It handles operations related to the images in the observation,
+   * parameter corrections, and parameter uncertainties. It defines the interface
+   * for choosing observation parameters via BundleObservationSolveSettings. The
+   * partial computation apis required by the bundle adjustment are also defined
+   * but must be implemented by sub-classes.
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -83,12 +90,9 @@ namespace Isis {
       virtual double computeObservationValue(BundleMeasure &measure, double deltaVal) = 0;
 
     protected:
-      QString m_observationNumber; /**< This is typically equivalent to serial number
-                                        except in the case of "observation mode" (e.g.
-                                        Lunar Orbiter) where the observation number is
-                                        the portion of the serial number shared between
-                                        all of the images in the observation. **/
-      int m_index; //!< Index of this observation.
+      QString m_observationNumber; /**< The shared portion of the serial numbers of
+                                        all images in the observation. **/
+      int m_index; //!< Index of this observation in the set of observations.
       //! Map between cube serial number and BundleImage pointers.
       QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.

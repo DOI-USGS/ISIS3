@@ -27,7 +27,7 @@ find files of those names at the top level of this repository. **/
 #include <QXmlStreamWriter>
 
 
-#include "IsisBundleObservation.h"
+#include "BundleObservation.h"
 #include "BundleObservationView.h"
 #include "BundleObservationViewWorkOrder.h"
 #include "ChipViewportsWidget.h"

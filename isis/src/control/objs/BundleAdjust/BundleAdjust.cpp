@@ -426,7 +426,6 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        // TODO ISIS vs. CSM (addNewIsisObservation?)
         BundleObservationQsp observation =
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
@@ -2820,7 +2819,10 @@ namespace Isis {
 
 
   /**
-   * Return a table cmatrix for the ith cube in the cube list given to the constructor.
+   * Return the updated instrument pointing table for the ith cube in the cube
+   * list given to the constructor.
+   *
+   * This is only valid for ISIS camera model cubes
    *
    * @param i The index of the cube
    *
@@ -2832,8 +2834,10 @@ namespace Isis {
 
 
   /**
-   * Return a table spacecraft vector for the ith cube in the cube list given to the
-   * constructor.
+   * Return the updated instrument position table for the ith cube in the cube
+   * list given to the constructor.
+   *
+   * This is only valid for ISIS camera model cubes
    *
    * @param i The index of the cube
    *

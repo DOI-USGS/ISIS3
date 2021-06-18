@@ -136,7 +136,6 @@ namespace Isis {
   }
 
 
-  // TODO change this to CSM solve settings once compute partials is updated
   /**
    * Accesses the solve settings
    *
@@ -160,9 +159,6 @@ namespace Isis {
    * @throws IException::Unknown "Unable to apply parameter corrections to CsmBundleObservation."
    *
    * @return @b bool Returns true upon successful application of corrections
-   *
-   * @internal
-   *   @todo always returns true?
    */
   bool CsmBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
     // Check that the correction vector is the correct size
@@ -195,7 +191,7 @@ namespace Isis {
   int CsmBundleObservation::numberParameters() {
     return m_paramIndices.size();
   }
-  
+
 
   /**
    * @brief Takes in an open std::ofstream and writes out information which goes into the

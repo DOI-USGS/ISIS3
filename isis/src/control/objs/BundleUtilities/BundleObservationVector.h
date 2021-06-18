@@ -61,9 +61,9 @@ namespace Isis {
 
       BundleObservationVector &operator=(const BundleObservationVector &src);
       BundleObservationQsp addNew(BundleImageQsp image,
-                                          QString observationNumber,
-                                          QString instrumentId,
-                                          BundleSettingsQsp bundleSettings);
+                                  QString observationNumber,
+                                  QString instrumentId,
+                                  BundleSettingsQsp bundleSettings);
 
       int numberParameters();
 

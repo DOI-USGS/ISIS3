@@ -19,8 +19,7 @@
     <p>
       Information about the CSM model will also be added to the CsmInfo group on
       the cube label. The group includes names, units, and types for model
-      parameter. These are just for users to reference and are not used
-      programmatically.
+      parameters.
     </p>
     <pre>
 Group = CsmInfo

@@ -1133,10 +1133,16 @@ namespace Isis {
 
       outputImagesCSVHeader(fpOut, observations.front());
 
-
-
       for (int j = 0; j < nObservations; j++ ) {
         BundleObservationQsp observation = observations[j];
+
+        // We need the image index, not the observation index,
+        // so count all of the images prior to this observation
+        int observationIndex = observation->index();
+        int imgIndex = 0;
+        for (int obsIndex = 0; obsIndex < observationIndex; obsIndex++) {
+          imgIndex += m_statisticsResults->observations().at(obsIndex)->size();
+        }
 
         if(!observation) {
           continue;
@@ -1145,16 +1151,7 @@ namespace Isis {
         int numImages = observation->size();
 
         for (int k = 0; k < numImages; k++) {
-
           BundleImageQsp image = observation->at(k);
-
-          // TODO this is a bad linear search, can we change the rms vectors to maps?
-          int observationIndex = m_statisticsResults->observations().indexOf(observation);
-          int imgIndex = k; // Start at k to account for the images in this observation
-          // Accumulate all of the images from previous observations
-          for (int obsIndex = 0; obsIndex < observationIndex; obsIndex++) {
-            imgIndex += m_statisticsResults->observations().at(obsIndex)->size();
-          }
 
           sprintf(buf, "%s", image->fileName().toLatin1().data());
           fpOut << buf;
