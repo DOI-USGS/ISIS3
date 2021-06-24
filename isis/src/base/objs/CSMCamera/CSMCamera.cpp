@@ -121,11 +121,14 @@ namespace Isis {
    * @returns @b bool If the image coordinate was set successfully
    */
   bool CSMCamera::SetImage(const double sample, const double line) {
+    // Save off the line & sample
+    p_childSample = sample;
+    p_childLine = line;
+
     csm::ImageCoord imagePt;
     isisToCsmPixel(p_alphaCube->AlphaLine(line), p_alphaCube->AlphaSample(sample), imagePt);
     double achievedPrecision = 0;
     csm::WarningList warnings;
-
     csm::EcefLocus imageLocus;
     try {
       imageLocus = m_model->imageToRemoteImagingLocus(imagePt,
@@ -156,18 +159,19 @@ namespace Isis {
     std::vector<double> locusVec = {imageLocus.direction.x,
                                     imageLocus.direction.y,
                                     imageLocus.direction.z};
-    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
-      return false;
-    }
 
-    // If we are here then everything went well so save the pixel and return true
+    // Save off the look vector
     m_lookB[0] = locusVec[0];
     m_lookB[1] = locusVec[1];
     m_lookB[2] = locusVec[2];
     m_newLookB = true;
+
+    // Check for a ground intersection
+    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
+      return false;
+    }
+
     p_pointComputed = true;
-    p_childSample = sample;
-    p_childLine = line;
     if (!m_et) {
       m_et = new iTime();
     }
