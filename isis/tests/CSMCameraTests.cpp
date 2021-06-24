@@ -44,6 +44,18 @@ TEST_F(CSMCameraFixture, SetImage) {
 }
 
 
+TEST_F(CSMCameraFixture, SetImageNoIntersect) {
+  csm::Ellipsoid wgs84;
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
+      .Times(1)
+      // looking straight down X-Axis
+      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, 0, 1, 0)));
+
+  EXPECT_FALSE(testCam->SetImage(5, 5));
+  EXPECT_THAT(testCam->lookDirectionBodyFixed(), ::testing::ElementsAre(0.0, 1.0, 0.0));
+}
+
+
 TEST_F(CSMCameraDemFixture, SetImage) {
   EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
