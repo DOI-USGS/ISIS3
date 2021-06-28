@@ -70,10 +70,6 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * `mkdir build install`
   * There should now be a build/ install/ and isis/ directory.
 
-* cd into the build directory and configure your build:
-  * `cmake -DisisData=<path-to-isis3-data> -DisisTestData=<path-to-isis3-test-data> -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -GNinja <source directory>`
-  * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
-
 * Set your ISISROOT to `/the/path/to/your/build`:
   * `export ISISROOT=$(pwd)`
   * **For internal instructions, see `Details` section below.**
@@ -103,6 +99,14 @@ echo -e "alias setisis='. /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh'" 
 
 </details>
 <br/>
+
+* If you want to run the tests set the ISISDATA and ISISTESTDATA directories
+  * `export ISISDATA=/path/to/your/data/directory`
+  * `export ISISTESTDATA=/path/to/your/test/data/directory`
+
+* cd into the build directory and configure your build:
+  * `cmake -DJP2KFLAG=OFF -GNinja <source directory>`
+  * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
 * Build ISIS inside of your build directory and install it to your install directory:
   * `ninja install`
