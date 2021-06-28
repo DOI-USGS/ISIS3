@@ -84,7 +84,7 @@ TEST_F(DefaultCube, FunctionalTestNoprojExpand) {
 
   std::unique_ptr<Histogram> hist (oCube.histogram(1));
   EXPECT_NEAR(hist->Average(), 127.50009071999523, .000001);
-  EXPECT_NEAR(hist->Sum(), 166542786, .0001);
+  EXPECT_NEAR(hist->Sum(), 166542786, 1);
   EXPECT_EQ(hist->ValidPixels(), 1306217);
   EXPECT_NEAR(hist->StandardDeviation(), 68.416277416274923, .0001);
 }
