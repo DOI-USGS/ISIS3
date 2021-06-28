@@ -117,7 +117,7 @@ namespace Isis {
 
       bundleImage->setParentObservation(bundleObservation);
 
-      // updateo observation number to observation ptr map
+      // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map

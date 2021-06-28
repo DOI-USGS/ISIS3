@@ -35,7 +35,7 @@ namespace Isis {
 
 
   /**
-   * Constructs a CsmBundleObservation from an BundleImage, an instrument id, an observation
+   * Constructs a CsmBundleObservation from a BundleImage, an instrument id, an observation
    * number to assign to this CsmBundleObservation, and a target body.
    *
    * @param image QSharedPointer to the primary image in the observation
