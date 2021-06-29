@@ -4,6 +4,7 @@
 #include "csm/csm.h"
 #include "csm/Ellipsoid.h"
 
+#include "CSMCamera.h"
 #include "Fixtures.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -13,6 +14,8 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "Fixtures.h"
+#include "SerialNumber.h"
+#include "SerialNumberList.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -38,6 +41,18 @@ TEST_F(CSMCameraFixture, SetImage) {
 
   iTime refTime("2000-01-01T11:58:55.816");
   EXPECT_EQ((refTime + 10.0).Et(), testCam->time().Et());
+}
+
+
+TEST_F(CSMCameraFixture, SetImageNoIntersect) {
+  csm::Ellipsoid wgs84;
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(csm::ImageCoord(4.5, 4.5)), ::testing::_, ::testing::_, ::testing::_))
+      .Times(1)
+      // looking straight down X-Axis
+      .WillOnce(::testing::Return(csm::EcefLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, 0, 1, 0)));
+
+  EXPECT_FALSE(testCam->SetImage(5, 5));
+  EXPECT_THAT(testCam->lookDirectionBodyFixed(), ::testing::ElementsAre(0.0, 1.0, 0.0));
 }
 
 
@@ -247,6 +262,217 @@ TEST_F(CSMCameraSetFixture, EmissionAngle) {
       .WillOnce(::testing::Return(imageLocus.point));
 
   EXPECT_DOUBLE_EQ(testCam->EmissionAngle(), 0.0);
+}
+
+
+TEST_F(CSMCameraSetFixture, GroundPartials) {
+  std::vector<double> expectedPartials = {1, 2, 3, 4, 5, 6};
+  EXPECT_CALL(mockModel, computeGroundPartials(MatchEcefCoord(groundPt)))
+      .Times(1)
+      .WillOnce(::testing::Return(expectedPartials));
+
+  std::vector<double> groundPartials = dynamic_cast<CSMCamera*>(testCam)->GroundPartials();
+  ASSERT_EQ(groundPartials.size(), 6);
+  EXPECT_EQ(groundPartials[0], expectedPartials[0]);
+  EXPECT_EQ(groundPartials[1], expectedPartials[1]);
+  EXPECT_EQ(groundPartials[2], expectedPartials[2]);
+  EXPECT_EQ(groundPartials[3], expectedPartials[3]);
+  EXPECT_EQ(groundPartials[4], expectedPartials[4]);
+  EXPECT_EQ(groundPartials[5], expectedPartials[5]);
+}
+
+
+TEST_F(CSMCameraSetFixture, SensorPartials) {
+  std::pair<double,double> expectedPartials = {1.23, -5.43};
+  EXPECT_CALL(mockModel, computeSensorPartials(1, MatchEcefCoord(groundPt), 0.001, NULL, NULL))
+      .Times(1)
+      .WillOnce(::testing::Return(expectedPartials));
+
+  std::vector<double> groundPartials =
+      dynamic_cast<CSMCamera*>(testCam)->getSensorPartials(1, testCam->GetSurfacePoint());
+  ASSERT_EQ(groundPartials.size(), 2);
+  EXPECT_EQ(groundPartials[0], expectedPartials.first);
+  EXPECT_EQ(groundPartials[1], expectedPartials.second);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesSet) {
+  std::vector<int> paramIndices = {0, 1, 2};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterType(0))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(1))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(2))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(csm::param::ADJUSTABLE);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesType) {
+  std::vector<int> paramIndices = {1, 2};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterType(0))
+      .WillRepeatedly(::testing::Return(csm::param::FIXED));
+  EXPECT_CALL(mockModel, getParameterType(1))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+  EXPECT_CALL(mockModel, getParameterType(2))
+      .WillRepeatedly(::testing::Return(csm::param::REAL));
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(csm::param::REAL);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesList) {
+  std::vector<int> paramIndices = {2, 0};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1"));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"Parameter 3", "Parameter 1"};
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesListComparison) {
+  std::vector<int> paramIndices = {2, 0, 1};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1  "));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("  Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"PARAMETER 3", "  Parameter 1", "parameter 2  "};
+
+  std::vector<int> indices = dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  ASSERT_EQ(indices.size(), paramIndices.size());
+  for (size_t i = 0; i < paramIndices.size(); i++) {
+    EXPECT_EQ(indices[i], paramIndices[i]) << "Error at index " << i;
+  }
+}
+
+
+TEST_F(CSMCameraFixture, getParameterIndicesListError) {
+  std::vector<int> paramIndices = {3, 1};
+  EXPECT_CALL(mockModel, getNumParameters())
+      .WillRepeatedly(::testing::Return(3));
+  EXPECT_CALL(mockModel, getParameterName(0))
+      .WillRepeatedly(::testing::Return("Parameter 1"));
+  EXPECT_CALL(mockModel, getParameterName(1))
+      .WillRepeatedly(::testing::Return("Parameter 2"));
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .WillRepeatedly(::testing::Return("Parameter 3"));
+
+  QStringList paramList = {"Parameter 4", "Parameter 1", "Parameter 0"};
+
+  try
+  {
+    dynamic_cast<CSMCamera*>(testCam)->getParameterIndices(paramList);
+  }
+  catch(Isis::IException &e)
+  {
+    EXPECT_TRUE(e.toString().toLatin1().contains("Failed to find indices for the following parameters ["
+        "Parameter 4,Parameter 0].")) << e.toString().toStdString();
+  }
+  catch(...)
+  {
+      FAIL() << "Expected an IException with message \""
+      "Failed to find indices for the following parameters [Parameter 4,Parameter 0].\"";
+  }
+}
+
+
+TEST_F(CSMCameraFixture, applyParameterCorrection) {
+  EXPECT_CALL(mockModel, getParameterValue(2))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+  EXPECT_CALL(mockModel, setParameterValue(2, 1.5))
+      .Times(1);
+
+  dynamic_cast<CSMCamera*>(testCam)->applyParameterCorrection(2, 1.0);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterCovariance) {
+  EXPECT_CALL(mockModel, getParameterCovariance(2, 3))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterCovariance(2, 3), 0.5);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterName) {
+  EXPECT_CALL(mockModel, getParameterName(2))
+      .Times(1)
+      .WillOnce(::testing::Return("Omega Bias"));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterName(2), "Omega Bias");
+}
+
+
+TEST_F(CSMCameraFixture, getParameterValue) {
+  EXPECT_CALL(mockModel, getParameterValue(2))
+      .Times(1)
+      .WillOnce(::testing::Return(0.5));
+
+  EXPECT_DOUBLE_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterValue(2), 0.5);
+}
+
+
+TEST_F(CSMCameraFixture, getParameterUnits) {
+  EXPECT_CALL(mockModel, getParameterUnits(2))
+      .Times(1)
+      .WillOnce(::testing::Return("m"));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getParameterUnits(2), "m");
+}
+
+
+TEST_F(CSMCameraSetFixture, SerialNumber) {
+  QString sn = SerialNumber::Compose(*testCube);
+  SerialNumberList snl;
+
+  snl.add(testCube->fileName());
+  QString instId = snl.spacecraftInstrumentId(sn);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, sn, "TestPlatform/TestInstrument/2000-01-01T11:58:55.816");
+  EXPECT_TRUE(snl.hasSerialNumber(sn));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instId, "TESTPLATFORM/TESTINSTRUMENT");
+}
+
+
+TEST_F(CSMCameraFixture, CameraState) {
+  std::string testString = "MockSensorModel\nTestModelState";
+  EXPECT_CALL(mockModel, getModelState())
+      .Times(1)
+      .WillOnce(::testing::Return(testString));
+
+  EXPECT_EQ(dynamic_cast<CSMCamera*>(testCam)->getModelState().toStdString(), testString);
 }
 
 

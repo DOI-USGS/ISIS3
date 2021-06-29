@@ -1,6 +1,8 @@
 #include "TestCsmModel.h"
+#include <math.h>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -9,24 +11,29 @@ const std::string TestCsmModel::SENSOR_MODEL_NAME = "TestCsmModel";
 
 // Sensor model Parameter names
 const std::vector<std::string> TestCsmModel::PARAM_NAMES = {
-  "test_param_one",
-  "test_param_two"
+  "center_latitude",
+  "center_longitude",
+  "scale", // pixels per degree
 };
 
 // Sensor model Parameter units
 const std::vector<std::string> TestCsmModel::PARAM_UNITS = {
-  "m",
-  "rad"
+//  "unitless", // Are these used/defined in an enum or anything like this?
+  "rad", // TODO: or degree?
+  "rad",
+  "pixels per degree",
 };
 
 // Sensor model Parameter Types
 const std::vector<csm::param::Type> TestCsmModel::PARAM_TYPES = {
-  csm::param::FICTITIOUS,
+  csm::param::REAL,
+  csm::param::REAL,
   csm::param::REAL
 };
 
 // Sensor model Parameter sharing criteria
 const std::vector<csm::SharingCriteria> TestCsmModel::PARAM_SHARING_CRITERIA = {
+  csm::SharingCriteria(),
   csm::SharingCriteria(),
   csm::SharingCriteria()
 };
@@ -37,6 +44,8 @@ const std::vector<csm::SharingCriteria> TestCsmModel::PARAM_SHARING_CRITERIA = {
  */
 TestCsmModel::TestCsmModel() {
   m_param_values.resize(TestCsmModel::PARAM_NAMES.size(), 0.0);
+  m_param_sigmas.resize(TestCsmModel::PARAM_NAMES.size(), 0.0);
+  m_noAdjustments = std::vector<double>(TestCsmModel::PARAM_NAMES.size(), 0.0);
 };
 
 
@@ -49,7 +58,7 @@ TestCsmModel::~TestCsmModel() {
 
 /**
  * Returns the sensor model family.
- * 
+ *
  * @return std::string Sensor model family
  */
 std::string TestCsmModel::getFamily() const {
@@ -59,7 +68,7 @@ std::string TestCsmModel::getFamily() const {
 
 /**
  * Returns the version of the sensor model
- * 
+ *
  * @return csm::Version sensor model version
  */
 csm::Version TestCsmModel::getVersion() const {
@@ -69,7 +78,7 @@ csm::Version TestCsmModel::getVersion() const {
 
 /**
  * Returns the name of the sensor model.
- * 
+ *
  * @return std::string sensor model name
  */
 std::string TestCsmModel::getModelName() const {
@@ -79,7 +88,7 @@ std::string TestCsmModel::getModelName() const {
 
 /**
  * Returns the pedigree of the sensor model.
- * 
+ *
  * @return std::string sensor model pedigree
  */
 std::string TestCsmModel::getPedigree() const {
@@ -89,7 +98,7 @@ std::string TestCsmModel::getPedigree() const {
 
 /**
  * Returns the image identifier.
- * 
+ *
  * @return std::string image identifier
  */
 std::string TestCsmModel::getImageIdentifier() const {
@@ -99,7 +108,7 @@ std::string TestCsmModel::getImageIdentifier() const {
 
 /**
  * Does nothing. Empty implementation for test.
- * 
+ *
  * @param imageId image identifier
  * @param warnings CSM warnings list
  */
@@ -110,8 +119,8 @@ void TestCsmModel::setImageIdentifier(const std::string& imageId,
 
 
 /**
- * Returns the sensor identifier for the sensor model. 
- * 
+ * Returns the sensor identifier for the sensor model.
+ *
  * @return std::string sensor identifier
  */
 std::string TestCsmModel::getSensorIdentifier() const {
@@ -121,7 +130,7 @@ std::string TestCsmModel::getSensorIdentifier() const {
 
 /**
  * Returns the platform identifier for the sensor model.
- * 
+ *
  * @return std::string platform identifier
  */
 std::string TestCsmModel::getPlatformIdentifier() const {
@@ -131,7 +140,7 @@ std::string TestCsmModel::getPlatformIdentifier() const {
 
 /**
  * Returns the collection identifier for the sensor model.
- * 
+ *
  * @return std::string collection identifier
  */
 std::string TestCsmModel::getCollectionIdentifier() const {
@@ -140,8 +149,8 @@ std::string TestCsmModel::getCollectionIdentifier() const {
 
 
 /**
- * Returns the trajectory identifier for the sensor model. 
- * 
+ * Returns the trajectory identifier for the sensor model.
+ *
  * @return std::string trajectory identifier
  */
 std::string TestCsmModel::getTrajectoryIdentifier() const {
@@ -151,7 +160,7 @@ std::string TestCsmModel::getTrajectoryIdentifier() const {
 
 /**
  * Reeturns the sensor type for the sensor model.
- * 
+ *
  * @return std::string sensor type
  */
 std::string TestCsmModel::getSensorType() const {
@@ -161,7 +170,7 @@ std::string TestCsmModel::getSensorType() const {
 
 /**
  * Returns the sensor mode for the sensor model
- * 
+ *
  * @return std::string sensor mode
  */
 std::string TestCsmModel::getSensorMode() const {
@@ -171,47 +180,68 @@ std::string TestCsmModel::getSensorMode() const {
 
 /**
  * Returns the reference date and time for the sensor model
- * 
+ *
  * @return std::string reference date and time
  */
 std::string TestCsmModel::getReferenceDateAndTime() const {
-  return "20000101T115959Z";
+  std::string timeString;
+  timeString = "20000101T12000" + std::to_string(m_referenceTime) + "Z";
+  return timeString;
 }
 
 
 /**
- * Returns the current model state for the sensor model. 
- * 
+ * Returns the current model state for the sensor model.
+ *
  * @return std::string model state
  */
 std::string TestCsmModel::getModelState() const {
   json state;
+  state["reference_time"] =  m_referenceTime;
+
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
     state[TestCsmModel::PARAM_NAMES[param_index]] = m_param_values[param_index];
   }
+
+  state["center_latitude_sigma"] = m_param_sigmas[0];
+  state["center_longitude_sigma"] = m_param_sigmas[1];
+  state["scale_sigma"] = m_param_sigmas[2];
+
   return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 
 /**
- * Uses the supplied sensor model state to set the steat of the current sensor model. 
- * 
+ * Uses the supplied sensor model state to set the steat of the current sensor model.
+ *
  * @param argState the model state
  */
 void TestCsmModel::replaceModelState(const std::string& argState) {
   // Get the JSON substring
   json state = json::parse(argState.substr(argState.find("\n") + 1));
+
+  // set reference time
+  m_referenceTime = state.at("reference_time");
+
+  // set parameter values
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
-    m_param_values[param_index] = state.at(TestCsmModel::PARAM_NAMES[param_index]);
+    // No error-checking, but that's probably fine for now.
+    m_param_values[param_index] = double(state.at(TestCsmModel::PARAM_NAMES[param_index]));
+  }
+
+  // set parameter sigmas
+  for (size_t sigma_index = 0; sigma_index < m_param_sigmas.size(); sigma_index++) {
+    // No error-checking, but that's probably fine for now.
+    m_param_sigmas[sigma_index] = double(state.at(TestCsmModel::PARAM_NAMES[sigma_index]+"_sigma"));
   }
 }
 
 
 /**
  * Constructs and returns a sensor model state from an ISD.
- * 
+ *
  * @param isd instrument support data
- * 
+ *
  * @return std::string sensor model state
  */
 std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
@@ -221,21 +251,26 @@ std::string TestCsmModel::constructStateFromIsd(const csm::Isd isd){
   if (isdFile.fail()) {
     std::cout << "Could not open file: " << filename << std::endl;
   }
-
   json parsedIsd;
   isdFile >> parsedIsd;
-  // Only extract the first 2 parameters from the file
+  // TODO: modified this so no longer true. Breaks existing tests? *Only extract the first 2 parameters from the file*
   json state;
+  state["reference_time"] =  parsedIsd.at("reference_time");
   for (size_t param_index = 0; param_index < m_param_values.size(); param_index++) {
     state[TestCsmModel::PARAM_NAMES[param_index]] = parsedIsd.at(TestCsmModel::PARAM_NAMES[param_index]);
   }
+  state["center_latitude_sigma"] = parsedIsd.at("center_latitude_sigma");
+  state["center_longitude_sigma"] = parsedIsd.at("center_longitude_sigma");
+  state["scale_sigma"] = parsedIsd.at("scale_sigma");
+
+  std::cout << "state output: " <<   TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump() << std::endl;;
   return TestCsmModel::SENSOR_MODEL_NAME + "\n" + state.dump();
 }
 
 
 /**
- * Returns a default reference point. 
- * 
+ * Returns a default reference point.
+ *
  * @return csm::EcefCoord reference point
  */
 csm::EcefCoord TestCsmModel::getReferencePoint() const {
@@ -245,7 +280,7 @@ csm::EcefCoord TestCsmModel::getReferencePoint() const {
 
 /**
  * Does nothing. Minimal implementation for test.
- * 
+ *
  * @param groundPt the ground point
  */
 void TestCsmModel::setReferencePoint(const csm::EcefCoord& groundPt) {
@@ -255,7 +290,7 @@ void TestCsmModel::setReferencePoint(const csm::EcefCoord& groundPt) {
 
 /**
  * Returns the number of sensor model parameters
- * 
+ *
  * @return int number of parameters
  */
 int TestCsmModel::getNumParameters() const {
@@ -265,9 +300,9 @@ int TestCsmModel::getNumParameters() const {
 
 /**
  * Returns the semsor model parameter name at the provided index
- * 
+ *
  * @param index parameter index
- * 
+ *
  * @return std::string parameter name
  */
 std::string TestCsmModel::getParameterName(int index) const {
@@ -277,9 +312,9 @@ std::string TestCsmModel::getParameterName(int index) const {
 
 /**
  * Returns the sensor model parameter units at the provided index
- * 
+ *
  * @param index parameter unit index
- * 
+ *
  * @return std::string parameter units
  */
 std::string TestCsmModel::getParameterUnits(int index) const {
@@ -288,8 +323,8 @@ std::string TestCsmModel::getParameterUnits(int index) const {
 
 
 /**
- * True if the sensor model has sharable parameters. 
- * 
+ * True if the sensor model has sharable parameters.
+ *
  * @return bool Always returns false
  */
 bool TestCsmModel::hasShareableParameters() const {
@@ -299,9 +334,9 @@ bool TestCsmModel::hasShareableParameters() const {
 
 /**
  * True if the sensor model parameter at the provided index is sharable.
- * 
+ *
  * @param index Parameter index
- * 
+ *
  * @return bool Always returns false
  */
 bool TestCsmModel::isParameterShareable(int index) const {
@@ -312,9 +347,9 @@ bool TestCsmModel::isParameterShareable(int index) const {
 
 /**
  * Returns the sharing criteria for the sensor model parameter at the provided index
- * 
+ *
  * @param index Parameter index
- * 
+ *
  * @return csm::SharingCriteria CSM sharing criteria for the parameter
  */
 csm::SharingCriteria TestCsmModel::getParameterSharingCriteria(int index) const {
@@ -324,9 +359,9 @@ csm::SharingCriteria TestCsmModel::getParameterSharingCriteria(int index) const 
 
 /**
  * Returns the sensor model parameter value at the provided index.
- * 
+ *
  * @param index Parameter index
- * 
+ *
  * @return double Value at provided index
  */
 double TestCsmModel::getParameterValue(int index) const {
@@ -335,9 +370,9 @@ double TestCsmModel::getParameterValue(int index) const {
 
 
 /**
- * Set the sensor model parameter at the provided index to the provided 
- * value. 
- * 
+ * Set the sensor model parameter at the provided index to the provided
+ * value.
+ *
  * @param index Parameter index
  * @param value Value to set the parameter to
  */
@@ -348,9 +383,9 @@ void TestCsmModel::setParameterValue(int index, double value) {
 
 /**
  * Returns the type of the sensor model parameter at the provided index.
- * 
+ *
  * @param index Parameter index
- * 
+ *
  * @return csm::param::Type Type of parameter
  */
 csm::param::Type TestCsmModel::getParameterType(int index) const {
@@ -360,7 +395,7 @@ csm::param::Type TestCsmModel::getParameterType(int index) const {
 
 /**
  * Does nothing. Minimal implementation for testing
- * 
+ *
  * @param index Parameter index
  * @param pType Parameter type
  */
@@ -370,19 +405,19 @@ void TestCsmModel::setParameterType(int index, csm::param::Type pType) {
 
 
 /**
- * Returns the covariance between the two sensor model parameters at the provided indicies. 
- * Defaults to identity covariance matrix for testing. 
- * 
+ * Returns the covariance between the two sensor model parameters at the provided indicies.
+ * Defaults to identity covariance matrix for testing.
+ *
  * @param index1 First parameter index
  * @param index2 Second parameter index
- * 
+ *
  * @return double Parameter covariance
  */
 double TestCsmModel::getParameterCovariance(int index1,
                                             int index2) const {
-  // default to identity covariance matrix
+  // Just return variances along the diagonal
   if (index1 == index2) {
-    return 1.0;
+    return m_param_sigmas[index1]*m_param_sigmas[index1];
   }
   return 0.0;
 }
@@ -390,7 +425,7 @@ double TestCsmModel::getParameterCovariance(int index1,
 
 /**
  * Does nothing. Minimal implementation for testing.
- * 
+ *
  * @param index1 First parameter index
  * @param index2 Second parameter index
  * @param covariance Covariance between the two parameters
@@ -404,7 +439,7 @@ void TestCsmModel::setParameterCovariance(int index1,
 
 /**
  * Returns the number of geometric correction switches.
- * 
+ *
  * @return int Number of geometric correction switches.
  */
 int TestCsmModel::getNumGeometricCorrectionSwitches() const {
@@ -413,10 +448,10 @@ int TestCsmModel::getNumGeometricCorrectionSwitches() const {
 
 
 /**
- * Always throws an error, as no geometric correction switches exist for this class. 
- *  
+ * Always throws an error, as no geometric correction switches exist for this class.
+ *
  * @param index Geometric correction index
- * 
+ *
  * @return std::string Geometric correction
  */
 std::string TestCsmModel::getGeometricCorrectionName(int index) const {
@@ -425,9 +460,9 @@ std::string TestCsmModel::getGeometricCorrectionName(int index) const {
 }
 
 
-/** 
+/**
  * Always throws an error, as no geometric correction switches exist for this class.
- * 
+ *
  * @param index Geometric correction index
  * @param value Value to set
  * @param pType Parameter type
@@ -442,9 +477,9 @@ void TestCsmModel::setGeometricCorrectionSwitch(int index,
 
 /**
  * Always throws an error, as no geometric correction switches exist for this class.
- * 
+ *
  * @param index Geometric correction index
- * 
+ *
  * @return bool If the geometric correction switch can be accessed.
  */
 bool TestCsmModel::getGeometricCorrectionSwitch(int index) const {
@@ -455,11 +490,11 @@ bool TestCsmModel::getGeometricCorrectionSwitch(int index) const {
 
 /**
  * Returns the cross covariance matrix.
- * 
+ *
  * @param comparisonModel The geometric model to compare with.
  * @param pSet Set of parameters to use
  * @param otherModels Not used.
- * 
+ *
  * @return std::vector<double> covariance matrix
  */
 std::vector<double> TestCsmModel::getCrossCovarianceMatrix(
@@ -484,14 +519,34 @@ std::vector<double> TestCsmModel::getCrossCovarianceMatrix(
   return covariance;
 }
 
-// csm::RasterGM methods
 csm::ImageCoord TestCsmModel::groundToImage(const csm::EcefCoord& groundPt,
                          double desiredPrecision,
                          double* achievedPrecision,
                          csm::WarningList* warnings) const {
-  return csm::ImageCoord(0.0,0.0);
+
+  return groundToImage(groundPt, m_noAdjustments, desiredPrecision, achievedPrecision, warnings);
 }
 
+
+csm::ImageCoord TestCsmModel::groundToImage(const csm::EcefCoord& groundPt, const std::vector<double> &adjustments,
+                         double desiredPrecision,
+                         double* achievedPrecision,
+                         csm::WarningList* warnings) const {
+  csm::ImageCoord imageCoord;
+
+  double center_lat = getValue(0, adjustments);
+  double center_longitude = getValue(1, adjustments);
+  double scale = getValue(2, adjustments);
+
+  double R = 1000000;
+  double lat = asin(groundPt.z/R)*(180/M_PI);
+  double lon = atan2(groundPt.y, groundPt.x)*(180/M_PI);
+
+  imageCoord.samp = (lon - center_longitude)*scale + getImageSize().samp/2.0;
+  imageCoord.line = (lat - center_lat)*scale + getImageSize().line/2.0;
+
+  return imageCoord;
+}
 
 csm::ImageCoordCovar TestCsmModel::groundToImage(const csm::EcefCoordCovar& groundPt,
                               double desiredPrecision,
@@ -499,14 +554,30 @@ csm::ImageCoordCovar TestCsmModel::groundToImage(const csm::EcefCoordCovar& grou
                               csm::WarningList* warnings) const {
   return csm::ImageCoordCovar(0.0, 0.0, 0.0, 0.0, 0.0);
 }
-  
+
 
 csm::EcefCoord TestCsmModel::imageToGround(const csm::ImageCoord& imagePt,
                                double height,
                                double desiredPrecision,
                                double* achievedPrecision,
                                csm::WarningList* warnings) const {
-  return csm::EcefCoord(0.0, 0.0, 0.0);
+  csm::EcefCoord groundPt;
+
+  double center_lat = m_param_values[0];
+  double center_longitude = m_param_values[1];
+  double scale = m_param_values[2];
+
+  double lon = center_longitude + (imagePt.samp - getImageSize().samp/2.0)/scale;
+  double lat = center_lat + (imagePt.line - getImageSize().line/2.0)/scale;
+  lon *= M_PI/180;
+  lat *= M_PI/180;
+
+  double R = 1000000.0; // TODO: getfromElliposid?
+  groundPt.x = R * cos(lat) * cos(lon);
+  groundPt.y = R * cos(lat) * sin(lon);
+  groundPt.z = R * sin(lat);
+
+  return groundPt;
 }
 
 csm::EcefCoordCovar TestCsmModel::imageToGround(const csm::ImageCoordCovar& imagePt,
@@ -515,7 +586,8 @@ csm::EcefCoordCovar TestCsmModel::imageToGround(const csm::ImageCoordCovar& imag
                                     double desiredPrecision,
                                     double* achievedPrecision,
                                     csm::WarningList* warnings) const {
-  return csm::EcefCoordCovar(0.0, 0.0, 0.0);
+  csm::EcefCoordCovar groundPt;
+  return groundPt;
 }
 
 
@@ -525,6 +597,8 @@ csm::EcefLocus TestCsmModel::imageToProximateImagingLocus(
   double desiredPrecision,
   double* achievedPrecision,
   csm::WarningList* warnings) const {
+
+  // TODO: not required to implement for testing, but return the ground point as the point for the locus
   return csm::EcefLocus(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 }
 
@@ -534,7 +608,19 @@ csm::EcefLocus TestCsmModel::imageToRemoteImagingLocus(
   double desiredPrecision,
   double* achievedPrecision,
   csm::WarningList* warnings) const {
-  return csm::EcefLocus(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+  // Convert: center lat, lon, radius+altitude to x,y,z and use that for s/c position
+  csm::EcefCoord sensorPosition = getSensorPosition(imagePt);
+
+  // Look vector = scale_to_unit_vector(groundPt - sensorPosition)
+  csm::EcefCoord groundPt = imageToGround(imagePt);
+  std::vector<double> look(3);
+  look[0] = groundPt.x - sensorPosition.x;
+  look[1] = groundPt.y - sensorPosition.y;
+  look[2] = groundPt.z - sensorPosition.z;
+  double length = sqrt(look[0]*look[0] + look[1]*look[1] + look[2]*look[2]);
+
+  return csm::EcefLocus(sensorPosition.x, sensorPosition.y, sensorPosition.z, look[0]/length, look[1]/length, look[2]/length);
 }
 
 
@@ -544,7 +630,8 @@ csm::ImageCoord TestCsmModel::getImageStart() const {
 
 
 csm::ImageVector TestCsmModel::getImageSize() const {
-  return csm::ImageVector(0.0, 0.0);
+  // todo: should probably come from input ISD
+  return csm::ImageVector(1024, 1024);
 }
 
 
@@ -571,7 +658,19 @@ double TestCsmModel::getImageTime(const csm::ImageCoord& imagePt) const {
 
 
 csm::EcefCoord TestCsmModel::getSensorPosition(const csm::ImageCoord& imagePt) const {
-  return csm::EcefCoord(0.0, 0.0, 0.0);
+  // Convert: center lat, lon, radius+altitude to x,y,z and use that for s/c position
+  csm::EcefCoord sensorPosition;
+
+  double lon = m_param_values[1] * M_PI/180;
+  double lat = m_param_values[0] * M_PI/180;
+
+  double altitude = 10000; // TODO: more realistic value?
+  double R = 1000000.0 + altitude; // TODO: getfromElliposid?  // only line different from imageToGround.
+  sensorPosition.x = R * cos(lat) * cos(lon);
+  sensorPosition.y = R * cos(lat) * sin(lon);
+  sensorPosition.z = R * sin(lat);
+
+  return sensorPosition;
 }
 
 
@@ -596,7 +695,8 @@ csm::RasterGM::SensorPartials TestCsmModel::computeSensorPartials(
             double desiredPrecision,
             double* achievedPrecision,
             csm::WarningList* warnings) const {
-  return csm::RasterGM::SensorPartials(0.0, 0.0);
+  csm::ImageCoord imagePt = groundToImage(groundPt, desiredPrecision, achievedPrecision);
+  return computeSensorPartials(index, imagePt, groundPt, desiredPrecision, achievedPrecision);
 }
 
 
@@ -607,14 +707,68 @@ csm::RasterGM::SensorPartials TestCsmModel::computeSensorPartials(
             double desiredPrecision,
             double* achievedPrecision,
             csm::WarningList* warnings) const {
-  
-  return csm::RasterGM::SensorPartials(0.0, 0.0);
+
+  double delta = 1.0;
+
+  // latitude/longitude
+  if (index == 2) {
+    delta = 0.5;
+  }
+  else {
+    // scale
+    delta = 0.0035;
+  }
+
+  std::vector<double> parameterAdjustments(getNumParameters(), 0.0);
+  parameterAdjustments[index] = delta;
+
+  csm::ImageCoord imagePt1 = groundToImage(groundPt, parameterAdjustments, desiredPrecision, achievedPrecision);
+
+  csm::RasterGM::SensorPartials partials;
+
+  partials.first = (imagePt1.line - imagePt.line) / delta;
+  partials.second = (imagePt1.samp - imagePt.samp) / delta;
+
+  return partials;
 }
 
 
 std::vector<double> TestCsmModel::computeGroundPartials(const csm::EcefCoord& groundPt) const {
-  std::vector<double> vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  return vec;
+ // Partial of line, sample wrt X, Y, Z
+  double x = groundPt.x;
+  double y = groundPt.y;
+  double z = groundPt.z;
+
+  csm::ImageCoord ipB = groundToImage(groundPt);
+  csm::EcefCoord nextPoint = imageToGround(csm::ImageCoord(ipB.line + 1, ipB.samp + 1));
+
+  double dx = nextPoint.x - x;
+  double dy = nextPoint.y - y;
+  double dz = nextPoint.z - z;
+
+  double pixelGroundSize = sqrt((dx * dx + dy * dy + dz * dz) / 2.0);
+  // If the ground size is too small, try the opposite direction
+  if (pixelGroundSize < 1e-10) {
+    nextPoint = imageToGround(csm::ImageCoord(ipB.line - 1, ipB.samp - 1));
+    dx = nextPoint.x - x;
+    dy = nextPoint.y - y;
+    dz = nextPoint.z - z;
+    pixelGroundSize = sqrt((dx * dx + dy * dy + dz * dz) / 2.0);
+  }
+
+  csm::ImageCoord ipX = groundToImage(csm::EcefCoord(x + pixelGroundSize, y, z));
+  csm::ImageCoord ipY = groundToImage(csm::EcefCoord(x, y + pixelGroundSize, z));
+  csm::ImageCoord ipZ = groundToImage(csm::EcefCoord(x, y, z + pixelGroundSize));
+
+  std::vector<double> partials(6, 0.0);
+  partials[0] = (ipX.line - ipB.line) / pixelGroundSize;
+  partials[3] = (ipX.samp - ipB.samp) / pixelGroundSize;
+  partials[1] = (ipY.line - ipB.line) / pixelGroundSize;
+  partials[4] = (ipY.samp - ipB.samp) / pixelGroundSize;
+  partials[2] = (ipZ.line - ipB.line) / pixelGroundSize;
+  partials[5] = (ipZ.samp - ipB.samp) / pixelGroundSize;
+
+  return partials;
 }
 
 const csm::CorrelationModel& TestCsmModel::getCorrelationModel() const {
@@ -628,3 +782,12 @@ std::vector<double> TestCsmModel::getUnmodeledCrossCovariance(
   return vec;
 }
 
+
+csm::Ellipsoid TestCsmModel::getEllipsoid() const {
+  return csm::Ellipsoid(1000000, 1000000);
+}
+
+
+double TestCsmModel::getValue(int index, const std::vector<double> &adjustments) const {
+  return m_param_values[index] + adjustments[index];
+}

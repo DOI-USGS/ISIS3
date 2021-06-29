@@ -1657,8 +1657,8 @@ namespace Isis {
 
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
-    std::vector<double> sB = bodyRotation()->ReferenceVector(
-        instrumentPosition()->Coordinate());
+    std::vector<double> sB(3, Isis::Null);
+    instrumentBodyFixedPosition(&sB[0]);
 
     SpiceDouble pB[3];
     SurfacePoint surfacePoint = GetSurfacePoint();

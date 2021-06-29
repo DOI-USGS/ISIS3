@@ -361,6 +361,7 @@ namespace Isis {
         Radar,          //!< Radar Camera
         Point,          //!< Point Camera
         RollingShutter, //!< RollingShutter
+        Csm             //!< Community Sensor Model Camera
       };
 
       /**

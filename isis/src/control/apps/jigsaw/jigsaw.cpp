@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 #include <QString>
 
+#include "Blob.h"
 #include "BundleAdjust.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
@@ -148,15 +149,26 @@ namespace Isis {
               break;
             }
 
-            //  Get Kernel group and add or replace LastModifiedInstrumentPointing
-            //  keyword.
-            Table cmatrix = bundleAdjustment->cMatrix(i);
+            //  Update the image parameters
             QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-            cmatrix.Label().addComment(jigComment);
-            Table spvector = bundleAdjustment->spVector(i);
-            spvector.Label().addComment(jigComment);
-            c->write(cmatrix);
-            c->write(spvector);
+            if (c->hasBlob("CSMState", "String")) {
+              Blob csmStateBlob("CSMState", "String");
+              // Read the BLOB from the cube to propagate things like the model
+              // and plugin name
+              c->read(csmStateBlob);
+              std::string modelState = bundleAdjustment->modelState(i).toStdString();
+              csmStateBlob.setData(modelState.c_str(), modelState.size());
+              csmStateBlob.Label().addComment(jigComment);
+              c->write(csmStateBlob);
+            }
+            else {
+              Table cmatrix = bundleAdjustment->cMatrix(i);
+              cmatrix.Label().addComment(jigComment);
+              Table spvector = bundleAdjustment->spVector(i);
+              spvector.Label().addComment(jigComment);
+              c->write(cmatrix);
+              c->write(spvector);
+            }
             p.WriteHistory(*c);
           }
           gp += PvlKeyword("Status", "Camera pointing updated");
@@ -443,6 +455,29 @@ namespace Isis {
                                                               positionVelocityAprioriSigma,
                                                               positionAccelerationAprioriSigma);
 
+      if ((ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVETYPE")) ||
+          (ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVELIST")) ||
+          (ui.WasEntered("CSMSOLVETYPE") && ui.WasEntered("CSMSOLVELIST")) ) {
+        QString msg = "Only one of CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST "
+                      "can be specified at a time.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      if (ui.WasEntered("CSMSOLVESET")) {
+        observationSolveSettings.setCSMSolveSet(
+            BundleObservationSolveSettings::stringToCSMSolveSet(ui.GetString("CSMSOLVESET")));
+      }
+      else if (ui.WasEntered("CSMSOLVETYPE")) {
+        observationSolveSettings.setCSMSolveType(
+            BundleObservationSolveSettings::stringToCSMSolveType(ui.GetString("CSMSOLVETYPE")));
+      }
+      else if (ui.WasEntered("CSMSOLVELIST")) {
+        std::vector<QString> csmParamVector;
+        ui.GetString("CSMSOLVELIST", csmParamVector);
+        QStringList csmParamList = QStringList::fromVector(QVector<QString>::fromStdVector(csmParamVector));
+        observationSolveSettings.setCSMSolveParameterList(csmParamList);
+      }
+
       // add all image observation numbers to this BOSS.
       for (int sn = 0; sn < cubeSNs.size(); sn++) {
         observationSolveSettings.addObservationNumber(cubeSNs.observationNumber(sn));
@@ -450,6 +485,7 @@ namespace Isis {
 
       // append the GUI acquired solve parameters to BOSS list.
       observationSolveSettingsList.append(observationSolveSettings);
+
     }
 
 

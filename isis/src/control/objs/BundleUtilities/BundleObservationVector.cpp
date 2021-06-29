@@ -8,9 +8,14 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleObservationVector.h"
 
+#include <algorithm>
+
 #include <QDebug>
 
 #include "BundleObservation.h"
+#include "IsisBundleObservation.h"
+#include "Camera.h"
+#include "CsmBundleObservation.h"
 #include "IException.h"
 
 namespace Isis {
@@ -33,6 +38,7 @@ namespace Isis {
       :QVector<BundleObservationQsp>(src) {
     m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
     m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+    m_instIdToObservationMap = src.m_instIdToObservationMap;
   }
 
 
@@ -60,6 +66,7 @@ namespace Isis {
       QVector<BundleObservationQsp>::operator=(src);
       m_observationNumberToObservationMap = src.m_observationNumberToObservationMap;
       m_imageSerialToObservationMap = src.m_imageSerialToObservationMap;
+      m_instIdToObservationMap = src.m_instIdToObservationMap;
     }
     return *this;
   }
@@ -92,6 +99,7 @@ namespace Isis {
                                                        QString observationNumber,
                                                        QString instrumentId,
                                                        BundleSettingsQsp bundleSettings) {
+
     BundleObservationQsp bundleObservation;
     bool addToExisting = false;
 
@@ -110,25 +118,34 @@ namespace Isis {
       bundleImage->setParentObservation(bundleObservation);
 
       // update observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber,bundleObservation);
+      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
-      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(),bundleObservation);
+      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
     }
     else {
       // create new BundleObservation and append to this vector
-      bundleObservation = BundleObservationQsp(new BundleObservation(bundleImage,
-                                                                     observationNumber,
-                                                                     instrumentId,
-                                               bundleSettings->bundleTargetBody()));
+
+      bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
+
+      if (isIsisObservation) {
+        bundleObservation.reset(new IsisBundleObservation(bundleImage,
+                                                      observationNumber,
+                                                      instrumentId,
+                                                      bundleSettings->bundleTargetBody()));
+      }
+      else {
+        bundleObservation.reset(new CsmBundleObservation(bundleImage,
+                                                         observationNumber,
+                                                         instrumentId,
+                                                         bundleSettings->bundleTargetBody()));
+      }
 
       if (!bundleObservation) {
         QString message = "Unable to allocate new BundleObservation ";
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
-
-      bundleImage->setParentObservation(bundleObservation);
 
       // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
@@ -146,50 +163,35 @@ namespace Isis {
 
       bundleObservation->setIndex(size());
 
+      bundleImage->setParentObservation(bundleObservation);
+
       append(bundleObservation);
+
+      if (isIsisObservation) {
+        QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
+        isisObs->initializeExteriorOrientation();
+        if (bundleSettings->solveTargetBody()) {
+          isisObs->initializeBodyRotation();
+        }
+      }
 
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
-    }
 
+      // update instrument ID to observation ptr map
+      // separate held observations out into their own entry
+      if (bundleObservation->numberParameters() == 0) {
+        m_instIdToObservationMap.insertMulti("held", bundleObservation);
+      }
+      else {
+        m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
+      }
+
+    }
     return bundleObservation;
-  }
-
-
-  /**
-   * Accesses the number of position parameters for the contained BundleObservations.
-   *
-   * @return @b int Returns the total number of position parameters for the BundleObservations
-   */
-  int BundleObservationVector::numberPositionParameters() {
-    int positionParameters = 0;
-
-    for (int i = 0; i < size(); i++) {
-      BundleObservationQsp observation = at(i);
-      positionParameters += observation->numberPositionParameters();
-    }
-
-    return positionParameters;
-  }
-
-
-  /**
-   * Accesses the number of pointing parameters for the contained BundleObservations.
-   *
-   * @return @b int Returns the total number of pointing parameters for the BundleObservations
-   */
-  int BundleObservationVector::numberPointingParameters() {
-    int pointingParameters = 0;
-
-    for (int i = 0; i < size(); i++) {
-      BundleObservationQsp observation = at(i);
-      pointingParameters += observation->numberPointingParameters();
-    }
-
-    return pointingParameters;
   }
 
 
@@ -200,7 +202,12 @@ namespace Isis {
    * @return @b int Returns the total number of parameters for the contained BundleObservations
    */
   int BundleObservationVector::numberParameters() {
-    return numberPositionParameters() + numberPointingParameters();
+    int numParameters = 0;
+
+    for (int i = 0; i < size(); i++) {
+      numParameters += at(i)->numberParameters();
+    }
+    return numParameters;
   }
 
 
@@ -226,33 +233,21 @@ namespace Isis {
 
 
   /**
-   * Initializes the exterior orientations for the contained BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
+   * Get a list of all instrument IDs that there are observations for
    */
-  bool BundleObservationVector::initializeExteriorOrientation() {
-    int nObservations = size();
-    for (int i = 0; i < nObservations; i++) {
-      BundleObservationQsp observation = at(i);
-      observation->initializeExteriorOrientation();
-    }
-
-    return true;
+  QList<QString> BundleObservationVector::instrumentIds() const {
+    return m_instIdToObservationMap.uniqueKeys();
   }
 
 
   /**
-   * Initializes the body rotations for the contained BundleObservations.
-   *
-   * @return @b bool Returns true upon successful initialization
+   * Get all of the observations with a specific instrument ID
    */
-  bool BundleObservationVector::initializeBodyRotation() {
-    int nObservations = size();
-    for (int i = 0; i < nObservations; i++) {
-      BundleObservationQsp observation = at(i);
-      observation->initializeBodyRotation();
-    }
-
-    return true;
+  QList<BundleObservationQsp> BundleObservationVector::
+      observationsByInstId(QString instrumentId) const {
+    QList<BundleObservationQsp> list = m_instIdToObservationMap.values(instrumentId);
+    // multimap returns them in reverse order they were put in, so invert them to preserve order
+    std::reverse(std::begin(list), std::end(list));
+    return list;
   }
 }
