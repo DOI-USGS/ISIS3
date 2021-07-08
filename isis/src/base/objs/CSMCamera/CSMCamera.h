@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QList>
 #include <QPointF>
+#include <QStringList>
 
 #include "csm/csm.h"
 #include "csm/RasterGM.h"
@@ -37,7 +38,7 @@ namespace Isis {
        * @return CameraType Camera::Point
        */
       virtual CameraType GetCameraType() const {
-        return Point;
+        return Csm;
       }
 
       /**
@@ -116,6 +117,21 @@ namespace Isis {
       virtual double RightAscension();
       virtual double Declination();
 
+      std::vector<int> getParameterIndices(csm::param::Set paramSet) const;
+      std::vector<int> getParameterIndices(csm::param::Type paramType) const;
+      std::vector<int> getParameterIndices(QStringList paramList) const;
+      void applyParameterCorrection(int index, double correction);
+      double getParameterCovariance(int index1, int index2);
+      QString getParameterName(int index);
+      QString getParameterUnits(int index);
+      double getParameterValue(int index);
+
+      std::vector<double> getSensorPartials(int index, SurfacePoint groundPoint);
+      virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
+      virtual std::vector<double> GroundPartials();
+
+      QString getModelState() const;
+
     protected:
       void setTarget(Pvl label);
 
@@ -137,7 +153,6 @@ namespace Isis {
 
       virtual std::vector<double> ImagePartials(SurfacePoint groundPoint);
       virtual std::vector<double> ImagePartials();
-
   };
 };
 #endif

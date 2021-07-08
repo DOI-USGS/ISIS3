@@ -307,6 +307,7 @@ namespace Isis {
     return p_et;
   }
 
+
   /**
    * Accessor method to get current time bias.
    *

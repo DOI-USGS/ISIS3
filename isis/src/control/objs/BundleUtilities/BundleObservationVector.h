@@ -9,13 +9,17 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <QList>
 #include <QMap>
+#include <QMultiMap>
 #include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
 #include "BundleImage.h"
 #include "BundleObservation.h"
+#include "IsisBundleObservation.h"
+#include "CsmBundleObservation.h"
 #include "BundleSettings.h"
 
 namespace Isis {
@@ -61,20 +65,20 @@ namespace Isis {
                                   QString instrumentId,
                                   BundleSettingsQsp bundleSettings);
 
-      int numberPositionParameters();
-      int numberPointingParameters();
       int numberParameters();
 
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
-      bool initializeExteriorOrientation();
-      bool initializeBodyRotation();
+      QList<QString> instrumentIds() const;
+      QList<BundleObservationQsp> observationsByInstId(QString instrumentId) const;
 
   private:
       //! Map between observation number and pointer to observation.
       QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
       QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
+      //! Map between instrument ID and pointer to observation.
+      QMultiMap<QString, BundleObservationQsp> m_instIdToObservationMap;
   };
 }
 
