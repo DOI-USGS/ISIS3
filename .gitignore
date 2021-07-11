@@ -48,7 +48,8 @@ print.prt
 */build/
 build/
 install/
-isis/src/.vscode/
+.vscode
+fort.6
 
 # Created by https://www.gitignore.io/api/macos
 # Edit at https://www.gitignore.io/?templates=macos
