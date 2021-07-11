@@ -182,14 +182,24 @@ if(NOT APPLE)
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
-# Append CPP flags set in the third party lib file to the string set in this file.
-string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
-
 if(NOT CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE "RELEASE")
+   set(CMAKE_BUILD_TYPE "Release")
+endif()
+message("Setting CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
+# Determine optimization level.
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+    set(OPTIMIZATION_LEVEL "-O3")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
+    set(OPTIMIZATION_LEVEL "-Os")
+else()
+    set(OPTIMIZATION_LEVEL "-Og")
 endif()
 
+# Append CPP flags set in the third party lib file to the string set in this file.
+string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR} ${OPTIMIZATION_LEVEL}" )
+message("Setting CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 if(APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 else()
