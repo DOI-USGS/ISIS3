@@ -1550,4 +1550,64 @@ namespace Isis {
       delete cubeList;
     }
   }
+
+  void ClipperNacCube::SetUp() {
+    DefaultCube::SetUp();
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-159011");
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = Clipper
+        InstrumentId              = EIS-NAC-RS
+        TargetName                = Europa
+        StartTime                 = 2025-01-01T00:00:00.000
+        JitterSampleCoefficients = (0.0, 0.0, 0.0)
+        JitterLineCoefficients   = (0.0, 0.0, 0.0)
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE               = 502
+        BODY502_RADII           = (1562.6, 1560.3, 1559.5)
+        BODY_FRAME_CODE         = 10024
+        INS-159011_FOCAL_LENGTH = 150.40199
+        INS-159011_PIXEL_PITCH  = 0.014
+        INS-159011_TRANSX       = (0.0, 0.014004651, 0.0)
+        INS-159011_TRANSY       = (0.0, 0.0, 0.01399535)
+        INS-159011_ITRANSS      = (0.0, 71.404849, 0.0)
+        INS-159011_ITRANSL      = (0.0, 0.0, 71.4523)
+      End_Object
+    )");
+
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+  }
+
+  void ClipperNacCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
 }
