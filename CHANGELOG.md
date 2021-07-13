@@ -56,6 +56,7 @@ release.
 - Fixed Thm2isis to properly use output attributes [#4213](https://github.com/USGS-Astrogeology/ISIS3/issues/4213)
 - Fixed caminfo uselabel SegFault. [#4401](https://github.com/USGS-Astrogeology/ISIS3/issues/4401)
 - Fixed ISIS docs for incorrect path and -WEBHELP issues [#4510](https://github.com/USGS-Astrogeology/ISIS3/issues/4510)
+- Fixed a bug where writing out updated positions for framing cameras in jigsaw caused an error. [#4545](https://github.com/USGS-Astrogeology/ISIS3/issues/4545)
 
 ## [5.0.0] - 2021-04-01
 
