@@ -370,6 +370,16 @@ class CSMNetwork : public TempTestingFiles {
     void SetUp() override;
     void TearDown() override;
 };
+
+class ClipperWacFcCube : public DefaultCube {
+  protected:
+    Cube *wacFcCube;
+    Pvl label;
+    json isd;
+    void SetUp() override;
+    void TearDown() override;
+};
+
 }
 
 #endif
