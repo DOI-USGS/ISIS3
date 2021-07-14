@@ -12,7 +12,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/jitterfit.xml").expanded();
 TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   QTemporaryDir prefix;
   QString outputCoeffs = prefix.path() + "/coef.csv";
-  QString outputRegistrationRes = prefix.path() + "/regResults.csv";
+  QString outputResiduals = prefix.path() + "/residuals.csv";
   QString outputRegistrationStats = prefix.path() + "/regStats.pvl";
 
   // Copy input data to tempdir because jitterfit writes to cube labels
@@ -34,6 +34,7 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
                            "scale=1.0",
                            "deffile=data/jitterfit/S046mos1400x2250.def",
                            "coefficientto=" + outputCoeffs,
+                           "residualto=" + outputResiduals,
                            "to2=" + outputRegistrationStats};
 
   UserInterface options(APP_XML, args);
@@ -73,6 +74,40 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   EXPECT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "-2.3393859908318e-09");
   EXPECT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "3.95551210901968e-06");
   EXPECT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0011490056688787");
+
+  // Test residuals
+  CSVReader::CSVAxis residLine;
+  CSVReader residCsv = CSVReader(outputResiduals, false, 0, ',', true, true);
+
+  // first
+  residLine = residCsv.getRow(0);
+  EXPECT_NEAR(residLine[0].toDouble(), 0, .0000000000000001); // Registered Line
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 471.00016795669); // Solved Line
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.51957457593351); // Registered Line Residual
+  EXPECT_NEAR(residLine[3].toDouble(), 0, .0000000000000001); // Registered Sample
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00053644333); // Solved Sample
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.2988303094298); // Sample Residual
+  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.52792617775619); // Time Taken
+
+  // middle
+  residLine = residCsv.getRow(9);
+  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 967.40156473472996);
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 471.00016795669);
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), 0.13004255779811);
+  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 375.28737801237997);
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00053644333);
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.071082732109573998);
+  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.52792617775619);
+
+  // last
+  residLine = residCsv.getRow(19);
+  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 966.40657305712);
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 966.00000003532);
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.44508132165397);
+  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 374.29938569993);
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00000012271);
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.2083505883896);
+  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.032540067994172);
 
   // Test stats of registration
   Pvl stats = Pvl(outputRegistrationStats);
