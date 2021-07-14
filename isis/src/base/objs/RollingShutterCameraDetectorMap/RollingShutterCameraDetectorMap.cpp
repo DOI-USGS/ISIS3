@@ -104,8 +104,8 @@ namespace Isis {
     p_parentSample   = (p_detectorSample - p_ss) / p_detectorSampleSumming + 1.0;
     p_parentLine     = (p_detectorLine   - p_sl) / p_detectorLineSumming   + 1.0;
     std::pair<double, double> jittered = applyJitter(p_parentSample, p_parentLine);
-    p_parentSample += jittered.first;
-    p_parentLine += jittered.second;
+    p_parentSample = jittered.first;
+    p_parentLine = jittered.second;
     return true;
   }
 
@@ -134,10 +134,10 @@ namespace Isis {
 
     while((qFabs(sample - currentSample) < 1e-7) &&
           (qFabs(line - currentLine) < 1e-7)) {
-      
+
       currentSample = (currentSample - jittered.first);
       currentLine = (currentLine - jittered.second);
-      
+
       jittered = removeJitter(currentSample, currentLine);
 
       iterations++;
@@ -147,7 +147,7 @@ namespace Isis {
       }
 
     }
-    
+
     return std::pair<double, double>(sample + currentSample, line + currentLine);
   }
 

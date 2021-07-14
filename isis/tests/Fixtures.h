@@ -371,7 +371,7 @@ class CSMNetwork : public TempTestingFiles {
     void TearDown() override;
 };
 
-class ClipperNacCube : public DefaultCube {
+class ClipperNacRsCube : public DefaultCube {
   protected:
     void SetUp() override;
     void TearDown() override;

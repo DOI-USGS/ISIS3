@@ -1551,7 +1551,7 @@ namespace Isis {
     }
   }
 
-  void ClipperNacCube::SetUp() {
+  void ClipperNacRsCube::SetUp() {
     DefaultCube::SetUp();
 
     delete testCube;
@@ -1604,7 +1604,7 @@ namespace Isis {
     testCube = new Cube(fileName, "rw");
   }
 
-  void ClipperNacCube::TearDown() {
+  void ClipperNacRsCube::TearDown() {
     if (testCube) {
       delete testCube;
     }
