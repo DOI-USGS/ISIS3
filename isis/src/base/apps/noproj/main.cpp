@@ -122,7 +122,7 @@ void IsisMain() {
 
   if(incam->DetectorMap()->LineRate() != 0.0) {
     instType = "LINESCAN";
-    // Isis3 line rate is always in seconds so convert to milliseconds for the
+    // ISIS line rate is always in seconds so convert to milliseconds for the
     // Ideal instrument
     detectorLines = 1;
     expandFlag = 1;
@@ -219,7 +219,7 @@ void IsisMain() {
     // Clean up the naif keywords object... delete everything that isn't a radii
     for (int keyIndex = naifKeywordsObject->keywords() - 1; keyIndex >= 0; keyIndex--) {
       QString keyName = (*naifKeywordsObject)[keyIndex].name();
-      
+
       if (!keyName.contains("RADII")) {
         naifKeywordsObject->deleteKeyword(keyIndex);
       }

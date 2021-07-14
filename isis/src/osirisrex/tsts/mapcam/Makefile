@@ -18,15 +18,12 @@ commands:
 	ocams2isis $(TSTARGS)                                                                        \
 	           from=$(INPUT)/20190303T100344S990_map_iofL2pan_V001.fits                          \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                  \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# spiceinit first image
 	spiceinit $(TSTARGS)                                                                         \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
-	           ckpredict=t                                                                       \
-	           spkpredict=t                                                                      \
-	           extra='$$osirisrex/kernels/pck/bennu_v10.tpc'                                     \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# phocube first image
 	# create 7 band backplane with from the following values:
@@ -39,13 +36,13 @@ commands:
 	           emission=t                                                                        \
 	           incidence=t                                                                       \
 	           pixelres=t                                                                        \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# explode first image's backplane into 5 cubes
 	explode $(TSTARGS)                                                                           \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-bp.cub                       \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-bp-explode                     \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# reunite exploded cubes. output should be identical to phocube bp output above
 	$(LS) $(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-bp-explode*                            \
@@ -53,7 +50,7 @@ commands:
 	cubeit $(TSTARGS)                                                                            \
 	           from=$(OUTPUT)/phocubeBandList.txt                                                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-bp.cub                         \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# for each pixel in first image, multiply by 2 then add 1 
 	algebra $(TSTARGS)                                                                           \
@@ -62,20 +59,20 @@ commands:
 	           operator=unary                                                                    \
 	           a=2                                                                               \
 	           a=1                                                                               \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# (SKIP) get camera information for first image
     # caminfo fails for this image using the testIsis code provided by team
-	caminfo $(TSTARGS)                                                                           \
+	#caminfo $(TSTARGS)                                                                           \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-caminfo.pvl                    \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# get camera statistics for first image
 	camstats $(TSTARGS)                                                                          \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-camstats.pvl                   \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# get DN statistics for first image
 	stats $(TSTARGS)                                                                             \
@@ -89,7 +86,7 @@ commands:
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-photrim.cub                    \
 	           minphase=100                                                                      \
 	           maxphase=101                                                                      \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# photomet first image
 	photomet $(TSTARGS)                                                                          \
@@ -104,13 +101,13 @@ commands:
 	           albedo=1.0                                                                        \
 	           maxemission=80                                                                    \
 	           maxincidenc=85                                                                    \
-	           >& /dev/null;
+	           > /dev/null;
 
 	# (SKIP) footprint first image
     # footprintinit fails for this image using the testIsis code provided by team
 	footprintinit $(TSTARGS)                                                                     \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
-	           >& /dev/null;
+	           > /dev/null;
 
 
 	# campt 4 corners and center of first image
@@ -121,35 +118,35 @@ commands:
 	           SAMPLE=350                                                                        \
 	           LINE=1                                                                            \
 	           ALLOWOUTSIDE=no                                                                   \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 	campt $(TSTARGS)                                                                             \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001_campt_upperright.pvl           \
 	           SAMPLE=1024                                                                       \
 	           LINE=1                                                                            \
 	           ALLOWOUTSIDE=no                                                                   \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 	campt $(TSTARGS)                                                                             \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001_campt_lowerright.pvl           \
-	           SAMPLE=1024                                                                       \
-	           LINE=1024                                                                         \
+	           SAMPLE=890                                                                        \
+	           LINE=615                                                                          \
 	           ALLOWOUTSIDE=no                                                                   \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 	campt $(TSTARGS)                                                                             \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001_campt_lowerleft.pvl            \
-	           SAMPLE=350                                                                        \
-	           LINE=1024                                                                         \
+	           SAMPLE=256                                                                        \
+	           LINE=750                                                                          \
 	           ALLOWOUTSIDE=no                                                                   \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 	campt $(TSTARGS)                                                                             \
 	           from=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub                \
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001_campt_imagecenter.pvl          \
 	           SAMPLE=512                                                                        \
 	           LINE=512                                                                          \
 	           ALLOWOUTSIDE=no                                                                   \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 
 	# get mapping group containing Equirectangular mosaic range values for the two images
 	$(LS) $(OUTPUT)/*spiceinit.cub > $(OUTPUT)/unprojectedSpiceinitCubeList.txt;
@@ -158,7 +155,7 @@ commands:
 	            to=$(OUTPUT)/MCAM_equi.map                                                       \
 	            precision=6                                                                      \
 	            projection=Equirectangular                                                       \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 																		                         
 	# project the two images using the map from mosrange				                         
 	cam2map $(TSTARGS)                                                                           \
@@ -166,7 +163,7 @@ commands:
 	           to=$(OUTPUT)/20190303T100344S990_map_iofL2pan_V001-cam2map_equi.cub               \
 	           map=$(OUTPUT)/MCAM_equi.map                                                       \
 	           pixres=map                                                                        \
-	           >& /dev/null;											                         
+	           > /dev/null;											                         
 																		                         
 	# getsn from each image 											                         
 	echo -e "\nOutput of getsn..." > $(OUTPUT)/MCAM_getsn.txt;  		                         

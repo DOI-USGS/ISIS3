@@ -1,6 +1,14 @@
 #ifndef ControlPointEdit_h
 #define ControlPointEdit_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 // This is the only include allowed in this file!
 #include <QWidget>
 
@@ -130,16 +138,16 @@ namespace Isis {
     *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In saveChips(), added single quotes
     *                           around the file names in case there are spaces or other special
     *                           characters in them. Fixes #1551.
-    *   @history 2015-01-13 Ian Humphrey - Modified setTemplateFile() so opening a template file 
+    *   @history 2015-01-13 Ian Humphrey - Modified setTemplateFile() so opening a template file
     *                           will undo registration if a point is already registered. Modified
     *                           saveMeasure() to handle exception thrown by
     *                           ControlMeasure::SetLogData(). Fixes #2041.
     *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Register (R), Save Measure (M),
     *                           Undo Registration (U), and Find (F). Fixes #2324.
     *   @history 2017-04-25 Marjorie Hahn - Moved AutoRegFactory creation from the constructor
-    *                           to ControlPointEdit::registerPoint() so that AutoRegFactory is 
+    *                           to ControlPointEdit::registerPoint() so that AutoRegFactory is
     *                           not created until it is needed. Fixes #4590.
-    *  
+    *
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.

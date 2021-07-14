@@ -13,7 +13,6 @@
 #include "iTime.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
-#include "Process.h"
 #include "ProgramLauncher.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -82,8 +81,7 @@ namespace Isis{
 
       // Add the orginal label blob
       if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
-        OriginalLabel orig;
-        incube->read(orig);
+        OriginalLabel orig = incube->readOriginalLabel();
         Pvl p = orig.ReturnLabels();
         p.setName("OriginalLabel");
         params.addObject(p);
@@ -372,7 +370,7 @@ namespace Isis{
           if (getFootBlob) {
             // Need to read history to obtain parameters that were used to
             // create the footprint
-            History hist("IsisCube", incube->fileName());
+            History hist = incube->readHistory();
             Pvl pvl = hist.ReturnHist();
             PvlObject::PvlObjectIterator objIter;
             bool found = false;
@@ -423,7 +421,7 @@ namespace Isis{
           }
 
           bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
-
+          
           // Check if the user requires valid image center geometry
           if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
             QString msg = "Image center does not project in camera model";
@@ -435,6 +433,8 @@ namespace Isis{
           GeneratePVLOutput(incube, general, camstats, statistics, bandGeom, ui);
         else
           GenerateCSVOutput(incube, general, camstats, statistics, bandGeom, ui);
+
+        incube->close();
 
         // Clean the data
         delete general;

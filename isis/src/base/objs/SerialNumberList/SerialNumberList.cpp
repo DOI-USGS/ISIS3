@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "SerialNumberList.h"
 
 #include <QString>
@@ -46,7 +52,7 @@ namespace Isis {
     try {
       FileList flist(listfile);
       if (progress != NULL) {
-        progress->SetText("Creating Isis 3 serial numbers from list file.");
+        progress->SetText("Creating Isis serial numbers from list file.");
         progress->SetMaximumSteps((int) flist.size() + 1);
         progress->CheckStatus();
       }
@@ -106,10 +112,10 @@ namespace Isis {
    * @internal
    *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before adding
    *                           to list.
-   *   @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter. This will allow 
+   *   @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter. This will allow
    *                           level 2 images to be added to a serial number list.
    *   @history 2010-11-29 Tracie Sucharski - Only read the Instrument group if m_checkTarget is
-   *                           True.  If def2filename is True, check for Mapping group if Target 
+   *                           True.  If def2filename is True, check for Mapping group if Target
    *                           does not exist.
    */
   void SerialNumberList::add(const QString &filename, bool def2filename) {
@@ -175,9 +181,19 @@ namespace Isis {
       nextpair.serialNumber = sn;
       nextpair.observationNumber = on;
 
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
-      if (cubeObj.hasGroup("Instrument")) {
+      if (cubeObj.hasGroup("CsmInfo")) {
+        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
+          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+        }
+      }
+
+      // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      else if (cubeObj.hasGroup("Instrument")) {
         PvlGroup instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
           nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
@@ -205,7 +221,7 @@ namespace Isis {
    *
    * @param serialNumber The serial number to be added
    * @param filename The filename to be added
-   * 
+   *
    * @see add(QString, QString)
    */
   void SerialNumberList::add(const char *serialNumber, const char *filename) {
@@ -225,12 +241,12 @@ namespace Isis {
    * @throws IException::User "Duplicate serial number from files [file1] and [file2]."
    * @throws IException::User "Unable to find Instrument group need for performing bundle
    *                           adjustment."
-   * @throws IException::User "Unable to find Spacecraftname or InstrumentId keywords needed for 
+   * @throws IException::User "Unable to find Spacecraftname or InstrumentId keywords needed for
    *                           performing bundle adjustment."
    * @throws IException::User "[SerialNumber, FileName] can not be added to serial number list."
-   *  
-   * @author 2012-07-12 Tracie Sucharski 
-   *  
+   *
+   * @author 2012-07-12 Tracie Sucharski
+   *
    */
   void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
     Pvl p(Isis::FileName(filename).expanded());
@@ -281,18 +297,31 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
-      // group for use in bundle adjustment
-      if (!cubeObj.hasGroup("Instrument")) {
-        QString msg = "Unable to find Instrument group in " + filename
-                      + " needed for performing bundle adjustment.";
-        throw IException(IException::User, msg, _FILEINFO_);
+      // Check if it is not a CSM label before checking SpacecraftName and InstrumentId
+      if (!cubeObj.hasGroup("CsmInfo")) {
+
+        // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+        // group for use in bundle adjustment
+        if (!cubeObj.hasGroup("Instrument")) {
+          QString msg = "Unable to find Instrument group in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
+          QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
-      PvlGroup instGroup = cubeObj.findGroup("Instrument");
-      if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
-        QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
-                      + " needed for performing bundle adjustment.";
-        throw IException(IException::User, msg, _FILEINFO_);
+      // Check if CSM label has CSMPlatformID and CSMInstrumentId
+      else {
+        PvlGroup csmGroup = cubeObj.findGroup("CSMInfo");
+        if (!csmGroup.hasKeyword("CSMPlatformID") || !csmGroup.hasKeyword("CSMInstrumentId")) {
+          QString msg = "Unable to find CSMPlatformID or CSMInstrumentId keywords in " + filename
+                        + " needed for performing bundle adjustment.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       Pair nextpair;
@@ -300,9 +329,19 @@ namespace Isis {
       nextpair.serialNumber = serialNumber;
       nextpair.observationNumber = observationNumber;
 
-      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
-      if (cubeObj.hasGroup("Instrument")) {
+      if (cubeObj.hasGroup("CsmInfo")) {
+        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
+          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+        }
+      }
+
+      // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      else if (cubeObj.hasGroup("Instrument")) {
         PvlGroup instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
           nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
@@ -381,7 +420,7 @@ namespace Isis {
    * @return @b QString The serial number corresponding to the input filename
    *
    * @internal
-   *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before searching 
+   *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before searching
    *                           list.
    */
   QString SerialNumberList::serialNumber(const QString &filename) {
@@ -470,7 +509,7 @@ namespace Isis {
    *
    * @return @b int The index of the input filename
    *
-   * @internal 
+   * @internal
    *   @history 2007-06-04 Tracie Sucharski - Expand filename to include full path before
    *                           searching list.
    *   @history 2007-07-11 Stuart Sides - Fixed bug where the correct index was not returned.
@@ -568,7 +607,7 @@ namespace Isis {
    * @throws IException::Programmer "Unable to get the possible serial numbers. The given
    *                                 observation number does not exist in the list."
    *
-   * @return @b vector<QString> The list of possible serial numbers matching the input observation 
+   * @return @b vector<QString> The list of possible serial numbers matching the input observation
    *                         number
    */
   std::vector<QString> SerialNumberList::possibleSerialNumbers(const QString &on) {

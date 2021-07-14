@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QDebug>
 
 #include <iomanip>
@@ -47,7 +36,7 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    //double knownCenterLat =  48.53477763371114; 
+    //double knownCenterLat =  48.53477763371114;
     //double knownCenterLon = 332.0435632412456;
     // double knownCenterLat = 48.5338707313522;
     // double knownCenterLon = 332.0434591311045;
@@ -84,7 +73,7 @@ int main(void) {
 
     qDebug() << "For lower right corner ...";
     TestSampLine(evenCam, evenCam->Samples(), evenCam->Lines());
-    
+
     qDebug() << "For center framelet 14 pixel position ...";
     double samp = evenCam->Samples() / 2;
     double line = evenCam->Lines() / 2 + 192.0 /2.0 / 2.0; // add half of summed framelet to get
@@ -99,7 +88,7 @@ int main(void) {
       qDebug() << "Latitude:     OK";
     }
     else {
-      qDebug() << "Latitude:     off by " 
+      qDebug() << "Latitude:     off by "
                << QString::number(evenCam->UniversalLatitude() - knownCenterLat,  'f',  16);
     }
 
@@ -107,7 +96,7 @@ int main(void) {
       qDebug() << "Longitude:    OK";
     }
     else {
-      qDebug() << "Longitude:    off by " 
+      qDebug() << "Longitude:    off by "
                << QString::number(evenCam->UniversalLongitude() - knownCenterLon,  'f',  16);
     }
     TestSampLine(evenCam, samp, line);
@@ -141,7 +130,7 @@ int main(void) {
 
     qDebug()<< "For lower right corner ...";
     TestSampLine(oddCam, oddCam->Samples(), oddCam->Lines() - 96.0); // omit framelet 26 for odd
-    
+
     qDebug() << "For center framelet 13 pixel position ...";
     knownCenterLat =  48.563958771636;
     knownCenterLon = 332.04676929446;
@@ -171,7 +160,7 @@ int main(void) {
     TestSampLine(oddCam, samp, line);
 
     qDebug() << "";
-    
+
     // Test name methods
     qDebug() << "Testing name methods ...";
     qDebug() << "Spacecraft Name Long: " << evenCam->spacecraftNameLong();
@@ -180,12 +169,12 @@ int main(void) {
     qDebug() << "Instrument Name Short: " << evenCam->instrumentNameShort();
     qDebug() << "";
     qDebug() << "";
-    
+
     qDebug() << "Testing errors";
     try {
       Cube irCube("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.cub", "r");
       ThemisVisCamera irImage(irCube);
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
@@ -229,4 +218,3 @@ void TestSampLine(Camera *cam, double samp, double line) {
 
   qDebug() << "";
 }
-

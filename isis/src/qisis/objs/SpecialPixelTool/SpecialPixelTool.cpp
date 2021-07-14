@@ -18,6 +18,7 @@
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "Stretch.h"
+#include "CubeStretch.h"
 #include "Workspace.h"
 
 namespace Isis {
@@ -210,9 +211,9 @@ namespace Isis {
       MdiCubeViewport *cvp = (*(cubeViewportList()))[i];
 
       // Get the Stretch objects from the cubeViewport
-      Stretch redStretch = cvp->redStretch();
-      Stretch greenStretch = cvp->greenStretch();
-      Stretch blueStretch = cvp->blueStretch();
+      CubeStretch redStretch = cvp->redStretch();
+      CubeStretch greenStretch = cvp->greenStretch();
+      CubeStretch blueStretch = cvp->blueStretch();
 
       // Apply selected null color
       QPalette palette = p_nullColor->palette();

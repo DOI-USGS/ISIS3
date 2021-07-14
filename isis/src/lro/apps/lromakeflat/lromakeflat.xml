@@ -8,11 +8,11 @@
 
   <description>
     <p>
-      This program creates flat-field images for line scan, push frame, and framing instruments. 
+      This program creates flat-field images for line scan, push frame, and framing instruments.
       All input cubes should have the same number of samples; any images in the list that do not
-      have the same number of samples as the first image will not be used.  The names of the cube 
-      files used to create the flat-field image must be entered using an ASCII file (FROMLIST) with 
-      one filename per line (any line beginning with a '#' or '//' is treated as a comment).  The 
+      have the same number of samples as the first image will not be used.  The names of the cube
+      files used to create the flat-field image must be entered using an ASCII file (FROMLIST) with
+      one filename per line (any line beginning with a '#' or '//' is treated as a comment).  The
       specific equation for each camera type is below.
     </p>
     <ul>
@@ -23,14 +23,14 @@
          <br />
           Mean Calculation:
          <br />
-         Sum( Sum(FrameColumn) / Average(Frame) * ValidPixels(FrameColumn) ) / 
+         Sum( Sum(FrameColumn) / Average(Frame) * ValidPixels(FrameColumn) ) /
          TotalColumnValidPixels
          <br />
           Median Calculation:
          <br />
           Median(PixelColumn(ValidPixel / Average(Frame)))
         </p>
-          
+
       <li>Push Frame</li>
         <p>
           Mean Calculation:
@@ -61,7 +61,7 @@
 
   <history>
     <change name="Victor Silva" date="2016-09-12">
-      Original version, Adapted from Isis3 version of makeflat.
+      Original version, Adapted from Isis version of makeflat.
     </change>
   </history>
 

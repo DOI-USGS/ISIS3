@@ -2,8 +2,12 @@
 #include <QTemporaryFile>
 #include <QRegularExpression>
 
-#include "spiceinit.h"
+#include <nlohmann/json.hpp>
 
+#include "spiceinit.h"
+#include "csminit.h"
+
+#include "Blob.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "PixelType.h"
@@ -14,6 +18,8 @@
 #include "FileName.h"
 
 #include "Fixtures.h"
+
+using json = nlohmann::json;
 
 #include "gmock/gmock.h"
 
@@ -519,6 +525,37 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"].unit(0), "seconds");
 }
 
+TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  Blob testBlob("CSMState", "String");
+  testCube->write(testBlob);
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  spiceinit(testCube, options);
+
+  EXPECT_FALSE(testCube->hasGroup("CsmInfo"));
+  EXPECT_FALSE(testCube->hasBlob("CSMState", "String"));
+}
+
+TEST_F(DefaultCube, TestSpiceinitCsmNoCleanup) {
+  // Add stuff from csminit
+  testCube->putGroup(PvlGroup("CsmInfo"));
+  Blob testBlob("CSMState", "String");
+  testCube->write(testBlob);
+
+  // Mangle the cube so that spiceinit failes
+  testCube->deleteGroup("Instrument");
+
+  QVector<QString> args(0);
+  UserInterface options(APP_XML, args);
+  ASSERT_ANY_THROW(spiceinit(testCube, options));
+
+  EXPECT_TRUE(testCube->hasGroup("CsmInfo"));
+  EXPECT_TRUE(testCube->hasBlob("CSMState", "String"));
+}
+
 TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
 
   std::istringstream labelStrm(R"(
@@ -624,3 +661,51 @@ TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
   PvlGroup kernels = testCube.label()->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels.findKeyword("ShapeModel"), demCube->fileName());
 }
+
+
+TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
+  // csminit the cube
+
+  // Create an ISD
+  json isd;
+  isd["reference_time"] = 0;
+  isd["center_latitude"] = 3.03125;
+  isd["center_longitude"] = -2.9375;
+  isd["scale"] = 240;
+  isd["center_longitude_sigma"] = 0.0645181963189456;
+  isd["center_latitude_sigma"] = 0.0645181963189456;
+  isd["scale_sigma"] = 8.25832912882503;
+  QString isdPath = tempDir.path() + "/default.json";
+  std::ofstream file(isdPath.toStdString());
+  file << isd;
+  file.flush();
+
+  QString cubeFile = testCube->fileName();
+
+  QVector<QString> csmArgs = {
+    "from="+cubeFile,
+    "isd="+isdPath};
+
+  QString CSMINIT_APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+  UserInterface csmOptions(CSMINIT_APP_XML, csmArgs);
+  testCube->close();
+
+  ASSERT_NO_THROW(csminit(csmOptions));
+  testCube->open(cubeFile);
+  PvlGroup csmInfoGroup = testCube->group("CsmInfo");
+  testCube->close();
+
+  // spiceinit
+  QVector<QString> spiceinitArgs = {"from="+cubeFile};
+
+  UserInterface spiceinitOptions(APP_XML, spiceinitArgs);
+  ASSERT_ANY_THROW(spiceinit(spiceinitOptions));
+
+  Cube outputCube(cubeFile);
+
+  ASSERT_NO_THROW(outputCube.camera());
+  EXPECT_TRUE(outputCube.hasBlob("CSMState", "String"));
+  ASSERT_TRUE(outputCube.hasGroup("CsmInfo"));
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, csmInfoGroup, outputCube.group("CsmInfo"));
+}
+

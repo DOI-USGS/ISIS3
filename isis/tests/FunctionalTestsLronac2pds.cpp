@@ -18,7 +18,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/lronac2pds.xml").expanded()
 
 TEST_F(ObservationPair, FunctionalTestLronac2pdsIof) {
   QVector<QString> args = {"from=" + cubeLPath,
-                           "to=" + tempDir.path() + "LroNacL.img"};
+                           "to=" + tempDir.path() + "/LroNacL.img"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
@@ -48,7 +48,7 @@ TEST_F(ObservationPair, FunctionalTestLronac2pdsIof) {
 
 TEST_F(ObservationPair, FunctionalTestLronac2pdsRadiance) {
   QVector<QString> args = {"from=" + cubeLPath,
-                           "to=" + tempDir.path() + "LroNacL.img"};
+                           "to=" + tempDir.path() + "/LroNacL.img"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 

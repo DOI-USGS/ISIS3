@@ -121,9 +121,11 @@ TEST_F(DefaultCube, FunctionalTestCamstatsAttach) {
   UserInterface options(APP_XML, args);
   Pvl appLog;
 
+  QString inPath = testCube->fileName();
+
   camstats(testCube, options, &appLog);
 
-  testCube->open(tempDir.path()+"/default.cub", "r");
+  testCube->open(inPath, "r");
   EXPECT_TRUE(testCube->hasTable("CameraStatistics"));
 }
 

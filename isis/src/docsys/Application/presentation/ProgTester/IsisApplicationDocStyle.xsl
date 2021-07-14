@@ -474,12 +474,12 @@ Deborah Lee Soltesz
                  border-color: #68A ;
                  background-color: #9BD ;
                }
-     
+
     /** Warning Class for displaying Warning messages. */
     span.warning {
           color: #ff0000;
           font-weight: bold;
-    } 
+    }
         </style>
         <!-- Dynamic analytics insertion to prevent running on local URLs -->
         <xsl:text>&#xa;</xsl:text>
@@ -494,7 +494,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -509,7 +509,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        ISIS 3 Application Documentation</p>
+        ISIS Application Documentation</p>
 
         <hr/>
 
@@ -598,10 +598,10 @@ Deborah Lee Soltesz
           This program replaces the following
           <xsl:choose>
             <xsl:when test="count(oldName/item) > 1">
-            applications 
+            applications
             </xsl:when>
             <xsl:otherwise>
-            application 
+            application
             </xsl:otherwise>
           </xsl:choose>
           existing in previous versions of ISIS:
@@ -1356,7 +1356,7 @@ document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@s
     <xsl:variable name="text">
       <xsl:choose>
         <xsl:when test ="@link">
-          <xsl:value-of select="normalize-space(@link)"/> 
+          <xsl:value-of select="normalize-space(@link)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="normalize-space(.)"/>
@@ -1392,4 +1392,3 @@ document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@s
   </xsl:template>
 
 </xsl:stylesheet>
-

@@ -17,7 +17,7 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/kaguyatc2isis.xml").expanded();
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisVis) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisVis) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img", "to="+cubeFileName};
@@ -95,7 +95,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisVis) {
   EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 26.830242572528928);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNir) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/nir_cropped.img", "to="+cubeFileName};
@@ -173,7 +173,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNir) {
   EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 2.8449125231835715);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisProj) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisProj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/3C5_label.pvl", "to="+cubeFileName};
@@ -188,7 +188,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisProj) {
   }
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNullRange) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNullRange) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
@@ -212,7 +212,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisNullRange) {
   EXPECT_EQ(hist->NullPixels(), 19161);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisHrsRange) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisHrsRange) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
@@ -236,7 +236,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisHrsRange) {
   EXPECT_EQ(hist->HrsPixels(), 19161);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisHisRange) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisHisRange) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
@@ -260,7 +260,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisHisRange) {
   EXPECT_EQ(hist->HisPixels(), 19161);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisLrsRange) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisLrsRange) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
@@ -284,7 +284,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisLrsRange) {
   EXPECT_EQ(hist->LrsPixels(), 19161);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisLisRange) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisLisRange) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
@@ -308,7 +308,7 @@ TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisLisRange) {
   EXPECT_EQ(hist->LisPixels(), 19161);
 }
 
-TEST(kaguyatc2isisTest, FunctionalTestsKaguyami2isisError) {
+TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
   QVector<QString> args = {"from=data/kaguyatc2isis/TC1S2B0_01_05186N225E0040_mini.lbl",

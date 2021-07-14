@@ -8,22 +8,21 @@
 # The Group names can NOT be repeated.
 #
 # InputGroup is a comma delimited list of objects and/or
-# groups in the foreign label. Traversing this list will
-# lead to the correct level to find the foreign keyword.
+# groups in the input label. Traversing this list will
+# lead to the correct level to find the output key.
 #
 # InputKey is the keyword within the group which holds
 # the information.
 #
 # InputDefault is the value used if there is no value for
-# the keyword
+# the keyword in the label
 #
-# Translation is the native and corresponding foreign values.
+# Translation is the output and corresponding input values.
 # Translation may be repeated as needed.
 #
 # This file is used to translate the InstrumentId from the
 # Isis cube Instrument group to an InstrumentName
 #
-# history Jeannie Backer and Adam Goins - Added Kaguya TC.
 
 Group = InstrumentName
 
@@ -84,10 +83,10 @@ Group = InstrumentName
   Translation   = (JunoCam, JNC)
 
   # Kaguya
-  Translation   = (Kaguya, MI-VIS)
-  Translation   = (Kaguya, MI-NIR)
-  Translation   = (Kaguya, TC1)
-  Translation   = (Kaguya, TC2)
+  Translation   = (Mi, MI-VIS)
+  Translation   = (Mi, MI-NIR)
+  Translation   = (Tc, TC1)
+  Translation   = (Tc, TC2)
 
   # LO
   Translation   = (Hrc, "High Resolution Camera")

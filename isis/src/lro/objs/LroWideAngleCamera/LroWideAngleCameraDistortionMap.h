@@ -1,30 +1,19 @@
 #ifndef LroWideAngleCameraDistortionMap_h
 #define LroWideAngleCameraDistortionMap_h
-/** 
- * @file 
- *  
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QVector>
 #include "CameraDistortionMap.h"
 
 namespace Isis {
-  /** 
+  /**
    *  Distort/undistort focal plane coordinates
    *
    * Creates a map for adding/removing optical distortions
@@ -46,7 +35,7 @@ namespace Isis {
    *            what is reported in the calibration document); removed the
    *            GuessDx method as it was not used; updated the UV boresight in
    *            the IK based upon analysis of the VIS and UV.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *            coding standards. References #972.
    *   @history 2011-08-30 Kris Becker - Implemented new decentering distortion
    *            model.  This becomes version 3 of the camera model

@@ -51,7 +51,7 @@ Group = GroundPoint
   EphemerisTime              = -182103311.79772 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
   LocalSolarTime             = 12.59760019772 <hour>
-  SolarLongitude             = 129.01790468942 <DEGREE>
+  SolarLongitude             = 129.01116499267 <DEGREE>
 
   # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
   LookDirectionBodyFixed     = (-0.13147866432244, 0.010191826600814,
@@ -114,7 +114,7 @@ Group = GroundPoint
   EphemerisTime              = -182103311.79772 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
   LocalSolarTime             = 11.791629846611 <hour>
-  SolarLongitude             = 129.01790468942 <DEGREE>
+  SolarLongitude             = 129.01116499267 <DEGREE>
 
   # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
   LookDirectionBodyFixed     = (-0.076075624316564, -0.015172515119546,

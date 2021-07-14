@@ -6,9 +6,9 @@
   </brief>
 
   <description>
-    This program will alter the projection of a <def link="Cube">cube</def> which is already 
-    in a <def link="Map Projection">map projection</def> (ISIS <def link="Level2">level2</def> cube).  
-    Pixels are physically moved using either a nearest neighbor, bilinear, or cubic convolution interpolator.  
+    This program will alter the projection of a <def link="Cube">cube</def> which is already
+    in a <def link="Map Projection">map projection</def> (ISIS <def link="Level2">level2</def> cube).
+    Pixels are physically moved using either a nearest neighbor, bilinear, or cubic convolution interpolator.
     Usage examples of this program include:
     <pre>
       1.  Converting from Sinusodial to Mercator or any other
@@ -17,16 +17,16 @@
           such as center longitude or standard parallels
       3.  No projection change but altering <def link="Pixel Resolution">pixel resolution</def>
       4.  No projection change but altering <def link="Latitude">latitude</def>/ <def link="Longitude">longitude</def> window
-      5.  No projection change but altering <def link="Latitude Type">latitude types</def>, 
+      5.  No projection change but altering <def link="Latitude Type">latitude types</def>,
           <def link="Longitude Domain">longitude domains</def>, or <def link="Longitude Direction">longitude direction</def>
       6.  Match the mapping parameters of another ISIS leve2 cube for
-          comparison.   
+          comparison.
     </pre>
     <p>If you need to generate your own map file you can use the <i>maptemplate</i> program or alternatively,
     hand create a file using your favorite editor.  The map file need only specify the ProjectionName
     as defaults will be computed for the remaining map file parameters.
    </p>
-   
+
    The map file can be an existing map projected (level2) cube.  A level2 cube has <def>PVL</def> labels
    and contains the Mapping group.  Depending on the values of the input parameters, the output
    cube can use some or all of the keyword values of the map file.  For instance, setting
@@ -39,7 +39,7 @@
 
    <p>To learn
    more about using map projections in ISIS, refer to the ISIS Workshop
-   <a href="https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Learning_About_Map_Projections">
+   <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
    "Learning About Map Projections"</a>.
    </p>
   </description>
@@ -89,7 +89,7 @@
       Fixed bug trimming longitudes
     </change>
     <change name="Stuart Sides" date="2007-11-16">
-        Fixed bug when TRIM option was used and most if not all data was being 
+        Fixed bug when TRIM option was used and most if not all data was being
         NULLed.
     </change>
     <change name="Steven Lambright" date="2007-12-05">
@@ -99,7 +99,7 @@
       Added the MATCHMAP option.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Steven Lambright" date="2008-06-13">
       The rotation keyword will no longer automatically propagate
@@ -211,8 +211,8 @@
         <brief>Match the map file</brief>
         <description>
           This forces all of the mapping parameters to come from the
-          map file.  Additionally, when the map file is an image the 
-          TO file will have the same number of lines and samples as 
+          map file.  Additionally, when the map file is an image the
+          TO file will have the same number of lines and samples as
           the map file.
         </description>
         <exclusions>
@@ -294,9 +294,9 @@
         <default><item>FROM</item></default>
         <description>
           This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
-          is obtained.  The ground range can be obtained from the input cube or map file.  Note the user can overide the default 
-          using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage of 
-          the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size (samples 
+          is obtained.  The ground range can be obtained from the input cube or map file.  Note the user can overide the default
+          using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage of
+          the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size (samples
           and line) of the output image.
         </description>
         <list>
@@ -319,9 +319,9 @@
             <function>LoadMapRange</function>
             <brief>Calculate Latitude/Longitude Ranges</brief>
             <description>
-              This helper button will calculate and convert the latitudes and 
-              longitudes it finds in the input file if DEFAULTRANGE = FROM. If the 
-              DEFAULTRANGE = MAP, this will copy the latitudes/longitudes from 
+              This helper button will calculate and convert the latitudes and
+              longitudes it finds in the input file if DEFAULTRANGE = FROM. If the
+              DEFAULTRANGE = MAP, this will copy the latitudes/longitudes from
               the map files and calculate the unfound ones from the input cube.
              </description>
             <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
@@ -347,7 +347,7 @@
         <brief>Maximum Latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum latitude of the ground range.   If this is entered by the user it will override 
+          The maximum latitude of the ground range.   If this is entered by the user it will override
           the default input cube or map value.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
@@ -360,7 +360,7 @@
         <brief>Minimum Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum longitude of the ground range.   If this is entered by the user it will override 
+          The minimum longitude of the ground range.   If this is entered by the user it will override
           the default input cube or map value.
         </description>
       </parameter>
@@ -370,7 +370,7 @@
         <brief>Maximum Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum longitude of the ground range.   If this is entered by the user it will override 
+          The maximum longitude of the ground range.   If this is entered by the user it will override
           the default input cube or map value.
         </description>
         <greaterThan><item>MINLON</item></greaterThan>
@@ -431,7 +431,7 @@
     <example>
       <brief> map2map example demonstrating use of MATCHMAP </brief>
       <description>
-        This example shows how to use map2map to match a system LOLA DEM to a 
+        This example shows how to use map2map to match a system LOLA DEM to a
         Clementine 750 base tile available from PDS.
       </description>
       <terminalInterface>
@@ -450,7 +450,7 @@
           <image src="assets/images/map2map_matchmap_image_gui_p1.jpg" width="728" height="428">
             <brief> Top of GUI for map2map MATCHMAP example </brief>
             <description>
-              The from file is a system LOLA dem.  The MAP is an Isis level 2 
+              The from file is a system LOLA dem.  The MAP is an Isis level 2
               image.  The output file will be a section of the dem extracted
               out and remapped into the same state as the level 2 image entered
               as MAP.  Because MATCHMAP is checked, all mapping parameters will
@@ -458,7 +458,7 @@
             </description>
             <thumbnail src="assets/thumbs/map2map_matchmap_image_gui_1_thumb.jpg" width="200" height="117" caption="map2map MATCHMAP example GUI top" />
           </image>
-        </guiInterface> 
+        </guiInterface>
         <guiInterface>
           <image src="assets/images/map2map_matchmap_image_gui_p2.jpg" width="728" height="380">
             <brief> Middle of GUI for map2map MATCHMAP example </brief>
@@ -470,7 +470,7 @@
             </description>
             <thumbnail src="assets/thumbs/map2map_matchmap_image_gui_1_thumb.jpg" width="200" height="104" caption="map2map MATCHMAP example GUI top" />
           </image>
-        </guiInterface> 
+        </guiInterface>
         <guiInterface>
           <image src="assets/images/map2map_matchmap_image_gui_p3.jpg" width="728" height="330">
             <brief> Bottom of GUI for map2map MATCHMAP example </brief>
@@ -480,13 +480,13 @@
             </description>
             <thumbnail src="assets/thumbs/map2map_matchmap_image_gui_1_thumb.jpg" width="200" height="90" caption="map2map MATCHMAP example GUI top" />
           </image>
-        </guiInterface> 
+        </guiInterface>
       </guiInterfaces>
       <inputImages>
         <image src="assets/images/FromFile_LOLA_global_DEM.jpg" width="496" height="496">
           <brief> FROM for map2map MATCHMAP example </brief>
           <description>
-            This is a LOLA global dem stored in the Isis system.  A section of 
+            This is a LOLA global dem stored in the Isis system.  A section of
             this file matching the coverage of MAP will be extracted and
             reprojected to match MAP.
           </description>
@@ -506,8 +506,8 @@
         <image src="assets/images/ToFIle_LOLA_Match_Clem750.jpg" width="496" height="496">
           <brief>  TO for map2map MATCHMAP example </brief>
           <description>
-            This is a section of the LOLA global dem extracted and remapped to 
-            match a base tile of the PDS Clementine 750.  Notice how the 
+            This is a section of the LOLA global dem extracted and remapped to
+            match a base tile of the PDS Clementine 750.  Notice how the
             geometry matches the geometry of the second input image above (MAP).
           </description>
           <thumbnail caption="MATCHMAP example  TO" src="assets/thumbs/ToFIle_LOLA_Match_Clem750_thumb.jpg" width="200" height="200"/>
@@ -527,7 +527,7 @@
       <terminalInterface>
         <commandLine>
           map2map from=MessengerFlyby_Mariner10_blobal.cub map=npola.map
-          to=MessengerFlyby_Mariner10_north_polar.cub pixres=map defaultrange=map 
+          to=MessengerFlyby_Mariner10_north_polar.cub pixres=map defaultrange=map
           trim=yes
         </commandLine>
         <description>
@@ -539,7 +539,7 @@
           <image src="assets/images/map2map_global_to_polar_gui_1.jpg" width="728" height="428">
             <brief> Top of GUI for map2map TRIM example </brief>
             <description>
-              The FROM file is a Messenger/Mariner10 global Equirectangular 
+              The FROM file is a Messenger/Mariner10 global Equirectangular
               mosaic.  The MAP file defines a PolarStereographic projection.
               The TO file will be the polar section of the FROM extracted out
               and transformed into a PolarStereographic projection.  Notice that
@@ -549,7 +549,7 @@
             </description>
             <thumbnail src="assets/thumbs/map2map_global_to_polar_gui_1_thumb.jpg" width="200" height="117" caption="map2map MATCHMAP example GUI top" />
           </image>
-        </guiInterface> 
+        </guiInterface>
         <guiInterface>
           <image src="assets/images/map2map_global_to_polar_gui_2.jpg" width="728" height="425">
             <brief> Bottom of GUI for map2map TRIM example </brief>
@@ -567,21 +567,21 @@
         <dataFile path="assets/IN/npola.map">
           <brief> View PVL mapping file </brief>
           <description>
-            The is the mapping file that defines the output map projection. 
+            The is the mapping file that defines the output map projection.
             Since the default range is set to MAP as well, it also contains
             the desired lat/lon range of the output level 2 image.
           </description>
         </dataFile>
-      </dataFiles> 
+      </dataFiles>
       <inputImages>
         <image src="assets/images/FromFile_MessengerFlyby_Mariner10_global.jpg" width="496" height="496">
           <brief> FROM for map2map TRIM example </brief>
           <description>
-            This is a Messenger/Mariner10 global mosaice in an Equirectangular 
-            map projection.  The north polar section of this file will be 
-            extracted and transformed to a Polar Stereographic projection and 
-            trimmed to the exact lat/lon range specified in the map file, 
-            forming a circle.  
+            This is a Messenger/Mariner10 global mosaice in an Equirectangular
+            map projection.  The north polar section of this file will be
+            extracted and transformed to a Polar Stereographic projection and
+            trimmed to the exact lat/lon range specified in the map file,
+            forming a circle.
           </description>
           <thumbnail caption="Input image (dem) to be reprojected" src="assets/thumbs/FromFile_MessengerFlyby_Mariner10_global_thumb.jpg" width="200" height="200"/>
           <parameterName>FROM</parameterName>
@@ -592,7 +592,7 @@
           <brief> TO for map2map TRIM example </brief>
           <description>
             This is the north polar section of the Messenger/Mariner10 global
-            mosaic of Mercury in an Polar Stereographic projection and trimmed 
+            mosaic of Mercury in an Polar Stereographic projection and trimmed
             to the exact lat/lon range specified in the map file to form a circle.
           </description>
           <thumbnail caption="Output PolarStereographic projection of north pole" src="assets/thumbs/ToFile_MessengerFlyby_Mariner10_north_polar_thumb.jpg" width="200" height="200"/>

@@ -13,14 +13,16 @@ dependencies:
   - bzip2
   - cmake >=3.15
   - cspice
+  - csm>=3.0.3,<3.0.4
   - curl
   - doxygen
   - eigen
   - embree
+  - ffmpeg>=3.4.1
   - geos>=3.7,<3.8
   - geotiff
-  - gmm
   - gmp
+  - graphviz
   - gsl>=2.6
   - hdf5
   - icu

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "IsisDebug.h"
 
 #include "ControlNet.h"
@@ -50,7 +58,7 @@ namespace Isis {
 
   //!Creates an empty ControlNet object
   ControlNet::ControlNet(SurfacePoint::CoordinateType coordType) {
-    
+
   //! Creates an empty ControlNet object
   // ControlNet::ControlNet() {
     nullify();
@@ -98,7 +106,7 @@ namespace Isis {
    */
   ControlNet::ControlNet(const QString &ptfile, Progress *progress,
                          SurfacePoint::CoordinateType coordType) {
-    
+
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -106,7 +114,7 @@ namespace Isis {
 
     m_ownPoints = true;
     m_coordType = coordType;
-    
+
     try {
       ReadControl(ptfile, progress);
     }
@@ -846,7 +854,7 @@ namespace Isis {
 
 
   /**
-   * Sets the control point coordinate type 
+   * Sets the control point coordinate type
    *
    * @param coordType Control point coordinate type
    */

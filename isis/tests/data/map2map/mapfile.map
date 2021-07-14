@@ -1,0 +1,6 @@
+Group = Mapping
+  LatitudeType = Planetocentric
+  LongitudeDirection = PositiveWest
+  LongitudeDomain = 180
+End_Group
+End

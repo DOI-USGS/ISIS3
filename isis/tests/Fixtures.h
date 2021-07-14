@@ -11,6 +11,9 @@
 
 #include <nlohmann/json.hpp>
 
+#include "csm/csm.h"
+#include "csm/Ellipsoid.h"
+
 #include "Cube.h"
 #include "IException.h"
 #include "OriginalLabel.h"
@@ -20,6 +23,8 @@
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "Blob.h"
+#include "MockCsmPlugin.h"
+#include "Mocks.h"
 #include "ControlNet.h"
 #include "FileList.h"
 #include "FileName.h"
@@ -70,6 +75,15 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class SmallGapCube : public TempTestingFiles {
+    protected:
+      Cube *horzCube;
+      Cube *vertCube;
+      Cube *bandCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
 
   class DefaultCube : public TempTestingFiles {
     protected:
@@ -82,6 +96,7 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+      void resizeCube(int samples, int lines, int bands);
   };
 
   class LineScannerCube : public TempTestingFiles {
@@ -92,6 +107,22 @@ namespace Isis {
       Pvl label;
       Pvl projLabel;
       json isd;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class OffBodyCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MiniRFCube : public TempTestingFiles {
+    protected:
+      Cube *testCube;
 
       void SetUp() override;
       void TearDown() override;
@@ -175,13 +206,37 @@ namespace Isis {
       void TearDown() override;
   };
 
+
+  class MroCtxCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class GalileoSsiCube : public DefaultCube {
+    protected:
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class MgsMocCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+
   class MroHiriseCube : public DefaultCube {
     protected:
       QString ckPath = "data/mroKernels/mroCK.bc";
       QString sclkPath = "data/mroKernels/mroSCLK.tsc";
       QString lskPath = "data/mroKernels/mroLSK.tls";
-      Cube dejitteredCube; 
-      QString jitterPath; 
+      Cube dejitteredCube;
+      QString jitterPath;
 
       void SetUp() override;
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
@@ -191,6 +246,13 @@ namespace Isis {
     protected:
       void setInstrument(QString ikid, QString instrumentId, QString spacecraftName);
   };
+
+
+  class OsirisRexCube : public DefaultCube {
+    protected:
+      void setInstrument(QString ikid, QString instrumentId);
+  };
+
 
   class ApolloCube : public LargeCube {
     protected:
@@ -208,6 +270,106 @@ namespace Isis {
 
       void SetUp() override;
   };
+
+  class CSMCubeFixture : public SmallCube {
+  protected:
+    QString filename;
+    MockRasterGM mockModel;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraFixture : public CSMCubeFixture {
+  protected:
+    Camera *testCam;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraSetFixture : public CSMCameraFixture {
+  protected:
+    csm::Ellipsoid wgs84;
+    csm::ImageCoord imagePt;
+    csm::EcefCoord groundPt;
+    csm::EcefLocus imageLocus;
+
+    void SetUp() override;
+};
+
+
+class CSMCameraDemFixture : public CSMCubeFixture {
+  protected:
+    Camera *testCam;
+    double demRadius;
+
+    void SetUp() override;
+};
+
+class HistoryBlob : public TempTestingFiles {
+  protected:
+    Blob historyBlob;
+    PvlObject historyPvl;
+
+    void SetUp() override;
+};
+
+
+class NullPixelCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+
+class MiniRFNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class VikThmNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+    Cube *testCube4;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class CSMNetwork : public TempTestingFiles {
+  protected:
+
+    QVector<FileName> stateStringFiles;
+    QVector<FileName> labelFiles;
+    QVector<Cube*> cubes;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    void SetUp() override;
+    void TearDown() override;
+};
 }
 
 #endif

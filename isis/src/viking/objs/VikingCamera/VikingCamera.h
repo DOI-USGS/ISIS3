@@ -1,26 +1,14 @@
 #ifndef VikingCamera_h
 #define VikingCamera_h
-/**
- * @file
- * $Revision: 1.3 $
- * $Date: 2009/08/31 15:12:32 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include "FramingCamera.h"
 
@@ -33,10 +21,10 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Viking
-   *  
-   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-075A 
-   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-083A 
-   *  
+   *
+   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-075A
+   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-083A
+   *
    * @author 2005-06-09 Elizabeth Ribelin
    *
    * @internal
@@ -58,13 +46,13 @@ namespace Isis {
    *                           method. Updated unitTest to test for new methods.
    *                           Updated documentation. Added Isis Disclaimer to
    *                           files. Added NAIF error check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
    *   @history 2015-08-14 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods and added data for Viking1 VISA, Viking1 VISB, and
    *                           Viking2 VISA.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
    */
@@ -73,45 +61,45 @@ namespace Isis {
       VikingCamera(Cube &cube);
       //! Destroys the VikingCamera Object
       ~VikingCamera() {};
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
-      /** 
+      /**
        * CK frame ID -
        * Viking1 instrument code (VO1_PLATFORM) = -27000
        * Viking2 instrument code (VO2_PLATFORM) = -30000
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
-       *  
+       *
        */
       virtual int CkFrameId() const { return p_ckFrameId; }
 
-      /** 
+      /**
        * CK Reference ID -
        * B1950 or J2000 depending on the ck used.  The mdim2.0_rand ck is in
        * J2000.  Here we use B1950 (code = 2) because it was the reference
        * frame for the original spice
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
-       *  
+       *
        */
       virtual int CkReferenceId() const { return (2); }
 
-      /** 
+      /**
        * SPK Target Body ID -
        * VIKING 1 ORBITER = -27
        * VIKING 2 ORBITER = -30
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Target ID
        */
       virtual int SpkTargetId() const { return p_spkTargetId; }
 
-      /** 
+      /**
        * SPK Reference ID - B1950
-       * 
+       *
        * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */

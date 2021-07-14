@@ -699,24 +699,24 @@ Group = SpiderLeg30Temperature
   Translation    = (*, *)
 End_Group
 
-Group = SpiderLeg120Temperature
+Group = SpiderLeg150Temperature
   Auto
-  InputKey       = MRO:SPIDER_LEG_120_TEMPERATURE
+  InputKey       = MRO:SPIDER_LEG_150_TEMPERATURE
   InputGroup     = TEMPERATURE_PARAMETERS
   InputPosition  = TEMPERATURE_PARAMETERS
   InputDefault   = -9999
-  OutputName     = SpiderLeg120Temperature
+  OutputName     = SpiderLeg150Temperature
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
 
-Group = SpiderLeg240Temperature
+Group = SpiderLeg270Temperature
   Auto
-  InputKey       = MRO:SPIDER_LEG_240_TEMPERATURE
+  InputKey       = MRO:SPIDER_LEG_270_TEMPERATURE
   InputGroup     = TEMPERATURE_PARAMETERS
   InputPosition  = TEMPERATURE_PARAMETERS
   InputDefault   = -9999
-  OutputName     = SpiderLeg240Temperature
+  OutputName     = SpiderLeg270Temperature
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -872,7 +872,7 @@ End_Group
 
 Group = ADCTimingSetting
   Auto
-  InputKey       = MRO:ADC_TIMING_SETTING
+  InputKey       = MRO:ADC_TIMING_SETTINGS
   InputGroup     = INSTRUMENT_SETTING_PARAMETERS
   InputPosition  = INSTRUMENT_SETTING_PARAMETERS
   InputDefault   = -9999

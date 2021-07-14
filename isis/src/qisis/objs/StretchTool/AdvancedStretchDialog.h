@@ -9,6 +9,7 @@ class QWidget;
 namespace Isis {
   class Stretch;
   class Histogram;
+  class CubeStretch;
 };
 
 namespace Isis {
@@ -48,12 +49,13 @@ namespace Isis {
                           Histogram &grayHist);
       void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
-      void restoreSavedStretch(Stretch stretch); 
+      void restoreGrayStretch(CubeStretch stretch); 
+      void restoreRgbStretch(CubeStretch red, CubeStretch green, CubeStretch blue);
 
-      Stretch getGrayStretch();
-      Stretch getRedStretch();
-      Stretch getGrnStretch();
-      Stretch getBluStretch();
+      CubeStretch getGrayStretch();
+      CubeStretch getRedStretch();
+      CubeStretch getGrnStretch();
+      CubeStretch getBluStretch();
 
       /**
        * Returns true if the advanced stretch is enabled

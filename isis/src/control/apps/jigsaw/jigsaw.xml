@@ -6,7 +6,7 @@
 
   <description>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis 3,
+      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis,
       level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
       simultaneously defines the selected image geometry information (camera pointing, spacecraft
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
@@ -25,7 +25,7 @@
 
     <p>
       The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that
-      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to
+      <def>SPICE</def> is included in the Isis <def>cube</def> labels in the Kernels group.  In order to
       run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
       net</def>, the name of an output <def>control net</def>, and the adjustment parameters.
       <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
@@ -1018,7 +1018,85 @@
           <item>No</item>
         </default>
       </parameter>
-      </group>
+    </group>
+
+    <group name="Community Sensor Model Options">
+      <parameter name="CSMSOLVESET">
+        <internalDefault>none</internalDefault>
+        <type>string</type>
+        <brief>Specify a set of a CSM parameters to solve for.</brief>
+        <description>
+          Specify one of the parameter sets from the CSM GeometricModel API to solve for.
+          All parameters belonging to the specified set will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVETYPE</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="VALID">
+            <brief> Solves for CSM parameters that are not NONE.</brief>
+          </option>
+          <option value="ADJUSTABLE">
+            <brief>Solves for real or fictitous CSM parameters.</brief>
+          </option>
+          <option value="NONADJUSTABLE">
+            <brief>Solves for fixed CSM parameters.</brief>
+            <description>
+              Solve for fixed CSM parameters. These parameters are generally not adjusted
+              but do have uncertainty which can help constrain the solutions and improve
+              a posteriori uncertainties for other parameters.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVETYPE">
+        <type>string</type>
+        <brief>Specify a type of a CSM parameters to solve for.</brief>
+        <description>
+          Specify a parameter type from the CSM GeometricModel API to solve for.
+          All parameters of the specified type will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="NONE">
+            <brief>Solve for unitialized CSM parameters</brief>
+          </option>
+          <option value="FICTITIOUS">
+            <brief>Solve for CSM parameters calculted by resection</brief>
+          </option>
+          <option value="REAL">
+            <brief>Solve for measured CSM parameters</brief>
+          </option>
+          <option value="FIXED">
+            <brief>Solve for fixed CSM parameters</brief>
+          </option>
+          <description>
+            Solve for fixed CSM parameters. These parameters are generally not adjusted
+            but do have uncertainty which can help constrain the solutions and improve
+            a posteriori uncertainties for other parameters.
+          </description>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVELIST">
+        <type>string</type>
+        <brief>Specify an explicit list of CSM parameters to solve for.</brief>
+        <description>
+          All CSM parameters in this list will be solved for. Trailing and leading whitespace
+          will be stripped off. Use standard ISIS parameter array notation to specify multiple
+          parameters.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVETYPE</item>
+        </exclusions>
+      </parameter>
+    </group>
 
     <group name="Target Body">
       <parameter name="SOLVETARGETBODY">
@@ -1342,6 +1420,21 @@
       </group>
 
     </groups>
+    <example>
+      <brief>Solve with CSM parameters</brief>
+      <description>
+        This is an example where the cubes in the network have been run through csminit.
+        When specified in CSMSOLVELIST, parameters described in the CsmInfo group can
+        be adjusted during the bundle.
+      </description>
+      <terminalInterface>
+        <commandLine> jigsaw fromlis=cubes.lis cnet=input.net onet=output.net radius=yes csmsolvelist="(Omega Bias, Phi Bias, Kappa Bias)" control_point_coordinate_type_bundle=rectangular control_point_coordinate_type_reports=rectangular point_x_sigma=50 point_y_sigma=50 point_z_sigma=50
+        </commandLine>
+        <description>
+         jigsaw CSM example
+        </description>
+      </terminalInterface>
+    </example>
 
     <liens>
       <item>Add items to glossary, example(s) and tips on how to analyze the

@@ -1,24 +1,11 @@
-/**
- * @file
- * $Revision:$
- * $Date:$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "TgoCassisCamera.h"
 
 #include <cmath>
@@ -54,7 +41,7 @@ namespace Isis {
 
     m_spacecraftNameLong = "Trace Gas Orbiter";
     m_spacecraftNameShort = "TGO";
-    
+
     NaifStatus::CheckErrors();
 
     // CaSSIS codes
@@ -91,7 +78,7 @@ namespace Isis {
       detMap->SetDetectorSampleSumming(summing);
       detMap->SetDetectorLineSumming(summing);
     }
-    
+
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, cassisCode);
 
@@ -135,15 +122,15 @@ namespace Isis {
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
-   * the SpacecraftClockCount keyword value, converted to ephemeris time. The 
-   * StartTime keyword value from the labels represents the shutter open time of 
-   * the observation. This method uses the FramingCamera class implementation, 
-   * returning the given time value as the shutter open and the sum of the time 
-   * value and exposure duration as the shutter close. 
+   * the SpacecraftClockCount keyword value, converted to ephemeris time. The
+   * StartTime keyword value from the labels represents the shutter open time of
+   * the observation. This method uses the FramingCamera class implementation,
+   * returning the given time value as the shutter open and the sum of the time
+   * value and exposure duration as the shutter close.
    *
    * @param exposureDuration Exposure duration value from the labels, converted
    *                         to seconds.
-   * @param time The SpacecraftClockCount value from the labels, converted to 
+   * @param time The SpacecraftClockCount value from the labels, converted to
    *             ephemeris time
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
@@ -160,8 +147,8 @@ namespace Isis {
 
   /**
    * CK frame ID -  TGO CaSSIS instrument code (TGO_CASSIS_FSA)
-   *  
-   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
    *                Kernel Frame ID.
    */
   int TgoCassisCamera::CkFrameId() const {
@@ -169,9 +156,9 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
     * CK Reference ID - J2000
-    * 
+    *
     * @return @b int The appropriate instrument code for the "Camera-matrix"
     *                Kernel Reference ID.
     */
@@ -191,10 +178,10 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
     *  SPK Reference ID - J2000
-    *  
-    * @return @b int The appropriate instrument code for the Spacecraft 
+    *
+    * @return @b int The appropriate instrument code for the Spacecraft
     *                Kernel Reference ID.
     */
   int TgoCassisCamera::SpkReferenceId() const {

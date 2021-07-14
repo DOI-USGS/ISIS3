@@ -2,13 +2,13 @@
 
 <application name="cnetpvl2bin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Converts an Isis3 control network file from pvl format into binary.
+    Converts an Isis control network file from pvl format into binary.
   </brief>
 
   <description>
     <p>
-      This program converts an Isis3 control network file from an ascii pvl 
-    format into a binary formatted file. 
+      This program converts an Isis control network file from an ascii pvl 
+    format into a binary formatted file.
     </p>
   </description>
 
@@ -43,7 +43,7 @@
               *.cnet *.pvl
       </filter>
     </parameter>
-  
+
     <parameter name="TO">
       <type>filename</type>
       <fileMode>output</fileMode>
@@ -57,6 +57,6 @@
               *.bin
       </filter>
     </parameter>
-    </group>    
+    </group>
   </groups>
 </application>

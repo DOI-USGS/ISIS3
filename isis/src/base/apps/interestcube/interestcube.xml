@@ -10,18 +10,18 @@
     <p>
       This program, interestcube, uses an interest operator to quantify how interesting each point
       of the input cube is. The size of the output cube matches the input cube. Each DN value of
-      the output cube represents the quality of interest that corresponds to points in the input 
-      cube.  The values of the output cube represent the quality of interest of each corresponding 
+      the output cube represents the quality of interest that corresponds to points in the input
+      cube.  The values of the output cube represent the quality of interest of each corresponding
       point in the input cube.
     </p>
     <p>
-      The user must select an interest operator (algorithm) from one of the following:  
+      The user must select an interest operator (algorithm) from one of the following:
       1) Förstner, 2) Gradient 3) Moravec and 4) Standard Deviation. The operator and its required
-      values are specified in the input PVL parameter for interestcube. This input PVL is a text 
+      values are specified in the input PVL parameter for interestcube. This input PVL is a text
       file that may be copied from the Examples section of this page.
     </p>
     <p>
-      Note: Forstner operator output will need to be manually stretched to see visual results, 
+      Note: Forstner operator output will need to be manually stretched to see visual results,
       due to the wide range of values it creates.
     </p>
   </description>
@@ -36,14 +36,14 @@
       Renamed app from "interest" -> "interestcube"
     </change>
     <change name="Sharmila Prasad" date="2010-04-14">
-      Create a universal ground map of the input cube to be passed onto the 
+      Create a universal ground map of the input cube to be passed onto the
       Interest Operator to calculate the Emission Angle
     </change>
     <change name="Ian Humphrey" date="2014-06-03">
       Closed the open cube to prevent errors from running sequential data in GUI. Fixes #1002.
     </change>
     <change name="Makayla Shepherd" date="2015-02-06">
-      Initialized the global variables and changed the catch in ISISMain in order to 
+      Initialized the global variables and changed the catch in ISISMain in order to
       close the cube before the exception is thrown. Fixes #2124, 2125.
     </change>
     <change name="Curtis Rose" date="2016-04-29">
@@ -105,7 +105,7 @@
       Using interestcube with Förstner operator.
       </brief>
       <description>
-        The use of Interest to ingest an ISIS 3 cube and output a cube with interest values. 
+        The use of Interest to ingest an ISIS cube and output a cube with interest values.
       </description>
       <terminalInterface>
         <commandLine>
@@ -114,12 +114,12 @@
 	  to= out.cub
         </commandLine>
         <description>
-	  This example shows the use of interestcube to create an ISIS 3 cube of interest 
-          values from a standard ISIS 3 cube. This example will use a 3x3 boxcar using the 
+	  This example shows the use of interestcube to create an ISIS cube of interest
+          values from a standard ISIS cube. This example will use a 3x3 boxcar using the
           Förstner Operator.
         </description>
      </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/InterestGUI.jpg">
@@ -143,7 +143,7 @@
           <description>
 	    The input cube that the Interest Operator is to run on.
           </description>
-          <thumbnail caption= "This is the input ISIS 3 cube."
+          <thumbnail caption= "This is the input ISIS cube."
                      src="assets/thumbs/ab102401.jpg" width="167" height="200"/>
           <parameterName>FROM</parameterName>
         </image>
@@ -160,16 +160,16 @@
           <parameterName>PVL</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="550" height="550" src="assets/images/forstner.jpg">
           <brief>
 	  Output image after processing.
           </brief>
           <description>
-            The interest cube image after processing. To view a Förstner image you MUST manually 
+            The interest cube image after processing. To view a Förstner image you MUST manually
             stretch the image. This image has been stretched from 0 to 1.67854e-27.  Keep in mind
-            if you dont do this, the data in the cube will be valid, but will display all white in 
+            if you dont do this, the data in the cube will be valid, but will display all white in
             qview.
           </description>
           <thumbnail caption= "Cube full of interest values after processing."
@@ -184,7 +184,7 @@
         Using interestcube with gradient operator.
       </brief>
       <description>
-        The use of Interst to ingest an ISIS 3 cube and output a cube with interest values. 
+        The use of Interst to ingest an ISIS cube and output a cube with interest values.
       </description>
       <terminalInterface>
         <commandLine>
@@ -193,12 +193,12 @@
 	  to= out.cub
         </commandLine>
         <description>
-	  This example shows the use of interestcube to create an ISIS 3 cube of interest 
-          values from a standard ISIS 3 cube. This example will use a 3x3 boxcar using the 
+	  This example shows the use of interestcube to create an ISIS cube of interest
+          values from a standard ISIS cube. This example will use a 3x3 boxcar using the
           Gradient Operator.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/InterestGUI.jpg">
@@ -222,7 +222,7 @@
           <description>
 	    The input cube that the Interest Operator is to run on.
           </description>
-          <thumbnail caption= "This is the input Isis 3 cube."
+          <thumbnail caption= "This is the input ISIS cube."
                      src="assets/thumbs/ab102401.jpg" width="167" height="200"/>
           <parameterName>FROM</parameterName>
         </image>
@@ -239,7 +239,7 @@
           <parameterName>PVL</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="458" height="550" src="assets/images/gradient.jpg">
           <brief>
@@ -260,7 +260,7 @@
         Using interestcube with Moravec operator.
       </brief>
       <description>
-        The use of Interst to ingest an ISIS 3 cube and output a cube with interest values. 
+        The use of Interst to ingest an ISIS cube and output a cube with interest values.
       </description>
       <terminalInterface>
         <commandLine>
@@ -269,12 +269,12 @@
 	  to= out.cub
         </commandLine>
         <description>
-	  This example shows the use of interestcube to create an ISIS 3 cube of interest 
-          values from a standard ISIS 3 cube. This example will use a 3x3 boxcar using the
+	  This example shows the use of interestcube to create an ISIS cube of interest
+          values from a standard ISIS cube. This example will use a 3x3 boxcar using the
            Moravec Operator.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/InterestGUI.jpg">
@@ -298,7 +298,7 @@
           <description>
 	    The input cube that the Interest Operator is to run on.
           </description>
-          <thumbnail caption= "This is the input Isis 3 cube."
+          <thumbnail caption= "This is the input ISIS cube."
           src="assets/thumbs/ab102401.jpg" width="167" height="200"/>
           <parameterName>FROM</parameterName>
         </image>
@@ -315,7 +315,7 @@
           <parameterName>PVL</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="458" height="550" src="assets/images/moravec.jpg">
           <brief>
@@ -336,7 +336,7 @@
         Using interestcube with Standard Deviation operator using a Small Boxcar (3x3).
       </brief>
       <description>
-        The use of Interest to ingest an ISIS 3 cube and output a cube with interest values. 
+        The use of Interest to ingest an ISIS cube and output a cube with interest values.
       </description>
       <terminalInterface>
         <commandLine>
@@ -345,12 +345,12 @@
 	  to= out.cub
         </commandLine>
         <description>
-	  This example shows the use of interestcube to create an ISIS 3 cube of interest 
-          values from a standard ISIS 3 cube. This example will use a 3x3 boxcar using the
+	  This example shows the use of interestcube to create an ISIS cube of interest
+          values from a standard ISIS cube. This example will use a 3x3 boxcar using the
           Standard Deviation Operator.
         </description>
       </terminalInterface>
-   
+
       <guiInterfaces>
         <guiInterface>
           <image width="450" height="550" src="assets/images/InterestGUI.jpg">
@@ -374,7 +374,7 @@
           <description>
 	    The input cube that the Interest Operator is to run on.
           </description>
-          <thumbnail caption= "This is the input Isis 3 cube."
+          <thumbnail caption= "This is the input ISIS cube."
           src="assets/thumbs/ab102401.jpg" width="167" height="200"/>
           <parameterName>FROM</parameterName>
         </image>
@@ -391,7 +391,7 @@
           <parameterName>PVL</parameterName>
         </dataFile>
       </dataFiles>
-  
+
       <outputImages>
         <image width="458" height="550" src="assets/images/stddev.jpg">
           <brief>
@@ -412,7 +412,7 @@
         Using interestcube with Standard Deviation operator and a Large Boxcar (15x15).
       </brief>
       <description>
-        The use of Interst to ingest an ISIS 3 cube and output a cube with interest values. This 
+        The use of Interst to ingest an ISIS cube and output a cube with interest values. This
         uses StandardDeviationOperator and a large boxcar to show the blurring effect of using
         a larger boxcar.
       </description>
@@ -423,8 +423,8 @@
           to= out.cub
         </commandLine>
         <description>
-          This example shows the use of interestcube to create an ISIS 3 cube of 
-          interest values from a standard ISIS 3 cube. This example will use a 15x15 
+          This example shows the use of interestcube to create an ISIS cube of
+          interest values from a standard ISIS cube. This example will use a 15x15
           boxcar using the StandardDeviationOperator.
         </description>
       </terminalInterface>
@@ -452,7 +452,7 @@
           <description>
             The input cube that the Interest Operator is to run on.
           </description>
-          <thumbnail caption= "This is the input ISIS 3 cube."
+          <thumbnail caption= "This is the input ISIS cube."
           src="assets/thumbs/ab102401.jpg" width="167" height="200"/>
           <parameterName>FROM</parameterName>
         </image>

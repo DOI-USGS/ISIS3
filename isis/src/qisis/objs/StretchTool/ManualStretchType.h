@@ -13,6 +13,7 @@ class QString;
 namespace Isis {
   class Stretch;
   class Histogram;
+  class CubeStretch;
 
   /**
    * @brief This handles arbitrary user-input stretches
@@ -36,6 +37,7 @@ namespace Isis {
                         const QString &name, const QColor &color);
       ~ManualStretchType();
 
+      virtual CubeStretch getStretch();
       virtual void setStretch(Stretch);
 
     private slots:

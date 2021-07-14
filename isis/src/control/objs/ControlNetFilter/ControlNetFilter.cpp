@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "ControlNetFilter.h"
 
 #include <QVector>
@@ -160,7 +168,7 @@ namespace Isis {
    * @author Sharmila Prasad (8/31/2010)
    */
   void ControlNetFilter::CubeStatsHeader(void) {
-    mOstm << "FileName, SerialNumber, ImageTotalPoints, ImagePointsIgnored, ImagePointsEditLocked, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ImageConvexHullRatio,";
+    mOstm << "FileName, SerialNumber, ImageTotalPoints, ImagePointsIgnored, ImagePointsEditLocked, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ImageConvexHullRatio";
   }
 
   /**
@@ -190,7 +198,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference";
       mOstm << endl;
     }
 
@@ -378,7 +386,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference";
       mOstm << endl;
     }
 
@@ -1029,7 +1037,7 @@ namespace Isis {
     if (pbLastFilter) {
       PointStatsHeader();
       CubeStatsHeader();
-      mOstm << "ImageMeasureIgnored, ImageMeasureEditLocked, ";
+      mOstm << ", ImageMeasureIgnored, ImageMeasureEditLocked";
       mOstm << endl;
     }
 
@@ -1306,7 +1314,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       CubeStatsHeader();
-      mOstm << "Distance_PointIDs >>, " << endl;
+      mOstm << ", Distance_PointIDs >>, " << endl;
     }
 
     int iNumCubes = mSerialNumFilter.size();

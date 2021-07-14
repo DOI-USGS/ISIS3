@@ -1,8 +1,16 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Angle.h"
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
 #include "BundleMeasure.h"
-#include "BundleObservation.h"
+#include "IsisBundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleSettings.h"
@@ -51,19 +59,19 @@ void printXml(const BundleObservationSolveSettings &);
  * @internal
  *   @history 2018-07-03 Debbie A Cook - Removed target radii. References #5457.
  *   @history 2014-12-11 - Original version.
- *   @history 2018-09-06 Debbie A. Cook - Merged dev into BundleXYZ branch 
- *                               Original branch history entry on 2017-06-26 
- *                               Updated to reflect changes made to BundleControlPoint. 
- *                               Some tests were no longer valid and new tests were added to exercise 
+ *   @history 2018-09-06 Debbie A. Cook - Merged dev into BundleXYZ branch
+ *                               Original branch history entry on 2017-06-26
+ *                               Updated to reflect changes made to BundleControlPoint.
+ *                               Some tests were no longer valid and new tests were added to exercise
  *                               the new option of adjusting in Rectangular coordinates.  The
- *                               Latitudinal covariance was being populated only along the diagonal 
- *                               (using the latitudinal sigmas).  This produced inaccurate results.  
- *                               Now it is created by converting  the rectangular covariance 
+ *                               Latitudinal covariance was being populated only along the diagonal
+ *                               (using the latitudinal sigmas).  This produced inaccurate results.
+ *                               Now it is created by converting  the rectangular covariance
  *                               matrix to latitudinal.  References #4649 and #501.
  *   @history 2018 -09-06 Debbie A. Cook - Merged dev into BundleXYZ branch
- *                               Original branch history entry on 2017-11-29 - Updated to reflect 
- *                               changes made to units of covariance matrix in SurfacePoint methods 
- *                               and removal of SurfacePoint::SetRadii method. 
+ *                               Original branch history entry on 2017-11-29 - Updated to reflect
+ *                               changes made to units of covariance matrix in SurfacePoint methods
+ *                               and removal of SurfacePoint::SetRadii method.
  *  @history 2018-09-28 Debbie A. Cook - Removed metersToRadians argument from
  *                               constructor because we are now using the local radius instead of
  *                               the target body equatorial radius to convert meters to radians.  To
@@ -119,15 +127,15 @@ namespace Isis {
  *   @history 2016-12-01 Ian Humphrey - Added extra qDebug() stream so the "apply param
  *                           corrections successful?" string will be in the unitTest output.
  *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
- *   @history 2017-03-05 Debbie A. Cook - updated to conform to changes made to 
- *                            BundleControlPointConstructor.  Fixed test 
+ *   @history 2017-03-05 Debbie A. Cook - updated to conform to changes made to
+ *                            BundleControlPointConstructor.  Fixed test
  *                             "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0"
  *                             to output radius type as free instead of N/A under Inital Accuracy column and
  *                             fixed weight value to be 0.  Corrections were made by creating a new contol
  *                             point when the settings were changed instead of just calling setWeights.
- *                             Deleted tests "Modified FreePoint - setWeights, "Modify FixedPoint -  
- *                             setWeights() and ModifyConstrainedPoint - setWeights()" since 
- *                             setWeights is always called in the constructor now.  References 
+ *                             Deleted tests "Modified FreePoint - setWeights, "Modify FixedPoint -
+ *                             setWeights() and ModifyConstrainedPoint - setWeights()" since
+ *                             setWeights is always called in the constructor now.  References
  *                             #4649 and #501
  */
 int main(int argc, char *argv[]) {
@@ -377,7 +385,7 @@ int main(int argc, char *argv[]) {
     Camera *camera = NULL;
     BundleImage bi(camera, "TestImageSerialNumber", "TestImageFileName");
     qDebug() << "setting null parentBundleObservation to BundleImage...";
-    BundleObservationQsp parentObservation;
+    IsisBundleObservationQsp parentObservation;
     bi.setParentObservation(parentObservation);
     qDebug() << "Access camera and parentObservation ...";
 //    Camera *cam = bi.camera();
@@ -404,8 +412,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug() << "Testing BundleObservation...";
-    qDebug() << "Constructing empty BundleObservation object...";
+    qDebug() << "Testing IsisBundleObservation...";
+    qDebug() << "Constructing empty IsisBundleObservation object...";
     /**
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: ??% (need to re-run SquishCoco)
     NEED:
@@ -421,29 +429,29 @@ int main(int argc, char *argv[]) {
                                                     pntsigma[1]  > 0, pntsigma[2] == 0
         6) formatBundleOutputString - with instrumentPosition/instrumentRotation not NULL
     */
-    BundleObservation bo;
+    IsisBundleObservation bo;
     BundleTargetBodyQsp bundleTargetBody = BundleTargetBodyQsp(new BundleTargetBody);
-    qDebug() << "Constructing BundleObservation object from BundleImage...";
-    BundleObservation bo2(bi2,
+    qDebug() << "Constructing IsisBundleObservation object from BundleImage...";
+    IsisBundleObservation bo2(bi2,
                           "ObservationNumber2",
                           "InstrumentId2",
                           bundleTargetBody);
 
     BundleImageQsp nullImage;
-    BundleObservation nullBO(nullImage,
+    IsisBundleObservation nullBO(nullImage,
                              "NullObservationNumber",
                              "NullInstrumentId",
                              bundleTargetBody);
 
     qDebug() << "Testing assignment operator to set this equal to itself...";
     {
-      BundleObservation &tbo2 = bo2;
+      IsisBundleObservation &tbo2 = bo2;
       bo2 = tbo2;
     }
     qDebug() << "Testing assignment operator to create a new object...";
     bo = bo2;
     qDebug() << "Testing copy constructor...";
-    BundleObservation bo3(bo);
+    IsisBundleObservation bo3(bo);
 
     qDebug() << "Testing mutators and accessors...";
     qDebug() << "    Set/get solve settings using with CAMESOLVE=NONE...";
@@ -459,7 +467,7 @@ int main(int argc, char *argv[]) {
     std::stringstream fpOut2;
     bo2.bundleOutputString(fpOut2, true);
     qDebug().noquote() << QString::fromStdString(fpOut2.str());
-    
+
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
@@ -483,8 +491,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "index = " << toString(bo3.index());
     qDebug() << "instrument id = " << bo3.instrumentId();
     qDebug() << "number parameters =     " << toString(bo3.numberParameters());
-    qDebug() << "number position param = " << toString(bo3.numberPositionParameters());
-    qDebug() << "number pointing param = " << toString(bo3.numberPointingParameters());
     qDebug() << "parameter list: " << bo3.parameterList();
     qDebug() << "image names:    " << bo3.imageNames();
 
@@ -607,29 +613,11 @@ int main(int argc, char *argv[]) {
     */
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
-    // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs1->formatBundleOutputString(true);
-    //obs1 = bov.observationByCubeSerialNumber("obs1");
-    //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs2->formatBundleOutputString(true);
-    qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
-    qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
-
-#if 0
-    BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");
-    qDebug() << "same observation?" << toString((obs1 == obs1b));
-    qDebug() << obs1b.formatBundleOutputString(true);
-#endif
-    // Following segfaults (see #4157)
-    qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleControlPoint...";
-    #if 0
-    TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 100%
-    #endif
     // #1 Test free point with default settings (solveRadius=false), apriori coordinates set, but no
     //       sigmas (other settings: observation mode = false, update =false, errorProp = false)
     qDebug() << "BCP test 1 - Create FreePoint with free point containing 2 measures "
@@ -666,7 +654,7 @@ int main(int argc, char *argv[]) {
     bcp1.zeroNumberOfRejectedMeasures();
     qDebug() << "Zero out number of rejected measures:" << bcp1.numberOfRejectedMeasures();
 
-    // ??? these print outs are not pretty... fix??? 
+    // ??? these print outs are not pretty... fix???
     qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
     // ??? these print outs are not pretty... fix??? improved somewhat 6-9-2017
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp);
@@ -678,7 +666,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp);
     qDebug() << "";
 
-// #2 Same as test 1, but assign coordinate values (0., 0., 10.) to adjusted surface points of FREE 
+// #2 Same as test 1, but assign coordinate values (0., 0., 10.) to adjusted surface points of FREE
 //       point with solve radius still false -- radius weight is fixed (1.0e+50).  Other coordinates are free
     qDebug() << "BCP test 2 - Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()";
     SurfacePoint sp1(Latitude(0.0, Angle::Degrees),
@@ -768,9 +756,9 @@ int main(int argc, char *argv[]) {
 // #4 Test with global sigmas now.  Everything else is the same as test #3.
     qDebug() << "BCP test 4 - Create FreePoint - solveRadius=true, apriori lat/lon/rad > 0 ";
     qDebug() << "                    from globals - coordinate type = Latitudinal";
-    settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal, 
+    settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
                               SurfacePoint::Latitudinal, 2.0, 3.0, 4.0);
-    freePoint->SetAprioriSurfacePoint(sp1); 
+    freePoint->SetAprioriSurfacePoint(sp1);
     BundleControlPoint bcp1b(settings, freePoint);
     bcp1b.setAdjustedSurfacePoint(sp1);
     BundleMeasure bcm1b = *(bcp1b.addMeasure(cm1));
@@ -812,7 +800,7 @@ int main(int argc, char *argv[]) {
     qDebug().noquote() << bcp3a->formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp3a->formatBundleOutputDetailString(errorProp);
 
-    qDebug() << "BCP test 6 - Create FixedPoint from empty fixed point, solveRadius = True";  
+    qDebug() << "BCP test 6 - Create FixedPoint from empty fixed point, solveRadius = True";
     qDebug() << " adjusted surface point (90, 180, 10)...";
 settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
                           SurfacePoint::Latitudinal, Isis::Null);
@@ -890,7 +878,7 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
     else {
       qDebug() << "weights:        NA";
     }
-        
+
     qDebug() << "";
     qDebug() << "";
 
@@ -909,12 +897,12 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
                                  Displacement(529.919264, Displacement::Meters), covar);
 // Extract the covar matrix converted to latitudinal coordinates now to use for test 10.
 // Usage note:  In order to get accurate results, the full correlation matrix should be
-// used as opposed to only setting the diagonal elements with the sigmas. 
+// used as opposed to only setting the diagonal elements with the sigmas.
     boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covarLat(3);
     covarLat.clear();
     covarLat = aprioriSurfPt.GetSphericalMatrix();
 
-// These results match what is being set in adjusted surface point.  
+// These results match what is being set in adjusted surface point.
     Angle latSigma = aprioriSurfPt.GetLatSigma();
     Angle lonSigma = aprioriSurfPt.GetLonSigma();
     Distance localRad = aprioriSurfPt.GetLocalRadiusSigma();
@@ -1090,7 +1078,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     catch (IException &e) {
       e.print();
     }
-    bundleMeasure.setParentObservation(BundleObservationQsp(new BundleObservation(bo2)));
+    bundleMeasure.setParentObservation(IsisBundleObservationQsp(new IsisBundleObservation(bo2)));
     // const BundleObservationSolveSettings *solveSettings =
     bundleMeasure.observationSolveSettings();
     // Camera *cam =

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <QByteArray>
 #include <QDataStream>
 #include <QDebug>
@@ -131,7 +139,14 @@ int main(int argc, char *argv[]) {
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
+
+    // Need to create a camera
+    QString inputFile = "$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.lev2.cub";
+    Cube cube;
+    cube.open(inputFile);
     Camera *camera = NULL;
+    camera = cube.camera();
+
     BundleImage bundleImage(camera,
                             "Ignored",
                             "TestImageFileName");

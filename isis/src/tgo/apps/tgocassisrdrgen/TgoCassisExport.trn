@@ -1,4 +1,4 @@
-# Translation for TGO CaSSIS export from ISIS3 cube to PDS4 product.
+# Translation for TGO CaSSIS export from ISIS cube to PDS4 product.
 #
 # Note these translations must be are ordered based on the required PDS4 order.
 #
@@ -13,7 +13,8 @@
 # history 2018-05-18 Jeannie Backer - Changed group names to upper camel case for consistency.
 # history 2018-05-22 Kaitlyn Lee - Moved mosaic keywords to tgoCassisExportMosaic.trn.
 # history 2018-06-18 Jeannie Backer - Look for ObservationId in Archive group
-# history 2019-06-12 Kristin Berry - Removed CaSSIS_Header for non-PDS4 compliance. 
+# history 2019-06-12 Kristin Berry - Removed CaSSIS_Header for non-PDS4 compliance.
+# history 2021-06-07 Kristin Berry  - Added footprint information. 
 
 #Group = FileName
 #  Auto
@@ -100,7 +101,7 @@ End_Group
 #Group = SmithedCK
 #  Auto
 #  Optional
-#  InputKey        = SmithedCK 
+#  InputKey        = SmithedCK
 #  InputPosition   = (IsisCube, Archive)
 #  OutputName      = cassis:smithedck
 #  OutputPosition  = (Product_Observational, Mission_Area, cassis:CaSSIS)
@@ -118,7 +119,7 @@ End_Group
 #End_Group
 
 # Commented-out non-PDS4 compliant CaSSIS_Header. Left in here in case
-# we want to translate these into a PDS4-compliant structure in the future. 
+# we want to translate these into a PDS4-compliant structure in the future.
 
 #Group = ProductId
 #  Auto
@@ -678,3 +679,90 @@ End_Group
 #  OutputPosition  = (Product_Observational, CaSSIS_Header, PEHK_HEADER)
 #  Translation     = (*, *)
 #End_Group
+
+# Export Footprint Coordinates 
+
+Group = Corner1Lattiude
+  Auto
+  Optional
+  InputKey        = Corner1Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputSiblings =  ("geom:reference_pixel_location|Lower Left Corner")
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner1Longitude
+  Auto
+  Optional
+  InputKey        = Corner1Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner2Lattiude
+  Auto
+  Optional
+  InputKey        = Corner2Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept2)
+  OutputSiblings = ("geom:reference_pixel_location|Lower Right Corner")
+  Translation     = (*, *)
+End_Group
+
+Group = Corner2Longitude
+  Auto
+  Optional
+  InputKey        = Corner2Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept2)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner3Lattiude
+  Auto
+  Optional
+  InputKey        = Corner3Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept3)
+  OutputSiblings  = ("geom:reference_pixel_location|Upper Left Corner")
+  Translation     = (*, *)
+End_Group
+
+Group = Corner3Longitude
+  Auto
+  Optional
+  InputKey        = Corner3Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept3)
+  Translation     = (*, *)
+End_Group
+
+Group = Corner4Lattiude
+  Auto
+  Optional
+  InputKey        = Corner4Latitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_latitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, new@geom:Pixel_Intercept4)
+  OutputSiblings  = ("geom:reference_pixel_location|Upper Right Corner")
+  Translation     = (*, *)
+End_Group
+
+Group = Corner4Longitude
+  Auto
+  Optional
+  InputKey        = Corner4Longitude
+  InputPosition   = (IsisCube, Archive)
+  OutputName      = geom:pixel_longitude
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, geom:Geometry, geom:Geometry_Orbiter, geom:Surface_Geometry, geom:Surface_Geometry_Specific, geom:Footprint_Vertices, geom:Pixel_Intercept4)
+  Translation     = (*, *)
+End_Group
+

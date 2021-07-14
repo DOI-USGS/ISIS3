@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Application.h"
 #include "CnetRefByEmission.h"
 #include "ControlNet.h"
@@ -50,7 +58,7 @@ namespace Isis {
     mStatus.SetText("Choosing Reference by Emission...");
     mStatus.SetMaximumSteps(pNewNet.GetNumPoints());
     mStatus.CheckStatus();
-    
+
     for (int point = 0; point < pNewNet.GetNumPoints(); ++point) {
       ControlPoint *newPnt = pNewNet.GetPoint(point);
 
@@ -69,7 +77,7 @@ namespace Isis {
         newPnt->SetDateTime(Application::DateTime());
       }
       else {
-        pvlPointObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock"); 
+        pvlPointObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock");
       }
 
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
@@ -89,12 +97,12 @@ namespace Isis {
       // Points having atleast 1 measure and Points not Ignored
       // Check for EditLock in the Measures and also verfify that
       // only a Reference Measure can be Locked else error
-      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 && 
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
         QString istrTemp;
         double dBestEmissionAngle = 135;
-        
+
         for (int measure = 0; measure < numMeasures; ++measure) {
           ControlMeasure *newMsr = newPnt->GetMeasure(measure);
           bool bMeasureLocked = newMsr->IsEditLocked();
@@ -209,7 +217,7 @@ namespace Isis {
           sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
-        
+
         if (iNumMeasuresLocked > 0 && !bRefLocked) {
           pvlPointObj += Isis::PvlKeyword("Error", "Point has a Measure with EditLock set to true "
                                           "but the Reference is not Locked");
@@ -239,7 +247,7 @@ namespace Isis {
               origPnt.GetReferenceSN());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevEmAngle",
               toString(bestEmissionAngle[iRefIndex]));
-  
+
           istrTemp = toString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
           istrTemp += toString((int)origPnt.GetMeasure(iRefIndex)->GetLine());

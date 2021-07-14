@@ -22,6 +22,9 @@
 
 #include "Isis.h"
 
+#include <vector>
+
+#include <QRegularExpression>
 #include <QString>
 
 #include "Cube.h"
@@ -60,24 +63,48 @@ void IsisMain() {
   CSVReader::CSVAxis header = reader.getHeader();
 
   // Construct an empty table with the CSV header as field names
+  // Collect identical field names together, including those with (###) at the end, so a single
+  // table field with multiple values can be created.
   TableRecord tableRow;
+  QRegularExpression rex(R"((?<name>\w+)(\((?<index>[0-9]*)\)|))");
   for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
-    TableField columnField(QString(header[columnIndex]), TableField::Double);
-    tableRow += columnField;
+    QRegularExpressionMatch match = rex.match(header[columnIndex]);
+    if (match.hasMatch()) {
+      QString name = match.captured("name");
+      QString index = match.captured("index");
+
+      // If the next column header is different, create a field for this one
+      QRegularExpressionMatch nextMatch = (columnIndex<numColumns-1)?rex.match(header[columnIndex+1]):QRegularExpressionMatch();
+      if ((columnIndex == numColumns-1) || (nextMatch.hasMatch() && (name != nextMatch.captured("name")))) {
+        TableField columnField(name, TableField::Double, (index.length()>0)?(index.toInt()+1):1);
+        tableRow += columnField;
+      }
+    }
   }
+
   QString tableName = ui.GetString("tablename");
   Table table(tableName, tableRow);
 
-  // Fill the table
+  // Fill the table from the csv
   for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
     CSVReader::CSVAxis csvRow = reader.getRow(rowIndex);
-    for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
-      tableRow[columnIndex] = toDouble(csvRow[columnIndex]);
+    for (int columnIndex = 0, fieldIndex = 0; columnIndex < numColumns; ) {
+      if (tableRow[fieldIndex].size() == 1) {
+        tableRow[fieldIndex] = toDouble(csvRow[columnIndex++]);
+      }
+      else {
+        std::vector<double> dblVector;
+        for (int arrayLen = 0; arrayLen < tableRow[fieldIndex].size(); arrayLen++) {
+          dblVector.push_back(toDouble(csvRow[columnIndex++]));
+        }
+        tableRow[fieldIndex] = dblVector;
+      }
+      fieldIndex++;
     }
     table += tableRow;
   }
 
-  // If a set of label keywords was passed add them to the table
+  // If a set of additional label keywords was given then add them to the table's pvl description
   if (ui.WasEntered("label")) {
     QString labelPvlFilename = ui.GetFileName("label");
     Pvl labelPvl;
@@ -116,5 +143,4 @@ void IsisMain() {
   }
 
   outCube.close();
-
 }

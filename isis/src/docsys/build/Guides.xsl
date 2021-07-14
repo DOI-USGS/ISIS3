@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -15,8 +15,8 @@ Deborah Lee Soltesz
 -->
 
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -69,7 +69,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        ISIS 3 Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -116,7 +116,7 @@ Deborah Lee Soltesz
 Coming Soon! ISIS Workshop!</strong>
 This section has been temporarily removed.
 We will soon be unveiling the new ISIS Workshop
-which will feature tutorials on using Isis 3
+which will feature tutorials on using Isis
 for everyone from beginners to advanced users!
 </p>
 
@@ -329,4 +329,3 @@ for everyone from beginners to advanced users!
 
 
 </xsl:stylesheet>
-

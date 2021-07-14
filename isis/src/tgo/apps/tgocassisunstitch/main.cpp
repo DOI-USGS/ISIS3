@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <QList>
@@ -92,18 +100,17 @@ void IsisMain() {
   }
 
   // Collect the tables and history from the input stitched cube
-  QList<Blob> inputTables;
-  QScopedPointer<History> inputHistory;
+  QList<Blob> inputBlobs;
   for(int i = 0; i < inputLabel->objects(); i++) {
     if(inputLabel->object(i).isNamed("Table")) {
       Blob table((QString)inputLabel->object(i)["Name"], inputLabel->object(i).name());
       cube->read(table);
-      inputTables.append(table);
+      inputBlobs.append(table);
     }
     if(inputLabel->object(i).isNamed("History") && Isis::iApp != NULL) {
-      inputHistory.reset( new History((QString)inputLabel->object(i)["Name"]) );
-      cube->read(*inputHistory);
-      inputHistory->AddEntry();
+      History inputHistory = cube->readHistory((QString)inputLabel->object(i)["Name"]);
+      inputHistory.AddEntry();
+      inputBlobs.append(inputHistory.toBlob());
     }
   }
 
@@ -198,13 +205,10 @@ void IsisMain() {
     // Delete Stitch group
     frameletLabel->findObject("IsisCube").deleteGroup("Stitch");
 
-    // Propagate Tables
-    for (int j = 0; j < inputTables.size(); j++) {
-      g_outputCubes[i]->write(inputTables[j]);
+    // Propagate Blobs
+    for (int j = 0; j < inputBlobs.size(); j++) {
+      g_outputCubes[i]->write(inputBlobs[j]);
     }
-
-    // Propagate History
-    g_outputCubes[i]->write(*inputHistory);
 
     // Close output cube
     g_outputCubes[i]->close();

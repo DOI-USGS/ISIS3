@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 #include "PvlGroup.h"
 #include "UserInterface.h"
@@ -30,7 +38,7 @@ struct Coordinate {
   double longitude;    //!< Longitude of the point
 };
 
-inline double distance(const double &x1, const double &y1, 
+inline double distance(const double &x1, const double &y1,
                        const double &x2, const double &y2) {
   return (sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)));
 }
@@ -136,14 +144,14 @@ void IsisMain() {
       else nulls++;
     }
     else {
-       badPoint++; 
+       badPoint++;
     }
     prog.CheckStatus();
   }
 
   PvlGroup results("Results");
-  results += PvlKeyword("PixelPitch", toString(pp), "millimeters");  
-  results += PvlKeyword("TotalPoints", toString(cn.GetNumPoints()));  
+  results += PvlKeyword("PixelPitch", toString(pp), "millimeters");
+  results += PvlKeyword("TotalPoints", toString(cn.GetNumPoints()));
   results += PvlKeyword("ValidPoints", toString((BigInt) coords.size()));
   results += PvlKeyword("InvalidPoints", toString(badPoint));
   if (checkForNulls) results += PvlKeyword("NullDNs", toString(nulls));
@@ -170,7 +178,7 @@ void IsisMain() {
     for(unsigned int i = 0; i < coords.size(); i++) {
       Coordinate &c = coords[i];
       os << c.samp << "," << c.line << "," << c.errSamp << "," << c.errLine << ","
-         << c.olddetX << "," << c.olddetY << "," << c.newdetX << "," << c.newdetY << "," 
+         << c.olddetX << "," << c.olddetY << "," << c.newdetX << "," << c.newdetY << ","
          << c.gof << "," << c.latitude << "," << c.longitude << endl;
 
     }
@@ -178,4 +186,3 @@ void IsisMain() {
 
   return;
 }
-

@@ -220,6 +220,9 @@ End_Group
     <change name="Kaitlyn Lee" date="2018-02-16">
       Removed units on look direction vectors to make them unitless. Fixes #5125.
     </change>
+    <change name="Kristin Berry, Jesse Mapel, and Stuart Sides" date="2021-02-10">
+      Modified to output Nulls when using a CSM Camera model and some values are not available.
+    </change>
   </history>
 
   <oldName>

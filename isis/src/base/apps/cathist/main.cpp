@@ -5,7 +5,7 @@
 #include "FileName.h"
 #include "IString.h"
 #include "History.h"
-#include "Pvl.h"   
+#include "Pvl.h"
 #include "TextFile.h"
 
 using namespace Isis;
@@ -26,7 +26,8 @@ void IsisMain() {
   }
 
   // Extract history from file
-  History hist("IsisCube", fromfile.expanded());
+  Blob historyBlob("IsisCube", "History", fromfile.expanded());
+  History hist(historyBlob);
   Pvl pvl = hist.ReturnHist();
 
   // Print full history

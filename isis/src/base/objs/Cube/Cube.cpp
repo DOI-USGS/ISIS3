@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.19 $
- * $Date: 2010/03/22 19:44:53 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "IsisDebug.h"
 #include "Cube.h"
 
@@ -33,22 +17,29 @@
 #include <QMutex>
 
 #include "Application.h"
+#include "Blob.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "CubeAttribute.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
+#include "CubeStretch.h"
 #include "Endian.h"
 #include "FileName.h"
+#include "History.h"
 #include "ImageHistogram.h"
+#include "ImagePolygon.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "Message.h"
+#include "OriginalLabel.h"
+#include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Table.h"
 #include "TProjection.h"
 #include "Longitude.h"
 
@@ -813,7 +804,7 @@ namespace Isis {
    *
    * @return (type)return description
    */
-  void Cube::read(Blob &blob) const {
+  void Cube::read(Blob &blob, const std::vector<PvlKeyword> keywords) const {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't read a blob from it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -825,7 +816,7 @@ namespace Isis {
 
     QMutexLocker locker(m_mutex);
     QMutexLocker locker2(m_ioHandler->dataFileMutex());
-    blob.Read(cubeFile.toString(), *label());
+    blob.Read(cubeFile.toString(), *label(), keywords);
   }
 
 
@@ -847,12 +838,137 @@ namespace Isis {
 
 
   /**
+   * Read the History from the Cube.
+   *
+   * @param name The name of the History Blob to read. This is used for reading
+   *             History from Cubes made prior to the History Blob name being
+   *             standardized.
+   */
+  History Cube::readHistory(const QString &name) const {
+    Blob historyBlob(name, "History");
+    try {
+      // read history from cube, if it exists.
+      read(historyBlob);
+    }
+    catch (IException &) {
+    // if the history does not exist in the cube, this function creates it.
+    }
+    History history(historyBlob);
+    return history;
+  }
+
+
+  /**
+   * Read the footprint polygon for the Cube.
+   *
+   * @return @b ImagePolygon
+   */
+  ImagePolygon Cube::readFootprint() const {
+    Blob footprintBlob("Footprint", "Polygon");
+    try {
+      // read history from cube, if it exists.
+      read(footprintBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Footprintinit must be run prior to reading the footprint";
+      msg += " with POLYGON=TRUE for cube [" + fileName() + "]";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    ImagePolygon footprint(footprintBlob);
+    return footprint;
+  }
+
+
+  /**
+   * Read the original PDS3 label from a cube.
+   *
+   * @param name The name of the OriginalLabel Blob
+   *
+   * @return @b OriginalLabel The original PDS3 label as a PVL document
+   */
+  OriginalLabel Cube::readOriginalLabel(const QString &name) const {
+    Blob origLabelBlob(name, "OriginalLabel");
+    try {
+      read(origLabelBlob);
+    }
+    catch (IException &e){
+      QString msg = "Unable to locate OriginalLabel in " + fileName();
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    OriginalLabel origLabel(origLabelBlob);
+    return origLabel;
+  }
+
+
+  /**
+   * Read a Stretch from a cube.
+   *
+   * @param name The name of the Stretch Blob
+   * @param keywords A set of keywords and values to match in the Stretch Blob label.
+   *                 This can be used to read the stretch for a specific band.
+   *
+   * @return @b CubeStretch
+   */
+  CubeStretch Cube::readCubeStretch(QString name, const std::vector<PvlKeyword> keywords) const {
+    Blob stretchBlob(name, "Stretch");
+    try {
+      read(stretchBlob, keywords);
+    }
+    catch (IException &e){
+      QString msg = "Unable to locate Stretch information in " + fileName();
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    CubeStretch cubeStretch(stretchBlob);
+    return stretchBlob;
+  }
+
+
+  /**
+   * Read the original PDS4 label from a cube.
+   *
+   * @return @b OriginalXmlLabel The original PDS4 label as an XML document
+   */
+  OriginalXmlLabel Cube::readOriginalXmlLabel() const {
+    Blob origXmlLabelBlob("IsisCube", "OriginalXmlLabel");
+    try {
+      read(origXmlLabelBlob);
+    }
+    catch (IException &e){
+      QString msg = "Unable to locate OriginalXmlLabel in " + fileName();
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    OriginalXmlLabel origXmlLabel(origXmlLabelBlob);
+    return origXmlLabel;
+  }
+
+
+  /**
+   * Read a Table from the cube.
+   *
+   * @param name The name of the Table to read
+   *
+   * @return @b Table
+   */
+  Table Cube::readTable(const QString &name) {
+    Blob tableBlob(name, "Table");
+    try {
+      read(tableBlob);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+    return Table(tableBlob);
+  }
+
+
+  /**
    * This method will write a blob of data (e.g. History, Table, etc)
    * to the cube as specified by the contents of the Blob object.
    *
    * @param blob data to be written
    */
-  void Cube::write(Blob &blob) {
+  void Cube::write(Blob &blob, bool overwrite) {
     if (!isOpen()) {
       string msg = "The cube is not opened so you can't write a blob to it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -888,7 +1004,8 @@ namespace Isis {
         stream.seekp(maxbyte, ios::beg);
       }
 
-      blob.Write(*m_label, stream);
+      // Use default argument of "" for detached stream
+      blob.Write(*m_label, stream, "", overwrite);
     }
 
     // Write a detached blob
@@ -907,12 +1024,88 @@ namespace Isis {
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
-// Changed to work with mods to FileName class
-//      blob.Write(p_cube.label,detachedStream,blobFileName.baseName()+"."+
-//                 blob.Type()+"."+
-//                 blobFileName.extension());
       blob.Write(*m_label, detachedStream, blobFileName.name());
     }
+  }
+
+
+  /**
+   * This method will write an OriginalLabel object.
+   * to the cube as specified by the contents of the Blob object.
+   *
+   * @param Original label data to be written
+   */
+  void Cube::write(OriginalLabel &lab) {
+    Blob labelBlob = lab.toBlob();
+    write(labelBlob);
+  }
+
+
+  /**
+   * This method will write an OriginalXmlLabel object.
+   * to the cube as specified by the contents of the Blob object.
+   *
+   * @param Original xml label data to be written
+   */
+  void Cube::write(const OriginalXmlLabel &lab) {
+    Blob labelBlob = lab.toBlob();
+    write(labelBlob);
+  }
+
+
+  /**
+   * Write a Table to the Cube.
+   *
+   * The Table will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readTable.
+   *
+   * @param table The table to write to the Cube
+   */
+  void Cube::write(const Table &table) {
+    Blob tableBlob = table.toBlob();
+    write(tableBlob);
+  }
+
+
+  /**
+   * Write a Stretch to the Cube
+   *
+   * The stretch will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readCubeStretch.
+   *
+   * @param cubeStretch The stretch to write to the Cube.
+   */
+  void Cube::write(const CubeStretch &cubeStretch) {
+    Blob cubeStretchBlob = cubeStretch.toBlob();
+    write(cubeStretchBlob);
+  }
+
+
+  /**
+   * Write an updated History to the Cube
+   *
+   * The History will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readHistory.
+   *
+   * @param history The history to write to the Cube.
+   * @param name The name for the history BLOB. This is used for backwards compatibility
+   *             with cubes from before the History BLOB name was standardized.
+   */
+  void Cube::write(History &history, const QString &name) {
+    Blob histBlob = history.toBlob(name);
+    write(histBlob);
+  }
+
+
+  /**
+   * Write a polygon to the Cube
+   *
+   * The polygon will be written to the Cube as a BLOB and can be accessed
+   * using Cube::readFootprint.
+   */
+  void Cube::write(const ImagePolygon &polygon) {
+    Blob polyBlob = polygon.toBlob();
+    write(polyBlob);
   }
 
 
@@ -1755,11 +1948,11 @@ namespace Isis {
    * Blob type and name. If blob does not exist it will do nothing and return
    * false.
    *
-   * @param BlobType type of blob to search for (Polygon, Table, etc)
    * @param BlobName blob to be deleted
+   * @param BlobType type of blob to search for (Polygon, Table, etc)
    * @return boolean if it found the blob and deleted it.
    */
-  bool Cube::deleteBlob(QString BlobType, QString BlobName) {
+  bool Cube::deleteBlob(QString BlobName, QString BlobType) {
     for(int i = 0; i < m_label->objects(); i++) {
       PvlObject obj = m_label->object(i);
       if (obj.name().compare(BlobType) == 0) {
@@ -1816,16 +2009,17 @@ namespace Isis {
 
 
   /**
-   * Check to see if the cube contains a pvl table by the provided name
+   * Check to see if the cube contains a BLOB.
    *
-   * @param name The name of the pvl table to search for
+   * @param name The name of the BLOB to search for
+   * @param type The type of the BLOB to search for
    *
-   * @return bool True if the pvl table was found
+   * @return bool True if the BLOB was found
    */
-  bool Cube::hasTable(const QString &name) {
+  bool Cube::hasBlob(const QString &name, const QString &type) {
     for(int o = 0; o < label()->objects(); o++) {
       PvlObject &obj = label()->object(o);
-      if (obj.isNamed("Table")) {
+      if (obj.isNamed(type)) {
         if (obj.hasKeyword("Name")) {
           QString temp = (QString) obj["Name"];
           temp = temp.toUpper();
@@ -1836,6 +2030,18 @@ namespace Isis {
       }
     }
     return false;
+  }
+
+
+  /**
+   * Check to see if the cube contains a pvl table by the provided name
+   *
+   * @param name The name of the pvl table to search for
+   *
+   * @return bool True if the pvl table was found
+   */
+  bool Cube::hasTable(const QString &name) {
+    return hasBlob(name, "Table");
   }
 
 
@@ -2271,7 +2477,7 @@ namespace Isis {
 
   /**
    * This is a helper, used by open(...), that handles opening Isis 2 cubes as
-   *   if they were Isis 3 cubes.
+   *   if they were Isis cubes.
    *
    * @param oldCube The filename of the Isis 2 cube
    */

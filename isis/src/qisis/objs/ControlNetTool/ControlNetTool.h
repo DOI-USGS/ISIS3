@@ -1,6 +1,14 @@
 #ifndef ControlNetTool_h
 #define ControlNetTool_h
 
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Tool.h"
 #include "ControlPoint.h"
 
@@ -29,7 +37,7 @@ namespace Isis {
   class UniversalGroundMap;
 
   /**
-   * @brief ControlNetTool Handles mouse events on CubeDnViews for control point editing for the 
+   * @brief ControlNetTool Handles mouse events on CubeDnViews for control point editing for the
    *        ipce app.
    *
    * @ingroup Visualization Tools
@@ -49,7 +57,7 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
    *                           center crosshair in red.  Removed refresh method; it was not being
    *                           used.  Fixes #5007, #5008.
-   *   @history 2017-08-08 Cole Neubauer - Renamed from IpceTool.  Fixes #5090. 
+   *   @history 2017-08-08 Cole Neubauer - Renamed from IpceTool.  Fixes #5090.
    *   @history 2017-08-09 Cole Neubauer - Added loadNetwork() for changing inbetween active
    *                           networks Fixes #4567
    *   @history 2018-03-12 Tracie Sucharski - Fixed some documentation leftover from renaming from

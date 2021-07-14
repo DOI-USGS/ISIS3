@@ -8,3 +8,5 @@ commands:
 	  to=$(OUTPUT)/${FILE}.vis.odd.cal.cub > /dev/null;
 	$(APPNAME) from=$(INPUT)/${FILE}.vis.even.cub \
           to=$(OUTPUT)/${FILE}.vis.even.cal.cub > /dev/null;
+	$(APPNAME) from=$(INPUT)/${FILE}.vis.even.spice.cub \
+          to=$(OUTPUT)/${FILE}.vis.even.spice.cal.cub > /dev/null;

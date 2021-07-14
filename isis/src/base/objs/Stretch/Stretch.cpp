@@ -1,25 +1,9 @@
-/**
- * @file
- * $Revision: 1.9 $
- * $Date: 2009/07/16 21:14:56 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
 
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 
 #include <QDebug>
@@ -38,7 +22,7 @@ namespace Isis {
    * Constructs a Stretch object with default mapping of special pixel values to
    * themselves.
    */
-  Stretch::Stretch() : Blob("ImageStretch", "Stretch") {
+  Stretch::Stretch() {
     p_null = Isis::NULL8;
     p_lis = Isis::LOW_INSTR_SAT8;
     p_lrs = Isis::LOW_REPR_SAT8;
@@ -47,26 +31,6 @@ namespace Isis {
     p_minimum = p_lrs;
     p_maximum = p_hrs;
     p_pairs = 0;
-    p_type = "None";
-  }
-
-
-  /**
-   * Constructs a Stretch object with default mapping of special pixel values to
-   * themselves and a provided name.
-   *
-   * @param name Name to use for Stretch
-   */
-  Stretch::Stretch(QString name) : Blob(name, "Stretch") {
-    p_null = Isis::NULL8;
-    p_lis = Isis::LOW_INSTR_SAT8;
-    p_lrs = Isis::LOW_REPR_SAT8;
-    p_his = Isis::HIGH_INSTR_SAT8;
-    p_hrs = Isis::HIGH_REPR_SAT8;
-    p_minimum = p_lrs;
-    p_maximum = p_hrs;
-    p_pairs = 0;
-    p_type = "None";
   }
 
 
@@ -430,88 +394,4 @@ namespace Isis {
     this->p_input = other.p_input;
     this->p_output = other.p_output;
   }
-
-
-  /**
-   * Read saved Stretch data from a Cube into this object.
-   *
-   * This is called by Blob::Read() and is the actual data reading function
-   * ultimately called when running something like cube->read(stretch);
-   *
-   * @param is input stream containing the saved Stretch information
-   */
-  void Stretch::ReadData(std::istream &is) {
-    // Set the Stretch Type
-     p_type = p_blobPvl["StretchType"][0];
-
-     // Read in the Stretch Pairs
-     streampos sbyte = p_startByte - 1;
-     is.seekg(sbyte, std::ios::beg);
-     if (!is.good()) {
-       QString msg = "Error preparing to read data from " + p_type +
-                    " [" + p_blobName + "]";
-       throw IException(IException::Io, msg, _FILEINFO_);
-     }
-
-     char *buf = new char[p_nbytes+1];
-     memset(buf, 0, p_nbytes + 1);
-
-     is.read(buf, p_nbytes);
-
-     // Read buffer data into a QString so we can call Parse()
-     std::string stringFromBuffer(buf);
-     QString qStringFromBuffer = QString::fromStdString(stringFromBuffer);
-     Parse(qStringFromBuffer);
-
-     delete [] buf;
-
-     if (!is.good()) {
-       QString msg = "Error reading data from " + p_type + " [" +
-                    p_blobName + "]";
-       throw IException(IException::Io, msg, _FILEINFO_);
-     }
-   }
-
-
-  /**
-   * Get the Type of Stretch. This is only used by the AdvancedStretchTool.
-   *
-   * @return QString Type of Stretch.
-   */
-  QString Stretch::getType(){
-    return p_type;
-  }
-
-
-  /**
-   * Set the Type of Stretch. This is only used by the AdvancedStretchTool.
-   *
-   * @param stretchType The type of stretch.
-   */
-  void Stretch::setType(QString stretchType){
-    // check to see if valid input
-    p_type = stretchType;
-  }
-
-
-  /**
-   *  Initializes for writing stretch to cube blob
-   */
-  void Stretch::WriteInit() {
-    p_nbytes = Text().toStdString().size();
-  }
-
-
-  /**
-   * Writes the stretch information to a cube.
-   *
-   * This is called by Blob::write() and is ultimately the function
-   * called when running something like cube->write(stretch);
-   *
-   * @param os output stream to write the stretch data to.
-   */
-  void Stretch::WriteData(std::fstream &os) {
-    os.write(Text().toStdString().c_str(), p_nbytes);
-  }
-
 } // end namespace isis

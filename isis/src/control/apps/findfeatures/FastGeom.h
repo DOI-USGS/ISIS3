@@ -1,26 +1,14 @@
 #ifndef FastGeom_h
 #define FastGeom_h
-/**
- * @file
- * $Revision$ 
- * $Date$ 
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 
 #include <QList>
 #include <QString>
@@ -38,31 +26,31 @@ class ImageTransform;
 
 /**
  * @brief Compute fast geom transform for pair of images
- *  
- * This class computes a fast geometric transformation of a query and train 
- * image pair using available geometry. 
- *  
- * It is assumed the two images have overlapping regions and in these regions 
- * there are geometries that map from one image to the other. 
- *  
- * There are three types of fast geometric transforms that are computed in this 
- * class: camera, crop and map. 
- *  
- * The camera fast geom works in the same way that the ISIS application cam2map 
- * works. It transforms the train image directly into camera space of the query 
- * image. The crop fast transform option computes the common area of overlap of 
- * the train image and minimumizes the outputs size of the transformed image. 
- * The map fast transform behaves just like cam2map where the output image is 
- * fully retained and projected into the camera space. This option has the 
- * highest degree of problems that can occur particularly if the image scales 
- * differ significantly. 
- *  
- * The resulting fast geom transform is added to the train transform list. This 
+ *
+ * This class computes a fast geometric transformation of a query and train
+ * image pair using available geometry.
+ *
+ * It is assumed the two images have overlapping regions and in these regions
+ * there are geometries that map from one image to the other.
+ *
+ * There are three types of fast geometric transforms that are computed in this
+ * class: camera, crop and map.
+ *
+ * The camera fast geom works in the same way that the ISIS application cam2map
+ * works. It transforms the train image directly into camera space of the query
+ * image. The crop fast transform option computes the common area of overlap of
+ * the train image and minimumizes the outputs size of the transformed image.
+ * The map fast transform behaves just like cam2map where the output image is
+ * fully retained and projected into the camera space. This option has the
+ * highest degree of problems that can occur particularly if the image scales
+ * differ significantly.
+ *
+ * The resulting fast geom transform is added to the train transform list. This
  * approach is well suited for the template MatchMaker::foreachpPair method.
- *  
- * @author 2015-10-01 Kris Becker 
- * @internal 
- *   @history 2015-10-01 Kris Becker - Original Version 
+ *
+ * @author 2015-10-01 Kris Becker
+ * @internal
+ *   @history 2015-10-01 Kris Becker - Original Version
  *   @history 2016-04-06 Kris Becker Created .cpp file and completed documentation
  */
 

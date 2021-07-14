@@ -1,4 +1,4 @@
-// Protocol buffer control point descriptor for Isis3 Control Networks
+// Protocol buffer control point descriptor for Isis Control Networks
 //
 // 2018-06-13 Jesse Mapel - Added flag to indicate it is a protobuf 2 file
 

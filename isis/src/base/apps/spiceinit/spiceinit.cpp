@@ -17,6 +17,7 @@
 #include "PvlToPvlTranslationManager.h"
 #include "SpiceClient.h"
 #include "SpiceClientStarter.h"
+#include "Blob.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "spiceinit.h"
@@ -255,11 +256,14 @@ namespace Isis {
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
 
-      if (!kernelSuccess)
+      if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
                          _FILEINFO_);
+      }
     }
+    icube->deleteGroup("CsmInfo");
+
     p.WriteHistory(*icube);
     p.EndProcess();
   }
@@ -374,6 +378,15 @@ namespace Isis {
     currentKernels.addKeyword(iakKeyword, Pvl::Replace);
     currentKernels.addKeyword(demKeyword, Pvl::Replace);
 
+    // Save off the CSM State so it can be restored if spiceinit fails
+    Blob csmState("CSMState", "String");
+    if (icube->hasBlob("CSMState", "String")) {
+      icube->read(csmState);
+    }
+
+    // Delete the CSM State blob so that CameraFactory doesn't try to instantiate a CSMCamera
+    icube->deleteBlob("CSMState", "String");
+
     // report qualities
     PvlKeyword spkQuality("InstrumentPositionQuality");
     spkQuality.addValue(Kernel::typeEnum(spk.type()));
@@ -475,6 +488,10 @@ namespace Isis {
           log->addGroup(currentKernels);
         }
         icube->putGroup(originalKernels);
+
+        // restore CSM State blob if spiceinit failed
+        icube->write(csmState);
+
         throw IException(e);
       }
 
@@ -550,7 +567,7 @@ namespace Isis {
 
         *icube->label() += cam->getStoredNaifKeywords();
       }
-      //modify Kernels group only
+      // Modify Kernels group only
       else {
         Pvl *label = icube->label();
         int i = 0;
@@ -656,7 +673,7 @@ namespace Isis {
         continue;
       }
     }
-    
+
     if (ui.GetString("SHAPE") == "USER") {
       kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
     }

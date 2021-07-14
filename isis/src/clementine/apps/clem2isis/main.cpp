@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cstdio>
@@ -91,7 +99,7 @@ void writeLine(Buffer &b) {
  *  Function to propagate the labels.
  *
  *  @internal
- *    @history 2009-02-17 Tracie Sucharski - Added BandBin keywords Center and 
+ *    @history 2009-02-17 Tracie Sucharski - Added BandBin keywords Center and
  *                            Width to the translation table, Clementine.trn.  Do not alter this
  *                            keywords for filter F, simply translate.
  *

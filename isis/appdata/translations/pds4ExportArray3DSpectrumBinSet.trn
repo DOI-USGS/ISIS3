@@ -1,5 +1,5 @@
-# Translates ISIS3 cube information to Array_3D_Spectrum section of PDS4 label
-# 
+# Translates ISIS cube information to Array_3D_Spectrum section of PDS4 label
+#
 # history 2018-05-09 Jeannie Backer - Original version.
 
 Group = ImageLocalId
@@ -64,5 +64,3 @@ Group = Samples
   OutputPosition  = (Product_Observational, File_Area_Observational, Array_3D_Spectrum, new@Axis_Array)
   Translation     = (*, *)
 End_Group
-
-

@@ -28,8 +28,7 @@ TEST(Marci2Isis, Marci2isisTestDefault) {
   Pvl *evenLabel = cubeEven.label();
   Pvl *oddLabel = cubeOdd.label();
 
-  ASSERT_EQ((int)evenLabel->findObject("OriginalLabel").findKeyword("Bytes"), 1846);
-  ASSERT_EQ((int)oddLabel->findObject("OriginalLabel").findKeyword("Bytes"), 3693);
+  ASSERT_EQ((int)evenLabel->findObject("OriginalLabel").findKeyword("Bytes"), (int)oddLabel->findObject("OriginalLabel").findKeyword("Bytes"));
 
   // Dimensions Group
   PvlGroup &evenDimensions = evenLabel->findGroup("Dimensions", Pvl::Traverse);

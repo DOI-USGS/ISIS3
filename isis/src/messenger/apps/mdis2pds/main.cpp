@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <cmath>
@@ -190,18 +198,17 @@ void IsisMain() {
 
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label
-  OriginalLabel origBlob;
-  incube->read(origBlob);
-  Pvl origLabel;
-  PvlObject origLabelObj = origBlob.ReturnLabels();
+  OriginalLabel origLabel = incube->readOriginalLabel();
+  Pvl pvlOrigLabel;
+  PvlObject origLabelObj = origLabel.ReturnLabels();
   origLabelObj.setName("OriginalLabelObject");
-  origLabel.addObject(origLabelObj);
+  pvlOrigLabel.addObject(origLabelObj);
 
   p.CheckStatus();
 
   // Translates the ISIS labels along with the original EDR labels
-  origLabel.addObject(*(incube->label()));
-  PvlToPvlTranslationManager labels(origLabel,
+  pvlOrigLabel.addObject(*(incube->label()));
+  PvlToPvlTranslationManager labels(pvlOrigLabel,
                                "$ISISROOT/appdata/translations/MessengerMdisCdrLabel.trn");
   labels.Auto(pdsLabel);
 

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "himos.h"
 
 #include "Camera.h"
@@ -175,8 +183,7 @@ namespace Isis {
       QString startTime;
       QString stopTime;
       for(int i = 0; i < (int)clist.size(); i++) {
-        OriginalLabel origLab;
-        clist[i]->read(origLab);
+        OriginalLabel origLab = clist[i]->readOriginalLabel();
         PvlGroup timegrp = origLab.ReturnLabels().findGroup("TIME_PARAMETERS", Pvl::Traverse);
         if(i == 0) {
           startClock = (QString)timegrp["SpacecraftClockStartCount"];
@@ -211,8 +218,7 @@ namespace Isis {
       for(int i = 0; i < (int)clist.size(); i++) {
         Pvl *clab = clist[i]->label();
         PvlGroup cInst = clab->findGroup("Instrument", Pvl::Traverse);
-        OriginalLabel cOrgLab;
-        clist[i]->read(cOrgLab);
+        OriginalLabel cOrgLab = clist[i]->readOriginalLabel();
         PvlGroup cGrp = cOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
         cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:TDI"];
         cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:BINNING"];
@@ -228,8 +234,7 @@ namespace Isis {
       }
 
       // Get the blob of original labels from first image in list
-      OriginalLabel org;
-      clist[0]->read(org);
+      OriginalLabel org = clist[0]->readOriginalLabel();
 
       //close all cubes
       for(int i = 0; i < (int)clist.size(); i++) {

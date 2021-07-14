@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Isis.h"
 
 #include <map>
@@ -389,15 +397,7 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
 
 
 QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
-  ImagePolygon poly;
-  try {
-    cube.read(poly);
-  }
-  catch (IException &e) {
-    QString msg = "Footprintinit must be run prior to running cnetadd";
-    msg += " with POLYGON=TRUE for cube [" + cube.fileName() + "]";
-    throw IException(e, IException::User, msg, _FILEINFO_);
-  }
+  ImagePolygon poly = cube.readFootprint();
 
   std::vector<void *> matches;
   MultiPolygon *polys = poly.Polys();
@@ -415,4 +415,3 @@ QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
 
   return results;
 }
-

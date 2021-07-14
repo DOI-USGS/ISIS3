@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include "SpicePosition.h"
 
 #include <algorithm>
@@ -39,7 +45,7 @@ namespace Isis {
  * observer/target order in the NAIF spkez_c/spkezp_c routines when determining
  * the state of spacecraft and target body.
  *
- * Traditionally, ISIS3 (and ISIS2!) has had the target/observer order swapped
+ * Traditionally, ISIS (and ISIS2!) has had the target/observer order swapped
  * improperly to determine state vector between the two bodies.  This
  * constructor provides a transaitional path to correct this in a
  * controlled way.  See SpacecraftPosition for details.
@@ -756,7 +762,7 @@ namespace Isis {
       p_et = p_cacheTime[0];
       SetEphemerisTime(p_et);
       std::vector<ale::State> stateCache;
-      stateCache.push_back(p_coordinate);
+      stateCache.push_back(ale::Vec3d(p_coordinate));
       std::vector<double> timeCache;
       timeCache.push_back(p_cacheTime[0]);
       if (m_state != NULL) {

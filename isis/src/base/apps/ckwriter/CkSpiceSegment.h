@@ -86,6 +86,8 @@ class PvlObject;
  *
  * @history 2019-12-05 Adam Paquette - Changed how kernels are loaded so CkSpiceSegment
  *                          no longer needs to use the Spice class.
+ *                          
+ * @history 2021-03-23 Kaitlyn Lee - Added time bias to ET times in getTimes(). Fixes #4129
  */
 class CkSpiceSegment {
   public:
@@ -172,7 +174,7 @@ class CkSpiceSegment {
     SMatrix load(Table &cache);
     SMatrix getQuaternions(const SMatrix &spice) const;
     SMatrix getAngularVelocities(const SMatrix &spice) const;
-    SVector getTimes(const SMatrix &spice) const;
+    SVector getTimes(const SMatrix &spice, const double timeBias) const;
 
     bool getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const;
     bool getFrameChains(Table &table, const int &leftBase,

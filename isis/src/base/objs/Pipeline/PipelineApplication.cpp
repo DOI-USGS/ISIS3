@@ -1,3 +1,9 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 
 #include "PipelineApplication.h"
@@ -65,7 +71,7 @@ namespace Isis {
   /**
    * Set the input parameter for this application and whether or not this
    * application supports the virtual bands functionality. It supports the virtual
-   * bands functionality if the input is an Isis 3 cube.
+   * bands functionality if the input is an Isis cube.
    *
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param supportsVirtualBands True if this application supports virtual bands
@@ -80,7 +86,7 @@ namespace Isis {
   /**
    * Set the input parameter for this application and whether or not this
    * application supports the virtual bands functionality. It supports the virtual
-   * bands functionality if the input is an Isis 3 cube.
+   * bands functionality if the input is an Isis cube.
    *
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param value Custom parameter value; Recommended to use an alternate
