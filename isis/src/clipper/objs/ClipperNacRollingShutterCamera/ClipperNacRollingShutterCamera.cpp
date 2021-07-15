@@ -90,7 +90,8 @@ namespace Isis {
     new CameraFocalPlaneMap(this, naifIkCode());
 
     // Set up distortion map (use default for now)
-    new CameraDistortionMap(this);
+    CameraDistortionMap *distMap = new CameraDistortionMap(this);
+    distMap->SetDistortion(naifIkCode());
 
     // Set up the ground and sky map
     new CameraGroundMap(this);
