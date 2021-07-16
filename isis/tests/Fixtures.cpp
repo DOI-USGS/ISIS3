@@ -1592,6 +1592,7 @@ namespace Isis {
         INS-159011_TRANSY       = (0.0, 0.0, 0.01399535)
         INS-159011_ITRANSS      = (0.0, 71.404849, 0.0)
         INS-159011_ITRANSL      = (0.0, 0.0, 71.4523)
+        INS-159011_OD_K         = (0.0, 0.0, 0.0)
       End_Object
     )");
 
