@@ -67,7 +67,7 @@ namespace Isis{
     Table mainReadouts(QString("Normalized Main Readout Line Times"), jitterCube.fileName());
     Table checklineReadouts(QString("Normalized Checkline Readout Line Times"), checkCube.fileName());
 
-    // Register each check line to the area near the corrisponding main image line using the
+    // Register each check line to the area near the corresponding main image line using the
     // registration definition file
     QList<RegistrationData> registrationData;
     for (int k = 0; k < checkCube.lineCount(); k++) {
@@ -80,7 +80,8 @@ namespace Isis{
       ar->PatternChip()->TackCube(sample, k + 1);
       ar->PatternChip()->Load(checkCube);
 
-      ar->SearchChip()->TackCube(sample, checklineLine * scale); // The checkline will correspond to the line number that the checkCube was taken at
+      // The checkline will correspond to the line number that the checkCube was taken at
+      ar->SearchChip()->TackCube(sample, checklineLine * scale);
       ar->SearchChip()->Load(jitterCube);
 
       ar->Register();
