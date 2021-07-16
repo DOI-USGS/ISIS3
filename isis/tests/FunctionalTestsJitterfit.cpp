@@ -14,18 +14,20 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   QString outputCoeffs = prefix.path() + "/coef.csv";
   QString outputResiduals = prefix.path() + "/residuals.csv";
   QString outputRegistrationStats = prefix.path() + "/regStats.pvl";
+  QString outputRegistrationResults = prefix.path() + "/regResults.csv";
 
   // Copy input data to tempdir because jitterfit writes to cube labels
   QString dataCube = prefix.path() + "/source.cub";
-  QString checkline = prefix.path() + "/checkline.cub";
   std::ifstream dataSrc("data/jitterfit/simulated_clipper_eis_nac_rolling_shutter_1461_750.cub", std::ios::binary);
   std::ofstream dataDest(dataCube.toStdString(), std::ios::binary);
-  std::ifstream checklineSrc("data/jitterfit/simulated_clipper_eis_nac_rolling_shutter_checkline_750.cub", std::ios::binary);;
-  std::ofstream checklineDest(checkline.toStdString(), std::ios::binary);
   dataDest << dataSrc.rdbuf();
-  checklineDest << checklineSrc.rdbuf();
   dataSrc.close();
   dataDest.close();
+
+  QString checkline = prefix.path() + "/checkline.cub";
+  std::ifstream checklineSrc("data/jitterfit/simulated_clipper_eis_nac_rolling_shutter_checkline_750.cub", std::ios::binary);;
+  std::ofstream checklineDest(checkline.toStdString(), std::ios::binary);
+  checklineDest << checklineSrc.rdbuf();
   checklineSrc.close();
   checklineDest.close();
 
@@ -35,6 +37,7 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
                            "deffile=data/jitterfit/S046mos1400x2250.def",
                            "coefficientto=" + outputCoeffs,
                            "residualto=" + outputResiduals,
+                           "to=" + outputRegistrationResults,
                            "to2=" + outputRegistrationStats};
 
   UserInterface options(APP_XML, args);
@@ -49,31 +52,32 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   // Test coefficients that were written to csv
   CSVReader::CSVAxis csvLine;
   CSVReader  csv = CSVReader(outputCoeffs, false, 0, ',', true, true);
-  csvLine = csv.getRow(0);
 
   // line 0, sample 0
-  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), -2.3393859908317998e-09);
-  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), -7.2806698028439998e-09);
-  csvLine = csv.getRow(1);
+  csvLine = csv.getRow(0);
+  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), -3.1003880660954e-09);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), -6.4776611130588001e-09);
+
   // line 1, sample 1
-  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), 3.9555121090196997e-06);
-  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 2.6898039797291999e-06);
-  csvLine = csv.getRow(2);
+  csvLine = csv.getRow(1);
+  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), 3.1623419152530002e-06);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 2.2632154475197e-06);
   // line 2, sample 2
-  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), 0.0011490056688787001);
-  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 0.0036510169712806999);
+  csvLine = csv.getRow(2);
+  EXPECT_DOUBLE_EQ(csvLine[0].toDouble(), 0.0014581710650981999);
+  EXPECT_DOUBLE_EQ(csvLine[1].toDouble(), 0.0033661760170435998);
 
   // Test coefficients that were written to cube
   Cube cube(dataCube);
   Pvl *isisLabel = cube.label();
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
 
-  EXPECT_EQ(inst["JitterSampleCoefficients"][0].toStdString(), "-7.28066980284397e-09");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][1].toStdString(), "2.68980397972921e-06");
-  EXPECT_EQ(inst["JitterSampleCoefficients"][2].toStdString(), "0.0036510169712807");
-  EXPECT_EQ(inst["JitterLineCoefficients"][0].toStdString(), "-2.3393859908318e-09");
-  EXPECT_EQ(inst["JitterLineCoefficients"][1].toStdString(), "3.95551210901968e-06");
-  EXPECT_EQ(inst["JitterLineCoefficients"][2].toStdString(), "0.0011490056688787");
+  EXPECT_DOUBLE_EQ(inst["JitterSampleCoefficients"][0].toDouble(), -6.4776611130587496e-09);
+  EXPECT_DOUBLE_EQ(inst["JitterSampleCoefficients"][1].toDouble(), 2.2632154475197199e-06);
+  EXPECT_DOUBLE_EQ(inst["JitterSampleCoefficients"][2].toDouble(), 0.0033661760170435998);
+  EXPECT_DOUBLE_EQ(inst["JitterLineCoefficients"][0].toDouble(), -3.1003880660953702e-09);
+  EXPECT_DOUBLE_EQ(inst["JitterLineCoefficients"][1].toDouble(), 3.1623419152529502e-06);
+  EXPECT_DOUBLE_EQ(inst["JitterLineCoefficients"][2].toDouble(), 0.0014581710650981999);
 
   // Test residuals
   CSVReader::CSVAxis residLine;
@@ -81,47 +85,92 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
 
   // first
   residLine = residCsv.getRow(0);
-  EXPECT_NEAR(residLine[0].toDouble(), 0, .0000000000000001); // Registered Line
-  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 471.00016795669); // Solved Line
-  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.51957457593351); // Registered Line Residual
-  EXPECT_NEAR(residLine[3].toDouble(), 0, .0000000000000001); // Registered Sample
-  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00053644333); // Solved Sample
-  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.2988303094298); // Sample Residual
+  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 472.05701420458); // Solved Line
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 471.00021366678); // Solved Line
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.74331356541646); // Registered Line Residual
+  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 376.18491660661); // Solved Sample
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00049465222); // Solved Sample
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.75747819554761); // Sample Residual
   EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.52792617775619); // Time Taken
 
   // middle
-  residLine = residCsv.getRow(9);
-  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 967.40156473472996);
-  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 471.00016795669);
-  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), 0.13004255779811);
-  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 375.28737801237997);
-  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00053644333);
-  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.071082732109573998);
-  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.52792617775619);
+  residLine = residCsv.getRow(29);
+  EXPECT_DOUBLE_EQ(residLine[0].toDouble(),  1460);
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 1460.9998547407);
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.24038563810288);
+  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 374);
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 374.99966574878);
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), 0.19762410314584);
+  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), 0.46284604176785);
 
   // last
-  residLine = residCsv.getRow(19);
-  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 966.40657305712);
-  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 966.00000003532);
-  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.44508132165397);
-  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 374.29938569993);
-  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 375.00000012271);
-  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.2083505883896);
-  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), -0.032540067994172);
+  residLine = residCsv.getRow(59);
+  EXPECT_DOUBLE_EQ(residLine[0].toDouble(), 1461);
+  EXPECT_DOUBLE_EQ(residLine[1].toDouble(), 1460.9998547407);
+  EXPECT_DOUBLE_EQ(residLine[2].toDouble(), -0.81030665929645);
+  EXPECT_DOUBLE_EQ(residLine[3].toDouble(), 374);
+  EXPECT_DOUBLE_EQ(residLine[4].toDouble(), 374.99966574878);
+  EXPECT_DOUBLE_EQ(residLine[5].toDouble(), -0.96593728311905);
+  EXPECT_DOUBLE_EQ(residLine[6].toDouble(), 0.46284604176785);
 
-  // Test stats of registration
+
+  // Test results of registration
+  CSVReader::CSVAxis regLine;
+  CSVReader regCsv= CSVReader(outputRegistrationResults, false, 0, ',', true, true);
+
+  // first
+  regLine = regCsv.getRow(0);
+  EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 471); // Checkline Line
+  EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375); // Checkline Sample
+  EXPECT_DOUBLE_EQ(regLine[2].toDouble(), -1); // Checkline Time Taken
+  EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 472.05701420458); // Matched Jittered Image Line
+  EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 376.18491660661); // Matched Jittered Image Sample
+  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), -0.52792617775619); // Matched Jittered image Time Taken
+  EXPECT_DOUBLE_EQ(regLine[6].toDouble(), -1.057014204579); // Delta Line
+  EXPECT_DOUBLE_EQ(regLine[7].toDouble(), -1.1849166066075); // Delta Sample
+  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.98617538549134); // Goodness Of Fit
+  EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 1); // Registration Success
+
+  // middle
+  regLine = regCsv.getRow(29);
+  EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 1461);
+  EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375);
+  EXPECT_DOUBLE_EQ(regLine[2].toDouble(), -0.016949152542373);
+  EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 1460);
+  EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 374);
+  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), 0.46284604176785);
+  EXPECT_DOUBLE_EQ(regLine[6].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(regLine[7].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.98756321875905);
+  EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 0);
+
+  // Last
+  regLine = regCsv.getRow(59);
+  EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 1461);
+  EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375);
+  EXPECT_DOUBLE_EQ(regLine[2].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 1461);
+  EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 374);
+  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), 0.46284604176785);
+  EXPECT_DOUBLE_EQ(regLine[6].toDouble(), 0);
+  EXPECT_DOUBLE_EQ(regLine[7].toDouble(), 1);
+  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.9295837101977);
+  EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 0);
+
+
+  // Test statistics of registration
   Pvl stats = Pvl(outputRegistrationStats);
   PvlGroup &autoRegStats = stats.findGroup("AutoRegStatistics");
   EXPECT_EQ((double) autoRegStats.findKeyword("Total"), 60);
-  EXPECT_EQ((double) autoRegStats.findKeyword("Successful"), 19);
-  EXPECT_EQ((double) autoRegStats.findKeyword("Failure"), 41);
+  EXPECT_EQ((double) autoRegStats.findKeyword("Successful"), 31);
+  EXPECT_EQ((double) autoRegStats.findKeyword("Failure"), 29);
 
   PvlGroup &success = stats.findGroup("Successes");
   EXPECT_EQ((double) success.findKeyword("SuccessPixel"), 0);
-  EXPECT_EQ((double) success.findKeyword("SuccessSubPixel"), 19);
+  EXPECT_EQ((double) success.findKeyword("SuccessSubPixel"), 31);
 
   PvlGroup &patternFailure = stats.findGroup("PatternChipFailures");
-  EXPECT_EQ((double) patternFailure.findKeyword("PatternNotEnoughValidData"), 40);
+  EXPECT_EQ((double) patternFailure.findKeyword("PatternNotEnoughValidData"), 0);
   EXPECT_EQ((double) patternFailure.findKeyword("PatternZScoreNotMet"), 0);
 
   PvlGroup &fitFailure = stats.findGroup("FitChipFailures");
@@ -129,7 +178,7 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   EXPECT_EQ((double) fitFailure.findKeyword("FitChipToleranceNotMet"), 0);
 
   PvlGroup &surfaceModelFailures = stats.findGroup("SurfaceModelFailures");
-  EXPECT_EQ((double) surfaceModelFailures.findKeyword("SurfaceModelNotEnoughValidData"), 1);
+  EXPECT_EQ((double) surfaceModelFailures.findKeyword("SurfaceModelNotEnoughValidData"), 29);
   EXPECT_EQ((double) surfaceModelFailures.findKeyword("SurfaceModelSolutionInvalid"), 0);
   EXPECT_EQ((double) surfaceModelFailures.findKeyword("SurfaceModelDistanceInvalid"), 0);
 }
