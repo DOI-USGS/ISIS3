@@ -1551,6 +1551,59 @@ namespace Isis {
     }
   }
 
+  void ClipperWacFcCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    // Use defaultCube label and isd for now
+    std::ifstream isdFile("data/defaultImage/defaultCube.isd");
+    std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
+    isdFile >> isd;
+    cubeLabel >> label;
+    
+    // Define WAC cube
+    wacFcCube = new Cube();
+    FileName wacFn(tempDir.path() + "/ClipperWAC.cub");
+    wacFcCube->fromIsd(wacFn, label, isd, "rw");
+
+    PvlGroup &wacKernels = wacFcCube->label()->findObject("IsisCube").findGroup("Kernels");
+    wacKernels.findKeyword("NaifFrameCode").setValue("-159104");
+
+      // Instruments Group
+    PvlGroup &realWacInst = wacFcCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream newWacInst(R"(
+      Group = Instrument
+        SpacecraftName            = Clipper
+        InstrumentId              = EIS-WAC-FC
+        TargetName                = Europa
+        StartTime                 = 2025-01-01T00:00:00.000
+      End_Group
+    )");
+    PvlGroup newWacInstPvl; newWacInst >> newWacInstPvl;
+    realWacInst = newWacInstPvl;
+
+      // NaifKeywords Group
+    PvlObject &realWacNk = wacFcCube->label()->findObject("NaifKeywords");
+    std::istringstream newWacNk(R"(
+        INS-159104_FOCAL_LENGTH = 150.40199
+        INS-159104_PIXEL_PITCH  = 0.014
+        INS-159104_TRANSX       = (0.0, 0.014004651, 0.0)
+        INS-159104_TRANSY       = (0.0, 0.0, 0.01399535)
+        INS-159104_ITRANSS      = (0.0, 71.404849, 0.0)
+        INS-159104_ITRANSL      = (0.0, 0.0, 71.4523)
+      End_Object
+    )");
+    PvlObject newWacNkPvl; newWacNk >> newWacNkPvl;
+    realWacNk = newWacNkPvl;
+
+    wacFcCube->reopen("rw");
+  }
+
+  void ClipperWacFcCube::TearDown() {
+    if (wacFcCube) {
+      delete wacFcCube;
+    }
+  }
+
   void ClipperNacRsCube::SetUp() {
     DefaultCube::SetUp();
 
@@ -1610,5 +1663,4 @@ namespace Isis {
       delete testCube;
     }
   }
-
 }
