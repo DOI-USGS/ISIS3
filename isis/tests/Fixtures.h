@@ -380,6 +380,12 @@ class ClipperWacFcCube : public DefaultCube {
     void TearDown() override;
 };
 
+class ClipperNacRsCube : public DefaultCube {
+  protected:
+    void SetUp() override;
+    void TearDown() override;
+};
+
 }
 
 #endif
