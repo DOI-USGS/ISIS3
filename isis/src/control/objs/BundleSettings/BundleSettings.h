@@ -163,6 +163,8 @@ namespace Isis {
                            double globalPointCoord3AprioriSigma = Isis::Null);
       void setOutlierRejection(bool outlierRejection,
                                double multiplier = 1.0);
+      void setGrossOutlierRejection(bool grossOutlierRejection,
+			       		   double probabilityLevel = 0.05);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
 
@@ -175,7 +177,9 @@ namespace Isis {
       bool updateCubeLabel() const;
       bool errorPropagation() const;
       bool outlierRejection() const;
+      bool grossOutlierRejection() const;
       double outlierRejectionMultiplier() const;
+      double grossOutlierProbabilityLevel() const;
 // These sigmas are either for planetocentric lat/lon/radius or body-fixed x/y/z
       double globalPointCoord1AprioriSigma() const;
       double globalPointCoord2AprioriSigma() const;
@@ -351,9 +355,14 @@ namespace Isis {
       bool m_errorPropagation; //!< Indicates whether to perform error propagation.
       bool m_createInverseMatrix; //!< Indicates whether to create the inverse matrix file.
       bool m_outlierRejection; /**< Indicates whether to perform automatic
-                                    outlier detection/rejection.*/
+                                    outlier detection/rejection based on median absolute deviation.*/
       double m_outlierRejectionMultiplier; /**< The multiplier value for outlier rejection.
                                                 Defaults to 1, so no change if rejection = false.*/
+      bool m_grossOutlierRejection; /** < Indicates whether to perform automatic
+					  outlier detection/rejection based on normalized residuals.*/
+      double m_grossOutlierProbabilityLevel; /**< The probability level for calculating the
+						  critical value for gross outlier detection.
+      						  Defaults to 0.05, so no change if grossRejection = false.*/
 
       // Parameter Uncertainties (Weighting)
       double m_globalPointCoord1AprioriSigma;   //!< The global a priori sigma for latitude or X.

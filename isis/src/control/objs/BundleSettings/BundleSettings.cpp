@@ -50,14 +50,16 @@ namespace Isis {
   void BundleSettings::init() {
     m_validateNetwork = true;
 
-    m_solveObservationMode = false;
-    m_solveRadius          = false;
-    m_updateCubeLabel      = false;
-    m_errorPropagation     = false;
-    m_createInverseMatrix  = false;
-    m_cubeList             =    "";
-    m_outlierRejection     = false;
+    m_solveObservationMode  = false;
+    m_solveRadius           = false;
+    m_updateCubeLabel       = false;
+    m_errorPropagation      = false;
+    m_createInverseMatrix   = false;
+    m_cubeList              =    "";
+    m_outlierRejection      = false;
+    m_grossOutlierRejection = false;
     m_outlierRejectionMultiplier = 3.0;
+    m_grossOutlierProbabilityLevel = 0.05;
 
     // Parameter Uncertainties (Weighting)
     // The units are meters for either coordinate type
@@ -131,6 +133,8 @@ namespace Isis {
         m_createInverseMatrix(other.m_createInverseMatrix),
         m_outlierRejection(other.m_outlierRejection),
         m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
+	m_grossOutlierRejection(other.m_grossOutlierRejection),
+	m_grossOutlierProbabilityLevel(other.m_grossOutlierProbabilityLevel),
         m_globalPointCoord1AprioriSigma(other.m_globalPointCoord1AprioriSigma),
         m_globalPointCoord2AprioriSigma(other.m_globalPointCoord2AprioriSigma),
         m_globalPointCoord3AprioriSigma(other.m_globalPointCoord3AprioriSigma),
@@ -177,6 +181,8 @@ namespace Isis {
       m_createInverseMatrix = other.m_createInverseMatrix;
       m_outlierRejection = other.m_outlierRejection;
       m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
+      m_grossOutlierRejection = other.m_grossOutlierRejection;
+      m_grossOutlierProbabilityLevel = other.m_grossOutlierProbabilityLevel;
       m_globalPointCoord1AprioriSigma = other.m_globalPointCoord1AprioriSigma;
       m_globalPointCoord2AprioriSigma = other.m_globalPointCoord2AprioriSigma;
       m_globalPointCoord3AprioriSigma = other.m_globalPointCoord3AprioriSigma;
@@ -320,10 +326,11 @@ namespace Isis {
 
 
   /**
-   * Set the outlier rejection options for the bundle adjustment.
+   * Set the median absolute deviation outlier rejection options for the bundle adjustment.
    *
    * @param outlierRejection Indicates whether to perform automatic outlier
-   *                         rejection during the bundle adjustment.
+   *                         rejection based on median absolute deviation
+   *                         during the bundle adjustment.
    * @param mutliplier The outlier rejection multiplier.
    */
   void BundleSettings::setOutlierRejection(bool outlierRejection, double multiplier) {
@@ -333,6 +340,27 @@ namespace Isis {
     }
     else {
       m_outlierRejectionMultiplier = 3.0;
+    }
+  }
+
+  /**
+   * Set the normalized residual outlier rejection options for the bundle adjustment.
+   *
+   * @param grossOutlierRejection Indicates whether to perform automatic outlier
+   *                              rejection based on the normalized residuals
+   *                              during the bunlde adjustment.
+   *
+   * @param probabilityLevel The probability level the normalized residual 
+   *                         must fit within to be considered an inlier.
+   */
+  void BundleSettings::setGrossOutlierRejection(bool grossOutlierRejection, 
+						double probabilityLevel) {
+    m_grossOutlierRejection = grossOutlierRejection;
+    if (m_grossOutlierRejection) {
+      m_grossOutlierProbabilityLevel = probabilityLevel;
+    }
+    else {
+      m_grossOutlierProbabilityLevel = 0.05;
     }
   }
 
@@ -395,13 +423,24 @@ namespace Isis {
 
   /**
    * This method is used to determine whether outlier rejection will be
-   * performed on this bundle adjustment.
+   * performed on median absolute deviation during the  bundle adjustment.
    *
    * @return @b bool Indicates whether to perform automatic outlier
    *                 rejection during the bundle adjustment.
    */
   bool BundleSettings::outlierRejection() const {
     return m_outlierRejection;
+  }
+
+  /**
+   * This method is used to determine whether outlier rejection will be
+   * performed on normalized residuals during the bundle adjustment.
+   *
+   * @return @b bool Indicates whether to perform automatic outlier
+   *                 rejection during the bundle adjustment.
+   */
+  bool BundleSettings::grossOutlierRejection() const {
+    return m_grossOutlierRejection;
   }
 
 
@@ -477,6 +516,16 @@ namespace Isis {
     return m_outlierRejectionMultiplier;
   }
 
+
+  /**
+   * Retrieves the gross outlier rejection probability level for the 
+   * bundle adjustment.
+   *
+   * @return @b double The outlier rejection probability level.
+   */
+  double BundleSettings::grossOutlierProbabilityLevel() const {
+    return m_grossOutlierProbabilityLevel;
+  }
 
   /**
    * Retrieves global a priori sigma for 1st coordinate of points for this bundle
@@ -1095,6 +1144,16 @@ namespace Isis {
     }
     stream.writeEndElement();
 
+    stream.writeStartElement("grossOutlierRejectionOptions");
+    stream.writeAttribute("rejection", toString(grossOutlierRejection()));
+    if (grossOutlierRejection()) {
+      stream.writeAttribute("probabilityLevel", toString(grossOutlierProbabilityLevel()));
+    }
+    else {
+      stream.writeAttribute("probabilityLevel", "N/A");
+    }
+    stream.writeEndElement();
+
     stream.writeStartElement("convergenceCriteriaOptions");
     stream.writeAttribute("convergenceCriteria",
                           convergenceCriteriaToString(convergenceCriteria()));
@@ -1270,6 +1329,23 @@ namespace Isis {
           }
           else {
             m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 3.0;
+          }
+        }
+      }
+      else if (localName == "grossOutlierRejectionOptions") {
+        QString grossOutlierRejectionStr = attributes.value("grossRejection");
+        if (!grossOutlierRejectionStr.isEmpty()) {
+          m_xmlHandlerBundleSettings->m_grossOutlierRejection = toBool(grossOutlierRejectionStr);
+        }
+
+        QString grossOutlierProbabilityLevelStr = attributes.value("probabilityLevel");
+        if (!grossOutlierProbabilityLevelStr.isEmpty()) {
+          if (grossOutlierProbabilityLevelStr!= "N/A") {
+            m_xmlHandlerBundleSettings->m_grossOutlierProbabilityLevel
+                = toDouble(grossOutlierProbabilityLevelStr);
+          }
+          else {
+            m_xmlHandlerBundleSettings->m_grossOutlierProbabilityLevel= 0.05;
           }
         }
       }
