@@ -59,7 +59,7 @@ namespace Isis {
     m_outlierRejection      = false;
     m_grossOutlierRejection = false;
     m_outlierRejectionMultiplier = 3.0;
-    m_grossOutlierProbabilityLevel = 0.05;
+    m_grossOutlierProbabilityLevel = 0.95;
 
     // Parameter Uncertainties (Weighting)
     // The units are meters for either coordinate type
@@ -360,7 +360,7 @@ namespace Isis {
       m_grossOutlierProbabilityLevel = probabilityLevel;
     }
     else {
-      m_grossOutlierProbabilityLevel = 0.05;
+      m_grossOutlierProbabilityLevel = 0.95;
     }
   }
 
@@ -1345,7 +1345,7 @@ namespace Isis {
                 = toDouble(grossOutlierProbabilityLevelStr);
           }
           else {
-            m_xmlHandlerBundleSettings->m_grossOutlierProbabilityLevel= 0.05;
+            m_xmlHandlerBundleSettings->m_grossOutlierProbabilityLevel= 0.95;
           }
         }
       }
