@@ -1559,7 +1559,7 @@ namespace Isis {
     std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
     isdFile >> isd;
     cubeLabel >> label;
-    
+
     // Define WAC cube
     wacFcCube = new Cube();
     FileName wacFn(tempDir.path() + "/ClipperWAC.cub");
@@ -1584,12 +1584,17 @@ namespace Isis {
       // NaifKeywords Group
     PvlObject &realWacNk = wacFcCube->label()->findObject("NaifKeywords");
     std::istringstream newWacNk(R"(
+      Object = NaifKeywords
+        BODY_CODE               = 502
+        BODY502_RADII           = (1562.6, 1560.3, 1559.5)
+        BODY_FRAME_CODE         = 10024
         INS-159104_FOCAL_LENGTH = 150.40199
         INS-159104_PIXEL_PITCH  = 0.014
         INS-159104_TRANSX       = (0.0, 0.014004651, 0.0)
         INS-159104_TRANSY       = (0.0, 0.0, 0.01399535)
         INS-159104_ITRANSS      = (0.0, 71.404849, 0.0)
         INS-159104_ITRANSL      = (0.0, 0.0, 71.4523)
+        INS-159104_OD_K         = (0.0, -0.0000538628307258204, -4.57142010849732E-09)
       End_Object
     )");
     PvlObject newWacNkPvl; newWacNk >> newWacNkPvl;

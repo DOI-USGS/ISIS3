@@ -47,7 +47,7 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Europa Imaging System Framing Wide Angle Camera");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameShort(), "EIS-FWAC");
 
-  
+
   // Check SetImage on corners
   int line, samp, nline, nsamp;
   line = 1.0;     samp = 1.0;
@@ -66,4 +66,33 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   std::pair<iTime, iTime> startStop;
   startStop = cam->ShutterOpenCloseTimes(etStart.Et(), 0.00005);  // dummy value for exposure duration
   EXPECT_TRUE(startStop.first.Et() < startStop.second.Et());
+
+
+  EXPECT_TRUE(cam->SetImage(145, 161));
+  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 8.5881709286625423);
+  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 253.71621132953456);
+  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), 145, 0.001);
+  EXPECT_NEAR(cam->Line(), 161, 0.001);
+
+  EXPECT_TRUE(cam->SetImage(3655, 157));
+  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 12.445262207724664);
+  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 255.73569853485378);
+  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), 3655, 0.001);
+  EXPECT_NEAR(cam->Line(), 157, 0.001);
+
+  EXPECT_TRUE(cam->SetImage(289, 1767));
+  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 7.7976578051658336);
+  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 255.60927064348147);
+  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), 289, 0.001);
+  EXPECT_NEAR(cam->Line(), 1767, 0.001);
+
+  EXPECT_TRUE(cam->SetImage(3767, 1579));
+  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 11.80993221278302);
+  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 257.50821511090754);
+  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), 3767, 0.001);
+  EXPECT_NEAR(cam->Line(), 1579, 0.001);
 }
