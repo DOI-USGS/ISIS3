@@ -193,17 +193,23 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWi
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
     set(OPTIMIZATION_LEVEL "-Os")
 else()
-    set(OPTIMIZATION_LEVEL "-Og")
+    set(OPTIMIZATION_LEVEL "-O0")
+endif()
+
+# Determine debug info type.
+# Default to -g to preserve original behaviour.
+if(NOT CMAKE_BUILD_TYPE)
+	set(DEBUG_INFO_LEVEL "-g")
 endif()
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR} ${OPTIMIZATION_LEVEL}" )
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR} ${OPTIMIZATION_LEVEL} ${DEBUG_INFO_LEVEL} -m64" )
 message("Setting CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 if(APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${DEBUG_INFO_LEVEL} -m64")
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og ${DEBUG_INFO_LEVEL} -m64")
 endif()
 
 # Paths to required executables
