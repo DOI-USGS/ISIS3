@@ -521,6 +521,42 @@
        </inclusions>
       </parameter>
 
+    <parameter name="GROSS_OUTLIER_REJECTION">
+      <brief> Auto-rejection of outliers gross outliers</brief>
+      <description>
+        Select this option to perform automatic gross outlier detection and rejection.
+        This option uses a statistical test to determine if each measure has a gross
+        error present during each iteration. Any measures that are found to have a gross
+        error are rejected and removed from the solution. Additionally, previously rejected
+        measures are re-checked to see if they still contain a gross error.
+      </description>
+      <type>boolean</type>
+      <default>
+        <item>No</item>
+      </default>
+      <inclusions>
+        <item>GROSS_CONFIDENCE</item>
+     </inclusions>
+    </parameter>
+
+    <parameter name="GROSS_CONFIDENCE">
+      <brief>Confidence level for gross outlier rejection</brief>
+      <description>
+        The statistical confidence level between 0 and 1 used to determine if a
+        measure contains a gross error. This value is converted into critical value
+        via the F distribution that the measure test statistics are compared against.
+      </description>
+      <type>double</type>
+      <default>
+        <item>0.95</item>
+      </default>
+      <inclusions>
+        <item>GROSS_OUTLIER_REJECTION</item>
+      </inclusions>
+      <minimum>0</minimum>
+      <maximum>1</maximum>
+    </parameter>
+
     <parameter name="ERRORPROPAGATION">
       <brief> Compute variance-covariance matrix</brief>
       <description>
