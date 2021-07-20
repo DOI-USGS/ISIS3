@@ -164,7 +164,7 @@ namespace Isis {
       void setOutlierRejection(bool outlierRejection,
                                double multiplier = 1.0);
       void setGrossOutlierRejection(bool grossOutlierRejection,
-			       		   double probabilityLevel = 0.95);
+                                    double probabilityLevel = 0.95);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
 

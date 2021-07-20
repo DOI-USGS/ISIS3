@@ -95,7 +95,7 @@ namespace Isis {
         m_rmsYResiduals(src.m_rmsYResiduals),
         m_rmsXYResiduals(src.m_rmsXYResiduals),
         m_rejectionLimit(src.m_rejectionLimit),
-	m_grossRejectionLimit(src.m_grossRejectionLimit),
+        m_grossRejectionLimit(src.m_grossRejectionLimit),
         m_numberObservations(src.m_numberObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
