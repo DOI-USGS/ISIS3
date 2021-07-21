@@ -356,12 +356,7 @@ namespace Isis {
   void BundleSettings::setGrossOutlierRejection(bool grossOutlierRejection, 
 						double probabilityLevel) {
     m_grossOutlierRejection = grossOutlierRejection;
-    if (m_grossOutlierRejection) {
-      m_grossOutlierProbabilityLevel = probabilityLevel;
-    }
-    else {
-      m_grossOutlierProbabilityLevel = 0.95;
-    }
+    m_grossOutlierProbabilityLevel = probabilityLevel;
   }
 
 
