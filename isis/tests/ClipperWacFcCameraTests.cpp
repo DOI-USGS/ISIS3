@@ -25,6 +25,15 @@ void TestLineSamp(Camera *cam, double samp, double line) {
   }
 }
 
+void TestImageToGroundToImage(Camera *cam, double samp, double line, double lat, double lon){
+  ASSERT_TRUE(cam->SetImage(samp, line));
+  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), lat);
+  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), lon);
+  ASSERT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), samp, 0.001);
+  EXPECT_NEAR(cam->Line(), line, 0.001);
+}
+
 
 TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   ClipperWacFcCamera *cam;
@@ -57,6 +66,10 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   TestLineSamp(cam, nline, nsamp);
   TestLineSamp(cam, nline, samp);
 
+  TestImageToGroundToImage(cam, 145, 161, 8.5881709286625423, 253.71621132953456);
+  TestImageToGroundToImage(cam, 3655, 157, 12.445262207724664, 255.73569853485378);
+  TestImageToGroundToImage(cam, 289, 1767, 7.7976578051658336, 255.60927064348147);
+  TestImageToGroundToImage(cam, 3767, 1579, 11.80993221278302, 257.50821511090754);
 
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
   PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
@@ -66,33 +79,4 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   std::pair<iTime, iTime> startStop;
   startStop = cam->ShutterOpenCloseTimes(etStart.Et(), 0.00005);  // dummy value for exposure duration
   EXPECT_TRUE(startStop.first.Et() < startStop.second.Et());
-
-
-  EXPECT_TRUE(cam->SetImage(145, 161));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 8.5881709286625423);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 253.71621132953456);
-  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
-  EXPECT_NEAR(cam->Sample(), 145, 0.001);
-  EXPECT_NEAR(cam->Line(), 161, 0.001);
-
-  EXPECT_TRUE(cam->SetImage(3655, 157));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 12.445262207724664);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 255.73569853485378);
-  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
-  EXPECT_NEAR(cam->Sample(), 3655, 0.001);
-  EXPECT_NEAR(cam->Line(), 157, 0.001);
-
-  EXPECT_TRUE(cam->SetImage(289, 1767));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 7.7976578051658336);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 255.60927064348147);
-  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
-  EXPECT_NEAR(cam->Sample(), 289, 0.001);
-  EXPECT_NEAR(cam->Line(), 1767, 0.001);
-
-  EXPECT_TRUE(cam->SetImage(3767, 1579));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 11.80993221278302);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 257.50821511090754);
-  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
-  EXPECT_NEAR(cam->Sample(), 3767, 0.001);
-  EXPECT_NEAR(cam->Line(), 1579, 0.001);
 }
