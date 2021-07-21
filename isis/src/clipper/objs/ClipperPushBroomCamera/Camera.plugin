@@ -1,0 +1,5 @@
+Group = Clipper/EIS-NAC-PB
+  Version = 1
+  Library = ClipperPushBroomCamera
+  Routine = ClipperPushBroomCameraPlugin
+EndGroup
