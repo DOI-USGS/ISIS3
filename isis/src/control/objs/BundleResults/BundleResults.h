@@ -129,6 +129,7 @@ namespace Isis {
                                    int numObservations);
 #endif
       void setRejectionLimit(double rejectionLimit);
+      void setGrossRejectionLimit(double grossRejectionLimit);
 #if 0
       double computeResiduals(
                ControlNet *pCnet,
@@ -199,6 +200,7 @@ namespace Isis {
       double rmsRy() const;  // currently unused ???
       double rmsRxy() const; // currently unused ???
       double rejectionLimit() const;
+      double grossRejectionLimit() const;
       int numberRejectedObservations() const;
       int numberObservations() const;
 
@@ -296,7 +298,8 @@ namespace Isis {
       double m_rmsYResiduals;                 //!< rms of y residuals
       double m_rmsXYResiduals;                //!< rms of all x and y residuals
 
-      double m_rejectionLimit;                //!< current rejection limit
+      double m_rejectionLimit;                //!< current rejection limit (for median absolute deviation)
+      double m_grossRejectionLimit;           //!< currnet gross rejection limit (for normalized residuals)
       // TODO:??? reorder read/write data stream, init, copy constructor, operator=
       int m_numberObservations;                //!< number of image coordinate observations
       int m_numberRejectedObservations;        //!< number of rejected image coordinate observations

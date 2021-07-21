@@ -95,6 +95,7 @@ namespace Isis {
         m_rmsYResiduals(src.m_rmsYResiduals),
         m_rmsXYResiduals(src.m_rmsXYResiduals),
         m_rejectionLimit(src.m_rejectionLimit),
+        m_grossRejectionLimit(src.m_grossRejectionLimit),
         m_numberObservations(src.m_numberObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
@@ -180,6 +181,7 @@ namespace Isis {
       m_rmsYResiduals = src.m_rmsYResiduals;
       m_rmsXYResiduals = src.m_rmsXYResiduals;
       m_rejectionLimit = src.m_rejectionLimit;
+      m_grossRejectionLimit = src.m_grossRejectionLimit;
       m_numberObservations = src.m_numberObservations;
       m_numberRejectedObservations = src.m_numberRejectedObservations;
       m_numberUnknownParameters = src.m_numberUnknownParameters;
@@ -290,6 +292,9 @@ namespace Isis {
 
     // set by compute rejection limit
     m_rejectionLimit = 0.0;
+
+    // set by compute gross rejection limit
+    m_grossRejectionLimit = 0.0;
 
     // set by flag outliers
     m_numberRejectedObservations = 0;
@@ -629,12 +634,23 @@ namespace Isis {
 
 
   /**
-   * Sets the rejection limit.
+   * Sets the rejection limit for median absolute deviation
+   * outlier rejection.
    *
-   * @param rejectionLimit The rejection limit.
+   * @param rejectionLimit The rejection limit for median absolute deviation.
    */
   void BundleResults::setRejectionLimit(double rejectionLimit) {
     m_rejectionLimit = rejectionLimit;
+  }
+
+  /**
+   * Sets the rejection limit for gross outlier detection 
+   * with normalized residuals.
+   * 
+   * @param grossRejectionLimit The rejection limit for normalized residuals.
+   */
+  void BundleResults::setGrossRejectionLimit(double grossRejectionLimit) {
+    m_grossRejectionLimit = grossRejectionLimit;
   }
 
 
@@ -1145,6 +1161,16 @@ namespace Isis {
   double BundleResults::rejectionLimit() const {
     return m_rejectionLimit;
   }
+  
+
+  /**
+   * Returns the rejection limit for normalized residuals.
+   *
+   * @return @b double The rejection limit for normalized residuals
+   */
+  double BundleResults::grossRejectionLimit() const {
+    return m_grossRejectionLimit;
+  }
 
 
   /**
@@ -1489,6 +1515,7 @@ namespace Isis {
     stream.writeTextElement("numberIgnoredPoints", toString(numberIgnoredPoints()));
     stream.writeTextElement("numberHeldImages", toString(numberHeldImages()));
     stream.writeTextElement("rejectionLimit", toString(rejectionLimit()));
+    stream.writeTextElement("grossRejectionLimit", toString(grossRejectionLimit()));
     stream.writeTextElement("numberRejectedObservations", toString(numberRejectedObservations()));
     stream.writeTextElement("numberObservations", toString(numberObservations()));
     stream.writeTextElement("numberImageParameters", toString(numberImageParameters()));
@@ -2173,6 +2200,9 @@ namespace Isis {
       }
       else if (qName == "rejectionLimit") {
         m_xmlHandlerBundleResults->m_rejectionLimit = toDouble(m_xmlHandlerCharacters);
+      }
+      else if (qName == "grossRejectionLimit") {
+        m_xmlHandlerBundleResults->m_grossRejectionLimit = toDouble(m_xmlHandlerCharacters);
       }
       else if (qName == "numberRejectedObservations") {
         m_xmlHandlerBundleResults->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
