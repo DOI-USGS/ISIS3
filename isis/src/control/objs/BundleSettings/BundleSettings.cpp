@@ -354,7 +354,7 @@ namespace Isis {
    *                         must fit within to be considered an inlier.
    */
   void BundleSettings::setGrossOutlierRejection(bool grossOutlierRejection, 
-						double probabilityLevel) {
+                                                double probabilityLevel) {
     m_grossOutlierRejection = grossOutlierRejection;
     m_grossOutlierProbabilityLevel = probabilityLevel;
   }
