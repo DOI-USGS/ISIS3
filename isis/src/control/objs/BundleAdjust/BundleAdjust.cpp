@@ -863,7 +863,7 @@ namespace Isis {
 	// flag outliers based on normalized residuals
         if ( m_bundleSettings->grossOutlierRejection() ) {
           computeGrossRejectionLimit();
-	  computeGrossOutlierTestStatistics();
+          computeGrossOutlierTestStatistics();
           flagGrossOutliers();
         }
 
@@ -1120,7 +1120,6 @@ namespace Isis {
 
       // loop over measures for this point
       int numMeasures = point->size();
-      outputBundleStatus("\nline 1115: formNormalEquations pointIndex = " + QString::number(pointIndex) + "\n");
       for (int j = 0; j < numMeasures; j++) {
         BundleMeasureQsp measure = point->at(j);
 
