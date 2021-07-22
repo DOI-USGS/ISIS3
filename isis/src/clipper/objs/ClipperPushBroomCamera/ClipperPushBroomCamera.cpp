@@ -37,10 +37,12 @@ namespace Isis {
 
      Pvl &lab = *cube.label();
      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+     double lineRate = ((double) inst["LineExposureDuration"]) / 1000;
      QString startTime = inst["StartTime"];
      iTime etStart(startTime);
 
-     // TODO: Set up VariableLineScanCameraDetectorMap
+     // set up detector map
+     new LineScanCameraDetectorMap(this, etStart.Et(), lineRate);
 
      // Set up focal plane map
      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
@@ -54,10 +56,10 @@ namespace Isis {
      new LineScanCameraGroundMap(this);
      new LineScanCameraSkyMap(this);
 
-     setTime(etStart.Et());
      LoadCache();
      NaifStatus::CheckErrors();
    }
+
 
    /**
     * Destructor for a ClipperPushBroomCamera object.
@@ -65,35 +67,23 @@ namespace Isis {
    ClipperPushBroomCamera::~ClipperPushBroomCamera() {
    }
 
+
    /**
-    * CK frame ID
+    * CK frame ID - Instrument Code from spacit run on CK
     *
-    * CK frame ID obtained from the CK kernel for Europa Clipper by using spacit.
-    * @see Camera::CkFrameId()
-
-    * <tt>spacit -> R -> ck/europa_sa_17F12v2_tour_eom_ecr3018.bc -> INSTRUMENT_ID</tt>
-
-    * @note Could not use spacit's S option, we do not have a SCLK for Clipper EIS yet.
-    *
-    * @return int The appropriate instrument code for the "Camera-Matrix" Kernel Frame ID.
+    * @return @b int The appropriate instrument code for the "Camera-matrix"
+    *         Kernel Frame ID
     */
    int ClipperPushBroomCamera::CkFrameId() const {
-     return (-159011);
+     return (-159121);
    }
 
 
    /**
     * CK Reference ID - J2000
     *
-    * CK reference ID obtained from the CK kernel for Europa Clipper by using spacit.
-    * @see Camera::CkReferenceId()
-    *
-    * <tt>spacit -> R -> ck/europa_sa_17F12v2_tour_eom_ecr3018.bc -> REFERENCE_FRAME_NAME</tt>
-    * Look up 'EUROPAM_SA_BASE' in FK kernel for Clipper EIS.
-    *
-    * @note Could not use spacit's S option, we do not have a SCLK for Clipper EIS yet.
-    *
-    * @return int The appropriate instrument code for the "Camera-matrix" Kernel Reference ID.
+    * @return @b int The appropriate instrument code for the "Camera-matrix"
+    *         Kernel Reference ID
     */
    int ClipperPushBroomCamera::CkReferenceId() const {
      return (-159010);
@@ -103,13 +93,8 @@ namespace Isis {
    /**
     * SPK Reference ID - J2000
     *
-    * SPK reference ID obtained from the SPK kernel for Europa Clipper by using spacit.
-    * @see Camera::SpkReferenceId()
-    *
-    * <tt>spacit -> S -> spk/17F12_DIR_L220604_A241223_V2_scpse.bsp, naif0012.tls -> B -> 502</tt>
-    * (502 is the NAIF ID for 'EUROPA')
-    *
-    * @return int The appropriate intstrument code for the Spacecraft Kernel Reference ID.
+    * @return @b int The appropriate instrument code for the Spacecraft
+    *         Kernel Reference ID
     */
    int ClipperPushBroomCamera::SpkReferenceId() const {
      return (1);

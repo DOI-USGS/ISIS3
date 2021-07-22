@@ -386,6 +386,12 @@ class ClipperNacRsCube : public DefaultCube {
     void TearDown() override;
 };
 
+class ClipperPbCube : public DefaultCube {
+  protected:
+    void SetUp() override;
+    void TearDown() override;
+};
+
 }
 
 #endif
