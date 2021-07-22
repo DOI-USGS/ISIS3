@@ -390,7 +390,7 @@ namespace Isis {
       double computeResiduals();
       bool computeRejectionLimit();
       bool computeGrossRejectionLimit();
-      bool computeObservationTestStatistics();
+      bool computeGrossOutlierTestStatistics();
       bool flagOutliers();
       bool flagGrossOutliers();
 
