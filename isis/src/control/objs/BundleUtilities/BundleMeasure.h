@@ -72,7 +72,7 @@ namespace Isis {
       void setImagePartial(const LinearAlgebra::Matrix &imagePartials);
       void setPoint3DPartial(const LinearAlgebra::Matrix &point3DPartial);
       void setTargetPartial(const LinearAlgebra::Matrix &targetPartial);
-      void setGrossOutlierTestStatistic(LinearAlgebra::Vector w);
+      void setGrossOutlierTestStatistic(double sampleOutlierTestStatistic, double lineOutlierTestStatistic);
 
       bool isRejected() const;
       Camera *camera() const;
@@ -89,7 +89,8 @@ namespace Isis {
       double sampleResidual() const;
       double lineResidual() const;
       double residualMagnitude() const;
-      LinearAlgebra::Vector grossOutlierTestStatistic() const;
+      double sampleOutlierTestStatistic() const;
+      double lineOutlierTestStatistic() const;
       QString cubeSerialNumber() const;
       double focalPlaneComputedX() const;
       double focalPlaneComputedY() const;
@@ -109,7 +110,8 @@ namespace Isis {
       LinearAlgebra::Matrix *m_targetPartial;   /**< Target partials associated with the control measure **/
 
       // Test statistic used for determining gross outliers
-      LinearAlgebra::Vector m_grossOutlierTestStatistic;
+      double m_sampleOutlierTestStatistic;
+      double m_lineOutlierTestStatistic;
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;
