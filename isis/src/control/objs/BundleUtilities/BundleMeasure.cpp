@@ -114,7 +114,12 @@ namespace Isis {
    * @param imagePartial BundleMeasure's imagePartial matrix
    */
   void BundleMeasure::setImagePartial(const LinearAlgebra::Matrix &imagePartial) {
-    *m_imagePartial = &imagePartial;
+    if (m_imagePartial) {
+      delete m_imagePartial;
+      m_imagePartial = nullptr;
+    }
+
+    m_imagePartial = new LinearAlgebra::Matrix(imagePartial);
   }
 
 
@@ -124,7 +129,12 @@ namespace Isis {
    * @param point3DPartial BundleMeasure's point3DPartial matrix
    */
   void BundleMeasure::setPoint3DPartial(const LinearAlgebra::Matrix &point3DPartial) {
-    *m_point3DPartial = &point3DPartial;
+    if (m_point3DPartial) {
+      delete m_point3DPartial;
+      m_point3DPartial = nullptr;
+    }
+    
+    m_point3DPartial = new LinearAlgebra::Matrix(point3DPartial);
   }
 
 
@@ -134,7 +144,12 @@ namespace Isis {
    * @param targetPartial BundleMeasure's targetPartial matrix
    */
   void BundleMeasure::setTargetPartial(const LinearAlgebra::Matrix &targetPartial) {
-    *m_targetPartial = &targetPartial;
+    if (m_targetPartial) {
+      delete m_targetPartial;
+      m_targetPartial = nullptr;
+    }
+
+    m_targetPartial = new LinearAlgebra::Matrix(targetPartial);
   }
 
   /**
@@ -250,7 +265,7 @@ namespace Isis {
    * @return @b image partial pointer
    */
   LinearAlgebra::Matrix *BundleMeasure::imagePartial() {
-    return m_imagePartial
+    return m_imagePartial;
   }
 
 
@@ -260,7 +275,7 @@ namespace Isis {
    * @return @b 3D point partial pointer
    */
   LinearAlgebra::Matrix *BundleMeasure::point3DPartial() {
-    return m_point3DPartial
+    return m_point3DPartial;
   }
 
 
@@ -270,7 +285,7 @@ namespace Isis {
    * @return @b target partial pointer
    */
   LinearAlgebra::Matrix *BundleMeasure::targetPartial() {
-    return m_targetPartial
+    return m_targetPartial;
   }
 
   /**

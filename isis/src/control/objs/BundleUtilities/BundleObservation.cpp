@@ -210,15 +210,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the data snooping test statistic
-   *
-   * @return @b LinearAlgebra::Vector Returns the data snooping test statistic
-   */
-  LinearAlgebra::Vector &BundleObservation::grossOutlierTestStatistic() {
-    return m_grossOutlierTestStatistic;
-  }
-
-  /**
    * Sets the index for the observation
    *
    * @param n Value to set the index of the observation to

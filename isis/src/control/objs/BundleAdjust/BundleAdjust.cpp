@@ -1903,6 +1903,7 @@ namespace Isis {
     
     if (m_bundleSettings->solveTargetBody()) {
       observation->computeTargetPartials(coeffTarget, measure, m_bundleSettings, m_bundleTargetBody);
+      // measure->setTargetPartial(&coeffTarget);
     }
 
     observation->computeImagePartials(coeffImage, measure);
@@ -2376,7 +2377,7 @@ namespace Isis {
   /**
    * @brief Compute rejection limit for normalized residual outlier rejection.
    *
-   * Computes a critical value from the t-distribution based on the systems degrees of freedom
+   * Computes a critical value from the f-distribution based on the systems degrees of freedom
    * and probability level. Then, sets the rejection limit in m_bundleResults.
    *
    * @return @b bool If the rejection limit was successfully computed and set.
