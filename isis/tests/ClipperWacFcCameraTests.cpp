@@ -66,11 +66,11 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   TestLineSamp(cam, nline, nsamp);
   TestLineSamp(cam, nline, samp);
 
-  TestImageToGroundToImage(cam, 145, 161, 8.5881709286625423, 253.71621132953456);
-  TestImageToGroundToImage(cam, 3655, 157, 12.445262207724664, 255.73569853485378);
-  TestImageToGroundToImage(cam, 289, 1767, 7.7976578051658336, 255.60927064348147);
-  TestImageToGroundToImage(cam, 3767, 1579, 11.80993221278302, 257.50821511090754);
-
+  TestImageToGroundToImage(cam, 145, 161, 8.5839718675128971, 253.72747262733904);
+  TestImageToGroundToImage(cam, 3655, 157, 12.477189586257952, 255.76543090545474);
+  TestImageToGroundToImage(cam, 289, 1767, 7.7936575791457452, 255.62130722292261);
+  TestImageToGroundToImage(cam, 3767, 1579, 11.843295382436571, 257.54360381024532);
+  
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
   PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
   QString startTime = inst["StartTime"];

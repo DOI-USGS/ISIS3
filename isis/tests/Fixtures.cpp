@@ -1599,6 +1599,13 @@ namespace Isis {
     )");
     PvlObject newWacNkPvl; newWacNk >> newWacNkPvl;
     realWacNk = newWacNkPvl;
+    
+    double offset = 10;
+    AlphaCube aCube(wacFcCube->sampleCount(), wacFcCube->lineCount(),
+                    wacFcCube->sampleCount()-offset, wacFcCube->lineCount() - offset,
+                    0, offset, wacFcCube->sampleCount(), wacFcCube->lineCount());
+
+    aCube.UpdateGroup(*wacFcCube);
 
     wacFcCube->reopen("rw");
   }
