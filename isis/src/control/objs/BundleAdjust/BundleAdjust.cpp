@@ -2455,7 +2455,7 @@ namespace Isis {
   /**
    * Flags outlier measures and control points by comparing
    * the observations normalized residual to a critical
-   * value determined by t-distribution and a user-defined
+   * value determined by F-distribution and a user-defined
    * probability level.
    *
    * @return @b bool If the flagging was successful.
@@ -2466,8 +2466,8 @@ namespace Isis {
     int numRejected;
     int totalNumRejected = 0;
 
-    int maxResidualIndex;
-    double maxResidual;
+    int maxTestStatisticIndex;
+    double maxTestStatistic;
 
     double wx, wy;
     double usedRejectionLimit = m_bundleResults.grossRejectionLimit();
@@ -2486,8 +2486,8 @@ namespace Isis {
       point->zeroNumberOfRejectedMeasures();
 
       numRejected = 0;
-      maxResidualIndex = -1;
-      maxResidual = -1.0;
+      maxTestStatisticIndex = -1;
+      maxTestStatistic = -1.0;
 
       int numMeasures = point->numberOfMeasures();
       for (int j = 0; j < numMeasures; j++) {
@@ -2525,19 +2525,19 @@ namespace Isis {
           continue;
         }
 
-        if ( wx > maxResidual ) {
-          maxResidual = wx;
-          maxResidualIndex = j;
+        if ( wx > maxTestStatistic ) {
+          maxTestStatistic = wx;
+          maxTestStatisticIndex = j;
         }
-        if ( wy > maxResidual ) {
-          maxResidual = wy;
-          maxResidualIndex = j;
+        if ( wy > maxTestStatistic ) {
+          maxTestStatistic = wy;
+          maxTestStatisticIndex = j;
         }
 
       }
 
       // no observations above the current rejection limit for this 3D point
-      if ( maxResidual == -1.0 || maxResidual <= usedRejectionLimit ) {
+      if ( maxTestStatistic == -1.0 || maxTestStatistic <= usedRejectionLimit ) {
           point->setNumberOfRejectedMeasures(numRejected);
           continue;
       }
@@ -2553,7 +2553,7 @@ namespace Isis {
       // for this point whose residual is above the
       // current rejection limit - we'll flag the
       // worst of these as rejected
-      BundleMeasureQsp rejected = point->at(maxResidualIndex);
+      BundleMeasureQsp rejected = point->at(maxTestStatisticIndex);
       rejected->setRejected(true);
       numRejected++;
       point->setNumberOfRejectedMeasures(numRejected);

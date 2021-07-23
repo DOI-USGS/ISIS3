@@ -89,9 +89,6 @@ namespace Isis {
       virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) = 0;
       virtual double computeObservationValue(BundleMeasure &measure, double deltaVal) = 0;
 
-      virtual LinearAlgebra::Vector &grossOutlierTestStatistic();
-      virtual bool setGrossOutlierTestStatistic(LinearAlgebra::Vector w);
-
     protected:
       QString m_observationNumber; /**< The shared portion of the serial numbers of
                                         all images in the observation. **/
@@ -109,8 +106,6 @@ namespace Isis {
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_adjustedSigmas;
-      // Test statistic used for determining gross outliers
-      LinearAlgebra::Vector m_grossOutlierTestStatistic;
   };
 
   //! Typdef for BundleObservation QSharedPointer.

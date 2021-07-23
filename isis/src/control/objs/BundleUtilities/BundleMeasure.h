@@ -68,6 +68,10 @@ namespace Isis {
       void setParentObservation(QSharedPointer<BundleObservation> observation);
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
+      void setImagePartial(const LinearAlgebra::Matrix &imagePartials);
+      void setPoint3DPartial(const LinearAlgebra::Matrix &point3DPartial);
+      void setTargetPartial(const LinearAlgebra::Matrix &targetPartial);
+      void setGrossOutlierTestStatistic(LinearAlgebra::Vector w);
 
       bool isRejected() const;
       Camera *camera() const;
@@ -77,10 +81,14 @@ namespace Isis {
       const QSharedPointer<BundleObservationSolveSettings> observationSolveSettings();
 
       double sample() const;
-      double sampleResidual() const;
       double line() const;
+      LinearAlgebra::Matrix *imagePartial();
+      LinearAlgebra::Matrix *point3DPartial();
+      LinearAlgebra::Matrix *targetPartial();
+      double sampleResidual() const;
       double lineResidual() const;
       double residualMagnitude() const;
+      LinearAlgebra::Vector grossOutlierTestStatistic() const;
       QString cubeSerialNumber() const;
       double focalPlaneComputedX() const;
       double focalPlaneComputedY() const;
@@ -94,6 +102,13 @@ namespace Isis {
                                                      bundle control measure **/
       QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
       QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+      
+      LinearAlgebra::Matrix *m_imagePartial;    /**< Image partials associated with the control measure **/
+      LinearAlgebra::Matrix *m_point3DPartial;  /**< Point partials associated with the control measure **/
+      LinearAlgebra::Matrix *m_targetPartial;   /**< Target partials associated with the control measure **/
+
+      // Test statistic used for determining gross outliers
+      LinearAlgebra::Vector m_grossOutlierTestStatistic;
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

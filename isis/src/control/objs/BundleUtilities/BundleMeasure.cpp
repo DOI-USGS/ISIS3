@@ -109,6 +109,45 @@ namespace Isis {
 
 
   /**
+   * Sets the BundleMeasure's image partial
+   *
+   * @param imagePartial BundleMeasure's imagePartial matrix
+   */
+  void BundleMeasure::setImagePartial(const LinearAlgebra::Matrix &imagePartial) {
+    *m_imagePartial = &imagePartial;
+  }
+
+
+  /**
+   * Sets the BundleMeasure's 3D point partial
+   *
+   * @param point3DPartial BundleMeasure's point3DPartial matrix
+   */
+  void BundleMeasure::setPoint3DPartial(const LinearAlgebra::Matrix &point3DPartial) {
+    *m_point3DPartial = &point3DPartial;
+  }
+
+
+  /**
+   * Sets the BundleMeasure's target partial
+   *
+   * @param targetPartial BundleMeasure's targetPartial matrix
+   */
+  void BundleMeasure::setTargetPartial(const LinearAlgebra::Matrix &targetPartial) {
+    *m_targetPartial = &targetPartial;
+  }
+
+  /**
+   * Sets the test statisitc used for data snooping outlier rejection method
+   *
+   * @param w vector of sample and line test statistic
+   */
+  void BundleMeasure::setGrossOutlierTestStatistic(LinearAlgebra::Vector w) {
+    m_grossOutlierTestStatistic = w;
+  }
+
+
+  /**
    * Determines whether or not this BundleMeasure is rejected
    *
    * @return @b bool Returns a boolean indicating whether this BundleMeasure is rejected
@@ -194,18 +233,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the sample residual for this control measure
-   *
-   * @see ControlMeasure::GetSampleResidual()
-   *
-   * @return @b double Returns the sample residual
-   */
-  double BundleMeasure::sampleResidual() const {
-    return m_controlMeasure->GetSampleResidual();
-  }
-
-
-  /**
    * Accesses the current line measurement for this control measure
    *
    * @see ControlMeasure::GetLine()
@@ -214,6 +241,47 @@ namespace Isis {
    */
   double BundleMeasure::line() const {
     return m_controlMeasure->GetLine();
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's image partial
+   *
+   * @return @b image partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::imagePartial() {
+    return m_imagePartial
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's point3D partial
+   *
+   * @return @b 3D point partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::point3DPartial() {
+    return m_point3DPartial
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's target partial
+   *
+   * @return @b target partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::targetPartial() {
+    return m_targetPartial
+  }
+
+  /**
+   * Accesses the sample residual for this control measure
+   *
+   * @see ControlMeasure::GetSampleResidual()
+   *
+   * @return @b double Returns the sample residual
+   */
+  double BundleMeasure::sampleResidual() const {
+    return m_controlMeasure->GetSampleResidual();
   }
 
 

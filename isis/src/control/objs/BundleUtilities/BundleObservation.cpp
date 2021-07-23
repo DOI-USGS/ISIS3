@@ -38,7 +38,6 @@ namespace Isis {
     m_corrections.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
-    m_grossOutlierTestStatistic.clear();
   }
 
 
@@ -62,7 +61,6 @@ namespace Isis {
     m_corrections.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
-    m_grossOutlierTestStatistic.clear();
 
     m_observationNumber = observationNumber;
     m_instrumentId = instrumentId;
@@ -210,18 +208,6 @@ namespace Isis {
     return m_adjustedSigmas;
   }
 
-
-  /**
-   * Sets the test statisitc used for data snooping outlier
-   * rejection metho
-   *
-   * @return @b bool if test statistic was successfully set
-   */
-  bool BundleObservation::setGrossOutlierTestStatistic(LinearAlgebra::Vector w) {
-    m_grossOutlierTestStatistic = w;
-
-    return true;
-  }
 
   /**
    * Accesses the data snooping test statistic
