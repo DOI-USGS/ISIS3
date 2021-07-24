@@ -172,11 +172,14 @@ set(thirdPartyCppFlags -Wall
 
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+if(NOT USE_LD)
+  set(USE_LD "-fuse-ld=gold")
+endif()
 
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} ${USE_LD}
 	                                       -pthread
 					       -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
@@ -342,6 +345,14 @@ foreach (_variableName ${_variableNames})
      list(APPEND ALLLIBDIRS "${LIBDIR}")
      list(APPEND ALLLIBS "${${_variableName}}")
    endif()
+endforeach()
+
+# miniconda3/lib has a copy of libz which conflicts with the ISIS one.
+# Takes over 30 sseconds to print out all the warnings associated with that conflict,
+# so lets just not include the base libz.
+set(IGNORE_LIB_SUFFIX "conda3/lib/libz.so" "conda/lib/libz.so")
+foreach (_ignore ${IGNORE_LIB_SUFFIX})
+	list(FILTER ALLLIBS EXCLUDE REGEX ".*${_ignore}$")
 endforeach()
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
