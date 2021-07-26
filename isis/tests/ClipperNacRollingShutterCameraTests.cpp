@@ -10,7 +10,7 @@ TEST_F(ClipperNacRsCube, ClipperNacRsCameraUnitTest) {
 
   ClipperNacRollingShutterCamera *cam = (ClipperNacRollingShutterCamera *)testCube->camera();
 
-  EXPECT_EQ(cam->CkFrameId(), -159011);
+  EXPECT_EQ(cam->CkFrameId(), -159101);
   EXPECT_EQ(cam->CkReferenceId(), -159010);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
