@@ -105,9 +105,9 @@ namespace Isis {
       QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
       QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
       
-      LinearAlgebra::Matrix *m_imagePartial;    /**< Image partials associated with the control measure **/
-      LinearAlgebra::Matrix *m_point3DPartial;  /**< Point partials associated with the control measure **/
-      LinearAlgebra::Matrix *m_targetPartial;   /**< Target partials associated with the control measure **/
+      LinearAlgebra::Matrix *m_imagePartial = nullptr;    /**< Image partials associated with the control measure **/
+      LinearAlgebra::Matrix *m_point3DPartial = nullptr;  /**< Point partials associated with the control measure **/
+      LinearAlgebra::Matrix *m_targetPartial = nullptr;   /**< Target partials associated with the control measure **/
 
       // Test statistic used for determining gross outliers
       double m_sampleOutlierTestStatistic;
