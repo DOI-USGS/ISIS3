@@ -388,8 +388,7 @@ class ClipperNacRsCube : public DefaultCube {
 
 class ClipperPbCube : public DefaultCube {
   protected:
-    void SetUp() override;
-    void TearDown() override;
+    void setInstrument(QString ikid, QString instrumentId);
 };
 
 }

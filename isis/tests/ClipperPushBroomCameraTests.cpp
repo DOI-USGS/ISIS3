@@ -6,11 +6,12 @@
 
 using namespace Isis;
 
-TEST_F(ClipperPbCube, ClipperPushBroomCameraUnitTest) {
+TEST_F(ClipperPbCube, ClipperPushBroomCameraNacTest) {
+  setInstrument("-159101", "EIS-NAC-PB");
 
   ClipperPushBroomCamera *cam = (ClipperPushBroomCamera *)testCube->camera();
 
-  EXPECT_EQ(cam->CkFrameId(), -159121);
+  EXPECT_EQ(cam->CkFrameId(), -159000);
   EXPECT_EQ(cam->CkReferenceId(), -159010);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
@@ -27,6 +28,32 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraUnitTest) {
   EXPECT_NEAR(cam->UniversalLatitude(), 8.6088673336344534, 0.0001);
   EXPECT_NEAR(cam->UniversalLongitude(), 253.69764361013753, 0.0001);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
-  EXPECT_NEAR(cam->Sample(), 5, 0.0001);
-  //EXPECT_NEAR(cam->Line(), 5, 0.0001);
+  EXPECT_NEAR(cam->Sample(), 5, 0.01);
+  //EXPECT_NEAR(cam->Line(), 5, 0.01);
+}
+
+TEST_F(ClipperPbCube, ClipperPushBroomCameraWacTest) {
+  setInstrument("-159102", "EIS-WAC-PB");
+
+  ClipperPushBroomCamera *cam = (ClipperPushBroomCamera *)testCube->camera();
+
+  EXPECT_EQ(cam->CkFrameId(), -159000);
+  EXPECT_EQ(cam->CkReferenceId(), -159010);
+  EXPECT_EQ(cam->SpkTargetId(), -159);
+  EXPECT_EQ(cam->SpkReferenceId(), 1);
+
+  EXPECT_NEAR(cam->FocalLength(), 150.402, 0.0001);
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->spacecraftNameLong(), "Europa Clipper");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->spacecraftNameShort(), "Clipper");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Europa Imaging System Push Broom Wide Angle Camera");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameShort(), "EIS-PBWAC");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentId(), "EIS-WAC-PB");
+
+  EXPECT_TRUE(cam->SetImage(5, 5));
+  EXPECT_NEAR(cam->UniversalLatitude(), 8.6088673336344534, 0.0001);
+  EXPECT_NEAR(cam->UniversalLongitude(), 253.69764361013753, 0.0001);
+  EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
+  EXPECT_NEAR(cam->Sample(), 5, 0.01);
+  //EXPECT_NEAR(cam->Line(), 5, 0.01);
 }

@@ -27,8 +27,23 @@ namespace Isis {
      m_spacecraftNameLong = "Europa Clipper";
      m_spacecraftNameShort = "Clipper";
 
-     m_instrumentNameLong  = "Europa Imaging System Push Broom Narrow Angle Camera";
-     m_instrumentNameShort = "EIS-PBNAC";
+     int frameCode = naifIkCode();
+
+     // ik values for NAC: -159101(general) and filters between -159121 and -159131
+     if (frameCode == -159101 || (frameCode > -159132 && frameCode < -159120)) {
+       m_instrumentNameLong  = "Europa Imaging System Push Broom Narrow Angle Camera";
+       m_instrumentNameShort = "EIS-PBNAC";
+     }
+     // ik values for WAC: -159102(general) and filters between -159141 and -159151
+     else if (frameCode == -159102 || (frameCode > -159152 && frameCode < -159140)) {
+       m_instrumentNameLong  = "Europa Imaging System Push Broom Wide Angle Camera";
+       m_instrumentNameShort = "EIS-PBWAC";
+     }
+     else {
+       QString msg = "Unable to construct Clipper Push Broom camera model. "
+                     "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
+       throw IException(IException::User, msg, _FILEINFO_);
+     }
 
      NaifStatus::CheckErrors();
 
@@ -75,7 +90,7 @@ namespace Isis {
     *         Kernel Frame ID
     */
    int ClipperPushBroomCamera::CkFrameId() const {
-     return (-159121);
+     return (-159000);
    }
 
 
