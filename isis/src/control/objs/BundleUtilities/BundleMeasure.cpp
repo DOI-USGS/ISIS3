@@ -29,6 +29,9 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
+    m_imagePartial = nullptr;
+    m_point3DPartial = nullptr;
+    m_targetPartial = nullptr;
   }
 
 
