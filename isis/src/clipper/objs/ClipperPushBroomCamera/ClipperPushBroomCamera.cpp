@@ -75,7 +75,7 @@ namespace Isis {
      // TODO: set distortion
 
      // Set up the ground and sky map
-     new LineCameraGroundMap(this);
+     new LineScanCameraGroundMap(this);
      new LineScanCameraSkyMap(this);
 
      LoadCache();
