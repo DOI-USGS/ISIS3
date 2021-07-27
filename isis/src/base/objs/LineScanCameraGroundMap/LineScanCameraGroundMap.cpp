@@ -282,11 +282,13 @@ namespace Isis {
     //double s[3], p[3];
     const double cacheStart = p_camera->Spice::cacheStartTime().Et();
     const double cacheEnd = p_camera->Spice::cacheEndTime().Et();
+    bool failed = false;
 
     double lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate(); //line rate
 
-    if (lineRate == 0.0) return Failure;
-
+    if (lineRate == 0.0) {
+      failed = true;
+    }
     LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
@@ -305,19 +307,22 @@ namespace Isis {
         p_camera->Sensor::setTime(approxTime);
         // check to make sure the point isn't behind the planet
         if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-          return Failure;
+          failed = true;
         }
-        p_camera->Sensor::LookDirection(lookC);
-        ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-        uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+        if (!failed) {
+          p_camera->Sensor::LookDirection(lookC);
+          ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+          uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
-        p_focalPlaneX = ux;
-        p_focalPlaneY = uy;
+          p_focalPlaneX = ux;
+          p_focalPlaneY = uy;
 
-        return Success;
+          return Success;
+        }
       }
 
       double fl, fh, xl, xh;
+      failed = false;
 
       // starting times for the secant method, kept within the domain of the cache
       xh = approxTime;
@@ -335,7 +340,7 @@ namespace Isis {
       // Iterate to refine the given approximate time that the instrument imaged the ground point
       for (int j=0; j < 10; j++) {
         if (fl-fh == 0.0) {
-          return Failure;
+          failed = true;
         }
         double etGuess = xl + (xh - xl) * fl / (fl - fh);
 
@@ -360,16 +365,18 @@ namespace Isis {
           p_camera->Sensor::setTime(approxTime);
           // check to make sure the point isn't behind the planet
           if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-            return Failure;
+            failed = true;
           }
-          p_camera->Sensor::LookDirection(lookC);
-          ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-          uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+          if (!failed) {
+            p_camera->Sensor::LookDirection(lookC);
+            ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+            uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
-          p_focalPlaneX = ux;
-          p_focalPlaneY = uy;
+            p_focalPlaneX = ux;
+            p_focalPlaneY = uy;
 
-          return Success;
+            return Success;
+          }
         }
       } // End itteration using a guess
       // return Failure; // Removed to let the lagrange method try to find the line if secant fails
@@ -396,6 +403,7 @@ namespace Isis {
 
     double quadPoly[3];
     double temp;
+    failed = false;
 
     for (int i=0; i<3; i++) {
       offsetNodes[i] = offsetFunc(timeNodes[i]);
@@ -444,10 +452,9 @@ namespace Isis {
     // (see Numerical Recipes Third Edition page 227)
     temp = quadPoly[1] * quadPoly[1] - 4.0 * quadPoly[0] * quadPoly[2];  //discriminant
 
-    // THIS IS A PREMATURE FAILURE RETURN. IT SHOULD TRY THE NEXT METHON BEFORE FAILING
-    // if (temp < 0.0) {
-    //   return Failure;  // there are apparently not any real roots on this image
-    // }
+    if (temp < 0.0) {
+      failed = true;  // there are apparently not any real roots on this image
+    }
 
     if (quadPoly[1] >= 0.0) {
       temp = -0.5 * (quadPoly[1] + sqrt(temp));
@@ -476,10 +483,9 @@ namespace Isis {
       root[i] = root[i]/scale + timeAverage;
     }
 
-    // THIS IS A PREMATURE FAILURE RETURN. IT SHOULD TRY THE NEXT METHON BEFORE FAILING
-    // if (root.size() == 0) {
-    //   return Failure;  // there are apparently not any roots on this image
-    // }
+    if (root.size() == 0) {
+      failed = true;  // there are apparently not any roots on this image
+    }
 
     // At the time of this writing ISIS made no attempt to support any sensors that were not "1 to 1".
     // Meaning they imaged the same point on the ground in multiple lines of the image
@@ -508,17 +514,18 @@ namespace Isis {
 
       // Check to make sure the point isn't behind the planet
       if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-        return Failure;
+        failed = true;
       }
+      if (!failed) {
+        p_camera->Sensor::LookDirection(lookC);
+        ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+        uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+        p_focalPlaneX = ux;
+        p_focalPlaneY = uy;
 
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-
-      return Success;
+        return Success;
+      }
     }
 
 
@@ -539,6 +546,7 @@ namespace Isis {
 
     // Get everything ordered for iteration combine and sort the five already defined points
     QList <QList <double> > pts;
+    failed = false;
 
     for (int i=0; i<3; i++) {
       QList <double> pt;
@@ -579,36 +587,39 @@ namespace Isis {
 
     // If none of the roots remain...
     if (root.size() == 0) {
-      return Failure;
+      failed = true;
     }
-
-    // Choose from the remaining roots, the solution with the smallest distance to target
-    dist.clear();
-    offset.clear();
-    for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
-      dist << distanceFunc(root[i]);
-      offset << offsetFunc(root[i]);
-    }
-
-    // Save the root with the smallest dist
-    {
-      int j=0;
-      for (int i=1; i<root.size(); i++) {
-        if (dist[i] < dist[j]) j=i;
+    if (!failed) {
+      // Choose from the remaining roots, the solution with the smallest distance to target
+      dist.clear();
+      offset.clear();
+      for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
+        dist << distanceFunc(root[i]);
+        offset << offsetFunc(root[i]);
       }
 
-      p_camera->Sensor::setTime(root[j]);
+      // Save the root with the smallest dist
+      {
+        int j=0;
+        for (int i=1; i<root.size(); i++) {
+          if (dist[i] < dist[j]) j=i;
+        }
+
+        p_camera->Sensor::setTime(root[j]);
+      }
+
+      // No need to make sure the point isn't behind the planet, it was done above
+      p_camera->Sensor::LookDirection(lookC);
+      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+
+      p_focalPlaneX = ux;
+      p_focalPlaneY = uy;
+
+      return Success;
     }
-
-    // No need to make sure the point isn't behind the planet, it was done above
-    p_camera->Sensor::LookDirection(lookC);
-    ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-    uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-    p_focalPlaneX = ux;
-    p_focalPlaneY = uy;
-
-    return Success;
+    // no methods returned Success, therefore return Failure.
+    return Failure;
   }
 }
 

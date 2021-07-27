@@ -1670,36 +1670,18 @@ namespace Isis {
   }
 
   void ClipperPbCube::setInstrument(QString ikid, QString instrumentId) {
-    DefaultCube::SetUp();
+    TempTestingFiles::SetUp();
 
-    delete testCube;
-    testCube = new Cube();
-
-    FileName newCube(tempDir.path() + "/testing.cub");
-
-    testCube->fromIsd(newCube, label, isd, "rw");
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/clipper/ClipperPho.cub", testPath);
+    testCube = new Cube(testPath);
 
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
 
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-    std::istringstream iss(R"(
-      Group = Instrument
-        SpacecraftName            = Clipper
-        InstrumentId              = EIS-NAC-PB
-        TargetName                = Europa
-        StartTime                 = 2024-12-28T13:48:12.530
-        LineExposureDuration      = 0.337600 <ms>
-        SpacecraftClockCount      = 1/0788665697.136
-      End_Group
-    )");
-
-    PvlGroup newInstGroup;
-    iss >> newInstGroup;
-
-    newInstGroup.findKeyword("InstrumentId").setValue(instrumentId);
-
-    inst = newInstGroup;
+    inst.findKeyword("InstrumentId").setValue(instrumentId);
+    inst.addKeyword(PvlKeyword("LineExposureDuration", "0.000337600"));
 
     json nk;
     nk["BODY_CODE"] =  502;
@@ -1715,9 +1697,5 @@ namespace Isis {
     PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
     PvlObject newNaifKeywords("NaifKeywords", nk);
     naifKeywords = newNaifKeywords;
-
-    QString fileName = testCube->fileName();
-    delete testCube;
-    testCube = new Cube(fileName, "rw");
   }
 }
