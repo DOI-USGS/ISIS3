@@ -1554,52 +1554,13 @@ namespace Isis {
   void ClipperWacFcCube::SetUp() {
     TempTestingFiles::SetUp();
 
-    // Use defaultCube label and isd for now
-    std::ifstream isdFile("data/defaultImage/defaultCube.isd");
-    std::ifstream cubeLabel("data/defaultImage/defaultCube.pvl");
-    isdFile >> isd;
-    cubeLabel >> label;
-
-    // Define WAC cube
-    wacFcCube = new Cube();
-    FileName wacFn(tempDir.path() + "/ClipperWAC.cub");
-    wacFcCube->fromIsd(wacFn, label, isd, "rw");
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/clipper/ClipperPho.cub", testPath);
+    wacFcCube = new Cube(testPath);
 
     PvlGroup &wacKernels = wacFcCube->label()->findObject("IsisCube").findGroup("Kernels");
     wacKernels.findKeyword("NaifFrameCode").setValue("-159102");
 
-      // Instruments Group
-    PvlGroup &realWacInst = wacFcCube->label()->findObject("IsisCube").findGroup("Instrument");
-    std::istringstream newWacInst(R"(
-      Group = Instrument
-        SpacecraftName            = Clipper
-        InstrumentId              = EIS-WAC-FC
-        TargetName                = Europa
-        StartTime                 = 2025-01-01T00:00:00.000
-      End_Group
-    )");
-    PvlGroup newWacInstPvl; newWacInst >> newWacInstPvl;
-    realWacInst = newWacInstPvl;
-
-      // NaifKeywords Group
-    PvlObject &realWacNk = wacFcCube->label()->findObject("NaifKeywords");
-    std::istringstream newWacNk(R"(
-      Object = NaifKeywords
-        BODY_CODE               = 502
-        BODY502_RADII           = (1562.6, 1560.3, 1559.5)
-        BODY_FRAME_CODE         = 10024
-        INS-159102_FOCAL_LENGTH = 150.40199
-        INS-159102_PIXEL_PITCH  = 0.014
-        INS-159102_TRANSX       = (0.0, 0.014004651, 0.0)
-        INS-159102_TRANSY       = (0.0, 0.0, 0.01399535)
-        INS-159102_ITRANSS      = (0.0, 71.404849, 0.0)
-        INS-159102_ITRANSL      = (0.0, 0.0, 71.4523)
-        INS-159102_OD_K         = (0.0, -0.0000538628307258204, -4.57142010849732E-09)
-      End_Object
-    )");
-    PvlObject newWacNkPvl; newWacNk >> newWacNkPvl;
-    realWacNk = newWacNkPvl;
-    
     double offset = 10;
     AlphaCube aCube(wacFcCube->sampleCount(), wacFcCube->lineCount(),
                     wacFcCube->sampleCount()-offset, wacFcCube->lineCount() - offset,
