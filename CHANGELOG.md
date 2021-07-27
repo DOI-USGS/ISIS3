@@ -38,6 +38,7 @@ release.
 ## [6.0.0] - 2021-08-27
 
 ### Added
+- Added a new application, isisimport. The application is designed to be a replacement for many of the mission/instrument specific import applications. It does not contain the templates for those applications at this time. It uses a templateing engine instead of the translation files.
 - Added a new dark current correction to hical that works with the higher temperatures recent images are captured at. Use the new config file, $ISISDATA/mro/calibration/hical.0023_darkrate.conf, to enable the new dark current correction over the old dark current correction. Runs of hical without the new dark current correction will also produce an extra line in the output log indicating that the ZeroDarkRate module is disabled. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
 - Added the ability to bundle adjust CSM models in jigsaw. Use the new CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST arguments to specify what you solve for. [#4537](https://github.com/USGS-Astrogeology/ISIS3/pull/4537)
 
@@ -66,6 +67,11 @@ release.
 - Fixed hideal2pds bug where parameterizing for 8-bit output create 18-bit output. [#4006](https://github.com/USGS-Astrogeology/ISIS3/issues/4006)
 - Fixed Thm2isis to properly use output attributes [#4213](https://github.com/USGS-Astrogeology/ISIS3/issues/4213)
 - Fixed caminfo uselabel SegFault. [#4401](https://github.com/USGS-Astrogeology/ISIS3/issues/4401)
+
+### Changed
+- isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+- Changed the name of topds4 to isisexport. The application is designed to be a replacement for many of the mission/instrument specific export applications. It uses a templateing engine instead of the translation files.
+
 
 ## [5.0.0] - 2021-04-01
 

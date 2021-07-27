@@ -13,16 +13,16 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 
-#include "topds4.h"
+#include "isisexport.h"
 
 #include "gmock/gmock.h"
 
 using namespace Isis;
 using json = nlohmann::json;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/topds4.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/isisexport.xml").expanded();
 
-TEST_F(SmallCube, FunctionalTestTopds4MainLabel) {
+TEST_F(SmallCube, FunctionalTestIsisexportMainLabel) {
   PvlGroup testGroup("TestGroup");
   PvlKeyword testKey("TestValue", "a");
   testGroup += testKey;
@@ -37,7 +37,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MainLabel) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -46,7 +46,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MainLabel) {
   EXPECT_EQ(testKey[0].toStdString(), line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4OriginalLabel) {
+TEST_F(SmallCube, FunctionalTestIsisexportOriginalLabel) {
   Pvl testLabel;
   PvlKeyword testKey("TestValue", "a");
   testLabel += testKey;
@@ -62,7 +62,7 @@ TEST_F(SmallCube, FunctionalTestTopds4OriginalLabel) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -71,7 +71,7 @@ TEST_F(SmallCube, FunctionalTestTopds4OriginalLabel) {
   EXPECT_EQ(testKey[0].toStdString(), line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4NoOriginalLabel) {
+TEST_F(SmallCube, FunctionalTestIsisexportNoOriginalLabel) {
   QString templateFile = tempDir.path()+"/bad_value.tpl";
   QString renderedFile = tempDir.path()+"/bad_value.txt";
   std::ofstream of;
@@ -81,10 +81,9 @@ TEST_F(SmallCube, FunctionalTestTopds4NoOriginalLabel) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  EXPECT_ANY_THROW(topds4(testCube, options));
-}
+  EXPECT_ANY_THROW(isisexport(testCube, options)); }
 
-TEST_F(SmallCube, FunctionalTestTopds4OriginalXmlLabel) {
+TEST_F(SmallCube, FunctionalTestIsisexportOriginalXmlLabel) {
 
   QString labelFileName = tempDir.path()+"/originallabel.xml";
   std::ofstream ofxml;
@@ -104,7 +103,7 @@ TEST_F(SmallCube, FunctionalTestTopds4OriginalXmlLabel) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -113,7 +112,7 @@ TEST_F(SmallCube, FunctionalTestTopds4OriginalXmlLabel) {
   EXPECT_EQ("Something", line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4ExtraPvl) {
+TEST_F(SmallCube, FunctionalTestIsisexportExtraPvl) {
   QString pvlFile = tempDir.path()+"/extra.pvl";
   Pvl testPvl;
   PvlKeyword testKey("TestValue", "a");
@@ -131,7 +130,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraPvl) {
                            "extrapvl=" + pvlFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -140,7 +139,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraPvl) {
   EXPECT_EQ(testKey[0].toStdString(), line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraPvl) {
+TEST_F(SmallCube, FunctionalTestIsisexportMultipleExtraPvl) {
   QString pvlFile1 = tempDir.path()+"/extra1.pvl";
   Pvl testPvl1;
   PvlKeyword testKey1("TestValue", "a");
@@ -171,7 +170,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraPvl) {
   UserInterface options(APP_XML, args);
   Pvl log;
 
-  topds4(testCube, options, &log);
+  isisexport(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -187,7 +186,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraPvl) {
   EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4ExtraJson) {
+TEST_F(SmallCube, FunctionalTestIsisexportExtraJson) {
   QString jsonFile = tempDir.path()+"/extra.json";
   json testJson;
   testJson["TestValue"] = "a";
@@ -207,7 +206,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraJson) {
                            "extrajson=" + jsonFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -216,7 +215,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraJson) {
   EXPECT_EQ(testJson["TestValue"], line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraJson) {
+TEST_F(SmallCube, FunctionalTestIsisexportMultipleExtraJson) {
   QString jsonFile1 = tempDir.path()+"/extra1.json";
   json testJson1;
   testJson1["TestValue"] = "a";
@@ -249,7 +248,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraJson) {
   UserInterface options(APP_XML, args);
   Pvl log;
 
-  topds4(testCube, options, &log);
+  isisexport(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -265,7 +264,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraJson) {
   EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4ExtraXml) {
+TEST_F(SmallCube, FunctionalTestIsisexportExtraXml) {
   QString xmlFile = tempDir.path()+"/extra.xml";
   std::ofstream xmlStream;
   xmlStream.open(xmlFile.toStdString());
@@ -283,7 +282,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraXml) {
                            "extraxml=" + xmlFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -292,7 +291,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ExtraXml) {
   EXPECT_EQ("a", line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraXml) {
+TEST_F(SmallCube, FunctionalTestIsisexportMultipleExtraXml) {
   QString xmlFile1 = tempDir.path()+"/extra1.xml";
   std::ofstream xmlStream1;
   xmlStream1.open(xmlFile1.toStdString());
@@ -325,7 +324,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraXml) {
   UserInterface options(APP_XML, args);
   Pvl log;
 
-  topds4(testCube, options, &log);
+  isisexport(testCube, options, &log);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -339,7 +338,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MultipleExtraXml) {
   EXPECT_TRUE(log.hasGroup("Warning"));
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4CurrentTime) {
+TEST_F(SmallCube, FunctionalTestIsisexportCurrentTime) {
   QString templateFile = tempDir.path()+"/current_time.tpl";
   QString renderedFile = tempDir.path()+"/current_time.txt";
   std::ofstream of;
@@ -349,7 +348,7 @@ TEST_F(SmallCube, FunctionalTestTopds4CurrentTime) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -369,7 +368,7 @@ TEST_F(SmallCube, FunctionalTestTopds4CurrentTime) {
                                                                 << "[YYYY-MM-DDTHH:MM:SS].";
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4ImageFileName) {
+TEST_F(SmallCube, FunctionalTestIsisexportImageFileName) {
   QString templateFile = tempDir.path()+"/current_time.tpl";
   QString renderedFile = tempDir.path()+"/current_time.txt";
   std::ofstream of;
@@ -379,7 +378,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ImageFileName) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -388,7 +387,7 @@ TEST_F(SmallCube, FunctionalTestTopds4ImageFileName) {
   EXPECT_EQ("current_time.cub", line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
+TEST_F(SmallCube, FunctionalTestIsisexportMD5Hash) {
   QString templateFile = tempDir.path()+"/current_time.tpl";
   QString renderedFile = tempDir.path()+"/current_time.txt";
   QString renderedCube = tempDir.path()+"/current_time.cub";
@@ -399,7 +398,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());
@@ -409,7 +408,7 @@ TEST_F(SmallCube, FunctionalTestTopds4MD5Hash) {
   EXPECT_EQ(md5.getHashFromFile(renderedCube).toStdString(), line);
 }
 
-TEST_F(SmallCube, FunctionalTestTopds4OutputFileSize) {
+TEST_F(SmallCube, FunctionalTestIsisexportOutputFileSize) {
   QString templateFile = tempDir.path()+"/file_size.tpl";
   QString renderedFile = tempDir.path()+"/file_size.txt";
   std::ofstream of;
@@ -419,7 +418,7 @@ TEST_F(SmallCube, FunctionalTestTopds4OutputFileSize) {
   QVector<QString> args = {"template=" + templateFile, "to=" + renderedFile};
   UserInterface options(APP_XML, args);
 
-  topds4(testCube, options);
+  isisexport(testCube, options);
 
   std::ifstream renderedStream;
   renderedStream.open(renderedFile.toStdString());

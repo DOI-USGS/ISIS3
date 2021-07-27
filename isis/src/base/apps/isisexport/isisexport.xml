@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="topds4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="isisexport" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Convert from ISIS cube to PDS 4 format using template XML files
+    Convert from ISIS cube to another format
   </brief>
 
   <description>
     <p>
-      Writes a PDS4 compatible label file and image file. The contents of the label file are
-      generated useing the template file specified by the TEMPLATE parameter.
+      NOTE: This program and the associated template files are incomplete. The documentation
+      describes what the eventual intended capabilities are. Many capabiliteis are not implemented
+      at this time.
+    </p>
+    <p>
+      Exports an ISIS cube file to an external, non-ISIS, format. The intended output formats
+      include PDS4, PDS3, and FITS compatible label and image files. The contents of the label file are
+      generated using a template file. The template file name is generated automatically from the ISIS
+      cube label information. If the template can not be found, the user must specify its name using
+      the TEMPLATE parameter.
     </p>
     <p>
       The image file is generated from the input ISIS cube specified by the FROM parameter.
@@ -21,7 +29,7 @@
       is converted to JSON and then it is accessed via the Inja templating syntax.
       See the <a href="https://pantor.github.io/inja">Inja documentation</a> for the full template
       syntax. The data from the label of the input cube is accessible under "MainLabel",
-      the data from the originally ingested PVL or XML label stored on the input cube is accessible 
+      the data from the originally ingested PVL or XML label stored on the input cube is accessible
       under "OriginalLabel",
       and the extra data is accessible under "ExtraPvl", "ExtraXml", and "ExtraJson".
     </p>
@@ -46,7 +54,7 @@
           Input cube
         </brief>
         <description>
-          This is the input cube that will be converted to PDS4 format.
+          This is the input cube that will be exported.
         </description>
         <filter>
           *.cub
@@ -55,15 +63,16 @@
 
       <parameter name="TEMPLATE">
         <type>filename</type>
+        <internalDefault>None</internalDefault>
         <fileMode>input</fileMode>
         <brief>
           Input template
         </brief>
         <description>
           The file name of the input template. This file contains "inja" compatible
-          template syntax inside of a PDS4 XML label. The data used to replace the
+          template syntax. The data used to replace the
           template elements comes from the ISIS cube label, the original label
-          (PDS3, FITS, PDS4), and other input PVL, XML, or JSON files.
+          (PDS3, FITS, PDS4), and user specified input PVL, XML, or JSON files.
         </description>
       </parameter>
 
@@ -71,11 +80,11 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output PDS4 label
+          Output label file name
         </brief>
         <description>
-          The output file name of the PDS4 label. The output image name will be derived from this
-          parameter by removing the last extension and adding .cub.
+          The output file name of the exported label. The output image name will be derived from this
+          parameter by removing the last extension and adding an appropriate file extension.
         </description>
       </parameter>
     </group>
