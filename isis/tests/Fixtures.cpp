@@ -1599,7 +1599,7 @@ namespace Isis {
     )");
     PvlObject newWacNkPvl; newWacNk >> newWacNkPvl;
     realWacNk = newWacNkPvl;
-    
+
     double offset = 10;
     AlphaCube aCube(wacFcCube->sampleCount(), wacFcCube->lineCount(),
                     wacFcCube->sampleCount()-offset, wacFcCube->lineCount() - offset,
@@ -1689,5 +1689,28 @@ namespace Isis {
       QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
       testCube = new Cube(testPath, "rw");
     }
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+
+    TableField ephTimeField("MinimumRadius", TableField::Double);
+    TableField expTimeField("MaximumRadius", TableField::Double);
+    TableField lineStartField("LineStart", TableField::Integer);
+
+    TableRecord timesRecord;
+    timesRecord += ephTimeField;
+    timesRecord += expTimeField;
+    timesRecord += lineStartField;
+
+    Table timesTable("LineScanTimes", timesRecord);
+
+    timesRecord[0] = 893716269.18552;
+    timesRecord[1] = (double) inst["LineExposureDuration"] / 1000;
+    timesRecord[2] = 1;
+    timesTable += timesRecord;
+
+    testCube->write(timesTable);
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
   }
 }
