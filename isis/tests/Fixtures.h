@@ -389,7 +389,7 @@ class ClipperNacRsCube : public DefaultCube {
 class ClipperPbCube : public TempTestingFiles {
   protected:
     Cube *testCube;
-    void setInstrument(QString ikid, QString instrumentId);
+    void setInstrument(QString instrumentId);
 };
 
 }

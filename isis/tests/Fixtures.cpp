@@ -1669,33 +1669,18 @@ namespace Isis {
     }
   }
 
-  void ClipperPbCube::setInstrument(QString ikid, QString instrumentId) {
+  void ClipperPbCube::setInstrument(QString instrumentId) {
     TempTestingFiles::SetUp();
 
-    QString testPath = tempDir.path() + "/test.cub";
-    QFile::copy("data/clipper/ClipperPho.cub", testPath);
-    testCube = new Cube(testPath);
-
-    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-    kernels.findKeyword("NaifFrameCode").setValue(ikid);
-
-    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
-    inst.findKeyword("InstrumentId").setValue(instrumentId);
-    inst.addKeyword(PvlKeyword("LineExposureDuration", "0.000337600"));
-
-    json nk;
-    nk["BODY_CODE"] =  502;
-    nk["BODY502_RADII"] =  {1562.6, 1560.3, 1559.5};
-    nk["BODY_FRAME_CODE"] =  10024;
-    nk["INS"+ikid.toStdString()+"_FOCAL_LENGTH"] = 150.40199;
-    nk["INS"+ikid.toStdString()+"_PIXEL_PITCH"] = 0.014;
-    nk["INS"+ikid.toStdString()+"_TRANSX"] = {0.0, 0.014004651, 0.0};
-    nk["INS"+ikid.toStdString()+"_TRANSY"] = {0.0, 0.0, 0.01399535};
-    nk["INS"+ikid.toStdString()+"_ITRANSS"] = {0.0, 71.404849, 0.0};
-    nk["INS"+ikid.toStdString()+"_ITRANSL"] = {0.0, 0.0, 71.4523};
-
-    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
-    PvlObject newNaifKeywords("NaifKeywords", nk);
-    naifKeywords = newNaifKeywords;
+    if (instrumentId == "EIS-NAC-PB") {
+      QString testPath = tempDir.path() + "/nacTest.cub";
+      QFile::copy("data/clipper/ClipperNacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+    else if (instrumentId == "EIS-WAC-PB") {
+      QString testPath = tempDir.path() + "/wacTest.cub";
+      QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
   }
 }

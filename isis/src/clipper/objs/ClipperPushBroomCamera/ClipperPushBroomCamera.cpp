@@ -29,15 +29,11 @@ namespace Isis {
 
      int frameCode = naifIkCode();
 
-     // ik values for NAC: -159101(general), -159110(rad), -159112(koz), filters between -159121 and -159131
-     if (frameCode == -159101 || frameCode == -159110 || frameCode == -159112
-                              || (frameCode > -159132 && frameCode < -159120)) {
+     if (frameCode == -159103) {
        m_instrumentNameLong  = "Europa Imaging System Push Broom Narrow Angle Camera";
        m_instrumentNameShort = "EIS-PBNAC";
      }
-     // ik values for WAC: -159102(general), -159111(rad), -159113(koz), filters between -159141 and -159151
-     else if (frameCode == -159102 || frameCode == -159111 || frameCode == -159113
-                                   || (frameCode > -159152 && frameCode < -159140)) {
+     else if (frameCode == -159104) {
        m_instrumentNameLong  = "Europa Imaging System Push Broom Wide Angle Camera";
        m_instrumentNameShort = "EIS-PBWAC";
      }
