@@ -1555,7 +1555,7 @@ namespace Isis {
     TempTestingFiles::SetUp();
 
     QString testPath = tempDir.path() + "/test.cub";
-    QFile::copy("data/clipper/ClipperPho.cub", testPath);
+    QFile::copy("data/clipper/ClipperWacFc.cub", testPath);
     wacFcCube = new Cube(testPath);
 
     PvlGroup &wacKernels = wacFcCube->label()->findObject("IsisCube").findGroup("Kernels");
