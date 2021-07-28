@@ -1675,4 +1675,19 @@ namespace Isis {
       delete testCube;
     }
   }
+
+  void ClipperPbCube::setInstrument(QString instrumentId) {
+    TempTestingFiles::SetUp();
+
+    if (instrumentId == "EIS-NAC-PB") {
+      QString testPath = tempDir.path() + "/nacTest.cub";
+      QFile::copy("data/clipper/ClipperNacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+    else if (instrumentId == "EIS-WAC-PB") {
+      QString testPath = tempDir.path() + "/wacTest.cub";
+      QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+  }
 }
