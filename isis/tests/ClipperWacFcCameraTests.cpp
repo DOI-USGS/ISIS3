@@ -45,7 +45,7 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
 
   // Camera info
   //EXPECT_EQ(cam->instrumentRotation()->Frame(), -27002);    // from the defaultcube isd
-  EXPECT_EQ(cam->CkFrameId(), -159102);
+  EXPECT_EQ(cam->CkFrameId(), -159000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
@@ -56,7 +56,6 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Europa Imaging System Framing Wide Angle Camera");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameShort(), "EIS-FWAC");
 
-
   // Check SetImage on corners
   int line, samp, nline, nsamp;
   line = 1.0;     samp = 1.0;
@@ -66,13 +65,13 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   TestLineSamp(cam, nline, nsamp);
   TestLineSamp(cam, nline, samp);
 
-  TestImageToGroundToImage(cam, 145, 161, 8.5839718675128971, 253.72747262733904);
-  TestImageToGroundToImage(cam, 3655, 157, 12.477189586257952, 255.76543090545474);
-  TestImageToGroundToImage(cam, 289, 1767, 7.7936575791457452, 255.62130722292261);
-  TestImageToGroundToImage(cam, 3767, 1579, 11.843295382436571, 257.54360381024532);
-  
+  TestImageToGroundToImage(cam, 145, 161, 1.0318106954644963, 79.845106263190786);
+  TestImageToGroundToImage(cam, 3655, 157, -30.257524123457561, 68.491558949717344);
+  TestImageToGroundToImage(cam, 289, 1767, 4.3522464978639448, 65.049067459499526);
+  TestImageToGroundToImage(cam, 3767, 1579, -26.240527197710811, 54.405682822879818);
+
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
-  PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = wacFcCube->label()->findObject("IsisCube").findGroup("Instrument", Pvl::Traverse);
   QString startTime = inst["StartTime"];
   iTime etStart(startTime);
 
