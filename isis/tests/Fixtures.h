@@ -386,6 +386,12 @@ class ClipperNacRsCube : public DefaultCube {
     void TearDown() override;
 };
 
+class ClipperPbCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+    void setInstrument(QString instrumentId);
+};
+
 }
 
 #endif
