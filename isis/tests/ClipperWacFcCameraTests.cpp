@@ -45,7 +45,7 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
 
   // Camera info
   //EXPECT_EQ(cam->instrumentRotation()->Frame(), -27002);    // from the defaultcube isd
-  EXPECT_EQ(cam->CkFrameId(), -159102);
+  EXPECT_EQ(cam->CkFrameId(), -159000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
