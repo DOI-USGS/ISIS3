@@ -24,6 +24,7 @@ find files of those names at the top level of this repository. **/
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/math/distributions/fisher_f.hpp>
 
 // Isis lib
 #include "Application.h"
@@ -850,10 +851,20 @@ namespace Isis {
         // compute residuals
         vtpv = computeResiduals();
 
-        // flag outliers
+        // variance of unit weight (also reference variance, variance factor, etc.)
+        m_bundleResults.computeSigma0(vtpv, m_bundleSettings->convergenceCriteria());
+
+        // flag outliers based on median absolute deviation
         if ( m_bundleSettings->outlierRejection() ) {
           computeRejectionLimit();
           flagOutliers();
+        }
+
+	// flag outliers based on normalized residuals
+        if ( m_bundleSettings->grossOutlierRejection() ) {
+          computeGrossRejectionLimit();
+          computeGrossOutlierTestStatistics();
+          flagGrossOutliers();
         }
 
         // testing
@@ -864,9 +875,6 @@ namespace Isis {
           return false;
         }
         // testing
-
-        // variance of unit weight (also reference variance, variance factor, etc.)
-        m_bundleResults.computeSigma0(vtpv, m_bundleSettings->convergenceCriteria());
 
         // Set up formatting for status updates with doubles (e.g. Sigma0, Elapsed Time)
         int fieldWidth = 20;
@@ -1390,7 +1398,7 @@ namespace Isis {
     m_bundleResults.resetNumberConstrainedImageParameters();
 
     int n = 0;
-
+    
     for (int i = 0; i < m_sparseNormals.size(); i++) {
       LinearAlgebra::Matrix *diagonalBlock = m_sparseNormals.getBlock(i, i);
       if ( !diagonalBlock )
@@ -1892,9 +1900,10 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-
+    
     if (m_bundleSettings->solveTargetBody()) {
       observation->computeTargetPartials(coeffTarget, measure, m_bundleSettings, m_bundleTargetBody);
+      // measure->setTargetPartial(&coeffTarget);
     }
 
     observation->computeImagePartials(coeffImage, measure);
@@ -2234,7 +2243,7 @@ namespace Isis {
 
       return true;
   }
-
+  
 
   /**
    * Flags outlier measures and control points.
@@ -2327,6 +2336,225 @@ namespace Isis {
       // current rejection limit - we'll flag the
       // worst of these as rejected
       BundleMeasureQsp rejected = point->at(maxResidualIndex);
+      rejected->setRejected(true);
+      numRejected++;
+      point->setNumberOfRejectedMeasures(numRejected);
+      m_controlNet->IncrementNumberOfRejectedMeasuresInImage(rejected->cubeSerialNumber());
+      totalNumRejected++;
+
+      // do we still have sufficient remaining observations for this 3D point?
+      if ( ( numMeasures-numRejected ) < 2 ) {
+          point->setRejected(true);
+          QString status = "Rejecting Entire Point: ";
+          status.append(QString("%1").arg(point->id().toLatin1().data()));
+          status.append("\r");
+          outputBundleStatus(status);
+      }
+      else
+          point->setRejected(false);
+
+    }
+
+    int numberRejectedObservations = 2*totalNumRejected;
+
+    QString status = "\nRejected Observations:";
+    status.append(QString("%1").arg(numberRejectedObservations));
+    status.append(" (Rejection Limit:");
+    status.append(QString("%1").arg(usedRejectionLimit));
+    status.append(")\n");
+    outputBundleStatus(status);
+
+    m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
+
+    status = "\nMeasures that came back: ";
+    status.append(QString("%1").arg(numComingBack));
+    status.append("\n");
+    outputBundleStatus(status);
+
+    return true;
+  }
+
+  /**
+   * @brief Compute rejection limit for normalized residual outlier rejection.
+   *
+   * Computes a critical value from the f-distribution based on the systems degrees of freedom
+   * and probability level. Then, sets the rejection limit in m_bundleResults.
+   *
+   * @return @b bool If the rejection limit was successfully computed and set.
+   *
+   * @TODO should this be in BundleResults?
+   *
+   */
+  bool BundleAdjust::computeGrossRejectionLimit() {
+    int dof = m_bundleResults.degreesOfFreedom();
+    double a0 = m_bundleSettings->grossOutlierProbabilityLevel();
+    
+    // define the cdf distribution as a function of x
+    auto fDistributionProbability = [&] (double x) {
+      // define the f distribution for a single point against entire observation set
+      boost::math::fisher_f_distribution<double> fDist(1, dof-1);
+      return boost::math::cdf(fDist, x) - a0;
+    };
+    
+    // define termination condition
+    auto terminationCondition = [] (double min, double max) {
+      return abs(min - max) <= 0.0001;
+    };
+
+    // feed cdf distirbution function-a0 into bisection algorithm
+    using boost::math::tools::bisect;
+    std::pair<double, double> result = bisect(fDistributionProbability, 0.001, 100.0, terminationCondition);
+    double c = (result.first + result.second) / 2;
+
+    QString status = "\nProbability level: ";
+    status.append(QString("%1").arg(a0));
+    status.append("\n");
+    outputBundleStatus(status);
+
+    m_bundleResults.setGrossRejectionLimit(c);
+
+    status = "\nGross Rejection Limit: ";
+    status.append(QString("%1").arg(m_bundleResults.grossRejectionLimit()));
+    status.append("\n");
+    outputBundleStatus(status);
+
+    return true;
+  }
+
+
+  bool BundleAdjust::computeGrossOutlierTestStatistics() {
+    int numObjectPoints = m_bundleControlPoints.size();
+    double sigma0 = m_bundleResults.sigma0();
+
+    for (int i = 0; i < numObjectPoints; i++) {
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
+      
+      int numMeasures = point->numberOfMeasures();
+      for (int j = 0; j < numMeasures; j++) {
+        BundleMeasureQsp measure = point->at(j);
+
+        // compute ai*xi
+        static LinearAlgebra::Vector aixi(2);
+        
+        // compute qvv=(1-ak*xi)/pi
+        static LinearAlgebra::Vector qvv(2);
+
+        // calculate test statistics
+        double vx = measure->sampleResidual();
+        double vy = measure->lineResidual();
+        //double wx = fabs(vx)/(sigma0*sqrt(qvv[0]));
+        //double wy = fabs(vy)/(sigma0*sqrt(qvv[1]));
+        // attach wi to BundleMeasure -> grossOutlierTestStatistic
+        //measure.setGrossOutlierTestStatistic(wx,wy);
+      }
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Flags outlier measures and control points by comparing
+   * the observations normalized residual to a critical
+   * value determined by F-distribution and a user-defined
+   * probability level.
+   *
+   * @return @b bool If the flagging was successful.
+   *
+   * @TODO How should we handle points with few measures.
+   */
+  bool BundleAdjust::flagGrossOutliers() {
+    int numRejected;
+    int totalNumRejected = 0;
+
+    int maxTestStatisticIndex;
+    double maxTestStatistic;
+
+    double wx, wy;
+    double usedRejectionLimit = m_bundleResults.grossRejectionLimit();
+
+
+    // TODO What to do if usedRejectionLimit is too low?
+
+    int numComingBack = 0;
+
+    int numObjectPoints = m_bundleControlPoints.size();
+
+    outputBundleStatus("\n");
+    for (int i = 0; i < numObjectPoints; i++) {
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
+
+      point->zeroNumberOfRejectedMeasures();
+
+      numRejected = 0;
+      maxTestStatisticIndex = -1;
+      maxTestStatistic = -1.0;
+
+      int numMeasures = point->numberOfMeasures();
+      for (int j = 0; j < numMeasures; j++) {
+
+        BundleMeasureQsp measure = point->at(j);
+
+        // grab test statistics
+        //wx = measure.grossOutlierLineTestStatistic();
+        //wy = measure.grossOutlierSampleTestStatistic();
+        wx = 1.34;
+        wy = 2.58;
+
+        // measure is good
+        if ( wx <= usedRejectionLimit && 
+             wy <= usedRejectionLimit) {
+
+          // was it previously rejected?
+          if ( measure->isRejected() ) {
+            QString status = "Coming back in: ";
+            status.append(QString("%1").arg(point->id().toLatin1().data()));
+            status.append("\r");
+            outputBundleStatus(status);
+            numComingBack++;
+            m_controlNet->DecrementNumberOfRejectedMeasuresInImage(measure->cubeSerialNumber());
+          }
+
+          measure->setRejected(false);
+          continue;
+        }
+
+        // if it's still rejected, skip it
+        if ( measure->isRejected() ) {
+          numRejected++;
+          totalNumRejected++;
+          continue;
+        }
+
+        if ( wx > maxTestStatistic ) {
+          maxTestStatistic = wx;
+          maxTestStatisticIndex = j;
+        }
+        if ( wy > maxTestStatistic ) {
+          maxTestStatistic = wy;
+          maxTestStatisticIndex = j;
+        }
+
+      }
+
+      // no observations above the current rejection limit for this 3D point
+      if ( maxTestStatistic == -1.0 || maxTestStatistic <= usedRejectionLimit ) {
+          point->setNumberOfRejectedMeasures(numRejected);
+          continue;
+      }
+
+      // this is another kluge - if we only have two observations
+      // we won't reject (for now)
+      if ((numMeasures - (numRejected + 1)) < 2) {
+          point->setNumberOfRejectedMeasures(numRejected);
+          continue;
+      }
+
+      // otherwise, we have at least one observation
+      // for this point whose residual is above the
+      // current rejection limit - we'll flag the
+      // worst of these as rejected
+      BundleMeasureQsp rejected = point->at(maxTestStatisticIndex);
       rejected->setRejected(true);
       numRejected++;
       point->setNumberOfRejectedMeasures(numRejected);

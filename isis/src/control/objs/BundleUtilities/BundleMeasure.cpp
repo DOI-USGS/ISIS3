@@ -36,6 +36,18 @@ namespace Isis {
    * Destructor
    */
   BundleMeasure::~BundleMeasure() {
+    if (m_imagePartial) {
+      delete m_imagePartial;
+      m_imagePartial = nullptr;
+    }
+    if (m_point3DPartial) {
+      delete m_point3DPartial;
+      m_point3DPartial = nullptr;
+    }
+    if (m_targetPartial) {
+      delete m_targetPartial;
+      m_targetPartial = nullptr;
+    }
   }
 
 
@@ -105,6 +117,61 @@ namespace Isis {
    */
   void BundleMeasure::setRejected(bool reject) {
     m_controlMeasure->SetRejected(reject);
+  }
+
+
+  /**
+   * Sets the BundleMeasure's image partial
+   *
+   * @param imagePartial BundleMeasure's imagePartial matrix
+   */
+  void BundleMeasure::setImagePartial(const LinearAlgebra::Matrix &imagePartial) {
+    if (m_imagePartial) {
+      delete m_imagePartial;
+      m_imagePartial = nullptr;
+    }
+
+    m_imagePartial = new LinearAlgebra::Matrix(imagePartial);
+  }
+
+
+  /**
+   * Sets the BundleMeasure's 3D point partial
+   *
+   * @param point3DPartial BundleMeasure's point3DPartial matrix
+   */
+  void BundleMeasure::setPoint3DPartial(const LinearAlgebra::Matrix &point3DPartial) {
+    if (m_point3DPartial) {
+      delete m_point3DPartial;
+      m_point3DPartial = nullptr;
+    }
+    
+    m_point3DPartial = new LinearAlgebra::Matrix(point3DPartial);
+  }
+
+
+  /**
+   * Sets the BundleMeasure's target partial
+   *
+   * @param targetPartial BundleMeasure's targetPartial matrix
+   */
+  void BundleMeasure::setTargetPartial(const LinearAlgebra::Matrix &targetPartial) {
+    if (m_targetPartial) {
+      delete m_targetPartial;
+      m_targetPartial = nullptr;
+    }
+
+    m_targetPartial = new LinearAlgebra::Matrix(targetPartial);
+  }
+
+  /**
+   * Sets the test statisitc used for data snooping outlier rejection method
+   *
+   * @param w vector of sample and line test statistic
+   */
+  void BundleMeasure::setGrossOutlierTestStatistic(double sampleOutlierTestStatistic, double lineOutlierTestStatistic) {
+    m_sampleOutlierTestStatistic = sampleOutlierTestStatistic;
+    m_lineOutlierTestStatistic = lineOutlierTestStatistic;
   }
 
 
@@ -194,18 +261,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the sample residual for this control measure
-   *
-   * @see ControlMeasure::GetSampleResidual()
-   *
-   * @return @b double Returns the sample residual
-   */
-  double BundleMeasure::sampleResidual() const {
-    return m_controlMeasure->GetSampleResidual();
-  }
-
-
-  /**
    * Accesses the current line measurement for this control measure
    *
    * @see ControlMeasure::GetLine()
@@ -214,6 +269,47 @@ namespace Isis {
    */
   double BundleMeasure::line() const {
     return m_controlMeasure->GetLine();
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's image partial
+   *
+   * @return @b image partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::imagePartial() {
+    return m_imagePartial;
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's point3D partial
+   *
+   * @return @b 3D point partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::point3DPartial() {
+    return m_point3DPartial;
+  }
+
+
+  /**
+   * Acessess the pointer to the BundleMeasure's target partial
+   *
+   * @return @b target partial pointer
+   */
+  LinearAlgebra::Matrix *BundleMeasure::targetPartial() {
+    return m_targetPartial;
+  }
+
+  /**
+   * Accesses the sample residual for this control measure
+   *
+   * @see ControlMeasure::GetSampleResidual()
+   *
+   * @return @b double Returns the sample residual
+   */
+  double BundleMeasure::sampleResidual() const {
+    return m_controlMeasure->GetSampleResidual();
   }
 
 
@@ -238,6 +334,27 @@ namespace Isis {
    */
   double BundleMeasure::residualMagnitude() const {
     return m_controlMeasure->GetResidualMagnitude();
+  }
+
+
+ /**
+  * Accesses the outlier test statistic used for the data snooping
+  * outlier rejection method associate with the BundleMeasure's sample.
+  *
+  * @return @b BundleMeasure sample's outlier test statistic
+  */
+  double BundleMeasure::sampleOutlierTestStatistic() const {
+    return m_sampleOutlierTestStatistic;
+  }
+
+ /**
+  * Accesses the outlier test statistic used for the data snooping
+  * outlier rejection method associate with the BundleMeasure's line.
+  *
+  * @return @b BundleMeasure line's outlier test statistic
+  */
+  double BundleMeasure::lineOutlierTestStatistic() const {
+    return m_lineOutlierTestStatistic;
   }
 
 

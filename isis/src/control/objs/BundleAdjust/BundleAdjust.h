@@ -389,7 +389,10 @@ namespace Isis {
       bool errorPropagation();
       double computeResiduals();
       bool computeRejectionLimit();
+      bool computeGrossRejectionLimit();
+      bool computeGrossOutlierTestStatistics();
       bool flagOutliers();
+      bool flagGrossOutliers();
 
       // normal equation matrices methods
 
