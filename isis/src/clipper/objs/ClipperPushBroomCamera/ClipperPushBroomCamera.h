@@ -10,8 +10,6 @@ find files of those names at the top level of this repository. **/
 
 #include "LineScanCamera.h"
 
-#include <QString>
-
 #include "VariableLineScanCameraDetectorMap.h"
 
 namespace Isis {
@@ -28,6 +26,12 @@ namespace Isis {
       virtual int CkFrameId() const;
       virtual int CkReferenceId() const;
       virtual int SpkReferenceId() const;
+
+    private:
+      void ReadLineRates(QString filename);
+
+      std::vector<LineRateChange> p_lineRates; /**< Vector of the variable line rates for this
+                                                    camera model.*/
   };
 };
 

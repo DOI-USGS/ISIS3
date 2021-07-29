@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
 #include "NaifStatus.h"
-#include "LineScanCameraDetectorMap.h"
 
 namespace Isis {
   /**
@@ -50,12 +49,13 @@ namespace Isis {
 
      Pvl &lab = *cube.label();
      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-     double lineRate = ((double) inst["LineExposureDuration"]) / 1000;
      QString startTime = inst["StartTime"];
      iTime etStart(startTime);
 
+     ReadLineRates(lab.fileName());
+
      // set up detector map
-     new LineScanCameraDetectorMap(this, etStart.Et(), lineRate);
+     new VariableLineScanCameraDetectorMap(this, p_lineRates);
 
      // Set up focal plane map
      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
@@ -73,6 +73,8 @@ namespace Isis {
      // Set up the ground and sky map
      new LineScanCameraGroundMap(this);
      new LineScanCameraSkyMap(this);
+
+     setTime(etStart.Et());
 
      LoadCache();
      NaifStatus::CheckErrors();
@@ -116,6 +118,31 @@ namespace Isis {
     */
    int ClipperPushBroomCamera::SpkReferenceId() const {
      return (1);
+   }
+
+   /**
+    * @param filename
+    */
+   void ClipperPushBroomCamera::ReadLineRates(QString filename) {
+     Table timesTable("LineScanTimes", filename);
+
+     if(timesTable.Records() <= 0) {
+       QString msg = "Table [LineScanTimes] in [";
+       msg += filename + "] must not be empty";
+       throw IException(IException::Unknown, msg, _FILEINFO_);
+     }
+
+     for(int i = 0; i < timesTable.Records(); i++) {
+       p_lineRates.push_back(LineRateChange((int)timesTable[i][2],
+                                            (double)timesTable[i][0],
+                                            timesTable[i][1]));
+     }
+
+     if(p_lineRates.size() <= 0) {
+       QString msg = "There is a problem with the data within the Table ";
+       msg += "[LineScanTimes] in [" + filename + "]";
+       throw IException(IException::Unknown, msg, _FILEINFO_);
+     }
    }
 }
 
