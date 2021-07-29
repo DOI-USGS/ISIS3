@@ -1709,8 +1709,14 @@ namespace Isis {
     timesTable += timesRecord;
 
     testCube->write(timesTable);
-    QString fileName = testCube->fileName();
-    delete testCube;
-    testCube = new Cube(fileName, "rw");
+        
+    double offset = 10;
+    AlphaCube aCube(testCube->sampleCount(), testCube->lineCount(),
+                    testCube->sampleCount()-offset, testCube->lineCount() - offset,
+                    0, offset, testCube->sampleCount(), testCube->lineCount());
+
+    aCube.UpdateGroup(*testCube);
+
+    testCube->reopen("rw");
   }
 }
