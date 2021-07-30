@@ -59,16 +59,12 @@ namespace Isis {
 
      // Set up focal plane map
      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-     if (m_instrumentNameShort == "EIS-PBNAC") {
-       focalMap->SetDetectorOrigin(2048.5, 1024.5);
-     }
-     else {
-       focalMap->SetDetectorOrigin(2092.5, 1112.5);
-     }
+     // center of array (same for WAC and NAC based on XY origin in EIS_Sensor_summary.xlsx)
+     focalMap->SetDetectorOrigin(2048.5, 1024.5);
 
      // Set up distortion map
-     new CameraDistortionMap(this);
-     // TODO: set distortion
+     CameraDistortionMap *distMap = new CameraDistortionMap(this);
+     distMap->SetDistortion(naifIkCode());
 
      // Set up the ground and sky map
      new LineScanCameraGroundMap(this);
