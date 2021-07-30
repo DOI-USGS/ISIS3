@@ -128,7 +128,7 @@ namespace Isis {
    * @return int The appropriate instrument code for the "Camera-Matrix" Kernel Frame ID.
    */
   int ClipperNacRollingShutterCamera::CkFrameId() const {
-    return (-159101);
+    return (-159000);
   }
 
 
@@ -146,7 +146,7 @@ namespace Isis {
    * @return int The appropriate instrument code for the "Camera-matrix" Kernel Reference ID.
    */
   int ClipperNacRollingShutterCamera::CkReferenceId() const {
-    return (-159010);
+    return (1);
   }
 
 

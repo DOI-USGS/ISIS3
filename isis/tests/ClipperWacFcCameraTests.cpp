@@ -45,7 +45,7 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
 
   // Camera info
   //EXPECT_EQ(cam->instrumentRotation()->Frame(), -27002);    // from the defaultcube isd
-  EXPECT_EQ(cam->CkFrameId(), -159102);
+  EXPECT_EQ(cam->CkFrameId(), -159000);
   EXPECT_EQ(cam->CkReferenceId(), 1);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
@@ -73,7 +73,7 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   TestImageToGroundToImage(cam, 3767, 1579, -49.080726453081574, 20.804349813352175);
 
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
-  PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = wacFcCube->label()->findObject("IsisCube").findGroup("Instrument", Pvl::Traverse);
   QString startTime = inst["StartTime"];
   iTime etStart(startTime);
 

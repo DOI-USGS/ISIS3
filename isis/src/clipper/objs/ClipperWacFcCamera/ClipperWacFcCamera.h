@@ -44,7 +44,7 @@ namespace Isis {
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
-      virtual int CkFrameId() const { return (-159102); }
+      virtual int CkFrameId() const { return (-159000); }
 
 
       /**

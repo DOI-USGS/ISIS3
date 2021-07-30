@@ -48,7 +48,7 @@ namespace Isis {
     new CameraDetectorMap(this);
     new CameraFocalPlaneMap(this, naifIkCode());
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin(2092.5, 1112.5);
+    focalMap->SetDetectorOrigin(2048.5, 1024.5);
     new CameraDistortionMap(this);
     CameraDistortionMap *distMap = new CameraDistortionMap(this);
     distMap->SetDistortion(naifIkCode());
