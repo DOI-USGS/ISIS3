@@ -49,28 +49,29 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   EXPECT_EQ(cam->CkReferenceId(), 1);
   EXPECT_EQ(cam->SpkTargetId(), -159);
   EXPECT_EQ(cam->SpkReferenceId(), 1);
-  EXPECT_NEAR(cam->FocalLength(), 150.402, 1e-4);
+  EXPECT_NEAR(cam->FocalLength(), 44.95757712, 1e-4);
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->spacecraftNameLong(), "Europa Clipper");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->spacecraftNameShort(), "Clipper");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameLong(), "Europa Imaging System Framing Wide Angle Camera");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cam->instrumentNameShort(), "EIS-FWAC");
 
+  // Check SetImage around the planet within the view port
 
-  // Check SetImage on corners
-  int line, samp, nline, nsamp;
-  line = 1.0;     samp = 1.0;
-  nline = 1203.0; nsamp = 1055.0;
-  TestLineSamp(cam, line, samp);
-  TestLineSamp(cam, line, nsamp);
-  TestLineSamp(cam, nline, nsamp);
-  TestLineSamp(cam, nline, samp);
+  // Top
+  TestLineSamp(cam, 2130, 30);
+  // Bottom
+  TestLineSamp(cam, 2130, 2030);
+  // Right
+  TestLineSamp(cam, 3058, 1024);
+  // Left
+  TestLineSamp(cam, 544, 1024);
 
-  TestImageToGroundToImage(cam, 145, 161, 8.5839718675128971, 253.72747262733904);
-  TestImageToGroundToImage(cam, 3655, 157, 12.477189586257952, 255.76543090545474);
-  TestImageToGroundToImage(cam, 289, 1767, 7.7936575791457452, 255.62130722292261);
-  TestImageToGroundToImage(cam, 3767, 1579, 11.843295382436571, 257.54360381024532);
-  
+  TestImageToGroundToImage(cam, 745, 261, 12.5675574458974923, 97.998866820335223);
+  TestImageToGroundToImage(cam, 3655, 157, -72.978969945309146, 99.874929787292132);
+  TestImageToGroundToImage(cam, 489, 1767, 36.483523069365532, 63.342537568059711);
+  TestImageToGroundToImage(cam, 3767, 1579, -49.080726453081574, 20.804349813352175);
+
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
   PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
   QString startTime = inst["StartTime"];
