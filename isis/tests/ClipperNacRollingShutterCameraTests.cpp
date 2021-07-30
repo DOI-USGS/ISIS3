@@ -25,29 +25,29 @@ TEST_F(ClipperNacRsCube, ClipperNacRsCameraUnitTest) {
 
 
   EXPECT_TRUE(cam->SetImage(145, 161));
-  EXPECT_NEAR(cam->UniversalLatitude(), 8.6646548238559333, 0.0001);
-  EXPECT_NEAR(cam->UniversalLongitude(), 253.93886964420707, 0.0001);
+  EXPECT_NEAR(cam->UniversalLatitude(), 8.6601675738056922, 0.0001);
+  EXPECT_NEAR(cam->UniversalLongitude(), 253.94913698482958, 0.0001);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 145, 0.0001);
   EXPECT_NEAR(cam->Line(), 161, 0.0001);
 
   EXPECT_TRUE(cam->SetImage(3655, 157));
-  EXPECT_NEAR(cam->UniversalLatitude(), 12.365243218956246, 0.0001);
-  EXPECT_NEAR(cam->UniversalLongitude(), 255.86310676733405, 0.0001);
+  EXPECT_NEAR(cam->UniversalLatitude(), 12.393863983217367, 0.0001);
+  EXPECT_NEAR(cam->UniversalLongitude(), 255.89185956199307, 0.0001);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 3655, 0.0001);
   EXPECT_NEAR(cam->Line(), 157, 0.0001);
 
   EXPECT_TRUE(cam->SetImage(289, 1767));
-  EXPECT_NEAR(cam->UniversalLatitude(), 7.8856314924390674, 0.0001);
-  EXPECT_NEAR(cam->UniversalLongitude(), 255.74387203937229, 0.0001);
+  EXPECT_NEAR(cam->UniversalLatitude(), 7.8819000470364564, 0.0001);
+  EXPECT_NEAR(cam->UniversalLongitude(), 255.75554569654594, 0.0001);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 289, 0.0001);
   EXPECT_NEAR(cam->Line(), 1767, 0.001);
 
   EXPECT_TRUE(cam->SetImage(3767, 1579));
-  EXPECT_NEAR(cam->UniversalLatitude(), 11.758392399326441, 0.0001);
-  EXPECT_NEAR(cam->UniversalLongitude(), 257.58926744604787, 0.0001);
+  EXPECT_NEAR(cam->UniversalLatitude(), 11.788225243842827, 0.0001);
+  EXPECT_NEAR(cam->UniversalLongitude(), 257.62075252064386, 0.0001);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 3767, 0.0001);
   EXPECT_NEAR(cam->Line(), 1579, 0.001);
