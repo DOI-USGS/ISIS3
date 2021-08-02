@@ -44,10 +44,19 @@ namespace Isis {
 
      NaifStatus::CheckErrors();
 
-     SetFocalLength();
+     Pvl &lab = *cube.label();
+
+     try {
+       PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
+       QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
+       SetFocalLength(Spice::getDouble(key));
+     }
+     // otherwise assume no specific filter focal length and use default
+     catch(...) {
+       SetFocalLength();
+     }
      SetPixelPitch();
 
-     Pvl &lab = *cube.label();
      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
      QString startTime = inst["StartTime"];
      iTime etStart(startTime);
