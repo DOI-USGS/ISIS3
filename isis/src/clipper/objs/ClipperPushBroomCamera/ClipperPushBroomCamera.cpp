@@ -46,12 +46,13 @@ namespace Isis {
 
      Pvl &lab = *cube.label();
 
+     // try/catch is temporary until we have an iak with ck based frames with filter information
      try {
        PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
        QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
        SetFocalLength(Spice::getDouble(key));
      }
-     // otherwise assume no specific filter focal length and use default
+     // temporarily grabbing non filter focal length until we have iak with ck based frames with filter information
      catch(...) {
        SetFocalLength();
      }
