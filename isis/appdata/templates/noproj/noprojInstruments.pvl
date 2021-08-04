@@ -6,13 +6,21 @@ Object = IdealInstrumentsSpecifications
 
   # Group name and values will change once stabilized
   Group = "Clipper/EIS-NAC-RS"
-    DetectorSamples = 4000
-    DetectorLines = 2000
+    DetectorSamples = 4096
+    DetectorLines = 2048
   End_Group
 
   Group = "Clipper/EIS-WAC-FC"
-    DetectorSamples = 4000
-    DetectorLines = 2000
+    DetectorSamples = 4096
+    DetectorLines = 2048
+  End_Group
+
+  Group = "Clipper/EIS-WAC-PB"
+    DetectorSamples = 4096
+  End_Group
+
+  Group = "Clipper/EIS-NAC-PB"
+    DetectorSamples = 4096
   End_Group
 
   # Max offset from undistorted to distorted < 1
