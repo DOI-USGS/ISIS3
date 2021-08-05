@@ -123,25 +123,25 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 471); // Checkline Line
   EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375); // Checkline Sample
   EXPECT_DOUBLE_EQ(regLine[2].toDouble(), -1); // Checkline Time Taken
-  EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 472.05701420458); // Matched Jittered Image Line
-  EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 376.18491660661); // Matched Jittered Image Sample
-  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), -0.52792617775619); // Matched Jittered image Time Taken
-  EXPECT_DOUBLE_EQ(regLine[6].toDouble(), -1.057014204579); // Delta Line
-  EXPECT_DOUBLE_EQ(regLine[7].toDouble(), -1.1849166066075); // Delta Sample
-  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.98617538549134); // Goodness Of Fit
+  EXPECT_NEAR(regLine[3].toDouble(), 472.05701420458, .00000001); // Matched Jittered Image Line
+  EXPECT_NEAR(regLine[4].toDouble(), 376.18491660661, .00000001); // Matched Jittered Image Sample
+  EXPECT_NEAR(regLine[5].toDouble(), -0.52792617775619, .00000001); // Matched Jittered image Time Taken
+  EXPECT_NEAR(regLine[6].toDouble(), -1.057014204579, .00000001); // Delta Line
+  EXPECT_NEAR(regLine[7].toDouble(), -1.1849166066075, .00000001); // Delta Sample
+  EXPECT_NEAR(regLine[8].toDouble(), 0.98617538549134, .00000001); // Goodness Of Fit
   EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 1); // Registration Success
 
   // middle
   regLine = regCsv.getRow(29);
   EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 1461);
   EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375);
-  EXPECT_DOUBLE_EQ(regLine[2].toDouble(), -0.016949152542373);
+  EXPECT_NEAR(regLine[2].toDouble(), -0.016949152542373, .00000001);
   EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 1460);
   EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 374);
-  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), 0.46284604176785);
+  EXPECT_NEAR(regLine[5].toDouble(), 0.46284604176785, .00000001);
   EXPECT_DOUBLE_EQ(regLine[6].toDouble(), 1);
   EXPECT_DOUBLE_EQ(regLine[7].toDouble(), 1);
-  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.98756321875905);
+  EXPECT_NEAR(regLine[8].toDouble(), 0.98756321875905, .00000001);
   EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 0);
 
   // Last
@@ -149,12 +149,12 @@ TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
   EXPECT_DOUBLE_EQ(regLine[0].toDouble(), 1461);
   EXPECT_DOUBLE_EQ(regLine[1].toDouble(), 375);
   EXPECT_DOUBLE_EQ(regLine[2].toDouble(), 1);
-  EXPECT_DOUBLE_EQ(regLine[3].toDouble(), 1461.1743826668001);
-  EXPECT_DOUBLE_EQ(regLine[4].toDouble(), 374.47660613948);
-  EXPECT_DOUBLE_EQ(regLine[5].toDouble(), 0.46284604176785);
-  EXPECT_DOUBLE_EQ(regLine[6].toDouble(), -0.17438266677323);
-  EXPECT_DOUBLE_EQ(regLine[7].toDouble(), 0.52339386051505998);
-  EXPECT_DOUBLE_EQ(regLine[8].toDouble(), 0.94265790827978002);
+  EXPECT_NEAR(regLine[3].toDouble(), 1461.1743826668001, .00000001);
+  EXPECT_NEAR(regLine[4].toDouble(), 374.47660613948, .00000001);
+  EXPECT_NEAR(regLine[5].toDouble(), 0.46284604176785, .00000001);
+  EXPECT_NEAR(regLine[6].toDouble(), -0.17438266677323, .00000001);
+  EXPECT_NEAR(regLine[7].toDouble(), 0.52339386051505998, .00000001);
+  EXPECT_NEAR(regLine[8].toDouble(), 0.94265790827978002, .00000001);
   EXPECT_DOUBLE_EQ(regLine[9].toDouble(), 1);
 
 

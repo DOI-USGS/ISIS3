@@ -67,10 +67,10 @@ TEST_F(ClipperWacFcCube, ClipperWacFcCameraUnitTest) {
   // Left
   TestLineSamp(cam, 544, 1024);
 
-  TestImageToGroundToImage(cam, 745, 261, 12.5675574458974923, 97.998866820335223);
-  TestImageToGroundToImage(cam, 3655, 157, -72.978969945309146, 99.874929787292132);
-  TestImageToGroundToImage(cam, 489, 1767, 36.483523069365532, 63.342537568059711);
-  TestImageToGroundToImage(cam, 3767, 1579, -49.080726453081574, 20.804349813352175);
+  TestImageToGroundToImage(cam, 745, 261, 11.208058331735591, 94.210914418320556);
+  TestImageToGroundToImage(cam, 3655, 157, -73.190005076221794, 89.189042140654522);
+  TestImageToGroundToImage(cam, 489, 1767, 35.950887637869364, 60.291146636386621);
+  TestImageToGroundToImage(cam, 3767, 1579, -50.121882340218569, 10.23020799909251);
 
   // Simple test for ClipperWacFcCamera::ShutterOpenCloseTimes
   PvlGroup &inst = wacFcCube->label()->findObject("IsisCube").findGroup("Instrument", Pvl::Traverse);
