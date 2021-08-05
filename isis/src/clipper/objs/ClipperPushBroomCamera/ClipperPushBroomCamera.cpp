@@ -44,10 +44,14 @@ namespace Isis {
 
      NaifStatus::CheckErrors();
 
-     SetFocalLength();
+     Pvl &lab = *cube.label();
+
+     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
+     QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
+     SetFocalLength(Spice::getDouble(key));
+
      SetPixelPitch();
 
-     Pvl &lab = *cube.label();
      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
      QString startTime = inst["StartTime"];
      iTime etStart(startTime);
