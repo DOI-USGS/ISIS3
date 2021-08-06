@@ -35,14 +35,14 @@ release.
 
 ## [5.0.2] - 2021-07-30
 
-## [5.0.1] - 2021-06-10
-
 ### Fixed
 - Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
 - Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
 - Fixed ISIS docs for incorrect path and -WEBHELP issues [#4510](https://github.com/USGS-Astrogeology/ISIS3/issues/4510)
 - Fixed a bug where writing out updated positions for framing cameras in jigsaw caused an error. [#4545](https://github.com/USGS-Astrogeology/ISIS3/issues/4545)
 - Fixed a bug where comments on BLOB labels were not written out. [#4442](https://github.com/USGS-Astrogeology/ISIS3/issues/4442)
+
+## [5.0.1] - 2021-06-10
 
 ### Fixed
 
