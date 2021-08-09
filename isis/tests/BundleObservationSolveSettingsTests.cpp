@@ -608,7 +608,7 @@ TEST(BundleObservationSolveSettings, GroupConstructorBadOverExisting) {
 
 TEST(BundleObservationSolveSettings, PositionStringToOptionBadValue)
 {
-  QString message = "Unknown bundle instrument position solve option foo";
+  QString message = "Unknown bundle instrument position solve option foo.";
 
   try {
     BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
@@ -625,7 +625,7 @@ TEST(BundleObservationSolveSettings, PositionStringToOptionBadValue)
 
 TEST(BundleObservationSolveSettings, PointingStringToOptionBadValue)
 {
-  QString message = "Unknown bundle instrument pointing solve option foo";
+  QString message = "Unknown bundle instrument pointing solve option foo.";
 
   try {
     BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
