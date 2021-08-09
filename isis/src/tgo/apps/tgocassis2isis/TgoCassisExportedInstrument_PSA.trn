@@ -45,12 +45,15 @@
 
 Group = SpacecraftName
   Auto
-  InputPosition        = (Observation_Area, Investigation_Area)
+  InputPosition        = (Observation_Area, Observing_System, Observing_System_Component)
+  InputKeyDependencies = "tag@type|Host"
   InputKey             = name
   OutputName           = SpacecraftName
   OutputPosition       = (Object,IsisCube,Group,Instrument)
   Translation          = (*, *)
 End_Group
+
+
 
 Group = InstrumentId
   Auto
@@ -65,7 +68,8 @@ End_Group
 Group = Expanded
   Auto
   InputDefault         = 1
-  InputPosition        = (Observation_Area, Investigation_Area)
+  InputPosition        = (Observation_Area, Observing_System, Observing_System_Component)
+  InputKeyDependencies = "tag@type|Host"
   InputKey             = name
   OutputName           = Expanded
   OutputPosition       = (Object,IsisCube,Group,Instrument)
@@ -110,7 +114,7 @@ End_Group
 
 Group = Filter
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey             = img:filter_name
   OutputName           = Filter
   OutputPosition       = (Object,IsisCube,Group,Instrument)
@@ -119,7 +123,7 @@ End_Group
 
 Group = FilterName
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey             = img:filter_name
   OutputName           = Filter
   OutputPosition       = (Object,IsisCube,Group,BandBin)
@@ -128,7 +132,7 @@ End_Group
 
 Group = Center
   Auto
-  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey       = img:filter_name
   OutputName     = Center
   OutputPosition = (Object, IsisCube, Group, BandBin)
@@ -141,7 +145,7 @@ End_Group
 
 Group = Width
   Auto
-  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey       = img:filter_name
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
