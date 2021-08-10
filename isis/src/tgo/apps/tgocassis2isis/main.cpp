@@ -57,8 +57,17 @@ void IsisMain() {
     Cube *outputCube = importer.SetOutputCube("TO");
 
     QString transRawFile = "TgoCassisInstrument.trn";
-    QString transExportFile = "TgoCassisExportedInstrument.trn";
 
+    QFile xmlFile(xmlFileName.expanded());
+    QDomDocument xmlDoc;
+    xmlDoc.setContent(&xmlFile, true);
+    // If any instances of "Observing_System_Component" exist, use PSA .trn file
+    QString transExportFile;
+    if (xmlDoc.elementsByTagName("Observing_System_Component").size()){
+      transExportFile = "TgoCassisExportedInstrument_PSA.trn";
+    } else {
+      transExportFile = "TgoCassisExportedInstrument.trn";
+    }
     // first assume lev1b image
     Pvl *outputLabel = outputCube->label();
     QString target = "";
@@ -190,10 +199,18 @@ bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
   //Translate the Mapping Group
   try {
     QString missionDir = "$ISISROOT/appdata/translations/";
-    FileName mapTransFile(missionDir + "TgoCassisMapping.trn");
+    QDomDocument xmlDoc;
+    QFile xmlFile(xmlFileName.expanded());
+    xmlDoc.setContent(&xmlFile, true);
+    // If any instances of "Observing_System_Component" exist, use PSA .trn file
+    FileName mapTransFile;
+    if (xmlDoc.elementsByTagName("cart:a_axis_radius").size()){
+      mapTransFile = FileName(missionDir + "TgoCassisMapping_PSA.trn");
+    } else {
+      mapTransFile = FileName(missionDir + "TgoCassisMapping.trn");
+    }
 
     // Get the translation manager ready for translating the mapping label
-
     XmlToPvlTranslationManager labelXMappinglater(xmlFileName, mapTransFile.expanded());
 
     // Pvl output label
