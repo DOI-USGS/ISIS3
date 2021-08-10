@@ -306,6 +306,10 @@
       Moved writeHistory() call to main function because a history entry was only being written
       to the cube when using a data area for kernels (not using the web service). Fixes #4040.
     </change>
+    <change name="Adam Paquette" date="2021-08-10">
+      Fixed the NaifKeywords PvlObject not being updated/replaced when spiceinit with web=true was
+      run on a cube that was already spiceinit'd.
+    </change>
   </history>
 
   <oldName>

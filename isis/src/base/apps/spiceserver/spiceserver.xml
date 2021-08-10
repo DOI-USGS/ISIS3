@@ -25,15 +25,15 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       Original Version
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. 
+       Updated Spice members to be more compliant with Isis coding standards.
        References #972.
     </change>
     <change name="Steven Lambright" date="2012-09-05">
       Added parameter CHECKVERSION in order to increase the testability of this program.
     </change>
     <change name="Jeannie Backer" date="2013-02-26">
-      Added ability to load multiple ck database files from the system using a 
-      conf file. Changed methods to lower camel case and added "g_" prefix to 
+      Added ability to load multiple ck database files from the system using a
+      conf file. Changed methods to lower camel case and added "g_" prefix to
       global variables to comply with Isis3 standards. References #924.
     </change>
     <change name="Stuart Sides" date="2013-07-11">
@@ -54,6 +54,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Tyler Wilson" date="2019-02-11">
       Modified the version check.  Now all versions of ISIS3 >= 3.5.*.* will be acceptable
       to the application.
+    </change>
+    <change name="Adam Paquette" date="2021-08-10">
+      Removed commented out debugging code that should be run in SpiceClient/spiceinit.
     </change>
   </history>
 
@@ -88,7 +91,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         <filter>*.dat</filter>
       </parameter>
     </group>
-    
+
     <group name="Options">
       <parameter name="CHECKVERSION">
         <type>boolean</type>
@@ -114,7 +117,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
         </brief>
         <description>
           This parameter was added for testing purposes only. The spice server has access to the
-          default location but the app tests will use their own output directory as the temp cube 
+          default location but the app tests will use their own output directory as the temp cube
           location.
         </description>
         <filter>*.cub</filter>
