@@ -25,7 +25,8 @@ In this step we will update the documents that are stored in the Github reposito
 * Update the Changelog 
   * For release candidates we need to update the Changelog to label all of the currently unreleased changes as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
   * For bug fix releases we need to update the Changelog to label **only the bug fixes** as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
-
+* Update code.json with the new version number and the date last modified.
+  
 
 ### Part B: Update the Authors List 
 
@@ -36,7 +37,6 @@ In this step we will update the documents that are stored in the Github reposito
 
 * Submit a pull request into the dev branch with your modifications to the Changelog and the Authors list.
 * For a bug fix release you will also need to [cherry-pick](https://www.atlassian.com/git/tutorials/cherry-pick) the squashed commit from your pull request into the version branch. If you run into merge conflicts it may be easier to simply redo the above steps with the version branch instead of dev.
-
 
 
 ## Step 3: Set Up the Local and Remote Repositories 
