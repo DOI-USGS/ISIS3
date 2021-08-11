@@ -331,7 +331,7 @@ namespace Isis {
   QGroupBox * QnetTool::createLeftMeasureGroupBox() {
 
     m_leftCombo = new QComboBox;
-    m_leftCombo->view()->installEventFilter(this);
+    m_leftCombo->setEditable(true);
     m_leftCombo->setToolTip("Choose left control measure");
     m_leftCombo->setWhatsThis("Choose left control measure identified by "
                               "cube filename.");
@@ -404,7 +404,7 @@ namespace Isis {
 
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
-    m_rightCombo->view()->installEventFilter(this);
+    m_rightCombo->setEditable(true);
 
     // Attach shortcuts to Qnet Tool's window for selecting right measures
     // Note: Qt handles this memory for us since m_qnetTool is the parent of these shortcuts
@@ -2310,6 +2310,21 @@ namespace Isis {
           m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
       }
     }
+    // sort left and right combo boxes alphabetically
+    QSortFilterProxyModel* leftProxy = new QSortFilterProxyModel(m_leftCombo);
+    QSortFilterProxyModel* rightProxy = new QSortFilterProxyModel(m_rightCombo);
+
+    leftProxy->setSourceModel(m_leftCombo->model());
+    rightProxy->setSourceModel(m_rightCombo->model());
+
+    m_leftCombo->model()->setParent(leftProxy);
+    m_rightCombo->model()->setParent(rightProxy);
+
+    m_leftCombo->setModel(leftProxy);
+    m_rightCombo->setModel(rightProxy);
+
+    m_leftCombo->model()->sort(0);
+    m_rightCombo->model()->sort(0);
 
 
     //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
