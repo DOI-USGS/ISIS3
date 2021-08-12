@@ -252,6 +252,9 @@ namespace Isis {
    *                           SurfacePoint::SetRadii. Fixes #5457.
    *   @history 2018-07-06 Jesse Mapel - Removed calls to ControlNet::GetTargetRadii because it is
    *                           both no longer needed and no longer available. Fixes #5457.
+   *   @history 2021-08-12 Amy Stamile - Added the ability to search filenames in measure's drop 
+                               down boxes by setting m_leftCombo and m_rightCombo to be editable.
+                               Added alphabetization to these combo boxes. Fixes #4581.
    */
   class QnetTool : public Tool {
     Q_OBJECT
