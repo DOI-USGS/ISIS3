@@ -286,6 +286,67 @@ namespace Isis{
           camstats->append(MakePair("ObliqueResolutionMaximum", cg["ObliqueResolutionMaximum"][0]));
         }
 
+        // Extracts camstat data from existing CameraStatistics Table in cube label
+        if(ui.GetBoolean("USECAMSTATSTBL")) {
+
+          if (!incube->hasTable("CameraStatistics")) {
+            QString msg = "CameraStatistics Table does not exist in the input cube.\n"
+            "Either run caminfo with camstats=true or run the ISIS camstats app on cube.";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+          camstats = new QList< QPair<QString, QString> >;
+
+          Table csTable = incube->readTable("CameraStatistics");
+
+          QString lat = TableRecord::toString(csTable[0]);
+          if(lat.split(",").at(0) == "Latitude") {
+            camstats->append(MakePair("MinimumLatitude", lat.split(",").at(1)));
+            camstats->append(MakePair("MaximumLatitude", lat.split(",").at(2)));
+          }
+
+          QString lon = TableRecord::toString(csTable[1]);
+          if(lon.split(",").at(0) == "Longitude") {
+            camstats->append(MakePair("MinimumLongitude", lon.split(",").at(1)));
+            camstats->append(MakePair("MaximumLongitude", lon.split(",").at(2)));
+          }
+
+          QString res = TableRecord::toString(csTable[4]);
+          if(res.split(",").at(0) == "Resolution") {
+            camstats->append(MakePair("MinimumResolution", res.split(",").at(1)));
+            camstats->append(MakePair("MaximumResolution", res.split(",").at(2)));
+          }
+
+          QString phase = TableRecord::toString(csTable[9]);
+          if(phase.split(",").at(0) == "PhaseAngle") {
+            camstats->append(MakePair("MinimumPhase", phase.split(",").at(1)));
+            camstats->append(MakePair("MaximumPhase", phase.split(",").at(2)));
+          }
+
+          QString emi = TableRecord::toString(csTable[10]);
+          if(emi.split(",").at(0) == "EmissionAngle") {
+            camstats->append(MakePair("MinimumEmission", emi.split(",").at(1)));
+            camstats->append(MakePair("MaximumEmission", emi.split(",").at(2)));
+          }
+
+          QString inc = TableRecord::toString(csTable[11]);
+          if(inc.split(",").at(0) == "IncidenceAngle") {
+            camstats->append(MakePair("MinimumIncidence", inc.split(",").at(1)));
+            camstats->append(MakePair("MaximumIncidence", inc.split(",").at(2)));
+          }
+
+          QString time = TableRecord::toString(csTable[12]);
+          if(time.split(",").at(0) == "LocalSolarTime") {
+            camstats->append(MakePair("LocalTimeMinimum", time.split(",").at(1)));
+            camstats->append(MakePair("LocalTimeMaximum", time.split(",").at(2)));
+          }
+
+          QString obl = TableRecord::toString(csTable[7]);
+          if(obl.split(",").at(0) == "ObliqueResolution") {
+            camstats->append(MakePair("ObliqueResolutionMinimum", obl.split(",").at(1)));
+            camstats->append(MakePair("ObliqueResolutionMaximum", obl.split(",").at(2)));
+          }
+        }
+
         // Compute statistics for entire cube
         if(ui.GetBoolean("STATISTICS")) {
           statistics = new QList< QPair<QString, QString> >;
@@ -311,7 +372,7 @@ namespace Isis{
           double lispercent  = (stats.LisPixels() / (nPixels)) * 100;
           double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
 
-          // Statitics output for band
+          // Statistics output for band
           statistics->append(MakePair("MeanValue", toString(stats.Average())));
           statistics->append(MakePair("StandardDeviation", toString(stats.StandardDeviation())));
           statistics->append(MakePair("MinimumValue", toString(stats.Minimum())));
@@ -421,7 +482,7 @@ namespace Isis{
           }
 
           bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
-          
+
           // Check if the user requires valid image center geometry
           if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
             QString msg = "Image center does not project in camera model";

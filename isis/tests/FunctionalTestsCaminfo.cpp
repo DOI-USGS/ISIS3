@@ -3,6 +3,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "CameraStatistics.h"
 
 #include "caminfo.h"
 
@@ -304,6 +305,76 @@ TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     EXPECT_NEAR(camstats.findKeyword("MaximumLongitude"), 256.14606952525, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756145388578005, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 69.941096124192, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 70.311944975377, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMinimum"), 7.7698055422189, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.001 );
+}
+
+TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
+
+    CameraStatistics camStats(testCube->camera(), 100, 100, testCube->fileName());
+
+    Pvl statsPvl = camStats.toPvl();
+
+    TableField fname("Name", Isis::TableField::Text, 45);
+    TableField fmin("Minimum", Isis::TableField::Double);
+    TableField fmax("Maximum", Isis::TableField::Double);
+    TableField favg("Average", Isis::TableField::Double);
+    TableField fstd("StandardDeviation", Isis::TableField::Double);
+
+    TableRecord record;
+    record += fname;
+    record += fmin;
+    record += fmax;
+    record += favg;
+    record += fstd;
+
+    Table table("CameraStatistics", record);
+
+    for (int i = 1; i < statsPvl.groups(); i++) {
+      PvlGroup &group = statsPvl.group(i);
+
+      int entry = 0;
+      record[entry] = group.name();
+      entry++;
+      for (int j = 0; j < group.keywords(); j++) {
+        record[entry] = toDouble(group[j][0]);
+        entry++;
+      }
+      table += record;
+    }
+    testCube->write(table);
+
+    QString outFileName = tempDir.path() + "/outTemp.csv";
+    QVector<QString> args = {"to="+outFileName, "USECAMSTATSTBL=true"};
+
+    UserInterface options(APP_XML, args);
+    try {
+        caminfo(testCube, options);
+    }
+    catch (IException &e) {
+        FAIL() << "Unable to open image: " << e.what() << std::endl;
+    }
+
+    Pvl pvlobject = Pvl(outFileName);
+
+    ASSERT_TRUE(pvlobject.hasObject("Caminfo"));
+    PvlObject camobj = pvlobject.findObject("Caminfo");
+    ASSERT_TRUE(camobj.hasObject("Camstats"));
+    PvlObject camstats = camobj.findObject("Camstats");
+
+    EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLongitude"), 256.14606952525, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756143590222, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.001 );

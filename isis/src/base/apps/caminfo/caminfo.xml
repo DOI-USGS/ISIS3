@@ -602,10 +602,28 @@ End
             <LI>MaximumObliqueResolution</LI>
           </UL>
         </description>
+        <exclusions>
+          <item>USECAMSTATSTBL</item>
+        </exclusions>
         <inclusions>
           <item>SINC</item>
           <item>LINC</item>
         </inclusions>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="USECAMSTATSTBL">
+        <type>boolean</type>
+        <brief>
+          Reads the camstats data from the input cube's CameraStatistics Table
+        </brief>
+        <description>
+          This extracts pre-existing statistics from the CameraStatistics Table
+          Object. This avoids the need to run camstats=true and regenerating all of the camstats data.
+        </description>
+        <exclusions>
+          <item>CAMSTATS</item>
+        </exclusions>
         <default><item>FALSE</item></default>
       </parameter>
 
