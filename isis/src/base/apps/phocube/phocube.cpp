@@ -3,12 +3,17 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Cube.h"
+#include "Displacement.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "LinearAlgebra.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
+#include "SurfacePoint.h"
 #include "TProjection.h"
 
 #include <cmath>
@@ -94,6 +99,8 @@ namespace Isis {
     bool sunAzimuth = false;
     bool spacecraftAzimuth = false;
     bool offnadirAngle = false;
+    bool slope = false;
+    bool slopeAzimuth = false;
     bool subSpacecraftGroundAzimuth = false;
     bool subSolarGroundAzimuth = false;
     bool morphologyRank = false;
@@ -120,6 +127,8 @@ namespace Isis {
       if ((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
       if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
       if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+      if ((slope = ui.GetBoolean("SLOPE"))) nbands++;
+      if ((slopeAzimuth = ui.GetBoolean("SLOPEAZIMUTH"))) nbands++;
       if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
       if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
       if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
@@ -169,11 +178,11 @@ namespace Isis {
     if (dn) {
       name += bname;
       raBandNum++;
-    } 
+    }
     if (phase) {
       name += "Phase Angle";
       raBandNum++;
-    } 
+    }
     if (emission) {
       name += "Emission Angle";
       raBandNum++;
@@ -234,6 +243,14 @@ namespace Isis {
       name += "OffNadir Angle";
       raBandNum++;
     }
+    if (slope) {
+      name += "Slope";
+      raBandNum++;
+    }
+    if (slopeAzimuth) {
+      name += "Slope Azimuth";
+      raBandNum++;
+    }
     if (subSpacecraftGroundAzimuth) {
       name += "Sub Spacecraft Ground Azimuth";
       raBandNum++;
@@ -268,13 +285,13 @@ namespace Isis {
     if (localSolarTime) {
       name += "Local Solar Time";
     }
-    bool specialPixels = ui.GetBoolean("SPECIALPIXELS"); 
+    bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
     /**
      * Computes all the geometric properties for the output buffer. Certain
      * knowledge of the buffers size is assumed below, so ensure the buffer
      * is still of the expected size.
-     * 
+     *
      * @param in  The input cube buffer.
      * @param out The output cube buffer.
      */
@@ -403,6 +420,53 @@ namespace Isis {
               out[index] = cam->OffNadirAngle();
               index += 64 * 64;
             }
+            if (slope) {
+              double slope;
+              bool success;
+              cam->Slope(slope, success);
+              if (success) {
+                out[index] = slope;
+              }
+              else {
+                out[index] = Isis::Null;
+              }
+              index += 64 * 64;
+            }
+            if (slopeAzimuth) {
+              double localNormal[3];
+              cam->GetLocalNormal(localNormal);
+              std::cout << "NORMAL: " << localNormal[0] << ", " << localNormal[1] << ", " << localNormal[2] << '\n';
+
+              SurfacePoint groundPoint = cam->GetSurfacePoint();
+              double originalLatitude = groundPoint.GetLatitude().degrees();
+              double originalLongitude = groundPoint.GetLongitude().degrees();
+              double newLatitude = originalLongitude + 1;
+
+              // (originalLongitude - originalLongitude) * Math.PI / 180;
+              // Distance of longitudes here will always be 0
+              double dLon = 0.0;
+
+              double y = sin(dLon) * cos(newLatitude);
+              double x = (cos(originalLatitude) * sin(newLatitude)) -
+                         (sin(originalLatitude) * cos(newLatitude) * cos(dLon));
+
+              LinearAlgebra::Vector northDirection = LinearAlgebra::vector(x, y, 0.0);
+              LinearAlgebra::Vector normNorthDirection = LinearAlgebra::normalize(northDirection);
+              std::cout << "DIRECTION: " << normNorthDirection[0] << ", " << normNorthDirection[1] << '\n';
+              double aspect = std::inner_product(std::begin(localNormal), std::end(localNormal), std::begin(normNorthDirection), 0.0);
+              std::cout << "ASPECT: " << aspect << '\n';
+              std::cout << "ASPECT2: " << acos(aspect) << '\n';
+              out[index] = aspect;
+
+              // SurfacePoint downSlopePoint(
+              //     Displacement(groundPoint.GetX().meters() + localNormal[0], Displacement::Meters),
+              //     Displacement(groundPoint.GetY().meters() + localNormal[1], Displacement::Meters),
+              //     Displacement(groundPoint.GetZ().meters() + localNormal[2], Displacement::Meters));
+              // out[index] = cam->GroundAzimuth(
+              //     groundPoint.GetLatitude().degrees(), groundPoint.GetLongitude().degrees(),
+              //     downSlopePoint.GetLatitude().degrees(), downSlopePoint.GetLongitude().degrees());
+              index += 64 * 64;
+            }
             if (subSpacecraftGroundAzimuth) {
               double ssplat, ssplon;
               ssplat = ssplon = 0.0;
@@ -490,7 +554,7 @@ namespace Isis {
     };
 
     p.SetInputCube(icube, OneBand);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),  
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
                                   icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     p.StartProcess(phocube);
