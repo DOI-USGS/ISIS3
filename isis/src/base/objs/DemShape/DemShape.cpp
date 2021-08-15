@@ -79,7 +79,7 @@ namespace Isis {
       demCubeFile = (QString) kernels["ShapeModel"];
     }
 
-    m_demCube = CubeManager::Open(demCubeFile);
+    m_demCube = new Isis::Cube(demCubeFile);
 
     // This caching algorithm works much better for DEMs than the default,
     //   regional. This is because the uniqueIOCachingAlgorithm keeps track
@@ -106,7 +106,7 @@ namespace Isis {
   DemShape::~DemShape() {
     m_demProj = NULL;
 
-    // We do not have ownership of p_demCube
+    delete m_demCube;
     m_demCube = NULL;
 
     delete m_interp;
