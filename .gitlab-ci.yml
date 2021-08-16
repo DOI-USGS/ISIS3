@@ -17,6 +17,7 @@ clone_github:
     script:
         - echo $SOURCE_REPOSITORY
         - git config --global http.sslVerify false # Epic....
+        - rm -rf isis  # Needed to allow multiple CI runs
         - git clone --mirror $SOURCE_REPOSITORY isis
         - cd isis
         - git remote remove origin
