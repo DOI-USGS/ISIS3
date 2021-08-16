@@ -2310,21 +2310,6 @@ namespace Isis {
           m_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
       }
     }
-    // sort left and right combo boxes alphabetically
-    QSortFilterProxyModel* leftProxy = new QSortFilterProxyModel(m_leftCombo);
-    QSortFilterProxyModel* rightProxy = new QSortFilterProxyModel(m_rightCombo);
-
-    leftProxy->setSourceModel(m_leftCombo->model());
-    rightProxy->setSourceModel(m_rightCombo->model());
-
-    m_leftCombo->model()->setParent(leftProxy);
-    m_rightCombo->model()->setParent(rightProxy);
-
-    m_leftCombo->setModel(leftProxy);
-    m_rightCombo->setModel(rightProxy);
-
-    m_leftCombo->model()->sort(0);
-    m_rightCombo->model()->sort(0);
 
 
     //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
