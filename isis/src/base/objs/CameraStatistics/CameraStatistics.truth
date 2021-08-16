@@ -54,7 +54,7 @@ ObliqueResolution:
 
 AspectRatio:
   AspectRatioMinimum = 1
-  AspectRatioMaximun = 1
+  AspectRatioMaximum = 1
   AspectRatioAverage = 1
   AspectRatioStandardDeviation = 0
 

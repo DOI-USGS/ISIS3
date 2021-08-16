@@ -376,6 +376,11 @@ End
       geometry PVL group. Updated example output in application description
       so that the addded oblique elements are included. Fixes #2205.
     </change>
+    <change name="Amy Stamile" date="2021-08-16">
+      Added the USECAMSTATSTBL option. This allows caminfo to extract existing
+      camera statistics from the CameraStatistics Table of the input cube instead
+      of recalculating CameraStatistics.  Fixes #3605.
+    </change>
   </history>
 
   <category>
