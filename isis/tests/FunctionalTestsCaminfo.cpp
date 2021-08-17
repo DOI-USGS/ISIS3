@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/caminfo.xml").expanded();
 
@@ -384,4 +385,19 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.001 );
+}
+
+TEST_F(DefaultCube, FunctionalTestCaminfoNoCamStatTableError) {
+  QString outFileName = tempDir.path() + "/outTemp.csv";
+  QVector<QString> args = {"to="+outFileName, "USECAMSTATSTBL=true"};
+
+  UserInterface options(APP_XML, args);
+
+  try{
+    caminfo(testCube, options);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e){
+    EXPECT_THAT(e.what(), HasSubstr("CameraStatistics Table does not exist in the input cube."));
+  }
 }
