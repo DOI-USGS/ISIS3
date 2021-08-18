@@ -17,6 +17,7 @@
 #include "IString.h"
 #include "Pvl.h"
 #include "Table.h"
+#include "TextFile.h"
 
 using namespace std;
 using namespace Isis;
@@ -83,6 +84,25 @@ namespace Isis {
     raw += "</input_label>";
 
     *p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
+
+    /*
+     * For Debugging, you may want to run spiceserver locally (without spiceinit).
+     *
+     * Uncomment the following code and run the spiceinit with web=true. An error will be thrown
+     * with the file name of the stored input hex file. You can rsync that file to your work area
+     * and run spiceserver locally.
+     */
+
+    // const char *inmode = "overwrite";
+    // const char *ext  = "dat";
+    // TextFile newInput;
+    // QString serverInputFile("/tmp/input");
+    // newInput.Open(serverInputFile, inmode, ext);
+    // newInput.Rewind();//start at begining
+    // newInput.PutLine(hexCode);
+    // newInput.Close();
+    // QString msg = "Exporting expected server input to: " + serverInputFile;
+    // throw IException(IException::Programmer, msg, _FILEINFO_);
 
     int contentLength = p_xml->length();
     QString contentLengthStr = toString((BigInt)contentLength);

@@ -132,7 +132,7 @@ TEST(Column, SetWidthError) {
 //Should throw an error when Alignment is Decimal and
 //SetType is called with String or Integer
 TEST_P(TypeError, SetTypeError) {
-  QString message = "Integer or string type is not sensible if alignment is Decimal";
+  QString message = "Integer or string type is not sensible if alignment is Decimal.";
   Column column;
   column.SetAlignment(Column::Decimal);
   try {
@@ -151,7 +151,7 @@ TEST_P(TypeError, SetTypeError) {
 //Should throw an error when Type is String or Integer and
 //SetAllignment is called with Decimal
 TEST_P(TypeError, SetAlignmentError) {
-  QString message = "Decimal alignment does not make sense for integer or string values";
+  QString message = "Decimal alignment does not make sense for integer or string values.";
   Column column;
   column.SetType(GetParam());
   try {

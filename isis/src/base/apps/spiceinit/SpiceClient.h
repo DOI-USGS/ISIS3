@@ -24,6 +24,9 @@ namespace Isis {
    * @author ????-??-?? Steven Lambright
    *
    * @internal
+   *   @history 2021-08-10 Adam Paquette - Moved debugging code for spiceserver
+   *                           into SpiceClient to maintain current debugging
+   *                           practices.
    */
   class SpiceClient : public QThread {
       Q_OBJECT

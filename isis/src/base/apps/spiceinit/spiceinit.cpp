@@ -684,7 +684,12 @@ namespace Isis {
       log->addGroup(kernelsGroup);
     }
 
-    icube->label()->addObject(naifKeywords);
+    Pvl *icubeLabel = icube->label();
+
+    if (icubeLabel->hasObject(naifKeywords.name())) {
+      icubeLabel->deleteObject(naifKeywords.name());
+    }
+    icubeLabel->addObject(naifKeywords);
 
     icube->write(*pointingTable);
     icube->write(*positionTable);
