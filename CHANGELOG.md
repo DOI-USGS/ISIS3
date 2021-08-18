@@ -37,6 +37,7 @@ release.
 
 ### Added
 - Added the ability to search filenames in measure's drop down boxes in Qnet Point Editor. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Added additional translation files for TGO CaSSiS in order to support PSA compliant labels.  As part of this change, the 'Exposure_Duration' key was dropped from both translation files. [#4567](https://github.com/USGS-Astrogeology/ISIS3/issues/4567)
 
 ## [6.0.0] - 2021-08-27
 
