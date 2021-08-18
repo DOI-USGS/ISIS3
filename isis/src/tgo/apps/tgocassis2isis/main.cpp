@@ -61,9 +61,9 @@ void IsisMain() {
     QFile xmlFile(xmlFileName.expanded());
     QDomDocument xmlDoc;
     xmlDoc.setContent(&xmlFile, true);
-    // If any instances of "Observing_System_Component" exist, use PSA .trn file
+    // If any instances of "Optical_Filter" exist, use PSA .trn file
     QString transExportFile;
-    if (xmlDoc.elementsByTagName("Observing_System_Component").size()){
+    if (xmlDoc.elementsByTagName("Optical_Filter").size()){
       transExportFile = "TgoCassisExportedInstrument_PSA.trn";
     } else {
       transExportFile = "TgoCassisExportedInstrument.trn";
