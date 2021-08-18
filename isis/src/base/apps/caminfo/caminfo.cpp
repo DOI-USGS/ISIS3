@@ -209,6 +209,11 @@ namespace Isis{
         // Get the format
         QString sFormat = ui.GetAsString("FORMAT");
 
+        if (!ui.GetBoolean("CAMSTATS") && ui.GetBoolean("USECAMSTATSTBL")){
+          QString msg = "[CAMSTATS] must be set to true when using [USECAMSTATSTBL].";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+
         // if true then run spiceinit, xml default is FALSE
         // spiceinit will use system kernels
         if(ui.GetBoolean("SPICE")) {
@@ -241,10 +246,29 @@ namespace Isis{
         general->append(MakePair("Samples",     toString(incube->sampleCount())));
         general->append(MakePair("Bands",       toString(incube->bandCount())));
 
+
+        // Extracts camstat data from existing CameraStatistics Table in cube label
+        if (ui.GetBoolean("USECAMSTATSTBL") && ui.GetBoolean("CAMSTATS")
+                                            && incube->hasTable("CameraStatistics")) {
+          camstats = new QList< QPair<QString, QString> >;
+
+          Table csTable = incube->readTable("CameraStatistics");
+
+          for (int rec = 0; rec < csTable.Records(); rec++) {
+            QString tableRec = TableRecord::toString(csTable[rec]);
+            QString recordName = tableRec.split(",").at(0);
+
+            camstats->append(MakePair(recordName + "Minimum", tableRec.split(",").at(1)));
+            camstats->append(MakePair(recordName + "Maximum", tableRec.split(",").at(2)));
+            camstats->append(MakePair(recordName + "Average", tableRec.split(",").at(3)));
+            camstats->append(MakePair(recordName + "StandardDeviation", tableRec.split(",").at(4)));
+          }
+        }
+
         // Run camstats on the entire image (all bands)
         // another camstats will be run for each band and output
         // for each band.
-        if(ui.GetBoolean("CAMSTATS")) {
+        else if (ui.GetBoolean("CAMSTATS") && !incube->hasTable("CameraStatistics")) {
           camstats = new QList< QPair<QString, QString> >;
 
           QString filename = incube->fileName();
@@ -253,97 +277,14 @@ namespace Isis{
           CameraStatistics stats(filename, sinc, linc);
           Pvl camPvl = stats.toPvl();
 
-          PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
-          camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
-          camstats->append(MakePair("MaximumLatitude", cg["latitudemaximum"][0]));
+          // Skips first "User Parameters" group.
+          for (int i = 1; i < camPvl.groups(); i++) {
+            PvlGroup &group = camPvl.group(i);
 
-          cg = camPvl.findGroup("Longitude", Pvl::Traverse);
-          camstats->append(MakePair("MinimumLongitude", cg["longitudeminimum"][0]));
-          camstats->append(MakePair("MaximumLongitude", cg["longitudemaximum"][0]));
-
-          cg = camPvl.findGroup("Resolution", Pvl::Traverse);
-          camstats->append(MakePair("MinimumResolution", cg["resolutionminimum"][0]));
-          camstats->append(MakePair("MaximumResolution", cg["resolutionmaximum"][0]));
-
-          cg = camPvl.findGroup("PhaseAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumPhase", cg["phaseminimum"][0]));
-          camstats->append(MakePair("MaximumPhase", cg["phasemaximum"][0]));
-
-          cg = camPvl.findGroup("EmissionAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumEmission", cg["emissionminimum"][0]));
-          camstats->append(MakePair("MaximumEmission", cg["emissionmaximum"][0]));
-
-          cg = camPvl.findGroup("IncidenceAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumIncidence", cg["incidenceminimum"][0]));
-          camstats->append(MakePair("MaximumIncidence", cg["incidencemaximum"][0]));
-
-          cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
-          camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
-          camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
-
-          cg = camPvl.findGroup("ObliqueResolution", Pvl::Traverse);
-          camstats->append(MakePair("ObliqueResolutionMinimum", cg["ObliqueResolutionMinimum"][0]));
-          camstats->append(MakePair("ObliqueResolutionMaximum", cg["ObliqueResolutionMaximum"][0]));
-        }
-
-        // Extracts camstat data from existing CameraStatistics Table in cube label
-        if(ui.GetBoolean("USECAMSTATSTBL")) {
-
-          if (!incube->hasTable("CameraStatistics")) {
-            QString msg = "CameraStatistics Table does not exist in the input cube.\n"
-            "Either run caminfo with camstats=true or run the ISIS camstats app on cube.";
-            throw IException(IException::Unknown, msg, _FILEINFO_);
-          }
-          camstats = new QList< QPair<QString, QString> >;
-
-          Table csTable = incube->readTable("CameraStatistics");
-
-          QString lat = TableRecord::toString(csTable[0]);
-          if(lat.split(",").at(0) == "Latitude") {
-            camstats->append(MakePair("MinimumLatitude", lat.split(",").at(1)));
-            camstats->append(MakePair("MaximumLatitude", lat.split(",").at(2)));
-          }
-
-          QString lon = TableRecord::toString(csTable[1]);
-          if(lon.split(",").at(0) == "Longitude") {
-            camstats->append(MakePair("MinimumLongitude", lon.split(",").at(1)));
-            camstats->append(MakePair("MaximumLongitude", lon.split(",").at(2)));
-          }
-
-          QString res = TableRecord::toString(csTable[4]);
-          if(res.split(",").at(0) == "Resolution") {
-            camstats->append(MakePair("MinimumResolution", res.split(",").at(1)));
-            camstats->append(MakePair("MaximumResolution", res.split(",").at(2)));
-          }
-
-          QString phase = TableRecord::toString(csTable[9]);
-          if(phase.split(",").at(0) == "PhaseAngle") {
-            camstats->append(MakePair("MinimumPhase", phase.split(",").at(1)));
-            camstats->append(MakePair("MaximumPhase", phase.split(",").at(2)));
-          }
-
-          QString emi = TableRecord::toString(csTable[10]);
-          if(emi.split(",").at(0) == "EmissionAngle") {
-            camstats->append(MakePair("MinimumEmission", emi.split(",").at(1)));
-            camstats->append(MakePair("MaximumEmission", emi.split(",").at(2)));
-          }
-
-          QString inc = TableRecord::toString(csTable[11]);
-          if(inc.split(",").at(0) == "IncidenceAngle") {
-            camstats->append(MakePair("MinimumIncidence", inc.split(",").at(1)));
-            camstats->append(MakePair("MaximumIncidence", inc.split(",").at(2)));
-          }
-
-          QString time = TableRecord::toString(csTable[12]);
-          if(time.split(",").at(0) == "LocalSolarTime") {
-            camstats->append(MakePair("LocalTimeMinimum", time.split(",").at(1)));
-            camstats->append(MakePair("LocalTimeMaximum", time.split(",").at(2)));
-          }
-
-          QString obl = TableRecord::toString(csTable[7]);
-          if(obl.split(",").at(0) == "ObliqueResolution") {
-            camstats->append(MakePair("ObliqueResolutionMinimum", obl.split(",").at(1)));
-            camstats->append(MakePair("ObliqueResolutionMaximum", obl.split(",").at(2)));
+            for (int j = 0; j < group.keywords(); j++) {
+              PvlKeyword &keyword = group[j];
+              camstats->append(MakePair(keyword.name(), keyword[0]));
+            }
           }
         }
 

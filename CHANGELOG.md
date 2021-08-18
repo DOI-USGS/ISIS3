@@ -38,7 +38,8 @@ release.
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
 camera statistics from the CameraStatistics Table of the input cube instead
-of recalculating CameraStatistics. [#3605](https://github.com/USGS-Astrogeology/ISIS3/issues/3605).
+of recalculating CameraStatistics. Updated caminfo to output all CameraStatistics
+Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/ISIS3/issues/3605).
 
 ### Fixed
 - Fixed AspectRationMinimum typo in CameraStatistics. Fixes [#3605](https://github.com/USGS-Astrogeology/ISIS3/issues/3605).
