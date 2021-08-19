@@ -74,7 +74,7 @@ TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
 
   group = appLog.findGroup("AspectRatio");
   EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioMinimum"), 1.0);
-  EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioMaximum"), 1.0);
+  EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioMaximun"), 1.0);
   EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioAverage"), 1.0);
   EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioStandardDeviation"), 0.0);
 

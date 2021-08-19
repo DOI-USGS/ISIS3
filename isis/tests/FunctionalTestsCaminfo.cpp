@@ -222,7 +222,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionAverage"), 19.342626220123, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionStandardDeviation"), 0.078013435023742, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioMinimum"), 1.0, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximum"), 1.0, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximun"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioAverage"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioStandardDeviation"), 0.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseMinimum"), 79.756143590222, 0.001 );
@@ -500,7 +500,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionStandardDeviation"), 0.087529228348495, 0.001 );
 
     EXPECT_NEAR(camstats.findKeyword("AspectRatioMinimum"), 1.0, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximum"), 1.0, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximun"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioAverage"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioStandardDeviation"), 0.0, 0.001 );
 

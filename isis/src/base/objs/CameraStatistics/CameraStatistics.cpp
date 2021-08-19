@@ -447,7 +447,8 @@ namespace Isis {
 
     PvlGroup pAspectRatio("AspectRatio");
     pAspectRatio += constructKeyword("AspectRatioMinimum", m_aspectRatioStat->Minimum());
-    pAspectRatio += constructKeyword("AspectRatioMaximum", m_aspectRatioStat->Maximum());
+    // Note: Maximum is spelled wrong here.
+    pAspectRatio += constructKeyword("AspectRatioMaximun", m_aspectRatioStat->Maximum());
     pAspectRatio += constructKeyword("AspectRatioAverage", m_aspectRatioStat->Average());
     pAspectRatio += constructKeyword("AspectRatioStandardDeviation",
         m_aspectRatioStat->StandardDeviation());

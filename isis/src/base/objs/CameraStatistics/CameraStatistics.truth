@@ -54,7 +54,7 @@ ObliqueResolution:
 
 AspectRatio:
   AspectRatioMinimum = 1
-  AspectRatioMaximum = 1
+  AspectRatioMaximun = 1
   AspectRatioAverage = 1
   AspectRatioStandardDeviation = 0
 
@@ -93,4 +93,3 @@ NorthAzimuth:
   NorthAzimuthMaximum = 360
   NorthAzimuthAverage = 356.025
   NorthAzimuthStandardDeviation = 28.4507
-
