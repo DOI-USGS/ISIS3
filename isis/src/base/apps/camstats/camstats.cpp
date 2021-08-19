@@ -102,7 +102,7 @@ namespace Isis {
              "ResolutionAverage," <<
              "ResolutionStandardDeviation," <<
              "AspectRatioMinimum," <<
-             "AspectRatioMaximun," <<
+             "AspectRatioMaximum," <<
              "AspectRatioAverage," <<
              "AspectRatioStandardDeviation," <<
              "PhaseMinimum," <<
