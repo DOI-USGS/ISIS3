@@ -99,6 +99,16 @@ Group = StartTime
   Translation          = (*, *)
 End_Group
 
+Group = ExposureDuration
+  Auto
+  Optional
+  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
+  InputKey             = img:exposure_duration
+  OutputName           = ExposureDuration
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
 Group = Filter
   Auto
   InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Image_Product_Information, img:Filter)
