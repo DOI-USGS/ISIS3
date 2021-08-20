@@ -103,6 +103,14 @@ Group = StartTime
   Translation          = (*, *)
 End_Group
 
+Group = ExposureDuration
+  Auto
+  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:PEHK_Derived_Data)
+  InputKey             = em16_tgo_cas:exposure_time
+  OutputName           = ExposureDuration
+  OutputPosition       = (Object, IsisCube, Group, Instrument)
+  Translation          = (*, *)
+End_Group
 
 Group = Filter
   Auto

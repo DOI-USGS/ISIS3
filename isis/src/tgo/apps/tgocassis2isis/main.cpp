@@ -327,7 +327,9 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
   // Add units of measurement to keywords from translation table
-  inst.findKeyword("ExposureDuration").setUnits("seconds");
+  if (inst.hasKeyword("ExposureDuration")){
+    inst.findKeyword("ExposureDuration").setUnits("seconds");
+  }
 
   // Translate BandBin group
   FileName bandBinTransFile(missionDir + "TgoCassisBandBin.trn");
