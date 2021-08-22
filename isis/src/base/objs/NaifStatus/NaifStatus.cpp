@@ -20,6 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "NaifStatus.h"
+#include "NaifContext.h"
 
 #include <iostream>
 
@@ -31,8 +32,6 @@
 #include "PvlToPvlTranslationManager.h"
 
 namespace Isis {
-  bool NaifStatus::initialized = false;
-
   /**
    * This method looks for any naif errors that might have occurred. It
    * then compares the error to a list of known naif errors and converts
@@ -41,12 +40,13 @@ namespace Isis {
    * @param resetNaif True if the NAIF error status should be reset (naif calls valid)
    */
   void NaifStatus::CheckErrors(bool resetNaif) {
-    if(!initialized) {
+    auto naifState = NaifContext::get()->top();
+    if(!naifState->naifStatusInitialized()) {
       SpiceChar returnAct[32] = "RETURN";
       SpiceChar printAct[32] = "NONE";
       erract_c("SET", sizeof(returnAct), returnAct);   // Reset action to return
       errprt_c("SET", sizeof(printAct), printAct);     // ... and print nothing
-      initialized = true;
+      naifState->set_naifStatusInitialized(true);
     }
 
     // Do nothing if NAIF didn't fail
