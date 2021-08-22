@@ -149,7 +149,6 @@ namespace Isis {
     private:
       JitInfo  jdata;            //!< Cube information
       geos::geom::Polygon *fpGeom;     //!< Polygon construction and manipulation
-      static bool naifLoaded;    //!< Status of NAIF required kernels for times
 
       void initLocal();
       void loadNaifTiming();

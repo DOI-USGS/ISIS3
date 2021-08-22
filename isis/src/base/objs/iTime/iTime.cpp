@@ -30,12 +30,10 @@
 #include "iTime.h"
 #include "SpecialPixel.h"
 #include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 namespace Isis {
-
-  // Static initializations
-  bool iTime::p_lpInitialized = false;
 
   //---------------------------------------------------------------------------
   // Constructors
@@ -459,9 +457,11 @@ namespace Isis {
 
   //! Uses the Naif routines to load the most current leap second kernel.
   void iTime::LoadLeapSecondKernel() {
+    auto naifState = NaifContext::get()->top();
+
     // Inorder to improve the speed of iTime comparisons, the leapsecond
     // kernel is loaded only once and left open.
-    if(p_lpInitialized) return;
+    if(naifState->iTimeInitialized()) return;
 
     // Get the leap second kernel file open
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
@@ -474,7 +474,7 @@ namespace Isis {
     furnsh_c(leapSecondName.toLatin1().data());
     NaifStatus::CheckErrors();
 
-    p_lpInitialized = true;
+    naifState->set_iTimeInitialized(true);
   }
 
   /**

@@ -87,9 +87,7 @@ namespace Isis {
       * @param time An ephemeris time (ET).
       */
       iTime(const double time) {
-        if(!p_lpInitialized)
-          LoadLeapSecondKernel();
-
+        LoadLeapSecondKernel();
         p_et = time;
       }
 
@@ -152,8 +150,6 @@ namespace Isis {
                            passed into the constructor or the operator= member*/
 
       void LoadLeapSecondKernel();
-
-      static bool p_lpInitialized;
   };
 };
 

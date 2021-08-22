@@ -82,9 +82,20 @@ namespace Isis {
        * @internal
        */
       struct IsisState {
-        IsisState() : naifStatusInitialized(false) {}
+        IsisState() 
+          : naifStatusInitialized(false), iTimeInitialized(false), targetPckLoaded(false)
+          , amicaTimingLoaded(false), hayabusaTimingLoaded(false), mdisTimingLoaded(false)
+          , mocWagoLoaded(false), hiJitCubeLoaded(false), hiCalTimingLoaded(false) {}
       
         bool naifStatusInitialized;
+        bool iTimeInitialized;
+        bool targetPckLoaded;
+        bool amicaTimingLoaded;
+        bool hayabusaTimingLoaded;
+        bool mdisTimingLoaded;
+        bool mocWagoLoaded;
+        bool hiJitCubeLoaded;
+        bool hiCalTimingLoaded;
       };
       
     public:
@@ -96,6 +107,14 @@ namespace Isis {
       boost::shared_ptr<void> naifState() { return m_naif; }
       
       NAIF_GETSET(bool,       naifStatusInitialized);
+      NAIF_GETSET(bool,       iTimeInitialized);
+      NAIF_GETSET(bool,       targetPckLoaded);
+      NAIF_GETSET(bool,       amicaTimingLoaded);
+      NAIF_GETSET(bool,       hayabusaTimingLoaded);
+      NAIF_GETSET(bool,       mdisTimingLoaded);
+      NAIF_GETSET(bool,       mocWagoLoaded);
+      NAIF_GETSET(bool,       hiJitCubeLoaded);
+      NAIF_GETSET(bool,       hiCalTimingLoaded);
       
     private:
       boost::shared_ptr<void> m_naif;

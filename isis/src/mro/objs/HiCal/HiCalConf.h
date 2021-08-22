@@ -134,7 +134,6 @@ namespace Isis {
                           const DbProfile &matconf) const;
 
     private:
-      static bool  _naifLoaded;  //!< Ensures one instance of NAIF kernels
       QString  _profName;    //!< Specified name of profile
       Pvl          _label;       //!< Hold label for future references
 

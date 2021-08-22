@@ -27,6 +27,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "ShapeModelFactory.h"
@@ -440,18 +441,17 @@ namespace Isis {
    */
   PvlGroup Target::radiiGroup(int bodyCode) {
 
-    // Load the most recent target attitude and shape kernel for NAIF
-    static bool pckLoaded = false;
-
     NaifStatus::CheckErrors();
 
     FileName kern("$base/kernels/pck/pck?????.tpc");
     kern = kern.highestVersion();
     QString kernName = kern.expanded();
 
-    if(!pckLoaded) {
+    // Load the most recent target attitude and shape kernel for NAIF
+    auto naifState = NaifContext::get()->top();
+    if(!naifState->targetPckLoaded()) {
       furnsh_c(kernName.toLatin1().data());
-      pckLoaded = true;
+      naifState->set_targetPckLoaded(true);
     }
     
     // Get the radii from NAIF
