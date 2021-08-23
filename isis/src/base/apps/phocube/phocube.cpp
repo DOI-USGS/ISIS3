@@ -3,17 +3,14 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Cube.h"
-#include "Displacement.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "LinearAlgebra.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "SurfacePoint.h"
 #include "Target.h"
 #include "TProjection.h"
 
@@ -91,6 +88,9 @@ namespace Isis {
     bool phase = false;
     bool emission = false;
     bool incidence = false;
+    bool ellipsoidNormal = false;
+    bool localNormal = false;
+    bool slope = false;
     bool localEmission = false;
     bool localIncidence = false;
     bool lineResolution = false;
@@ -100,9 +100,6 @@ namespace Isis {
     bool sunAzimuth = false;
     bool spacecraftAzimuth = false;
     bool offnadirAngle = false;
-    bool slope = false;
-    bool localNormal = false;
-    bool ellipsoidNormal = false;
     bool subSpacecraftGroundAzimuth = false;
     bool subSolarGroundAzimuth = false;
     bool morphologyRank = false;
