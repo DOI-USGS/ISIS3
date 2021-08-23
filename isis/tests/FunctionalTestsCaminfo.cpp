@@ -16,155 +16,298 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/caminfo.xml").expanded();
 
 
 TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
-    QString outFileName = tempDir.path() + "/outTemp.csv";
-    QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
+    // QString outFlatFileName = tempDir.path() + "/outTemp.csv";
+    QString outFlatFileName = "/work/users/jmapel/ISIS3/build/outTemp.csv";
+    QVector<QString> flatArgs = {"from="+ testCube->fileName(),  "to="+outFlatFileName,
         "FORMAT=flat", "APPEND=false", "STATISTICS=true", "CAMSTATS=true",
         "GEOMETRY=true", "spice=true"};
 
-    UserInterface options(APP_XML, args);
+    UserInterface flatOptions(APP_XML, flatArgs);
     try {
-       caminfo(options);
+       caminfo(flatOptions);
     }
     catch (IException &e) {
-        FAIL() << "Unable to open image: " << e.what() << std::endl;
+        FAIL() << "Failed to run caminfo with flat output: " << e.what() << std::endl;
     }
 
-    CSVReader::CSVAxis csvLine;
-    // Access the "Header" information first
-    CSVReader header = CSVReader(outFileName,
-                                 false, 0, ',', false, true);
+    // QString outPvlFileName = tempDir.path() + "/outTemp.pvl";
+    QString outPvlFileName = "/work/users/jmapel/ISIS3/build/outTemp.pvl";
+    QVector<QString> pvlArgs = {"from="+ testCube->fileName(),  "to="+outPvlFileName,
+        "FORMAT=PVL", "APPEND=false", "STATISTICS=true", "CAMSTATS=true",
+        "GEOMETRY=true", "spice=true"};
 
-    // Validate the header information is correct
-    csvLine = header.getRow(1);
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "caminfo");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[2], "Viking1/VISB/33322515");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[3], "default.cub");
-    EXPECT_EQ(csvLine[4].toInt(), 1056);
-    EXPECT_EQ(csvLine[5].toInt(), 1204);
-    EXPECT_EQ(csvLine[6].toInt(), 1);
-    EXPECT_NEAR(csvLine[7].toDouble(), 9.928647808629, 0.001);
-    EXPECT_NEAR(csvLine[8].toDouble(), 10.434709827388, 0.001);
-    EXPECT_NEAR(csvLine[9].toDouble(), 10.181983206084, 0.001);
-    EXPECT_NEAR(csvLine[10].toDouble(), 0.11084102743244, 0.001);
-    EXPECT_NEAR(csvLine[11].toDouble(), 255.64554860056, 0.001);
-    EXPECT_NEAR(csvLine[12].toDouble(), 256.14606965798, 0.001);
-    EXPECT_NEAR(csvLine[13].toDouble(), 255.89390491018, 0.001);
-    EXPECT_NEAR(csvLine[14].toDouble(), 0.10658330462779, 0.001);
-    EXPECT_NEAR(csvLine[15].toDouble(), 18.840683405214, 0.001);
-    EXPECT_NEAR(csvLine[16].toDouble(), 18.985953933844, 0.001);
-    EXPECT_NEAR(csvLine[17].toDouble(), 18.90816559308, 0.001);
-    EXPECT_NEAR(csvLine[18].toDouble(), 0.038060007185836, 0.001);
-    EXPECT_NEAR(csvLine[19].toDouble(), 18.840683425668, 0.001);
-    EXPECT_NEAR(csvLine[20].toDouble(), 18.985953877822, 0.001);
-    EXPECT_NEAR(csvLine[21].toDouble(), 18.90816559308, 0.001);
-    EXPECT_NEAR(csvLine[22].toDouble(), 0.038060007185836, 0.001);
-    EXPECT_NEAR(csvLine[23].toDouble(), 18.840683425668, 0.001);
-    EXPECT_NEAR(csvLine[24].toDouble(), 18.985953877822, 0.001);
-    EXPECT_NEAR(csvLine[25].toDouble(), 18.90816559308, 0.001);
-    EXPECT_NEAR(csvLine[26].toDouble(), 0.038060007185836, 0.001);
-    EXPECT_NEAR(csvLine[27].toDouble(), 19.180671135452, 0.001);
-    EXPECT_NEAR(csvLine[28].toDouble(), 19.525658668048, 0.001);
-    EXPECT_NEAR(csvLine[29].toDouble(), 19.342626220123, 0.001);
-    EXPECT_NEAR(csvLine[30].toDouble(), 0.078013435023742, 0.001);
-    EXPECT_NEAR(csvLine[31].toDouble(), 19.180671135452, 0.001);
-    EXPECT_NEAR(csvLine[32].toDouble(), 19.525658668048, 0.001);
-    EXPECT_NEAR(csvLine[33].toDouble(), 19.342626220123, 0.001);
-    EXPECT_NEAR(csvLine[34].toDouble(), 0.078013435023742, 0.001);
-    EXPECT_NEAR(csvLine[35].toDouble(), 19.180671135452, 0.001);
-    EXPECT_NEAR(csvLine[36].toDouble(), 19.525658668048, 0.001);
-    EXPECT_NEAR(csvLine[37].toDouble(), 19.342626220123, 0.001);
-    EXPECT_NEAR(csvLine[38].toDouble(), 0.078013435023742, 0.001);
-    EXPECT_NEAR(csvLine[39].toDouble(), 1.0, 0.001);
-    EXPECT_NEAR(csvLine[40].toDouble(), 1.0, 0.001);
-    EXPECT_NEAR(csvLine[41].toDouble(), 1.0, 0.001);
-    EXPECT_NEAR(csvLine[42].toDouble(), 0.0, 0.001);
-    EXPECT_NEAR(csvLine[43].toDouble(), 79.756143590222, 0.001);
-    EXPECT_NEAR(csvLine[44].toDouble(), 81.304900313013, 0.001);
-    EXPECT_NEAR(csvLine[45].toDouble(), 80.529097153288, 0.001);
-    EXPECT_NEAR(csvLine[46].toDouble(), 0.44420861263609, 0.001);
-    EXPECT_NEAR(csvLine[47].toDouble(), 10.798462835458, 0.001);
-    EXPECT_NEAR(csvLine[48].toDouble(), 13.502630463571, 0.001);
-    EXPECT_NEAR(csvLine[49].toDouble(), 12.15148695101, 0.001);
-    EXPECT_NEAR(csvLine[50].toDouble(), 0.56543791358696, 0.001);
-    EXPECT_NEAR(csvLine[51].toDouble(), 69.941096124192, 0.001);
-    EXPECT_NEAR(csvLine[52].toDouble(), 70.311944975377, 0.001);
-    EXPECT_NEAR(csvLine[53].toDouble(), 70.127459134075, 0.001);
-    EXPECT_NEAR(csvLine[54].toDouble(), 0.1024903912555, 0.001);
-    EXPECT_NEAR(csvLine[55].toDouble(), 7.7698055422189, 0.001);
-    EXPECT_NEAR(csvLine[56].toDouble(), 7.8031735959943, 0.001);
-    EXPECT_NEAR(csvLine[57].toDouble(), 7.7863626216564, 0.001);
-    EXPECT_NEAR(csvLine[58].toDouble(), 0.0071055546164837, 0.001);
-    EXPECT_NEAR(csvLine[59].toDouble(), 3410663.3374636, 0.001);
-    EXPECT_NEAR(csvLine[60].toDouble(), 3413492.0662692, 0.001);
-    EXPECT_NEAR(csvLine[61].toDouble(), 3412205.8144925, 0.001);
-    EXPECT_NEAR(csvLine[62].toDouble(), 648.57630811947, 0.001);
-    EXPECT_NEAR(csvLine[63].toDouble(), 312.29940658175, 0.001);
-    EXPECT_NEAR(csvLine[64].toDouble(), 350.59781250198, 0.001);
-    EXPECT_NEAR(csvLine[65].toDouble(), 332.96766151038, 0.001);
-    EXPECT_NEAR(csvLine[66].toDouble(), 0.67383190647698, 0.001);
-    EXPECT_NEAR(csvLine[67].toDouble(), -1.79769313486231e+308, 0.001);
-    EXPECT_NEAR(csvLine[68].toDouble(), -1.79769313486231e+308, 0.001);
-    EXPECT_NEAR(csvLine[69].toDouble(), -1.79769313486231e+308, 0.001);
-    EXPECT_NEAR(csvLine[70].toDouble(), -1.79769313486231e+308, 0.001);
-    EXPECT_NEAR(csvLine[71].toDouble(), 0.0, 0.001);
-    EXPECT_NEAR(csvLine[72].toDouble(), 0.0, 0.001);
-    EXPECT_NEAR(csvLine[73].toDouble(), 0.0, 0.001);
-    EXPECT_NEAR(csvLine[74].toDouble(), 0.0, 0.001);
-    EXPECT_NEAR(csvLine[75].toDouble(), 100, 0.001);
-    ASSERT_EQ(csvLine[76].toInt(), 1271424);
-    EXPECT_NEAR(csvLine[77].toDouble(), 1, 0.001);
-    EXPECT_NEAR(csvLine[78].toDouble(), 1, 0.001);
-    EXPECT_NEAR(csvLine[79].toDouble(), 1, 0.001);
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[80], "MARS");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[81], "1977-07-09T20:05:51.5549999");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[82], "1977-07-09T20:05:51.5549999");
-    EXPECT_NEAR(csvLine[83].toDouble(), 528.0, 0.001);
-    EXPECT_NEAR(csvLine[84].toDouble(), 602.0, 0.001);
-    EXPECT_NEAR(csvLine[85].toDouble(), 10.181441189059, 0.001);
-    EXPECT_NEAR(csvLine[86].toDouble(), 255.89292858638001, 0.001);
-    EXPECT_NEAR(csvLine[87].toDouble(), 3412288.6566562001, 0.001);
-    EXPECT_NEAR(csvLine[88].toDouble(), 310.20703346939001, 0.001);
-    EXPECT_NEAR(csvLine[89].toDouble(), -46.327247017379, 0.001);
-    EXPECT_NEAR(csvLine[90].toDouble(), 255.64554860056, 0.001);
-    EXPECT_NEAR(csvLine[91].toDouble(), 10.086794148631, 0.001);
-    EXPECT_NEAR(csvLine[92].toDouble(), 255.96651410281, 0.001);
-    EXPECT_NEAR(csvLine[93].toDouble(), 9.928647808629, 0.001);
-    EXPECT_NEAR(csvLine[94].toDouble(), 256.14606965798, 0.001);
-    EXPECT_NEAR(csvLine[95].toDouble(), 10.279980555851, 0.001);
-    EXPECT_NEAR(csvLine[96].toDouble(), 255.82316032959, 0.001);
-    EXPECT_NEAR(csvLine[97].toDouble(), 10.434709827388, 0.001);
-    EXPECT_NEAR(csvLine[98].toDouble(), 80.528382053153, 0.001);
-    EXPECT_NEAR(csvLine[99].toDouble(), 12.13356433166, 0.001);
-    EXPECT_NEAR(csvLine[100].toDouble(), 70.127983086993, 0.001);
-    EXPECT_NEAR(csvLine[101].toDouble(), 332.65918485196, 0.001);
-    EXPECT_NEAR(csvLine[102].toDouble(), 9.9273765164008, 0.001);
-    EXPECT_NEAR(csvLine[103].toDouble(), 294.73518831328, 0.001);
-    EXPECT_NEAR(csvLine[104].toDouble(), 7.7862975334032, 0.001);
-    EXPECT_NEAR(csvLine[105].toDouble(), 4160.7294345949, 0.001);
-    EXPECT_NEAR(csvLine[106].toDouble(), 762.37204489156, 0.001);
-    EXPECT_NEAR(csvLine[107].toDouble(), 18.904248476287, 0.001);
-    EXPECT_NEAR(csvLine[108].toDouble(), 18.904248476287, 0.001);
-    EXPECT_NEAR(csvLine[109].toDouble(), 18.904248476287, 0.001);
-    EXPECT_NEAR(csvLine[110].toDouble(), 18.913336801664, 0.001);
-    EXPECT_NEAR(csvLine[111].toDouble(), 92.033828011827, 0.001);
-    EXPECT_NEAR(csvLine[112].toDouble(), 118.87356332432, 0.001);
-    EXPECT_NEAR(csvLine[113].toDouble(), -22.740326163641, 0.001);
-    EXPECT_NEAR(csvLine[114].toDouble(), 319.09846558533, 0.001);
-    EXPECT_NEAR(csvLine[115].toDouble(), 240.08514371127, 0.001);
-    EXPECT_NEAR(csvLine[116].toDouble(), 267.53187323573, 0.001);
-    EXPECT_NEAR(csvLine[117].toDouble(), 10.078847382918, 0.001);
-    EXPECT_NEAR(csvLine[118].toDouble(), 253.65422317887, 0.001);
-    EXPECT_NEAR(csvLine[119].toDouble(), 0.0092584293412006, 0.001);
-    EXPECT_NEAR(csvLine[120].toDouble(), -0.21479478952768, 0.001);
-    EXPECT_NEAR(csvLine[121].toDouble(), 1.3359751259293, 0.001);
-    EXPECT_NEAR(csvLine[122].toDouble(), 2.4227562244446, 0.001);
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[123], "FALSE");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[124], "FALSE");
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[125], "FALSE");
-    EXPECT_NEAR(csvLine[126].toDouble(), 19.336214228383, 0.001);
-    EXPECT_NEAR(csvLine[127].toDouble(), 19.336214228383, 0.001);
-    EXPECT_NEAR(csvLine[128].toDouble(), 19.336214228383, 0.001);
-    EXPECT_NEAR(csvLine[129].toDouble(), 19.336214228383, 0.001);
+    UserInterface pvlOptions(APP_XML, pvlArgs);
+    try {
+       caminfo(pvlOptions);
+    }
+    catch (IException &e) {
+        FAIL() << "Failed to run caminfo with PVL output: " << e.what() << std::endl;
+    }
+
+    Pvl caminfoPvl(outPvlFileName);
+
+    ASSERT_TRUE(caminfoPvl.hasObject("Caminfo"));
+    PvlObject camobj = caminfoPvl.findObject("Caminfo");
+
+    ASSERT_TRUE(camobj.hasObject("Parameters"));
+    PvlObject parameters = camobj.findObject("Parameters");
+
+    ASSERT_TRUE(camobj.hasObject("Camstats"));
+    PvlObject camstats = camobj.findObject("Camstats");
+
+    ASSERT_TRUE(camobj.hasObject("Statistics"));
+    PvlObject statistics = camobj.findObject("Statistics");
+
+    ASSERT_TRUE(camobj.hasObject("Geometry"));
+    PvlObject geometry = camobj.findObject("Geometry");
+
+    CSVReader caminfoCsv = CSVReader(outFlatFileName,
+                                 true, 0, ',', false, true);
+
+    for (int i = 0; i < parameters.keywords(); i++) {
+        PvlKeyword currentKey = parameters[i];
+        CSVReader::CSVAxis currentColumn = caminfoCsv.getColumn(currentKey.name());
+
+        // Skip RunDate as it's not in the CSV
+        if (currentKey.name() != "RunDate") {
+            EXPECT_TRUE(currentColumn.dim1() > 0) << "Failed to find column [" <<
+                    currentKey.name().toStdString() << "] in CSV";
+            QString stringCsvValue = currentColumn[0];
+            bool isCsvNumeric = false;
+            double numericCsvValue = stringCsvValue.toDouble(&isCsvNumeric);
+            QString stringPvlValue = QString(currentKey);
+            bool isPvlNumeric = false;
+            double numericPvlValue = stringPvlValue.toDouble(&isPvlNumeric);
+            if (isCsvNumeric && isPvlNumeric) {
+                EXPECT_NEAR(numericCsvValue, numericPvlValue, 0.001) <<
+                        "Column [" << currentKey.name().toStdString() << "] value [" <<
+                        stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                        stringPvlValue.toStdString() << "] within tolerance [0.001].";
+            }
+            else {
+                EXPECT_EQ(stringCsvValue.toStdString(), stringPvlValue.toStdString()) <<
+                        "Column [" << currentKey.name().toStdString() << "] value [" <<
+                        stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                        stringPvlValue.toStdString() << "].";
+            }
+        }
+    }
+
+    for (int i = 0; i < camstats.keywords(); i++) {
+        PvlKeyword currentKey = camstats[i];
+        QString columnName = "CamStats_" + currentKey.name();
+        CSVReader::CSVAxis currentColumn = caminfoCsv.getColumn(columnName);
+        EXPECT_TRUE(currentColumn.dim1() > 0) << "Failed to find column [" <<
+                                                 columnName.toStdString() << "] in CSV";
+        QString stringCsvValue = currentColumn[0];
+        bool isCsvNumeric = false;
+        double numericCsvValue = stringCsvValue.toDouble(&isCsvNumeric);
+        QString stringPvlValue = QString(currentKey);
+        bool isPvlNumeric = false;
+        double numericPvlValue = stringPvlValue.toDouble(&isPvlNumeric);
+        if (isCsvNumeric && isPvlNumeric) {
+            EXPECT_NEAR(numericCsvValue, numericPvlValue, 0.001) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "] within tolerance [0.001].";
+        }
+        else {
+            EXPECT_EQ(stringCsvValue.toStdString(), stringPvlValue.toStdString()) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "].";
+        }
+    }
+
+    for (int i = 0; i < statistics.keywords(); i++) {
+        PvlKeyword currentKey = statistics[i];
+        QString columnName = "Stats_" + currentKey.name();
+        CSVReader::CSVAxis currentColumn = caminfoCsv.getColumn(columnName);
+        EXPECT_TRUE(currentColumn.dim1() > 0) << "Failed to find column [" <<
+                                                 columnName.toStdString() << "] in CSV";
+        QString stringCsvValue = currentColumn[0];
+        bool isCsvNumeric = false;
+        double numericCsvValue = stringCsvValue.toDouble(&isCsvNumeric);
+        QString stringPvlValue = QString(currentKey);
+        bool isPvlNumeric = false;
+        double numericPvlValue = stringPvlValue.toDouble(&isPvlNumeric);
+        if (isCsvNumeric && isPvlNumeric) {
+            EXPECT_NEAR(numericCsvValue, numericPvlValue, 0.001) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "] within tolerance [0.001].";
+        }
+        else {
+            EXPECT_EQ(stringCsvValue.toStdString(), stringPvlValue.toStdString()) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "].";
+        }
+    }
+
+    for (int i = 0; i < geometry.keywords(); i++) {
+        PvlKeyword currentKey = geometry[i];
+        QString columnName = "Geom_" + currentKey.name();
+        CSVReader::CSVAxis currentColumn = caminfoCsv.getColumn(columnName);
+        EXPECT_TRUE(currentColumn.dim1() > 0) << "Failed to find column [" <<
+                                                 columnName.toStdString() << "] in CSV";
+        QString stringCsvValue = currentColumn[0];
+        bool isCsvNumeric = false;
+        double numericCsvValue = stringCsvValue.toDouble(&isCsvNumeric);
+        QString stringPvlValue = QString(currentKey);
+        bool isPvlNumeric = false;
+        double numericPvlValue = stringPvlValue.toDouble(&isPvlNumeric);
+        if (isCsvNumeric && isPvlNumeric) {
+            EXPECT_NEAR(numericCsvValue, numericPvlValue, 0.001) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "] within tolerance [0.001].";
+        }
+        else {
+            EXPECT_EQ(stringCsvValue.toStdString(), stringPvlValue.toStdString()) <<
+                    "Column [" << columnName.toStdString() << "] value [" <<
+                    stringCsvValue.toStdString() << "] does not match Pvl value [" <<
+                    stringPvlValue.toStdString() << "].";
+        }
+    }
+
+    // CSVReader::CSVAxis csvLine;
+    // CSVReader::CSVAxis csvColumn;
+    // // Access the "Header" information first
+
+    // csvColumn = header.getColumn();
+
+    // // Validate the header information is correct
+    // csvLine = header.getRow(1);
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[0], "caminfo");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[2], "Viking1/VISB/33322515");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[3], "default.cub");
+    // EXPECT_EQ(csvLine[4].toInt(), 1056);
+    // EXPECT_EQ(csvLine[5].toInt(), 1204);
+    // EXPECT_EQ(csvLine[6].toInt(), 1);
+    // EXPECT_NEAR(csvLine[7].toDouble(), 9.928647808629, 0.001);
+    // EXPECT_NEAR(csvLine[8].toDouble(), 10.434709827388, 0.001);
+    // EXPECT_NEAR(csvLine[9].toDouble(), 10.181983206084, 0.001);
+    // EXPECT_NEAR(csvLine[10].toDouble(), 0.11084102743244, 0.001);
+    // EXPECT_NEAR(csvLine[11].toDouble(), 255.64554860056, 0.001);
+    // EXPECT_NEAR(csvLine[12].toDouble(), 256.14606965798, 0.001);
+    // EXPECT_NEAR(csvLine[13].toDouble(), 255.89390491018, 0.001);
+    // EXPECT_NEAR(csvLine[14].toDouble(), 0.10658330462779, 0.001);
+    // EXPECT_NEAR(csvLine[15].toDouble(), 18.840683405214, 0.001);
+    // EXPECT_NEAR(csvLine[16].toDouble(), 18.985953933844, 0.001);
+    // EXPECT_NEAR(csvLine[17].toDouble(), 18.90816559308, 0.001);
+    // EXPECT_NEAR(csvLine[18].toDouble(), 0.038060007185836, 0.001);
+    // EXPECT_NEAR(csvLine[19].toDouble(), 18.840683425668, 0.001);
+    // EXPECT_NEAR(csvLine[20].toDouble(), 18.985953877822, 0.001);
+    // EXPECT_NEAR(csvLine[21].toDouble(), 18.90816559308, 0.001);
+    // EXPECT_NEAR(csvLine[22].toDouble(), 0.038060007185836, 0.001);
+    // EXPECT_NEAR(csvLine[23].toDouble(), 18.840683425668, 0.001);
+    // EXPECT_NEAR(csvLine[24].toDouble(), 18.985953877822, 0.001);
+    // EXPECT_NEAR(csvLine[25].toDouble(), 18.90816559308, 0.001);
+    // EXPECT_NEAR(csvLine[26].toDouble(), 0.038060007185836, 0.001);
+    // EXPECT_NEAR(csvLine[27].toDouble(), 19.180671135452, 0.001);
+    // EXPECT_NEAR(csvLine[28].toDouble(), 19.525658668048, 0.001);
+    // EXPECT_NEAR(csvLine[29].toDouble(), 19.342626220123, 0.001);
+    // EXPECT_NEAR(csvLine[30].toDouble(), 0.078013435023742, 0.001);
+    // EXPECT_NEAR(csvLine[31].toDouble(), 19.180671135452, 0.001);
+    // EXPECT_NEAR(csvLine[32].toDouble(), 19.525658668048, 0.001);
+    // EXPECT_NEAR(csvLine[33].toDouble(), 19.342626220123, 0.001);
+    // EXPECT_NEAR(csvLine[34].toDouble(), 0.078013435023742, 0.001);
+    // EXPECT_NEAR(csvLine[35].toDouble(), 19.180671135452, 0.001);
+    // EXPECT_NEAR(csvLine[36].toDouble(), 19.525658668048, 0.001);
+    // EXPECT_NEAR(csvLine[37].toDouble(), 19.342626220123, 0.001);
+    // EXPECT_NEAR(csvLine[38].toDouble(), 0.078013435023742, 0.001);
+    // EXPECT_NEAR(csvLine[39].toDouble(), 1.0, 0.001);
+    // EXPECT_NEAR(csvLine[40].toDouble(), 1.0, 0.001);
+    // EXPECT_NEAR(csvLine[41].toDouble(), 1.0, 0.001);
+    // EXPECT_NEAR(csvLine[42].toDouble(), 0.0, 0.001);
+    // EXPECT_NEAR(csvLine[43].toDouble(), 79.756143590222, 0.001);
+    // EXPECT_NEAR(csvLine[44].toDouble(), 81.304900313013, 0.001);
+    // EXPECT_NEAR(csvLine[45].toDouble(), 80.529097153288, 0.001);
+    // EXPECT_NEAR(csvLine[46].toDouble(), 0.44420861263609, 0.001);
+    // EXPECT_NEAR(csvLine[47].toDouble(), 10.798462835458, 0.001);
+    // EXPECT_NEAR(csvLine[48].toDouble(), 13.502630463571, 0.001);
+    // EXPECT_NEAR(csvLine[49].toDouble(), 12.15148695101, 0.001);
+    // EXPECT_NEAR(csvLine[50].toDouble(), 0.56543791358696, 0.001);
+    // EXPECT_NEAR(csvLine[51].toDouble(), 69.941096124192, 0.001);
+    // EXPECT_NEAR(csvLine[52].toDouble(), 70.311944975377, 0.001);
+    // EXPECT_NEAR(csvLine[53].toDouble(), 70.127459134075, 0.001);
+    // EXPECT_NEAR(csvLine[54].toDouble(), 0.1024903912555, 0.001);
+    // EXPECT_NEAR(csvLine[55].toDouble(), 7.7698055422189, 0.001);
+    // EXPECT_NEAR(csvLine[56].toDouble(), 7.8031735959943, 0.001);
+    // EXPECT_NEAR(csvLine[57].toDouble(), 7.7863626216564, 0.001);
+    // EXPECT_NEAR(csvLine[58].toDouble(), 0.0071055546164837, 0.001);
+    // EXPECT_NEAR(csvLine[59].toDouble(), 3410663.3374636, 0.001);
+    // EXPECT_NEAR(csvLine[60].toDouble(), 3413492.0662692, 0.001);
+    // EXPECT_NEAR(csvLine[61].toDouble(), 3412205.8144925, 0.001);
+    // EXPECT_NEAR(csvLine[62].toDouble(), 648.57630811947, 0.001);
+    // EXPECT_NEAR(csvLine[63].toDouble(), 312.29940658175, 0.001);
+    // EXPECT_NEAR(csvLine[64].toDouble(), 350.59781250198, 0.001);
+    // EXPECT_NEAR(csvLine[65].toDouble(), 332.96766151038, 0.001);
+    // EXPECT_NEAR(csvLine[66].toDouble(), 0.67383190647698, 0.001);
+    // EXPECT_NEAR(csvLine[67].toDouble(), -1.79769313486231e+308, 0.001);
+    // EXPECT_NEAR(csvLine[68].toDouble(), -1.79769313486231e+308, 0.001);
+    // EXPECT_NEAR(csvLine[69].toDouble(), -1.79769313486231e+308, 0.001);
+    // EXPECT_NEAR(csvLine[70].toDouble(), -1.79769313486231e+308, 0.001);
+    // EXPECT_NEAR(csvLine[71].toDouble(), 0.0, 0.001);
+    // EXPECT_NEAR(csvLine[72].toDouble(), 0.0, 0.001);
+    // EXPECT_NEAR(csvLine[73].toDouble(), 0.0, 0.001);
+    // EXPECT_NEAR(csvLine[74].toDouble(), 0.0, 0.001);
+    // EXPECT_NEAR(csvLine[75].toDouble(), 100, 0.001);
+    // ASSERT_EQ(csvLine[76].toInt(), 1271424);
+    // EXPECT_NEAR(csvLine[77].toDouble(), 1, 0.001);
+    // EXPECT_NEAR(csvLine[78].toDouble(), 1, 0.001);
+    // EXPECT_NEAR(csvLine[79].toDouble(), 1, 0.001);
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[80], "MARS");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[81], "1977-07-09T20:05:51.5549999");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[82], "1977-07-09T20:05:51.5549999");
+    // EXPECT_NEAR(csvLine[83].toDouble(), 528.0, 0.001);
+    // EXPECT_NEAR(csvLine[84].toDouble(), 602.0, 0.001);
+    // EXPECT_NEAR(csvLine[85].toDouble(), 10.181441189059, 0.001);
+    // EXPECT_NEAR(csvLine[86].toDouble(), 255.89292858638001, 0.001);
+    // EXPECT_NEAR(csvLine[87].toDouble(), 3412288.6566562001, 0.001);
+    // EXPECT_NEAR(csvLine[88].toDouble(), 310.20703346939001, 0.001);
+    // EXPECT_NEAR(csvLine[89].toDouble(), -46.327247017379, 0.001);
+    // EXPECT_NEAR(csvLine[90].toDouble(), 255.64554860056, 0.001);
+    // EXPECT_NEAR(csvLine[91].toDouble(), 10.086794148631, 0.001);
+    // EXPECT_NEAR(csvLine[92].toDouble(), 255.96651410281, 0.001);
+    // EXPECT_NEAR(csvLine[93].toDouble(), 9.928647808629, 0.001);
+    // EXPECT_NEAR(csvLine[94].toDouble(), 256.14606965798, 0.001);
+    // EXPECT_NEAR(csvLine[95].toDouble(), 10.279980555851, 0.001);
+    // EXPECT_NEAR(csvLine[96].toDouble(), 255.82316032959, 0.001);
+    // EXPECT_NEAR(csvLine[97].toDouble(), 10.434709827388, 0.001);
+    // EXPECT_NEAR(csvLine[98].toDouble(), 80.528382053153, 0.001);
+    // EXPECT_NEAR(csvLine[99].toDouble(), 12.13356433166, 0.001);
+    // EXPECT_NEAR(csvLine[100].toDouble(), 70.127983086993, 0.001);
+    // EXPECT_NEAR(csvLine[101].toDouble(), 332.65918485196, 0.001);
+    // EXPECT_NEAR(csvLine[102].toDouble(), 9.9273765164008, 0.001);
+    // EXPECT_NEAR(csvLine[103].toDouble(), 294.73518831328, 0.001);
+    // EXPECT_NEAR(csvLine[104].toDouble(), 7.7862975334032, 0.001);
+    // EXPECT_NEAR(csvLine[105].toDouble(), 4160.7294345949, 0.001);
+    // EXPECT_NEAR(csvLine[106].toDouble(), 762.37204489156, 0.001);
+    // EXPECT_NEAR(csvLine[107].toDouble(), 18.904248476287, 0.001);
+    // EXPECT_NEAR(csvLine[108].toDouble(), 18.904248476287, 0.001);
+    // EXPECT_NEAR(csvLine[109].toDouble(), 18.904248476287, 0.001);
+    // EXPECT_NEAR(csvLine[110].toDouble(), 18.913336801664, 0.001);
+    // EXPECT_NEAR(csvLine[111].toDouble(), 92.033828011827, 0.001);
+    // EXPECT_NEAR(csvLine[112].toDouble(), 118.87356332432, 0.001);
+    // EXPECT_NEAR(csvLine[113].toDouble(), -22.740326163641, 0.001);
+    // EXPECT_NEAR(csvLine[114].toDouble(), 319.09846558533, 0.001);
+    // EXPECT_NEAR(csvLine[115].toDouble(), 240.08514371127, 0.001);
+    // EXPECT_NEAR(csvLine[116].toDouble(), 267.53187323573, 0.001);
+    // EXPECT_NEAR(csvLine[117].toDouble(), 10.078847382918, 0.001);
+    // EXPECT_NEAR(csvLine[118].toDouble(), 253.65422317887, 0.001);
+    // EXPECT_NEAR(csvLine[119].toDouble(), 0.0092584293412006, 0.001);
+    // EXPECT_NEAR(csvLine[120].toDouble(), -0.21479478952768, 0.001);
+    // EXPECT_NEAR(csvLine[121].toDouble(), 1.3359751259293, 0.001);
+    // EXPECT_NEAR(csvLine[122].toDouble(), 2.4227562244446, 0.001);
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[123], "FALSE");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[124], "FALSE");
+    // EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[125], "FALSE");
+    // EXPECT_NEAR(csvLine[126].toDouble(), 19.336214228383, 0.001);
+    // EXPECT_NEAR(csvLine[127].toDouble(), 19.336214228383, 0.001);
+    // EXPECT_NEAR(csvLine[128].toDouble(), 19.336214228383, 0.001);
+    // EXPECT_NEAR(csvLine[129].toDouble(), 19.336214228383, 0.001);
 }
 
 
@@ -222,7 +365,6 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionAverage"), 19.342626220123, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionStandardDeviation"), 0.078013435023742, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioMinimum"), 1.0, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximun"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioAverage"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioStandardDeviation"), 0.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseMinimum"), 79.756143590222, 0.001 );
@@ -459,6 +601,22 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     ASSERT_TRUE(camobj.hasObject("Camstats"));
     PvlObject camstats = camobj.findObject("Camstats");
 
+    EXPECT_NEAR(camstats.findKeyword("MinimumLatitude"), 9.9286479874788, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLatitude"), 10.434709753119, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumLongitude"), 255.64554871862, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumLongitude"), 256.14606952525, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756145388578005, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 69.941096124192, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 70.311944975377, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMinimum"), 7.7698055422189, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.180671135452, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMaximum"), 19.525658668048, 0.001 );
+
     EXPECT_NEAR(camstats.findKeyword("LatitudeMinimum"), 9.9286479874788, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LatitudeMaximum"), 10.434709753119, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LatitudeAverage"), 10.191400154932, 0.001 );
@@ -500,7 +658,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionStandardDeviation"), 0.087529228348495, 0.001 );
 
     EXPECT_NEAR(camstats.findKeyword("AspectRatioMinimum"), 1.0, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximun"), 1.0, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("AspectRatioMaximum"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioAverage"), 1.0, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("AspectRatioStandardDeviation"), 0.0, 0.001 );
 

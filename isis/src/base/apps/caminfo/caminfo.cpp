@@ -262,6 +262,28 @@ namespace Isis{
             camstats->append(MakePair(recordName + "Maximum", tableRec.split(",").at(2)));
             camstats->append(MakePair(recordName + "Average", tableRec.split(",").at(3)));
             camstats->append(MakePair(recordName + "StandardDeviation", tableRec.split(",").at(4)));
+
+            // Add keywords for backwards compatibility
+            // Keywords that are unchanged
+            if (recordName == "Latitude" ||
+                recordName == "Longitude" ||
+                recordName == "Resolution" ||
+                recordName == "ObliqueResolution") {
+              camstats->append(MakePair("Minimum" + recordName, tableRec.split(",").at(1)));
+              camstats->append(MakePair("Maximum" + recordName, tableRec.split(",").at(2)));
+            }
+            // Keywords that have Angle removed
+            else if (recordName == "PhaseAngle" ||
+                     recordName == "EmissionAngle" ||
+                     recordName == "IncidenceAngle") {
+              camstats->append(MakePair("Minimum" + recordName.remove("Angle"), tableRec.split(",").at(1)));
+              camstats->append(MakePair("Maximum" + recordName.remove("Angle"), tableRec.split(",").at(2)));
+            }
+            // Special Cases
+            else if (recordName == "LocalSolarTime") {
+              camstats->append(MakePair(recordName.remove("Solar") + "Minimum", tableRec.split(",").at(1)));
+              camstats->append(MakePair(recordName.remove("Solar") + "Maximum", tableRec.split(",").at(2)));
+            }
           }
         }
 
@@ -277,6 +299,40 @@ namespace Isis{
           CameraStatistics stats(filename, sinc, linc);
           Pvl camPvl = stats.toPvl();
 
+          // Add keywords for backwards comaptibility
+          PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
+          camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
+          camstats->append(MakePair("MaximumLatitude", cg["latitudemaximum"][0]));
+
+          cg = camPvl.findGroup("Longitude", Pvl::Traverse);
+          camstats->append(MakePair("MinimumLongitude", cg["longitudeminimum"][0]));
+          camstats->append(MakePair("MaximumLongitude", cg["longitudemaximum"][0]));
+
+          cg = camPvl.findGroup("Resolution", Pvl::Traverse);
+          camstats->append(MakePair("MinimumResolution", cg["resolutionminimum"][0]));
+          camstats->append(MakePair("MaximumResolution", cg["resolutionmaximum"][0]));
+
+          cg = camPvl.findGroup("PhaseAngle", Pvl::Traverse);
+          camstats->append(MakePair("MinimumPhase", cg["phaseminimum"][0]));
+          camstats->append(MakePair("MaximumPhase", cg["phasemaximum"][0]));
+
+          cg = camPvl.findGroup("EmissionAngle", Pvl::Traverse);
+          camstats->append(MakePair("MinimumEmission", cg["emissionminimum"][0]));
+          camstats->append(MakePair("MaximumEmission", cg["emissionmaximum"][0]));
+
+          cg = camPvl.findGroup("IncidenceAngle", Pvl::Traverse);
+          camstats->append(MakePair("MinimumIncidence", cg["incidenceminimum"][0]));
+          camstats->append(MakePair("MaximumIncidence", cg["incidencemaximum"][0]));
+
+          cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
+          camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
+          camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
+
+          cg = camPvl.findGroup("ObliqueResolution", Pvl::Traverse);
+          camstats->append(MakePair("ObliqueResolutionMinimum", cg["ObliqueResolutionMinimum"][0]));
+          camstats->append(MakePair("ObliqueResolutionMaximum", cg["ObliqueResolutionMaximum"][0]));
+
+          // Add keywords for all camera values
           // Skips first "User Parameters" group.
           for (int i = 1; i < camPvl.groups(); i++) {
             PvlGroup &group = camPvl.group(i);
