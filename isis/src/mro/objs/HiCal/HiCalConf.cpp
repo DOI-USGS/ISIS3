@@ -434,7 +434,7 @@ void HiCalConf::loadNaifTiming( ) {
     NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once
-    naifState->set_hiCalTimingLoaded(tre);
+    naifState->set_hiCalTimingLoaded(true);
   }
   return;
 }
