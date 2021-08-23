@@ -14,6 +14,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "TProjection.h"
 
 #include <cmath>
@@ -100,7 +101,8 @@ namespace Isis {
     bool spacecraftAzimuth = false;
     bool offnadirAngle = false;
     bool slope = false;
-    bool slopeAzimuth = false;
+    bool localNormal = false;
+    bool ellipsoidNormal = false;
     bool subSpacecraftGroundAzimuth = false;
     bool subSolarGroundAzimuth = false;
     bool morphologyRank = false;
@@ -128,7 +130,8 @@ namespace Isis {
       if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
       if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
       if ((slope = ui.GetBoolean("SLOPE"))) nbands++;
-      if ((slopeAzimuth = ui.GetBoolean("SLOPEAZIMUTH"))) nbands++;
+      if ((localNormal = ui.GetBoolean("LOCALNORMAL"))) nbands = nbands + 3;
+      if ((ellipsoidNormal = ui.GetBoolean("ELLIPSOIDNORMAL"))) nbands = nbands + 3;
       if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
       if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
       if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
@@ -191,6 +194,30 @@ namespace Isis {
       name += "Incidence Angle";
       raBandNum++;
     }
+    if (ellipsoidNormal) {
+      name += "Ellipsoid Normal X";
+      raBandNum++;
+
+      name += "Ellipsoid Normal Y";
+      raBandNum++;
+
+      name += "Ellipsoid Normal Z";
+      raBandNum++;
+    }
+    if (localNormal) {
+      name += "Local Normal X";
+      raBandNum++;
+
+      name += "Local Normal Y";
+      raBandNum++;
+
+      name += "Local Normal Z";
+      raBandNum++;
+    }
+    if (slope) {
+      name += "Slope";
+      raBandNum++;
+    }
     if (localEmission) {
       name += "Local Emission Angle";
       raBandNum++;
@@ -241,14 +268,6 @@ namespace Isis {
     }
     if (offnadirAngle) {
       name += "OffNadir Angle";
-      raBandNum++;
-    }
-    if (slope) {
-      name += "Slope";
-      raBandNum++;
-    }
-    if (slopeAzimuth) {
-      name += "Slope Azimuth";
       raBandNum++;
     }
     if (subSpacecraftGroundAzimuth) {
@@ -344,6 +363,23 @@ namespace Isis {
               out[index] = cam->IncidenceAngle();
               index += 64 * 64;
             }
+            if (ellipsoidNormal) {
+              ShapeModel *shapeModel = cam->target()->shape();
+              std::vector<double> ellipsoidNormal = shapeModel->normal();
+
+              LinearAlgebra::Vector ellipsoidNormalXYZ = LinearAlgebra::vector(ellipsoidNormal[0], ellipsoidNormal[1], ellipsoidNormal[2]);
+              ellipsoidNormalXYZ = LinearAlgebra::normalize(ellipsoidNormalXYZ);
+
+              // Generate X, Y, and Z back plan
+              out[index] = ellipsoidNormalXYZ[0];
+              index += 64 * 64;
+
+              out[index] = ellipsoidNormalXYZ[1];
+              index += 64 * 64;
+
+              out[index] = ellipsoidNormalXYZ[2];
+              index += 64 * 64;
+            }
             if (localEmission || localIncidence) {
               Angle phase;
               Angle incidence;
@@ -360,6 +396,37 @@ namespace Isis {
                 out[index] = incidence.degrees();
                 index += 64 * 64;
               }
+            }
+            // This if block sets the normal within the camera/shapemodel to the
+            // local normal, any code that needs the ellipsoid normal should be
+            // placed before this if block
+            if (localNormal) {
+              double localNormal[3];
+              cam->GetLocalNormal(localNormal);
+              LinearAlgebra::Vector localNormalXYZ = LinearAlgebra::vector(localNormal[0], localNormal[1], localNormal[2]);
+              localNormalXYZ = LinearAlgebra::normalize(localNormalXYZ);
+
+              // Generate X, Y, and Z back plan
+              out[index] = localNormalXYZ[0];
+              index += 64 * 64;
+
+              out[index] = localNormalXYZ[1];
+              index += 64 * 64;
+
+              out[index] = localNormalXYZ[2];
+              index += 64 * 64;
+            }
+            if (slope) {
+              double slope;
+              bool success;
+              cam->Slope(slope, success);
+              if (success) {
+                out[index] = slope;
+              }
+              else {
+                out[index] = Isis::Null;
+              }
+              index += 64 * 64;
             }
             if (latitude) {
               if (noCamera) {
@@ -418,53 +485,6 @@ namespace Isis {
             }
             if (offnadirAngle) {
               out[index] = cam->OffNadirAngle();
-              index += 64 * 64;
-            }
-            if (slope) {
-              double slope;
-              bool success;
-              cam->Slope(slope, success);
-              if (success) {
-                out[index] = slope;
-              }
-              else {
-                out[index] = Isis::Null;
-              }
-              index += 64 * 64;
-            }
-            if (slopeAzimuth) {
-              double localNormal[3];
-              cam->GetLocalNormal(localNormal);
-              std::cout << "NORMAL: " << localNormal[0] << ", " << localNormal[1] << ", " << localNormal[2] << '\n';
-
-              SurfacePoint groundPoint = cam->GetSurfacePoint();
-              double originalLatitude = groundPoint.GetLatitude().degrees();
-              double originalLongitude = groundPoint.GetLongitude().degrees();
-              double newLatitude = originalLongitude + 1;
-
-              // (originalLongitude - originalLongitude) * Math.PI / 180;
-              // Distance of longitudes here will always be 0
-              double dLon = 0.0;
-
-              double y = sin(dLon) * cos(newLatitude);
-              double x = (cos(originalLatitude) * sin(newLatitude)) -
-                         (sin(originalLatitude) * cos(newLatitude) * cos(dLon));
-
-              LinearAlgebra::Vector northDirection = LinearAlgebra::vector(x, y, 0.0);
-              LinearAlgebra::Vector normNorthDirection = LinearAlgebra::normalize(northDirection);
-              std::cout << "DIRECTION: " << normNorthDirection[0] << ", " << normNorthDirection[1] << '\n';
-              double aspect = std::inner_product(std::begin(localNormal), std::end(localNormal), std::begin(normNorthDirection), 0.0);
-              std::cout << "ASPECT: " << aspect << '\n';
-              std::cout << "ASPECT2: " << acos(aspect) << '\n';
-              out[index] = aspect;
-
-              // SurfacePoint downSlopePoint(
-              //     Displacement(groundPoint.GetX().meters() + localNormal[0], Displacement::Meters),
-              //     Displacement(groundPoint.GetY().meters() + localNormal[1], Displacement::Meters),
-              //     Displacement(groundPoint.GetZ().meters() + localNormal[2], Displacement::Meters));
-              // out[index] = cam->GroundAzimuth(
-              //     groundPoint.GetLatitude().degrees(), groundPoint.GetLongitude().degrees(),
-              //     downSlopePoint.GetLatitude().degrees(), downSlopePoint.GetLongitude().degrees());
               index += 64 * 64;
             }
             if (subSpacecraftGroundAzimuth) {

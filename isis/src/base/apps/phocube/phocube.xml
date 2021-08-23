@@ -319,6 +319,13 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2020-03-15">
       Converted application and tests for Gtest conversion.
     </change>
+    <change name="Jesse Maple" date="2020-08-12">
+      Added initial slope and slope azimuth computation to phocube.
+    </change>
+    <change name="Adam Paquette" date="2020-08-23">
+      Removed incorrect slope azimuth calculation and added backplane options
+      for the local normal and the ellipsoid normal.
+    </change>
   </history>
 
   <category>
@@ -649,26 +656,30 @@ xsi:noNamespaceSchemaLocation=
           <a href="../slpmap/slpmap.html" target="_blank">slpmap</a>.
         </description>
       </parameter>
-      <parameter name="SLOPEAZIMUTH">
+      <parameter name="LOCALNORMAL">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a slope azimuth band</brief>
+        <brief>
+          Create X, Y, and Z back planes from the local normal vector
+        </brief>
         <description>
-          This angle is also refered to as the slope aspect.
-
-          If this parameter is true, the slope azimuth will be computed for
-          every pixel and placed in a band in the output cube. The output cube
-          labels will contain "Slope Azimuth" in the BandBin group, in band
-          sequence of the output file. The slope azimuth at a ground point is
-          the compass angle between the vector pointing North and the local
-          surface normal. The slope azimuth is measured in positive clockwise
-          degrees from North; the local surface normal points North at 0
-          degrees, East at 90 degrees, South at 180 degrees, and so on.
-
-          If computing slope azimuths, the input image must be a level1 image.
-          To compute slope azimuths for a level2 DEM use
-          <a href="../slpmap/slpmap.html" target="_blank">slpmap</a>
-          with OUTPUT=ASPECT.
+          If this parameter is true, the local normal will be computed for
+          every pixel and placed in three bands (X, Y, Z) in the output cube.
+          The output cube labels will contain three "Local Normal (coord)" keywords
+          in the BandBin group, in band sequence of the output file.
+        </description>
+      </parameter>
+      <parameter name="ELLIPSOIDNORMAL">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Create X, Y, and Z back planes from the ellipsoid normal vector
+        </brief>
+        <description>
+          If this parameter is true, the ellipsoid normal will be computed for
+          every pixel and placed in three bands (X, Y, Z) in the output cube.
+          The output cube labels will contain three "Ellipsoid Normal (coord)"
+          keywords in the BandBin group, in band sequence of the output file.
         </description>
       </parameter>
       <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
