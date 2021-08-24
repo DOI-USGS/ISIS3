@@ -55,11 +55,11 @@ namespace Isis {
   };
 
 
-  QList<Cube *> g_outputCubes;
-  Cube *cube = NULL;
-  QStringList g_filterList;
-  QList<FilterInfo> g_frameletInfoList;
-  void unstitchFullFrame(Buffer &in);
+  static QList<Cube *> g_outputCubes;
+  static Cube *cube = NULL;
+  static QStringList g_filterList;
+  static QList<FilterInfo> g_frameletInfoList;
+  static void unstitchFullFrame(Buffer &in);
 
   void tgocassisunstitch(UserInterface &ui) {
     ProcessByLine p;
@@ -152,7 +152,8 @@ namespace Isis {
     }
 
     // Unstitch
-    p.SetInputCube("FROM");
+    CubeAttributeInput &att = ui.GetInputAttribute("FROM");
+    p.SetInputCube(ui.GetFileName("FROM"), att);
     p.Progress()->SetText("Processing output cubes.");
     p.StartProcess(unstitchFullFrame);
     p.EndProcess();

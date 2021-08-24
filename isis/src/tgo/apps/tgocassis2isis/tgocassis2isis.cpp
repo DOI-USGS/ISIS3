@@ -26,12 +26,12 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
-  void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
-  bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
-  bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
-  void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
-  QString convertUniqueIdToObservationId(Pvl &outputLabel);
+  static void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
+  static void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
+  static bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
+  static bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
+  static void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
+  static QString convertUniqueIdToObservationId(Pvl &outputLabel);
 
   void tgocassis2isis(UserInterface &ui) {
     FileName xmlFileName = ui.GetFileName("FROM");
@@ -53,7 +53,7 @@ namespace Isis {
       }
 
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      Cube *outputCube = importer.SetOutputCube("TO", att);
+      Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
       QString transRawFile = "TgoCassisInstrument.trn";
       QString transExportFile = "TgoCassisExportedInstrument.trn";

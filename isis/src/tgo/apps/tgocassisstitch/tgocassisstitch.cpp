@@ -27,8 +27,8 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  QMap<QString, FileName> sortFramelets(FileName frameletListFile);
-  void stitchFrame(QList<FileName> frameletList, FileName frameFileName);
+  static QMap<QString, FileName> sortFramelets(FileName frameletListFile);
+  static void stitchFrame(QList<FileName> frameletList, FileName frameFileName);
 
   /**
    * Functor for stitching framelets into a full frame
