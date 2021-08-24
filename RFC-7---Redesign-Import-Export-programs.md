@@ -1,7 +1,7 @@
 - Feature/Process Name: Import Export Program Redesign
 - Start Date: August 23, 2021
 - RFC PR: forthcoming
-- Issue: [#4607](https://github.com/USGS-Astrogeology/ISIS3/issues/4607)
+- Issue: [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
 - Author: Stuart Sides
 
 # Summary
