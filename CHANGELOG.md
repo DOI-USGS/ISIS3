@@ -37,6 +37,7 @@ release.
 
 ### Added
 - Added the ability to search filenames in measure's drop down boxes in Qnet Point Editor. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Added slope, local normal, and ellipsoid normal calculations to phocube. [#3635](https://github.com/USGS-Astrogeology/ISIS3/issues/3645)
 
 ## [6.0.0] - 2021-08-27
 
