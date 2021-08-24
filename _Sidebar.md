@@ -26,7 +26,6 @@
   * [RFC4 - Migration of ISIS Data to GitHub - Updated Information 2020-03-16](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC4---Migration-of-ISIS-Data-to-Git)
   * [RFC5 - Remove old LRO LOLA/GRAIL SPK files](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC5-Remove-old-LOLAGRAIL-SPKs)
   * [RFC6 - BLOB Redesign](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC6:-BLOB-Redesign)
-  * [RFC7 - Import/Export Redesign](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-7---Redesign-Import-Export-programs)
 
 # Instrument Workflows
 * [Kaguya Terrain Camera](https://github.com/USGS-Astrogeology/ISIS3/wiki/Kaguya-Terrain-Camera)
