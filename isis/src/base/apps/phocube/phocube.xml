@@ -319,12 +319,9 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2020-03-15">
       Converted application and tests for Gtest conversion.
     </change>
-    <change name="Jesse Maple" date="2020-08-12">
-      Added initial slope and slope azimuth computation to phocube.
-    </change>
     <change name="Adam Paquette" date="2020-08-23">
-      Removed incorrect slope azimuth calculation and added backplane options
-      for the local normal and the ellipsoid normal.
+      Added initial slope and backplane options for the local normal and the
+      ellipsoid normal.
     </change>
   </history>
 
@@ -651,6 +648,11 @@ xsi:noNamespaceSchemaLocation=
           file. The slope is in degrees with 0 degrees being perfectly flat and
           90 degrees being sheer vertical.
 
+          <p>
+            Note: The slope is measured relative to a sphere and not a more
+            complex datum like the gravity model
+          </p>
+
           If computing slopes, the input image must be a level1 image. To
           compute slopes for a level2 DEM use
           <a href="../slpmap/slpmap.html" target="_blank">slpmap</a>.
@@ -663,10 +665,17 @@ xsi:noNamespaceSchemaLocation=
           Create X, Y, and Z back planes from the local normal vector
         </brief>
         <description>
-          If this parameter is true, the local normal will be computed for
-          every pixel and placed in three bands (X, Y, Z) in the output cube.
-          The output cube labels will contain three "Local Normal (coord)" keywords
-          in the BandBin group, in band sequence of the output file.
+          If this parameter is true, a local normal will be computed for
+          every pixel based on the shapemodel of the cube, and placed in
+          three bands (X, Y, Z) in the output cube. Meaning if your cube has an
+          ellipsoid shapemodel rather than a DEM, the local normal and the
+          ellipsoid normal will look the same. The output cube labels will contain
+          three "Local Normal (coord)" keywordsin the BandBin group, in band
+          sequence of the output file.
+
+          <p>
+            Note: These X, Y, and Z bands are in the body fixed reference frame.
+          </p>
         </description>
       </parameter>
       <parameter name="ELLIPSOIDNORMAL">
@@ -678,8 +687,14 @@ xsi:noNamespaceSchemaLocation=
         <description>
           If this parameter is true, the ellipsoid normal will be computed for
           every pixel and placed in three bands (X, Y, Z) in the output cube.
-          The output cube labels will contain three "Ellipsoid Normal (coord)"
-          keywords in the BandBin group, in band sequence of the output file.
+          This normal will always be computed with a triaxial ellipsoid
+          regardless of shapemodel. The output cube labels will contain three
+          "Ellipsoid Normal (coord)" keywords in the BandBin group, in band
+          sequence of the output file.
+
+          <p>
+            Note: These X, Y, and Z bands are in the body fixed reference frame.
+          </p>
         </description>
       </parameter>
       <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
