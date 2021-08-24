@@ -15,6 +15,7 @@
 
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
+  * [Redesign of ISIS Import and Export Programs](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-7---Redesign-Import-Export-programs)
 
 
 # Archived RFCs
