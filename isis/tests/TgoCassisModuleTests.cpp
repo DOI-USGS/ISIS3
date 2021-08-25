@@ -25,7 +25,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   // run tgocassis2isis and spiceinit on pan framelet.
   QString panFileName = prefix.path() + "/panframelet.cub";
-  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/stitchUnstitch/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",  
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",  
                                          "to=" + panFileName};
 
   UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
@@ -47,7 +47,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   // run tgocassis2isis and spiceinit on red framelet.
   QString redFileName = prefix.path() + "/redframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/stitchUnstitch/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",  
                         "to=" + redFileName};
   UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -68,7 +68,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   // run tgocassis2isis and spiceinit on blu framelet.
   QString bluFileName = prefix.path() + "/bluframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/stitchUnstitch/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",  
                         "to=" + bluFileName};
   UserInterface tgocassis2isisBlu(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -89,7 +89,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   // run tgocassis2isis and spiceinit on nir framelet.
   QString nirFileName = prefix.path() + "/nirframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/stitchUnstitch/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",  
                         "to=" + nirFileName};
   UserInterface tgocassis2isisNir(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {

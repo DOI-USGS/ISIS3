@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational xmlns:psa="http://psa.esa.int/psa/v1" xmlns:cas="http://psa.esa.int/psa/em16/cas/v1" xmlns:img="http://pds.nasa.gov/pds4/img/v1" xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd http://pds.nasa.gov/pds4/disp/v1 http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.xsd http://pds.nasa.gov/pds4/img/v1 http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.xsd http://psa.esa.int/psa/v1 http://psa.esa.int/psa/v1/PDS4_PSA_1000.xsd http://psa.esa.int/psa/em16/cas/v1 http://psa.esa.int/psa/em16/cas/v1/PDS4_PSA_EM16_CAS_1000.xsd" xmlns:disp="http://pds.nasa.gov/pds4/disp/v1">
+ <Identification_Area>
+  <logical_identifier>urn:esa:psa:em16_tgo_cas:data_raw:my34_002002_211_2</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS3 cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Alias_List>
+   <Alias>
+    <alternate_id>MY34_002002_211_2</alternate_id>
+    <comment>CaSSIS Internal Identifier</comment>
+   </Alias>
+  </Alias_List>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2019-08-16</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the tgocassisrdrgen application from ISIS version 3.8.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2018-05-05T23:11:48.767Z</start_date_time>
+   <stop_date_time>2018-05-05T23:11:48.767Z</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.488e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>RED</img:filter_name>
+      <img:filter_id>RED</img:filter_id>
+      <img:bandwidth unit="nm">100</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">840</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <File>
+   <file_name>CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.img</file_name>
+  </File>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <description>Pixel values are in units of I/F (intensity/flux). I/F is defined asthe ratio of the observed radiance and the radiance of a 100% lambertian reflector with the sun and camera orthogonal to the observing surface.</description>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>1792</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>256</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
