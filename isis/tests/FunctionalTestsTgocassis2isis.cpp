@@ -348,7 +348,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestInstrumentError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-InstrumentError.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-InstrumentError.xml", 
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   
@@ -364,7 +364,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestInstrumentError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestSpacecraftError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-SpacecraftError.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-SpacecraftError.xml", 
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   
@@ -380,7 +380,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestSpacecraftError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestFilterError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00.xml", 
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   
@@ -396,7 +396,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestFilterError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/reingested_unproj.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_rdrgen.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_rdrgen.xml", 
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   
@@ -453,7 +453,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedProj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/reingested_unproj.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_proj_rdrgen.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_proj_rdrgen.xml", 
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
   
