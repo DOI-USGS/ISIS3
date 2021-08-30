@@ -8,12 +8,14 @@ Missions that are not listed in the table below are provided with a static set o
 
 | Mission     | ISIS Update Cadence | Mission Update Cadence |
 | ----------- | ------------------- | ----------------------
-| Cassini     |  daily              | Unknown |
+| Cassini     |  daily              | No kernel updates are planned at this time |
 | CaSSIS      |  daily              | 1-3 times a week |
-| Dawn        |  every 12 hours     | Unknown |
-| Hayabusa2   |  daily              | Unknown |
+| Dawn        |  every 12 hours     | Planned update for Vesta SPC shape model and corresponding SPICE kernels in early 2022. |
+| Hayabusa2   |  daily              | No kernel updates are planned at this time |
 | Juno        |  daily              | Unknown |
 | LRO         |  daily              | daily   |
-| MEX         |  once a month       | Unknown |
-| MRO         |  daily              | Unknown |
-| Odyssey     |  daily              | Unknown |
+| MEX         |  once a month       | V2 release date TBD. |
+| MRO         |  daily              | CKs daily/weekly; SPKs semi-weekly; SCLKs, FK and IK updates, etc. - as needed |
+| Odyssey     |  daily              | CKs – daily; Merged CKs – quarterly (month after quarter start); SPKs – weekly on Thursdays; Merged SPKs - quarterly (month after quarter start); SCLKs - monthly |
+
+If you would like to receive notification from NAIF when kernels are publicly released, please sign up with [SPICE Announce](https://naif.jpl.nasa.gov/mailman/listinfo/spice_announce). You will also receive announcements from NAIF regarding new software, bug fixes, training opportunities and similar items. 
