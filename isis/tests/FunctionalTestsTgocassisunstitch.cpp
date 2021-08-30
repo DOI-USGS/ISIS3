@@ -208,7 +208,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   
   
   // Unstitched Blu Cube
-  QString bluFile = prefix.path() + "/unstitched_blu.cub";
+  QString bluFile = prefix.path() + "/unstitched_BLU.cub";
   Cube bluCube(bluFile);
   Pvl *bluLabel = bluCube.label();
 
@@ -600,7 +600,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   
   
   // Unstitched Blu Cube
-  QString bluFile = prefix.path() + "/unstitched_blu.cub";
+  QString bluFile = prefix.path() + "/unstitched_BLU.cub";
   Cube bluCube(bluFile);
   Pvl *bluLabel = bluCube.label();
 
