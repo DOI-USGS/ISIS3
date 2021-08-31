@@ -4,9 +4,11 @@ on:
     branches:
       - dev
 jobs:
+  # Check if the PR is a bugfix
   check_labels:
     runs-on: ubuntu-latest
     name: Check PR labels action step
+    # Make the output of this job available to other jobs
     outputs: 
       result: ${{steps.check_pr_labels.outputs.result}}
     steps:
@@ -15,16 +17,19 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         labels: '["bug"]'
+    # Print the result to the log
     - name: See result
       run: echo "${{ steps.check_pr_labels.outputs.result }}"
   release_pull_request:
     needs: check_labels
+    # Only run this step if the code was a bugfix
     if: contains(needs.check_labels.outputs.result, 'true')
     runs-on: ubuntu-latest
     name: release_pull_request
     steps:
     - name: checkout
       uses: actions/checkout@v2.2.0
+      # Fetch all info including branches + tags
       with:
         fetch-depth: 0
     - name: 'Get Previous tag'
@@ -32,11 +37,13 @@ jobs:
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
     - id: get_short_version
       run: |
+	# Get the major / minor version without patch info i.e. 6.0 from 6.0.1
         major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
         echo "::set-output name=major_minor::$major_minor"
     - name: Create PR to branch
       uses: adamtharani/github-action-cherry-pick@master
       with:
+	# PR to the latest feature release.  Merges are enabled
         pr_branch: ${{steps.get_short_version.outputs.major_minor}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
