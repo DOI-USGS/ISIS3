@@ -1,0 +1,40 @@
+name: PR for release branch
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  check_labels:
+    runs-on: ubuntu-latest
+    name: Check PR labels action step
+    steps:
+    - id: check_pr_labels
+      uses: shioyang/check-pr-labels-on-push-action@v1.0.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        labels: '["bug"]'
+  release_pull_request:
+    needs: check_labels
+    if: ${{needs.check_labels.output.results}} == 'true'
+    runs-on: ubuntu-latest
+    name: release_pull_request
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2.2.0
+      with:
+        fetch-depth: 0
+    - name: 'Get Previous tag'
+      id: get_latest_tag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+    - id: get_short_version
+      run: |
+        major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
+        echo "::set-output name=major_minor::$major_minor"
+    - run: echo "${{steps.get_short_version.outputs.id}}"
+    - name: Create PR to branch
+      uses: gorillio/github-action-cherry-pick@master
+      with:
+        pr_branch: ${{steps.get_short_version.outputs.major_minor}}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DRY_RUN: false
