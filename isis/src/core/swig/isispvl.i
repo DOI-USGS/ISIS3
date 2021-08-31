@@ -22,6 +22,11 @@
     return pvl;
   }
 
+  void readString(const char *pvlString) {
+    std::istringstream in(pvlString);
+    in >> *$self;
+  }
+
   void read(const char* file) {
     QString qfile(file);
     $self->read(qfile);

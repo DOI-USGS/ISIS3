@@ -23,8 +23,23 @@
     return blob;
   }
 
-  setData(const char *buffer, int nbytes) {
-    $self->setData(buffer, nbytes);
+  void Write(const char *file) {
+    QString qfile(file);
+
+    $self->Write(file);
+  }
+
+  char * getStringBuffer() {
+    int bufferSize = $self->Size();
+    char * buffer = $self->getBuffer();
+    std::ostringstream os;
+    for (int i = 0; i < bufferSize; i++) os << buffer[i];
+    os << '\0';
+
+    std::string str = os.str();
+    char * cstr = new char [str.length()+1];
+    std::strcpy (cstr, str.c_str());
+    return cstr;
   }
 
 }
