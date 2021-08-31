@@ -37,13 +37,13 @@ jobs:
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
     - id: get_short_version
       run: |
-	# Get the major / minor version without patch info i.e. 6.0 from 6.0.1
+        # Get the major / minor version without patch info i.e. 6.0 from 6.0.1
         major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
         echo "::set-output name=major_minor::$major_minor"
     - name: Create PR to branch
       uses: adamtharani/github-action-cherry-pick@master
       with:
-	# PR to the latest feature release.  Merges are enabled
+        # PR to the latest feature release.  Merges are enabled
         pr_branch: ${{steps.get_short_version.outputs.major_minor}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
