@@ -173,7 +173,7 @@ namespace Isis {
         bname = mybb["FilterName"][0];
       }
     }
-    else if (alldns && icube->hasGroup("BandBin")) {
+    else if (alldn && icube->hasGroup("BandBin")) {
       PvlGroup &mybb = icube->group("BandBin");
       if (mybb.hasKeyword("Name")) {
         bnames = mybb.findKeyword("Name");
@@ -188,14 +188,12 @@ namespace Isis {
     if (dn) {
       name += bname;
       raBandNum++;
-      std::cout << "band name = " << bname << std::endl;
     }
-    else if (alldns) {
+    else if (alldn) {
       for (int i = 0; i<bnames.size(); i++) {
         name += bnames[i];
         raBandNum++;
       }
-      std::cout << "band names = " << bnames << std::endl;
     }
     if (phase) {
       name += "Phase Angle";
@@ -320,8 +318,8 @@ namespace Isis {
             out[index] = in[index];
             index += 64 * 64;
           }
-          else if (alldns) {
-            for (int i = 0; i < icube->nbands(); i++) {
+          else if (alldn) {
+            for (int i = 0; i < icube->bandCount(); i++) {
               out[index] = in[index];
               index += 64 * 64;
             }
@@ -335,8 +333,8 @@ namespace Isis {
             if (dn) {
               startBand = 1;
             }
-            else if (allDns) {
-              startBand = icube->nbands();
+            else if (alldn) {
+              startBand = icube->bandCount();
             }
             for (int band = startBand; band < nbands; band++) {
               out[index] = Isis::Null;
@@ -520,8 +518,8 @@ namespace Isis {
             if (dn) {
               startBand = 1;
             }
-            else if (allDns) {
-              startBand = icube->nbands();
+            else if (alldn) {
+              startBand = icube->bandCount();
             }
 
             for (int band = startBand; band < nbands; band++) {
