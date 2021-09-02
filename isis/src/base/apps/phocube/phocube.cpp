@@ -5,10 +5,12 @@
 #include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
+#include "LinearAlgebra.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
+#include "Target.h"
 #include "TProjection.h"
 
 #include <cmath>
@@ -85,6 +87,9 @@ namespace Isis {
     bool phase = false;
     bool emission = false;
     bool incidence = false;
+    bool ellipsoidNormal = false;
+    bool localNormal = false;
+    bool slope = false;
     bool localEmission = false;
     bool localIncidence = false;
     bool lineResolution = false;
@@ -120,6 +125,9 @@ namespace Isis {
       if ((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
       if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
       if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+      if ((slope = ui.GetBoolean("SLOPE"))) nbands++;
+      if ((localNormal = ui.GetBoolean("LOCALNORMAL"))) nbands = nbands + 3;
+      if ((ellipsoidNormal = ui.GetBoolean("ELLIPSOIDNORMAL"))) nbands = nbands + 3;
       if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
       if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
       if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
@@ -169,17 +177,41 @@ namespace Isis {
     if (dn) {
       name += bname;
       raBandNum++;
-    } 
+    }
     if (phase) {
       name += "Phase Angle";
       raBandNum++;
-    } 
+    }
     if (emission) {
       name += "Emission Angle";
       raBandNum++;
     }
     if (incidence) {
       name += "Incidence Angle";
+      raBandNum++;
+    }
+    if (ellipsoidNormal) {
+      name += "Ellipsoid Normal X";
+      raBandNum++;
+
+      name += "Ellipsoid Normal Y";
+      raBandNum++;
+
+      name += "Ellipsoid Normal Z";
+      raBandNum++;
+    }
+    if (localNormal) {
+      name += "Local Normal X";
+      raBandNum++;
+
+      name += "Local Normal Y";
+      raBandNum++;
+
+      name += "Local Normal Z";
+      raBandNum++;
+    }
+    if (slope) {
+      name += "Slope";
       raBandNum++;
     }
     if (localEmission) {
@@ -268,13 +300,13 @@ namespace Isis {
     if (localSolarTime) {
       name += "Local Solar Time";
     }
-    bool specialPixels = ui.GetBoolean("SPECIALPIXELS"); 
+    bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
     /**
      * Computes all the geometric properties for the output buffer. Certain
      * knowledge of the buffers size is assumed below, so ensure the buffer
      * is still of the expected size.
-     * 
+     *
      * @param in  The input cube buffer.
      * @param out The output cube buffer.
      */
@@ -327,6 +359,23 @@ namespace Isis {
               out[index] = cam->IncidenceAngle();
               index += 64 * 64;
             }
+            if (ellipsoidNormal) {
+              ShapeModel *shapeModel = cam->target()->shape();
+              std::vector<double> ellipsoidNormal = shapeModel->normal();
+
+              LinearAlgebra::Vector ellipsoidNormalXYZ = LinearAlgebra::vector(ellipsoidNormal[0], ellipsoidNormal[1], ellipsoidNormal[2]);
+              ellipsoidNormalXYZ = LinearAlgebra::normalize(ellipsoidNormalXYZ);
+
+              // Generate X, Y, and Z back plan
+              out[index] = ellipsoidNormalXYZ[0];
+              index += 64 * 64;
+
+              out[index] = ellipsoidNormalXYZ[1];
+              index += 64 * 64;
+
+              out[index] = ellipsoidNormalXYZ[2];
+              index += 64 * 64;
+            }
             if (localEmission || localIncidence) {
               Angle phase;
               Angle incidence;
@@ -343,6 +392,37 @@ namespace Isis {
                 out[index] = incidence.degrees();
                 index += 64 * 64;
               }
+            }
+            // This if block sets the normal within the camera/shapemodel to the
+            // local normal, any code that needs the ellipsoid normal should be
+            // placed before this if block
+            if (localNormal) {
+              double localNormal[3];
+              cam->GetLocalNormal(localNormal);
+              LinearAlgebra::Vector localNormalXYZ = LinearAlgebra::vector(localNormal[0], localNormal[1], localNormal[2]);
+              localNormalXYZ = LinearAlgebra::normalize(localNormalXYZ);
+
+              // Generate X, Y, and Z back plan
+              out[index] = localNormalXYZ[0];
+              index += 64 * 64;
+
+              out[index] = localNormalXYZ[1];
+              index += 64 * 64;
+
+              out[index] = localNormalXYZ[2];
+              index += 64 * 64;
+            }
+            if (slope) {
+              double slope;
+              bool success;
+              cam->Slope(slope, success);
+              if (success) {
+                out[index] = slope;
+              }
+              else {
+                out[index] = Isis::Null;
+              }
+              index += 64 * 64;
             }
             if (latitude) {
               if (noCamera) {
@@ -490,7 +570,7 @@ namespace Isis {
     };
 
     p.SetInputCube(icube, OneBand);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),  
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
                                   icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     p.StartProcess(phocube);
