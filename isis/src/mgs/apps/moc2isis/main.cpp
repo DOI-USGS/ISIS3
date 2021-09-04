@@ -245,7 +245,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   //   Day of the year (Julian day) followed by the
   //   Last five digits of the ProductId
   if(startTime.length() > 0 && productId.length() > 0) {
-    iTime tim(startTime);
+    iTime tim(ocube->naif(), startTime);
     QString imageNumber = tim.YearString();
     imageNumber = imageNumber.mid(3, 1);
     imageNumber += tim.DayOfYearString();

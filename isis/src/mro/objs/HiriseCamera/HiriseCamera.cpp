@@ -50,7 +50,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
     SetPixelPitch();
@@ -132,7 +132,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   //! Destroys the HiriseCamera object

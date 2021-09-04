@@ -52,7 +52,7 @@ namespace Isis {
   /** 
    *  Default constructor creates empty SumFile object.
    */
-  SumFile::SumFile()  { }
+  SumFile::SumFile() : m_obsTime(nullptr)  { }
   
 
   /**
@@ -60,7 +60,7 @@ namespace Isis {
    *  
    * @param sumFile Name of SUMFILE to read/parse
    */
-  SumFile::SumFile(const QString &sumFile) {
+  SumFile::SumFile(const QString &sumFile) : m_obsTime(nullptr) {
     parseSumFile(sumFile);
   }
   
@@ -230,7 +230,7 @@ namespace Isis {
     vector<double> spacecraftPos = getPosition();
 
     // Have vector point from s/c to body
-    vminus_c(&spacecraftPos[0], &spacecraftPos[0]);
+    vminus_c(camera->naif()->get(), &spacecraftPos[0], &spacecraftPos[0]);
     // Transform position vector from body-fixed to J2000
     spacecraftPos = j2000ToTarget.Conjugate().Qxv(spacecraftPos);
   
@@ -381,7 +381,7 @@ namespace Isis {
   
     // Get the time. We expect spaces in the time specification
     values = getSumLine(sumin.readLine(), 4);
-    m_obsTime = iTime(values.join("-"));
+    m_obsTime = iTime(nullptr, values.join("-"));
   
     // Get image lines/samples and lower/upper dn boundaries
     values = getSumLine(sumin.readLine(), 7, "THRSH");

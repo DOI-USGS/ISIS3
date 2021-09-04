@@ -57,7 +57,7 @@ namespace Isis {
    *
    */
   Mariner10Camera::Mariner10Camera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     
     m_spacecraftNameLong = "Mariner 10";
     m_spacecraftNameShort = "Mariner10";
@@ -75,7 +75,7 @@ namespace Isis {
     // Get utc start time
     QString stime = inst["StartTime"];
 
-    iTime startTime;
+    iTime startTime(naif());
     startTime.setUtc((QString)inst["StartTime"]);
     setTime(startTime);
 
@@ -129,7 +129,7 @@ namespace Isis {
     new CameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   
@@ -156,11 +156,12 @@ namespace Isis {
    */
   pair<iTime, iTime> Mariner10Camera::ShutterOpenCloseTimes(double time,
                                                             double exposureDuration) {
-    pair<iTime, iTime> shuttertimes;
-    // To get shutter start (open) time, subtract half exposure duration
-    shuttertimes.first = time - (exposureDuration / 2.0);
-    // To get shutter end (close) time, add half exposure duration
-    shuttertimes.second = time + (exposureDuration / 2.0);
+    pair<iTime, iTime> shuttertimes {
+      // To get shutter start (open) time, subtract half exposure duration
+      iTime(naif(), time - (exposureDuration / 2.0)),
+      // To get shutter end (close) time, add half exposure duration
+      iTime(naif(), time + (exposureDuration / 2.0))
+    };
     return shuttertimes;
   }
 }

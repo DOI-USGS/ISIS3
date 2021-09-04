@@ -19,6 +19,8 @@ QStringList kernels(QString kernelType, Kernel (KernelDb::*kernelDbAccessor)(Pvl
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
+  auto n = naif->get();
 
   ProcessByBrick p;
   Cube *demCube = p.SetInputCube("FROM");
@@ -42,11 +44,11 @@ void IsisMain() {
     allKernelFiles.append(kernels("PCK", &KernelDb::targetAttitudeShape, *demCube->label()));
     allKernelFiles.append(kernels("SPK", &KernelDb::targetPosition, *demCube->label()));
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
 
     foreach (QString kernelFile, allKernelFiles) {
       kernelsUsed += kernelFile;
-      furnsh_c(FileName(kernelFile).expanded().toLatin1().data());
+      furnsh_c(n, FileName(kernelFile).expanded().toLatin1().data());
     }
 
     // Find the NAIF target code for the DEM's target
@@ -54,21 +56,21 @@ void IsisMain() {
     SpiceDouble sunPosition[3];
     SpiceDouble lightTime;
 
-    NaifStatus::CheckErrors();
-    iTime time(ui.GetString("TIME"));
+    NaifStatus::CheckErrors(naif);
+    iTime time(naif, ui.GetString("TIME"));
 
     // Get actual sun position, relative to target
     QString bodyFixedFrame = QString("IAU_%1").arg(name.toUpper());
-    spkpos_c("SUN", time.Et(), bodyFixedFrame.toLatin1().data(), "NONE",
+    spkpos_c(n, "SUN", time.Et(), bodyFixedFrame.toLatin1().data(), "NONE",
              name.toUpper().toLatin1().data(), sunPosition, &lightTime);
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
 
     // Adjusted for light time
-    spkpos_c("SUN", time.Et() - lightTime, bodyFixedFrame.toLatin1().data(), "NONE",
+    spkpos_c(n, "SUN", time.Et() - lightTime, bodyFixedFrame.toLatin1().data(), "NONE",
              name.toUpper().toLatin1().data(), sunPosition, &lightTime);
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
 
     // Convert sun position units: KM -> M
     sunPosition[0] *= 1000;
@@ -76,10 +78,10 @@ void IsisMain() {
     sunPosition[2] *= 1000;
 
     foreach (QString kernelFile, allKernelFiles) {
-      unload_c(FileName(kernelFile).expanded().toLatin1().data());
+      unload_c(n, FileName(kernelFile).expanded().toLatin1().data());
     }
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
     functor.setSunPosition(sunPosition);
   }
 

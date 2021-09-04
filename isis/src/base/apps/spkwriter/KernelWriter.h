@@ -31,6 +31,7 @@
 #include "Commentor.h"
 #include "IException.h"
 #include "NaifStatus.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -81,13 +82,13 @@ class KernelWriter {
     }
 
     /** Write header with comments provided   */
-    void header(const QString &comment) {
-      WriteComment(_handle, comment);
+    void header(NaifContextPtr naif, const QString &comment) {
+      WriteComment(_handle, naif, comment);
     }
 
     /** Write a set of kernel segments from teh Kernels segment container */
-    void write(const K &kernels)  {
-      k_write(_handle, kernels);
+    void write(NaifContextPtr naif, const K &kernels)  {
+      k_write(_handle, naif, kernels);
     }
 
     /**
@@ -101,12 +102,12 @@ class KernelWriter {
      * @param QString Name of file to write kernel to
      * @param QString Name
      */
-    void write(const K &kernels, const QString &kfile,
+    void write(NaifContextPtr naif, const K &kernels, const QString &kfile,
                const QString &comfile = "") {
       QString comments = getComment(kernels, comfile);
       open(kfile, comments.size() + 512);
       header(comments);  // Writes header
-      write(kernels);
+      write(naif, kernels);
       close();
       return;
     }
@@ -127,9 +128,9 @@ class KernelWriter {
 
   protected:
     /** These virtual methods must be provided by the K class */
-    virtual int k_open(const QString &kfile, const int &comsize = 512) = 0;
-    virtual void k_write(const SpiceInt &handle, const K &kernels) = 0;
-    virtual void k_close(SpiceInt &handle) = 0;
+    virtual int k_open(NaifContextPtr naif, const QString &kfile, const int &comsize = 512) = 0;
+    virtual void k_write(NaifContextPtr naif, const SpiceInt &handle, const K &kernels) = 0;
+    virtual void k_close(NaifContextPtr naif, SpiceInt &handle) = 0;
     virtual QString k_header(const QString &comfile = "") const = 0;
 
   private:
@@ -141,7 +142,7 @@ class KernelWriter {
      *
      * @return bool Returns success if so.
      */
-    virtual bool WriteComment(SpiceInt handle, const QString &comment)
+    virtual bool WriteComment(SpiceInt handle, NaifContextPtr naif, const QString &comment)
                               const {
       if ( handle == 0 ) {
         QString mess = "Comments cannot be written as the file is not open";
@@ -152,12 +153,12 @@ class KernelWriter {
       // Calling environments can decide how to handle it.
       try {
         QString commOut;
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(naif);
         for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
              dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
-             NaifStatus::CheckErrors();
+             NaifStatus::CheckErrors(naif);
              commOut.clear();
            }
            else {
@@ -169,7 +170,7 @@ class KernelWriter {
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
           dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
-          NaifStatus::CheckErrors();
+          NaifStatus::CheckErrors(naif);
         }
       }
       catch (IException &) {

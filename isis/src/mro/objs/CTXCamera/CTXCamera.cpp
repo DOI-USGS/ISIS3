@@ -48,7 +48,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
     SetPixelPitch();
@@ -94,7 +94,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 }
 

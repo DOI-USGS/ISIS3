@@ -50,7 +50,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Express";
     m_spacecraftNameShort = "MEX";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
     SetPixelPitch(0.007);
@@ -90,7 +90,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

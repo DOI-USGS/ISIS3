@@ -345,7 +345,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
     }
   }
 
-  iTime stime(startTimeString);
+  iTime stime(outputCube->naif(), startTimeString);
 
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
 

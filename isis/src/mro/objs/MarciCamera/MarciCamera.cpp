@@ -51,7 +51,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a marci image
@@ -159,7 +159,7 @@ namespace Isis {
     new PushFrameCameraGroundMap(this, evenFramelets);
     new CameraSkyMap(this);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     if(sumMode == 1) {
       SetGeometricTilingHint(16, 4);

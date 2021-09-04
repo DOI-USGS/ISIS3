@@ -54,13 +54,13 @@ namespace Isis {
     m_spacecraftNameLong = "Galileo Orbiter";
     m_spacecraftNameShort = "Galileo";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Get the camera characteristics
     double k1;
 
     Pvl &lab = *cube.label();
-    iTime removeCoverDate("1994/04/01 00:00:00");
-    iTime imageDate(lab.findKeyword("StartTime", PvlObject::Traverse)[0]);
+    iTime removeCoverDate(naif(), "1994/04/01 00:00:00");
+    iTime imageDate(naif(), lab.findKeyword("StartTime", PvlObject::Traverse)[0]);
     /*
     * Change the Focal Length and K1 constant based on whether or not the protective cover is on
     * See "The Direction of the North Pole and the Control Network of Asteroid 951 Gaspra"  Icarus 107, 18-22 (1994)
@@ -81,12 +81,12 @@ namespace Isis {
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime((QString)inst["StartTime"]).Et();
+    iTime et(naif(), (QString)inst["StartTime"]);
 
     //?????????? NEED THESE??????
     // exposure duration keyword value is measured in seconds
     double exposureDuration = ((double) inst["ExposureDuration"]);
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et.Et(), exposureDuration);
 
     // Get summation mode
     double sumMode = inst["Summing"];
@@ -114,7 +114,7 @@ namespace Isis {
 
     setTime(et);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   /**
@@ -140,11 +140,13 @@ namespace Isis {
    */
   pair<iTime, iTime> SsiCamera::ShutterOpenCloseTimes(double time,
                                                       double exposureDuration) {
-    pair <iTime, iTime> shuttertimes;
-    // To get shutter start (open) time, subtract half exposure duration
-    shuttertimes.first = time - (exposureDuration / 2.0);
-    // To get shutter end (close) time, add half exposure duration
-    shuttertimes.second = time + (exposureDuration / 2.0);
+    pair <iTime, iTime> shuttertimes {
+      // To get shutter start (open) time, subtract half exposure duration
+      iTime(naif(), time - (exposureDuration / 2.0)),
+
+      // To get shutter end (close) time, add half exposure duration
+      iTime(naif(), time + (exposureDuration / 2.0))
+    };
     return shuttertimes;
   }
 }

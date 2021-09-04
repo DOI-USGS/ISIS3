@@ -66,7 +66,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Set up the camera info from ik/iak kernels
 
     SetFocalLength();
@@ -79,16 +79,16 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];
-    SpiceDouble etStart=0;
+    iTime etStart(naif());
 
     if(stime != "NULL") {
-      etStart = iTime(stime).Et();
+      etStart = stime;
     }
     else {
       //TODO throw an error if "StartTime" keyword is absent
     }
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
 
     // Get other info from labels
@@ -96,7 +96,7 @@ namespace Isis {
     setTime(etStart);
 
     // Setup detector map
-    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart.Et(), lineRate);
     detectorMap->SetDetectorSampleSumming(1.0);
     detectorMap->SetStartingDetectorSample(1.0);
 
@@ -121,7 +121,7 @@ namespace Isis {
 
     LoadCache();
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 }
 

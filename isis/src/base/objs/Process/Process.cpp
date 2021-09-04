@@ -82,7 +82,7 @@ namespace Isis {
   Isis::Cube *Process::SetInputCube(const QString &fname,
                                     const Isis::CubeAttributeInput &att,
                                     int requirements) {
-    Isis::Cube *cube = new Isis::Cube;
+    Isis::Cube *cube = new Isis::Cube(Application::GetNaif());
     if(att.bands().size() != 0) {
       vector<QString> lame = att.bands();
       cube->setVirtualBands(lame);
@@ -344,7 +344,7 @@ namespace Isis {
     }
 
     // Setup the cube
-    Isis::Cube *cube = new Isis::Cube;
+    Isis::Cube *cube = new Isis::Cube(Application::GetNaif());
     try {
       cube->setDimensions(ns, nl, nb);
       cube->setByteOrder(att.byteOrder());

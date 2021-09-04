@@ -18,7 +18,7 @@
 using namespace Isis;
 
 
-ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
+ControlNet * mergeNetworks(NaifContextPtr naif, FileList &filelist, PvlObject &conflictLog,
     QString networkId, QString description);
 void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, 
     PvlObject &cnetLog, Progress progress);
@@ -68,6 +68,7 @@ QString logName;
 void IsisMain() {
   // Get user parameters
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   FileList filelist;
   if (ui.GetString("INPUTTYPE") == "LIST") {
     filelist.read(ui.GetFileName("CLIST"));
@@ -141,7 +142,7 @@ void IsisMain() {
   // throw an error
   mergePoints = ui.GetString("DUPLICATEPOINTS") == "MERGE";
 
-  ControlNet *outNet = mergeNetworks(filelist, conflictLog,
+  ControlNet *outNet = mergeNetworks(naif, filelist, conflictLog,
       ui.GetString("NETWORKID"), ui.GetString("DESCRIPTION"));
 
   // If the user wishes to report on conflicts, write them out to a file
@@ -158,7 +159,8 @@ void IsisMain() {
 }
 
 
-ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
+ControlNet * mergeNetworks(NaifContextPtr naif,
+    FileList &filelist, PvlObject &conflictLog,
     QString networkId, QString description) {
 
   if (!mergePoints) {
@@ -222,7 +224,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
   baseNet->SetNetworkId(networkId);
   baseNet->SetUserName(Isis::Application::UserName());
   baseNet->SetCreatedDate(Isis::Application::DateTime());
-  baseNet->SetModifiedDate(Isis::iTime::CurrentLocalTime());
+  baseNet->SetModifiedDate(Isis::iTime::CurrentLocalTime(naif));
   baseNet->SetDescription(description);
 
 

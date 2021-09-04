@@ -61,6 +61,7 @@ void IsisMain() {
 
   // Setup the input and make sure it is a moc file
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   Cube *icube = p.SetInputCube("FROM", OneBand);
   gbl::moc = new MocLabels(ui.GetFileName("FROM"));
 
@@ -80,7 +81,7 @@ void IsisMain() {
   // activation et is set to the largest double precision value.  If
   // The narrow angle B detectors ever get activated then the value
   // will need to be changed to the appropriate et
-  iTime startTime(gbl::moc->StartTime());
+  iTime startTime(naif, gbl::moc->StartTime());
   double etStart = startTime.Et();
   double etNABActivation = DBL_MAX;
 

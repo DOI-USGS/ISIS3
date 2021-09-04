@@ -54,7 +54,7 @@ void IsisMain() {
   const QString sumspice_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
-
+  auto naif = Application::GetNaif();
 
 
   //  Get the list of input cubes to be processed
@@ -227,9 +227,9 @@ void IsisMain() {
              << cubesum->cubeStartTime().UTC() << ","
              << cubesum->cubeCenterTime().UTC() << ","
              << cubesum->cubeStopTime().UTC() << ","
-             << iTime(cubesum->sumStartTime()).UTC() << ","
-             << iTime(cubesum->sumCenterTime()).UTC() << ","
-             << iTime(cubesum->sumStopTime()).UTC();
+             << iTime(naif, cubesum->sumStartTime()).UTC() << ","
+             << iTime(naif, cubesum->sumCenterTime()).UTC() << ","
+             << iTime(naif, cubesum->sumStopTime()).UTC();
       }
 
       lout << "\n";

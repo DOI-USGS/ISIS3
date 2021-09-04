@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong = "Hayabusa";
     m_spacecraftNameShort = "Hayabusa";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     Pvl &lab = *cube.label();
     // Get the camera characteristics
     QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["Name"];
@@ -109,7 +109,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

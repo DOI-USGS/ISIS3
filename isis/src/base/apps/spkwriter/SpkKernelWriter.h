@@ -92,7 +92,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
 
   protected:
-    int k_open(const QString &kfile, const int &comsize = 512) {
+    int k_open(NaifContextPtr naif, const QString &kfile, const int &comsize = 512) override {
       FileName kf(kfile);
       if ( kf.fileExists() ) {
         QString full_kf = kf.expanded();
@@ -100,20 +100,20 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       }
       SpiceInt  myHandle;
 
-      NaifStatus::CheckErrors();
-      spkopn_c(kf.expanded().toLatin1().data(), "USGS_SPK_FILE", comsize, &myHandle);
-      NaifStatus::CheckErrors();
+      NaifStatus::CheckErrors(naif);
+      spkopn_c(naif->get(), kf.expanded().toLatin1().data(), "USGS_SPK_FILE", comsize, &myHandle);
+      NaifStatus::CheckErrors(naif);
       return (myHandle);
     }
 
-    QString k_header(const QString &comfile = "") const;
+    QString k_header(const QString &comfile = "") const override;
 
-    void k_write(const SpiceInt &handle, const SpkKernel &kernels) {
+    void k_write(NaifContextPtr naif, const SpiceInt &handle, const SpkKernel &kernels) override {
       if ( _spkType == 9 ) {
-        kernels.Accept(WriteSpk9<SpkSegment>(handle));
+        kernels.Accept(WriteSpk9<SpkSegment>(naif, handle));
       }
       else if ( _spkType == 13 ) {
-        kernels.Accept(WriteSpk13<SpkSegment>(handle));
+        kernels.Accept(WriteSpk13<SpkSegment>(naif, handle));
       }
       else {
         setType(_spkType);
@@ -121,8 +121,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       return;
     }
 
-    void  k_close(SpiceInt &handle) {
-      if ( handle > 0 ) { spkcls_c(handle); }
+    void  k_close(NaifContextPtr naif, SpiceInt &handle) override {
+      if ( handle > 0 ) { spkcls_c(naif->get(), handle); }
       handle = 0;
     }
 
@@ -134,7 +134,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
     struct WriteSpk9 {
       typedef typename K::SVector SVector;
       typedef typename K::SMatrix SMatrix;
-      WriteSpk9(SpiceInt handle) : _handle(handle) {  }
+      WriteSpk9(NaifContextPtr naif, SpiceInt handle) : _naif(naif), _handle(handle) {  }
       virtual ~WriteSpk9() { }
       void operator()(const K &segment) const {
         SpiceInt body   = segment.BodyCode();
@@ -148,17 +148,18 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
         int nrecs = segment.size();
         segment.LoadKernelType("FK");
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(naif);
 
-        spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+        spkw09_c(naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                  segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
 
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(naif);
         segment.UnloadKernelType("FK");
         return;
       }
       private:
         SpiceInt _handle;
+        NaifContextPtr _naif;
     };
 
     template <class K>
@@ -166,7 +167,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       typedef typename K::SVector SVector;
       typedef typename K::SMatrix SMatrix;
 
-      WriteSpk13(SpiceInt handle) : _handle(handle) { }
+      WriteSpk13(NaifContextPtr naif, SpiceInt handle) : _naif(naif), _handle(handle) { }
       virtual ~WriteSpk13() { }
       void operator()(const K &segment) const {
         // Collect frames
@@ -183,16 +184,17 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
-        NaifStatus::CheckErrors();
-        spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+        NaifStatus::CheckErrors(naif);
+        spkw13_c(naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                  segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(naif);
         segment.UnloadKernelType("FK");
         return;
       }
 
       private:
         SpiceInt _handle;
+        NaifContextPtr _naif;
     };
 
 };

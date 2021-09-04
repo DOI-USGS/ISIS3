@@ -80,7 +80,7 @@ namespace Isis {
       }
     }
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     SetFocalLength(focalLength);
     SetPixelPitch();
@@ -89,14 +89,14 @@ namespace Isis {
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime((QString)inst["StartTime"]).Et();
+    double et = iTime(naif(), (QString)inst["StartTime"]).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
 
     //correct time for center of exposure duration
-    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
+    iTime centerTime(naif(), shuttertimes.first.Et() + exposureDuration / 2.0);
 
     // Setup detector map
     int summingMode = inst["SummingMode"];
@@ -120,7 +120,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   /**

@@ -131,7 +131,7 @@ namespace Isis {
     // Set initial start time always (label start time is inaccurate)
 
     if (!m_is1BCalibrated){
-      setTime(iTime(startTime())); 
+      setTime(iTime(naif(), startTime())); 
     }
 
     //  Now check to determine if we have a cache already.  If we have a cache
@@ -361,7 +361,7 @@ namespace Isis {
      // Compute the optical mirror angle
      double mirrorSin = trec["M_MIRROR_SIN_HK"];
      double mirrorCos = trec["M_MIRROR_COS_HK"];
-     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
+     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c(naif()->get());
      double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
      optAng /= 1000.0;
 
@@ -485,6 +485,8 @@ namespace Isis {
     SpiceDouble m[3][3];
     SpiceDouble q_av[7], *av(&q_av[4]);
 
+    auto n = naif()->get();
+
     for (int i = 0 ; i < nlines ; i++) {
       int index = min(i, nlines-1);
       double etTime = m_mirrorData[index].m_scanLineEt;  // mid exposure ET
@@ -495,12 +497,12 @@ namespace Isis {
 
         // Set rotation of optical scan mirror (in radians)
         eulang[1] = -optAng;
-        eul2xf_c(eulang, 1, 2, 3, xform);
-        mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
+        eul2xf_c(n, eulang, 1, 2, 3, xform);
+        mxmg_c(n, xform, &state[0][0], 6, 6, 6, xform2);
 
         // Transform to output format
-        xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
-        m2q_c(m, q_av);          // Transfers quaternion
+        xf2rav_c(n, xform2, m, av);  // Transfers AV to output q_av via pointer
+        m2q_c(n, m, q_av);          // Transfers quaternion
 
         //  Now populate the table record with the line pointing
         for (int k = 0 ; k < nvals ; k++) {
@@ -537,7 +539,7 @@ namespace Isis {
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
-    ident_c(identity);
+    ident_c(n, identity);
 
     //  Store DAWN_VIR_{ID}_ZERO -> DAWN_VIR_{ID}_ZERO identity rotation
     PvlKeyword crot("ConstantRotation");
@@ -574,21 +576,22 @@ namespace Isis {
                                                          const double &etTime)
                                                          const {
     SMatrix state(6,6);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
+    auto n = naif()->get();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+      sxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
-      NaifStatus::CheckErrors();
+      NaifStatus::CheckErrors(naif());
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+        pxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(naif());
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
-        rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
+        rav2xf_c(n, (SpiceDouble (*)[3]) rot[0], av,
                  (SpiceDouble (*)[6]) state[0]);
       }
       catch (IException &ie2) {

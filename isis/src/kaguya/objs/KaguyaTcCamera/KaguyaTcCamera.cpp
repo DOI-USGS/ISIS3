@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong  = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Get the camera characteristics
     SetFocalLength();
     SetPixelPitch();
@@ -103,7 +103,7 @@ namespace Isis {
 
     setTime(time);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   //! Destroys the KaguyaTcCamera object.

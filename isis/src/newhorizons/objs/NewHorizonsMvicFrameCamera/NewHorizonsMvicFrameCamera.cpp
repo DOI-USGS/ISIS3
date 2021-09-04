@@ -56,7 +56,7 @@ namespace Isis {
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     SetFocalLength();
     SetPixelPitch();
@@ -71,7 +71,7 @@ namespace Isis {
     double offset = 0.125;
     m_etStart = getClockTime(stime).Et() + offset;
     SpiceChar utc[30];
-    et2utc_c(m_etStart, "ISOC", 3, 30, utc);
+    et2utc_c(naif()->get(), m_etStart, "ISOC", 3, 30, utc);
 //  qDebug()<<"\n\nspacecraftClockStartCount + "<<offset<<" (offset) = "<<utc;
 
     // If bands have been extracted from the original image then we
@@ -117,7 +117,7 @@ namespace Isis {
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 
@@ -135,12 +135,12 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    iTime time(m_utcTime[vband-1]);
+    iTime time(naif(), m_utcTime[vband-1]);
     double et = time.Et();
    
     SpiceChar utc[30];
-    et2utc_c(et, "ISOC", 3, 30, utc);
-    Camera::setTime(et);
+    et2utc_c(naif()->get(), et, "ISOC", 3, 30, utc);
+    Camera::setTime(time);
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, m_exposure);
 
     //  Set up valid band access

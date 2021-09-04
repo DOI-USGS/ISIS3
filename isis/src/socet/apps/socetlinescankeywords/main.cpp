@@ -44,6 +44,8 @@ void IsisMain() {
 
   // Get user parameters and error check
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
+  auto n = naif->get();
   QString from = ui.GetFileName("FROM");
   QString to = FileName(ui.GetFileName("TO")).expanded();
 //TO DO: UNCOMMENT THIS LINE ONCE HRSC IS WORKING IN SS
@@ -298,7 +300,7 @@ void IsisMain() {
   // time by the line rate and map the ground position into the sensor in
   // undistorted focal plane coordinates
 
-  cam->setTime(iTime(tMid + intTime));
+  cam->setTime(iTime(naif, tMid + intTime));
   double uX, uY;
   groundMap->GetXY(latCenter, lonCenter, radiusCenter, &uX, &uY);
 
@@ -416,7 +418,7 @@ void IsisMain() {
     //build the tables of values
     double et = etCenter - (((numEphem - 1) / 2) * dtEphem);
     for (int i = 0; i < numEphem; i++) {
-      cam->setTime(iTime(et));
+      cam->setTime(iTime(naif, et));
       SpiceRotation *bodyRot = cam->bodyRotation();
       vector<double> pos = bodyRot->ReferenceVector(cam->instrumentPosition()->Coordinate());
 //TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
@@ -513,7 +515,7 @@ void IsisMain() {
     // to_ephem needed by SOCET (to_ephem is relative to etCenter)
     double et = etCenter - (((numEphem - 1) / 2) * dtEphem);
     for (int i = 0; i < numEphem; i++) {
-      cam->setTime(iTime(et));
+      cam->setTime(iTime(naif, et));
       SpiceRotation *bodyRot = cam->bodyRotation();
       vector<double> pos = bodyRot->ReferenceVector(cam->instrumentPosition()->Coordinate());
 //TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
@@ -582,7 +584,7 @@ void IsisMain() {
   double et = etCenter - (((numQuaternions - 1) / 2) * dtQuat);
 
   for (int i = 0; i < numQuaternions; i++) {
-    cam->setTime(iTime(et));
+    cam->setTime(iTime(naif, et));
     vector<double> j2000ToBodyFixedMatrixVector = cam->bodyRotation()->Matrix();
     vector<double> j2000ToCameraMatrixVector = cam->instrumentRotation()->Matrix();
     double quaternion[4] = {0.0, 0.0, 0.0, 0.0};
@@ -600,9 +602,9 @@ void IsisMain() {
     }
 
     // get the quaternion
-    mxmt_c(j2000ToBodyFixedRotationMatrix, j2000ToCameraRotationMatrix,
+    mxmt_c(n, j2000ToBodyFixedRotationMatrix, j2000ToCameraRotationMatrix,
            cameraToBodyFixedRotationMatrix);
-    m2q_c(cameraToBodyFixedRotationMatrix, quaternion);
+    m2q_c(n, cameraToBodyFixedRotationMatrix, quaternion);
 
     // add the quaternion to the list of quaternions
     QList<double> quat;

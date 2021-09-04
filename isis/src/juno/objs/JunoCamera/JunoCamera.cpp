@@ -49,7 +49,7 @@ namespace Isis {
     m_spacecraftNameLong = "Juno";
     m_spacecraftNameShort = "Juno";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     // Set up the camera characteristics
     instrumentRotation()->SetFrame( CkFrameId() );
@@ -116,7 +116,7 @@ namespace Isis {
     setTime(frameStartEt + exposureDur / 2.0);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

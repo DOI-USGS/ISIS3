@@ -65,7 +65,7 @@ namespace Isis {
     m_spacecraftNameLong = "Messenger";
     m_spacecraftNameShort = "Messenger";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     
     // Set up detector constants
     // Note that Wac has filters, -236800 through -236812
@@ -243,7 +243,7 @@ namespace Isis {
     iTime centerTime = etStart + (exposureDuration / 2.0);
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

@@ -20,6 +20,7 @@ void IsisMain () {
 
   ProcessImportFits importFits;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
   importFits.setProcessFileStructure(0);
 
@@ -102,7 +103,7 @@ void IsisMain () {
   archGrp["SourceProductId"].setValue(FileName(source).baseName());
 
   //  Create YearDoy keyword in Archive group
-  iTime stime(outputLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  iTime stime(naif, outputLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
   archGrp.addKeyword(yeardoy);
   outputCube->putGroup(archGrp);

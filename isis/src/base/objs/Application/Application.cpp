@@ -747,6 +747,13 @@ namespace Isis {
   }
 
   /**
+   * Returns the default shared NAIF context.
+   */
+  NaifContextPtr Application::GetNaif() {
+    return NaifContext::ctx();
+  }
+
+  /**
    * Updates the progress bar in the gui.
    *
    * @param text Progress text

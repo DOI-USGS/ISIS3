@@ -56,7 +56,7 @@ namespace Isis {
    *                          method and added a call to the new method.
    */
   VikingCamera::VikingCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Set the pixel pitch
     SetPixelPitch(1.0 / 85.0);
 
@@ -158,6 +158,8 @@ namespace Isis {
      *           START_TIME                                                      *
      *****************************************************************************/
 
+    auto n = naif()->get();
+
     // Get clock count and convert it to a time
     QString spacecraftClock = inst["SpacecraftClockCount"];
     double etClock = getClockTime(spacecraftClock, altinstcode).Et();
@@ -167,8 +169,8 @@ namespace Isis {
 
     // Calculate and load the euler angles
     SpiceDouble CP[3][3];
-    eul2m_c((SpiceDouble)raster * rpd_c(), (SpiceDouble)cone * rpd_c(),
-            (SpiceDouble) - crosscone * rpd_c(), 3, 2, 1, CP);
+    eul2m_c(n, (SpiceDouble)raster * rpd_c(n), (SpiceDouble)cone * rpd_c(n),
+            (SpiceDouble) - crosscone * rpd_c(n), 3, 2, 1, CP);
 
     //    LoadEulerMounting(CP);
 
@@ -177,8 +179,8 @@ namespace Isis {
     // find center shutter time
     double centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
     char timepds[25];
-    et2utc_c(centerTime, "ISOC", 3, 25, timepds);
-    utc2et_c(timepds, &centerTime);
+    et2utc_c(n, centerTime, "ISOC", 3, 25, timepds);
+    utc2et_c(n, timepds, &centerTime);
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -196,9 +198,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
+    setTime(iTime(naif(), centerTime));
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   
@@ -224,7 +226,6 @@ namespace Isis {
    */
   pair<iTime, iTime> VikingCamera::ShutterOpenCloseTimes(double time,
                                                          double exposureDuration) {
-    pair<iTime, iTime> shuttertimes;
     double offset1;
     if (exposureDuration <= .420) {
       offset1 = 7.0 / 8.0 * 4.48;    //4.48 seconds = nomtick
@@ -234,9 +235,12 @@ namespace Isis {
     }
     double offset2 = 1.0 / 64.0 * 4.48;
 
-    // set private variables inherited from Spice class
-    shuttertimes.first = time + offset1 + offset2;
-    shuttertimes.second = shuttertimes.first.Et() + exposureDuration;
+    pair<iTime, iTime> shuttertimes {
+      // set private variables inherited from Spice class
+      iTime(naif(), time + offset1 + offset2),
+      iTime(naif(), shuttertimes.first.Et() + exposureDuration)
+    };
+
     return shuttertimes;
   }
 }

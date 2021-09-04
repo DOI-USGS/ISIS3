@@ -25,6 +25,7 @@
  *   $Id$
  */
 #include <QString>
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -60,8 +61,8 @@ class CkSpiceSegment;
  */
 class CkKernelWriter {
   public:
-    CkKernelWriter();
-    CkKernelWriter(const QString &kfile, const int &csize = 0,
+    CkKernelWriter(NaifContextPtr naif);
+    CkKernelWriter(NaifContextPtr naif, const QString &kfile, const int &csize = 0,
                    const int &cktype = 3);
     virtual ~CkKernelWriter() { close(); }
 
@@ -87,7 +88,9 @@ class CkKernelWriter {
     int          _comSize;
     mutable unsigned int _comCharsWritten;
 
-    void init();
+    NaifContext * _naif;
+
+    void init(NaifContextPtr naif);
     bool writeComment(const QString &comment) const;
     void writeCk1(const CkSpiceSegment &segment) const;
     void writeCk2(const CkSpiceSegment &segment) const;

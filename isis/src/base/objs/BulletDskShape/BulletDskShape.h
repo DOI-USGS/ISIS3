@@ -42,7 +42,7 @@ namespace Isis {
   class BulletDskShape : public BulletTargetShape {
     public:
       BulletDskShape();
-      BulletDskShape(const QString &dskfile);
+      BulletDskShape(NaifContextPtr naif, const QString &dskfile);
       virtual ~BulletDskShape();
 
       int getNumTriangles() const;
@@ -59,7 +59,7 @@ namespace Isis {
                                                               and this uses 0-based indexing. */
 
       // Custom DSK reader
-      void loadFromDsk(const QString &dskfile);
+      void loadFromDsk(NaifContextPtr naif, const QString &dskfile);
 
   };
 

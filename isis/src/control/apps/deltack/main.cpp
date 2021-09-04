@@ -37,14 +37,16 @@ using namespace Isis;
 Distance GetRadius(QString filename, Latitude lat, Longitude lon);
 BundleSettingsQsp bundleSettings();
 
-void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3][3]);
-void ApplyRotation(const double R[3][3], Table &ckTable);
+void Vector2VectorRotation(NaifContextPtr naif, const double v1[3], const double v2[3], double rmat[3][3]);
+void ApplyRotation(NaifContextPtr naif, const double R[3][3], Table &ckTable);
 void printMatrix(const SpiceDouble m[3][3]);
 
 
 void IsisMain() {
   Progress progress;  
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
+  auto n = naif->get();
   QString filename = ui.GetFileName("FROM");
   //ControlNet m_cnet(ui.GetFileName("NET"),&progress);
   //QList<ControlPoint *> cntrlPts = m_cnet.GetPoints();
@@ -145,7 +147,7 @@ void IsisMain() {
 
       // Compute vector from S/C position 1 to surface point 2
       vector<double> scpt2(3);
-      vsub_c( pt2, scpos1, &scpt2[0]);
+      vsub_c( n, pt2, scpos1, &scpt2[0]);
 
       vector<double> ldir1, ldir2;
       ldir1 = v_cam->bodyRotation()->J2000Vector(scpt1);
@@ -153,12 +155,12 @@ void IsisMain() {
 
 
       // Compute angle difference of update
-      double j2kAngle = vsep_c(&ldir1[0], &ldir2[0]);
-      results += PvlKeyword("AdjustedAngle", toString(j2kAngle * dpr_c()), "degrees");
+      double j2kAngle = vsep_c(n, &ldir1[0], &ldir2[0]);
+      results += PvlKeyword("AdjustedAngle", toString(j2kAngle * dpr_c(n)), "degrees");
 
       // Compute rotation of vectors
       SpiceDouble R[3][3];
-      Vector2VectorRotation(&ldir1[0], &ldir2[0], R);
+      Vector2VectorRotation(naif, &ldir1[0], &ldir2[0], R);
 
       // Ok, now retrieve the pointing table (quaternions) and apply the offset
       Table o_cmat = v_cam->instrumentRotation()->Cache("InstrumentPointing");
@@ -168,7 +170,7 @@ void IsisMain() {
 
       // Four or more fields indicates we have quaterions stored in the table
       if ( nfields > 3 ) {
-        ApplyRotation(R, o_cmat);
+        ApplyRotation(naif, R, o_cmat);
       }
       // We have three fields which indicates euler angle polynimials. We must
       // handle this differently.
@@ -185,7 +187,7 @@ void IsisMain() {
         // Get the line cache and apply rotation using that cache. Then refit
         // to polynomials
         Table lcache = v_cam->instrumentRotation()->LineCache(o_cmat.Name());
-        ApplyRotation(R, lcache);
+        ApplyRotation(naif, R, lcache);
         v_cam->instrumentRotation()->LoadCache(lcache);
         v_cam->instrumentRotation()->SetPolynomial();
         o_cmat = v_cam->instrumentRotation()->Cache("InstrumentPointing");
@@ -193,7 +195,7 @@ void IsisMain() {
       
       // Write out a description in the spice table
       results += PvlKeyword("RecordsUpdated", toString(o_cmat.Records()));
-      QString deltackComment = "deltackDirectAdjusted = " + Isis::iTime::CurrentLocalTime();
+      QString deltackComment = "deltackDirectAdjusted = " + Isis::iTime::CurrentLocalTime(naif);
       o_cmat.Label().addComment(deltackComment);
 
       // Write out the updated pointing dataset
@@ -278,7 +280,7 @@ void IsisMain() {
 
 
       // Write out a description in the spice table
-      QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
+      QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime(naif);
       cmatrix.Label().addComment(deltackComment);
       //PvlKeyword description("Description");
       //description = "Camera pointing updated via deltack application";
@@ -424,27 +426,29 @@ BundleSettingsQsp bundleSettings() {
  * @param v2  Desired vector of rotation
  * @param rmat  Returns 3x3 rotation matrix to rotate v1 -> v2
  */
-void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3][3]) {
+void Vector2VectorRotation(NaifContextPtr naif, const double v1[3], const double v2[3], double rmat[3][3]) {
+
+  auto n = naif->get();
 
   // Compute cross and dot products to get theta and skew matrix
   SpiceDouble x[3];
-  vcrss_c(v1, v2, x);
+  vcrss_c(n, v1, v2, x);
 
-  SpiceDouble xnorm  = vnorm_c(x);
-  vscl_c(1.0/xnorm, x, x);
+  SpiceDouble xnorm  = vnorm_c(n, x);
+  vscl_c(n, 1.0/xnorm, x, x);
 
   // Compute theta angle using dot product
-  SpiceDouble theta = std::acos( vdot_c(v1, v2) / (vnorm_c(v1) * vnorm_c(v2)) );
+  SpiceDouble theta = std::acos( vdot_c(n, v1, v2) / (vnorm_c(n, v1) * vnorm_c(n, v2)) );
 
   // If there is no separation angle (i.e., vectors are the same), return identity
   if ( qFuzzyCompare( 1.0 + theta, 1.0 + 0.0) ) {
-    ident_c ( rmat );
+    ident_c ( n, rmat );
     return;
   }
   
   // Need identity matrix
   SpiceDouble I[3][3];
-  ident_c ( I );
+  ident_c ( n, I );
 
   // Skew-symmetric matrix A corresponding to x
   SpiceDouble A[3][3] = { 
@@ -455,21 +459,21 @@ void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3
 
   // Scale skew matrix by sin(theta)
   SpiceDouble sinTA[3][3];
-  vsclg_c(std::sin(theta), A, 9, (SpiceDouble( *)) sinTA[0]);
+  vsclg_c(n, std::sin(theta), A, 9, (SpiceDouble( *)) sinTA[0]);
 
   // Compute A^2
   SpiceDouble A2[3][3];
-  mxm_c(A, A, A2);
+  mxm_c(n, A, A, A2);
 
   SpiceDouble cosTA2[3][3];
-  vsclg_c((1.0 - std::cos(theta)), A2, 9, (SpiceDouble( *)) cosTA2[0]);
+  vsclg_c(n, (1.0 - std::cos(theta)), A2, 9, (SpiceDouble( *)) cosTA2[0]);
 
   // Compute R
-  vaddg_c(I, sinTA, 9, (SpiceDouble( *)) rmat[0]);
-  vaddg_c(rmat, cosTA2, 9, (SpiceDouble( *)) rmat[0]);
+  vaddg_c(n, I, sinTA, 9, (SpiceDouble( *)) rmat[0]);
+  vaddg_c(n, rmat, cosTA2, 9, (SpiceDouble( *)) rmat[0]);
 
   // Invert for the proper rotation
-  invert_c(rmat, rmat);
+  invert_c(n, rmat, rmat);
   return;
 }
 
@@ -488,7 +492,9 @@ void Vector2VectorRotation(const double v1[3], const double v2[3], double rmat[3
  * @param R     The constant angular pointing matrix that will be applied
  * @param table Instrument pointing table containing quaternions
  */
-void ApplyRotation(const double R[3][3], Table &table) {
+void ApplyRotation(NaifContextPtr naif, const double R[3][3], Table &table) {
+
+  auto n = naif->get();
 
   // Sanity check...
   if ( table[0].Fields() < 4 ) {
@@ -512,7 +518,7 @@ void ApplyRotation(const double R[3][3], Table &table) {
     std::vector<double> CJ = q.ToMatrix();
 
     // Apply the constant offset
-    mxm_c( (SpiceDouble( *)[3]) &CJ[0], R, (SpiceDouble( *)[3]) &CJ[0] );
+    mxm_c( n, (SpiceDouble( *)[3]) &CJ[0], R, (SpiceDouble( *)[3]) &CJ[0] );
 
     // Reassign the updated matrix and covert back to quaternion
     q.Set( CJ );

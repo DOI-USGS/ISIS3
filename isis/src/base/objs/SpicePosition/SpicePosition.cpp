@@ -28,7 +28,7 @@ namespace Isis {
    * @param targetCode Valid naif body name.
    * @param observerCode Valid naif body name.
    */
-  SpicePosition::SpicePosition(int targetCode, int observerCode) {
+  SpicePosition::SpicePosition(NaifContextPtr naif, int targetCode, int observerCode) : m_naif(naif) {
     init(targetCode, observerCode, false);
   }
 
@@ -61,8 +61,9 @@ namespace Isis {
  * @param swapObserverTarget True indicates implement the observer/target swap,
  *                             false will invoke preexisting behavior
  */
-  SpicePosition::SpicePosition(int targetCode, int observerCode,
-                               bool swapObserverTarget) {
+  SpicePosition::SpicePosition(NaifContextPtr naif,
+                               int targetCode, int observerCode,
+                               bool swapObserverTarget) : m_naif(naif) {
     init(targetCode, observerCode, swapObserverTarget);
   }
 
@@ -242,7 +243,7 @@ namespace Isis {
    *                      to make software more readable.
    */
   const std::vector<double> &SpicePosition::SetEphemerisTime(double et) {
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
 
     // Save the time
     if(et == p_et) return p_coordinate;
@@ -265,7 +266,7 @@ namespace Isis {
       SetEphemerisTimeSpice();
     }
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
 
     // Return the coordinate
     return p_coordinate;
@@ -702,7 +703,7 @@ namespace Isis {
    *                        to allow all function types (>=HermiteCache)
    */
   void SpicePosition::ReloadCache() {
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
 
     // Save current et
     double et = p_et;
@@ -747,7 +748,7 @@ namespace Isis {
     p_et = -DBL_MAX;
     SetEphemerisTime(et);
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
   }
 
 
@@ -1926,25 +1927,27 @@ namespace Isis {
                                          double state[6], bool &hasVelocity,
                                          double &lightTime) const {
 
+    auto naif = m_naif->get();
+
     // First try getting the entire state (including the velocity vector)
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
     hasVelocity = true;
     lightTime = 0.0;
-    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
+    spkez_c(naif, (SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
             abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
 
     // If Naif fails attempting to get the entire state, assume the velocity vector is
     // not available and just get the position.  First turn off Naif error reporting and
     // return any error without printing them.
-    SpiceBoolean spfailure = failed_c();
-    reset_c();                   // Reset Naif error system to allow caller to recover
+    SpiceBoolean spfailure = failed_c(naif);
+    reset_c(naif);                   // Reset Naif error system to allow caller to recover
     if ( spfailure ) {
       hasVelocity = false;
       lightTime = 0.0;
-      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
+      spkezp_c(naif, (SpiceInt) target, (SpiceDouble) et, refFrame.toLatin1().data(),
                abcorr.toLatin1().data(), (SpiceInt) observer, state, &lightTime);
     }
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
     return;
   }
 
@@ -1994,8 +1997,9 @@ namespace Isis {
     // Negate vectors if swap of observer target is requested so interface
     // remains consistent
     if (m_swapObserverTarget) {
-      vminus_c(&p_velocity[0],   &p_velocity[0]);
-      vminus_c(&p_coordinate[0], &p_coordinate[0]);
+      auto naif = m_naif->get();
+      vminus_c(naif, &p_velocity[0],   &p_velocity[0]);
+      vminus_c(naif, &p_coordinate[0], &p_coordinate[0]);
     }
 
     return;

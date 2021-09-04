@@ -45,8 +45,8 @@ namespace Isis {
 
 
   /** Initialize  */
-SpkSpiceSegment::SpkSpiceSegment() {
-  init();
+SpkSpiceSegment::SpkSpiceSegment(NaifContextPtr naif) {
+  init(naif);
 }
 
 /** Initialize with a cube extracting BLOB content */
@@ -108,12 +108,12 @@ int SpkSpiceSegment::UnloadKernelType(const QString &ktypes) const {
 void SpkSpiceSegment::init(Cube &cube) {
 
   _kernels.UnLoad();  // Unload all active, owned kernels
-  init();            // Init local variables
+  init(cube.naif());  // Init local variables
 
   _fname = cube.fileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(_naif);
   try {
 
     // Order is somewhat important here.  The call to initialize Kernels
@@ -182,7 +182,8 @@ QString SpkSpiceSegment::getKeyValue(PvlObject &label,
  * binaries are 0 and the Kernels object is cleared.
  *
  */
-void SpkSpiceSegment::init() {
+void SpkSpiceSegment::init(NaifContextPtr naif) {
+  _naif = NaifContext::UseDefaultIfNull(naif);
   _name = _fname = _instId = _target = "";
   _startTime = _endTime = 0.0;
   _utcStartTime = _utcEndTime = "";
@@ -355,14 +356,15 @@ void SpkSpiceSegment::setEndTime(double et) {
  */
 QString SpkSpiceSegment::getNaifName(int naifid) const {
   SpiceChar naifBuf[40];
+  auto n = _naif->get();
 
-  NaifStatus::CheckErrors();
-  frmnam_c ( (SpiceInt) naifid, sizeof(naifBuf), naifBuf);
+  NaifStatus::CheckErrors(_naif);
+  frmnam_c ( n, (SpiceInt) naifid, sizeof(naifBuf), naifBuf);
   string cframe(naifBuf);
 
   if ( cframe.empty() ) {
     SpiceBoolean found;
-    bodc2n_c((SpiceInt) naifid, sizeof(naifBuf), naifBuf, &found);
+    bodc2n_c(n, (SpiceInt) naifid, sizeof(naifBuf), naifBuf, &found);
     if ( found ) cframe = naifBuf;
   }
 
@@ -375,7 +377,7 @@ QString SpkSpiceSegment::getNaifName(int naifid) const {
   //  throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
   }
 
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(_naif);
   return (cframe.c_str());
 }
 
@@ -384,9 +386,9 @@ QString SpkSpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
 
-  NaifStatus::CheckErrors();
-  et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(_naif);
+  et2utc_c(_naif->get(), et, "ISOC", 3, UTCLEN, utcout);
+  NaifStatus::CheckErrors(_naif);
 
   return (QString(utcout));
 }
@@ -395,9 +397,9 @@ QString SpkSpiceSegment::toUTC(const double &et) const {
 double SpkSpiceSegment::UTCtoET(const QString &utc) const {
   SpiceDouble et;
 
-  NaifStatus::CheckErrors();
-  utc2et_c(utc.toLatin1().data(), &et);
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(_naif);
+  utc2et_c(_naif->get(), utc.toLatin1().data(), &et);
+  NaifStatus::CheckErrors(_naif);
 
   return (et);
 }

@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
     SetPixelPitch();
@@ -106,7 +106,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 }
 

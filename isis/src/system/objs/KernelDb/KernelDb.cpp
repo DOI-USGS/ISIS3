@@ -397,8 +397,8 @@ namespace Isis {
     }
 
     // Get the start and end time for the cube
-    iTime start;
-    iTime end;
+    iTime start(&m_naif);
+    iTime end(&m_naif);
 
     if (cube.hasGroup("Instrument")) {
       start = (QString) cube.findGroup("Instrument")["StartTime"];
@@ -487,8 +487,8 @@ namespace Isis {
 
                 if (!key.isNamed("Time")) continue;
 
-                iTime timeRangeStart((QString)key[0]);
-                iTime timeRangeEnd((QString)key[1]);
+                iTime timeRangeStart(&m_naif, (QString)key[0]);
+                iTime timeRangeEnd(&m_naif, (QString)key[1]);
 
                 bool thisEndMatches = matches(lab, endTimeGrp,
                                               timeRangeEnd, cameraVersion);
@@ -594,6 +594,8 @@ namespace Isis {
     bool matchTime = !grp.hasKeyword("Time");
     bool matchKeywords = true;
 
+    auto naif = timeToMatch.naif();
+
     // First, the time search. Loop through the keywords, if the name isn't
     //  Time then skip it. If it is, then get the start/end times and keep
     //  looking until one is found.
@@ -602,8 +604,8 @@ namespace Isis {
 
       if (key.isNamed("Time")) {
         // Pull the selections start and end time out
-        iTime kernelStart = (QString) key[0];
-        iTime kernelEnd   = (QString) key[1];
+        iTime kernelStart(naif, (QString) key[0]);
+        iTime kernelEnd  (naif, (QString) key[1]);
 
         // If the kernel times inside of the requested times we
         // set the matchTime to be true.
@@ -813,7 +815,7 @@ namespace Isis {
           PvlGroup &grp = inst.group(groupIndex);
           // Only add files in Selection groups with matching intrument id
           if (grp.isNamed("Selection")
-              && KernelDb::matches(lab, grp, iTime(), 1)) {
+              && KernelDb::matches(lab, grp, iTime(&m_naif), 1)) {
             foundMatch = true;
             // add each File keywords in the matching group to the list
             for (int keyIndex = 0; keyIndex < grp.keywords(); keyIndex++) {

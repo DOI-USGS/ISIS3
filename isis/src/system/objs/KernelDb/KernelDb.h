@@ -165,6 +165,8 @@ namespace Isis {
       Pvl m_kernelData; /**< Pvl containing the information in the kernel
                              database(s) that is read in from the constructor
                              and whenever the loadSystemDb() method is called.*/
+
+      NaifContext m_naif;
   };
 };
 

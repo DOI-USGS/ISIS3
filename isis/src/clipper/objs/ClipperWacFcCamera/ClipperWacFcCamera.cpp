@@ -51,7 +51,7 @@ namespace Isis {
     m_instrumentNameLong  = "Europa Imaging System Framing Wide Angle Camera";
     m_instrumentNameShort = "EIS-FWAC";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     SetFocalLength(); 
     SetPixelPitch();
@@ -68,16 +68,16 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString startTime = inst["StartTime"];
-    iTime etStart(startTime);
+    iTime etStart(naif(), startTime);
 
     // double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
     // pair<iTime, iTime> startStop = ShutterOpenCloseTimes(et, exposureDuration);
 
-     setTime(etStart.Et()); // Set the time explicitly for now to prevent segfault
+     setTime(etStart); // Set the time explicitly for now to prevent segfault
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
   /**

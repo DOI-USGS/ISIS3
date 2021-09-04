@@ -53,7 +53,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Odyssey";
     m_spacecraftNameShort = "Odyssey";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Set up the camera characteristics
     // LoadFrameMounting("M01_SPACECRAFT","M01_THEMIS_VIS");
     // Changed Focal Length from 203.9 (millimeters????) to 202.059, per request from
@@ -120,7 +120,7 @@ namespace Isis {
     new CameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
   
 

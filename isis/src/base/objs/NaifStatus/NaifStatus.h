@@ -36,7 +36,7 @@ namespace Isis {
    */
   class NaifStatus {
     public:
-      static void CheckErrors(bool resetNaif = true);
+      static void CheckErrors(NaifContextPtr naif, bool resetNaif = true);
   };
 };
 

@@ -62,8 +62,8 @@ namespace Isis {
    */
   class MocLabels {
     public:
-      MocLabels(Cube &cube);
-      MocLabels(const QString &file);
+      MocLabels(Cube &cube, NaifContextPtr naif);
+      MocLabels(const QString &file, NaifContextPtr naif);
       //! Empty destructor.
       ~MocLabels() {};
 
@@ -166,7 +166,7 @@ namespace Isis {
       double Offset(int line = 1);
 
     private:
-      void Init(Cube &cube);
+      void Init(Cube &cube, NaifContextPtr naif);
       void ReadLabels(Cube &cube);
       void ValidateLabels();
       void Compute();
@@ -220,6 +220,8 @@ namespace Isis {
 
       FileName p_lsk;
       FileName p_sclk;
+
+      NaifContextPtr m_naif;
   };
 };
 #endif

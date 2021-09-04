@@ -56,7 +56,7 @@ namespace Isis {
     m_spacecraftNameLong = "Rosetta";
     m_spacecraftNameShort = "Rosetta";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -124,12 +124,12 @@ namespace Isis {
     focalMap->SetDetectorOrigin(referenceSample, referenceLine);
     distortionMap->setBoresight(referenceSample, referenceLine);
 
-    iTime centerTime = start + (exposureTime / 2.0);
+    iTime centerTime(naif(), start + (exposureTime / 2.0));
     setTime( centerTime );
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     return;
   }

@@ -31,6 +31,7 @@
 
 #include "Table.h"
 #include "PolynomialUnivariate.h"
+#include "NaifContext.h"
 
 #include <nlohmann/json.hpp>
 
@@ -197,7 +198,7 @@ namespace Isis {
                     //                table and adding nth degree polynomial
                   };
 
-      SpicePosition(int targetCode, int observerCode);
+      SpicePosition(NaifContextPtr naif, int targetCode, int observerCode);
 
       //! Destructor
       virtual ~SpicePosition();
@@ -303,7 +304,7 @@ namespace Isis {
 
       //======================================================================
       // New methods support for light time correction and swap of observer/target
-      SpicePosition(int targetCode, int observerCode, bool swapObserverTarget);
+      SpicePosition(NaifContextPtr naif, int targetCode, int observerCode, bool swapObserverTarget);
       int getObserverCode() const;
       int getTargetCode() const;
       double getAdjustedEphemerisTime() const;
@@ -364,6 +365,8 @@ namespace Isis {
       // Variables support observer/target swap and light time correction
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
+
+      NaifContextPtr m_naif;
   };
 };
 

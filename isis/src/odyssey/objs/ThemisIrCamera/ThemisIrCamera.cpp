@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Odyssey";
     m_spacecraftNameShort = "Odyssey";
     
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     // Set the detector size
     SetPixelPitch(0.05);
     SetFocalLength(203.9213);
@@ -116,7 +116,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

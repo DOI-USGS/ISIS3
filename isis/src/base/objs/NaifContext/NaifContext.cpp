@@ -27,85 +27,20 @@
 
 namespace Isis {
 
-  thread_local NaifContext* NaifContext::m_self = nullptr;
+  static NaifContext static_global_state;
 
-  void NaifContext::createForThread() {
-    if (m_self)
-      throw std::runtime_error("NaifContext already created for thread!");
-      
-    m_self = new NaifContext();
+  NaifContext::CSpiceState::CSpiceState() : m_state(cspice_alloc(), &cspice_free) {}
+  NaifContext::CSpiceState::CSpiceState(const CSpiceState &src) : m_state(cspice_copy(src.m_state.get()), &cspice_free) {}
+
+  NaifContext::NaifContext()
+    : m_cspice()
+    , naifStatusInitialized(false), iTimeInitialized(false), targetPckLoaded(false)
+    , amicaTimingLoaded(false), hayabusaTimingLoaded(false), mdisTimingLoaded(false)
+    , mocWagoLoaded(false), hiJitCubeLoaded(false), hiCalTimingLoaded(false)
+  {
   }
+
+  NaifContext *NaifContext::ctx() { return &static_global_state; }
+  void        *NaifContext::ctx() { return static_global_state(); }
   
-  void NaifContext::destroyForThread() {
-    if (!m_self)
-      throw std::runtime_error("NaifContext doesn't exist for thread!");
-      
-    delete m_self;
-    m_self = nullptr;
-  }
-
-  NaifContext::NaifContext() {
-    cspice_init();
-
-    boost::shared_ptr<void> initial_cspice(cspice_save(), &cspice_free);
-    NaifSnapshot::IsisState initial_isis;
-    boost::shared_ptr<NaifSnapshot> initial_state = boost::make_shared<NaifSnapshot>(initial_cspice, initial_isis);
-    push(initial_state);
-  }
-
-  NaifContext::~NaifContext() {
-    pop();
-    cspice_shutdown();
-  }
-  
-  void NaifContext::push(boost::shared_ptr<NaifSnapshot>& snapshot) {
-    m_stack.push(snapshot);
-    cspice_push(snapshot->naifState().get());
-  }
-  
-  void NaifContext::push_copy(boost::shared_ptr<NaifSnapshot>& snapshot) {
-    boost::shared_ptr<NaifSnapshot> copy = boost::make_shared<NaifSnapshot>(*snapshot);
-    m_stack.push(copy);
-    cspice_push(copy->naifState().get());  
-  }
-      
-  boost::shared_ptr<NaifSnapshot> NaifContext::pop() {
-    cspice_pop();
-    auto r = m_stack.top();
-    m_stack.pop();
-
-    return r;
-  }
-
-
-  NaifSnapshot::NaifSnapshot() 
-    : m_naif(cspice_save(), &cspice_free)
-    , m_isis(NaifContext::get()->top()->m_isis) 
-    {}
-  NaifSnapshot::NaifSnapshot(boost::shared_ptr<void> naif, IsisState& isis)
-    : m_naif(naif)
-    , m_isis(isis)
-    {}
-  NaifSnapshot::NaifSnapshot(const NaifSnapshot &src) 
-    : m_naif(cspice_copy(src.m_naif.get()), &cspice_free)
-    , m_isis(src.m_isis)
-    {}
-
-
-  PushNaifSnapshot::PushNaifSnapshot(boost::shared_ptr<NaifSnapshot> snapshot) {
-    NaifContext::get()->push(snapshot);
-  }
-
-  PushNaifSnapshot::~PushNaifSnapshot() {
-    NaifContext::get()->pop();
-  }
-
-
-  PushNaifSnapshotCopy::PushNaifSnapshotCopy(boost::shared_ptr<NaifSnapshot> snapshot) {
-    NaifContext::get()->push_copy(snapshot);
-  }
-
-  PushNaifSnapshotCopy::~PushNaifSnapshotCopy() {
-    NaifContext::get()->pop();
-  }
 }

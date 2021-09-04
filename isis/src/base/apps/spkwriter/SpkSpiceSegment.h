@@ -67,7 +67,7 @@ class SpkSpiceSegment {
     typedef TNT::Array1D<SpiceDouble> SVector;       //!<  1-D Buffer
     typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
 
-    SpkSpiceSegment();
+    SpkSpiceSegment(NaifContextPtr naif);
     SpkSpiceSegment(Cube &cube);
     virtual ~SpkSpiceSegment() { }
 
@@ -134,8 +134,10 @@ class SpkSpiceSegment {
     QString _utcStartTime; //  Need to store these as conversion from ET
     QString _utcEndTime;   //  requires leap seconds kernel
 
+    NaifContextPtr _naif;
+
     mutable Kernels _kernels;  // Kernel manager
-    void init();
+    void init(NaifContextPtr naif);
 
 };
 

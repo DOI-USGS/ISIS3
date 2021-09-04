@@ -29,6 +29,7 @@
 
 #include "IsisBullet.h"
 #include "BulletClosestRayCallback.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -55,9 +56,9 @@ namespace Isis {
       QString name() const;
 
       // Special constructors
-      static BulletTargetShape *load(const QString &dem, const Pvl *conf = 0);
+      static BulletTargetShape *load(NaifContextPtr naif, const QString &dem, const Pvl *conf = 0);
       static BulletTargetShape *loadPC(const QString &dem, const Pvl *conf = 0);
-      static BulletTargetShape *loadDSK(const QString &dem, const Pvl *conf = 0);
+      static BulletTargetShape *loadDSK(NaifContextPtr naif, const QString &dem, const Pvl *conf = 0);
       static BulletTargetShape *loadCube(const QString &dem, const Pvl *conf = 0);
 
       void writeBullet(const QString &btName) const;

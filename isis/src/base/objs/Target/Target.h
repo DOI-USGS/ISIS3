@@ -102,10 +102,10 @@ namespace Isis {
       std::vector<Angle> poleDecCoefs();
       std::vector<Angle> pmCoefs();
 
-      static SpiceInt lookupNaifBodyCode(QString name);
+      static SpiceInt lookupNaifBodyCode(NaifContextPtr naif, QString name);
       // Static conversion methods
-      static PvlGroup radiiGroup(QString target);
-      static PvlGroup radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup);
+      static PvlGroup radiiGroup(NaifContextPtr naif, QString target);
+      static PvlGroup radiiGroup(NaifContextPtr naif, Pvl &cubeLab, const PvlGroup &mapGroup);
 
       std::vector<double> poleRaNutPrecCoefs();
       std::vector<double> poleDecNutPrecCoefs();
@@ -115,9 +115,11 @@ namespace Isis {
       std::vector<Angle> sysNutPrecConstants();
       std::vector<Angle> sysNutPrecCoefs();
 
+      NaifContextPtr naif() const { return _naif; }
+
     private:
       SpiceInt lookupNaifBodyCode(Pvl &lab) const;
-      static PvlGroup radiiGroup(int bodyFrameCode);
+      static PvlGroup radiiGroup(NaifContextPtr naif, int bodyFrameCode);
       SpiceInt *m_bodyCode;          /**< The NaifBodyCode value, if it exists in the
                                        labels. Otherwise, if the target is sky,
                                        it's the SPK code and if not sky then it's
@@ -137,6 +139,7 @@ namespace Isis {
       //           think.
       Spice *m_spice;                /**< parent Spice object, needed to get pixel resolution in
                                        ShapeModels*/
+      NaifContextPtr m_naif;
   };
 
   typedef QSharedPointer<Target> TargetQsp;

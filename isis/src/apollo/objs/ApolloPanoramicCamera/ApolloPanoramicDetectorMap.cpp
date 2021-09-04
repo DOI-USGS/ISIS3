@@ -60,7 +60,7 @@ namespace Isis {
 
       //cout << "fiducial coordinate return from IO: " << p_detectorSample << " " << p_detectorLine << endl;
       //convert from fiducial coordinates to detector/time coordinates
-      iTime isisTime(m_etMiddle + p_detectorLine*m_lineRate);
+      iTime isisTime(p_camera->naif(), m_etMiddle + p_detectorLine*m_lineRate);
       p_camera->setTime(isisTime);
       //This declaration may cause some debate.  Regardless it seems to that
       //  since we model the motion of the camera as continuous smooth motion 

@@ -99,6 +99,7 @@ PvlGroup calibInfo;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   //load the appropriate multipliers and the correct calibration version
 
@@ -145,7 +146,7 @@ void IsisMain() {
 
   }
 
-  iTime startTime(timeString);
+  iTime startTime(naif, timeString);
   //Determine the year string to access the appropriate calibration file
   yearString= QString::number(startTime.Year() );
 

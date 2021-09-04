@@ -29,6 +29,7 @@
 #include <SpiceZmc.h>
 
 #include "FileName.h"
+#include "NaifContext.h"
 
 class QString;
 
@@ -78,15 +79,16 @@ namespace Isis {
   class iTime {
     public:
       // constructor
-      iTime();
-      iTime(const QString &time);
+      iTime(NaifContextPtr naif);
+      iTime(NaifContextPtr naif, const QString &time);
 
       /**
       * Constructs a iTime object and initializes it to the time from the argument.
       *
       * @param time An ephemeris time (ET).
       */
-      iTime(const double time) {
+      iTime(NaifContextPtr naif, const double time) {
+        Construct(naif);
         LoadLeapSecondKernel();
         p_et = time;
       }
@@ -139,17 +141,23 @@ namespace Isis {
       }
 
       QString UTC(int precision=8) const;
-      static QString CurrentGMT();
-      static QString CurrentLocalTime();
+      static QString CurrentGMT(NaifContextPtr naif = nullptr);
+      static QString CurrentLocalTime(NaifContextPtr naif = nullptr);
 
       void setEt(double et);
       void setUtc(QString utcString);
+
+      NaifContextPtr naif() const { return p_naif; }
 
     private:
       double p_et;     /**<The ephemeris representaion of the original string
                            passed into the constructor or the operator= member*/
 
+      NaifContextPtr p_naif;
+
       void LoadLeapSecondKernel();
+
+      void Construct(NaifContextPtr naif);
   };
 };
 

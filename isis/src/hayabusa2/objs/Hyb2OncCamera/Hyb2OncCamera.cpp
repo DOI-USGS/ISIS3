@@ -68,7 +68,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     SetFocalLength();  // Retrives from IK stored in units of mm
     SetPixelPitch();  // Get from IAK
@@ -111,7 +111,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

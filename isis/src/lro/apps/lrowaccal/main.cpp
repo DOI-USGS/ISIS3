@@ -62,6 +62,7 @@ Buffer *g_darkCube1, *g_darkCube2, *g_flatCube, *g_specpixCube;
 void IsisMain () {
   ResetGlobals();
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   ProcessByBrick p;
   Cube *icube = p.SetInputCube("FROM");
@@ -136,7 +137,7 @@ void IsisMain () {
     if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
       darkFiles.resize(2);
       double temp = (double) inst["MiddleTemperatureFpa"];
-      double time = iTime(inst["StartTime"][0]).Et();
+      double time = iTime(naif, inst["StartTime"][0]).Et();
       QString darkFile = GetCalibrationDirectory("wac_darks") + "WAC_" + instModeId;
       if (instModeId == "BW")
         darkFile += "_" + filter + "_Mode" + mode;
@@ -200,28 +201,29 @@ void IsisMain () {
         g_iofResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
 
       try {
-        iTime startTime((QString) inst["StartTime"]);
+        iTime startTime(naif, (QString) inst["StartTime"]);
+        auto n = naif->get();
         double etStart = startTime.Et();
         // Get the distance between the Moon and the Sun at the given time in
         // Astronomical Units (AU)
         QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
         QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
-        furnsh_c(bspKernel1.toLatin1().data());
-        furnsh_c(bspKernel2.toLatin1().data());
+        furnsh_c(n, bspKernel1.toLatin1().data());
+        furnsh_c(n, bspKernel2.toLatin1().data());
         QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
         QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
         QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
-        furnsh_c(pckKernel1.toLatin1().data());
-        furnsh_c(pckKernel2.toLatin1().data());
-        furnsh_c(pckKernel3.toLatin1().data());
+        furnsh_c(n, pckKernel1.toLatin1().data());
+        furnsh_c(n, pckKernel2.toLatin1().data());
+        furnsh_c(n, pckKernel3.toLatin1().data());
         double sunpos[6], lt;
-        spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
-        g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
-        unload_c(bspKernel1.toLatin1().data());
-        unload_c(bspKernel2.toLatin1().data());
-        unload_c(pckKernel1.toLatin1().data());
-        unload_c(pckKernel2.toLatin1().data());
-        unload_c(pckKernel3.toLatin1().data());
+        spkezr_c(n, "sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
+        g_solarDistance = vnorm_c(n, sunpos) / KM_PER_AU;
+        unload_c(n, bspKernel1.toLatin1().data());
+        unload_c(n, bspKernel2.toLatin1().data());
+        unload_c(n, pckKernel1.toLatin1().data());
+        unload_c(n, pckKernel2.toLatin1().data());
+        unload_c(n, pckKernel3.toLatin1().data());
       }
       catch (IException &e) {
         QString msg = "Can not find necessary SPICE kernels for converting to IOF";

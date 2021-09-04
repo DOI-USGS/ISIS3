@@ -64,6 +64,7 @@ void IsisMain() {
   ProcessImportPds p;
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   bool needsUnlut = false;
 
   // Get the input filename and make sure it is a MESSENGER/MDIS EDR
@@ -112,7 +113,7 @@ void IsisMain() {
   PvlKeyword sourceId("SourceProductId", '"' + inFile.baseName() + '"');
 
   //  Create YearDoy keyword in Archive group
-  iTime stime(outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  iTime stime(naif, outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
   (void) outLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 

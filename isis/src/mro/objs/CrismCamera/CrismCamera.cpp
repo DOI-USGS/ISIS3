@@ -58,7 +58,7 @@ namespace Isis {
     m_instrumentNameShort = "CRISM";
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     Pvl &lab = *cube.label();
 
@@ -123,7 +123,7 @@ namespace Isis {
 
     //  Compute the sclk and UTC of the specifed line for cropping purposes
 #if 0
-     iTime myLineStartTime(etStart  + ((25.0 - 1.0) * frame_time));
+     iTime myLineStartTime(naif(), etStart  + ((25.0 - 1.0) * frame_time));
 //     cout << "\nLine 25 Start Times...\n";
      SpiceChar sclk[80];
      (void) sce2s_c(naifSclkCode(), myLineStartTime.Et(), sizeof(sclk), sclk);
@@ -177,7 +177,7 @@ namespace Isis {
 //    new CrismCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    setTime(iTime(frameStartTime));
+    setTime(iTime(naif(), frameStartTime));
     double tol = 0.0; //PixelResolution();
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
@@ -194,7 +194,7 @@ namespace Isis {
     LoadCache();
 #endif
 //    cout << "Done.\n";
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     return;
   }
 

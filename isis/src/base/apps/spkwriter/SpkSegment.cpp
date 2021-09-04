@@ -46,12 +46,12 @@ using namespace std;
 namespace Isis {
 
 /** Default constructor */
-SpkSegment::SpkSegment() : SpkSpiceSegment() {
+SpkSegment::SpkSegment(NaifContextPtr naif) : SpkSpiceSegment(naif) {
   init();
 }
 
 /** Constructor from ISIS cube file by name of the cube */
-SpkSegment::SpkSegment(const QString &fname, const int spkType) : SpkSpiceSegment() {
+SpkSegment::SpkSegment(NaifContextPtr naif, const QString &fname, const int spkType) : SpkSpiceSegment(naif) {
   init(spkType);
   Cube cube;
   cube.open(fname);
@@ -90,7 +90,7 @@ void SpkSegment::import(Cube &cube) {
   //typedef std::vector<QString>  StrList;
 
   //  Extract ISIS SPK blob and transform to requested content
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(cube.naif());
   try {
 
     Camera *camera(cube.camera());
@@ -227,14 +227,17 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
   //  Compute state rotations relative to the reference frame
   QString j2000 = getNaifName(1);  // ISIS stores in J2000
   if (j2000 != m_refFrame) {
+    auto naif = camera.naif();
+    auto n = naif->get();
+
     // cout << "FromFrame = " << j2000 << ", TOFrame = " << _refFrame << "\n";
-    NaifStatus::CheckErrors();
-    for (int n = 0 ; n < nrecs ; n++) {
+    NaifStatus::CheckErrors(naif);
+    for (int i = 0 ; i < nrecs ; i++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[n], xform);
-      mxvg_c(xform, states[n], 6, 6, states[n]);
+      sxform_c(n, j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[i], xform);
+      mxvg_c(n, xform, states[i], 6, 6, states[i]);
     }
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
   }
 
   return;

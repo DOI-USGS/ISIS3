@@ -44,7 +44,7 @@ namespace Isis {
    */
   OsirisRexOcamsCamera::OsirisRexOcamsCamera(Cube &cube) : FramingCamera(cube) {
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     m_spacecraftNameLong = "OSIRIS-REx";
     m_spacecraftNameShort = "OSIRIS-REx";
@@ -98,7 +98,7 @@ namespace Isis {
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(startTime, exposureDuration);
 
     // Add half exposure duration to get time at center of image
-    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
+    iTime centerTime = shuttertimes.first + exposureDuration / 2.0;
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -127,7 +127,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
   }
 
 

@@ -39,6 +39,7 @@ void IsisMain() {
 
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?
   // YES - we should be able to just TRIANGULATE the points in the control net
@@ -135,7 +136,7 @@ void IsisMain() {
           //  Get Kernel group and add or replace LastModifiedInstrumentPointing
           //  keyword.
           Table cmatrix = bundleAdjustment->cMatrix(i);
-          QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+          QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime(naif);
           cmatrix.Label().addComment(jigComment);
           Table spvector = bundleAdjustment->spVector(i);
           spvector.Label().addComment(jigComment);

@@ -92,8 +92,8 @@ class CkSpiceSegment {
     typedef TNT::Array1D<SpiceDouble> SVector;       //!<  1-D Buffer
     typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
 
-    CkSpiceSegment();
-    CkSpiceSegment(const QString &fname);
+    CkSpiceSegment(NaifContextPtr naif);
+    CkSpiceSegment(NaifContextPtr naif, const QString &fname);
     CkSpiceSegment(Cube &cube, const QString &tblname = "CkSpiceSegment");
     virtual ~CkSpiceSegment() { }
 
@@ -162,9 +162,10 @@ class CkSpiceSegment {
     SVector     _times;
     double      _tickRate;     // Number of seconds per tick for s/c
 
+    NaifContextPtr _naif;
 
     // Internal processing methods
-    void init();
+    void init(NaifContextPtr naif);
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
     QString getKeyValue(PvlObject &label, const QString &keyword);

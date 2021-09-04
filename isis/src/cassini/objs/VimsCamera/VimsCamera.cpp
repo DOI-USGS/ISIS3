@@ -68,7 +68,7 @@ namespace Isis {
     m_spacecraftNameLong = "Cassini Huygens";
     m_spacecraftNameShort = "Cassini";
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -169,7 +169,7 @@ namespace Isis {
     IgnoreProjection(true);
     SetImage(1, 1);
     IgnoreProjection(false);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
     return;
   }
 

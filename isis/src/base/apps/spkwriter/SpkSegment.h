@@ -68,8 +68,8 @@ class SpkSegment : public SpkSpiceSegment {
     typedef SpkSpiceSegment::SVector SVector;
     typedef SpkSpiceSegment::SMatrix SMatrix;
 
-    SpkSegment();
-    SpkSegment(const QString &fname, const int spkType);
+    SpkSegment(NaifContextPtr naif);
+    SpkSegment(NaifContextPtr naif, const QString &fname, const int spkType);
     SpkSegment(Cube &cube, const int spkType);
     virtual ~SpkSegment() { }
 

@@ -32,6 +32,7 @@
 
 #include "Endian.h"
 #include "PixelType.h"
+#include "NaifContext.h"
 
 class QFile;
 class QMutex;
@@ -171,8 +172,8 @@ namespace Isis {
    */
   class Cube {
     public:
-      Cube();
-      Cube(const FileName &fileName, QString access = "r");
+      Cube(NaifContextPtr naif = nullptr);
+      Cube(const FileName &fileName, QString access = "r", NaifContextPtr naif = nullptr);
       
       virtual ~Cube();
 
@@ -315,11 +316,13 @@ namespace Isis {
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
 
+      NaifContextPtr naif() const { return m_naif; }
+
     private:
       void applyVirtualBandsToLabel();
       void cleanUp(bool remove);
 
-      void construct();
+      void construct(NaifContextPtr naif);
       QFile *dataFile() const;
       FileName realDataFileName() const;
 
@@ -439,6 +442,9 @@ namespace Isis {
 
       //! If allocated, converts from physical on-disk band # to virtual band #
       QList<int> *m_virtualBandList;
+
+      //! Environment for all CSPICE operations.
+      NaifContextPtr m_naif;
   };
 }
 

@@ -44,19 +44,20 @@ using namespace std;
 
 namespace Isis {
 
- CkKernelWriter::CkKernelWriter() {
-   init();
+ CkKernelWriter::CkKernelWriter(NaifContextPtr naif) {
+   init(naif);
  }
 
- CkKernelWriter::CkKernelWriter(const QString &kfile, const int &csize,
+ CkKernelWriter::CkKernelWriter(NaifContextPtr naif, const QString &kfile, const int &csize,
                                 const int &cktype) {
-   init();
+   init(naif);
    setCommentSize(csize);
    setType(cktype);
    open(kfile);
  }
 
- void CkKernelWriter::init() {
+ void CkKernelWriter::init(NaifContextPtr naif) {
+   _naif = NaifContext::UseDefaultIfNull(naif);
    _ckType = DefaultCkType;
    _handle = 0;
    _comSize = DefaultCommentSize;
@@ -91,17 +92,17 @@ namespace Isis {
 
  void CkKernelWriter::open(const QString &kfile,
                            const QString &intCkName) {
-   NaifStatus::CheckErrors();
+   NaifStatus::CheckErrors(_naif);
    FileName kf(kfile);
    if ( kf.fileExists() ) {
      QString full_kf = kf.expanded();
      QFile::remove(full_kf);
    }
    SpiceInt  myHandle;
-   ckopn_c(kf.expanded().toLatin1().data(), intCkName.toLatin1().data(), _comSize, &myHandle);
+   ckopn_c(_naif->get(), kf.expanded().toLatin1().data(), intCkName.toLatin1().data(), _comSize, &myHandle);
    _handle = myHandle;
 
-   NaifStatus::CheckErrors();
+   NaifStatus::CheckErrors(_naif);
    return;
  }
 
@@ -135,14 +136,16 @@ namespace Isis {
    // Trap errors so they are not fatal if the comment section fills up.
    // Calling environments can decide how to handle it.
    try {
+     auto n = _naif->get();
+
      QString commOut;
-     NaifStatus::CheckErrors();
+     NaifStatus::CheckErrors(_naif);
      for ( int i = 0 ; i < comment.size() ; i++ ) {
         if ( comment[i] == '\n' ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
+          dafac_c(n, _handle, 1, commOut.size(), commOut.toLatin1().data());
           _comCharsWritten += commOut.size();
-          NaifStatus::CheckErrors();
+          NaifStatus::CheckErrors(_naif);
           commOut.clear();
         }
         else {
@@ -153,9 +156,9 @@ namespace Isis {
      // See if there is residual to write
      if ( commOut.size() > 0 ) {
        while ( commOut.size() < 2 ) { commOut.append(" "); }
-       dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
+       dafac_c(n, _handle, 1, commOut.size(), commOut.toLatin1().data());
        _comCharsWritten += commOut.size();
-       NaifStatus::CheckErrors();
+       NaifStatus::CheckErrors(_naif);
      }
    } catch (IException &) {
      return (false);
@@ -167,9 +170,9 @@ namespace Isis {
  /** Close an opened kernel file */
  void CkKernelWriter::close() {
    if ( _handle != 0 ) {
-     NaifStatus::CheckErrors();
-     ckcls_c(_handle);
-     NaifStatus::CheckErrors();
+     NaifStatus::CheckErrors(_naif);
+     ckcls_c(_naif->get(), _handle);
+     NaifStatus::CheckErrors(_naif);
      _handle = 0;
    }
    return;
@@ -190,11 +193,11 @@ namespace Isis {
 
     int nrecs = segment.size();
 
-    NaifStatus::CheckErrors();
-    ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+    NaifStatus::CheckErrors(_naif);
+    ckw01_c(_naif->get(), _handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
              quats[0], avvs);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(_naif);
     return;
   }
 
@@ -220,11 +223,11 @@ namespace Isis {
     }
     stops[nrecs-1] = sclks[nrecs-1];
     CkSpiceSegment::SVector rates(nrecs, segment.TickRate());
-    NaifStatus::CheckErrors();
-    ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+    NaifStatus::CheckErrors(_naif);
+    ckw02_c(_naif->get(), _handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.toLatin1().data(), segId.toLatin1().data(), nrecs, &sclks[0],
              &stops[0], quats[0], avvs[0], &rates[0]);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(_naif);
     return;
   }
 
@@ -245,13 +248,13 @@ namespace Isis {
     int nrecs = segment.size();
 
     segment.FurnshKernelType("FK");
-    NaifStatus::CheckErrors();
-    ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+    NaifStatus::CheckErrors(_naif);
+    ckw03_c(_naif->get(), _handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
              quats[0], avvs, 1, &sclks[0]);
     segment.UnloadKernelType("FK");
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(_naif);
     return;
   }
 

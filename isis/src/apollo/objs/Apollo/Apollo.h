@@ -52,7 +52,7 @@ namespace Isis {
        * 
        * @see initialize(QString spacecraft, QString instrument)
        */
-      Apollo (QString spacecraft, QString instrument) {
+      Apollo (QString spacecraft, QString instrument, NaifContextPtr naif = nullptr) : p_launchDate(naif) {
         initialize(spacecraft.toUpper(), instrument.toUpper());
       };
 
@@ -65,7 +65,7 @@ namespace Isis {
        * 
        * @see initialize(QString spacecraft, QString instrument)
        */
-      Apollo(QString filename) {
+      Apollo(QString filename, NaifContextPtr naif = nullptr) : p_launchDate(naif) {
         QString spacecraft, instrument;
         if (filename.mid(0,4) == "AS15") spacecraft = "APOLLO 15";
         else if (filename.mid(0,4) == "AS16") spacecraft = "APOLLO 16";

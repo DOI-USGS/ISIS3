@@ -77,7 +77,7 @@ using namespace std;
 using namespace Isis;
 
 
-void Load_Kernel(Isis::PvlKeyword &key);
+void Load_Kernel(NaifContextPtr naif, Isis::PvlKeyword &key);
 void crossp(double v1[3], double v2[3], double v1cv2[3]);
 void Geographic2GeocentricLunar(double geographic[3], double geocentric[3]);
 void MfromLeftEulers(double M[3][3], double omega, double phi, double kappa);
@@ -89,6 +89,8 @@ double R_MOON[3];
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
+  auto n = naif->get();
   double  time0,//start time
           time1,//end time
           alti,  //altitude of the spacecraftmore
@@ -99,7 +101,7 @@ void IsisMain() {
           led;  //line exposure duration in seconds
 
   Cube  panCube;
-  iTime  isisTime;
+  iTime  isisTime(naif);
   QString iStrTEMP;
 
   int i,j,k,scFrameCode,insCode;
@@ -241,25 +243,25 @@ void IsisMain() {
   panCube.putGroup(kernels_pvlG);
 
   //Load all the kernals
-  Load_Kernel(kernels_pvlG["TargetPosition"]);
-  Load_Kernel(kernels_pvlG["TargetAttitudeShape"]);
-  Load_Kernel(kernels_pvlG["LeapSecond"]);
+  Load_Kernel(naif, kernels_pvlG["TargetPosition"]);
+  Load_Kernel(naif, kernels_pvlG["TargetAttitudeShape"]);
+  Load_Kernel(naif, kernels_pvlG["LeapSecond"]);
 
   //////////////////////////////////////////attach a target rotation table
   char frameName[32];
   SpiceInt frameCode;
   SpiceBoolean found;
   //get the framecode from the body code (301=MOON)
-  cidfrm_c(301, sizeof(frameName), &frameCode, frameName, &found);
+  cidfrm_c(n, 301, sizeof(frameName), &frameCode, frameName, &found);
   if(!found) {
     QString naifTarget = QString("IAU_MOOM");
-    namfrm_c(naifTarget.toLatin1().data(), &frameCode);
+    namfrm_c(n, naifTarget.toLatin1().data(), &frameCode);
     if(frameCode == 0) {
       QString msg = "Can not find NAIF code for [" + naifTarget + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
-  spRot = new SpiceRotation(frameCode);
+  spRot = new SpiceRotation(naif, frameCode);
   //create a table from starttime to endtime (streched by 3%) with NODES entries
   spRot->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);
   Table tableTargetRot = spRot->Cache("BodyRotation");
@@ -268,7 +270,7 @@ void IsisMain() {
 
 
   //////////////////////////////////////////////////attach a sun position table
-  spPos = new SpicePosition(10,301);  //Position of the sun (10) WRT to the MOON (301)
+  spPos = new SpicePosition(naif,10,301);  //Position of the sun (10) WRT to the MOON (301)
   //create a table from starttime to endtime (stretched by 3%) with NODES entries
   spPos->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);
   Table tableSunPos = spPos->Cache("SunPosition");
@@ -281,7 +283,7 @@ void IsisMain() {
   /////////////Finding the principal scan line position and orientation
   //get the radii of the MOON
   SpiceInt tempRadii = 0;
-  bodvcd_c(301,"RADII",3,&tempRadii,R_MOON);  //units are km
+  bodvcd_c(n,301,"RADII",3,&tempRadii,R_MOON);  //units are km
   double  omega,phi,kappa;
 
   std::vector<double>  posSel;  //Seleno centric position
@@ -480,7 +482,7 @@ void IsisMain() {
   for(j=0; j<3; j++)    //reformating M_J2toT to a 3x3
     for(k=0; k<3; k++)
       Mtemp1[j][k] = M_J2toT[3*j+k];
-  mxm_c(M0, Mtemp1, Mtemp2);
+  mxm_c(n, M0, Mtemp1, Mtemp2);
   M2Q(Mtemp2, Q[(NODES-1)/2]);  //save the middle scan line quarternion
 
   Q[(NODES-1)/2][4] = (time1 + time0)/2.0;  //time in the center of the image
@@ -501,13 +503,13 @@ void IsisMain() {
     //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0--NOTE the order swap and
     //  transposes are needed because both Mdr and Mdg were caculated in image space and need to be
     //  transposed to apply to object space
-    mtxm_c(Mdg, M0, Mtemp1);
+    mtxm_c(n, Mdg, M0, Mtemp1);
     //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a
     //  vector from the target centric space into camera space.  However, what is standard to
     //  include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the
     //  transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera
     //  space to target centric space
-    mtxm_c(Mdr, Mtemp1, M0);
+    mtxm_c(n, Mdr, Mtemp1, M0);
     //now adding the rotation from the target frame to J2000
     spRot->SetEphemerisTime(Q[i][4]);
     //this actually gives the rotation from J2000 to target centric--hence the mxmt_c function being
@@ -516,7 +518,7 @@ void IsisMain() {
     for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
       for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];
-    mxm_c(M0, Mtemp1, Mtemp2);
+    mxm_c(n, M0, Mtemp1, Mtemp2);
     M2Q(Mtemp2, Q[i]);    //convert to a quarterion
   }
 
@@ -536,20 +538,20 @@ void IsisMain() {
     //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0    NOTE the order swap and
     //  transposes are needed because both Mdr and Mdg were caculated in image space and need to be
     //  transposed to apply to object space
-    mtxm_c(Mdg, M0, Mtemp1);
+    mtxm_c(n, Mdg, M0, Mtemp1);
     //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a
     //  vector from the target centric space into camera space.  However, what is standard to
     //  include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the
     //  transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera
     //  space to target centric space
-    mtxm_c(Mdr, Mtemp1, M0);
+    mtxm_c(n, Mdr, Mtemp1, M0);
     //now adding the rotation from the target frame to J2000
     spRot->SetEphemerisTime(Q[i][4]);
     M_J2toT = spRot->Matrix();
     for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
       for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];
-    mxm_c(M0, Mtemp1, Mtemp2);
+    mxm_c(n, M0, Mtemp1, Mtemp2);
     M2Q(Mtemp2, Q[i]);    //convert to a quarterion
   }
   //fill in the table
@@ -804,10 +806,12 @@ void IsisMain() {
 
 //function largely copied from the spice class because it was private and I couldn't access it
 //  without shoe-horning the input to please the rest of the Spice::Init() funciton
-void Load_Kernel(Isis::PvlKeyword &key) {
+void Load_Kernel(NaifContextPtr naif, Isis::PvlKeyword &key) {
+
+  auto n = naif->get();
 
   //Load all the kernal files (file names are stored as values of the PvlKeyword)
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(naif);
 
   for(int i = 0; i < key.size(); i++) {
      if(key[i] == "") continue;
@@ -822,10 +826,10 @@ void Load_Kernel(Isis::PvlKeyword &key) {
        throw IException(IException::Io, msg, _FILEINFO_);
      }
      QString fileName(file.expanded());
-     furnsh_c(fileName.toLatin1().data());
+     furnsh_c(n, fileName.toLatin1().data());
   }
 
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(naif);
 }
 
 void crossp(double v1[3],double v2[3],double v1cv2[3])

@@ -31,6 +31,8 @@ using namespace Isis;
  */
 int main(int argc, char *argv[]) {
   try {
+    NaifContext naif;
+
     qDebug() << "Testing BulletTargetShape";
     qDebug() << endl;
 
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
     QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Testing with " << dskfile << "...";
     qDebug() << "";
-    BulletTargetShape *itokawaTargetShape = BulletTargetShape::load(dskfile);
+    BulletTargetShape *itokawaTargetShape = BulletTargetShape::load(&naif, dskfile);
     qDebug() << "Target name: " << itokawaTargetShape->name();
     qDebug() << "Maximum distance in kilometers: " << itokawaTargetShape->maximumDistance();
     qDebug() << "btCollisionBody pointer is valid? " << (bool) itokawaTargetShape->body();
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]) {
     QString itokawaCube = "$hayabusa/testData/st_2391934788_v.cub";
     qDebug() << "Testing with " << itokawaCube << "...";
     qDebug() << "";
-    BulletTargetShape *cubeTargetShape = BulletTargetShape::load(itokawaCube);
+    BulletTargetShape *cubeTargetShape = BulletTargetShape::load(&naif, itokawaCube);
     qDebug() << "Target shape pointer is valid?" << (bool) cubeTargetShape;
     qDebug() << endl;
 
@@ -64,7 +66,7 @@ int main(int argc, char *argv[]) {
     QString otherFile = "$base/testData/xmlTestLabel.xml";
     qDebug() << "Testing with " << otherFile << "...";
     qDebug() << "";
-    BulletTargetShape *otherTargetShape = BulletTargetShape::load(otherFile);
+    BulletTargetShape *otherTargetShape = BulletTargetShape::load(&naif, otherFile);
     qDebug() << "Target shape pointer is valid?" << (bool) otherTargetShape;
     qDebug() << endl;
 

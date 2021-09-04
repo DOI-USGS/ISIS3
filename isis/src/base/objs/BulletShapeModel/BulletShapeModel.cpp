@@ -99,7 +99,7 @@ namespace Isis {
       shapefile = (QString) kernels["ShapeModel"];
     }
 
-    QScopedPointer<BulletTargetShape> v_shape( BulletTargetShape::load(shapefile) );
+    QScopedPointer<BulletTargetShape> v_shape( BulletTargetShape::load(target->naif(), shapefile) );
     if (v_shape.isNull() ) {
       QString mess = "Cannot create a BulletShape from " + shapefile;
       throw IException(IException::User, mess, _FILEINFO_);
