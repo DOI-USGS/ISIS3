@@ -52,7 +52,7 @@ namespace Isis {
    * @brief Constructor using an ISIS cube file name
    * @param filename Name of ISIS cube file
    */
-  MdisGeometry::MdisGeometry(NaifContextPtr naif, const QString &filename) : _naif(NaifContext::UseDefaultIfNull(naif)) {
+  MdisGeometry::MdisGeometry(NaifContextPtr naif, const QString &filename) : _naif(NaifContext::UseDefaultIfNull(naif)), _spice(_naif) {
     Cube cube(_naif);
     cube.open(filename);
     init(cube);
@@ -62,7 +62,7 @@ namespace Isis {
    * @brief Construct using an ISIS Cube class
    * @param cube ISIS cube class
    */
-  MdisGeometry::MdisGeometry(Cube &cube) : _naif(cube.naif()) {
+  MdisGeometry::MdisGeometry(Cube &cube) : _naif(cube.naif()), _spice(_naif) {
     init(cube);
   }
 
@@ -105,16 +105,16 @@ namespace Isis {
    *
    * @return bool True if the target is a recognized target, false if not.
    */
-  bool MdisGeometry::validateTarget(Pvl &label, bool makeValid) {
+  bool MdisGeometry::validateTarget(NaifContextPtr n, Pvl &label, bool makeValid) {
     // Add the planetary constants kernel
-    SpiceManager naif;
+    SpiceManager naif(n);
     naif.add("$base/kernels/pck/pck?????.tpc");
 
     //  Get the target and check for validity
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     
     try {
-      Target::lookupNaifBodyCode(target);
+      Target::lookupNaifBodyCode(n, target);
       return (true);
     }
     catch (...) {
@@ -723,8 +723,8 @@ namespace Isis {
     QString target = _camera->target()->name();
 
     try {
-      scCode = Target::lookupNaifBodyCode("MESSENGER");
-      targCode = Target::lookupNaifBodyCode(target.toLatin1().data());
+      scCode = Target::lookupNaifBodyCode(_naif, "MESSENGER");
+      targCode = Target::lookupNaifBodyCode(_naif, target.toLatin1().data());
     }
     catch (...) {
       found = false;
@@ -972,8 +972,8 @@ namespace Isis {
 
     // Get NAIF body codes
     SpiceInt sc(-236), sun(10);
-    sc = Target::lookupNaifBodyCode("MESSENGER");
-    sun = Target::lookupNaifBodyCode("SUN");
+    sc = Target::lookupNaifBodyCode(_naif, "MESSENGER");
+    sun = Target::lookupNaifBodyCode(_naif, "SUN");
 
     auto n = _naif->get();
 

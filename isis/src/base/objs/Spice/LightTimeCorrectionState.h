@@ -22,6 +22,7 @@
  */
 
 #include <QString>
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -62,8 +63,8 @@ namespace Isis {
   class LightTimeCorrectionState  {
     public:
 
-      LightTimeCorrectionState();
-      LightTimeCorrectionState(int ikCode, Spice *spice);
+      LightTimeCorrectionState(NaifContextPtr naif);
+      LightTimeCorrectionState(NaifContextPtr naif, int ikCode, Spice *spice);
 
      // destructor
       virtual ~LightTimeCorrectionState() {  }
@@ -90,6 +91,8 @@ namespace Isis {
       QString m_abcorr;
       bool m_swapObserverTarget;
       bool m_sc_to_surf_ltcorr;
+
+      NaifContextPtr m_naif;
 
       void setDefaultState();
   };

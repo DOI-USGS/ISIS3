@@ -55,7 +55,7 @@ void IsisMain() {
   int spacecraftCode = -61500; 
 
   if (doFullCcd) {
-    PushFrameCameraCcdLayout ccdLayout(spacecraftCode);
+    PushFrameCameraCcdLayout ccdLayout(naif, spacecraftCode);
     try {
       ccdLayout.addKernel("$juno/kernels/ik/juno_junocam_v??.ti");
     }

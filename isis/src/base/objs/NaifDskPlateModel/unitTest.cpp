@@ -57,11 +57,13 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContext naif;
+    
     qDebug() << "Unit test for NaifDskPlateModel.";
     qDebug() << "";
 
     qDebug() << "Default constructor.";
-    NaifDskPlateModel naifPlateModel;
+    NaifDskPlateModel naifPlateModel(&naif);
     qDebug() << "default object is valid?" << naifPlateModel.isValid();
     qDebug() << "File name:          " << naifPlateModel.filename();
     qDebug() << "Number of Plates:   " << naifPlateModel.numberPlates();
@@ -70,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Construct NaifDskPlateModel object from NAIF DSK file and retrieve basic info.";
     FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
-    NaifDskPlateModel naifPlateModelFromDSK(dskFile.expanded());
+    NaifDskPlateModel naifPlateModelFromDSK(&naif, dskFile.expanded());
     qDebug() << "object is valid? " << naifPlateModelFromDSK.isValid();
     FileName file(naifPlateModelFromDSK.filename());
     qDebug() << "File name:          " << file.baseName();
@@ -173,7 +175,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Thrown from openDSK(): Open DSK file that doesn't exist.";
     try {
       FileName junkFile("./junk.bds");
-      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
+      NaifDskPlateModel naifPlateModelFromDSK(&naif, junkFile.expanded());
     }
     catch (IException &e) {
       e.print();
@@ -191,7 +193,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "~NaifDskDescriptor(): Unknown NAIF error has occured.";
     try {
       FileName junkFile("$base/kernels/spk/de405.bsp");
-      NaifDskPlateModel naifPlateModelFromDSK(junkFile.toString());
+      NaifDskPlateModel naifPlateModelFromDSK(&naif, junkFile.toString());
     }
     catch (IException &e) {
       ReportError(e.toString());

@@ -29,12 +29,13 @@ using namespace Isis;
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContext naif;
 
   qDebug() << "Unit Test for PushFrameCameraCcdLayout::FrameletInfo...";
   qDebug() << "";
   try {
     qDebug() << "Create a default FrameletInfo object";
-    PushFrameCameraCcdLayout::FrameletInfo defaultInfo;
+    PushFrameCameraCcdLayout::FrameletInfo defaultInfo(&naif);
     qDebug() << "framelet ID:" << defaultInfo.m_frameId;
     qDebug() << "framelet name:" << defaultInfo.m_filterName;
     qDebug() << "framelet start sample:" << defaultInfo.m_startSample;
@@ -44,7 +45,7 @@ int main(void) {
     qDebug() << "";
 
     qDebug() << "Create a FrameletInfo object for a specific ID";
-    PushFrameCameraCcdLayout::FrameletInfo numberedInfo(42);
+    PushFrameCameraCcdLayout::FrameletInfo numberedInfo(&naif, 42);
     qDebug() << "framelet ID:" << numberedInfo.m_frameId;
     qDebug() << "framelet name:" << numberedInfo.m_filterName;
     qDebug() << "framelet start sample:" << numberedInfo.m_startSample;
@@ -61,14 +62,14 @@ int main(void) {
   qDebug() << "";
   try {
     qDebug() << "Create a default PushFrameCameraCcdLayout";
-    PushFrameCameraCcdLayout defaultLayout;
+    PushFrameCameraCcdLayout defaultLayout(&naif);
     qDebug() << "Try adding a kernel that does not exist";
     bool loaded = defaultLayout.addKernel("not_a_kernel_file");
     qDebug() << "Kernel file loaded?" << loaded;
     qDebug() << "";
 
     qDebug() << "Create the JunoCam layout";
-    PushFrameCameraCcdLayout junoLayout(-61500);
+    PushFrameCameraCcdLayout junoLayout(&naif, -61500);
     qDebug() << "Load the JunoCam kernels";
     if (!junoLayout.addKernel("$juno/kernels/ik/juno_junocam_v??.ti")) {
       QString msg = "Failed to load the JunoCam Instrument Kernel.";

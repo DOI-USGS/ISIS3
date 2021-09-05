@@ -49,7 +49,9 @@ namespace Isis {
    */
   bool CameraSkyMap::SetFocalPlane(const double ux, const double uy,
                                    double uz) {
-    NaifStatus::CheckErrors();
+    auto n = naif();
+
+    NaifStatus::CheckErrors(n);
 
     SpiceDouble lookC[3];
     lookC[0] = ux;
@@ -57,10 +59,10 @@ namespace Isis {
     lookC[2] = uz;
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
+    vhat_c(n->get(), lookC, unitLookC);
     p_camera->SetLookDirection(unitLookC);
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(n);
 
     return true;
   }

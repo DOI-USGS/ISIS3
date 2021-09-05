@@ -277,7 +277,7 @@ namespace Isis {
    * 
    * @throws IException::Io
    */
-  EmbreeTargetShape::EmbreeTargetShape(const QString &dem, const Pvl *conf)
+  EmbreeTargetShape::EmbreeTargetShape(NaifContextPtr naif, const QString &dem, const Pvl *conf)
       : m_name(),
         m_mesh(),
         m_cloud(),
@@ -297,7 +297,7 @@ namespace Isis {
       }
       // DSKs
       else if (file.extension() == "bds") {
-        mesh = readDSK(file);
+        mesh = readDSK(naif, file);
       }
       // Let PCL try to handle other formats (obj, ply, etc.)
       else {
@@ -324,7 +324,7 @@ namespace Isis {
    * @throws IException::User
    * @throws IException::Io
    */
-  pcl::PolygonMesh::Ptr EmbreeTargetShape::readDSK(FileName file) {
+  pcl::PolygonMesh::Ptr EmbreeTargetShape::readDSK(NaifContextPtr naif, FileName file) {
 
     /** NAIF DSK parameter setup   */
     SpiceInt      dskHandle;      //!< The DAS file handle of the DSK file.
@@ -339,26 +339,28 @@ namespace Isis {
       QString mess = "NAIF DSK file [" + file.expanded() + "] does not exist.";
       throw IException(IException::User, mess, _FILEINFO_);
     }
+
+    auto n = naif->get();
   
     // Open the NAIF Digital Shape Kernel (DSK)
-    dasopr_c( file.expanded().toLatin1().data(), &dskHandle );
-    NaifStatus::CheckErrors();
+    dasopr_c( n, file.expanded().toLatin1().data(), &dskHandle );
+    NaifStatus::CheckErrors(naif);
   
     // Search to the first DLA segment
     SpiceBoolean found;
-    dlabfs_c( dskHandle, &dlaDescriptor, &found );
-    NaifStatus::CheckErrors();
+    dlabfs_c( n, dskHandle, &dlaDescriptor, &found );
+    NaifStatus::CheckErrors(naif);
     if ( !found ) {
       QString mess = "No segments found in DSK file [" + file.expanded() + "]"; 
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
-    dskgd_c( dskHandle, &dlaDescriptor, &dskDescriptor );
-    NaifStatus::CheckErrors();
+    dskgd_c( n, dskHandle, &dlaDescriptor, &dskDescriptor );
+    NaifStatus::CheckErrors(naif);
 
     // Get The number of polygons and vertices
-    dskz02_c( dskHandle, &dlaDescriptor, &numVertices, &numPlates );
-    NaifStatus::CheckErrors();
+    dskz02_c( n, dskHandle, &dlaDescriptor, &numVertices, &numPlates );
+    NaifStatus::CheckErrors(naif);
 
     // Allocate polygon and vertices arrays
     //   These arrays are actually numVertices x 3 and numPlates x 3,
@@ -369,9 +371,9 @@ namespace Isis {
 
     // Read the vertices from the dsk file
     SpiceInt numRead = 0;
-    dskv02_c(dskHandle, &dlaDescriptor, 1, numVertices,
+    dskv02_c(n, dskHandle, &dlaDescriptor, 1, numVertices,
              &numRead, ( SpiceDouble(*)[3] )(verticesArray) );
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
     if ( numRead != numVertices ) {
       QString msg = "Failed reading all vertices from the DSK file, ["
                     + toString(numRead) + "] out of ["
@@ -381,9 +383,9 @@ namespace Isis {
 
     // Read the polygons from the DSK
     numRead = 0;
-    dskp02_c(dskHandle, &dlaDescriptor, 1, numPlates,
+    dskp02_c(n, dskHandle, &dlaDescriptor, 1, numPlates,
              &numRead, ( SpiceInt(*)[3] )(polygonsArray) );
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif);
     if ( numRead != numPlates ) {
       QString msg = "Failed reading all polygons from the DSK file, ["
                     + toString(numRead) + "] out of ["

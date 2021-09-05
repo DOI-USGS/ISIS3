@@ -64,7 +64,9 @@ namespace Isis {
    * @return @b bool If conversion was successful
    */
   bool CameraGroundMap::SetFocalPlane(const double ux, const double uy, const double uz) {
-    NaifStatus::CheckErrors();
+    auto n = naif();
+
+    NaifStatus::CheckErrors(n);
 
     SpiceDouble lookC[3];
     lookC[0] = ux;
@@ -72,9 +74,9 @@ namespace Isis {
     lookC[2] = uz;
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
+    vhat_c(n->get(), lookC, unitLookC);
 
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(n);
 
     bool result = p_camera->SetLookDirection(unitLookC);
     return result;
@@ -211,12 +213,13 @@ namespace Isis {
     // Check for point on back of planet by checking to see if surface point is viewable 
     //   (test emission angle)
     if (test) {
+      auto n = naif()->get();
       vector<double> lookB = bodyRot->ReferenceVector(lookJ);
       double upsB[3], upB[3], dist;
-      vminus_c((SpiceDouble *) &lookB[0], upsB);
-      unorm_c(upsB, upsB, &dist);
-      unorm_c((SpiceDouble *) &pB[0], upB, &dist);
-      double cosangle = vdot_c(upB, upsB);
+      vminus_c(n, (SpiceDouble *) &lookB[0], upsB);
+      unorm_c(n, upsB, upsB, &dist);
+      unorm_c(n, (SpiceDouble *) &pB[0], upB, &dist);
+      double cosangle = vdot_c(n, upB, upsB);
       double emission;
       if (cosangle > 1) {
         emission = 0;

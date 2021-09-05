@@ -28,8 +28,8 @@ namespace Isis {
   /**
    * Construct MocLabels object using a Pvl object
    */
-  MocLabels::MocLabels(Cube &cube, NaifContextPtr naif) {
-    Init(cube, naif);
+  MocLabels::MocLabels(Cube &cube) {
+    Init(cube, cube.naif());
   }
 
   /**

@@ -60,6 +60,7 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContext naif;
     qDebug() << "Unit test for NaifDskShape.";
     qDebug() << "";
 
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Construct NaifDskShape object from a plate model.";    
     FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
-    NaifDskPlateModel plateModel(dskFile.expanded());
+    NaifDskPlateModel plateModel(&naif, dskFile.expanded());
     NaifDskShape shapeModelFromPlate(plateModel);
     qDebug() << "Try to intersect surface at obsPos (0,0,0) and lookDir (1,1,1)";
     std::vector<double> obsPos; 

@@ -1,6 +1,8 @@
 #ifndef NaifStatus_h
 #define NaifStatus_h
 
+#include "NaifContext.h"
+
 /**
  * @file
  * $Revision: 1.1 $

@@ -578,14 +578,16 @@ namespace Isis {
     SpiceDouble pB[3];
     surfaceIntersection()->ToNaifArray(pB);
 
+    auto n = naif();
+
     // Get the body radii and compute the true normal of the ellipsoid
     QVector<double> norm(3);
     // need a case for target == NULL
     QVector<Distance> radii = QVector<Distance>::fromStdVector(targetRadii());
-    NaifStatus::CheckErrors();
-    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
+    NaifStatus::CheckErrors(n);
+    surfnm_c(n->get(), radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
              pB, &norm[0]);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(n);
 
     return (norm);
   }

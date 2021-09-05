@@ -229,20 +229,23 @@ void translateLabels(Pvl &label, Cube *ocube) {
     inst.findKeyword("TdiRate").setUnits("hz");
   }
 
+  auto naif = ocube->naif();
+  auto n = naif->get();
+
   //  Create StartTime (UTC) from the SpacecraftClockStartCount.  Need to load the leapsecond
   //  and spacecraft clock kernels to calculate time.
-  NaifStatus::CheckErrors();
+  NaifStatus::CheckErrors(naif);
   // Leapsecond kernel
   QString lsk = "$ISISDATA/base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
-  furnsh_c(lskName.expanded().toLatin1().data());
+  furnsh_c(n, lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
   QString sclk = "$ISISDATA/newhorizons/kernels/sclk/new_horizons_???.tsc";
   FileName sclkName(sclk);
   sclkName = sclkName.highestVersion();
-  furnsh_c(sclkName.expanded().toLatin1().data());
+  furnsh_c(n, sclkName.expanded().toLatin1().data());
 
   SpiceInt sclkCode;
   if (label.hasKeyword("SPCSCID", Pvl::Traverse)) {
@@ -255,9 +258,9 @@ void translateLabels(Pvl &label, Cube *ocube) {
 
   QString scTime = inst["SpacecraftClockStartCount"];
   double et;
-  scs2e_c(sclkCode, scTime.toLatin1().data(), &et);
+  scs2e_c(n, sclkCode, scTime.toLatin1().data(), &et);
   SpiceChar utc[30];
-  et2utc_c(et, "ISOC", 3, 30, utc);
+  et2utc_c(n, et, "ISOC", 3, 30, utc);
   inst.addKeyword(PvlKeyword("StartTime", QString(utc)));
 
   // Create a Band Bin group

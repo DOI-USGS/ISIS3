@@ -39,7 +39,8 @@ namespace Isis {
   /**
    * Constructs an empty quaternion
    */
-  Quaternion::Quaternion() {
+  Quaternion::Quaternion(NaifContextPtr naif)
+   : p_naif(NaifContext::UseDefaultIfNull(naif)) {
     p_quaternion.resize(4);
 
     for(int i = 0;  i < 4;  i++) {
@@ -55,7 +56,8 @@ namespace Isis {
    * @param rotation   rotation defined as either a matrix or another quaternion
    *                            loaded as a vector
    */
-  Quaternion::Quaternion(const std::vector<double> rotation) {
+  Quaternion::Quaternion(NaifContextPtr naif, const std::vector<double> rotation)
+   : p_naif(NaifContext::UseDefaultIfNull(naif)) {
     p_quaternion.resize(4);
     Set(rotation);
 
@@ -72,9 +74,9 @@ namespace Isis {
   void Quaternion::Set(std::vector<double> rotation) {
 
     if(rotation.size() == 9) {        // Matrix initialization
-      NaifStatus::CheckErrors();
-      m2q_c(&rotation[0], &p_quaternion[0]);
-      NaifStatus::CheckErrors();
+      NaifStatus::CheckErrors(p_naif);
+      m2q_c(p_naif->get(), &rotation[0], &p_quaternion[0]);
+      NaifStatus::CheckErrors(p_naif);
     }
     else if(rotation.size() == 4) {   //quaternion initialization
       p_quaternion = rotation;
@@ -90,7 +92,7 @@ namespace Isis {
   //! Converts quaternion to 3x3 rotational matrix
   std::vector<double> Quaternion::ToMatrix() {
     std::vector<double> matrix(9);
-    q2m_c(&p_quaternion[0], (SpiceDouble( *)[3]) &matrix[0]);
+    q2m_c(p_naif->get(), &p_quaternion[0], (SpiceDouble( *)[3]) &matrix[0]);
     return matrix;
   }
 
@@ -133,7 +135,8 @@ namespace Isis {
   Quaternion &Quaternion::operator*=(const Quaternion &quat) {
     std::vector<double> qout(4);
 
-    qxq_c((SpiceDouble *) & (this->p_quaternion[0]),
+    qxq_c(p_naif->get(),
+          (SpiceDouble *) & (this->p_quaternion[0]),
           (SpiceDouble *) & (quat.p_quaternion[0]),
           (SpiceDouble *) & (qout[0]));
     this->p_quaternion[0] = qout[0];
@@ -211,7 +214,7 @@ namespace Isis {
 
   //! Returns the conjugate of the quaternion
   Quaternion Quaternion::Conjugate() {
-    Quaternion qout;
+    Quaternion qout(p_naif);
     qout.p_quaternion[0] = p_quaternion[0];
 
     for(int i = 1;  i < 4;  i++) {
@@ -234,14 +237,14 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Quaternion qvin;
+    Quaternion qvin(p_naif);
     qvin.p_quaternion[0] = 0.;
     qvin.p_quaternion[1] = vin[0];
     qvin.p_quaternion[2] = vin[1];
     qvin.p_quaternion[3] = vin[2];
 
-    Quaternion qvout(p_quaternion);
-    Quaternion conj(p_quaternion);
+    Quaternion qvout(p_naif, p_quaternion);
+    Quaternion conj(p_naif, p_quaternion);
     qvout *= qvin;
     qvout *= conj.Conjugate();
     std::vector<double> vout(qvout.p_quaternion.begin() + 1, qvout.p_quaternion.end());
@@ -276,10 +279,10 @@ namespace Isis {
   std::vector<double> Quaternion::ToAngles(int axis3, int axis2, int axis1) {
     std::vector<double> rotationMatrix = ToMatrix();
     SpiceDouble ang1, ang2, ang3;
-    NaifStatus::CheckErrors();
-    m2eul_c((SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,
+    NaifStatus::CheckErrors(p_naif);
+    m2eul_c(p_naif->get(), (SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,
             &ang3, &ang2, &ang1);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(p_naif);
     std::vector<double> angles;
     angles.push_back(ang1);
     angles.push_back(ang2);

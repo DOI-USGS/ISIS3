@@ -23,6 +23,7 @@
  */
 
 #include "TProjection.h"
+#include "NaifContext.h"
 
 namespace Isis {
   class Pvl;
@@ -81,7 +82,7 @@ namespace Isis {
    */
   class ObliqueCylindrical : public Isis::TProjection {
     public:
-      ObliqueCylindrical(Isis::Pvl &label, bool allowDefaults = false);
+      ObliqueCylindrical(NaifContextPtr naif, Isis::Pvl &label, bool allowDefaults = false);
       ~ObliqueCylindrical();
       bool operator==(const Isis::Projection &proj);
 
@@ -115,6 +116,8 @@ namespace Isis {
                                                mapping group in the label.*/
       std::vector<double> m_zAxisVector; /**< The z-axis vector, read from the 
                                                mapping group in the label.*/
+
+      NaifContextPtr m_naif;
   };
 };
 

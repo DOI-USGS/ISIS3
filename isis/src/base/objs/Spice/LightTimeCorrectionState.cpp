@@ -54,7 +54,8 @@ namespace Isis {
  * 
  * @author 2012-10-28 Kris Becker
  */
-  LightTimeCorrectionState::LightTimeCorrectionState() {
+  LightTimeCorrectionState::LightTimeCorrectionState(NaifContextPtr naif) :
+    m_naif(NaifContext::UseDefaultIfNull(naif)) {
     setDefaultState();
   }
 
@@ -72,8 +73,10 @@ namespace Isis {
   * @param ikCode NAIF code for instrument
   * @param spice  Spice object associated with geometry
   */
-  LightTimeCorrectionState::LightTimeCorrectionState(int ikCode,
-                                                     Spice *spice) {
+  LightTimeCorrectionState::LightTimeCorrectionState(NaifContextPtr naif,
+                                                     int ikCode,
+                                                     Spice *spice) :
+    m_naif(NaifContext::UseDefaultIfNull(naif)) {
     setDefaultState();
     checkObserverTargetSwap(ikCode, spice);
     checkAberrationCorrection(ikCode, spice);
@@ -189,7 +192,7 @@ namespace Isis {
     //  Determine loaded-only kernels.  Our search is restricted to only 
     //  kernels that are loaded and, currently, only of SPK type is of 
     //  interest.
-    Kernels kernels;
+    Kernels kernels(m_naif);
     kernels.Discover();
 
     //  Init the tag to Qt QString for effective searching
@@ -198,7 +201,8 @@ namespace Isis {
 
     //  Retrieve list of loaded SPKs from Kernel object
     QStringList spks = kernels.getKernelList("SPK");
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors(m_naif); 
+    auto naif = m_naif->get();
     for ( int k = 0 ; k < spks.size() ; k++ ) {
       QString spkFile = spks[k];
       SpiceChar ktype[32];
@@ -206,7 +210,7 @@ namespace Isis {
       SpiceInt  handle;
       SpiceBoolean found;
       //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-      (void) kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
+      (void) kinfo_c(naif, spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
                      source, &handle, &found);
       if (found == SPICETRUE) {
         // SPK is open so read and parse all the comments.
@@ -219,7 +223,7 @@ namespace Isis {
         // first comment line when and only when the last comment line is
         // read.  This is not apparent in the NAIF documentation.
         while ( !done ) {
-          dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+          dafec_c(naif, handle, 1, sizeof(commnt), &n, commnt, &done);
           QString cmmt(commnt);
           int pos = 0;
           if ( (pos = cmmt.indexOf(qtag, pos, Qt::CaseInsensitive)) != -1 ) {
@@ -233,7 +237,7 @@ namespace Isis {
         if ( !abcorr.isEmpty() )  break;
       }
     }
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(m_naif);
   
     // Set internal state only if it was found in the kernels, otherwise the 
     // existing state is preserved.

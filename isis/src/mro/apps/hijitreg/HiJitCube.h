@@ -103,9 +103,9 @@ namespace Isis {
       };
 
     public:
-      HiJitCube();
-      HiJitCube(const QString &filename);
-      HiJitCube(const QString &filename, PvlObject &shift);
+      HiJitCube(NaifContextPtr naif = nullptr);
+      HiJitCube(const QString &filename, NaifContextPtr naif = nullptr);
+      HiJitCube(const QString &filename, PvlObject &shift, NaifContextPtr naif = nullptr);
       ~HiJitCube();
 
       void setSampleOffset(int soff);

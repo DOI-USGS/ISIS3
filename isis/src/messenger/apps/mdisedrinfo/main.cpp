@@ -58,7 +58,7 @@ void IsisMain() {
       Cube cube;
       cube.open(temp.expanded(), "rw");
       Pvl *label = cube.label();
-      MdisGeometry::validateTarget(*label, true);
+      MdisGeometry::validateTarget(naif, *label, true);
       cube.close();
 
       //  Run spiceinit on it

@@ -93,7 +93,7 @@ namespace Isis {
       }
 
       void setCube(const QString &filename);
-      static bool validateTarget(Pvl &label, bool makeValid = true);
+      static bool validateTarget(NaifContextPtr naif, Pvl &label, bool makeValid = true);
       virtual void refCenterCoord(double &sample, double &line) const;
       virtual void refUpperLeftCoord(double &sample, double &line) const;
       virtual void refUpperRightCoord(double &sample, double &line) const;
@@ -171,7 +171,7 @@ namespace Isis {
       QString   _NullDefault;      //!< Current null string
       bool          _doUpdate;         //!< Action when vlue is uncomputable
       SpiceManager _spice;             //!< SPICE kernel manager
-      NaifContexPtr _naif;
+      NaifContextPtr _naif;
 
       void init(Cube &cube);
 

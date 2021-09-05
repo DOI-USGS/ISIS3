@@ -47,7 +47,20 @@ namespace Isis {
    * @param filename Name of ISIS cube file
    * @param furnish Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(const QString &filename, bool furnish) {
+  SpiceManager::SpiceManager(NaifContextPtr naif) : 
+    _kernlist(), 
+    _furnish(true), 
+    _naif(NaifContext::UseDefaultIfNull(naif)) { 
+    }
+
+  /**
+   * @brief Construct using an ISIS file name
+   *
+   * @param filename Name of ISIS cube file
+   * @param furnish Do we load the kernels we find?
+   */
+  SpiceManager::SpiceManager(NaifContextPtr naif, const QString &filename, bool furnish) : 
+    _naif(NaifContext::UseDefaultIfNull(naif)) {
     Pvl pvl(filename);
     Load(pvl, furnish);
   }
@@ -58,7 +71,8 @@ namespace Isis {
    * @param cube    Cube object of ISIS file
    * @param furnish Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(Cube &cube, bool furnish) {
+  SpiceManager::SpiceManager(Cube &cube, bool furnish) :
+    _naif(cube.naif()) {
     Load(*cube.label(), furnish);
   }
 
@@ -68,7 +82,8 @@ namespace Isis {
    * @param pvl  ISIS label to get kernel information from
    * @param furnish  Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(Pvl &pvl, bool furnish) {
+  SpiceManager::SpiceManager(NaifContextPtr naif, Pvl &pvl, bool furnish) :
+  _naif(NaifContext::UseDefaultIfNull(naif)) {
     Load(pvl, furnish);
   }
 
@@ -186,7 +201,7 @@ namespace Isis {
    * @brief Unloads all kernels if they were loaded when found
    */
   void SpiceManager::Unload() {
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(_naif);
     if(_furnish) {
       for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
         /**
@@ -196,11 +211,11 @@ namespace Isis {
         */
         FileName f(_kernlist[i]);
         QString kernName(f.expanded());
-        unload_c(kernName.toLatin1().data());
+        unload_c(_naif->get(), kernName.toLatin1().data());
       }
     }
     _kernlist.clear();
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(_naif);
     return;
   }
 
@@ -219,7 +234,7 @@ namespace Isis {
    * @see  loadKernelFromTable()
    */
   void SpiceManager::loadKernel(PvlKeyword &key) {
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors(_naif); 
     for(int i = 0; i < key.size(); i++) {
       if(key[i] == "") continue;
       if(IString(key[i]).UpCase() == "NULL") continue;
@@ -231,10 +246,10 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       QString fileName(file.expanded());
-      if(_furnish) furnsh_c(fileName.toLatin1().data());
+      if(_furnish) furnsh_c(_naif->get(), fileName.toLatin1().data());
       addKernelName((QString)key[i]);
     }
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors(_naif); 
   }
 
   /**

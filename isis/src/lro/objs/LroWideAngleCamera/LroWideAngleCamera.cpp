@@ -281,7 +281,7 @@ namespace Isis {
     SpiceBoolean found;
     SpiceInt n;
     SpiceChar ctype[1];
-    dtpool_c(key.toLatin1().data(), &found, &n, ctype);
+    dtpool_c(naif()->get(), key.toLatin1().data(), &found, &n, ctype);
     if (!found) n = 0;
     return (n);
   }

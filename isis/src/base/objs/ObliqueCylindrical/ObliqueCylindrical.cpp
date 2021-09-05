@@ -50,8 +50,9 @@ namespace Isis {
    *
    * @throws IException
    */
-  ObliqueCylindrical::ObliqueCylindrical(Pvl &label, bool allowDefaults) :
-    TProjection::TProjection(label) {
+  ObliqueCylindrical::ObliqueCylindrical(NaifContextPtr naif, Pvl &label, bool allowDefaults) :
+    TProjection::TProjection(label),
+    m_naif(NaifContext::UseDefaultIfNull(naif)) {
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
@@ -126,9 +127,9 @@ namespace Isis {
         double longitudeAngle = (360.0 - m_poleLongitude) * (PI / 180.0);
         double pvec[3][3];
 
-        NaifStatus::CheckErrors();
-        eul2m_c(rotationAngle, latitudeAngle, longitudeAngle, 3, 2, 3, pvec);
-        NaifStatus::CheckErrors();
+        NaifStatus::CheckErrors(m_naif);
+        eul2m_c(m_naif->get(), rotationAngle, latitudeAngle, longitudeAngle, 3, 2, 3, pvec);
+        NaifStatus::CheckErrors(m_naif);
 
         // Reset the vector keywords
         if (mapGroup.hasKeyword("XAxisVector")) {
@@ -462,7 +463,7 @@ namespace Isis {
  * @return @b Isis::Projection* Pointer to an ObliqueCylindrical 
  *         projection object.
  */
-extern "C" Isis::Projection *ObliqueCylindricalPlugin(Isis::Pvl &lab,
+extern "C" Isis::Projection *ObliqueCylindricalPlugin(Isis::NaifContextPtr naif, Isis::Pvl &lab,
     bool allowDefaults) {
-  return new Isis::ObliqueCylindrical(lab, allowDefaults);
+  return new Isis::ObliqueCylindrical(naif, lab, allowDefaults);
 }

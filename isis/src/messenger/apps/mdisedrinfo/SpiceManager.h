@@ -31,6 +31,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "IException.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -59,10 +60,10 @@ namespace Isis {
   class SpiceManager {
     public:
       /** Default Constructor */
-      SpiceManager() : _kernlist(), _furnish(true) { }
-      SpiceManager(const QString &filename, bool furnish = true);
+      SpiceManager(NaifContextPtr naif = nullptr);
+      SpiceManager(NaifContextPtr naif, const QString &filename, bool furnish = true);
       SpiceManager(Cube &cube, bool furnish = true);
-      SpiceManager(Pvl &pvl, bool furnish = true);
+      SpiceManager(NaifContextPtr naif, Pvl &pvl, bool furnish = true);
       /** Destructor always unloads the kernels from the pool */
       virtual ~SpiceManager() {
         Unload();
@@ -82,6 +83,7 @@ namespace Isis {
     private:
       std::vector<QString> _kernlist;  //!< The list of kernels
       bool _furnish;                       //!< Load the kernels found?
+      NaifContextPtr _naif;
 
       void loadKernel(PvlKeyword &key);
       void loadKernelFromTable(PvlKeyword &key, const QString &tblname,

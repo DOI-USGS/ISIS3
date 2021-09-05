@@ -22,6 +22,7 @@ void IsisMain() {
 
   // Get the user interface and from filename
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   // The linear option can never be true in Isis2, if it is needed, comment out
   // the following line, and uncomment the line below it. Also, add the code
@@ -30,7 +31,7 @@ void IsisMain() {
 // linear = ui.GetBoolean("LINEAR");
   const QString in = ui.GetFileName("FROM");
 
-  calParam = new CalParameters(in);
+  calParam = new CalParameters(naif, in);
 
   // Open the input cube
   Cube icube;

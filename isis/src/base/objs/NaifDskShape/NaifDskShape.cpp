@@ -99,7 +99,7 @@ namespace Isis {
 
     // Attempt to initialize the DSK file - exception ensues if errors occur
     // error thrown if ShapeModel=Null (i.e. Ellipsoid)
-    m_model = NaifDskPlateModel(dskFile);
+    m_model = NaifDskPlateModel(naif(), dskFile);
 
   }
 
@@ -310,10 +310,10 @@ namespace Isis {
     QVector<double> norm(3);
     // need a case for target == NULL
     QVector<Distance> radii = QVector<Distance>::fromStdVector(targetRadii());
-    NaifStatus::CheckErrors();
-    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
+    NaifStatus::CheckErrors(naif());
+    surfnm_c(naif()->get(), radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
              pB, &norm[0]);
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(naif());
 
     return (norm);
   }

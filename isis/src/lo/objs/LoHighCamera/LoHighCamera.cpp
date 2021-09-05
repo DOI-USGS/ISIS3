@@ -91,7 +91,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    double time = iTime(naif(), (QString)inst["StartTime"]).Et();
+    iTime time(naif(), (QString)inst["StartTime"]);
 
     // Setup focal plane map
     LoCameraFiducialMap fid(inst, naifIkCode());
@@ -156,11 +156,12 @@ namespace Isis {
    */
   pair<iTime, iTime> LoHighCamera::ShutterOpenCloseTimes(double time,
                                                          double exposureDuration) {
-    pair<iTime, iTime> shuttertimes;
-    // To get shutter start (open) time, subtract half the exposure duration from the center time
-    shuttertimes.first = time - (exposureDuration / 2);
-    // To get shutter end (close) time, add half the exposure duration to the center time
-    shuttertimes.second = time + (exposureDuration / 2);
+    pair<iTime, iTime> shuttertimes {
+      // To get shutter start (open) time, subtract half the exposure duration from the center time
+      iTime(naif(), time - (exposureDuration / 2)),
+      // To get shutter end (close) time, add half the exposure duration to the center time
+      iTime(naif(), time + (exposureDuration / 2))
+    };
     return shuttertimes;
   }
 }

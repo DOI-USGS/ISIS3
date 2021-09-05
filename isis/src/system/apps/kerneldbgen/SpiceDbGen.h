@@ -36,6 +36,7 @@
 #include "IString.h"
 #include "KernelDb.h"
 #include "Pvl.h"
+#include "NaifContext.h"
 
 /**
  * @brief Utility for SPICE kernel interrogation and kerneldb generation
@@ -60,7 +61,7 @@
 class SpiceDbGen {
 
   public:
-    SpiceDbGen(QString type);
+    SpiceDbGen(NaifContextPtr naif, QString type);
     Isis::PvlObject Direct(QString quality, QString location,
                            std::vector<QString> & filter, double startOffset, double endOffset);
     Isis::PvlObject Direct(QString quality, Isis::FileList fileList,
@@ -77,6 +78,7 @@ class SpiceDbGen {
     //private instance variables
     QString p_type;
     QString m_coverageLevel; //! The time coverage level of the database: INTERVAL or SEGMENT
+    NaifContextPtr m_naif;
     static const char *calForm;
 };
 

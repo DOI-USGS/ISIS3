@@ -79,7 +79,7 @@ namespace Isis {
       demCubeFile = (QString) kernels["ShapeModel"];
     }
 
-    m_demCube = new Isis::Cube(demCubeFile);
+    m_demCube = new Isis::Cube(demCubeFile, "r", target->naif());
 
     // This caching algorithm works much better for DEMs than the default,
     //   regional. This is because the uniqueIOCachingAlgorithm keeps track
@@ -167,7 +167,9 @@ namespace Isis {
 
     double tol2 = tol * tol;
 
-    NaifStatus::CheckErrors();
+    auto n = naif();
+
+    NaifStatus::CheckErrors(n);
     while (!done) {
 
       if (it > maxit) {
@@ -205,7 +207,7 @@ namespace Isis {
 
       double r = radiusKm.kilometers();
       bool status;
-      surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
+      surfpt_c(n->get(), (SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
                (SpiceBoolean*) &status);
 
       // LinearAlgebra::Vector point = LinearAlgebra::vector(observerPos[0],
@@ -241,7 +243,7 @@ namespace Isis {
 
       it ++;
     } // end of while loop
-    NaifStatus::CheckErrors();
+    NaifStatus::CheckErrors(n);
 
     return hasIntersection();
   }
@@ -317,9 +319,11 @@ namespace Isis {
 
     vector<double> normal(3,0.);
 
-    NaifStatus::CheckErrors();
-    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
-    NaifStatus::CheckErrors();
+    auto n = naif();
+
+    NaifStatus::CheckErrors(n);
+    surfnm_c(n->get(), a, b, c, pB, (SpiceDouble *) &normal[0]);
+    NaifStatus::CheckErrors(n);
 
     setNormal(normal);
     setHasNormal(true);
@@ -368,18 +372,20 @@ namespace Isis {
       return;
     }
 
+    auto n = naif()->get();
+
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
-    vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
+    vsub_c(n, neighborPoints[0], neighborPoints[1], topMinusBottom);
     double rightMinusLeft[3];
-    vsub_c(neighborPoints[3], neighborPoints [2], rightMinusLeft);
+    vsub_c(n, neighborPoints[3], neighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
-    ucrss_c(topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
+    ucrss_c(n, topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
 
     // unitize normal (and do sanity check for magnitude)
     double mag;
-    unorm_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
+    unorm_c(n, (SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
 
     if (mag == 0.0) {
       normal[0] = normal[1] = normal[2] = 0.0;
@@ -398,10 +404,10 @@ namespace Isis {
     double centerLookVect[3];
     SpiceDouble pB[3];
     surfaceIntersection()->ToNaifArray(pB);
-    unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c((SpiceDouble *) &normal[0], centerLookVect);
+    unorm_c(n, pB, centerLookVect, &mag);
+    double dotprod = vdot_c(n, (SpiceDouble *) &normal[0], centerLookVect);
     if (dotprod < 0.0) {
-      vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
+      vminus_c(n, (SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
     }
 
     setNormal(normal);
@@ -416,5 +422,11 @@ namespace Isis {
     calculateDefaultNormal();
   }
 
+  /**
+   * Returns the NaifContext for the Cube & Target object.
+   */
+  NaifContextPtr DemShape::naif() const {
+    return m_demCube->naif();
+  }
 
 }

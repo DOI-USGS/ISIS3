@@ -33,6 +33,7 @@
 #include "CollectorMap.h"
 #include "IException.h"
 #include "Pvl.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -111,11 +112,11 @@ namespace Isis {
 class Kernels {
     public:
       /** Default Constructor */
-      Kernels();
+      Kernels(NaifContextPtr naif);
       Kernels(const Kernels &kernels);
-      Kernels(const QString &filename);
+      Kernels(NaifContextPtr naif, const QString &filename);
       Kernels(Cube &cube);
-      Kernels(Pvl &pvl);
+      Kernels(NaifContextPtr naif, Pvl &pvl);
       /** Destructor always unloads the kernels from the pool */
       virtual ~Kernels() { UnLoad(); }
 
@@ -172,6 +173,8 @@ class Kernels {
     typedef std::vector<KernelFile> KernelList;
     KernelList _kernels;
     int        _camVersion;
+
+    NaifContextPtr _naif;
 
     typedef std::vector<KernelFile *> KernelFileList;
     typedef CollectorMap<QString, KernelFileList> TypeList;
