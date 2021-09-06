@@ -131,6 +131,8 @@ namespace Isis {
       ldir = xdir;
     }
 
+    auto n = naif()->get();
+
     // Put the translation coefficients into the Naif kernel pool so the
     // CameraFocalPlaneClass can find them
     try {
@@ -149,7 +151,7 @@ namespace Isis {
       storeValue("IDEAL_TRANSX", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSX", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSX", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSX", 3, keyval);
+      pdpool_c(n, "IDEAL_TRANSX", 3, keyval);
     }
 
     try {
@@ -168,7 +170,7 @@ namespace Isis {
       storeValue("IDEAL_TRANSY", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSY", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSY", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSY", 3, keyval);
+      pdpool_c(n, "IDEAL_TRANSY", 3, keyval);
     }
 
     try {
@@ -187,7 +189,7 @@ namespace Isis {
       storeValue("IDEAL_TRANSS", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSS", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSS", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSS", 3, keyval);
+      pdpool_c(n, "IDEAL_TRANSS", 3, keyval);
     }
 
     try {
@@ -206,7 +208,7 @@ namespace Isis {
       storeValue("IDEAL_TRANSL", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSL", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSL", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSL", 3, keyval);
+      pdpool_c(n, "IDEAL_TRANSL", 3, keyval);
     }
 
     // Create correct camera type
@@ -221,7 +223,7 @@ namespace Isis {
       new CameraGroundMap(this);
       new CameraSkyMap(this);
 
-      setTime(et);
+      setTime(iTime(naif(), et));
       LoadCache();
     }
     else if (type.toUpper() == "LINESCAN") {

@@ -108,7 +108,7 @@ namespace Isis {
 
     // Setup focal plane map
     if(type == Fiducial) {
-      LoCameraFiducialMap fid(inst, naifIkCode());
+      LoCameraFiducialMap fid(naif(), inst, naifIkCode());
       CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
       // Try (0.,0.)
       focalMap->SetDetectorOrigin(0.0, 0.0);

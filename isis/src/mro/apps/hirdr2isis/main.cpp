@@ -17,6 +17,7 @@ void IsisMain() {
   ProcessImportPds p;
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   QString labelFile = ui.GetFileName("FROM");
 
@@ -71,7 +72,7 @@ void IsisMain() {
 
     //  Get the target and check for validity
     QString target = label.findKeyword("TargetName", PvlObject::Traverse)[0];
-    PvlGroup radii = Target::radiiGroup(target);
+    PvlGroup radii = Target::radiiGroup(naif, target);
 
     // Set existing radius to CenterLatitudeRadius
     PvlKeyword &eqRadius =  mapgrp.findKeyword("EquatorialRadius");

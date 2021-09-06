@@ -14,10 +14,11 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   PvlGroup dependency("Dependencies");
 
   // Create the database writer based on the kernel type
-  SpiceDbGen sdg(ui.GetString("TYPE"));
+  SpiceDbGen sdg(naif, ui.GetString("TYPE"));
 
   // Load the SCLK. If it exists, add its location to the dependency group
   // If there is none, set a flag so that no file is searched for

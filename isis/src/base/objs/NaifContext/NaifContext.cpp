@@ -33,14 +33,14 @@ namespace Isis {
   NaifContext::CSpiceState::CSpiceState(const CSpiceState &src) : m_state(cspice_copy(src.m_state.get()), &cspice_free) {}
 
   NaifContext::NaifContext()
-    : m_cspice()
-    , naifStatusInitialized(false), iTimeInitialized(false), targetPckLoaded(false)
+    : naifStatusInitialized(false), iTimeInitialized(false), targetPckLoaded(false)
     , amicaTimingLoaded(false), hayabusaTimingLoaded(false), mdisTimingLoaded(false)
     , mocWagoLoaded(false), hiJitCubeLoaded(false), hiCalTimingLoaded(false)
+    , m_cspice()
   {
   }
 
-  NaifContext *NaifContext::ctx() { return &static_global_state; }
-  void        *NaifContext::ctx() { return static_global_state(); }
+  NaifContext *NaifContext::ctx()  { return &static_global_state; }
+  void        *NaifContext::naif() { return static_global_state(); }
   
 }

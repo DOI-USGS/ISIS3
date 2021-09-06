@@ -187,6 +187,7 @@ namespace Isis {
       virtual ~Sensor();
 
       void setTime(const iTime &time);
+      void setTime(double time);
       bool SetLookDirection(const double v[3]);
       bool SetRightAscensionDeclination(const double ra, const double dec);
       bool SetUniversalGround(const double latitude, const double longitude,

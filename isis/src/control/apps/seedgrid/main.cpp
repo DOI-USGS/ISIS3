@@ -31,6 +31,7 @@ void IsisMain() {
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   // get the pvl containing a mapping group
   Pvl userMap;
@@ -60,7 +61,7 @@ void IsisMain() {
   // If the mapping group doesn't have the target radii, try to get them from the Target class.
   if (!mapGroup.hasKeyword("EquatorialRadius")) {
     try {
-      PvlGroup pvlRadii = Target::radiiGroup(target);
+      PvlGroup pvlRadii = Target::radiiGroup(naif, target);
       mapGroup += PvlKeyword("EquatorialRadius", pvlRadii["EquatorialRadius"], "Meters");
       // if we successfully found equatorial radius, then polar should have worked too.
       mapGroup += PvlKeyword("PolarRadius", pvlRadii["PolarRadius"], "Meters");

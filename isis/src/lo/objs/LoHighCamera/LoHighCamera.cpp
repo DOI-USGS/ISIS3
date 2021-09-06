@@ -94,7 +94,7 @@ namespace Isis {
     iTime time(naif(), (QString)inst["StartTime"]);
 
     // Setup focal plane map
-    LoCameraFiducialMap fid(inst, naifIkCode());
+    LoCameraFiducialMap fid(naif(), inst, naifIkCode());
 
     // Setup detector map
     new CameraDetectorMap(this);

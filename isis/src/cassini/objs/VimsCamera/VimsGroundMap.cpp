@@ -216,7 +216,7 @@ namespace Isis {
       if (p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
-        p_camera->setTime(et);
+        p_camera->setTime(iTime(p_camera->naif(), et));
       }
 
       for (int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -224,7 +224,7 @@ namespace Isis {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-          p_camera->setTime(et);
+          p_camera->setTime(iTime(p_camera->naif(), et));
         }
 
         if (p_camera->SetImage((double) samp + 1, (double)line + 1)) {
@@ -325,14 +325,14 @@ namespace Isis {
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
     }
-    p_camera->setTime(et);
+    p_camera->setTime(iTime(p_camera->naif(), et));
 
     //  get Look Direction
     SpiceDouble lookC[3];
     LookDirection(lookC);
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
+    vhat_c(p_camera->naif()->get(), lookC, unitLookC);
     return p_camera->SetLookDirection(unitLookC);
   }
 
@@ -393,7 +393,7 @@ namespace Isis {
         //  Convert lat/lon to x/y/z
         Distance radius = p_camera->LocalRadius(lat, lon);
         SpiceDouble pB[3];
-        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
+        latrec_c(p_camera->naif()->get(), radius.kilometers(), lon.radians(), lat.radians(), pB);
 
         //  Make sure this point falls within range of image
         if (pB[0] < p_minX || pB[0] > p_maxX ||

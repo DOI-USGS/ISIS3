@@ -81,6 +81,7 @@ void IsisMain() {
   const QString mdiscalVersion = "1.6";
   const QString mdiscalRevision = "$Revision: 6715 $";
   QString mdiscalRuntime = Application::DateTime();
+  auto naif = Application::GetNaif();
 
   // Specify the version of the CDR generated
   // 2015-09-02 Jeannie Backer - Increased cdr version to 5
@@ -305,7 +306,7 @@ void IsisMain() {
   bool applyECFactor = ui.GetBoolean("ECFACTOR") && !g_isNarrowAngleCamera;// Not applicable to NAC
   if (applyECFactor) {  // Get correction for WAC filters
     empiricalCorrectionFile = "";
-    g_empiricalCorrectionFactor = loadEmpiricalCorrection(startTime, g_filterNumber + 1,
+    g_empiricalCorrectionFactor = loadEmpiricalCorrection(naif, startTime, g_filterNumber + 1,
                                                           empiricalCorrectionFile,
                                                           empiricalCorrectionDate);
     empiricalCorrectionFactor = toString(g_empiricalCorrectionFactor);
@@ -327,11 +328,11 @@ void IsisMain() {
     PvlGroup& inst = icube->group("Instrument");
     QString target = inst["TargetName"];
     QString startTime = inst["SpacecraftClockCount"];
-    if (sunDistanceAU(startTime, target, g_solarDist)) {
+    if (sunDistanceAU(naif, startTime, target, g_solarDist)) {
       vector<double> sol = loadSolarIrr(g_isNarrowAngleCamera, g_isBinnedData,
                                         g_filterNumber + 1, solirrfile);
       g_Ff = sol[2];
-      g_iof = pi_c() * (g_solarDist * g_solarDist) / g_Ff;
+      g_iof = pi_c(naif) * (g_solarDist * g_solarDist) / g_Ff;
       validIOF = true;
     }
     else {

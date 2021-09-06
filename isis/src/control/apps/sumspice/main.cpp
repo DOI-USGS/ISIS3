@@ -90,7 +90,7 @@ void IsisMain() {
                                                SumFinder::Stop;
 
   // Load any meta kernels if provided by user
-  Kernels meta;
+  Kernels meta(naif);
   if ( ui.WasEntered("METAKERNEL") ) {
     QString metafile = ui.GetFileName("METAKERNEL");
     meta.Add(metafile);

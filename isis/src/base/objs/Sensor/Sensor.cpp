@@ -113,7 +113,9 @@ namespace Isis {
     Spice::setTime(time);
     target()->shape()->clearSurfacePoint();
   }
-
+  void Sensor::setTime(double time) {
+    setTime(iTime(naif(), time));
+  }
 
   /**
    * Sets the look direction of the spacecraft. This routine will then attempt to
@@ -602,7 +604,7 @@ namespace Isis {
     vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
 
     SpiceDouble range;
-    recrad_c((SpiceDouble *)&lookJ[0], &range, &m_ra, &m_dec);
+    recrad_c(naif()->get(), (SpiceDouble *)&lookJ[0], &range, &m_ra, &m_dec);
     m_ra *= 180.0 / PI;
     m_dec *= 180.0 / PI;
   }
@@ -618,7 +620,7 @@ namespace Isis {
    */
   bool Sensor::SetRightAscensionDeclination(const double ra, const double dec) {
     vector<double> lookJ(3);
-    radrec_c(1.0, ra * PI / 180.0, dec * PI / 180.0, (SpiceDouble *)&lookJ[0]);
+    radrec_c(naif()->get(), 1.0, ra * PI / 180.0, dec * PI / 180.0, (SpiceDouble *)&lookJ[0]);
 
     vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
     return SetLookDirection((double *)&lookC[0]);
@@ -657,8 +659,9 @@ namespace Isis {
     pB[1] = shape->surfaceIntersection()->GetY().kilometers();
     pB[2] = shape->surfaceIntersection()->GetZ().kilometers();
 
-    vsub_c(pB, (SpiceDouble *) &sB[0], psB);
-    unorm_c(psB, upsB, &dist);
+    auto n = naif()->get();
+    vsub_c(n, pB, (SpiceDouble *) &sB[0], psB);
+    unorm_c(n, psB, upsB, &dist);
     return dist;
   }
 
@@ -725,7 +728,7 @@ namespace Isis {
 
     // Now with the 3 spherical value compute the x/y/z coordinate
     double ssB[3];
-    latrec_c(rad.kilometers(), rlon, rlat, ssB);
+    latrec_c(naif()->get(), rad.kilometers(), rlon, rlat, ssB);
 
     // Calc the change
     double xChange = spB[0] - ssB[0];

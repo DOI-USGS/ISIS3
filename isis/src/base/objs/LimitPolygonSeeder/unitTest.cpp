@@ -18,12 +18,14 @@
 #include "PvlGroup.h"
 #include "Target.h"
 #include "TProjection.h"
+#include "NaifContext.h"
 
 using namespace std;
 using namespace Isis;
 
 int main() {
   Isis::Preference::Preferences(true);
+  NaifContext naif;
   try {
     cout << "Test 1, create a seeder" << endl;
 
@@ -72,7 +74,7 @@ int main() {
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
-      PvlGroup radii = Target::radiiGroup("MARS");
+      PvlGroup radii = Target::radiiGroup(&naif, "MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -135,7 +137,7 @@ int main() {
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
       // Create the projection necessary for seeding
-      PvlGroup radii = Target::radiiGroup("MARS");
+      PvlGroup radii = Target::radiiGroup(&naif, "MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");

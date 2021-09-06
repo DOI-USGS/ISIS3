@@ -230,7 +230,8 @@ namespace Isis {
    * @param latRes  Resolution of latitude lines (in degrees/pixel)
    * @param lonRes  Resolution of longitude lines (in degrees/pixel)
    */
-  void GroundGrid::CreateGrid(Latitude baseLat, 
+  void GroundGrid::CreateGrid(NaifContextPtr naif,
+                              Latitude baseLat, 
                               Longitude baseLon,
                               Angle latInc,  
                               Angle lonInc,
@@ -295,7 +296,7 @@ namespace Isis {
     p_reinitialize = true;
 
     // Find starting points for lat/lon
-    Latitude startLat = Latitude(baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
+    Latitude startLat = Latitude(naif, baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
                                  *GetMappingGroup(), 
                                  Latitude::AllowPastPole);
 
@@ -311,7 +312,7 @@ namespace Isis {
                      Angle::Degrees);
     }
 
-    Latitude endLat = Latitude((long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
+    Latitude endLat = Latitude(naif, (long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
                                *GetMappingGroup());
     Longitude endLon =
         (long)((*p_maxLon - startLon) / lonInc) * lonInc + startLon;

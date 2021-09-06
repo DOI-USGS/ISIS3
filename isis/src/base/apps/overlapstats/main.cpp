@@ -26,6 +26,7 @@ QString FormatString(double input, int head, int tail);
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
 
   // Find all the overlaps between the images in the FROMLIST
@@ -122,7 +123,7 @@ void IsisMain() {
       PvlGroup &mapGroup = maplab.findGroup("Mapping");
 
       // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
-      mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+      mapGroup = Target::radiiGroup(naif, cubeLab, mapGroup);
 
       // mapGroup started as empty, so no need to replace here, just add keywords 
       mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
