@@ -321,16 +321,16 @@ remove these elements to and from your path.
 
 ### Updating
 
-  To update to a new version of ISIS up to version 3.9.1, simply run `conda update isis3`
+  To update to the newest version of ISIS, run `mamba update -c usgs-astrogeology isis`
 
-  To update to our latest release candidate up to version 3.9.1, run `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  To update to our latest release candidate , run `mamba update -c usgs-astrogeology/label/RC isis`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `conda update isis3` and
-  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
-  will no longer work for additional updates. Instead, after installing an `isis` package,
-  `conda update isis` should be used to update to a new version and
-  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
+  available under the package name `isis` and `mamba update isis3` and
+  `mamba update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  will not work for additional updates. Instead, after installing an `isis` package,
+  `mamba update isis` should be used to update to a new version and
+  `mamba update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 
