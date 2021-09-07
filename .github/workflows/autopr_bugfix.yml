@@ -47,5 +47,5 @@ jobs:
         pr_branch: ${{steps.get_short_version.outputs.major_minor}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DRY_RUN: true
+        DRY_RUN: false
 
