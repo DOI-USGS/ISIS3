@@ -79,6 +79,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
         conda config --env --add channels usgs-astrogeology
 
 6.  Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
+
         conda install -c conda-forge mamba
 
 7.  The environment is now ready to download ISIS and its dependencies:
