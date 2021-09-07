@@ -78,25 +78,27 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
         conda config --env --add channels usgs-astrogeology
 
+6.  Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
+        conda install -c conda-forge mamba
 
-6.  The environment is now ready to download ISIS and its dependencies:
+7.  The environment is now ready to download ISIS and its dependencies:
 
-        conda install -c usgs-astrogeology isis
+        mamba install -c usgs-astrogeology isis
 
     If you would like to work with our latest ISIS version 3, rather than updating
     to ISIS 4, instead run:
 
-	    conda install -c usgs-astrogeology isis=3.10.0
+	    mamba install -c usgs-astrogeology isis=3.10.0
 
 
-7.  Finally, setup the environment variables:
+8.  Finally, setup the environment variables:
 
-    ISIS requires several environment variables to be set in order to run correctly. 
-    The variables include: ISISROOT and ISISDATA. 
+    ISIS requires several environment variables to be set in order to run correctly.
+    The variables include: ISISROOT and ISISDATA.
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area"). 
-    
-    The following steps are only valid for versions of ISIS after 4.2.0.   
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area").
+
+    The following steps are only valid for versions of ISIS after 4.2.0.
     For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
 
     There are two methods to configure the environment variables for ISIS:
@@ -104,23 +106,23 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     7.1 Using the provided isisVarInit.py script:
 
       To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
-  
+
           python $CONDA_PREFIX/scripts/isisVarInit.py
-  
+
       Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
-  
-          python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  
-  
-      Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py. 
+
+          python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
+
+      Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
       This does not happen retroactively, so re-activate the isis environment with one of the following commands:
-  
+
           for Anaconda 3.4 and up - conda activate isis
           prior to Anaconda 3.4 - source activate isis
 
     7.2 Using `conda env config vars`
 
       Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
-      This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed. 
+      This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
 
       To determine if your version of conda is recent enough run:
 
@@ -128,24 +130,26 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
       If the version number is less than 4.8, update conda to a newer version by running:
 
-          conda update -n base conda 
+          conda update -n base conda
 
-      The version number should now be greater than 4.8. 
+      The version number should now be greater than 4.8.
 
       To use the built in environment variable configuration feature, first activate the environment by first running:
 
-          conda activate isis 
+          conda activate isis
 
       After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
       To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
 
-          conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory] 
-      
+          conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
+
       To make these changes take effect, re-activate the isis environment by running:
 
           conda activate isis
 
       The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
+
+      **Note** This method will not enable tab completion for arguments in C-Shell.
 
 
 
@@ -321,7 +325,7 @@ remove these elements to and from your path.
   To update to our latest release candidate up to version 3.9.1, run `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `conda update isis3` and  
+  available under the package name `isis` and `conda update isis3` and
   `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
   will no longer work for additional updates. Instead, after installing an `isis` package,
   `conda update isis` should be used to update to a new version and
