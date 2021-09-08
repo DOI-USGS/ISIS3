@@ -295,6 +295,9 @@ namespace Isis {
     }
 
     std::vector<geos::geom::Geometry *> *polys = new std::vector<geos::geom::Geometry *>;
+
+    // Do we lose ownership of global p_pts here?
+    // Could cause problems
     geos::geom::Polygon *poly = globalFactory->createPolygon(globalFactory->createLinearRing(p_pts), nullptr);
     polys->push_back(poly->clone().release());
     // createMultiPolygon takes ownership of polys argument
@@ -1323,11 +1326,11 @@ namespace Isis {
       std::cout << "F 2==========" << std::endl;
       delete newGeom;
       std::cout << "F 3==========" << std::endl;
-      delete newLonLatPts;
+      // delete newLonLatPts;
       std::cout << "F 4==========" << std::endl;
-      delete pts;
+      // delete pts;
       std::cout << "F 5==========" << std::endl;
-      delete pts2;
+      // delete pts2;
       std::cout << "F 6==========" << std::endl;
     }
     catch(geos::util::IllegalArgumentException *geosIll) {

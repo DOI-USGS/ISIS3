@@ -280,7 +280,7 @@ namespace Isis {
                                                  ugm->Line()));
           } // end num coords in hole loop
           holes->push_back(globalFactory->createLinearRing(slcoords));
-          delete slcoords;
+          // delete slcoords;
           delete llcoords;
         } // end num holes in polygon loop
 
@@ -822,13 +822,14 @@ namespace Isis {
       }
 
       // Test the middle point for a spike
+      // IsSpiked takes ownership of these inputs
       if(IsSpiked(vertices->getAt(testCoords[0]),
                   vertices->getAt(testCoords[1]),
                   vertices->getAt(testCoords[2]))) {
         // It's spiked, delete it
         std::vector<geos::geom::Coordinate> coords;
         vertices->toVector(coords);
-        coords.erase(coords.begin()+testCoords[1]);
+        coords.erase(coords.begin()+testCoords[1]); // testCoords[1] destructor called here without ownership
         vertices->setPoints(coords);
 
         // Back up to the first test that is affected by this change
@@ -894,6 +895,7 @@ namespace Isis {
    */
   bool PolygonTools::TestSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle,
                                 geos::geom::Coordinate last) {
+    // globalFactory takes ownership of function inputs
     geos::geom::Point *firstPt = Isis::globalFactory->createPoint(first);
     geos::geom::Point *middlePt = Isis::globalFactory->createPoint(middle);
     geos::geom::Point *lastPt = Isis::globalFactory->createPoint(last);
@@ -951,7 +953,7 @@ namespace Isis {
       delete poly;
     }
 
-
+    // TODO are these owned by libgeos now?
     delete firstPt;
     delete middlePt;
     delete lastPt;
@@ -2067,7 +2069,7 @@ namespace Isis {
       geos::geom::Polygon *newPoly = globalFactory->createPolygon
                                      (globalFactory->createLinearRing(newLonLatPts), NULL);
       geos::geom::MultiPolygon *multi_polygon = PolygonTools::MakeMultiPolygon(newPoly);
-      delete newLonLatPts;
+      // delete newLonLatPts;
       return multi_polygon;
     }
 
@@ -2162,9 +2164,9 @@ namespace Isis {
             lon = lon - 360;
           }
           newLonLatPts->add(geos::geom::Coordinate(lon, lat), k);
-
-          delete pts3;
         }
+        delete pts3;
+
         // Add the points to polys
         finalpolys->push_back(globalFactory->createPolygon
                               (globalFactory->createLinearRing(newLonLatPts), NULL));
@@ -2178,11 +2180,11 @@ namespace Isis {
 
       geos::geom::MultiPolygon *multi_polygon = globalFactory->createMultiPolygon(finalpolys);
 
-      delete finalpolys;
+      // delete finalpolys;
       delete newGeom;
-      delete newLonLatPts;
-      delete pts;
-      delete pts2;
+      // delete newLonLatPts;
+      // delete pts;
+      // delete pts2;
       return multi_polygon;
     }
     catch(geos::util::IllegalArgumentException *geosIll) {
