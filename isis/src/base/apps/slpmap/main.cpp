@@ -17,8 +17,8 @@ using namespace std;
 using namespace Isis;
 
 UniversalGroundMap *g_groundMap;
-SurfacePoint g_upperLeft;
-SurfacePoint g_lowerLeft;
+SurfacePoint g_upperLeft(nullptr);
+SurfacePoint g_lowerLeft(nullptr);
 double g_conversionFactor;
 
 enum OutputType {
@@ -48,6 +48,7 @@ void IsisMain() {
 
   // Get the output type either ASPECT, SLOPE, or SLOPEPERCENT
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
   if (ui.GetString("OUTPUT") == "ASPECT") {
     g_outputType = Aspect;
   }
@@ -80,7 +81,7 @@ void IsisMain() {
   }
   else {
     if (ui.GetString("PIXRES") == "AUTOMATIC") {
-      g_upperLeft = g_lowerLeft = SurfacePoint();
+      g_upperLeft = g_lowerLeft = SurfacePoint(naif);
       g_groundMap = new UniversalGroundMap(*icube);
       p.StartProcess(createSlpCubeAutomatic);
     }
@@ -127,9 +128,10 @@ void IsisMain() {
  * @param v Output value
  */
 void createSlpCubeAutomatic(Buffer &in, double &v) {
+  auto naif = Application::GetNaif();
   // Can't do anything if the center pixel is bad
   if (in[4] == Isis::Null) {
-    g_upperLeft = g_lowerLeft = SurfacePoint();
+    g_upperLeft = g_lowerLeft = SurfacePoint(naif);
     v = Isis::Null;
     return;
   }
@@ -164,7 +166,7 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     }  
   }
 
-  SurfacePoint upperRight;
+  SurfacePoint upperRight(naif);
   if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) - 0.5) ) {
     upperRight.SetSphericalCoordinates(
                    Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
@@ -172,7 +174,7 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
                    Distance(in[4],Distance::Meters));
   }  
 
-  SurfacePoint lowerRight;
+  SurfacePoint lowerRight(naif);
   if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) + 0.5) ) {
     lowerRight.SetSphericalCoordinates(
                    Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),

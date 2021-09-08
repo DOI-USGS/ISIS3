@@ -68,7 +68,7 @@ void IsisMain() {
   for (int i = 0 ; i < flist.size() ; i++) {
     // Add and process each image
     try {
-      kernel.add(SpkSegment(flist[i].toString(), spkType)); 
+      kernel.add(SpkSegment(naif, flist[i].toString(), spkType)); 
     } 
     catch (IException &ie) {
       QString mess = "Cannot create type 13 SPK. Please use type 9 or run jigsaw to create a "

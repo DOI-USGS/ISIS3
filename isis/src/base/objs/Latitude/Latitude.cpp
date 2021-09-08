@@ -537,7 +537,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(m_naif, mapping["TargetName"][0]);
         equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                     Distance::Meters);
         polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),

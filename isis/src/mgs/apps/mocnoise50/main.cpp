@@ -48,7 +48,7 @@ void IsisMain() {
   // message
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM", OneBand);
-  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"));
+  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"), icube->naif());
   int nlines = icube->lineCount();
 
   // Must be narrow angle

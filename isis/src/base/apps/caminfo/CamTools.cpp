@@ -249,16 +249,16 @@ namespace Isis {
 
         //  Parallax values (Corrected 2012-11-23, KJB)
         if(!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftGroundAzimuth)) {
-          double emi_r  = DegToRad(g.emi);
-          double ssga_r = DegToRad(g.subSpacecraftGroundAzimuth);
+          double emi_r  = DegToRad(_naif, g.emi);
+          double ssga_r = DegToRad(_naif, g.subSpacecraftGroundAzimuth);
           g.parallaxx = -tan(emi_r) * cos(ssga_r);
           g.parallaxy =  tan(emi_r) * sin(ssga_r);
         }
 
         // Shadow values (Corrected 2012-11-23, KJB)
         if(!IsSpecial(g.inc) && !IsSpecial(g.subSolarGroundAzimuth)) {
-          double inc_r  = DegToRad(g.inc);
-          double ssga_r = DegToRad(g.subSolarGroundAzimuth);
+          double inc_r  = DegToRad(_naif, g.inc);
+          double ssga_r = DegToRad(_naif, g.subSolarGroundAzimuth);
           g.shadowx = -tan(inc_r) * cos(ssga_r);
           g.shadowy =  tan(inc_r) * sin(ssga_r);
         }
@@ -724,11 +724,11 @@ namespace Isis {
     if(IsSpecial(lon2)) return (false);
     if(IsSpecial(radius)) return (false);
 
-    SurfacePoint point1(
+    SurfacePoint point1(_naif, 
       Latitude(lat1, Angle::Degrees),
       Longitude(lon1, Angle::Degrees),
       Distance(radius, Distance::Meters));
-    SurfacePoint point2(
+    SurfacePoint point2(_naif, 
       Latitude(lat2, Angle::Degrees),
       Longitude(lon2, Angle::Degrees),
       Distance(radius, Distance::Meters));

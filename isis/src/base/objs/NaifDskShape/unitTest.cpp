@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Find local radius given lat/lon";
-    Latitude lat(0, Angle::Degrees);
+    Latitude lat(&naif, 0, Angle::Degrees);
     Longitude lon(0, Angle::Degrees);
     Distance rad = shapeModelFromPvlElevation.localRadius(lat, lon);
     qDebug() << "Local radius at (" << lat.degrees() << ", " 
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
     try {
       // if the surface point is accidentally reset to an invalid point, but hasIntercept still 
       // set to true.
-      shapeModelFromPvlElevation.setSurfacePoint(SurfacePoint());
+      shapeModelFromPvlElevation.setSurfacePoint(SurfacePoint(&naif));
       shapeModelFromPvlElevation.ellipsoidNormal();
     } 
     catch (IException &e) {

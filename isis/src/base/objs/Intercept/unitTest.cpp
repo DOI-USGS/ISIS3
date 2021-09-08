@@ -43,6 +43,7 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContext naif;
     qDebug() << "Unit test for Intercept.";
     qDebug() << "";
 
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
     try {
       SurfacePoint *invalidSP = NULL;
       Intercept invalidIntercept(observer, raydir, invalidSP, shape.take());
-      invalidIntercept.emission();  
+      invalidIntercept.emission(&naif);  
     } 
     catch (IException &e) {
       e.print();
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
     try {
       TriangularPlate *invalidShape = NULL;
       Intercept invalidIntercept(observer, raydir, ipoint.take(), invalidShape);
-      invalidIntercept.emission();  
+      invalidIntercept.emission(&naif);  
     } 
     catch (IException &e) {
       e.print();

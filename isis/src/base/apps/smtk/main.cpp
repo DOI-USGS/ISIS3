@@ -39,11 +39,11 @@ map <QString,void*> GuiHelpers(){
 }
 
 /** Function to create a Control point from an SmtkPoint */
-ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
+ControlPoint CreatePoint(NaifContextPtr naif, const SmtkPoint &spnt, const QString &pid,
                          const QString &lcn, const QString &rcn) {
   ControlPoint pnt(pid);
   Coordinate geom = spnt.getGeometry().getLeft();
-  SurfacePoint surpnt(Latitude(geom.getLatitude(), Angle::Degrees),
+  SurfacePoint surpnt(naif, Latitude(geom.getLatitude(), Angle::Degrees),
                       Longitude(geom.getLongitude(), Angle::Degrees),
                       Distance(1.0, Distance::Kilometers));  // Kludge radius
   pnt.SetAprioriSurfacePoint(surpnt);
@@ -72,7 +72,7 @@ ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
 
 
 /** Function that creates and writes a control network from a SmtkQStack */
-void WriteCnet(const QString &netfile, SmtkQStack &points,
+void WriteCnet(NaifContextPtr naif, const QString &netfile, SmtkQStack &points,
                const Pvl &label, const QString &lcn,
                const QString &rcn) {
    // Initialize control point network
@@ -84,7 +84,7 @@ void WriteCnet(const QString &netfile, SmtkQStack &points,
   SmtkQStackIter pnt = points.begin();
   for (int i = 0 ; pnt != points.end() ; i++, ++pnt) {
     QString pntid = "Point_" + toString(i);
-    cn.AddPoint(new ControlPoint(CreatePoint(pnt.value(), pntid, lcn, rcn)));
+    cn.AddPoint(new ControlPoint(CreatePoint(naif, pnt.value(), pntid, lcn, rcn)));
   }
 
   cn.Write(netfile);
@@ -100,6 +100,7 @@ void IsisMain() {
   // process. Fixes #4058.
   qSetGlobalQHashSeed(1031);
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = Application::GetNaif();
 
   // Open the first cube.  It is the left hand image.
   Cube lhImage;
@@ -287,7 +288,7 @@ void IsisMain() {
 
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
-      WriteCnet(ui.GetFileName("OSEEDNET"), gstack,
+      WriteCnet(naif, ui.GetFileName("OSEEDNET"), gstack,
                 *lhImage.label(), serialLeft, serialRight);
     }
 
@@ -481,7 +482,7 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if (ui.WasEntered("ONET")) {
-    WriteCnet(ui.GetFileName("ONET"), bmf, *lhImage.label(), serialLeft,
+    WriteCnet(naif, ui.GetFileName("ONET"), bmf, *lhImage.label(), serialLeft,
               serialRight);
   }
 

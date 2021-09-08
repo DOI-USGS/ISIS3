@@ -34,6 +34,7 @@
 #include "SpecialPixel.h"
 #include "ImagePolygon.h"
 #include "IException.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -84,12 +85,12 @@ namespace Isis {
 
 
   /** Returns degree to radian conversion factor */
-  inline double DegToRad(const double ang) {
-    return (ang * rpd_c());
+  inline double DegToRad(NaifContextPtr naif, const double ang) {
+    return (ang * rpd_c(naif->get()));
   }
   /** Returns radians to degrees conversion factor */
-  inline double RadToDeg(const double ang) {
-    return (ang * dpr_c());
+  inline double RadToDeg(NaifContextPtr naif, const double ang) {
+    return (ang * dpr_c(naif->get()));
   }
 
   /**  A very useful, typesafe way to delete pointers in STL container
@@ -152,10 +153,11 @@ namespace Isis {
   class BandGeometry {
 
     public:
-      BandGeometry() : _nLines(0), _nSamps(0), _nBands(0), _sampleInc(1),
+      BandGeometry(NaifContextPtr naif) : _nLines(0), _nSamps(0), _nBands(0), _sampleInc(1),
         _lineInc(1), _radius(1.0), _isBandIndependent(true),
         _hasCenterGeom(false), _gBandList(), _polys(),
-        _combined(0), _mapping() {  }
+        _combined(0), _mapping(),
+        _naif(NaifContext::UseDefaultIfNull(naif)) {  }
       ~BandGeometry() {
         destruct();
       }
@@ -287,6 +289,8 @@ namespace Isis {
                          double lat2, double lon2, double radius,
                          double &thisDist) const;
       geos::geom::MultiPolygon *makeMultiPolygon(geos::geom::Geometry *g) const;
+
+      NaifContextPtr _naif;
 
 
   };

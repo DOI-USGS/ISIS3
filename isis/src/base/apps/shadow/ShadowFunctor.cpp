@@ -226,7 +226,7 @@ namespace Isis {
         // We need to calculate the direction of the light source (sun) relative to the surface
         //   point.
         if (elevationModelProjection->SetWorld(sample + 1, line + 1)) {
-          SurfacePoint startSurfacePoint(
+          SurfacePoint startSurfacePoint(m_inputDem->camera()->naif(),
               Latitude(elevationModelProjection->UniversalLatitude(), Angle::Degrees),
               Longitude(elevationModelProjection->UniversalLongitude(), Angle::Degrees),
               demElevation);
@@ -340,7 +340,7 @@ namespace Isis {
             rayFromSurfaceToSun[2] = sunEdgeInBoxyFixed[2] - rayStartPointInBodyFixed[2];
           }
 
-          SurfacePoint secondSurfacePoint(
+          SurfacePoint secondSurfacePoint(m_inputDem->camera()->naif(),
               Displacement(rayStartPointInBodyFixed[0] + rayFromSurfaceToSunCenterNormalized[0],
                            Displacement::Meters),
               Displacement(rayStartPointInBodyFixed[1] + rayFromSurfaceToSunCenterNormalized[1],
@@ -809,7 +809,7 @@ namespace Isis {
       tooFarFromTarget = (rayPointElevation > Distance(m_inputDemMax, Distance::Meters));
 
       // We need to find the DEM line/sample that corresponds to this ray point.
-      SurfacePoint surfacePoint(
+      SurfacePoint surfacePoint(m_inputDem->camera()->naif(),
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[0], Displacement::Meters),
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[1], Displacement::Meters),
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[2], Displacement::Meters));
