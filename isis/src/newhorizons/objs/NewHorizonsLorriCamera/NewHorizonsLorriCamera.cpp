@@ -55,7 +55,7 @@ namespace Isis {
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // The LORRI focal length is fixed and is designed not to change throught the operational 
     // temperature. The NAIF code, set in the ISIS labels, will be used to read a single focal 
@@ -114,15 +114,15 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString clockCount = inst["SpacecraftClockStartCount"];
-    iTime et = getClockTime(clockCount);
+    double et = getClockTime(clockCount).Et();
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
 
-    pair<iTime, iTime> startStop = ShutterOpenCloseTimes(et.Et(), exposureDuration);
+    pair<iTime, iTime> startStop = ShutterOpenCloseTimes(et, exposureDuration);
     setTime(et);
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
   /**

@@ -43,8 +43,9 @@ namespace Isis {
  * bodies.
  */
 
-static void loadNaifTiming(NaifContextPtr naif) {
-  if (!naif->get_amicaTimingLoaded()) {
+static void loadNaifTiming() {
+  auto naifState = NaifContext::get()->top();
+  if (!naifState->amicaTimingLoaded()) {
 
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
@@ -64,19 +65,17 @@ static void loadNaifTiming(NaifContextPtr naif) {
     QString pckName3(pck3.expanded());
     QString pckName4(pck4.expanded());
 
-    auto n = naif->get();
+    furnsh_c(leapsecondsName.toLatin1().data());
+    furnsh_c(sclkName.toLatin1().data());
 
-    furnsh_c(n, leapsecondsName.toLatin1().data());
-    furnsh_c(n, sclkName.toLatin1().data());
-
-    furnsh_c(n, pckName1.toLatin1().data());
-    furnsh_c(n, pckName2.toLatin1().data());
-    furnsh_c(n, pckName3.toLatin1().data());
-    furnsh_c(n, pckName4.toLatin1().data());
+    furnsh_c(pckName1.toLatin1().data());
+    furnsh_c(pckName2.toLatin1().data());
+    furnsh_c(pckName3.toLatin1().data());
+    furnsh_c(pckName4.toLatin1().data());
 
 
 //  Ensure it is loaded only once
-    naif->set_amicaTimingLoaded(true);
+    naifState->set_amicaTimingLoaded(true);
   }
   return;
 }
@@ -90,38 +89,35 @@ static void loadNaifTiming(NaifContextPtr naif) {
  *  
  * @return @b double Distance in AU between Sun and observed body.
  */
-static bool sunDistanceAU(NaifContextPtr naif,
-                          const QString &scStartTime,
+static bool sunDistanceAU(const QString &scStartTime,
                           const QString &target,
                           double &sunDist) {
 
   //  Ensure NAIF kernels are loaded
-  loadNaifTiming(naif);
+  loadNaifTiming();
   sunDist = 1.0;
-
-  auto n = naif->get();
 
   //  Determine if the target is a valid NAIF target
   SpiceInt tcode;
   SpiceBoolean found;
-  bodn2c_c(n, target.toLatin1().data(), &tcode, &found);
+  bodn2c_c(target.toLatin1().data(), &tcode, &found);
 
   if (!found) return (false);
 
   //  Convert starttime to et
   double obsStartTime;
-  scs2e_c(n, -130, scStartTime.toLatin1().data(), &obsStartTime);
+  scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
 
 
 
   //  Get the vector from target to sun and determine its length
   double sunv[3];
   double lt;
-  spkpos_c(n, target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+  spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                   sunv, &lt);
   NaifStatus::CheckErrors();
 
-  double sunkm = vnorm_c(n, sunv);
+  double sunkm = vnorm_c(sunv);
 
 
   //  Return in AU units
@@ -299,7 +295,7 @@ static double f_focused(double alpha,int binning,double x,double y) {
  *
  */
 
-static double f_unfocused(NaifContextPtr naif, double * A,double * sigma, int N,int binning,double x,double y)  {
+static double f_unfocused(double * A,double * sigma, int N,int binning,double x,double y)  {
 
 
   double X = binning*x;
@@ -308,10 +304,8 @@ static double f_unfocused(NaifContextPtr naif, double * A,double * sigma, int N,
   double r = sqrt(X*X+Y*Y);
   double sum = 0;
 
-  auto n = naif->get();
-
   for (int i = 0; i < N; i ++)   {     
-    sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c(n) ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
+    sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c() ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
   }
 
 
@@ -338,7 +332,7 @@ static double f_unfocused(NaifContextPtr naif, double * A,double * sigma, int N,
  * @param binning
  * @return @b double * A pointer to a [size x size] matrix of light distribution values.
  */
-double * setPSFFilter(NaifContextPtr naif, int size, double *A,double *sigma, double alpha,int N,int binning) {
+double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int binning) {
 
 
   double * psfVals = new double[size*size];
@@ -352,7 +346,7 @@ double * setPSFFilter(NaifContextPtr naif, int size, double *A,double *sigma, do
          i++;
        }
        else {
-         psfVals[i]=f_unfocused(naif,A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);                 
+         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);                 
          i++;
        }      
     }

@@ -54,8 +54,7 @@ void IsisMain() {
   line = 1;
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
-  
+
   p.SetInputCube("FROM");
   Cube * outCube = p.SetOutputCube("TO");
 
@@ -77,11 +76,11 @@ void IsisMain() {
   }
 
   // Image time
-  iTime time(naif, inst["StartTime"][0]);
+  iTime time(inst["StartTime"][0]);
   // Day 64, hour 1
-  iTime min(naif, "1979-03-05T01:00:00.000");
+  iTime min("1979-03-05T01:00:00.000");
   // Day 64, hour 17
-  iTime max(naif, "1979-03-05T17:00:00.000");
+  iTime max("1979-03-05T17:00:00.000");
 
   // From Isis2, the time range is day 64, hours 1-16, inclusive.
   if (time < min || time >= max) {

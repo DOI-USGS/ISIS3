@@ -56,8 +56,8 @@ using namespace std;
 
 namespace Isis {
   //! Constructs a Cube object.
-  Cube::Cube(NaifContextPtr naif) {
-    construct(naif);
+  Cube::Cube() {
+    construct();
   }
 
   /**
@@ -68,8 +68,8 @@ namespace Isis {
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
    */
-  Cube::Cube(const FileName &fileName, QString access, NaifContextPtr naif) {
-    construct(naif);
+  Cube::Cube(const FileName &fileName, QString access) {
+    construct();
     open(fileName.toString(), access);
   }
 
@@ -267,8 +267,8 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    // MECHSOFT TODO: Shouldn't this have a copy of the NaifContext? How to manage the context lifetime?
-    Cube *result = new Cube(m_naif);
+
+    Cube *result = new Cube;
 
     if (newFileAttributes.labelAttachment() != ExternalLabel) {
       result->setDimensions(sampleCount(), lineCount(), bandCount());
@@ -1923,9 +1923,7 @@ namespace Isis {
    * Initialize members from their initial undefined states
    *
    */
-  void Cube::construct(NaifContextPtr naif) {
-    m_naif = NaifContext::UseDefaultIfNull(naif);
-
+  void Cube::construct() {
     m_labelFile = NULL;
     m_dataFile = NULL;
     m_ioHandler = NULL;

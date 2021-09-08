@@ -25,7 +25,6 @@ using namespace Isis;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   ProcessImportPds processPDS;
 
@@ -157,7 +156,7 @@ void IsisMain() {
   newLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Width").setUnits("micrometers");
 
   //  Create YearDoy keyword in Archive group
-  iTime stime(naif, newLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  iTime stime(newLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
   newLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 

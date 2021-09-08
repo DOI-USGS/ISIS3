@@ -32,7 +32,6 @@
 #include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
-#include "NaifContext.h"
 
 namespace Isis {
   class Cube;
@@ -353,8 +352,6 @@ namespace Isis {
       PvlObject getStoredNaifKeywords() const;
       virtual double resolution();
 
-      NaifContextPtr naif() const { return m_naif; }
-
     protected:
       /**
        * NAIF value primitive type
@@ -445,8 +442,6 @@ namespace Isis {
 
       bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned 
                             from ALE */
-
-      NaifContextPtr m_naif;
   };
 }
 

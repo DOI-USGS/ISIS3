@@ -208,12 +208,11 @@ int main(int argc, char *argv[]) {
   PvlGroup mappingGroup("Mapping");
 
   // Throw errors for incomplete label/mapping info
-  NaifContext naif;
   try {
     // Mapping group does not have TargetRadii
     // Mapping group does not have TargetName
     // No IsisCube in label
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -226,7 +225,7 @@ int main(int argc, char *argv[]) {
     // Mapping group does not have TargetRadii
     // Mapping group does not have TargetName
     // Instrument group not found in label
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]) {
     // Mapping group has TargetName=""
     // Instrument group found in label
     //     Instrument group does not have TargetName 
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -253,7 +252,7 @@ int main(int argc, char *argv[]) {
     // Mapping group has TargetName=""
     // Instrument group found in label
     //     Instrument group has TargetName=""
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -265,7 +264,7 @@ int main(int argc, char *argv[]) {
   try {
     // Mapping group has TargetName="Chewbaca" (not recognized by NAIF)
     // NaifKeywords object not found in label
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -278,7 +277,7 @@ int main(int argc, char *argv[]) {
     // Mapping group has TargetName="Chewbaca" (not recognized by NAIF)
     // NaifKeywords object exists
     //     BODY_FRAME_CODE not found 
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -294,7 +293,7 @@ int main(int argc, char *argv[]) {
     //     BODY_FRAME_CODE exists
     //     BODY<code>_RADII does not exist
     //     BODY_FRAME_CODE not recognized by NAIF
-    Target::radiiGroup(&naif, label, mappingGroup);
+    Target::radiiGroup(label, mappingGroup);
   }
   catch (IException &error) {
     printRadiiGroupInfo(false, label, mappingGroup);
@@ -310,7 +309,7 @@ int main(int argc, char *argv[]) {
   bennuRadii.addValue("0.2675");
   bennuRadii.addValue("0.254");
   naifKeywords.addKeyword(bennuRadii);
-  PvlGroup radii = Target::radiiGroup(&naif, label, mappingGroup);
+  PvlGroup radii = Target::radiiGroup(label, mappingGroup);
   printRadiiGroupInfo(true, label, mappingGroup);
   radii.addComment("Set radii to BODY RADII values in NaifKeywords Object.");
   cout << radii;
@@ -318,7 +317,7 @@ int main(int argc, char *argv[]) {
 
   // Valid TargetName found in Mapping group is recognized by NAIF
   mappingGroup.addKeyword(PvlKeyword("TargetName", "Mars"), PvlContainer::Replace);
-  radii = Target::radiiGroup(&naif, label, mappingGroup);
+  radii = Target::radiiGroup(label, mappingGroup);
   printRadiiGroupInfo(true, label, mappingGroup);
   radii.addComment("Find radii using known NAIF TargetName, Mars.");
   cout << radii;
@@ -326,7 +325,7 @@ int main(int argc, char *argv[]) {
 
   // Radii values found in given mapping group
   printRadiiGroupInfo(true, label, radii);
-  radii = Target::radiiGroup(&naif, label, radii);
+  radii = Target::radiiGroup(label, radii);
   radii.addComment("Read radii from given Mapping group.");
   cout << radii;
   cout << endl << "-------------------------------" << endl << endl;
@@ -335,11 +334,11 @@ int main(int argc, char *argv[]) {
   cout << "Testing lookupNaifBodyCode() methods " << endl << endl;
   // known target
   cout << "FOUND NAIF BODY CODE FOR TARGET 'Mars': " 
-       << toString((int)Target::lookupNaifBodyCode(&naif, "Mars"))
+       << toString((int)Target::lookupNaifBodyCode("Mars"))
        << endl << endl;
   try {
     // unknown target
-    cout << Target::lookupNaifBodyCode(&naif, "HanSolo");
+    cout << Target::lookupNaifBodyCode("HanSolo");
   }
   catch (IException &error) {
     cout << "FAILED TO FIND NAIF BODY CODE FOR TARGET 'HanSolo." << endl;

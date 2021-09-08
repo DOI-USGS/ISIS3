@@ -25,7 +25,6 @@
 #include "IException.h"
 
 #include "BulletWorldManager.h"
-#include "NaifContext.h"
 
 using namespace Isis;
 
@@ -34,8 +33,6 @@ using namespace Isis;
  */
 int main(int argc, char *argv[]) {
   try {
-    NaifContext naif;
-
     qDebug() << "Testing BulletWorldManager";
     qDebug() << endl;
 
@@ -56,7 +53,7 @@ int main(int argc, char *argv[]) {
     QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Adding " << dskfile << "...";
     qDebug() << "";
-    BulletTargetShape *itokawaShape = BulletTargetShape::load(&naif, dskfile);
+    BulletTargetShape *itokawaShape = BulletTargetShape::load(dskfile);
     if (!itokawaShape) {
       QString msg = "Failed loading shapefile.";
       throw IException(IException::Unknown, msg, _FILEINFO_);

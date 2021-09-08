@@ -36,7 +36,6 @@ void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   QString dskfile = ui.GetFileName("FROM");
   NaifDskPlateModel dsk(dskfile);
@@ -112,18 +111,17 @@ void IsisMain() {
           // determined by negating the vector and an intersection is computed.
           // Grid method winds up doing the same thing - this is the direct
           // computation.
-          auto n = naif->get();
           NaifVertex observer(3);
           point.ToNaifArray(&observer[0]);
 
-          NaifStatus::CheckErrors(naif);
-          vscl_c(n, 1.5, &observer[0], &observer[0]);
-          NaifStatus::CheckErrors(naif);
+          NaifStatus::CheckErrors();
+          vscl_c(1.5, &observer[0], &observer[0]);
+          NaifStatus::CheckErrors();
 
           // Get look vector
           NaifVector raydir(3);
-          vminus_c(n, &observer[0], &raydir[0]);
-          NaifStatus::CheckErrors(naif);
+          vminus_c(&observer[0], &raydir[0]);
+          NaifStatus::CheckErrors();
   
           // Check for valid intercept
           NaifVertex xpt;

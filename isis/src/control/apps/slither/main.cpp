@@ -23,7 +23,6 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
   QString cfile = ui.GetFileName("CONTROL");
   ControlNet cn(cfile);
 
@@ -60,7 +59,7 @@ void IsisMain() {
     ofstream os;
     os.open(rFile.toLatin1().data(), ios::out);
     os << "#  Slither Transform Results\n"
-       << "#  RunDate: " << iTime::CurrentLocalTime(naif) << endl
+       << "#  RunDate: " << iTime::CurrentLocalTime() << endl
        << "#    FROM:     " << icube->fileName() << endl
        << "#    CNETFILE: " << cfile << endl << endl;
 

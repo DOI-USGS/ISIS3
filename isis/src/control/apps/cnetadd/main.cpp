@@ -56,7 +56,6 @@ QMap< QString, QSet<QString> > g_modifications;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   FileList addList(ui.GetFileName("ADDLIST"));
 
@@ -84,7 +83,7 @@ void IsisMain() {
 
   ControlNet inNet = ControlNet(ui.GetFileName("CNET"));
   inNet.SetUserName(Application::UserName());
-  inNet.SetModifiedDate(iTime::CurrentLocalTime(naif)); //This should be done in ControlNet's Write fn
+  inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
 
   QString retrievalOpt = ui.GetString("RETRIEVAL");
   PvlKeyword duplicates("DupSerialNumbers");
@@ -161,7 +160,7 @@ void IsisMain() {
 
   // Loop through all the images
   for (int img = 0; img < addList.size(); img++) {
-    Cube cube(naif);
+    Cube cube;
     cube.open(addList[img].toString());
     Pvl *cubepvl = cube.label();
     QString sn = SerialNumber::Compose(*cubepvl);

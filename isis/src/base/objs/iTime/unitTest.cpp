@@ -11,14 +11,13 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
   Preference::Preferences(true);
-  NaifContext naif;
 
   cout << "Unit test for iTime" << endl;
 
   try {
     cout << setprecision(9);
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *time = new iTime(&naif, test);
+    iTime *time = new iTime(test);
     cout << "  Test of date = " << test << endl;
     cout << "   Year        = " << time->YearString() << endl;
     cout << "   Year        = " << time->Year() << endl;
@@ -48,7 +47,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     QString test = "2000-12-31T23:59:01.6789";
-    iTime time(&naif);
+    iTime time;
     time = test;
     cout << "  Test of date = " << test << endl;
     cout << "   Year        = " << time.YearString() << endl;
@@ -78,7 +77,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << setprecision(9);
-    iTime time(&naif, saveEt);
+    iTime time(saveEt);
     cout << "  Test of date = " << time.EtString() << endl;
     cout << "   Year        = " << time.YearString() << endl;
     cout << "   Year        = " << time.Year() << endl;
@@ -108,15 +107,15 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator>= member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " >= " << t2->EtString() << " = ";
     cout << (*t1 >= *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " >= " << t3->EtString() << " = ";
     cout << (*t1 >= *t3) << endl;
-    iTime *t4 = new iTime(&naif, "2003/01/02 12:15:01.1230");
+    iTime *t4 = new iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " >= " << t4->EtString() << " = ";
     cout << (*t1 >= *t4) << endl;
   }
@@ -129,15 +128,15 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator<= member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " <= " << t2->EtString() << " = ";
     cout << (*t1 <= *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " <= " << t3->EtString() << " = ";
     cout << (*t1 <= *t3) << endl;
-    iTime *t4 = new iTime(&naif, "2003/01/02 12:15:01.1230");
+    iTime *t4 = new iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " <= " << t4->EtString() << " = ";
     cout << (*t1 <= *t4) << endl;
   }
@@ -151,15 +150,15 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator> member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " > " << t2->EtString() << " = ";
     cout << (*t1 > *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " > " << t3->EtString() << " = ";
     cout << (*t1 > *t3) << endl;
-    iTime *t4 = new iTime(&naif, "2003/01/02 12:15:01.1230");
+    iTime *t4 = new iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " > " << t4->EtString() << " = ";
     cout << (*t1 > *t4) << endl;
   }
@@ -172,15 +171,15 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator< member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " < " << t2->EtString() << " = ";
     cout << (*t1 < *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " < " << t3->EtString() << " = ";
     cout << (*t1 < *t3) << endl;
-    iTime *t4 = new iTime(&naif, "2003/01/02 12:15:01.1230");
+    iTime *t4 = new iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " < " << t4->EtString() << " = ";
     cout << (*t1 < *t4) << endl;
   }
@@ -193,12 +192,12 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator!= member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " != " << t2->EtString() << " = ";
     cout << (*t1 != *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " != " << t3->EtString() << " = ";
     cout << (*t1 != *t3) << endl;
   }
@@ -211,12 +210,12 @@ int main(int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of iTime operator== member" << endl;
     QString test = "2003/01/02 12:15:01.1234";
-    iTime *t1 = new iTime(&naif, test);
+    iTime *t1 = new iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    iTime *t2 = new iTime(&naif, test);
+    iTime *t2 = new iTime(test);
     cout << "    " << t1->EtString() << " == " << t2->EtString() << " = ";
     cout << (*t1 == *t2) << endl;
-    iTime *t3 = new iTime(&naif, "2003/01/02 12:15:01.12345");
+    iTime *t3 = new iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " == " << t3->EtString() << " = ";
     cout << (*t1 == *t3) << endl;
   }
@@ -228,7 +227,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     cout << "  Test of iTime operator+(double) member" << endl;
-    iTime t1(&naif, 0.0);
+    iTime t1(0.0);
     t1 = t1 + 1.01;
     cout << "    " << t1.EtString() << endl;
   }
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     cout << "  Test of iTime operator+=(double) member" << endl;
-    iTime t1(&naif, 0.0);
+    iTime t1(0.0);
     t1 += 1.01;
     cout << "    " << t1.EtString() << endl;
   }
@@ -252,7 +251,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     cout << "  Test of iTime operator-(double) member" << endl;
-    iTime t1(&naif, 0.0);
+    iTime t1(0.0);
     t1 = t1 - 1.01;
     cout << "    " << t1.EtString() << endl;
   }
@@ -264,7 +263,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     cout << "  Test of iTime operator-=(double) member" << endl;
-    iTime t1(&naif, 0.0);
+    iTime t1(0.0);
     t1 -= 1.01;
     cout << "    " << t1.EtString() << endl;
   }
@@ -276,8 +275,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << setprecision(9);
     cout << "  Test of double operator-(iTIme) member" << endl;
-    iTime t1(&naif, 0.0);
-    iTime t2 = iTime(&naif, 100.001);
+    iTime t1(0.0);
+    iTime t2 = 100.001;
     double interval = t1 - t2;
     cout << "    " << interval << endl;
   }

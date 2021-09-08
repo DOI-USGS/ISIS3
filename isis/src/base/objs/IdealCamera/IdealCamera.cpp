@@ -74,7 +74,7 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   IdealCamera::IdealCamera(Cube &cube) : Camera(cube) {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     
     // Since this is an ideal camera, we'll call it Ideal Spacecraft
     m_spacecraftNameLong = "Ideal Spacecraft";
@@ -235,7 +235,7 @@ namespace Isis {
       new LineScanCameraSkyMap(this);
 
       LoadCache();
-      NaifStatus::CheckErrors(naif());
+      NaifStatus::CheckErrors();
     }
     else {
       QString msg = "Unknown InstrumentType [" +

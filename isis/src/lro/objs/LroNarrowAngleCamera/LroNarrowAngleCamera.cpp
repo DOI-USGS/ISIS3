@@ -60,7 +60,7 @@ namespace Isis {
       msg += " is not a supported instrument kernel code for Lunar Reconnaissance Orbiter.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
@@ -87,13 +87,13 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockPrerollCount"];
-    iTime etStart(naif());
+    SpiceDouble etStart;
 
     if(stime != "NULL") {
-      etStart = getClockTime(stime);
+      etStart = getClockTime(stime).Et();
     }
     else {
-      etStart = (QString)inst["PrerollTime"];
+      etStart = iTime((QString)inst["PrerollTime"]).Et();
     }
 
     // Get other info from labels
@@ -110,7 +110,7 @@ namespace Isis {
     setTime(etStart);
 
     // Setup detector map
-    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart.Et(), lineRate);
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);
     detectorMap->SetDetectorSampleSumming(csum);
     detectorMap->SetStartingDetectorSample(ss);
 
@@ -136,7 +136,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 }
 

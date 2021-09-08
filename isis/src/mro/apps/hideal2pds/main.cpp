@@ -31,14 +31,13 @@ using namespace Isis;
 using namespace std;
 
 pair<double, double> inputRange(Cube *inputCube);
-void updatePdsLabelTimeParametersGroup(NaifContextPtr naif, Pvl &pdsLabel);
+void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel);
 void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel);
 void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
                               UserInterface &ui, Camera *cam);
 void IsisMain() {
   // Get user interface and create a ProcessExportPds object
-  UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
+  UserInterface &ui = Application::GetUserInterface();  
   ProcessExportPds p;
   Process pHist;
   double *band_min, *band_max;
@@ -183,7 +182,7 @@ void IsisMain() {
                                  "$ISISROOT/appdata/translations/MroHirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
-  updatePdsLabelTimeParametersGroup(naif, pdsLabel);
+  updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
   Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
@@ -618,14 +617,14 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
  *  
  * @param pdsLabel Pvl of the output PDS labels 
  */
-void updatePdsLabelTimeParametersGroup(NaifContextPtr naif, Pvl &pdsLabel) {
+void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel) {
   // Calculate and add PRODUCT_CREATION_TIME to the TIME_PARAMETERS group
   time_t startTime = time(NULL);
   struct tm *tmbuf = gmtime(&startTime);
   char timestr[80];
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
   QString dateTime = (QString) timestr;
-  iTime tmpDateTime(naif, dateTime);
+  iTime tmpDateTime(dateTime);
   PvlGroup &timeParam = pdsLabel.findGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 }

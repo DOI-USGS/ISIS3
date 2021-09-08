@@ -32,7 +32,6 @@
 #include "Camera.h"
 #include "SpiceManager.h"
 #include "IException.h"
-#include "NaifContext.h"
 
 namespace Isis {
 
@@ -82,11 +81,10 @@ namespace Isis {
     public:
 
       /** Default constructor */
-      MdisGeometry(NaifContextPtr naif) : _label(), _orglabel(), _nSubframes(0), _camera(0),
+      MdisGeometry() : _label(), _orglabel(), _nSubframes(0), _camera(0),
         _digitsPrecision(_defaultDigits),
-        _NullDefault("\"N/A\""), _doUpdate(true), _spice(),
-        _naif(NaifContext::UseDefaultIfNull(naif)) { }
-      MdisGeometry(NaifContextPtr naif, const QString &filename);
+        _NullDefault("\"N/A\""), _doUpdate(true), _spice() { }
+      MdisGeometry(const QString &filename);
       MdisGeometry(Cube &cube);
       virtual ~MdisGeometry() {
         delete _camera;
@@ -171,7 +169,6 @@ namespace Isis {
       QString   _NullDefault;      //!< Current null string
       bool          _doUpdate;         //!< Action when vlue is uncomputable
       SpiceManager _spice;             //!< SPICE kernel manager
-      NaifContexPtr _naif;
 
       void init(Cube &cube);
 

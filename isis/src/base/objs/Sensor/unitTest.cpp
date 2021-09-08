@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     cerr << "Unit test for Sensor" << endl;
 
     Cube dummyCube("$base/testData/isisTruth.cub", "r");
-          
+
     Pvl &lab = *dummyCube.label();
     PvlGroup inst("INSTRUMENT");
     inst += PvlKeyword("TargetName", "Mars");
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetLookDirection using ShapeModel=Null" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi.setTime(iTime(spi.naif(), t));
+      spi.setTime(iTime(t));
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
 
       spi.SetLookDirection(v);
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
             "$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi2.setTime(iTime(spi.naif(), t));
+      spi2.setTime(iTime(t));
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
 
       spi2.SetLookDirection(v);

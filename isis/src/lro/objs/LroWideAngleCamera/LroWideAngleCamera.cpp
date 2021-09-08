@@ -53,7 +53,7 @@ namespace Isis {
   LroWideAngleCamera::LroWideAngleCamera(Cube &cube) :
     PushFrameCamera(cube) {
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     
     m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
     m_spacecraftNameShort = "LRO";
@@ -216,7 +216,7 @@ namespace Isis {
 
     SetBand(1);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     if(instId == "WAC-UV") {
       // geometric tiling is not worth trying for 4-line framelets

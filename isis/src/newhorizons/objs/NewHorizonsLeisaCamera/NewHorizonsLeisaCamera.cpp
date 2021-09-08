@@ -55,7 +55,7 @@ namespace Isis {
     m_spacecraftNameShort = "NewHorizons";
     
     // Override the SPICE error process for SPICE calls 
-    NaifStatus::CheckErrors(naif()); 
+    NaifStatus::CheckErrors(); 
 
     SetFocalLength();
     SetPixelPitch();
@@ -116,7 +116,7 @@ namespace Isis {
     LoadCache();  
 
     // Check to see if there were any SPICE errors
-    NaifStatus::CheckErrors(naif());  
+    NaifStatus::CheckErrors();  
   }
 
 

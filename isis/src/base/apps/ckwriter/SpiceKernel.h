@@ -85,7 +85,7 @@ class SpiceKernel {
 
     bool validate() const;
 
-    void write(NaifContextPtr naif, const QString &kname, const QString &commfile = "",
+    void write(const QString &kname, const QString &commfile = "",
                const int ckType = 3) const;
 
   private:

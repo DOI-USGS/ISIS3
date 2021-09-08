@@ -274,7 +274,7 @@ namespace Isis {
    * @param [in] et Ephemeris time
    *
    */
-  std::vector<double> PixelOffset::SetEphemerisTimeHPF(NaifContextPtr naif, const double et) {
+  std::vector<double> PixelOffset::SetEphemerisTimeHPF(const double et) {
 
     Isis::PolynomialUnivariate function1(p_degree);
     Isis::PolynomialUnivariate function2(p_degree);
@@ -305,12 +305,11 @@ namespace Isis {
 
     std::vector<double> TC(9);
 
-    NaifStatus::CheckErrors(naif);
-    eul2m_c(naif->get(), 
-            (SpiceDouble) 0., (SpiceDouble) angle2, (SpiceDouble) angle1,
+    NaifStatus::CheckErrors();
+    eul2m_c((SpiceDouble) 0., (SpiceDouble) angle2, (SpiceDouble) angle1,
             3,                    2,                    1,
             (SpiceDouble( *) [3]) &TC[0]);
-    NaifStatus::CheckErrors(naif);
+    NaifStatus::CheckErrors();
 
     return (TC);
   }
@@ -325,15 +324,14 @@ namespace Isis {
    * @return double Wrapped angle
    *
    */
-  double PixelOffset::WrapAngle(NaifContextPtr naif, double compareAngle, double angle) {
-    auto n = naif->get();
+  double PixelOffset::WrapAngle(double compareAngle, double angle) {
     double diff1 = compareAngle - angle;
 
-    if(diff1 < -1 * pi_c(n)) {
-      angle -= twopi_c(n);
+    if(diff1 < -1 * pi_c()) {
+      angle -= twopi_c();
     }
-    else if(diff1 > pi_c(n)) {
-      angle += twopi_c(n);
+    else if(diff1 > pi_c()) {
+      angle += twopi_c();
     }
     return angle;
   }

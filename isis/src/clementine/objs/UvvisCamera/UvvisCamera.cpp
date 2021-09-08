@@ -49,7 +49,7 @@ namespace Isis {
     m_spacecraftNameLong = "Clementine 1";
     m_spacecraftNameShort = "Clementine1";
     
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     // Get the camera characteristics
     SetFocalLength();
     SetPixelPitch();
@@ -59,13 +59,13 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    double time = iTime(naif(), (QString)inst["StartTime"]).Et();
+    double time = iTime((QString)inst["StartTime"]).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(time, exposureDuration);
     // Add half exposure duration to get time at center of image
-    iTime centerTime = shuttertimes.first + exposureDuration / 2.0;
+    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -97,7 +97,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
 

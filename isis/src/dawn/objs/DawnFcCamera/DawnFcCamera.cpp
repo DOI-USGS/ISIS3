@@ -47,7 +47,7 @@ namespace Isis {
    *                                       and optical distortion based on filter
    */
   DawnFcCamera::DawnFcCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     m_spacecraftNameLong = "Dawn";
     m_spacecraftNameShort = "Dawn";
@@ -132,16 +132,16 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
-    iTime et = getClockTime(stime);
+    double et = getClockTime(stime).Et();
     et += 193.0 / 1000.0;
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et.Et(), exposureDuration);
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
     iTime centerTime = et + exposureDuration / 2.0;
     setTime(centerTime);
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
 

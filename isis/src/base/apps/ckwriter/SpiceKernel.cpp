@@ -128,7 +128,7 @@ bool SpiceKernel::validate() const {
 }
 
 
- void SpiceKernel::write(NaifContextPtr naif, const QString &kname, const QString &comfile,
+ void SpiceKernel::write(const QString &kname, const QString &comfile,
                          const int cktype) const {
    vector<const CkSpiceSegment *> seglist;
    int comChars(0);
@@ -144,10 +144,10 @@ bool SpiceKernel::validate() const {
 
    //  Create the output file.
    try {
-     NaifStatus::CheckErrors(naif);
-     CkKernelWriter ckwriter(naif, kname, comChars+512, cktype);
+     NaifStatus::CheckErrors();
+     CkKernelWriter ckwriter(kname, comChars+512, cktype);
      ckwriter.addComment(comment);
-     NaifStatus::CheckErrors(naif);
+     NaifStatus::CheckErrors();
 
    // Write sorted segments
      for ( unsigned int i = 0 ; i < seglist.size() ; i++ ) {
@@ -155,7 +155,7 @@ bool SpiceKernel::validate() const {
          ckwriter.write(*seglist[i]);
          comment = seglist[i]->getComment();
          ckwriter.addComment(comment);
-         NaifStatus::CheckErrors(naif);
+         NaifStatus::CheckErrors();
        } catch ( IException &ie ) {
          ostringstream mess;
          mess << "Failed to write segment, ID = " << seglist[i]->Id();

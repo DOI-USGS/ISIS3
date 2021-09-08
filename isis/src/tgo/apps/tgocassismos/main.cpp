@@ -29,7 +29,6 @@ void IsisMain() {
   // Get the list of cubes to mosaic
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
   FileList fromList(ui.GetFileName("FROMLIST"));
 
   vector<Cube *> cubeList;
@@ -193,20 +192,20 @@ void IsisMain() {
       }
       else {
         // current cube's StartTime/StopTime values
-        iTime currentStartTime(naif, instGroup["StartTime"][0]);
+        iTime currentStartTime = iTime(instGroup["StartTime"][0]);
 
-        if (currentStartTime < iTime(naif, firstStartTime)) {
+        if (currentStartTime < iTime(firstStartTime)) {
           firstStartTime = currentStartTime.UTC();
           startClock = instGroup["SpacecraftClockStartCount"][0];
         }
-        if (currentStartTime > iTime(naif, lastStartTime)) {
+        if (currentStartTime > iTime(lastStartTime)) {
           lastStartTime = currentStartTime.UTC();
         }
       }
     }
        
    // After selecting the last StartTime, calculate the StopTime
-   iTime lastStartTimeValue(naif, lastStartTime);
+   iTime lastStartTimeValue = iTime(lastStartTime);
    iTime stopTimeValue = lastStartTimeValue + exposureDuration.toDouble(); 
    stopTime = stopTimeValue.UTC(3);
 

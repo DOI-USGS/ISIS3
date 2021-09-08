@@ -40,7 +40,7 @@ using namespace std;
 FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix);
 void calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 
-QString loadCalibrationVariables(NaifContextPtr naif, const QString &config);
+QString loadCalibrationVariables(const QString &config);
 
 #if 0
 // PSF correction is currently not working and has been removed as an option. 
@@ -136,7 +136,6 @@ void IsisMain() {
 
 
   UserInterface& ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
   g_nullPolarizedPixels = ui.GetBoolean("NULLPOLARPIX");
   g_iofCorrection = ui.GetString("UNITS");
 
@@ -292,14 +291,14 @@ void IsisMain() {
   //nb = inputCube->bandCount();
 #endif
 
-  QString calfile = loadCalibrationVariables(naif, ui.GetAsString("CONFIG"));
+  QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
 
   g_timeRatio = g_tvct / (g_exposureTime + g_tvct);
   g_darkCurrent = g_d0 * exp(g_d1 * g_temperature);
   g_calibrationScale = 1.0;
   QString g_units = "DN";
 
-  if ( !sunDistanceAU(naif, startTime, target, g_solarDist) ) {
+  if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
      throw IException(IException::Programmer, 
                       "Cannot calculated distance to sun!", 
                       _FILEINFO_);
@@ -593,7 +592,7 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
  * @brief Loads the calibration variables into the program.
  */
 
-QString loadCalibrationVariables(NaifContextPtr naif, const QString &config)  {
+QString loadCalibrationVariables(const QString &config)  {
 
 //  UserInterface& ui = Application::GetUserInterface();
 
@@ -662,9 +661,9 @@ QString loadCalibrationVariables(NaifContextPtr naif, const QString &config)  {
   double tsecs;
   double tdays;
 
-  loadNaifTiming(naif);  // Ensure the proper kernels are loaded
+  loadNaifTiming();  // Ensure the proper kernels are loaded
 
-  scs2e_c(naif->get(), g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);  
+  scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);  
   tsecs = obsStartTime - g_launchTime.Et();
   tdays = tsecs / 86400;
   g_bias = g_b0 

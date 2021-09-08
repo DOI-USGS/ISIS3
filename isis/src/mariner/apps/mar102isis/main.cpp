@@ -88,8 +88,6 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   int keyPosition;
   int consumeChars;
 
-  auto naif = cube->naif();
-
   // Image number
   key = "FDS=";
   keyPosition = labels.indexOf(key);
@@ -185,7 +183,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 
   // Construct the Start Time in yyyy-mm-ddThh:mm:ss format
   QString fullTime = date + "T" + time + ".000";
-  iTime startTime(naif, fullTime);
+  iTime startTime(fullTime);
 
   // Create the archive group
   PvlGroup archive("Archive");
@@ -214,24 +212,24 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   // Date used for all is two days before date of first encounter on website. Information
   // is important for nominal reseaus used and for Keyword encounter
   QString target = "";
-  if(startTime < iTime(naif, "1974-2-3T12:00:00")) {
+  if(startTime < iTime("1974-2-3T12:00:00")) {
     target = "$mariner10/reseaus/mar10MoonNominal.pvl";
     inst += PvlKeyword("TargetName", "Moon");
     archive += PvlKeyword("Encounter", "Moon");
   }
   //Disagreement on the below date between ASU website and NASA website, used earlier of the two - ASU
-  else if(startTime < iTime(naif, "1974-3-22T12:00:00")) {
+  else if(startTime < iTime("1974-3-22T12:00:00")) {
     target = "$mariner10/reseaus/mar10VenusNominal.pvl";
     inst += PvlKeyword("TargetName", "Venus");
     archive += PvlKeyword("Encounter", "Venus");
   }
-  else if(startTime < iTime(naif, "1974-9-19T12:00:00")) {
+  else if(startTime < iTime("1974-9-19T12:00:00")) {
     target = "$mariner10/reseaus/mar10Merc1Nominal.pvl";
     inst += PvlKeyword("TargetName", "Mercury");
     archive += PvlKeyword("Encounter", "Mercury_1");
   }
   // No specific date on ASU website, used NASA date
-  else if(startTime < iTime(naif, "1975-3-14T12:00:00")) {
+  else if(startTime < iTime("1975-3-14T12:00:00")) {
     target = "$mariner10/reseaus/mar10Merc2Nominal.pvl";
     inst += PvlKeyword("TargetName", "Mercury");
     archive += PvlKeyword("Encounter", "Mercury_2");
@@ -263,23 +261,23 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 
   // Kernels group
   PvlGroup kernels("Kernels");
-  PvlKeyword naifFrameCode("NaifFrameCode");
+  PvlKeyword naif("NaifFrameCode");
 
   // Camera dependent information
   QString camera = "";
   if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
-    naifFrameCode += "-76110";
+    naif += "-76110";
     camera = "M10_VIDICON_A_RESEAUS";
   }
   else {
     templ = "$mariner10/reseaus/mar10b.template.cub";
-    naifFrameCode += "-76120";
+    naif += "-76120";
     camera = "M10_VIDICON_B_RESEAUS";
   }
 
   // Add naif frame code
-  kernels += naifFrameCode;
+  kernels += naif;
 
   // Find the correct PvlKeyword corresponding to the camera for nominal positions
   PvlKeyword resnom = nomRx[camera];
@@ -330,8 +328,6 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
 
-  auto naif = oCube->naif();
-
   transFile = transDir + "Mariner10isis2.trn";
 
   // Get the translation manager ready
@@ -359,17 +355,17 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   ino = ino.trimmed();
   imgNo.setValue(ino);
 
-  iTime time(naif, startTime[0]);
-  if(time < iTime(naif, "1974-2-3T12:00:00")) {
+  iTime time(startTime[0]);
+  if(time < iTime("1974-2-3T12:00:00")) {
     archive += PvlKeyword("Encounter", "Moon");
   }
-  else if(time < iTime(naif, "1974-3-22T12:00:00")) {
+  else if(time < iTime("1974-3-22T12:00:00")) {
     archive += PvlKeyword("Encounter", "Venus");
   }
-  else if(time < iTime(naif, "1974-9-19T12:00:00")) {
+  else if(time < iTime("1974-9-19T12:00:00")) {
     archive += PvlKeyword("Encounter", "Mercury_1");
   }
-  else if(time < iTime(naif, "1975-3-14T12:00:00")) {
+  else if(time < iTime("1975-3-14T12:00:00")) {
     archive += PvlKeyword("Encounter", "Mercury_2");
   }
   else {

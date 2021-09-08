@@ -110,7 +110,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     // Set initial start time always (label start time is inaccurate)
-    setTime(iTime(naif(), startTime()));    // Isis3nightly
+    setTime(iTime(startTime()));    // Isis3nightly
 //      SetEphemerisTime(startTime());  // Isis3.2.1
 
     //  Now check to determine if we have a cache already.  If we have a cache
@@ -527,19 +527,19 @@ namespace Isis {
                                                          const double &etTime)
                                                          const {
     SMatrix state(6,6);
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     try {
       // Get pointing w/AVs
       sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
-      NaifStatus::CheckErrors(naif());
+      NaifStatus::CheckErrors();
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
         pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
-        NaifStatus::CheckErrors(naif());
+        NaifStatus::CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
         rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
                  (SpiceDouble (*)[6]) state[0]);

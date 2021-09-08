@@ -50,7 +50,7 @@ namespace Isis {
    *
    */
   LoHighCamera::LoHighCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     
     m_instrumentNameLong = "High Resolution Camera";
     m_instrumentNameShort = "High";
@@ -91,7 +91,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    double time = iTime(naif(), (QString)inst["StartTime"]).Et();
+    double time = iTime((QString)inst["StartTime"]).Et();
 
     // Setup focal plane map
     LoCameraFiducialMap fid(inst, naifIkCode());
@@ -128,7 +128,7 @@ namespace Isis {
 
     setTime(time);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
   

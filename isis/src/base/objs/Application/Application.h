@@ -40,7 +40,6 @@
 
 #include "Pvl.h"
 #include "UserInterface.h"
-#include "NaifContext.h"
 
 class QLocalSocket;
 
@@ -130,7 +129,6 @@ namespace Isis {
       static void GuiLog(const PvlGroup &results);
       static void GuiLog(const QString &results);
       static QString Name();
-      static NaifContextPtr GetNaif();
 
       static bool p_applicationForceGuiApp;
 

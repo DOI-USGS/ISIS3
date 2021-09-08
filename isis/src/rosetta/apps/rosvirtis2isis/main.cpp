@@ -36,8 +36,6 @@ void IsisMain ()
 {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
-  auto n = naif->get();
 
   FileName inFile = ui.GetFileName("FROM");
 
@@ -405,24 +403,24 @@ void IsisMain ()
     sclkName = sclkName.highestVersion(); 
     lskName = lskName.highestVersion(); 
 
-    furnsh_c(n, lskName.expanded().toLatin1().data());
-    furnsh_c(n, sclkName.expanded().toLatin1().data());
+    furnsh_c(lskName.expanded().toLatin1().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
     
     SpiceDouble etStart;
     SpiceDouble etEnd;
-    scs2e_c( n, (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
-    scs2e_c( n, (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
+    scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
+    scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
 
     PvlKeyword &frameParam = inst["FrameParameter"];
     double exposureTime = toDouble(frameParam[0]);
 
-    QString startTime = iTime(naif, etStart-exposureTime).UTC(); 
-    QString stopTime = iTime(naif, etEnd-exposureTime).UTC(); 
+    QString startTime = iTime(etStart-exposureTime).UTC(); 
+    QString stopTime = iTime(etEnd-exposureTime).UTC(); 
 
     SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
-    sce2s_c( n, (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
-    sce2s_c( n, (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
+    sce2s_c( (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
+    sce2s_c( (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
     
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 
@@ -433,8 +431,8 @@ void IsisMain ()
     outcube->putGroup(inst);
 
     // Unload the naif kernels
-    unload_c(n, lsk.toLatin1().data());
-    unload_c(n, sclk.toLatin1().data());
+    unload_c(lsk.toLatin1().data());
+    unload_c(sclk.toLatin1().data());
   }
   
   // Write the Archive and Instrument groups to the output cube label

@@ -226,11 +226,11 @@ namespace Isis {
   class SpiceRotation {
     public:
       // Constructors
-      SpiceRotation(NaifContextPtr naif, int frameCode);
+      SpiceRotation(int frameCode);
       /*      SpiceRotation( int NaifCode );
       We would like to call refchg instead to avoid the strings.  Currently Naif does
       not have refchg_c, but only the f2c'd refchg.c.*/
-      SpiceRotation(NaifContextPtr naif, int frameCode, int targetCode);
+      SpiceRotation(int frameCode, int targetCode);
       SpiceRotation(const SpiceRotation &rotToCopy);
 
       // Destructor
@@ -443,8 +443,6 @@ namespace Isis {
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
-
-      NaifContextPtr m_naif;
 
     private:
       // method

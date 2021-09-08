@@ -50,7 +50,7 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   LoMediumCamera::LoMediumCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     
     m_instrumentNameLong = "Medium Resolution Camera";
     m_instrumentNameShort = "Medium";
@@ -104,7 +104,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    iTime time(naif(), (QString)inst["StartTime"]);
+    double time = iTime((QString)inst["StartTime"]).Et();
 
     // Setup focal plane map
     if(type == Fiducial) {
@@ -150,7 +150,7 @@ namespace Isis {
 
     setTime(time);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
   
@@ -178,12 +178,11 @@ namespace Isis {
    */
   pair<iTime, iTime> LoMediumCamera::ShutterOpenCloseTimes(double time,
                                                            double exposureDuration) {
-    pair<iTime, iTime> shuttertimes {
-      // To get shutter start (open) time, subtract half the exposure duration from the center time
-      iTime(naif(), time - (exposureDuration / 2)),
-      // To get shutter end (close) time, add half the exposure duration to the center time
-      iTime(naif(), time + (exposureDuration / 2))
-    };
+    pair<iTime, iTime> shuttertimes;
+    // To get shutter start (open) time, subtract half the exposure duration from the center time
+    shuttertimes.first = time - (exposureDuration / 2);
+    // To get shutter end (close) time, add half the exposure duration to the center time
+    shuttertimes.second = time + (exposureDuration / 2);
     return shuttertimes;
   }
 }

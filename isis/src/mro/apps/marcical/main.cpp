@@ -156,7 +156,6 @@ Stretch stretch;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
   Cube icube;
@@ -202,8 +201,8 @@ void IsisMain() {
   }
 
   QString startTime = icube.label()->findGroup("Instrument", Pvl::Traverse)["StartTime"][0];
-  iTime start(naif, startTime);
-  iTime changeTime(naif, "November 6, 2006 21:30:00 UTC");
+  iTime start(startTime);
+  iTime changeTime("November 6, 2006 21:30:00 UTC");
 
   if (start < changeTime) {
     decimation.push_back(1.0);

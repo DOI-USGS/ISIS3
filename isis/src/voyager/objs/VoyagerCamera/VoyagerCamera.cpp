@@ -63,7 +63,7 @@ namespace Isis {
    *                          ShutterOpenCloseTimes() method.
    */
   VoyagerCamera::VoyagerCamera (Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // Set the pixel pitch
     SetPixelPitch();
@@ -155,7 +155,7 @@ namespace Isis {
     // StartTime is modified to be highly accurate.
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
-    iTime startTime(naif());
+    iTime startTime;
     startTime.setUtc((QString)inst["StartTime"]);
 
     // set the start (shutter open) and end (shutter close) times for the image
@@ -169,11 +169,11 @@ namespace Isis {
                                                             exposureDuration);
 
     // add half the exposure duration to the start time to get the center if the image
-    iTime centerTime = shuttertimes.first + exposureDuration / 2.0;
+    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
     setTime(centerTime);
 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
   
@@ -201,13 +201,11 @@ namespace Isis {
    */
   pair<iTime, iTime> VoyagerCamera::ShutterOpenCloseTimes(double time,
                                                           double exposureDuration) {
-    pair<iTime, iTime> shuttertimes {
-      // To get shutter end (close) time, subtract 2 seconds from the StartTime keyword value
-      iTime(naif(), time - 2),
-      // To get shutter start (open) time, take off the exposure duration from the end time.
-      iTime(naif(), shuttertimes.second.Et() - exposureDuration)
-    };
-
+    pair<iTime, iTime> shuttertimes;
+    // To get shutter end (close) time, subtract 2 seconds from the StartTime keyword value
+    shuttertimes.second = time - 2;
+    // To get shutter start (open) time, take off the exposure duration from the end time.
+    shuttertimes.first = shuttertimes.second.Et() - exposureDuration;
     return shuttertimes;
   }
 }

@@ -32,8 +32,6 @@ void writeJP2Image(Buffer &in);
 
 void IsisMain() {
 
-  auto naif = Application::GetNaif();
-
   QString projName;
 
   Process pHist;
@@ -200,7 +198,7 @@ void IsisMain() {
   char timestr[80];
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
   QString dateTime = (QString) timestr;
-  iTime tmpDateTime(naif, dateTime);
+  iTime tmpDateTime(dateTime);
   PvlGroup &timeParam = pdsLabel.findGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 

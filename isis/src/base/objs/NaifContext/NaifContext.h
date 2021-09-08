@@ -27,13 +27,7 @@
 #include <boost/shared_ptr.hpp>
 
 namespace Isis {
-  
-#define NAIF_GETSET(type, name)                   \
-private:                                          \
-  type name;                                      \
-public:                                           \
-  inline type get_##name() const { return name; } \
-  inline void set_##name(type v) { name = v; }
+  class NaifSnapshot;
   
   /**
    * @brief Manages the main lifecycle of f2c'd NAIF state.
@@ -41,48 +35,122 @@ public:                                           \
    * @internal
    */
   class NaifContext {
-    // Little wrapper object so we can use the NaifContext
-    // default copy constructor. 
-    class CSpiceState {
-      public:
-        CSpiceState();
-        CSpiceState(const CSpiceState &src);
-
-        void* operator()() const { return m_state.get(); }
-        
-      private:
-        boost::shared_ptr<void> m_state;
-    };
+    friend class NaifSnapshot;
   
     public:
-      NaifContext();
+      static void createForThread();
+      static void destroyForThread();
+      
+      static NaifContext* get() { return m_self; }
 
-      // A shared state for programs that haven't been converted to private state;
-      static NaifContext * ctx();
-      static void        * naif();
-
-      static NaifContext * UseDefaultIfNull(NaifContext *naif) { return naif ? naif : ctx(); }
-
-      NAIF_GETSET(bool, naifStatusInitialized);
-      NAIF_GETSET(bool, iTimeInitialized);
-      NAIF_GETSET(bool, targetPckLoaded);
-      NAIF_GETSET(bool, amicaTimingLoaded);
-      NAIF_GETSET(bool, hayabusaTimingLoaded);
-      NAIF_GETSET(bool, mdisTimingLoaded);
-      NAIF_GETSET(bool, mocWagoLoaded);
-      NAIF_GETSET(bool, hiJitCubeLoaded);
-      NAIF_GETSET(bool, hiCalTimingLoaded);
-
-      // Supply this to the NAIF kernels.
-      void* operator()() const { return m_cspice(); }
-      void* get() const { return m_cspice(); }
+      boost::shared_ptr<NaifSnapshot> top() { return m_stack.top(); }
+      
+      void push(boost::shared_ptr<NaifSnapshot>& snapshot);
+      void push_copy(boost::shared_ptr<NaifSnapshot>& snapshot);
+      
+      boost::shared_ptr<NaifSnapshot> pop();
       
     private:
-      CSpiceState m_cspice;
+      NaifContext();
+      ~NaifContext();
+      
+      static thread_local NaifContext* m_self;
+      
+      std::stack<boost::shared_ptr<NaifSnapshot>> m_stack;
   };
+  
+#define NAIF_GETSET(type, name) \
+  inline type name() { return m_isis.name; } \
+  inline void set_##name(type v) { m_isis.name = v; }
+  
+  /**
+   * @brief Takes a copy of the current NAIF state.
+   *
+   * Can pass this to threads for them to load copies of the state.
+   *
+   * @internal
+   */
+  class NaifSnapshot {
+    friend class NaifContext;
 
-  // Should we ever need to use shared pointers.
-  typedef NaifContext* NaifContextPtr;
+    private:
+      /**
+       * @brief Private ISIS state that must be attached to NAIF state.
+       *
+       * For example: Whether certain kernels have been loaded.
+       *
+       * @internal
+       */
+      struct IsisState {
+        IsisState() 
+          : naifStatusInitialized(false), iTimeInitialized(false), targetPckLoaded(false)
+          , amicaTimingLoaded(false), hayabusaTimingLoaded(false), mdisTimingLoaded(false)
+          , mocWagoLoaded(false), hiJitCubeLoaded(false), hiCalTimingLoaded(false) {}
+      
+        bool naifStatusInitialized;
+        bool iTimeInitialized;
+        bool targetPckLoaded;
+        bool amicaTimingLoaded;
+        bool hayabusaTimingLoaded;
+        bool mdisTimingLoaded;
+        bool mocWagoLoaded;
+        bool hiJitCubeLoaded;
+        bool hiCalTimingLoaded;
+      };
+      
+    public:
+      NaifSnapshot();
+      NaifSnapshot(boost::shared_ptr<void> naif, IsisState& isis);
+      NaifSnapshot(const NaifSnapshot& ctx);
+      
+      IsisState&              isisState() { return m_isis; }
+      boost::shared_ptr<void> naifState() { return m_naif; }
+      
+      NAIF_GETSET(bool,       naifStatusInitialized);
+      NAIF_GETSET(bool,       iTimeInitialized);
+      NAIF_GETSET(bool,       targetPckLoaded);
+      NAIF_GETSET(bool,       amicaTimingLoaded);
+      NAIF_GETSET(bool,       hayabusaTimingLoaded);
+      NAIF_GETSET(bool,       mdisTimingLoaded);
+      NAIF_GETSET(bool,       mocWagoLoaded);
+      NAIF_GETSET(bool,       hiJitCubeLoaded);
+      NAIF_GETSET(bool,       hiCalTimingLoaded);
+      
+    private:
+      boost::shared_ptr<void> m_naif;
+      IsisState               m_isis;
+  };
+  
+  /**
+   * Pushes a copy of the input state onto the CSPICE state stack.
+   *
+   * Pops when out of scope.
+   *
+   * This class is not thread safe. Ensure only 1 thread has set
+   * the state as activate.
+   *
+   * @internal
+   */
+  class PushNaifSnapshot {
+    public:
+      PushNaifSnapshot(boost::shared_ptr<NaifSnapshot> snapshot);
+      ~PushNaifSnapshot();
+  };
+  
+  /**
+   * Sets the given snapshot as current.
+   *
+   * Pops when out of scope.
+   *
+   * Duplicating snapshots is thread safe (as long as the source state isn't active!).
+   *
+   * @internal
+   */
+  class PushNaifSnapshotCopy {
+    public:
+      PushNaifSnapshotCopy(boost::shared_ptr<NaifSnapshot> snapshot);
+      ~PushNaifSnapshotCopy();
+  };
 };
 
 #endif

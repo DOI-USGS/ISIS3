@@ -33,7 +33,6 @@ void IsisMain() {
 
   // Setup the input and make sure it is a mariner10 file
   UserInterface & ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup & inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -62,7 +61,7 @@ void IsisMain() {
 
   QString target = inst["TargetName"];
 
-  iTime startTime(naif, (QString) inst["StartTime"]);
+  iTime startTime((QString) inst["StartTime"]);
 
   double exposure = inst["ExposureDuration"];
   double exposureOffset = 0.0;

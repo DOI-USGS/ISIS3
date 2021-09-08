@@ -98,12 +98,12 @@ namespace Isis {
    * 
    * @return @b BulletTargetShape A target shape containing the DEM
    */
-  BulletTargetShape *BulletTargetShape::load(NaifContextPtr naif, const QString &dem, const Pvl *conf) {
+  BulletTargetShape *BulletTargetShape::load(const QString &dem, const Pvl *conf) {
     FileName v_file(dem);
     
     QString ext = v_file.extension().toLower();
 
-    if ( "bds" == ext) return ( loadDSK(naif, dem) );
+    if ( "bds" == ext) return ( loadDSK(dem) );
     if ( "cub" == ext) return ( loadCube(dem) );
     return ( loadPC(dem) );
   }
@@ -131,8 +131,8 @@ namespace Isis {
    * 
    * @return @b BulletTargetShape A target shape containing the DEM
    */
-  BulletTargetShape *BulletTargetShape::loadDSK(NaifContextPtr naif, const QString &dem, const Pvl *conf) {
-    return ( new BulletDskShape(naif, dem) );
+  BulletTargetShape *BulletTargetShape::loadDSK(const QString &dem, const Pvl *conf) {
+    return ( new BulletDskShape(dem) );
   }
 
   /** Load an ISIS cube type DEM in Bullet.

@@ -55,7 +55,7 @@ namespace Isis {
     m_spacecraftNameLong = "Trace Gas Orbiter";
     m_spacecraftNameShort = "TGO";
     
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // CaSSIS codes
     int cassisCode = naifIkCode();
@@ -75,7 +75,7 @@ namespace Isis {
     //       this will change to use SCLK. JAM 2017-02-06
     QString stime = inst["SpacecraftClockStartCount"];
     QString startT = inst["StartTime"];
-    iTime et(naif(), startT);
+    iTime et(startT);
 
     // Get summing mode
     // Summing modes are:
@@ -121,7 +121,7 @@ namespace Isis {
 
     setTime(p_etStart);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
 

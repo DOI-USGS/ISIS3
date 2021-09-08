@@ -2064,7 +2064,7 @@ namespace Isis {
     // method is done
     bool computed = p_pointComputed;
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // Get the azimuth's origin point (the current position) and its radius
     SpiceDouble azimuthOrigin[3];
@@ -2190,7 +2190,7 @@ namespace Isis {
     if (azimuth < 0.0) azimuth += 360.0;
     if (azimuth > 360.0) azimuth -= 360.0;
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // computed is true if the sample/line or lat/lon were reset in this method
     // to find the location of the point of interest
@@ -2212,7 +2212,7 @@ namespace Isis {
    * @return @b double Off Nadir Angle
    */
   double Camera::OffNadirAngle() {
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // Get the xyz coordinates for the spacecraft and point we are interested in
     double coord[3], spCoord[3];
@@ -2226,7 +2226,7 @@ namespace Isis {
     // The three angles in a triangle must add up to 180 degrees
     double c = 180.0 - (a + b);
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     return c;
   }

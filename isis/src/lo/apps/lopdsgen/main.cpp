@@ -21,7 +21,6 @@ void IsisMain() {
   Cube *iCube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   double min = -DBL_MAX;
   double max = DBL_MAX;
@@ -209,7 +208,7 @@ void IsisMain() {
   char timestr[80];
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
   QString dateTime = (QString) timestr;
-  iTime tmpDateTime(naif, dateTime);
+  iTime tmpDateTime(dateTime);
   pdsLabel += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 
   if(ui.WasEntered("NOTE")) {

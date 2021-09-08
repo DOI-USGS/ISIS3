@@ -51,8 +51,6 @@ namespace Isis {
    */
   MiniRF::MiniRF(Isis::Cube &cube) : Isis::RadarCamera(cube) {
     
-    auto n = naif()->get();
-
     // LRO MiniRF naif instrument code = -85700
     if (naifIkCode() == -85700) {
       m_instrumentNameLong = "Miniature Radio Frequency";
@@ -88,8 +86,7 @@ namespace Isis {
 
     // Get the start time from labels (the SpacecraftClockStartCount is set to
     // is set to UNK in the PDS labels, so StartTime is used instead)
-    iTime itStart(naif(), (QString)inst["StartTime"]);
-    SpiceDouble etStart = itStart.Et();
+    SpiceDouble etStart = iTime((QString)inst["StartTime"]).Et();
 
     // The line rate is in units of seconds in the PDS label. The exposure
     // is the sum of the burst and the delay for the return. The movement of the
@@ -113,7 +110,7 @@ namespace Isis {
     // PDS labels are updated. Right now, the mrf2isis program is putting
     // a frequency value in the labels based on the instrument mode id.
     double frequency = (double) inst["Frequency"]; // units are htz
-    double waveLength = clight_c(n) / frequency;    // units are km/sec/htz
+    double waveLength = clight_c() / frequency;    // units are km/sec/htz
 
     // Setup map from image(sample,line) to radar(sample,time)
     new RadarPulseMap(this, etStart, lineRate);
@@ -136,7 +133,7 @@ namespace Isis {
     // velocity at the center of the image, so it is calculated
     // after Spice gets loaded.
     double range_sigma = rangeResolution * sin(incidenceAngle) * 100; // scaled meters
-    iTime etMid(naif(), etStart + 0.5 * (this->ParentLines() + 1) * lineRate);
+    double etMid = etStart + 0.5 * (this->ParentLines() + 1) * lineRate;
 
     // Setup the map from Radar(groundRange,t) to Radar(slantRange,t)
     RadarSlantRangeMap *slantRangeMap = new RadarSlantRangeMap(this,
@@ -150,7 +147,7 @@ namespace Isis {
 
     // Set the time range to cover the cube
     // Must be done last as the naif kernels will be unloaded
-    iTime etEnd = itStart + this->ParentLines() * lineRate + lineRate;
+    double etEnd = etStart + this->ParentLines() * lineRate + lineRate;
     etStart = etStart - lineRate;
     double tol = PixelResolution() / 100.;
 
@@ -159,31 +156,31 @@ namespace Isis {
       setTime(etMid);
       tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 100.;
     }
-    Spice::createCache(itStart, etEnd, this->ParentLines() + 1, tol);
+    Spice::createCache(etStart, etEnd, this->ParentLines() + 1, tol);
     setTime(etMid);
     SpiceRotation *bodyFrame = this->bodyRotation();
     SpicePosition *spaceCraft = this->instrumentPosition();
 
     SpiceDouble Ssc[6];
     // Load the state into Ssc
-    vequ_c(n, (SpiceDouble *) & (spaceCraft->Coordinate()[0]), Ssc);
-    vequ_c(n, (SpiceDouble *) & (spaceCraft->Velocity()[0]), Ssc + 3);
+    vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), Ssc);
+    vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), Ssc + 3);
     // Create the J2000 to body-fixed state transformation matrix BJ
     SpiceDouble BJ[6][6];
-    rav2xf_c(n, &(bodyFrame->Matrix()[0]), (SpiceDouble *) & (bodyFrame->AngularVelocity()[0]), BJ);
+    rav2xf_c(&(bodyFrame->Matrix()[0]), (SpiceDouble *) & (bodyFrame->AngularVelocity()[0]), BJ);
     // Rotate the spacecraft state from J2000 to body-fixed
-    mxvg_c(n, BJ, Ssc, 6, 6, Ssc);
+    mxvg_c(BJ, Ssc, 6, 6, Ssc);
     // Extract the body-fixed position and velocity
     double Vsc[3];
     double Xsc[3];
-    vequ_c(n, Ssc, Xsc);
-    vequ_c(n, Ssc + 3, Vsc);
+    vequ_c(Ssc, Xsc);
+    vequ_c(Ssc + 3, Vsc);
 
     Isis::Distance radii[3];
     this->radii(radii);
     double R = radii[0].kilometers();
     double height = sqrt(Xsc[0] * Xsc[0] + Xsc[1] * Xsc[1] + Xsc[2] * Xsc[2]) - R;
-    double speed = vnorm_c(n, Vsc);
+    double speed = vnorm_c(Vsc);
     double dopplerSigma = 2.0 * speed * azimuthResolution / (waveLength *
                           height / cos(incidenceAngle)) * 100.;
     groundMap->SetDopplerSigma(dopplerSigma);

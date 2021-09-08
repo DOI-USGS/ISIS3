@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Global Surveyor";
     m_spacecraftNameShort = "MGS";
     
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     //      LoadEulerMounting();
     SetFocalLength();
@@ -88,7 +88,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 }
 

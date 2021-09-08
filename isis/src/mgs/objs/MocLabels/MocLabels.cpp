@@ -20,25 +20,23 @@ namespace Isis {
   /**
    * Construct MocLabels object using the file name
    */
-  MocLabels::MocLabels(const QString &file, NaifContextPtr naif) {
+  MocLabels::MocLabels(const QString &file) {
     Cube cube(file, "r");
-    Init(cube, naif);
+    Init(cube);
   }
 
   /**
    * Construct MocLabels object using a Pvl object
    */
-  MocLabels::MocLabels(Cube &cube, NaifContextPtr naif) {
-    Init(cube, naif);
+  MocLabels::MocLabels(Cube &cube) {
+    Init(cube);
   }
 
   /**
    * General initializer
    * @param lab MOC label for the image
    */
-  void MocLabels::Init(Cube &cube, NaifContextPtr naif) {
-    m_naif = NaifContext::UseDefaultIfNull(naif);
-
+  void MocLabels::Init(Cube &cube) {
     // Initialize gain tables
     InitGainMaps();
 
@@ -189,8 +187,8 @@ namespace Isis {
     // pre-mapping to mapping phase.  Fix it up if necessary
     // (when the Downtrack summing is not 1)
     if(NarrowAngle() && (p_downtrackSumming != 1)) {
-      iTime currentTime(m_naif, p_startTime);
-      iTime mappingPhaseBeginTime(m_naif, "1999-04-03T01:00:40.441");
+      iTime currentTime(p_startTime);
+      iTime mappingPhaseBeginTime("1999-04-03T01:00:40.441");
       if(currentTime < mappingPhaseBeginTime) {
         double newGain = p_gain / (double) p_downtrackSumming;
         double mindiff = DBL_MAX;
@@ -219,21 +217,19 @@ namespace Isis {
     // Initialize the maps from sample coordinate to detector coordinates
     InitDetectorMaps();
 
-    auto n = m_naif->get();
-
     // Temporarily load some naif kernels
     QString lsk = p_lsk.expanded();
     QString sclk = p_sclk.expanded();
-    furnsh_c(n, lsk.toLatin1().data());
-    furnsh_c(n, sclk.toLatin1().data());
+    furnsh_c(lsk.toLatin1().data());
+    furnsh_c(sclk.toLatin1().data());
 
     // Compute the starting ephemeris time
-    scs2e_c(n, -94, p_clockCount.toLatin1().data(), &p_etStart);
+    scs2e_c(-94, p_clockCount.toLatin1().data(), &p_etStart);
     p_etEnd = EphemerisTime((double)p_nl);
 
     // Unload the naif kernels
-    unload_c(n, lsk.toLatin1().data());
-    unload_c(n, sclk.toLatin1().data());
+    unload_c(lsk.toLatin1().data());
+    unload_c(sclk.toLatin1().data());
   }
 
   /**
@@ -419,16 +415,15 @@ namespace Isis {
    */
   void MocLabels::InitWago() {
     // Only do this once
-    if(!m_naif->get_mocWagoLoaded()) return;
-    m_naif->set_mocWagoLoaded(true);
-
-    auto n = m_naif->get();
+    auto naifState = NaifContext::get()->top();
+    if(!naifState->mocWagoLoaded()) return;
+    naifState->set_mocWagoLoaded(true);
 
     // Load naif kernels
     QString lskKern = p_lsk.expanded();
     QString sclkKern = p_sclk.expanded();
-    furnsh_c(n, lskKern.toLatin1().data());
-    furnsh_c(n, sclkKern.toLatin1().data());
+    furnsh_c(lskKern.toLatin1().data());
+    furnsh_c(sclkKern.toLatin1().data());
 
     //Set up file for reading
     FileName wagoFile("$mgs/calibration/MGSC_????_wago.tab");
@@ -471,7 +466,7 @@ namespace Isis {
       sclk.Remove("\"");
       sclk.Trim(" ");
       double et;
-      scs2e_c(n, -94, currentSclk.c_str(), &et);
+      scs2e_c(-94, currentSclk.c_str(), &et);
 
       //Compare time against given parameters, if it fits, process
       if(et < p_etEnd && et > p_etStart) {
@@ -497,7 +492,7 @@ namespace Isis {
           }
           sclk = currentSclk;
           sclk.Trim(" ");
-          scs2e_c(n, -94, currentSclk.c_str(), &et);
+          scs2e_c(-94, currentSclk.c_str(), &et);
 
           bottom = linenum;
         }
@@ -519,7 +514,7 @@ namespace Isis {
           }
           sclk = currentSclk;
           sclk.Trim(" ");
-          scs2e_c(n, -94, currentSclk.c_str(), &et);
+          scs2e_c(-94, currentSclk.c_str(), &et);
           top = linenum;
         }
         //Now, go from the upper limit to the lower limit, and grab all lines
@@ -547,7 +542,7 @@ namespace Isis {
           sclk.Remove("\"");
           sclk.Trim(" ");
 
-          scs2e_c(n, -94, sclk.c_str(), &et);
+          scs2e_c(-94, sclk.c_str(), &et);
 
           // Get the gain mode id
           gainId = line.Token(",").ToQt().remove("\"").trimmed();
@@ -563,8 +558,8 @@ namespace Isis {
           p = p_gainMapWA.find(gainId);
           if(p == p_gainMapWA.end()) {
             // Unload the naif kernels
-            unload_c(n, lskKern.toLatin1().data());
-            unload_c(n, sclkKern.toLatin1().data());
+            unload_c(lskKern.toLatin1().data());
+            unload_c(sclkKern.toLatin1().data());
 
             QString msg = "Invalid GainModeId [" + gainId + "] in wago table";
             throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -599,8 +594,8 @@ namespace Isis {
     unique(p_wagos.begin(), p_wagos.end());
 
     // Unload the naif kernels
-    unload_c(n, lskKern.toLatin1().data());
-    unload_c(n, sclkKern.toLatin1().data());
+    unload_c(lskKern.toLatin1().data());
+    unload_c(sclkKern.toLatin1().data());
   }
 }
 

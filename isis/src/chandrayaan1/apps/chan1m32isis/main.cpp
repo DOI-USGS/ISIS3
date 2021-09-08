@@ -67,8 +67,6 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
   g_utcTable = NULL;
   double calcOutputLines = 0;
 
-  auto naif = Application::GetNaif();
-
   ProcessImportPds importPds;
   importPds.Progress()->SetText((QString)"Writing " + outputParamName + " file");
 
@@ -150,8 +148,8 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
         for (int rec = 0; rec < g_utcTable->Records() - 1; rec++) {
           outputLines++; // One for this line
 
-          iTime thisEt(naif, (QString)(*g_utcTable)[rec]["UtcTime"]); 
-          iTime nextEt(naif, (QString)(*g_utcTable)[rec+1]["UtcTime"]);
+          iTime thisEt((QString)(*g_utcTable)[rec]["UtcTime"]); 
+          iTime nextEt((QString)(*g_utcTable)[rec+1]["UtcTime"]);
           double delta = fabs(nextEt - thisEt); // Time table may be assending or decenting times
 
           while (delta > g_expectedLineRate * 1.9) {
@@ -161,8 +159,8 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
         }
         outputLines++; // One more for the last line
 
-        iTime firstEt(naif, (QString)(*g_utcTable)[0]["UtcTime"]); 
-        iTime lastEt(naif, (QString)(*g_utcTable)[g_utcTable->Records()-1]["UtcTime"]);
+        iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]); 
+        iTime lastEt((QString)(*g_utcTable)[g_utcTable->Records()-1]["UtcTime"]);
         calcOutputLines = fabs((lastEt + g_expectedLineRate / 2.0) - 
                                (firstEt - g_expectedLineRate / 2.0)) / g_expectedLineRate;
       }
@@ -179,7 +177,7 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
 
     // Since the output cube possibly has more lines then the input PDS image, due to dropped 
     // lines, we have to write the output cube instead of letting ProcessImportPds do it for us.
-    g_oCube = new Cube(naif);
+    g_oCube = new Cube();
     if (fileType == ProcessImportPds::L0) {
       g_oCube->setPixelType(importPds.PixelType());
     }
@@ -270,8 +268,6 @@ void writeCubeWithDroppedLines(Buffer &in) {
   g_oCube->write(*g_oBuff);
   (*g_oBuff)++;
 
-  auto naif = g_oCube->naif();
-
   // Now check the UTC_TIME table and see if there is a gap (missing lines) after the TIME record
   // for the current line. If there are, add as many lines as are necessary to fill the gap. 
   // Since the PDS files are in BIL order we are writeing to the ISIS cube in that order, so we 
@@ -283,8 +279,8 @@ void writeCubeWithDroppedLines(Buffer &in) {
     QString tt = (QString)(*g_utcTable)[in.Line() - 1]["UtcTime"];
     QString ttt = (QString)(*g_utcTable)[in.Line()]["UtcTime"];
 
-    iTime thisEt(naif, (QString)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
-    iTime nextEt(naif, (QString)(*g_utcTable)[in.Line()]["UtcTime"]);
+    iTime thisEt((QString)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
+    iTime nextEt((QString)(*g_utcTable)[in.Line()]["UtcTime"]);
 
     double delta = fabs(nextEt - thisEt);
 
@@ -316,9 +312,6 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
                                    ProcessImportPds::PdsFileType fileType) {
   Pvl outLabel;
 
-  auto naif = ocube->naif();
-  auto n = naif->get();
-
   // Translate the archive group
   FileName transFile("$ISISROOT/appdata/translations/Chandrayaan1M3Archive.trn");
   PvlToPvlTranslationManager archiveXlator(pdsLabel, transFile.expanded());
@@ -344,12 +337,12 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
     QString lsk = "$base/kernels/lsk/naif????.tls";
     FileName lskName(lsk);
     lskName = lskName.highestVersion();
-    furnsh_c(n, lskName.expanded().toLatin1().data());
+    furnsh_c(lskName.expanded().toLatin1().data());
 
     QString sclk = "$chandrayaan1/kernels/sclk/aig_ch1_sclk_complete_biased_m1p???.tsc";
     FileName sclkName(sclk);
     sclkName = sclkName.highestVersion();
-    furnsh_c(n, sclkName.expanded().toLatin1().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
 
     SpiceInt sclkCode = -86;
 
@@ -371,8 +364,8 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
     // Assume the UTC table times are better, so change the labels to match the table
     // The start and stop clock counts need to match the start/stop time, so convert the times
     // to new clock counts.
-    iTime firstEt(naif, (QString)(*g_utcTable)[0]["UtcTime"]);
-    iTime lastEt(naif, (QString)(*g_utcTable)[utcTable.Records()-1]["UtcTime"]);
+    iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
+    iTime lastEt((QString)(*g_utcTable)[utcTable.Records()-1]["UtcTime"]);
 
     // The table is in assending order
     // The table contains the middle of the exposure. include times to cover the beginning of
@@ -388,13 +381,13 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
 
     inst.findKeyword("StartTime").setValue(firstEt.UTC());
     SpiceChar startClockString[100];
-    sce2s_c (n, sclkCode, firstEt.Et(), 100, startClockString);
+    sce2s_c (sclkCode, firstEt.Et(), 100, startClockString);
     QString startClock(startClockString);
     inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
 
     inst.findKeyword("StopTime").setValue(lastEt.UTC());
     SpiceChar stopClockString[100];
-    sce2s_c (n, sclkCode, lastEt.Et(), 100, stopClockString);
+    sce2s_c (sclkCode, lastEt.Et(), 100, stopClockString);
     QString stopClock(stopClockString);
     inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
   }

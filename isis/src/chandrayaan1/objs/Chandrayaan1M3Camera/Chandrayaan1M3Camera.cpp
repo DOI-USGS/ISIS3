@@ -52,7 +52,7 @@ namespace Isis {
     m_spacecraftNameLong = "Chandrayaan 1";
     m_spacecraftNameShort = "Chan1";
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
     SetPixelPitch();
@@ -102,7 +102,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 }
 

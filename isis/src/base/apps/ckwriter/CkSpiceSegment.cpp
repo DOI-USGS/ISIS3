@@ -52,21 +52,21 @@ namespace Isis {
 
 
   /** Default constructor */
-CkSpiceSegment::CkSpiceSegment(NaifContextPtr naif) {
-  init(_naif);
+CkSpiceSegment::CkSpiceSegment() {
+  init();
 }
 
 /** Construct with an ISIS cube file */
-CkSpiceSegment::CkSpiceSegment(NaifContextPtr naif, const QString &fname) {
-  init(naif);
-  Cube cube(naif);
+CkSpiceSegment::CkSpiceSegment(const QString &fname) {
+  init();
+  Cube cube;
   cube.open(fname);
   import(cube);
 }
 
 /** Construct with a Cube and optional naming of table */
 CkSpiceSegment::CkSpiceSegment(Cube &cube, const QString &tblname) {
-  init(cube.naif());
+  init();
   import(cube, tblname);
 }
 
@@ -168,7 +168,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
   _fname = cube.fileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
   try {
 
     // Order is somewhat important here.  The call to initialize Kernels
@@ -429,9 +429,9 @@ bool CkSpiceSegment::getFrameChains(Table &table, const int &leftBase,
 
 QString CkSpiceSegment::getFrameName(int frameid) const {
   SpiceChar frameBuf[40];
-  NaifStatus::CheckErrors(_naif);
-  frmnam_c ( _naif->get(), (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
+  frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
+  NaifStatus::CheckErrors();
   return (QString(frameBuf));
 }
 
@@ -490,22 +490,21 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeStateRotation(const QString &fram
                                                          const QString &frame2,
                                                          double etTime) const {
   SMatrix state(6,6);
-  NaifStatus::CheckErrors(_naif);
-  auto n = _naif->get();
+  NaifStatus::CheckErrors();
 
   try {
     // Get pointing w/AVs
-    sxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+    sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
              (SpiceDouble (*)[6]) state[0]);
-    NaifStatus::CheckErrors(_naif);
+    NaifStatus::CheckErrors();
   } catch ( IException & ) {
     try {
       SMatrix rot(3,3);
-      pxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+      pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[3]) rot[0]);
-      NaifStatus::CheckErrors(_naif);
+      NaifStatus::CheckErrors();
       SVector av(3, 0.0);
-      rav2xf_c(n, (SpiceDouble (*)[3]) rot[0], &av[0],
+      rav2xf_c((SpiceDouble (*)[3]) rot[0], &av[0],
                (SpiceDouble (*)[6]) state[0]);
     } catch ( IException &ie ) {
       ostringstream mess;
@@ -536,15 +535,14 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeChainRotation(
     }
 
    SpiceInt toId = chain[0];
-   auto n = _naif->get();
    for ( int i = 1  ; i < chain.size() ; i++ ) {
      SpiceInt fromId = chain[i];
      QString CfromId = getFrameName(fromId);
      QString CtoId = getFrameName(toId);
      SMatrix left = computeStateRotation(CtoId, CfromId, etTime);
-     NaifStatus::CheckErrors(_naif);
-     mxmg_c(n, left[0], state[0], 6, 6, 6, state[0]);
-     NaifStatus::CheckErrors(_naif);
+     NaifStatus::CheckErrors();
+     mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
+     NaifStatus::CheckErrors();
      toId = fromId;
    }
   }
@@ -609,23 +607,22 @@ CkSpiceSegment::SVector CkSpiceSegment::convertTimes(
                                           int sclkCode,
                                           const CkSpiceSegment::SVector &etTimes
                                                 ) {
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
   SVector sclks(size(etTimes));
-  auto n = _naif->get();
   for ( int i  = 0 ; i < size(etTimes) ; i++ ) {
-    sce2c_c(n, sclkCode, etTimes[i], &sclks[i]);
+    sce2c_c(sclkCode, etTimes[i], &sclks[i]);
   }
 
   //  Determine the tick rate in case we need to create a type 2 CK
   SpiceDouble et0, et1;
-  sct2e_c(n, sclkCode, sclks[0], &et0);
-  sct2e_c(n, sclkCode, sclks[0]+1.0, &et1);
+  sct2e_c(sclkCode, sclks[0], &et0);
+  sct2e_c(sclkCode, sclks[0]+1.0, &et1);
   _tickRate = fabs(et1 - et0);
 
   _utcStartTime = toUTC(startTime());
   _utcEndTime   = toUTC(endTime());
 
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
   return (sclks);
 }
 
@@ -649,8 +646,6 @@ void CkSpiceSegment::convert(const CkSpiceSegment::SMatrix &quats,
   SpiceDouble *avOut(&avRav[0]); // For no AVs
   bool hasAv = (size(avvs) > 0);
 
-  auto n = _naif->get();
-
   for ( int i = 0 ; i < size(quats) ; i++ ) {
     //  Handle option angular velocities
     if ( hasAv ) {
@@ -658,19 +653,19 @@ void CkSpiceSegment::convert(const CkSpiceSegment::SMatrix &quats,
       avOut = ckAvvs[i];
     }
 
-    NaifStatus::CheckErrors(_naif);
+    NaifStatus::CheckErrors();
     // Convert quaternion to rotation and then to state matrix
-    q2m_c(n, quats[i], m);
-    rav2xf_c(n, m, avIn, xform);
+    q2m_c(quats[i], m);
+    rav2xf_c(m, avIn, xform);
 
     // Do the left and right multiplies
-    mxmg_c(n, getMatrix(lmats, i)[0], xform, 6, 6, 6, mout);
-    mxmg_c(n, mout, getMatrix(rmats, i)[0], 6, 6, 6, xform);
+    mxmg_c(getMatrix(lmats, i)[0], xform, 6, 6, 6, mout);
+    mxmg_c(mout, getMatrix(rmats, i)[0], 6, 6, 6, xform);
 
     // Transform to output format
-    xf2rav_c(n, xform, m, avOut);  // Transfers AV to output ckAvvs
-    m2q_c(n, m, ckQuats[i]);       // Transfers quaternion
-    NaifStatus::CheckErrors(_naif);
+    xf2rav_c(xform, m, avOut);  // Transfers AV to output ckAvvs
+    m2q_c(m, ckQuats[i]);       // Transfers quaternion
+    NaifStatus::CheckErrors();
   }
   return;
 }
@@ -712,8 +707,7 @@ QString CkSpiceSegment::getComment() const {
   return (QString(comment.str().c_str()));
 }
 
-void CkSpiceSegment::init(NaifContextPtr naif) {
-  _naif = NaifContext::UseDefaultIfNull(naif);
+void CkSpiceSegment::init() {
   _camVersion = 1;
   _name = _fname = "";
   _startTime = _endTime  = 0.0;
@@ -869,9 +863,9 @@ CkSpiceSegment::SVector CkSpiceSegment::expand(int ntop, int nbot,
 double CkSpiceSegment::SCLKtoET(SpiceInt scCode, double sclk) const {
   SpiceDouble et;
 
-  NaifStatus::CheckErrors(_naif);
-  sct2e_c(_naif->get(), scCode, sclk, &et);
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
+  sct2e_c(scCode, sclk, &et);
+  NaifStatus::CheckErrors();
 
   return (et);
 }
@@ -879,9 +873,9 @@ double CkSpiceSegment::SCLKtoET(SpiceInt scCode, double sclk) const {
 double CkSpiceSegment::ETtoSCLK(SpiceInt scCode, double et) const {
   SpiceDouble sclk;
 
-  NaifStatus::CheckErrors(_naif);
-  sce2c_c(_naif->get(), scCode, et, &sclk);
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
+  sce2c_c(scCode, et, &sclk);
+  NaifStatus::CheckErrors();
 
   return (sclk);
 }
@@ -890,9 +884,9 @@ QString CkSpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
 
-  NaifStatus::CheckErrors(_naif);
-  et2utc_c(_naif->get(), et, "ISOC", 3, UTCLEN, utcout);
-  NaifStatus::CheckErrors(_naif);
+  NaifStatus::CheckErrors();
+  et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
+  NaifStatus::CheckErrors();
 
   return (QString(utcout));
 }

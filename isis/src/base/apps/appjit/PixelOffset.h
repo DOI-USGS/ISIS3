@@ -31,7 +31,6 @@
 #include <SpiceZmc.h>
 
 #include "PolynomialUnivariate.h"
-#include "NaifContext.h"
 
 namespace Isis {
   /**
@@ -80,9 +79,9 @@ namespace Isis {
 
       void SetEphemerisTime(const double et);
 
-      std::vector<double> SetEphemerisTimeHPF(NaifContextPtr naif, const double et);
+      std::vector<double> SetEphemerisTimeHPF(const double et);
 
-      double WrapAngle(NaifContextPtr naif, double compareAngle, double angle);
+      double WrapAngle(double compareAngle, double angle);
 //      std::vector<double> &Matrix() { return p_TC; };
 
 

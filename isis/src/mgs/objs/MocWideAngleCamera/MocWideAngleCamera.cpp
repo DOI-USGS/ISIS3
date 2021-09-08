@@ -51,7 +51,7 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Global Surveyor";
     m_spacecraftNameShort = "MGS";
     
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     // See if we have a moc camera
     Pvl &lab = *cube.label();
     MocLabels *moclab = new MocLabels(cube);
@@ -104,7 +104,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 }
 

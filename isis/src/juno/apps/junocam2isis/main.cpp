@@ -24,7 +24,7 @@
 using namespace std;
 using namespace Isis;
 
-void translateLabel(NaifContextPtr naif, Pvl &inputLabel, Pvl &outputLabel);
+void translateLabel(Pvl &inputLabel, Pvl &outputLabel);
 void processFramelets(Buffer &in);
 void processFullFrames(Buffer &in);
 void openNextCube(int index);
@@ -41,7 +41,6 @@ void IsisMain() {
   g_outputCubes.clear();
   
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
   FileName inputFile = ui.GetFileName("FROM");
 
   Pvl inputLabel;
@@ -49,7 +48,7 @@ void IsisMain() {
   OriginalLabel origLabels(inputLabel);
 
   Pvl outputLabel;
-  translateLabel(naif, inputLabel, outputLabel);
+  translateLabel(inputLabel, outputLabel);
 
   bool doFullCcd = ui.GetBoolean("FULLCCD");
   int spacecraftCode = -61500; 
@@ -290,7 +289,7 @@ void IsisMain() {
  * @param inputLabel The input PDS3 label.
  * @param outputLabel A reference to the output ISIS3 label to be updated.
  */
-void translateLabel(NaifContextPtr naif, Pvl &inputLabel, Pvl &outputLabel) {
+void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
   // Get the directory where the Juno translation tables are
   QString transDir = "$ISISROOT/appdata/translations/";
 
@@ -345,7 +344,7 @@ void translateLabel(NaifContextPtr naif, Pvl &inputLabel, Pvl &outputLabel) {
   PvlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outputLabel);
   PvlGroup &archive = outputLabel.findGroup("Archive", PvlObject::Traverse);
-  iTime startTime(naif, inst["StartTime"][0]);
+  iTime startTime(inst["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(startTime.Year()*1000 + startTime.DayOfYear()));
   archive.addKeyword(yeardoy);
   UserInterface &ui = Application::GetUserInterface();

@@ -52,7 +52,6 @@
 #include "SurfacePoint.h"
 #include "Target.h"
 #include "TProjection.h"
-#include "Application.h"
 
 using namespace std;
 
@@ -642,7 +641,7 @@ namespace Isis {
     double radius = getRadius();
     double globalCoverage(Null);
     if(!IsSpecial(radius)) {
-      double globalArea = 4.0 * pi_c(Application::GetNaif()) * (radius * radius) / (1000.0 * 1000.0);
+      double globalArea = 4.0 * pi_c() * (radius * radius) / (1000.0 * 1000.0);
       globalCoverage = _summary.surfaceArea / globalArea * 100.0;
       globalCoverage = SetRound(globalCoverage, 6);
     }
@@ -708,7 +707,7 @@ namespace Isis {
 
   double BandGeometry::getPixelsPerDegree(double pixres,
                                           double radius) const {
-    double circumference = 2.0  * pi_c(Application::GetNaif()) * radius;
+    double circumference = 2.0  * pi_c() * radius;
     double metersPerDegree = circumference / 360.0;
     double pixelsPerDegree = metersPerDegree / pixres;
     return (pixelsPerDegree);

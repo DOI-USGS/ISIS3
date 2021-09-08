@@ -47,7 +47,7 @@ namespace Isis {
     m_spacecraftNameLong = "Hayabusa";
     m_spacecraftNameShort = "Hayabusa";
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
 
     // Get focal length and pixel pitch from IAK
@@ -91,7 +91,7 @@ namespace Isis {
 
     setTime(centerTime);
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
 

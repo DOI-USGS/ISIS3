@@ -27,7 +27,6 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   // Convert between integer representations of months to abbreviated QStrings,
   // as used in the TDB time format of the kernel date ranges
@@ -142,17 +141,17 @@ void IsisMain() {
 
           // Add 7 days (in units of seconds) to the current start time to
           // signify a week's time from the start time
-          iTime weekFromStart(naif, currentStart);
+          iTime weekFromStart(currentStart);
           weekFromStart += 7 * 24 * 3600 + 1;
 
           // See if a week has passed from the start time to the pivot end time
-          iTime pivotEndTime(naif, pivotEnd);
+          iTime pivotEndTime(pivotEnd);
           time[1] = newEnd;
 
           PvlGroup *currentGroup = &ckGroup;
 
           // Add a second to adjust for midnight conversion
-          iTime coveredTime(naif, currentStart);
+          iTime coveredTime(currentStart);
           coveredTime += 1;
           while (coveredTime <= pivotEndTime) {
             // Keep adding a new file for every day that doesn't have coverage

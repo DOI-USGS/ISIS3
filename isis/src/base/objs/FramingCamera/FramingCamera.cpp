@@ -54,13 +54,11 @@ namespace Isis {
 
   pair<iTime, iTime> FramingCamera::ShutterOpenCloseTimes(double time,
                                                           double exposureDuration) {
-    pair<iTime, iTime> shuttertimes {
-      // assume the time passed in is the shutter open time
-      iTime(naif(), time),
-
-      // add exposure duration to get the shutter close time
-      iTime(naif(), time + exposureDuration)
-    };
+    pair<iTime, iTime> shuttertimes;
+    // assume the time passed in is the shutter open time
+    shuttertimes.first = time;
+    // add exposure duration to get the shutter close time
+    shuttertimes.second = time + exposureDuration;
     return shuttertimes;
   }
 };

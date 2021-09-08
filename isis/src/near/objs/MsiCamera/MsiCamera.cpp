@@ -52,22 +52,22 @@ namespace Isis {
     m_spacecraftNameShort = "NEAR";
 
     Pvl &lab = *cube.label();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
     SetFocalLength();
     SetPixelPitch();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime(naif(), (QString)inst["StartTime"]).Et();
+    double et = iTime((QString)inst["StartTime"]).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
 
     //correct time for center of exposure duration
-    iTime centerTime = shuttertimes.first + exposureDuration / 2.0;
+    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
 
     // Setup detector map.  These images are full summing.
     new CameraDetectorMap(this);
@@ -92,7 +92,7 @@ namespace Isis {
     // the following LoadCache() command should be replaced with the
     // commented lines at the end of this file.
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
   //! Destroys the MsiCamera object.
@@ -207,7 +207,7 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       // get transformation matrix based on temperature, from spacecraft to MSI
 //       SpiceDouble sc2msiMatrix[3][3];
 //       pxform_c("J2000", nearMsiTimeDependentFrame,tempCelcius, sc2msiMatrix);
-//       NaifStatus::CheckErrors(naif());
+//       NaifStatus::CheckErrors();
 //       // get current TC matrix, from j2000 to spacecraft
 //       vector<double> originalCJ = instrumentRotation()->TimeBasedMatrix();
 //       // get new CJ matrix based on temperatureBasedRotation x originalTC
@@ -215,7 +215,7 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       vector<double> newCJ(9);
 //       mxm_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalCJ[0],
 //             (SpiceDouble( *)[3]) &newCJ[0]);
-//       NaifStatus::CheckErrors(naif());
+//       NaifStatus::CheckErrors();
 //       // mxmg_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalTC[0],
 //       //        6, 6, 6, (SpiceDouble( *)[3]) &newCJ[0]);
 //       // set new CJ matrix

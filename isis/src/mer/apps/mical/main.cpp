@@ -47,8 +47,6 @@ void IsisMain() {
 
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
-  auto n = naif->get();
   stagestop = ui.GetAsString("CALSTAGE");
 
   Cube *pack = p.SetInputCube("FROM");
@@ -85,24 +83,24 @@ void IsisMain() {
     gbl::mi->SetPCBTemperature(ui.GetDouble("PCBtemp"));
   }
 
-  iTime startTime(naif, gbl::mi->StartTime());
+  iTime startTime = gbl::mi->StartTime();
   double ETstartTime = startTime.Et();
   //Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
   QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(n, bspKernel.toLatin1().data());
+  furnsh_c(bspKernel.toLatin1().data());
   QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-  furnsh_c(n, satKernel.toLatin1().data());
+  furnsh_c(satKernel.toLatin1().data());
   QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(n, pckKernel.toLatin1().data());
+  furnsh_c(pckKernel.toLatin1().data());
   double sunpos[6], lt;
-  spkezr_c(n, "sun", ETstartTime, "iau_mars", "LT+S", "mars", sunpos, &lt);
-  double dist = vnorm_c(n, sunpos);
+  spkezr_c("sun", ETstartTime, "iau_mars", "LT+S", "mars", sunpos, &lt);
+  double dist = vnorm_c(sunpos);
   double kmperAU = 1.4959787066E8;
   gbl::sunAU = dist / kmperAU;
-  unload_c(n, bspKernel.toLatin1().data());
-  unload_c(n, satKernel.toLatin1().data());
-  unload_c(n, pckKernel.toLatin1().data());
+  unload_c(bspKernel.toLatin1().data());
+  unload_c(satKernel.toLatin1().data());
+  unload_c(pckKernel.toLatin1().data());
 
 
   //See what calibtation values the user wants to apply

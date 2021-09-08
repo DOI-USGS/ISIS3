@@ -52,7 +52,7 @@ namespace Isis {
     m_instrumentNameLong  = "Europa Imaging System Rolling Shutter Narrow Angle Camera";
     m_instrumentNameShort = "EIS-RSNAC";
 
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
 
     SetFocalLength();
     SetPixelPitch();
@@ -62,7 +62,7 @@ namespace Isis {
 
     // Set up start time and exposure duration
     QString startTime = inst["StartTime"];
-    iTime etStart(naif(), startTime); 
+    iTime etStart(startTime); 
 
     // Use to calculate center time when exposure duration is available
     // double exposureDuration = ((double) inst["ExposureDuration"]);
@@ -111,7 +111,7 @@ namespace Isis {
 
     setTime(etStart.Et()); // Consider changing to center in future. 
     LoadCache();
-    NaifStatus::CheckErrors(naif());
+    NaifStatus::CheckErrors();
   }
 
 

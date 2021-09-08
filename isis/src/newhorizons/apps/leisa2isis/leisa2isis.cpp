@@ -181,7 +181,7 @@ namespace Isis {
 
     //Add StartTime & EndTime
     QString midTimeStr = archive["MidObservationTime"];
-    iTime midTime(output->naif(), midTimeStr.toDouble());
+    iTime midTime(midTimeStr.toDouble());
 
     QString obsDuration = archive["ObservationDuration"];
     double obsSeconds = obsDuration.toDouble();

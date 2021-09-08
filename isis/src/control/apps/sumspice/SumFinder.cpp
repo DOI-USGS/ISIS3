@@ -54,16 +54,16 @@ namespace Isis {
 
 
   SumFinder::SumFinder() : m_cube(), m_kernels(), m_cubename(),
-                           m_sumfile(), m_timestamp(Center), m_sumtime(nullptr),
-                           m_cubeStartTime(nullptr), m_cubeCenterTime(nullptr), m_cubeStopTime(nullptr),
+                           m_sumfile(), m_timestamp(Center), m_sumtime(),
+                           m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
                            m_cubeExposureTime(0), m_exposureDelay(0.0),
                            m_timeDiff(0.0), m_closest(DBL_MAX) {
   }
 
   SumFinder::SumFinder(const QString &cubename, const TimeStamp &tstamp) :
                        m_cube(), m_kernels(), m_cubename(),
-                       m_sumfile(), m_timestamp(tstamp), m_sumtime(nullptr),
-                       m_cubeStartTime(nullptr), m_cubeCenterTime(nullptr), m_cubeStopTime(nullptr),
+                       m_sumfile(), m_timestamp(tstamp), m_sumtime(),
+                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
                        m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
@@ -73,8 +73,8 @@ namespace Isis {
   SumFinder::SumFinder(const QString &cubename, const SumFileList &sumlist,
                        const double &tolerance, const TimeStamp &tstamp) :
                        m_cube(), m_kernels(), m_cubename(cubename),
-                       m_sumfile(), m_timestamp(tstamp), m_sumtime(nullptr),
-                       m_cubeStartTime(nullptr), m_cubeCenterTime(nullptr), m_cubeStopTime(nullptr),
+                       m_sumfile(), m_timestamp(tstamp), m_sumtime(),
+                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
                        m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
@@ -85,8 +85,8 @@ namespace Isis {
   SumFinder::SumFinder(const QString &cubename, const SharedSumFile &sumfile,
                        const TimeStamp &tstamp) :
                        m_cube(), m_kernels(), m_cubename(cubename),
-                       m_sumfile(sumfile), m_timestamp(tstamp), m_sumtime(nullptr),
-                       m_cubeStartTime(nullptr), m_cubeCenterTime(nullptr), m_cubeStopTime(nullptr),
+                       m_sumfile(sumfile), m_timestamp(tstamp), m_sumtime(),
+                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
                        m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
@@ -520,19 +520,17 @@ namespace Isis {
 
     // Compute new values for existing keywords if we got them
     Camera *camera = m_cube->camera();
-    auto naif = camera->naif();
-    auto n = naif->get();
-    
-    iTime newStartClock(naif, sumStartTime() - startExposureDelay(*m_cube));
-    iTime newStopClock(naif, sumStopTime()   + stopExposureDelay(*m_cube));
+
+    iTime newStartClock(sumStartTime() - startExposureDelay(*m_cube));
+    iTime newStopClock(sumStopTime()   + stopExposureDelay(*m_cube));
 
     // Compute start SCLK if present on labels
     if ( origStartClock.size() > 0 ) {
-      NaifStatus::CheckErrors(naif);
+      NaifStatus::CheckErrors();
       char newSCLK[256];
-      sce2s_c(n, camera->naifSclkCode(), newStartClock.Et(),
+      sce2s_c(camera->naifSclkCode(), newStartClock.Et(),
               sizeof(newSCLK), newSCLK);
-      NaifStatus::CheckErrors(naif);
+      NaifStatus::CheckErrors();
 
       sumtStartClock.addValue(origStartClock[0], origStartClock.unit());
       origStartClock.setValue(QString(newSCLK), origStartClock.unit());
@@ -544,11 +542,11 @@ namespace Isis {
 
     // Compute end SCLK if present on labels
     if ( origStopClock.size() > 0 ) {
-      NaifStatus::CheckErrors(naif);
+      NaifStatus::CheckErrors();
       char newSCLK[256];
-      sce2s_c(n, camera->naifSclkCode(), newStopClock.Et(),
+      sce2s_c(camera->naifSclkCode(), newStopClock.Et(),
               sizeof(newSCLK), newSCLK);
-      NaifStatus::CheckErrors(naif);
+      NaifStatus::CheckErrors();
 
       sumtStopClock.addValue(origStopClock[0], origStopClock.unit());
       origStopClock.setValue(QString(newSCLK), origStopClock.unit());

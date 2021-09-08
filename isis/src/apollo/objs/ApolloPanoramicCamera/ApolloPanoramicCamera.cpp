@@ -72,17 +72,15 @@ namespace Isis {
     ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
     multiplicativeLineTimeError = getDouble(ikernKey);
     
-    auto n = naif()->get();
-
     Pvl &lab = *cube.label(); 
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];  
     SpiceDouble etStart;
-    str2et_c(n, stime.toLatin1().data(), &etStart);
+    str2et_c(stime.toLatin1().data(), &etStart);
     stime = (QString) inst["StopTime"];
     SpiceDouble etStop;
-    str2et_c(n, stime.toLatin1().data(), &etStop);
-    iTime isisTime( naif(), (QString) inst["StartTime"]);
+    str2et_c(stime.toLatin1().data(), &etStop);
+    iTime isisTime( (QString) inst["StartTime"]);
     
     // Get other info from labels
     // line exposure duration, sec/mm

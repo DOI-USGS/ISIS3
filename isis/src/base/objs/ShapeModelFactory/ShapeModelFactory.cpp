@@ -177,7 +177,7 @@ namespace Isis {
         // Cubes are not supported at this time. 
 
         try {
-          BulletTargetShape *bullet = BulletTargetShape::load(target->naif(), shapeModelFilenames);
+          BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
           if ( 0 == bullet ) {
 
             // Bullet failed to load the kernel...test failure conditions

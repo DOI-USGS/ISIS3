@@ -111,7 +111,7 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
   QString stime = inst["StartTime"];
   double et; // StartTime keyword is the center exposure time
-  str2et_c(cam->naif()->get(), stime.toLatin1().data(), &et);
+  str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
   qDebug() << "Shutter open  = " << toString(shuttertimes.first.Et(), 16);
   qDebug() << "Shutter close = " << toString(shuttertimes.second.Et(), 16);

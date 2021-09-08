@@ -52,8 +52,8 @@ namespace Isis {
    * @brief Constructor using an ISIS cube file name
    * @param filename Name of ISIS cube file
    */
-  MdisGeometry::MdisGeometry(NaifContextPtr naif, const QString &filename) : _naif(NaifContext::UseDefaultIfNull(naif)) {
-    Cube cube(_naif);
+  MdisGeometry::MdisGeometry(const QString &filename) {
+    Cube cube;
     cube.open(filename);
     init(cube);
   }
@@ -62,7 +62,7 @@ namespace Isis {
    * @brief Construct using an ISIS Cube class
    * @param cube ISIS cube class
    */
-  MdisGeometry::MdisGeometry(Cube &cube) : _naif(cube.naif()) {
+  MdisGeometry::MdisGeometry(Cube &cube) {
     init(cube);
   }
 
@@ -731,13 +731,11 @@ namespace Isis {
       return found;
     }
 
-    auto n = _naif->get();
-
     //  Get the target state (starg)
     SpiceRotation *rotate = _camera->instrumentRotation();
     SpiceDouble starg[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
-    spkez_c(n, targCode, rotate->EphemerisTime(), "J2000", "LT+S", scCode,
+    spkez_c(targCode, rotate->EphemerisTime(), "J2000", "LT+S", scCode,
             starg, &lt);
 
     //  Get surfarce intersection vector in body-fixed coordinates (surfx)
@@ -749,7 +747,7 @@ namespace Isis {
 
     //  Get angular velocity vector of camera (av)
     SpiceDouble sclkdp;
-    (void) sce2c_c(n, scCode, rotate->EphemerisTime(), &sclkdp);
+    (void) sce2c_c(scCode, rotate->EphemerisTime(), &sclkdp);
 
     //  Determine instrument ID (inst)
     PvlKeyword &key = _label.findKeyword("NaifIkCode", PvlObject::Traverse);
@@ -761,12 +759,12 @@ namespace Isis {
     // Get CK time tolerance (tol)
     SpiceDouble tol;
     SpiceInt tmp;
-    gdpool_c(n, QString("INS" + iCode + "_CK_TIME_TOLERANCE").toLatin1().data(),
+    gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toLatin1().data(),
              0, 1, &tmp, &tol, &found);
 
     // Finally get av
     SpiceDouble cmat[3][3], av[3], clkout;
-    (void) ckgpav_c(n, (scCode * 1000), sclkdp, tol, "J2000", cmat, av, &clkout,
+    (void) ckgpav_c((scCode * 1000), sclkdp, tol, "J2000", cmat, av, &clkout,
                     &found);
     if (!found) {
 #if defined(DEBUG)
@@ -779,13 +777,13 @@ namespace Isis {
     //  Get the state transformation matrix (tsipm)
     SpiceChar frname[40];
     SpiceInt frcode;
-    (void) cidfrm_c(n, targCode, sizeof(frname), &frcode, frname, &found);
+    (void) cidfrm_c(targCode, sizeof(frname), &frcode, frname, &found);
     if (!found) {
       return (false);
     }
 
     SpiceDouble tsipm[6][6];
-    (void) sxform_c(n, "J2000", frname, rotate->EphemerisTime(), tsipm);
+    (void) sxform_c("J2000", frname, rotate->EphemerisTime(), tsipm);
 
     //  Get focal length
     double foclen = _camera->FocalLength();
@@ -817,25 +815,25 @@ namespace Isis {
     omega[2][1] =  av[0];
 
     SpiceDouble dticam[3][3];
-    mxmt_c(n, &ticam[0], omega, dticam);
+    mxmt_c(&ticam[0], omega, dticam);
 
     //--  Done with rav2dr
 
     // Complete the rest of smrimg
     SpiceDouble surfxi[3], vi[3];
-    mtxv_c(n, tipm, surfx, surfxi);
-    vadd_c(n, starg, surfxi, vi);
+    mtxv_c(tipm, surfx, surfxi);
+    vadd_c(starg, surfxi, vi);
 
     SpiceDouble dvb[3], dvi[3];
-    mtxv_c(n, dtipm, surfx, dvb);
-    vadd_c(n, &starg[3], dvb, dvi);
+    mtxv_c(dtipm, surfx, dvb);
+    vadd_c(&starg[3], dvb, dvi);
 
     SpiceDouble vc[3], dvc1[3], dvc2[3], dvc[3];
-    mxv_c(n, &ticam[0], vi, vc);
+    mxv_c(&ticam[0], vi, vc);
 
-    mxv_c(n, &ticam[0], dvi, dvc1);
-    mxv_c(n, dticam, vi, dvc2);
-    vadd_c(n, dvc1, dvc2, dvc);
+    mxv_c(&ticam[0], dvi, dvc1);
+    mxv_c(dticam, vi, dvc2);
+    vadd_c(dvc1, dvc2, dvc);
 
     // Make sure we Vf can be computed
     if (vc[2] == 0.0) {
@@ -844,7 +842,7 @@ namespace Isis {
 
     // Compute derivative of Vf which is dvf
     SpiceDouble dvf[2];
-    vlcomg_c(n, 2, -foclen * dvc[2] / (vc[2]*vc[2]), vc,
+    vlcomg_c(2, -foclen * dvc[2] / (vc[2]*vc[2]), vc,
              foclen        / vc[2],         dvc, dvf);
 
     // dvf has units for mm/sec.  Scale by pixel pitch and multiply
@@ -853,17 +851,17 @@ namespace Isis {
     double explen = (double) key;   // in milliseconds
 
     SpiceDouble smear[2];
-    vsclg_c(n, pxlscl * (explen / 1000.0), dvf, 2, smear); //convert explen to seconds
+    vsclg_c(pxlscl * (explen / 1000.0), dvf, 2, smear); //convert explen to seconds
 
     //  Compute the norm and azimuth angle
-    smear_magnitude = vnormg_c(n, smear, 2);
-    NaifStatus::CheckErrors(_naif);
+    smear_magnitude = vnormg_c(smear, 2);
+    NaifStatus::CheckErrors();
 
     if (smear_magnitude == 0.0) {
       smear_azimuth = 0.0;
     }
     else {
-      smear_azimuth = atan2(smear[1], smear[0]) * dpr_c(n);
+      smear_azimuth = atan2(smear[1], smear[0]) * dpr_c();
       if (smear_azimuth  < 0.0) smear_azimuth += 360.0;
     }
 
@@ -935,10 +933,9 @@ namespace Isis {
 
     //  Subtract target-sun vector from sc-sun vector and normalize to get
     //  distance from observer to sun
-    auto n = _naif->get();
     double scPos[3];
-    vsub_c(n, &sVec[0], &jVec[0], scPos);
-    double sc_sun_dist = vnorm_c(n, scPos);
+    vsub_c(&sVec[0], &jVec[0], scPos);
+    double sc_sun_dist = vnorm_c(scPos);
     geom += format("SPACECRAFT_SOLAR_DISTANCE", sc_sun_dist, "KM");
 
     //  Record position vector
@@ -975,21 +972,19 @@ namespace Isis {
     sc = Target::lookupNaifBodyCode("MESSENGER");
     sun = Target::lookupNaifBodyCode("SUN");
 
-    auto n = _naif->get();
-
     //  Get the Sun to Messenger state matrix
     SpiceRotation *rotate = _camera->bodyRotation();
     SpiceDouble stateJ[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
-    spkez_c(n, sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
-    NaifStatus::CheckErrors(_naif); 
+    spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
+    NaifStatus::CheckErrors(); 
 
     // Stage result and negate as it needs to be relative to Messenger
     vector<double> scvel;
     scvel.push_back(stateJ[3]);
     scvel.push_back(stateJ[4]);
     scvel.push_back(stateJ[5]);
-    vminus_c(n, &scvel[0], &scvel[0]);
+    vminus_c(&scvel[0], &scvel[0]);
 
     return (scvel);
   }
@@ -1023,7 +1018,6 @@ namespace Isis {
     _camera->SetImage(refSamp, refLine);
 
     //  These parameters only require a target other than the Sky
-    auto n = _naif->get();
     if (!_camera->target()->isSky()) {
       double sslat, sslon;
       _camera->subSolarPoint(sslat, sslon);
@@ -1032,7 +1026,7 @@ namespace Isis {
 
       SpicePosition *sunpos = _camera->sunPosition();
       std::vector<double> jVec = sunpos->Coordinate();
-      double solar_dist = vnorm_c(n, &jVec[0]);
+      double solar_dist = vnorm_c(&jVec[0]);
 
       geom += format("SOLAR_DISTANCE", solar_dist, "KM");
 
