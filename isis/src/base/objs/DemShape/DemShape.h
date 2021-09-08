@@ -103,8 +103,6 @@ namespace Isis {
      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
      void calculateSurfaceNormal();
 
-     NaifContextPtr naif() const;
-
     protected:
      Cube *demCube();         //!< Returns the cube defining the shape model.
 

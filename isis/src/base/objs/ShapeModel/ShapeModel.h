@@ -24,8 +24,6 @@
 
 #include <vector>
 
-#include "NaifContext.h"
-
 template<class T> class QVector;
 
 class QString;
@@ -164,8 +162,6 @@ namespace Isis {
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection);
-
-      NaifContextPtr naif() const;
 
     protected:
 

@@ -115,7 +115,7 @@ namespace Isis {
       std::vector<Angle> sysNutPrecConstants();
       std::vector<Angle> sysNutPrecCoefs();
 
-      NaifContextPtr naif() const { return m_naif; }
+      NaifContextPtr naif() const { return _naif; }
 
     private:
       SpiceInt lookupNaifBodyCode(Pvl &lab) const;

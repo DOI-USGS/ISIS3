@@ -293,9 +293,6 @@ namespace Isis {
       void Memcache2HermiteCache(double tolerance);
       std::vector<double> Extrapolate(double timeEt);
       std::vector<double> HermiteCoordinate();
-
-      NaifContextPtr naif() const { return m_naif; }
-      
     protected:
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();

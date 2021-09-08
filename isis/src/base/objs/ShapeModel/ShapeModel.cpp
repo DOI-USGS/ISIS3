@@ -151,7 +151,7 @@ namespace Isis {
     // Unitize the vector
     SpiceDouble upB[3];
     SpiceDouble dist;
-    unorm_c(naif()->get(), pB, upB, &dist);
+    unorm_c(pB, upB, &dist);
     memcpy(&m_normal[0], upB, sizeof(double) * 3);
 
     m_hasNormal = true;
@@ -187,14 +187,12 @@ namespace Isis {
     pB[1] = surfaceIntersection()->GetY().kilometers();
     pB[2] = surfaceIntersection()->GetZ().kilometers();
 
-    auto n = naif()->get();
-
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c(n, (ConstSpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
-    unorm_c(n, psB, upsB, &dist);
+    vsub_c((ConstSpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
+    unorm_c(psB, upsB, &dist);
 
-    double angle = vdot_c(n, (SpiceDouble *) &m_normal[0], upsB);
+    double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
     return acos(angle) * RAD2DEG;
@@ -236,14 +234,12 @@ namespace Isis {
     pB[1] = surfaceIntersection()->GetY().kilometers();
     pB[2] = surfaceIntersection()->GetZ().kilometers();
 
-    auto n = naif()->get();
-
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3], dist;
-    vsub_c(n, (SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
-    unorm_c(n, puB, upuB, &dist);
+    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
+    unorm_c(puB, upuB, &dist);
 
-    double angle = vdot_c(n, (SpiceDouble *) &m_normal[0], upuB);
+    double angle = vdot_c((SpiceDouble *) &m_normal[0], upuB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
     return acos(angle) * RAD2DEG;
@@ -286,12 +282,10 @@ namespace Isis {
     SpiceDouble intersectionPoint[3];
     SpiceBoolean intersected = false;
 
-    auto n = naif();
-
-    NaifStatus::CheckErrors(n);
-    surfpt_c(n->get(), (SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
+    NaifStatus::CheckErrors();
+    surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
              intersectionPoint, &intersected);
-    NaifStatus::CheckErrors(n);
+    NaifStatus::CheckErrors();
 
     if (intersected) {
       m_surfacePoint->FromNaifArray(intersectionPoint);
@@ -330,19 +324,17 @@ namespace Isis {
     pB[1] = surfaceIntersection()->GetY().kilometers();
     pB[2] = surfaceIntersection()->GetZ().kilometers();
 
-    auto n = naif()->get();
-
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c(n, (SpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
-    unorm_c(n, psB, upsB, &dist);
+    vsub_c((SpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
+    unorm_c(psB, upsB, &dist);
 
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3];
-    vsub_c(n, (SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
-    unorm_c(n, puB, upuB, &dist);
+    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
+    unorm_c(puB, upuB, &dist);
 
-    double angle = vdot_c(n, upsB, upuB);
+    double angle = vdot_c(upsB, upuB);
 
     // How can these lines be tested???
     if(angle > 1.0) return 0.0;
@@ -440,14 +432,6 @@ namespace Isis {
 
     // All other conditions indicate the point is not visable from the observer
     return (false);
-  }
-
-  /**
-   * Returns the NaifContext for the Target object.
-   */
-  NaifContextPtr ShapeModel::naif() const 
-  {
-     return m_target->naif();
   }
 
   /**

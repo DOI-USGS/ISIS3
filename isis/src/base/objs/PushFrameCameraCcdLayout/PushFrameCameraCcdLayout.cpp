@@ -31,15 +31,13 @@
 #include "IString.h"
 #include "PushFrameCameraCcdLayout.h"
 #include "NaifStatus.h"
-#include "NaifContext.h"
 
 namespace Isis {
   /** 
    * Push frame full CCD layout class
    *  
    */
-  PushFrameCameraCcdLayout::PushFrameCameraCcdLayout(NaifContextPtr naif) 
-    : m_naif(NaifContext::UseDefaultIfNull(naif)), m_kernels(m_naif) {
+  PushFrameCameraCcdLayout::PushFrameCameraCcdLayout() {
     m_ccdId = 1;
   }
 
@@ -49,8 +47,7 @@ namespace Isis {
    * 
    * @param ccId The NAIF ID of the CCD
    */
-  PushFrameCameraCcdLayout::PushFrameCameraCcdLayout(NaifContextPtr naif, const int ccdId)
-    : m_naif(NaifContext::UseDefaultIfNull(naif)), m_kernels(m_naif) {
+  PushFrameCameraCcdLayout::PushFrameCameraCcdLayout(const int ccdId) {
     m_ccdId = ccdId;
   }
 
@@ -162,12 +159,12 @@ namespace Isis {
     SpiceBoolean found = false;
     SpiceInt numValuesRead;
     SpiceInt kernelValue;
-    gipool_c(m_naif->get(), var.toLatin1().data(), (SpiceInt) index, 1, &numValuesRead,
+    gipool_c(var.toLatin1().data(), (SpiceInt) index, 1, &numValuesRead,
              &kernelValue, &found);
 
     // Gotta throw an error here if not found
     if (!found) {
-      NaifStatus::CheckErrors(m_naif);
+      NaifStatus::CheckErrors();
       QString msg = "Can not find [" + var + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
      }
@@ -191,12 +188,12 @@ namespace Isis {
     SpiceBoolean found = false;
     SpiceInt numValuesRead;
     SpiceDouble kernelValue;
-    gdpool_c(m_naif->get(), var.toLatin1().data(), (SpiceInt) index, 1, &numValuesRead,
+    gdpool_c(var.toLatin1().data(), (SpiceInt) index, 1, &numValuesRead,
              &kernelValue, &found);
 
     // Gotta throw an error here if not found
     if (!found) {
-      NaifStatus::CheckErrors(m_naif);
+      NaifStatus::CheckErrors();
       QString msg = "Can not find [" + var + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
      }
@@ -220,12 +217,12 @@ namespace Isis {
     SpiceBoolean found = false;
     SpiceInt numValuesRead;
     char kernelValue[512];
-    gcpool_c(m_naif->get(), var.toLatin1().data(), (SpiceInt) index, 1, sizeof(kernelValue),
+    gcpool_c(var.toLatin1().data(), (SpiceInt) index, 1, sizeof(kernelValue),
              &numValuesRead, kernelValue, &found);
 
     // Gotta throw an error here if not found
     if (!found) {
-      NaifStatus::CheckErrors(m_naif);
+      NaifStatus::CheckErrors();
       QString msg = "Can not find [" + var + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
      }

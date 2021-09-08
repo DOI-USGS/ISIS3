@@ -71,8 +71,6 @@ namespace Isis {
         return p_focalPlaneY;
       };
 
-      NaifContextPtr naif() const { return p_camera->naif(); }
-
     protected:
       Camera *p_camera;       //!< The main camera to calculate distortions on
       double p_focalPlaneX;   //!< Undistorted x value for the focal plane

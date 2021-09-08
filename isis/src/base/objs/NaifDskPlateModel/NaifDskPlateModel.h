@@ -28,7 +28,6 @@
 #include <QString>
 
 #include "NaifDskApi.h"
-#include "NaifContext.h"
 
 namespace Isis {
 
@@ -66,8 +65,8 @@ namespace Isis {
   class NaifDskPlateModel {
 
     public:
-      NaifDskPlateModel(NaifContextPtr naif = nullptr);
-      NaifDskPlateModel(NaifContextPtr naif, const QString &dskfile);
+      NaifDskPlateModel();
+      NaifDskPlateModel(const QString &dskfile);
       virtual ~NaifDskPlateModel();
 
       bool isValid() const;
@@ -112,7 +111,7 @@ namespace Isis {
      */
       class NaifDskDescriptor {
         public:
-          NaifDskDescriptor(NaifContextPtr naif);
+          NaifDskDescriptor();
           ~NaifDskDescriptor();
 
           QString       m_dskfile;  //!< The NAIF DSK file representing this plate's shape model.
@@ -123,15 +122,11 @@ namespace Isis {
           SpiceInt      m_plates;   //!< Number of Plates in the model.
           SpiceInt      m_vertices; //!< Number of vertices defining the plate.
           QMutex        m_mutex;    //!< Mutex for thread saftey
-
-          NaifContextPtr m_naif;
       };
 
       // Shared file descriptor supports copying of object
       typedef QSharedPointer<NaifDskDescriptor>  SharedNaifDskDescriptor;
       SharedNaifDskDescriptor  m_dsk; //!< Shared pointer to the NaifDskDescriptor for this plate.
-
-      NaifContextPtr           m_naif;
 
       NaifDskDescriptor *openDSK(const QString &dskfile);
       bool verify(const bool &test, const QString &errmsg,

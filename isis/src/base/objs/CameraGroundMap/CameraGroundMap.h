@@ -147,8 +147,6 @@ namespace Isis {
         return p_focalPlaneY;
       };
 
-      NaifContextPtr naif() const { return p_camera->naif(); }
-
     protected:
       Camera *p_camera;     //!< Camera
       double p_focalPlaneX; //!< Camera's x focal plane coordinate

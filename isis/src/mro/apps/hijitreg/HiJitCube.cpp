@@ -52,14 +52,14 @@ namespace Isis {
   /**
    *  @brief Default constructor with no cube
    */
-  HiJitCube::HiJitCube(NaifContextPtr naif) : Cube(naif) {
+  HiJitCube::HiJitCube() {
     initLocal();
   }
 
   /**
    *  @brief Constructor with file to open
    */
-  HiJitCube::HiJitCube(const QString &filename, NaifContextPtr naif) : Cube(naif)  {
+  HiJitCube::HiJitCube(const QString &filename) {
     initLocal();
     OpenCube(filename);
   }
@@ -67,7 +67,7 @@ namespace Isis {
   /**
    *  @brief Constructor with file to open and potential shift applied
    */
-  HiJitCube::HiJitCube(const QString &filename, PvlObject &shift, NaifContextPtr naif) : Cube(naif)  {
+  HiJitCube::HiJitCube(const QString &filename, PvlObject &shift) {
     initLocal();
     OpenCube(filename, shift);
   }
@@ -150,7 +150,8 @@ namespace Isis {
 
 
   void HiJitCube::loadNaifTiming() {
-    if(!naif()->get_hiJitCubeLoaded()) {
+    auto naifState = NaifContext::get()->top();
+    if(!naifState->hiJitCubeLoaded()) {
 //  Load the NAIF kernels to determine timing data
       Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
       leapseconds = leapseconds.highestVersion();
@@ -159,14 +160,14 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      NaifStatus::CheckErrors(naif());
+      NaifStatus::CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
-      furnsh_c(naif()->get(), lsk.toLatin1().data());
-      furnsh_c(naif()->get(), sClock.toLatin1().data());
+      furnsh_c(lsk.toLatin1().data());
+      furnsh_c(sClock.toLatin1().data());
 
 //  Ensure it is loaded only once
-      naif()->set_hiJitCubeLoaded(true);
+      naifState->set_hiJitCubeLoaded(true);
     }
     return;
   }
@@ -182,8 +183,8 @@ namespace Isis {
 
     if(!jdata.scStartTime.isEmpty()) {
       QString scStartTimeString = jdata.scStartTime;
-      scs2e_c(naif()->get(), -74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
-      NaifStatus::CheckErrors(naif());
+      scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
+      NaifStatus::CheckErrors();
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)

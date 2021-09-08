@@ -57,13 +57,13 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     QString clockCount = inst["SpacecraftClockStartCount"];
-    iTime time = getClockTime(clockCount, -1, true);
+    double time = getClockTime(clockCount, -1, true).Et();
 
     // Setup detector map
     double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
     
     // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)   
-    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time.Et(), lineRate);
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
 
     // Detetermine what to set the starting detector sample to, based on swath mode
     QString swathMode = inst["SwathModeId"];

@@ -75,7 +75,7 @@ namespace Isis {
       bool updatePointing(Cube &cube, Camera *camera = 0) const;
       bool updatePosition(Cube &cube, Camera *camera = 0) const;
   
-      Quaternion getPointing(NaifContextPtr naif) const;
+      Quaternion getPointing() const;
       std::vector<double> getPosition() const;
       std::vector<double> getSunPosition()  const;
   

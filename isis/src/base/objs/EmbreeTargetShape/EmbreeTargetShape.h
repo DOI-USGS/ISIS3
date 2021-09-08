@@ -43,7 +43,6 @@
 
 #include "FileName.h"
 #include "LinearAlgebra.h"
-#include "NaifContext.h"
 
 namespace Isis {
 
@@ -158,7 +157,7 @@ namespace Isis {
 
       EmbreeTargetShape();
       EmbreeTargetShape(pcl::PolygonMesh::Ptr mesh, const QString &name = "");
-      EmbreeTargetShape(NaifContextPtr naif, const QString &dem, const Pvl *conf = 0);
+      EmbreeTargetShape(const QString &dem, const Pvl *conf = 0);
       virtual ~EmbreeTargetShape();
 
       QString name() const;
@@ -178,7 +177,7 @@ namespace Isis {
       static void occlusionFilter(void* userDataPtr, RTCOcclusionRay& ray);
 
     protected:
-      pcl::PolygonMesh::Ptr readDSK(NaifContextPtr naif, FileName file);
+      pcl::PolygonMesh::Ptr readDSK(FileName file);
       pcl::PolygonMesh::Ptr readPC(FileName file);
       void initMesh(pcl::PolygonMesh::Ptr mesh);
       void addVertices(int geomID);

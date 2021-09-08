@@ -39,7 +39,7 @@ void IsisMain() {
   auto naif = Application::GetNaif();
 
   QString dskfile = ui.GetFileName("FROM");
-  NaifDskPlateModel dsk(naif, dskfile);
+  NaifDskPlateModel dsk(dskfile);
 
   cout << "Total #Plates:   " << dsk.size() << "\n";
   cout << "Total #Vertices: " << dsk.numberVertices() << "\n";

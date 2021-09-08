@@ -12,7 +12,6 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  NaifContext naif;
 
   cout << "UNIT TEST FOR ObliqueCylindrical" << endl << endl;
 
@@ -38,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Test missing pole rotation keyword ..." << endl;
   try {
-    ObliqueCylindrical p(&naif, lab);
+    ObliqueCylindrical p(lab);
   }
   catch(IException &e) {
     e.print();
@@ -51,8 +50,8 @@ int main(int argc, char *argv[]) {
   // testing operator ==
   cout << "Testing operator == ..." << endl;
   try {
-    ObliqueCylindrical p1(&naif, lab);
-    ObliqueCylindrical p2(&naif, lab);
+    ObliqueCylindrical p1(lab);
+    ObliqueCylindrical p2(lab);
     bool flag = (p1 == p2);
     if(flag) {
       cout << "(p1==p2) = True" << endl;
@@ -120,7 +119,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     mapGrp["PoleRotation"] = "43.8423";
-    ObliqueCylindrical different(&naif, lab);
+    ObliqueCylindrical different(lab);
     cout << "Test Name and comparision method with differing data... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (different == *s) << endl;

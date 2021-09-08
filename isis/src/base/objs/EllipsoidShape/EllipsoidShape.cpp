@@ -118,12 +118,10 @@ namespace Isis {
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
 
-    auto n = naif();
-
     vector<double> normal(3,0.);
-    NaifStatus::CheckErrors(n);
-    surfnm_c(n->get(), a, b, c, pB, (SpiceDouble *) &normal[0]);
-    NaifStatus::CheckErrors(n);
+    NaifStatus::CheckErrors();
+    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
+    NaifStatus::CheckErrors();
 
     setNormal(normal);
     setHasNormal(true);

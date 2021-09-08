@@ -32,7 +32,6 @@
 #include "Pvl.h"
 #include "DbAccess.h"
 #include "IException.h"
-#include "NaifContext.h"
 
 namespace Isis {
 
@@ -101,9 +100,9 @@ namespace Isis {
 
     public:
       //  Constructors and Destructor
-      HiCalConf(NaifContextPtr naif);
-      HiCalConf(NaifContextPtr naif, Pvl &label);
-      HiCalConf(NaifContextPtr naif, Pvl &label, const QString &conf);
+      HiCalConf();
+      HiCalConf(Pvl &label);
+      HiCalConf(Pvl &label, const QString &conf);
 
       /** Destructor ensures everything is cleaned up properly */
       virtual ~HiCalConf () { }
@@ -140,7 +139,6 @@ namespace Isis {
 
       QString  _filter;      //!< Filter set name (RED, IR, BG)
 
-      NaifContextPtr _naif;
 
       void init();
       void init(Pvl &label);

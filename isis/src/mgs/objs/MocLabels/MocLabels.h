@@ -28,7 +28,6 @@
 #include <QString>
 
 #include "FileName.h"
-#include "NaifContext.h"
 
 
 namespace Isis {
@@ -63,7 +62,7 @@ namespace Isis {
    */
   class MocLabels {
     public:
-      MocLabels(Cube &cube);
+      MocLabels(Cube &cube, NaifContextPtr naif);
       MocLabels(const QString &file, NaifContextPtr naif);
       //! Empty destructor.
       ~MocLabels() {};

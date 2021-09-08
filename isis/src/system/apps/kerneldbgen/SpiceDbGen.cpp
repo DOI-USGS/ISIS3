@@ -38,8 +38,7 @@ const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.###### TDB ::TDB";
  *
  * @param type The type of kernel to be processed. Either, "SPK" or "CK.
 */
-SpiceDbGen::SpiceDbGen(NaifContextPtr naif, QString type)
- : m_naif(NaifContext::UseDefaultIfNull(naif)) {
+SpiceDbGen::SpiceDbGen(QString type) {
   p_type = type;
   m_coverageLevel = "SEGMENT"; // default
   //  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
@@ -238,36 +237,34 @@ void SpiceDbGen::setCoverageLevel(QString level) {
   * @throws Isis::iException::Message
   */
 PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double endOffset) {
-  NaifStatus::CheckErrors(m_naif);
-
-  auto n = m_naif->get();
+  NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
   QString tmp = fileIn.expanded();
 //  const char* file = fileIn.expanded().c_str();
-  furnsh_c(n, tmp.toLatin1().data());
+  furnsh_c(tmp.toLatin1().data());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
 
   SpiceBoolean found;
-  kinfo_c(n, tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
+  kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
   QString currFile = fileType;
 
   //create a spice cell capable of containing all the objects in the kernel.
   SPICEINT_CELL(currCell, 1000);
   //this resizing is done because otherwise a spice cell will append new data
   //to the last "currCell"
-  ssize_c(n, 0, &currCell);
-  ssize_c(n, 1000, &currCell);
+  ssize_c(0, &currCell);
+  ssize_c(1000, &currCell);
 
   //select which spice coverage routine to use. If a text kernel is detected, it
   //will be returned here and weeded out at the end of Direct(). This helps
   //to protect the user from inadvertently adding "." and ".." to their filters
   if (currFile == "SPK") {
-    spkobj_c(n, tmp.toLatin1().data(), &currCell);
+    spkobj_c(tmp.toLatin1().data(), &currCell);
   }
   else if (currFile == "CK") {
-    ckobj_c(n, tmp.toLatin1().data(), &currCell);
+    ckobj_c(tmp.toLatin1().data(), &currCell);
   }
   else if (currFile == "TEXT") {
     return PvlGroup("No coverage");
@@ -275,7 +272,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
   PvlGroup result;
   //iterate through every body in the kernel
-  for(int bodyCount = 0 ; bodyCount < card_c(n, &currCell) ; bodyCount++) {
+  for(int bodyCount = 0 ; bodyCount < card_c(&currCell) ; bodyCount++) {
     //get the NAIF body code
     int body = SPICE_CELL_ELEM_I(&currCell, bodyCount);
 
@@ -283,34 +280,34 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
     //(Positive codes indicate planetary bodies, negatives indicate
     // spacecraft and instruments)
     if (body < 0) {
-      NaifStatus::CheckErrors(m_naif);
+      NaifStatus::CheckErrors();
 
       //find the correct coverage window
       if (currFile == "SPK") {
         SPICEDOUBLE_CELL(cover, 200000);
-        ssize_c(n, 0, &cover);
-        ssize_c(n, 200000, &cover);
-        spkcov_c(n, tmp.toLatin1().data(), body, &cover);
+        ssize_c(0, &cover);
+        ssize_c(200000, &cover);
+        spkcov_c(tmp.toLatin1().data(), body, &cover);
 
-        NaifStatus::CheckErrors(m_naif);
+        NaifStatus::CheckErrors();
 
         result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
       else if (currFile == "CK") {
         //  200,000 is the max coverage window size for a CK kernel
         SPICEDOUBLE_CELL(cover, 200000);
-        ssize_c(n, 0, &cover);
-        ssize_c(n, 200000, &cover);
+        ssize_c(0, &cover);
+        ssize_c(200000, &cover);
 
         // A SPICE SEGMENT is composed of SPICE INTERVALS
         if (QString::compare(m_coverageLevel, "SEGMENT", Qt::CaseInsensitive) == 0 ) {
-          ckcov_c(n, tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
         }
         else {
-          ckcov_c(n, tmp.toLatin1().data(), body, SPICEFALSE, "INTERVAL", 0.0, "TDB", &cover);
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "INTERVAL", 0.0, "TDB", &cover);
         }
 
-        NaifStatus::CheckErrors(m_naif);
+        NaifStatus::CheckErrors();
         result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
     }
@@ -319,10 +316,10 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
   QString outFile = fileIn.originalPath();
   result += PvlKeyword("File", outFile + "/" + fileIn.name());
 
-  NaifStatus::CheckErrors(m_naif);
+  NaifStatus::CheckErrors();
 
   // Unfurnishes tmp file to prevent file table overflow
-  unload_c(n, tmp.toLatin1().data());
+  unload_c(tmp.toLatin1().data());
 
   return result;
 }
@@ -330,30 +327,28 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
 PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
                                      double startOffset, double endOffset) {
-  NaifStatus::CheckErrors(m_naif);
-
-  auto n = m_naif->get();
+  NaifStatus::CheckErrors();
 
   PvlGroup result(type);
   SpiceChar begStr[35], endStr[35];
   //Get the number of intervals in the object.
-  int niv = card_c(n, &coverage) / 2;
+  int niv = card_c(&coverage) / 2;
   //Convert the coverage interval start and stop times to TDB
   double begin, end;
   for(int j = 0;  j < niv;  j++) {
     //Get the endpoints of the jth interval.
-    wnfetd_c(n, &coverage, j, &begin, &end);
+    wnfetd_c(&coverage, j, &begin, &end);
     //Convert the endpoints to TDB calendar
     begin -= startOffset;
     end += endOffset;
-    timout_c(n, begin, calForm, 35, begStr);
-    timout_c(n, end, calForm, 35, endStr);
+    timout_c(begin, calForm, 35, begStr);
+    timout_c(end, calForm, 35, endStr);
 
     result += PvlKeyword("Time", "(\"" + (QString)begStr +
                          "\", \"" + (QString)endStr + "\")");
   }
 
-  NaifStatus::CheckErrors(m_naif);
+  NaifStatus::CheckErrors();
 
   return result;
 }
@@ -361,24 +356,22 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
 
 void SpiceDbGen::FurnishDependencies(QList<FileName> sclks, QList<FileName> lsks,
                                      QList<FileName> extras) {
-  NaifStatus::CheckErrors(m_naif);
-
-  auto n = m_naif->get();
+  NaifStatus::CheckErrors();
 
   // furnish the lsk files
   foreach (FileName lsk, lsks) {
-    furnsh_c(n, lsk.expanded().toLatin1().data());
+    furnsh_c(lsk.expanded().toLatin1().data());
   }
 
   // furnish the sclk files
   foreach (FileName sclk, sclks) {
-    furnsh_c(n, sclk.expanded().toLatin1().data());
+    furnsh_c(sclk.expanded().toLatin1().data());
   }
 
   // furnish the extra files
   foreach (FileName extra, extras) {
-    furnsh_c(n, extra.expanded().toLatin1().data());
+    furnsh_c(extra.expanded().toLatin1().data());
   }
 
-  NaifStatus::CheckErrors(m_naif);
+  NaifStatus::CheckErrors();
 }

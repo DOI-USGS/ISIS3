@@ -620,7 +620,7 @@ namespace Isis {
    *   @history 2011-07-22 Kris Becker 
    */
   bool RosettaVirtisCamera::hasArticulationKernel(Pvl &label) const {
-    Kernels kerns(naif(), label);
+    Kernels kerns(label);
     QStringList cks = kerns.getKernelList("CK");
     QRegExp virCk("*ROS_VIRTIS_M_????_????_V?.BC");
     virCk.setPatternSyntax(QRegExp::Wildcard);

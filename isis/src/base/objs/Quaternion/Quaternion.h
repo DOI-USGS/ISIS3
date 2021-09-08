@@ -31,8 +31,6 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
-#include "NaifContext.h"
-
 namespace Isis {
   /**
    * @brief Provide operations for quaternion arithmetic
@@ -54,8 +52,8 @@ namespace Isis {
   class Quaternion {
     public:
       // constructors
-      Quaternion(NaifContextPtr naif);
-      Quaternion(NaifContextPtr naif, const std::vector<double> matrix);
+      Quaternion();
+      Quaternion(const std::vector<double> matrix);
 
       // destructor
       ~Quaternion();
@@ -109,7 +107,6 @@ namespace Isis {
 
     private:
       std::vector<double> p_quaternion;     //!< Quaternion
-      NaifContextPtr p_naif;
       void Polish(Quaternion &quat);
   };
 };

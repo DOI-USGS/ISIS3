@@ -13,24 +13,21 @@
 #include "Preference.h"
 #include "Spice.h"
 #include "NaifStatus.h"      
-#include "NaifContext.h"
 
 using namespace std;
 
 int main() {
   Isis::Preference::Preferences(true);
-  Isis::NaifContext naif;
-  auto n = naif.get();
 
   // Test the matrix constructor
   std::vector<double> inMat(9);
   std::vector<double> outMat(9);
 
   //call eul2m to make a matrix and fill the vector
-  eul2m_c(n, 0, 77.2 * rpd_c(n), -100.94 * rpd_c(n), 1, 3, 1,
+  eul2m_c(0, 77.2 * rpd_c(), -100.94 * rpd_c(), 1, 3, 1,
           (SpiceDouble( *)[3])(&inMat[0]));
 
-  Isis::Quaternion q1(&naif, inMat);
+  Isis::Quaternion q1(inMat);
 
   outMat = q1.ToMatrix();
 
@@ -47,7 +44,7 @@ int main() {
 
   // compare inquat and q1
   std::vector<double> inquat(4);
-  m2q_c(n, (SpiceDouble *) &inMat[0], (SpiceDouble *) &inquat[0]);
+  m2q_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &inquat[0]);
   cout << " Naif quaternion from matrix:  " << " " << inquat[0] << " " << inquat[1] << " "
        << inquat[2] <<
        " " << inquat[3] << endl;
@@ -55,7 +52,7 @@ int main() {
        << " " << q1[3] << endl;
 
   // compare angles
-  double cvt = dpr_c(n);
+  double cvt = dpr_c();
   std::vector<double> angles =  q1.ToAngles(1, 3, 1);
 
   // Take care of Solaris round-off.  Find a better way later.
@@ -67,14 +64,14 @@ int main() {
 
 
   //Test the quaternion constructor
-  Isis::Quaternion q2(&naif, inquat);
+  Isis::Quaternion q2(inquat);
   cout << "Class constructed quaternion:  " << " " << q2[0] << " " << q2[1] << " " << q2[2]
        << " " << q2[3] << endl;
 
 
 
   // Test the empty constructor
-  Isis::Quaternion q3(&naif);
+  Isis::Quaternion q3;
   cout << "Empty Quaternion:  " << q3[0] << " " << q3[1] << " " << q3[2] << " "
        << q3[3] << endl;
 
@@ -98,14 +95,14 @@ int main() {
   multMat[7] = 0.;
   multMat[8] = 1.;
 
-  Isis::Quaternion multQ(&naif, multMat);
+  Isis::Quaternion multQ(multMat);
 
-  mxm_c(n, (SpiceDouble *) &inMat[0], (SpiceDouble *) &multMat[0],
+  mxm_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &multMat[0],
         (SpiceDouble( *) [3]) &outMat[0]);
 
   SpiceDouble naifQ[4];
 
-  m2q_c(n, (SpiceDouble *) &outMat[0], naifQ);
+  m2q_c((SpiceDouble *) &outMat[0], naifQ);
   q2 *= multQ;
   cout << "Naif mult  :  " << naifQ[0] << " " << naifQ[1] << " " << naifQ[2] <<
        " " << naifQ[3] << endl;
@@ -113,7 +110,7 @@ int main() {
        << q2[3] << endl;
 
   // Test the * operator with a quaternion
-  Isis::Quaternion q4(&naif);
+  Isis::Quaternion q4;
 
   q4  =  q3 * multQ;
 
@@ -121,7 +118,7 @@ int main() {
        << q4[3] << endl;
 
   // Test the * operator with a scalar
-  Isis::Quaternion q5(&naif);
+  Isis::Quaternion q5;
 
   q5 = q1 * 2.;
   cout << "Quat scalar mult: " << q5[0] << " " << q5[1] << " " << q5[2] << " "
@@ -154,10 +151,10 @@ int main() {
        << "         " << mymat[6] << " " << mymat[7] << " " << mymat[8] << endl;
 
   SpiceDouble myVecOut[3];
-  mxv_c(n, (SpiceDouble *) &mymat[0], (SpiceDouble *) &vecIn[0], myVecOut);
+  mxv_c((SpiceDouble *) &mymat[0], (SpiceDouble *) &vecIn[0], myVecOut);
 
   cout << "my qxv output = " << myVecOut[0] << " " << myVecOut[1] << " "
        << myVecOut[2]  << endl;
 
-  Isis::NaifStatus::CheckErrors(&naif); //make sure none of the SPICE calls caused an error
+  Isis::NaifStatus::CheckErrors(); //make sure none of the SPICE calls caused an error
 }

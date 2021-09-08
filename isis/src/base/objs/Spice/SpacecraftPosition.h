@@ -74,8 +74,8 @@ namespace Isis {
   class SpacecraftPosition : public SpicePosition {
     public:
 
-      SpacecraftPosition(NaifContextPtr n, int targetCode, int observerCode,
-                         const LightTimeCorrectionState &ltState = LightTimeCorrectionState(n),
+      SpacecraftPosition(int targetCode, int observerCode,
+                         const LightTimeCorrectionState &ltState = LightTimeCorrectionState(),
                          const Distance &radius = Distance(0.0, Distance::Meters));
 
 

@@ -119,7 +119,7 @@ static bool sunDistanceAU(NaifContextPtr naif,
   double lt;
   spkpos_c(n, target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                   sunv, &lt);
-  NaifStatus::CheckErrors(naif);
+  NaifStatus::CheckErrors();
 
   double sunkm = vnorm_c(n, sunv);
 

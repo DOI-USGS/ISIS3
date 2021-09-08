@@ -514,7 +514,7 @@ void ApplyRotation(NaifContextPtr naif, const double R[3][3], Table &table) {
     j2000Quat.push_back((double)rec[3]);
 
     // Set up a formal quaterian and get the rotation matrix
-    Quaternion q(naif, j2000Quat);
+    Quaternion q(j2000Quat);
     std::vector<double> CJ = q.ToMatrix();
 
     // Apply the constant offset

@@ -60,12 +60,12 @@ namespace Isis {
    * @param observerCode       NAIF code for observer
    * @param swapObserverTarget Boolean to specify swap
    */
-  SpacecraftPosition::SpacecraftPosition(NaifContextPtr naif, int targetCode, int observerCode,
+  SpacecraftPosition::SpacecraftPosition(int targetCode, int observerCode,
                                          const LightTimeCorrectionState &ltState,
                                          const Distance &radius) : 
-                                         SpicePosition(naif, targetCode, observerCode,
-                                                       ltState.isObserverTargetSwapped()),
-                                         m_abcorr(ltState) { 
+                                         SpicePosition(targetCode, observerCode,
+                                                       ltState.isObserverTargetSwapped()) { 
+    m_abcorr = ltState;
     m_radius = radius;
     return;
   }
@@ -86,7 +86,7 @@ namespace Isis {
  *         radius provided/set in the object
  */
   double SpacecraftPosition::getRadiusLightTime() const {
-    return (m_radius.kilometers()/clight_c(naif()));
+    return (m_radius.kilometers()/clight_c());
   }
 
 /**
@@ -100,7 +100,7 @@ namespace Isis {
  *        
  */
   double SpacecraftPosition::getDistanceLightTime(const Distance &distance) {
-    return (distance.kilometers()/clight_c(naif()->get()));
+    return (distance.kilometers()/clight_c());
   }
 
 
@@ -193,7 +193,7 @@ namespace Isis {
                        "J2000", "NONE", ssbTarg, dummy, ssbTarg_lt);
 
     // 4) compute target to observer
-    (void) vsubg_c(naif()->get(), ssbTarg, ssbObs, 6, state);
+    (void) vsubg_c(ssbTarg, ssbObs, 6, state);
 
     // Store vector and light time correction results
     setStateVector(state, hasVelocity);

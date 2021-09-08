@@ -26,8 +26,6 @@
 
 #include <QString>
 
-#include "NaifContext.h"
-
 namespace Isis {
   /**
    * @brief Sets up calibration parameters for Viking images
@@ -52,7 +50,7 @@ namespace Isis {
   class CalParameters {
     public:
       // Constructor
-      CalParameters(NaifContextPtr naif, const QString &fname);
+      CalParameters(const QString &fname);
 
       /**
        * Calculates and returns time based offset at specified line and sample
@@ -256,8 +254,6 @@ namespace Isis {
       double p_dist1;            //!<Calculated distance from the sun
       int p_constOff;            //!<Flag indicating constant offset
       double p_off_off;          //!<Constant offset
-
-      NaifContextPtr p_naif;
   };
 };
 #endif

@@ -39,8 +39,7 @@
 using namespace std;
 namespace Isis {
 
-  CalParameters::CalParameters(NaifContextPtr naif, const QString &fname) :
-    p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  CalParameters::CalParameters(const QString &fname) {
     try {
       // Extract Pvl Information from the file
       Pvl pvl(fname.toLatin1().data());
@@ -379,20 +378,19 @@ namespace Isis {
    * @param t iTime
    */
   void CalParameters::CalcSunDist(QString t) {
-    NaifStatus::CheckErrors(p_naif);
-    auto n = p_naif->get();
+    NaifStatus::CheckErrors();
     double sunv[3];
     SpiceDouble lt, et;
     FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
     FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
     QString tempfname1 = fname1.expanded();
     QString tempfname2 = fname2.expanded();
-    furnsh_c(n, tempfname1.toLatin1().data());
-    furnsh_c(n, tempfname2.toLatin1().data());
-    utc2et_c(n, t.toLatin1().data(), &et);
-    spkezp_c(n, 10, et, "J2000", "LT+S", 499, sunv, &lt);
+    furnsh_c(tempfname1.toLatin1().data());
+    furnsh_c(tempfname2.toLatin1().data());
+    utc2et_c(t.toLatin1().data(), &et);
+    spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
     p_dist1 = sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
-    NaifStatus::CheckErrors(p_naif);
+    NaifStatus::CheckErrors();
   }
 
 } // end namespace isis

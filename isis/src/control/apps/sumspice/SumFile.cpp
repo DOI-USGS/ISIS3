@@ -151,21 +151,20 @@ namespace Isis {
   bool SumFile::updatePointing(Cube &cube, Camera *camera) const {
   
     Camera *mycam = ( camera != NULL ) ? camera : cube.camera();
-    auto naif = cube.naif();
 
     // get new pointing quaternion from sum file
 
     // first, we get the rotattion between j2000 and target (i.e. body fixed frame)
     SpiceRotation *body = mycam->bodyRotation();
-    Quaternion j2000ToTarget(naif, body->Matrix());
+    Quaternion j2000ToTarget(body->Matrix());
 
     // next, get the constant rotation for the camera from the cube's table
     SpiceRotation *oldRotation = mycam->instrumentRotation();
-    Quaternion oldConstantRotation(naif, oldRotation->ConstantRotation()); // old TC rotation
+    Quaternion oldConstantRotation(oldRotation->ConstantRotation()); // old TC rotation
 
     // Get the new rotation from the sum file. 
     // this is the instrument frame (relative to the target, i.e. body-fixed)
-    Quaternion newRotation = getPointing(naif);
+    Quaternion newRotation = getPointing();
 
     // new target to instrument rotation (TC) is found by
     //     TC = inverse(rotation from sum file) * (old TC rotation)
@@ -223,16 +222,15 @@ namespace Isis {
   bool SumFile::updatePosition(Cube &cube, Camera *camera) const {
   
     Camera *mycam = ( !camera ) ? cube.camera() : camera;
-    auto naif = cube.naif();
 
     SpiceRotation *body = mycam->bodyRotation();
-    Quaternion j2000ToTarget(naif, body->Matrix());
+    Quaternion j2000ToTarget(body->Matrix());
 
     // Get body-fixed s/c vector - points from body to s/c
     vector<double> spacecraftPos = getPosition();
 
     // Have vector point from s/c to body
-    vminus_c(naif->get(), &spacecraftPos[0], &spacecraftPos[0]);
+    vminus_c(camera->naif()->get(), &spacecraftPos[0], &spacecraftPos[0]);
     // Transform position vector from body-fixed to J2000
     spacecraftPos = j2000ToTarget.Conjugate().Qxv(spacecraftPos);
   
@@ -289,7 +287,7 @@ namespace Isis {
    * 
    * @return Quaternion The SUMFILE's pointing matrix
    */
-  Quaternion SumFile::getPointing(NaifContextPtr naif) const {
+  Quaternion SumFile::getPointing() const {
     vector<SpiceDouble> cmatrixBodyFixed(9);
 
     // copy the transposed matrix to a 9 unit vector to be converted to quaternion
@@ -299,7 +297,7 @@ namespace Isis {
       }
     }
 
-    Quaternion quaternionBodyFixed(naif, cmatrixBodyFixed);
+    Quaternion quaternionBodyFixed(cmatrixBodyFixed);
     return quaternionBodyFixed;
   }
   

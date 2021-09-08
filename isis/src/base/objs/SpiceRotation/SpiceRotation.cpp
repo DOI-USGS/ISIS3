@@ -53,7 +53,7 @@ namespace Isis {
    *
    * @param frameCode Valid naif frame code.
    */
-  SpiceRotation::SpiceRotation(NaifContextPtr naif, int frameCode) : m_naif(naif), p_quaternion(m_naif) {
+  SpiceRotation::SpiceRotation(NaifContextPtr naif, int frameCode) : m_naif(naif) {
     p_constantFrames.push_back(frameCode);
     p_timeBias = 0.0;
     p_source = Spice;
@@ -87,7 +87,7 @@ namespace Isis {
    *
    * @throws IException::Io "Cannot find [key] in text kernels"
    */
-  SpiceRotation::SpiceRotation(NaifContextPtr naif, int frameCode, int targetCode) : m_naif(naif), p_quaternion(m_naif) {
+  SpiceRotation::SpiceRotation(NaifContextPtr naif, int frameCode, int targetCode) : m_naif(naif) {
     NaifStatus::CheckErrors(m_naif);
 
     p_constantFrames.push_back(frameCode);
@@ -139,7 +139,7 @@ namespace Isis {
    *
    * @param rotToCopy const reference to other SpiceRotation to copy
    */
-  SpiceRotation::SpiceRotation(const SpiceRotation &rotToCopy) : m_naif(rotToCopy.m_naif), p_quaternion(rotToCopy.m_naif) {
+  SpiceRotation::SpiceRotation(const SpiceRotation &rotToCopy) : m_naif(rotToCopy.m_naif) {
     p_cacheTime = rotToCopy.p_cacheTime;
     p_cache = rotToCopy.p_cache;
     p_cacheAv = rotToCopy.p_cacheAv;
@@ -438,7 +438,7 @@ namespace Isis {
 
     for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
         std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
-        Quaternion q(m_naif, quat);
+        Quaternion q(quat);
         std::vector<double> CJ = q.ToMatrix();
         p_cache.push_back(CJ);
     }
@@ -574,7 +574,7 @@ namespace Isis {
         j2000Quat.push_back((double)rec[2]);
         j2000Quat.push_back((double)rec[3]);
 
-        Quaternion q(m_naif, j2000Quat);
+        Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
         p_cache.push_back(CJ);
         p_cacheTime.push_back((double)rec[4]);
@@ -598,7 +598,7 @@ namespace Isis {
         j2000Quat.push_back((double)rec[3]);
 
 
-        Quaternion q(m_naif, j2000Quat);
+        Quaternion q(j2000Quat);
         std::vector<double> CJ = q.ToMatrix();
         p_cache.push_back(CJ);
 
@@ -815,7 +815,7 @@ namespace Isis {
       Table table(tableName, record);
 
       for (int i = 0; i < (int)p_cache.size(); i++) {
-        Quaternion q(m_naif, p_cache[i]);
+        Quaternion q(p_cache[i]);
         std::vector<double> v = q.GetQuaternion();
         record[0] = v[0];
         record[1] = v[1];

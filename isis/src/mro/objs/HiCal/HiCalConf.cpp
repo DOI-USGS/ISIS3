@@ -50,8 +50,7 @@ namespace Isis {
 /**
  * @brief Default constructor for HiCalConf
  */
-  HiCalConf::HiCalConf(NaifContextPtr naif) : DbAccess(),
-    _naif(NaifContext::UseDefaultIfNull(naif)) {
+  HiCalConf::HiCalConf() : DbAccess() {
     _profName.clear();
     init();
   }
@@ -61,8 +60,7 @@ namespace Isis {
    * @brief Construct from a HiRISE label
    * @param label Label from HiRISE cube file
    */
-  HiCalConf::HiCalConf(NaifContextPtr naif, Pvl &label) : DbAccess(),
-    _naif(NaifContext::UseDefaultIfNull(naif)) {
+  HiCalConf::HiCalConf(Pvl &label) : DbAccess() {
     _profName.clear();
     init(label);
   }
@@ -73,9 +71,8 @@ namespace Isis {
    * @param label Label from HiRISE cube file
    * @param conf Name of configuration file to use
    */
-  HiCalConf::HiCalConf(NaifContextPtr naif, Pvl &label, const QString &conf) :
-       DbAccess(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse)),
-      _naif(NaifContext::UseDefaultIfNull(naif)) {
+  HiCalConf::HiCalConf(Pvl &label, const QString &conf) :
+       DbAccess(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse)) {
     _profName.clear();
     init(label);
   }
@@ -314,14 +311,12 @@ namespace Isis {
    * @return double Distance in AU between Sun and observed body
    */
   double HiCalConf::sunDistanceAU() {
-    NaifStatus::CheckErrors(_naif);
+    NaifStatus::CheckErrors();
     loadNaifTiming();
-
-    auto n = _naif->get();
 
     QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
     double obsStartTime;
-    scs2e_c (n, -74999,scStartTime.toLatin1().data(),&obsStartTime);
+    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
 
     QString targetName = getKey("TargetName", "Instrument");
     if (targetName.toLower() == "sky" ||
@@ -332,10 +327,10 @@ namespace Isis {
     }
     double sunv[3];
     double lt;
-    (void) spkpos_c(n, targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
-    double sunkm = vnorm_c(n, sunv);
-    NaifStatus::CheckErrors(_naif);
+    double sunkm = vnorm_c(sunv);
+    NaifStatus::CheckErrors();
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }
@@ -411,10 +406,9 @@ namespace Isis {
  * body ephemerides to support time and relative positions of planet bodies.
  */
 void HiCalConf::loadNaifTiming( ) {
-  NaifStatus::CheckErrors(_naif);
-  if (!_naif->get_hiCalTimingLoaded()) {
-    auto n = _naif->get();
-
+  NaifStatus::CheckErrors();
+  auto naifState = NaifContext::get()->top();
+  if (!naifState->hiCalTimingLoaded()) {
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
     leapseconds = leapseconds.highestVersion();
@@ -433,14 +427,14 @@ void HiCalConf::loadNaifTiming( ) {
     QString sClock = sclk.expanded();
     QString pConstants = pck.expanded();
     QString satConstants = sat.expanded();
-    furnsh_c(n, lsk.toLatin1().data());
-    furnsh_c(n, sClock.toLatin1().data());
-    furnsh_c(n, pConstants.toLatin1().data());
-    furnsh_c(n, satConstants.toLatin1().data());
-    NaifStatus::CheckErrors(_naif);
+    furnsh_c(lsk.toLatin1().data());
+    furnsh_c(sClock.toLatin1().data());
+    furnsh_c(pConstants.toLatin1().data());
+    furnsh_c(satConstants.toLatin1().data());
+    NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once
-    _naif->set_hiCalTimingLoaded(true);
+    naifState->set_hiCalTimingLoaded(true);
   }
   return;
 }

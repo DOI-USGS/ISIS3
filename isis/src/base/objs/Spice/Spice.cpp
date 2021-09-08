@@ -369,12 +369,12 @@ namespace Isis {
 
     //  Set up for observer/target and light time correction to between s/c 
     // and target body.
-    LightTimeCorrectionState ltState(m_naif, *m_ikCode, this);
+    LightTimeCorrectionState ltState(*m_ikCode, this);
     ltState.checkSpkKernelsForAberrationCorrection();
 
     vector<Distance> radius = m_target->radii();
     Distance targetRadius((radius[0] + radius[2])/2.0);
-    m_instrumentPosition = new SpacecraftPosition(m_naif, *m_spkCode, *m_spkBodyCode,
+    m_instrumentPosition = new SpacecraftPosition(*m_spkCode, *m_spkBodyCode,
                                                   ltState, targetRadius);
 
     m_sunPosition = new SpicePosition(m_naif, 10, m_target->naifBodyCode());
