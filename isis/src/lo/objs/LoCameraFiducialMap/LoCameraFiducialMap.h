@@ -21,7 +21,6 @@
  */
 
 #include "PvlGroup.h"
-#include "NaifContext.h"
 
 namespace Isis {
   /**
@@ -55,13 +54,13 @@ namespace Isis {
    */
   class LoCameraFiducialMap  {
     public:
-      LoCameraFiducialMap(NaifContextPtr naif, PvlGroup &inst, const int naifIkCode);
+      LoCameraFiducialMap(PvlGroup &inst, const int naifIkCode);
       //! Destroys LoCameraFiducialMap object.
       ~LoCameraFiducialMap() {};
 
     private:
       void ReadFiducials(PvlGroup &inst);
-      void CreateTrans(NaifContextPtr naif, int xdir);
+      void CreateTrans(int xdir);
       std::vector<double> p_fidSamples; //!< Image sample positions of fiducial map
       std::vector<double> p_fidLines;   //!< Image line positions of fiducial map
       std::vector<double> p_fidXCoords; //!< Focal plane X positions of fiducial map

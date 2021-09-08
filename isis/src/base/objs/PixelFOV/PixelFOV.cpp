@@ -204,7 +204,7 @@ namespace Isis {
       newLook[0] = focalPlaneX;
       newLook[1] = focalPlaneY;
       newLook[2] = camera.DistortionMap()->UndistortedFocalPlaneZ();
-      vhat_c(camera.naif()->get(), newLook, unitNewLook);
+      vhat_c(newLook, unitNewLook);
       if (camera.SetLookDirection(unitNewLook)) {
         vertices.append(QPointF(camera.UniversalLatitude(), camera.UniversalLongitude()));
       }

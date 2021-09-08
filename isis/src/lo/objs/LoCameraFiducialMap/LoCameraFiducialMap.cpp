@@ -16,7 +16,7 @@ namespace Isis {
    * @param naifIkCode  Naif code of the Lunar Orbiter instrument for reading coefficients
    *
    */
-  LoCameraFiducialMap::LoCameraFiducialMap(NaifContextPtr naif, PvlGroup &inst, const int naifIkCode) {
+  LoCameraFiducialMap::LoCameraFiducialMap(PvlGroup &inst, const int naifIkCode) {
     // Get the Instrument label information needed to define the fiducial map for this frame
     p_naifIkCode = naifIkCode;
     ReadFiducials(inst);
@@ -29,7 +29,7 @@ namespace Isis {
     else {
       xdir = 1;
     }
-    CreateTrans(naif, xdir);
+    CreateTrans(xdir);
   }
 
 
@@ -75,7 +75,7 @@ namespace Isis {
    *
    * @throws IException::User - "Unable to create fiducial map."
    */
-  void LoCameraFiducialMap::CreateTrans(NaifContextPtr naif, int xdir) {
+  void LoCameraFiducialMap::CreateTrans(int xdir) {
     // Setup focal plane map
     Affine *fptrans = new Affine();
 
@@ -107,13 +107,11 @@ namespace Isis {
     transy.insert(transy.begin(), transy[2]);
     transy.pop_back();
 
-    auto n = naif->get();
-
     string icode = "INS" + IString(p_naifIkCode);
     string icodex = icode + "_TRANSX";
     string icodey = icode + "_TRANSY";
-    pdpool_c(n, icodex.c_str(), 3, (double( *)) &transx[0]);
-    pdpool_c(n, icodey.c_str(), 3, (double( *)) &transy[0]);
+    pdpool_c(icodex.c_str(), 3, (double( *)) &transx[0]);
+    pdpool_c(icodey.c_str(), 3, (double( *)) &transy[0]);
 
     vector<double> transs;
     vector<double> transl;
@@ -132,7 +130,7 @@ namespace Isis {
 
     string icodes = icode + "_ITRANSS";
     string icodel = icode + "_ITRANSL";
-    pdpool_c(n, icodes.c_str(), 3, (double( *)) &transs[0]);
-    pdpool_c(n, icodel.c_str(), 3, (double( *)) &transl[0]);
+    pdpool_c(icodes.c_str(), 3, (double( *)) &transs[0]);
+    pdpool_c(icodel.c_str(), 3, (double( *)) &transl[0]);
   }
 }

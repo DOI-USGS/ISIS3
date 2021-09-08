@@ -35,8 +35,7 @@ namespace Isis {
   /**
    * Create a blank Latitude object without Planetographic support.
    */
-  Latitude::Latitude(NaifContextPtr naif) : Angle(),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+  Latitude::Latitude() : Angle() {
     
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -56,9 +55,8 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(NaifContextPtr naif, double latitude, Angle::Units latitudeUnits,
-                     ErrorChecking errors) : Angle(),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+  Latitude::Latitude(double latitude, Angle::Units latitudeUnits,
+                     ErrorChecking errors) : Angle() {
 
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -76,8 +74,7 @@ namespace Isis {
    * @param latitude The latitude value this instance will represent
    * @param errors Error checking conditions
    */
-  Latitude::Latitude(NaifContextPtr naif, Angle latitude, ErrorChecking errors) : Angle(),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+  Latitude::Latitude(Angle latitude, ErrorChecking errors) : Angle() {
     
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -103,9 +100,8 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(NaifContextPtr naif, Angle latitude, PvlGroup mapping,
-                     ErrorChecking errors) : Angle(latitude),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+  Latitude::Latitude(Angle latitude, PvlGroup mapping,
+                     ErrorChecking errors) : Angle(latitude) {
     
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -118,7 +114,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(m_naif, mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
@@ -162,12 +158,10 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(NaifContextPtr naif,
-                     double latitude,
+  Latitude::Latitude(double latitude,
                      PvlGroup mapping,
                      Angle::Units latitudeUnits,
-                     ErrorChecking errors) : Angle(latitude, latitudeUnits),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+                     ErrorChecking errors) : Angle(latitude, latitudeUnits) {
 
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -180,7 +174,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(m_naif, mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
@@ -224,13 +218,11 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(NaifContextPtr naif,
-                     double latitude,
+  Latitude::Latitude(double latitude,
                      Distance equatorialRadius, Distance polarRadius,
                      CoordinateType latType,
                      Angle::Units latitudeUnits,
-                     ErrorChecking errors) : Angle(latitude, latitudeUnits),
-                     m_naif(NaifContext::UseDefaultIfNull(naif)) {
+                     ErrorChecking errors) : Angle(latitude, latitudeUnits) {
     
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
@@ -260,8 +252,6 @@ namespace Isis {
    */
   Latitude::Latitude(const Latitude &latitudeToCopy) : Angle(latitudeToCopy) {
     
-    m_naif = latitudeToCopy.m_naif;
-
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
@@ -363,7 +353,7 @@ namespace Isis {
 
     // This theoretically should just be an angle, but make it a Latitude so
     //   we can access angle
-    return Latitude(m_naif, ographicLatitude, Angle::Radians).angle(units);
+    return Latitude(ographicLatitude, Angle::Radians).angle(units);
   }
 
 
@@ -471,8 +461,8 @@ namespace Isis {
 
     // Provide a little wriggle room for precision problems
     Angle epsilon(DBL_EPSILON, Angle::Degrees);
-    Latitude adjustedMin(m_naif, min - epsilon);
-    Latitude adjustedMax(m_naif, max + epsilon);
+    Latitude adjustedMin = min - epsilon;
+    Latitude adjustedMax = max + epsilon;
 
     // Is this latitude between the min and the max
     return *this >= adjustedMin && *this <= adjustedMax;
@@ -576,16 +566,16 @@ namespace Isis {
                          Distance equatorialRadius, 
                          Distance polarRadius,
                          CoordinateType latType) {
-    Latitude result(m_naif);
+    Latitude result;
 
     switch (latType) {
       case Planetocentric:
-        result = Latitude(m_naif, planetocentric() + angleToAdd.radians(), equatorialRadius, polarRadius,
+        result = Latitude(planetocentric() + angleToAdd.radians(), equatorialRadius, polarRadius,
                           latType, Radians, m_errors);
         break;
 
       case Planetographic:
-        result = Latitude(m_naif, planetographic() + angleToAdd.radians(), equatorialRadius, polarRadius,
+        result = Latitude(planetographic() + angleToAdd.radians(), equatorialRadius, polarRadius,
                           latType, Radians, m_errors);
         break;
     }

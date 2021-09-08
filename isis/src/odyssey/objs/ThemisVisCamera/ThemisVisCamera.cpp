@@ -139,7 +139,7 @@ namespace Isis {
 
     // Set the et
     double et = p_etStart + BandEphemerisTimeOffset(vband);
-    setTime(iTime(naif(), et));
+    setTime(et);
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
     dmap->SetStartTime(et);
   }

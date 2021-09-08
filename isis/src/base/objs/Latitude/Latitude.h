@@ -21,7 +21,6 @@
  */
 
 #include "Angle.h"
-#include "NaifContext.h"
 
 namespace Isis {
   class Distance;
@@ -116,27 +115,23 @@ namespace Isis {
         Planetographic
       };
 
-      Latitude(NaifContextPtr naif);
-      Latitude(NaifContextPtr naif,
-               double latitude,
+      Latitude();
+      Latitude(double latitude,
                Angle::Units latitudeUnits,
                ErrorChecking errors = AllowPastPole);
 
-      Latitude(NaifContextPtr naif, Angle latitude, ErrorChecking errors = AllowPastPole);
+      Latitude(Angle latitude, ErrorChecking errors = AllowPastPole);
 
-      Latitude(NaifContextPtr naif,
-               Angle latitude,
+      Latitude(Angle latitude,
                PvlGroup mapping,
                ErrorChecking errors = ThrowAllErrors);
 
-      Latitude(NaifContextPtr naif,
-               double latitude,
+      Latitude(double latitude,
                PvlGroup mapping,
                Angle::Units latitudeUnits,
                ErrorChecking errors = ThrowAllErrors);
 
-      Latitude(NaifContextPtr naif,
-               double latitude, Distance equatorialRadius, Distance polarRadius,
+      Latitude(double latitude, Distance equatorialRadius, Distance polarRadius,
                CoordinateType latType = Planetocentric,
                Angle::Units latitudeUnits = Angle::Radians,
                ErrorChecking errors = ThrowAllErrors);
@@ -176,8 +171,6 @@ namespace Isis {
       virtual void setAngle(const double &angle, const Angle::Units &units);
 
     private:
-      NaifContextPtr m_naif;
-
       /**
        * Used for converting to Planetographic, this is the radius of the target
        *   on the equatorial plane.

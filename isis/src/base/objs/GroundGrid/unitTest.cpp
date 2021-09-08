@@ -21,8 +21,7 @@ void IsisMain() {
     application when mode=ground - if that application is correct, then this
     object is correct and vice versa.
    */
-  auto naif = Application::GetNaif();
-  Cube someCube(&naif);
+  Cube someCube;
 
   cout << "Reading cube..." << endl;
   someCube.open("$mgs/testData/ab102401.cub");
@@ -38,7 +37,7 @@ void IsisMain() {
                        Latitude(34.340453944831125, Angle::Degrees),
                        Longitude(-134.060950006448195, Angle::Degrees));
 
-  grid.CreateGrid(Latitude(&naif, 0, Angle::Degrees), Longitude(0, Angle::Degrees),
+  grid.CreateGrid(Latitude(0, Angle::Degrees), Longitude(0, Angle::Degrees),
       Angle(0.2, Angle::Degrees), Angle(0.2, Angle::Degrees),
       &progress, Angle(0.1, Angle::Degrees), Angle(0.01, Angle::Degrees));
 

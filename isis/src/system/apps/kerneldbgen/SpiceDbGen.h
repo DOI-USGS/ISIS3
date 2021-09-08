@@ -61,7 +61,7 @@
 class SpiceDbGen {
 
   public:
-    SpiceDbGen(Isis::NaifContextPtr naif, QString type);
+    SpiceDbGen(NaifContextPtr naif, QString type);
     Isis::PvlObject Direct(QString quality, QString location,
                            std::vector<QString> & filter, double startOffset, double endOffset);
     Isis::PvlObject Direct(QString quality, Isis::FileList fileList,
@@ -78,7 +78,7 @@ class SpiceDbGen {
     //private instance variables
     QString p_type;
     QString m_coverageLevel; //! The time coverage level of the database: INTERVAL or SEGMENT
-    Isis::NaifContextPtr m_naif;
+    NaifContextPtr m_naif;
     static const char *calForm;
 };
 

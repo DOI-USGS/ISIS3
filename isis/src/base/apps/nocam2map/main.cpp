@@ -61,7 +61,6 @@ void IsisMain() {
   Brick lonBrick(1, 1, 1, lonCube->pixelType());
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   //Set the sample and line increments
   float sinc = (inCube->sampleCount() * 0.10);
@@ -242,7 +241,7 @@ void IsisMain() {
     }
     //Else read them from the pck
     else {
-      PvlGroup radii = Target::radiiGroup(naif, targetName[0]);
+      PvlGroup radii = Target::radiiGroup(targetName[0]);
       equRadius = radii["EquatorialRadius"];
       polRadius = radii["PolarRadius"];
     }
@@ -857,7 +856,6 @@ void ComputeInputRange() {
   Cube *lonCub = p.SetInputCube("LONCUB");
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
   Pvl userMap;
   userMap.read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
@@ -900,7 +898,7 @@ void ComputeInputRange() {
         target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 
-      PvlGroup radii = Target::radiiGroup(naif, target);
+      PvlGroup radii = Target::radiiGroup(target);
       equRadius = double(radii["EquatorialRadius"]);
       polRadius = double(radii["PolarRadius"]);
     }

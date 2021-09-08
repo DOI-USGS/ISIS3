@@ -313,7 +313,7 @@ namespace Isis {
      // Compute the optical mirror angle
      double mirrorSin = trec["MirrorSin"];
      double mirrorCos = trec["MirrorCos"];
-     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c(naif()->get());
+     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
      double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
      optAng /= 1000.0;
 
@@ -438,8 +438,6 @@ namespace Isis {
     SpiceDouble m[3][3];
     SpiceDouble q_av[7], *av(&q_av[4]);
 
-    auto n = naif()->get();
-
     for (int i = 0 ; i < nlines ; i++) {
       int index = min(i, nlines-1);
       double etTime = m_mirrorData[index].m_scanLineEt;  // mid exposure ET
@@ -450,12 +448,12 @@ namespace Isis {
 
         // Set rotation of optical scan mirror (in radians)
         eulang[1] = -optAng;
-        eul2xf_c(n, eulang, 1, 2, 3, xform);
-        mxmg_c(n, xform, &state[0][0], 6, 6, 6, xform2);
+        eul2xf_c(eulang, 1, 2, 3, xform);
+        mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
 
         // Transform to output format
-        xf2rav_c(n, xform2, m, av);  // Transfers AV to output q_av via pointer
-        m2q_c(n, m, q_av);          // Transfers quaternion
+        xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
+        m2q_c(m, q_av);          // Transfers quaternion
 
         //  Now populate the table record with the line pointing
         for (int k = 0 ; k < nvals ; k++) {
@@ -492,7 +490,7 @@ namespace Isis {
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
-    ident_c(n, identity);
+    ident_c(identity);
 
     //  Store DAWN_VIR_{ID}_ZERO -> DAWN_VIR_{ID}_ZERO identity rotation
     PvlKeyword crot("ConstantRotation");
@@ -530,22 +528,21 @@ namespace Isis {
                                                          const {
     SMatrix state(6,6);
     NaifStatus::CheckErrors(naif());
-    auto n = naif()->get();
     try {
       // Get pointing w/AVs
-      sxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+      sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
       NaifStatus::CheckErrors(naif());
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(n, frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+        pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
         NaifStatus::CheckErrors(naif());
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
-        rav2xf_c(n, (SpiceDouble (*)[3]) rot[0], av,
-                    (SpiceDouble (*)[6]) state[0]);
+        rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
+                 (SpiceDouble (*)[6]) state[0]);
       }
       catch (IException &ie2) {
         ostringstream mess;
@@ -573,7 +570,7 @@ namespace Isis {
    *   @history 2011-07-22 Kris Becker 
    */
   bool DawnVirCamera::hasArticulationKernel(Pvl &label) const {
-    Kernels kerns(naif(), label);
+    Kernels kerns(label);
     QStringList cks = kerns.getKernelList("CK");
     QRegExp virCk("*dawn_vir_?????????_?.bc");
     virCk.setPatternSyntax(QRegExp::Wildcard);

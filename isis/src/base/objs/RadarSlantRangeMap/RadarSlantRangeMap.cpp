@@ -272,12 +272,11 @@ namespace Isis {
   void RadarSlantRangeMap::SetCoefficients(PvlKeyword &keyword) {
     PvlSequence seq;
     seq = keyword;
-    auto n = p_camera->naif()->get();
     for (int i = 0; i < seq.Size(); i++) {
       // TODO:  Test array size to be 4 if not throw error
       std::vector<QString> array = seq[i];
       double et;
-      utc2et_c(n, array[0].toLatin1().data(), &et);
+      utc2et_c(array[0].toLatin1().data(), &et);
       p_time.push_back(et);
       p_a0.push_back(toDouble(array[1]));
       p_a1.push_back(toDouble(array[2]));

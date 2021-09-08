@@ -1591,7 +1591,7 @@ namespace Isis {
         lon = surfacePoint.GetLongitude();
         radius = LocalRadius(lat, lon);
 
-        latrec_c(naif()->get(), radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
+        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
       }
 
       // if the first 2 surrounding points match or the last 2 surrounding points match,
@@ -1666,11 +1666,9 @@ namespace Isis {
     GetLocalNormal(normal);
     success = true;
 
-    auto naifptr = naif()->get();
-
     // Check to make sure normal is valid
     SpiceDouble mag;
-    unorm_c(naifptr,normal,normal,&mag);
+    unorm_c(normal,normal,&mag);
     if (mag == 0.) {
       success = false;
       return;
@@ -1687,28 +1685,28 @@ namespace Isis {
     pB[1] = surfacePoint.GetY().kilometers();
     pB[2] = surfacePoint.GetZ().kilometers();
 
-    vsub_c(naifptr, (SpiceDouble *) &sB[0], pB, surfSpaceVect);
-    unorm_c(naifptr, surfSpaceVect, unitizedSurfSpaceVect, &dist);
+    vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
+    unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
 
     // get a normalized surface sun vector
     SpiceDouble surfaceSunVect[3];
-    vsub_c(naifptr, m_uB, pB, surfaceSunVect);
+    vsub_c(m_uB, pB, surfaceSunVect);
     SpiceDouble unitizedSurfSunVect[3];
-    unorm_c(naifptr, surfaceSunVect, unitizedSurfSunVect, &dist);
+    unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
 
     // use normalized surface spacecraft and surface sun vectors to calculate
     // the phase angle (in radians)
-    phase = Angle(vsep_c(naifptr, unitizedSurfSpaceVect, unitizedSurfSunVect),
+    phase = Angle(vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect),
         Angle::Radians);
 
     // use normalized surface spacecraft and local normal vectors to calculate
     // the emission angle (in radians)
-    emission = Angle(vsep_c(naifptr, unitizedSurfSpaceVect, normal),
+    emission = Angle(vsep_c(unitizedSurfSpaceVect, normal),
         Angle::Radians);
 
     // use normalized surface sun and normal vectors to calculate the incidence
     // angle (in radians)
-    incidence = Angle(vsep_c(naifptr, unitizedSurfSunVect, normal),
+    incidence = Angle(vsep_c(unitizedSurfSunVect, normal),
         Angle::Radians);
 
 
@@ -2067,7 +2065,6 @@ namespace Isis {
     bool computed = p_pointComputed;
 
     NaifStatus::CheckErrors(naif());
-    auto n = naif()->get();
 
     // Get the azimuth's origin point (the current position) and its radius
     SpiceDouble azimuthOrigin[3];
@@ -2081,7 +2078,7 @@ namespace Isis {
     // body-fixed coordinate system and use the azimuth's origin radius to avoid the
     // situation where the DEM does not cover the entire planet
     SpiceDouble pointOfInterestFromBodyCenter[3];
-    latrec_c(n, originRadius.kilometers(), lon * PI / 180.0,
+    latrec_c(originRadius.kilometers(), lon * PI / 180.0,
              lat * PI / 180.0, pointOfInterestFromBodyCenter);
 
     // Get the difference vector with its tail at the azimuth origin and its
@@ -2091,31 +2088,31 @@ namespace Isis {
     // pointOfInterest = pointOfInterestFromBodyCenter - azimuthOriginFromBodyCenter
     //
     SpiceDouble pointOfInterest[3];
-    vsub_c(n, pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
+    vsub_c(pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
 
     // Get the component of the difference vector pointOfInterestFromAzimuthOrigin that is
     // perpendicular to the origin point (i.e. project perpendicularly onto the reference plane).
     // This will result in a point of interest vector that is in the plane tangent to the surface at
     // the origin point
     SpiceDouble pointOfInterestProj[3];
-    vperp_c(n, pointOfInterest, azimuthOrigin, pointOfInterestProj);
+    vperp_c(pointOfInterest, azimuthOrigin, pointOfInterestProj);
 
     // Unitize the tangent vector to a 1 km length vector
     SpiceDouble pointOfInterestProjUnit[3];
-    vhat_c(n, pointOfInterestProj, pointOfInterestProjUnit);
+    vhat_c(pointOfInterestProj, pointOfInterestProjUnit);
 
     // Scale the vector to within a pixel of the azimuth's origin point.
     // Get pixel scale in km/pixel and divide by 2 to insure that we stay within
     // a pixel of the origin point
     double scale = (PixelResolution() / 1000.0) / 2.0;
     SpiceDouble pointOfInterestProjUnitScaled[3];
-    vscl_c(n, scale, pointOfInterestProjUnit, pointOfInterestProjUnitScaled);
+    vscl_c(scale, pointOfInterestProjUnit, pointOfInterestProjUnitScaled);
 
     // Compute the adjusted point of interest vector from the body center. This point
     // will be within a pixel of the origin and in the same direction as the requested
     // raw point of interest vector
     SpiceDouble adjustedPointOfInterestFromBodyCenter[3];
-    vadd_c(n, azimuthOrigin, pointOfInterestProjUnitScaled, adjustedPointOfInterestFromBodyCenter);
+    vadd_c(azimuthOrigin, pointOfInterestProjUnitScaled, adjustedPointOfInterestFromBodyCenter);
 
     // Get the origin image coordinate
     double azimuthOriginSample = Sample();
@@ -2123,7 +2120,7 @@ namespace Isis {
 
     // Convert the point to a lat/lon and find out its image coordinate
     double adjustedPointOfInterestRad, adjustedPointOfInterestLon, adjustedPointOfInterestLat;
-    reclat_c(n, adjustedPointOfInterestFromBodyCenter,
+    reclat_c(adjustedPointOfInterestFromBodyCenter,
              &adjustedPointOfInterestRad,
              &adjustedPointOfInterestLon,
              &adjustedPointOfInterestLat);
@@ -2223,7 +2220,7 @@ namespace Isis {
     instrumentPosition(spCoord);
 
     // Get the angle between the 2 points and convert to degrees
-    double a = vsep_c(naif()->get(), coord, spCoord) * 180.0 / PI;
+    double a = vsep_c(coord, spCoord) * 180.0 / PI;
     double b = 180.0 - EmissionAngle();
 
     // The three angles in a triangle must add up to 180 degrees
@@ -2459,10 +2456,10 @@ namespace Isis {
 
     p_ignoreProjection = projIgnored;
 
-    Spice::createCache(iTime(naif(), ephemerisTimes.first), iTime(naif(), ephemerisTimes.second),
+    Spice::createCache(ephemerisTimes.first, ephemerisTimes.second,
                        cacheSize, tol);
 
-    setTime(iTime(naif(), ephemerisTimes.first));
+    setTime(ephemerisTimes.first);
 
     // Reset to band 1
     SetBand(1);

@@ -113,7 +113,7 @@ namespace Isis {
     double frameStartEt = observationStartEt + startTimeBias + (frameNumber - 1)
                              * (interFrameDelay + interFrameDelayBias);
     // Set start time to center of exposure time to ensure the proper SPICE data is cached.
-    setTime(iTime(naif(), frameStartEt + exposureDur / 2.0));
+    setTime(frameStartEt + exposureDur / 2.0);
 
     LoadCache();
     NaifStatus::CheckErrors(naif());

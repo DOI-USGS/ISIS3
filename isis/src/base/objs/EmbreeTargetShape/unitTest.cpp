@@ -38,7 +38,6 @@
 #include "Spice.h"
 #include "SurfacePoint.h"
 #include "Target.h"
-#include "NaifContext.h"
 
 using namespace Isis;
 
@@ -66,7 +65,6 @@ double roundToPrecision(double value, double precision);
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
-    NaifContext naif;
 
     qDebug() << "RTCMultiHitRay";
     qDebug() << endl;
@@ -150,7 +148,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Loading shapefile";
     qDebug() << endl;
 
-    EmbreeTargetShape itokawaShape(&naif, dskfile);
+    EmbreeTargetShape itokawaShape(dskfile);
     qDebug() << "Target shape name: " << itokawaShape.name();
     qDebug() << "Target mesh status:";
     qDebug() << "  Number of vertices: " << itokawaShape.numberOfVertices();
@@ -259,13 +257,13 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Invalid shapefile";
     try {
-      EmbreeTargetShape invalidShapefile(&naif, "junkyshapefile.bds");
+      EmbreeTargetShape invalidShapefile("junkyshapefile.bds");
     }
     catch (IException &e) {
       e.print();
     }
     try {
-      EmbreeTargetShape invalidShapefile(&naif, "junkydem.cub");
+      EmbreeTargetShape invalidShapefile("junkydem.cub");
     }
     catch (IException &e) {
       e.print();

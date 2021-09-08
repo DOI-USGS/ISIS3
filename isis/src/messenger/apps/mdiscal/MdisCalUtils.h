@@ -76,8 +76,9 @@ namespace Isis {
    * planetary body ephemerides to support time and relative positions of planet
    * bodies.
    */
-  static void loadNaifTiming(NaifContextPtr naif) {
-    if (!naif->get_mdisTimingLoaded()) {
+  static void loadNaifTiming() {
+    auto naifState = NaifContext::get()->top();
+    if (!naifState->mdisTimingLoaded()) {
 //  Load the NAIF kernels to determine timing data
       Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
       leapseconds = leapseconds.highestVersion();
@@ -88,18 +89,16 @@ namespace Isis {
       Isis::FileName pck("$base/kernels/spk/de???.bsp");
       pck = pck.highestVersion();
 
-      auto n = naif->get();
-
 //  Load the kernels
       QString leapsecondsName(leapseconds.expanded());
       QString sclkName(sclk.expanded());
       QString pckName(pck.expanded());
-      furnsh_c(n, leapsecondsName.toLatin1().data());
-      furnsh_c(n, sclkName.toLatin1().data());
-      furnsh_c(n, pckName.toLatin1().data());
+      furnsh_c(leapsecondsName.toLatin1().data());
+      furnsh_c(sclkName.toLatin1().data());
+      furnsh_c(pckName.toLatin1().data());
 
 //  Ensure it is loaded only once
-      naif->set_mdisTimingLoaded(true);
+      naifState->set_mdisTimingLoaded(true);
     }
     return;
   }
@@ -112,33 +111,30 @@ namespace Isis {
    *
    * @return double Distance in AU between Sun and observed body
    */
-  static bool sunDistanceAU(NaifContextPtr naif,
-                            const QString &scStartTime,
+  static bool sunDistanceAU(const QString &scStartTime,
                             const QString &target,
                             double &sunDist) {
 
     //  Ensure NAIF kernels are loaded
-    loadNaifTiming(naif);
+    loadNaifTiming();
     sunDist = 1.0;
-
-    auto n = naif->get();
 
     //  Determine if the target is a valid NAIF target
     SpiceInt tcode;
     SpiceBoolean found;
-    bodn2c_c(n, target.toLatin1().data(), &tcode, &found);
+    bodn2c_c(target.toLatin1().data(), &tcode, &found);
     if (!found) return (false);
 
     //  Convert starttime to et
     double obsStartTime;
-    scs2e_c(n, -236, scStartTime.toLatin1().data(), &obsStartTime);
+    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
 
     //  Get the vector from target to sun and determine its length
     double sunv[3];
     double lt;
-    spkpos_c(n, target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+    spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
-    double sunkm = vnorm_c(n, sunv);
+    double sunkm = vnorm_c(sunv);
 
     //  Return in AU units
     sunDist = sunkm / 1.49597870691E8;
@@ -336,7 +332,7 @@ namespace Isis {
  * @return double     - Event correction factor at the selected time to apply 
  *                      to WAC filter data.
  */
- double loadEmpiricalCorrection(NaifContextPtr naif, const QString &scStartTime, const int filter, 
+ double loadEmpiricalCorrection(const QString &scStartTime, const int filter, 
                                 QString &ename, QString &eDate) {
 
    //  This table maps the filter number extracted from BandBin/Number keyword
@@ -382,12 +378,11 @@ namespace Isis {
     }
 
     // Ensure NAIF kernels are loaded for NAIF time computations
-    loadNaifTiming(naif);
-    auto n = naif->get();
+    loadNaifTiming();
 
     //  Convert s/c clock start time to et
     double obsStartTime;
-    scs2e_c(n, -236, scStartTime.toLatin1().data(), &obsStartTime);
+    scs2e_c(-236, scStartTime.toLatin1().data(), &obsStartTime);
 
     // Set initial conditions and loop through all rows in the event table
     double evalue = 1.0;
@@ -397,7 +392,7 @@ namespace Isis {
       CSVReader::CSVAxis eRow = csv.getRow(i);
       QString utcTime = eRow[0];
       double eTime;
-      utc2et_c(n, utcTime.toLatin1().data(), &eTime);
+      utc2et_c(utcTime.toLatin1().data(), &eTime);
 
       // If current time is greater than start time this is the post event case
       if (eTime > obsStartTime) {

@@ -148,18 +148,18 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
         int nrecs = segment.size();
         segment.LoadKernelType("FK");
-        NaifStatus::CheckErrors(_naif);
+        NaifStatus::CheckErrors(naif);
 
-        spkw09_c(_naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+        spkw09_c(naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                  segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
 
-        NaifStatus::CheckErrors(_naif);
+        NaifStatus::CheckErrors(naif);
         segment.UnloadKernelType("FK");
         return;
       }
       private:
-        NaifContextPtr _naif;
         SpiceInt _handle;
+        NaifContextPtr _naif;
     };
 
     template <class K>
@@ -184,17 +184,17 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
-        NaifStatus::CheckErrors(_naif);
-        spkw13_c(_naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+        NaifStatus::CheckErrors(naif);
+        spkw13_c(naif->get(), _handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                  segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
-        NaifStatus::CheckErrors(_naif);
+        NaifStatus::CheckErrors(naif);
         segment.UnloadKernelType("FK");
         return;
       }
 
       private:
-        NaifContextPtr _naif;
         SpiceInt _handle;
+        NaifContextPtr _naif;
     };
 
 };

@@ -109,7 +109,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(etStart); // Consider changing to center in future. 
+    setTime(etStart.Et()); // Consider changing to center in future. 
     LoadCache();
     NaifStatus::CheckErrors(naif());
   }

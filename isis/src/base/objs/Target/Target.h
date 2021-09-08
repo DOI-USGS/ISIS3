@@ -31,8 +31,6 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
-#include "NaifContext.h"
-
 class QString;
 
 namespace Isis {

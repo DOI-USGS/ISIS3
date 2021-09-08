@@ -204,8 +204,7 @@ int main(int argc, char *argv[]) {
   PvlGroup mappingGroup("Mapping");
   mappingGroup += PvlKeyword("TargetName", "Yoda");
   try {
-    NaifContext naif;
-    Latitude( &naif, Angle(PI, Angle::Radians), mappingGroup);
+    Latitude( Angle(PI, Angle::Radians), mappingGroup);
   }
   catch (IException &e) {
     cout << "-------------------------------------------------------" << endl;

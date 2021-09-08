@@ -92,9 +92,9 @@ namespace Isis {
 
 
     private:
-      NaifContextPtr m_naif;
       int      m_ccdId;     //!< NAIF ID of the CCD
       Kernels  m_kernels;   //!< NAIF kernel manager
+      NaifContextPtr m_naif;
 
       int      getSpiceInt(const QString &var, const int index = 0) const;
       double   getSpiceDouble(const QString &var, const int index = 0) const;

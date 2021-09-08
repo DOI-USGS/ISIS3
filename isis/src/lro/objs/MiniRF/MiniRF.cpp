@@ -123,7 +123,7 @@ namespace Isis {
     if((QString)inst["LookDirection"] == "LEFT") {
       ldir = Radar::Left;
     }
-    RadarGroundRangeMap::setTransform(naif(), naifIkCode(), groundRangeResolution,
+    RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,
                                       this->Samples(), ldir);
     new RadarGroundRangeMap(this, naifIkCode());
 

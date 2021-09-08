@@ -86,8 +86,7 @@ namespace Isis {
                       Angle lonInc,
                       Progress *progress = 0);
 
-      void CreateGrid(NaifContextPtr naif,
-                      Latitude baseLat, 
+      void CreateGrid(Latitude baseLat, 
                       Longitude baseLon,
                       Angle latInc,  
                       Angle lonInc,

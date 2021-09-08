@@ -113,7 +113,6 @@ void IsisMain(){
   const QString hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   QString procStep("prepping phase");
   try {
@@ -126,7 +125,7 @@ void IsisMain(){
 
 //  Initialize the configuration file
     QString conf(ui.GetAsString("CONF"));
-    HiCalConf hiconf(naif, *(hifrom->label()), conf);
+    HiCalConf hiconf(*(hifrom->label()), conf);
     DbProfile hiprof = hiconf.getMatrixProfile();
 
 // Check for label propagation and set the output cube

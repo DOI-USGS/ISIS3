@@ -76,8 +76,8 @@ class KernelWriter {
     virtual ~KernelWriter() { }
 
     /** Open a kernel file using virtual method provided in K */
-    void open(NaifContextPtr naif, const QString &kfile, const int &commnt_size = 5120) {
-      _handle = k_open(naif, kfile, commnt_size);
+    void open(const QString &kfile, const int &commnt_size = 5120) {
+      _handle = k_open(kfile, commnt_size);
 
     }
 
@@ -106,7 +106,7 @@ class KernelWriter {
                const QString &comfile = "") {
       QString comments = getComment(kernels, comfile);
       open(kfile, comments.size() + 512);
-      header(naif, comments);  // Writes header
+      header(comments);  // Writes header
       write(naif, kernels);
       close();
       return;
@@ -154,11 +154,10 @@ class KernelWriter {
       try {
         QString commOut;
         NaifStatus::CheckErrors(naif);
-        auto n = naif->get();
         for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
-             dafac_c(n, handle, 1, commOut.size(), commOut.toLatin1().data());
+             dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
              NaifStatus::CheckErrors(naif);
              commOut.clear();
            }
@@ -170,7 +169,7 @@ class KernelWriter {
         // See if there is residual to write
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(n, handle, 1, commOut.size(), commOut.toLatin1().data());
+          dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
           NaifStatus::CheckErrors(naif);
         }
       }

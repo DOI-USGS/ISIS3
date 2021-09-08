@@ -33,8 +33,7 @@ namespace Isis {
     : CameraFocalPlaneMap(parent, naifIkCode) {
   }
 
-  void RadarGroundRangeMap::setTransform(NaifContextPtr naif,
-                                         int naifIkCode,
+  void RadarGroundRangeMap::setTransform(int naifIkCode,
                                          double groundRangeResolution,
                                          int samples, Radar::LookDirection ldir) {
     // Setup map from radar(sample,time) to radar(groundRange,time)
@@ -60,11 +59,10 @@ namespace Isis {
     transl[2] = 0.0;
 
     std::string icode = "INS" + IString(naifIkCode);
-    auto n = naif->get();
-    pdpool_c(n, (icode + "_TRANSX").c_str(), 3, transx);
-    pdpool_c(n, (icode + "_TRANSY").c_str(), 3, transy);
-    pdpool_c(n, (icode + "_ITRANSS").c_str(), 3, transs);
-    pdpool_c(n, (icode + "_ITRANSL").c_str(), 3, transl);
+    pdpool_c((icode + "_TRANSX").c_str(), 3, transx);
+    pdpool_c((icode + "_TRANSY").c_str(), 3, transy);
+    pdpool_c((icode + "_ITRANSS").c_str(), 3, transs);
+    pdpool_c((icode + "_ITRANSL").c_str(), 3, transl);
   }
 }
 
