@@ -43,7 +43,6 @@ void GenerateCSVOutput(Cube *incube,
 void IsisMain() {
   const QString caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = Application::GetNaif();
 
   QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
   BandGeometry *bandGeom = NULL;
@@ -200,7 +199,7 @@ void IsisMain() {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    bandGeom = new BandGeometry(naif);
+    bandGeom = new BandGeometry();
     bandGeom->setSampleInc(polySinc);
     bandGeom->setLineInc(polyLinc);
     bandGeom->setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));

@@ -78,7 +78,7 @@ void IsisMain() {
   mapper.CheckStatus();
 
   pixels.SetTile(1);
-  SurfacePoint point(naif);
+  SurfacePoint point;
 
   //  Now process the table writing the output
   while ( !pixels.end() ) {
@@ -100,7 +100,7 @@ void IsisMain() {
         // Calculate the grid point intersection of the DEM
         if ( useGridMethod ) {  // ( "grid" == method )
           // Get the grid point (lat, lon) from the DEM
-          QScopedPointer<SurfacePoint> dempt(naif, dsk.point(point.GetLatitude(), 
+          QScopedPointer<SurfacePoint> dempt(dsk.point(point.GetLatitude(), 
                                                        point.GetLongitude()));
 
           pixels[i] = dempt->GetLocalRadius().meters();

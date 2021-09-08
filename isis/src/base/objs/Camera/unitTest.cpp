@@ -33,7 +33,6 @@
 #include "Preference.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
-#include "NaifContext.h"
 
 using namespace std;
 using namespace Isis;
@@ -88,9 +87,8 @@ class MyCamera : public Camera {
 int main() {
   try {
     Preference::Preferences(true);
-    NaifContext naif;
     QString inputFile = "$mgs/testData/ab102401.lev2.cub";
-    Cube cube(&naif);
+    Cube cube;
     cube.open(inputFile);
     Camera *c = NULL;
     c = cube.camera();
@@ -103,7 +101,7 @@ int main() {
     cout << "SpacecraftNameShort: " << cam.spacecraftNameShort() << endl;
     double line = 453.0;
     double sample = 534.0;
-    Latitude lat(&naif, 18.221, Angle::Degrees);
+    Latitude lat(18.221, Angle::Degrees);
     Longitude lon(226.671, Angle::Degrees);
     double ra = 347.016;
     double dec = -51.2677;

@@ -17,7 +17,7 @@ namespace Isis {
    * Constructs an empty SurfacePoint object
    *
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  SurfacePoint::SurfacePoint() {
     InitCovariance();
     InitPoint();
   }
@@ -27,7 +27,6 @@ namespace Isis {
    *
    */
   SurfacePoint::SurfacePoint(const SurfacePoint &other) {
-    p_naif = other.p_naif;
     p_localRadius = other.p_localRadius;
 
     if(other.p_x) {
@@ -74,8 +73,8 @@ namespace Isis {
    * @param lon  The longitude of the surface point
    * @param radius The radius of the surface point
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
-      const Distance &radius) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
+      const Distance &radius) {
     InitCovariance();
     InitPoint();
     SetSphericalPoint(lat, lon, radius);
@@ -97,9 +96,9 @@ namespace Isis {
    * @param sigmaLon  The sigma of the longitude
    * @param sigmaRadius  The sigma of the local radius
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
       const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
-      const Distance &radiusSigma) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+      const Distance &radiusSigma) {
     InitCovariance();
     InitPoint();
     SetSpherical(lat, lon, radius, latSigma, lonSigma, radiusSigma);
@@ -111,8 +110,8 @@ namespace Isis {
    *   its variance/covariance matrix.
    *
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
-      const Distance &radius, const symmetric_matrix<double, upper> &covar) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
+      const Distance &radius, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
     InitPoint();
     SetSpherical(lat, lon, radius, covar);
@@ -126,8 +125,8 @@ namespace Isis {
    * @param y  The y coordinate of the surface point
    * @param z  The z coordinate of the surface point
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
-      const Displacement &z) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
+      const Displacement &z) {
     InitCovariance();
     InitPoint();
     SetRectangular(x, y, z);
@@ -148,9 +147,9 @@ namespace Isis {
    * @param ySigma  The y coordinate of the surface point
    * @param zSigma  The z coordinate of the surface point
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
       const Displacement &z, const Distance &xSigma, const Distance &ySigma,
-      const Distance &zSigma) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+      const Distance &zSigma) {
     InitCovariance();
     InitPoint();
     SetRectangular(x, y, z, xSigma, ySigma, zSigma);
@@ -166,8 +165,8 @@ namespace Isis {
    * @param z  The z coordinate of the surface point
    * @param covar  The variance/covariance matrix of the point
    */
-  SurfacePoint::SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
-      const Displacement &z, const symmetric_matrix<double, upper> &covar) : p_naif(NaifContext::UseDefaultIfNull(naif)) {
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
+      const Displacement &z, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
     InitPoint();
     SetRectangular(x, y, z, covar);
@@ -436,10 +435,9 @@ namespace Isis {
     if(!p_sphereCovar)
       p_sphereCovar = new symmetric_matrix<double, upper>(3);
 
-    auto n = p_naif->get();
     SpiceDouble mat[3][3];
-    mxm_c (n, J, rectMat, mat);
-    mxmt_c (n, mat, J, mat);
+    mxm_c (J, rectMat, mat);
+    mxmt_c (mat, J, mat);
     if (units == Kilometers) {
       // Now take care of unit mismatch between rect matrix in km and Jacobian in m
       (*p_sphereCovar)(0,0) = mat[0][0] * 1.0e6;
@@ -486,9 +484,8 @@ namespace Isis {
     SpiceDouble dlon = (double) lon.radians();
     SpiceDouble dradius = radius.kilometers();
 
-    auto n = p_naif->get();
     SpiceDouble rect[3];
-    latrec_c ( n, dradius, dlon, dlat, rect);
+    latrec_c ( dradius, dlon, dlat, rect);
 
     // Set local radius now since we have it and avoid calculating it later
     p_localRadius = radius;
@@ -709,10 +706,9 @@ namespace Isis {
     if(!p_rectCovar)
       p_rectCovar = new symmetric_matrix<double, upper>(3);
 
-    auto n = p_naif->get();
     SpiceDouble mat[3][3];
-    mxm_c (n, J, sphereMat, mat);
-    mxmt_c (n, mat, J, mat);
+    mxm_c (J, sphereMat, mat);
+    mxmt_c (mat, J, mat);
 
     if (units == Kilometers) {
       (*p_rectCovar)(0,0) = mat[0][0];
@@ -930,9 +926,8 @@ namespace Isis {
     p_localRadius = radius;
     
     // Set rectangular coordinates
-    auto n = p_naif->get();
     SpiceDouble rect[3];
-    latrec_c (n, (SpiceDouble) radius.kilometers(), lon, lat, rect);
+    latrec_c ((SpiceDouble) radius.kilometers(), lon, lat, rect);
     p_x->setKilometers(rect[0]);
     p_y->setKilometers(rect[1]);
     p_z->setKilometers(rect[2]);
@@ -1663,7 +1658,7 @@ namespace Isis {
    */
     Latitude SurfacePoint::GetLatitude() const {
       if (!Valid())
-        return Latitude(p_naif);
+        return Latitude();
 
       // TODO Scale for accuracy with coordinate of largest magnitude
       double x = p_x->meters();
@@ -1671,9 +1666,9 @@ namespace Isis {
       double z = p_z->meters();
 
       if (x != 0.  ||  y != 0.  || z != 0.)
-        return Latitude(p_naif, atan2(z, sqrt(x*x + y*y) ), Angle::Radians);
+        return Latitude(atan2(z, sqrt(x*x + y*y) ), Angle::Radians);
       else
-        return Latitude(p_naif);
+        return Latitude();
     }
 
 
@@ -2004,7 +1999,6 @@ namespace Isis {
 
     // Finally initialize local radius to avoid using a previous value
     p_localRadius = other.GetLocalRadius();
-    p_naif = other.p_naif;
 
     return *this;
   }

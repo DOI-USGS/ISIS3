@@ -35,7 +35,6 @@
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
-#include "NaifContext.h"
 
 using namespace std;
 using namespace Isis;
@@ -57,10 +56,9 @@ using namespace Isis;
 int main() {
   try {
     Preference::Preferences(true);
-    NaifContext naif;
     //string inputFile = "$mgs/testData/ab102401.cub";
     QString inputFile = "$base/testData/PlaneShape/W1591510834_1_cal.cub";
-    Cube cube(&naif);
+    Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();
     std::vector<Distance> radii = c->target()->radii();
@@ -153,7 +151,7 @@ int main() {
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing localRadius method ..." << endl;
-    double radius = shape.localRadius(Latitude(&naif, 0.0, Angle::Degrees),
+    double radius = shape.localRadius(Latitude(0.0, Angle::Degrees),
                                       Longitude(336.824286272771076, Angle::Degrees)).kilometers();
     printf("   Localradius = %lf km\n", radius);
     // radius at point on ring plane = 127509023.718129977583885

@@ -28,7 +28,6 @@
 #include "NaifDskApi.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
-#include "NaifContext.h"
 
 using namespace Isis;
 
@@ -112,7 +111,6 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for Abstract Plate.";
     Preference::Preferences(true);
-    NaifContext naif;
 
     qDebug() << "Virtual class... first create a child";
     MyPlate mp;
@@ -121,7 +119,7 @@ int main(int argc, char *argv[]) {
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] = 0.0;
     NaifVector raydir(3);
     raydir[0] = 1.0;    raydir[1] = 1.0;    raydir[2] = 1.0;
-    SurfacePoint *ipoint = new SurfacePoint(&naif, Displacement(2.0, Displacement::Meters),
+    SurfacePoint *ipoint = new SurfacePoint(Displacement(2.0, Displacement::Meters),
                                             Displacement(2.0, Displacement::Meters),
                                             Displacement(2.0, Displacement::Meters));
     qDebug() << "Construct intercept from vertex (0,0,0), vector(1,1,1), and surface point(2,2,2).";

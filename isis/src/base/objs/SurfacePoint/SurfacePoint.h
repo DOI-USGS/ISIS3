@@ -35,7 +35,6 @@
 #include "Displacement.h"
 #include "Distance.h"
 #include "Angle.h"
-#include "NaifContext.h"
 
 namespace Isis {
   class Latitude;
@@ -170,23 +169,23 @@ namespace Isis {
     };
       
       // Constructors
-      SurfacePoint(NaifContextPtr naif);
+      SurfacePoint();
       SurfacePoint(const SurfacePoint &other);
-      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
                    const Distance &radius);
-      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
           const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
           const Distance &radiusSigma);
-      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
                    const Distance &radius,
                    const boost::numeric::ublas::symmetric_matrix
                      <double,boost::numeric::ublas::upper>& covar);
-      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
+      SurfacePoint(const Displacement &x, const Displacement &y,
                    const Displacement &z);
-      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
+      SurfacePoint(const Displacement &x, const Displacement &y,
           const Displacement &z, const Distance &xSigma, const Distance &ySigma,
           const Distance &zSigma);
-      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
+      SurfacePoint(const Displacement &x, const Displacement &y,
                    const Displacement &z,
                    const boost::numeric::ublas::symmetric_matrix
                      <double,boost::numeric::ublas::upper>& covar);
@@ -330,8 +329,6 @@ namespace Isis {
       //! 3x3 upper triangular covariance matrix ocentric coordinates
       boost::numeric::ublas::symmetric_matrix
           <double,boost::numeric::ublas::upper> *p_sphereCovar;
-
-      NaifContextPtr p_naif;
   };
 };
 

@@ -105,7 +105,7 @@ class KernelWriter {
     void write(NaifContextPtr naif, const K &kernels, const QString &kfile,
                const QString &comfile = "") {
       QString comments = getComment(kernels, comfile);
-      open(naif, kfile, comments.size() + 512);
+      open(kfile, comments.size() + 512);
       header(naif, comments);  // Writes header
       write(naif, kernels);
       close();
