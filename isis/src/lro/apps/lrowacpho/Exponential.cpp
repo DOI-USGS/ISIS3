@@ -27,9 +27,7 @@
 #include <memory>
 #include <sstream>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Camera.h"
 #include "DbProfile.h"

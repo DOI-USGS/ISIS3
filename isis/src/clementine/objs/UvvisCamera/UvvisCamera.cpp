@@ -29,7 +29,7 @@
 #include "ClementineUvvisDistortionMap.h"
 #include "IString.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

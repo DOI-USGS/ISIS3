@@ -29,7 +29,7 @@
 
 #include <QString>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Brick.h"
 #include "Cube.h"
@@ -40,7 +40,7 @@
 #include "IException.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NaifContext.h"
 
 using namespace std;

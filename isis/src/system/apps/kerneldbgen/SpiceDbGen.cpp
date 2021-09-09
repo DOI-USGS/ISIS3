@@ -26,7 +26,7 @@
 #include <QDir>
 
 #include "SpiceDbGen.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 using namespace Isis;

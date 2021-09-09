@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Geometry.h>

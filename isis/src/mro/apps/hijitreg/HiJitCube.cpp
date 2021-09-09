@@ -24,7 +24,7 @@
 #include <sstream>
 #include <string>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "FileName.h"
 #include "HiJitCube.h"
@@ -32,7 +32,7 @@
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NaifContext.h"
 
 using namespace UA::HiRISE;

@@ -1,7 +1,7 @@
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "IException.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Preference.h"
 
 using namespace Isis;

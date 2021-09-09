@@ -34,7 +34,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

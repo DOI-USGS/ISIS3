@@ -34,7 +34,7 @@
 
 #include <boost/foreach.hpp>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -42,7 +42,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "CkSpiceSegment.h"
 #include "Table.h"
 

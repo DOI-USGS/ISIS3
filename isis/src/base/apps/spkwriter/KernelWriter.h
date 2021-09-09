@@ -26,11 +26,11 @@
  */
 #include <string>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Commentor.h"
 #include "IException.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 namespace Isis {
 

@@ -27,8 +27,7 @@
 
 #include <QDebug>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
+#include "NaifContext.h"
 
 // Specs for convenient NAIF vectors and matrices
 #include <tnt/tnt_array1d.h>

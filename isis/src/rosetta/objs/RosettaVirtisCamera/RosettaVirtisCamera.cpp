@@ -20,7 +20,7 @@
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NumericalApproximation.h"
 
 // #define DUMP_INFO 1

@@ -26,7 +26,7 @@
 #include "EllipsoidShape.h"
 #include "FileName.h"
 #include "IException.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NaifContext.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -51,7 +51,7 @@ namespace Isis {
    */
 
   // TODO: what is needed to initialize?
-  Target::Target(Spice *spice, Pvl &lab) {
+  Target::Target(Spice *spice, Pvl &lab, NaifContextPtr naif) {
 
     // Initialize members
     init();
@@ -90,14 +90,14 @@ namespace Isis {
 
     }
     else {
-      *m_bodyCode = lookupNaifBodyCode(lab);
+      *m_bodyCode = lookupNaifBodyCode(lab, naif);
       m_sky = false;
 
       *m_systemCode = (*m_bodyCode/100)*100 + 99;
 
       SpiceChar naifBuf[40];
       SpiceBoolean found;
-      bodc2n_c((SpiceInt) *m_systemCode, sizeof(naifBuf), naifBuf, &found);
+      naif->bodc2n_c((SpiceInt) *m_systemCode, sizeof(naifBuf), naifBuf, &found);
       string s(naifBuf);
       (*m_systemName).append(s.c_str());
 
@@ -151,7 +151,8 @@ namespace Isis {
    * Destroys the Target object
    */
   Target::~Target() {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+    naif->CheckErrors();
 
     delete m_bodyCode;
     m_bodyCode = NULL;
@@ -189,10 +190,10 @@ namespace Isis {
    * @return @b SpiceInt NAIF body code
    *
    */
-  SpiceInt Target::lookupNaifBodyCode(Pvl &lab) const {
+  SpiceInt Target::lookupNaifBodyCode(Pvl &lab, NaifContextPtr naif) const {
     SpiceInt code;
     try {
-      code = lookupNaifBodyCode(*m_name);
+      code = lookupNaifBodyCode(*m_name, naif);
       return code;
     }
     catch (IException &e) {
@@ -232,18 +233,18 @@ namespace Isis {
    * @return @b SpiceInt NAIF body code
    *
    */
-  SpiceInt Target::lookupNaifBodyCode(QString name) {
+  SpiceInt Target::lookupNaifBodyCode(QString name, NaifContextPtr naif) {
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     SpiceInt code;
     SpiceBoolean found;
-    bodn2c_c(name.toLatin1().data(), &code, &found);
+    naif->bodn2c_c(name.toLatin1().data(), &code, &found);
     if (!found) {
       QString msg = "Could not convert Target [" + name +
                    "] to NAIF body code";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     return  code;
 
   }
@@ -263,7 +264,7 @@ namespace Isis {
    *                 PolarRadius.
    *  
    */
-  PvlGroup Target::radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup) {
+  PvlGroup Target::radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup, NaifContextPtr naif = nullptr) {
     PvlGroup mapping = mapGroup;
 
     // Check to see if the mapGroup already has the target radii.
@@ -304,7 +305,7 @@ namespace Isis {
       // first, attempt to use cached values or run NAIF routine on the target name to get the
       // radii values. if this fails, the exception will be caught and we will try to find
       // radii in the NaifKeywords object of the labels
-      PvlGroup radii = Target::radiiGroup(target);
+      PvlGroup radii = Target::radiiGroup(target, naif);
 
       // Successfully found radii using target name. 
       // Copy the EquatorialRadius and PolorRadius and we are done.
@@ -329,7 +330,7 @@ namespace Isis {
           SpiceInt bodyCode = 0;
           try {
             // Try using the target bodycode_RADII keyword in the NaifKeywords PVL object
-            bodyCode = lookupNaifBodyCode(target);
+            bodyCode = lookupNaifBodyCode(target, naif);
           }
           catch (IException &e2) {
             throw IException(e, IException::Unknown, e2.what(), _FILEINFO_);
@@ -391,7 +392,7 @@ namespace Isis {
    * @return PvlGroup Group named "Mapping" with keywords TargetName, 
    *             EquatorialRadius, and PolarRadius.
    */
-  PvlGroup Target::radiiGroup(QString target) {
+  PvlGroup Target::radiiGroup(QString target, NaifContextPtr naif) {
 
     if (target.isEmpty()) {
       throw IException(IException::Unknown,
@@ -409,7 +410,7 @@ namespace Isis {
 
       SpiceInt bodyCode = 0;
       try {
-        bodyCode = lookupNaifBodyCode(target);
+        bodyCode = lookupNaifBodyCode(target, naif);
       }
       catch (IException &e) {
         QString msg = "Unable to find target radii for given target [" 
@@ -417,7 +418,7 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      PvlGroup radiiGroup = Target::radiiGroup(int(bodyCode));
+      PvlGroup radiiGroup = Target::radiiGroup(int(bodyCode), naif);
       mapping += PvlKeyword("TargetName",  target);
       mapping += radiiGroup.findKeyword("EquatorialRadius");
       mapping += radiiGroup.findKeyword("PolarRadius");
@@ -439,28 +440,27 @@ namespace Isis {
    *  
    * @return PvlGroup containing EquatorialRadius and PolarRadius keywords. 
    */
-  PvlGroup Target::radiiGroup(int bodyCode) {
+  PvlGroup Target::radiiGroup(int bodyCode, NaifContextPtr naif) {
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     FileName kern("$base/kernels/pck/pck?????.tpc");
     kern = kern.highestVersion();
     QString kernName = kern.expanded();
 
     // Load the most recent target attitude and shape kernel for NAIF
-    auto naifState = NaifContext::get()->top();
-    if(!naifState->targetPckLoaded()) {
-      furnsh_c(kernName.toLatin1().data());
-      naifState->set_targetPckLoaded(true);
+    if(!naif->targetPckLoaded()) {
+      naif->furnsh_c(kernName.toLatin1().data());
+      naif->set_targetPckLoaded(true);
     }
     
     // Get the radii from NAIF
     SpiceInt n;
     SpiceDouble radii[3];
-    bodvar_c(bodyCode, "RADII", &n, radii);
+    naif->bodvar_c(bodyCode, "RADII", &n, radii);
     
     try {
-      NaifStatus::CheckErrors();
+      naif->CheckErrors();
     }
     catch (IException &e) {
       QString msg = "Unable to find radii for target code [" + toString(bodyCode)

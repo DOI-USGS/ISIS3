@@ -28,7 +28,7 @@
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NirsDetectorMap.h"
 
 using namespace std;

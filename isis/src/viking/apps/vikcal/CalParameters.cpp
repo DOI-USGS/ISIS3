@@ -23,9 +23,7 @@
 
 #include <QString>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "CalParameters.h"
 #include "FileName.h"
@@ -34,7 +32,7 @@
 #include "LeastSquares.h"
 #include "Pvl.h"
 #include "TextFile.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 namespace Isis {

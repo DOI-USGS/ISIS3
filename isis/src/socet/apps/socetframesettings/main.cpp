@@ -20,7 +20,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Process.h"
 #include "Projection.h"
 #include "Pvl.h"

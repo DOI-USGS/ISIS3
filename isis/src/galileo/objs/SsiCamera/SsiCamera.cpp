@@ -30,7 +30,7 @@
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "RadialDistortionMap.h"

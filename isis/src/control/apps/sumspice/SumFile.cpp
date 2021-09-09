@@ -41,7 +41,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "Kernels.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Progress.h"
 
 

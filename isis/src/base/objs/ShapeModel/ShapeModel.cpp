@@ -10,15 +10,13 @@
 
 #include <cmath>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Distance.h"
 #include "SurfacePoint.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Spice.h"
 #include "Target.h"
 

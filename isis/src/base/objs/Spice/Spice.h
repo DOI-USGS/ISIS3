@@ -24,9 +24,7 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Pvl.h"
 #include "ShapeModel.h"
@@ -302,36 +300,37 @@ namespace Isis {
       virtual ~Spice();
 
       // Methods
-      void setTime(const iTime &time);
-      void instrumentPosition(double p[3]) const;
-      void instrumentBodyFixedPosition(double p[3]) const;
+      void setTime(const iTime &time, NaifContextPtr naif);
+      void instrumentPosition(double p[3], NaifContextPtr naif) const;
+      void instrumentBodyFixedPosition(double p[3], NaifContextPtr naif) const;
       void sunPosition(double p[3]) const;
-      double targetCenterDistance() const;
-      double sunToBodyDist() const;
+      double targetCenterDistance(NaifContextPtr naif) const;
+      double sunToBodyDist(NaifContextPtr naif) const;
       
       Longitude solarLongitude();
-      void instrumentBodyFixedVelocity(double v[3]) const;
+      void instrumentBodyFixedVelocity(double v[3], NaifContextPtr naif) const;
       iTime time() const;
 
       void radii(Distance r[3]) const;
 
       void createCache(iTime startTime, iTime endTime,
-                       const int size, double tol);
+                       const int size, double tol, NaifContextPtr naif);
       iTime cacheStartTime() const;
       iTime cacheEndTime() const;
 
-      void subSpacecraftPoint(double &lat, double &lon);
-      void subSolarPoint(double &lat, double &lon);
+      void subSpacecraftPoint(double &lat, double &lon, NaifContextPtr naif);
+      void subSolarPoint(double &lat, double &lon, NaifContextPtr naif);
 
       Target *target() const;
       QString targetName() const;
 
-      iTime getClockTime(QString clockValue,
+      iTime getClockTime(NaifContextPtr naif,
+                         QString clockValue,
                          int sclkCode = -1, 
                          bool clockTicks=false);
-      SpiceDouble getDouble(const QString &key, int index = 0);
-      SpiceInt getInteger(const QString &key,   int index = 0);
-      QString getString(const QString &key,     int index = 0);
+      SpiceDouble getDouble(NaifContextPtr naif, const QString &key, int index = 0);
+      SpiceInt getInteger(NaifContextPtr naif, const QString &key,   int index = 0);
+      QString getString(NaifContextPtr naif, const QString &key,     int index = 0);
 
       SpicePosition *sunPosition() const;
       SpicePosition *instrumentPosition() const;
@@ -364,7 +363,7 @@ namespace Isis {
         SpiceByteCodeType //!< SpiceByteCode type
       };
 
-      QVariant readValue(QString key, SpiceValueType type, int index = 0);
+      QVariant readValue(NaifContextPtr naif, QString key, SpiceValueType type, int index = 0);
 
       void storeResult(QString name, SpiceValueType type, QVariant value);
       QVariant getStoredResult(QString name, SpiceValueType type);
@@ -398,8 +397,8 @@ namespace Isis {
   
       void init(Pvl &pvl, bool noTables, nlohmann::json isd = NULL);
 
-      void load(PvlKeyword &key, bool notab);
-      void computeSolarLongitude(iTime et);
+      void load(PvlKeyword &key, bool notab, NaifContextPtr naif);
+      void computeSolarLongitude(iTime et, NaifContextPtr naif);
 
       Longitude *m_solarLongitude; //!< Body rotation solar longitude value
       iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)

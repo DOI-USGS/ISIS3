@@ -25,9 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "PixelOffset.h"
 #include "PolynomialUnivariate.h"

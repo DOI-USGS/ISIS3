@@ -31,7 +31,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "FileName.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Preference.h"
 
 using namespace std;

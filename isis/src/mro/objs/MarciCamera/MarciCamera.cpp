@@ -28,7 +28,7 @@
 #include "CameraSkyMap.h"
 #include "IException.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "PushFrameCameraGroundMap.h"
 

@@ -28,14 +28,14 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "FileName.h"
 #include "IException.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
 #include "SpiceManager.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

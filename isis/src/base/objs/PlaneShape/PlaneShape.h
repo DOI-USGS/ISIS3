@@ -28,9 +28,7 @@
 
 #include <QVector>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Pvl.h"
 #include "SurfacePoint.h"

@@ -16,7 +16,7 @@
 #include "iTime.h"
 #include "IException.h"
 #include "Table.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 // Declarations for binding for Naif Spicelib routine refchg_ that does not have
 // a wrapper

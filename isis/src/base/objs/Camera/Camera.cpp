@@ -49,7 +49,7 @@
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "RingPlaneProjection.h"

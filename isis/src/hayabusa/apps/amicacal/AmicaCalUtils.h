@@ -10,7 +10,7 @@
 #include "IException.h"
 #include "FileName.h"
 #include "LineManager.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "NaifContext.h"
 #include "IString.h"
 #include "Pvl.h"

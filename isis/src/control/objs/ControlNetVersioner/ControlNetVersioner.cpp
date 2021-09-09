@@ -21,7 +21,7 @@
 #include "Latitude.h"
 #include "LinearAlgebra.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"

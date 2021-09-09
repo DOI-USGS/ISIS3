@@ -12,7 +12,7 @@
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 

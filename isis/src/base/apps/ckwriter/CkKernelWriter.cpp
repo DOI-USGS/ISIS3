@@ -29,13 +29,13 @@
 
 #include <QFile>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "CkKernelWriter.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "CkSpiceSegment.h"
 #include "TextFile.h"

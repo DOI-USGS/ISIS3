@@ -7,7 +7,7 @@
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "PvlContainer.h"
 #include "SpecialPixel.h"

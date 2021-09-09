@@ -49,7 +49,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifDskApi.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "SurfacePoint.h"
 #include "TriangularPlate.h"
 

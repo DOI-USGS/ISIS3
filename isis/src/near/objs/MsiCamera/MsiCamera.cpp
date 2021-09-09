@@ -27,7 +27,7 @@
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Plugin.h"
 #include "RadialDistortionMap.h"
 

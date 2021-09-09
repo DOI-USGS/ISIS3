@@ -33,7 +33,7 @@
 #include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "ShapeModel.h"
 #include "Target.h"

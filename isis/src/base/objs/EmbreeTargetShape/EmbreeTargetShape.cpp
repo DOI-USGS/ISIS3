@@ -34,7 +34,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 
 namespace Isis {

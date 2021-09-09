@@ -11,7 +11,7 @@
 #include "Longitude.h"
 #include "NaifDskApi.h"
 #include "NaifDskPlateModel.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "PixelType.h"
 #include "ProcessByLine.h"
 #include "Progress.h"

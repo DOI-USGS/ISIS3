@@ -37,15 +37,13 @@
 #include <boost/foreach.hpp>
 
 // naif library
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 // other ISIS
 #include "IException.h"
 #include "InlineInfixToPostfix.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

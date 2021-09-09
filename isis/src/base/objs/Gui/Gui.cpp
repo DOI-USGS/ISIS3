@@ -33,6 +33,7 @@
 #include "Pvl.h"
 #include "SessionLog.h"
 #include "UserInterface.h"
+#include "NaifContext.h"
 
 #ifdef Q_OS_LINUX
 #include <X11/Xlib.h>
@@ -350,6 +351,8 @@ namespace Isis {
     // Call the application's main
     ProcessEvents();
     try {
+      Isis::NaifContextLifecycle naif;
+
       ui.VerifyAll();
       ui.SaveHistory();
       Isis::SessionLog::TheLog(true);

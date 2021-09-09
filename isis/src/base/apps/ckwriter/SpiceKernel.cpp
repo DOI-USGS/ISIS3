@@ -31,7 +31,7 @@
 #include <QString>
 #include <QStringList>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Application.h"
 #include "CkKernelWriter.h"
@@ -39,7 +39,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "SpiceKernel.h"
 #include "TextFile.h"

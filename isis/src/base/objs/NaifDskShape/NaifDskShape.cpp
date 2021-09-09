@@ -36,7 +36,7 @@
 #include "Longitude.h"
 #include "NaifDskApi.h"
 #include "NaifDskPlateModel.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "ShapeModel.h"
 #include "SpecialPixel.h"

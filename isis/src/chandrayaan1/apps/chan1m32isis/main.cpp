@@ -13,7 +13,7 @@
 #include "IException.h"
 #include "ImportPdsTable.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "OriginalLabel.h"
 #include "PixelType.h"
 #include "ProcessByLine.h"

@@ -33,11 +33,11 @@
 
 #include <QVector>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "FileName.h"
 #include "IException.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
 

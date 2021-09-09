@@ -36,7 +36,7 @@
 #include "Kernels.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Spice.h"
 
 namespace Isis {

@@ -28,7 +28,7 @@
 
 #include <QStringList>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "FileName.h"
 #include "FileList.h"

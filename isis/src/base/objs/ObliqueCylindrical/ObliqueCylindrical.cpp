@@ -25,7 +25,7 @@
 #include <cfloat>
 #include <cmath>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Constants.h"
 #include "IException.h"
@@ -33,7 +33,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 namespace Isis {

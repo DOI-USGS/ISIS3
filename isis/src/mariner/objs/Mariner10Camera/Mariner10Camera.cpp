@@ -25,9 +25,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include <QString>
 
@@ -38,7 +36,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "FileName.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Pvl.h"
 #include "ReseauDistortionMap.h"
 

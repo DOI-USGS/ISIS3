@@ -39,7 +39,7 @@
 #include "IString.h"
 #include "Pvl.h"
 #include "NaifDskPlateModel.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

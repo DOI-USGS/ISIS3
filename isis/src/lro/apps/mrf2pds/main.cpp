@@ -10,7 +10,7 @@
 #include "SerialNumberList.h"
 #include "Constants.h"
 #include "Statistics.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Spice.h"
 #include <fstream>
 #include <iostream>

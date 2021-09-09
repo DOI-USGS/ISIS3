@@ -26,12 +26,12 @@
 
 #include <QDebug>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 

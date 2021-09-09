@@ -29,9 +29,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 #include "XmlStackedHandler.h"
 
 class QDataStream;

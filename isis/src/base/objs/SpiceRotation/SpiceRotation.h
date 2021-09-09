@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-//#include <SpiceUsr.h>
+//#include "NaifContext.h"
 //#include <SpiceZfc.h>
 //#include <SpiceZmc.h>
 
@@ -300,25 +300,25 @@ namespace Isis {
         NOTJ2000PCK = 7   //!< PCK frame not referenced to J2000
       };
 
-      void SetEphemerisTime(double et);
+      void SetEphemerisTime(double et, NaifContextPtr naif);
       double EphemerisTime() const;
 
-      std::vector<double> GetCenterAngles();
+      std::vector<double> GetCenterAngles(NaifContextPtr naif);
 
-      std::vector<double> Matrix();
+      std::vector<double> Matrix(NaifContextPtr naif);
       std::vector<double> AngularVelocity();
 
       // TC
-      std::vector<double> ConstantRotation();
+      std::vector<double> ConstantRotation(NaifContextPtr naif);
       std::vector<double> &ConstantMatrix();
       void SetConstantMatrix(std::vector<double> constantMatrix);
 
       // CJ
-      std::vector<double> TimeBasedRotation();
+      std::vector<double> TimeBasedRotation(NaifContextPtr naif);
       std::vector<double> &TimeBasedMatrix();
       void SetTimeBasedMatrix(std::vector<double> timeBasedMatrix);
 
-      std::vector<double> J2000Vector(const std::vector<double> &rVec);
+      std::vector<double> J2000Vector(const std::vector<double> &rVec, NaifContextPtr naif);
 
       std::vector<Angle> poleRaCoefs();
 
@@ -336,20 +336,20 @@ namespace Isis {
 
       std::vector<Angle> sysNutPrecCoefs();
 
-      std::vector<double> ReferenceVector(const std::vector<double> &jVec);
+      std::vector<double> ReferenceVector(const std::vector<double> &jVec, NaifContextPtr naif);
 
-      std::vector<double> EvaluatePolyFunction();
+      std::vector<double> EvaluatePolyFunction(NaifContextPtr naif);
 
-      void loadPCFromSpice(int CenterBodyCode);
-      void loadPCFromTable(const PvlObject &Label);
+      void loadPCFromSpice(int CenterBodyCode, NaifContextPtr naif);
+      void loadPCFromTable(const PvlObject &Label, NaifContextPtr naif);
 
       void MinimizeCache(DownsizeStatus status);
 
-      void LoadCache(double startTime, double endTime, int size);
+      void LoadCache(double startTime, double endTime, int size, NaifContextPtr naif);
 
-      void LoadCache(double time);
+      void LoadCache(double time, NaifContextPtr naif);
 
-      void LoadCache(Table &table);
+      void LoadCache(Table &table, NaifContextPtr naif);
 
       void LoadCache(nlohmann::json &isd);
 
@@ -360,10 +360,10 @@ namespace Isis {
       Table Cache(const QString &tableName);
       void CacheLabel(Table &table);
 
-      void LoadTimeCache();
+      void LoadTimeCache(NaifContextPtr naif);
 
-      std::vector<double> Angles(int axis3, int axis2, int axis1);
-      void SetAngles(std::vector<double> angles, int axis3, int axis2, int axis1);
+      std::vector<double> Angles(int axis3, int axis2, int axis1, NaifContextPtr naif);
+      void SetAngles(std::vector<double> angles, int axis3, int axis2, int axis1, NaifContextPtr naif);
 
       bool IsCached() const;
 
@@ -404,35 +404,37 @@ namespace Isis {
       double DPckPolynomial(PartialType partialVar, const int coeffIndex);
 
       std::vector<double> toJ2000Partial(const std::vector<double> &lookT,
-                                         PartialType partialVar, int coeffIndex);
+                                         PartialType partialVar, int coeffIndex,
+                                         NaifContextPtr naif);
       std::vector<double> ToReferencePartial(std::vector<double> &lookJ,
-                                             PartialType partialVar, int coeffIndex);
-      void DCJdt(std::vector<double> &dRJ);
+                                             PartialType partialVar, int coeffIndex,
+                                             NaifContextPtr naif);
+      void DCJdt(std::vector<double> &dRJ, NaifContextPtr naif);
 
-      double WrapAngle(double compareAngle, double angle);
+      double WrapAngle(double compareAngle, double angle, NaifContextPtr naif);
       void SetAxes(int axis1, int axis2, int axis3);
       std::vector<double> GetFullCacheTime();
-      void FrameTrace(double et);
+      void FrameTrace(double et, NaifContextPtr naif);
 
       // Return the frame chain for the constant part of the rotation (ends in target)
       std::vector<int>  ConstantFrameChain();
       std::vector<int>  TimeFrameChain();
-      void InitConstantRotation(double et);
+      void InitConstantRotation(double et, NaifContextPtr naif);
       bool HasAngularVelocity();
 
       void ComputeAv();
-      std::vector<double> Extrapolate(double timeEt);
+      std::vector<double> Extrapolate(double timeEt, NaifContextPtr naif);
 
-      void checkForBinaryPck();
+      void checkForBinaryPck(NaifContextPtr naif);
 
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
-      void setEphemerisTimeMemcache();
-      void setEphemerisTimeNadir();
-      void setEphemerisTimeSpice();
-      void setEphemerisTimePolyFunction();
-      void setEphemerisTimePolyFunctionOverSpice();
-      void setEphemerisTimePckPolyFunction();
+      void setEphemerisTimeMemcache(NaifContextPtr naif);
+      void setEphemerisTimeNadir(NaifContextPtr naif);
+      void setEphemerisTimeSpice(NaifContextPtr naif);
+      void setEphemerisTimePolyFunction(NaifContextPtr naif);
+      void setEphemerisTimePolyFunctionOverSpice(NaifContextPtr naif);
+      void setEphemerisTimePckPolyFunction(NaifContextPtr naif);
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
       std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as
                                                       rotation matrix from J2000
@@ -446,7 +448,7 @@ namespace Isis {
 
     private:
       // method
-      void setFrameType();
+      void setFrameType(NaifContextPtr naif);
       std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant
                                                rotation TC. The first entry will always
                                                be the target frame code*/
@@ -495,8 +497,8 @@ namespace Isis {
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
       bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation
                                                includes angular velocity*/
-      std::vector<double> StateTJ();      /**< State matrix (6x6) for rotating state
-                                               vectors from J2000 to target frame*/
+      std::vector<double> StateTJ(NaifContextPtr naif);      /**< State matrix (6x6) for rotating state
+                                                                  vectors from J2000 to target frame*/
       // The remaining items are only used for PCK frame types.  In this case the
       // rotation is  stored as a cache, but the coefficients are available for display
       // or comparison, and the first three coefficient sets can be solved for and

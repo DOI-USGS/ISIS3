@@ -30,7 +30,7 @@
 #include "CameraSkyMap.h"
 #include "iTime.h"
 #include "JunoDistortionMap.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

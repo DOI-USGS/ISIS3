@@ -5,7 +5,7 @@
 #include <QString>
 
 // naif library includes
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 // Isis includes
 #include "Buffer.h"
@@ -14,7 +14,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "LineManager.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "ProcessByLine.h"
 #include "Table.h"
 #include "TextFile.h"

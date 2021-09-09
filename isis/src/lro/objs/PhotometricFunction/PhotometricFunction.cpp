@@ -1,6 +1,4 @@
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Angle.h"
 #include "Camera.h"

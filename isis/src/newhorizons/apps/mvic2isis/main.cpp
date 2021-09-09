@@ -10,7 +10,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "LineManager.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "OriginalLabel.h"
 #include "ProcessBySample.h"
 #include "ProcessImportFits.h"

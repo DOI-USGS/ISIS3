@@ -24,9 +24,7 @@
 
 #include <string>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "FileName.h"
 
@@ -87,7 +85,7 @@ namespace Isis {
       * @param time An ephemeris time (ET).
       */
       iTime(const double time) {
-        LoadLeapSecondKernel();
+        LoadLeapSecondKernel(NaifContext::acquire());
         p_et = time;
       }
 
@@ -149,7 +147,7 @@ namespace Isis {
       double p_et;     /**<The ephemeris representaion of the original string
                            passed into the constructor or the operator= member*/
 
-      void LoadLeapSecondKernel();
+      void LoadLeapSecondKernel(NaifContextPtr naif);
   };
 };
 

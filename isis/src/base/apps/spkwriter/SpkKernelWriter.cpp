@@ -33,7 +33,7 @@
 #include "IString.h"
 #include "IException.h"
 
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 using namespace std;
 

@@ -20,7 +20,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "Spice.h"

@@ -31,12 +31,12 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "CameraFactory.h"
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "OriginalLabel.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
@@ -722,9 +722,11 @@ namespace Isis {
     SpiceBoolean found;
     QString target = _camera->target()->name();
 
+    auto naif = NaifContext::acquire();
+
     try {
-      scCode = Target::lookupNaifBodyCode("MESSENGER");
-      targCode = Target::lookupNaifBodyCode(target.toLatin1().data());
+      scCode = Target::lookupNaifBodyCode("MESSENGER", naif);
+      targCode = Target::lookupNaifBodyCode(target.toLatin1().data(), naif);
     }
     catch (...) {
       found = false;
@@ -735,7 +737,7 @@ namespace Isis {
     SpiceRotation *rotate = _camera->instrumentRotation();
     SpiceDouble starg[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
-    spkez_c(targCode, rotate->EphemerisTime(), "J2000", "LT+S", scCode,
+    naif->spkez_c(targCode, rotate->EphemerisTime(), "J2000", "LT+S", scCode,
             starg, &lt);
 
     //  Get surfarce intersection vector in body-fixed coordinates (surfx)
@@ -747,7 +749,7 @@ namespace Isis {
 
     //  Get angular velocity vector of camera (av)
     SpiceDouble sclkdp;
-    (void) sce2c_c(scCode, rotate->EphemerisTime(), &sclkdp);
+    (void) naif->sce2c_c(scCode, rotate->EphemerisTime(), &sclkdp);
 
     //  Determine instrument ID (inst)
     PvlKeyword &key = _label.findKeyword("NaifIkCode", PvlObject::Traverse);

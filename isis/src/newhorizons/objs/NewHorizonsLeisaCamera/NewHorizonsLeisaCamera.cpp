@@ -24,7 +24,7 @@
 #include <QString>
 #include <QVector>
 
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "iTime.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"

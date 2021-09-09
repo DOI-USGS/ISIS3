@@ -1,12 +1,12 @@
 #include "Isis.h"
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "Application.h"
 #include "Distance.h"
 #include "iTime.h"
 #include "KernelDb.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "ProcessByBrick.h"
 #include "ShadowFunctor.h"
 #include "SpicePosition.h"

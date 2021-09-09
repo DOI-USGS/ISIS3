@@ -22,7 +22,7 @@
  */
 
 #include "CameraSkyMap.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 
 namespace Isis {
   /** Constructor a map between focal plane x/y and right acension/declination

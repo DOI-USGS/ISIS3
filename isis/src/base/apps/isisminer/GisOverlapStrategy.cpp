@@ -36,7 +36,7 @@
 // other ISIS
 #include "IException.h"
 #include "IString.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "Progress.h"
 #include "PvlFlatMap.h"
 #include "PvlKeyword.h"

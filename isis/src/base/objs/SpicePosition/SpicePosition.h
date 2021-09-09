@@ -25,9 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include "Table.h"
 #include "PolynomialUnivariate.h"
@@ -209,7 +207,7 @@ namespace Isis {
       virtual QString GetAberrationCorrection() const;
       double GetLightTime() const;
 
-      const std::vector<double> &SetEphemerisTime(double et);
+      const std::vector<double> &SetEphemerisTime(double et, NaifContextPtr naif);
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
       //! Return the current ephemeris time
@@ -217,7 +215,7 @@ namespace Isis {
         return p_et;
       };
 
-      const std::vector<double> &GetCenterCoordinate();
+      const std::vector<double> &GetCenterCoordinate(NaifContextPtr naif);
 
       //! Return the current J2000 position
       const std::vector<double> &Coordinate() {
@@ -232,27 +230,28 @@ namespace Isis {
         return p_hasVelocity;
       };
 
-      void LoadCache(double startTime, double endTime, int size);
-      void LoadCache(double time);
-      void LoadCache(Table &table);
-      void LoadCache(nlohmann::json &isd);
+      void LoadCache(double startTime, double endTime, int size, NaifContextPtr naif);
+      void LoadCache(double time, NaifContextPtr naif);
+      void LoadCache(Table &table, NaifContextPtr naif);
+      void LoadCache(nlohmann::json &isd, NaifContextPtr naif);
 
-      Table LineCache(const QString &tableName);
-      Table LoadHermiteCache(const QString &tableName);
+      Table LineCache(const QString &tableName, NaifContextPtr naif);
+      Table LoadHermiteCache(const QString &tableName, NaifContextPtr naif);
 
-      void ReloadCache();
-      void ReloadCache(Table &table);
+      void ReloadCache(NaifContextPtr naif);
+      void ReloadCache(Table &table, NaifContextPtr naif);
 
-      Table Cache(const QString &tableName);
+      Table Cache(const QString &tableName, NaifContextPtr naif);
 
       //! Is this position cached
       bool IsCached() const {
         return (p_cache.size() > 0);
       };
 
-      void SetPolynomial(const Source type = PolyFunction);
+      void SetPolynomial(NaifContextPtr naif, const Source type = PolyFunction);
 
-      void SetPolynomial(const std::vector<double>& XC,
+      void SetPolynomial(NaifContextPtr naif, 
+                         const std::vector<double>& XC,
                          const std::vector<double>& YC,
                          const std::vector<double>& ZC,
                          const Source type = PolyFunction);
@@ -262,7 +261,7 @@ namespace Isis {
                          std::vector<double>& ZC);
 
       //! Set the polynomial degree
-      void SetPolynomialDegree(int degree);
+      void SetPolynomialDegree(int degree, NaifContextPtr naif);
 
       //! Return the source of the position
       Source GetSource() {
@@ -295,7 +294,7 @@ namespace Isis {
     protected:
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();
-      virtual void SetEphemerisTimeSpice();
+      virtual void SetEphemerisTimeSpice(NaifContextPtr naif);
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
@@ -311,8 +310,9 @@ namespace Isis {
                               const QString &refFrame,
                               const QString &abcorr,
                               double state[6], bool &hasVelocity,
-                              double &lightTime) const;
-      void setStateVector(const double state[6], const bool &hasVelocity);
+                              double &lightTime,
+                              NaifContextPtr naif) const;
+      void setStateVector(const double state[6], const bool &hasVelocity, NaifContextPtr naif);
       void setLightTime(const double &lightTime);
       //======================================================================
 

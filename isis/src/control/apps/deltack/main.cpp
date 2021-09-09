@@ -5,7 +5,7 @@
 #include <QList>
 #include <vector>
 
-#include <SpiceUsr.h>
+#include "NaifContext.h"
 
 #include "BundleAdjust.h"
 #include "BundleResults.h"

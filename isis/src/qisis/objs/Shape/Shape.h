@@ -31,9 +31,7 @@
 #include "Longitude.h"
 #include "XmlStackedHandler.h"
 
-#include <SpiceUsr.h>
-#include <SpiceZfc.h>
-#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 class QUuid;
 class QMutex;

@@ -27,7 +27,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "iTime.h"
-#include "NaifStatus.h"
+#include "NaifContext.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "PushFrameCameraGroundMap.h"
 #include "ThemisVisDistortionMap.h"
