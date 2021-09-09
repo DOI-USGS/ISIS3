@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://psa.esa.int/psa/v1/PDS4_PSA_1F00_1300.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/geom/v1/PDS4_GEOM_1F00_1910.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1F00_1500.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1F00_1810.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1F00_1950.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://psa.esa.int/psa/em16/v1/PDS4_EM16_1F00_1200.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd http://psa.esa.int/psa/v1 https://psa.esa.int/psa/v1/PDS4_PSA_1F00_1300.xsd http://psa.esa.int/psa/em16/tgo/cas/v1 https://psa.esa.int/psa/em16/tgo/cas/v1/PDS4_EM16_TGO_CAS_1F00_1100.xsd http://pds.nasa.gov/pds4/disp/v1 https://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1F00_1500.xsd http://pds.nasa.gov/pds4/geom/v1 https://pds.nasa.gov/pds4/geom/v1/PDS4_GEOM_1F00_1910.xsd http://pds.nasa.gov/pds4/img/v1 https://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1F00_1810.xsd http://pds.nasa.gov/pds4/cart/v1 https://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1F00_1950.xsd" xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:em16_tgo_cas="http://psa.esa.int/psa/em16/tgo/cas/v1" xmlns:geom="http://pds.nasa.gov/pds4/geom/v1" xmlns:disp="http://pds.nasa.gov/pds4/disp/v1" xmlns:psa="http://psa.esa.int/psa/v1" xmlns:img="http://pds.nasa.gov/pds4/img/v1" xmlns:cart="http://pds.nasa.gov/pds4/cart/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <Identification_Area>
+  <logical_identifier>urn:esa:psa:em16_tgo_cas:data_derived:my36_015782_024_0_pan</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS3 cube.</title>
+  <information_model_version>1.15.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Alias_List>
+   <Alias>
+    <alternate_id>MY36_015782_024_0</alternate_id>
+    <comment>CaSSIS Internal Identifier</comment>
+   </Alias>
+  </Alias_List>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2021-07-06</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the tgocassisrdrgen application from ISIS version 4.4.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2021-06-07T00:31:03.723Z</start_date_time>
+   <stop_date_time>2021-06-07T00:31:14.193Z</stop_date_time>
+   <local_true_solar_time>10.180834712301</local_true_solar_time>
+   <solar_longitude unit="deg">55.415973760255</solar_longitude>
+  </Time_Coordinates>
+  <Primary_Result_Summary>
+   <purpose>Science</purpose>
+   <processing_level>Derived</processing_level>
+   <description>Summary of Results</description>
+   <Science_Facets>
+    <wavelength_range>Near Infrared</wavelength_range>
+    <domain>Surface</domain>
+    <discipline_name>Imaging</discipline_name>
+   </Science_Facets>
+  </Primary_Result_Summary>
+  <Investigation_Area>
+   <name>ExoMars 2016</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:esa:psa:context:investigation:mission.em16</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <comment>This is the PDS4 logical identifier for the ExoMars Trace Gas Orbiter mission.</comment>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Host</type>
+    <description>Instrument Host</description>
+    <Internal_Reference>
+     <lid_reference>urn:esa:psa:context:instrument_host:spacecraft.tgo</lid_reference>
+     <reference_type>is_instrument_host</reference_type>
+    </Internal_Reference>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+    <description>Colour and Stereo Surface Imaging System
+				(CaSSIS) on the Exomars Trace Gas Orbiter which is a
+				push-frame cmos visible reflecting telescope</description>
+    <Internal_Reference>
+     <lid_reference>urn:esa:psa:context:instrument:tgo.cassis</lid_reference>
+     <reference_type>is_instrument</reference_type>
+    </Internal_Reference>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <description>Planet Mars</description>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+    <reference_type>data_to_target</reference_type>
+   </Internal_Reference>
+  </Target_Identification>
+  <Mission_Area>
+   <psa:Mission_Information>
+    <psa:mission_phase_name>Science Phase</psa:mission_phase_name>
+    <psa:mission_phase_identifier>psp</psa:mission_phase_identifier>
+    <psa:start_orbit_number>015782</psa:start_orbit_number>
+   </psa:Mission_Information>
+   <psa:Sub-Instrument>
+    <psa:identifier>SCI</psa:identifier>
+    <psa:name>CASSIS Science</psa:name>
+    <psa:type>Imager</psa:type>
+   </psa:Sub-Instrument>
+   <psa:Observation_Context>
+    <psa:instrument_pointing_mode>No pointing</psa:instrument_pointing_mode>
+    <psa:instrument_pointing_description>No pointing</psa:instrument_pointing_description>
+    <psa:observation_identifier>837628000</psa:observation_identifier>
+   </psa:Observation_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Geometry_Pipeline</psa:processing_software_title>
+    <psa:processing_software_version>1.0.1</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Radiometric Pipeline</psa:processing_software_title>
+    <psa:processing_software_version>v1.01</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Header_Creation: c_new_header</psa:processing_software_title>
+    <psa:processing_software_version>V3.2 (16-Feb-2017)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>SC TM Conversion: c_sc_file_resolution</psa:processing_software_title>
+    <psa:processing_software_version>V1.5 (22-Mar-2018)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Mechanism HK validity flag set: c_rot_mechanism_validity</psa:processing_software_title>
+    <psa:processing_software_version>V1.0 (02-May-2019)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>SC TM Conversion: c_batch_sc_tm_packets</psa:processing_software_title>
+    <psa:processing_software_version>V1.40 (03-Dec-2019)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Bias Subtraction (bias_short_190313.dat): c_remove_bias</psa:processing_software_title>
+    <psa:processing_software_version>V1.13 (13-Mar-2019)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Flat field removal (flat_field_190313.dat): c_remove_flat</psa:processing_software_title>
+    <psa:processing_software_version>V1.14 (13-Mar-2019)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Bad pixel removal (   9 pixels replaced): c_remove_badpix</psa:processing_software_title>
+    <psa:processing_software_version>V1.01 (03-Apr-2019)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Expansion: c_expand</psa:processing_software_title>
+    <psa:processing_software_version>V1.1</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Absolute_Calibration: c_absolute_calibration</psa:processing_software_title>
+    <psa:processing_software_version>V1.1</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>SC TM Conversion: c_top_batch_level0tolevel1a</psa:processing_software_title>
+    <psa:processing_software_version>V1.16 (10-Jul-2020)</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Command_Verification: c_top_batch_level1atolevel1</psa:processing_software_title>
+    <psa:processing_software_version>V1.11</psa:processing_software_version>
+   </psa:Processing_Context>
+   <psa:Processing_Context>
+    <psa:processing_software_title>Photometric_correction: c_correct_straylight_level1</psa:processing_software_title>
+    <psa:processing_software_version>V2.05</psa:processing_software_version>
+   </psa:Processing_Context>
+   <em16_tgo_cas:Cassis_Data>
+    <em16_tgo_cas:Instrument_Information>
+     <em16_tgo_cas:instrument_ifov>1.143e-005</em16_tgo_cas:instrument_ifov>
+     <em16_tgo_cas:instrument_ifov_unit_description>rad/px</em16_tgo_cas:instrument_ifov_unit_description>
+     <em16_tgo_cas:filters_available>BLU RED NIR PAN</em16_tgo_cas:filters_available>
+    </em16_tgo_cas:Instrument_Information>
+    <em16_tgo_cas:HK_Derived_Data>
+     <em16_tgo_cas:telescope_rotation_angle unit="deg">250.009</em16_tgo_cas:telescope_rotation_angle>
+     <em16_tgo_cas:compression_name>JPEG-LS</em16_tgo_cas:compression_name>
+     <em16_tgo_cas:actual_compression_ratio>3.109</em16_tgo_cas:actual_compression_ratio>
+     <em16_tgo_cas:requested_compression_ratio>3.014</em16_tgo_cas:requested_compression_ratio>
+     <em16_tgo_cas:Saturation_analysis>
+      <em16_tgo_cas:percent_FW_95>0.00</em16_tgo_cas:percent_FW_95>
+     </em16_tgo_cas:Saturation_analysis>
+     <em16_tgo_cas:absolute_calibration>4.26194e-005</em16_tgo_cas:absolute_calibration>
+     <em16_tgo_cas:absolute_calibration_unit_description>#/DN</em16_tgo_cas:absolute_calibration_unit_description>
+    </em16_tgo_cas:HK_Derived_Data>
+    <em16_tgo_cas:PEHK_Derived_Data>
+     <em16_tgo_cas:binning_window_1>0</em16_tgo_cas:binning_window_1>
+     <em16_tgo_cas:binning_window_2>0</em16_tgo_cas:binning_window_2>
+     <em16_tgo_cas:binning_window_3>0</em16_tgo_cas:binning_window_3>
+     <em16_tgo_cas:binning_window_4>0</em16_tgo_cas:binning_window_4>
+     <em16_tgo_cas:binning_window_5>0</em16_tgo_cas:binning_window_5>
+     <em16_tgo_cas:binning_window_6>0</em16_tgo_cas:binning_window_6>
+     <em16_tgo_cas:exposure_time unit="s">1.018e-003</em16_tgo_cas:exposure_time>
+     <em16_tgo_cas:number_of_windows>4</em16_tgo_cas:number_of_windows>
+     <em16_tgo_cas:t_fpa1>2735</em16_tgo_cas:t_fpa1>
+     <em16_tgo_cas:t_fpa1_unit_description>K*10</em16_tgo_cas:t_fpa1_unit_description>
+     <em16_tgo_cas:t_fpa2>2732</em16_tgo_cas:t_fpa2>
+     <em16_tgo_cas:t_fpa2_unit_description>K*10</em16_tgo_cas:t_fpa2_unit_description>
+     <em16_tgo_cas:t_pe>2626</em16_tgo_cas:t_pe>
+     <em16_tgo_cas:t_pe_unit_description>K*10</em16_tgo_cas:t_pe_unit_description>
+     <em16_tgo_cas:window1_end_col unit="pixel">2047</em16_tgo_cas:window1_end_col>
+     <em16_tgo_cas:window1_end_row unit="pixel">633</em16_tgo_cas:window1_end_row>
+     <em16_tgo_cas:window1_start_col unit="pixel">0</em16_tgo_cas:window1_start_col>
+     <em16_tgo_cas:window1_start_row unit="pixel">354</em16_tgo_cas:window1_start_row>
+     <em16_tgo_cas:window2_end_col unit="pixel">1535</em16_tgo_cas:window2_end_col>
+     <em16_tgo_cas:window2_end_row unit="pixel">967</em16_tgo_cas:window2_end_row>
+     <em16_tgo_cas:window2_start_col unit="pixel">512</em16_tgo_cas:window2_start_col>
+     <em16_tgo_cas:window2_start_row unit="pixel">712</em16_tgo_cas:window2_start_row>
+     <em16_tgo_cas:window3_end_col unit="pixel">1727</em16_tgo_cas:window3_end_col>
+     <em16_tgo_cas:window3_end_row unit="pixel">1303</em16_tgo_cas:window3_end_row>
+     <em16_tgo_cas:window3_start_col unit="pixel">320</em16_tgo_cas:window3_start_col>
+     <em16_tgo_cas:window3_start_row unit="pixel">1048</em16_tgo_cas:window3_start_row>
+     <em16_tgo_cas:window4_end_col unit="pixel">1727</em16_tgo_cas:window4_end_col>
+     <em16_tgo_cas:window4_end_row unit="pixel">1664</em16_tgo_cas:window4_end_row>
+     <em16_tgo_cas:window4_start_col unit="pixel">320</em16_tgo_cas:window4_start_col>
+     <em16_tgo_cas:window4_start_row unit="pixel">1409</em16_tgo_cas:window4_start_row>
+     <em16_tgo_cas:window5_end_col unit="pixel">63</em16_tgo_cas:window5_end_col>
+     <em16_tgo_cas:window5_end_row unit="pixel">-1</em16_tgo_cas:window5_end_row>
+     <em16_tgo_cas:window5_start_col unit="pixel">0</em16_tgo_cas:window5_start_col>
+     <em16_tgo_cas:window5_start_row unit="pixel">0</em16_tgo_cas:window5_start_row>
+     <em16_tgo_cas:window6_end_col unit="pixel">63</em16_tgo_cas:window6_end_col>
+     <em16_tgo_cas:window6_end_row unit="pixel">-1</em16_tgo_cas:window6_end_row>
+     <em16_tgo_cas:window6_start_col unit="pixel">0</em16_tgo_cas:window6_start_col>
+     <em16_tgo_cas:window6_start_row unit="pixel">0</em16_tgo_cas:window6_start_row>
+    </em16_tgo_cas:PEHK_Derived_Data>
+    <em16_tgo_cas:Telescope_Information>
+     <em16_tgo_cas:focal_length>0.8749</em16_tgo_cas:focal_length>
+     <em16_tgo_cas:focal_length_unit_description>M</em16_tgo_cas:focal_length_unit_description>
+     <em16_tgo_cas:f_number>6.48</em16_tgo_cas:f_number>
+     <em16_tgo_cas:telescope_description>Three-mirror anastigmat with powered fold mirror</em16_tgo_cas:telescope_description>
+    </em16_tgo_cas:Telescope_Information>
+    <em16_tgo_cas:Detector_Information>
+     <em16_tgo_cas:cassis_description>Three-mirror anastigmat with powered fold mirror</em16_tgo_cas:cassis_description>
+     <em16_tgo_cas:pixel_height>10.0</em16_tgo_cas:pixel_height>
+     <em16_tgo_cas:pixel_height_unit_description>MICRON</em16_tgo_cas:pixel_height_unit_description>
+     <em16_tgo_cas:pixel_width>10.0</em16_tgo_cas:pixel_width>
+     <em16_tgo_cas:pixel_width_unit_description>MICRON</em16_tgo_cas:pixel_width_unit_description>
+     <em16_tgo_cas:detector_description>SI CMOS HYBRID (OSPREY 2K)</em16_tgo_cas:detector_description>
+     <em16_tgo_cas:read_noise>61.0</em16_tgo_cas:read_noise>
+     <em16_tgo_cas:read_noise_unit_description>ELECTRON</em16_tgo_cas:read_noise_unit_description>
+    </em16_tgo_cas:Detector_Information>
+    <em16_tgo_cas:Geometry_Information>
+     <em16_tgo_cas:tgo_off_nadir_angle unit="deg">3.873</em16_tgo_cas:tgo_off_nadir_angle>
+     <em16_tgo_cas:cassis_off_nadir_angle unit="deg">9.250</em16_tgo_cas:cassis_off_nadir_angle>
+     <em16_tgo_cas:tgo_ground_track_velocity unit="km/s">2.9401</em16_tgo_cas:tgo_ground_track_velocity>
+     <em16_tgo_cas:predicted_maximum_exposure_time unit="ms">1.5929</em16_tgo_cas:predicted_maximum_exposure_time>
+     <em16_tgo_cas:predicted_required_repetition_frequency unit="ms">367.0</em16_tgo_cas:predicted_required_repetition_frequency>
+     <em16_tgo_cas:sub_cassis_longitude>257.091527</em16_tgo_cas:sub_cassis_longitude>
+     <em16_tgo_cas:sub_cassis_longitude_unit_description>deg (East Planetocentric)</em16_tgo_cas:sub_cassis_longitude_unit_description>
+     <em16_tgo_cas:sub_cassis_latitude>22.312523</em16_tgo_cas:sub_cassis_latitude>
+     <em16_tgo_cas:sub_cassis_latitude_unit_description>deg (Planetocentric)</em16_tgo_cas:sub_cassis_latitude_unit_description>
+     <em16_tgo_cas:tgo_ground_track_vector_x unit="km/s">0.8804</em16_tgo_cas:tgo_ground_track_vector_x>
+     <em16_tgo_cas:tgo_ground_track_vector_y unit="km/s"> 0.9815</em16_tgo_cas:tgo_ground_track_vector_y>
+     <em16_tgo_cas:tgo_ground_track_vector_z unit="km/s">2.6279</em16_tgo_cas:tgo_ground_track_vector_z>
+     <em16_tgo_cas:cassis_ground_track_vector_x unit="km/s">0.8653</em16_tgo_cas:cassis_ground_track_vector_x>
+     <em16_tgo_cas:cassis_ground_track_vector_y unit="km/s"> 0.9309</em16_tgo_cas:cassis_ground_track_vector_y>
+     <em16_tgo_cas:cassis_ground_track_vector_z unit="km/s">2.6472</em16_tgo_cas:cassis_ground_track_vector_z>
+     <em16_tgo_cas:l_sub_s unit="deg">55.416</em16_tgo_cas:l_sub_s>
+     <em16_tgo_cas:sun_angle_from_cassis_detector_plane unit="deg">-64.568</em16_tgo_cas:sun_angle_from_cassis_detector_plane>
+     <em16_tgo_cas:sun_azimuth_wrt_cassis_detector_frame unit="deg">237.059</em16_tgo_cas:sun_azimuth_wrt_cassis_detector_frame>
+     <em16_tgo_cas:beta_angle unit="deg">24.325</em16_tgo_cas:beta_angle>
+     <em16_tgo_cas:line_of_sight_distance unit="km">409.235</em16_tgo_cas:line_of_sight_distance>
+     <em16_tgo_cas:spacecraft_direction_with_respect_to_node>ASCENDING</em16_tgo_cas:spacecraft_direction_with_respect_to_node>
+     <em16_tgo_cas:sun_elevation_on_minus_y unit="deg">-68.514</em16_tgo_cas:sun_elevation_on_minus_y>
+     <em16_tgo_cas:sun_azimuth_on_minus_y unit="deg">278.279</em16_tgo_cas:sun_azimuth_on_minus_y>
+     <em16_tgo_cas:smithedck>true</em16_tgo_cas:smithedck>
+    </em16_tgo_cas:Geometry_Information>
+    <em16_tgo_cas:Image_Command>
+     <em16_tgo_cas:num_exp>30</em16_tgo_cas:num_exp>
+    </em16_tgo_cas:Image_Command>
+    <em16_tgo_cas:Producer_Data>
+     <em16_tgo_cas:stp>164</em16_tgo_cas:stp>
+     <em16_tgo_cas:mtp>M041</em16_tgo_cas:mtp>
+    </em16_tgo_cas:Producer_Data>
+   </em16_tgo_cas:Cassis_Data>
+  </Mission_Area>
+  <Discipline_Area>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+   <img:Imaging>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Optical_Filter>
+     <img:filter_name>PAN</img:filter_name>
+     <img:filter_id>PAN</img:filter_id>
+     <img:bandwidth unit="nm">231.5</img:bandwidth>
+     <img:center_filter_wavelength unit="nm">677.4</img:center_filter_wavelength>
+    </img:Optical_Filter>
+   </img:Imaging>
+   <cart:Cartography>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>cartography_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <cart:Spatial_Domain>
+     <cart:Bounding_Coordinates>
+      <cart:west_bounding_coordinate unit="deg">257.01272950127</cart:west_bounding_coordinate>
+      <cart:east_bounding_coordinate unit="deg">257.31376427531</cart:east_bounding_coordinate>
+      <cart:north_bounding_coordinate unit="deg">22.889184664064</cart:north_bounding_coordinate>
+      <cart:south_bounding_coordinate unit="deg">22.253261430151</cart:south_bounding_coordinate>
+     </cart:Bounding_Coordinates>
+    </cart:Spatial_Domain>
+    <cart:Spatial_Reference_Information>
+     <cart:Horizontal_Coordinate_System_Definition>
+      <cart:Planar>
+       <cart:Map_Projection>
+        <cart:map_projection_name>Equirectangular</cart:map_projection_name>
+        <cart:Equirectangular>
+         <cart:latitude_of_projection_origin unit="deg">0.0</cart:latitude_of_projection_origin>
+         <cart:standard_parallel_1 unit="deg">20.0</cart:standard_parallel_1>
+         <cart:longitude_of_central_meridian unit="deg">180.0</cart:longitude_of_central_meridian>
+        </cart:Equirectangular>
+       </cart:Map_Projection>
+       <cart:Planar_Coordinate_Information>
+        <cart:planar_coordinate_encoding_method>Coordinate Pair</cart:planar_coordinate_encoding_method>
+        <cart:Coordinate_Representation>
+         <cart:pixel_resolution_x unit="m/pixel">4.0</cart:pixel_resolution_x>
+         <cart:pixel_resolution_y unit="m/pixel">4.0</cart:pixel_resolution_y>
+         <cart:pixel_scale_x unit="pixel/deg">14808.391167037</cart:pixel_scale_x>
+         <cart:pixel_scale_y unit="pixel/deg">14808.391167037</cart:pixel_scale_y>
+        </cart:Coordinate_Representation>
+       </cart:Planar_Coordinate_Information>
+       <cart:Geo_Transformation>
+        <cart:upperleft_corner_x unit="m">4286632.0</cart:upperleft_corner_x>
+        <cart:upperleft_corner_y unit="m">1355808.0</cart:upperleft_corner_y>
+       </cart:Geo_Transformation>
+      </cart:Planar>
+      <cart:Geodetic_Model>
+       <cart:latitude_type>Planetocentric</cart:latitude_type>
+       <cart:a_axis_radius unit="m">3393833.261</cart:a_axis_radius>
+       <cart:b_axis_radius unit="m">3393833.261</cart:b_axis_radius>
+       <cart:c_axis_radius unit="m">3393833.261</cart:c_axis_radius>
+       <cart:longitude_direction>Positive East</cart:longitude_direction>
+       <cart:coordinate_system_type>Body-fixed Non-rotating</cart:coordinate_system_type>
+      </cart:Geodetic_Model>
+     </cart:Horizontal_Coordinate_System_Definition>
+    </cart:Spatial_Reference_Information>
+   </cart:Cartography>
+   <geom:Geometry>
+    <geom:SPICE_Kernel_Files>
+     <geom:SPICE_Kernel_Identification>
+      <geom:spice_kernel_file_name>em16_cassis.tm</geom:spice_kernel_file_name>
+     </geom:SPICE_Kernel_Identification>
+    </geom:SPICE_Kernel_Files>
+    <geom:Image_Display_Geometry>
+     <geom:Display_Direction>
+      <geom:horizontal_display_axis>Sample</geom:horizontal_display_axis>
+      <geom:horizontal_display_direction>Left to Right</geom:horizontal_display_direction>
+      <geom:vertical_display_axis>Line</geom:vertical_display_axis>
+      <geom:vertical_display_direction>Top to Bottom</geom:vertical_display_direction>
+     </geom:Display_Direction>
+     <geom:Object_Orientation_North_East>
+      <geom:north_azimuth unit="deg">270.0</geom:north_azimuth>
+      <geom:east_azimuth unit="deg">0.0</geom:east_azimuth>
+      <geom:Reference_Frame_Identification>
+       <geom:name>J2000</geom:name>
+      </geom:Reference_Frame_Identification>
+     </geom:Object_Orientation_North_East>
+    </geom:Image_Display_Geometry>
+    <geom:Geometry_Orbiter>
+     <geom:geometry_reference_time_utc>2021-06-07T00:31:03.723Z</geom:geometry_reference_time_utc>
+     <geom:Distances>
+      <geom:Distances_Specific>
+       <geom:spacecraft_central_body_distance unit="km">3796.5</geom:spacecraft_central_body_distance>
+       <geom:spacecraft_geocentric_distance unit="AU">2.2909610</geom:spacecraft_geocentric_distance>
+       <geom:spacecraft_heliocentric_distance unit="AU">1.6595426</geom:spacecraft_heliocentric_distance>
+       <geom:spacecraft_target_boresight_intercept_distance unit="km">409.235</geom:spacecraft_target_boresight_intercept_distance>
+      </geom:Distances_Specific>
+     </geom:Distances>
+     <geom:Surface_Geometry>
+      <geom:Surface_Geometry_Specific>
+       <geom:Footprint_Vertices>
+        <geom:Pixel_Intercept>
+         <geom:reference_pixel_location>Upper Left Corner</geom:reference_pixel_location>
+         <geom:pixel_latitude unit="deg">22.287994812409</geom:pixel_latitude>
+         <geom:pixel_longitude unit="deg">257.18736665772</geom:pixel_longitude>
+        </geom:Pixel_Intercept>
+        <geom:Pixel_Intercept>
+         <geom:reference_pixel_location>Upper Right Corner</geom:reference_pixel_location>
+         <geom:pixel_latitude unit="deg">22.253269143531</geom:pixel_latitude>
+         <geom:pixel_longitude unit="deg">257.01774681231</geom:pixel_longitude>
+        </geom:Pixel_Intercept>
+        <geom:Pixel_Intercept>
+         <geom:reference_pixel_location>Lower Right Corner</geom:reference_pixel_location>
+         <geom:pixel_latitude unit="deg">22.780084761799</geom:pixel_latitude>
+         <geom:pixel_longitude unit="deg">257.13840206251</geom:pixel_longitude>
+        </geom:Pixel_Intercept>
+        <geom:Pixel_Intercept>
+         <geom:reference_pixel_location>Lower Left Corner</geom:reference_pixel_location>
+         <geom:pixel_latitude unit="deg">22.814756212254</geom:pixel_latitude>
+         <geom:pixel_longitude unit="deg">257.30905532131</geom:pixel_longitude>
+        </geom:Pixel_Intercept>
+       </geom:Footprint_Vertices>
+       <geom:subsolar_azimuth unit="deg">359.37934400953</geom:subsolar_azimuth>
+      </geom:Surface_Geometry_Specific>
+     </geom:Surface_Geometry>
+     <geom:Illumination_Geometry>
+      <geom:Illumination_Specific>
+       <geom:reference_pixel_location>Center</geom:reference_pixel_location>
+       <geom:incidence_angle unit="deg">25.428425703542</geom:incidence_angle>
+       <geom:emission_angle unit="deg">8.0711133108878</geom:emission_angle>
+       <geom:phase_angle unit="deg">25.375868707623</geom:phase_angle>
+      </geom:Illumination_Specific>
+     </geom:Illumination_Geometry>
+    </geom:Geometry_Orbiter>
+   </geom:Geometry>
+  </Discipline_Area>
+ </Observation_Area>
+ <Reference_List>
+  <Internal_Reference>
+   <lid_reference>urn:esa:psa:em16_tgo_cas:data_calibrated:cas_cal_sc_20210607t003104-20210607t003118-pan-837628000-sti</lid_reference>
+   <reference_type>data_to_calibrated_product</reference_type>
+  </Internal_Reference>
+ </Reference_List>
+ <File_Area_Observational>
+  <File>
+   <file_name>MY36_015782_024_0_PAN_cropped.dat</file_name>
+  </File>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <description>Pixel values are in units of I/F (intensity/flux). I/F is defined asthe ratio of the observed radiance and the radiance of a 100% lambertian reflector with the sun and camera orthogonal to the observing surface.</description>
+   <Element_Array>
+    <data_type>IEEE754LSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>500</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>3</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
