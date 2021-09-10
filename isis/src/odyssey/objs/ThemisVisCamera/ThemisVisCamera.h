@@ -91,7 +91,7 @@ namespace Isis {
       ~ThemisVisCamera();
 
       // Sets the band to the band number given
-      void SetBand(const int band);
+      void SetBand(const int band, NaifContextPtr naif) override;
 
       double BandEphemerisTimeOffset(int vband);
 

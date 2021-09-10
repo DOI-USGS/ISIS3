@@ -42,22 +42,24 @@ namespace Isis {
    * @internal
    */
   NewHorizonsMvicTdiCamera::NewHorizonsMvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Multispectral Visible Imaging TDI Camera";
     m_instrumentNameShort = "MVIC TDI";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
-    SetPixelPitch();
-    SetFocalLength();
+    SetPixelPitch(naif);
+    SetFocalLength(naif);
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
 
-    m_etStart = getClockTime(stime).Et();
+    m_etStart = getClockTime(naif, stime).Et();
     m_lineRate = 1.0 / (double)inst["TdiRate"];
 
     // The detector map tells us how to convert from image coordinates to
@@ -84,8 +86,8 @@ namespace Isis {
     vector<double> residualRowDistCoefs;
 
     for (int i=0; i < 20; i++) {
-      distCoefX.push_back(getDouble(naifXKey,i));
-      distCoefY.push_back(getDouble(naifYKey,i));
+      distCoefX.push_back(getDouble(naif, naifXKey,i));
+      distCoefY.push_back(getDouble(naif, naifYKey,i));
     }
 
     // read residual polynomial distortion coefs from the NAIF Kernels
@@ -94,8 +96,8 @@ namespace Isis {
     QString naifROWKey = "INS" + toString(code) + "_RESIDUAL_ROW_DIST_COEF";
 
     for (int i=0; i < 6; i++) {
-      residualColumnDistCoefs.push_back(getDouble(naifCOLKey,i));
-      residualRowDistCoefs.push_back(getDouble(naifROWKey,i));
+      residualColumnDistCoefs.push_back(getDouble(naif, naifCOLKey,i));
+      residualRowDistCoefs.push_back(getDouble(naif, naifROWKey,i));
     }
 
     new NewHorizonsMvicTdiCameraDistortionMap(this, distCoefX, distCoefY, residualColumnDistCoefs,
@@ -105,8 +107,8 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 }
 

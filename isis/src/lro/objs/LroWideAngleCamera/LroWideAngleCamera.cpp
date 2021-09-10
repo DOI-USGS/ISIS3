@@ -53,15 +53,16 @@ namespace Isis {
   LroWideAngleCamera::LroWideAngleCamera(Cube &cube) :
     PushFrameCamera(cube) {
 
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+    naif->CheckErrors();
     
     m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
     m_spacecraftNameShort = "LRO";
     
     // Set up the camera characteristics
     instrumentRotation()->SetFrame(naifIkCode());
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     Pvl &lab = *cube.label();
 
@@ -69,7 +70,7 @@ namespace Isis {
     double et;
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
-    et = getClockTime(stime).Et();
+    et = getClockTime(naif, stime).Et();
 
     p_exposureDur = toDouble(inst["ExposureDuration"]);
     // TODO:  Changed et - exposure to et + exposure.
@@ -126,14 +127,14 @@ namespace Isis {
     QString instCode = "INS" + QString::number(naifIkCode());
 
     QString ikernKey = instCode + "_FILTER_BANDCENTER";
-    IntParameterList fbc = GetVector(ikernKey);
+    IntParameterList fbc = GetVector(ikernKey, naif);
 
     ikernKey = instCode + "_FILTER_OFFSET";
-    IntParameterList foffset = GetVector(ikernKey);
+    IntParameterList foffset = GetVector(ikernKey, naif);
 
     //  Get band ID to determine new filter dependent IK codes
     ikernKey = instCode + "_FILTER_BANDID";
-    IntParameterList fbandid = GetVector(ikernKey);
+    IntParameterList fbandid = GetVector(ikernKey, naif);
 
 
     // Create a map of filter wavelength to offset.  Also needs a reverse
@@ -169,9 +170,9 @@ namespace Isis {
       p_frameletOffsets.push_back(filterToFrameletOffset.get(filtNames[i].toInt()));
 
       QString kBase = "INS" + QString::number(filterIKCode.get(filtNames[i].toInt()));
-      p_focalLength.push_back(getDouble(kBase+"_FOCAL_LENGTH"));
-      p_boreSightSample.push_back(getDouble(kBase+"_BORESIGHT_SAMPLE"));
-      p_boreSightLine.push_back(getDouble(kBase+"_BORESIGHT_LINE"));
+      p_focalLength.push_back(getDouble(naif, kBase+"_FOCAL_LENGTH"));
+      p_boreSightSample.push_back(getDouble(naif, kBase+"_BORESIGHT_SAMPLE"));
+      p_boreSightLine.push_back(getDouble(naif, kBase+"_BORESIGHT_LINE"));
     }
 
     // Setup detector map
@@ -198,7 +199,7 @@ namespace Isis {
     }
 
     ikernKey = instCode + "_" + instModeId + "_SAMPLE_OFFSET";
-    int sampOffset = getInteger(ikernKey);
+    int sampOffset = getInteger(naif, ikernKey);
     dmap->SetStartingDetectorSample(sampOffset+1);
 
     // Setup focal plane and distortion maps
@@ -215,8 +216,8 @@ namespace Isis {
     new CameraSkyMap(this);
 
     SetBand(1);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
 
     if(instId == "WAC-UV") {
       // geometric tiling is not worth trying for 4-line framelets
@@ -277,11 +278,11 @@ namespace Isis {
    * @param key
    * @return @b int Pool key size
    */
-  int LroWideAngleCamera::PoolKeySize(const QString &key) const {
+  int LroWideAngleCamera::PoolKeySize(const QString &key, NaifContextPtr naif) const {
     SpiceBoolean found;
     SpiceInt n;
     SpiceChar ctype[1];
-    dtpool_c(key.toLatin1().data(), &found, &n, ctype);
+    naif->dtpool_c(key.toLatin1().data(), &found, &n, ctype);
     if (!found) n = 0;
     return (n);
   }
@@ -292,13 +293,13 @@ namespace Isis {
    * @param key
    * @return @b vector < @b int >
    */
-  LroWideAngleCamera::IntParameterList LroWideAngleCamera::GetVector(const QString &key) {
+  LroWideAngleCamera::IntParameterList LroWideAngleCamera::GetVector(const QString &key, NaifContextPtr naif) {
     QVariant poolKeySize = getStoredResult(key + "_SIZE", SpiceIntType);
 
     int nvals = poolKeySize.toInt();
 
     if (nvals == 0) {
-      nvals = PoolKeySize(key);
+      nvals = PoolKeySize(key, naif);
       storeResult(key + "_SIZE", SpiceIntType, nvals);
     }
 
@@ -309,7 +310,7 @@ namespace Isis {
 
     IntParameterList parms;
     for (int i = 0 ; i < nvals ; i++) {
-      parms.push_back(getInteger(key, i));
+      parms.push_back(getInteger(naif, key, i));
     }
 
     return (parms);

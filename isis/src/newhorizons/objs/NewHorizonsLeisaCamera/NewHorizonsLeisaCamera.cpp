@@ -49,23 +49,25 @@ namespace Isis {
    * @internal
    */
   NewHorizonsLeisaCamera::NewHorizonsLeisaCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Linear Etalon Imaging Spectral Array";
     m_instrumentNameShort = "LEISA";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
     // Override the SPICE error process for SPICE calls 
-    NaifStatus::CheckErrors(); 
+    naif->CheckErrors(); 
 
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString expDuration = inst["ExposureDuration"];
 
     QString stime = inst["SpacecraftClockStartCount"];
-    double m_etStart = getClockTime(stime).Et(); 
+    double m_etStart = getClockTime(naif, stime).Et(); 
     
     // The line rate is set to the time between each frame since we are treating LEASA as a linescan    
     double m_lineRate = expDuration.toDouble();
@@ -113,10 +115,10 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();  
+    LoadCache(naif);  
 
     // Check to see if there were any SPICE errors
-    NaifStatus::CheckErrors();  
+    naif->CheckErrors();  
   }
 
 
@@ -128,7 +130,7 @@ namespace Isis {
    * @author 2014-09-24 Stuart Sides 
    *  
    */
-  void NewHorizonsLeisaCamera::SetBand(const int vband) {
+  void NewHorizonsLeisaCamera::SetBand(const int vband, NaifContextPtr naif) {
     if ( (vband < 1) || (vband > m_originalBand.size())) {
      QString msg = QObject::tr("Band number out of array bounds in NewHorizonsLeisaCamera::SetBand "
                                "legal bands are [1-%1], input was [%2]").
@@ -137,7 +139,7 @@ namespace Isis {
     }
     int band;
     band = m_originalBand[vband-1];
-    Camera::SetBand(vband);
+    Camera::SetBand(vband, naif);
     
     // Get the affine coefficients from the focal plane map and adjust the constant terms to
     // provide the correct Y/Line offset for this band

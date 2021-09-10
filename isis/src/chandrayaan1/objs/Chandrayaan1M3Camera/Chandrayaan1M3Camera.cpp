@@ -47,21 +47,23 @@ namespace Isis {
    *   @history 2013-08-18 Stuart Sides - Original version.
    */
   Chandrayaan1M3Camera::Chandrayaan1M3Camera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Moon Mineralogy Mapper";
     m_instrumentNameShort = "M3";
     m_spacecraftNameLong = "Chandrayaan 1";
     m_spacecraftNameShort = "Chan1";
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Set up the camera info from ik/iak kernels
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
-    double etStart = getClockTime(stime).Et();
+    double etStart = getClockTime(naif, stime).Et();
 
     // Get other info from labels
     double csum = inst["SpatialSumming"];
@@ -78,10 +80,10 @@ namespace Isis {
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     QString ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(ikernKey);
+    double sampleBoreSight = getDouble(naif, ikernKey);
 
     ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(ikernKey);
+    double lineBoreSight = getDouble(naif, ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
     focalMap->SetDetectorOffset(0.0, 0.0);
@@ -93,16 +95,16 @@ namespace Isis {
 
     // Setup distortion map
     new Chandrayaan1M3DistortionMap(this, 
-                                    getDouble(ppKey, 0), getDouble(ppKey, 1),
-                                    getDouble(odKey, 0), getDouble(odKey, 1), getDouble(odKey, 2),
-                                    getDouble(decenterKey, 0), getDouble(decenterKey, 1));
+                                    getDouble(naif, ppKey, 0), getDouble(naif, ppKey, 1),
+                                    getDouble(naif, odKey, 0), getDouble(naif, odKey, 1), getDouble(naif, odKey, 2),
+                                    getDouble(naif, decenterKey, 0), getDouble(naif, decenterKey, 1));
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 }
 

@@ -104,8 +104,8 @@ namespace Isis {
 
     public:
       HiJitCube();
-      HiJitCube(const QString &filename);
-      HiJitCube(const QString &filename, PvlObject &shift);
+      HiJitCube(const QString &filename, NaifContextPtr naif);
+      HiJitCube(const QString &filename, PvlObject &shift, NaifContextPtr naif);
       ~HiJitCube();
 
       void setSampleOffset(int soff);
@@ -124,8 +124,8 @@ namespace Isis {
         return (jdata.lineOffset);
       }
 
-      void OpenCube(const QString &filename);
-      void OpenCube(const QString &filename, PvlObject &shift);
+      void OpenCube(const QString &filename, NaifContextPtr naif);
+      void OpenCube(const QString &filename, PvlObject &shift, NaifContextPtr naif);
       inline const JitInfo &GetInfo() const {
         return (jdata);
       }
@@ -151,9 +151,9 @@ namespace Isis {
       geos::geom::Polygon *fpGeom;     //!< Polygon construction and manipulation
 
       void initLocal();
-      void loadNaifTiming();
-      void computeStartTime();
-      void Init();
+      void loadNaifTiming(NaifContextPtr naif);
+      void computeStartTime(NaifContextPtr naif);
+      void Init(NaifContextPtr naif);
       int getBinModeIndex(int summing) const;
       void computePoly();
       Corners FocalPlaneToImage(const Corners &fp) const;

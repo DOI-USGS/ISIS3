@@ -51,7 +51,8 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
 
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+    naif->CheckErrors();
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a marci image
@@ -61,10 +62,10 @@ namespace Isis {
     }
 
     // Set up the camera characteristics
-    SetFocalLength();
+    SetFocalLength(naif);
 
     QString pixelPitchKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
-    SetPixelPitch(getDouble(pixelPitchKey));
+    SetPixelPitch(getDouble(naif, pixelPitchKey));
 
     // Get necessary variables
     p_exposureDur = inst["ExposureDuration"];
@@ -74,7 +75,7 @@ namespace Isis {
     // Get the start and end time
     double et;
     QString stime = inst["SpacecraftClockCount"];
-    et = getClockTime(stime).Et();
+    et = getClockTime(naif, stime).Et();
     p_etStart = et - ((p_exposureDur / 1000.0) / 2.0);
     p_nframelets = (int) (ParentLines() / sumMode);
 
@@ -158,8 +159,8 @@ namespace Isis {
     bool evenFramelets = (inst["Framelets"][0] == "Even");
     new PushFrameCameraGroundMap(this, evenFramelets);
     new CameraSkyMap(this);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
 
     if(sumMode == 1) {
       SetGeometricTilingHint(16, 4);

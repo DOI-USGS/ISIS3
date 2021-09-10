@@ -48,7 +48,9 @@ namespace Isis {
    *                         problem with ckwriter
    */
   ApolloMetricCamera::ApolloMetricCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+
+    naif->CheckErrors();
     
     m_instrumentNameLong = "Metric Camera";
     m_instrumentNameShort = "Metric";
@@ -91,8 +93,8 @@ namespace Isis {
     }
     
     // Get the camera characteristics
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -105,10 +107,10 @@ namespace Isis {
     QString odkKey("INS" + toString(naifIkCode()) + "_OD_K");
     QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
 
-    new ApolloMetricDistortionMap(this, getDouble(ppKey, 0),
-                                  getDouble(ppKey, 1), getDouble(odkKey, 0), getDouble(odkKey, 1),
-                                  getDouble(odkKey, 2), getDouble(decenterKey, 0),
-                                  getDouble(decenterKey, 1), getDouble(decenterKey, 2));
+    new ApolloMetricDistortionMap(this, getDouble(naif, ppKey, 0),
+                                  getDouble(naif, ppKey, 1), getDouble(naif, odkKey, 0), getDouble(naif, odkKey, 1),
+                                  getDouble(naif, odkKey, 2), getDouble(naif, decenterKey, 0),
+                                  getDouble(naif, decenterKey, 1), getDouble(naif, decenterKey, 2));
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -117,9 +119,9 @@ namespace Isis {
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
-    setTime((QString)inst["StartTime"]);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime((QString)inst["StartTime"], naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

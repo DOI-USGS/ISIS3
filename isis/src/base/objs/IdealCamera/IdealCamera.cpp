@@ -74,7 +74,9 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   IdealCamera::IdealCamera(Cube &cube) : Camera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+
+    naif->CheckErrors();
     
     // Since this is an ideal camera, we'll call it Ideal Spacecraft
     m_spacecraftNameLong = "Ideal Spacecraft";
@@ -91,14 +93,14 @@ namespace Isis {
       SetFocalLength(inst["FocalLength"]);
     }
     else {
-      SetFocalLength(readValue("IDEAL_FOCAL_LENGTH", SpiceDoubleType).toDouble());
+      SetFocalLength(readValue(naif, "IDEAL_FOCAL_LENGTH", SpiceDoubleType).toDouble());
     }
 
     if (inst.hasKeyword("PixelPitch")) {
       SetPixelPitch(inst["PixelPitch"]);
     }
     else {
-      SetPixelPitch(readValue("IDEAL_PIXEL_PITCH", SpiceDoubleType).toDouble());
+      SetPixelPitch(readValue(naif, "IDEAL_PIXEL_PITCH", SpiceDoubleType).toDouble());
     }
 
     double et = inst["EphemerisTime"];
@@ -134,7 +136,7 @@ namespace Isis {
     // Put the translation coefficients into the Naif kernel pool so the
     // CameraFocalPlaneClass can find them
     try {
-      readValue("IDEAL_TRANSX", SpiceDoubleType);
+      readValue(naif, "IDEAL_TRANSX", SpiceDoubleType);
     }
     catch (IException &) {
       double keyval[3];
@@ -149,11 +151,11 @@ namespace Isis {
       storeValue("IDEAL_TRANSX", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSX", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSX", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSX", 3, keyval);
+      naif->pdpool_c("IDEAL_TRANSX", 3, keyval);
     }
 
     try {
-      readValue("IDEAL_TRANSY", SpiceDoubleType);
+      readValue(naif, "IDEAL_TRANSY", SpiceDoubleType);
     }
     catch (IException &) {
       double keyval[3];
@@ -168,11 +170,11 @@ namespace Isis {
       storeValue("IDEAL_TRANSY", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSY", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSY", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSY", 3, keyval);
+      naif->pdpool_c("IDEAL_TRANSY", 3, keyval);
     }
 
     try {
-      readValue("IDEAL_TRANSS", SpiceDoubleType);
+      readValue(naif, "IDEAL_TRANSS", SpiceDoubleType);
     }
     catch (IException &) {
       double keyval[3];
@@ -187,11 +189,11 @@ namespace Isis {
       storeValue("IDEAL_TRANSS", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSS", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSS", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSS", 3, keyval);
+      naif->pdpool_c("IDEAL_TRANSS", 3, keyval);
     }
 
     try {
-      readValue("IDEAL_TRANSL", SpiceDoubleType);
+      readValue(naif, "IDEAL_TRANSL", SpiceDoubleType);
     }
     catch (IException &) {
       double keyval[3];
@@ -206,7 +208,7 @@ namespace Isis {
       storeValue("IDEAL_TRANSL", 0, SpiceDoubleType, keyval[0]);
       storeValue("IDEAL_TRANSL", 1, SpiceDoubleType, keyval[1]);
       storeValue("IDEAL_TRANSL", 2, SpiceDoubleType, keyval[2]);
-      pdpool_c("IDEAL_TRANSL", 3, keyval);
+      naif->pdpool_c("IDEAL_TRANSL", 3, keyval);
     }
 
     // Create correct camera type
@@ -221,8 +223,8 @@ namespace Isis {
       new CameraGroundMap(this);
       new CameraSkyMap(this);
 
-      setTime(et);
-      LoadCache();
+      setTime(et, naif);
+      LoadCache(naif);
     }
     else if (type.toUpper() == "LINESCAN") {
       p_framing = false;
@@ -234,8 +236,8 @@ namespace Isis {
       new LineScanCameraGroundMap(this);
       new LineScanCameraSkyMap(this);
 
-      LoadCache();
-      NaifStatus::CheckErrors();
+      LoadCache(naif);
+      naif->CheckErrors();
     }
     else {
       QString msg = "Unknown InstrumentType [" +

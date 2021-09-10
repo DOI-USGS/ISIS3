@@ -44,6 +44,8 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   IssNACamera::IssNACamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Imaging Science Subsystem Narrow Angle";
     m_instrumentNameShort = "ISSNA";
     m_spacecraftNameLong = "Cassini Huygens";
@@ -60,12 +62,12 @@ namespace Isis {
       QString key = QString("INS%1_%2_FOCAL_LENGTH").
                       arg(naifIkCode()).arg(bandBin["FilterName"][0]);
       key = key.replace("/", "_");
-      focalLength = getDouble(key);   
+      focalLength = getDouble(naif, key);   
     }
     catch (IException &firstException) {
       try {
         QString key = "INS-82360_DEFAULT_FOCAL_LENGTH";
-        focalLength = getDouble(key);   
+        focalLength = getDouble(naif, key);   
       }
       catch (IException &secondException) {
         PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
@@ -80,11 +82,11 @@ namespace Isis {
       }
     }
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     SetFocalLength(focalLength);
-    SetPixelPitch();
-    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + toString(naifIkCode()) + "_FRAME_ID"));
+    SetPixelPitch(naif);
+    instrumentRotation()->SetFrame(Spice::getInteger(naif, "INS_" + toString(naifIkCode()) + "_FRAME_ID"));
 
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -107,20 +109,20 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE"),
-                                Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE"),
+                                Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE"));
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
+    double k1 = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_K1");
     new RadialDistortionMap(this, k1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   /**

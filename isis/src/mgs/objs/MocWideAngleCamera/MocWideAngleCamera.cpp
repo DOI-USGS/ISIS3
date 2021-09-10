@@ -46,12 +46,14 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MocWideAngleCamera::MocWideAngleCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Mars Orbiter Camera Wide Angle";
     m_instrumentNameShort = "MOC-WA";
     m_spacecraftNameLong = "Mars Global Surveyor";
     m_spacecraftNameShort = "MGS";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // See if we have a moc camera
     Pvl &lab = *cube.label();
     MocLabels *moclab = new MocLabels(cube);
@@ -63,8 +65,8 @@ namespace Isis {
 
     // Set up the camera info from ik/iak kernels
     // LoadEulerMounting();
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     if(PixelPitch() == 1) {
       throw IException(IException::User,
@@ -75,7 +77,7 @@ namespace Isis {
     // Get the start time from labels
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
-    double etStart = getClockTime(stime).Et();
+    double etStart = getClockTime(naif, stime).Et();
 
     // Setup detector map
     MocWideAngleDetectorMap *detectorMap =
@@ -103,8 +105,8 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 }
 

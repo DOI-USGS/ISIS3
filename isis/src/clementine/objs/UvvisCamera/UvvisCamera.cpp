@@ -44,15 +44,17 @@ namespace Isis {
    *                          call to ShutterOpenCloseTimes() method.
    */
   UvvisCamera::UvvisCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+    
     m_instrumentNameLong = "Ultraviolet Visible Camera";
     m_instrumentNameShort = "UVVIS";
     m_spacecraftNameLong = "Clementine 1";
     m_spacecraftNameShort = "Clementine1";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Get the camera characteristics
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time in et
     Pvl &lab = *cube.label();
@@ -74,9 +76,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble(naif, "INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble(naif, "INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_LINE"));
 
     QString ppKey("INS" + toString(naifIkCode()) + "_PP");
@@ -85,9 +87,9 @@ namespace Isis {
 
     // Setup distortion map
     new ClementineUvvisDistortionMap(this, 
-                                    getDouble(ppKey, 0), getDouble(ppKey, 1),
-                                    getDouble(odKey, 0), getDouble(odKey, 1), getDouble(odKey, 2),
-                                    getDouble(decenterKey, 0), getDouble(decenterKey, 1));
+                                    getDouble(naif, ppKey, 0), getDouble(naif, ppKey, 1),
+                                    getDouble(naif, odKey, 0), getDouble(naif, odKey, 1), getDouble(naif, odKey, 2),
+                                    getDouble(naif, decenterKey, 0), getDouble(naif, decenterKey, 1));
 
 
 
@@ -95,9 +97,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 

@@ -167,7 +167,7 @@ namespace Isis {
    * @return @b bool Returns True if the image was set successfully and False if it
    *              was not.
    */
-  bool Camera::SetImage(const double sample, const double line) {
+  bool Camera::SetImage(const double sample, const double line, NaifContextPtr naif) {
     p_childSample = sample;
     p_childLine = line;
     p_pointComputed = true;
@@ -213,7 +213,7 @@ namespace Isis {
 
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape); 
+      return SetImageMapProjection(sample, line, shape, naif); 
     }
 
     // failure
@@ -241,7 +241,7 @@ namespace Isis {
    * @return @b bool Returns True if the image was set successfully and False if it
    *              was not.
    */
-  bool Camera::SetImage(const double sample, const double line, const double deltaT) {
+  bool Camera::SetImage(const double sample, const double line, const double deltaT, NaifContextPtr naif) {
     p_childSample = sample;
     p_childLine = line;
     p_pointComputed = true;
@@ -287,7 +287,7 @@ namespace Isis {
     
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape); 
+      return SetImageMapProjection(sample, line, shape, naif); 
     }
 
     // failure
@@ -307,7 +307,7 @@ namespace Isis {
  * @return bool Returns True if the image was set successfully and False if it
  *              was not.
  */
-  bool Camera::SetImageMapProjection(const double sample, const double line, ShapeModel *shape) {
+  bool Camera::SetImageMapProjection(const double sample, const double line, ShapeModel *shape, NaifContextPtr naif) {
     Latitude lat;
     Longitude lon;
     Distance rad;
@@ -322,7 +322,7 @@ namespace Isis {
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt)) {
+        if (SetGround(surfPt, naif)) {
           p_childSample = sample;
           p_childLine = line;
 
@@ -343,7 +343,7 @@ namespace Isis {
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt)) {
+        if (SetGround(surfPt, naif)) {
           p_childSample = sample;
           p_childLine = line;
 
@@ -393,11 +393,11 @@ namespace Isis {
    * @return @b bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetUniversalGround(const double latitude, const double longitude) {
+  bool Camera::SetUniversalGround(const double latitude, const double longitude, NaifContextPtr naif) {
     // Convert lat/lon or rad/az (i.e. ring rad / ring lon) to undistorted focal plane x/y
     if (p_groundMap->SetGround(Latitude(latitude, Angle::Degrees),
                               Longitude(longitude, Angle::Degrees))) {
-      return RawFocalPlanetoImage();
+      return RawFocalPlanetoImage(naif);
     }
 
     target()->shape()->clearSurfacePoint();
@@ -414,7 +414,7 @@ namespace Isis {
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetGround(Latitude latitude, Longitude longitude) {
+  bool Camera::SetGround(Latitude latitude, Longitude longitude, NaifContextPtr naif) {
     ShapeModel *shape = target()->shape();
     Distance localRadius;
 
@@ -431,7 +431,7 @@ namespace Isis {
       return false;
     }
 
-    return SetGround(SurfacePoint(latitude, longitude, localRadius));
+    return SetGround(SurfacePoint(latitude, longitude, localRadius), naif);
   }
 
 
@@ -444,7 +444,7 @@ namespace Isis {
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetGround(const SurfacePoint & surfacePt) {
+  bool Camera::SetGround(const SurfacePoint & surfacePt, NaifContextPtr naif) {
     ShapeModel *shape = target()->shape();
     if (!surfacePt.Valid()) {
       shape->clearSurfacePoint();
@@ -453,7 +453,7 @@ namespace Isis {
 
     // Convert lat/lon to undistorted focal plane x/y
     if (p_groundMap->SetGround(surfacePt)) {
-      return RawFocalPlanetoImage();
+      return RawFocalPlanetoImage(naif);
     }
 
     shape->clearSurfacePoint();
@@ -468,7 +468,7 @@ namespace Isis {
    * @return @b bool Returns true if image coordinate was computed successfully and
    *              false if it was not
    */
-  bool Camera::RawFocalPlanetoImage() {
+  bool Camera::RawFocalPlanetoImage(NaifContextPtr naif) {
     double ux = p_groundMap->FocalPlaneX();
     double uy = p_groundMap->FocalPlaneY();
 
@@ -505,7 +505,7 @@ namespace Isis {
             return true;
           }
           else if (p_projection->IsSky()) {
-            if (p_projection->SetGround(Declination(), RightAscension())) {
+            if (p_projection->SetGround(Declination(naif), RightAscension(naif))) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
@@ -556,12 +556,12 @@ namespace Isis {
   *              and False if it was not
   */
   bool Camera::SetUniversalGround(const double latitude, const double longitude,
-                                  const double radius) {
+                                  const double radius, NaifContextPtr naif) {
     // Convert lat/lon to undistorted focal plane x/y
     if (p_groundMap->SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees),
                                             Longitude(longitude, Angle::Degrees),
                                             Distance(radius, Distance::Meters)))) {
-      return RawFocalPlanetoImage();  // sets p_hasIntersection
+      return RawFocalPlanetoImage(naif);  // sets p_hasIntersection
     }
 
     target()->shape()->clearSurfacePoint();
@@ -595,16 +595,16 @@ namespace Isis {
    *
    * @return @b double
    */
-  double Camera::ObliqueDetectorResolution(){
+  double Camera::ObliqueDetectorResolution(NaifContextPtr naif){
 
 
       if(HasSurfaceIntersection()){
 
           double thetaRad;          
-          thetaRad = EmissionAngle()*DEG2RAD;
+          thetaRad = EmissionAngle(naif)*DEG2RAD;
 
           if (thetaRad < HALFPI) {           
-            return DetectorResolution()/cos(thetaRad);
+            return DetectorResolution(naif)/cos(thetaRad);
 
           }
           return Isis::Null;
@@ -621,10 +621,10 @@ namespace Isis {
    *
    * @return @b double The detector resolution
    */
-  double Camera::DetectorResolution() {
+  double Camera::DetectorResolution(NaifContextPtr naif) {
     if (HasSurfaceIntersection()) {
       double sB[3];
-      instrumentPosition(sB);
+      instrumentPosition(sB, naif);
       double pB[3];
       Coordinate(pB);
       double a = sB[0] - pB[0];
@@ -642,9 +642,9 @@ namespace Isis {
    *
    * @return @b double The sample resolution
    */
-  double Camera::SampleResolution() {
+  double Camera::SampleResolution(NaifContextPtr naif) {
 
-    return DetectorResolution() * p_detectorMap->SampleScaleFactor();
+    return DetectorResolution(naif) * p_detectorMap->SampleScaleFactor();
   }
 
   /**
@@ -653,9 +653,9 @@ namespace Isis {
    *
    * @return @b double The sample resolution
    */
-  double Camera::ObliqueSampleResolution() {
+  double Camera::ObliqueSampleResolution(NaifContextPtr naif) {
 
-    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+    return ObliqueDetectorResolution(naif) * p_detectorMap->SampleScaleFactor();
   }
 
 
@@ -664,8 +664,8 @@ namespace Isis {
    *
    * @return @b double The line resolution
    */
-  double Camera::LineResolution() {
-    return DetectorResolution() * p_detectorMap->LineScaleFactor();
+  double Camera::LineResolution(NaifContextPtr naif) {
+    return DetectorResolution(naif) * p_detectorMap->LineScaleFactor();
   }
 
 
@@ -676,9 +676,9 @@ namespace Isis {
    *
    * @return @b double The line resolution
    */
-  double Camera::ObliqueLineResolution() {
+  double Camera::ObliqueLineResolution(NaifContextPtr naif) {
 
-    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+    return ObliqueDetectorResolution(naif) * p_detectorMap->LineScaleFactor();
   }
 
 
@@ -686,9 +686,9 @@ namespace Isis {
    * @brief Returns the pixel resolution at the current position in meters/pixel.
    * @return @b double The pixel resolution
    */
-  double Camera::PixelResolution() {
-    double lineRes = LineResolution();
-    double sampRes = SampleResolution();
+  double Camera::PixelResolution(NaifContextPtr naif) {
+    double lineRes = LineResolution(naif);
+    double sampRes = SampleResolution(naif);
     if (lineRes < 0.0) return Isis::Null;
     if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;
@@ -701,9 +701,9 @@ namespace Isis {
    *
    * @return @b double The pixel resolution
    */
-  double Camera::ObliquePixelResolution() {
-    double lineRes = ObliqueLineResolution();
-    double sampRes = ObliqueSampleResolution();
+  double Camera::ObliquePixelResolution(NaifContextPtr naif) {
+    double lineRes = ObliqueLineResolution(naif);
+    double sampRes = ObliqueSampleResolution(naif);
     if (lineRes < 0.0) return Isis::Null;
     if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;
@@ -715,8 +715,8 @@ namespace Isis {
    *
    * @return @b double The lowest/worst resolution in the image
    */
-  double Camera::LowestImageResolution() {
-    GroundRangeResolution();
+  double Camera::LowestImageResolution(NaifContextPtr naif) {
+    GroundRangeResolution(naif);
     return p_maxres;
   }
 
@@ -726,8 +726,8 @@ namespace Isis {
    *
    * @return @b double The highest/best resolution in the entire image
    */
-  double Camera::HighestImageResolution() {
-    GroundRangeResolution();
+  double Camera::HighestImageResolution(NaifContextPtr naif) {
+    GroundRangeResolution(naif);
     return p_minres;
   }
 
@@ -737,8 +737,8 @@ namespace Isis {
    *
    * @return @b double The lowest/worst oblique resolution in the image
    */
-  double Camera::LowestObliqueImageResolution() {
-    GroundRangeResolution();
+  double Camera::LowestObliqueImageResolution(NaifContextPtr naif) {
+    GroundRangeResolution(naif);
     return p_minobliqueres;
   }
 
@@ -748,8 +748,8 @@ namespace Isis {
    *
    * @return @b double The highest/best oblique resolution in the entire image
    */
-  double Camera::HighestObliqueImageResolution() {
-    GroundRangeResolution();
+  double Camera::HighestObliqueImageResolution(NaifContextPtr naif) {
+    GroundRangeResolution(naif);
     return p_maxobliqueres;
   }
 
@@ -757,7 +757,7 @@ namespace Isis {
   /**
    *  @brief Computes the ground range and min/max resolution
    */
-  void Camera::GroundRangeResolution() {
+  void Camera::GroundRangeResolution(NaifContextPtr naif) {
     // Software adjustment is needed if we get here -- call RingRangeResolution instead
     if (target()->shape()->name() == "Plane") {
       IString msg = "Images with plane targets should use Camera method RingRangeResolution ";
@@ -790,7 +790,7 @@ namespace Isis {
     int eband = p_bands;
     if (IsBandIndependent()) eband = 1;
     for (int band = 1; band <= eband; band++) {
-      SetBand(band);
+      SetBand(band, naif);
 
       // Loop for each line testing the left and right sides of the image
       for (int line = 1; line <= p_lines + 1; line++) {
@@ -799,7 +799,7 @@ namespace Isis {
         int samp;
         for (samp = 1; samp <= p_samples + 1; samp++) {
 
-          if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
+          if (SetImage((double)samp - 0.5, (double)line - 0.5, naif)) {
             double lat = UniversalLatitude();
             double lon = UniversalLongitude();
             if (lat < p_minlat) p_minlat = lat;
@@ -811,13 +811,13 @@ namespace Isis {
             if (lon < p_minlon180) p_minlon180 = lon;
             if (lon > p_maxlon180) p_maxlon180 = lon;
 
-            double res = PixelResolution();
+            double res = PixelResolution(naif);
             if (res > 0.0) {
               if (res < p_minres) p_minres = res;
               if (res > p_maxres) p_maxres = res;
             }
             //  Determine min/max oblique resolution
-            double obliqueres = ObliquePixelResolution();
+            double obliqueres = ObliquePixelResolution(naif);
             if (obliqueres > 0.0) {
                 if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
                 if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
@@ -834,7 +834,7 @@ namespace Isis {
         // Look for the first good lat/lon on the right edge of the image
         if (samp < p_samples + 1) {
           for (samp = p_samples + 1; samp >= 1; samp--) {
-            if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
+            if (SetImage((double)samp - 0.5, (double)line - 0.5, naif)) {
               double lat = UniversalLatitude();
               double lon = UniversalLongitude();
               if (lat < p_minlat) p_minlat = lat;
@@ -846,14 +846,14 @@ namespace Isis {
               if (lon < p_minlon180) p_minlon180 = lon;
               if (lon > p_maxlon180) p_maxlon180 = lon;
 
-              double res = PixelResolution();
+              double res = PixelResolution(naif);
               if (res > 0.0) {
                 if (res < p_minres) p_minres = res;
                 if (res > p_maxres) p_maxres = res;
               }
 
               //  Determine min/max oblique resolution
-              double obliqueres = ObliquePixelResolution();
+              double obliqueres = ObliquePixelResolution(naif);
               if (obliqueres > 0.0) {
                   if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
                   if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
@@ -869,7 +869,7 @@ namespace Isis {
       // better resolution
       double lat, lon;
 
-      subSpacecraftPoint(lat, lon);
+      subSpacecraftPoint(lat, lon, naif);
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
       // get the local radius for the subspacecraft point
@@ -880,16 +880,16 @@ namespace Isis {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
-        if (SetGround(testPoint)) {
+        if (SetGround(testPoint, naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-            double res = PixelResolution();
+            double res = PixelResolution(naif);
             if (res > 0.0) {
               if (res < p_minres) p_minres = res;
               if (res > p_maxres) p_maxres = res;
             }
 
-            double obliqueres = ObliquePixelResolution();
+            double obliqueres = ObliquePixelResolution(naif);
             if (obliqueres > 0.0) {
                 if (obliqueres < p_minobliqueres) p_minobliqueres = obliqueres;
                 if (obliqueres > p_maxobliqueres) p_maxobliqueres = obliqueres;
@@ -909,7 +909,7 @@ namespace Isis {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
-        if (SetGround(testPoint)) {
+        if (SetGround(testPoint, naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_maxlat = 90.0;
@@ -928,7 +928,7 @@ namespace Isis {
       if (radius.isValid()) {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
-        if (SetGround(testPoint)) {
+        if (SetGround(testPoint, naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlat = -90.0;
@@ -946,7 +946,7 @@ namespace Isis {
       for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
                     lat <= Latitude(p_maxlat, Angle::Degrees);
                     lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
-        if (SetGround(lat, Longitude(0.0, Angle::Degrees))) {
+        if (SetGround(lat, Longitude(0.0, Angle::Degrees), naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon = 0.0;
@@ -958,7 +958,7 @@ namespace Isis {
         // Another special test for ground range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if (SetGround(lat, Longitude(180.0, Angle::Degrees))) {
+        if (SetGround(lat, Longitude(180.0, Angle::Degrees), naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon180 = -180.0;
@@ -969,10 +969,10 @@ namespace Isis {
       } // end for loop (latitudes from min to max)
     } // end for loop through bands
 
-    SetBand(originalBand);
+    SetBand(originalBand, naif);
 
     if(computed) {
-      SetImage(originalSample, originalLine);
+      SetImage(originalSample, originalLine, naif);
     }
     else {
       p_pointComputed = false;
@@ -998,7 +998,7 @@ namespace Isis {
    * @brief Analogous to above GroundRangeResolution method. Computes the ring range
    * and min/max resolution
    */
-  void Camera::ringRangeResolution() {
+  void Camera::ringRangeResolution(NaifContextPtr naif) {
     // TODO Add test to make sure we have a ring plane image **
 
     // Have we already done this
@@ -1027,7 +1027,7 @@ namespace Isis {
       eband = 1;
 
     for (int band = 1; band <= eband; band++) {
-      SetBand(band);
+      SetBand(band, naif);
 
       // Loop for each line testing the left and right sides of the image
       for (int line = 1; line <= p_lines + 1; line++) {
@@ -1037,7 +1037,7 @@ namespace Isis {
         int samp;
         for (samp = 1; samp <= p_samples + 1; samp++) {
 
-          if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
+          if (SetImage((double)samp - 0.5, (double)line - 0.5, naif)) {
             double radius = LocalRadius().meters();
             double azimuth = UniversalLongitude();
             if (radius < p_minRingRadius) p_minRingRadius = radius;
@@ -1049,7 +1049,7 @@ namespace Isis {
             if (azimuth < p_minRingLongitude180) p_minRingLongitude180 = azimuth;
             if (azimuth > p_maxRingLongitude180) p_maxRingLongitude180 = azimuth;
 
-            double res = PixelResolution();
+            double res = PixelResolution(naif);
             if (res > 0.0) {
               if (res < p_minres) p_minres = res;
               if (res > p_maxres) p_maxres = res;
@@ -1064,7 +1064,7 @@ namespace Isis {
         // Look for the first good rad/azimuth on the right edge of the image
         if (samp < p_samples + 1) {
           for(samp = p_samples + 1; samp >= 1; samp--) {
-            if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
+            if (SetImage((double)samp - 0.5, (double)line - 0.5, naif)) {
               double radius = LocalRadius().meters();
               double azimuth = UniversalLongitude();
               if (radius < p_minRingRadius) p_minRingRadius = radius;
@@ -1076,7 +1076,7 @@ namespace Isis {
               if (azimuth < p_minRingLongitude180) p_minRingLongitude180 = azimuth;
               if (azimuth > p_maxRingLongitude180) p_maxRingLongitude180 = azimuth;
 
-              double res = PixelResolution();
+              double res = PixelResolution(naif);
               if (res > 0.0) {
                 if (res < p_minres) p_minres = res;
                 if (res > p_maxres) p_maxres = res;
@@ -1120,7 +1120,7 @@ namespace Isis {
       for (Distance radius = Distance(p_minRingRadius, Distance::Meters);
                    radius <= Distance(p_maxRingRadius, Distance::Meters);
                    radius += Distance((p_maxRingRadius - p_minRingRadius) / 10.0, Distance::Meters)) {
-        if (SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius))) {
+        if (SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius), naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minRingLongitude = 0.0;
@@ -1144,7 +1144,7 @@ namespace Isis {
         // Another special test for ring range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if (SetGround(Latitude(0.0, Angle::Degrees), Longitude(180.0, Angle::Degrees))) {
+        if (SetGround(Latitude(0.0, Angle::Degrees), Longitude(180.0, Angle::Degrees), naif)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minRingLongitude180 = -180.0;
@@ -1155,10 +1155,10 @@ namespace Isis {
       }
     } // end loop over bands
 
-    SetBand(originalBand);
+    SetBand(originalBand, naif);
 
     if (computed) {
-      SetImage(originalSample, originalLine);
+      SetImage(originalSample, originalLine, naif);
     }
     else {
       p_pointComputed = false;
@@ -1181,9 +1181,9 @@ namespace Isis {
    * @return @b bool Returns true if the range intersects the longitude domain, and
    *              false if it does not
    */
-  bool Camera::IntersectsLongitudeDomain(Pvl &pvl) {
+  bool Camera::IntersectsLongitudeDomain(Pvl &pvl, NaifContextPtr naif) {
     double minlat, minlon, maxlat, maxlon;
-    return GroundRange(minlat, maxlat, minlon, maxlon, pvl);
+    return GroundRange(minlat, maxlat, minlon, maxlon, pvl, naif);
   }
 
   /**
@@ -1200,9 +1200,9 @@ namespace Isis {
    */
   bool Camera::GroundRange(double &minlat, double &maxlat,
                            double &minlon, double &maxlon,
-                           Pvl &pvl) {
+                           Pvl &pvl, NaifContextPtr naif) {
     // Compute the ground range and resolution
-    GroundRangeResolution();
+    GroundRangeResolution(naif);
 
     // Get the default radii
     Distance localRadii[3];
@@ -1303,9 +1303,10 @@ namespace Isis {
    *              false if it does not
    */
   bool Camera::ringRange(double &minRingRadius, double &maxRingRadius,
-                         double &minRingLongitude, double &maxRingLongitude, Pvl &pvl) {
+                         double &minRingLongitude, double &maxRingLongitude, Pvl &pvl,
+                         NaifContextPtr naif) {
     // Compute the ring range and resolution
-    ringRangeResolution();
+    ringRangeResolution(naif);
 
     // Get the mapping group
     PvlGroup map = pvl.findGroup("Mapping", Pvl::Traverse);
@@ -1372,7 +1373,7 @@ namespace Isis {
    *
    * @param pvl Pvl to write mapping group to
    */
-  void Camera::BasicMapping(Pvl &pvl) {
+  void Camera::BasicMapping(Pvl &pvl, NaifContextPtr naif) {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target()->name());
 
@@ -1384,7 +1385,7 @@ namespace Isis {
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
 
-    GroundRangeResolution();
+    GroundRangeResolution(naif);
     map += PvlKeyword("MinimumLatitude", toString(p_minlat));
     map += PvlKeyword("MaximumLatitude", toString(p_maxlat));
     map += PvlKeyword("MinimumLongitude", toString(p_minlon));
@@ -1401,7 +1402,7 @@ namespace Isis {
    *
    * @param pvl Pvl to write mapping group to
    */
-  void Camera::basicRingMapping(Pvl &pvl) {
+  void Camera::basicRingMapping(Pvl &pvl, NaifContextPtr naif) {
     if (target()->shape()->name() != "Plane") {
       // If we get here and we don't have a plane, throw an error
       IString msg = "A ring plane projection has been requested on an image whose shape is not a ring plane.  ";
@@ -1415,7 +1416,7 @@ namespace Isis {
     map += PvlKeyword("RingLongitudeDirection", "CounterClockwise");
     map += PvlKeyword("RingLongitudeDomain", "360");
 
-    ringRangeResolution();
+    ringRangeResolution(naif);
     map += PvlKeyword("MinimumRingRadius", toString(p_minRingRadius));
     map += PvlKeyword("MaximumRingRadius", toString(p_maxRingRadius));
     map += PvlKeyword("MinimumRingLongitude", toString(p_minRingLongitude));
@@ -1427,17 +1428,17 @@ namespace Isis {
   }
 
   //! Reads the focal length from the instrument kernel
-  void Camera::SetFocalLength() {
+  void Camera::SetFocalLength(NaifContextPtr naif) {
     int code = naifIkCode();
     QString key = "INS" + toString(code) + "_FOCAL_LENGTH";
-    SetFocalLength(Spice::getDouble(key));
+    SetFocalLength(Spice::getDouble(naif, key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
-  void Camera::SetPixelPitch() {
+  void Camera::SetPixelPitch(NaifContextPtr naif) {
     int code = naifIkCode();
     QString key = "INS" + toString(code) + "_PIXEL_PITCH";
-    SetPixelPitch(Spice::getDouble(key));
+    SetPixelPitch(Spice::getDouble(naif, key));
   }
 
 
@@ -1504,7 +1505,7 @@ namespace Isis {
    * @param [out] normal The local normal vector to be calculated.
    *
    */
-  void Camera::GetLocalNormal(double normal[3]) {
+  void Camera::GetLocalNormal(double normal[3], NaifContextPtr naif) {
 
     ShapeModel *shapeModel = target()->shape();
     if ( !shapeModel->hasIntersection()) {
@@ -1560,18 +1561,18 @@ namespace Isis {
       // if this is a dsk, we only need to use the existing intercept point (plate) normal then return
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
         // If a surrounding point fails, set it to the original point
-        if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+        if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second, naif))) {
           surroundingPoints[i].first = samp;
           surroundingPoints[i].second = line;
 
           // If the original point fails too, we can't get a normal.  Clean up and return.
-          if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+          if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second, naif))) {
 
             normal[0] = normal[1] = normal[2] = 0.0;
 
             // restore input state
             if (computed) {
-              SetImage(originalSample, originalLine);
+              SetImage(originalSample, originalLine, naif);
             }
             else {
               p_pointComputed = false;
@@ -1591,7 +1592,7 @@ namespace Isis {
         lon = surfacePoint.GetLongitude();
         radius = LocalRadius(lat, lon);
 
-        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
+        naif->latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
       }
 
       // if the first 2 surrounding points match or the last 2 surrounding points match,
@@ -1605,7 +1606,7 @@ namespace Isis {
 
         // restore input state
         if (!computed) {
-          SetImage(originalSample, originalLine);
+          SetImage(originalSample, originalLine, naif);
         }
         else {
           p_pointComputed = false;
@@ -1619,7 +1620,7 @@ namespace Isis {
       }
 
       // Restore input state to original point before calculating normal
-      SetImage(originalSample, originalLine);
+      SetImage(originalSample, originalLine, naif);
       shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
       // free memory
@@ -1658,17 +1659,17 @@ namespace Isis {
    * @param emission The local emission angle to be calculated
    * @param success A boolean to keep track of whether normal is valid
    */
-  void Camera::LocalPhotometricAngles(Angle & phase, Angle & incidence,
+  void Camera::LocalPhotometricAngles(NaifContextPtr naif, Angle & phase, Angle & incidence,
       Angle & emission, bool &success) {
 
     // get local normal vector
     double normal[3];
-    GetLocalNormal(normal);
+    GetLocalNormal(normal, naif);
     success = true;
 
     // Check to make sure normal is valid
     SpiceDouble mag;
-    unorm_c(normal,normal,&mag);
+    naif->unorm_c(normal,normal,&mag);
     if (mag == 0.) {
       success = false;
       return;
@@ -1677,7 +1678,7 @@ namespace Isis {
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
     std::vector<double> sB = bodyRotation()->ReferenceVector(
-        instrumentPosition()->Coordinate());
+        instrumentPosition()->Coordinate(), naif);
 
     SpiceDouble pB[3];
     SurfacePoint surfacePoint = GetSurfacePoint();
@@ -1685,28 +1686,28 @@ namespace Isis {
     pB[1] = surfacePoint.GetY().kilometers();
     pB[2] = surfacePoint.GetZ().kilometers();
 
-    vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
-    unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
+    naif->vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
+    naif->unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
 
     // get a normalized surface sun vector
     SpiceDouble surfaceSunVect[3];
-    vsub_c(m_uB, pB, surfaceSunVect);
+    naif->vsub_c(m_uB, pB, surfaceSunVect);
     SpiceDouble unitizedSurfSunVect[3];
-    unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
+    naif->unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
 
     // use normalized surface spacecraft and surface sun vectors to calculate
     // the phase angle (in radians)
-    phase = Angle(vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect),
+    phase = Angle(naif->vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect),
         Angle::Radians);
 
     // use normalized surface spacecraft and local normal vectors to calculate
     // the emission angle (in radians)
-    emission = Angle(vsep_c(unitizedSurfSpaceVect, normal),
+    emission = Angle(naif->vsep_c(unitizedSurfSpaceVect, normal),
         Angle::Radians);
 
     // use normalized surface sun and normal vectors to calculate the incidence
     // angle (in radians)
-    incidence = Angle(vsep_c(unitizedSurfSunVect, normal),
+    incidence = Angle(naif->vsep_c(unitizedSurfSunVect, normal),
         Angle::Radians);
 
 
@@ -1723,7 +1724,8 @@ namespace Isis {
    * @return @b bool Returns true if the range computation was successful and false
    *              if it was not
    */
-  bool Camera::RaDecRange(double &minra, double &maxra,
+  bool Camera::RaDecRange(NaifContextPtr naif,
+                          double &minra, double &maxra,
                           double &mindec, double &maxdec) {
 
 
@@ -1748,15 +1750,15 @@ namespace Isis {
       int eband = p_bands;
       if (IsBandIndependent()) eband = 1;
       for (int band = 1; band <= eband; band++) {
-        this->SetBand(band);
+        this->SetBand(band, naif);
 
         for (int line = 1; line <= p_lines; line++) {
           // Test left, top, and bottom sides
           int samp;
           for (samp = 1; samp <= p_samples; samp++) {
-            SetImage((double)samp, (double)line);
-            double ra = RightAscension();
-            double dec = Declination();
+            SetImage((double)samp, (double)line, naif);
+            double ra = RightAscension(naif);
+            double dec = Declination(naif);
             if (ra < p_minra) p_minra = ra;
             if (ra > p_maxra) p_maxra = ra;
             if (dec < p_mindec) p_mindec = dec;
@@ -1772,9 +1774,9 @@ namespace Isis {
           // Test right side
           if (samp < p_samples) {
             for (samp = p_samples; samp >= 1; samp--) {
-              SetImage((double)samp, (double)line);
-              double ra = RightAscension();
-              double dec = Declination();
+              SetImage((double)samp, (double)line, naif);
+              double ra = RightAscension(naif);
+              double dec = Declination(naif);
               if (ra < p_minra) p_minra = ra;
               if (ra > p_maxra) p_maxra = ra;
               if (dec < p_mindec) p_mindec = dec;
@@ -1847,10 +1849,10 @@ namespace Isis {
     mindec = p_mindec;
     maxdec = p_maxdec;
 
-    SetBand(originalBand);
+    SetBand(originalBand, naif);
 
     if (computed) {
-      SetImage(originalSample, originalLine);
+      SetImage(originalSample, originalLine, naif);
     }
     else {
       p_pointComputed = false;
@@ -1865,37 +1867,37 @@ namespace Isis {
    *
    * @return @b double The resutant RaDec resolution
    */
-  double Camera::RaDecResolution() {
+  double Camera::RaDecResolution(NaifContextPtr naif) {
 
     bool computed = p_pointComputed;
     double originalSample = Sample();
     double originalLine = Line();
     int originalBand = Band();
 
-    SetImage(1.0, 1.0);
-    double ra1 = RightAscension();
-    double dec1 = Declination();
+    SetImage(1.0, 1.0, naif);
+    double ra1 = RightAscension(naif);
+    double dec1 = Declination(naif);
 
-    SetImage(1.0, (double)p_lines);
-    double ra2 = RightAscension();
-    double dec2 = Declination();
+    SetImage(1.0, (double)p_lines, naif);
+    double ra2 = RightAscension(naif);
+    double dec2 = Declination(naif);
 
     double dist = (ra1 - ra2) * (ra1 - ra2) + (dec1 - dec2) * (dec1 - dec2);
     dist = sqrt(dist);
     double lineRes = dist / (p_lines - 1);
 
-    SetImage((double)p_samples, 1.0);
-    ra2 = RightAscension();
-    dec2 = Declination();
+    SetImage((double)p_samples, 1.0, naif);
+    ra2 = RightAscension(naif);
+    dec2 = Declination(naif);
 
     dist = (ra1 - ra2) * (ra1 - ra2) + (dec1 - dec2) * (dec1 - dec2);
     dist = sqrt(dist);
     double sampRes = dist / (p_samples - 1);
 
-    SetBand(originalBand);
+    SetBand(originalBand, naif);
 
     if (computed) {
-      SetImage(originalSample, originalLine);
+      SetImage(originalSample, originalLine, naif);
     }
     else {
       p_pointComputed = false;
@@ -1909,7 +1911,7 @@ namespace Isis {
    *
    * @return @b double North Azimuth
    */
-  double Camera::NorthAzimuth() {
+  double Camera::NorthAzimuth(NaifContextPtr naif) {
     if (target()->shape()->name() == "Plane") {
       QString msg = "North Azimuth is not available for plane target shapes.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1919,11 +1921,11 @@ namespace Isis {
     double lat = UniversalLatitude();
     // We are in northern hemisphere
     if (lat >= 0.0) {
-      return ComputeAzimuth(90.0, 0.0);
+      return ComputeAzimuth(90.0, 0.0, naif);
     }
     // We are in southern hemisphere
     else {
-      double azimuth = ComputeAzimuth(-90.0, 0.0) + 180.0;
+      double azimuth = ComputeAzimuth(-90.0, 0.0, naif) + 180.0;
       if (azimuth > 360.0) azimuth = azimuth - 360.0;
       return azimuth;
     }
@@ -1936,10 +1938,10 @@ namespace Isis {
    *
    * @todo Get appropriate radius at the subsolar point
    */
-  double Camera::SunAzimuth() {
+  double Camera::SunAzimuth(NaifContextPtr naif) {
     double lat, lon;
-    subSolarPoint(lat, lon);
-    return ComputeAzimuth(lat, lon);
+    subSolarPoint(lat, lon, naif);
+    return ComputeAzimuth(lat, lon, naif);
   }
 
 
@@ -1950,10 +1952,10 @@ namespace Isis {
    *
    * @todo Get appropriate radius at the subscraft point
    */
-  double Camera::SpacecraftAzimuth() {
+  double Camera::SpacecraftAzimuth(NaifContextPtr naif) {
     double lat, lon;
-    subSpacecraftPoint(lat, lon);
-    return ComputeAzimuth(lat, lon);
+    subSpacecraftPoint(lat, lon, naif);
+    return ComputeAzimuth(lat, lon, naif);
   }
 
 
@@ -2056,7 +2058,7 @@ namespace Isis {
    *   @todo Write PushState and PopState method to ensure the internals of the class are set based
    *         on SetImage or SetGround
    */
-  double Camera::ComputeAzimuth(const double lat, const double lon) {
+  double Camera::ComputeAzimuth(const double lat, const double lon, NaifContextPtr naif) {
     // Make sure we are on the planet, if not, north azimuth is meaningless
     if (!HasSurfaceIntersection()) return Isis::Null;
 
@@ -2064,7 +2066,7 @@ namespace Isis {
     // method is done
     bool computed = p_pointComputed;
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     // Get the azimuth's origin point (the current position) and its radius
     SpiceDouble azimuthOrigin[3];
@@ -2078,8 +2080,8 @@ namespace Isis {
     // body-fixed coordinate system and use the azimuth's origin radius to avoid the
     // situation where the DEM does not cover the entire planet
     SpiceDouble pointOfInterestFromBodyCenter[3];
-    latrec_c(originRadius.kilometers(), lon * PI / 180.0,
-             lat * PI / 180.0, pointOfInterestFromBodyCenter);
+    naif->latrec_c(originRadius.kilometers(), lon * PI / 180.0,
+                   lat * PI / 180.0, pointOfInterestFromBodyCenter);
 
     // Get the difference vector with its tail at the azimuth origin and its
     // head at the point of interest by subtracting vectors the vectors that
@@ -2088,31 +2090,31 @@ namespace Isis {
     // pointOfInterest = pointOfInterestFromBodyCenter - azimuthOriginFromBodyCenter
     //
     SpiceDouble pointOfInterest[3];
-    vsub_c(pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
+    naif->vsub_c(pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
 
     // Get the component of the difference vector pointOfInterestFromAzimuthOrigin that is
     // perpendicular to the origin point (i.e. project perpendicularly onto the reference plane).
     // This will result in a point of interest vector that is in the plane tangent to the surface at
     // the origin point
     SpiceDouble pointOfInterestProj[3];
-    vperp_c(pointOfInterest, azimuthOrigin, pointOfInterestProj);
+    naif->vperp_c(pointOfInterest, azimuthOrigin, pointOfInterestProj);
 
     // Unitize the tangent vector to a 1 km length vector
     SpiceDouble pointOfInterestProjUnit[3];
-    vhat_c(pointOfInterestProj, pointOfInterestProjUnit);
+    naif->vhat_c(pointOfInterestProj, pointOfInterestProjUnit);
 
     // Scale the vector to within a pixel of the azimuth's origin point.
     // Get pixel scale in km/pixel and divide by 2 to insure that we stay within
     // a pixel of the origin point
-    double scale = (PixelResolution() / 1000.0) / 2.0;
+    double scale = (PixelResolution(naif) / 1000.0) / 2.0;
     SpiceDouble pointOfInterestProjUnitScaled[3];
-    vscl_c(scale, pointOfInterestProjUnit, pointOfInterestProjUnitScaled);
+    naif->vscl_c(scale, pointOfInterestProjUnit, pointOfInterestProjUnitScaled);
 
     // Compute the adjusted point of interest vector from the body center. This point
     // will be within a pixel of the origin and in the same direction as the requested
     // raw point of interest vector
     SpiceDouble adjustedPointOfInterestFromBodyCenter[3];
-    vadd_c(azimuthOrigin, pointOfInterestProjUnitScaled, adjustedPointOfInterestFromBodyCenter);
+    naif->vadd_c(azimuthOrigin, pointOfInterestProjUnitScaled, adjustedPointOfInterestFromBodyCenter);
 
     // Get the origin image coordinate
     double azimuthOriginSample = Sample();
@@ -2120,10 +2122,10 @@ namespace Isis {
 
     // Convert the point to a lat/lon and find out its image coordinate
     double adjustedPointOfInterestRad, adjustedPointOfInterestLon, adjustedPointOfInterestLat;
-    reclat_c(adjustedPointOfInterestFromBodyCenter,
-             &adjustedPointOfInterestRad,
-             &adjustedPointOfInterestLon,
-             &adjustedPointOfInterestLat);
+    naif->reclat_c(adjustedPointOfInterestFromBodyCenter,
+                  &adjustedPointOfInterestRad,
+                  &adjustedPointOfInterestLon,
+                  &adjustedPointOfInterestLat);
     adjustedPointOfInterestLat = adjustedPointOfInterestLat * 180.0 / PI;
     adjustedPointOfInterestLon = adjustedPointOfInterestLon * 180.0 / PI;
     if (adjustedPointOfInterestLon < 0) adjustedPointOfInterestLon += 360.0;
@@ -2133,11 +2135,12 @@ namespace Isis {
     // to avoid the effects of topography on the calculation
     bool success = SetUniversalGround(adjustedPointOfInterestLat,
                                       adjustedPointOfInterestLon,
-                                      originRadius.meters());
+                                      originRadius.meters(),
+                                      naif);
     if (!success) {
       // if the adjusted lat/lon values for the point of origin fail to be set, we can not compute
       // an azimuth. reset to the original sample/line and return null.
-      SetImage(azimuthOriginSample, azimuthOriginLine);
+      SetImage(azimuthOriginSample, azimuthOriginLine, naif);
       return Isis::Null;
     }
 
@@ -2190,13 +2193,13 @@ namespace Isis {
     if (azimuth < 0.0) azimuth += 360.0;
     if (azimuth > 360.0) azimuth -= 360.0;
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     // computed is true if the sample/line or lat/lon were reset in this method
     // to find the location of the point of interest
     // If so, reset "state" of camera to the original sample/line
     if (computed) {
-      SetImage(azimuthOriginSample, azimuthOriginLine);
+      SetImage(azimuthOriginSample, azimuthOriginLine, naif);
     }
     else {
       p_pointComputed = false;
@@ -2211,22 +2214,22 @@ namespace Isis {
    *
    * @return @b double Off Nadir Angle
    */
-  double Camera::OffNadirAngle() {
-    NaifStatus::CheckErrors();
+  double Camera::OffNadirAngle(NaifContextPtr naif) {
+    naif->CheckErrors();
 
     // Get the xyz coordinates for the spacecraft and point we are interested in
     double coord[3], spCoord[3];
     Coordinate(coord);
-    instrumentPosition(spCoord);
+    instrumentPosition(spCoord, naif);
 
     // Get the angle between the 2 points and convert to degrees
-    double a = vsep_c(coord, spCoord) * 180.0 / PI;
-    double b = 180.0 - EmissionAngle();
+    double a = naif->vsep_c(coord, spCoord) * 180.0 / PI;
+    double b = 180.0 - EmissionAngle(naif);
 
     // The three angles in a triangle must add up to 180 degrees
     double c = 180.0 - (a + b);
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     return c;
   }
@@ -2429,18 +2432,18 @@ namespace Isis {
    *                          Moved calculations of cache size and start/end
    *                          ephemeris times to their own methods.
    */
-  void Camera::LoadCache() {
+  void Camera::LoadCache(NaifContextPtr naif) {
     // We want to stay in unprojected space for this process
     bool projIgnored = p_ignoreProjection;
     p_ignoreProjection = true;
 
     // get the cache variables
-    pair<double,double> ephemerisTimes = StartEndEphemerisTimes();
+    pair<double,double> ephemerisTimes = StartEndEphemerisTimes(naif);
     int cacheSize = CacheSize(ephemerisTimes.first, ephemerisTimes.second);
 
     // Set a position in the image so that the PixelResolution can be calculated
-    SetImage(p_alphaCube->BetaSamples() / 2, p_alphaCube->BetaLines() / 2);
-    double tol = PixelResolution() / 100.; //meters/pix/100.
+    SetImage(p_alphaCube->BetaSamples() / 2, p_alphaCube->BetaLines() / 2, naif);
+    double tol = PixelResolution(naif) / 100.; //meters/pix/100.
 
     if (tol < 0.0) {
       // Alternative calculation of ground resolution of a pixel/100
@@ -2449,7 +2452,7 @@ namespace Isis {
         altitudeMeters = 1.0;
       }
       else {
-        altitudeMeters = SpacecraftAltitude() * 1000.;
+        altitudeMeters = SpacecraftAltitude(naif) * 1000.;
       }
       tol = PixelPitch() * altitudeMeters / FocalLength() / 100.;
     }
@@ -2457,12 +2460,12 @@ namespace Isis {
     p_ignoreProjection = projIgnored;
 
     Spice::createCache(ephemerisTimes.first, ephemerisTimes.second,
-                       cacheSize, tol);
+                       cacheSize, tol, naif);
 
-    setTime(ephemerisTimes.first);
+    setTime(ephemerisTimes.first, naif);
 
     // Reset to band 1
-    SetBand(1);
+    SetBand(1, naif);
 
     return;
   }
@@ -2488,17 +2491,18 @@ namespace Isis {
    * @internal
    *   @history 2011-02-02 Jeannie Walldren - Original version.
    */
-  pair<double, double> Camera::StartEndEphemerisTimes() {
+  pair<double, double> Camera::StartEndEphemerisTimes(NaifContextPtr naif) {
     pair<double,double> ephemerisTimes;
     double startTime = -DBL_MAX;
     double endTime = -DBL_MAX;
 
     for (int band = 1; band <= Bands(); band++) {
-      SetBand(band);
-      SetImage(0.5, 0.5);
+      SetBand(band, naif);
+      SetImage(0.5, 0.5, naif);
       double etStart = time().Et();
       SetImage(p_alphaCube->BetaSamples() + 0.5,
-               p_alphaCube->BetaLines() + 0.5); // need to do something if SetImage returns false???
+               p_alphaCube->BetaLines() + 0.5,
+               naif); // need to do something if SetImage returns false???
       double etEnd = time().Et();
       if (band == 1) {
         startTime = min(etStart, etEnd);
@@ -2689,7 +2693,7 @@ namespace Isis {
    *
    * @param band Band Number
    */
-  void Camera::SetBand(const int band) {
+  void Camera::SetBand(const int band, NaifContextPtr naif) {
     p_childBand = band;
   }
 
@@ -2729,8 +2733,8 @@ namespace Isis {
    *
    * @return @b double pixel resolution
    */
-  double Camera::resolution() {
-    return PixelResolution();
+  double Camera::resolution(NaifContextPtr naif) {
+    return PixelResolution(naif);
   }
 
 
@@ -3046,13 +3050,13 @@ namespace Isis {
    *
    * @return @b double The resultant Celestial North Clock Angle
    */
-  double Camera::CelestialNorthClockAngle() {
+  double Camera::CelestialNorthClockAngle(NaifContextPtr naif) {
     double orgLine = Line();
     double orgSample = Sample();
-    double orgDec = Declination();
-    double orgRa = RightAscension();
+    double orgDec = Declination(naif);
+    double orgRa = RightAscension(naif);
 
-    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution()));
+    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution(naif)));
     double y = Line() - orgLine;
     double x = Sample() - orgSample;
     double celestialNorthClockAngle = atan2(-y, x) * 180.0 / Isis::PI;
@@ -3062,7 +3066,7 @@ namespace Isis {
        celestialNorthClockAngle += 360.0;
     }
 
-    SetImage(orgSample, orgLine);
+    SetImage(orgSample, orgLine, naif);
     return celestialNorthClockAngle;
   }
 

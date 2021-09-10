@@ -44,6 +44,8 @@ namespace Isis {
    *   @history 2012-06-14 Orrin Thomas - original version
    */
   KaguyaMiCamera::KaguyaMiCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_spacecraftNameLong = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
 
@@ -66,13 +68,13 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Set up the camera info from ik/iak kernels
 
-    SetFocalLength();
+    SetFocalLength(naif);
     //Kaguya IK kernal uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
     QString ikernKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
-    SetPixelPitch(getDouble(ikernKey));
+    SetPixelPitch(getDouble(naif, ikernKey));
  
 
     // Get the start time from labels
@@ -88,12 +90,12 @@ namespace Isis {
       //TODO throw an error if "StartTime" keyword is absent
     }
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
 
     // Get other info from labels
     double lineRate = (double) inst["CorrectedSamplingInterval"] / 1000.0;
-    setTime(etStart);
+    setTime(etStart, naif);
 
     // Setup detector map
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);
@@ -104,8 +106,8 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     // Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + toString(naifIkCode()) + "_CENTER";
-    double sampleBoreSight = getDouble(ikernKey,0);
-    double lineBoreSight = getDouble(ikernKey,1)-1.0;
+    double sampleBoreSight = getDouble(naif, ikernKey,0);
+    double lineBoreSight = getDouble(naif, ikernKey,1)-1.0;
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
     focalMap->SetDetectorOffset(0.0, 0.0);
@@ -119,9 +121,9 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
+    LoadCache(naif);
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
   }
 }
 

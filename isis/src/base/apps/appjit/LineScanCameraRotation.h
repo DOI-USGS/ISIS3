@@ -108,13 +108,13 @@ namespace Isis {
 //      virtual ~LineScanCameraRotation() { };
       virtual ~LineScanCameraRotation();
 
-      void LoadCache();
+      void LoadCache(NaifContextPtr naif);
 
       void SetJitter(PixelOffset *jitter) {
         p_jitter = jitter;
       };
 
-      void ReloadCache();
+      void ReloadCache(NaifContextPtr naif);
 
       void ResetPitchRate(double pitchRate) {
         p_pitchRate = pitchRate;

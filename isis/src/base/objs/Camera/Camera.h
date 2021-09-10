@@ -30,6 +30,7 @@
 #include <QString>
 
 #include "AlphaCube.h"
+#include "NaifContext.h"
 
 namespace Isis {
   class Angle;
@@ -256,55 +257,56 @@ namespace Isis {
       virtual ~Camera();
 
       // Methods
-      virtual bool SetImage(const double sample, const double line);
-      virtual bool SetImage(const double sample, const double line, const double deltaT);
+      virtual bool SetImage(const double sample, const double line, NaifContextPtr naif);
+      virtual bool SetImage(const double sample, const double line, const double deltaT, NaifContextPtr naif);
 
-      virtual bool SetUniversalGround(const double latitude, const double longitude);
+      virtual bool SetUniversalGround(const double latitude, const double longitude, NaifContextPtr naif);
       virtual bool SetUniversalGround(const double latitude, const double longitude,
-                                      const double radius);
-      bool SetGround(Latitude latitude, Longitude longitude);
-      bool SetGround(const SurfacePoint & surfacePt);
+                                      const double radius, NaifContextPtr naif);
+      bool SetGround(Latitude latitude, Longitude longitude, NaifContextPtr naif);
+      bool SetGround(const SurfacePoint & surfacePt, NaifContextPtr naif);
       bool SetRightAscensionDeclination(const double ra, const double dec);
 
-      void LocalPhotometricAngles(Angle & phase, Angle & incidence,
+      void LocalPhotometricAngles(NaifContextPtr naif,
+                                  Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
 
-      void GetLocalNormal(double normal[3]);
+      void GetLocalNormal(double normal[3], NaifContextPtr naif);
 
       bool HasProjection();
       virtual bool IsBandIndependent();
       int ReferenceBand() const;
       bool HasReferenceBand() const;
-      virtual void SetBand(const int band);
+      virtual void SetBand(const int band, NaifContextPtr naif);
       virtual double Sample();
       int Band();
       virtual double Line();
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
-                       double &maxlon, Pvl &pvl);
+                       double &maxlon, Pvl &pvl, NaifContextPtr naif);
       bool ringRange(double &minRingRadius, double &maxRingRadius,
-                     double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
-      bool IntersectsLongitudeDomain(Pvl &pvl);
+                     double &minRingLongitude, double &maxRingLongitude, Pvl &pvl, NaifContextPtr naif);
+      bool IntersectsLongitudeDomain(Pvl &pvl, NaifContextPtr naif);
 
-      double PixelResolution();
-      double LineResolution();
-      double SampleResolution();
-      double DetectorResolution();
+      double PixelResolution(NaifContextPtr naif);
+      double LineResolution(NaifContextPtr naif);
+      double SampleResolution(NaifContextPtr naif);
+      double DetectorResolution(NaifContextPtr naif);
 
-      double ObliqueDetectorResolution();
-      double ObliqueSampleResolution();
-      double ObliqueLineResolution();
-      double ObliquePixelResolution();
+      double ObliqueDetectorResolution(NaifContextPtr naif);
+      double ObliqueSampleResolution(NaifContextPtr naif);
+      double ObliqueLineResolution(NaifContextPtr naif);
+      double ObliquePixelResolution(NaifContextPtr naif);
 
 
-      virtual double resolution();
-      double LowestImageResolution();
-      double HighestImageResolution();
-      double LowestObliqueImageResolution();
-      double HighestObliqueImageResolution();
+      virtual double resolution(NaifContextPtr naif);
+      double LowestImageResolution(NaifContextPtr naif);
+      double HighestImageResolution(NaifContextPtr naif);
+      double LowestObliqueImageResolution(NaifContextPtr naif);
+      double HighestObliqueImageResolution(NaifContextPtr naif);
 
-      void BasicMapping(Pvl &map);
-      void basicRingMapping(Pvl &map);
+      void BasicMapping(Pvl &map, NaifContextPtr naif);
+      void basicRingMapping(Pvl &map, NaifContextPtr naif);
 
       double FocalLength() const;
       double PixelPitch() const;
@@ -320,11 +322,12 @@ namespace Isis {
       int ParentLines() const;
       int ParentSamples() const;
 
-      double CelestialNorthClockAngle();
+      double CelestialNorthClockAngle(NaifContextPtr naif);
 
-      bool RaDecRange(double &minra, double &maxra,
+      bool RaDecRange(NaifContextPtr naif,
+                      double &minra, double &maxra,
                       double &mindec, double &maxdec);
-      double RaDecResolution();
+      double RaDecResolution(NaifContextPtr naif);
 
       CameraDistortionMap *DistortionMap();
       CameraFocalPlaneMap *FocalPlaneMap();
@@ -345,18 +348,18 @@ namespace Isis {
       void SetGroundMap(CameraGroundMap *map);
       void SetSkyMap(CameraSkyMap *map);
 
-      double NorthAzimuth();
-      double SunAzimuth();
-      double SpacecraftAzimuth();
-      double OffNadirAngle();
+      double NorthAzimuth(NaifContextPtr naif);
+      double SunAzimuth(NaifContextPtr naif);
+      double SpacecraftAzimuth(NaifContextPtr naif);
+      double OffNadirAngle(NaifContextPtr naif);
 
       static double GroundAzimuth(double glat, double glon, double slat,
                                   double slon);
 
       void IgnoreProjection(bool ignore);
 
-      void LoadCache();
-      std::pair< double, double > StartEndEphemerisTimes();
+      void LoadCache(NaifContextPtr naif);
+      std::pair< double, double > StartEndEphemerisTimes(NaifContextPtr naif);
       int CacheSize(double startTime, double endTime);
 
 
@@ -491,8 +494,8 @@ namespace Isis {
       void SetFocalLength(double v);
       void SetPixelPitch(double v);
 
-      void SetFocalLength();
-      void SetPixelPitch();
+      void SetFocalLength(NaifContextPtr naif);
+      void SetPixelPitch(NaifContextPtr naif);
 
       void SetGeometricTilingHint(int startSize = 128, int endSize = 8);
 
@@ -512,13 +515,13 @@ namespace Isis {
 
 
     private:
-      void GroundRangeResolution();
-      void ringRangeResolution();
-      double ComputeAzimuth(const double lat, const double lon);
-      bool RawFocalPlanetoImage();
+      void GroundRangeResolution(NaifContextPtr naif);
+      void ringRangeResolution(NaifContextPtr naif);
+      double ComputeAzimuth(const double lat, const double lon, NaifContextPtr naif);
+      bool RawFocalPlanetoImage(NaifContextPtr naif);
       // SetImage helper functions: 
       // bool SetImageNoProjection(const double sample, const double line); 
-      bool SetImageMapProjection(const double sample, const double line, ShapeModel *shape);
+      bool SetImageMapProjection(const double sample, const double line, ShapeModel *shape, NaifContextPtr naif);
       bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape); 
 
 

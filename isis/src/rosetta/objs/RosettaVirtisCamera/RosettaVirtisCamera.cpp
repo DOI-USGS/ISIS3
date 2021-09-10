@@ -35,7 +35,8 @@ namespace Isis {
    * 
    */
   RosettaVirtisCamera::RosettaVirtisCamera(Cube &cube) : LineScanCamera(cube) {
-    
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Visual and Infrared Thermal Imaging Spectrometer";
     m_instrumentNameShort = "VIRTIS";
     m_spacecraftNameLong = "Rosetta";
@@ -88,8 +89,8 @@ namespace Isis {
     instrumentRotation()->MinimizeCache(SpiceRotation::No);
 
     // Set up the camera info from ik/iak kernels
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get other info from labels
     PvlKeyword &frameParam = inst["FrameParameter"];
@@ -104,10 +105,10 @@ namespace Isis {
     //  Get the line scan rates/times
 
     if (!m_is1BCalibrated) {
-      readHouseKeeping(lab.fileName(), m_scanRate); 
+      readHouseKeeping(lab.fileName(), m_scanRate, naif); 
     }
     else {
-      readSCET(lab.fileName());
+      readSCET(lab.fileName(), naif);
     }
 
     new VariableLineScanCameraDetectorMap(this, m_lineRates);
@@ -117,10 +118,10 @@ namespace Isis {
     new CameraFocalPlaneMap(this, naifIkCode());
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(ikernKey);
+    double sampleBoreSight = getDouble(naif, ikernKey);
 
     ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(ikernKey);
+    double lineBoreSight = getDouble(naif, ikernKey);
     FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
     // Setup distortion map
@@ -131,7 +132,7 @@ namespace Isis {
     // Set initial start time always (label start time is inaccurate)
 
     if (!m_is1BCalibrated){
-      setTime(iTime(startTime())); 
+      setTime(iTime(startTime()), naif); 
     }
 
     //  Now check to determine if we have a cache already.  If we have a cache
@@ -139,14 +140,14 @@ namespace Isis {
     //  point table from the housekeeping data or articulation kernel.
     if (!instrumentRotation()->IsCached() && !hasArtCK && !m_is1BCalibrated) {
       // Create new table here prior to creating normal caches
-      Table quats = getPointingTable(frameId, virFrame);
+      Table quats = getPointingTable(frameId, virFrame, naif);
 
       // Create all system tables - all kernels closed after this
-      LoadCache();
-      instrumentRotation()->LoadCache(quats);
+      LoadCache(naif);
+      instrumentRotation()->LoadCache(quats, naif);
     }
     else {
-      LoadCache();
+      LoadCache(naif);
     }
 
 #if defined(DUMP_INFO)
@@ -290,7 +291,7 @@ namespace Isis {
    *
    * @history 2011-07-22 Kris Becker
    */
-  void RosettaVirtisCamera::readSCET(const QString &filename) {
+  void RosettaVirtisCamera::readSCET(const QString &filename, NaifContextPtr naif) {
    //  Open the ISIS table object
    std::vector<double> cacheTime; 
    Table hktable("VIRTISHouseKeeping", filename);
@@ -300,7 +301,7 @@ namespace Isis {
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
      QString scetString = trec["dataSCET"];
-     lineEndTime = getClockTime(scetString, naifSpkCode()).Et();
+     lineEndTime = getClockTime(naif, scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
                                           lineEndTime-exposureTime(),
                                           exposureTime()));
@@ -346,7 +347,7 @@ namespace Isis {
    * @history 2011-07-22 Kris Becker
    */
   void RosettaVirtisCamera::readHouseKeeping(const QString &filename,
-                                       double lineRate) {
+                                       double lineRate, NaifContextPtr naif) {
    //  Open the ISIS table object
    Table hktable("VIRTISHouseKeeping", filename);
 
@@ -361,7 +362,7 @@ namespace Isis {
      // Compute the optical mirror angle
      double mirrorSin = trec["M_MIRROR_SIN_HK"];
      double mirrorCos = trec["M_MIRROR_COS_HK"];
-     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
+     double scanElecDeg = atan(mirrorSin/mirrorCos) * naif->dpr_c();
      double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
      optAng /= 1000.0;
 
@@ -369,7 +370,7 @@ namespace Isis {
      ScanMirrorInfo smInfo;
      double lineMidTime;
      //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
-     lineMidTime = getClockTime(toString(scet), naifSpkCode()).Et();
+     lineMidTime = getClockTime(naif, toString(scet), naifSpkCode()).Et();
      bool isDark = (shutterMode == 1);
 
      // Add fit data for all open angles
@@ -448,7 +449,7 @@ namespace Isis {
    *   @history 2011-07-22 Kris Becker 
    */
   Table RosettaVirtisCamera::getPointingTable(const QString &virChannel,
-                                        const int zeroFrame)  {
+                                        const int zeroFrame, NaifContextPtr naif)  {
 
     // Create Spice Pointing table
     TableField q0("J2000Q0", TableField::Double);
@@ -491,16 +492,16 @@ namespace Isis {
       double optAng = m_mirrorData[index].m_opticalAngle;
       try {
         // J2000 -> ROS_VIRTIS-M_{channel}_ZERO
-        SMatrix state = getStateRotation("J2000", virZero, etTime);
+        SMatrix state = getStateRotation("J2000", virZero, etTime, naif);
 
         // Set rotation of optical scan mirror (in radians)
         eulang[1] = -optAng;
-        eul2xf_c(eulang, 1, 2, 3, xform);
-        mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
+        naif->eul2xf_c(eulang, 1, 2, 3, xform);
+        naif->mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
 
         // Transform to output format
-        xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
-        m2q_c(m, q_av);          // Transfers quaternion
+        naif->xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
+        naif->m2q_c(m, q_av);          // Transfers quaternion
 
         //  Now populate the table record with the line pointing
         for (int k = 0 ; k < nvals ; k++) {
@@ -524,7 +525,7 @@ namespace Isis {
     quats.Label() += PvlKeyword("CkTableOriginalSize", toString(quats.Records()));
 
     // Create the time dependant frames keyword
-    int virZeroId = getInteger("FRAME_" + virZero);
+    int virZeroId = getInteger(naif, "FRAME_" + virZero);
     PvlKeyword tdf("TimeDependentFrames", toString(virZeroId)); // ROS_VIRTIS_M_{ID}_ZERO
     tdf.addValue("-226200");  //  ROS_VIRTIS
     tdf.addValue("-226000");  //  ROSETTA_SPACECRAFT
@@ -537,7 +538,7 @@ namespace Isis {
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
-    ident_c(identity);
+    naif->ident_c(identity);
 
     //  Store DAWN_VIR_{ID}_ZERO -> DAWN_VIR_{ID}_ZERO identity rotation
     PvlKeyword crot("ConstantRotation");
@@ -571,25 +572,26 @@ namespace Isis {
 
   RosettaVirtisCamera::SMatrix RosettaVirtisCamera::getStateRotation(const QString &frame1,
                                                          const QString &frame2,
-                                                         const double &etTime)
+                                                         const double &etTime,
+                                                         NaifContextPtr naif)
                                                          const {
     SMatrix state(6,6);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
-               (SpiceDouble (*)[6]) state[0]);
-      NaifStatus::CheckErrors();
+      naif->sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+                    (SpiceDouble (*)[6]) state[0]);
+      naif->CheckErrors();
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
-                 (SpiceDouble (*)[3]) rot[0]);
-        NaifStatus::CheckErrors();
+        naif->pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+                      (SpiceDouble (*)[3]) rot[0]);
+        naif->CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
-        rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
-                 (SpiceDouble (*)[6]) state[0]);
+        naif->rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
+                      (SpiceDouble (*)[6]) state[0]);
       }
       catch (IException &ie2) {
         ostringstream mess;

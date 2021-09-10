@@ -42,12 +42,14 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   ThemisIrCamera::ThemisIrCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Thermal Emission Imaging System Infrared";
     m_instrumentNameShort = "Themis-IR";
     m_spacecraftNameLong = "Mars Odyssey";
     m_spacecraftNameShort = "Odyssey";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Set the detector size
     SetPixelPitch(0.05);
     SetFocalLength(203.9213);
@@ -58,7 +60,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
-    p_etStart = getClockTime(stime).Et();
+    p_etStart = getClockTime(naif, stime).Et();
 
     double offset = inst["SpacecraftClockOffset"];
     p_etStart += offset;
@@ -115,8 +117,8 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif>CheckErrors();
   }
 
 

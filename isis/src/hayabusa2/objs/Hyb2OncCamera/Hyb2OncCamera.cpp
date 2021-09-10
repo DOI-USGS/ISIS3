@@ -43,6 +43,8 @@ namespace Isis {
    * @internal
    */
   Hyb2OncCamera::Hyb2OncCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_spacecraftNameLong = "Hayabusa2";
     m_spacecraftNameShort = "Hayabusa2";
 
@@ -68,10 +70,10 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
-    SetFocalLength();  // Retrives from IK stored in units of mm
-    SetPixelPitch();  // Get from IAK
+    SetFocalLength(naif);  // Retrives from IK stored in units of mm
+    SetPixelPitch(naif);  // Get from IAK
 
     // Get the start time in et
     Pvl &lab = *cube.label();
@@ -79,7 +81,7 @@ namespace Isis {
 
     // set variables startTime and exposureDuration
     QString stime = inst["SpacecraftClockStartCount"];
-    iTime etStart = getClockTime(stime);
+    iTime etStart = getClockTime(naif, stime);
 
     double exposureDuration = ((double) inst["ExposureDuration"]);
     iTime centerTime  = etStart + (exposureDuration / 2.0);
@@ -88,8 +90,8 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     
     // BORESIGHT SAMPLE AND LINE still need to be added to the IAK 
-    double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double bLines = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
+    double bSamples = Spice::getDouble(naif,"INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
     
@@ -109,9 +111,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 

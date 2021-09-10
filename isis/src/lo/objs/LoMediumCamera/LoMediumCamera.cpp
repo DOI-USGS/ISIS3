@@ -50,7 +50,9 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   LoMediumCamera::LoMediumCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+    
+    naif->CheckErrors();
     
     m_instrumentNameLong = "Medium Resolution Camera";
     m_instrumentNameShort = "Medium";
@@ -100,8 +102,8 @@ namespace Isis {
     instrumentPosition()->SetAberrationCorrection("NONE");
 
     // Get the camera characteristics
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time in et
     double time = iTime((QString)inst["StartTime"]).Et();
@@ -148,9 +150,9 @@ namespace Isis {
     }
 
 
-    setTime(time);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(time, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

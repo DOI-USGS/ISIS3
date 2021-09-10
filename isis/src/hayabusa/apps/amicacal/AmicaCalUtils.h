@@ -43,9 +43,8 @@ namespace Isis {
  * bodies.
  */
 
-static void loadNaifTiming() {
-  auto naifState = NaifContext::get()->top();
-  if (!naifState->amicaTimingLoaded()) {
+static void loadNaifTiming(NaifContextPtr naif) {
+  if (!naif->amicaTimingLoaded()) {
 
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
@@ -65,17 +64,17 @@ static void loadNaifTiming() {
     QString pckName3(pck3.expanded());
     QString pckName4(pck4.expanded());
 
-    furnsh_c(leapsecondsName.toLatin1().data());
-    furnsh_c(sclkName.toLatin1().data());
+    naif->furnsh_c(leapsecondsName.toLatin1().data());
+    naif->furnsh_c(sclkName.toLatin1().data());
 
-    furnsh_c(pckName1.toLatin1().data());
-    furnsh_c(pckName2.toLatin1().data());
-    furnsh_c(pckName3.toLatin1().data());
-    furnsh_c(pckName4.toLatin1().data());
+    naif->furnsh_c(pckName1.toLatin1().data());
+    naif->furnsh_c(pckName2.toLatin1().data());
+    naif->furnsh_c(pckName3.toLatin1().data());
+    naif->furnsh_c(pckName4.toLatin1().data());
 
 
 //  Ensure it is loaded only once
-    naifState->set_amicaTimingLoaded(true);
+    naif->set_amicaTimingLoaded(true);
   }
   return;
 }
@@ -91,33 +90,34 @@ static void loadNaifTiming() {
  */
 static bool sunDistanceAU(const QString &scStartTime,
                           const QString &target,
+                          NaifContextPtr naif,
                           double &sunDist) {
 
   //  Ensure NAIF kernels are loaded
-  loadNaifTiming();
+  loadNaifTiming(naif);
   sunDist = 1.0;
 
   //  Determine if the target is a valid NAIF target
   SpiceInt tcode;
   SpiceBoolean found;
-  bodn2c_c(target.toLatin1().data(), &tcode, &found);
+  naif->bodn2c_c(target.toLatin1().data(), &tcode, &found);
 
   if (!found) return (false);
 
   //  Convert starttime to et
   double obsStartTime;
-  scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
+  naif->scs2e_c(-130, scStartTime.toLatin1().data(), &obsStartTime);
 
 
 
   //  Get the vector from target to sun and determine its length
   double sunv[3];
   double lt;
-  spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+  naif->spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                   sunv, &lt);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
 
-  double sunkm = vnorm_c(sunv);
+  double sunkm = naif->vnorm_c(sunv);
 
 
   //  Return in AU units
@@ -295,7 +295,7 @@ static double f_focused(double alpha,int binning,double x,double y) {
  *
  */
 
-static double f_unfocused(double * A,double * sigma, int N,int binning,double x,double y)  {
+static double f_unfocused(double * A,double * sigma, int N,int binning,double x,double y,NaifContextPtr naif)  {
 
 
   double X = binning*x;
@@ -304,8 +304,10 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
   double r = sqrt(X*X+Y*Y);
   double sum = 0;
 
+  double pi = naif->pi_c();
+
   for (int i = 0; i < N; i ++)   {     
-    sum += (A[i]/(sigma[i]*sqrt(2.0*pi_c() ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
+    sum += (A[i]/(sigma[i]*sqrt(2.0*pi ) ) )*exp(-(r*r)/(2*sigma[i]*sigma[i]) );
   }
 
 
@@ -332,7 +334,7 @@ static double f_unfocused(double * A,double * sigma, int N,int binning,double x,
  * @param binning
  * @return @b double * A pointer to a [size x size] matrix of light distribution values.
  */
-double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int binning) {
+double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int binning, NaifContextPtr naif) {
 
 
   double * psfVals = new double[size*size];
@@ -346,7 +348,7 @@ double * setPSFFilter(int size, double *A,double *sigma, double alpha,int N,int 
          i++;
        }
        else {
-         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y) +f_focused(alpha,binning,x,y);                 
+         psfVals[i]=f_unfocused(A,sigma,N,binning,x,y,naif) +f_focused(alpha,binning,x,y);                 
          i++;
        }      
     }

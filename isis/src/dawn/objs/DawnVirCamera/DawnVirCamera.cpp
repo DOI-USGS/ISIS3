@@ -35,7 +35,8 @@ namespace Isis {
    * 
    */
   DawnVirCamera::DawnVirCamera(Cube &cube) : LineScanCamera(cube) {
-    
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Visual and Infrared Spectrometer";
     m_instrumentNameShort = "VIR";
     m_spacecraftNameLong = "Dawn";
@@ -75,8 +76,8 @@ namespace Isis {
     instrumentRotation()->MinimizeCache(SpiceRotation::No);
 
     // Set up the camera info from ik/iak kernels
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get other info from labels
     PvlKeyword &frameParam = inst["FrameParameter"];
@@ -86,7 +87,7 @@ namespace Isis {
 
     // Setup detector map
     //  Get the line scan rates/times
-    readHouseKeeping(lab.fileName(), m_scanRate);
+    readHouseKeeping(lab.fileName(), m_scanRate, naif);
     new VariableLineScanCameraDetectorMap(this, m_lineRates);
     DetectorMap()->SetDetectorSampleSumming(m_summing);
 
@@ -95,10 +96,10 @@ namespace Isis {
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(ikernKey);
+    double sampleBoreSight = getDouble(naif, ikernKey);
 
     ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(ikernKey);
+    double lineBoreSight = getDouble(naif, ikernKey);
 
     FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
@@ -110,7 +111,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     // Set initial start time always (label start time is inaccurate)
-    setTime(iTime(startTime()));    // Isis3nightly
+    setTime(iTime(startTime()), naif);    // Isis3nightly
 //      SetEphemerisTime(startTime());  // Isis3.2.1
 
     //  Now check to determine if we have a cache already.  If we have a cache
@@ -119,14 +120,14 @@ namespace Isis {
     if (!instrumentRotation()->IsCached() && !hasArtCK) {
 
       // Create new table here prior to creating normal caches
-      Table quats = getPointingTable(channelId, virFrame);
+      Table quats = getPointingTable(channelId, virFrame, naif);
 
       // Create all system tables - all kernels closed after this
-      LoadCache();
-      instrumentRotation()->LoadCache(quats);
+      LoadCache(naif);
+      instrumentRotation()->LoadCache(quats, naif);
     }
     else {
-      LoadCache();
+      LoadCache(naif);
     }
 
 #if defined(DUMP_INFO)
@@ -298,7 +299,7 @@ namespace Isis {
    * @history 2011-07-22 Kris Becker
    */
   void DawnVirCamera::readHouseKeeping(const QString &filename,
-                                       double lineRate) {
+                                       double lineRate, NaifContextPtr naif) {
    //  Open the ISIS table object
    Table hktable("VIRHouseKeeping", filename);
 
@@ -313,15 +314,15 @@ namespace Isis {
      // Compute the optical mirror angle
      double mirrorSin = trec["MirrorSin"];
      double mirrorCos = trec["MirrorCos"];
-     double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
+     double scanElecDeg = atan(mirrorSin/mirrorCos) * naif->dpr_c();
      double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
      optAng /= 1000.0;
 
 
      ScanMirrorInfo smInfo;
      double lineMidTime;
-     //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
-     lineMidTime = getClockTime(scet, naifSpkCode()).Et();
+     //  naif->scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
+     lineMidTime = getClockTime(naif, scet, naifSpkCode()).Et();
      bool isDark = shutterMode.toLower() == "closed";
 
      // Add fit data for all open angles
@@ -400,7 +401,7 @@ namespace Isis {
    *   @history 2011-07-22 Kris Becker 
    */
   Table DawnVirCamera::getPointingTable(const QString &virChannel,
-                                        const int zeroFrame)  {
+                                        const int zeroFrame, NaifContextPtr naif)  {
 
     // Create Spice Pointing table
     TableField q0("J2000Q0", TableField::Double);
@@ -444,16 +445,16 @@ namespace Isis {
       double optAng = m_mirrorData[index].m_opticalAngle;
       try {
         // J2000 -> DAWN_VIR_{channel}_ZERO
-        SMatrix state = getStateRotation("J2000", virZero, etTime);
+        SMatrix state = getStateRotation("J2000", virZero, etTime, naif);
 
         // Set rotation of optical scan mirror (in radians)
         eulang[1] = -optAng;
-        eul2xf_c(eulang, 1, 2, 3, xform);
-        mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
+        naif->eul2xf_c(eulang, 1, 2, 3, xform);
+        naif->mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
 
         // Transform to output format
-        xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
-        m2q_c(m, q_av);          // Transfers quaternion
+        naif->xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
+        naif->m2q_c(m, q_av);          // Transfers quaternion
 
         //  Now populate the table record with the line pointing
         for (int k = 0 ; k < nvals ; k++) {
@@ -477,7 +478,7 @@ namespace Isis {
     quats.Label() += PvlKeyword("CkTableOriginalSize", toString(quats.Records()));
 
     // Create the time dependant frames keyword
-    int virZeroId = getInteger("FRAME_" + virZero);
+    int virZeroId = getInteger(naif, "FRAME_" + virZero);
     PvlKeyword tdf("TimeDependentFrames", toString(virZeroId)); // DAWN_VIR_{ID}_ZERO
     tdf.addValue("-203200");  // DAWN_VIR
     tdf.addValue("-203000");  // DAWN_SPACECRAFT
@@ -490,7 +491,7 @@ namespace Isis {
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
-    ident_c(identity);
+    naif->ident_c(identity);
 
     //  Store DAWN_VIR_{ID}_ZERO -> DAWN_VIR_{ID}_ZERO identity rotation
     PvlKeyword crot("ConstantRotation");
@@ -524,25 +525,26 @@ namespace Isis {
 
   DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const QString &frame1,
                                                          const QString &frame2,
-                                                         const double &etTime)
+                                                         const double &etTime,
+                                                         NaifContextPtr naif)
                                                          const {
     SMatrix state(6,6);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+      naif->sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
-      NaifStatus::CheckErrors();
+      naif->CheckErrors();
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
-                 (SpiceDouble (*)[3]) rot[0]);
-        NaifStatus::CheckErrors();
+        naif->pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+                      (SpiceDouble (*)[3]) rot[0]);
+        naif->CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
-        rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
-                 (SpiceDouble (*)[6]) state[0]);
+        naif->rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
+                      (SpiceDouble (*)[6]) state[0]);
       }
       catch (IException &ie2) {
         ostringstream mess;

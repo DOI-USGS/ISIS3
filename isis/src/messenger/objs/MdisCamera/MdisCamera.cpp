@@ -62,10 +62,12 @@ namespace Isis {
    *
    */
   MdisCamera::MdisCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_spacecraftNameLong = "Messenger";
     m_spacecraftNameShort = "Messenger";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     
     // Set up detector constants
     // Note that Wac has filters, -236800 through -236812
@@ -130,19 +132,19 @@ namespace Isis {
 
     // Fetch the frame translations from the instrument kernels
     ikernKey = "INS" + ikCode + "_REFERENCE_FRAME";
-    QString baseFrame = getString(ikernKey);
+    QString baseFrame = getString(naif, ikernKey);
 
     ikernKey = "INS" + filterCode + "_FRAME";
-    QString ikFrame = getString(ikernKey);
+    QString ikFrame = getString(naif, ikernKey);
 
     // Set up the camera info from ik/iak kernels
 
     //  Turns out (2008-01-17) the WAC has different focal lengths for
     // each filter.  Added to the instrument kernel (IAK) on this date.
     //  Add temperature dependant focal length
-    SetFocalLength(computeFocalLength(filterCode, lab));
+    SetFocalLength(computeFocalLength(filterCode, lab, naif));
 
-    SetPixelPitch();
+    SetPixelPitch(naif);
 
     // Removed by Jeff Anderson.  The refactor of the SPICE class
     // uses frames always so this is no longer needed
@@ -156,7 +158,7 @@ namespace Isis {
     QString stime = inst["SpacecraftClockCount"];
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;// divide by 1000 to convert to seconds
 
-    iTime etStart = getClockTime(stime);
+    iTime etStart = getClockTime(naif, stime);
 
     //  Setup camera detector map
     CameraDetectorMap *detMap = new CameraDetectorMap(this);
@@ -167,10 +169,10 @@ namespace Isis {
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + ikCode + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(ikernKey);
+    double sampleBoreSight = getDouble(naif, ikernKey);
 
     ikernKey = "INS" + ikCode + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(ikernKey);
+    double lineBoreSight = getDouble(naif, ikernKey);
 
     //  Apply the boresight
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
@@ -241,9 +243,9 @@ namespace Isis {
     // creating the cache since all kernels are unloaded, essentially
     // clearing the pool and whacking the frames definitions, required to
     iTime centerTime = etStart + (exposureDuration / 2.0);
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 
@@ -304,7 +306,8 @@ namespace Isis {
  * @return double    Computed temperature dependant focal length
  */
   double MdisCamera::computeFocalLength(const QString &filterCode,
-                                        Pvl &label) {
+                                        Pvl &label,
+                                        NaifContextPtr naif) {
 
     double focalLength(0.0);
     QString tdflKey("TempDependentFocalLength");
@@ -321,13 +324,13 @@ namespace Isis {
       //  IK containing polynomial parameters is not in use.
 
     // Original Code ensures backward compatibility
-      focalLength = getDouble("INS" + filterCode + "_FOCAL_LENGTH");
+      focalLength = getDouble(naif, "INS" + filterCode + "_FOCAL_LENGTH");
 
       //  Check for disabling of temperature dependent focal length
       bool tdfl_disabled(false);
 #ifndef DISABLE_TDFL_DISABLING
       try {
-        IString tdfl_state = getString("DISABLE_MDIS_TD_FOCAL_LENGTH");
+        IString tdfl_state = getString(naif, "DISABLE_MDIS_TD_FOCAL_LENGTH");
         tdfl_disabled = ( "TRUE" == tdfl_state.UpCase() );
       }
       catch (IException &ie) {
@@ -347,7 +350,7 @@ namespace Isis {
           QString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
           //  Compute 5th order polynomial
           for (int i = 0 ; i < 6 ;  i++) {
-            fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);
+            fl += getDouble(naif, fptCoeffs, i) * pow(fpTemp, (double) i);
           }
 
           // Store computed focal length

@@ -53,7 +53,8 @@ namespace Isis {
     m_spacecraftNameLong = "Mars Odyssey";
     m_spacecraftNameShort = "Odyssey";
     
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+    naif->CheckErrors();
     // Set up the camera characteristics
     // LoadFrameMounting("M01_SPACECRAFT","M01_THEMIS_VIS");
     // Changed Focal Length from 203.9 (millimeters????) to 202.059, per request from
@@ -79,7 +80,7 @@ namespace Isis {
     // Get the start and end time
     double et;
     QString stime = inst["SpacecraftClockCount"];
-    et = getClockTime(stime).Et();
+    et = getClockTime(naif, stime).Et();
 
     double offset = inst["SpacecraftClockOffset"];
     p_etStart = et + offset - ((p_exposureDur / 1000.0) / 2.0);
@@ -119,8 +120,8 @@ namespace Isis {
     new PushFrameCameraGroundMap(this, evenFramelets);
     new CameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
   
 
@@ -134,12 +135,12 @@ namespace Isis {
    *
    * @param vband The band number to set
    */
-  void ThemisVisCamera::SetBand(const int vband) {
-    Camera::SetBand(vband);
+  void ThemisVisCamera::SetBand(const int vband, NaifContextPtr naif) {
+    Camera::SetBand(vband, naif);
 
     // Set the et
     double et = p_etStart + BandEphemerisTimeOffset(vband);
-    setTime(et);
+    setTime(et, naif);
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
     dmap->SetStartTime(et);
   }

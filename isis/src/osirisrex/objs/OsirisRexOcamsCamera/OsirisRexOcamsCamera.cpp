@@ -43,8 +43,9 @@ namespace Isis {
    * @param lab Pvl label from an Osiris Rex MapCam image.
    */
   OsirisRexOcamsCamera::OsirisRexOcamsCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     m_spacecraftNameLong = "OSIRIS-REx";
     m_spacecraftNameShort = "OSIRIS-REx";
@@ -84,16 +85,16 @@ namespace Isis {
     }
 
     QString focalLength = "INS" + ikCode + "_FOCAL_LENGTH";
-    SetFocalLength(getDouble(focalLength));
+    SetFocalLength(getDouble(naif, focalLength));
 
     // The instrument kernel contains pixel pitch in microns, so convert it to mm.
     QString pitch = "INS" + ikCode + "_PIXEL_SIZE";
-    SetPixelPitch(getDouble(pitch) / 1000.0);
+    SetPixelPitch(getDouble(naif, pitch) / 1000.0);
 
     // Get the start time in et
     // Set the observation time and exposure duration
     QString clockCount = inst["SpacecraftClockStartCount"];
-    double startTime = getClockTime(clockCount).Et();
+    double startTime = getClockTime(naif, clockCount).Et();
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(startTime, exposureDuration);
 
@@ -110,8 +111,8 @@ namespace Isis {
     // The instrument kernel contains a CCD_CENTER keyword instead of BORESIGHT_LINE
     // and BORESIGHT_SAMPLE keywords.
     focalMap->SetDetectorOrigin(
-        Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 0) + 1.0,
-        Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
+        Spice::getDouble(naif, "INS" + ikCode + "_CCD_CENTER", 0) + 1.0,
+        Spice::getDouble(naif, "INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
 
     // Setup distortion map
     OsirisRexDistortionMap *distortionMap = new OsirisRexDistortionMap(this);
@@ -125,9 +126,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 

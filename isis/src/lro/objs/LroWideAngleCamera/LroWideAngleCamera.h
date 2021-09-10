@@ -119,8 +119,8 @@ namespace Isis {
       DblParameterList p_boreSightSample;
       DblParameterList p_boreSightLine;
 
-      int PoolKeySize(const QString &key) const;
-      IntParameterList GetVector(const QString &key);
+      int PoolKeySize(const QString &key, NaifContextPtr naif) const;
+      IntParameterList GetVector(const QString &key, NaifContextPtr naif);
   };
 }  // namespace Isis
 #endif

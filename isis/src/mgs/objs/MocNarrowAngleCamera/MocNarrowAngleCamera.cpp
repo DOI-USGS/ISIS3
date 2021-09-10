@@ -42,23 +42,25 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MocNarrowAngleCamera::MocNarrowAngleCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Mars Orbiter Camera Narrow Angle";
     m_instrumentNameShort = "MOC-NA";
     m_spacecraftNameLong = "Mars Global Surveyor";
     m_spacecraftNameShort = "MGS";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Set up the camera info from ik/iak kernels
     //      LoadEulerMounting();
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
     instrumentRotation()->SetTimeBias(-1.15);
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
-    double etStart = getClockTime(stime).Et();
+    double etStart = getClockTime(naif, stime).Et();
 
     // Get other info from labels
     double csum = inst["CrosstrackSumming"];
@@ -87,8 +89,8 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 }
 

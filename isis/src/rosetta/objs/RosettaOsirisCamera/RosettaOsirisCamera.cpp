@@ -51,12 +51,14 @@ namespace Isis {
    */
 
   RosettaOsirisCamera::RosettaOsirisCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Optical, Spectroscopic, and Infrared Remote Imaging System";
     m_instrumentNameShort = "OSIRIS";
     m_spacecraftNameLong = "Rosetta";
     m_spacecraftNameShort = "Rosetta";
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -67,14 +69,14 @@ namespace Isis {
     QString ikCode =  toString(naifIkCode());
 
     QString fl = "INS" + ikCode + "_FOCAL_LENGTH";
-    double focalLength = Spice::getDouble(fl);
+    double focalLength = Spice::getDouble(naif, fl);
     SetFocalLength(focalLength);
 
     // For setting the pixel pitch, the Naif keyword PIXEL_SIZE is used instead of the ISIS
     // default of PIXEL_PITCH, so set the value directly.  Needs to be converted from microns to mm.
     QString pp = "INS" + ikCode + "_PIXEL_SIZE";
 
-    double pixelPitch = Spice::getDouble(pp);
+    double pixelPitch = Spice::getDouble(naif, pp);
     pixelPitch /= 1000.0;
     SetPixelPitch(pixelPitch);
 
@@ -102,7 +104,7 @@ namespace Isis {
 
     // Setup clock start and stop times.
     QString clockStartCount = inst["SpacecraftClockStartCount"];
-    double start = getClockTime(clockStartCount).Et();
+    double start = getClockTime(naif, clockStartCount).Et();
     // QString clockStopCount = inst["SpacecraftClockStopCount"];
     // double stop = getClockTime(clockStopCount).Et();
     double exposureTime = (double) inst["ExposureDuration"];
@@ -110,13 +112,13 @@ namespace Isis {
     // Setup the distortion map
     PvlGroup &BandBin = lab.findGroup("BandBin", Pvl::Traverse);
     QString filterNumber = BandBin["FilterNumber"];
-    initDistortion(ikCode, distortionMap);
+    initDistortion(ikCode, distortionMap, naif);
     distortionMap->setPixelPitch(pixelPitch);
 
     // The boresight position depends on the filter. They are all defined as
     // offsets from the middle of the ccd.
-    double referenceSample = Spice::getDouble("INS" + ikCode + "_BORESIGHT",0) + 1.0;
-    double referenceLine = Spice::getDouble("INS" + ikCode + "_BORESIGHT",1) + 1.0;
+    double referenceSample = Spice::getDouble(naif, "INS" + ikCode + "_BORESIGHT",0) + 1.0;
+    double referenceLine = Spice::getDouble(naif, "INS" + ikCode + "_BORESIGHT",1) + 1.0;
     // The offsets in the IAK are based on the S/C frame, not the camera frame
     // For now, do not adjust based on filter. -JAM
 //     referenceSample += Spice::getDouble("INS" + ikCode + "_FILTER_" + filterNumber + "_DX");
@@ -125,11 +127,11 @@ namespace Isis {
     distortionMap->setBoresight(referenceSample, referenceLine);
 
     iTime centerTime = start + (exposureTime / 2.0);
-    setTime( centerTime );
+    setTime( centerTime, naif );
 
     // Internalize all the NAIF SPICE information into memory.
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
 
     return;
   }
@@ -166,7 +168,8 @@ namespace Isis {
    * @param[out] distortionMap The distortion map that will be initialized
    */
   void RosettaOsirisCamera::initDistortion(QString ikCode,
-                                           RosettaOsirisCameraDistortionMap *distortionMap) {
+                                           RosettaOsirisCameraDistortionMap *distortionMap,
+                                           NaifContextPtr naif) {
 
     // Initialize matrices
     LinearAlgebra::Matrix toUnDistX = LinearAlgebra::zeroMatrix(4, 4);
@@ -175,8 +178,8 @@ namespace Isis {
     // Fill matrices from the kernels
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        toUnDistX(i, j) = Spice::getDouble("INS" + ikCode + "_TO_UNDISTORTED_X", 4 * i + j);
-        toUnDistY(i, j) = Spice::getDouble("INS" + ikCode + "_TO_UNDISTORTED_Y", 4 * i + j);
+        toUnDistX(i, j) = Spice::getDouble(naif, "INS" + ikCode + "_TO_UNDISTORTED_X", 4 * i + j);
+        toUnDistY(i, j) = Spice::getDouble(naif, "INS" + ikCode + "_TO_UNDISTORTED_Y", 4 * i + j);
       }
     }
 

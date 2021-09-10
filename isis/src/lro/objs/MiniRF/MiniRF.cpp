@@ -31,6 +31,8 @@
 #include "RadarSlantRangeMap.h"
 #include "RadarGroundMap.h"
 #include "RadarSkyMap.h"
+#include "NaifContext.h"
+#include "NaifContextCast.h"
 
 using namespace std;
 
@@ -69,6 +71,8 @@ namespace Isis {
       QString msg = "Cube does not appear to be a mini RF image";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    auto naif = NaifContext::acquire();
 
     // Get the ground range resolution (ScaledPixelHeight and ScaledPixelWidth
     // are expected to be equal - mrf2isis checks for this)
@@ -110,7 +114,7 @@ namespace Isis {
     // PDS labels are updated. Right now, the mrf2isis program is putting
     // a frequency value in the labels based on the instrument mode id.
     double frequency = (double) inst["Frequency"]; // units are htz
-    double waveLength = clight_c() / frequency;    // units are km/sec/htz
+    double waveLength = naif->clight_c() / frequency;    // units are km/sec/htz
 
     // Setup map from image(sample,line) to radar(sample,time)
     new RadarPulseMap(this, etStart, lineRate);
@@ -149,38 +153,38 @@ namespace Isis {
     // Must be done last as the naif kernels will be unloaded
     double etEnd = etStart + this->ParentLines() * lineRate + lineRate;
     etStart = etStart - lineRate;
-    double tol = PixelResolution() / 100.;
+    double tol = PixelResolution(naif) / 100.;
 
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
-      setTime(etMid);
-      tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 100.;
+      setTime(etMid, naif);
+      tol = PixelPitch() * SpacecraftAltitude(naif) / FocalLength() / 100.;
     }
-    Spice::createCache(etStart, etEnd, this->ParentLines() + 1, tol);
-    setTime(etMid);
+    Spice::createCache(etStart, etEnd, this->ParentLines() + 1, tol, naif);
+    setTime(etMid, naif);
     SpiceRotation *bodyFrame = this->bodyRotation();
     SpicePosition *spaceCraft = this->instrumentPosition();
 
     SpiceDouble Ssc[6];
     // Load the state into Ssc
-    vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), Ssc);
-    vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), Ssc + 3);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), Ssc);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), Ssc + 3);
     // Create the J2000 to body-fixed state transformation matrix BJ
     SpiceDouble BJ[6][6];
-    rav2xf_c(&(bodyFrame->Matrix()[0]), (SpiceDouble *) & (bodyFrame->AngularVelocity()[0]), BJ);
+    naif->rav2xf_c(&(bodyFrame->Matrix(naif)[0]), (SpiceDouble *) & (bodyFrame->AngularVelocity()[0]), BJ);
     // Rotate the spacecraft state from J2000 to body-fixed
-    mxvg_c(BJ, Ssc, 6, 6, Ssc);
+    naif->mxvg_c(BJ, Ssc, 6, 6, Ssc);
     // Extract the body-fixed position and velocity
     double Vsc[3];
     double Xsc[3];
-    vequ_c(Ssc, Xsc);
-    vequ_c(Ssc + 3, Vsc);
+    naif->vequ_c(Ssc, Xsc);
+    naif->vequ_c(Ssc + 3, Vsc);
 
     Isis::Distance radii[3];
     this->radii(radii);
     double R = radii[0].kilometers();
     double height = sqrt(Xsc[0] * Xsc[0] + Xsc[1] * Xsc[1] + Xsc[2] * Xsc[2]) - R;
-    double speed = vnorm_c(Vsc);
+    double speed = naif->vnorm_c(Vsc);
     double dopplerSigma = 2.0 * speed * azimuthResolution / (waveLength *
                           height / cos(incidenceAngle)) * 100.;
     groundMap->SetDopplerSigma(dopplerSigma);

@@ -51,6 +51,8 @@ using json = nlohmann::json;
 #include "Target.h"
 #include "Blob.h"
 
+#include "NaifContextCast.h"
+
 using namespace std;
 
 namespace Isis {
@@ -383,7 +385,7 @@ namespace Isis {
     if (m_usingAle) {
       m_sunPosition->LoadCache(isd["SunPosition"], naif);
       m_bodyRotation->LoadCache(isd["BodyRotation"], naif);
-      solarLongitude();
+      solarLongitude(naif);
     }
     else if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
       Table t("SunPosition", lab.fileName(), lab);
@@ -396,7 +398,7 @@ namespace Isis {
             Angle::Degrees);
       }
       else {
-        solarLongitude();
+        solarLongitude(naif);
       }
     }
     
@@ -423,7 +425,7 @@ namespace Isis {
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
     else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+     m_instrumentRotation->LoadCache(isd["InstrumentPointing"], naif);
     }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
@@ -1490,7 +1492,7 @@ namespace Isis {
    *
    * @return @b double The Solar Longitude
    */
-  Longitude Spice::solarLongitude() {
+  Longitude Spice::solarLongitude(NaifContextPtr naif) {
     if (m_et) {
       computeSolarLongitude(*m_et, naif);
       return *m_solarLongitude;

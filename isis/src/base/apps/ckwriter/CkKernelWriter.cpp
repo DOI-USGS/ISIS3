@@ -40,6 +40,8 @@
 #include "CkSpiceSegment.h"
 #include "TextFile.h"
 
+#include "NaifContextCast.h"
+
 using namespace std;
 
 namespace Isis {
@@ -48,12 +50,12 @@ namespace Isis {
    init();
  }
 
- CkKernelWriter::CkKernelWriter(const QString &kfile, const int &csize,
+ CkKernelWriter::CkKernelWriter(NaifContextPtr naif, const QString &kfile, const int &csize,
                                 const int &cktype) {
    init();
    setCommentSize(csize);
    setType(cktype);
-   open(kfile);
+   open(naif, kfile);
  }
 
  void CkKernelWriter::init() {
@@ -74,47 +76,48 @@ namespace Isis {
    return;
  }
 
- bool CkKernelWriter::addComment(const QString &comment) {
-   return (writeComment(comment));
+ bool CkKernelWriter::addComment(const QString &comment, NaifContextPtr naif) {
+   return (writeComment(comment, naif));
  }
 
- bool CkKernelWriter::addCommentFile(const QString &comfile) {
+ bool CkKernelWriter::addCommentFile(const QString &comfile, NaifContextPtr naif) {
    TextFile t(comfile);
    QString comment;
    bool lastWrite(true);
    while ( t.GetLine(comment, false) ) {
      if ( comment.size() == 0 ) comment.push_back('\n');
-     lastWrite = writeComment(comment);
+     lastWrite = writeComment(comment, naif);
    }
    return (lastWrite);
  }
 
- void CkKernelWriter::open(const QString &kfile,
+ void CkKernelWriter::open(NaifContextPtr naif,
+                           const QString &kfile,
                            const QString &intCkName) {
-   NaifStatus::CheckErrors();
+   naif->CheckErrors();
    FileName kf(kfile);
    if ( kf.fileExists() ) {
      QString full_kf = kf.expanded();
      QFile::remove(full_kf);
    }
    SpiceInt  myHandle;
-   ckopn_c(kf.expanded().toLatin1().data(), intCkName.toLatin1().data(), _comSize, &myHandle);
+   naif->ckopn_c(kf.expanded().toLatin1().data(), intCkName.toLatin1().data(), _comSize, &myHandle);
    _handle = myHandle;
 
-   NaifStatus::CheckErrors();
+   naif->CheckErrors();
    return;
  }
 
- void CkKernelWriter::write(const CkSpiceSegment &segment) const {
+ void CkKernelWriter::write(const CkSpiceSegment &segment, NaifContextPtr naif) const {
    switch ( _ckType ) {
      case 1:
-       writeCk1(segment);
+       writeCk1(segment, naif);
        break;
      case 2:
-       writeCk2(segment);
+       writeCk2(segment, naif);
        break;
      case 3:
-       writeCk3(segment);
+       writeCk3(segment, naif);
        break;
      default:
        string mess = "Selected CK type (" + IString(_ckType) +
@@ -126,7 +129,7 @@ namespace Isis {
  }
 
  /** Writes a comment to an opened NAIF kernel file */
- bool CkKernelWriter::writeComment(const QString &comment) const {
+ bool CkKernelWriter::writeComment(const QString &comment, NaifContextPtr naif) const {
    if ( _handle == 0 ) {
      string mess = "Comments cannot be written as the file is not open";
      throw IException(IException::Programmer, mess, _FILEINFO_);
@@ -136,13 +139,13 @@ namespace Isis {
    // Calling environments can decide how to handle it.
    try {
      QString commOut;
-     NaifStatus::CheckErrors();
+     naif->CheckErrors();
      for ( int i = 0 ; i < comment.size() ; i++ ) {
         if ( comment[i] == '\n' ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
+          naif->dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
           _comCharsWritten += commOut.size();
-          NaifStatus::CheckErrors();
+          naif->CheckErrors();
           commOut.clear();
         }
         else {
@@ -153,9 +156,9 @@ namespace Isis {
      // See if there is residual to write
      if ( commOut.size() > 0 ) {
        while ( commOut.size() < 2 ) { commOut.append(" "); }
-       dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
+       naif->dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
        _comCharsWritten += commOut.size();
-       NaifStatus::CheckErrors();
+       naif->CheckErrors();
      }
    } catch (IException &) {
      return (false);
@@ -165,17 +168,17 @@ namespace Isis {
  }
 
  /** Close an opened kernel file */
- void CkKernelWriter::close() {
+ void CkKernelWriter::close(NaifContextPtr naif) {
    if ( _handle != 0 ) {
-     NaifStatus::CheckErrors();
-     ckcls_c(_handle);
-     NaifStatus::CheckErrors();
+     naif->CheckErrors();
+     naif->ckcls_c(_handle);
+     naif->CheckErrors();
      _handle = 0;
    }
    return;
  }
 
-  void CkKernelWriter::writeCk1(const CkSpiceSegment &segment) const {
+  void CkKernelWriter::writeCk1(const CkSpiceSegment &segment, NaifContextPtr naif) const {
 
     const CkSpiceSegment::SVector &sclks = segment.SCLKTimes();
     const CkSpiceSegment::SMatrix &quats = segment.Quaternions();
@@ -190,15 +193,15 @@ namespace Isis {
 
     int nrecs = segment.size();
 
-    NaifStatus::CheckErrors();
-    ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
-             quats[0], avvs);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+                   refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
+                   quats[0], avvs);
+    naif->CheckErrors();
     return;
   }
 
-  void CkKernelWriter::writeCk2(const CkSpiceSegment &segment) const {
+  void CkKernelWriter::writeCk2(const CkSpiceSegment &segment, NaifContextPtr naif) const {
 
     if ( !segment.hasAngularVelocities() ) {
       QString mess = "Type 2 CK kernels require angular velocities";
@@ -220,16 +223,16 @@ namespace Isis {
     }
     stops[nrecs-1] = sclks[nrecs-1];
     CkSpiceSegment::SVector rates(nrecs, segment.TickRate());
-    NaifStatus::CheckErrors();
-    ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toLatin1().data(), segId.toLatin1().data(), nrecs, &sclks[0],
-             &stops[0], quats[0], avvs[0], &rates[0]);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+                   refFrame.toLatin1().data(), segId.toLatin1().data(), nrecs, &sclks[0],
+                   &stops[0], quats[0], avvs[0], &rates[0]);
+    naif->CheckErrors();
     return;
   }
 
 
-  void CkKernelWriter::writeCk3(const CkSpiceSegment &segment) const {
+  void CkKernelWriter::writeCk3(const CkSpiceSegment &segment, NaifContextPtr naif) const {
 
     const CkSpiceSegment::SVector &sclks = segment.SCLKTimes();
     const CkSpiceSegment::SMatrix &quats = segment.Quaternions();
@@ -245,13 +248,13 @@ namespace Isis {
     int nrecs = segment.size();
 
     segment.FurnshKernelType("FK");
-    NaifStatus::CheckErrors();
-    ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
-             quats[0], avvs, 1, &sclks[0]);
+    naif->CheckErrors();
+    naif->ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
+                   refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
+                   quats[0], avvs, 1, &sclks[0]);
     segment.UnloadKernelType("FK");
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     return;
   }
 

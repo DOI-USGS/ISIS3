@@ -57,17 +57,17 @@ CkSpiceSegment::CkSpiceSegment() {
 }
 
 /** Construct with an ISIS cube file */
-CkSpiceSegment::CkSpiceSegment(const QString &fname) {
+CkSpiceSegment::CkSpiceSegment(NaifContextPtr naif, const QString &fname) {
   init();
   Cube cube;
   cube.open(fname);
-  import(cube);
+  import(naif, cube);
 }
 
 /** Construct with a Cube and optional naming of table */
-CkSpiceSegment::CkSpiceSegment(Cube &cube, const QString &tblname) {
+CkSpiceSegment::CkSpiceSegment(NaifContextPtr naif, Cube &cube, const QString &tblname) {
   init();
-  import(cube, tblname);
+  import(naif, cube, tblname);
 }
 
 /** Set the name of the CK SPICE segment */
@@ -163,12 +163,12 @@ QString CkSpiceSegment::getKeyValue(PvlObject &label,
   return (value);
 }
 
-void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
+void CkSpiceSegment::import(NaifContextPtr naif, Cube &cube, const QString &tblname) {
 
   _fname = cube.fileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   try {
 
     // Order is somewhat important here.  The call to initialize Kernels
@@ -211,7 +211,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
      _camVersion = _kernels.CameraVersion();
 
     //  Get the SPICE data
-    Table ckCache = camera->instrumentRotation()->LineCache(tblname);
+    Table ckCache = camera->instrumentRotation()->LineCache(tblname, naif);
     SMatrix spice = load(ckCache);
 
     _quats = getQuaternions(spice);
@@ -229,15 +229,16 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
     SVector sclks;
-    getRotationMatrices(cube, *camera, ckCache, lmats, rmats, sclks);
+    getRotationMatrices(naif, cube, *camera, ckCache, lmats, rmats, sclks);
     SMatrix ckQuats, ckAvvs;
-    convert(_quats, _avvs, lmats, rmats, ckQuats, ckAvvs);
+    convert(_quats, _avvs, lmats, rmats, ckQuats, ckAvvs, naif);
 
     // Compute small increment to pad each end
     const double Epsilon(3.0e-3);
-    double topSclk = ETtoSCLK(camera->naifSclkCode(), _times[0] - Epsilon);
+    double topSclk = ETtoSCLK(camera->naifSclkCode(), _times[0] - Epsilon, naif);
     double botSclk = ETtoSCLK(camera->naifSclkCode(),
-                              _times[size(_times)-1] + Epsilon);
+                              _times[size(_times)-1] + Epsilon,
+                              naif);
 
     // Pad the top and bottom of the CK data.  This copies the top and bottom
     //  contents of the data - that will work for us.
@@ -255,11 +256,11 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     _avvs =  ckAvvs;
     _times = sclks;
 
-    _startTime = SCLKtoET(camera->naifSclkCode(),_times[0]);
-    _endTime = SCLKtoET(camera->naifSclkCode(),_times[size(_times)-1]);
+    _startTime = SCLKtoET(camera->naifSclkCode(),_times[0], naif);
+    _endTime = SCLKtoET(camera->naifSclkCode(),_times[size(_times)-1], naif);
 
-    _utcStartTime = toUTC(startTime());
-    _utcEndTime   = toUTC(endTime());
+    _utcStartTime = toUTC(startTime(), naif);
+    _utcEndTime   = toUTC(endTime(), naif);
     _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
 
   } catch ( IException &ie  ) {
@@ -427,11 +428,11 @@ bool CkSpiceSegment::getFrameChains(Table &table, const int &leftBase,
   return (true);
 }
 
-QString CkSpiceSegment::getFrameName(int frameid) const {
+QString CkSpiceSegment::getFrameName(int frameid, NaifContextPtr naif) const {
   SpiceChar frameBuf[40];
-  NaifStatus::CheckErrors();
-  frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
+  naif->CheckErrors();
   return (QString(frameBuf));
 }
 
@@ -488,24 +489,25 @@ CkSpiceSegment::SMatrix CkSpiceSegment::getIdentityRotation(const int &nelements
  */
 CkSpiceSegment::SMatrix CkSpiceSegment::computeStateRotation(const QString &frame1,
                                                          const QString &frame2,
-                                                         double etTime) const {
+                                                         double etTime,
+                                                         NaifContextPtr naif) const {
   SMatrix state(6,6);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
 
   try {
     // Get pointing w/AVs
-    sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
-             (SpiceDouble (*)[6]) state[0]);
-    NaifStatus::CheckErrors();
+    naif->sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+                   (SpiceDouble (*)[6]) state[0]);
+    naif->CheckErrors();
   } catch ( IException & ) {
     try {
       SMatrix rot(3,3);
-      pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
-               (SpiceDouble (*)[3]) rot[0]);
-      NaifStatus::CheckErrors();
+      naif->pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
+                     (SpiceDouble (*)[3]) rot[0]);
+      naif->CheckErrors();
       SVector av(3, 0.0);
-      rav2xf_c((SpiceDouble (*)[3]) rot[0], &av[0],
-               (SpiceDouble (*)[6]) state[0]);
+      naif->rav2xf_c((SpiceDouble (*)[3]) rot[0], &av[0],
+                     (SpiceDouble (*)[6]) state[0]);
     } catch ( IException &ie ) {
       ostringstream mess;
       mess << "Could not get dynamic state for time " << etTime;
@@ -518,10 +520,11 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeStateRotation(const QString &fram
 CkSpiceSegment::SMatrix CkSpiceSegment::computeChainRotation(
                                        const QVector<int> &fChain,
                                        const int &terminatorID,
-                                       const double &etTime) const {
+                                       const double &etTime,
+                                       NaifContextPtr naif) const {
 
   // Set up identity default
-  SMatrix state = computeStateRotation("J2000", "J2000", etTime);
+  SMatrix state = computeStateRotation("J2000", "J2000", etTime, naif);
 
 //  cout << "\nCompute Chain Rotations...\n";
   if ( fChain.size() > 0 ) {
@@ -537,12 +540,12 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeChainRotation(
    SpiceInt toId = chain[0];
    for ( int i = 1  ; i < chain.size() ; i++ ) {
      SpiceInt fromId = chain[i];
-     QString CfromId = getFrameName(fromId);
-     QString CtoId = getFrameName(toId);
-     SMatrix left = computeStateRotation(CtoId, CfromId, etTime);
-     NaifStatus::CheckErrors();
-     mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
-     NaifStatus::CheckErrors();
+     QString CfromId = getFrameName(fromId, naif);
+     QString CtoId = getFrameName(toId, naif);
+     SMatrix left = computeStateRotation(CtoId, CfromId, etTime, naif);
+     naif->CheckErrors();
+     naif->mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
+     naif->CheckErrors();
      toId = fromId;
    }
   }
@@ -551,7 +554,8 @@ CkSpiceSegment::SMatrix CkSpiceSegment::computeChainRotation(
 }
 
 
-void CkSpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
+void CkSpiceSegment::getRotationMatrices(NaifContextPtr naif,
+                                       Cube &cube, Camera &camera, Table &table,
                                        SMatSeq &lmats, SMatSeq &rmats,
                                        SVector &sclks) {
 
@@ -577,20 +581,20 @@ void CkSpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &tabl
   // Set CK instrument code
   _instCode = leftId;
 
-  _instFrame = getFrameName(leftId);
-  _refFrame = getFrameName(rightId);
+  _instFrame = getFrameName(leftId, naif);
+  _refFrame = getFrameName(rightId, naif);
 
   SMatSeq lmat(size(_times)), rmat(size(_times)), avr(size(_times));
   for ( int i = 0 ; i < size(_times) ; i++ ) {
-    SMatrix left = computeChainRotation(leftFrames, leftId, _times[i]);
-    SMatrix right = computeChainRotation(rightFrames, rightId, _times[i]);
+    SMatrix left = computeChainRotation(leftFrames, leftId, _times[i], naif);
+    SMatrix right = computeChainRotation(rightFrames, rightId, _times[i], naif);
     lmat[i] = left;
     rmat[i] = right;
   }
 
   lmats = lmat;
   rmats = rmat;
-  sclks = convertTimes(camera.naifSclkCode(), _times);
+  sclks = convertTimes(camera.naifSclkCode(), _times, naif);
 
   return;
 }
@@ -605,24 +609,25 @@ const CkSpiceSegment::SMatrix &CkSpiceSegment::getMatrix(const CkSpiceSegment::S
 
 CkSpiceSegment::SVector CkSpiceSegment::convertTimes(
                                           int sclkCode,
-                                          const CkSpiceSegment::SVector &etTimes
+                                          const CkSpiceSegment::SVector &etTimes,
+                                          NaifContextPtr naif
                                                 ) {
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   SVector sclks(size(etTimes));
   for ( int i  = 0 ; i < size(etTimes) ; i++ ) {
-    sce2c_c(sclkCode, etTimes[i], &sclks[i]);
+    naif->sce2c_c(sclkCode, etTimes[i], &sclks[i]);
   }
 
   //  Determine the tick rate in case we need to create a type 2 CK
   SpiceDouble et0, et1;
-  sct2e_c(sclkCode, sclks[0], &et0);
-  sct2e_c(sclkCode, sclks[0]+1.0, &et1);
+  naif->sct2e_c(sclkCode, sclks[0], &et0);
+  naif->sct2e_c(sclkCode, sclks[0]+1.0, &et1);
   _tickRate = fabs(et1 - et0);
 
-  _utcStartTime = toUTC(startTime());
-  _utcEndTime   = toUTC(endTime());
+  _utcStartTime = toUTC(startTime(), naif);
+  _utcEndTime   = toUTC(endTime(), naif);
 
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   return (sclks);
 }
 
@@ -632,7 +637,8 @@ void CkSpiceSegment::convert(const CkSpiceSegment::SMatrix &quats,
                            const CkSpiceSegment::SMatSeq &lmats,
                            const CkSpiceSegment::SMatSeq &rmats,
                            CkSpiceSegment::SMatrix &ckQuats,
-                           CkSpiceSegment::SMatrix &ckAvvs) const {
+                           CkSpiceSegment::SMatrix &ckAvvs,
+                           NaifContextPtr naif) const {
 
   ckQuats = SMatrix(quats.dim1(), quats.dim2());
   ckAvvs = SMatrix(avvs.dim1(), avvs.dim2());
@@ -653,19 +659,19 @@ void CkSpiceSegment::convert(const CkSpiceSegment::SMatrix &quats,
       avOut = ckAvvs[i];
     }
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Convert quaternion to rotation and then to state matrix
-    q2m_c(quats[i], m);
-    rav2xf_c(m, avIn, xform);
+    naif->q2m_c(quats[i], m);
+    naif->rav2xf_c(m, avIn, xform);
 
     // Do the left and right multiplies
-    mxmg_c(getMatrix(lmats, i)[0], xform, 6, 6, 6, mout);
-    mxmg_c(mout, getMatrix(rmats, i)[0], 6, 6, 6, xform);
+    naif->mxmg_c(getMatrix(lmats, i)[0], xform, 6, 6, 6, mout);
+    naif->mxmg_c(mout, getMatrix(rmats, i)[0], 6, 6, 6, xform);
 
     // Transform to output format
-    xf2rav_c(xform, m, avOut);  // Transfers AV to output ckAvvs
-    m2q_c(m, ckQuats[i]);       // Transfers quaternion
-    NaifStatus::CheckErrors();
+    naif->xf2rav_c(xform, m, avOut);  // Transfers AV to output ckAvvs
+    naif->m2q_c(m, ckQuats[i]);       // Transfers quaternion
+    naif->CheckErrors();
   }
   return;
 }
@@ -860,33 +866,33 @@ CkSpiceSegment::SVector CkSpiceSegment::expand(int ntop, int nbot,
   return (myvec);
 }
 
-double CkSpiceSegment::SCLKtoET(SpiceInt scCode, double sclk) const {
+double CkSpiceSegment::SCLKtoET(SpiceInt scCode, double sclk, NaifContextPtr naif) const {
   SpiceDouble et;
 
-  NaifStatus::CheckErrors();
-  sct2e_c(scCode, sclk, &et);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->sct2e_c(scCode, sclk, &et);
+  naif->CheckErrors();
 
   return (et);
 }
 
-double CkSpiceSegment::ETtoSCLK(SpiceInt scCode, double et) const {
+double CkSpiceSegment::ETtoSCLK(SpiceInt scCode, double et, NaifContextPtr naif) const {
   SpiceDouble sclk;
 
-  NaifStatus::CheckErrors();
-  sce2c_c(scCode, et, &sclk);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->sce2c_c(scCode, et, &sclk);
+  naif->CheckErrors();
 
   return (sclk);
 }
 
-QString CkSpiceSegment::toUTC(const double &et) const {
+QString CkSpiceSegment::toUTC(const double &et, NaifContextPtr naif) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
 
-  NaifStatus::CheckErrors();
-  et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
+  naif->CheckErrors();
 
   return (QString(utcout));
 }

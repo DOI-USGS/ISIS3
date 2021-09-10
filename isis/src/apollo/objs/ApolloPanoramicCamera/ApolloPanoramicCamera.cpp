@@ -25,6 +25,8 @@ namespace Isis {
    *
    */
   ApolloPanoramicCamera::ApolloPanoramicCamera(Isis::Cube &cube) : Isis::LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     // Set up the camera info from ik/iak kernels
     SetFocalLength(610.0);  //nominal (uncalibrated) focal length in mm from "Apollo 15 SIM Bay
     // Photographic Equipment and Mission Summary" August, 1971
@@ -61,25 +63,25 @@ namespace Isis {
     
     //following keywords in InstrumentAddendum file
     QString ikernKey = "INS" + toString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
-    constantTimeOffset = getDouble(ikernKey);
+    constantTimeOffset = getDouble(naif, ikernKey);
     
     ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
-    additionalPreroll = getDouble(ikernKey);
+    additionalPreroll = getDouble(naif, ikernKey);
     
     ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
-    additiveLineTimeError = getDouble(ikernKey);
+    additiveLineTimeError = getDouble(naif, ikernKey);
     
     ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
-    multiplicativeLineTimeError = getDouble(ikernKey);
+    multiplicativeLineTimeError = getDouble(naif, ikernKey);
     
     Pvl &lab = *cube.label(); 
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];  
     SpiceDouble etStart;
-    str2et_c(stime.toLatin1().data(), &etStart);
+    naif->str2et_c(stime.toLatin1().data(), &etStart);
     stime = (QString) inst["StopTime"];
     SpiceDouble etStop;
-    str2et_c(stime.toLatin1().data(), &etStop);
+    naif->str2et_c(stime.toLatin1().data(), &etStop);
     iTime isisTime( (QString) inst["StartTime"]);
     
     // Get other info from labels
@@ -91,7 +93,7 @@ namespace Isis {
     etStart += additionalPreroll * lineRate;
     etStart += constantTimeOffset;
     
-    setTime(isisTime);
+    setTime(isisTime, naif);
     
     // Setup detector map
     //note (etStart+etStop)/2.0 is the time in the middle of image 
@@ -130,7 +132,7 @@ namespace Isis {
     m_CkFrameId = toInt(instP["NaifFrameCode"][0]);
     m_CkFrameId = -int(-m_CkFrameId/1000)*1000;
     
-    LoadCache();
+    LoadCache(naif);
   }
 }// end Isis namespace
 

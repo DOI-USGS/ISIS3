@@ -310,13 +310,13 @@ namespace Isis {
    *
    * @return double Distance in AU between Sun and observed body
    */
-  double HiCalConf::sunDistanceAU() {
-    NaifStatus::CheckErrors();
-    loadNaifTiming();
+  double HiCalConf::sunDistanceAU(NaifContextPtr naif) {
+    naif->CheckErrors();
+    loadNaifTiming(naif);
 
     QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
     double obsStartTime;
-    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
+    naif->scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
 
     QString targetName = getKey("TargetName", "Instrument");
     if (targetName.toLower() == "sky" ||
@@ -327,10 +327,10 @@ namespace Isis {
     }
     double sunv[3];
     double lt;
-    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) naif->spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
-    double sunkm = vnorm_c(sunv);
-    NaifStatus::CheckErrors();
+    double sunkm = naif->vnorm_c(sunv);
+    naif->CheckErrors();
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }
@@ -405,10 +405,8 @@ namespace Isis {
  * This method maintains the loading of kernels for HiRISE timing and planetary
  * body ephemerides to support time and relative positions of planet bodies.
  */
-void HiCalConf::loadNaifTiming( ) {
-  NaifStatus::CheckErrors();
-  auto naifState = NaifContext::get()->top();
-  if (!naifState->hiCalTimingLoaded()) {
+void HiCalConf::loadNaifTiming(NaifContextPtr naif) {
+  if (!naif->hiCalTimingLoaded()) {
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
     leapseconds = leapseconds.highestVersion();
@@ -427,14 +425,14 @@ void HiCalConf::loadNaifTiming( ) {
     QString sClock = sclk.expanded();
     QString pConstants = pck.expanded();
     QString satConstants = sat.expanded();
-    furnsh_c(lsk.toLatin1().data());
-    furnsh_c(sClock.toLatin1().data());
-    furnsh_c(pConstants.toLatin1().data());
-    furnsh_c(satConstants.toLatin1().data());
-    NaifStatus::CheckErrors();
+    naif->furnsh_c(lsk.toLatin1().data());
+    naif->furnsh_c(sClock.toLatin1().data());
+    naif->furnsh_c(pConstants.toLatin1().data());
+    naif->furnsh_c(satConstants.toLatin1().data());
+    naif->CheckErrors();
 
 //  Ensure it is loaded only once
-    naifState->set_hiCalTimingLoaded(true);
+    naif->set_hiCalTimingLoaded(true);
   }
   return;
 }

@@ -46,16 +46,18 @@ namespace Isis {
    *                           LoadCache() call in the constructor.
    */
   MsiCamera::MsiCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Multi-Spectral Imager";
     m_instrumentNameShort = "MSI";
     m_spacecraftNameLong = "Near Earth Asteroid Rendezvous";
     m_spacecraftNameShort = "NEAR";
 
     Pvl &lab = *cube.label();
-    NaifStatus::CheckErrors();
-    SetFocalLength();
-    SetPixelPitch();
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
+    naif->CheckErrors();
 
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -76,23 +78,23 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // Make sure to grab lines and samples in the correct order. 
-    double line = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double sample = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double line = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
+    double sample = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
     focalMap->SetDetectorOrigin(sample, line);
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
+    double k1 = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_K1");
     new RadialDistortionMap(this, k1, 1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
-    setTime(centerTime);
+    setTime(centerTime, naif);
     // Note: If the temperature-dependent instrument kernel is used,
     // the following LoadCache() command should be replaced with the
     // commented lines at the end of this file.
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   //! Destroys the MsiCamera object.
@@ -207,7 +209,7 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       // get transformation matrix based on temperature, from spacecraft to MSI
 //       SpiceDouble sc2msiMatrix[3][3];
 //       pxform_c("J2000", nearMsiTimeDependentFrame,tempCelcius, sc2msiMatrix);
-//       NaifStatus::CheckErrors();
+//       naif->CheckErrors();
 //       // get current TC matrix, from j2000 to spacecraft
 //       vector<double> originalCJ = instrumentRotation()->TimeBasedMatrix();
 //       // get new CJ matrix based on temperatureBasedRotation x originalTC
@@ -215,7 +217,7 @@ extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
 //       vector<double> newCJ(9);
 //       mxm_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalCJ[0],
 //             (SpiceDouble( *)[3]) &newCJ[0]);
-//       NaifStatus::CheckErrors();
+//       naif->CheckErrors();
 //       // mxmg_c(sc2msiMatrix, (SpiceDouble( *)[3]) &originalTC[0],
 //       //        6, 6, 6, (SpiceDouble( *)[3]) &newCJ[0]);
 //       // set new CJ matrix

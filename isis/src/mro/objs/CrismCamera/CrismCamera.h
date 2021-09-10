@@ -62,7 +62,7 @@ namespace Isis {
       //! Destroys the CrismCamera object.
       virtual ~CrismCamera() {  }
 
-      void SetBand (const int physicalBand);
+      void SetBand (const int physicalBand, NaifContextPtr naif) override;
 
       /**
        * @brief This is a band-dependant instrument
@@ -101,7 +101,7 @@ namespace Isis {
     std::vector<LineRateChange> m_lineRates;
     bool m_isBandDependent;
 
-    double getEtTime(const QString &sclk);
+    double getEtTime(const QString &sclk, NaifContextPtr naif);
   };
 };
 #endif

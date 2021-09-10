@@ -44,22 +44,24 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   IssWACamera::IssWACamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Imaging Science Subsystem Wide Angle";
     m_instrumentNameShort = "ISSWA";
     m_spacecraftNameLong = "Cassini Huygens";
     m_spacecraftNameShort = "Cassini";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     Pvl &lab = *cube.label();
     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     // Get the camera characteristics
     QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
     key = key.replace("/", "_");
-    double focalLength = Spice::getDouble(key);
+    double focalLength = Spice::getDouble(naif, key);
 
     SetFocalLength(focalLength);
-    SetPixelPitch();
-    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + toString(naifIkCode()) + "_FRAME_ID"));
+    SetPixelPitch(naif);
+    instrumentRotation()->SetFrame(Spice::getInteger(naif, "INS_" + toString(naifIkCode()) + "_FRAME_ID"));
 
 
     // Get the start time in et
@@ -83,20 +85,20 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE"),
-                                Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE"),
+                                Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE"));
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
+    double k1 = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_K1");
     new RadialDistortionMap(this, k1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

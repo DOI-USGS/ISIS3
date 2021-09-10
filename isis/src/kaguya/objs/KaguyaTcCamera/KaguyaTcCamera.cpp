@@ -42,22 +42,24 @@ namespace Isis {
    *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original Version
    */
   KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : LineScanCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong  = "Terrain Camera";
     m_instrumentNameShort = "TC";
     m_spacecraftNameLong  = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     // Get the camera characteristics
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time in et
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     QString clockCount = inst["SpacecraftClockStartCount"];
-    double time = getClockTime(clockCount, -1, true).Et();
+    double time = getClockTime(naif, clockCount, -1, true).Et();
 
     // Setup detector map
     double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
@@ -88,10 +90,10 @@ namespace Isis {
     // The origin of the detector does not depend on swath mode. 
     QString key;
     key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(key);
+    double sampleBoreSight = getDouble(naif, key);
 
     key = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(key);
+    double lineBoreSight = getDouble(naif, key);
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight); 
 
     // Setup distortion map
@@ -101,9 +103,9 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    setTime(time);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(time, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   //! Destroys the KaguyaTcCamera object.

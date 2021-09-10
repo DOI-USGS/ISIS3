@@ -54,11 +54,13 @@ namespace Isis {
    */
   CrismCamera::CrismCamera(Cube &cube) : LineScanCamera(cube), m_lineRates(),
                                        m_isBandDependent(true) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Compact Reconnaissance Imaging Spectrometer for Mars";
     m_instrumentNameShort = "CRISM";
     m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
     m_spacecraftNameShort = "MRO";
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     Pvl &lab = *cube.label();
 
@@ -71,12 +73,12 @@ namespace Isis {
     QString ikCode(toString(naifIkCode()));
 
     // Set Frame mounting.  Same for both (VNIR, IR) detectors
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start and end time in et
-    double etStart = getEtTime((QString) inst ["SpacecraftClockStartCount"]);
-    double etStop  = getEtTime((QString) inst ["SpacecraftClockStopCount"]);
+    double etStart = getEtTime((QString) inst ["SpacecraftClockStartCount"], naif);
+    double etStop  = getEtTime((QString) inst ["SpacecraftClockStopCount"], naif);
 
 
     //  Compute the exposure time of the first line and the line rate.  This
@@ -161,8 +163,8 @@ namespace Isis {
 
     // lines and samples added to the pvl in the order you
     // call getDouble()
-    double bLine = getDouble("INS"+ikCode+"_BORESIGHT_LINE");
-    double bSample = getDouble("INS"+ikCode+"_BORESIGHT_SAMPLE");
+    double bLine = getDouble(naif, "INS"+ikCode+"_BORESIGHT_LINE");
+    double bSample = getDouble(naif, "INS"+ikCode+"_BORESIGHT_SAMPLE");
 
     fmap->SetDetectorOrigin(bSample, bLine);
     fmap->SetDetectorOffset(0.0, 0.0);
@@ -177,11 +179,11 @@ namespace Isis {
 //    new CrismCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    setTime(iTime(frameStartTime));
+    setTime(iTime(frameStartTime), naif);
     double tol = 0.0; //PixelResolution();
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
-      tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 1000. / 100.;
+      tol = PixelPitch() * SpacecraftAltitude(naif) / FocalLength() / 1000. / 100.;
     }
 
 //    cout << "\nCreateCache(" << frameStartTime << ", " << frameEndTime << ")...\n";
@@ -191,14 +193,14 @@ namespace Isis {
 
 #else
 //    cout << "LoadCache()...\n";
-    LoadCache();
+    LoadCache(naif);
 #endif
 //    cout << "Done.\n";
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     return;
   }
 
-  void CrismCamera::SetBand (const int physicalBand) {
+  void CrismCamera::SetBand (const int physicalBand, NaifContextPtr naif) {
     return;
   }
 
@@ -207,8 +209,8 @@ namespace Isis {
   }
 
 
-  double CrismCamera::getEtTime(const QString &sclk) {
-    return (getClockTime(sclk, -74999).Et());
+  double CrismCamera::getEtTime(const QString &sclk, NaifContextPtr naif) {
+    return (getClockTime(naif, sclk, -74999).Et());
   }
 }
 

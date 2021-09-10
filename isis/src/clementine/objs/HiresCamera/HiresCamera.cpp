@@ -47,19 +47,21 @@ namespace Isis {
    *                          models. 
    */
   HiresCamera::HiresCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "High Resolution Camera";
     m_instrumentNameShort = "HiRES";
     m_spacecraftNameLong = "Clementine 1";
     m_spacecraftNameShort = "Clementine1";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     Pvl &lab = *cube.label();
     // Get the camera characteristics
     QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.toUpper();
 
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time in et
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -88,9 +90,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) +
+      Spice::getDouble(naif, "INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) +
+      Spice::getDouble(naif, "INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map
@@ -100,9 +102,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   /**

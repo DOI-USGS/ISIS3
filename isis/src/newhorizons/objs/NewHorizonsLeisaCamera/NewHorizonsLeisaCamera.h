@@ -82,7 +82,7 @@ namespace Isis {
       virtual int SpkReferenceId() const { return (1); } //can get from spacit S on spk
 
 
-      void SetBand(const int vband);
+      void SetBand(const int vband, NaifContextPtr naif) override;
 
     private:
       QVector<int> m_originalBand; //!< Stores the band bin OriginalBand keyword values

@@ -59,17 +59,17 @@ namespace Isis {
   /**
    *  @brief Constructor with file to open
    */
-  HiJitCube::HiJitCube(const QString &filename) {
+  HiJitCube::HiJitCube(const QString &filename, NaifContextPtr naif) {
     initLocal();
-    OpenCube(filename);
+    OpenCube(filename, naif);
   }
 
   /**
    *  @brief Constructor with file to open and potential shift applied
    */
-  HiJitCube::HiJitCube(const QString &filename, PvlObject &shift) {
+  HiJitCube::HiJitCube(const QString &filename, PvlObject &shift, NaifContextPtr naif) {
     initLocal();
-    OpenCube(filename, shift);
+    OpenCube(filename, shift, naif);
   }
 
 
@@ -94,14 +94,14 @@ namespace Isis {
   }
 
 
-  void HiJitCube::OpenCube(const QString &filename) {
+  void HiJitCube::OpenCube(const QString &filename, NaifContextPtr naif) {
     open(filename);
-    Init();
+    Init(naif);
     return;
   }
 
-  void HiJitCube::OpenCube(const QString &filename, PvlObject &shift) {
-    OpenCube(filename);
+  void HiJitCube::OpenCube(const QString &filename, PvlObject &shift, NaifContextPtr naif) {
+    OpenCube(filename, naif);
 
     //  Determine if a shift of the CCD exists in the definitions file
     if(shift.hasGroup(jdata.ccdName)) {
@@ -149,9 +149,8 @@ namespace Isis {
   }
 
 
-  void HiJitCube::loadNaifTiming() {
-    auto naifState = NaifContext::get()->top();
-    if(!naifState->hiJitCubeLoaded()) {
+  void HiJitCube::loadNaifTiming(NaifContextPtr naif) {
+    if(!naif->hiJitCubeLoaded()) {
 //  Load the NAIF kernels to determine timing data
       Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
       leapseconds = leapseconds.highestVersion();
@@ -160,20 +159,20 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      NaifStatus::CheckErrors();
+      naif->CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
-      furnsh_c(lsk.toLatin1().data());
-      furnsh_c(sClock.toLatin1().data());
+      naif->furnsh_c(lsk.toLatin1().data());
+      naif->furnsh_c(sClock.toLatin1().data());
 
 //  Ensure it is loaded only once
-      naifState->set_hiJitCubeLoaded(true);
+      naif->set_hiJitCubeLoaded(true);
     }
     return;
   }
 
-  void HiJitCube::computeStartTime() {
-    loadNaifTiming();
+  void HiJitCube::computeStartTime(NaifContextPtr naif) {
+    loadNaifTiming(naif);
 
 //  Compute the unbinned and binned linerates in seconds
     jdata.unBinnedRate = ((Instrument::LINE_TIME_PRE_OFFSET +
@@ -183,8 +182,8 @@ namespace Isis {
 
     if(!jdata.scStartTime.isEmpty()) {
       QString scStartTimeString = jdata.scStartTime;
-      scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
-      NaifStatus::CheckErrors();
+      naif->scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
+      naif->CheckErrors();
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)
@@ -223,7 +222,7 @@ namespace Isis {
     fpGeom = 0;
   }
 
-  void HiJitCube::Init() {
+  void HiJitCube::Init(NaifContextPtr naif) {
     // Get required keywords from instrument group
     Pvl *labelPvl(label());
     Isis::PvlGroup inst;
@@ -311,7 +310,7 @@ namespace Isis {
     }
 
 // Determine starting time of image and compute the binning rates
-    computeStartTime();
+    computeStartTime(naif);
 
 //  Compute the focal plane polygon for this image
     computePoly();

@@ -63,11 +63,13 @@ namespace Isis {
    *                          ShutterOpenCloseTimes() method.
    */
   VoyagerCamera::VoyagerCamera (Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+
+    naif->CheckErrors();
 
     // Set the pixel pitch
-    SetPixelPitch();
-    SetFocalLength();
+    SetPixelPitch(naif);
+    SetFocalLength(naif);
     // Find out what camera is being used, and set the focal length, altinstcode,
     // and camera
     Pvl &lab = *cube.label();
@@ -170,10 +172,10 @@ namespace Isis {
 
     // add half the exposure duration to the start time to get the center if the image
     iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
-    setTime(centerTime);
+    setTime(centerTime, naif);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

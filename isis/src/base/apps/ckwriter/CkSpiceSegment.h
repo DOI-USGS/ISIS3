@@ -93,8 +93,8 @@ class CkSpiceSegment {
     typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
 
     CkSpiceSegment();
-    CkSpiceSegment(const QString &fname);
-    CkSpiceSegment(Cube &cube, const QString &tblname = "CkSpiceSegment");
+    CkSpiceSegment(NaifContextPtr naif, const QString &fname);
+    CkSpiceSegment(NaifContextPtr naif, Cube &cube, const QString &tblname = "CkSpiceSegment");
     virtual ~CkSpiceSegment() { }
 
     /** Returns the number of elements in the quaternions */
@@ -168,7 +168,7 @@ class CkSpiceSegment {
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
     QString getKeyValue(PvlObject &label, const QString &keyword);
-    void import(Cube &cube, const QString &tblname = "CkSpiceSegment");
+    void import(NaifContextPtr naif, Cube &cube, const QString &tblname = "CkSpiceSegment");
     SMatrix load(Table &cache);
     SMatrix getQuaternions(const SMatrix &spice) const;
     SMatrix getAngularVelocities(const SMatrix &spice) const;
@@ -179,31 +179,34 @@ class CkSpiceSegment {
                         const int &rightBase, QVector<int> &leftChain,
                         QVector<int> &rightChain) const;
 
-    QString getFrameName(int frameid) const;
+    QString getFrameName(int frameid, NaifContextPtr naif) const;
 
     SMatrix getConstantRotation(Table &table) const;
     SMatrix getIdentityRotation(const int &nelements = 3) const;
     SMatrix computeStateRotation(const QString &frame1,
                                  const QString &frame2,
-                                 double etTime) const;
+                                 double etTime,
+                                 NaifContextPtr naif) const;
     SMatrix computeChainRotation(const QVector<int> &fChain,
-                                 const int &ckId, const double &etTime) const;
-    void getRotationMatrices(Cube &cube, Camera &camera, Table &table,
+                                 const int &ckId, const double &etTime,
+                                 NaifContextPtr naif) const;
+    void getRotationMatrices(NaifContextPtr naif, Cube &cube, Camera &camera, Table &table,
                              SMatSeq &lmats, SMatSeq &rmat, SVector &sclks);
 
-    SVector convertTimes(int scCode, const SVector &etTimes);
+    SVector convertTimes(int scCode, const SVector &etTimes, NaifContextPtr naif);
     void convert(const SMatrix &quats, const SMatrix &avvs,
                  const SMatSeq &lmats, const SMatSeq &rmats,
-                 SMatrix &ckQuats, SMatrix &ckAvvs) const;
+                 SMatrix &ckQuats, SMatrix &ckAvvs,
+                 NaifContextPtr naif) const;
     const SMatrix &getMatrix(const SMatSeq &seq, const int &nth) const;
 
     SMatrix expand(int ntop, int nbot, const SMatrix &matrix) const;
     SVector expand(int ntop, int nbot, const SVector &vec) const;
 
-    double SCLKtoET(SpiceInt scCode, double sclk) const;
-    double ETtoSCLK(SpiceInt scCode, double et) const;
+    double SCLKtoET(SpiceInt scCode, double sclk, NaifContextPtr naif) const;
+    double ETtoSCLK(SpiceInt scCode, double et, NaifContextPtr naif) const;
 
-    QString toUTC(const double &et) const;
+    QString toUTC(const double &et, NaifContextPtr naif) const;
 
 };
 

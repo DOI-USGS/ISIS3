@@ -54,7 +54,9 @@ namespace Isis {
    *                          method and added a call to the new method.
    */
   VikingCamera::VikingCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+
+    naif->CheckErrors();
     // Set the pixel pitch
     SetPixelPitch(1.0 / 85.0);
 
@@ -158,15 +160,15 @@ namespace Isis {
 
     // Get clock count and convert it to a time
     QString spacecraftClock = inst["SpacecraftClockCount"];
-    double etClock = getClockTime(spacecraftClock, altinstcode).Et();
+    double etClock = getClockTime(naif, spacecraftClock, altinstcode).Et();
 
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
 
     // Calculate and load the euler angles
     SpiceDouble CP[3][3];
-    eul2m_c((SpiceDouble)raster * rpd_c(), (SpiceDouble)cone * rpd_c(),
-            (SpiceDouble) - crosscone * rpd_c(), 3, 2, 1, CP);
+    naif->eul2m_c((SpiceDouble)raster * naif->rpd_c(), (SpiceDouble)cone * naif->rpd_c(),
+                  (SpiceDouble) - crosscone * naif->rpd_c(), 3, 2, 1, CP);
 
     //    LoadEulerMounting(CP);
 
@@ -175,8 +177,8 @@ namespace Isis {
     // find center shutter time
     double centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
     char timepds[25];
-    et2utc_c(centerTime, "ISOC", 3, 25, timepds);
-    utc2et_c(timepds, &centerTime);
+    naif->et2utc_c(centerTime, "ISOC", 3, 25, timepds);
+    naif->utc2et_c(timepds, &centerTime);
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -194,9 +196,9 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(centerTime, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

@@ -50,7 +50,9 @@ namespace Isis {
    *
    */
   LoHighCamera::LoHighCamera(Cube &cube) : FramingCamera(cube) {
-    NaifStatus::CheckErrors();
+    auto naif = NaifContext::acquire();
+
+    naif->CheckErrors();
     
     m_instrumentNameLong = "High Resolution Camera";
     m_instrumentNameShort = "High";
@@ -87,8 +89,8 @@ namespace Isis {
     instrumentPosition()->SetAberrationCorrection("NONE");
 
     // Get the camera characteristics
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time in et
     double time = iTime((QString)inst["StartTime"]).Et();
@@ -126,9 +128,9 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    setTime(time);
-    LoadCache();
-    NaifStatus::CheckErrors();
+    setTime(time, naif);
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   

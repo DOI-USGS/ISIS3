@@ -90,7 +90,7 @@ namespace Isis {
        */
       virtual int SpkReferenceId() const { return (1); }
 
-      void initDistortion(QString ikCode, RosettaOsirisCameraDistortionMap *distortionMap);
+      void initDistortion(QString ikCode, RosettaOsirisCameraDistortionMap *distortionMap, NaifContextPtr naif);
   };
 };
 #endif

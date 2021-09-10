@@ -51,15 +51,17 @@ namespace Isis {
    * @internal
    */
   NewHorizonsMvicFrameCamera::NewHorizonsMvicFrameCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Multispectral Visible Imaging Framing Camera";
     m_instrumentNameShort = "MVIC FRAMING";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
@@ -69,9 +71,9 @@ namespace Isis {
     // **  TODO  **  Need an offset time added to labels at ingestion??  The 0.125 value is 
     //     the value in DELTAT00.
     double offset = 0.125;
-    m_etStart = getClockTime(stime).Et() + offset;
+    m_etStart = getClockTime(naif, stime).Et() + offset;
     SpiceChar utc[30];
-    et2utc_c(m_etStart, "ISOC", 3, 30, utc);
+    naif->et2utc_c(m_etStart, "ISOC", 3, 30, utc);
 //  qDebug()<<"\n\nspacecraftClockStartCount + "<<offset<<" (offset) = "<<utc;
 
     // If bands have been extracted from the original image then we
@@ -105,8 +107,8 @@ namespace Isis {
     vector<double> distCoefY;
 
     for (int i=0; i < 20; i++) {
-      distCoefX.push_back(getDouble(naifXKey,i));
-      distCoefY.push_back(getDouble(naifYKey,i));
+      distCoefX.push_back(getDouble(naif,naifXKey,i));
+      distCoefY.push_back(getDouble(naif,naifYKey,i));
     }
 
     new NewHorizonsMvicFrameCameraDistortionMap(this, distCoefX, distCoefY);
@@ -116,8 +118,8 @@ namespace Isis {
     new CameraSkyMap(this);
 
     // Internalize all the NAIF SPICE information into memory.
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 
@@ -126,7 +128,7 @@ namespace Isis {
    *
    * @param band The band number to set
    */
-  void NewHorizonsMvicFrameCamera::SetBand(const int vband) {
+  void NewHorizonsMvicFrameCamera::SetBand(const int vband, NaifContextPtr naif) {
 
     if(vband > (int) m_originalBand.size()) {
       QString msg = QObject::tr("Band number out of array bounds in NewHorizonsMvicFrameCamera::SetBand legal "
@@ -139,12 +141,12 @@ namespace Isis {
     double et = time.Et();
    
     SpiceChar utc[30];
-    et2utc_c(et, "ISOC", 3, 30, utc);
-    Camera::setTime(et);
+    naif->et2utc_c(et, "ISOC", 3, 30, utc);
+    Camera::setTime(et, naif);
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, m_exposure);
 
     //  Set up valid band access
-    Camera::SetBand(vband);
+    Camera::SetBand(vband, naif);
     
   }
 

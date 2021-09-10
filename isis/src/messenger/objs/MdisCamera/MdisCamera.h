@@ -144,7 +144,7 @@ namespace Isis {
       virtual int SpkReferenceId() const { return (1); }
 
     private:
-      double computeFocalLength(const QString &filterCode, Pvl &label);
+      double computeFocalLength(const QString &filterCode, Pvl &label, NaifContextPtr naif);
   };
 };
 #endif

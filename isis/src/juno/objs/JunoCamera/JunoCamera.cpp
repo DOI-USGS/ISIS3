@@ -42,6 +42,7 @@ namespace Isis {
    * @param cube The image cube.
    */
   JunoCamera::JunoCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
 
     m_instrumentNameLong = "Juno EPO Camera";
     m_instrumentNameShort = "JNC"; // or JunoCam?
@@ -49,12 +50,12 @@ namespace Isis {
     m_spacecraftNameLong = "Juno";
     m_spacecraftNameShort = "Juno";
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     // Set up the camera characteristics
     instrumentRotation()->SetFrame( CkFrameId() );
-    SetFocalLength();
-    SetPixelPitch();
+    SetFocalLength(naif);
+    SetPixelPitch(naif);
 
     // Get all the necessary stuff from the labels
     Pvl &lab = *cube.label();
@@ -81,14 +82,14 @@ namespace Isis {
     // Setup focal plane map and set Juno detector boresight
     new CameraFocalPlaneMap(this, junoCode);
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, junoCode);
-    double bsSample = getDouble("INS" + juno + "_BORESIGHT_SAMPLE");
-    double bsLine = getDouble("INS" + juno + "_BORESIGHT_LINE");
+    double bsSample = getDouble(naif, "INS" + juno + "_BORESIGHT_SAMPLE");
+    double bsLine = getDouble(naif, "INS" + juno + "_BORESIGHT_LINE");
     focalMap->SetDetectorOrigin(bsSample, bsLine);
 
     // Set starting filter location on the detector
     const PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     QString filterIkCode = bandBin.findKeyword("NaifIkCode")[0];
-    detMap->SetStartingDetectorLine(getDouble("INS" + filterIkCode + "_FILTER_OFFSET"));
+    detMap->SetStartingDetectorLine(getDouble(naif, "INS" + filterIkCode + "_FILTER_OFFSET"));
 
     // Set up distortion map, keeping z-direction positive JunoDistortion map defaults to z+
     JunoDistortionMap *distortionMap = new JunoDistortionMap(this);
@@ -100,23 +101,23 @@ namespace Isis {
 
     // Set time based on clock count, frame number, exposure duration, and interframe delay
     QString startClockCount   = inst["SpacecraftClockStartCount"];
-    double observationStartEt = getClockTime(startClockCount).Et(); // in seconds
+    double observationStartEt = getClockTime(naif, startClockCount).Et(); // in seconds
     double frameNumber     = (double) inst["FrameNumber"];
     double interFrameDelay    = (double) inst["InterFrameDelay"];  // in seconds
     double exposureDur        = ((double) inst["ExposureDuration"]) / 1000.0; // in seconds
 
     // Get the fixed time biases
-    double startTimeBias       = getDouble("INS" + juno + "_START_TIME_BIAS");
-    double interFrameDelayBias = getDouble("INS" + juno + "_INTERFRAME_DELTA");
+    double startTimeBias       = getDouble(naif, "INS" + juno + "_START_TIME_BIAS");
+    double interFrameDelayBias = getDouble(naif, "INS" + juno + "_INTERFRAME_DELTA");
 
     // get start et for this frame, in seconds
     double frameStartEt = observationStartEt + startTimeBias + (frameNumber - 1)
                              * (interFrameDelay + interFrameDelayBias);
     // Set start time to center of exposure time to ensure the proper SPICE data is cached.
-    setTime(frameStartEt + exposureDur / 2.0);
+    setTime(frameStartEt + exposureDur / 2.0, naif);
 
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
 

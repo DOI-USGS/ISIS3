@@ -50,30 +50,32 @@ namespace Isis {
    */
 
   NewHorizonsLorriCamera::NewHorizonsLorriCamera(Cube &cube) : FramingCamera(cube) {
+    auto naif = NaifContext::acquire();
+
     m_instrumentNameLong = "Long Range Reconnaissance Imager";
     m_instrumentNameShort = "LORRI";
     m_spacecraftNameLong = "New Horizons";
     m_spacecraftNameShort = "NewHorizons";
     
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     // The LORRI focal length is fixed and is designed not to change throught the operational 
     // temperature. The NAIF code, set in the ISIS labels, will be used to read a single focal 
     // length from the SPICE kernels. Version 100 of the Lorri IK uses meters for focal length, 
     // units, version 200 uses mm, and has a units keyword.
     QString unitsKey = "INS" + toString(naifIkCode()) + "_FOCAL_LENGTH_UNITS";
-    QString focalLengthUnits = Spice::getString(unitsKey);
+    QString focalLengthUnits = Spice::getString(naif, unitsKey);
     if (focalLengthUnits != "mm") {
       QString msg = QObject::tr("SPICE keyword [%1] is expected to be mm. [%2] was found instead").
                     arg(unitsKey).arg(focalLengthUnits);
        throw IException(IException::User, msg, _FILEINFO_);      
     }
-    SetFocalLength(Spice::getDouble("INS" + toString(naifIkCode()) + "_FOCAL_LENGTH"));
+    SetFocalLength(Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_FOCAL_LENGTH"));
 
     // For setting the pixel pitch, the Naif keyword PIXEL_SIZE is used instead of the ISIS
     // default of PIXEL_PITCH, so set the value directly.
     QString pp = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
-    double pixelPitch = Spice::getDouble(pp);
+    double pixelPitch = Spice::getDouble(naif, pp);
     pixelPitch /= 1000.0;
     SetPixelPitch(pixelPitch);
 
@@ -89,8 +91,8 @@ namespace Isis {
 
     // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted 
     // for ISIS
-    double boresightSample = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
-    double boresightLine = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
+    double boresightSample = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
+    double boresightLine = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
     focalMap->SetDetectorOrigin(boresightSample,boresightLine);
 
     // Setup distortion map. Start by reading the distortion coefficient from the instrument kernel.
@@ -103,8 +105,8 @@ namespace Isis {
     QString e2("INS" + toString(naifIkCode()) + "_OOC_EM");
     QString e5("INS" + toString(naifIkCode()) + "_OOC_EM");
     QString e6("INS" + toString(naifIkCode()) + "_OOC_EM");
-    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 1), 
-                                      getDouble(e6, 2), -1);
+    new NewHorizonsLorriDistortionMap(this, getDouble(naif, e2, 0), getDouble(naif, e5, 1), 
+                                      getDouble(naif, e6, 2), -1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -114,15 +116,15 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString clockCount = inst["SpacecraftClockStartCount"];
-    double et = getClockTime(clockCount).Et();
+    double et = getClockTime(naif, clockCount).Et();
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
 
     pair<iTime, iTime> startStop = ShutterOpenCloseTimes(et, exposureDuration);
-    setTime(et);
+    setTime(et, naif);
 
     // Internalize all the NAIF SPICE information into memory.
-    LoadCache();
-    NaifStatus::CheckErrors();
+    LoadCache(naif);
+    naif->CheckErrors();
   }
 
   /**

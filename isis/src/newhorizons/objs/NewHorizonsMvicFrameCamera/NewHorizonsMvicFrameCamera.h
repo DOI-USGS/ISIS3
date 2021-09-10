@@ -52,7 +52,7 @@ namespace Isis {
 
 
       // Sets the band to the band number given
-      void SetBand(const int vband);
+      void SetBand(const int vband, NaifContextPtr naif) override;
 
 
 //      /**

@@ -307,7 +307,7 @@ namespace Isis {
       double targetCenterDistance(NaifContextPtr naif) const;
       double sunToBodyDist(NaifContextPtr naif) const;
       
-      Longitude solarLongitude();
+      Longitude solarLongitude(NaifContextPtr naif);
       void instrumentBodyFixedVelocity(double v[3], NaifContextPtr naif) const;
       iTime time() const;
 

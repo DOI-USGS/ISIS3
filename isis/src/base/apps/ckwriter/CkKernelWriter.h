@@ -61,7 +61,7 @@ class CkSpiceSegment;
 class CkKernelWriter {
   public:
     CkKernelWriter();
-    CkKernelWriter(const QString &kfile, const int &csize = 0,
+    CkKernelWriter(NaifContextPtr naif, const QString &kfile, const int &csize = 0,
                    const int &cktype = 3);
     virtual ~CkKernelWriter() { close(); }
 
@@ -71,13 +71,14 @@ class CkKernelWriter {
     int getCommentSize() const { return (_comSize); }
     int getCommentWrittenCount() const { return (_comCharsWritten); }
 
-    bool addComment(const QString &comment);
-    bool addCommentFile(const QString &comfile);
+    bool addComment(const QString &comment, NaifContextPtr naif);
+    bool addCommentFile(const QString &comfile, NaifContextPtr naif);
 
-    void open(const QString &kfile,
+    void open(NaifContextPtr naif,
+              const QString &kfile,
               const QString &intCkName = "USGS_CK_File");
-    void write(const CkSpiceSegment &segment) const;
-    void close();
+    void write(const CkSpiceSegment &segment, NaifContextPtr naif) const;
+    void close(NaifContextPtr naif);
 
   private:
     enum { DefaultCommentSize = 7000 };
@@ -88,10 +89,10 @@ class CkKernelWriter {
     mutable unsigned int _comCharsWritten;
 
     void init();
-    bool writeComment(const QString &comment) const;
-    void writeCk1(const CkSpiceSegment &segment) const;
-    void writeCk2(const CkSpiceSegment &segment) const;
-    void writeCk3(const CkSpiceSegment &segment) const;
+    bool writeComment(const QString &comment, NaifContextPtr naif) const;
+    void writeCk1(const CkSpiceSegment &segment, NaifContextPtr naif) const;
+    void writeCk2(const CkSpiceSegment &segment, NaifContextPtr naif) const;
+    void writeCk3(const CkSpiceSegment &segment, NaifContextPtr naif) const;
 
 };
 
