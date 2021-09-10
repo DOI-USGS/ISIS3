@@ -73,7 +73,7 @@ class SpkSegment : public SpkSpiceSegment {
     SpkSegment(Cube &cube, const int spkType);
     virtual ~SpkSegment() { }
 
-    void import(Cube &cube);
+    void import(Cube &cube, NaifContextPtr naif);
 
     /** Returns the number of elements in the vectors */
     int size() const { return (size(m_states)); }
@@ -120,7 +120,7 @@ class SpkSegment : public SpkSpiceSegment {
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
     SMatrix load(Table &cache);
-    void getStates(Camera &camera, const SMatrix &spice, SMatrix &states,
+    void getStates(NaifContextPtr naif, Camera &camera, const SMatrix &spice, SMatrix &states,
                    SVector &epochs, bool &hasVV) const;
     SVector makeState(SpicePosition *position, const double &time0,
                       const SVector &stateT, const double &timeT) const;

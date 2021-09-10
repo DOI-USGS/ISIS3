@@ -132,7 +132,8 @@ namespace Isis {
    *
    * @return @b bool Indicates whether the intersection was found.
    */
-  bool DemShape::intersectSurface(vector<double> observerPos,
+  bool DemShape::intersectSurface(NaifContextPtr naif,
+                                  vector<double> observerPos,
                                   vector<double> lookDirection) {
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
@@ -165,7 +166,7 @@ namespace Isis {
 
     double tol2 = tol * tol;
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     while (!done) {
 
       if (it > maxit) {
@@ -203,8 +204,8 @@ namespace Isis {
 
       double r = radiusKm.kilometers();
       bool status;
-      surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
-               (SpiceBoolean*) &status);
+      naif->surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
+                     (SpiceBoolean*) &status);
 
       // LinearAlgebra::Vector point = LinearAlgebra::vector(observerPos[0],
       //                                                     observerPos[1],
@@ -239,7 +240,7 @@ namespace Isis {
 
       it ++;
     } // end of while loop
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
     return hasIntersection();
   }
@@ -294,7 +295,7 @@ namespace Isis {
    * compatability) for the DemShape.
    */
 
-  void DemShape::calculateDefaultNormal() {
+  void DemShape::calculateDefaultNormal(NaifContextPtr naif) {
 
     if (!surfaceIntersection()->Valid() || !hasIntersection() ) {
       IString msg = "A valid intersection must be defined before computing the surface normal";
@@ -315,9 +316,9 @@ namespace Isis {
 
     vector<double> normal(3,0.);
 
-    NaifStatus::CheckErrors();
-    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
+    naif->CheckErrors();
 
     setNormal(normal);
     setHasNormal(true);
@@ -356,7 +357,8 @@ namespace Isis {
    *
    * @param neighborPoints
    */
-  void DemShape::calculateLocalNormal(QVector<double *> neighborPoints) {
+  void DemShape::calculateLocalNormal(NaifContextPtr naif,
+                                      QVector<double *> neighborPoints) {
 
     std::vector<SpiceDouble> normal(3);
     if (neighborPoints.isEmpty()) {
@@ -368,16 +370,16 @@ namespace Isis {
 
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
-    vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
+    naif->vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
     double rightMinusLeft[3];
-    vsub_c(neighborPoints[3], neighborPoints [2], rightMinusLeft);
+    naif->vsub_c(neighborPoints[3], neighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
-    ucrss_c(topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
+    naif->ucrss_c(topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
 
     // unitize normal (and do sanity check for magnitude)
     double mag;
-    unorm_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
+    naif->unorm_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
 
     if (mag == 0.0) {
       normal[0] = normal[1] = normal[2] = 0.0;
@@ -396,10 +398,10 @@ namespace Isis {
     double centerLookVect[3];
     SpiceDouble pB[3];
     surfaceIntersection()->ToNaifArray(pB);
-    unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c((SpiceDouble *) &normal[0], centerLookVect);
+    naif->unorm_c(pB, centerLookVect, &mag);
+    double dotprod = naif->vdot_c((SpiceDouble *) &normal[0], centerLookVect);
     if (dotprod < 0.0) {
-      vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
+      naif->vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
     }
 
     setNormal(normal);
@@ -410,8 +412,8 @@ namespace Isis {
    * This method calculates the surface normal of the current intersection
    * point.
    */
-  void DemShape::calculateSurfaceNormal() {
-    calculateDefaultNormal();
+  void DemShape::calculateSurfaceNormal(NaifContextPtr naif) {
+    calculateDefaultNormal(naif);
   }
 
 

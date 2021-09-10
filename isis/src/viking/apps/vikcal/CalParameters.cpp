@@ -87,7 +87,7 @@ namespace Isis {
       }
 
       QString startTime = instrument["STARTTIME"];
-      CalcSunDist(startTime);
+      CalcSunDist(NaifContext::acquire(), startTime);
       p_labexp = (double)instrument["EXPOSUREDURATION"] * 1000.0;  // convert to msec
       QString target = " ";
       PvlKeyword cs1 = instrument["FLOODMODEID"];
@@ -375,20 +375,20 @@ namespace Isis {
    *
    * @param t iTime
    */
-  void CalParameters::CalcSunDist(QString t) {
-    NaifStatus::CheckErrors();
+  void CalParameters::CalcSunDist(NaifContextPtr naif, QString t) {
+    naif->CheckErrors();
     double sunv[3];
     SpiceDouble lt, et;
     FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
     FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
     QString tempfname1 = fname1.expanded();
     QString tempfname2 = fname2.expanded();
-    furnsh_c(tempfname1.toLatin1().data());
-    furnsh_c(tempfname2.toLatin1().data());
-    utc2et_c(t.toLatin1().data(), &et);
-    spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
+    naif->furnsh_c(tempfname1.toLatin1().data());
+    naif->furnsh_c(tempfname2.toLatin1().data());
+    naif->utc2et_c(t.toLatin1().data(), &et);
+    naif->spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
     p_dist1 = sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
   }
 
 } // end namespace isis

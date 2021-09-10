@@ -129,7 +129,7 @@ namespace Isis {
   /**
    *  Calculates the ellipsoidal surface normal.
    */
-  void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
+  void ShapeModel::calculateEllipsoidalSurfaceNormal(NaifContextPtr naif)  {
     // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
     // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true
     // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
@@ -149,7 +149,7 @@ namespace Isis {
     // Unitize the vector
     SpiceDouble upB[3];
     SpiceDouble dist;
-    unorm_c(pB, upB, &dist);
+    naif->unorm_c(pB, upB, &dist);
     memcpy(&m_normal[0], upB, sizeof(double) * 3);
 
     m_hasNormal = true;
@@ -174,10 +174,10 @@ namespace Isis {
    * @return The emission angle, in decimal degrees.
    *
    */
-  double ShapeModel::emissionAngle(const std::vector<double> &observerBodyFixedPosition) {
+  double ShapeModel::emissionAngle(NaifContextPtr naif, const std::vector<double> &observerBodyFixedPosition) {
 
     // Calculate the surface normal if we haven't yet
-    if (!hasNormal()) calculateDefaultNormal();
+    if (!hasNormal()) calculateDefaultNormal(naif);
 
     // Get vector from center of body to surface point
     SpiceDouble pB[3];
@@ -187,10 +187,10 @@ namespace Isis {
 
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c((ConstSpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
-    unorm_c(psB, upsB, &dist);
+    naif->vsub_c((ConstSpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
+    naif->unorm_c(psB, upsB, &dist);
 
-    double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
+    double angle = naif->vdot_c((SpiceDouble *) &m_normal[0], upsB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
     return acos(angle) * RAD2DEG;
@@ -221,10 +221,10 @@ namespace Isis {
    *
    * @return @b double Incidence angle, in degrees.
    */
-  double ShapeModel::incidenceAngle(const std::vector<double> &illuminatorBodyFixedPosition) {
+  double ShapeModel::incidenceAngle(NaifContextPtr naif, const std::vector<double> &illuminatorBodyFixedPosition) {
 
     // Calculate the surface normal if we haven't yet.
-    if (!m_hasNormal) calculateDefaultNormal();
+    if (!m_hasNormal) calculateDefaultNormal(naif);
 
     // Get vector from center of body to surface point
     SpiceDouble pB[3];
@@ -234,10 +234,10 @@ namespace Isis {
 
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3], dist;
-    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
-    unorm_c(puB, upuB, &dist);
+    naif->vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
+    naif->unorm_c(puB, upuB, &dist);
 
-    double angle = vdot_c((SpiceDouble *) &m_normal[0], upuB);
+    double angle = naif->vdot_c((SpiceDouble *) &m_normal[0], upuB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
     return acos(angle) * RAD2DEG;
@@ -256,7 +256,8 @@ namespace Isis {
    *
    * @return @b bool Indicates whether this shape model found a valid ellipsoid intersection.
    */
-  bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
+  bool ShapeModel::intersectEllipsoid(NaifContextPtr naif,
+                                      const std::vector<double> observerBodyFixedPosition,
                                       const std::vector<double> &observerLookVectorToTarget) {
 
     // Clear out previous surface point and normal
@@ -280,10 +281,10 @@ namespace Isis {
     SpiceDouble intersectionPoint[3];
     SpiceBoolean intersected = false;
 
-    NaifStatus::CheckErrors();
-    surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
-             intersectionPoint, &intersected);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
+                   intersectionPoint, &intersected);
+    naif->CheckErrors();
 
     if (intersected) {
       m_surfacePoint->FromNaifArray(intersectionPoint);
@@ -313,7 +314,8 @@ namespace Isis {
    *
    * @return @b double Phase angle, in degrees.
    */
-  double ShapeModel::phaseAngle(const std::vector<double> &observerBodyFixedPosition,
+  double ShapeModel::phaseAngle(NaifContextPtr naif,
+                                const std::vector<double> &observerBodyFixedPosition,
                                 const std::vector<double> &illuminatorBodyFixedPosition) {
 
     // Get vector from center of body to surface point
@@ -324,15 +326,15 @@ namespace Isis {
 
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c((SpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
-    unorm_c(psB, upsB, &dist);
+    naif->vsub_c((SpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
+    naif->unorm_c(psB, upsB, &dist);
 
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3];
-    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
-    unorm_c(puB, upuB, &dist);
+    naif->vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
+    naif->unorm_c(puB, upuB, &dist);
 
-    double angle = vdot_c(upsB, upuB);
+    double angle = naif->vdot_c(upsB, upuB);
 
     // How can these lines be tested???
     if(angle > 1.0) return 0.0;
@@ -420,10 +422,11 @@ namespace Isis {
  * 
  * @return bool True if the point is not visable, false if it can be seen
  */
-  bool ShapeModel::isVisibleFrom(const std::vector<double> observerPos,
+  bool ShapeModel::isVisibleFrom(NaifContextPtr naif,
+                                 const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection)  {
     if ( hasIntersection() ) {
-      if ( fabs(emissionAngle(observerPos)) <= 90.0 ) {
+      if ( fabs(emissionAngle(naif, observerPos)) <= 90.0 ) {
         return (true);
       }
     }

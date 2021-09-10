@@ -31,7 +31,10 @@
 
 #include "IException.h"
 #include "IString.h"
-#include "NaifContext.h"
+
+#include "NaifContextCast.h"
+
+#include <math.h>
 
 namespace Isis {
   /**
@@ -53,9 +56,9 @@ namespace Isis {
    * @param rotation   rotation defined as either a matrix or another quaternion
    *                            loaded as a vector
    */
-  Quaternion::Quaternion(const std::vector<double> rotation) {
+  Quaternion::Quaternion(const std::vector<double> rotation, NaifContextPtr naif) {
     p_quaternion.resize(4);
-    Set(rotation);
+    Set(rotation, naif);
 
   }
 
@@ -67,12 +70,12 @@ namespace Isis {
    *
    * @param rotation   rotation defined as either a matrix or a set of 3 angles
    */
-  void Quaternion::Set(std::vector<double> rotation) {
+  void Quaternion::Set(std::vector<double> rotation, NaifContextPtr naif) {
 
     if(rotation.size() == 9) {        // Matrix initialization
-      NaifStatus::CheckErrors();
-      m2q_c(&rotation[0], &p_quaternion[0]);
-      NaifStatus::CheckErrors();
+      naif->CheckErrors();
+      naif->m2q_c(&rotation[0], &p_quaternion[0]);
+      naif->CheckErrors();
     }
     else if(rotation.size() == 4) {   //quaternion initialization
       p_quaternion = rotation;
@@ -86,9 +89,9 @@ namespace Isis {
 
 
   //! Converts quaternion to 3x3 rotational matrix
-  std::vector<double> Quaternion::ToMatrix() {
+  std::vector<double> Quaternion::ToMatrix(NaifContextPtr naif) {
     std::vector<double> matrix(9);
-    q2m_c(&p_quaternion[0], (SpiceDouble( *)[3]) &matrix[0]);
+    naif->q2m_c(&p_quaternion[0], (SpiceDouble( *)[3]) &matrix[0]);
     return matrix;
   }
 
@@ -129,11 +132,13 @@ namespace Isis {
    *
    */
   Quaternion &Quaternion::operator*=(const Quaternion &quat) {
+    auto naif = NaifContext::acquire();
+
     std::vector<double> qout(4);
 
-    qxq_c((SpiceDouble *) & (this->p_quaternion[0]),
-          (SpiceDouble *) & (quat.p_quaternion[0]),
-          (SpiceDouble *) & (qout[0]));
+    naif->qxq_c((SpiceDouble *) & (this->p_quaternion[0]),
+                (SpiceDouble *) & (quat.p_quaternion[0]),
+                (SpiceDouble *) & (qout[0]));
     this->p_quaternion[0] = qout[0];
     this->p_quaternion[1] = qout[1];
     this->p_quaternion[2] = qout[2];
@@ -226,7 +231,7 @@ namespace Isis {
    * @param [in] vin (const std::vector<double>(3)) Vector to be multiplied
    *                                                (rotated)
    */
-  std::vector<double> Quaternion::Qxv(const std::vector<double> &vin) {
+  std::vector<double> Quaternion::Qxv(const std::vector<double> &vin, NaifContextPtr naif) {
     if(vin.size() != 3) {
       std::string msg = "Unexpected vector size -- 3 expected";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -238,8 +243,8 @@ namespace Isis {
     qvin.p_quaternion[2] = vin[1];
     qvin.p_quaternion[3] = vin[2];
 
-    Quaternion qvout(p_quaternion);
-    Quaternion conj(p_quaternion);
+    Quaternion qvout(p_quaternion, naif);
+    Quaternion conj(p_quaternion, naif);
     qvout *= qvin;
     qvout *= conj.Conjugate();
     std::vector<double> vout(qvout.p_quaternion.begin() + 1, qvout.p_quaternion.end());
@@ -271,13 +276,13 @@ namespace Isis {
     * the quaternion
     *
     */
-  std::vector<double> Quaternion::ToAngles(int axis3, int axis2, int axis1) {
+  std::vector<double> Quaternion::ToAngles(int axis3, int axis2, int axis1, NaifContextPtr naif) {
     std::vector<double> rotationMatrix = ToMatrix();
     SpiceDouble ang1, ang2, ang3;
-    NaifStatus::CheckErrors();
-    m2eul_c((SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,
-            &ang3, &ang2, &ang1);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->m2eul_c((SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,
+                  &ang3, &ang2, &ang1);
+    naif->CheckErrors();
     std::vector<double> angles;
     angles.push_back(ang1);
     angles.push_back(ang2);

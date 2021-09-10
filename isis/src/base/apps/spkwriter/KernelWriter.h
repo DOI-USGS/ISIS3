@@ -81,8 +81,8 @@ class KernelWriter {
     }
 
     /** Write header with comments provided   */
-    void header(const QString &comment) {
-      WriteComment(_handle, comment);
+    void header(NaifContextPtr naif, const QString &comment) {
+      WriteComment(naif, _handle, comment);
     }
 
     /** Write a set of kernel segments from teh Kernels segment container */
@@ -127,10 +127,10 @@ class KernelWriter {
 
   protected:
     /** These virtual methods must be provided by the K class */
-    virtual int k_open(const QString &kfile, const int &comsize = 512) = 0;
-    virtual void k_write(const SpiceInt &handle, const K &kernels) = 0;
-    virtual void k_close(SpiceInt &handle) = 0;
-    virtual QString k_header(const QString &comfile = "") const = 0;
+    virtual int k_open(NaifContextPtr naif, const QString &kfile, const int &comsize = 512) = 0;
+    virtual void k_write(NaifContextPtr naif, const SpiceInt &handle, const K &kernels) = 0;
+    virtual void k_close(NaifContextPtr naif, SpiceInt &handle) = 0;
+    virtual QString k_header(NaifContextPtr naif, const QString &comfile = "") const = 0;
 
   private:
     SpiceInt    _handle;    ///< SPICE file handle
@@ -141,7 +141,7 @@ class KernelWriter {
      *
      * @return bool Returns success if so.
      */
-    virtual bool WriteComment(SpiceInt handle, const QString &comment)
+    virtual bool WriteComment(NaifContextPtr naif, SpiceInt handle, const QString &comment)
                               const {
       if ( handle == 0 ) {
         QString mess = "Comments cannot be written as the file is not open";
@@ -152,12 +152,12 @@ class KernelWriter {
       // Calling environments can decide how to handle it.
       try {
         QString commOut;
-        NaifStatus::CheckErrors();
+        naif->CheckErrors();
         for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
-             dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
-             NaifStatus::CheckErrors();
+             naif->dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
+             naif->CheckErrors();
              commOut.clear();
            }
            else {
@@ -168,8 +168,8 @@ class KernelWriter {
         // See if there is residual to write
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
-          NaifStatus::CheckErrors();
+          naif->dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
+          naif->CheckErrors();
         }
       }
       catch (IException &) {

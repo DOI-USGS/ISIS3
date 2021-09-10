@@ -63,8 +63,8 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::SetFocalPlane(const double ux, const double uy, const double uz) {
-    NaifStatus::CheckErrors();
+  bool CameraGroundMap::SetFocalPlane(const double ux, const double uy, const double uz, NaifContextPtr naif) {
+    naif->CheckErrors();
 
     SpiceDouble lookC[3];
     lookC[0] = ux;
@@ -72,11 +72,11 @@ namespace Isis {
     lookC[2] = uz;
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
+    naif->vhat_c(lookC, unitLookC);
 
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
 
-    bool result = p_camera->SetLookDirection(unitLookC);
+    bool result = p_camera->SetLookDirection(unitLookC, naif);
     return result;
   }
 
@@ -89,7 +89,7 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+  bool CameraGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
     if (p_camera->target()->shape()->name() == "Plane") {
       double radius = lat.degrees(); 
       // double azimuth = lon.degrees();
@@ -97,16 +97,16 @@ namespace Isis {
       if (radius < 0.0) radius = 0.0; // TODO: massive, temporary kluge to get around testing
                                                      // latitude at -90 in caminfo app (are there
                                                      // more issues like this? Probably)KE
-      if (p_camera->Sensor::SetGround(SurfacePoint(lat, lon, Distance(radius, Distance::Meters)))) {
-         LookCtoFocalPlaneXY();
+      if (p_camera->Sensor::SetGround(naif, SurfacePoint(lat, lon, Distance(radius, Distance::Meters)))) {
+         LookCtoFocalPlaneXY(naif);
          return true;
       }
     }
     else {
       Distance radius(p_camera->LocalRadius(lat, lon));
       if (radius.isValid()) {
-        if (p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
-          LookCtoFocalPlaneXY();
+        if (p_camera->Sensor::SetGround(naif, SurfacePoint(lat, lon, radius))) {
+          LookCtoFocalPlaneXY(naif);
           return true;
         }
       }
@@ -119,9 +119,9 @@ namespace Isis {
   /**
    * Compute undistorted focal plane coordinate from camera look vector
    */
-  void CameraGroundMap::LookCtoFocalPlaneXY() {
+  void CameraGroundMap::LookCtoFocalPlaneXY(NaifContextPtr naif) {
     double lookC[3];
-    p_camera->Sensor::LookDirection(lookC);
+    p_camera->Sensor::LookDirection(lookC, naif);
 
     //Get the fl as the z coordinate to handle instruments looking down the -z axis 2013-02-22.
     double focalLength = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
@@ -139,9 +139,9 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
-    if (p_camera->Sensor::SetGround(surfacePoint)) {
-      LookCtoFocalPlaneXY();
+  bool CameraGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) {
+    if (p_camera->Sensor::SetGround(naif, surfacePoint)) {
+      LookCtoFocalPlaneXY(naif);
       return true;
     }
 
@@ -165,7 +165,8 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::GetXY(const SurfacePoint &point, double *cudx, 
+  bool CameraGroundMap::GetXY(NaifContextPtr naif,
+                              const SurfacePoint &point, double *cudx, 
                               double *cudy, bool test) {
 
     vector<double> pB(3);
@@ -183,7 +184,7 @@ namespace Isis {
     // Get spacecraft vector in j2000 coordinates
     SpiceRotation *bodyRot = p_camera->bodyRotation();
     SpiceRotation *instRot = p_camera->instrumentRotation();
-    vector<double> pJ = bodyRot->J2000Vector(pB);
+    vector<double> pJ = bodyRot->J2000Vector(pB, naif);
     vector<double> sJ = p_camera->instrumentPosition()->Coordinate();
 
     // Calculate lookJ
@@ -211,12 +212,12 @@ namespace Isis {
     // Check for point on back of planet by checking to see if surface point is viewable 
     //   (test emission angle)
     if (test) {
-      vector<double> lookB = bodyRot->ReferenceVector(lookJ);
+      vector<double> lookB = bodyRot->ReferenceVector(lookJ, naif);
       double upsB[3], upB[3], dist;
-      vminus_c((SpiceDouble *) &lookB[0], upsB);
-      unorm_c(upsB, upsB, &dist);
-      unorm_c((SpiceDouble *) &pB[0], upB, &dist);
-      double cosangle = vdot_c(upB, upsB);
+      naif->vminus_c((SpiceDouble *) &lookB[0], upsB);
+      naif->unorm_c(upsB, upsB, &dist);
+      naif->unorm_c((SpiceDouble *) &pB[0], upB, &dist);
+      double cosangle = naif->vdot_c(upB, upsB);
       double emission;
       if (cosangle > 1) {
         emission = 0;
@@ -237,7 +238,7 @@ namespace Isis {
     m_lookJ.resize(3);
     m_lookJ = lookJ;
     vector<double> lookC(3);
-    lookC = instRot->ReferenceVector(m_lookJ);
+    lookC = instRot->ReferenceVector(m_lookJ, naif);
 
     // Get focal length with direction for scaling coordinates
     double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
@@ -267,12 +268,13 @@ namespace Isis {
    *
    * @see the application socetlinescankeywords
    */
-  bool CameraGroundMap::GetXY(const double lat, const double lon,
+  bool CameraGroundMap::GetXY(NaifContextPtr naif,
+                              const double lat, const double lon,
                               const double radius, double *cudx, double *cudy) {
     SurfacePoint spoint(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(radius, Distance::Meters));
-    return GetXY(spoint, cudx, cudy);
+    return GetXY(naif, spoint, cudx, cudy);
   }
 
 
@@ -292,7 +294,8 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
+  bool CameraGroundMap::GetdXYdPosition(NaifContextPtr naif,
+                                        const SpicePosition::PartialType varType, int coefIndex,
                                         double *dx, double *dy) {
 
     //TODO add a check to make sure m_lookJ has been set
@@ -303,13 +306,13 @@ namespace Isis {
     // Rotate look vector into camera frame
     SpiceRotation *instRot = p_camera->instrumentRotation();
     vector<double> lookC(3);
-    lookC = instRot->ReferenceVector(m_lookJ);
+    lookC = instRot->ReferenceVector(m_lookJ, naif);
 
     SpicePosition *instPos = p_camera->instrumentPosition();
 
     vector<double> d_lookJ = instPos->CoordinatePartial(varType, coefIndex);
     for (int j = 0; j < 3; j++) d_lookJ[j] *= -1.0;
-    vector<double> d_lookC =  instRot->ReferenceVector(d_lookJ);
+    vector<double> d_lookC =  instRot->ReferenceVector(d_lookJ, naif);
     *dx = fl * DQuotient(lookC, d_lookC, 0);
     *dy = fl * DQuotient(lookC, d_lookC, 1);
     return true;
@@ -331,7 +334,8 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::GetdXYdOrientation(const SpiceRotation::PartialType varType, int coefIndex,
+  bool CameraGroundMap::GetdXYdOrientation(NaifContextPtr naif,
+                                           const SpiceRotation::PartialType varType, int coefIndex,
                                            double *dx, double *dy) {
 
     //TODO add a check to make sure m_lookJ has been set
@@ -342,10 +346,10 @@ namespace Isis {
     // Rotate J2000 look vector into camera frame
     SpiceRotation *instRot = p_camera->instrumentRotation();
     vector<double> lookC(3);
-    lookC = instRot->ReferenceVector(m_lookJ);
+    lookC = instRot->ReferenceVector(m_lookJ, naif);
 
     // Rotate J2000 look vector into camera frame through the derivative rotation
-    vector<double> d_lookC = instRot->ToReferencePartial(m_lookJ, varType, coefIndex);
+    vector<double> d_lookC = instRot->ToReferencePartial(m_lookJ, varType, coefIndex, naif);
 
     *dx = fl * DQuotient(lookC, d_lookC, 0);
     *dy = fl * DQuotient(lookC, d_lookC, 1);
@@ -367,7 +371,8 @@ namespace Isis {
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::GetdXYdTOrientation(const SpiceRotation::PartialType varType, int coefIndex,
+  bool CameraGroundMap::GetdXYdTOrientation(NaifContextPtr naif,
+                                            const SpiceRotation::PartialType varType, int coefIndex,
                                             double *dx, double *dy) {
 
     //TODO add a check to make sure m_pB and m_lookJ have been set. 
@@ -384,13 +389,13 @@ namespace Isis {
     // Rotate body-fixed look vector into J2000 through the derivative rotation
     SpiceRotation *bodyRot = p_camera->bodyRotation();
     SpiceRotation *instRot = p_camera->instrumentRotation();
-    vector<double> dlookJ = bodyRot->toJ2000Partial(m_pB, varType, coefIndex);
+    vector<double> dlookJ = bodyRot->toJ2000Partial(m_pB, varType, coefIndex, naif);
     vector<double> lookC(3);
     vector<double> dlookC(3);
 
     // Rotate both the J2000 look vector and the derivative J2000 look vector into the camera
-    lookC = instRot->ReferenceVector(m_lookJ);
-    dlookC = instRot->ReferenceVector(dlookJ);
+    lookC = instRot->ReferenceVector(m_lookJ, naif);
+    dlookC = instRot->ReferenceVector(dlookJ, naif);
 
     *dx = fl * DQuotient(lookC, dlookC, 0);
     *dy = fl * DQuotient(lookC, dlookC, 1);
@@ -411,7 +416,7 @@ namespace Isis {
    *
    * @return conversion was successful 
    */
-  bool CameraGroundMap::GetdXYdPoint(vector<double> d_pB, double *dx, double *dy) {
+  bool CameraGroundMap::GetdXYdPoint(NaifContextPtr naif, vector<double> d_pB, double *dx, double *dy) {
 
     //  TODO  add a check to make sure m_lookJ has been set
 
@@ -421,11 +426,11 @@ namespace Isis {
     // Rotate look vector into camera frame
     SpiceRotation *instRot = p_camera->instrumentRotation();
     vector<double> lookC(3);
-    lookC = instRot->ReferenceVector(m_lookJ);
+    lookC = instRot->ReferenceVector(m_lookJ, naif);
 
     SpiceRotation *bodyRot = p_camera->bodyRotation();
-    vector<double> d_lookJ = bodyRot->J2000Vector(d_pB);
-    vector<double> d_lookC = instRot->ReferenceVector(d_lookJ);
+    vector<double> d_lookJ = bodyRot->J2000Vector(d_pB, naif);
+    vector<double> d_lookC = instRot->ReferenceVector(d_lookJ, naif);
 
     *dx = fl * DQuotient(lookC, d_lookC, 0);
     *dy = fl * DQuotient(lookC, d_lookC, 1);

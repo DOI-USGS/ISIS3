@@ -11,23 +11,26 @@
 #include "Preference.h"
 #include "Spice.h"
 #include "NaifContext.h"      
+#include "NaifContextCast.h"
 
 using namespace std;
 
 int main() {
   Isis::Preference::Preferences(true);
+  Isis::NaifContextLifecycle naif_lifecycle;
+  auto naif = Isis::NaifContext::acquire();
 
   // Test the matrix constructor
   std::vector<double> inMat(9);
   std::vector<double> outMat(9);
 
   //call eul2m to make a matrix and fill the vector
-  eul2m_c(0, 77.2 * rpd_c(), -100.94 * rpd_c(), 1, 3, 1,
-          (SpiceDouble( *)[3])(&inMat[0]));
+  naif->eul2m_c(0, 77.2 * naif->rpd_c(), -100.94 * naif->rpd_c(), 1, 3, 1,
+                (SpiceDouble( *)[3])(&inMat[0]));
 
-  Isis::Quaternion q1(inMat);
+  Isis::Quaternion q1(inMat, naif);
 
-  outMat = q1.ToMatrix();
+  outMat = q1.ToMatrix(naif);
 
   // Take care of Solaris round-off.  Find a better way later.
   if(abs(outMat[6]) < .000000000000001) outMat[6] = 0.;
@@ -42,7 +45,7 @@ int main() {
 
   // compare inquat and q1
   std::vector<double> inquat(4);
-  m2q_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &inquat[0]);
+  naif->m2q_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &inquat[0]);
   cout << " Naif quaternion from matrix:  " << " " << inquat[0] << " " << inquat[1] << " "
        << inquat[2] <<
        " " << inquat[3] << endl;
@@ -50,8 +53,8 @@ int main() {
        << " " << q1[3] << endl;
 
   // compare angles
-  double cvt = dpr_c();
-  std::vector<double> angles =  q1.ToAngles(1, 3, 1);
+  double cvt = naif->dpr_c();
+  std::vector<double> angles =  q1.ToAngles(1, 3, 1, naif);
 
   // Take care of Solaris round-off.  Find a better way later.
   if(abs(angles[2]) < .000000000000001) angles[2] = 0.;
@@ -62,7 +65,7 @@ int main() {
 
 
   //Test the quaternion constructor
-  Isis::Quaternion q2(inquat);
+  Isis::Quaternion q2(inquat, naif);
   cout << "Class constructed quaternion:  " << " " << q2[0] << " " << q2[1] << " " << q2[2]
        << " " << q2[3] << endl;
 
@@ -93,14 +96,14 @@ int main() {
   multMat[7] = 0.;
   multMat[8] = 1.;
 
-  Isis::Quaternion multQ(multMat);
+  Isis::Quaternion multQ(multMat, naif);
 
-  mxm_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &multMat[0],
-        (SpiceDouble( *) [3]) &outMat[0]);
+  naif->mxm_c((SpiceDouble *) &inMat[0], (SpiceDouble *) &multMat[0],
+              (SpiceDouble( *) [3]) &outMat[0]);
 
   SpiceDouble naifQ[4];
 
-  m2q_c((SpiceDouble *) &outMat[0], naifQ);
+  naif->m2q_c((SpiceDouble *) &outMat[0], naifQ);
   q2 *= multQ;
   cout << "Naif mult  :  " << naifQ[0] << " " << naifQ[1] << " " << naifQ[2] <<
        " " << naifQ[3] << endl;
@@ -137,22 +140,22 @@ int main() {
 
   cout << vecIn[0] << " " << vecIn[1] << " " << vecIn[2] << endl;
 
-  std::vector<double> vecOut = q6.Qxv(vecIn);
+  std::vector<double> vecOut = q6.Qxv(vecIn, naif);
 
   cout << "qxv output = " << vecOut[0] << " " << vecOut[1] << " " << vecOut[2]
        << endl;
 
-  std::vector<double> mymat = q6.ToMatrix();
+  std::vector<double> mymat = q6.ToMatrix(naif);
 
   cout << "mymat = " << mymat[0] << " " << mymat[1] << " " << mymat[2] << endl
        << "         " << mymat[3] << " " << mymat[4] << " " << mymat[5] << endl
        << "         " << mymat[6] << " " << mymat[7] << " " << mymat[8] << endl;
 
   SpiceDouble myVecOut[3];
-  mxv_c((SpiceDouble *) &mymat[0], (SpiceDouble *) &vecIn[0], myVecOut);
+  naif->mxv_c((SpiceDouble *) &mymat[0], (SpiceDouble *) &vecIn[0], myVecOut);
 
   cout << "my qxv output = " << myVecOut[0] << " " << myVecOut[1] << " "
        << myVecOut[2]  << endl;
 
-  Isis::NaifStatus::CheckErrors(); //make sure none of the SPICE calls caused an error
+  naif->CheckErrors(); //make sure none of the SPICE calls caused an error
 }

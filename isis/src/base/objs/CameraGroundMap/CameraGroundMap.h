@@ -95,7 +95,7 @@ namespace Isis {
       virtual ~CameraGroundMap() {};
 
       virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz);
+                                 const double uz, NaifContextPtr naif);
 
       /**
        * Radius axes types to use when computing partials. When computing partials, this enum
@@ -110,22 +110,22 @@ namespace Isis {
         WRT_PolarAxis
       };
 
-      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
-      virtual bool SetGround(const SurfacePoint &surfacePoint);
-      virtual bool GetXY(const SurfacePoint &spoint, double *cudx, 
+      virtual bool SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon);
+      virtual bool SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint);
+      virtual bool GetXY(NaifContextPtr naif, const SurfacePoint &spoint, double *cudx, 
                        double *cudy, bool test=true);
-      virtual bool GetXY(const double lat, const double lon,
+      virtual bool GetXY(NaifContextPtr naif, const double lat, const double lon,
                          const double radius, double *cudx, double *cudy);
-      virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,
+      virtual bool GetdXYdPosition(NaifContextPtr naif, const SpicePosition::PartialType varType,
                                    int coefIndex,
                                    double *cudx, double *cudy);
-      virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType,
+      virtual bool GetdXYdOrientation(NaifContextPtr naif, const SpiceRotation::PartialType varType,
                                       int coefIndex,
                                       double *cudx, double *cudy);
-      virtual bool GetdXYdTOrientation(const SpiceRotation::PartialType varType,
+      virtual bool GetdXYdTOrientation(NaifContextPtr naif, const SpiceRotation::PartialType varType,
                                        int coefIndex,
                                        double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(std::vector<double> d_pB,
+      virtual bool GetdXYdPoint(NaifContextPtr naif, std::vector<double> d_pB,
                                 double *dx, double *dy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
       std::vector<double> EllipsoidPartial(SurfacePoint spoint, PartialType raxis);
@@ -153,7 +153,7 @@ namespace Isis {
       double p_focalPlaneY; //!< Camera's y focal plane coordinate
 
     private:
-      void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
+      void LookCtoFocalPlaneXY(NaifContextPtr naif);  //!< Calculate focalplane x/y from lookvector in camera
       /** Surface point calculated from ground coordinates in GetXY and used for partials*/
       std::vector<double> m_pB;
       /** Look vector in J2000 calculated from ground coordinates in GetXY and used for partials*/

@@ -59,7 +59,7 @@ namespace Isis {
                                                               and this uses 0-based indexing. */
 
       // Custom DSK reader
-      void loadFromDsk(const QString &dskfile);
+      void loadFromDsk(const QString &dskfile, NaifContextPtr naif);
 
   };
 

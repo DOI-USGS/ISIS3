@@ -72,12 +72,13 @@ namespace Isis {
   * @param ikCode NAIF code for instrument
   * @param spice  Spice object associated with geometry
   */
-  LightTimeCorrectionState::LightTimeCorrectionState(int ikCode,
+  LightTimeCorrectionState::LightTimeCorrectionState(NaifContextPtr naif,
+                                                     int ikCode,
                                                      Spice *spice) {
     setDefaultState();
-    checkObserverTargetSwap(ikCode, spice);
-    checkAberrationCorrection(ikCode, spice);
-    checkLightTimeToSurfaceCorrect(ikCode, spice);
+    checkObserverTargetSwap(naif, ikCode, spice);
+    checkAberrationCorrection(naif, ikCode, spice);
+    checkLightTimeToSurfaceCorrect(naif, ikCode, spice);
   }
 
 
@@ -119,11 +120,12 @@ namespace Isis {
  *              keywords  
  * @return bool True if a value was found and applied
  */
-  bool LightTimeCorrectionState::checkAberrationCorrection(int ikCode, 
+  bool LightTimeCorrectionState::checkAberrationCorrection(NaifContextPtr naif,
+                                                         int ikCode, 
                                                          Spice *spice) {
     try {
       QString ikernKey = "INS" + toString(ikCode) + "_LIGHTTIME_CORRECTION";
-      QString abcorr = spice->getString(ikernKey);
+      QString abcorr = spice->getString(naif, ikernKey);
       m_abcorr = abcorr;
       return (true);
     }
@@ -185,12 +187,12 @@ namespace Isis {
  *               section of the SPK, otherwise false if it is not found.  When
  *               false, the existing value is retained.
  */
-  bool LightTimeCorrectionState::checkSpkKernelsForAberrationCorrection() {
+  bool LightTimeCorrectionState::checkSpkKernelsForAberrationCorrection(NaifContextPtr naif) {
     //  Determine loaded-only kernels.  Our search is restricted to only 
     //  kernels that are loaded and, currently, only of SPK type is of 
     //  interest.
     Kernels kernels;
-    kernels.Discover();
+    kernels.Discover(naif);
 
     //  Init the tag to Qt QString for effective searching
     QString qtag("ID:USGS_SPK_ABCORR");
@@ -198,7 +200,7 @@ namespace Isis {
 
     //  Retrieve list of loaded SPKs from Kernel object
     QStringList spks = kernels.getKernelList("SPK");
-    NaifStatus::CheckErrors(); 
+    naif->CheckErrors(); 
     for ( int k = 0 ; k < spks.size() ; k++ ) {
       QString spkFile = spks[k];
       SpiceChar ktype[32];
@@ -206,8 +208,8 @@ namespace Isis {
       SpiceInt  handle;
       SpiceBoolean found;
       //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-      (void) kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
-                     source, &handle, &found);
+      (void) naif->kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
+                           source, &handle, &found);
       if (found == SPICETRUE) {
         // SPK is open so read and parse all the comments.
         SpiceChar commnt[1001];
@@ -219,7 +221,7 @@ namespace Isis {
         // first comment line when and only when the last comment line is
         // read.  This is not apparent in the NAIF documentation.
         while ( !done ) {
-          dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+          naif->dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
           QString cmmt(commnt);
           int pos = 0;
           if ( (pos = cmmt.indexOf(qtag, pos, Qt::CaseInsensitive)) != -1 ) {
@@ -233,7 +235,7 @@ namespace Isis {
         if ( !abcorr.isEmpty() )  break;
       }
     }
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
   
     // Set internal state only if it was found in the kernels, otherwise the 
     // existing state is preserved.
@@ -266,12 +268,13 @@ namespace Isis {
  * @return true if swap of observer/target is requested via kernel pool 
  *         variables
  */
-  bool LightTimeCorrectionState::checkObserverTargetSwap(int ikCode, 
+  bool LightTimeCorrectionState::checkObserverTargetSwap(NaifContextPtr naif,
+                                                         int ikCode, 
                                                          Spice *spice) {
 
     try {
       QString ikernKey = "INS" + toString(ikCode) + "_SWAP_OBSERVER_TARGET";
-      QString value = spice->getString(ikernKey).toUpper();
+      QString value = spice->getString(naif, ikernKey).toUpper();
       m_swapObserverTarget = ("TRUE" == value);
     }
     catch (IException &ie) {
@@ -318,12 +321,13 @@ namespace Isis {
  * @return bool State of light time from surface to center body correction as 
  *         determined.
  */
-  bool LightTimeCorrectionState::checkLightTimeToSurfaceCorrect(int ikCode, 
+  bool LightTimeCorrectionState::checkLightTimeToSurfaceCorrect(NaifContextPtr naif,
+                                                                int ikCode, 
                                                                 Spice *spice) {
 
     try {
       QString ikernKey = "INS" + toString(ikCode) + "_LT_SURFACE_CORRECT";
-      QString value = spice->getString(ikernKey).toUpper();
+      QString value = spice->getString(naif, ikernKey).toUpper();
       m_sc_to_surf_ltcorr = ("TRUE" == value);
     }
     catch (IException &ie) {

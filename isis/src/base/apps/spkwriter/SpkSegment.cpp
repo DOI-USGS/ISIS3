@@ -52,17 +52,18 @@ SpkSegment::SpkSegment() : SpkSpiceSegment() {
 
 /** Constructor from ISIS cube file by name of the cube */
 SpkSegment::SpkSegment(const QString &fname, const int spkType) : SpkSpiceSegment() {
+  auto naif = NaifContext::acquire();
   init(spkType);
   Cube cube;
   cube.open(fname);
-  SpkSpiceSegment::init(cube);
-  import(cube);
+  SpkSpiceSegment::init(cube, naif);
+  import(cube, naif);
 }
 
 /** Constructor from ISIS cube object */
 SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpkSpiceSegment(cube) {
   init(spkType);
-  import(cube);
+  import(cube, NaifContext::acquire());
 }
 
 /**
@@ -86,11 +87,11 @@ SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpkSpiceSegment(cube) {
  *                           to make this option available for testing.
  *                           This will need to be an option in the future.
  */
-void SpkSegment::import(Cube &cube) {
+void SpkSegment::import(Cube &cube, NaifContextPtr naif) {
   //typedef std::vector<QString>  StrList;
 
   //  Extract ISIS SPK blob and transform to requested content
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   try {
 
     Camera *camera(cube.camera());
@@ -100,9 +101,9 @@ void SpkSegment::import(Cube &cube) {
     kernels.Load("PCK,LSK,FK,SPK,EXTRA");
     m_body = camera->SpkTargetId();
     m_center = camera->SpkCenterId();
-    m_refFrame = getNaifName(camera->SpkReferenceId());
-    m_bodyFrame = getNaifName(m_body);
-    m_centerFrame = getNaifName(m_center);
+    m_refFrame = getNaifName(camera->SpkReferenceId(), naif);
+    m_bodyFrame = getNaifName(m_body, naif);
+    m_centerFrame = getNaifName(m_center, naif);
 
     //  Get the SPICE data
     Table spkCache("SpkSegment");
@@ -118,7 +119,7 @@ void SpkSegment::import(Cube &cube) {
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
-    getStates(*camera, load(spkCache), m_states, m_epochs, m_hasVV);
+    getStates(naif, *camera, load(spkCache), m_states, m_epochs, m_hasVV);
 
     // Save current time
     SpicePosition *ipos(camera->instrumentPosition());
@@ -165,8 +166,8 @@ void SpkSegment::import(Cube &cube) {
       cout << " " << setw(26) << setprecision(13) << m_epochs[i] << "\n";
     }
 #endif
-    setStartTime(m_epochs[0]);
-    setEndTime(m_epochs[size(m_epochs)-1]);
+    setStartTime(m_epochs[0], naif);
+    setEndTime(m_epochs[size(m_epochs)-1], naif);
 
   } catch ( IException &ie  ) {
     ostringstream mess;
@@ -202,7 +203,7 @@ void SpkSegment::import(Cube &cube) {
  * @param states Matrix containing "nrecs" states vectors
  * @param times  TBD epoch times for each record
  */
-void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
+void SpkSegment::getStates(NaifContextPtr naif, Camera &camera, const SMatrix &spice,
                            SMatrix &states, SVector &epochs, bool &hasVV)
                            const {
   int nrecs = size(spice);
@@ -228,13 +229,13 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
   QString j2000 = getNaifName(1);  // ISIS stores in J2000
   if (j2000 != m_refFrame) {
     // cout << "FromFrame = " << j2000 << ", TOFrame = " << _refFrame << "\n";
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[n], xform);
-      mxvg_c(xform, states[n], 6, 6, states[n]);
+      naif->sxform_c(j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[n], xform);
+      naif->mxvg_c(xform, states[n], 6, 6, states[n]);
     }
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
   }
 
   return;

@@ -71,20 +71,21 @@ namespace Isis {
       using Isis::ShapeModel::intersectSurface; 
 
       //! Intersect the shape model
-      bool intersectSurface(std::vector<double> observerPos,
+      bool intersectSurface(NaifContextPtr naif,
+                            std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
       //! Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
+      virtual void calculateDefaultNormal(NaifContextPtr naif);
 
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
 
       //! Calculate the local surface normal of the current intersection point
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
+      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
 
       //! Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal();
+      void calculateSurfaceNormal(NaifContextPtr naif);
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);

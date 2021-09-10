@@ -50,7 +50,7 @@ namespace Isis {
    *                                 kernel as needing special light time and
    *                                 stellar aberration correction in spiceinit
    */
-  QString SpkKernelWriter::k_header(const QString &comfile) const {
+  QString SpkKernelWriter::k_header(NaifContextPtr naif, const QString &comfile) const {
     ostringstream comment;
     comment << "\
  ****************************************************************************\n\

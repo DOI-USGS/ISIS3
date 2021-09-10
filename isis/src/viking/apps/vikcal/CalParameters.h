@@ -233,7 +233,7 @@ namespace Isis {
                        int cam, QString wav, int cs1, int cs2, int cs3, int cs4);
       void vikoffSetup(QString mission, int spn, QString target,
                        int cam, double clock, int cs3);
-      void CalcSunDist(QString t);
+      void CalcSunDist(NaifContextPtr naif, QString t);
 
       double p_labexp;           //!<Exposure Duration from cube label
       double p_w0;               //!<Omega0 from vikcal.sav file

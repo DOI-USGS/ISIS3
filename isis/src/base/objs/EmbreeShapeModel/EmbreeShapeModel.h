@@ -63,7 +63,8 @@ namespace Isis {
       virtual ~EmbreeShapeModel();
 
       // Intersect the shape model
-      virtual bool intersectSurface(std::vector<double> observerPos,
+      virtual bool intersectSurface(NaifContextPtr naif,
+                                    std::vector<double> observerPos,
                                     std::vector<double> lookDirection);
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
@@ -80,18 +81,19 @@ namespace Isis {
       void   setTolerance(const double &tolerance);
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
+      virtual void calculateDefaultNormal(NaifContextPtr naif);
       // Calculate the surface normal of the current intersection point
-      virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      virtual void calculateSurfaceNormal();
-      QVector<double> ellipsoidNormal();
+      virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
+      virtual void calculateSurfaceNormal(NaifContextPtr naif);
+      QVector<double> ellipsoidNormal(NaifContextPtr naif);
 
-      virtual double incidenceAngle(const std::vector<double> &uB);
+      virtual double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB);
 
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon);
 
       // Determine if the internal intercept is occluded from the observer/lookdir
-      virtual bool isVisibleFrom(const std::vector<double> observerPos,
+      virtual bool isVisibleFrom(NaifContextPtr naif,
+                                 const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection);
 
     private:

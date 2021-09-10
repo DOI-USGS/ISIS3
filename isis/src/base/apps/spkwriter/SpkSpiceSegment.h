@@ -109,19 +109,19 @@ class SpkSpiceSegment {
     virtual QString getComment() const = 0;
 
   protected:
-    void init(Cube &cube);
+    void init(Cube &cube, NaifContextPtr naif);
     QString getKeyValue(PvlObject &label, const QString &keyword);
     const Kernels &getKernels() const { return (_kernels); }
-    bool getImageTimes(Pvl &lab, double &start, double &end) const;
+    bool getImageTimes(NaifContextPtr naif, Pvl &lab, double &start, double &end) const;
     SMatrix expand(int ntop, int nbot, const SMatrix &matrix) const;
     SVector expand(int ntop, int nbot, const SVector &vec) const;
 
-    void setStartTime(double et);
-    void setEndTime(double et);
+    void setStartTime(double et, NaifContextPtr naif);
+    void setEndTime(double et, NaifContextPtr naif);
 
-    QString getNaifName(int naifid) const;
-    QString toUTC(const double &et) const;
-    double UTCtoET(const QString &utc) const;
+    QString getNaifName(int naifid, NaifContextPtr naif) const;
+    QString toUTC(const double &et, NaifContextPtr naif) const;
+    double UTCtoET(const QString &utc, NaifContextPtr naif) const;
 
   private:
     QString _name;

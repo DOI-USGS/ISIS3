@@ -41,7 +41,8 @@ namespace Isis {
   /** Find the intersection point
    *
    */
-  bool EllipsoidShape::intersectSurface (std::vector<double> observerPos,
+  bool EllipsoidShape::intersectSurface (NaifContextPtr naif,
+                                         std::vector<double> observerPos,
                                          std::vector<double> lookDirection) {
 
     return (intersectEllipsoid(observerPos, lookDirection));
@@ -51,18 +52,18 @@ namespace Isis {
   /** Calculate default normal
    *
    */
-  void EllipsoidShape::calculateDefaultNormal()  {
+  void EllipsoidShape::calculateDefaultNormal(NaifContextPtr naif)  {
     QVector <double *> points;
-    calculateLocalNormal(points);
+    calculateLocalNormal(naif, points);
   }
 
 
   /** Calculate surface normal
    *
    */
-  void EllipsoidShape::calculateSurfaceNormal()  {
+  void EllipsoidShape::calculateSurfaceNormal(NaifContextPtr naif)  {
     QVector <double *> points;
-    calculateLocalNormal(points);
+    calculateLocalNormal(naif, points);
   }
 
 
@@ -97,7 +98,8 @@ namespace Isis {
    *
    * @param cornerNeighborPoints
    */
-  void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
+  void EllipsoidShape::calculateLocalNormal(NaifContextPtr naif,
+                                            QVector<double *> cornerNeighborPoints)  {
 
     if (!surfaceIntersection()->Valid() || !hasIntersection()) {
      IString msg = "A valid intersection must be defined before computing the surface normal";
@@ -117,9 +119,9 @@ namespace Isis {
     double c = radii[2].kilometers();
 
     vector<double> normal(3,0.);
-    NaifStatus::CheckErrors();
-    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
+    naif->CheckErrors();
 
     setNormal(normal);
     setHasNormal(true);

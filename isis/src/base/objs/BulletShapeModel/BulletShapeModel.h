@@ -64,7 +64,8 @@ namespace Isis {
       void   setTolerance(const double &tolerance);
 
       // Intersect the shape model
-      bool intersectSurface(std::vector<double> observerPos,
+      bool intersectSurface(NaifContextPtr naif,
+                            std::vector<double> observerPos,
                             std::vector<double> lookDirection);
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
@@ -77,24 +78,25 @@ namespace Isis {
       virtual void clearSurfacePoint();
 
       // Calculate the default normal of the current intersection point
-      void calculateDefaultNormal();
+      void calculateDefaultNormal(NaifContextPtr naif);
 
       bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      void calculateSurfaceNormal();
+      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
+      void calculateSurfaceNormal(NaifContextPtr naif);
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
-      QVector<double> ellipsoidNormal();
+      QVector<double> ellipsoidNormal(NaifContextPtr naif);
 
       const BulletWorldManager &model() const;
 
 
       // Determine if the internal intercept is occluded from the observer/lookdir
-      virtual bool isVisibleFrom(const std::vector<double> observerPos,
+      virtual bool isVisibleFrom(NaifContextPtr naif,
+                                 const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection);
 
     private:

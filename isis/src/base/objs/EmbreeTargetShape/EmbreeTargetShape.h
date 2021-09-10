@@ -177,7 +177,7 @@ namespace Isis {
       static void occlusionFilter(void* userDataPtr, RTCOcclusionRay& ray);
 
     protected:
-      pcl::PolygonMesh::Ptr readDSK(FileName file);
+      pcl::PolygonMesh::Ptr readDSK(FileName file, NaifContextPtr naif);
       pcl::PolygonMesh::Ptr readPC(FileName file);
       void initMesh(pcl::PolygonMesh::Ptr mesh);
       void addVertices(int geomID);

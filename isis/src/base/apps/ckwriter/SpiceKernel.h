@@ -78,14 +78,14 @@ class SpiceKernel {
     int size() const { return (m_segments.size()); }
     const CkSpiceSegment &operator[](const int i) const;
 
-    void add(const QString &fname);
-    void add(Cube &cube);
+    void add(NaifContextPtr naif, const QString &fname);
+    void add(NaifContextPtr naif, Cube &cube);
 
     QString getSummary(const QString &commfile = "") const;
 
     bool validate() const;
 
-    void write(const QString &kname, const QString &commfile = "",
+    void write(NaifContextPtr naif, const QString &kname, const QString &commfile = "",
                const int ckType = 3) const;
 
   private:

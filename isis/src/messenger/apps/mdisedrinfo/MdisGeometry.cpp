@@ -43,6 +43,7 @@
 #include "SpiceManager.h"
 #include "Target.h"
 #include "TProjection.h"
+#include "NaifContextCast.h"
 
 using namespace std;
 
@@ -253,7 +254,7 @@ namespace Isis {
    *
    * @return Pvl Contains PvlKeywords of all computed parameters
    */
-  Pvl MdisGeometry::getGeometry(const QString &filename) {
+  Pvl MdisGeometry::getGeometry(NaifContextPtr naif, const QString &filename) {
     Pvl geom;
 
     // Set initial keywords
@@ -261,10 +262,10 @@ namespace Isis {
     geom += format("SOURCE_PRODUCT_ID", _spice.getList(true));
 
     //  Invoke routines to compute associated keys
-    GeometryKeys(geom);
-    TargetKeys(geom);
-    SpacecraftKeys(geom);
-    ViewingAndLightingKeys(geom);
+    GeometryKeys(naif, geom);
+    TargetKeys(naif, geom);
+    SpacecraftKeys(naif, geom);
+    ViewingAndLightingKeys(naif, geom);
     return (geom);
   }
 
@@ -307,7 +308,7 @@ namespace Isis {
    *
    * @param geom Pvl container for generated keyword/value data
    */
-  void MdisGeometry::GeometryKeys(Pvl &geom) {
+  void MdisGeometry::GeometryKeys(NaifContextPtr naif, Pvl &geom) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Geometry keys!";
@@ -324,14 +325,14 @@ namespace Isis {
     refPixel.push_back(refLine);
     geom += format("RA_DEC_REF_PIXEL", refPixel);
 
-    _camera->SetImage(refSamp, refLine);
-    double centerRa  = _camera->RightAscension();
-    double centerDec = _camera->Declination();
+    _camera->SetImage(refSamp, refLine, naif);
+    double centerRa  = _camera->RightAscension(naif);
+    double centerDec = _camera->Declination(naif);
     geom += format("RIGHT_ASCENSION", centerRa,  "DEG");
     geom += format("DECLINATION",    centerDec, "DEG");
 
 // Compute the celestial north clocking angle for TWIST_ANGLE
-    double res = _camera->RaDecResolution();
+    double res = _camera->RaDecResolution(naif);
     _camera->SetRightAscensionDeclination(centerRa, centerDec + 2.0 * res);
     double x = _camera->Sample() - refSamp;
     double y = _camera->Line() - refLine;
@@ -347,24 +348,24 @@ namespace Isis {
     std::vector<double> retRa, retDec;
 
     refUpperLeftCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
-    retRa.push_back(_camera->RightAscension());
-    retDec.push_back(_camera->Declination());
+    _camera->SetImage(refSamp, refLine, naif);
+    retRa.push_back(_camera->RightAscension(naif));
+    retDec.push_back(_camera->Declination(naif));
 
     refUpperRightCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
-    retRa.push_back(_camera->RightAscension());
-    retDec.push_back(_camera->Declination());
+    _camera->SetImage(refSamp, refLine, naif);
+    retRa.push_back(_camera->RightAscension(naif));
+    retDec.push_back(_camera->Declination(naif));
 
     refLowerLeftCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
-    retRa.push_back(_camera->RightAscension());
-    retDec.push_back(_camera->Declination());
+    _camera->SetImage(refSamp, refLine, naif);
+    retRa.push_back(_camera->RightAscension(naif));
+    retDec.push_back(_camera->Declination(naif));
 
     refLowerRightCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
-    retRa.push_back(_camera->RightAscension());
-    retDec.push_back(_camera->Declination());
+    _camera->SetImage(refSamp, refLine, naif);
+    retRa.push_back(_camera->RightAscension(naif));
+    retDec.push_back(_camera->Declination(naif));
 
     geom += format("RETICLE_POINT_RA", retRa, "DEG");
     geom += format("RETICLE_POINT_DECLINATION", retDec, "DEG");
@@ -403,7 +404,7 @@ namespace Isis {
    *
    * @param geom Pvl container for generated keyword/value data
    */
-  void MdisGeometry::TargetKeys(Pvl &geom) {
+  void MdisGeometry::TargetKeys(NaifContextPtr naif, Pvl &geom) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Target keys!";
@@ -420,7 +421,7 @@ namespace Isis {
       geom += format("SC_TARGET_POSITION_VECTOR", jVec, "KM");
 
       //  Compute distances
-      geom += format("TARGET_CENTER_DISTANCE", _camera->targetCenterDistance(),
+      geom += format("TARGET_CENTER_DISTANCE", _camera->targetCenterDistance(naif),
                      "KM");
     }
     else if (_doUpdate) {
@@ -433,18 +434,18 @@ namespace Isis {
     refCenterCoord(refSamp, refLine);
 
     //  Set point at center
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (_camera->HasSurfaceIntersection()) {
 
-      geom += format("SLANT_DISTANCE", _camera->SlantDistance(), "KM");
+      geom += format("SLANT_DISTANCE", _camera->SlantDistance(naif), "KM");
 
       //  Geometric coordinages
       geom += format("CENTER_LATITUDE", _camera->UniversalLatitude(), "DEG");
       geom += format("CENTER_LONGITUDE", _camera->UniversalLongitude(), "DEG");
 
       // Resolution
-      geom += format("HORIZONTAL_PIXEL_SCALE", _camera->SampleResolution(), "M");
-      geom += format("VERTICAL_PIXEL_SCALE", _camera->LineResolution(), "M");
+      geom += format("HORIZONTAL_PIXEL_SCALE", _camera->SampleResolution(naif), "M");
+      geom += format("VERTICAL_PIXEL_SCALE", _camera->LineResolution(naif), "M");
 
 //  COMPUTE SMEAR MAGNITUDE AND AZIMUTH
 
@@ -459,7 +460,7 @@ namespace Isis {
       }
 
       //  Other angles
-      geom += format("NORTH_AZIMUTH", _camera->NorthAzimuth(), "DEG");
+      geom += format("NORTH_AZIMUTH", _camera->NorthAzimuth(naif), "DEG");
     }
     else if (_doUpdate) {
       geom += format("SLANT_DISTANCE", Null);
@@ -477,7 +478,7 @@ namespace Isis {
     int nGood(0);
 
     refUpperLeftCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
@@ -489,7 +490,7 @@ namespace Isis {
     }
 
     refUpperRightCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
@@ -501,7 +502,7 @@ namespace Isis {
     }
 
     refLowerLeftCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
@@ -513,7 +514,7 @@ namespace Isis {
     }
 
     refLowerRightCoord(refSamp, refLine);
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
@@ -534,7 +535,7 @@ namespace Isis {
     }
 
     //  Do subframe targets
-    SubframeTargetKeys(geom);
+    SubframeTargetKeys(naif, geom);
 
     return;
   }
@@ -547,7 +548,7 @@ namespace Isis {
    *
    * @param geom Pvl container for generated keyword/value data
    */
-  void MdisGeometry::SubframeTargetKeys(Pvl &geom) {
+  void MdisGeometry::SubframeTargetKeys(NaifContextPtr naif, Pvl &geom) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Target keys!";
@@ -573,7 +574,7 @@ namespace Isis {
         int nGood(0);
 
         double refSamp(sample), refLine(line);
-        _camera->SetImage(refSamp, refLine);
+        _camera->SetImage(refSamp, refLine, naif);
         if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
@@ -586,7 +587,7 @@ namespace Isis {
 
         refSamp = sample + width - 1.0;
         refLine = line;
-        _camera->SetImage(refSamp, refLine);
+        _camera->SetImage(refSamp, refLine, naif);
         if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
@@ -599,7 +600,7 @@ namespace Isis {
 
         refSamp = sample;
         refLine = line + height - 1.0;
-        _camera->SetImage(refSamp, refLine);
+        _camera->SetImage(refSamp, refLine, naif);
         if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
@@ -612,7 +613,7 @@ namespace Isis {
 
         refSamp = sample + width - 1.0;
         refLine = line + height - 1.0;
-        _camera->SetImage(refSamp, refLine);
+        _camera->SetImage(refSamp, refLine, naif);
         if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
@@ -745,7 +746,7 @@ namespace Isis {
     _camera->Coordinate(surfx);
 
     //  Get camera transform (ticam)
-    std::vector<double> ticam = rotate->Matrix();
+    std::vector<double> ticam = rotate->Matrix(naif);
 
     //  Get angular velocity vector of camera (av)
     SpiceDouble sclkdp;
@@ -761,13 +762,13 @@ namespace Isis {
     // Get CK time tolerance (tol)
     SpiceDouble tol;
     SpiceInt tmp;
-    gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toLatin1().data(),
-             0, 1, &tmp, &tol, &found);
+    naif->gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toLatin1().data(),
+                   0, 1, &tmp, &tol, &found);
 
     // Finally get av
     SpiceDouble cmat[3][3], av[3], clkout;
-    (void) ckgpav_c((scCode * 1000), sclkdp, tol, "J2000", cmat, av, &clkout,
-                    &found);
+    (void) naif->ckgpav_c((scCode * 1000), sclkdp, tol, "J2000", cmat, av, &clkout,
+                          &found);
     if (!found) {
 #if defined(DEBUG)
       cout << "Cannot get angular camera velocity for time "
@@ -779,13 +780,13 @@ namespace Isis {
     //  Get the state transformation matrix (tsipm)
     SpiceChar frname[40];
     SpiceInt frcode;
-    (void) cidfrm_c(targCode, sizeof(frname), &frcode, frname, &found);
+    (void) naif->cidfrm_c(targCode, sizeof(frname), &frcode, frname, &found);
     if (!found) {
       return (false);
     }
 
     SpiceDouble tsipm[6][6];
-    (void) sxform_c("J2000", frname, rotate->EphemerisTime(), tsipm);
+    (void) naif->sxform_c("J2000", frname, rotate->EphemerisTime(), tsipm);
 
     //  Get focal length
     double foclen = _camera->FocalLength();
@@ -817,25 +818,25 @@ namespace Isis {
     omega[2][1] =  av[0];
 
     SpiceDouble dticam[3][3];
-    mxmt_c(&ticam[0], omega, dticam);
+    naif->mxmt_c(&ticam[0], omega, dticam);
 
     //--  Done with rav2dr
 
     // Complete the rest of smrimg
     SpiceDouble surfxi[3], vi[3];
-    mtxv_c(tipm, surfx, surfxi);
-    vadd_c(starg, surfxi, vi);
+    naif->mtxv_c(tipm, surfx, surfxi);
+    naif->vadd_c(starg, surfxi, vi);
 
     SpiceDouble dvb[3], dvi[3];
-    mtxv_c(dtipm, surfx, dvb);
-    vadd_c(&starg[3], dvb, dvi);
+    naif->mtxv_c(dtipm, surfx, dvb);
+    naif->vadd_c(&starg[3], dvb, dvi);
 
     SpiceDouble vc[3], dvc1[3], dvc2[3], dvc[3];
-    mxv_c(&ticam[0], vi, vc);
+    naif->mxv_c(&ticam[0], vi, vc);
 
-    mxv_c(&ticam[0], dvi, dvc1);
-    mxv_c(dticam, vi, dvc2);
-    vadd_c(dvc1, dvc2, dvc);
+    naif->mxv_c(&ticam[0], dvi, dvc1);
+    naif->mxv_c(dticam, vi, dvc2);
+    naif->vadd_c(dvc1, dvc2, dvc);
 
     // Make sure we Vf can be computed
     if (vc[2] == 0.0) {
@@ -844,8 +845,8 @@ namespace Isis {
 
     // Compute derivative of Vf which is dvf
     SpiceDouble dvf[2];
-    vlcomg_c(2, -foclen * dvc[2] / (vc[2]*vc[2]), vc,
-             foclen        / vc[2],         dvc, dvf);
+    naif->vlcomg_c(2, -foclen * dvc[2] / (vc[2]*vc[2]), vc,
+                   foclen        / vc[2],         dvc, dvf);
 
     // dvf has units for mm/sec.  Scale by pixel pitch and multiply
     // by exposure length to obtain smear
@@ -853,17 +854,17 @@ namespace Isis {
     double explen = (double) key;   // in milliseconds
 
     SpiceDouble smear[2];
-    vsclg_c(pxlscl * (explen / 1000.0), dvf, 2, smear); //convert explen to seconds
+    naif->vsclg_c(pxlscl * (explen / 1000.0), dvf, 2, smear); //convert explen to seconds
 
     //  Compute the norm and azimuth angle
-    smear_magnitude = vnormg_c(smear, 2);
-    NaifStatus::CheckErrors();
+    smear_magnitude = naif->vnormg_c(smear, 2);
+    naif->CheckErrors();
 
     if (smear_magnitude == 0.0) {
       smear_azimuth = 0.0;
     }
     else {
-      smear_azimuth = atan2(smear[1], smear[0]) * dpr_c();
+      smear_azimuth = atan2(smear[1], smear[0]) * naif->dpr_c();
       if (smear_azimuth  < 0.0) smear_azimuth += 360.0;
     }
 
@@ -889,7 +890,7 @@ namespace Isis {
    *
    * @param geom Pvl container for generated keyword/value data
    */
-  void MdisGeometry::SpacecraftKeys(Pvl &geom) {
+  void MdisGeometry::SpacecraftKeys(NaifContextPtr naif, Pvl &geom) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Spacecraft keys!";
@@ -901,16 +902,16 @@ namespace Isis {
     refCenterCoord(refSamp, refLine);
 
     // Get the center ra/dec
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
     if (!_camera->target()->isSky()) {
       double lat, lon;
-      _camera->subSpacecraftPoint(lat, lon);
+      _camera->subSpacecraftPoint(lat, lon, naif);
       geom += format("SUB_SPACECRAFT_LATITUDE", lat, "DEG");
       geom += format("SUB_SPACECRAFT_LONGITUDE", lon, "DEG");
-      geom += format("SPACECRAFT_ALTITUDE", _camera->SpacecraftAltitude(), "KM");
+      geom += format("SPACECRAFT_ALTITUDE", _camera->SpacecraftAltitude(naif), "KM");
 
       if (_camera->HasSurfaceIntersection()) {
-        geom += format("SUB_SPACECRAFT_AZIMUTH", _camera->SpacecraftAzimuth(),
+        geom += format("SUB_SPACECRAFT_AZIMUTH", _camera->SpacecraftAzimuth(naif),
                        "DEG");
       }
       else if (_doUpdate) {
@@ -936,8 +937,8 @@ namespace Isis {
     //  Subtract target-sun vector from sc-sun vector and normalize to get
     //  distance from observer to sun
     double scPos[3];
-    vsub_c(&sVec[0], &jVec[0], scPos);
-    double sc_sun_dist = vnorm_c(scPos);
+    naif->vsub_c(&sVec[0], &jVec[0], scPos);
+    double sc_sun_dist = naif->vnorm_c(scPos);
     geom += format("SPACECRAFT_SOLAR_DISTANCE", sc_sun_dist, "KM");
 
     //  Record position vector
@@ -947,7 +948,7 @@ namespace Isis {
     scVec.push_back(scPos[2]);
     geom += format("SC_SUN_POSITION_VECTOR", scVec, "KM");
 
-    geom += format("SC_SUN_VELOCITY_VECTOR", ScVelocityVector(), "KM/S");
+    geom += format("SC_SUN_VELOCITY_VECTOR", ScVelocityVector(naif), "KM/S");
     return;
   }
 
@@ -962,7 +963,7 @@ namespace Isis {
    *
    * @return std::vector<double>  x, y, z velocity components in km/s units
    */
-  std::vector<double> MdisGeometry::ScVelocityVector() {
+  std::vector<double> MdisGeometry::ScVelocityVector(NaifContextPtr naif) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image/camera model established for Spacecraft Velocity keys!";
@@ -978,15 +979,15 @@ namespace Isis {
     SpiceRotation *rotate = _camera->bodyRotation();
     SpiceDouble stateJ[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
-    spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
-    NaifStatus::CheckErrors(); 
+    naif->spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
+    naif->CheckErrors(); 
 
     // Stage result and negate as it needs to be relative to Messenger
     vector<double> scvel;
     scvel.push_back(stateJ[3]);
     scvel.push_back(stateJ[4]);
     scvel.push_back(stateJ[5]);
-    vminus_c(&scvel[0], &scvel[0]);
+    naif->vminus_c(&scvel[0], &scvel[0]);
 
     return (scvel);
   }
@@ -1005,7 +1006,7 @@ namespace Isis {
    *
    * @param geom Pvl container for generated keyword/value data
    */
-  void MdisGeometry::ViewingAndLightingKeys(Pvl &geom) {
+  void MdisGeometry::ViewingAndLightingKeys(NaifContextPtr naif,Pvl &geom) {
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Viewing & Lighting keys!";
@@ -1017,18 +1018,18 @@ namespace Isis {
     refCenterCoord(refSamp, refLine);
 
 // Get the center ra/dec
-    _camera->SetImage(refSamp, refLine);
+    _camera->SetImage(refSamp, refLine, naif);
 
     //  These parameters only require a target other than the Sky
     if (!_camera->target()->isSky()) {
       double sslat, sslon;
-      _camera->subSolarPoint(sslat, sslon);
+      _camera->subSolarPoint(sslat, sslon, naif);
       geom += format("SUB_SOLAR_LATITUDE", sslat, "DEG");
       geom += format("SUB_SOLAR_LONGITUDE", sslon, "DEG");
 
       SpicePosition *sunpos = _camera->sunPosition();
       std::vector<double> jVec = sunpos->Coordinate();
-      double solar_dist = vnorm_c(&jVec[0]);
+      double solar_dist = naif->vnorm_c(&jVec[0]);
 
       geom += format("SOLAR_DISTANCE", solar_dist, "KM");
 
@@ -1042,11 +1043,11 @@ namespace Isis {
     //  These require surface intersections
     if (_camera->HasSurfaceIntersection()) {
 // Solar information
-      geom += format("SUB_SOLAR_AZIMUTH", _camera->SunAzimuth(), "DEG");
+      geom += format("SUB_SOLAR_AZIMUTH", _camera->SunAzimuth(naif), "DEG");
       geom += format("INCIDENCE_ANGLE", _camera->IncidenceAngle(), "DEG");
-      geom += format("PHASE_ANGLE", _camera->PhaseAngle(), "DEG");
-      geom += format("EMISSION_ANGLE", _camera->EmissionAngle(), "DEG");
-      geom += format("LOCAL_HOUR_ANGLE", _camera->LocalSolarTime() * 15.0, "DEG");
+      geom += format("PHASE_ANGLE", _camera->PhaseAngle(naif), "DEG");
+      geom += format("EMISSION_ANGLE", _camera->EmissionAngle(naif), "DEG");
+      geom += format("LOCAL_HOUR_ANGLE", _camera->LocalSolarTime(naif) * 15.0, "DEG");
     }
     else if (_doUpdate) {
       geom += format("SUB_SOLAR_AZIMUTH", Null);

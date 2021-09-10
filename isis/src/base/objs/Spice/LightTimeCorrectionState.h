@@ -63,25 +63,25 @@ namespace Isis {
     public:
 
       LightTimeCorrectionState();
-      LightTimeCorrectionState(int ikCode, Spice *spice);
+      LightTimeCorrectionState(NaifContextPtr naif, int ikCode, Spice *spice);
 
      // destructor
       virtual ~LightTimeCorrectionState() {  }
 
       bool operator==(const LightTimeCorrectionState &state) const;
 
-      bool checkAberrationCorrection(int ikCode, Spice *spice);
+      bool checkAberrationCorrection(NaifContextPtr naif, int ikCode, Spice *spice);
       void setAberrationCorrection(const QString &correction);
       QString getAberrationCorrection() const;
-      bool checkSpkKernelsForAberrationCorrection();
+      bool checkSpkKernelsForAberrationCorrection(NaifContextPtr naif);
       bool isLightTimeCorrected() const;
 
-      bool checkObserverTargetSwap(int ikCode, Spice *spice);
+      bool checkObserverTargetSwap(NaifContextPtr naif, int ikCode, Spice *spice);
       bool isObserverTargetSwapped() const;
       void setSwapObserverTarget();
       void setNoSwapObserverTarget();
 
-      bool checkLightTimeToSurfaceCorrect(int ikCode, Spice *spice);
+      bool checkLightTimeToSurfaceCorrect(NaifContextPtr naif, int ikCode, Spice *spice);
       bool isLightTimeToSurfaceCorrected() const;
       void setCorrectLightTimeToSurface();
       void setNoCorrectLightTimeToSurface();

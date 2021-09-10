@@ -47,9 +47,9 @@ namespace Isis {
    * @param filename Name of ISIS cube file
    * @param furnish Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(const QString &filename, bool furnish) {
+  SpiceManager::SpiceManager(NaifContextPtr naif, const QString &filename, bool furnish) {
     Pvl pvl(filename);
-    Load(pvl, furnish);
+    Load(naif, pvl, furnish);
   }
 
   /**
@@ -58,8 +58,8 @@ namespace Isis {
    * @param cube    Cube object of ISIS file
    * @param furnish Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(Cube &cube, bool furnish) {
-    Load(*cube.label(), furnish);
+  SpiceManager::SpiceManager(NaifContextPtr naif, Cube &cube, bool furnish) {
+    Load(naif, *cube.label(), furnish);
   }
 
   /**
@@ -68,8 +68,8 @@ namespace Isis {
    * @param pvl  ISIS label to get kernel information from
    * @param furnish  Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(Pvl &pvl, bool furnish) {
-    Load(pvl, furnish);
+  SpiceManager::SpiceManager(NaifContextPtr naif, Pvl &pvl, bool furnish) {
+    Load(naif, pvl, furnish);
   }
 
 
@@ -84,8 +84,8 @@ namespace Isis {
    * @param pvl  ISIS label
    * @param furnish Do we actually load the kernel files as we find them?
    */
-  void SpiceManager::Load(Pvl &pvl, bool furnish) {
-    Unload();
+  void SpiceManager::Load(NaifContextPtr naif, Pvl &pvl, bool furnish) {
+    Unload(naif);
     _furnish = furnish;
 
     QString kernlist;
@@ -93,39 +93,41 @@ namespace Isis {
     PvlGroup kernels = pvl.findGroup("Kernels", Pvl::Traverse);
     //  Changed 2008-02-27 to load planetary ephemeris before spacecraft
     //  since MESSENGER team may update planet data in the s/c SPK.
-    loadKernelFromTable(kernels["TargetPosition"], "SunPosition", pvl);
+    loadKernelFromTable(naif, kernels["TargetPosition"], "SunPosition", pvl);
 
     //  Now do s/c ephemeris
     if(kernels.hasKeyword("SpacecraftPosition")) {
-      loadKernel(kernels["SpacecraftPosition"]);
+      loadKernel(naif, kernels["SpacecraftPosition"]);
     }
     else {
-      loadKernelFromTable(kernels["InstrumentPosition"], "InstrumentPosition",
+      loadKernelFromTable(naif, 
+                          kernels["InstrumentPosition"], "InstrumentPosition",
                           pvl);
     }
 
     if(kernels.hasKeyword("SpacecraftPointing")) {
-      loadKernel(kernels["SpacecraftPointing"]);
+      loadKernel(naif, kernels["SpacecraftPointing"]);
     }
     else {
-      loadKernelFromTable(kernels["InstrumentPointing"], "InstrumentPointing",
+      loadKernelFromTable(naif,
+                          kernels["InstrumentPointing"], "InstrumentPointing",
                           pvl);
     }
 
     if(kernels.hasKeyword("Frame")) {
-      loadKernel(kernels["Frame"]);
+      loadKernel(naif, kernels["Frame"]);
     }
 
     if(kernels.hasKeyword("Extra")) {
-      loadKernel(kernels["Extra"]);
+      loadKernel(naif, kernels["Extra"]);
     }
 
 
-    loadKernel(kernels["TargetAttitudeShape"]);
-    loadKernel(kernels["Instrument"]);
-    loadKernel(kernels["InstrumentAddendum"]);  // Always load after instrument
-    loadKernel(kernels["LeapSecond"]);
-    loadKernel(kernels["SpacecraftClock"]);
+    loadKernel(naif, kernels["TargetAttitudeShape"]);
+    loadKernel(naif, kernels["Instrument"]);
+    loadKernel(naif, kernels["InstrumentAddendum"]);  // Always load after instrument
+    loadKernel(naif, kernels["LeapSecond"]);
+    loadKernel(naif, kernels["SpacecraftClock"]);
     return;
   }
 
@@ -138,7 +140,7 @@ namespace Isis {
    *
    * @param kernel  Name of kernel file (or pattern) to add
    */
-  void SpiceManager::add(const QString &kernfile) {
+  void SpiceManager::add(NaifContextPtr naif, const QString &kernfile) {
 
     QString kfile(kernfile);
 
@@ -151,7 +153,7 @@ namespace Isis {
 
     //  Add a specific kernel to the list
     PvlKeyword kernel("Kernels", kfile);
-    loadKernel(kernel);
+    loadKernel(naif, kernel);
     return;
   }
 
@@ -185,8 +187,8 @@ namespace Isis {
   /**
    * @brief Unloads all kernels if they were loaded when found
    */
-  void SpiceManager::Unload() {
-    NaifStatus::CheckErrors();
+  void SpiceManager::Unload(NaifContextPtr naif) {
+    naif->CheckErrors();
     if(_furnish) {
       for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
         /**
@@ -196,11 +198,11 @@ namespace Isis {
         */
         FileName f(_kernlist[i]);
         QString kernName(f.expanded());
-        unload_c(kernName.toLatin1().data());
+        naif->unload_c(kernName.toLatin1().data());
       }
     }
     _kernlist.clear();
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
     return;
   }
 
@@ -218,8 +220,8 @@ namespace Isis {
    * @param key PvlKeyword containing SPICE kernels
    * @see  loadKernelFromTable()
    */
-  void SpiceManager::loadKernel(PvlKeyword &key) {
-    NaifStatus::CheckErrors(); 
+  void SpiceManager::loadKernel(NaifContextPtr naif, PvlKeyword &key) {
+    naif->CheckErrors(); 
     for(int i = 0; i < key.size(); i++) {
       if(key[i] == "") continue;
       if(IString(key[i]).UpCase() == "NULL") continue;
@@ -231,10 +233,10 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       QString fileName(file.expanded());
-      if(_furnish) furnsh_c(fileName.toLatin1().data());
+      if(_furnish) naif->furnsh_c(fileName.toLatin1().data());
       addKernelName((QString)key[i]);
     }
-    NaifStatus::CheckErrors(); 
+    naif->CheckErrors(); 
   }
 
   /**
@@ -248,10 +250,11 @@ namespace Isis {
    * @param tblname Name of Table where the SPICE blob is located in the label
    * @param pvl Pvl label to search for the SPICE Table Object Blob
    */
-  void SpiceManager::loadKernelFromTable(PvlKeyword &key,
+  void SpiceManager::loadKernelFromTable(NaifContextPtr naif,
+                                         PvlKeyword &key,
                                          const QString &tblname, Pvl &pvl) {
     if(key[0].toUpper() != "TABLE") {
-      loadKernel(key);
+      loadKernel(naif, key);
     }
     else {
       PvlObject::PvlObjectIterator objIter;
@@ -259,7 +262,7 @@ namespace Isis {
         if(objIter->name().toUpper() == "TABLE") {
           if(objIter->hasKeyword("Name")) {
             if(objIter->findKeyword("Name")[0].toUpper() == tblname.toUpper()) {
-              loadKernel(objIter->findKeyword("Kernels"));
+              loadKernel(naif, objIter->findKeyword("Kernels"));
               return;
             }
           }

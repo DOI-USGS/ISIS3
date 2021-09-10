@@ -160,9 +160,10 @@ void ConvertComments(FileName file) {
  * @param ocube Pointer to output cube
  * @internal
  *   @history 2009-03-11 Jeannie Walldren - Original Version
- *   @history 2015-07-22 Kristin Berry - Added NaifStatus::CheckErrors()
+ *   @history 2015-07-22 Kristin Berry - Added naif->CheckErrors()
  */
 void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
+  auto naif = NaifContext::acquire();
   Pvl inputLabel(inputLab);
 
   // Get the directory where the Voyager translation tables are
@@ -347,13 +348,13 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   ********************************************************************/
 
   // We've already handled a couple of the steps mentioned above.
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   //* 3 *//
   // Leapsecond kernel
   QString lsk = "$base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
-  furnsh_c(lskName.expanded().toLatin1().data());
+  naif->furnsh_c(lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
   QString sclk = "$ISISDATA/voyager";
@@ -363,19 +364,19 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   sclk.append("?????.tsc");
   FileName sclkName(sclk);
   sclkName = sclkName.highestVersion();
-  furnsh_c(sclkName.expanded().toLatin1().data());
+  naif->furnsh_c(sclkName.expanded().toLatin1().data());
 
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get the partition, the very first number 1/...
   double approxEphemeris = 0.0;
-  utc2et_c(inst["StartTime"][0].toLatin1().data(), &approxEphemeris);
+  naif->utc2et_c(inst["StartTime"][0].toLatin1().data(), &approxEphemeris);
   char approxSpacecraftClock[80];
 
   // sce2s_c requires the spacecraft number, not the instrument number as
   // we've found elsewhere, either -31 or -32 in this case.
   int spacecraftClockNumber = -30;
   spacecraftClockNumber -= toInt(spacecraftNumber);
-  sce2s_c(spacecraftClockNumber, approxEphemeris, 80, approxSpacecraftClock);
+  naif->sce2s_c(spacecraftClockNumber, approxEphemeris, 80, approxSpacecraftClock);
 
   /*
    * For our next trick, we will substitute the image number we got earlier
@@ -403,12 +404,12 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   // I lied ;) get the last two digits.
   newClockCount.append(imgNumber.mid(5, 2));
 
-  scs2e_c(spacecraftClockNumber, newClockCount.toLatin1().data(), &approxEphemeris);
+  naif->scs2e_c(spacecraftClockNumber, newClockCount.toLatin1().data(), &approxEphemeris);
 
   //* 4 *//
   char utcOut[25];
-  et2utc_c(approxEphemeris, "ISOC", 3, 26, utcOut);
-  NaifStatus::CheckErrors();
+  naif->et2utc_c(approxEphemeris, "ISOC", 3, 26, utcOut);
+  naif->CheckErrors();
   inst["StartTime"].setValue(QString(utcOut));
 
   // Set up the nominal reseaus group
@@ -439,7 +440,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
                     + ".template.cub");
   res += PvlKeyword("Status", "Nominal");
   ocube->putGroup(res);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
 }
 
 

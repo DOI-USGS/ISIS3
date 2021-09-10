@@ -190,7 +190,8 @@ namespace Isis {
    *
    * @return @b bool If an intersection was found and saved.
    */
-  bool BulletShapeModel::intersectSurface(std::vector<double> observerPos,
+  bool BulletShapeModel::intersectSurface(NaifContextPtr naif,
+                                          std::vector<double> observerPos,
                                           std::vector<double> lookDirection) {
 
     clearSurfacePoint();
@@ -467,7 +468,8 @@ namespace Isis {
    * 
    * @return @b bool If the saved intercept is visible.
    */
-  bool BulletShapeModel::isVisibleFrom(const std::vector<double> observerPos,
+  bool BulletShapeModel::isVisibleFrom(NaifContextPtr naif,
+                                       const std::vector<double> observerPos,
                                        const std::vector<double> lookDirection)  {
 
     if ( !m_intercept.isValid() ) return (false);
@@ -513,7 +515,8 @@ namespace Isis {
    *
    * @param neighborPoints Input body-fixed points to compute normal for
    */
-  void BulletShapeModel::calculateLocalNormal(QVector<double *> neighborPoints) {
+  void BulletShapeModel::calculateLocalNormal(NaifContextPtr naif,
+                                              QVector<double *> neighborPoints) {
 
     // Sanity check
     if ( !hasIntersection() ) { // hasIntersection()  <==>  !m_intercept.isNull()
@@ -528,17 +531,17 @@ namespace Isis {
   /** 
    * Calculate the surface normal of the ellipsoid as the default
    */
-  void BulletShapeModel::calculateDefaultNormal() {
+  void BulletShapeModel::calculateDefaultNormal(NaifContextPtr naif) {
     // ShapeModel (parent class) throws error if no intersection
-     calculateSurfaceNormal();
+     calculateSurfaceNormal(naif);
   }
 
   /**
    * compute the ellipsoid surface normal of the target
    */
-  void BulletShapeModel::calculateSurfaceNormal() {
+  void BulletShapeModel::calculateSurfaceNormal(NaifContextPtr naif) {
     // ShapeModel (parent class) throws error if no intersection
-    setNormal(ellipsoidNormal().toStdVector());// this takes care of setHasNormal(true);
+    setNormal(ellipsoidNormal(naif).toStdVector());// this takes care of setHasNormal(true);
   }
 
 
@@ -556,7 +559,7 @@ namespace Isis {
    * @return @b QVector<double> Normal vector at the intercept point relative
    *                            to the ellipsoid (not the plate model)
    */
-  QVector<double> BulletShapeModel::ellipsoidNormal()  {
+  QVector<double> BulletShapeModel::ellipsoidNormal(NaifContextPtr naif)  {
 
     // Sanity check on state
     if ( !hasIntersection() ) {
@@ -582,10 +585,10 @@ namespace Isis {
     QVector<double> norm(3);
     // need a case for target == NULL
     QVector<Distance> radii = QVector<Distance>::fromStdVector(targetRadii());
-    NaifStatus::CheckErrors();
-    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
-             pB, &norm[0]);
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
+                   pB, &norm[0]);
+    naif->CheckErrors();
 
     return (norm);
   }

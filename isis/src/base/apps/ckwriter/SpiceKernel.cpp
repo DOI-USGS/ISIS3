@@ -52,15 +52,15 @@ namespace Isis {
    init();
  }
 
-void SpiceKernel::add(const QString &cfile) {
+void SpiceKernel::add(NaifContextPtr naif, const QString &cfile) {
  Cube cube;
  cube.open(cfile);
- add(cube);
+ add(naif, cube);
  return;
 }
 
-void SpiceKernel::add(Cube &cube) {
-  m_segments.push_back(CkSpiceSegment(cube));
+void SpiceKernel::add(NaifContextPtr naif, Cube &cube) {
+  m_segments.push_back(CkSpiceSegment(naif, cube));
   return;
 }
 const CkSpiceSegment &SpiceKernel::operator[](const int i) const {
@@ -128,7 +128,7 @@ bool SpiceKernel::validate() const {
 }
 
 
- void SpiceKernel::write(const QString &kname, const QString &comfile,
+ void SpiceKernel::write(NaifContextPtr naif, const QString &kname, const QString &comfile,
                          const int cktype) const {
    vector<const CkSpiceSegment *> seglist;
    int comChars(0);
@@ -144,18 +144,18 @@ bool SpiceKernel::validate() const {
 
    //  Create the output file.
    try {
-     NaifStatus::CheckErrors();
-     CkKernelWriter ckwriter(kname, comChars+512, cktype);
-     ckwriter.addComment(comment);
-     NaifStatus::CheckErrors();
+     naif->CheckErrors();
+     CkKernelWriter ckwriter(naif, kname, comChars+512, cktype);
+     ckwriter.addComment(comment, naif);
+     naif->CheckErrors();
 
    // Write sorted segments
      for ( unsigned int i = 0 ; i < seglist.size() ; i++ ) {
        try {
-         ckwriter.write(*seglist[i]);
+         ckwriter.write(*seglist[i], naif);
          comment = seglist[i]->getComment();
-         ckwriter.addComment(comment);
-         NaifStatus::CheckErrors();
+         ckwriter.addComment(comment, naif);
+         naif->CheckErrors();
        } catch ( IException &ie ) {
          ostringstream mess;
          mess << "Failed to write segment, ID = " << seglist[i]->Id();

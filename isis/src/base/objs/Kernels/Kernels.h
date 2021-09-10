@@ -33,6 +33,7 @@
 #include "CollectorMap.h"
 #include "IException.h"
 #include "Pvl.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -117,7 +118,7 @@ class Kernels {
       Kernels(Cube &cube);
       Kernels(Pvl &pvl);
       /** Destructor always unloads the kernels from the pool */
-      virtual ~Kernels() { UnLoad(); }
+      virtual ~Kernels() { UnLoad(NaifContext::acquire()); }
 
       Kernels &operator=(const Kernels &kernels);
 
@@ -125,25 +126,25 @@ class Kernels {
       int size() const { return (_kernels.size());  }
       int Missing() const;
 
-      void Init(Pvl &pvl);
-      bool Add(const QString &kfile);
+      void Init(NaifContextPtr naif, Pvl &pvl);
+      bool Add(NaifContextPtr naif, const QString &kfile);
 
       void Clear();
-      int Discover();
+      int Discover(NaifContextPtr naif);
 
       void Manage();
       void UnManage();
       bool IsManaged() const;
 
-      void InitializeNaifKernelPool();
+      void InitializeNaifKernelPool(NaifContextPtr naif);
 
-      int Load(const QString &ktype);
-      int Load();
+      int Load(NaifContextPtr naif, const QString &ktype);
+      int Load(NaifContextPtr naif);
 
-      int UnLoad(const QString &ktype);
-      int UnLoad();
+      int UnLoad(NaifContextPtr naif, const QString &ktype);
+      int UnLoad(NaifContextPtr naif);
 
-      int UpdateLoadStatus();
+      int UpdateLoadStatus(NaifContextPtr naif);
 
       int Merge(const Kernels &other);
 
@@ -176,8 +177,8 @@ class Kernels {
     typedef std::vector<KernelFile *> KernelFileList;
     typedef CollectorMap<QString, KernelFileList> TypeList;
 
-    bool Load(KernelFile &kfile);
-    bool UnLoad(KernelFile &kfile);
+    bool Load(NaifContextPtr naif, KernelFile &kfile);
+    bool UnLoad(NaifContextPtr naif, KernelFile &kfile);
 
     QStringList getTypes(const QString &ktypes) const;
     QString resolveType(const QString &kfile) const;
@@ -185,10 +186,10 @@ class Kernels {
                                  const QString &iktype = "UNKNOWN") const;
 
     bool IsNaifType(const QString &ktype) const;
-    KernelFile examine(const QString &fname, const bool &manage = true) 
+    KernelFile examine(NaifContextPtr naif, const QString &fname, const bool &manage = true) 
                        const;
     int UpdateManagedStatus();
-    std::vector<KernelFile> findKernels(Pvl &pvl, const QString &kname,
+    std::vector<KernelFile> findKernels(NaifContextPtr naif, Pvl &pvl, const QString &kname,
                                        const bool &manage = true);
     KernelFile *findByName(const QString &kfile);
     TypeList categorizeByType() const;

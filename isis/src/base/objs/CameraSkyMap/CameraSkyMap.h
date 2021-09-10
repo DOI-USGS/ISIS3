@@ -53,9 +53,9 @@ namespace Isis {
       virtual ~CameraSkyMap() {};
 
       virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz);
+                                 const double uz, NaifContextPtr naif);
 
-      virtual bool SetSky(const double ra, const double dec);
+      virtual bool SetSky(const double ra, const double dec, NaifContextPtr naif);
 
       /**
        * @returns The undistorted focal plane x

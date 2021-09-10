@@ -89,7 +89,8 @@ namespace Isis {
       virtual ~ShapeModel()=0;
 
       // Intersect the shape model
-      virtual bool intersectSurface(std::vector<double> observerPos,
+      virtual bool intersectSurface(NaifContextPtr naif,
+                                    std::vector<double> observerPos,
                                     std::vector<double> lookDirection)=0;
 
       // These two methods are for optional testing of occlusions when checking
@@ -111,27 +112,28 @@ namespace Isis {
       bool hasNormal() const;
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal() = 0;
+      virtual void calculateDefaultNormal(NaifContextPtr naif) = 0;
 
       // Calculate the local normal of the current intersection point
       // (relative to neighbor points)
-      virtual void calculateLocalNormal(QVector<double *> neighborPoints) = 0;
+      virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> neighborPoints) = 0;
 
       // Calculate the surface normal of the current intersection point
       // (relative to ellipsoid)
-      virtual void calculateSurfaceNormal() = 0;
+      virtual void calculateSurfaceNormal(NaifContextPtr naif) = 0;
 
       // Clear current point
       virtual void clearSurfacePoint();
 
       // Calculate the emission angle of the current intersection point
-      virtual double emissionAngle(const std::vector<double> & sB);
+      virtual double emissionAngle(NaifContextPtr naif, const std::vector<double> & sB);
 
       // Calculate the incidence angle of the current intersection point
-      virtual double incidenceAngle(const std::vector<double> &uB);
+      virtual double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB);
 
       // Calculate the phase angle of the current intersection point
-      virtual double phaseAngle(const std::vector<double> &sB,
+      virtual double phaseAngle(NaifContextPtr naif,
+                                const std::vector<double> &sB,
                                 const std::vector<double> &uB);
 
       // Return local radius from shape model
@@ -160,7 +162,8 @@ namespace Isis {
       std::vector<double>  normal();
 
       // Determine if the internal intercept is occluded from the observer/lookdir
-      virtual bool isVisibleFrom(const std::vector<double> observerPos,
+      virtual bool isVisibleFrom(NaifContextPtr naif,
+                                 const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection);
 
     protected:
@@ -172,11 +175,12 @@ namespace Isis {
       // Set shape name
       void setName(QString name);
 
-      void calculateEllipsoidalSurfaceNormal();
+      void calculateEllipsoidalSurfaceNormal(NaifContextPtr naif);
       bool hasEllipsoidIntersection();
 
       // Intersect ellipse
-      bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
+      bool intersectEllipsoid(NaifContextPtr naif,
+                              const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;

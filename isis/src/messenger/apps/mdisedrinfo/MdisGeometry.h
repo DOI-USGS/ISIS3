@@ -97,7 +97,7 @@ namespace Isis {
       virtual void refUpperRightCoord(double &sample, double &line) const;
       virtual void refLowerLeftCoord(double &sample, double &line) const;
       virtual void refLowerRightCoord(double &sample, double &line) const;
-      Pvl getGeometry(const QString &filename);
+      Pvl getGeometry(NaifContextPtr naif, const QString &filename);
 
 
       /**
@@ -172,15 +172,15 @@ namespace Isis {
 
       void init(Cube &cube);
 
-      void GeometryKeys(Pvl &geom);
-      void TargetKeys(Pvl &geom);
-      void SubframeTargetKeys(Pvl &geom);
+      void GeometryKeys(NaifContextPtr naif, Pvl &geom);
+      void TargetKeys(NaifContextPtr naif, Pvl &geom);
+      void SubframeTargetKeys(NaifContextPtr naif, Pvl &geom);
       bool getSubframeCoordinates(int frameno, double &sample, double &line,
                                   double &width, double &height);
-      void SpacecraftKeys(Pvl &geom);
-      void ViewingAndLightingKeys(Pvl &geom);
+      void SpacecraftKeys(NaifContextPtr naif, Pvl &geom);
+      void ViewingAndLightingKeys(NaifContextPtr naif, Pvl &geom);
       bool SmearComponents(double &smear_magnitude, double &smear_azimuth);
-      std::vector<double> ScVelocityVector();
+      std::vector<double> ScVelocityVector(NaifContextPtr naif);
 
       PvlKeyword format(const QString &name, const double &value,
                         const QString &unit = "") const;

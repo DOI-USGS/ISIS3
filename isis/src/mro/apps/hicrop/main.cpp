@@ -40,12 +40,12 @@ iTime actualTime(iTime timeFromInputClockCount, double tdiMode,
                  double unbinnedRate, double binMode);
 iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode, 
                           double unbinnedRate, double binMode);
-pair<double, double> ckBeginEndTimes(IString ckFileName);
+pair<double, double> ckBeginEndTimes(NaifContextPtr naif, IString ckFileName);
 // methods for converting between lines/times/clock counts
 iTime line2time(double lineNumber, double lineRate, double originalStartEt);
 double et2line(double et, double lineRate, double originalStartEt);
-QString time2clock(iTime time);
-iTime clock2time(QString spacecraftClockCount);
+QString time2clock(NaifContextPtr naif, iTime time);
+iTime clock2time(NaifContextPtr naif, QString spacecraftClockCount);
 // method to validate calculated or user-entered cropped line and time values
 void validateCropLines();
 void validateCropTimes(double cropStart, double  cropStop, 
@@ -64,6 +64,7 @@ void IsisMain() {
 
   // get user inputs for input cube and open
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString inputFileName = ui.GetFileName("FROM");
   try {
     CubeAttributeInput inAtt(inputFileName);
@@ -94,13 +95,13 @@ void IsisMain() {
     }
 
     // furnish these kernels
-    NaifStatus::CheckErrors();
-    furnsh_c(ckFileName.c_str());
-    NaifStatus::CheckErrors();
-    furnsh_c(sclkFileName.c_str());
-    NaifStatus::CheckErrors();
-    furnsh_c(lskFileName.c_str());
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->furnsh_c(ckFileName.c_str());
+    naif->CheckErrors();
+    naif->furnsh_c(sclkFileName.c_str());
+    naif->CheckErrors();
+    naif->furnsh_c(lskFileName.c_str());
+    naif->CheckErrors();
 
     // get values from the labels needed to compute the line rate and the
     // actual start time of the input cube
@@ -124,12 +125,12 @@ void IsisMain() {
 
     // get the actual original start time by making adjustments to the
     // spacecraft clock start count in the labels
-    iTime timeFromLabelClockCount = clock2time(labelStartClockCount);
+    iTime timeFromLabelClockCount = clock2time(naif, labelStartClockCount);
     iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode, 
                                      unbinnedRate, binMode);
     double originalStartEt = originalStart.Et();
      
-    pair<double, double> ckCoverage = ckBeginEndTimes(ckFileName);
+    pair<double, double> ckCoverage = ckBeginEndTimes(naif, ckFileName);
     // find the values of the first and last lines to be kept from user inputs
     if (ui.GetString("SOURCE") == "LINEVALUES") {
       g_cropStartLine = ui.GetInteger("LINE");
@@ -253,8 +254,8 @@ void IsisMain() {
                       ckCoverage.first, ckCoverage.second);
 
     // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-    IString actualCropStartClockCount = time2clock(cropStartTime);//???
-    IString actualCropStopClockCount = time2clock(cropStopTime); //???
+    IString actualCropStartClockCount = time2clock(naif, cropStartTime);//???
+    IString actualCropStopClockCount = time2clock(naif, cropStopTime); //???
 
 //???
  // UTC
@@ -276,10 +277,10 @@ void IsisMain() {
     // spacecraft clock start count for the labels of the cropped cube
     iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode, 
                                                       unbinnedRate, binMode);
-    QString adjustedCropStartClockCount = time2clock(adjustedCropStartTime);
+    QString adjustedCropStartClockCount = time2clock(naif, adjustedCropStartTime);
     iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode, 
                                                      unbinnedRate, binMode);
-    QString adjustedCropStopClockCount = time2clock(adjustedCropStopTime);
+    QString adjustedCropStopClockCount = time2clock(naif, adjustedCropStopTime);
 
 
 
@@ -361,11 +362,11 @@ void IsisMain() {
     // Write the results to the log
     Application::Log(results);
       // Unfurnishes kernel files to prevent file table overflow
-    NaifStatus::CheckErrors();
-    unload_c(ckFileName.c_str());
-    unload_c(sclkFileName.c_str());
-    unload_c(lskFileName.c_str());
-    NaifStatus::CheckErrors();
+    naif->CheckErrors();
+    naif->unload_c(ckFileName.c_str());
+    naif->unload_c(sclkFileName.c_str());
+    naif->unload_c(lskFileName.c_str());
+    naif->CheckErrors();
   }
   catch (IException &e) {
     IString msg = "Unable to crop the given cube [" + inputFileName 
@@ -467,20 +468,20 @@ iTime labelClockCountTime(iTime actualCalculatedTime, double tdiMode,
  * @return A pair of doubles, the first is the earliest time covered by the CK
  *         file and the second is the latest time covered by the CK file.
  */
-pair<double, double> ckBeginEndTimes(IString ckFileName) {
+pair<double, double> ckBeginEndTimes(NaifContextPtr naif, IString ckFileName) {
   //create a spice cell capable of containing all the objects in the kernel.
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   SPICEINT_CELL(currCell, 1000);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   //this resizing is done because otherwise a spice cell will append new data
   //to the last "currCell"
-  ssize_c(0, &currCell);
-  NaifStatus::CheckErrors();
-  ssize_c(1000, &currCell);
-  NaifStatus::CheckErrors();
-  ckobj_c(ckFileName.c_str(), &currCell);
-  NaifStatus::CheckErrors();
-  int numberOfBodies = card_c(&currCell);
+  naif->ssize_c(0, &currCell);
+  naif->CheckErrors();
+  naif->ssize_c(1000, &currCell);
+  naif->CheckErrors();
+  naif->ckobj_c(ckFileName.c_str(), &currCell);
+  naif->CheckErrors();
+  int numberOfBodies = naif->card_c(&currCell);
   if (numberOfBodies != 1) {
     IString msg = "Unable to find start and stop times using the given CK "
                   "file [" + ckFileName + "]. This application only works with"
@@ -490,19 +491,19 @@ pair<double, double> ckBeginEndTimes(IString ckFileName) {
 
   //get the NAIF body code
   int body = SPICE_CELL_ELEM_I(&currCell, numberOfBodies-1);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
   //  200,000 is the max coverage window size for a CK kernel
   SPICEDOUBLE_CELL(cover, 200000);
-  NaifStatus::CheckErrors();
-  ssize_c(0, &cover);
-  NaifStatus::CheckErrors();
-  ssize_c(200000, &cover);
-  NaifStatus::CheckErrors();
-  ckcov_c(ckFileName.c_str(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->ssize_c(0, &cover);
+  naif->CheckErrors();
+  naif->ssize_c(200000, &cover);
+  naif->CheckErrors();
+  naif->ckcov_c(ckFileName.c_str(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+  naif->CheckErrors();
   //Get the number of intervals in the object.
-  int numberOfIntervals = card_c(&cover) / 2;
-  NaifStatus::CheckErrors();
+  int numberOfIntervals = naif->card_c(&cover) / 2;
+  naif->CheckErrors();
   if (numberOfIntervals != 1) {
     IString msg = "Unable to find start and stop times using the given CK "
                   "file [" + ckFileName + "]. This application only works with "
@@ -512,8 +513,8 @@ pair<double, double> ckBeginEndTimes(IString ckFileName) {
   //Convert the coverage interval start and stop times to TDB
   //Get the endpoints of the interval.
   double begin, end;
-  wnfetd_c(&cover, numberOfIntervals-1, &begin, &end);
-  NaifStatus::CheckErrors();
+  naif->wnfetd_c(&cover, numberOfIntervals-1, &begin, &end);
+  naif->CheckErrors();
   QVariant startTime = begin;//??? why use variants? why not just use begin and end ???
   QVariant stopTime = end;   //??? why use variants? why not just use begin and end ???
   pair< double, double > coverage(startTime.toDouble(),  stopTime.toDouble());
@@ -578,13 +579,13 @@ double et2line(double et, double lineRate, double originalStartEt) {
  * @return A string containing the spacecraft clock count corresponding 
  *         to the given time.
  */
-QString time2clock(iTime time) {
+QString time2clock(NaifContextPtr naif, iTime time) {
   // char
   char stringOutput[19];
   double et = time.Et();
-  NaifStatus::CheckErrors();
-  sce2s_c(-74999, et, 19, stringOutput);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->sce2s_c(-74999, et, 19, stringOutput);
+  naif->CheckErrors();
   return stringOutput;
 }
 
@@ -597,14 +598,14 @@ QString time2clock(iTime time) {
  *  
  * @see Spice::getClockTime(clockCountString, sclkCode)
  */
-iTime clock2time(QString spacecraftClockCount) {
+iTime clock2time(NaifContextPtr naif, QString spacecraftClockCount) {
   // Convert the spacecraft clock count to ephemeris time
   SpiceDouble timeOutput;
   // The -74999 is the code to select the transformation from
   // high-precision MRO SCLK to ET
-  NaifStatus::CheckErrors();
-  scs2e_c(-74999, spacecraftClockCount.toLatin1().data(), &timeOutput);
-  NaifStatus::CheckErrors();
+  naif->CheckErrors();
+  naif->scs2e_c(-74999, spacecraftClockCount.toLatin1().data(), &timeOutput);
+  naif->CheckErrors();
   QVariant clockTime = timeOutput;
   iTime time = clockTime.toDouble();
   return time;

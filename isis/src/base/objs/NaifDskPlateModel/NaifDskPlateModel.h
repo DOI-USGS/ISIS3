@@ -28,6 +28,7 @@
 #include <QString>
 
 #include "NaifDskApi.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -76,16 +77,17 @@ namespace Isis {
       SpiceInt numberPlates() const;
       SpiceInt numberVertices() const;
 
-      SurfacePoint *point(const Latitude &lat, const Longitude &lon) const;
-      Intercept *intercept(const NaifVertex &vertex, const NaifVector &raydir) const;
+      SurfacePoint *point(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) const;
+      Intercept *intercept(NaifContextPtr naif, const NaifVertex &vertex, const NaifVector &raydir) const;
   //    Intercept *intercept(const SurfacePoint &pnt) const;
 
       // Lower level I/O
       bool     isPlateIdValid(const SpiceInt plateid) const;
-      SpiceInt plateIdOfIntercept(const NaifVertex &vertex,
+      SpiceInt plateIdOfIntercept(NaifContextPtr naif,
+                                     const NaifVertex &vertex,
                                      const NaifVector &raydir,
                                      NaifVertex &xpoint) const;
-      NaifTriangle plate(SpiceInt plateid) const;
+      NaifTriangle plate(NaifContextPtr naif, SpiceInt plateid) const;
 
       NaifDskPlateModel *clone() const;
 
@@ -128,7 +130,7 @@ namespace Isis {
       typedef QSharedPointer<NaifDskDescriptor>  SharedNaifDskDescriptor;
       SharedNaifDskDescriptor  m_dsk; //!< Shared pointer to the NaifDskDescriptor for this plate.
 
-      NaifDskDescriptor *openDSK(const QString &dskfile);
+      NaifDskDescriptor *openDSK(NaifContextPtr naif, const QString &dskfile);
       bool verify(const bool &test, const QString &errmsg,
                   const ErrAction &action = Throw) const;
       SurfacePoint *makePoint(const NaifVertex &v) const;

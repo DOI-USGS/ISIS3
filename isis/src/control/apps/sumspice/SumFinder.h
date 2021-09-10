@@ -63,11 +63,11 @@ namespace Isis {
       enum TimeStamp { Start, Center, Stop };
 
       SumFinder();
-      SumFinder(const QString &cubename, const TimeStamp &tstamp = Center);
-      SumFinder(const QString &cubename, const SumFileList &sumlist,
+      SumFinder(NaifContextPtr naif, const QString &cubename, const TimeStamp &tstamp = Center);
+      SumFinder(NaifContextPtr naif, const QString &cubename, const SumFileList &sumlist,
                 const double &tolerance = DBL_MAX,
                 const TimeStamp &tstamp = Center);
-      SumFinder(const QString &cubename, const SharedSumFile &sumfile,
+      SumFinder(NaifContextPtr naif, const QString &cubename, const SharedSumFile &sumfile,
                 const TimeStamp &tstamp = Center);
       virtual ~SumFinder();
 
@@ -91,7 +91,7 @@ namespace Isis {
       double deltaT() const;
       double closest() const;
 
-      void setCube(const QString &name = "");
+      void setCube(NaifContextPtr naif, const QString &name = "");
       const Cube *cube() const;
       const QString &name() const;
 
@@ -99,12 +99,13 @@ namespace Isis {
       bool  setSumFile(const SharedSumFile &sumfile);
       const SumFile *sumfile() const;
 
-      bool update(const unsigned int options);
+      bool update(NaifContextPtr naif, const unsigned int options);
 
       void writeHistory();
 
    protected:
-      virtual bool calculateTimes(Cube &cube,
+      virtual bool calculateTimes(NaifContextPtr naif, 
+                                  Cube &cube,
                                   iTime &startTime,
                                   iTime &centerTime,
                                   iTime &stopTime,
@@ -134,7 +135,7 @@ namespace Isis {
       double                  m_timeDiff;
       double                  m_closest;
 
-      bool updateTimes();
+      bool updateTimes(NaifContextPtr naif);
       bool resetTimes();
 
       PvlKeyword findKeyword(const QString &name, const PvlContainer &keys) const;

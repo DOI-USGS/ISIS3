@@ -31,6 +31,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "IException.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -60,12 +61,12 @@ namespace Isis {
     public:
       /** Default Constructor */
       SpiceManager() : _kernlist(), _furnish(true) { }
-      SpiceManager(const QString &filename, bool furnish = true);
-      SpiceManager(Cube &cube, bool furnish = true);
-      SpiceManager(Pvl &pvl, bool furnish = true);
+      SpiceManager(NaifContextPtr naif, const QString &filename, bool furnish = true);
+      SpiceManager(NaifContextPtr naif, Cube &cube, bool furnish = true);
+      SpiceManager(NaifContextPtr naif, Pvl &pvl, bool furnish = true);
       /** Destructor always unloads the kernels from the pool */
       virtual ~SpiceManager() {
-        Unload();
+        Unload(NaifContext::acquire());
       }
 
       /** Returns the number of kernels found and/or loaded */
@@ -73,18 +74,18 @@ namespace Isis {
         return (_kernlist.size());
       }
 
-      void Load(Pvl &pvl, bool furnish = true);
-      void add(const QString &kernel);
+      void Load(NaifContextPtr naif, Pvl &pvl, bool furnish = true);
+      void add(NaifContextPtr naif, const QString &kernel);
       std::vector<QString> getList(bool removePath = false) const;
-      void Unload();
+      void Unload(NaifContextPtr naif);
 
 
     private:
       std::vector<QString> _kernlist;  //!< The list of kernels
       bool _furnish;                       //!< Load the kernels found?
 
-      void loadKernel(PvlKeyword &key);
-      void loadKernelFromTable(PvlKeyword &key, const QString &tblname,
+      void loadKernel(NaifContextPtr naif, PvlKeyword &key);
+      void loadKernelFromTable(NaifContextPtr naif, PvlKeyword &key, const QString &tblname,
                                Pvl &pvl);
       void addKernelName(const QString &kname);
 

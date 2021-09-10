@@ -51,18 +51,18 @@ namespace Isis {
     public:
       // constructors
       Quaternion();
-      Quaternion(const std::vector<double> matrix);
+      Quaternion(const std::vector<double> matrix, NaifContextPtr naif);
 
       // destructor
       ~Quaternion();
 
       //Methods
 
-      std::vector<double> ToMatrix();
+      std::vector<double> ToMatrix(NaifContextPtr naif);
 
-      std::vector<double> ToAngles(int axis3, int axis2, int axis1);
+      std::vector<double> ToAngles(int axis3, int axis2, int axis1, NaifContextPtr naif);
 
-      void Set(std::vector<double>);
+      void Set(std::vector<double> rotation, NaifContextPtr naif);
 
       //! Return the quaternion as a vector
       std::vector<double> GetQuaternion() const {
@@ -96,7 +96,7 @@ namespace Isis {
 
 
 
-      std::vector<double> Qxv(const std::vector<double> &vin);
+      std::vector<double> Qxv(const std::vector<double> &vin, NaifContextPtr naif);
 
       Quaternion Conjugate();
 
