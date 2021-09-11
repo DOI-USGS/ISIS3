@@ -43,12 +43,12 @@ namespace Isis {
    */
   class LroWideAngleCameraFocalPlaneMap : public CameraFocalPlaneMap {
     public:
-      LroWideAngleCameraFocalPlaneMap(Camera *parent, int naifIkCode);
+      LroWideAngleCameraFocalPlaneMap(NaifContextPtr naif, Camera *parent, int naifIkCode);
 
       //! Destroys the LroWideAngleCameraFocalPlaneMap object
       virtual ~LroWideAngleCameraFocalPlaneMap() { }
 
-      void addFilter(int naifIkCode);
+      void addFilter(NaifContextPtr naif, int naifIkCode);
       void setBand(int vband);
 
     private:

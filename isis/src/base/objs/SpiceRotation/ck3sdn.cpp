@@ -13,12 +13,11 @@ using namespace Isis;
 static int c__4 = 4;
 /* Builtin functions */
 //    double sqrt(doublereal), asin(doublereal);
-extern int moved_(doublereal *arrfrm, integer *ndim, doublereal *arrto);
-extern int qmini(double *init, double *final, double frac, double *qintrp);
+extern int qmini(NaifContextPtr naif, double *init, double *final, double frac, double *qintrp);
 
 /* $Procedure  CK3SDN( Down sample type 3 CK data prepared for writing ) */
 /* Subroutine */
-int ck3sdn(double sdntol, bool avflag, int *nrec,
+int ck3sdn(NaifContextPtr naif, double sdntol, bool avflag, int *nrec,
            double *sclkdp, double *quats, double *avvs,
            int nints, double *starts, double *dparr, int *intarr) {
   /* System generated locals */
@@ -243,11 +242,11 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
 
   /*     Standard SPICE error handling. */
 
-  if(return_c()) {
+  if(naif->return_c()) {
     return 0;
   }
   else {
-    chkin_c("CK3SDN");
+    naif->chkin_c("CK3SDN");
   }
 
   /*     Let's do some sanity checks that needed to make sure that future */
@@ -255,22 +254,22 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
   /*     number pointing records is greater that zero. */
 
   if(*nrec <= 0) {
-    setmsg_c("The number of pointing records must be greater than zero. I"
+    naif->setmsg_c("The number of pointing records must be greater than zero. I"
              "t was #.");
-    errint_c("#", *nrec);
-    sigerr_c("SPICE(INVALIDNUMBEROFRECORDS)");
-    chkout_c("CK3SDN");
+    naif->errint_c("#", *nrec);
+    naif->sigerr_c("SPICE(INVALIDNUMBEROFRECORDS)");
+    naif->chkout_c("CK3SDN");
     return 0;
   }
 
   /*     Then, verify that the number intervals is greater that zero. */
 
   if(nints <= 0) {
-    setmsg_c("The number of interval starts must be greater than zero. It"
+    naif->setmsg_c("The number of interval starts must be greater than zero. It"
              " was #.");
-    errint_c("#", nints);
-    sigerr_c("SPICE(INVALIDNUMBEROFINTERVALS)");
-    chkout_c("CK3SDN");
+    naif->errint_c("#", nints);
+    naif->sigerr_c("SPICE(INVALIDNUMBEROFINTERVALS)");
+    naif->chkout_c("CK3SDN");
     return 0;
   }
 
@@ -278,12 +277,12 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
   /*     the number of records. */
 
   if(nints > *nrec) {
-    setmsg_c("The number of interval starts, #, is not less than or equal"
+    naif->setmsg_c("The number of interval starts, #, is not less than or equal"
              " to the number of records, #.");
-    errint_c("#", nints);
-    errint_c("#", *nrec);
-    sigerr_c("SPICE(BUFFERSIZESMISMATCH)");
-    chkout_c("CK3SDN");
+    naif->errint_c("#", nints);
+    naif->errint_c("#", *nrec);
+    naif->sigerr_c("SPICE(BUFFERSIZESMISMATCH)");
+    naif->chkout_c("CK3SDN");
     return 0;
   }
 
@@ -291,12 +290,12 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
   /*     as the first time in the records array. */
 
   if(sclkdp[0] != starts[0]) {
-    setmsg_c("The first interval start time, #, is not the same as the fi"
+    naif->setmsg_c("The first interval start time, #, is not the same as the fi"
              "rst record time, #.");
-    errdp_c("#", *sclkdp);
-    errdp_c("#", *starts);
-    sigerr_c("SPICE(FIRSTRECORDMISMATCH)");
-    chkout_c("CK3SDN");
+    naif->errdp_c("#", *sclkdp);
+    naif->errdp_c("#", *starts);
+    naif->sigerr_c("SPICE(FIRSTRECORDMISMATCH)");
+    naif->chkout_c("CK3SDN");
     return 0;
   }
 
@@ -304,11 +303,11 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
   /*     number. */
 
   if(sdntol < 0.) {
-    setmsg_c("The down sampling tolerance must be a non-negative number. "
+    naif->setmsg_c("The down sampling tolerance must be a non-negative number. "
              "It was #.");
-    errdp_c("#", sdntol);
-    sigerr_c("SPICE(BADDOWNSAMPLINGTOL)");
-    chkout_c("CK3SDN");
+    naif->errdp_c("#", sdntol);
+    naif->sigerr_c("SPICE(BADDOWNSAMPLINGTOL)");
+    naif->chkout_c("CK3SDN");
     return 0;
   }
 
@@ -349,7 +348,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
       /*           to the start of the next interval. */
 
       i__2 = *nrec - intcrf + 1;
-      intnrf = bsrchd_c(starts[i__], i__2, &sclkdp[intcrf - 1]);
+      intnrf = naif->bsrchd_c(starts[i__], i__2, &sclkdp[intcrf - 1]);
       if(intnrf != 0) {
 
         /*              Found index must be adjusted to be relative to the */
@@ -369,14 +368,14 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
         /*              been formed improperly for this to happen. Signal an */
         /*              error. */
 
-        setmsg_c("Cannot find pointing record with time that matches "
+        naif->setmsg_c("Cannot find pointing record with time that matches "
                  "the start time # (encoded SCLK ticks) of the interpo"
                  "lation interval number #.");
-        errdp_c("#", starts[i__]);
+        naif->errdp_c("#", starts[i__]);
         i__2 = i__ + 1;
-        errint_c("#", i__2);
-        sigerr_c("SPICE(INTERVALSTARTNOTFOUND)");
-        chkout_c("CK3SDN");
+        naif->errint_c("#", i__2);
+        naif->sigerr_c("SPICE(INTERVALSTARTNOTFOUND)");
+        naif->chkout_c("CK3SDN");
         return 0;
       }
     }
@@ -405,21 +404,21 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
       /*           Unitize bracketing quaternions as QMINI seems to be */
       /*           very sensitive to that. :) */
 
-      vhatg_c(&quats[(keepf << 2) - 4], c__4, qkeepf);
-      vhatg_c(&quats[(keepl << 2) - 4], c__4, qkeepl);
+      naif->vhatg_c(&quats[(keepf << 2) - 4], c__4, qkeepf);
+      naif->vhatg_c(&quats[(keepl << 2) - 4], c__4, qkeepl);
 
       /*           Pick the closer of the right quaternion or its negative to */
       /*           QKEEPF for input into QMINI to ensure that QMINI does */
       /*           interpolation in the "shortest arc" direction. */
 
-      vminug_c(qkeepl, c__4, qlneg);
-      dpos = vdistg_c(qkeepl, qkeepf, c__4);
-      dneg = vdistg_c(qlneg, qkeepf, c__4);
+      naif->vminug_c(qkeepl, c__4, qlneg);
+      dpos = naif->vdistg_c(qkeepl, qkeepf, c__4);
+      dneg = naif->vdistg_c(qlneg, qkeepf, c__4);
       if(dneg < dpos) {
-        moved_(qlneg, (integer *) &c__4, qlinpt);
+        naif->moved_(qlneg, (integer *) &c__4, qlinpt);
       }
       else {
-        moved_(qkeepl, (integer *) &c__4, qlinpt);
+        naif->moved_(qkeepl, (integer *) &c__4, qlinpt);
       }
 
       /*           Check all records between the currently picked window ends */
@@ -437,15 +436,15 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
                    keepl - 1] - sclkdp[keepf - 1]);
         }
         else {
-          sigerr_c("SPICE(CK3SDNBUG)");
-          chkout_c("CK3SDN");
+          naif->sigerr_c("SPICE(CK3SDNBUG)");
+          naif->chkout_c("CK3SDN");
           return 0;
         }
 
         /*              Call Nat's fast quaternion interpolation routine to */
         /*              compute interpolated rotation for this point. */
 
-        qmini(qkeepf, qlinpt, frac, qintrp);
+        qmini(naif, qkeepf, qlinpt, frac, qintrp);
 
         /*              Find the squared distance between the interpolated */
         /*              and input quaternions. */
@@ -493,7 +492,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
 
           i__2 = keepl - 1;
           for(j = keepf + 1; j <= i__2; ++j) {
-            sclkdp[j - 1] = dpmax_c();
+            sclkdp[j - 1] = naif->dpmax_c();
             ++ndropd;
           }
 
@@ -543,11 +542,11 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
     /*        Since SCLKs were the ones "marked" by DPMAX, we will use them */
     /*        to get the order vector. */
 
-    orderd_c(sclkdp, *nrec, (SpiceInt *) intarr);
+    naif->orderd_c(sclkdp, *nrec, (SpiceInt *) intarr);
 
     /*        Now, with the order vector in hand, sort the SCLKs ... */
 
-    reordd_c(intarr, *nrec, sclkdp);
+    naif->reordd_c(intarr, *nrec, sclkdp);
 
     /*        ... then sort quaternions (element by element) ... */
 
@@ -556,7 +555,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
       for(j = 1; j <= i__1; ++j) {
         dparr[j - 1] = quats[i__ + (j << 2) - 4];
       }
-      reordd_c(intarr, *nrec, dparr);
+      naif->reordd_c(intarr, *nrec, dparr);
       i__1 = *nrec;
       for(j = 1; j <= i__1; ++j) {
         quats[i__ + (j << 2) - 4] = dparr[j - 1];
@@ -572,7 +571,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
         for(j = 1; j <= i__1; ++j) {
           dparr[j - 1] = avvs[i__ + j * 3 - 4];
         }
-        reordd_c(intarr, *nrec, dparr);
+        naif->reordd_c(intarr, *nrec, dparr);
         i__1 = *nrec;
         for(j = 1; j <= i__1; ++j) {
           avvs[i__ + j * 3 - 4] = dparr[j - 1];
@@ -587,7 +586,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
 
   /*     All done. Check out. */
 
-  chkout_c("CK3SDN");
+  naif->chkout_c("CK3SDN");
   return 0;
 } /* ck3sdn_ */
 

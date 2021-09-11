@@ -72,7 +72,7 @@ namespace Isis {
     // focal plane x/y.  This will read the appropriate CCD
     // transformation coefficients from the instrument kernel
 
-    new CameraFocalPlaneMap(this, naifIkCode());
+    new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     QString ikernKey = "INS" + toString(naifIkCode())  + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(naif, ikernKey);

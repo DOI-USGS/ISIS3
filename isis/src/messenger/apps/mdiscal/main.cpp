@@ -87,6 +87,8 @@ void IsisMain() {
   const int cdrVersion = 5;
 
 
+  auto naif = NaifContext::acquire();
+
   // We will be processing by column in case of a linear dark current fit. This will make the
   // calibration a one pass system in this case, rather than two.
   ProcessByLine p;
@@ -307,7 +309,8 @@ void IsisMain() {
     empiricalCorrectionFile = "";
     g_empiricalCorrectionFactor = loadEmpiricalCorrection(startTime, g_filterNumber + 1,
                                                           empiricalCorrectionFile,
-                                                          empiricalCorrectionDate);
+                                                          empiricalCorrectionDate,
+                                                          naif);
     empiricalCorrectionFactor = toString(g_empiricalCorrectionFactor);
   }
   else {
@@ -327,11 +330,11 @@ void IsisMain() {
     PvlGroup& inst = icube->group("Instrument");
     QString target = inst["TargetName"];
     QString startTime = inst["SpacecraftClockCount"];
-    if (sunDistanceAU(startTime, target, g_solarDist)) {
+    if (sunDistanceAU(startTime, target, naif, g_solarDist)) {
       vector<double> sol = loadSolarIrr(g_isNarrowAngleCamera, g_isBinnedData,
                                         g_filterNumber + 1, solirrfile);
       g_Ff = sol[2];
-      g_iof = pi_c() * (g_solarDist * g_solarDist) / g_Ff;
+      g_iof = naif->pi_c() * (g_solarDist * g_solarDist) / g_Ff;
       validIOF = true;
     }
     else {

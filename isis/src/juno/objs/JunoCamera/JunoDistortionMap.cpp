@@ -75,7 +75,7 @@ namespace Isis {
    *
    * @param naifIkCode Code to search for in instrument kernel
    */
-  void JunoDistortionMap::SetDistortion(int naifIkCode) {
+  void JunoDistortionMap::SetDistortion(NaifContextPtr naif, int naifIkCode) {
 
     // Use the pixel pitch to scale k1 and k2 coefficients to operate in focal
     // plane coordinates (millimeters). The coefficients found in the kernels
@@ -88,7 +88,7 @@ namespace Isis {
     // here in case this coefficient is needed for future distortion models.
     try {
       QString odk0 = "INS" + toString(naifIkCode) + "_DISTORTION_K0";
-      p_odk.push_back(p_camera->Spice::getDouble(odk0));
+      p_odk.push_back(p_camera->Spice::getDouble(naif, odk0));
 
     }
     catch (IException &e) {
@@ -96,9 +96,9 @@ namespace Isis {
     }
 
     QString odk1 = "INS" + toString(naifIkCode) + "_DISTORTION_K1";
-    p_odk.push_back(p_camera->Spice::getDouble(odk1) / p2);
+    p_odk.push_back(p_camera->Spice::getDouble(naif, odk1) / p2);
     QString odk2 = "INS" + toString(naifIkCode) + "_DISTORTION_K2";
-    p_odk.push_back(p_camera->Spice::getDouble(odk2) / (p2 * p2));
+    p_odk.push_back(p_camera->Spice::getDouble(naif, odk2) / (p2 * p2));
   }
 
 

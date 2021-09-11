@@ -41,10 +41,10 @@ namespace Isis {
   /**
    * @param naifIkCode 
    */
-  void LroNarrowAngleDistortionMap::SetDistortion(const int naifIkCode) {
+  void LroNarrowAngleDistortionMap::SetDistortion(NaifContextPtr naif, const int naifIkCode) {
     QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     p_odk.clear();
-    p_odk.push_back(p_camera->getDouble(odkkey, 0));
+    p_odk.push_back(p_camera->getDouble(naif, odkkey, 0));
   }
 
   /** Compute undistorted focal plane x/y

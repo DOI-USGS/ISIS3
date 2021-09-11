@@ -29,6 +29,7 @@
 #include "Interpolator.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
+#include "NaifContext.h"
 
 #include <vector>
 
@@ -206,7 +207,7 @@ namespace Isis {
 
       void Load(Cube &cube, const double rotation = 0.0, const double scale = 1.0,
                 const int band = 1);
-      void Load(Cube &cube, Chip &match, Cube &matchChipCube,
+      void Load(NaifContextPtr naif, Cube &cube, Chip &match, Cube &matchChipCube,
                 const double scale = 1.0, const int band = 1);
       void Load(Cube &cube, const Affine &affine, const bool &keepPoly = true,
                 const int band = 1);

@@ -39,6 +39,7 @@ inline double distance(const double &x1, const double &y1,
 void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Open the FROM cube. It must have a camera model associated with it
   Cube from;
@@ -104,14 +105,14 @@ void IsisMain() {
       }
 
       if (isGood) {
-        if (fcamera->SetImage(c.samp, c.line)) {
+        if (fcamera->SetImage(c.samp, c.line, naif)) {
           c.latitude = fcamera->UniversalLatitude();
           c.longitude = fcamera->UniversalLongitude();
           double o_ux = dmap->UndistortedFocalPlaneX();
           double o_uy = dmap->UndistortedFocalPlaneY();
           double o_dx = dmap->FocalPlaneX();
           double o_dy = dmap->FocalPlaneY();
-          if (fcamera->SetImage(c.errSamp, c.errLine)) {
+          if (fcamera->SetImage(c.errSamp, c.errLine, naif)) {
             double c_ux = dmap->UndistortedFocalPlaneX();
             double c_uy = dmap->UndistortedFocalPlaneY();
             double c_dx = dmap->FocalPlaneX();

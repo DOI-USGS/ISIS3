@@ -20,7 +20,7 @@ static doublereal c_b3 = 1.;
 
 /* $Procedure    QMINI ( Quaternion linear interpolation ) */
 /* Subroutine */
-int qmini(doublereal *init, doublereal *final, doublereal frac, doublereal *qintrp) {
+int qmini(NaifContextPtr naif, doublereal *init, doublereal *final, doublereal frac, doublereal *qintrp) {
   /* System generated locals */
   doublereal d__1;
 
@@ -277,16 +277,16 @@ int qmini(doublereal *init, doublereal *final, doublereal frac, doublereal *qint
   /*     Find the conjugate INSTAR of the input quaternion INIT. */
 
   instar[0] = init[0];
-  vminus_c(&init[1], &instar[1]);
+  naif->vminus_c(&init[1], &instar[1]);
 
   /*     Find the quotient quaternion Q that maps INIT to FINAL. */
 
-  qxq_c(final, instar, q);
+  naif->qxq_c(final, instar, q);
 
   /*     Extract the rotation angle from Q. Use arccosine for */
   /*     speed, sacrificing some accuracy. */
 
-  angle = acos(brcktd_c(q[0], c_b2, c_b3)) * 2.;
+  angle = acos(naif->brcktd_c(q[0], c_b2, c_b3)) * 2.;
 
   /*     Create a quaternion QSCALE from the rotation axis of the quotient */
   /*     and the scaled rotation angle. */
@@ -299,17 +299,17 @@ int qmini(doublereal *init, doublereal *final, doublereal frac, doublereal *qint
   /*     part of Q is zero, the returned "unit" vector will be the */
   /*     zero vector. */
 
-  unorm_c(&q[1], axis, &vmag);
+  naif->unorm_c(&q[1], axis, &vmag);
 
   /*     Form the vector part of QSCALE. */
 
   d__1 = sin(intang);
-  vscl_c(d__1, axis, &qscale[1]);
+  naif->vscl_c(d__1, axis, &qscale[1]);
 
   /*     Apply QSCALE to INIT to produce the interpolated quaternion we */
   /*     seek. */
 
-  qxq_c(qscale, init, qintrp);
+  naif->qxq_c(qscale, init, qintrp);
   return 0;
 } /* qmini_ */
 

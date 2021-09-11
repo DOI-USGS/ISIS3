@@ -32,8 +32,8 @@
 using namespace std;
 using namespace Isis;
 
-void testCamera(Cube &c, double sample, double line, double knownLat, double knownLon);
-void testLineSamp(Camera *cam, double sample, double line);
+void testCamera(Cube &c, double sample, double line, double knownLat, double knownLon, NaifContextPtr naif);
+void testLineSamp(Camera *cam, double sample, double line, NaifContextPtr naif);
 
 /**
  * This is the unit test for the Osiris Rex Camera model. 
@@ -54,6 +54,8 @@ void testLineSamp(Camera *cam, double sample, double line);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for OsirisRexOcamsCamera..." << endl;
   try {
@@ -64,14 +66,14 @@ int main(void) {
     double knownLon = 349.0213035062322433;
     double sample = 512.0; 
     double line = 512.0;
-    testCamera(polyCamCube, sample, line, knownLat, knownLon);
+    testCamera(polyCamCube, sample, line, knownLat, knownLon, naif);
     cout << "\nTesting PolyCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
     Cube polyCamCube2("$osirisrex/testData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
     knownLat = -5.5191879351483450;
     knownLon = 349.6939492565607566;
     sample = 512.0; 
     line = 512.0;
-    testCamera(polyCamCube2, sample, line, knownLat, knownLon);
+    testCamera(polyCamCube2, sample, line, knownLat, knownLon, naif);
     cout << "============================================================================" << endl;
 
     cout << "\nTesting MapCam (backwards compatibility)..." << endl;
@@ -80,14 +82,14 @@ int main(void) {
     knownLon = 149.3814386120742768;
     sample = 512.0; 
     line = 512.0;
-    testCamera(mapCamCube, sample, line, knownLat, knownLon);
+    testCamera(mapCamCube, sample, line, knownLat, knownLon, naif);
     cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
     Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
     knownLat = -19.2946930665326732;
     knownLon = 145.9510736765638512;
     sample = 512.0; 
     line = 512.0;
-    testCamera(mapCamCube2, sample, line, knownLat, knownLon);
+    testCamera(mapCamCube2, sample, line, knownLat, knownLon, naif);
     cout << "============================================================================" << endl;
 
 /*
@@ -109,7 +111,8 @@ int main(void) {
 
 void testCamera(Cube &cube, 
                 double sample, double line,
-                double knownLat, double knownLon) {
+                double knownLat, double knownLon,
+                NaifContextPtr naif) {
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *) CameraFactory::Create(cube);
   cout << "FileName: " << FileName(cube.fileName()).name() << endl;
@@ -135,26 +138,26 @@ void testCamera(Cube &cube,
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
   QString stime = inst["StartTime"];
   double et; // StartTime keyword is the center exposure time
-  str2et_c(stime.toLatin1().data(), &et);
+  naif->str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
   cout << "Shutter open = " << shuttertimes.first.Et() << endl;
   cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
 
   // Test all four corners to make sure the conversions are right
   cout << "For upper left corner ..." << endl;
-  testLineSamp(cam, 1.0, 1.0);
+  testLineSamp(cam, 1.0, 1.0, naif);
 
   cout << "For upper right corner ..." << endl;
-  testLineSamp(cam, 1024.0, 1.0);
+  testLineSamp(cam, 1024.0, 1.0, naif);
 
   cout << "For lower left corner ..." << endl;
-  testLineSamp(cam, 1.0, 1024.0);
+  testLineSamp(cam, 1.0, 1024.0, naif);
 
   cout << "For lower right corner ..." << endl;
-  testLineSamp(cam, 1024.0, 1024.0);
+  testLineSamp(cam, 1024.0, 1024.0, naif);
 
   cout << "For known pixel position ..." << endl;
-  if (!cam->SetImage(sample, line)) {
+  if (!cam->SetImage(sample, line, naif)) {
     throw IException(IException::Unknown, "ERROR setting image to known position.", _FILEINFO_);
   }
   if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
@@ -172,11 +175,11 @@ void testCamera(Cube &cube,
 }
 
 
-void testLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void testLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if (success) {

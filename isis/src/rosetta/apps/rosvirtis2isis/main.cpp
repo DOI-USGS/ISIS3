@@ -36,6 +36,7 @@ void IsisMain ()
 {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   FileName inFile = ui.GetFileName("FROM");
 
@@ -403,13 +404,13 @@ void IsisMain ()
     sclkName = sclkName.highestVersion(); 
     lskName = lskName.highestVersion(); 
 
-    furnsh_c(lskName.expanded().toLatin1().data());
-    furnsh_c(sclkName.expanded().toLatin1().data());
+    naif->furnsh_c(lskName.expanded().toLatin1().data());
+    naif->furnsh_c(sclkName.expanded().toLatin1().data());
     
     SpiceDouble etStart;
     SpiceDouble etEnd;
-    scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
-    scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
+    naif->scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
+    naif->scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
 
     PvlKeyword &frameParam = inst["FrameParameter"];
     double exposureTime = toDouble(frameParam[0]);
@@ -419,8 +420,8 @@ void IsisMain ()
 
     SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
-    sce2s_c( (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
-    sce2s_c( (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
+    naif->sce2s_c( (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
+    naif->sce2s_c( (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
     
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 
@@ -431,8 +432,8 @@ void IsisMain ()
     outcube->putGroup(inst);
 
     // Unload the naif kernels
-    unload_c(lsk.toLatin1().data());
-    unload_c(sclk.toLatin1().data());
+    naif->unload_c(lsk.toLatin1().data());
+    naif->unload_c(sclk.toLatin1().data());
   }
   
   // Write the Archive and Instrument groups to the output cube label

@@ -68,9 +68,11 @@ namespace Isis {
 
       virtual ~PushFrameCameraDetectorMap();
 
-      virtual bool SetParent(const double sample, 
+      virtual bool SetParent(NaifContextPtr naif, 
+                             const double sample, 
                              const double line);
-      virtual bool SetParent(const double sample, 
+      virtual bool SetParent(NaifContextPtr naif, 
+                             const double sample, 
                              const double line, 
                              const double deltaT);
 
@@ -83,7 +85,7 @@ namespace Isis {
       int FrameletOffset() const;
       void SetFrameletOffset(int frameletOffset);
 
-      void SetFramelet(int framelet, const double deltaT=0);
+      void SetFramelet(NaifContextPtr naif, int framelet, const double deltaT=0);
       int Framelet();
       
       void SetBandFirstDetectorLine(int firstLine);

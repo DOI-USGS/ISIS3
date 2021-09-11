@@ -47,7 +47,7 @@ namespace Isis {
    *
    * @return bool Always returns true
    */
-    bool ApolloPanoramicDetectorMap::SetParent(const double sample, const double line) {
+    bool ApolloPanoramicDetectorMap::SetParent(NaifContextPtr naif, const double sample, const double line) {
       //Given an image (aka 'Parent', aka encoder, aka machine) coordinate set the detector 
       //coordiante and the time (time is set in the 'parent' camera class)
       //save the parent data
@@ -61,7 +61,7 @@ namespace Isis {
       //cout << "fiducial coordinate return from IO: " << p_detectorSample << " " << p_detectorLine << endl;
       //convert from fiducial coordinates to detector/time coordinates
       iTime isisTime(m_etMiddle + p_detectorLine*m_lineRate);
-      p_camera->setTime(isisTime);
+      p_camera->setTime(isisTime, naif);
       //This declaration may cause some debate.  Regardless it seems to that
       //  since we model the motion of the camera as continuous smooth motion 
       //  (not some discretely defined series of 1 pixel or 1 mm wide 'push-frames'),

@@ -37,10 +37,12 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
   cout << "Unit Test for ApolloCamera..." << endl;
   try {
 
@@ -82,20 +84,20 @@ int main(void) {
          
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(camTL, 1.0, 1.0);
+    TestLineSamp(camTL, 1.0, 1.0, naif);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(camTR, 1.0, 1.0);
+    TestLineSamp(camTR, 1.0, 1.0, naif);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(camBL, 1.0, 1.0);
+    TestLineSamp(camBL, 1.0, 1.0, naif);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(camBR, 1.0, 1.0);
+    TestLineSamp(camBR, 1.0, 1.0, naif);
 
      cout << "For center pixel position ..." << endl;
 
-    if(!camM->SetImage(1.0, 1.0)) {
+    if(!camM->SetImage(1.0, 1.0, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
@@ -134,10 +136,10 @@ int main(void) {
   
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
   if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

@@ -70,7 +70,7 @@ namespace Isis {
     iTime centerTime  = etStart + (exposureDuration / 2.0);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     
     // lines and samples added to the pvl in the order you
     // call getDouble()

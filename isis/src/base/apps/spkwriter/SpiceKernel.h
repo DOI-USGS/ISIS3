@@ -184,10 +184,10 @@ template <typename K>
        * @param Visitor  Visitor class that accepts each segment in the list
        */
       template <typename Visitor>
-        void Accept(const Visitor &v) const {
+        void Accept(NaifContextPtr naif, const Visitor &v) const {
            ConstSegmentIter k(begin());
            while (k != end()) {
-             v(*k);
+             v(naif, *k);
              k++;
            }
           return;

@@ -35,7 +35,7 @@ using namespace std;
 using namespace Isis;
 
 void testCamera(Cube &c, double knownLat, double knownLon);
-void testLineSamp(Camera *cam, double sample, double line);
+void testLineSamp(Camera *cam, double sample, double line, NaifContextPtr naif);
 
 /**
  * Unit Test for the Hayabusa AMICA camera.
@@ -49,6 +49,7 @@ void testLineSamp(Camera *cam, double sample, double line);
  */
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
 
   qDebug() << "Unit Test for HayabusaAmicaCamera...";
   try {
@@ -79,6 +80,7 @@ int main(void) {
 
 void testCamera(Cube &c, double knownLat, double knownLon) {
   HayabusaAmicaCamera *cam = (HayabusaAmicaCamera *) CameraFactory::Create(c);
+  auto naif = NaifContext::acquire();
   qDebug() << "FileName: " << FileName(c.fileName()).name();
   qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
   qDebug() << "";
@@ -103,7 +105,7 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
   QString stime = inst["StartTime"];
   double et; // StartTime keyword is the center exposure time
-  str2et_c(stime.toLatin1().data(), &et);
+  naif->str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
   qDebug() << "Shutter open  = " << toString(shuttertimes.first.Et(), 16);
   qDebug() << "Shutter close = " << toString(shuttertimes.second.Et(), 16);
@@ -111,20 +113,20 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
 
   // Test all four corners to make sure the conversions are right
   qDebug() << "For upper left corner ...";
-  testLineSamp(cam, 1.0, 1.0);
+  testLineSamp(cam, 1.0, 1.0, naif);
 
   qDebug() << "For upper right corner ...";
-  testLineSamp(cam, cam->Samples(), 1.0);
+  testLineSamp(cam, cam->Samples(), 1.0, naif);
 
   qDebug() << "For lower left corner ...";
-  testLineSamp(cam, 1.0, cam->Lines());
+  testLineSamp(cam, 1.0, cam->Lines(), naif);
 
   qDebug() << "For lower right corner ...";
-  testLineSamp(cam, cam->Samples(), cam->Lines());
+  testLineSamp(cam, cam->Samples(), cam->Lines(), naif);
 
   qDebug() << "For center pixel position ...";
 
-  if(!cam->SetImage((cam->Samples()/2.0), (cam->Lines()/2.0))) {
+  if(!cam->SetImage((cam->Samples()/2.0), (cam->Lines()/2.0), naif)) {
     throw IException(IException::Unknown, "ERROR setting image to known position.", _FILEINFO_);
   }
 
@@ -142,15 +144,15 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
     qDebug() << "Longitude off by: " << toString(cam->UniversalLongitude() - knownLon, 16);
   }
 
-  testLineSamp( cam, (cam->Samples()/2.0), (cam->Lines()/2.0) );
+  testLineSamp( cam, (cam->Samples()/2.0), (cam->Lines()/2.0), naif );
 }
 
 
-void testLineSamp(Camera *cam, double sample, double line) {
-  bool success = cam->SetImage(sample, line);
+void testLineSamp(Camera *cam, double sample, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(sample, line, naif);
 
   if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

@@ -44,10 +44,11 @@ namespace Isis {
    *                      (either 1 or -1)
    *
    */
-  LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, 
+  LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(NaifContextPtr naif,
+                                                                   Camera *parent, 
                                                                    int naifIkCode) : 
                                                                    CameraDistortionMap(parent) {
-    SetDistortion(naifIkCode);
+    SetDistortion(naif, naifIkCode);
   }
 
 
@@ -66,12 +67,12 @@ namespace Isis {
  * 
  * @param naifIkCode NAIF IK code for the desired filter to add.
  */
-  void LroWideAngleCameraDistortionMap::addFilter(int naifIkCode) {
+  void LroWideAngleCameraDistortionMap::addFilter(NaifContextPtr naif, int naifIkCode) {
     QString odkkey = "INS" + QString::number(naifIkCode) + "_OD_K";
     
     std::vector<double> v_odk; 
     for(int i = 0; i < 3; i++) {
-      v_odk.push_back(p_camera->getDouble(odkkey, i));
+      v_odk.push_back(p_camera->getDouble(naif, odkkey, i));
     }
 
     m_odkFilters.push_back(v_odk);

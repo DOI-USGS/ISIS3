@@ -92,7 +92,7 @@ namespace Isis {
     DetectorMap()->SetDetectorSampleSumming(m_summing);
 
     // Setup focal plane map
-    new CameraFocalPlaneMap(this, naifIkCode());
+    new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";

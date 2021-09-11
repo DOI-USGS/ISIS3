@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Isis;
 
-void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *cam,
+void getCamPosOPK(NaifContextPtr naif, Spice &spice, QString spacecraftName, SpiceDouble et, Camera *cam,
                   SpiceDouble ographicCamPos[3], SpiceDouble omegaPhiKappa[3],
                   SpiceDouble isisFocalPlane2SocetPlateTranspose[3][3]);
 
@@ -40,6 +40,7 @@ void IsisMain() {
   Process p;
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString from = ui.GetFileName("FROM");
   QString to = FileName(ui.GetFileName("TO")).expanded();
   QString socetProject = ui.GetString("SS_PROJECT");
@@ -77,11 +78,11 @@ void IsisMain() {
   // location
   double detectorSampleOrigin = focalMap->DetectorSampleOrigin();
   double detectorLineOrigin = focalMap->DetectorLineOrigin();
-  cam->SetImage(detectorSampleOrigin, detectorLineOrigin);
+  cam->SetImage(detectorSampleOrigin, detectorLineOrigin, naif);
   SpiceDouble et = cam->time().Et();
 
   Spice spice(*input);
-  spice.setTime(et);
+  spice.setTime(et, naif);
 
   // Get required keywords from instrument and band groups
   PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
@@ -102,7 +103,7 @@ void IsisMain() {
                                                            { 0.0, 0.0, 0.0 },
                                                            { 0.0, 0.0, 0.0 } };
 
-  getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos,
+  getCamPosOPK(naif, spice, spacecraftName, et, cam, ographicCamPos,
                omegaPhiKappa,isisFocalPlane2SocetPlateTranspose);
 
   // Determine the SOCET Set camera calibration file
@@ -614,7 +615,7 @@ void IsisMain() {
 //               positive rotation, pole)
 
 
-void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *cam,
+void getCamPosOPK(NaifContextPtr naif, Spice &spice, QString spacecraftName, SpiceDouble et, Camera *cam,
                   SpiceDouble ographicCamPos[3], SpiceDouble omegaPhiKappa[3],
                   SpiceDouble isisFocalPlane2SocetPlateTranspose[3][3]) {
 
@@ -880,8 +881,8 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   // - (Planet-)Ocentric => target body-fixed [+X = PMxEq.; +Z = TPRP]
   // - PMxEq. => intersection of target Prime Merdian and Equator
   // - TPRP => Target Positive Rotation Pole, typically = North
-  vector<double>  j2000ToOcentricMatrixVector = cam->bodyRotation()->Matrix();
-  vector<double>  j2000ToIsisFocalPlaneMatrixVector = cam->instrumentRotation()->Matrix();
+  vector<double>  j2000ToOcentricMatrixVector = cam->bodyRotation()->Matrix(naif);
+  vector<double>  j2000ToIsisFocalPlaneMatrixVector = cam->instrumentRotation()->Matrix(naif);
 
   // Reformat rotation matrices from 9-element vector<double>'s to 3x3 arrays
   SpiceDouble j2000ToOcentricRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
@@ -902,13 +903,13 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   SpiceDouble isisFocalPlaneToOcentricRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
                                                                { 0.0, 0.0, 0.0 },
                                                                { 0.0, 0.0, 0.0 } };
-  mxmt_c(j2000ToOcentricRotationMatrix, j2000ToIsisFocalPlaneMatrix,
-         isisFocalPlaneToOcentricRotationMatrix);
+  naif->mxmt_c(j2000ToOcentricRotationMatrix, j2000ToIsisFocalPlaneMatrix,
+               isisFocalPlaneToOcentricRotationMatrix);
 
   // Get instrumemt position vector, convert to meters
   SpiceDouble instrumentPosition[3] = { 0.0, 0.0, 0.0 };
-  spice.instrumentPosition(instrumentPosition);
-  vscl_c(1000.0, instrumentPosition, instrumentPosition);
+  spice.instrumentPosition(instrumentPosition, naif);
+  naif->vscl_c(1000.0, instrumentPosition, instrumentPosition);
 
   // Get planet radii
   Distance dRadii[3];
@@ -921,16 +922,16 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   SpiceDouble lon = 0.0;
   SpiceDouble lat = 0.0;
   SpiceDouble height = 0.0;
-  recgeo_c (instrumentPosition, equatorialRadiusMeters, flattening,
-            &lon, &lat, &height);
+  naif->recgeo_c (instrumentPosition, equatorialRadiusMeters, flattening,
+                  &lon, &lat, &height);
 
   // Calculate rotation matrix from Socet Set plate to ocentric ground coordinates
   SpiceDouble ocentricGroundToSocetPlateRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
                                                                  { 0.0, 0.0, 0.0 },
                                                                  { 0.0, 0.0, 0.0 } };
 
-  mxmt_c (isisFocalPlane2SocetPlate, isisFocalPlaneToOcentricRotationMatrix,
-          ocentricGroundToSocetPlateRotationMatrix);
+  naif->mxmt_c (isisFocalPlane2SocetPlate, isisFocalPlaneToOcentricRotationMatrix,
+                ocentricGroundToSocetPlateRotationMatrix);
 
   // Populate the ocentric-to-LSR rotation matrix; it is a function of
   // camera position only
@@ -941,8 +942,8 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
                                                     { 0.0, 0.0, 0.0 },
                                                     { 0.0, 0.0, 0.0 } };
 
-  twovec_c(instrumentPosition, 3, uvPlusZ, 2, ocentricToLsrRotationMatrix);
-  xpose_c(ocentricToLsrRotationMatrix, lsrToOcentricRotationMatrix);
+  naif->twovec_c(instrumentPosition, 3, uvPlusZ, 2, ocentricToLsrRotationMatrix);
+  naif->xpose_c(ocentricToLsrRotationMatrix, lsrToOcentricRotationMatrix);
 
   // Compute the Rotation matrix from LSR frame to Socet Set Plate frame,
   // and extract the euler angles to get omega-phi-kappa attidude angles
@@ -950,13 +951,13 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
                                                             { 0.0, 0.0, 0.0 },
                                                             { 0.0, 0.0, 0.0 } };
 
-  mxmt_c (ocentricGroundToSocetPlateRotationMatrix, ocentricToLsrRotationMatrix,
-          lsrGroundToSocetPlateRotationMatrix);
+  naif->mxmt_c (ocentricGroundToSocetPlateRotationMatrix, ocentricToLsrRotationMatrix,
+                lsrGroundToSocetPlateRotationMatrix);
 
   SpiceDouble omega = 0.0;
   SpiceDouble phi = 0.0;
   SpiceDouble kappa = 0.0;
-  m2eul_c (lsrGroundToSocetPlateRotationMatrix, 3, 2, 1, &kappa, &phi, &omega);
+  naif->m2eul_c (lsrGroundToSocetPlateRotationMatrix, 3, 2, 1, &kappa, &phi, &omega);
 
   // Return resulting geographic lat, lon, omega, phi, kappa in decimal degrees
   // height in meters
@@ -974,7 +975,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   }
 
   // Return the transpose of the isisFocalPlane2SocetPlate matrix for the FrameOffAxis sensor model
-  xpose_c(isisFocalPlane2SocetPlate, isisFocalPlane2SocetPlateTranspose);
+  naif->xpose_c(isisFocalPlane2SocetPlate, isisFocalPlane2SocetPlateTranspose);
 
   return;
 }

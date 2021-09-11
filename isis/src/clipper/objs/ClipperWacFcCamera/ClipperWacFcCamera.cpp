@@ -60,7 +60,7 @@ namespace Isis {
 
     // Set up detector map, focal plane map, and distortion map
     new CameraDetectorMap(this);
-    new CameraFocalPlaneMap(this, naifIkCode());
+    new CameraFocalPlaneMap(naif, this, naifIkCode());
     new CameraDistortionMap(this);
     
     // Setup the ground and sky map

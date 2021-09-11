@@ -87,7 +87,7 @@ namespace Isis {
     iTime centerTime  = etStart + (exposureDuration / 2.0);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     
     // BORESIGHT SAMPLE AND LINE still need to be added to the IAK 
     double bLines = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
@@ -105,7 +105,7 @@ namespace Isis {
 
     // Setup distortion map (use default for now) 
     CameraDistortionMap *distortionMap = new Hyb2OncDistortionMap(this);
-    distortionMap->SetDistortion(naifIkCode());
+    distortionMap->SetDistortion(naif, naifIkCode());
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

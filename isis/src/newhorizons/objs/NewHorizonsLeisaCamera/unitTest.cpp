@@ -32,10 +32,12 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for NewHorizonsLeisaCamera..." << endl;
   try {
@@ -74,25 +76,25 @@ int main(void) {
       // data in the corners, so values were specifically choosen.
       cout << "Test forward and backward line/samp to lat/lon delta for Band #" << i+1 << endl;
       cout << "  For upper left corner (1.0, " << uLLine + i << ") ..." << endl;
-      cam->SetBand(i+1);
-      TestLineSamp(cam, 1.0, uLLine + i);
+      cam->SetBand(i+1, naif);
+      TestLineSamp(cam, 1.0, uLLine + i, naif);
 
       cout << "  For upper right corner (256.0, " << uRLine + i << ") ..." << endl;
-      TestLineSamp(cam, 256.0, uRLine + i);
+      TestLineSamp(cam, 256.0, uRLine + i, naif);
 
       cout << "  For lower left corner (1.0, " << lLLine + i << ") ..." << endl;
-      TestLineSamp(cam, 1.0, lLLine + i);
+      TestLineSamp(cam, 1.0, lLLine + i, naif);
 
       cout << "  For lower right corner (256.0, " << lRLine + i << ") ..." << endl;
-      TestLineSamp(cam, 256.0, lRLine + i);
+      TestLineSamp(cam, 256.0, lRLine + i, naif);
     }
 
     double samp = 256.0/2.0;
     double line = 677;
-    cam->SetBand(1);
+    cam->SetBand(1, naif);
     cout << "For center pixel position ..." << endl;
 
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR call SetImage "<< samp << " " << line << endl;
     }
 
@@ -118,7 +120,7 @@ int main(void) {
 
     // Test trying to set an illeagal band number
     try {
-      cam->SetBand(257);
+      cam->SetBand(257, naif);
     }
     catch (IException &e) {
       e.print();
@@ -131,10 +133,10 @@ int main(void) {
 }
 
 
-void TestLineSamp(Camera *cam, double samp, double line) {
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
 
-  if (cam->SetImage(samp, line)) {
-    if (cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude())) {
+  if (cam->SetImage(samp, line, naif)) {
+    if (cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude())) {
       double deltaSamp = samp - cam->Sample();
       double deltaLine = line - cam->Line();
       if (fabs(deltaSamp) < 0.001) deltaSamp = 0.0;

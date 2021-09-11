@@ -92,18 +92,18 @@ namespace Isis {
    *
    * @param naifIkCode    Code to search for in instrument kernel
    * */
-  void LoHighDistortionMap::SetDistortion(const int naifIkCode) {
+  void LoHighDistortionMap::SetDistortion(NaifContextPtr naif, const int naifIkCode) {
     // Get the perspective correction factors for x and y and the distortion
     // center (point of symmetry of distortion)
     QString perskey = "INS" + toString(naifIkCode) + "_PERSPECTIVE_FACTORS";
     QString centkey = "INS" + toString(naifIkCode) + "_POINT_OF_SYMMETRY";
-    p_xPerspective = p_camera->Spice::getDouble(perskey, 0);
-    p_yPerspective = p_camera->Spice::getDouble(perskey, 1);
-    p_x0 = p_camera->Spice::getDouble(centkey, 0);
-    p_y0 = p_camera->Spice::getDouble(centkey, 1);
+    p_xPerspective = p_camera->Spice::getDouble(naif, perskey, 0);
+    p_yPerspective = p_camera->Spice::getDouble(naif, perskey, 1);
+    p_x0 = p_camera->Spice::getDouble(naif, centkey, 0);
+    p_y0 = p_camera->Spice::getDouble(naif, centkey, 1);
 
     // Get the distortion coefficients
-    CameraDistortionMap::SetDistortion(naifIkCode);
+    CameraDistortionMap::SetDistortion(naif, naifIkCode);
   }
 
 

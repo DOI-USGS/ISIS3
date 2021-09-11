@@ -33,10 +33,12 @@
 using namespace std;
 using namespace Isis;
 
-void TestSampLine(Camera *cam, double samp, double line);
+void TestSampLine(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   qDebug() << "Unit Test for ThemisVisCamera...";
   qDebug() << "";
@@ -74,23 +76,23 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
-    TestSampLine(evenCam, 1.0, 192.0 / 2 + 1.5);  // omit framelet 1 for even
+    TestSampLine(evenCam, 1.0, 192.0 / 2 + 1.5, naif);  // omit framelet 1 for even
 
     qDebug() << "For upper right corner ...";
-    TestSampLine(evenCam, evenCam->Samples(), 192.0 / 2 + 1.5); // omit framelet 1 for even
+    TestSampLine(evenCam, evenCam->Samples(), 192.0 / 2 + 1.5, naif); // omit framelet 1 for even
 
     qDebug() << "For lower left corner ...";
-    TestSampLine(evenCam, 1.0, evenCam->Lines());
+    TestSampLine(evenCam, 1.0, evenCam->Lines(), naif);
 
     qDebug() << "For lower right corner ...";
-    TestSampLine(evenCam, evenCam->Samples(), evenCam->Lines());
+    TestSampLine(evenCam, evenCam->Samples(), evenCam->Lines(), naif);
     
     qDebug() << "For center framelet 14 pixel position ...";
     double samp = evenCam->Samples() / 2;
     double line = evenCam->Lines() / 2 + 192.0 /2.0 / 2.0; // add half of summed framelet to get
                                                            // center of framelet 14
 
-    if (!evenCam->SetImage(samp, line)) {
+    if (!evenCam->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }
@@ -110,7 +112,7 @@ int main(void) {
       qDebug() << "Longitude:    off by " 
                << QString::number(evenCam->UniversalLongitude() - knownCenterLon,  'f',  16);
     }
-    TestSampLine(evenCam, samp, line);
+    TestSampLine(evenCam, samp, line, naif);
 
     qDebug() << "";
     qDebug() << "";
@@ -131,16 +133,16 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug()<< "For upper left corner ...";
-    TestSampLine(oddCam, 1.0, 1.0);
+    TestSampLine(oddCam, 1.0, 1.0, naif);
 
     qDebug()<< "For upper right corner ...";
-    TestSampLine(oddCam, oddCam->Samples(), 1.0);
+    TestSampLine(oddCam, oddCam->Samples(), 1.0, naif);
 
     qDebug()<< "For lower left corner ...";
-    TestSampLine(oddCam, 1.0, oddCam->Lines() - 96.0); // omit framelet 26 for odd
+    TestSampLine(oddCam, 1.0, oddCam->Lines() - 96.0, naif); // omit framelet 26 for odd
 
     qDebug()<< "For lower right corner ...";
-    TestSampLine(oddCam, oddCam->Samples(), oddCam->Lines() - 96.0); // omit framelet 26 for odd
+    TestSampLine(oddCam, oddCam->Samples(), oddCam->Lines() - 96.0, naif); // omit framelet 26 for odd
     
     qDebug() << "For center framelet 13 pixel position ...";
     knownCenterLat =  48.563958771636;
@@ -148,7 +150,7 @@ int main(void) {
     samp = oddCam->Samples()/ 2;
     line = oddCam->Lines() / 2 - 192.0 / 2.0 / 2.0;  // subtract half of summed framelet to
                                                      // get center of framelet 13
-    if (!oddCam->SetImage(samp, line)) {
+    if (!oddCam->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }
@@ -168,7 +170,7 @@ int main(void) {
       qDebug() << "Longitude:    off by "
           << QString::number(oddCam->UniversalLongitude() - knownCenterLon,  'f',  16);
     }
-    TestSampLine(oddCam, samp, line);
+    TestSampLine(oddCam, samp, line, naif);
 
     qDebug() << "";
     
@@ -196,11 +198,11 @@ int main(void) {
   }
 }
 
-void TestSampLine(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestSampLine(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if (success) {

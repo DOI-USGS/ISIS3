@@ -375,8 +375,9 @@ namespace Isis {
   void InlineCalculator::radians() {
     QVector<double> degree = Pop();
     QVector<double> result;
+    const auto rpd = NaifContext::acquire()->rpd_c();
     BOOST_FOREACH(double d, degree) {
-      result.push_back(d * rpd_c());
+      result.push_back(d * rpd);
     }
     Push(result);
     return;
@@ -390,8 +391,9 @@ namespace Isis {
   void InlineCalculator::degrees() {
     QVector<double> radians = Pop();
     QVector<double> result;
+    const auto dpr = NaifContext::acquire()->dpr_c();
     BOOST_FOREACH(double r, radians) {
-      result.push_back(r * dpr_c());
+      result.push_back(r * dpr);
     }
     Push(result);
     return;
@@ -450,7 +452,7 @@ namespace Isis {
    * Pushes the PI constant onto the current stack.
    */  
   void InlineCalculator::pi() {
-    Push(pi_c());
+    Push(NaifContext::acquire()->pi_c());
     return;
   }
  

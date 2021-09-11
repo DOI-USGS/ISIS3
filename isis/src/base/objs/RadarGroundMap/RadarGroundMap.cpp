@@ -59,7 +59,7 @@ namespace Isis {
    * @return conversion was successful
    */
   bool RadarGroundMap::SetFocalPlane(const double ux, const double uy,
-                                     double uz) {
+                                     double uz, NaifContextPtr naif) {
 
     SpiceRotation *bodyFrame = p_camera->bodyRotation();
     SpicePosition *spaceCraft = p_camera->instrumentPosition();
@@ -67,33 +67,33 @@ namespace Isis {
     // Get spacecraft position and velocity to create a state vector
     std::vector<double> Ssc(6);
     // Load the state into Ssc
-    vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
-    vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
 
     // Rotate state vector to body-fixed
     std::vector<double> bfSsc(6);
-    bfSsc = bodyFrame->ReferenceVector(Ssc);
+    bfSsc = bodyFrame->ReferenceVector(Ssc, naif);
 
     // Extract body-fixed position and velocity
     std::vector<double> Vsc(3);
     std::vector<double> Xsc(3);
-    vequ_c(&bfSsc[0], (SpiceDouble *) & (Xsc[0]));
-    vequ_c(&bfSsc[3], (SpiceDouble *) & (Vsc[0]));
+    naif->vequ_c(&bfSsc[0], (SpiceDouble *) & (Xsc[0]));
+    naif->vequ_c(&bfSsc[3], (SpiceDouble *) & (Vsc[0]));
 
     // Compute intrack, crosstrack, and radial coordinate
     SpiceDouble i[3];
-    vhat_c(&Vsc[0], i);
+    naif->vhat_c(&Vsc[0], i);
 
     SpiceDouble c[3];
     SpiceDouble dp;
-    dp = vdot_c(&Xsc[0], i);
+    dp = naif->vdot_c(&Xsc[0], i);
     SpiceDouble p[3], q[3];
-    vscl_c(dp, i, p);
-    vsub_c(&Xsc[0], p, q);
-    vhat_c(q, c);
+    naif->vscl_c(dp, i, p);
+    naif->vsub_c(&Xsc[0], p, q);
+    naif->vhat_c(q, c);
 
     SpiceDouble r[3];
-    vcrss_c(i, c, r);
+    naif->vcrss_c(i, c, r);
 
     // What is the initial guess for R
     Distance radii[3];
@@ -117,12 +117,12 @@ namespace Isis {
     // time, the slope variable would be set to .25.
     bool useSlopeEqn = false;
     double slope = .5;
-    bool success = Iterate(R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
+    bool success = Iterate(naif,R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
 
     if(!success) {
       R = radii[0].kilometers();
       useSlopeEqn = true;
-      success = Iterate(R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
+      success = Iterate(naif,R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
     }
 
     if(!success) return false;
@@ -138,14 +138,14 @@ namespace Isis {
     lookB[1] = X[1] - Xsc[1];
     lookB[2] = X[2] - Xsc[2];
 
-    std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
+    std::vector<double> lookJ = bodyFrame->J2000Vector(lookB, naif);
     SpiceRotation *cameraFrame = p_camera->instrumentRotation();
-    std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
+    std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ, naif);
 
     SpiceDouble unitLookC[3];
-    vhat_c(&lookC[0], unitLookC);
+    naif->vhat_c(&lookC[0], unitLookC);
 
-    return p_camera->Sensor::SetUniversalGround(lat, lon);
+    return p_camera->Sensor::SetUniversalGround(naif, lat, lon);
   }
 
   /** Iteration loop for computing ground position from slant range
@@ -156,7 +156,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::Iterate(SpiceDouble &R, const double &slantRangeSqr, const SpiceDouble c[],
+  bool RadarGroundMap::Iterate(NaifContextPtr naif, SpiceDouble &R, const double &slantRangeSqr, const SpiceDouble c[],
                                const SpiceDouble r[], SpiceDouble X[], SpiceDouble &lat,
                                SpiceDouble &lon, const std::vector<double> &Xsc,
                                const bool &useSlopeEqn, const double &slope) {
@@ -168,9 +168,9 @@ namespace Isis {
     SpiceDouble rlon;
     int iter = 0;
     do {
-      double normXsc = vnorm_c(&Xsc[0]);
+      double normXsc = naif->vnorm_c(&Xsc[0]);
       double alpha = (R * R - slantRangeSqr - normXsc * normXsc) /
-                     (2.0 * vdot_c(&Xsc[0], c));
+                     (2.0 * naif->vdot_c(&Xsc[0], c));
 
       double arg = slantRangeSqr - alpha * alpha;
       if(arg < 0.0) return false;
@@ -179,15 +179,15 @@ namespace Isis {
       if(p_lookDirection == Radar::Left) beta *= -1.0;
 
       SpiceDouble alphac[3], betar[3];
-      vscl_c(alpha, c, alphac);
-      vscl_c(beta, r, betar);
+      naif->vscl_c(alpha, c, alphac);
+      naif->vscl_c(beta, r, betar);
 
-      vadd_c(alphac, betar, alphac);
-      vadd_c(&Xsc[0], alphac, X);
+      naif->vadd_c(alphac, betar, alphac);
+      naif->vadd_c(&Xsc[0], alphac, X);
 
       // Convert X to lat,lon
       lastR = R;
-      reclat_c(X, &R, &lon, &lat);
+      naif->reclat_c(X, &R, &lon, &lat);
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
@@ -213,14 +213,14 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+  bool RadarGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
     Distance localRadius(p_camera->LocalRadius(lat, lon));
 
     if(!localRadius.isValid()) {
       return false;
     }
 
-    return SetGround(SurfacePoint(lat, lon, p_camera->LocalRadius(lat, lon)));
+    return SetGround(naif, SurfacePoint(lat, lon, p_camera->LocalRadius(lat, lon)));
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius
@@ -231,7 +231,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+  bool RadarGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) {
     // Get the ground point in rectangular coordinates (X)
     if(!surfacePoint.Valid()) return false;
 
@@ -240,13 +240,13 @@ namespace Isis {
 
     // Compute lower bound for Doppler shift
     double et1 = p_camera->Spice::cacheStartTime().Et();
-    p_camera->Sensor::setTime(et1);
-    double xv1 = ComputeXv(X);
+    p_camera->Sensor::setTime(et1, naif);
+    double xv1 = ComputeXv(naif, X);
 
     // Compute upper bound for Doppler shift
     double et2 = p_camera->Spice::cacheEndTime().Et();
-    p_camera->Sensor::setTime(et2);
-    double xv2 = ComputeXv(X);
+    p_camera->Sensor::setTime(et2, naif);
+    double xv2 = ComputeXv(naif, X);
 
     // Make sure we bound root (xv = 0.0)
     if((xv1 < 0.0) && (xv2 < 0.0)) return false;
@@ -274,8 +274,8 @@ namespace Isis {
 
       // Compute the guessed Doppler shift.  Hopefully
       // this guess converges to zero at some point
-      p_camera->Sensor::setTime(etGuess);
-      double fGuess = ComputeXv(X);
+      p_camera->Sensor::setTime(etGuess, naif);
+      double fGuess = ComputeXv(naif, X);
 
       // Update the bounds
       double delTime;
@@ -299,16 +299,16 @@ namespace Isis {
         std::vector<double> Ssc(6);
 
         // Load the state into Ssc and rotate to body-fixed
-        vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
-        vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
+        naif->vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
+        naif->vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
         std::vector<double> bfSsc(6);
-        bfSsc = bodyFrame->ReferenceVector(Ssc);
+        bfSsc = bodyFrame->ReferenceVector(Ssc, naif);
 
         // Extract the body-fixed position and velocity from the state
         std::vector<double> Vsc(3);
         std::vector<double> Xsc(3);
-        vequ_c(&bfSsc[0], (SpiceDouble *) & (Xsc[0]));
-        vequ_c(&bfSsc[3], (SpiceDouble *) & (Vsc[0]));
+        naif->vequ_c(&bfSsc[0], (SpiceDouble *) & (Xsc[0]));
+        naif->vequ_c(&bfSsc[3], (SpiceDouble *) & (Vsc[0]));
 
         // Determine if focal plane coordinate falls on the correct side of the
         // spacecraft. Radar has both left and right look directions. Make sure
@@ -321,9 +321,9 @@ namespace Isis {
         SpiceDouble vout1[3];
         SpiceDouble vout2[3];
         SpiceDouble dp;
-        vsub_c(X, &Xsc[0], vout1);
-        vcrss_c(&Vsc[0], &Xsc[0], vout2);
-        dp = vdot_c(vout1, vout2);
+        naif->vsub_c(X, &Xsc[0], vout1);
+        naif->vcrss_c(&Vsc[0], &Xsc[0], vout2);
+        dp = naif->vdot_c(vout1, vout2);
         if(dp > 0.0 && p_lookDirection == Radar::Left) return false;
         if(dp < 0.0 && p_lookDirection == Radar::Right) return false;
         if(dp == 0.0) return false;
@@ -337,12 +337,12 @@ namespace Isis {
         lookB[1] = X[1] - Xsc[1];
         lookB[2] = X[2] - Xsc[2];
 
-        std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
+        std::vector<double> lookJ = bodyFrame->J2000Vector(lookB, naif);
         SpiceRotation *cameraFrame = p_camera->instrumentRotation(); //this is the pointer to the camera's SpiceRotation/instrumentatrotation object
-        std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
+        std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ, naif);
 
         SpiceDouble unitLookC[3];
-        vhat_c(&lookC[0], unitLookC);
+        naif->vhat_c(&lookC[0], unitLookC);
 
         p_camera->SetFocalLength(p_slantRange * 1000.0); // p_slantRange is km so focal length is in m
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
@@ -351,7 +351,7 @@ namespace Isis {
 
         // set the sensor's ground point and also makes it possible to calculate m_ra & m_dec
 
-        return p_camera->Sensor::SetGround(surfacePoint, true);
+        return p_camera->Sensor::SetGround(naif, surfacePoint, true);
       }
     }
 
@@ -374,7 +374,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetXY(const SurfacePoint &spoint, double *cudx,
+  bool RadarGroundMap::GetXY(NaifContextPtr naif,
+                             const SurfacePoint &spoint, double *cudx,
                              double *cudy, bool test) {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
@@ -389,24 +390,24 @@ namespace Isis {
 
     std::vector<double> sJ(6);   // Spacecraft state vector (position and velocity) in J2000 frame
     // Load the state into sJ
-    vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &sJ[0]);
-    vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &sJ[3]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &sJ[0]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &sJ[3]);
 
     // Rotate the state to body-fixed
     p_sB.resize(6);
-    p_sB = bodyFrame->ReferenceVector(sJ);
+    p_sB = bodyFrame->ReferenceVector(sJ, naif);
 
     // Extract the body-fixed position and velocity
     SpiceDouble VsB[3];
     SpiceDouble PsB[3];
-    vequ_c(&p_sB[0], PsB);
-    vequ_c(&p_sB[3], VsB);
+    naif->vequ_c(&p_sB[0], PsB);
+    naif->vequ_c(&p_sB[3], VsB);
 
     p_lookB.resize(3);
-    vsub_c(X, PsB, &p_lookB[0]);
+    naif->vsub_c(X, PsB, &p_lookB[0]);
 
-    p_groundSlantRange = vnorm_c(&p_lookB[0]);  // km
-    p_groundDopplerFreq = 2. / p_waveLength / p_groundSlantRange * vdot_c(&p_lookB[0], &VsB[0]);
+    p_groundSlantRange = naif->vnorm_c(&p_lookB[0]);  // km
+    p_groundDopplerFreq = 2. / p_waveLength / p_groundSlantRange * naif->vdot_c(&p_lookB[0], &VsB[0]);
     *cudx = p_groundSlantRange * 1000.0 / p_rangeSigma;  // to meters, then to focal plane coord
     *cudy = p_groundDopplerFreq / p_dopplerSigma;   // htx to focal plane coord
 
@@ -419,7 +420,7 @@ namespace Isis {
   }
 
 
-  double RadarGroundMap::ComputeXv(SpiceDouble X[3]) {
+  double RadarGroundMap::ComputeXv(NaifContextPtr naif, SpiceDouble X[3]) {
     // Get the spacecraft position (Xsc) and velocity (Vsc) in body fixed
     // coordinates
     SpiceRotation *bodyFrame = p_camera->bodyRotation();
@@ -427,28 +428,28 @@ namespace Isis {
 
     // Load the state into Ssc
     std::vector<double> Ssc(6);
-    vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
-    vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Coordinate()[0]), &Ssc[0]);
+    naif->vequ_c((SpiceDouble *) & (spaceCraft->Velocity()[0]), &Ssc[3]);
 
     // Rotate the state to body-fixed
     std::vector<double> bfSsc(6);
-    bfSsc = bodyFrame->ReferenceVector(Ssc);
+    bfSsc = bodyFrame->ReferenceVector(Ssc, naif);
 
     // Extract the body-fixed position and velocity
     std::vector<double> Vsc(3);
     std::vector<double> Xsc(3);
-    vequ_c(&bfSsc[0], &Xsc[0]);
-    vequ_c(&bfSsc[3], &Vsc[0]);
+    naif->vequ_c(&bfSsc[0], &Xsc[0]);
+    naif->vequ_c(&bfSsc[3], &Vsc[0]);
 
     // Compute the slant range
     SpiceDouble lookB[3];
-    vsub_c(&Xsc[0], X, lookB);
-    p_slantRange = vnorm_c(lookB);   // units are km
+    naif->vsub_c(&Xsc[0], X, lookB);
+    p_slantRange = naif->vnorm_c(lookB);   // units are km
 
     // Compute and return xv = -2 * (point - observer) dot (point velocity - observer velocity) / (slantRange*wavelength)
     // In body-fixed coordinates, the point velocity = 0. so the equation becomes
     //    double xv = 2.0 * vdot_c(lookB,&Vsc[0]) / (vnorm_c(lookB) * WaveLength() );
-    double xv = -2.0 * vdot_c(lookB, &Vsc[0]) / (vnorm_c(lookB) * WaveLength()); // - is applied to lookB above
+    double xv = -2.0 * naif->vdot_c(lookB, &Vsc[0]) / (naif->vnorm_c(lookB) * WaveLength()); // - is applied to lookB above
     return xv;
   }
 
@@ -474,21 +475,21 @@ namespace Isis {
   // Add the partial for the x coordinate of the position (differentiating
   // point(x,y,z) - spacecraftPosition(x,y,z) in body-fixed and the velocity
   // Load the derivative of the state into d_lookJ
-  bool RadarGroundMap::GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
+  bool RadarGroundMap::GetdXYdPosition(NaifContextPtr naif, const SpicePosition::PartialType varType, int coefIndex,
                                        double *dx, double *dy) {
     SpicePosition *instPos = p_camera->instrumentPosition();
     SpiceRotation *bodyRot = p_camera->bodyRotation();
 
     std::vector <double> d_lookJ(6);
-    vequ_c(&(instPos->CoordinatePartial(varType, coefIndex))[0], &d_lookJ[0]);
-    vequ_c(&(instPos->VelocityPartial(varType, coefIndex))[0], &d_lookJ[3]);
+    naif->vequ_c(&(instPos->CoordinatePartial(varType, coefIndex))[0], &d_lookJ[0]);
+    naif->vequ_c(&(instPos->VelocityPartial(varType, coefIndex))[0], &d_lookJ[3]);
 
-    std::vector<double> d_lookB =  bodyRot->ReferenceVector(d_lookJ);
+    std::vector<double> d_lookB =  bodyRot->ReferenceVector(d_lookJ, naif);
 
-    double d_slantRange = (-1.) * vdot_c(&p_lookB[0], &d_lookB[0]) / p_groundSlantRange;
+    double d_slantRange = (-1.) * naif->vdot_c(&p_lookB[0], &d_lookB[0]) / p_groundSlantRange;
     double d_dopplerFreq = (-1.) * p_groundDopplerFreq * d_slantRange / p_groundSlantRange -
-                           2. / p_waveLength / p_groundSlantRange * vdot_c(&d_lookB[0], &p_sB[3]) +
-                           2. / p_waveLength / p_groundSlantRange * vdot_c(&p_lookB[0], &d_lookB[3]);
+                           2. / p_waveLength / p_groundSlantRange * naif->vdot_c(&d_lookB[0], &p_sB[3]) +
+                           2. / p_waveLength / p_groundSlantRange * naif->vdot_c(&p_lookB[0], &d_lookB[3]);
 
     *dx = d_slantRange * 1000.0 / p_rangeSigma;// km to meters, then to focal plane coord
     *dy = d_dopplerFreq / p_dopplerSigma;   // htz scaled to focal plane
@@ -509,17 +510,18 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetdXYdPoint(std::vector<double> d_lookB,
+  bool RadarGroundMap::GetdXYdPoint(NaifContextPtr naif,
+                                    std::vector<double> d_lookB,
                                     double *dx, double *dy) {
 
     //  TODO  add a check to make sure p_lookB has been set
 
-    double d_slantRange = vdot_c(&p_lookB[0], &d_lookB[0]) / p_groundSlantRange;  // km
+    double d_slantRange = naif->vdot_c(&p_lookB[0], &d_lookB[0]) / p_groundSlantRange;  // km
     // After switching to J2000, the last term will not be 0. as it is in body-fixed
 //    double d_dopplerFreq = p_groundDopplerFreq*d_slantRange/p_groundSlantRange // Ken
 //      + 2./p_waveLength/p_groundSlantRange*vdot_c(&d_lookB[0], &p_sB[3]);
     double d_dopplerFreq = (-1.) * p_groundDopplerFreq * d_slantRange / p_groundSlantRange
-                           + 2. / p_waveLength / p_groundSlantRange * vdot_c(&d_lookB[0], &p_sB[3]);
+                           + 2. / p_waveLength / p_groundSlantRange * naif->vdot_c(&d_lookB[0], &p_sB[3]);
 //        + 2./p_wavelength/slantRange*vdot_c(&p_lookB[0], 0);
 
     *dx = d_slantRange * 1000.0 / p_rangeSigma;

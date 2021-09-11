@@ -38,10 +38,12 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(int argc, char **argv) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
   cout << "Unit Test for ApolloCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
@@ -68,7 +70,7 @@ int main(int argc, char **argv) {
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toLatin1().data(), &et);
+    naif->str2et_c(stime.toLatin1().data(), &et);
     // approximate 1 tenth of a second since Apollo did not
     double exposureDuration = .1;
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
@@ -77,22 +79,22 @@ int main(int argc, char **argv) {
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 1.0);
+    TestLineSamp(cam, 1.0, 1.0, naif);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), 1.0);
+    TestLineSamp(cam, cam->Samples(), 1.0, naif);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 1.0, cam->Lines());
+    TestLineSamp(cam, 1.0, cam->Lines(), naif);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), cam->Lines());
+    TestLineSamp(cam, cam->Samples(), cam->Lines(), naif);
 
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
     cout << "For center pixel position ..." << endl;
 
-    if(!cam->SetImage(samp, line)) {
+    if(!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
@@ -137,11 +139,11 @@ int main(int argc, char **argv) {
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
-  if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+  if (success) {
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

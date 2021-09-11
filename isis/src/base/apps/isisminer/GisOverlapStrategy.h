@@ -75,7 +75,7 @@ namespace Isis {
                          const ResourceList &globals);
       virtual ~GisOverlapStrategy();
   
-      virtual int apply(ResourceList &resources, const ResourceList &globals);
+      virtual int apply(NaifContextPtr naif, ResourceList &resources, const ResourceList &globals);
       
     protected:
       enum GisMergeOption { None, Default, Intersection, Union, Centroid, 
@@ -87,10 +87,12 @@ namespace Isis {
       // These methods can be overridden by the deriving class if so desired
       virtual ResourceList overlapCandidates(ResourceList &resources,
                                              const ResourceList &globals);
-      virtual ResourceList processOverlaps(SharedResource &resource,
+      virtual ResourceList processOverlaps(NaifContextPtr naif,
+                                           SharedResource &resource,
                                            ResourceList &overlaps,
                                            const ResourceList &globals);
-      virtual SharedResource processOverlap(SharedResource &resourceA,
+      virtual SharedResource processOverlap(NaifContextPtr naif,
+                                            SharedResource &resourceA,
                                             SharedResource &resourceB,
                                             const double &ovrRatioA,
                                             const double &ovrRatioB,

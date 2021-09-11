@@ -54,7 +54,7 @@ void IsisMain() {
   const QString sumspice_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
-
+  auto naif = NaifContext::acquire();
 
 
   //  Get the list of input cubes to be processed
@@ -93,8 +93,8 @@ void IsisMain() {
   Kernels meta;
   if ( ui.WasEntered("METAKERNEL") ) {
     QString metafile = ui.GetFileName("METAKERNEL");
-    meta.Add(metafile);
-    meta.Load();
+    meta.Add(naif, metafile);
+    meta.Load(naif);
   }
 
   // Load sumfiles
@@ -153,7 +153,7 @@ void IsisMain() {
 
     // Find the proper SUMFILE for the cube
     QString filename(cubeNameList[cubeIndex].expanded());
-    SharedFinder cubesum( new SumFinder(filename, sumFiles, tolerance, tstamp) );
+    SharedFinder cubesum( new SumFinder(naif, filename, sumFiles, tolerance, tstamp) );
 
     // Format a warning and save it off for later
     if ( !cubesum->isFound() ) {
@@ -164,7 +164,7 @@ void IsisMain() {
       warnings <<  mess;
     }
     else {
-      if ( !cubesum->update(options) ) {
+      if ( !cubesum->update(naif, options) ) {
         QString msg = "Failed to apply SUMFILE updates on cube " + filename;
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -173,7 +173,7 @@ void IsisMain() {
     // This will update the history blob and close the cube,
     // but retain all the pertinent info
     cubesum->writeHistory();
-    cubesum->setCube();
+    cubesum->setCube(naif);
     resultSet.append(cubesum);
     progress.CheckStatus();
   }
@@ -238,5 +238,5 @@ void IsisMain() {
   }
 
   // Unload meta kernels - automatic, but done for completeness
-  meta.UnLoad();
+  meta.UnLoad(naif);
 }

@@ -100,7 +100,7 @@ void IsisMain() {
         // Calculate the grid point intersection of the DEM
         if ( useGridMethod ) {  // ( "grid" == method )
           // Get the grid point (lat, lon) from the DEM
-          QScopedPointer<SurfacePoint> dempt(dsk.point(point.GetLatitude(), 
+          QScopedPointer<SurfacePoint> dempt(dsk.point(naif, point.GetLatitude(), 
                                                        point.GetLongitude()));
 
           pixels[i] = dempt->GetLocalRadius().meters();
@@ -126,7 +126,7 @@ void IsisMain() {
   
           // Check for valid intercept
           NaifVertex xpt;
-          if ( dsk.isPlateIdValid(dsk.plateIdOfIntercept(observer, raydir, xpt)) ) { 
+          if ( dsk.isPlateIdValid(dsk.plateIdOfIntercept(naif, observer, raydir, xpt)) ) { 
             point.FromNaifArray(&xpt[0]);
             pixels[i] = point.GetLocalRadius().meters();
           }

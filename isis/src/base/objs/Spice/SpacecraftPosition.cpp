@@ -85,8 +85,8 @@ namespace Isis {
  * @return double Time in seconds it takes light to travel the distance of the 
  *         radius provided/set in the object
  */
-  double SpacecraftPosition::getRadiusLightTime() const {
-    return (m_radius.kilometers()/clight_c());
+  double SpacecraftPosition::getRadiusLightTime(NaifContextPtr naif) const {
+    return (m_radius.kilometers()/naif->clight_c());
   }
 
 /**
@@ -99,8 +99,8 @@ namespace Isis {
  * @return double Time in seconds it takes light to travel given distance 
  *        
  */
-  double SpacecraftPosition::getDistanceLightTime(const Distance &distance) {
-    return (distance.kilometers()/clight_c());
+  double SpacecraftPosition::getDistanceLightTime(NaifContextPtr naif, const Distance &distance) {
+    return (distance.kilometers()/naif->clight_c());
   }
 
 
@@ -143,14 +143,14 @@ namespace Isis {
  *   @history 2012-11-01 Kris Becker - Revised parameters to computeStateVector
  *                                     to match comments.  References #1136.
  */
-  void SpacecraftPosition::SetEphemerisTimeSpice() {
+  void SpacecraftPosition::SetEphemerisTimeSpice(NaifContextPtr naif) {
 
     // Both light time correction and surface light time correction *must* be requested
     // in order to invoke the algorithm below, otherwise we can call the pre-existing
     // implementation as it handles swap and light time adjustments as requested. 
     // The algorithm below only additionally handles light time surface correction.
     if ( !(m_abcorr.isLightTimeCorrected() && m_abcorr.isLightTimeToSurfaceCorrected()) ) {
-      SpicePosition::SetEphemerisTimeSpice();
+      SpicePosition::SetEphemerisTimeSpice(naif);
       return;
     }
 
@@ -178,25 +178,25 @@ namespace Isis {
 
     //  1)  get observer/target light time
     computeStateVector(getAdjustedEphemerisTime(), getTargetCode(), getObserverCode(),
-                       "J2000", GetAberrationCorrection(), state, hasVelocity, lt);
+                       "J2000", GetAberrationCorrection(), state, hasVelocity, lt, naif);
 
     //  2)  get SSB to s/c
     SpiceDouble ssbObs[6], ssbObs_lt;
     bool dummy;
     computeStateVector(getAdjustedEphemerisTime(), getObserverCode(), ssbCode,
-                       "J2000", "NONE", ssbObs, dummy, ssbObs_lt);
+                       "J2000", "NONE", ssbObs, dummy, ssbObs_lt, naif);
 
     // 3) get adjusted target position from SSB
-    double ltAdj_et = getAdjustedEphemerisTime() - lt + getRadiusLightTime();
+    double ltAdj_et = getAdjustedEphemerisTime() - lt + getRadiusLightTime(naif);
     SpiceDouble ssbTarg[6], ssbTarg_lt;
     computeStateVector(ltAdj_et, getTargetCode(), ssbCode,
-                       "J2000", "NONE", ssbTarg, dummy, ssbTarg_lt);
+                       "J2000", "NONE", ssbTarg, dummy, ssbTarg_lt, naif);
 
     // 4) compute target to observer
-    (void) vsubg_c(ssbTarg, ssbObs, 6, state);
+    (void) naif->vsubg_c(ssbTarg, ssbObs, 6, state);
 
     // Store vector and light time correction results
-    setStateVector(state, hasVelocity);
+    setStateVector(state, hasVelocity, naif);
     setLightTime(ltAdj_et);
     return;
   }

@@ -58,7 +58,7 @@ namespace Isis {
     public:
       CameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
-      virtual void SetDistortion(int naifIkCode);
+      virtual void SetDistortion(NaifContextPtr naif, int naifIkCode);
 
       virtual ~CameraDistortionMap();
 

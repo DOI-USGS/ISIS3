@@ -46,7 +46,7 @@ namespace Isis {
     public:
       JunoDistortionMap(Camera *parent);
 
-      virtual void SetDistortion(int naifIkCode);
+      virtual void SetDistortion(NaifContextPtr naif, int naifIkCode);
 
       virtual ~JunoDistortionMap();
 

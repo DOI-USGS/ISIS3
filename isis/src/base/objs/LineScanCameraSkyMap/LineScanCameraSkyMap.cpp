@@ -40,13 +40,13 @@ namespace Isis {
    * @todo can this all be solved by restricting the physical size of
    * the focal plane?
    */
-  bool LineScanCameraSkyMap::SetSky(const double ra, const double dec) {
+  bool LineScanCameraSkyMap::SetSky(NaifContextPtr naif, const double ra, const double dec) {
     // Get beginning bounding time and offset for iterative loop
-    p_camera->Sensor::setTime(p_camera->Spice::cacheStartTime());
-    p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
+    p_camera->Sensor::setTime(p_camera->Spice::cacheStartTime(), naif);
+    p_camera->Sensor::SetRightAscensionDeclination(ra, dec, naif);
 
     double lookC[3];
-    p_camera->Sensor::LookDirection(lookC);
+    p_camera->Sensor::LookDirection(lookC, naif);
     double ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     double uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
@@ -61,10 +61,10 @@ namespace Isis {
                          focalMap->DetectorLine();
 
     // Get ending bounding time and offset for iterative loop
-    p_camera->Sensor::setTime(p_camera->Spice::cacheEndTime());
-    p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
+    p_camera->Sensor::setTime(p_camera->Spice::cacheEndTime(), naif);
+    p_camera->Sensor::SetRightAscensionDeclination(ra, dec, naif);
 
-    p_camera->Sensor::LookDirection(lookC);
+    p_camera->Sensor::LookDirection(lookC, naif);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
@@ -101,9 +101,9 @@ namespace Isis {
     double timeTol = detectorMap->LineRate() / 10.0;
     for(int j = 0; j < 30; j++) {
       double etGuess = xl + (xh - xl) * fl / (fl - fh);
-      p_camera->Sensor::setTime(etGuess);
-      p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
-      p_camera->Sensor::LookDirection(lookC);
+      p_camera->Sensor::setTime(etGuess, naif);
+      p_camera->Sensor::SetRightAscensionDeclination(ra, dec, naif);
+      p_camera->Sensor::LookDirection(lookC, naif);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 

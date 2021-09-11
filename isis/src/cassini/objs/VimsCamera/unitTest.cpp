@@ -32,7 +32,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 /**
  * @internal
@@ -53,6 +53,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  */
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for VimsCamera..." << endl;
   /*
@@ -150,22 +152,22 @@ int main(void) {
 
       // Test all four corners to make sure the conversions are right
       cout << "For upper left corner ..." << endl;
-      TestLineSamp(cam, corners[i*4].first, corners[i*4].second);
+      TestLineSamp(cam, corners[i*4].first, corners[i*4].second, naif);
 
       cout << "For upper right corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+1].first, corners[i*4+1].second);
+      TestLineSamp(cam, corners[i*4+1].first, corners[i*4+1].second, naif);
 
       cout << "For lower left corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+2].first, corners[i*4+2].second);
+      TestLineSamp(cam, corners[i*4+2].first, corners[i*4+2].second, naif);
 
       cout << "For lower right corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+3].first, corners[i*4+3].second);
+      TestLineSamp(cam, corners[i*4+3].first, corners[i*4+3].second, naif);
 
       double samp = cam->Samples() / 2;
       double line = cam->Lines() / 2;
       cout << "For center pixel position ..." << endl;
 
-      if(!cam->SetImage(samp, line)) {
+      if(!cam->SetImage(samp, line, naif)) {
         cout << "ERROR" << endl;
         return 0;
       }
@@ -205,7 +207,7 @@ int main(void) {
     //  Test a non-intersecting pixel
     double samp = 3.;
     double line = 4.;
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "Sample:3  Line:4   No Intersection" << endl;
     }
     //  Test intersecting pixel and back project
@@ -214,7 +216,7 @@ int main(void) {
     cout << "Sample:3.0121    Line:4.39113" << endl;
     double expectedLat = -19.3962073091522598;
     double expectedLon = 45.5092093638429773;
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
     }
 
@@ -246,11 +248,11 @@ int main(void) {
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

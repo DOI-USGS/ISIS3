@@ -20,7 +20,9 @@ using namespace Isis;
  * 
  */
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   try {
     cout << "UnitTest for Stereo" << endl;
@@ -32,8 +34,8 @@ int main(int argc, char *argv[]) {
     Cube rightCube;
     rightCube.open("$mariner10/testData/0166613_clean_equi.cub");
 
-    leftCube.camera()->SetImage(1054.19, 624.194);
-    rightCube.camera()->SetImage(1052.19, 624.194);
+    leftCube.camera()->SetImage(1054.19, 624.194, naif);
+    rightCube.camera()->SetImage(1052.19, 624.194, naif);
 
     double radius, lat, lon, sepang, error;
     Stereo::elevation(*(leftCube.camera()), *(rightCube.camera()),

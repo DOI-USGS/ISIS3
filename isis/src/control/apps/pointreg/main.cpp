@@ -178,14 +178,14 @@ class Validation {
 };
 
 
-void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
+void registerPoint(NaifContextPtr naif, ControlPoint *outPoint, ControlMeasure *patternCM,
     QString registerMeasures, bool outputFailed);
-void validatePoint(ControlPoint *point, ControlMeasure *reference,
+void validatePoint(NaifContextPtr naif, ControlPoint *point, ControlMeasure *reference,
     double shiftTolerance);
-Validation backRegister(ControlMeasure *measure, ControlMeasure *reference,
+Validation backRegister(NaifContextPtr naif, ControlMeasure *measure, ControlMeasure *reference,
     double shiftTolerance);
 
-double getResolution(Cube &cube, ControlMeasure &measure);
+double getResolution(NaifContextPtr naif, Cube &cube, ControlMeasure &measure);
 void verifyCube(Cube & cube);
 bool outputValue(ofstream &os, double value);
 int calcGoodMeasureCount(const ControlPoint *point);
@@ -217,6 +217,7 @@ void IsisMain() {
 
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   if (ui.WasEntered("FALSEPOSITIVES")) {
     logFalsePositives = true;
@@ -332,10 +333,10 @@ void IsisMain() {
       outPoint->SetRefMeasure(patternCM);
 
       if (validate != "ONLY") {
-        registerPoint(outPoint, patternCM, registerMeasures, outputFailed);
+        registerPoint(naif, outPoint, patternCM, registerMeasures, outputFailed);
       }
       if (validate != "SKIP") {
-        validatePoint(outPoint, patternCM, ui.GetDouble("SHIFT"));
+        validatePoint(naif, outPoint, patternCM, ui.GetDouble("SHIFT"));
       }
 
       // Check to see if the control point has now been assigned
@@ -524,7 +525,7 @@ void IsisMain() {
 }
 
 
-void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
+void registerPoint(NaifContextPtr naif, ControlPoint *outPoint, ControlMeasure *patternCM,
     QString registerMeasures, bool outputFailed) {
 
   Cube &patternCube = *cubeMgr->OpenCube(
@@ -565,7 +566,7 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
         verifyCube(searchCube);
 
         try {
-          ar->SearchChip()->Load(searchCube, *(ar->PatternChip()), patternCube);
+          ar->SearchChip()->Load(naif, searchCube, *(ar->PatternChip()), patternCube);
 
           // If the measurements were correctly registered
           // Write them to the new ControlNet
@@ -586,7 +587,7 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
             // Check to make sure the newly calculated measure position is on
             // the surface of the planet
             Camera *cam = searchCube.camera();
-            bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine());
+            bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine(), naif);
 
             if (foundLatLon) {
               registered++;
@@ -682,14 +683,14 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
 }
 
 
-void validatePoint(ControlPoint *point, ControlMeasure *reference,
+void validatePoint(NaifContextPtr naif, ControlPoint *point, ControlMeasure *reference,
     double shiftTolerance) {
 
   for (int i = 0; i < point->GetNumMeasures(); i++) {
     if (i != point->IndexOfRefMeasure()) {
       ControlMeasure *measure = point->GetMeasure(i);
       if (measure->IsMeasured() && !measure->IsEditLocked()) {
-        Validation validation = backRegister(
+        Validation validation = backRegister(naif,
             reference, measure, shiftTolerance);
 
         // If the validation failed, or we were unable to perform the validation
@@ -719,7 +720,7 @@ void validatePoint(ControlPoint *point, ControlMeasure *reference,
 }
 
 
-Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
+Validation backRegister(NaifContextPtr naif, ControlMeasure *reference, ControlMeasure *measure,
     double shiftTolerance) {
 
   Validation validation(
@@ -730,8 +731,8 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
   Cube &searchCube = *cubeMgr->OpenCube(files->fileName(
         reference->GetCubeSerialNumber()));
 
-  double patternRes = getResolution(patternCube, *measure);
-  double searchRes = getResolution(searchCube, *reference);
+  double patternRes = getResolution(naif, patternCube, *measure);
+  double searchRes = getResolution(naif, searchCube, *reference);
   validation.compareResolutions(patternRes, searchRes, resTolerance);
 
   if (validation.skipped()) 
@@ -746,7 +747,7 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
   verifyCube(searchCube);
 
   try {
-    validator->SearchChip()->Load(
+    validator->SearchChip()->Load(naif,
         searchCube, *(validator->PatternChip()), patternCube);
 
     // If the measurements were correctly registered
@@ -760,7 +761,7 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
       // the surface of the planet
       Camera *cam = searchCube.camera();
       bool foundLatLon = cam->SetImage(
-          validator->CubeSample(), validator->CubeLine());
+          validator->CubeSample(), validator->CubeLine(), naif);
 
       if (foundLatLon) {
         validation.compare(
@@ -775,11 +776,11 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
 }
 
 
-double getResolution(Cube &cube, ControlMeasure &measure) {
+double getResolution(NaifContextPtr naif, Cube &cube, ControlMeasure &measure) {
   // TODO retrieve for projection
   Camera *camera = cube.camera();
-  camera->SetImage(measure.GetSample(), measure.GetLine());
-  return camera->PixelResolution();
+  camera->SetImage(measure.GetSample(), measure.GetLine(), naif);
+  return camera->PixelResolution(naif);
 }
 
 

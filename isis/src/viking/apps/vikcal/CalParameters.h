@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <QString>
+#include "NaifContext.h"
 
 namespace Isis {
   /**

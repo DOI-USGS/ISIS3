@@ -60,6 +60,8 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
     qDebug() << "Unit test for NaifDskShape.";
     qDebug() << "";
 
@@ -79,24 +81,24 @@ int main(int argc, char *argv[]) {
     std::vector<double> lookDir; 
     obsPos.push_back(0.0);   obsPos.push_back(0.0);   obsPos.push_back(0.0);
     lookDir.push_back(1.0);  lookDir.push_back(1.0);  lookDir.push_back(1.0);
-    bool success = shapeModelFromPlate.intersectSurface(obsPos, lookDir);
+    bool success = shapeModelFromPlate.intersectSurface(naif, obsPos, lookDir);
     qDebug() << "Intersection successful? " << toString(success);
     qDebug() << "";
      
     qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=DSK file.";
     Pvl pvlWithShape("./st_2530292409_v_DskShapeModel.lbl");
-    Target targetSh(NULL, pvlWithShape);
+    Target targetSh(NULL, pvlWithShape, naif);
     NaifDskShape shapeModelFromPvlShape(&targetSh, pvlWithShape);
     qDebug() << "Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1)";
     obsPos[0]  = 0.0;  obsPos[1]  = 0.0;   obsPos[2]  = 1000.0;
     lookDir[0] = 0.0;  lookDir[1] = -1.0;  lookDir[2] = -1.0;
-    success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
+    success = shapeModelFromPvlShape.intersectSurface(naif, obsPos, lookDir);
     qDebug() << "Intersection successful?     " << toString(success);
 
     qDebug() << "";
     qDebug() << "Construct NaifDskShape object from cube labels with ElevationModel=DSK file.";    
     Pvl pvlWithElevation("./st_2530292409_v_DskElevationModel.lbl");
-    Target targetEl(NULL, pvlWithElevation);
+    Target targetEl(NULL, pvlWithElevation, naif);
     Distance meter(1, Distance::Meters);
     std::vector<Distance> radii;
     radii.push_back(meter);
@@ -107,7 +109,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)";
     obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
     lookDir[0] = -1.0;  lookDir[1] = 0.0;  lookDir[2] = 0.0;
-    success = shapeModelFromPvlElevation.intersectSurface(obsPos, lookDir);
+    success = shapeModelFromPvlElevation.intersectSurface(naif, obsPos, lookDir);
     qDebug() << "Intersection successful?     " << toString(success);
     qDebug() << "Intersection valid? " << shapeModelFromPvlElevation.surfaceIntersection()->Valid();
 
@@ -159,7 +161,7 @@ int main(int argc, char *argv[]) {
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
     // no need to call calculateSurfaceNormal() or ellipsoidNormal()
     // directly. these methods are called by calculateDefaultNormal()
-    shapeModelFromPvlElevation.calculateDefaultNormal(); 
+    shapeModelFromPvlElevation.calculateDefaultNormal(naif); 
     qDebug() << "Has default normal?                  " << shapeModelFromPvlElevation.hasNormal();
     qDebug() << "Default normal:                      "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
@@ -168,7 +170,7 @@ int main(int argc, char *argv[]) {
     double point[3];
     point[0] = 1.0;    point[1] = 0.0;    point[2] = 0.0;
     cornerNeighborPoints.push_back(point);
-    shapeModelFromPvlElevation.calculateLocalNormal(cornerNeighborPoints); 
+    shapeModelFromPvlElevation.calculateLocalNormal(naif, cornerNeighborPoints); 
     qDebug() << "Has local normal?                    " << shapeModelFromPvlElevation.hasNormal();
     qDebug() << "Local normal from neighbor points:   "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
@@ -195,7 +197,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. ";
     try {
-      shapeModel.calculateLocalNormal(cornerNeighborPoints);
+      shapeModel.calculateLocalNormal(naif, cornerNeighborPoints);
     } 
     catch (IException &e) {
       e.print();
@@ -203,7 +205,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "Thrown by ellipsoidNormal() - No intersection. ";
     try {
-      shapeModel.ellipsoidNormal();
+      shapeModel.ellipsoidNormal(naif);
     } 
     catch (IException &e) {
       e.print();
@@ -214,7 +216,7 @@ int main(int argc, char *argv[]) {
       // if the surface point is accidentally reset to an invalid point, but hasIntercept still 
       // set to true.
       shapeModelFromPvlElevation.setSurfacePoint(SurfacePoint());
-      shapeModelFromPvlElevation.ellipsoidNormal();
+      shapeModelFromPvlElevation.ellipsoidNormal(naif);
     } 
     catch (IException &e) {
       e.print();
@@ -223,9 +225,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "Thrown by ellipsoidNormal() - Invalid target. ";
     try {
       // get valid intersection
-      shapeModelFromPlate.intersectSurface(obsPos, lookDir);
+      shapeModelFromPlate.intersectSurface(naif, obsPos, lookDir);
       // model with invalid target
-      shapeModelFromPlate.ellipsoidNormal();
+      shapeModelFromPlate.ellipsoidNormal(naif);
     } 
     catch (IException &e) {
       e.print();

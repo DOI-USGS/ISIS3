@@ -47,7 +47,7 @@ namespace Isis {
    */
   class MarciDistortionMap : public CameraDistortionMap {
     public:
-      MarciDistortionMap(Camera *parent, int naifIkCode);
+      MarciDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode);
 
       //! Destructor
       virtual ~MarciDistortionMap() {};

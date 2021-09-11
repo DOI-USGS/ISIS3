@@ -77,7 +77,7 @@ class LineOffsetFunctor :
      *
      * @return Line off (see description)
      */
-    double operator()(double et) {
+    double operator()(NaifContextPtr naif, double et) {
       double lookC[3] = {0.0, 0.0, 0.0};
       double ux = 0.0;
       double uy = 0.0;
@@ -93,17 +93,17 @@ class LineOffsetFunctor :
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
      
-      m_camera->Sensor::setTime(et);
+      m_camera->Sensor::setTime(et, naif);
  
       // Set ground
-      if (!m_camera->Sensor::SetGround(m_surfacePoint, false)) {
+      if (!m_camera->Sensor::SetGround(naif, m_surfacePoint, false)) {
         IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                       " LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
    
       // Calculate the undistorted focal plane coordinates
-      m_camera->Sensor::LookDirection(lookC);
+      m_camera->Sensor::LookDirection(lookC, naif);
       ux = m_camera->FocalLength() * lookC[0] / lookC[2];
       uy = m_camera->FocalLength() * lookC[1] / lookC[2];
 
@@ -174,7 +174,7 @@ class SensorSurfacePointDistanceFunctor :
     ~SensorSurfacePointDistanceFunctor() {}
 
 
-    double operator()(double et) {
+    double operator()(NaifContextPtr naif, double et) {
       double s[3], p[3];
 
       //verify the time is with the cache bounds
@@ -186,12 +186,12 @@ class SensorSurfacePointDistanceFunctor :
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      m_camera->Sensor::setTime(et);
-      if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
+      m_camera->Sensor::setTime(et, naif);
+      if (!m_camera->Sensor::SetGround(naif, surfacePoint, false)) {
          IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                        "SensorSurfacePointDistanceFunctor";
       }
-      m_camera->instrumentPosition(s);
+      m_camera->instrumentPosition(s, naif);
       m_camera->Coordinate(p);
       return sqrt((s[0] - p[0]) * (s[0] - p[0]) +
                   (s[1] - p[1]) * (s[1] - p[1]) +
@@ -225,12 +225,12 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
+  bool LineScanCameraGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat,
       const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
 
     if (radius.isValid()) {
-      return SetGround(SurfacePoint(lat, lon, radius));
+      return SetGround(naif, SurfacePoint(lat, lon, radius));
     }
     else {
       return false;
@@ -246,8 +246,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint, const int &approxLine) {
-    FindFocalPlaneStatus status = FindFocalPlane(approxLine, surfacePoint);
+  bool LineScanCameraGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint, const int &approxLine) {
+    FindFocalPlaneStatus status = FindFocalPlane(naif, approxLine, surfacePoint);
     if (status == Success) return true;
     //if(status == Failure) return false;
     return false;
@@ -260,8 +260,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
-    FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
+  bool LineScanCameraGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) {
+    FindFocalPlaneStatus status = FindFocalPlane(naif, -1, surfacePoint);
 
     if (status == Success) return true;
 
@@ -269,21 +269,22 @@ namespace Isis {
   }
 
 
-  double LineScanCameraGroundMap::FindSpacecraftDistance(int line,
+  double LineScanCameraGroundMap::FindSpacecraftDistance(NaifContextPtr naif, int line,
       const SurfacePoint &surfacePoint) {
 
     CameraDetectorMap *detectorMap = p_camera->DetectorMap();
-    detectorMap->SetParent(p_camera->ParentSamples() / 2, line);
-    if (!p_camera->Sensor::SetGround(surfacePoint, false)) {
+    detectorMap->SetParent(naif, p_camera->ParentSamples() / 2, line);
+    if (!p_camera->Sensor::SetGround(naif, surfacePoint, false)) {
       return DBL_MAX;
     }
 
-    return p_camera->SlantDistance();
+    return p_camera->SlantDistance(naif);
   }
 
 
   LineScanCameraGroundMap::FindFocalPlaneStatus
-      LineScanCameraGroundMap::FindFocalPlane(const int &approxLine,
+      LineScanCameraGroundMap::FindFocalPlane(NaifContextPtr naif, 
+                                              const int &approxLine,
                                               const SurfacePoint &surfacePoint) {
 
     //CameraDistortionMap *distortionMap = p_camera->DistortionMap();
@@ -311,19 +312,19 @@ namespace Isis {
     if (approxLine >= 0.5) {
 
       // convert the approxLine to an approximate time and offset
-      p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
+      p_camera->DetectorMap()->SetParent(naif, p_camera->ParentSamples() / 2.0, approxLine);
       approxTime = p_camera->time().Et();
   
-      approxOffset = offsetFunc(approxTime);
+      approxOffset = offsetFunc(naif, approxTime);
 
       // Check to see if there is no need to improve this root, it's good enough
       if (fabs(approxOffset) < 1e-2) { 
-        p_camera->Sensor::setTime(approxTime);
+        p_camera->Sensor::setTime(approxTime, naif);
         // check to make sure the point isn't behind the planet
-        if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+        if (!p_camera->Sensor::SetGround(naif, surfacePoint, true)) {
           return Failure;
         } 
-        p_camera->Sensor::LookDirection(lookC);
+        p_camera->Sensor::LookDirection(lookC, naif);
         ux = p_camera->FocalLength() * lookC[0] / lookC[2];
         uy = p_camera->FocalLength() * lookC[1] / lookC[2];
      
@@ -346,7 +347,7 @@ namespace Isis {
 
       // starting offsets
       fh = approxOffset;  //the first is already calculated
-      fl = offsetFunc(xl);
+      fl = offsetFunc(naif, xl);
 
       // Iterate to refine the given approximate time that the instrument imaged the ground point
       for (int j=0; j < 10; j++) {
@@ -358,7 +359,7 @@ namespace Isis {
         if (etGuess < cacheStart) etGuess = cacheStart;
         if (etGuess > cacheEnd) etGuess = cacheEnd;
 
-        double f = offsetFunc(etGuess);
+        double f = offsetFunc(naif, etGuess);
 
 
         // elliminate the node farthest away from the current best guess
@@ -373,12 +374,12 @@ namespace Isis {
 
         // See if we converged on the point so set up the undistorted focal plane values and return
         if (fabs(f) < 1e-2) {
-          p_camera->Sensor::setTime(approxTime);
+          p_camera->Sensor::setTime(approxTime, naif);
           // check to make sure the point isn't behind the planet
-          if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+          if (!p_camera->Sensor::SetGround(naif, surfacePoint, true)) {
             return Failure;
           } 
-          p_camera->Sensor::LookDirection(lookC);
+          p_camera->Sensor::LookDirection(lookC, naif);
           ux = p_camera->FocalLength() * lookC[0] / lookC[2];
           uy = p_camera->FocalLength() * lookC[1] / lookC[2];
       
@@ -414,7 +415,7 @@ namespace Isis {
     double temp;
 
     for (int i=0; i<3; i++) {
-      offsetNodes[i] = offsetFunc(timeNodes[i]);
+      offsetNodes[i] = offsetFunc(naif, timeNodes[i]);
     }
    
     // centralize and normalize the data for stability in root finding
@@ -504,8 +505,8 @@ namespace Isis {
     // the shortest distance being the winner.  For legacy consistency I have used the same logic below.  
 
     for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
-      dist << distanceFunc(root[i]);
-      offset << offsetFunc(root[i]);
+      dist << distanceFunc(naif, root[i]);
+      offset << offsetFunc(naif, root[i]);
     }
 
     // Save the root with the smallest dist
@@ -520,14 +521,14 @@ namespace Isis {
     }
 
     if (fabs(approxOffset) < 1.0e-2) { // No need to iteratively improve this root, it's good enough
-      p_camera->Sensor::setTime(approxTime);
+      p_camera->Sensor::setTime(approxTime, naif);
 
       // Check to make sure the point isn't behind the planet
-      if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+      if (!p_camera->Sensor::SetGround(naif, surfacePoint, true)) {
         return Failure;
       }
        
-      p_camera->Sensor::LookDirection(lookC);
+      p_camera->Sensor::LookDirection(lookC, naif);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];
      
@@ -586,9 +587,9 @@ namespace Isis {
 
     // Discard any roots that are looking through the planet
     for (int i = root.size()-1; i>=0; i--) {
-      p_camera->Sensor::setTime(root[i]);
+      p_camera->Sensor::setTime(root[i], naif);
       //check to make sure the point isn't behind the planet
-      if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+      if (!p_camera->Sensor::SetGround(naif, surfacePoint, true)) {
         root.removeAt(i);
       }
     }
@@ -602,8 +603,8 @@ namespace Isis {
     dist.clear();
     offset.clear();
     for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
-      dist << distanceFunc(root[i]);
-      offset << offsetFunc(root[i]);
+      dist << distanceFunc(naif, root[i]);
+      offset << offsetFunc(naif, root[i]);
     }
 
     // Save the root with the smallest dist
@@ -613,11 +614,11 @@ namespace Isis {
         if (dist[i] < dist[j]) j=i;
       }
 
-      p_camera->Sensor::setTime(root[j]);
+      p_camera->Sensor::setTime(root[j], naif);
     }
 
     // No need to make sure the point isn't behind the planet, it was done above
-    p_camera->Sensor::LookDirection(lookC);
+    p_camera->Sensor::LookDirection(lookC, naif);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];
      

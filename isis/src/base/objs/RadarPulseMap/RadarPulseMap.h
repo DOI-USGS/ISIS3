@@ -100,7 +100,7 @@ namespace Isis {
         return p_lineRate;
       };
 
-      virtual bool SetParent(const double sample, const double line);
+      virtual bool SetParent(NaifContextPtr naif, const double sample, const double line);
 
       virtual bool SetDetector(const double sample, const double line);
 

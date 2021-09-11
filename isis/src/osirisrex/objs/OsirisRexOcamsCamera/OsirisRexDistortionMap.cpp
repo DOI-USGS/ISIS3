@@ -83,7 +83,7 @@ namespace Isis {
    *  
    * @param naifIkCode    Code to search for in instrument kernel
    */
-  void OsirisRexDistortionMap::SetDistortion(int naifIkCode, QString filter="UNKNOWN") {
+  void OsirisRexDistortionMap::SetDistortion(NaifContextPtr naif, int naifIkCode, QString filter="UNKNOWN") {
     // Load distortion coefficients, including filter if we have it.
     QString odkkey;
 
@@ -96,7 +96,7 @@ namespace Isis {
 
     try {
       for (int i = 0; i < 5; ++i) {
-         p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
+         p_odk.push_back(p_camera->Spice::getDouble(naif, odkkey, i));
       }
     } 
     catch (IException &e) {
@@ -115,8 +115,8 @@ namespace Isis {
     else {
       odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER_" + filter.trimmed().toUpper(); 
     }
-    m_distortionOriginSample = p_camera->Spice::getDouble(odcenterkey, 0);
-    m_distortionOriginLine =   p_camera->Spice::getDouble(odcenterkey, 1);
+    m_distortionOriginSample = p_camera->Spice::getDouble(naif, odcenterkey, 0);
+    m_distortionOriginLine =   p_camera->Spice::getDouble(naif, odcenterkey, 1);
   }
 
 

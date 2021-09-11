@@ -82,7 +82,7 @@ namespace Isis {
 
     // Setup focal plane map. The class will read data from the instrument addendum kernel to pull
     // out the affine transforms from detector samp,line to focal plane x,y.
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     CameraDetectorMap *detectorMap = new CameraDetectorMap(this);
     detectorMap->SetStartingDetectorSample((double) inst["FirstLineSample"]);

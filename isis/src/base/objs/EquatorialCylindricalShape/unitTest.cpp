@@ -56,6 +56,8 @@ using namespace Isis;
 int main() {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
     QString inputFile = "$mgs/testData/ab102401.cub";
     // string inputFile = "/work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub";
     Cube cube;
@@ -64,7 +66,7 @@ int main() {
     std::vector<Distance> radii = c->target()->radii();
     Pvl &pvl = *cube.label();
     Spice spi(cube);
-    Target targ(&spi, pvl);
+    Target targ(&spi, pvl, naif);
     targ.setRadii(radii);
 
     cout << "Begin testing Dem Shape Model class...." << endl;
@@ -82,9 +84,9 @@ int main() {
     // The next point goes with the LRO image /work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub
     // double line = 1255.62;
     // double sample = 26112.5;
-    c->SetImage(sample, line);
+    c->SetImage(sample, line, naif);
     std::vector<double> sB(3);
-    c->instrumentPosition((double *) &sB[0]);
+    c->instrumentPosition((double *) &sB[0], naif);
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     std::vector<double> lookB(3);
@@ -98,7 +100,7 @@ int main() {
       Incidence                  = 85.341094499768
       Emission                   = 46.966269013795
     */
-    if (!shape.intersectSurface(sB, lookB)) { 
+    if (!shape.intersectSurface(naif, sB, lookB)) { 
         cout << "...  intersectSurface method failed" << endl;
         return -1;
     }
@@ -116,7 +118,7 @@ int main() {
     lookB[0] = 1.;
     lookB[1] = -0.9;
     lookB[2] = -0.01;
-    if (!shape.intersectSurface(sB, lookB)) { 
+    if (!shape.intersectSurface(naif, sB, lookB)) { 
         cout << "...  intersectSurface method failed" << endl;
     }
 

@@ -102,7 +102,7 @@ namespace Isis {
     new RollingShutterCameraDetectorMap(this, readoutTimes, sampleCoeffs, lineCoeffs);
 
     // Set up focal plane map
-    new CameraFocalPlaneMap(this, naifIkCode());
+    new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     // Set up distortion map (use default for now)
     new CameraDistortionMap(this);

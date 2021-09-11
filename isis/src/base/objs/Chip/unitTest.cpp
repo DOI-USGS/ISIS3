@@ -24,6 +24,9 @@ void ReportError(QString err);
 
 int main() {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
+
   Chip chip(51, 50);
   cout << "Test basics" << endl;
   cout << chip.Samples() << endl;
@@ -247,7 +250,7 @@ int main() {
   // to the match chip, the chips should be almost identical
   Chip newChip(4, 4);
   newChip.TackCube(1000, 500);
-  newChip.Load(junkCube, matchChip, junkCube);
+  newChip.Load(naif, junkCube, matchChip, junkCube);
   cout << "\nLoading new chip values from match chip..." << endl;
   cout << "Passes if difference is less than EPSILON = " << 2E-6 << endl;
   for(int i = 1; i <= newChip.Lines(); i++) {
@@ -310,21 +313,21 @@ int main() {
   }
   cout << "Try to load a cube that is not camera or map projection:" << endl;
   try {
-    newChip.Load(junk, matchChip, junkCube);
+    newChip.Load(naif, junk, matchChip, junkCube);
   }
   catch(IException &e) {
     ReportError(e.toString());
   }
   cout << "Try to load a cube with a match cube that is not camera or map projection:" << endl;
   try {
-    newChip.Load(junkCube, matchChip, junk);
+    newChip.Load(naif, junkCube, matchChip, junk);
   }
   catch(IException &e) {
     ReportError(e.toString());
   }
   cout << "Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:" << endl;
   try {
-    newChip.Load(junkCube, matchChip, junkCube2);
+    newChip.Load(naif, junkCube, matchChip, junkCube2);
   }
   catch(IException &e) {
     ReportError(e.toString());

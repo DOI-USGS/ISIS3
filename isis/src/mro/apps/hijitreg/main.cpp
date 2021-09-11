@@ -69,7 +69,8 @@ void IsisMain() {
 
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
-
+  auto naif = NaifContext::acquire();
+  
 //  Open the shift definitions file
   Pvl shiftdef;
   if (ui.WasEntered("SHIFTDEF")) {
@@ -87,7 +88,7 @@ void IsisMain() {
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   vector<QString> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
-  trans.OpenCube(ui.GetFileName("FROM"), stitch);
+  trans.OpenCube(ui.GetFileName("FROM"), stitch, naif);
 
 
   // Open the second cube, it is held in place.  We will be matching the
@@ -96,7 +97,7 @@ void IsisMain() {
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   vector<QString> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
-  match.OpenCube(ui.GetFileName("MATCH"), stitch);
+  match.OpenCube(ui.GetFileName("MATCH"), stitch, naif);
 
 //  Ensure only one band
   if ((trans.bandCount() != 1) || (match.bandCount() != 1)) {

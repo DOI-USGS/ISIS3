@@ -80,8 +80,8 @@ namespace Isis {
     QString juno = toString(junoCode);
 
     // Setup focal plane map and set Juno detector boresight
-    new CameraFocalPlaneMap(this, junoCode);
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, junoCode);
+    new CameraFocalPlaneMap(naif, this, junoCode);
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, junoCode);
     double bsSample = getDouble(naif, "INS" + juno + "_BORESIGHT_SAMPLE");
     double bsLine = getDouble(naif, "INS" + juno + "_BORESIGHT_LINE");
     focalMap->SetDetectorOrigin(bsSample, bsLine);
@@ -93,7 +93,7 @@ namespace Isis {
 
     // Set up distortion map, keeping z-direction positive JunoDistortion map defaults to z+
     JunoDistortionMap *distortionMap = new JunoDistortionMap(this);
-    distortionMap->SetDistortion(CkFrameId());
+    distortionMap->SetDistortion(naif, CkFrameId());
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

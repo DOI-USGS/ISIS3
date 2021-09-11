@@ -40,6 +40,7 @@ void IsisMain() {
   // We will be processing by line
   ProcessByBrick p;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Use the def file for filter constants
   Pvl uvvisDef("$clementine1/calibration/uvvis/uvvis.def");
@@ -111,7 +112,7 @@ void IsisMain() {
   }
 
   Camera *cam = icube->camera();
-  bool camSuccess = cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2);
+  bool camSuccess = cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2, naif);
 
   if(!camSuccess) {
     throw IException(IException::Unknown, "Unable to calculate the Solar Distance for this cube.", _FILEINFO_);

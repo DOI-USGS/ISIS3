@@ -78,7 +78,7 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap =
-      new CameraFocalPlaneMap(this, naifIkCode());
+      new CameraFocalPlaneMap(naif, this, naifIkCode());
     focalMap->SetDetectorOrigin(1024.5, 0.0);
     focalMap->SetDetectorOffset(0.0, 0.0);
 

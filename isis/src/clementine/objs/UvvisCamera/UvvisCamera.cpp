@@ -73,7 +73,7 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
       Spice::getDouble(naif, "INS" + toString(naifIkCode()) + 

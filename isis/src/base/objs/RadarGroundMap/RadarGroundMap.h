@@ -116,15 +116,15 @@ namespace Isis {
       virtual ~RadarGroundMap() {};
 
       virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz);
-      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
-      virtual bool SetGround(const SurfacePoint &surfacePoint);
-      virtual bool GetXY(const SurfacePoint &spoint, double *cudx,
-                         double *cudy, bool test=false);
-      virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,
-                                   int coefIndex, double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(std::vector<double> d_lookB, double *dx,
-                                double *dy);
+                                 const double uz, NaifContextPtr naif) override;
+      virtual bool SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
+      virtual bool SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) override;
+      virtual bool GetXY(NaifContextPtr naif, const SurfacePoint &spoint, double *cudx,
+                         double *cudy, bool test=false) override;
+      virtual bool GetdXYdPosition(NaifContextPtr naif, const SpicePosition::PartialType varType,
+                                   int coefIndex, double *cudx, double *cudy) override;
+      virtual bool GetdXYdPoint(NaifContextPtr naif, std::vector<double> d_lookB, double *dx,
+                                double *dy) override;
 
       //!Set the range sigma
       void SetRangeSigma(double rangeSigma) {
@@ -152,10 +152,10 @@ namespace Isis {
       };
 
     private:
-      double ComputeXv(SpiceDouble X[3]);
+      double ComputeXv(NaifContextPtr naif, SpiceDouble X[3]);
       double GetRadius(const Latitude &lat, const Longitude &lon);
 
-      bool Iterate(SpiceDouble &R, const double &slantRangeSqr, const SpiceDouble c[],
+      bool Iterate(NaifContextPtr naif, SpiceDouble &R, const double &slantRangeSqr, const SpiceDouble c[],
                    const SpiceDouble r[], SpiceDouble X[], SpiceDouble &lat,
                    SpiceDouble &lon, const std::vector<double> &Xsc, const bool &useSlopeEqn,
                    const double &slope);

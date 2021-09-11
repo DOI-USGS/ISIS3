@@ -26,6 +26,7 @@ void IsisMain() {
 
   // Get the values for the from 1 cube
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString from1 = ui.GetFileName("FROM1");
 
   // Make a temporary list file for automos
@@ -111,26 +112,26 @@ void IsisMain() {
   // intersect in projection lat. lon. space.
   Cube from1cube(from1, "r");
   Camera *cam = CameraFactory::Create(from1cube);
-  if(cam->SetUniversalGround(avgLat, avgLon)) {
-    Cemiss = cam->EmissionAngle();
-    Cphase = cam->PhaseAngle();
+  if(cam->SetUniversalGround(naif, avgLat, avgLon)) {
+    Cemiss = cam->EmissionAngle(naif);
+    Cphase = cam->PhaseAngle(naif);
     Cincid = cam->IncidenceAngle();
-    ClocalSolTime = cam->LocalSolarTime();
-    CsolarLong = cam->solarLongitude().degrees();
-    CnorthAzimuth = cam->NorthAzimuth();
-    CsunAzimuth = cam->SunAzimuth();
+    ClocalSolTime = cam->LocalSolarTime(naif);
+    CsolarLong = cam->solarLongitude(naif).degrees();
+    CnorthAzimuth = cam->NorthAzimuth(naif);
+    CsunAzimuth = cam->SunAzimuth(naif);
     runXY = false;
   }
   else if(ui.WasEntered("FROM2")) {
     Camera *cam = CameraFactory::Create(from2cube);
-    if(cam->SetUniversalGround(avgLat, avgLon)) {
-      Cemiss = cam->EmissionAngle();
-      Cphase = cam->PhaseAngle();
+    if(cam->SetUniversalGround(naif, avgLat, avgLon)) {
+      Cemiss = cam->EmissionAngle(naif);
+      Cphase = cam->PhaseAngle(naif);
       Cincid = cam->IncidenceAngle();
-      ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->solarLongitude().degrees();
-      CnorthAzimuth = cam->NorthAzimuth();
-      CsunAzimuth = cam->SunAzimuth();
+      ClocalSolTime = cam->LocalSolarTime(naif);
+      CsolarLong = cam->solarLongitude(naif).degrees();
+      CnorthAzimuth = cam->NorthAzimuth(naif);
+      CsunAzimuth = cam->SunAzimuth(naif);
       runXY = false;
     }
   }
@@ -167,26 +168,26 @@ void IsisMain() {
     double sample = proj->ToWorldX(avgX);
     double line = proj->ToWorldY(avgY);
     Camera *cam = CameraFactory::Create(from1cube);
-    if(cam->SetImage(sample, line)) {
-      Cemiss = cam->EmissionAngle();
-      Cphase = cam->PhaseAngle();
+    if(cam->SetImage(sample, line, naif)) {
+      Cemiss = cam->EmissionAngle(naif);
+      Cphase = cam->PhaseAngle(naif);
       Cincid = cam->IncidenceAngle();
-      ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->solarLongitude().degrees();
-      CnorthAzimuth = cam->NorthAzimuth();
-      CsunAzimuth = cam->SunAzimuth();
+      ClocalSolTime = cam->LocalSolarTime(naif);
+      CsolarLong = cam->solarLongitude(naif).degrees();
+      CnorthAzimuth = cam->NorthAzimuth(naif);
+      CsunAzimuth = cam->SunAzimuth(naif);
       runXY = false;
     }
     else if(ui.WasEntered("FROM2")) {
       Camera *cam = CameraFactory::Create(from2cube);
-      if(cam->SetImage(sample, line)) {
-        Cemiss = cam->EmissionAngle();
-        Cphase = cam->PhaseAngle();
+      if(cam->SetImage(sample, line, naif)) {
+        Cemiss = cam->EmissionAngle(naif);
+        Cphase = cam->PhaseAngle(naif);
         Cincid = cam->IncidenceAngle();
-        ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->solarLongitude().degrees();
-        CnorthAzimuth = cam->NorthAzimuth();
-        CsunAzimuth = cam->SunAzimuth();
+        ClocalSolTime = cam->LocalSolarTime(naif);
+        CsolarLong = cam->solarLongitude(naif).degrees();
+        CnorthAzimuth = cam->NorthAzimuth(naif);
+        CsunAzimuth = cam->SunAzimuth(naif);
         runXY = false;
       }
     }

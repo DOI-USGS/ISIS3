@@ -47,7 +47,7 @@ namespace Isis {
   /**
    * @param naifIkCode 
    */
-  void KaguyaMiCameraDistortionMap::SetDistortion(const int naifIkCode) {
+  void KaguyaMiCameraDistortionMap::SetDistortion(NaifContextPtr naif, const int naifIkCode) {
     //determine if this is the VIS or the NIR sensor, by loooking at the pixel pitch
     if (p_camera->PixelPitch() == 0.013) m_numDistCoef = 3;  //VIS camera has 3 distortion coefs
     else                       m_numDistCoef = 4;  //NIR camera has 4 distortion coefs
@@ -56,14 +56,14 @@ namespace Isis {
     QString naifXKey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_X";
     QString naifYKey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_Y";
     for (int i=0; i < m_numDistCoef; i++) {
-      m_distCoefX[i] = p_camera->getDouble(naifXKey,i);
-      m_distCoefY[i] = p_camera->getDouble(naifYKey,i);
+      m_distCoefX[i] = p_camera->getDouble(naif, naifXKey,i);
+      m_distCoefY[i] = p_camera->getDouble(naif, naifYKey,i);
     }
 
     //now read the boresights, or what I would typicall call the principal point offsets
     naifXKey = "INS" + toString(naifIkCode) + "_BORESIGHT";
-    m_boreX = p_camera->getDouble(naifXKey, 0);
-    m_boreY = p_camera->getDouble(naifXKey, 1);
+    m_boreX = p_camera->getDouble(naif, naifXKey, 0);
+    m_boreY = p_camera->getDouble(naif, naifXKey, 1);
   }
 
   /** Compute undistorted focal plane x/y

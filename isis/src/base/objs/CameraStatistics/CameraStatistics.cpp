@@ -24,11 +24,11 @@ namespace Isis {
    * @param sinc Sample increment for gathering statistics
    * @param linc Line increment for gathering statistics
    */
-  CameraStatistics::CameraStatistics(QString filename, int sinc, int linc) {
+  CameraStatistics::CameraStatistics(NaifContextPtr naif, QString filename, int sinc, int linc) {
     Cube cube;
     cube.open(filename);
     Camera *cam = cube.camera();
-    init(cam, sinc, linc, filename);
+    init(naif, cam, sinc, linc, filename);
   }
 
 
@@ -46,8 +46,8 @@ namespace Isis {
    * @param sinc Sample increment for gathering statistics
    * @param linc Line increment for gathering statistics
    */
-  CameraStatistics::CameraStatistics(Camera *cam, int sinc, int linc) {
-    init(cam, sinc, linc, "");
+  CameraStatistics::CameraStatistics(NaifContextPtr naif, Camera *cam, int sinc, int linc) {
+    init(naif, cam, sinc, linc, "");
   }
 
 
@@ -65,9 +65,9 @@ namespace Isis {
    * @param linc Line increment for gathering statistics
    * @param filename String filename of the Cube whose Camera is being used
    */
-  CameraStatistics::CameraStatistics(Camera *cam, int sinc, int linc,
+  CameraStatistics::CameraStatistics(NaifContextPtr naif, Camera *cam, int sinc, int linc,
       QString filename) {
-    init(cam, sinc, linc, filename);
+    init(naif, cam, sinc, linc, filename);
   }
 
 
@@ -83,7 +83,7 @@ namespace Isis {
    * @param linc Line increment for gathering statistics
    * @param filename String filename of the Cube whose Camera is being used
    */
-  void CameraStatistics::init(Camera *cam, int sinc, int linc,
+  void CameraStatistics::init(NaifContextPtr naif, Camera *cam, int sinc, int linc,
       QString filename) {
 
     m_filename = filename;
@@ -121,15 +121,15 @@ namespace Isis {
     progress.CheckStatus();
 
     for (int band = 1; band <= eband; band++) {
-      cam->SetBand(band);
+      cam->SetBand(band, naif);
       for (int line = 1; line < (int)cam->Lines(); line = line + linc) {
         for (int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
-          addStats(cam, sample, line);
+          addStats(naif, cam, sample, line);
         }
 
         // Set the sample value to the last sample and run buildstats
         int sample = cam->Samples();
-        addStats(cam, sample, line);
+        addStats(naif, cam, sample, line);
         progress.CheckStatus();
       }
 
@@ -137,12 +137,12 @@ namespace Isis {
       // sinc)
       int line = cam->Lines();
       for (int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
-        addStats(cam, sample, line);
+        addStats(naif, cam, sample, line);
       }
 
       // Set last sample and run with last line
       int sample = cam->Samples();
-      addStats(cam, sample, line);
+      addStats(naif, cam, sample, line);
       progress.CheckStatus();
     }
   }
@@ -230,32 +230,32 @@ namespace Isis {
    * @param sample Sample of the image to gather Camera information on
    * @param line Line of the image to gather Camera information on
    */
-  void CameraStatistics::addStats(Camera *cam, int &sample, int &line) {
-    cam->SetImage(sample, line);
+  void CameraStatistics::addStats(NaifContextPtr naif, Camera *cam, int &sample, int &line) {
+    cam->SetImage(sample, line, naif);
     if(cam->HasSurfaceIntersection()) {
       m_latStat->AddData(cam->UniversalLatitude());
       m_lonStat->AddData(cam->UniversalLongitude());
 
 
-      m_obliqueResStat->AddData(cam->ObliquePixelResolution());
-      m_obliqueSampleResStat->AddData(cam->ObliqueSampleResolution());
-      m_obliqueLineResStat->AddData(cam->ObliqueLineResolution());
+      m_obliqueResStat->AddData(cam->ObliquePixelResolution(naif));
+      m_obliqueSampleResStat->AddData(cam->ObliqueSampleResolution(naif));
+      m_obliqueLineResStat->AddData(cam->ObliqueLineResolution(naif));
 
 
 
-      m_resStat->AddData(cam->PixelResolution());
-      m_sampleResStat->AddData(cam->SampleResolution());
-      m_lineResStat->AddData(cam->LineResolution());
-      m_phaseStat->AddData(cam->PhaseAngle());
-      m_emissionStat->AddData(cam->EmissionAngle());
+      m_resStat->AddData(cam->PixelResolution(naif));
+      m_sampleResStat->AddData(cam->SampleResolution(naif));
+      m_lineResStat->AddData(cam->LineResolution(naif));
+      m_phaseStat->AddData(cam->PhaseAngle(naif));
+      m_emissionStat->AddData(cam->EmissionAngle(naif));
       m_incidenceStat->AddData(cam->IncidenceAngle());
-      m_localSolarTimeStat->AddData(cam->LocalSolarTime());
+      m_localSolarTimeStat->AddData(cam->LocalSolarTime(naif));
       m_localRaduisStat->AddData(cam->LocalRadius().meters());
       // if IsValid
-      m_northAzimuthStat->AddData(cam->NorthAzimuth());
+      m_northAzimuthStat->AddData(cam->NorthAzimuth(naif));
 
       // if resolution not equal to -1.0
-      double aspectRatio = cam->LineResolution() / cam->SampleResolution();
+      double aspectRatio = cam->LineResolution(naif) / cam->SampleResolution(naif);
       m_aspectRatioStat->AddData(aspectRatio);
     }
   }

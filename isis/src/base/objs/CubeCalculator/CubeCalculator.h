@@ -26,6 +26,7 @@
 
 #include "Calculator.h"
 #include "Cube.h"
+#include "NaifContext.h"
 
 class QString;
 template<class T> class QVector;
@@ -84,7 +85,7 @@ namespace Isis {
                                QVector<Cube *> &inCubes,
                                Cube *outCube);
 
-      QVector<double> runCalculations(QVector<Buffer *> &cubeData,
+      QVector<double> runCalculations(NaifContextPtr naif, QVector<Buffer *> &cubeData,
                                       int line, int band);
 
     private:
@@ -219,23 +220,23 @@ namespace Isis {
        void enableEmacBuffer();
 
        // Accessors
-       QVector<double> *phaBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *inaBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *emaBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *latBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *lonBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *resBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *radiusBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *phalBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *inalBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *emalBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *phacBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *inacBuffer(int currentLine, int ns, int currentBand);
-       QVector<double> *emacBuffer(int currentLine, int ns, int currentBand);
+       QVector<double> *phaBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *inaBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *emaBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *latBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *lonBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *resBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *radiusBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *phalBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *inalBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *emalBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *phacBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *inacBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
+       QVector<double> *emacBuffer(NaifContextPtr naif, int currentLine, int ns, int currentBand);
 
 
     private:
-      void loadBuffers(int currentLine, int ns, int currentBand);
+      void loadBuffers(NaifContextPtr naif, int currentLine, int ns, int currentBand);
 
       Camera *m_camera; //!< Camera to obtain camera-related information from.
       int m_lastLine; //!< The number of the last line loaded into the enabled camera buffers.

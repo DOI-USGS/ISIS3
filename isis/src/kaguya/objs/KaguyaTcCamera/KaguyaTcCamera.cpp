@@ -83,7 +83,7 @@ namespace Isis {
 
     detectorMap->SetStartingDetectorSample(startingDetectorSample);
     
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     // This sets the origin of the detector (not image samp,line). It is zero bassed.
     // The detector offsets are 0,0 because the borsight is in the center of the array
@@ -97,7 +97,7 @@ namespace Isis {
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight); 
 
     // Setup distortion map
-    new KaguyaTcCameraDistortionMap(this, naifIkCode());
+    new KaguyaTcCameraDistortionMap(naif, this, naifIkCode());
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);

@@ -77,7 +77,7 @@ namespace Isis {
       }
 
       /** Fill the buffer with the points collected using stereo matching */
-      BigInt FillPoints(Camera &lhcam, Camera &rhcam, int boxsize,
+      BigInt FillPoints(NaifContextPtr naif, Camera &lhcam, Camera &rhcam, int boxsize,
                      Buffer &dem, Buffer &stErr, Buffer &eigen,
                      Statistics *stAng = 0) {
 
@@ -93,14 +93,14 @@ namespace Isis {
           double line = point->getLeft().getLine();
           double samp = point->getLeft().getSample();
           double ev(point->GoodnessOfFit());
-          if (lhcam.SetImage(samp, line) && lhcam.InCube()) {
+          if (lhcam.SetImage(samp, line, naif) && lhcam.InCube()) {
             double rhLine = point->getRight().getLine();
             double rhSamp = point->getRight().getSample();
-            if (rhcam.SetImage(rhSamp, rhLine) && rhcam.InCube()) {
+            if (rhcam.SetImage(rhSamp, rhLine, naif) && rhcam.InCube()) {
               double radius, lat, lon, sepang, error;
               if (Stereo::elevation(lhcam, rhcam, radius, lat, lon, sepang, error)) {
                 int index;
-                if (WithinTile(lhcam, lat, lon, radius, dem, index)) {
+                if (WithinTile(naif, lhcam, lat, lon, radius, dem, index)) {
                   double elevation = radius - lhcam.LocalRadius().meters();
                   dem[index] = elevation;
                   stErr[index] = error;
@@ -136,9 +136,9 @@ namespace Isis {
       }
 
       /** Checks a latitude/longitude coordinate if it falls within a buffer */
-      bool WithinTile(Camera &cam, const double &latitude, const double &longitude,
+      bool WithinTile(NaifContextPtr naif, Camera &cam, const double &latitude, const double &longitude,
                       const double radius, Buffer &obuf, int &index) {
-        if (!(cam.SetUniversalGround(latitude, longitude) && cam.InCube())) {
+        if (!(cam.SetUniversalGround(naif, latitude, longitude) && cam.InCube())) {
           return (false);
         }
 

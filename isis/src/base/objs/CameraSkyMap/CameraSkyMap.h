@@ -52,10 +52,10 @@ namespace Isis {
       //! Destructor
       virtual ~CameraSkyMap() {};
 
-      virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz, NaifContextPtr naif);
+      virtual bool SetFocalPlane(NaifContextPtr naif, const double ux, const double uy,
+                                 const double uz);
 
-      virtual bool SetSky(const double ra, const double dec, NaifContextPtr naif);
+      virtual bool SetSky(NaifContextPtr naif, const double ra, const double dec);
 
       /**
        * @returns The undistorted focal plane x

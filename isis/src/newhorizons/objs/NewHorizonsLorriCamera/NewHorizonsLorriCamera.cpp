@@ -87,7 +87,7 @@ namespace Isis {
 
     // Setup focal plane map. The class will read data from the instrument addendum kernel to pull
     // out the affine transforms from detector samp,line to focal plane x,y.
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted 
     // for ISIS
@@ -100,7 +100,7 @@ namespace Isis {
     // Uncomment the 3 lines below to use the default distortion map (i.e., no distortion)
     //    new CameraDistortionMap(this, -1);
     //    CameraDistortionMap *distortionMap = new CameraDistortionMap(this, -1);
-    //    distortionMap->SetDistortion(naifIkCode());
+    //    distortionMap->SetDistortion(naif, naifIkCode());
     // Changed the SPICE keyword names to work with LORRI IK version 200
     QString e2("INS" + toString(naifIkCode()) + "_OOC_EM");
     QString e5("INS" + toString(naifIkCode()) + "_OOC_EM");

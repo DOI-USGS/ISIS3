@@ -42,7 +42,9 @@ using namespace Isis;
 
 int main() {
   try {
-    Isis::Preference::Preferences(true);
+    Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     cout << "Unit test for Isis::ShapeModel" << endl;
 
@@ -89,7 +91,7 @@ int main() {
     Pvl lab2;
     lab2.addGroup(inst2);
     lab2.addGroup(kern2);
-    Target targSh(NULL, lab2);
+    Target targSh(NULL, lab2, naif);
     ShapeModel *smSh = ShapeModelFactory::create(&targSh, lab2);
     cout << "    Successfully created shape " << smSh->name() << endl;
     delete smSh;
@@ -101,7 +103,7 @@ int main() {
     Pvl lab3;
     lab3.addGroup(inst2);
     lab3.addGroup(kern3);
-    Target targEl(NULL, lab3);
+    Target targEl(NULL, lab3, naif);
     ShapeModel *smEl = ShapeModelFactory::create(&targEl, lab3);
     cout << "    Successfully created shape " << smEl->name() << endl;
     delete smEl;
@@ -113,7 +115,7 @@ int main() {
     Pvl lab4;
     lab4.addGroup(inst2);
     lab4.addGroup(kern4);
-    Target targShNull(NULL, lab4);
+    Target targShNull(NULL, lab4, naif);
     ShapeModel *smShNull = ShapeModelFactory::create(&targShNull, lab4);
     cout << "    Successfully created shape " << smShNull->name() << endl;
     delete smShNull;
@@ -125,7 +127,7 @@ int main() {
     Pvl lab5;
     lab5.addGroup(inst2);
     lab5.addGroup(kern5);
-    Target targElNull(NULL, lab5);
+    Target targElNull(NULL, lab5, naif);
     ShapeModel *smElNull = ShapeModelFactory::create(&targElNull, lab5);
     cout << "    Successfully created shape " << smElNull->name() << endl;
     delete smElNull;
@@ -137,7 +139,7 @@ int main() {
     Pvl lab6;
     lab6.addGroup(inst2);
     lab6.addGroup(kern6);
-    Target targDem(NULL, lab6);
+    Target targDem(NULL, lab6, naif);
     ShapeModel *smDem = ShapeModelFactory::create(&targDem, lab6);
     cout << "    Successfully created shape " << smDem->name() << endl;
     delete smDem;
@@ -151,7 +153,7 @@ int main() {
     Pvl lab7;
     lab7.addGroup(inst2);
     lab7.addGroup(kern7);
-    Target targShDsk(NULL, lab7);
+    Target targShDsk(NULL, lab7, naif);
     ShapeModel *smShDsk = ShapeModelFactory::create(&targShDsk, lab7);
     cout << "    Successfully created shape " << smShDsk->name() << endl;
     delete smShDsk;
@@ -165,7 +167,7 @@ int main() {
     Pvl lab8;
     lab8.addGroup(inst2);
     lab8.addGroup(kern8);
-    Target targEmbree(NULL, lab8);
+    Target targEmbree(NULL, lab8, naif);
     ShapeModel *smEmbree = ShapeModelFactory::create(&targEmbree, lab8);
     cout << "    Successfully created shape " << smEmbree->name() << endl;
     delete smEmbree;
@@ -179,13 +181,13 @@ int main() {
     Pvl lab9;
     lab9.addGroup(inst2);
     lab9.addGroup(kern9);
-    Target targBullet(NULL, lab9);
+    Target targBullet(NULL, lab9, naif);
     ShapeModel *smBullet= ShapeModelFactory::create(&targBullet, lab9);
     cout << "    Successfully created shape " << smBullet->name() << endl;
     delete smBullet;
 
     // Create Spice and Target objects for sky test
-    Target skyTarget(NULL, lab1);
+    Target skyTarget(NULL, lab1, naif);
     ShapeModel *skyShape = ShapeModelFactory::create(&skyTarget,  lab1);
     cout << endl << "  Testing Sky target..." << endl;
     cout << "    Shape model is " << skyShape->name() << endl;
@@ -199,7 +201,7 @@ int main() {
     vector<Distance> radii(3,Distance());
     radii = c->target()->radii();
     Pvl pvl = *cube.label();
-    Target targ(NULL, pvl);
+    Target targ(NULL, pvl, naif);
     targ.setRadii(radii);
     ShapeModel *sm = ShapeModelFactory::create(&targ, pvl);
     cout << "    Successfully created shape " << sm->name() << endl;
@@ -213,7 +215,7 @@ int main() {
     c = cube.camera();
     radii = c->target()->radii();
     pvl = *cube.label();
-    Target targ2(NULL, pvl);
+    Target targ2(NULL, pvl, naif);
     targ2.setRadii(radii);
     sm = ShapeModelFactory::create(&targ2, pvl);
     cout << "    Successfully created shape " << sm->name() << endl;
@@ -251,7 +253,7 @@ int main() {
       Pvl labError;
       labError.addGroup(inst2);
       labError.addGroup(kernError);
-      Target targBadFile(NULL, labError);
+      Target targBadFile(NULL, labError, naif);
       ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
       cout << "    Successfully created shape " << smBadFile->name() << endl;
       delete smBadFile;
@@ -268,7 +270,7 @@ int main() {
       Pvl labError;
       labError.addGroup(inst2);
       labError.addGroup(kernError);
-      Target targBadFile(NULL, labError);
+      Target targBadFile(NULL, labError, naif);
       ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
       cout << "    Successfully created shape " << smBadFile->name() << endl;
       delete smBadFile;
@@ -285,7 +287,7 @@ int main() {
       Pvl labError;
       labError.addGroup(inst2);
       labError.addGroup(kernError);
-      Target targBadFile(NULL, labError);
+      Target targBadFile(NULL, labError, naif);
       ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
       cout << "    Successfully created shape " << smBadFile->name() << endl;
       delete smBadFile;

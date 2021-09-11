@@ -110,10 +110,10 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
     void k_write(NaifContextPtr naif, const SpiceInt &handle, const SpkKernel &kernels) {
       if ( _spkType == 9 ) {
-        kernels.Accept(WriteSpk9<SpkSegment>(handle));
+        kernels.Accept(naif, WriteSpk9<SpkSegment>(handle));
       }
       else if ( _spkType == 13 ) {
-        kernels.Accept(WriteSpk13<SpkSegment>(handle));
+        kernels.Accept(naif, WriteSpk13<SpkSegment>(handle));
       }
       else {
         setType(_spkType);
@@ -136,7 +136,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       typedef typename K::SMatrix SMatrix;
       WriteSpk9(SpiceInt handle) : _handle(handle) {  }
       virtual ~WriteSpk9() { }
-      void operator()(const K &segment) const {
+      void operator()(NaifContextPtr naif, const K &segment) const {
         SpiceInt body   = segment.BodyCode();
         SpiceInt center = segment.CenterCode();
         QString   frame  = segment.ReferenceFrame();
@@ -150,8 +150,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         segment.LoadKernelType("FK");
         naif->CheckErrors();
 
-        spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
-                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
+        naif->spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                       segId.toLatin1().data(), degree, nrecs, (ConstSpiceDouble (*)[6])states[0], &epochs[0]);
 
         naif->CheckErrors();
         segment.UnloadKernelType("FK");
@@ -168,7 +168,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
       WriteSpk13(SpiceInt handle) : _handle(handle) { }
       virtual ~WriteSpk13() { }
-      void operator()(const K &segment) const {
+      void operator()(NaifContextPtr naif, const K &segment) const {
         // Collect frames
         SpiceInt body   = segment.BodyCode();
         SpiceInt center = segment.CenterCode();
@@ -184,8 +184,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
         naif->CheckErrors();
-        spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
-                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
+        naif->spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                       segId.toLatin1().data(), degree, nrecs, (ConstSpiceDouble (*)[6])states[0], &epochs[0]);
         naif->CheckErrors();
         segment.UnloadKernelType("FK");
         return;

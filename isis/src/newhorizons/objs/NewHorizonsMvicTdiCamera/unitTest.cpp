@@ -33,7 +33,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 
 /**
@@ -48,6 +48,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  */   
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for New HorizonsMvicTdiFrameCamera..." << endl;
   try {
@@ -79,39 +81,39 @@ int main(void) {
 
     // Test four pixels to make sure the conversions are right
     cout << "For upper left  ..." << endl;
-    TestLineSamp(cam, 2484.0, 310.0);
+    TestLineSamp(cam, 2484.0, 310.0, naif);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 2528.0, 310.0);
+    TestLineSamp(cam, 2528.0, 310.0, naif);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 2484.0, 350.0);
+    TestLineSamp(cam, 2484.0, 350.0, naif);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 2528.0, 350.0);
+    TestLineSamp(cam, 2528.0, 350.0, naif);
 
     double samp = 2503.0;
     double line = 330.0;
     cout << "For center pixel position ..." << endl;
 
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
     else {
       cout << "Sample: " << cam->Sample() << endl; 
       cout << "Line: " << cam->Line() << endl; 
-      cout << "RightAscension: " << cam->RightAscension() << endl; 
-      cout << "Declination: " << cam->Declination() << endl; 
+      cout << "RightAscension: " << cam->RightAscension(naif) << endl; 
+      cout << "Declination: " << cam->Declination(naif) << endl; 
       cout << "PlanetocentricLatitude: " << cam->UniversalLatitude() << endl; 
       cout << "PositiveEast360Longitude: " << cam->UniversalLongitude() << endl;
       cout << "EphemerisTime: " << cam->time().Et() << endl; 
-      cout << "NorthAzimuth: " << cam->NorthAzimuth() << endl;
-      cout << "SunAzimuth: " << cam->SunAzimuth() << endl;
-      cout << "SpacecraftAzimuth: " << cam->SpacecraftAzimuth() << endl;
-      cout << "OffNadirAngle: " << cam->OffNadirAngle() << endl;
-      cout << "CelestialNorthClockAngle: " << cam->CelestialNorthClockAngle() << endl;
-      cout << "RaDecResolution: " << cam->RaDecResolution()  << endl;
+      cout << "NorthAzimuth: " << cam->NorthAzimuth(naif) << endl;
+      cout << "SunAzimuth: " << cam->SunAzimuth(naif) << endl;
+      cout << "SpacecraftAzimuth: " << cam->SpacecraftAzimuth(naif) << endl;
+      cout << "OffNadirAngle: " << cam->OffNadirAngle(naif) << endl;
+      cout << "CelestialNorthClockAngle: " << cam->CelestialNorthClockAngle(naif) << endl;
+      cout << "RaDecResolution: " << cam->RaDecResolution(naif)  << endl;
 
       double pB[3];
       cam->Coordinate(pB);
@@ -119,33 +121,33 @@ int main(void) {
       cout << "BodyFixedCoordinate: " << pB[1] << endl; 
       cout << "BodyFixedCoordinate: " << pB[2] << endl; 
       cout << "LocalRadius: " << cam->LocalRadius().meters() << endl; 
-      cout << "SampleResolution: " << cam->SampleResolution() << endl; 
-      cout << "LineResolution: " << cam->LineResolution() << endl; 
-      cout << "ObliqueDetectorResolution: " << cam->ObliqueDetectorResolution() << endl; 
-      cout << "ObliqueLineResolution: " << cam->ObliqueLineResolution() << endl; 
-      cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution() << endl; 
+      cout << "SampleResolution: " << cam->SampleResolution(naif) << endl; 
+      cout << "LineResolution: " << cam->LineResolution(naif) << endl; 
+      cout << "ObliqueDetectorResolution: " << cam->ObliqueDetectorResolution(naif) << endl; 
+      cout << "ObliqueLineResolution: " << cam->ObliqueLineResolution(naif) << endl; 
+      cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution(naif) << endl; 
     }
 
     //testing SetImage with deltaT
     double deltaT = 0.5; 
-    if (!cam->SetImage(samp, line, deltaT)) {
+    if (!cam->SetImage(samp, line, deltaT, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
     else {
       cout << "Sample: " << cam->Sample() << endl; 
       cout << "Line: " << cam->Line() << endl; 
-      cout << "RightAscension: " << cam->RightAscension() << endl; 
-      cout << "Declination: " << cam->Declination() << endl; 
+      cout << "RightAscension: " << cam->RightAscension(naif) << endl; 
+      cout << "Declination: " << cam->Declination(naif) << endl; 
       cout << "PlanetocentricLatitude: " << cam->UniversalLatitude() << endl; 
       cout << "PositiveEast360Longitude: " << cam->UniversalLongitude() << endl;
       cout << "EphemerisTime: " << cam->time().Et() << endl; 
-      cout << "NorthAzimuth: " << cam->NorthAzimuth() << endl;
-      cout << "SunAzimuth: " << cam->SunAzimuth() << endl;
-      cout << "SpacecraftAzimuth: " << cam->SpacecraftAzimuth() << endl;
-      cout << "OffNadirAngle: " << cam->OffNadirAngle() << endl;
-      cout << "CelestialNorthClockAngle: " << cam->CelestialNorthClockAngle() << endl;
-      cout << "RaDecResolution: " << cam->RaDecResolution()  << endl;
+      cout << "NorthAzimuth: " << cam->NorthAzimuth(naif) << endl;
+      cout << "SunAzimuth: " << cam->SunAzimuth(naif) << endl;
+      cout << "SpacecraftAzimuth: " << cam->SpacecraftAzimuth(naif) << endl;
+      cout << "OffNadirAngle: " << cam->OffNadirAngle(naif) << endl;
+      cout << "CelestialNorthClockAngle: " << cam->CelestialNorthClockAngle(naif) << endl;
+      cout << "RaDecResolution: " << cam->RaDecResolution(naif)  << endl;
 
       double pB[3];
       cam->Coordinate(pB);
@@ -153,11 +155,11 @@ int main(void) {
       cout << "BodyFixedCoordinate: " << pB[1] << endl; 
       cout << "BodyFixedCoordinate: " << pB[2] << endl; 
       cout << "LocalRadius: " << cam->LocalRadius().meters() << endl; 
-      cout << "SampleResolution: " << cam->SampleResolution() << endl; 
-      cout << "LineResolution: " << cam->LineResolution() << endl; 
-      cout << "ObliqueDetectorResolution: " << cam->ObliqueDetectorResolution() << endl; 
-      cout << "ObliqueLineResolution: " << cam->ObliqueLineResolution() << endl; 
-      cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution() << endl; 
+      cout << "SampleResolution: " << cam->SampleResolution(naif) << endl; 
+      cout << "LineResolution: " << cam->LineResolution(naif) << endl; 
+      cout << "ObliqueDetectorResolution: " << cam->ObliqueDetectorResolution(naif) << endl; 
+      cout << "ObliqueLineResolution: " << cam->ObliqueLineResolution(naif) << endl; 
+      cout << "ObliqueSampleResolution: " << cam->ObliqueSampleResolution(naif) << endl; 
     }
 
     if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
@@ -179,11 +181,11 @@ int main(void) {
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if (success) {

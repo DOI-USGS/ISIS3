@@ -110,8 +110,8 @@ namespace Isis {
 
     // Setup focal plane map
     if(type == Fiducial) {
-      LoCameraFiducialMap fid(inst, naifIkCode());
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+      LoCameraFiducialMap fid(naif, inst, naifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
       // Try (0.,0.)
       focalMap->SetDetectorOrigin(0.0, 0.0);
 
@@ -120,7 +120,7 @@ namespace Isis {
       // Read boresight
       double boresightSample = inst["BoresightSample"];
       double boresightLine = inst["BoresightLine"];
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
       focalMap->SetDetectorOrigin(boresightSample, boresightLine);
     }
 
@@ -129,7 +129,7 @@ namespace Isis {
 
     // Setup distortion map
     LoMediumDistortionMap *distortionMap = new LoMediumDistortionMap(this);
-    distortionMap->SetDistortion(naifIkCode());
+    distortionMap->SetDistortion(naif, naifIkCode());
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);

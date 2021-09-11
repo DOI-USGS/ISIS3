@@ -183,7 +183,7 @@ namespace Isis {
       double parentSample = p_alphaCube->AlphaSample(sample);
       double parentLine = p_alphaCube->AlphaLine(line);
       bool success = false;
-      success = p_detectorMap->SetParent(parentSample, parentLine);
+      success = p_detectorMap->SetParent(naif, parentSample, parentLine);
       // Convert from parent to detector
       if (success) {
         double detectorSample = p_detectorMap->DetectorSample();
@@ -200,7 +200,7 @@ namespace Isis {
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
-            return p_groundMap->SetFocalPlane(x, y, z);
+            return p_groundMap->SetFocalPlane(x, y, z, naif);
           }
         }
       }
@@ -208,12 +208,12 @@ namespace Isis {
 
     // The projection is a sky map
     else if (p_projection->IsSky()) {
-      return SetImageSkyMapProjection(sample, line, shape); 
+      return SetImageSkyMapProjection(naif, sample, line, shape); 
     }
 
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape, naif); 
+      return SetImageMapProjection(naif, sample, line, shape); 
     }
 
     // failure
@@ -257,7 +257,7 @@ namespace Isis {
       double parentSample = p_alphaCube->AlphaSample(sample);
       double parentLine = p_alphaCube->AlphaLine(line);
       bool success = false;
-      success = p_detectorMap->SetParent(parentSample, parentLine, deltaT);
+      success = p_detectorMap->SetParent(naif, parentSample, parentLine, deltaT);
       // Convert from parent to detector
       if (success) {
         double detectorSample = p_detectorMap->DetectorSample();
@@ -274,7 +274,7 @@ namespace Isis {
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
-            return p_groundMap->SetFocalPlane(x, y, z);
+            return p_groundMap->SetFocalPlane(x, y, z, naif);
           }
         }
       }
@@ -282,12 +282,12 @@ namespace Isis {
 
     // The projection is a sky map
     else if (p_projection->IsSky()) {
-      return SetImageSkyMapProjection(sample, line, shape); 
+      return SetImageSkyMapProjection(naif, sample, line, shape); 
     }
     
     // We have map projected camera model
     else {
-      return SetImageMapProjection(sample, line, shape, naif); 
+      return SetImageMapProjection(naif, sample, line, shape); 
     }
 
     // failure
@@ -307,7 +307,7 @@ namespace Isis {
  * @return bool Returns True if the image was set successfully and False if it
  *              was not.
  */
-  bool Camera::SetImageMapProjection(const double sample, const double line, ShapeModel *shape, NaifContextPtr naif) {
+  bool Camera::SetImageMapProjection(NaifContextPtr naif, const double sample, const double line, ShapeModel *shape) {
     Latitude lat;
     Longitude lon;
     Distance rad;
@@ -322,7 +322,7 @@ namespace Isis {
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt, naif)) {
+        if (SetGround(naif, surfPt)) {
           p_childSample = sample;
           p_childLine = line;
 
@@ -343,7 +343,7 @@ namespace Isis {
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt, naif)) {
+        if (SetGround(naif, surfPt)) {
           p_childSample = sample;
           p_childLine = line;
 
@@ -368,11 +368,11 @@ namespace Isis {
  * @return bool Returns True if the image was set successfully and False if it
  *              was not.
  */
-  bool Camera::SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape) {
+  bool Camera::SetImageSkyMapProjection(NaifContextPtr naif, const double sample, const double line, ShapeModel *shape) {
     TProjection *tproj = (TProjection *) p_projection;
     if (tproj->SetWorld(sample, line)) {
       if (SetRightAscensionDeclination(tproj->Longitude(),
-                                      tproj->UniversalLatitude())) {
+                                      tproj->UniversalLatitude(), naif)) {
         p_childSample = sample;
         p_childLine = line;
 
@@ -393,9 +393,9 @@ namespace Isis {
    * @return @b bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetUniversalGround(const double latitude, const double longitude, NaifContextPtr naif) {
+  bool Camera::SetUniversalGround(NaifContextPtr naif, const double latitude, const double longitude) {
     // Convert lat/lon or rad/az (i.e. ring rad / ring lon) to undistorted focal plane x/y
-    if (p_groundMap->SetGround(Latitude(latitude, Angle::Degrees),
+    if (p_groundMap->SetGround(naif, Latitude(latitude, Angle::Degrees),
                               Longitude(longitude, Angle::Degrees))) {
       return RawFocalPlanetoImage(naif);
     }
@@ -414,7 +414,7 @@ namespace Isis {
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetGround(Latitude latitude, Longitude longitude, NaifContextPtr naif) {
+  bool Camera::SetGround(NaifContextPtr naif, Latitude latitude, Longitude longitude) {
     ShapeModel *shape = target()->shape();
     Distance localRadius;
 
@@ -431,7 +431,7 @@ namespace Isis {
       return false;
     }
 
-    return SetGround(SurfacePoint(latitude, longitude, localRadius), naif);
+    return SetGround(naif, SurfacePoint(latitude, longitude, localRadius));
   }
 
 
@@ -444,7 +444,7 @@ namespace Isis {
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
-  bool Camera::SetGround(const SurfacePoint & surfacePt, NaifContextPtr naif) {
+  bool Camera::SetGround(NaifContextPtr naif, const SurfacePoint & surfacePt) {
     ShapeModel *shape = target()->shape();
     if (!surfacePt.Valid()) {
       shape->clearSurfacePoint();
@@ -452,7 +452,7 @@ namespace Isis {
     }
 
     // Convert lat/lon to undistorted focal plane x/y
-    if (p_groundMap->SetGround(surfacePt)) {
+    if (p_groundMap->SetGround(naif, surfacePt)) {
       return RawFocalPlanetoImage(naif);
     }
 
@@ -555,10 +555,10 @@ namespace Isis {
   * @return @b bool Returns True if the Universal Ground was set successfully
   *              and False if it was not
   */
-  bool Camera::SetUniversalGround(const double latitude, const double longitude,
-                                  const double radius, NaifContextPtr naif) {
+  bool Camera::SetUniversalGround(NaifContextPtr naif, const double latitude, const double longitude,
+                                  const double radius) {
     // Convert lat/lon to undistorted focal plane x/y
-    if (p_groundMap->SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees),
+    if (p_groundMap->SetGround(naif, SurfacePoint(Latitude(latitude, Angle::Degrees),
                                             Longitude(longitude, Angle::Degrees),
                                             Distance(radius, Distance::Meters)))) {
       return RawFocalPlanetoImage(naif);  // sets p_hasIntersection
@@ -880,7 +880,7 @@ namespace Isis {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
-        if (SetGround(testPoint, naif)) {
+        if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             double res = PixelResolution(naif);
@@ -909,7 +909,7 @@ namespace Isis {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
-        if (SetGround(testPoint, naif)) {
+        if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_maxlat = 90.0;
@@ -928,7 +928,7 @@ namespace Isis {
       if (radius.isValid()) {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
-        if (SetGround(testPoint, naif)) {
+        if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlat = -90.0;
@@ -946,7 +946,7 @@ namespace Isis {
       for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
                     lat <= Latitude(p_maxlat, Angle::Degrees);
                     lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
-        if (SetGround(lat, Longitude(0.0, Angle::Degrees), naif)) {
+        if (SetGround(naif, lat, Longitude(0.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon = 0.0;
@@ -958,7 +958,7 @@ namespace Isis {
         // Another special test for ground range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if (SetGround(lat, Longitude(180.0, Angle::Degrees), naif)) {
+        if (SetGround(naif, lat, Longitude(180.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon180 = -180.0;
@@ -1120,7 +1120,7 @@ namespace Isis {
       for (Distance radius = Distance(p_minRingRadius, Distance::Meters);
                    radius <= Distance(p_maxRingRadius, Distance::Meters);
                    radius += Distance((p_maxRingRadius - p_minRingRadius) / 10.0, Distance::Meters)) {
-        if (SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius), naif)) {
+        if (SetGround(naif, SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minRingLongitude = 0.0;
@@ -1144,7 +1144,7 @@ namespace Isis {
         // Another special test for ring range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if (SetGround(Latitude(0.0, Angle::Degrees), Longitude(180.0, Angle::Degrees), naif)) {
+        if (SetGround(naif, Latitude(0.0, Angle::Degrees), Longitude(180.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minRingLongitude180 = -180.0;
@@ -1452,8 +1452,8 @@ namespace Isis {
    * @return @b bool Returns true if the declination was set successfully and false
    *              if it was not
    */
-  bool Camera::SetRightAscensionDeclination(const double ra, const double dec) {
-    if (p_skyMap->SetSky(ra, dec)) {
+  bool Camera::SetRightAscensionDeclination(const double ra, const double dec, NaifContextPtr naif) {
+    if (p_skyMap->SetSky(naif, ra, dec)) {
       double ux = p_skyMap->FocalPlaneX();
       double uy = p_skyMap->FocalPlaneY();
       if (p_distortionMap->SetUndistortedFocalPlane(ux, uy)) {
@@ -1528,7 +1528,7 @@ namespace Isis {
       QVector<double *> unusedNeighborPoints(4);
       double origin[3] = {0, 0, 0};
       unusedNeighborPoints.fill(origin);
-      shapeModel->calculateLocalNormal(unusedNeighborPoints);
+      shapeModel->calculateLocalNormal(naif, unusedNeighborPoints);
     }
     else { // attempt to find local normal for DEM shapes using 4 surrounding points on the image
       QVector<double *> cornerNeighborPoints(4);
@@ -1621,7 +1621,7 @@ namespace Isis {
 
       // Restore input state to original point before calculating normal
       SetImage(originalSample, originalLine, naif);
-      shapeModel->calculateLocalNormal(cornerNeighborPoints);
+      shapeModel->calculateLocalNormal(naif, cornerNeighborPoints);
 
       // free memory
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
@@ -1792,7 +1792,7 @@ namespace Isis {
         }
 
         // Special test for ground range to see if either pole is in the image
-        if (SetRightAscensionDeclination(0.0, 90.0)) {
+        if (SetRightAscensionDeclination(0.0, 90.0, naif)) {
           if ((Line() >= 0.5) && (Line() <= p_lines) &&
               (Sample() >= 0.5) && (Sample() <= p_samples)) {
             p_maxdec = 90.0;
@@ -1803,7 +1803,7 @@ namespace Isis {
           }
         }
 
-        if (SetRightAscensionDeclination(0.0, -90.0)) {
+        if (SetRightAscensionDeclination(0.0, -90.0, naif)) {
           if ((Line() >= 0.5) && (Line() <= p_lines) &&
               (Sample() >= 0.5) && (Sample() <= p_samples)) {
             p_mindec = -90.0;
@@ -1818,7 +1818,7 @@ namespace Isis {
         // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for (double dec = p_mindec; dec <= p_maxdec; dec += (p_maxdec - p_mindec) / 10.0) {
-          if (SetRightAscensionDeclination(0.0, dec)) {
+          if (SetRightAscensionDeclination(0.0, dec, naif)) {
             if ((Line() >= 0.5) && (Line() <= p_lines) &&
                 (Sample() >= 0.5) && (Sample() <= p_samples)) {
               p_minra = 0.0;
@@ -1832,7 +1832,7 @@ namespace Isis {
         // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for (double dec = p_mindec; dec <= p_maxdec; dec += (p_maxdec - p_mindec) / 10.0) {
-          if (SetRightAscensionDeclination(180.0, dec)) {
+          if (SetRightAscensionDeclination(180.0, dec, naif)) {
             if ((Line() >= 0.5) && (Line() <= p_lines) &&
                 (Sample() >= 0.5) && (Sample() <= p_samples)) {
               p_minra180 = -180.0;
@@ -2133,10 +2133,10 @@ namespace Isis {
     // Use the radius of the azimuth's origin point
     // (rather than that of the adjusted point of interest location)
     // to avoid the effects of topography on the calculation
-    bool success = SetUniversalGround(adjustedPointOfInterestLat,
+    bool success = SetUniversalGround(naif,
+                                      adjustedPointOfInterestLat,
                                       adjustedPointOfInterestLon,
-                                      originRadius.meters(),
-                                      naif);
+                                      originRadius.meters());
     if (!success) {
       // if the adjusted lat/lon values for the point of origin fail to be set, we can not compute
       // an azimuth. reset to the original sample/line and return null.
@@ -3056,7 +3056,7 @@ namespace Isis {
     double orgDec = Declination(naif);
     double orgRa = RightAscension(naif);
 
-    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution(naif)));
+    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution(naif)), naif);
     double y = Line() - orgLine;
     double x = Sample() - orgSample;
     double celestialNorthClockAngle = atan2(-y, x) * 180.0 / Isis::PI;

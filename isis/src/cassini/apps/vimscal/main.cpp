@@ -82,7 +82,7 @@ void calculateIrDarkCurrent(Cube *);
 void chooseFlatFile(Cube *, ProcessByLine *);
 
 void calculateSpecificEnergy(Cube *);
-void calculateSolarRemove(Cube *, ProcessByLine *);
+void calculateSolarRemove(NaifContextPtr, Cube *, ProcessByLine *);
 void loadCalibrationValues();
 void updateWavelengths(Cube *icube);
 
@@ -99,6 +99,7 @@ PvlGroup calibInfo;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   //load the appropriate multipliers and the correct calibration version
 
@@ -165,7 +166,7 @@ void IsisMain() {
   calibInfo += PvlKeyword("OutputUnits", ((iof) ? "I/F" : "Specific Energy"));
 
   // done first since it's likely to cause an error if one exists
-  calculateSolarRemove(icube, &p);
+  calculateSolarRemove(naif, icube, &p);
 
   if(ui.GetBoolean("DARK"))
     calculateDarkCurrent(icube);
@@ -309,7 +310,7 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
  * @param *icube A pointer to the input cube
  * @param *p A pointer to the ProcessByLine object
  */
-void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
+void calculateSolarRemove(NaifContextPtr naif, Cube *icube, ProcessByLine *p) {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("UNITS") != "IOF") return;
 
@@ -329,44 +330,44 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   solarRemoveCoefficient = -1;
 
   // try center first
-  if(cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2)) {
+  if(cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   // try 4 corners
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, 1.0, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(), 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(), 1.0, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(),
-      icube->lineCount())) {
+      icube->lineCount(), naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount(), naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   // try center of 4 edges
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount() / 2, 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount() / 2, 1.0, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(),
-      icube->lineCount() / 2)) {
+      icube->lineCount() / 2, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount() / 2,
-      icube->lineCount())) {
+      icube->lineCount(), naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount() / 2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount() / 2, naif)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 

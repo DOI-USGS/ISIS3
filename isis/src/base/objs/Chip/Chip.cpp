@@ -319,7 +319,7 @@ namespace Isis {
    *   @history 2010-06-10 Jeannie Walldren - Modified error message and added tolerance to
    *                           linearity check. Fixed error messages.
    */
-  void Chip::Load(Cube &cube, Chip &match, Cube &matchChipCube, const double scale, const int band)
+  void Chip::Load(NaifContextPtr naif, Cube &cube, Chip &match, Cube &matchChipCube, const double scale, const int band)
   {
     // See if the match cube has a camera or projection
     Camera *matchCam = NULL;
@@ -428,7 +428,7 @@ namespace Isis {
         match.SetChipPosition(matchChipSamp, matchChipLine);
         double lat, lon;
         if (matchCam != NULL) {
-          matchCam->SetImage(match.CubeSample(), match.CubeLine());
+          matchCam->SetImage(match.CubeSample(), match.CubeLine(), naif);
           if (!matchCam->HasSurfaceIntersection() ) {
             vector<int> newlocation = MovePoints(startSamp, startLine, endSamp, endLine);
             startSamp = newlocation[0];
@@ -457,7 +457,7 @@ namespace Isis {
         // Now use that lat/lon to find a line/sample in our chip
         double line, samp;
         if (cam != NULL) {
-          cam->SetUniversalGround(lat, lon);
+          cam->SetUniversalGround(naif, lat, lon);
           if (!cam->HasSurfaceIntersection() ) {
             vector<int> newlocation = MovePoints(startSamp, startLine, endSamp, endLine);
             startSamp = newlocation[0];

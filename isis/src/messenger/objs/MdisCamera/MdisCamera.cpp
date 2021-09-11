@@ -165,7 +165,7 @@ namespace Isis {
 
     // Setup focal plane map, and detector origin for the instrument that
     // may have a filter (WAC only!).
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, fnCode);
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, fnCode);
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + ikCode + "_BORESIGHT_SAMPLE";
@@ -223,7 +223,7 @@ namespace Isis {
     // filterNumber stays at 0 for the NAC only!
     try {
       TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this);
-      distortionMap->SetDistortion(fnCode);
+      distortionMap->SetDistortion(naif, fnCode);
     }
     catch(IException &ie) {
       string msg = "New MDIS NAC/WAC distortion models will invalidate previous "

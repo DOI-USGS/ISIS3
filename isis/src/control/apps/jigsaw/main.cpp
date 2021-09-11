@@ -31,7 +31,8 @@ using namespace Isis;
 BundleSettingsQsp bundleSettings(UserInterface &ui);
 void checkImageList(SerialNumberList &heldSerialList, SerialNumberList &cubeSerialList);
 QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui);
-ControlNetQsp fixHeldImages(const QString &cnetFile,
+ControlNetQsp fixHeldImages(NaifContextPtr naif,
+                            const QString &cnetFile,
                             const QString &heldList,
                             const QString &imageList);
 
@@ -39,6 +40,7 @@ void IsisMain() {
 
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?
   // YES - we should be able to just TRIANGULATE the points in the control net
@@ -64,7 +66,7 @@ void IsisMain() {
     if (ui.WasEntered("HELDLIST")) {
       QString heldList = ui.GetFileName("HELDLIST");
       // Update the control network so that any control points intersecting a held image are fixed
-      ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
+      ControlNetQsp cnet = fixHeldImages(naif, cnetFile, heldList, cubeList);
       bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
     }
     else {
@@ -510,7 +512,8 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
  *         the held images are set to FIXED and have their apriori surface points set to
  *         corresponding surface points for the held image's measures.
  */
-ControlNetQsp fixHeldImages(const QString &cnetFile,
+ControlNetQsp fixHeldImages(NaifContextPtr naif,
+                            const QString &cnetFile,
                             const QString &heldList,
                             const QString &snList) {
   ControlNetQsp cnet(new ControlNet(cnetFile));
@@ -529,7 +532,7 @@ ControlNetQsp fixHeldImages(const QString &cnetFile,
       ControlPoint *pt = cm->Parent();
       pt->SetType(ControlPoint::Fixed);
       // If possible, set the apriori surface point for the current measure's control point
-      if ( cam->SetImage(cm->GetSample(), cm->GetLine()) ) {
+      if ( cam->SetImage(cm->GetSample(), cm->GetLine(), naif) ) {
         pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
       }
       else {

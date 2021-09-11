@@ -260,12 +260,12 @@ namespace Isis {
       virtual bool SetImage(const double sample, const double line, NaifContextPtr naif);
       virtual bool SetImage(const double sample, const double line, const double deltaT, NaifContextPtr naif);
 
-      virtual bool SetUniversalGround(const double latitude, const double longitude, NaifContextPtr naif);
-      virtual bool SetUniversalGround(const double latitude, const double longitude,
-                                      const double radius, NaifContextPtr naif);
-      bool SetGround(Latitude latitude, Longitude longitude, NaifContextPtr naif);
-      bool SetGround(const SurfacePoint & surfacePt, NaifContextPtr naif);
-      bool SetRightAscensionDeclination(const double ra, const double dec);
+      virtual bool SetUniversalGround(NaifContextPtr naif, const double latitude, const double longitude);
+      virtual bool SetUniversalGround(NaifContextPtr naif, const double latitude, const double longitude,
+                                      const double radius);
+      bool SetGround(NaifContextPtr naif, Latitude latitude, Longitude longitude);
+      bool SetGround(NaifContextPtr naif, const SurfacePoint & surfacePt);
+      bool SetRightAscensionDeclination(const double ra, const double dec, NaifContextPtr naif);
 
       void LocalPhotometricAngles(NaifContextPtr naif,
                                   Angle & phase, Angle & incidence,
@@ -521,8 +521,8 @@ namespace Isis {
       bool RawFocalPlanetoImage(NaifContextPtr naif);
       // SetImage helper functions: 
       // bool SetImageNoProjection(const double sample, const double line); 
-      bool SetImageMapProjection(const double sample, const double line, ShapeModel *shape, NaifContextPtr naif);
-      bool SetImageSkyMapProjection(const double sample, const double line, ShapeModel *shape); 
+      bool SetImageMapProjection(NaifContextPtr naif, const double sample, const double line, ShapeModel *shape);
+      bool SetImageSkyMapProjection(NaifContextPtr naif, const double sample, const double line, ShapeModel *shape); 
 
 
       double p_focalLength;                  //!< The focal length, in units of millimeters

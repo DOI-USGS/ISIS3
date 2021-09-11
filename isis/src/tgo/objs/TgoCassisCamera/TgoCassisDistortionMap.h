@@ -57,7 +57,7 @@ namespace Isis {
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:
-      TgoCassisDistortionMap(Camera *parent, int naifIkCode);
+      TgoCassisDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode);
 
       virtual ~TgoCassisDistortionMap();
 

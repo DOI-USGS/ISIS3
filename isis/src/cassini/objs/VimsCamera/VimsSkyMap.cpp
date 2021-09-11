@@ -66,7 +66,7 @@ namespace Isis {
    *                     code (exp * 1.01725).
    *                     *Reference:  email from John Ivens 11/27/2006.
    */
-  void VimsSkyMap::Init(Pvl &lab) {
+  void VimsSkyMap::Init(NaifContextPtr naif, Pvl &lab) {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
@@ -76,7 +76,7 @@ namespace Isis {
     QString intTime = stime.split(".").first();
     stime = stime.split(".").last();
 
-    p_etStart = p_camera->getClockTime(intTime).Et();
+    p_etStart = p_camera->getClockTime(naif, intTime).Et();
     p_etStart += toDouble(stime) / 15959.0;
 
     //----------------------------------------------------------------------
@@ -170,7 +170,7 @@ namespace Isis {
       if(p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
-        p_camera->setTime(et);
+        p_camera->setTime(et, naif);
       }
 
       for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -178,12 +178,12 @@ namespace Isis {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-          p_camera->setTime(et);
+          p_camera->setTime(et, naif);
         }
 
-        p_camera->SetImage((double) samp + 1, (double)line + 1);
-        double ra = p_camera->RightAscension();
-        double dec = p_camera->Declination();
+        p_camera->SetImage((double) samp + 1, (double)line + 1, naif);
+        double ra = p_camera->RightAscension(naif);
+        double dec = p_camera->Declination(naif);
         if(ra < p_minRa) p_minRa = ra;
         if(ra > p_maxRa) p_maxRa = ra;
         if(dec < p_minDec) p_minDec = dec;
@@ -209,7 +209,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool VimsSkyMap::SetFocalPlane(const double ux, const double uy,
+  bool VimsSkyMap::SetFocalPlane(NaifContextPtr naif, const double ux, const double uy,
                                  const double uz) {
     p_ux = ux;
     p_uy = uy;
@@ -237,14 +237,14 @@ namespace Isis {
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
     }
-    p_camera->setTime(et);
+    p_camera->setTime(et, naif);
 
     SpiceDouble lookC[3];
     LookDirection(lookC);
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
-    return p_camera->SetLookDirection(unitLookC);
+    naif->vhat_c(lookC, unitLookC);
+    return p_camera->SetLookDirection(unitLookC, naif);
   }
 
   /**
@@ -255,7 +255,7 @@ namespace Isis {
    *
    * @return set sky was successful
    */
-  bool VimsSkyMap::SetSky(const double ra, const double dec) {
+  bool VimsSkyMap::SetSky(NaifContextPtr naif, const double ra, const double dec) {
     if(ra < p_minRa || ra > p_maxRa ||
         dec < p_minDec || dec > p_maxDec) {
       return false;
@@ -356,7 +356,7 @@ namespace Isis {
     }
 
     p_camera->IgnoreProjection(true);
-    p_camera->SetImage(inSamp, inLine);
+    p_camera->SetImage(inSamp, inLine, naif);
     p_camera->IgnoreProjection(false);
     p_focalPlaneX = inSamp;
     p_focalPlaneY = inLine;

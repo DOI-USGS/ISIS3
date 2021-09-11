@@ -41,7 +41,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool PushFrameCameraGroundMap::SetGround(const Latitude &lat,
+  bool PushFrameCameraGroundMap::SetGround(NaifContextPtr naif,
+                                           const Latitude &lat,
                                            const Longitude &lon) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
 
@@ -49,10 +50,10 @@ namespace Isis {
 
     // Get ending bounding framelets and distances for iterative loop to minimize the spacecraft distance
     int startFramelet = 1;
-    double startDist = FindSpacecraftDistance(1, surfacePoint);
+    double startDist = FindSpacecraftDistance(naif, 1, surfacePoint);
 
     int    endFramelet = detectorMap->TotalFramelets();
-    double endDist     = FindSpacecraftDistance(endFramelet, surfacePoint);
+    double endDist     = FindSpacecraftDistance(naif, endFramelet, surfacePoint);
 
     bool minimizedSpacecraftDist = false;
 
@@ -83,7 +84,7 @@ namespace Isis {
       }
 
       int middleFramelet = startFramelet + (int)(deltaX + biasFactor * deltaX);
-      double middleDist = FindSpacecraftDistance(middleFramelet, surfacePoint);
+      double middleDist = FindSpacecraftDistance(naif, middleFramelet, surfacePoint);
 
       if (startDist > endDist) {
         // This makes sure we don't get stuck halfway between framelets
@@ -117,14 +118,14 @@ namespace Isis {
 
     int direction = 2;
 
-    double realDist = FindDistance(realFramelet, surfacePoint);
+    double realDist = FindDistance(naif, realFramelet, surfacePoint);
     int    guessFramelet = realFramelet + direction;
-    double guessDist     = FindDistance(guessFramelet, surfacePoint);
+    double guessDist     = FindDistance(naif, guessFramelet, surfacePoint);
 
     if (guessDist > realDist) {
       direction = -1 * direction; // reverse the search direction
       guessFramelet = realFramelet + direction;
-      guessDist = FindDistance(guessFramelet, surfacePoint);
+      guessDist = FindDistance(naif, guessFramelet, surfacePoint);
     }
 
     for (int j = 0; (realDist >= guessDist) && (j < 30);j++) {
@@ -132,7 +133,7 @@ namespace Isis {
       realDist = guessDist;
 
       guessFramelet = realFramelet + direction;
-      guessDist = FindDistance(guessFramelet, surfacePoint);
+      guessDist = FindDistance(naif, guessFramelet, surfacePoint);
 
       if (realFramelet <= 0 || realFramelet > detectorMap->TotalFramelets()) {
         return false;
@@ -141,12 +142,12 @@ namespace Isis {
 
     detectorMap->SetFramelet(realFramelet);
 
-    return CameraGroundMap::SetGround(surfacePoint);
+    return CameraGroundMap::SetGround(naif, surfacePoint);
   }
 
 
-  bool PushFrameCameraGroundMap::SetGround(const SurfacePoint &surfacePt) {
-    return SetGround(surfacePt.GetLatitude(), surfacePt.GetLongitude());
+  bool PushFrameCameraGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePt) {
+    return SetGround(naif, surfacePt.GetLatitude(), surfacePt.GetLongitude());
   }
 
 
@@ -160,16 +161,16 @@ namespace Isis {
    *
    * @return double Y-Distance squared from center of framelet to lat,lon
    */
-  double PushFrameCameraGroundMap::FindDistance(int framelet,
+  double PushFrameCameraGroundMap::FindDistance(NaifContextPtr naif, int framelet,
       const SurfacePoint &surfacePoint) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
     CameraDistortionMap *distortionMap = (CameraDistortionMap *) p_camera->DistortionMap();
 
-    detectorMap->SetFramelet(framelet);
-    if(!p_camera->Sensor::SetGround(surfacePoint, false)) return DBL_MAX;
+    detectorMap->SetFramelet(naif, framelet);
+    if(!p_camera->Sensor::SetGround(naif, surfacePoint, false)) return DBL_MAX;
 
     double lookC[3];
-    p_camera->Sensor::LookDirection(lookC);
+    p_camera->Sensor::LookDirection(lookC, naif);
     double ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     double uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
@@ -199,13 +200,13 @@ namespace Isis {
    *
    * @return double Distance from spacecraft to the lat,lon
    */
-  double PushFrameCameraGroundMap::FindSpacecraftDistance(int framelet,
+  double PushFrameCameraGroundMap::FindSpacecraftDistance(NaifContextPtr naif, int framelet,
       const SurfacePoint &surfacePoint) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
 
     detectorMap->SetFramelet(framelet);
-    if(!p_camera->Sensor::SetGround(surfacePoint, false)) return DBL_MAX;
+    if(!p_camera->Sensor::SetGround(naif, surfacePoint, false)) return DBL_MAX;
 
-    return p_camera->SlantDistance();
+    return p_camera->SlantDistance(naif);
   }
 }

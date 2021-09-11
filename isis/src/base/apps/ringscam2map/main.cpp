@@ -12,6 +12,7 @@
 #include "RingPlaneProjection.h"
 #include "ringscam2map.h"
 #include "Target.h"
+#include "NaifContext.h"
 
 using namespace std;
 using namespace Isis;
@@ -44,6 +45,7 @@ void IsisMain() {
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl userMap;
   userMap.read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
@@ -61,12 +63,12 @@ void IsisMain() {
 
   // Get the mapping group from the camera
   Pvl camMap;
-  incam->basicRingMapping(camMap);
+  incam->basicRingMapping(camMap, naif);
   PvlGroup &camGrp = camMap.findGroup("Mapping");
 
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
-  incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
+  incam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif);
   camGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
   camGrp.addKeyword(PvlKeyword("MaximumRingRadius", toString(maxrad)), Pvl::Replace);
   camGrp.addKeyword(PvlKeyword("MinimumRingLongitude", toString(minaz)), Pvl::Replace);
@@ -169,12 +171,12 @@ void IsisMain() {
     if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE")) {
       //TODO This camera method will need attention for rings***** Solution:  just call ringRange directly
       // if(incam->IntersectsLongitudeDomain(userMap)) {
-      if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+      if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif)) {
         if(ui.GetString("RINGLONSEAM") == "AUTO") {
           if((int) userGrp["RingLongitudeDomain"] == 360) {
             userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
                                Pvl::Replace);
-            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif)) {
               // Its looks like a global image so switch back to the
               // users preference
               userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
@@ -184,7 +186,7 @@ void IsisMain() {
           else {
             userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
                                Pvl::Replace);
-            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif)) {
               // Its looks like a global image so switch back to the
               // users preference
               userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
@@ -194,7 +196,7 @@ void IsisMain() {
           // Make the target info match the new azimuth (ring longitude) domain Use radius for where
           // camera expects latitude & azimuth (ring longitude) where the camera expects longitude
           double minrad, maxrad, minaz, maxaz;
-          incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
+          incam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif);
           if(!ui.WasEntered("MINRINGRAD")) {
             userGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
           }
@@ -270,7 +272,7 @@ void IsisMain() {
   //  TODO:  WEIRD ... why is this needed ... Talk to Tracie or JAA???
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
-  if(incam->SetImage(centerSamp, centerLine)) {
+  if(incam->SetImage(centerSamp, centerLine, naif)) {
     // Force rings data into Isis by returning ring radius for latitude
     // and azimuth (ring longitude) for longitude
     if(outmap->SetUniversalGround(incam->LocalRadius().meters(),
@@ -446,9 +448,10 @@ ringscam2mapForward::ringscam2mapForward(const int inputSamples,
 // Transform method mapping input line/samps to radii/lons to output line/samps
 bool ringscam2mapForward::Xform(double &outSample, double &outLine,
                     const double inSample, const double inLine) {
+  auto naif = NaifContext::acquire();
 
   // See if the input image coordinate converts to a radius/lon
-  if (!p_incam->SetImage(inSample,inLine)) return false;
+  if (!p_incam->SetImage(inSample,inLine,naif)) return false;
 
   // Does that ground coordinate work in the map projection
   // We will be forcing ring data to work by substituting ring radius for latitude
@@ -510,6 +513,8 @@ ringscam2mapReverse::ringscam2mapReverse(const int inputSamples,
 // Transform method mapping output line/samps to rads/azs to input line/samps
 bool ringscam2mapReverse::Xform(double &inSample, double &inLine,
                            const double outSample, const double outLine) {
+  auto naif = NaifContext::acquire();
+
   // See if the output image coordinate converts to lat/lon
   if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
@@ -525,7 +530,7 @@ bool ringscam2mapReverse::Xform(double &inSample, double &inLine,
   double radius = p_outmap->RingRadius();
   double az = p_outmap->UniversalRingLongitude();
 
-  if(!p_incam->SetUniversalGround(radius, az)) return false;
+  if(!p_incam->SetUniversalGround(naif, radius, az)) return false;
 
   // Make sure the point is inside the input image
   if(p_incam->Sample() < 0.5) return false;
@@ -549,7 +554,7 @@ int ringscam2mapReverse::OutputLines() const {
 }
 
 void BandChange(const int band) {
-  incam->SetBand(band);
+  incam->SetBand(band, NaifContext::acquire());
 }
 
 // Helper function to print out mapfile to session log
@@ -597,6 +602,7 @@ void LoadMapRes() {
 //Helper function to get camera resolution.
 void LoadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString file = ui.GetFileName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
@@ -604,7 +610,7 @@ void LoadCameraRes() {
   c.open(file);
   Camera *cam = c.camera();
   Pvl camMap;
-  cam->BasicMapping(camMap);
+  cam->BasicMapping(camMap, naif);
   PvlGroup &camGrp = camMap.findGroup("Mapping");
 
   ui.Clear("RESOLUTION");
@@ -660,6 +666,7 @@ void LoadMapRange() {
 //Helper function to load camera range.
 void LoadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString file = ui.GetFileName("FROM");
 
   // Get the map projection file provided by the user
@@ -673,7 +680,7 @@ void LoadCameraRange() {
 
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
-  cam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
+  cam->ringRange(minrad, maxrad, minaz, maxaz, userMap, naif);
 
   // Set ground range parameters in UI
   ui.Clear("MINRINGRAD");

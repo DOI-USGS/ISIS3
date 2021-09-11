@@ -24,6 +24,7 @@
 #define CameraPointInfo_h
 
 #include <QString>
+#include "NaifContext.h"
 
 namespace Isis {
   class Camera;
@@ -98,14 +99,14 @@ namespace Isis {
 
       void SetCube(const QString &cubeFileName);
       void SetCSVOutput(bool csvOutput);
-      PvlGroup *SetImage(const double sample, const double line,
+      PvlGroup *SetImage(NaifContextPtr naif, const double sample, const double line,
                          const bool outside = false, const bool error = false);
-      PvlGroup *SetCenter(const bool outside = false, const bool error = false);
-      PvlGroup *SetSample(const double sample, const bool outside = false,
+      PvlGroup *SetCenter(NaifContextPtr naif, const bool outside = false, const bool error = false);
+      PvlGroup *SetSample(NaifContextPtr naif, const double sample, const bool outside = false,
                           const bool error = false);
-      PvlGroup *SetLine(const double line, const bool outside = false,
+      PvlGroup *SetLine(NaifContextPtr naif, const double line, const bool outside = false,
                         const bool error = false);
-      PvlGroup *SetGround(const double latitude, const double longitude,
+      PvlGroup *SetGround(NaifContextPtr naif, const double latitude, const double longitude,
                           const bool outside = false, const bool error = false);
 
     protected:
@@ -114,7 +115,7 @@ namespace Isis {
 
     private:
       bool CheckCube();
-      virtual PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
+      virtual PvlGroup *GetPointInfo(NaifContextPtr naif, bool passed, bool outside, bool errors);
       CubeManager *m_usedCubes; //!< The cubeManager used to open the current cube
       Cube *m_currentCube;      //!< The cube to extract camera information from
       Camera *m_camera;         //!< The camera to extract point information from

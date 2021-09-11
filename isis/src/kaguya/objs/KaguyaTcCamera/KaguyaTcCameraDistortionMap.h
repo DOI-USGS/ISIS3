@@ -43,7 +43,7 @@ namespace Isis {
    */
   class KaguyaTcCameraDistortionMap : public CameraDistortionMap {
     public:
-      KaguyaTcCameraDistortionMap(Camera *parent, int naifIkCode);
+      KaguyaTcCameraDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode);
 
       virtual ~KaguyaTcCameraDistortionMap();
 

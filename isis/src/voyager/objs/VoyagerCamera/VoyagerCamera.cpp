@@ -137,7 +137,7 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map, and detector origin
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     focalMap->SetDetectorOrigin(500.0, 500.0);
 
     // Master reseau location file

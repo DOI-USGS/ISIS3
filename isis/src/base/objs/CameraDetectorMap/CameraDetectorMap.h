@@ -67,9 +67,11 @@ namespace Isis {
 
       virtual ~CameraDetectorMap();
 
-      virtual bool SetParent(const double sample, 
+      virtual bool SetParent(NaifContextPtr naif,
+                             const double sample, 
                              const double line);
-      virtual bool SetParent(const double sample, 
+      virtual bool SetParent(NaifContextPtr naif,
+                             const double sample, 
                              const double line, 
                              const double deltaT);
 

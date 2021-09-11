@@ -22,6 +22,7 @@
  */
 
 #include <QString>
+#include "NaifContext.h"
 
 namespace Isis {
 

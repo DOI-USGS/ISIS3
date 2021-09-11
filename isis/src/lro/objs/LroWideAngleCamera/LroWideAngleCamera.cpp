@@ -203,11 +203,11 @@ namespace Isis {
     dmap->SetStartingDetectorSample(sampOffset+1);
 
     // Setup focal plane and distortion maps
-    LroWideAngleCameraFocalPlaneMap *fplane = new LroWideAngleCameraFocalPlaneMap(this, naifIkCode());
-    LroWideAngleCameraDistortionMap *distort = new LroWideAngleCameraDistortionMap(this, naifIkCode());
+    LroWideAngleCameraFocalPlaneMap *fplane = new LroWideAngleCameraFocalPlaneMap(naif, this, naifIkCode());
+    LroWideAngleCameraDistortionMap *distort = new LroWideAngleCameraDistortionMap(naif, this, naifIkCode());
     for ( int i = 0 ; i < filtNames.size() ; i++ ) {
-      fplane->addFilter(filterIKCode.get(filtNames[i].toInt()));
-      distort->addFilter(filterIKCode.get(filtNames[i].toInt()));
+      fplane->addFilter(naif, filterIKCode.get(filtNames[i].toInt()));
+      distort->addFilter(naif, filterIKCode.get(filtNames[i].toInt()));
     }
 
     // Setup the ground and sky map
@@ -253,8 +253,10 @@ namespace Isis {
       throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
 
+    auto naif = NaifContext::acquire();
+
     //  Set up valid band access
-    Camera::SetBand(vband);
+    Camera::SetBand(vband, naif);
     PushFrameCameraDetectorMap *dmap = NULL;
     dmap = (PushFrameCameraDetectorMap *) DetectorMap();
     dmap->SetBandFirstDetectorLine(p_detectorStartLines[vband - 1]);

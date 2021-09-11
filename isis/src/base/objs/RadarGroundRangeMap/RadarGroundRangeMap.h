@@ -53,9 +53,9 @@ namespace Isis {
    */
   class RadarGroundRangeMap : public CameraFocalPlaneMap {
     public:
-      RadarGroundRangeMap(Camera *parent, const int naifIkCode);
+      RadarGroundRangeMap(NaifContextPtr naif, Camera *parent, const int naifIkCode);
 
-      static void setTransform(int naifIkCode, double groundRangeResolution,
+      static void setTransform(NaifContextPtr naif, int naifIkCode, double groundRangeResolution,
                                int samples, Radar::LookDirection ldir);
   };
 };

@@ -134,7 +134,8 @@ namespace Isis {
    * 
    * @return int Number of successful stereo sources that have pairings
    */
-  int StereoPairStrategy::apply(ResourceList &resources,
+  int StereoPairStrategy::apply(NaifContextPtr naif,
+                                ResourceList &resources,
                                 const ResourceList &globals) {
     BOOST_FOREACH ( SharedResource resource, resources ) {
       if ( resource->isActive() ) {
@@ -154,7 +155,7 @@ namespace Isis {
     }
 
     // Now invoke overlap algorithm in GisOverlapStrategy
-    return ( GisOverlapStrategy::apply(resources, globals) );
+    return ( GisOverlapStrategy::apply(naif, resources, globals) );
   }
 
   /**
@@ -205,7 +206,8 @@ namespace Isis {
    * 
    * @return SharedResource 
    */
-  SharedResource StereoPairStrategy::processOverlap(SharedResource &resourceA,
+  SharedResource StereoPairStrategy::processOverlap(NaifContextPtr naif,
+                                                    SharedResource &resourceA,
                                                     SharedResource &resourceB,
                                                     const double &ovrRatioA,
                                                     const double &ovrRatioB, 
@@ -220,14 +222,14 @@ namespace Isis {
     SharedResource stpair(0);
 
     try {
-      stpair = GisOverlapStrategy::processOverlap(resourceA, resourceB, 
+      stpair = GisOverlapStrategy::processOverlap(naif, resourceA, resourceB, 
                                                   ovrRatioA, ovrRatioB, 
                                                   globals);
     
       // We know they both pass for level1 constraints. Check level2 (stereo)
       // constraints and rank parameters. stpair automatically deleted upon
       // empty resource returned.
-      if ( !computeStereo(resourceA, resourceB, stpair, globals) ) {
+      if ( !computeStereo(naif, resourceA, resourceB, stpair, globals) ) {
         if ( isDebug() ) {
           cout << "StereoPair " << resourceA->name() << "/" << resourceB->name() 
                << " failed!\n";
@@ -291,7 +293,8 @@ namespace Isis {
    * 
    * @return bool Returns true if all operations were successful
    */
-  bool StereoPairStrategy::computeStereo(const SharedResource &resourceA, 
+  bool StereoPairStrategy::computeStereo(NaifContextPtr naif,
+                                         const SharedResource &resourceA, 
                                          const SharedResource &resourceB, 
                                          SharedResource &stereo,
                                          const ResourceList &globals) const {
@@ -343,19 +346,19 @@ namespace Isis {
     stereo->add("ResolutionRatio", toString(resratio));
   
     // Now compute DeltaSunAzimuth
-    (void) computeDelta(resourceA, resourceB, "DeltaSolarAzimuth", 
+    (void) computeDelta(naif, resourceA, resourceB, "DeltaSolarAzimuth", 
                         "SubSolarGroundAzimuth", stereo);
   
     // Now compute DeltaSpacecraftAzimuth
-    (void) computeDelta(resourceA, resourceB, "DeltaSpacecraftAzimuth", 
+    (void) computeDelta(naif, resourceA, resourceB, "DeltaSpacecraftAzimuth", 
                         "SubSpacecraftGroundAzimuth", stereo);
   
     // Compute StereoAngle that will contribute to the vertical precision if
     // it is successfully computed.
     double stAngle(dp);  // ParallelHeightRatio is the default
-    if ( computeStereoAngle(resourceA, resourceB, stereo, globals) ) {
+    if ( computeStereoAngle(naif, resourceA, resourceB, stereo, globals) ) {
       if ( m_useStereoAngle ) {
-        stAngle = tan(toDouble(stereo->value("StereoAngle")) * rpd_c()); 
+        stAngle = tan(toDouble(stereo->value("StereoAngle")) * naif->rpd_c()); 
       }
     }
 
@@ -582,7 +585,8 @@ namespace Isis {
  * 
  * @return bool True if the value is computed, false otherwise
  */
-bool StereoPairStrategy::computeDelta(const SharedResource &resourceA, 
+bool StereoPairStrategy::computeDelta(NaifContextPtr naif,
+                                        const SharedResource &resourceA, 
                                         const SharedResource &resourceB, 
                                         const QString &parameter, 
                                         const QString &keysrc,
@@ -592,7 +596,7 @@ bool StereoPairStrategy::computeDelta(const SharedResource &resourceA,
   if ( resourceA->exists(dsckey) && resourceB->exists(dsckey) ) {
     double dsc1 = toDouble(resourceA->value(dsckey)); 
     double dsc2 = toDouble(resourceB->value(dsckey));
-    double dscaz = acos( cos((dsc2 - dsc1) * rpd_c()) ) * dpr_c();
+    double dscaz = acos( cos((dsc2 - dsc1) * naif->rpd_c()) ) * naif->dpr_c();
     composite->add(parameter, toString(dscaz));
     return (true);
   }
@@ -625,7 +629,8 @@ bool StereoPairStrategy::computeDelta(const SharedResource &resourceA,
  * 
  * @return bool      True if the angle was successfully computed
  */
-bool StereoPairStrategy::computeStereoAngle(const SharedResource &resourceA, 
+bool StereoPairStrategy::computeStereoAngle(NaifContextPtr naif,
+                                            const SharedResource &resourceA, 
                                             const SharedResource &resourceB, 
                                             SharedResource &stereo,
                                             const ResourceList &globals) 
@@ -669,21 +674,23 @@ bool StereoPairStrategy::computeStereoAngle(const SharedResource &resourceA,
 
     keyword = "AllDone...";
 
-    double pxA = radiusA/1000.0 * cos(lonA * rpd_c()) * cos(latA * rpd_c());
-    double pyA = radiusA/1000.0 * sin(lonA * rpd_c()) * cos(latA * rpd_c());
-    double pzA = radiusA/1000.0 * sin(latA * rpd_c());
+    const auto rpd = naif->rpd_c();
 
-    double pxB = radiusB/1000.0 * cos(lonB * rpd_c()) * cos(latB * rpd_c());
-    double pyB = radiusB/1000.0 * sin(lonB * rpd_c()) * cos(latB * rpd_c());
-    double pzB = radiusB/1000.0 * sin(latB * rpd_c());
+    double pxA = radiusA/1000.0 * cos(lonA * rpd) * cos(latA * rpd);
+    double pyA = radiusA/1000.0 * sin(lonA * rpd) * cos(latA * rpd);
+    double pzA = radiusA/1000.0 * sin(latA * rpd);
 
-    double sxA = tcentA * cos(sclonA * rpd_c()) * cos(sclatA * rpd_c());
-    double syA = tcentA * sin(sclonA * rpd_c()) * cos(sclatA * rpd_c());
-    double szA = tcentA * sin(sclatA * rpd_c());
+    double pxB = radiusB/1000.0 * cos(lonB * rpd) * cos(latB * rpd);
+    double pyB = radiusB/1000.0 * sin(lonB * rpd) * cos(latB * rpd);
+    double pzB = radiusB/1000.0 * sin(latB * rpd);
 
-    double sxB = tcentB * cos(sclonB * rpd_c()) * cos(sclatB * rpd_c());
-    double syB = tcentB * sin(sclonB * rpd_c()) * cos(sclatB * rpd_c()); 
-    double szB = tcentB * sin(sclatB * rpd_c());
+    double sxA = tcentA * cos(sclonA * rpd) * cos(sclatA * rpd);
+    double syA = tcentA * sin(sclonA * rpd) * cos(sclatA * rpd);
+    double szA = tcentA * sin(sclatA * rpd);
+
+    double sxB = tcentB * cos(sclonB * rpd) * cos(sclatB * rpd);
+    double syB = tcentB * sin(sclonB * rpd) * cos(sclatB * rpd); 
+    double szB = tcentB * sin(sclatB * rpd);
 
     double vxA = sxA - pxA;
     double vyA = syA - pyA;
@@ -700,7 +707,7 @@ bool StereoPairStrategy::computeStereoAngle(const SharedResource &resourceA,
 
 
     // Convert to degrees
-    convang = acos ( convang ) * dpr_c();
+    convang = acos ( convang ) * naif->dpr_c();
     stereo->add("StereoAngle", toString(convang));
 
     if ( isDebug() ) {

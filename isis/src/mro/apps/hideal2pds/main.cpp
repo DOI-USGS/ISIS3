@@ -37,7 +37,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
                               UserInterface &ui, Camera *cam);
 void IsisMain() {
   // Get user interface and create a ProcessExportPds object
-  UserInterface &ui = Application::GetUserInterface();  
+  UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   ProcessExportPds p;
   Process pHist;
   double *band_min, *band_max;
@@ -196,7 +197,7 @@ void IsisMain() {
   //    problem if we decide to allow attached PDS products in the future.
   QString pdsTableFile = "";
   pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POINTING_TABLE.dat"; 
-  Table instRotationTable = cam->instrumentRotation()->Cache("InstrumentPointing");
+  Table instRotationTable = cam->instrumentRotation()->Cache("InstrumentPointing", naif);
   p.ExportTable(instRotationTable, pdsTableFile);
   PvlObject isisTableLab = instRotationTable.Label();
   PvlObject &instPtTabLab = pdsLabel.findObject("INSTRUMENT_POINTING_TABLE");
@@ -220,7 +221,7 @@ void IsisMain() {
   instPtTabLab += tableKeyword;
 
   pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POSITION_TABLE.dat"; 
-  Table instPositionTable = cam->instrumentPosition()->Cache("InstrumentPosition");
+  Table instPositionTable = cam->instrumentPosition()->Cache("InstrumentPosition", naif);
   p.ExportTable(instPositionTable, pdsTableFile); 
   isisTableLab = instPositionTable.Label();
   PvlObject &instPosTabLab = pdsLabel.findObject("INSTRUMENT_POSITION_TABLE");
@@ -238,7 +239,7 @@ void IsisMain() {
   instPosTabLab += tableKeyword;
 
   pdsTableFile = outPdsFile.baseName() + "_BODY_ROTATION_TABLE.dat"; 
-  Table bodyRotationTable = cam->bodyRotation()->Cache("BodyRotation");
+  Table bodyRotationTable = cam->bodyRotation()->Cache("BodyRotation", naif);
   p.ExportTable(bodyRotationTable, pdsTableFile); 
   isisTableLab = bodyRotationTable.Label();
   PvlObject &bodyRotTabLab = pdsLabel.findObject("BODY_ROTATION_TABLE");
@@ -260,14 +261,14 @@ void IsisMain() {
   }
   else {
     tableKeyword = PvlKeyword("SOLAR_LONGITUDE", 
-                              toString(cam->solarLongitude().force360Domain()
+                              toString(cam->solarLongitude(naif).force360Domain()
                                    .positiveEast(Angle::Degrees)), 
                               "DEGREES");
   }
   bodyRotTabLab += tableKeyword;
 
   pdsTableFile = outPdsFile.baseName() + "_SUN_POSITION_TABLE.dat"; 
-  Table sunPositionTable  = cam->sunPosition()->Cache("SunPosition");
+  Table sunPositionTable  = cam->sunPosition()->Cache("SunPosition", naif);
   p.ExportTable(sunPositionTable, pdsTableFile); 
   isisTableLab = sunPositionTable.Label();
   PvlObject &sunPosTabLab = pdsLabel.findObject("SUN_POSITION_TABLE");

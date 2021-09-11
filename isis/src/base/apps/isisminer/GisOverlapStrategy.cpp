@@ -159,7 +159,8 @@ namespace Isis {
    * @param globals   List of global keywords to use in argument substitutions
    * @return int      Number of stereo pairs found
    */ 
-  int GisOverlapStrategy::apply(ResourceList &resources, 
+  int GisOverlapStrategy::apply(NaifContextPtr naif, 
+                                ResourceList &resources, 
                                 const ResourceList &globals) {
 
     if ( isDebug() ) {
@@ -251,7 +252,7 @@ namespace Isis {
         // Process the primary Resource and the resulting overlap Resourcelist.
         // Virtual implementations must confirm addition overlapping conditions 
         // are met.
-        ResourceList aList = processOverlaps(resource, overlaps, globals);
+        ResourceList aList = processOverlaps(naif, resource, overlaps, globals);
 
         if ( isDebug() ) {
           cout << "  Valid overlaps returned for storage: " << aList.size()  << "\n";
@@ -366,7 +367,8 @@ namespace Isis {
  * @return ResourceList List of processed overlaps that are found to satisfy 
  *         constraints and additional processing by processOverlap().
  */
-  ResourceList GisOverlapStrategy::processOverlaps(SharedResource &resource,
+  ResourceList GisOverlapStrategy::processOverlaps(NaifContextPtr naif,
+                                                   SharedResource &resource,
                                                    ResourceList &overlaps,
                                                    const ResourceList &globals)  {
     ResourceList matches;
@@ -389,7 +391,7 @@ namespace Isis {
         // be returned by processOverlap() so make sure we check validity.
         if ( ratioA > 0.0 ) {
           if ( (ratioA >= m_overlapMin) && (ratioA <= m_overlapMax) ) {
-            SharedResource composite = processOverlap(resource, candidate, 
+            SharedResource composite = processOverlap(naif, resource, candidate, 
                                                       ratioA, ratioB,
                                                       globals);
             if ( !composite.isNull() ) { matches.append(composite); }
@@ -432,7 +434,8 @@ namespace Isis {
  *                        resourceA and resourceB including an optional
  *                        composite geoemtery
  */
-  SharedResource GisOverlapStrategy::processOverlap(SharedResource &resourceA,
+  SharedResource GisOverlapStrategy::processOverlap(NaifContextPtr naif,
+                                                    SharedResource &resourceA,
                                                     SharedResource &resourceB,
                                                     const double &ovrRatioA,
                                                     const double &ovrRatioB,

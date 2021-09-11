@@ -106,7 +106,7 @@ namespace Isis {
 
     // Setup focal plane map using the general IK code for the given camera
     // Note that this is not the specific naifIkCode() value for PolyCam
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, frameCode);
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, frameCode);
 
     // The instrument kernel contains a CCD_CENTER keyword instead of BORESIGHT_LINE
     // and BORESIGHT_SAMPLE keywords.
@@ -120,7 +120,7 @@ namespace Isis {
     // Different distortion model for each instrument and filter
     PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     QString filterName = bandBin["FilterName"];
-    distortionMap->SetDistortion(ikCode.toInt(), filterName);
+    distortionMap->SetDistortion(naif, ikCode.toInt(), filterName);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

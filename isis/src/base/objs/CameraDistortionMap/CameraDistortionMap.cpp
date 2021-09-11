@@ -71,10 +71,10 @@ namespace Isis {
    * @todo Generalize to read variable number of coefficients
    * @todo Add latex equation to the documentation
    */
-  void CameraDistortionMap::SetDistortion(int naifIkCode) {
+  void CameraDistortionMap::SetDistortion(NaifContextPtr naif, int naifIkCode) {
     QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     for (int i = 0; i < 3; ++i) {
-      p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
+      p_odk.push_back(p_camera->Spice::getDouble(naif, odkkey, i));
     }
   }
 

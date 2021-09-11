@@ -82,13 +82,13 @@ namespace Isis {
       // destructor
       virtual ~SpacecraftPosition() {   }
 
-      double getRadiusLightTime() const;
-      static double getDistanceLightTime(const Distance &distance);
+      double getRadiusLightTime(NaifContextPtr naif) const;
+      static double getDistanceLightTime(NaifContextPtr naif, const Distance &distance);
 
       virtual void SetAberrationCorrection(const QString &correction);
       virtual QString GetAberrationCorrection() const;
 
-      virtual void SetEphemerisTimeSpice();
+      virtual void SetEphemerisTimeSpice(NaifContextPtr naif) override;
 
       const LightTimeCorrectionState &getLightTimeState() const;
 

@@ -44,11 +44,13 @@ namespace gbl {
 }
 
 void IsisMain() {
+  auto naif = NaifContext::acquire();
+
   // Make sure we have a moc cube.  If not spit out an appropriate error
   // message
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM", OneBand);
-  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"));
+  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"), naif);
   int nlines = icube->lineCount();
 
   // Must be narrow angle

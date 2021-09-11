@@ -95,14 +95,14 @@ namespace Isis {
       virtual ~VimsGroundMap();
 
       virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz);
+                                 const double uz, NaifContextPtr naif) override;
 
-      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+      virtual bool SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
 //    bool SetGroundwithLatitudeLongitude(const Latitude &lat, const Longitude &lon);
 //    bool SetGroundwithRadiusLongitude(const double &radius, const Longitude &lon);
-      virtual bool SetGround(const SurfacePoint &surfacePoint);
+      virtual bool SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) override;
 
-      void Init(Pvl &lab);
+      void Init(NaifContextPtr naif, Pvl &lab);
 
     private:
       void LookDirection(double v[3]);

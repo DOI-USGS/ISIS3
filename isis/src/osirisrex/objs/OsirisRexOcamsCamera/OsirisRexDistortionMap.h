@@ -47,7 +47,7 @@ namespace Isis {
 
       virtual ~OsirisRexDistortionMap();
 
-      virtual void SetDistortion(int naifIkCode, QString filterName);
+      virtual void SetDistortion(NaifContextPtr naif, int naifIkCode, QString filterName);
 
       virtual bool SetFocalPlane(double dx, double dy);
 

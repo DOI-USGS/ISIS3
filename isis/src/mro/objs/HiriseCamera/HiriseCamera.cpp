@@ -119,14 +119,14 @@ namespace Isis {
     // focal plane x/y.  This will read the appropriate CCD
     // transformation coefficients from the instrument kernel
     CameraFocalPlaneMap *focalMap =
-      new CameraFocalPlaneMap(this, -74600 - ccd);
+      new CameraFocalPlaneMap(naif, this, -74600 - ccd);
     focalMap->SetDetectorOrigin(1024.5, 0.0);
     focalMap->SetDetectorOffset(0.0, ccdLine_c);
 
     // Setup distortion map.  This will read the optical distortion
     // coefficients from the instrument kernel
     CameraDistortionMap *distortionMap = new CameraDistortionMap(this);
-    distortionMap->SetDistortion(naifIkCode());
+    distortionMap->SetDistortion(naif, naifIkCode());
 
     // Setup the ground and sky map to transform undistorted focal
     // plane x/y to lat/lon or ra/dec respectively.

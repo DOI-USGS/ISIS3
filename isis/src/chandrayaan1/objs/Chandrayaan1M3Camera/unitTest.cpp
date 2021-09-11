@@ -30,11 +30,13 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
 
   cout << "Unit Test for Chandrayaan1M3Camera..." << endl;
@@ -68,22 +70,22 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 0.5, 0.5);
+    TestLineSamp(cam, 0.5, 0.5, naif);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 608.4999, 0.5);
+    TestLineSamp(cam, 608.4999, 0.5, naif);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 0.5, 564.4999);
+    TestLineSamp(cam, 0.5, 564.4999, naif);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 608.4999, 564.4999);
+    TestLineSamp(cam, 608.4999, 564.4999, naif);
 
     double samp = 304.0;
     double line = 282.0;
     cout << "For center pixel position ..." << endl;
 
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
@@ -102,8 +104,8 @@ int main(void) {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
 
-    cout << "RightAscension = " << cam->RightAscension() << endl;
-    cout << "Declination = " << cam->Declination() << endl;     
+    cout << "RightAscension = " << cam->RightAscension(naif) << endl;
+    cout << "Declination = " << cam->Declination(naif) << endl;     
     
   }
   catch (IException &e) {
@@ -112,11 +114,11 @@ int main(void) {
 }
 
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if (success) {

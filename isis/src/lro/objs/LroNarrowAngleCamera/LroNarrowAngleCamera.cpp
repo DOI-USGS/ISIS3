@@ -117,7 +117,7 @@ namespace Isis {
     detectorMap->SetStartingDetectorSample(ss);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
@@ -131,7 +131,7 @@ namespace Isis {
 
     // Setup distortion map
     LroNarrowAngleDistortionMap *distMap = new LroNarrowAngleDistortionMap(this);
-    distMap->SetDistortion(naifIkCode());
+    distMap->SetDistortion(naif, naifIkCode());
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);

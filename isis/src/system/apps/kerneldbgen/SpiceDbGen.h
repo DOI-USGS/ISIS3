@@ -61,18 +61,18 @@ class SpiceDbGen {
 
   public:
     SpiceDbGen(QString type);
-    Isis::PvlObject Direct(NaifContextPtr naif, QString quality, QString location,
+    Isis::PvlObject Direct(Isis::NaifContextPtr naif, QString quality, QString location,
                            std::vector<QString> & filter, double startOffset, double endOffset);
-    Isis::PvlObject Direct(NaifContextPtr naif, QString quality, Isis::FileList fileList,
+    Isis::PvlObject Direct(Isis::NaifContextPtr naif, QString quality, Isis::FileList fileList,
                            double startOffset, double endOffset);
-    void FurnishDependencies(NaifContextPtr naif, QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
+    void FurnishDependencies(Isis::NaifContextPtr naif, QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
     void setCoverageLevel(QString level);
 
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);
-    Isis::PvlGroup AddSelection(NaifContextPtr naif, Isis::FileName fileIn, double startOffset, double endOffset);
-    Isis::PvlGroup FormatIntervals(NaifContextPtr naif, SpiceCell &coverage, QString type, double startOffset, double endOffset);
+    Isis::PvlGroup AddSelection(Isis::NaifContextPtr naif, Isis::FileName fileIn, double startOffset, double endOffset);
+    Isis::PvlGroup FormatIntervals(Isis::NaifContextPtr naif, SpiceCell &coverage, QString type, double startOffset, double endOffset);
     Isis::PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
     QString p_type;

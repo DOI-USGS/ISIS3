@@ -56,9 +56,9 @@ namespace Isis {
     public:
       //  Constructors and Destructor
       GainUnitConversion() : Module("GainUnitConversion"), _units("DN") { }
-      GainUnitConversion(HiCalConf &conf, const QString &units) :
+      GainUnitConversion(NaifContextPtr naif, HiCalConf &conf, const QString &units) :
                  Module("GainUnitConversion"),  _units(units) {
-        init(conf);
+        init(naif, conf);
       }
 
       /** Destructor */
@@ -67,7 +67,7 @@ namespace Isis {
     private:
       QString   _units;
 
-      void init(HiCalConf &conf) {
+      void init(NaifContextPtr naif, HiCalConf &conf) {
         _history.clear();
         DbProfile prof = conf.getMatrixProfile();
         _history.add("Profile["+ prof.Name()+"]");
@@ -75,7 +75,7 @@ namespace Isis {
         double sed = ToDouble(prof("ScanExposureDuration"));  // units = us
         if ( IsEqual(_units, "IOF") ) {
           //  Add solar I/F correction parameters
-          double au = conf.sunDistanceAU();
+          double au = conf.sunDistanceAU(naif);
           _history.add("SunDist[" + ToString(au) + " (AU)]");
           double suncorr =  1.5 / au;
           suncorr *= suncorr;

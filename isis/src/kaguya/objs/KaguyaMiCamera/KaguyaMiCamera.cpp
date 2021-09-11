@@ -103,7 +103,7 @@ namespace Isis {
     detectorMap->SetStartingDetectorSample(1.0);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     // Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + toString(naifIkCode()) + "_CENTER";
     double sampleBoreSight = getDouble(naif, ikernKey,0);
@@ -115,7 +115,7 @@ namespace Isis {
 
     KaguyaMiCameraDistortionMap *distMap = new KaguyaMiCameraDistortionMap(this);
     //LroNarrowAngleDistortionMap *distMap = new LroNarrowAngleDistortionMap(this);
-    distMap->SetDistortion(naifIkCode());
+    distMap->SetDistortion(naif, naifIkCode());
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);

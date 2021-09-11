@@ -39,6 +39,7 @@
 #include "PvlFlatMap.h"
 #include "Resource.h"
 #include "Strategy.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -163,16 +164,17 @@ namespace Isis {
                          const ResourceList &globals);
       virtual ~StereoPairStrategy();
 
-      virtual int apply(ResourceList &resource, const ResourceList &globals);
+      virtual int apply(NaifContextPtr naif, ResourceList &resource, const ResourceList &globals) override;
 
     protected:
       virtual ResourceList overlapCandidates(ResourceList &resources, 
-                                             const ResourceList &globals);
-      virtual SharedResource processOverlap(SharedResource &resourceA,
+                                             const ResourceList &globals) override;
+      virtual SharedResource processOverlap(NaifContextPtr naif,
+                                            SharedResource &resourceA,
                                             SharedResource &resourceB,
                                             const double &ovrRatioA,
                                             const double &ovrRatioB, 
-                                            const ResourceList &globals);
+                                            const ResourceList &globals) override;
   
     private:
       /**
@@ -193,7 +195,8 @@ namespace Isis {
 
       QString getStereoValue(const QString &key, const ResourceList &globals,
                              const QString &defValue = "") const;
-      bool computeStereo(const SharedResource &resourceA, 
+      bool computeStereo(NaifContextPtr naif,
+                          const SharedResource &resourceA, 
                           const SharedResource &resourceB,
                           SharedResource &composite,
                           const ResourceList &globals) const;
@@ -205,12 +208,14 @@ namespace Isis {
                            double &rank,
                            const SharedResource &out = SharedResource(),
                            const QString &suffix = "Rank") const;
-      bool computeDelta(const SharedResource &resourceA, 
+      bool computeDelta(NaifContextPtr naif,
+                          const SharedResource &resourceA, 
                           const SharedResource &resourceB, 
                           const QString &parameter, 
                           const QString &keysrc,
                           SharedResource &composite) const;
-      bool computeStereoAngle(const SharedResource &resourceA, 
+      bool computeStereoAngle(NaifContextPtr naif,
+                              const SharedResource &resourceA, 
                               const SharedResource &resourceB, 
                               SharedResource &stereo,
                               const ResourceList &globals) const;

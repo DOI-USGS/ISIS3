@@ -24,6 +24,8 @@
 
 #include <vector>
 
+#include "NaifContext.h"
+
 template<class T> class QVector;
 
 class QString;

@@ -72,7 +72,7 @@ namespace Isis {
       ~ThemisIrCamera() {};
 
       // Band dependent
-      void SetBand(const int band);
+      void SetBand(const int band, NaifContextPtr naif);
       bool IsBandIndependent() {
         return false;
       };

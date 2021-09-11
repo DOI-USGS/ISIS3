@@ -33,6 +33,7 @@ void IsisMain() {
 
   // Setup the input and make sure it is a mariner10 file
   UserInterface & ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup & inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -142,7 +143,7 @@ void IsisMain() {
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
   Camera * cam = icube->camera();
-  bool camSuccess = cam->SetImage(icube->sampleCount()/2,icube->lineCount()/2);
+  bool camSuccess = cam->SetImage(icube->sampleCount()/2,icube->lineCount()/2,naif);
   if (!camSuccess) {
     throw IException(IException::Unknown,
         "Unable to calculate the Solar Distance on [" +

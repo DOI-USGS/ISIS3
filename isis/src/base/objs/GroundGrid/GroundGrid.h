@@ -22,6 +22,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "NaifContext.h"
+
 namespace Isis {
   class Angle;
   class Latitude;
@@ -72,7 +74,8 @@ namespace Isis {
    */
   class GroundGrid {
     public:
-      GroundGrid(UniversalGroundMap *gmap, 
+      GroundGrid(NaifContextPtr naif,
+                 UniversalGroundMap *gmap, 
                  bool splitLatLon,
                  bool extendGrid,
                  unsigned int width, 

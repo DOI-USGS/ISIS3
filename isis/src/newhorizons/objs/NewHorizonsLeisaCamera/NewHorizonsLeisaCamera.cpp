@@ -78,7 +78,7 @@ namespace Isis {
 
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y) and back.
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     focalMap->SetDetectorOrigin(128.5, 128.5);
 
     // Pull out the focal plane map affine coefficients so we can use them to adjust when the band

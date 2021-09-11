@@ -105,12 +105,13 @@ void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
   Buffer &outBuffer = *output[0];
 
   QVector<Buffer *> inputCopy;
+  auto naif = NaifContext::acquire();
 
   for (int i = 0; i < (int)input.size(); i++) {
     inputCopy.push_back(input[i]);
   }
 
-  QVector<double> results = c.runCalculations(inputCopy,
+  QVector<double> results = c.runCalculations(naif, inputCopy,
                             outBuffer.Line(), outBuffer.Band());
 
   // If final result is a scalar, set all pixels to that value.

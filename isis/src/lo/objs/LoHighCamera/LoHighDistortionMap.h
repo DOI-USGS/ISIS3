@@ -64,7 +64,7 @@ namespace Isis {
     public:
       LoHighDistortionMap(Camera *parent);
 
-      void SetDistortion(const int naifIkCode);
+      void SetDistortion(NaifContextPtr naif, const int naifIkCode);
       virtual bool SetFocalPlane(const double dx, const double dy);
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);

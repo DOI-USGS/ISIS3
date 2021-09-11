@@ -54,9 +54,10 @@ namespace Isis {
    *  
    * @return @b bool 
    */
-  bool MocWideAngleDetectorMap::SetParent(const double sample,
+  bool MocWideAngleDetectorMap::SetParent(NaifContextPtr naif,
+                                          const double sample,
                                           const double line) {
-    if(!LineScanCameraDetectorMap::SetParent(sample, line)) return false;
+    if(!LineScanCameraDetectorMap::SetParent(naif, sample, line)) return false;
 
     // Handle variable summing if necessary
     if((p_moclab->CrosstrackSumming() == 13) ||

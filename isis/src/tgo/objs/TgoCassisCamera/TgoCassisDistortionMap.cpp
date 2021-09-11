@@ -40,23 +40,24 @@ namespace Isis {
    * @param naifIkCode    NAIF IK code.
    *
    */
-  TgoCassisDistortionMap::TgoCassisDistortionMap(Camera *parent, 
+  TgoCassisDistortionMap::TgoCassisDistortionMap(NaifContextPtr naif, 
+                                                 Camera *parent, 
                                                  int naifIkCode) 
       : CameraDistortionMap(parent) {
 
     QString od = "INS" + toString(naifIkCode) + "_OD_";
 
     for(int i = 0; i < 6; i++) {
-      m_A1_corr.push_back(p_camera->getDouble(od + "A1_CORR", i));
-      m_A2_corr.push_back(p_camera->getDouble(od + "A2_CORR", i));
-      m_A3_corr.push_back(p_camera->getDouble(od + "A3_CORR", i));
-      m_A1_dist.push_back(p_camera->getDouble(od + "A1_DIST", i));
-      m_A2_dist.push_back(p_camera->getDouble(od + "A2_DIST", i));
-      m_A3_dist.push_back(p_camera->getDouble(od + "A3_DIST", i));
+      m_A1_corr.push_back(p_camera->getDouble(naif, od + "A1_CORR", i));
+      m_A2_corr.push_back(p_camera->getDouble(naif, od + "A2_CORR", i));
+      m_A3_corr.push_back(p_camera->getDouble(naif, od + "A3_CORR", i));
+      m_A1_dist.push_back(p_camera->getDouble(naif, od + "A1_DIST", i));
+      m_A2_dist.push_back(p_camera->getDouble(naif, od + "A2_DIST", i));
+      m_A3_dist.push_back(p_camera->getDouble(naif, od + "A3_DIST", i));
     }
-    m_pixelPitch = p_camera->getDouble("INS" + toString(naifIkCode) + "_PIXEL_PITCH");
-    m_width  = p_camera->getDouble("INS" + toString(naifIkCode) + "_FILTER_SAMPLES");
-    m_height = p_camera->getDouble("INS" + toString(naifIkCode) + "_FILTER_LINES");
+    m_pixelPitch = p_camera->getDouble(naif, "INS" + toString(naifIkCode) + "_PIXEL_PITCH");
+    m_width  = p_camera->getDouble(naif, "INS" + toString(naifIkCode) + "_FILTER_SAMPLES");
+    m_height = p_camera->getDouble(naif, "INS" + toString(naifIkCode) + "_FILTER_LINES");
   }
 
 

@@ -109,7 +109,7 @@ namespace Isis {
     // We do not want to set the exposure duration in the detector map, let it default to 0.0...
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     focalMap->SetDetectorOrigin(512.5, 512.5);
 
     // Setup distortion map

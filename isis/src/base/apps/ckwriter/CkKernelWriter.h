@@ -63,7 +63,7 @@ class CkKernelWriter {
     CkKernelWriter();
     CkKernelWriter(NaifContextPtr naif, const QString &kfile, const int &csize = 0,
                    const int &cktype = 3);
-    virtual ~CkKernelWriter() { close(); }
+    virtual ~CkKernelWriter() { close(NaifContext::acquire()); }
 
     void setType(const int cktype);
 

@@ -15,10 +15,12 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   QString testNACFile("$rosetta/testData/n20100710t154539230id20f22.cub");
   QString testWACFile("$rosetta/testData/W20100710T153440162ID30F13.cub");
@@ -173,22 +175,22 @@ int main(void) {
     // The asteroid doesn't fill the full image, and the kernels are imperfect
     // so, test the corners of the asteroid
     cout << "For upper left corner of asteroid ..." << endl;
-    TestLineSamp(cam, 400.0, 1300.0);
+    TestLineSamp(cam, 400.0, 1300.0, naif);
 
     cout << "For upper right corner of asteriod ..." << endl;
-    TestLineSamp(cam, 1575.0, 1190.0);
+    TestLineSamp(cam, 1575.0, 1190.0, naif);
 
     cout << "For lower left corner of asteriod..." << endl;
-    TestLineSamp(cam, 540.0, 1600.0);
+    TestLineSamp(cam, 540.0, 1600.0, naif);
 
     cout << "For lower right corner of asteroid..." << endl;
-    TestLineSamp(cam, 1600.0, 1560.0);
+    TestLineSamp(cam, 1600.0, 1560.0, naif);
 
     double samp = 1024.0;
     double line = 1024.0;
     cout << "For center pixel position ..." << endl;
 
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
@@ -213,27 +215,27 @@ int main(void) {
     RosettaOsirisCamera *wideAngleCam = (RosettaOsirisCamera *) CameraFactory::Create(wacCube);
 
     cout << "For upper left corner of asteroid ..." << endl;
-    TestLineSamp(wideAngleCam, 215.0, 230.0);
+    TestLineSamp(wideAngleCam, 215.0, 230.0, naif);
 
     cout << "For upper right corner of asteriod ..." << endl;
-    TestLineSamp(wideAngleCam, 304.0, 235.0);
+    TestLineSamp(wideAngleCam, 304.0, 235.0, naif);
 
     cout << "For lower left corner of asteriod..." << endl;
-    TestLineSamp(wideAngleCam, 230.0, 303.0);
+    TestLineSamp(wideAngleCam, 230.0, 303.0, naif);
 
     cout << "For lower right corner of asteroid..." << endl;
-    TestLineSamp(wideAngleCam, 299.0, 312.0);
+    TestLineSamp(wideAngleCam, 299.0, 312.0, naif);
   }
   catch (IException &e) {
     e.print();
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if (success) {

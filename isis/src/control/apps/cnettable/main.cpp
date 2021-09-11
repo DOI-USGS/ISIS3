@@ -56,6 +56,7 @@ void IsisMain() {
 
   // Get user entered information
   UserInterface & ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   ControlNet cnet(ui.GetFileName("CNET"));
   SerialNumberList serials(ui.GetFileName("FROMLIST"));
   append = ui.GetBoolean("APPEND");
@@ -284,7 +285,7 @@ void IsisMain() {
       // Set and then get CameraPointInfo information
       camPoint.SetCube(serials.fileName(cmeasure->GetCubeSerialNumber()));
 
-      grp = camPoint.SetImage(cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
+      grp = camPoint.SetImage(naif, cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...
       if (grp == NULL) {
         string msg = "You shouldn't have gotten here. Errors in CameraPointInfo class";

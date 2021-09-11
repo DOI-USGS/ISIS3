@@ -589,6 +589,7 @@ void ExtractLatLonRange(ControlNet &outNet,
   }
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Get the lat/lon and fix the range for the internal 0/360
   Latitude minlat(ui.GetDouble("MINLAT"), Angle::Degrees);
@@ -683,7 +684,8 @@ void ExtractLatLonRange(ControlNet &outNet,
         }
         else {
           if(!camera->SetImage(controlPt->GetMeasure(cm)->GetSample(),
-                               controlPt->GetMeasure(cm)->GetLine())) {
+                               controlPt->GetMeasure(cm)->GetLine(),
+                               naif)) {
             nonLatLonPoints.push_back(controlPt->GetId());
             remove = true;
           }

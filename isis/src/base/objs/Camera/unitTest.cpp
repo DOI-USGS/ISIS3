@@ -65,7 +65,7 @@ class MyCamera : public Camera {
       return true;
     }
 
-    void SetBand(const int band) {
+    void SetBand(const int band, NaifContextPtr naif) override {
       cout << "SetBand called, band: " << band << endl;
     }
 
@@ -87,6 +87,9 @@ class MyCamera : public Camera {
 int main() {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
+
     QString inputFile = "$mgs/testData/ab102401.lev2.cub";
     Cube cube;
     cube.open(inputFile);
@@ -116,15 +119,15 @@ int main() {
     cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
     cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
 
-    cout << "SetImage (sample, line): " << toString(c->SetImage(sample, line))
+    cout << "SetImage (sample, line): " << toString(c->SetImage(sample, line, naif))
          << endl << endl;
 
-    cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
-    cout << "SunAzimuth: " << c->SunAzimuth() << endl;
-    cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
-    cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
-    cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
-    cout << "RaDecResolution: " << c->RaDecResolution()  << endl << endl;
+    cout << "NorthAzimuth: " << c->NorthAzimuth(naif) << endl;
+    cout << "SunAzimuth: " << c->SunAzimuth(naif) << endl;
+    cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth(naif) << endl;
+    cout << "OffNadirAngle: " << c->OffNadirAngle(naif) << endl;
+    cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle(naif) << endl;
+    cout << "RaDecResolution: " << c->RaDecResolution(naif) << endl << endl;
 
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 226.671, 20.0, 230.0) << endl;
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(20.0, 226.671, 20.0, 230.0) << endl;
@@ -141,15 +144,15 @@ int main() {
     cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl;
 
     cout << "SetUniversalGround(lat, lon): "
-         << c->SetGround(lat, lon) << endl;
+         << c->SetGround(naif, lat, lon) << endl;
 
     cout << "SetRightAscensionDeclination(ra, dec): "
-         << c->SetRightAscensionDeclination(ra, dec) << endl;
+         << c->SetRightAscensionDeclination(ra, dec, naif) << endl;
     cout << "HasProjection: " << c->HasProjection() << endl;
     cam.IsBandIndependent();
     cout << "ReferenceBand: " << c->ReferenceBand() << endl;
     cout << "HasReferenceBand: " << c->HasReferenceBand() << endl;
-    cam.SetBand(7);
+    cam.SetBand(7, naif);
     cout << "Sample: " << setprecision(3) << c->Sample() << endl;
     cout << "Line: " << setprecision(3) << c->Line() << endl << endl;
 
@@ -162,15 +165,15 @@ int main() {
       cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
       cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
 
-      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT))
+      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT, naif))
            << endl << endl;
 
-      cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
-      cout << "SunAzimuth: " << c->SunAzimuth() << endl;
-      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
-      cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
-      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
-      cout << "RaDecResolution: " << c->RaDecResolution()  << endl;
+      cout << "NorthAzimuth: " << c->NorthAzimuth(naif) << endl;
+      cout << "SunAzimuth: " << c->SunAzimuth(naif) << endl;
+      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth(naif) << endl;
+      cout << "OffNadirAngle: " << c->OffNadirAngle(naif) << endl;
+      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle(naif) << endl;
+      cout << "RaDecResolution: " << c->RaDecResolution(naif)  << endl;
       cout << "PlanetocentricLatitude: " << c->UniversalLatitude() << endl; 
       cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl; 
     } 
@@ -187,15 +190,15 @@ int main() {
       cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
       cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
 
-      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT))
+      cout << "SetImage (sample, line, deltaT): " << toString(c->SetImage(sample, line, deltaT, naif))
            << endl << endl;
 
-      cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
-      cout << "SunAzimuth: " << c->SunAzimuth() << endl;
-      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
-      cout << "OffNadirAngle: " << c->OffNadirAngle() << endl;
-      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle() << endl;
-      cout << "RaDecResolution: " << c->RaDecResolution()  << endl;
+      cout << "NorthAzimuth: " << c->NorthAzimuth(naif) << endl;
+      cout << "SunAzimuth: " << c->SunAzimuth(naif) << endl;
+      cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth(naif) << endl;
+      cout << "OffNadirAngle: " << c->OffNadirAngle(naif) << endl;
+      cout << "CelestialNorthClockAngle: " << c->CelestialNorthClockAngle(naif) << endl;
+      cout << "RaDecResolution: " << c->RaDecResolution(naif)  << endl;
       cout << "PlanetocentricLatitude: " << c->UniversalLatitude() << endl; 
       cout << "PositiveEast360Longitude: " << c->UniversalLongitude() << endl << endl;
 
@@ -205,40 +208,40 @@ int main() {
     }
 
     // Reset to original setimage: 
-    c->SetImage(sample, line); 
-    c->SetGround(lat, lon);
-    c->SetRightAscensionDeclination(ra, dec);
+    c->SetImage(sample, line, naif); 
+    c->SetGround(naif, lat, lon);
+    c->SetRightAscensionDeclination(ra, dec, naif);
 
     try {
       double lat = 0, lon = 0;
       cout << "GroundRange: "
-           << c->GroundRange(lat, lat, lon, lon, pvl) << endl;
+           << c->GroundRange(lat, lat, lon, lon, pvl, naif) << endl;
       cout << "IntersectsLongitudeDomain: "
-           << c->IntersectsLongitudeDomain(pvl) << endl;
+           << c->IntersectsLongitudeDomain(pvl, naif) << endl;
     }
     catch(IException &e) {
       cout << "No mapping group found, so GroundRange and " << endl
            << "IntersectsLongitudeDomain cannot run." << endl;
     }
 
-    cout << "PixelResolution: " << c->PixelResolution() << endl;
+    cout << "PixelResolution: " << c->PixelResolution(naif) << endl;
     cout << "ExposureDuration: " << c->exposureDuration() << endl;
 
-    cout << "ObliquePixelResolution: " << c->ObliquePixelResolution() << endl;
-    cout << "LineResolution: " << c->LineResolution() << endl;
-    cout << "ObliqueLineResolution: " << c->ObliqueLineResolution() << endl;
-    cout << "SampleResolution: " << c->SampleResolution() << endl;
-    cout << "ObliqueSampleResolution: " << c->ObliqueSampleResolution() << endl;
-    cout << "DetectorResolution: " << c->DetectorResolution() << endl;
-    cout << "ObliqueDetectorResolution: " << c->ObliqueDetectorResolution() << endl;
+    cout << "ObliquePixelResolution: " << c->ObliquePixelResolution(naif) << endl;
+    cout << "LineResolution: " << c->LineResolution(naif) << endl;
+    cout << "ObliqueLineResolution: " << c->ObliqueLineResolution(naif) << endl;
+    cout << "SampleResolution: " << c->SampleResolution(naif) << endl;
+    cout << "ObliqueSampleResolution: " << c->ObliqueSampleResolution(naif) << endl;
+    cout << "DetectorResolution: " << c->DetectorResolution(naif) << endl;
+    cout << "ObliqueDetectorResolution: " << c->ObliqueDetectorResolution(naif) << endl;
 
 
     cout << "LowestImageResolution: " << setprecision(4)
-         << c->LowestImageResolution() << endl;
+         << c->LowestImageResolution(naif) << endl;
     cout << "HighestImageResolution: " << setprecision(3)
-         << c->HighestImageResolution() << endl;
+         << c->HighestImageResolution(naif) << endl;
     cout << "Calling BasicMapping (pvl)..." << endl;
-    c->BasicMapping(pvl);
+    c->BasicMapping(pvl, naif);
 
     double pixRes2 = pvl.findGroup("Mapping")["PixelResolution"];
     pixRes2 *= 10000000;
@@ -257,14 +260,14 @@ int main() {
 
 
     try {
-      cout << c->RaDecRange(ra, ra, dec, dec) << endl;
+      cout << c->RaDecRange(naif, ra, ra, dec, dec) << endl;
     }
     catch(IException &e) {
       e.print();
     }
 
     try {
-      cout << c->RaDecResolution() << endl;
+      cout << c->RaDecResolution(naif) << endl;
     }
     catch(IException &e) {
       e.print();
@@ -286,8 +289,8 @@ int main() {
     lat.setDegrees(18.221);
     lon.setDegrees(226.671);
     double radius = 3414033.72108798;
-    c->SetUniversalGround(lat.degrees(), lon.degrees(), radius);
-    c->SetGround(SurfacePoint(lat, lon, Distance(radius, Distance::Meters)));
+    c->SetUniversalGround(naif, lat.degrees(), lon.degrees(), radius);
+    c->SetGround(naif, SurfacePoint(lat, lon, Distance(radius, Distance::Meters)));
     cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
     cout << "Latitude = " << c->UniversalLatitude() << endl;
     cout << "Longitude = " << c->UniversalLongitude() << endl;
@@ -303,7 +306,7 @@ int main() {
     line = c->Lines() / 2.0;
     cout << "Sample = " << setprecision(3) << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(c->SetImage(sample, line)) << endl;
+    cout << "SetImage (sample, line): " << toString(c->SetImage(sample, line, naif)) << endl;
     cout << "Latitude = " << c->UniversalLatitude() << endl;
     cout << "Longitude = " << c->UniversalLongitude() << endl;
     cout << "Radius = " << c->LocalRadius().meters() << endl;
@@ -311,7 +314,7 @@ int main() {
     cout << "Point = " << setprecision(4)
          << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "SetUniversalGround (lat, lon, radius): "
-         << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(),
+         << c->SetUniversalGround(naif, c->UniversalLatitude(), c->UniversalLongitude(),
                                   c->LocalRadius().meters())
          << endl;
     cout << "Sample = " << c->Sample() << endl;
@@ -334,7 +337,7 @@ int main() {
     }
     cout << "Basic Mapping: " << endl;
     Pvl camMap;
-    cam2->BasicMapping(camMap);
+    cam2->BasicMapping(camMap, naif);
 
     double minLat = camMap.findGroup("Mapping")["MinimumLatitude"];
     minLat *= 100;
@@ -360,7 +363,7 @@ int main() {
     cout << "180 Domain Range: " << endl;
     double minlat, maxlat, minlon, maxlon;
     camMap.findGroup("Mapping")["LongitudeDomain"][0] = "180";
-    cam2->GroundRange(minlat, maxlat, minlon, maxlon, camMap);
+    cam2->GroundRange(minlat, maxlat, minlon, maxlon, camMap, naif);
     cout << "Latitude Range: " << minlat << " to " << maxlat << endl;
     cout << "Longitude Range: " << minlon << " to " << maxlon
               << endl << endl;
@@ -371,7 +374,7 @@ int main() {
     line = cam2->Lines() / 2.0;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam2->SetImage(sample, line)) << endl;
+    cout << "SetImage (sample, line): " << toString(cam2->SetImage(sample, line, naif)) << endl;
     cout << "Latitude = " << cam2->UniversalLatitude() << endl;
     cout << "Longitude = " << cam2->UniversalLongitude() << endl;
     cout << "Radius = " << cam2->LocalRadius().meters() << endl;
@@ -379,7 +382,8 @@ int main() {
     cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "SetUniversalGround (cam2->UniversalLatitude(), "
             "cam2->UniversalLongitude()): "
-         << cam2->SetUniversalGround(cam2->UniversalLatitude(),
+         << cam2->SetUniversalGround(naif,
+                                     cam2->UniversalLatitude(),
                                      cam2->UniversalLongitude())
          << endl;
     cout << "Sample = " << cam2->Sample() << endl;
@@ -402,15 +406,15 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam3->SetImage(sample, line)) << endl;
+    cout << "SetImage (sample, line): " << toString(cam3->SetImage(sample, line, naif)) << endl;
     double normal[3];
-    cam3->GetLocalNormal(normal);
+    cam3->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
     Angle phase;
     Angle incidence;
     Angle emission;
     bool success;
-    cam3->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam3->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -433,10 +437,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam4->SetImage(sample, line)) << endl;
-    cam4->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam4->SetImage(sample, line, naif)) << endl;
+    cam4->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam4->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam4->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -459,10 +463,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam5->SetImage(sample, line)) << endl;
-    cam5->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam5->SetImage(sample, line, naif)) << endl;
+    cam5->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam5->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam5->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -485,10 +489,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam6->SetImage(sample, line)) << endl;
-    cam6->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam6->SetImage(sample, line, naif)) << endl;
+    cam6->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam6->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam6->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -511,10 +515,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam7->SetImage(sample, line)) << endl;
-    cam7->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam7->SetImage(sample, line, naif)) << endl;
+    cam7->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam7->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam7->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -537,10 +541,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam8->SetImage(sample, line)) << endl;
-    cam8->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam8->SetImage(sample, line, naif)) << endl;
+    cam8->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam8->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam8->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -563,10 +567,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam9->SetImage(sample, line)) << endl;
-    cam9->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam9->SetImage(sample, line, naif)) << endl;
+    cam9->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam9->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam9->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -589,10 +593,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam10->SetImage(sample, line)) << endl;
-    cam10->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam10->SetImage(sample, line, naif)) << endl;
+    cam10->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam10->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam10->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -615,10 +619,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam11->SetImage(sample, line)) << endl;
-    cam11->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam11->SetImage(sample, line, naif)) << endl;
+    cam11->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam11->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam11->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -641,10 +645,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam12->SetImage(sample, line)) << endl;
-    cam12->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam12->SetImage(sample, line, naif)) << endl;
+    cam12->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam12->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam12->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;
@@ -668,10 +672,10 @@ int main() {
     cout << "Camera* from: " << inputFile << endl;
     cout << "Sample = " << sample << endl;
     cout << "Line = " << line << endl;
-    cout << "SetImage (sample, line): " << toString(cam13->SetImage(sample, line)) << endl;
-    cam13->GetLocalNormal(normal);
+    cout << "SetImage (sample, line): " << toString(cam13->SetImage(sample, line, naif)) << endl;
+    cam13->GetLocalNormal(normal, naif);
     cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
-    cam13->LocalPhotometricAngles(phase,emission,incidence,success);
+    cam13->LocalPhotometricAngles(naif,phase,emission,incidence,success);
     if (success) {
       cout << "Phase = " << phase.degrees() << endl;
       cout << "Emission = " << emission.degrees() << endl;

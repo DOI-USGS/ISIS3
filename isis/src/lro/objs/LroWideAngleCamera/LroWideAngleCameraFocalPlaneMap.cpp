@@ -44,9 +44,11 @@ namespace Isis {
    *                      (either 1 or -1)
    *
    */
-  LroWideAngleCameraFocalPlaneMap::LroWideAngleCameraFocalPlaneMap(Camera *parent, 
+  LroWideAngleCameraFocalPlaneMap::LroWideAngleCameraFocalPlaneMap(NaifContextPtr naif,
+                                                                   Camera *parent, 
                                                                    int naifIkCode) : 
-                                                                   CameraFocalPlaneMap(parent,
+                                                                   CameraFocalPlaneMap(naif,
+                                                                                       parent,
                                                                                        naifIkCode) {
   }
 
@@ -66,7 +68,7 @@ namespace Isis {
  * 
  * @param naifIkCode NAIF IK code for the desired filter to add.
  */
-  void LroWideAngleCameraFocalPlaneMap::addFilter(int naifIkCode) {
+  void LroWideAngleCameraFocalPlaneMap::addFilter(NaifContextPtr naif, int naifIkCode) {
 
     QString xkey  = "INS" + toString(naifIkCode) + "_TRANSX";
     QString ykey  = "INS" + toString(naifIkCode) + "_TRANSY";
@@ -74,10 +76,10 @@ namespace Isis {
     QString iykey = "INS" + toString(naifIkCode) + "_ITRANSL";
     TranslationParameters trans_p;
     for (int i = 0; i < 3; ++i) {
-      trans_p.m_transx[i]  = p_camera->getDouble(xkey, i);
-      trans_p.m_transy[i]  = p_camera->getDouble(ykey, i);
-      trans_p.m_itranss[i] = p_camera->getDouble(ixkey, i);
-      trans_p.m_itransl[i] = p_camera->getDouble(iykey, i);
+      trans_p.m_transx[i]  = p_camera->getDouble(naif, xkey, i);
+      trans_p.m_transy[i]  = p_camera->getDouble(naif, ykey, i);
+      trans_p.m_itranss[i] = p_camera->getDouble(naif, ixkey, i);
+      trans_p.m_itransl[i] = p_camera->getDouble(naif, iykey, i);
     }
 
     m_transparms.push_back(trans_p);

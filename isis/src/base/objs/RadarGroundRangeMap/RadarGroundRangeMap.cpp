@@ -29,11 +29,12 @@ namespace Isis {
    * @param naifIkCode  code of the naif instrument for reading coefficients
    *
    */
-  RadarGroundRangeMap::RadarGroundRangeMap(Camera *parent, const int naifIkCode)
-    : CameraFocalPlaneMap(parent, naifIkCode) {
+  RadarGroundRangeMap::RadarGroundRangeMap(NaifContextPtr naif, Camera *parent, const int naifIkCode)
+    : CameraFocalPlaneMap(naif, parent, naifIkCode) {
   }
 
-  void RadarGroundRangeMap::setTransform(int naifIkCode,
+  void RadarGroundRangeMap::setTransform(NaifContextPtr naif,
+                                         int naifIkCode,
                                          double groundRangeResolution,
                                          int samples, Radar::LookDirection ldir) {
     // Setup map from radar(sample,time) to radar(groundRange,time)
@@ -59,10 +60,10 @@ namespace Isis {
     transl[2] = 0.0;
 
     std::string icode = "INS" + IString(naifIkCode);
-    pdpool_c((icode + "_TRANSX").c_str(), 3, transx);
-    pdpool_c((icode + "_TRANSY").c_str(), 3, transy);
-    pdpool_c((icode + "_ITRANSS").c_str(), 3, transs);
-    pdpool_c((icode + "_ITRANSL").c_str(), 3, transl);
+    naif->pdpool_c((icode + "_TRANSX").c_str(), 3, transx);
+    naif->pdpool_c((icode + "_TRANSY").c_str(), 3, transy);
+    naif->pdpool_c((icode + "_ITRANSS").c_str(), 3, transs);
+    naif->pdpool_c((icode + "_ITRANSL").c_str(), 3, transl);
   }
 }
 

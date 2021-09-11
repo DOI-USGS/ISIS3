@@ -126,7 +126,7 @@ namespace Isis {
     }
     RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,
                                       this->Samples(), ldir);
-    new RadarGroundRangeMap(this, naifIkCode());
+    new RadarGroundRangeMap(naif, this, naifIkCode());
 
     // Calculate weighting for focal plane coordinates. This is done
     // because the focal plane coordinates (slant range and Doppler

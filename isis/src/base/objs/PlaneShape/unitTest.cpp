@@ -56,6 +56,9 @@ using namespace Isis;
 int main() {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
+
     //string inputFile = "$mgs/testData/ab102401.cub";
     QString inputFile = "$base/testData/PlaneShape/W1591510834_1_cal.cub";
     Cube cube;
@@ -64,7 +67,7 @@ int main() {
     std::vector<Distance> radii = c->target()->radii();
     Pvl pvl = *cube.label();
     Spice spi(cube);
-    Target targ(&spi, pvl);
+    Target targ(&spi, pvl, naif);
     targ.setRadii(radii);
 
     cout << "Begin testing Plane Shape Model class...." << endl;
@@ -88,7 +91,7 @@ int main() {
 
     cout << endl << "  Testing method intersectSurface with failure..." << endl; 
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
-    shape.intersectSurface(sB, lookB);
+    shape.intersectSurface(naif, sB, lookB);
     if (!shape.hasIntersection())
       cout << "    Intersection failed " << endl;
 
@@ -97,8 +100,8 @@ int main() {
     cout << "   Set a pixel in the image and check again." << endl;
     double line = 272.516;
     double sample = 189.935;
-    c->SetImage(sample, line);
-    c->instrumentPosition((double *) &sB[0]);
+    c->SetImage(sample, line, naif);
+    c->instrumentPosition((double *) &sB[0], naif);
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     c->SpacecraftSurfaceVector((double *) &lookB[0]);
@@ -110,7 +113,7 @@ int main() {
   //  Incidence = 83.3692
   //  Emission = 62.2289
 
-    if (!shape.intersectSurface(sB, lookB)) { 
+    if (!shape.intersectSurface(naif, sB, lookB)) { 
         cout << "    ...  intersectSurface method failed" << endl;
         return -1;
     }
@@ -127,7 +130,7 @@ int main() {
     shape.intersectSurface(sp->GetLatitude(), sp->GetLongitude(), sB);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
-    shape.intersectSurface(sB, lookB);
+    shape.intersectSurface(naif, sB, lookB);
 
     cout << endl << "  Testing class method calculateLocalNormal..." << endl;
     QVector<double *>  notUsed(4);
@@ -135,18 +138,18 @@ int main() {
     for (int i = 0; i < notUsed.size(); i ++)
         notUsed[i] = new double[3];
 
-    shape.calculateLocalNormal(notUsed);
+    shape.calculateLocalNormal(naif, notUsed);
     vector<double> myNormal(3);
     myNormal = shape.normal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal(); 
+    shape.calculateSurfaceNormal(naif); 
     myNormal = shape.normal();
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
-    shape.calculateDefaultNormal();
+    shape.calculateDefaultNormal(naif);
     myNormal = shape.normal();
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
@@ -167,13 +170,13 @@ int main() {
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
     cout << endl << "  Testing incidence angle method..." << endl;
-    cout << "    incidence angle: " << shape.incidenceAngle(uB) << endl;
+    cout << "    incidence angle: " << shape.incidenceAngle(naif, uB) << endl;
 
     cout << endl << "  Testing emission angle method..." << endl;
-    cout << "     emission angle: " << shape.emissionAngle(sB) << endl;
+    cout << "     emission angle: " << shape.emissionAngle(naif, sB) << endl;
 
     cout << endl << "  Testing phase angle method..." << endl;
-    cout << "        phase angle: " << shape.phaseAngle(sB,uB) << endl;
+    cout << "        phase angle: " << shape.phaseAngle(naif,sB,uB) << endl;
 
     cube.close();
   } 

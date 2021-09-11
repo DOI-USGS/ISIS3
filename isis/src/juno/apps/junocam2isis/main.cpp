@@ -41,6 +41,7 @@ void IsisMain() {
   g_outputCubes.clear();
   
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   FileName inputFile = ui.GetFileName("FROM");
 
   Pvl inputLabel;
@@ -56,7 +57,7 @@ void IsisMain() {
   if (doFullCcd) {
     PushFrameCameraCcdLayout ccdLayout(spacecraftCode);
     try {
-      ccdLayout.addKernel("$juno/kernels/ik/juno_junocam_v??.ti");
+      ccdLayout.addKernel(naif, "$juno/kernels/ik/juno_junocam_v??.ti");
     }
     catch (IException &e) {
       QString msg = "Failed to load the JunoCam Instrument Kernel required for "
@@ -64,7 +65,7 @@ void IsisMain() {
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
     try {
-      ccdLayout.addKernel("$juno/kernels/iak/junoAddendum???.ti");
+      ccdLayout.addKernel(naif, "$juno/kernels/iak/junoAddendum???.ti");
     }
     catch (IException &e) {
       QString msg = "Failed to load the JunoCam Instrument Addendum Kernel "
@@ -73,28 +74,28 @@ void IsisMain() {
     }
 
     //int blueOffset = ccdLayout.getFrameInfo(-61501).m_startLine;
-    int blueLines = ccdLayout.getFrameInfo(-61501).m_lines;
-    int greenOffset = ccdLayout.getFrameInfo(-61502).m_startLine;
-    int greenLines = ccdLayout.getFrameInfo(-61502).m_lines;
-    int redOffset = ccdLayout.getFrameInfo(-61503).m_startLine; 
+    int blueLines = ccdLayout.getFrameInfo(naif, -61501).m_lines;
+    int greenOffset = ccdLayout.getFrameInfo(naif, -61502).m_startLine;
+    int greenLines = ccdLayout.getFrameInfo(naif, -61502).m_lines;
+    int redOffset = ccdLayout.getFrameInfo(naif, -61503).m_startLine; 
 
     // Determine which filters are contained in the input label and set the fullFrameLines.
     for (int i=0; i < g_filterList.size(); i++) {
       if (g_filterList[i] == "BLUE") {
-        g_fullFrameLines += ccdLayout.getFrameInfo(-61501).m_lines;
-        g_filterOffsetList.append(ccdLayout.getFrameInfo(-61501).m_startLine);
+        g_fullFrameLines += ccdLayout.getFrameInfo(naif, -61501).m_lines;
+        g_filterOffsetList.append(ccdLayout.getFrameInfo(naif, -61501).m_startLine);
       }
       if (g_filterList[i] == "GREEN") {
-        g_fullFrameLines += ccdLayout.getFrameInfo(-61502).m_lines;
+        g_fullFrameLines += ccdLayout.getFrameInfo(naif, -61502).m_lines;
         g_filterOffsetList.append(greenOffset-blueLines);
       }
       if (g_filterList[i] == "RED") {
-        g_fullFrameLines += ccdLayout.getFrameInfo(-61503).m_lines;
+        g_fullFrameLines += ccdLayout.getFrameInfo(naif, -61503).m_lines;
         g_filterOffsetList.append(redOffset-greenLines-blueLines);
       }
       if (g_filterList[i] == "METHANE") {
-        g_fullFrameLines += ccdLayout.getFrameInfo(-61504).m_lines;
-        g_filterOffsetList.append(ccdLayout.getFrameInfo(-61504).m_startLine);
+        g_fullFrameLines += ccdLayout.getFrameInfo(naif, -61504).m_lines;
+        g_filterOffsetList.append(ccdLayout.getFrameInfo(naif, -61504).m_startLine);
       }
     }
 
@@ -120,7 +121,7 @@ void IsisMain() {
       progress.CheckStatus();
       Cube *fullFrameCube = new Cube();
       QString fullFrameNumString = QString("%1").arg(i+1, 4, 10, QChar('0'));
-      fullFrameCube->setDimensions(ccdLayout.ccdSamples(), ccdLayout.ccdLines(), 1);
+      fullFrameCube->setDimensions(ccdLayout.ccdSamples(naif), ccdLayout.ccdLines(naif), 1);
       fullFrameCube->setPixelType(Isis::SignedWord);
       FileName fullFrameCubeFileName(outputBaseName 
                                      + "_" + fullFrameNumString

@@ -29,6 +29,7 @@ void IsisMain() {
   // Get the list of cubes to mosaic
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   FileList fromList(ui.GetFileName("FROMLIST"));
 
   vector<Cube *> cubeList;
@@ -90,14 +91,14 @@ void IsisMain() {
     double northAzimuth;
     for (int i = 0; i < (int)cubeList.size(); i++) {
       Camera *cam = cubeList[i]->camera();
-      if (cam->SetUniversalGround(avgLat, avgLon)) {
-        emissionAngle = cam->EmissionAngle();
-        phaseAngle = cam->PhaseAngle();
+      if (cam->SetUniversalGround(naif, avgLat, avgLon)) {
+        emissionAngle = cam->EmissionAngle(naif);
+        phaseAngle = cam->PhaseAngle(naif);
         incidenceAngle = cam->IncidenceAngle();
-        localSolarTime = cam->LocalSolarTime();
-        solarLongitude = cam->solarLongitude().degrees();
-        sunAzimuth = cam->SunAzimuth();
-        northAzimuth = cam->NorthAzimuth();
+        localSolarTime = cam->LocalSolarTime(naif);
+        solarLongitude = cam->solarLongitude(naif).degrees();
+        sunAzimuth = cam->SunAzimuth(naif);
+        northAzimuth = cam->NorthAzimuth(naif);
         runXY = false;
         break;
       }
@@ -145,14 +146,14 @@ void IsisMain() {
 
       for (int i = 0; i < (int)cubeList.size(); i++) {
         Camera *cam = cubeList[i]->camera();
-        if (cam->SetImage(sample, line)) {
-          emissionAngle = cam->EmissionAngle();
-          phaseAngle = cam->PhaseAngle();
+        if (cam->SetImage(sample, line, naif)) {
+          emissionAngle = cam->EmissionAngle(naif);
+          phaseAngle = cam->PhaseAngle(naif);
           incidenceAngle = cam->IncidenceAngle();
-          localSolarTime = cam->LocalSolarTime();
-          solarLongitude = cam->solarLongitude().degrees();
-          sunAzimuth = cam->SunAzimuth();
-          northAzimuth = cam->NorthAzimuth();
+          localSolarTime = cam->LocalSolarTime(naif);
+          solarLongitude = cam->solarLongitude(naif).degrees();
+          sunAzimuth = cam->SunAzimuth(naif);
+          northAzimuth = cam->NorthAzimuth(naif);
           runXY = false;
           break;
         }

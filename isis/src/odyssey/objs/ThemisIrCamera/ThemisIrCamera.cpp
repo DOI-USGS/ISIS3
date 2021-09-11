@@ -100,7 +100,7 @@ namespace Isis {
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
     // This is band dependent so it will change in SetBand
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     // The boresight sample in the K-T model was 164.25.  In Duxbury's it is
     // 160.5 or half the detector width.  The detector offset varies by band
@@ -118,7 +118,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     LoadCache(naif);
-    naif>CheckErrors();
+    naif->CheckErrors();
   }
 
 
@@ -130,7 +130,7 @@ namespace Isis {
    *
    * @author 2009-02-26 Jeff Anderson
    */
-  void ThemisIrCamera::SetBand(const int vband) {
+  void ThemisIrCamera::SetBand(const int vband, NaifContextPtr naif) {
     // Lookup the original band from the band bin group.  Unless there is
     // a reference band which means the data has all been aligned in the
     // band dimension

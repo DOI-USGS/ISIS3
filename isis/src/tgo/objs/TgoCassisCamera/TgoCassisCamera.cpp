@@ -94,7 +94,7 @@ namespace Isis {
     }
     
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, cassisCode);
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, cassisCode);
 
     // Get CASSIS detector boresight
     double bsSample = getDouble(naif, "INS" + cassis + "_BORESIGHT_SAMPLE");
@@ -103,7 +103,7 @@ namespace Isis {
 
     // Setup distortion map
     try {
-      new TgoCassisDistortionMap(this, naifIkCode());
+      new TgoCassisDistortionMap(naif, this, naifIkCode());
     }
     catch (IException &e) {
       // Set NULL so that cameras destructor wont seg fault trying to delete

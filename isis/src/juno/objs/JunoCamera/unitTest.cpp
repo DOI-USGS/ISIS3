@@ -35,7 +35,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestSampLine(Camera *cam, double samp, double line);
+void TestSampLine(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 /**
  * Unit test for Juno's JunoCam instrument.
@@ -47,6 +47,8 @@ void TestSampLine(Camera *cam, double samp, double line);
  */
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   qDebug() << "Unit Test for JunoCamera...";
   try {
@@ -75,7 +77,7 @@ int main(void) {
     double exposureDuration = toDouble( inst["ExposureDuration"][0] );
     QString stime = inst["StartTime"];
     double et;
-    str2et_c(stime.toLatin1().data(), &et);
+    naif->str2et_c(stime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     qDebug() << qSetRealNumberPrecision(18) << "Shutter open = " << shuttertimes.first.Et();
     qDebug() << qSetRealNumberPrecision(18) << "Shutter close = " << shuttertimes.second.Et();
@@ -84,22 +86,22 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
-    TestSampLine(cam, 952.0, 1.0);
+    TestSampLine(cam, 952.0, 1.0, naif);
 
     qDebug() << "For upper right corner ...";
-    TestSampLine(cam, 1630.0, 1.0);
+    TestSampLine(cam, 1630.0, 1.0, naif);
 
     qDebug() << "For lower left corner ...";
-    TestSampLine(cam, 1005.0, cam->Lines());
+    TestSampLine(cam, 1005.0, cam->Lines(), naif);
 
     qDebug() << "For lower right corner ...";
-    TestSampLine(cam, 1630.0, cam->Lines());
+    TestSampLine(cam, 1630.0, cam->Lines(), naif);
 
     double samp = 1300;
     double line = 64;
     qDebug() << "For center pixel position ...";
 
-    if(!cam->SetImage(samp, line)) {
+    if(!cam->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }
@@ -125,11 +127,11 @@ int main(void) {
   }
 }
 
-void TestSampLine(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestSampLine(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

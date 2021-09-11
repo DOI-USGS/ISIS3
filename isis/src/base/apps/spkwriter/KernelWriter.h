@@ -75,8 +75,8 @@ class KernelWriter {
     virtual ~KernelWriter() { }
 
     /** Open a kernel file using virtual method provided in K */
-    void open(const QString &kfile, const int &commnt_size = 5120) {
-      _handle = k_open(kfile, commnt_size);
+    void open(NaifContextPtr naif, const QString &kfile, const int &commnt_size = 5120) {
+      _handle = k_open(naif, kfile, commnt_size);
 
     }
 
@@ -86,8 +86,8 @@ class KernelWriter {
     }
 
     /** Write a set of kernel segments from teh Kernels segment container */
-    void write(const K &kernels)  {
-      k_write(_handle, kernels);
+    void write(NaifContextPtr naif, const K &kernels)  {
+      k_write(naif, _handle, kernels);
     }
 
     /**
@@ -101,26 +101,26 @@ class KernelWriter {
      * @param QString Name of file to write kernel to
      * @param QString Name
      */
-    void write(const K &kernels, const QString &kfile,
+    void write(NaifContextPtr naif, const K &kernels, const QString &kfile,
                const QString &comfile = "") {
-      QString comments = getComment(kernels, comfile);
-      open(kfile, comments.size() + 512);
-      header(comments);  // Writes header
-      write(kernels);
-      close();
+      QString comments = getComment(naif, kernels, comfile);
+      open(naif, kfile, comments.size() + 512);
+      header(naif, comments);  // Writes header
+      write(naif, kernels);
+      close(naif);
       return;
     }
 
 
     /** Generic close method simply calls specified method */
-    void close() {
-      k_close(_handle);
+    void close(NaifContextPtr naif) {
+      k_close(naif, _handle);
     }
 
     /** Accumulate comment from K object and individed set */
-    QString getComment(const K &kernels, const QString &comfile) {
+    QString getComment(NaifContextPtr naif, const K &kernels, const QString &comfile) {
       Commentor<SegmentType> commentor;
-      commentor.setCommentHeader(k_header(comfile));
+      commentor.setCommentHeader(k_header(naif, comfile));
       kernels.Accept(commentor);
       return (commentor.comments());
     }

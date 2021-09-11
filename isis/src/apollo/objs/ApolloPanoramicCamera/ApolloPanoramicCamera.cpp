@@ -111,7 +111,7 @@ namespace Isis {
     detectorMap->SetStartingDetectorSample(0.0);
     // Setup focal plane map
     PvlGroup &kernel = lab.findGroup("Kernels", Pvl::Traverse);
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, (int) kernel["NaifFrameCode"]);
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, (int) kernel["NaifFrameCode"]);
     
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     double sampleBoreSight = 0.0;  //Presently no NAIF keywords for this sensor
@@ -122,7 +122,7 @@ namespace Isis {
     
     // Setup distortion map
     new CameraDistortionMap(this, -1.0);
-    //distMap->SetDistortion(naifIkCode());    Presently no NAIF keywords for this sensor
+    //distMap->SetDistortion(naif, naifIkCode());    Presently no NAIF keywords for this sensor
     
     //Setup the ground and sky map
     new LineScanCameraGroundMap(this);

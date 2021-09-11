@@ -115,14 +115,16 @@ void CamTestFunctor::setResults(Statistics* resultsStats) {
 }
 
 void CamTestFunctor::operator()(Buffer &in, Buffer &out) const {
+  auto naif = NaifContext::acquire();
+  
   if (in.Line() == 1) {
-    m_cam->SetBand(in.Band());
+    m_cam->SetBand(in.Band(), naif);
   }
 
   double line = in.Line();
   for (int samp = 0; samp < in.SampleDimension(); samp++) {
     double sample = in.Sample(samp);
-    if (!m_cam->SetImage(sample, line)) {
+    if (!m_cam->SetImage(sample, line, naif)) {
       out[samp] = Lrs;
       continue;
     }
@@ -134,7 +136,7 @@ void CamTestFunctor::operator()(Buffer &in, Buffer &out) const {
       out[samp] = m_cam->UniversalLongitude();
     }
     else {
-      if (!m_cam->SetUniversalGround(m_cam->UniversalLatitude(), m_cam->UniversalLongitude())) {
+      if (!m_cam->SetUniversalGround(naif, m_cam->UniversalLatitude(), m_cam->UniversalLongitude())) {
         out[samp] = Hrs;
         continue;
       }

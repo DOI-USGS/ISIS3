@@ -51,7 +51,7 @@ namespace Isis {
       //! Destroys the KaguyaMiCameraDistortionMap object.
       virtual ~KaguyaMiCameraDistortionMap() {};
 
-      void SetDistortion(const int naifIkCode);
+      void SetDistortion(NaifContextPtr naif, const int naifIkCode);
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 

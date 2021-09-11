@@ -68,7 +68,7 @@ namespace Isis {
       //! Destroys ApolloPanoramicDetectorMap object
       virtual ~ApolloPanoramicDetectorMap() {};
 
-      virtual bool SetParent(const double sample, const double line);
+      virtual bool SetParent(NaifContextPtr naif, const double sample, const double line);
 
       virtual bool SetDetector(const double sample, const double line);
 

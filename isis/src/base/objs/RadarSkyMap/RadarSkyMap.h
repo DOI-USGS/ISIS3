@@ -52,10 +52,10 @@ namespace Isis {
       //! Destructor
       virtual ~RadarSkyMap() {};
 
-      virtual bool SetFocalPlane(const double ux, const double uy,
-                                 const double uz);
+      virtual bool SetFocalPlane(NaifContextPtr naif, const double ux, const double uy,
+                                 const double uz) override;
 
-      virtual bool SetSky(const double ra, const double dec);
+      virtual bool SetSky(NaifContextPtr naif, const double ra, const double dec) override;
 
   };
 };

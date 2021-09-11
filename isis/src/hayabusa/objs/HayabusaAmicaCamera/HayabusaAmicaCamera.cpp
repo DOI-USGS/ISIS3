@@ -72,7 +72,7 @@ namespace Isis {
     iTime centerTime  = etStart + (exposureDuration / 2.0);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     
     // lines and samples added to the pvl in the order you
     // call getDouble()
@@ -103,7 +103,7 @@ namespace Isis {
 
     // Setup distortion map
     CameraDistortionMap *dmap = new CameraDistortionMap(this);
-    dmap->SetDistortion(-130102);
+    dmap->SetDistortion(naif, -130102);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

@@ -52,7 +52,7 @@ namespace Isis {
     public:
       TaylorCameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
-      void SetDistortion(const int naifIkCode);
+      void SetDistortion(NaifContextPtr naif, const int naifIkCode);
 
       //! Destructor
       ~TaylorCameraDistortionMap() {};

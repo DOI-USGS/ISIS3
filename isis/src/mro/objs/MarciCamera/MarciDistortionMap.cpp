@@ -38,11 +38,11 @@ namespace Isis {
    *                      (either 1 or -1)
    *
    */
-  MarciDistortionMap::MarciDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
+  MarciDistortionMap::MarciDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
     QString odkkey = "INS" + toString(naifIkCode) + "_DISTORTION_COEFFS";
 
     for(int i = 0; i < 4; i++) {
-      p_odk.push_back(p_camera->getDouble(odkkey, i));
+      p_odk.push_back(p_camera->getDouble(naif, odkkey, i));
     }
   }
 

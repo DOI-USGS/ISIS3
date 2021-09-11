@@ -42,20 +42,20 @@ namespace Isis {
    *                      (either 1 or -1)
    *
    */
-  KaguyaTcCameraDistortionMap::KaguyaTcCameraDistortionMap(Camera *parent, int naifIkCode)
+  KaguyaTcCameraDistortionMap::KaguyaTcCameraDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode)
       : CameraDistortionMap(parent) {
     QString odtxkey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_X";
     QString odtykey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_Y";
     QString boresightkey = "INS" + toString(naifIkCode) + "_BORESIGHT";
 
     for(int i = 0; i < 4; ++i) {
-      p_odkx.push_back(p_camera->getDouble(odtxkey, i));
-      p_odky.push_back(p_camera->getDouble(odtykey, i));
+      p_odkx.push_back(p_camera->getDouble(naif, odtxkey, i));
+      p_odky.push_back(p_camera->getDouble(naif, odtykey, i));
     }
 
     // add boresight x and y to coefficients vector
-    p_odkx[0] = p_odkx[0] + p_camera->getDouble(boresightkey, 0);
-    p_odky[0] = p_odky[0] + p_camera->getDouble(boresightkey, 1);
+    p_odkx[0] = p_odkx[0] + p_camera->getDouble(naif, boresightkey, 0);
+    p_odky[0] = p_odky[0] + p_camera->getDouble(naif, boresightkey, 1);
   }
 
 

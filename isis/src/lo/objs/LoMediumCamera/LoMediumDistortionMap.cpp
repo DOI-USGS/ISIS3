@@ -86,17 +86,17 @@ namespace Isis {
    * @param naifIkCode    Code to search for in instrument kernel
    * */
 
-  void LoMediumDistortionMap::SetDistortion(const int naifIkCode) {
+  void LoMediumDistortionMap::SetDistortion(NaifContextPtr naif, const int naifIkCode) {
     // Get the distortion center (point of symmetry of distortion)
     p_camera->FocalPlaneMap()->SetFocalPlane(0., 0.);
     double boreS = p_camera->FocalPlaneMap()->DetectorSample();
     double boreL = p_camera->FocalPlaneMap()->DetectorLine();
     QString centkey = "INS" + toString(naifIkCode) + "_POINT_OF_SYMMETRY";
-    p_sample0 = boreS - p_camera->Spice::getDouble(centkey, 0);
-    p_line0 = boreL + p_camera->Spice::getDouble(centkey, 1);
+    p_sample0 = boreS - p_camera->Spice::getDouble(naif, centkey, 0);
+    p_line0 = boreL + p_camera->Spice::getDouble(naif, centkey, 1);
 
     // Get the distortion coefficients
-    CameraDistortionMap::SetDistortion(naifIkCode);
+    CameraDistortionMap::SetDistortion(naif, naifIkCode);
   }
 
 

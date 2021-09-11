@@ -216,7 +216,7 @@ namespace Isis {
     if (type.toUpper() == "FRAMING") {
       p_framing = true;
       new CameraDetectorMap(this);
-      CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);
+      CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(naif, this, 0);
       fmap->SetDetectorOrigin(sampleDetectors / 2.0 + 0.5,
                               lineDetectors / 2.0 + 0.5);
       new CameraDistortionMap(this);
@@ -229,7 +229,7 @@ namespace Isis {
     else if (type.toUpper() == "LINESCAN") {
       p_framing = false;
       new LineScanCameraDetectorMap(this, et, exposureDuration);
-      CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);
+      CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(naif, this, 0);
       fmap->SetDetectorOrigin(sampleDetectors / 2.0 + 0.5,
                               0.0);
       new CameraDistortionMap(this);

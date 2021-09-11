@@ -9,12 +9,14 @@ using namespace Isis;
 
 int main() {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   try {
     cout << "Unit test for MocLabels" << endl;
     cout << "MocWideAngleCamera cub test..." << endl;
     Cube c1("$mgs/testData/ab102401.cub", "r");
-    MocLabels lab1(c1);
+    MocLabels lab1(c1, naif);
 
     cout << "NarrowAngle?  " << lab1.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab1.WideAngle() << endl;
@@ -37,7 +39,7 @@ int main() {
 
     cout << "MocNarrowAngleCamera cub test..." << endl;
     Cube c2("$mgs/testData/fha00491.lev1.cub", "r");
-    MocLabels lab2(c2);
+    MocLabels lab2(c2, naif);
 
     cout << "NarrowAngle?  " << lab2.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab2.WideAngle() << endl;

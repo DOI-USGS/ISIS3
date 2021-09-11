@@ -56,7 +56,7 @@ namespace Isis {
     naif->CheckErrors();
     // See if we have a moc camera
     Pvl &lab = *cube.label();
-    MocLabels *moclab = new MocLabels(cube);
+    MocLabels *moclab = new MocLabels(cube, naif);
     double lineRate = moclab->LineRate();
     double csum = moclab->CrosstrackSumming();
     double dsum = moclab->DowntrackSumming();
@@ -88,7 +88,7 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap =
-      new CameraFocalPlaneMap(this, naifIkCode());
+      new CameraFocalPlaneMap(naif, this, naifIkCode());
     if(isRed) {
       focalMap->SetDetectorOrigin(1674.65, 0.0);
       focalMap->SetDetectorOffset(0.0, 6.7785);

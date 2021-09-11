@@ -28,6 +28,7 @@ void IsisMain() {
 
 //  Input parameters
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString sourceFile = ui.GetAsString("FROM");    //  Save off source filename
   FileName from(sourceFile);
 
@@ -84,7 +85,7 @@ void IsisMain() {
 
 //  Compute the Geometry
     MdisGeometry geom(from.expanded());
-    Pvl geomkeys = geom.getGeometry(sourceFile);
+    Pvl geomkeys = geom.getGeometry(naif, sourceFile);
     edrkeys.updateKeys(geomkeys);
 
     PvlGroup mdiskeys("MdisPdsKeys");

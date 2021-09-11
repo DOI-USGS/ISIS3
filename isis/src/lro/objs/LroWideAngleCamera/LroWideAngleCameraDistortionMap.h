@@ -57,12 +57,12 @@ namespace Isis {
    */
   class LroWideAngleCameraDistortionMap : public CameraDistortionMap {
     public:
-      LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode);
+      LroWideAngleCameraDistortionMap(NaifContextPtr naif, Camera *parent, int naifIkCode);
 
       //! Destroys the LroWideAngleCameraDistortionMap object
       virtual ~LroWideAngleCameraDistortionMap() { }
 
-      void addFilter(int naifIkCode);
+      void addFilter(NaifContextPtr naif, int naifIkCode);
       void setBand(int vband);
 
       virtual bool SetFocalPlane(const double dx, const double dy);

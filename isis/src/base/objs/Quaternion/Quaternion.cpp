@@ -277,7 +277,7 @@ namespace Isis {
     *
     */
   std::vector<double> Quaternion::ToAngles(int axis3, int axis2, int axis1, NaifContextPtr naif) {
-    std::vector<double> rotationMatrix = ToMatrix();
+    std::vector<double> rotationMatrix = ToMatrix(naif);
     SpiceDouble ang1, ang2, ang3;
     naif->CheckErrors();
     naif->m2eul_c((SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,

@@ -159,7 +159,7 @@ namespace Isis {
     DetectorMap()->SetDetectorLineSumming(1.0);  // Line dimension never binned
 
     // Setup focal plane map
-    CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(naif, this, naifIkCode());
 
     // lines and samples added to the pvl in the order you
     // call getDouble()

@@ -244,7 +244,7 @@ Macros that substitute for function calls:
    #define   dskxv_c( pri,   target, nsurf,  srflst, et,    fixref,   \
                       nrays, vtxarr, dirarr, xptarr, fndarr        )  \
                                                                       \
-           ( dskxv_c( (pri),              CONST_STR(target), (nsurf), \
+             dskxv_c( (pri),              CONST_STR(target), (nsurf), \
                       CONST_IVEC(srflst), (et),                       \
                       CONST_STR(fixref),  (nrays),                    \
                       CONST_VEC3(vtxarr), CONST_VEC3(dirarr),         \
@@ -252,15 +252,15 @@ Macros that substitute for function calls:
 
    #define  dvdot_c( s1, s2 )                                         \
                                                                       \
-           ( dvdot_c ( CONST_VEC(s1), CONST_VEC(s2) )
+            dvdot_c ( CONST_VEC(s1), CONST_VEC(s2) )
 
    #define  dvhat_c( v1, v2 )                                         \
                                                                       \
-           ( dvhat_c ( CONST_VEC(v1), (v2) )
+            dvhat_c ( CONST_VEC(v1), (v2) )
 
    #define  dvsep_c( s1, s2 )                                         \
                                                                       \
-           ( dvsep_c ( CONST_VEC(s1), CONST_VEC(s2) )
+            dvsep_c ( CONST_VEC(s1), CONST_VEC(s2) )
 
    #define  edlimb_c( a, b, c, viewpt, limb )                          \
                                                                        \
@@ -376,7 +376,7 @@ Macros that substitute for function calls:
                       udrepi, udrepu, udrepf, nintvls,                 \
                       bail,   udbail, cnfine, result         )         \
                                                                        \
-         ( gfevnt_c( (udstep),           (udrefn),  (gquant),          \
+            gfevnt_c((udstep),           (udrefn),  (gquant),          \
                      (qnpars),           (lenvals), CONST_VOID(qpnams),\
                      CONST_VOID(qcpars), (qdpars),  (qipars),          \
                      (qlpars),           (op),      (refval),          \
@@ -425,7 +425,7 @@ Macros that substitute for function calls:
                       abcorr, obsrvr, spoint, trgepc,                  \
                       srfvec, phase, solar,   emissn   )               \
                                                                        \
-       (   ilumin_c ( (method), (target), (et),    (fixref),           \
+            ilumin_c ( (method), (target), (et),    (fixref),          \
                       (abcorr), (obsrvr), CONST_VEC(spoint), (trgepc), \
                       (srfvec), (phase),  (solar), (emissn)          )
 
@@ -480,7 +480,7 @@ Macros that substitute for function calls:
                       maxn,   npts,   points, epochs,                  \
                       tangts                          )                \
                                                                        \
-       (   limbpt_c( CONST_STR(method), CONST_STR(target),  (et),      \
+            limbpt_c( CONST_STR(method), CONST_STR(target),  (et),     \
                      CONST_STR(fixref), CONST_STR(abcorr),             \
                      CONST_STR(corloc), CONST_STR(obsrvr),             \
                      CONST_VEC(refvec), (rolstp),           (ncuts),   \
@@ -529,7 +529,7 @@ Macros that substitute for function calls:
 
    #define  mequ_c( m1, m2 )                                           \
                                                                        \
-           ( mequ_c  ( CONST_MAT(m1), m2 )
+            mequ_c  ( CONST_MAT(m1), m2 )
 
    #define  mequg_c( m1, nr, nc, mout )                                \
                                                                        \
@@ -966,7 +966,7 @@ Macros that substitute for function calls:
                       maxn,   npts,   points, epochs,                  \
                       tangts                          )                \
                                                                        \
-       (   termpt_c( CONST_STR(method), CONST_STR(ilusrc),             \
+            termpt_c( CONST_STR(method), CONST_STR(ilusrc),            \
                      CONST_STR(target), (et),                          \
                      CONST_STR(fixref), CONST_STR(abcorr),             \
                      CONST_STR(corloc), CONST_STR(obsrvr),             \
@@ -977,7 +977,7 @@ Macros that substitute for function calls:
 
    #define  trace_c( m1 )                                              \
                                                                        \
-           ( trace_c ( CONST_MAT(m1) )
+            trace_c ( CONST_MAT(m1) )
 
    #define  twovec_c( axdef, indexa, plndef, indexp, mout )            \
                                                                        \
@@ -1002,7 +1002,7 @@ Macros that substitute for function calls:
 
    #define  vaddg_c( v1, v2, ndim,vout )                               \
                                                                        \
-        (  vaddg_c ( CONST_VEC(v1), CONST_VEC(v2), (ndim), (vout) )
+            vaddg_c ( CONST_VEC(v1), CONST_VEC(v2), (ndim), (vout) )
 
    #define  vcrss_c( v1, v2, vout )                                    \
                                                                        \
@@ -1053,12 +1053,12 @@ Macros that substitute for function calls:
 
    #define  vlcomg_c( n, a, v1, b, v2, sum )                           \
                                                                        \
-           ( vlcomg_c ( (n), (a), CONST_VEC(v1),                       \
+            vlcomg_c ( (n), (a), CONST_VEC(v1),                        \
                              (b), CONST_VEC(v2),  (sum) )
 
    #define  vminug_c( v1, ndim, vout )                                 \
                                                                        \
-       (   vminug_c ( CONST_VEC(v1), (ndim), (vout) )
+            vminug_c ( CONST_VEC(v1), (ndim), (vout) )
 
    #define  vminus_c( v1, vout )                                       \
                                                                        \
@@ -1091,11 +1091,11 @@ Macros that substitute for function calls:
 
    #define  vrel_c( v1, v2 )                                           \
                                                                        \
-           ( vrel_c ( CONST_VEC(v1), CONST_VEC(v2) )
+            vrel_c ( CONST_VEC(v1), CONST_VEC(v2) )
 
    #define  vrelg_c( v1, v2, ndim )                                    \
                                                                        \
-           ( vrelg_c ( CONST_VEC(v1), CONST_VEC(v2), (ndim) )
+            vrelg_c ( CONST_VEC(v1), CONST_VEC(v2), (ndim) )
 
    #define  vrotv_c( v, axis, theta, r )                               \
                                                                        \
@@ -1115,7 +1115,7 @@ Macros that substitute for function calls:
 
    #define  vsepg_c( v1, v2, ndim)                                     \
                                                                        \
-           ( vsepg_c ( CONST_VEC(v1), CONST_VEC(v2), ndim )
+            vsepg_c ( CONST_VEC(v1), CONST_VEC(v2), ndim )
 
    #define  vsub_c( v1, v2, vout )                                     \
                                                                        \
@@ -1127,11 +1127,11 @@ Macros that substitute for function calls:
                       (ndim),        (vout)            )
    #define  vtmv_c( v1, mat, v2 )                                      \
                                                                        \
-        ( vtmv_c ( CONST_VEC(v1), CONST_MAT(mat), CONST_VEC(v2) )
+            vtmv_c ( CONST_VEC(v1), CONST_MAT(mat), CONST_VEC(v2) )
 
    #define  vtmvg_c( v1, mat, v2, nrow, ncol )                         \
                                                                        \
-        ( vtmvg_c ( CONST_VOID(v1), CONST_VOID(mat), CONST_VOID(v2),   \
+            vtmvg_c ( CONST_VOID(v1), CONST_VOID(mat), CONST_VOID(v2), \
                    (nrow), (ncol)                                   )
 
    #define  vupack_c( v, x, y, z )                                     \

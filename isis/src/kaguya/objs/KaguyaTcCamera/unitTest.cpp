@@ -35,7 +35,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestLineSamp(Camera *cam, double samp, double line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 /**
  * Unit test for Kaguya TC Camera.
@@ -45,6 +45,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  */
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   qDebug() << "Unit Test for KaguyaTcCamera...";
   try {
@@ -74,22 +76,22 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
-    TestLineSamp(cam, 1.0, 1.0);
+    TestLineSamp(cam, 1.0, 1.0, naif);
 
     qDebug() << "For upper right corner ...";
-    TestLineSamp(cam, cam->Samples(), 1.0);
+    TestLineSamp(cam, cam->Samples(), 1.0, naif);
 
     qDebug() << "For lower left corner ...";
-    TestLineSamp(cam, 1.0, cam->Lines());
+    TestLineSamp(cam, 1.0, cam->Lines(), naif);
 
     qDebug() << "For lower right corner ...";
-    TestLineSamp(cam, cam->Samples(), cam->Lines());
+    TestLineSamp(cam, cam->Samples(), cam->Lines(), naif);
 
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
     qDebug() << "For center pixel position ...";
 
-    if(!cam->SetImage(samp, line)) {
+    if(!cam->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }
@@ -136,22 +138,22 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
-    TestLineSamp(cam2, 1.0, 1.0);
+    TestLineSamp(cam2, 1.0, 1.0, naif);
 
     qDebug() << "For upper right corner ...";
-    TestLineSamp(cam2, cam2->Samples(), 1.0);
+    TestLineSamp(cam2, cam2->Samples(), 1.0, naif);
 
     qDebug() << "For lower left corner ...";
-    TestLineSamp(cam2, 1.0, cam2->Lines());
+    TestLineSamp(cam2, 1.0, cam2->Lines(), naif);
 
     qDebug() << "For lower right corner ...";
-    TestLineSamp(cam2, cam2->Samples(), cam2->Lines());
+    TestLineSamp(cam2, cam2->Samples(), cam2->Lines(), naif);
 
     samp = cam2->Samples() / 2;
     line = cam2->Lines() / 2;
     qDebug() << "For center pixel position ...";
 
-    if(!cam2->SetImage(samp, line)) {
+    if(!cam2->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }
@@ -177,11 +179,11 @@ int main(void) {
   }
 }
 
-void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
+void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif) {
+  bool success = cam->SetImage(samp, line, naif);
 
   if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(naif, cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
   if(success) {

@@ -125,7 +125,7 @@ namespace Isis {
    *                          adjusted for images with different resolutions.  I think it would
    *                          just cause a few extra pixels at the edge worse case scenario.
    */
-  void VimsGroundMap::Init(Pvl &lab) {
+  void VimsGroundMap::Init(NaifContextPtr naif, Pvl &lab) {
 
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
@@ -136,7 +136,7 @@ namespace Isis {
     QString intTime = stime.split(".").first();
     stime = stime.split(".").last();
 
-    p_etStart = p_camera->getClockTime(intTime).Et();
+    p_etStart = p_camera->getClockTime(naif, intTime).Et();
     p_etStart += toDouble(stime) / 15959.0;
     //----------------------------------------------------------------------
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and
@@ -216,7 +216,7 @@ namespace Isis {
       if (p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
-        p_camera->setTime(et);
+        p_camera->setTime(et, naif);
       }
 
       for (int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -224,10 +224,10 @@ namespace Isis {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-          p_camera->setTime(et);
+          p_camera->setTime(et, naif);
         }
 
-        if (p_camera->SetImage((double) samp + 1, (double)line + 1)) {
+        if (p_camera->SetImage((double) samp + 1, (double)line + 1, naif)) {
 
           double xyz[3];
           p_camera->Coordinate(xyz);
@@ -297,7 +297,7 @@ namespace Isis {
    *                         so that fractional pixels are used in calculations.
    */
   bool VimsGroundMap::SetFocalPlane(const double ux, const double uy,
-                                    const double uz) {
+                                    const double uz, NaifContextPtr naif) {
 
     p_ux = ux;
     p_uy = uy;
@@ -325,15 +325,15 @@ namespace Isis {
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
     }
-    p_camera->setTime(et);
+    p_camera->setTime(et, naif);
 
     //  get Look Direction
     SpiceDouble lookC[3];
     LookDirection(lookC);
 
     SpiceDouble unitLookC[3];
-    vhat_c(lookC, unitLookC);
-    return p_camera->SetLookDirection(unitLookC);
+    naif->vhat_c(lookC, unitLookC);
+    return p_camera->SetLookDirection(unitLookC, naif);
   }
 
 
@@ -368,7 +368,7 @@ namespace Isis {
    *                            to xyz.
    *
    */
-  bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+  bool VimsGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
 
 
     //  Make sure at least 1 pixel in image has projected onto surface
@@ -393,7 +393,7 @@ namespace Isis {
         //  Convert lat/lon to x/y/z
         Distance radius = p_camera->LocalRadius(lat, lon);
         SpiceDouble pB[3];
-        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
+        naif->latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
 
         //  Make sure this point falls within range of image
         if (pB[0] < p_minX || pB[0] > p_maxX ||
@@ -481,7 +481,7 @@ namespace Isis {
 
     // Sanity check
     p_camera->IgnoreProjection(true);
-    p_camera->SetImage(inSamp, inLine);
+    p_camera->SetImage(inSamp, inLine, naif);
     p_camera->IgnoreProjection(false);
     if (!p_camera->HasSurfaceIntersection()) return false;
 
@@ -501,8 +501,8 @@ namespace Isis {
    *
    * @internal
    */
-  bool VimsGroundMap::SetGround(const SurfacePoint &surfacePoint) {
-    return SetGround(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
+  bool VimsGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &surfacePoint) {
+    return SetGround(naif, surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
 //    return SetGroundwithLatitudeLongitude(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
   }
 

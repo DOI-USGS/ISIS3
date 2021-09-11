@@ -29,6 +29,7 @@ void IsisMain() {
   // Get the list of cubes to mosaic
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   FileList flist(ui.GetFileName("FROMLIST"));
 
 
@@ -103,14 +104,14 @@ void IsisMain() {
     double CnorthAzimuth;
     for(int i = 0; i < (int)clist.size(); i++) {
       Camera *cam = clist[i]->camera();
-      if(cam->SetUniversalGround(avgLat, avgLon)) {
-        Cemiss = cam->EmissionAngle();
-        Cphase = cam->PhaseAngle();
+      if(cam->SetUniversalGround(naif, avgLat, avgLon)) {
+        Cemiss = cam->EmissionAngle(naif);
+        Cphase = cam->PhaseAngle(naif);
         Cincid = cam->IncidenceAngle();
-        ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->solarLongitude().degrees();
-        CsunAzimuth = cam->SunAzimuth();
-        CnorthAzimuth = cam->NorthAzimuth();
+        ClocalSolTime = cam->LocalSolarTime(naif);
+        CsolarLong = cam->solarLongitude(naif).degrees();
+        CsunAzimuth = cam->SunAzimuth(naif);
+        CnorthAzimuth = cam->NorthAzimuth(naif);
         runXY = false;
         break;
       }
@@ -158,14 +159,14 @@ void IsisMain() {
 
       for(int i = 0; i < (int)clist.size(); i++) {
         Camera *cam = clist[i]->camera();
-        if(cam->SetImage(sample, line)) {
-          Cemiss = cam->EmissionAngle();
-          Cphase = cam->PhaseAngle();
+        if(cam->SetImage(sample, line, naif)) {
+          Cemiss = cam->EmissionAngle(naif);
+          Cphase = cam->PhaseAngle(naif);
           Cincid = cam->IncidenceAngle();
-          ClocalSolTime = cam->LocalSolarTime();
-          CsolarLong = cam->solarLongitude().degrees();
-          CsunAzimuth = cam->SunAzimuth();
-          CnorthAzimuth = cam->NorthAzimuth();
+          ClocalSolTime = cam->LocalSolarTime(naif);
+          CsolarLong = cam->solarLongitude(naif).degrees();
+          CsunAzimuth = cam->SunAzimuth(naif);
+          CnorthAzimuth = cam->NorthAzimuth(naif);
           runXY = false;
           break;
         }

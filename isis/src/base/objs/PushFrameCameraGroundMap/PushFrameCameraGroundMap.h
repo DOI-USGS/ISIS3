@@ -64,12 +64,12 @@ namespace Isis {
       //! Destructor
       virtual ~PushFrameCameraGroundMap() {};
 
-      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
-      virtual bool SetGround(const SurfacePoint &surfacePt);
+      virtual bool SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
+      virtual bool SetGround(NaifContextPtr naif, const SurfacePoint &surfacePt) override;
 
     private:
-      double FindDistance(int framelet, const SurfacePoint &surfacePoint);
-      double FindSpacecraftDistance(int framelet,
+      double FindDistance(NaifContextPtr naif, int framelet, const SurfacePoint &surfacePoint);
+      double FindSpacecraftDistance(NaifContextPtr naif, int framelet,
                                     const SurfacePoint &surfacePoint);
 
       bool   p_evenFramelets; //!< True if the file contains even framelets

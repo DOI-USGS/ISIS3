@@ -57,6 +57,8 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
     qDebug() << "Unit test for NaifDskPlateModel.";
     qDebug() << "";
 
@@ -82,7 +84,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for surface point at equator, lon 0.0";
     Latitude lat(0.0, Angle::Degrees);
     Longitude lon(0.0, Angle::Degrees);
-    SurfacePoint *sp = naifPlateModelFromDSK.point(lat, lon);
+    SurfacePoint *sp = naifPlateModelFromDSK.point(naif, lat, lon);
     qDebug() << "Surface point at pole is null?     " << toString(sp == NULL);
     qDebug() << "Surface point: " << sp->GetX().meters()
                                   << sp->GetY().meters()
@@ -97,17 +99,17 @@ int main(int argc, char *argv[]) {
     obsPos[0] = 0.0;   obsPos[1] = 0.0;   obsPos[2] = 0.0;
     rayDir[0] = 1.0;   rayDir[1] = 1.0;   rayDir[2] = 1.0;
     xpoint[0] = 2.0;   xpoint[1] = 2.0;   xpoint[2] = 2.0;
-    Intercept *intercept = naifPlateModelFromDSK.intercept(obsPos, rayDir);
+    Intercept *intercept = naifPlateModelFromDSK.intercept(naif, obsPos, rayDir);
     qDebug() << "Ray Dir:            " << rayDir;
     qDebug() << "Observer:           " << obsPos;
     qDebug() << "Intercept is null?  " << toString(intercept == NULL);
     qDebug() << "intercept plateID?  "
-             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
+             << naifPlateModelFromDSK.plateIdOfIntercept(naif, obsPos, rayDir, xpoint);
 
     // Find obs/rayDir with valid intercept
     obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
     rayDir[0] = -1.0;  rayDir[1] = 0.0;  rayDir[2] = 0.0;
-    intercept = naifPlateModelFromDSK.intercept(obsPos, rayDir);
+    intercept = naifPlateModelFromDSK.intercept(naif, obsPos, rayDir);
     qDebug() << "Ray Dir:            " << rayDir;
     qDebug() << "Observer:           " << obsPos;
     qDebug() << "Intercept is null?  " << toString(intercept == NULL);
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
     xpoint[2] = xp.GetZ().meters();
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
     qDebug() << "intercept plateID                    =  "
-             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
+             << naifPlateModelFromDSK.plateIdOfIntercept(naif, obsPos, rayDir, xpoint);
     qDebug() << "";
 
     qDebug() << "Get plate info from id:";
@@ -129,7 +131,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Is plate ID = 1 valid for invalid NaifDskPlateModel? "
              << naifPlateModel.isPlateIdValid(1);
     qDebug() << "Triangular Plate for ID = 1:";
-    qDebug() << naifPlateModelFromDSK.plate(1);
+    qDebug() << naifPlateModelFromDSK.plate(naif, 1);
     qDebug() << "";
 
     // currently there is a clone() method prototype, but no implementation.
@@ -156,7 +158,7 @@ int main(int argc, char *argv[]) {
     try {
       NaifVertex badObs(2);
       badObs[0] = 0.0; badObs[1] = 0.0;
-      naifPlateModelFromDSK.plateIdOfIntercept(badObs, rayDir, xpoint);
+      naifPlateModelFromDSK.plateIdOfIntercept(naif, badObs, rayDir, xpoint);
     }
     catch (IException &e) {
       e.print();
@@ -164,7 +166,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "Thrown from plate(): Get plate from invalid plate ID.";
     try {
-      naifPlateModelFromDSK.plate(0);
+      naifPlateModelFromDSK.plate(naif, 0);
     }
     catch (IException &e) {
       e.print();

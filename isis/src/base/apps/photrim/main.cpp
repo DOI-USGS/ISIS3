@@ -57,10 +57,12 @@ void IsisMain() {
 
 // Line processing routine
 void photrim(Buffer &in, Buffer &out) {
+  auto naif = NaifContext::acquire();
+
   // See if there is a change in band which would change the camera model
   if (in.Band() != lastBand) {
     lastBand = in.Band();
-    cam->SetBand(icube->physicalBand(lastBand));
+    cam->SetBand(icube->physicalBand(lastBand), naif);
   }
 
   // Loop for each pixel in the line.
@@ -68,12 +70,12 @@ void photrim(Buffer &in, Buffer &out) {
   double line = in.Line();
   for (int i = 0; i < in.size(); i++) {
     samp = in.Sample(i);
-    cam->SetImage(samp, line);
+    cam->SetImage(samp, line, naif);
     if (cam->HasSurfaceIntersection()) {
-      if (((phase = cam->PhaseAngle()) < minPhase) || (phase > maxPhase)) {
+      if (((phase = cam->PhaseAngle(naif)) < minPhase) || (phase > maxPhase)) {
         out[i] = Isis::NULL8;
       }
-      else if (((emission = cam->EmissionAngle()) < minEmission) ||
+      else if (((emission = cam->EmissionAngle(naif)) < minEmission) ||
               (emission > maxEmission)) {
         out[i] = Isis::NULL8;
       }

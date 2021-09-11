@@ -56,15 +56,16 @@ namespace Isis {
    *
    * @return conversion successful
    */
-  bool RadarPulseMap::SetParent(const double sample,
+  bool RadarPulseMap::SetParent(NaifContextPtr naif,
+                                const double sample,
                                 const double line) {
     // Apply base class summing/first sample corrections
-    if(!CameraDetectorMap::SetParent(sample, line)) return false;
+    if(!CameraDetectorMap::SetParent(naif, sample, line)) return false;
 
     // line is really a function of time so set detector line to zero
     p_detectorLine = 0;
     double etLine = p_etStart + p_lineRate * (line - 1.0);
-    p_camera->setTime(etLine);
+    p_camera->setTime(etLine, naif);
     return true;
   }
 }

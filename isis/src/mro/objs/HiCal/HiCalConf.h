@@ -32,6 +32,7 @@
 #include "Pvl.h"
 #include "DbAccess.h"
 #include "IException.h"
+#include "NaifContext.h"
 
 namespace Isis {
 

@@ -109,9 +109,10 @@ namespace Isis {
    *
    * @return conversion successful
    */
-  bool VariableLineScanCameraDetectorMap::SetParent(const double sample, 
+  bool VariableLineScanCameraDetectorMap::SetParent(NaifContextPtr naif, 
+                                                    const double sample, 
                                                     const double line) {
-    return SetParent(sample, line, 0.0); 
+    return SetParent(naif, sample, line, 0.0); 
   }
 
 
@@ -127,10 +128,11 @@ namespace Isis {
    *
    * @return @b bool conversion successful
    */
-  bool VariableLineScanCameraDetectorMap::SetParent(const double sample, 
+  bool VariableLineScanCameraDetectorMap::SetParent(NaifContextPtr naif, 
+                                                    const double sample, 
                                                     const double line, 
                                                     const double deltaT) {
-    if (!CameraDetectorMap::SetParent(sample, line, deltaT)) {
+    if (!CameraDetectorMap::SetParent(naif, sample, line, deltaT)) {
       return false;
     } //check to make sure we're not doubling the "DeltaT" 
 
@@ -162,7 +164,7 @@ namespace Isis {
 
     SetLineRate(rate);
 
-    p_camera->setTime(et + deltaT);
+    p_camera->setTime(et + deltaT, naif);
 
     return true;
   }

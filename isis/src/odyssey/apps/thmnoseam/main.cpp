@@ -19,7 +19,7 @@ using namespace std;
 void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers);
 
 //! This function calculates about how much the framelets overlap
-int FrameletOverlapSize();
+int FrameletOverlapSize(NaifContextPtr naif);
 int frameletSize; //!< This is the number of lines in a framelet
 Cube *evenCube; //!< Input even framelet cube
 Cube *oddCube; //!< Input odd framelet cube
@@ -85,6 +85,7 @@ void IsisMain() {
   outOdd = p.SetOutputCube("OUTODD");
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   // Make sure it is a Themis EDR/RDR
   try {
     if(evenCube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
@@ -126,7 +127,7 @@ void IsisMain() {
   PvlGroup &inputInstrumentGrp = evenCube->group("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];
   frameletSize = 192 / toInt(spatialSumming[0]);
-  overlapSize = FrameletOverlapSize();
+  overlapSize = FrameletOverlapSize(naif);
 
   if(overlapSize == 0) {
     IString msg = "There must be overlap to remove seams";
@@ -151,7 +152,7 @@ void IsisMain() {
 //! band changes so it doesn't have to re-project at every framelet.
 //! Equivalent changes are calculated for the next framelet... that is,
 //! equivalent pixels. This function both calculates and applies these.
-void RemoveSeam(Buffer &out, int framelet, int band,
+void RemoveSeam(NaifContextPtr naif, Buffer &out, int framelet, int band,
                 bool matchIsEven) {
   // Apply fixes from last pass. Basically all changes happen in two
   //   places, because the DNs exist in two cubes, this is the second
@@ -179,8 +180,8 @@ void RemoveSeam(Buffer &out, int framelet, int band,
   Camera *badCam  = badDataCube->camera();
 
   // Verify we're at the correct band
-  goodCam->SetBand(band);
-  badCam->SetBand(band);
+  goodCam->SetBand(band, naif);
+  badCam->SetBand(band, naif);
 
   // Absolute line number for top of framelets.
   int goodDataStart = frameletSize * (framelet + 1);
@@ -227,11 +228,11 @@ void RemoveSeam(Buffer &out, int framelet, int band,
         ASSERT(frameletOffsetsForBand[optimizeIndex].Sample() == sample);
       }
       // There is no pre-calculated translation, calculate it
-      else if(badCam->SetImage(sample, badLine)) {
+      else if(badCam->SetImage(sample, badLine, naif)) {
         double lat = badCam->UniversalLatitude();
         double lon = badCam->UniversalLongitude();
 
-        if(goodCam->SetUniversalGround(lat, lon)) {
+        if(goodCam->SetUniversalGround(naif, lat, lon)) {
           double goodSample = goodCam->Sample();
           double goodLine = goodCam->Line();
 
@@ -284,7 +285,7 @@ void RemoveSeam(Buffer &out, int framelet, int band,
  *   is corrected by RemoveSeam and this also clears remembered offsets
  *   (used for speed optimization) when the band changes.
  */
-void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
+void FixSeams(NaifContextPtr naif, vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   Buffer &evenBuffer    = *inBuffers[0];
   Buffer &oddBuffer     = *inBuffers[1];
 
@@ -307,10 +308,10 @@ void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   }
 
   if(evenStats.ValidPixels() > oddStats.ValidPixels()) {
-    RemoveSeam(outEvenBuffer, framelet, evenBuffer.Band(), false);
+    RemoveSeam(naif, outEvenBuffer, framelet, evenBuffer.Band(), false);
   }
   else {
-    RemoveSeam(outOddBuffer, framelet, oddBuffer.Band(), true);
+    RemoveSeam(naif, outOddBuffer, framelet, oddBuffer.Band(), true);
   }
 }
 
@@ -318,7 +319,7 @@ void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
 /**
  * This calculates the number of lines of overlap between framelets.
  */
-int FrameletOverlapSize() {
+int FrameletOverlapSize(NaifContextPtr naif) {
   Camera *camEven = evenCube->camera();
   Camera *camOdd = oddCube->camera();
 
@@ -331,12 +332,12 @@ int FrameletOverlapSize() {
   int frameletOverlap = 0;
 
   // Framelet 2 is even, so let's use the even camera to find the lat,lon at it's beginning
-  if(camEven->SetImage(1, frameletSize + 1)) {
+  if(camEven->SetImage(1, frameletSize + 1, naif)) {
     double framelet2StartLat = camEven->UniversalLatitude();
     double framelet2StartLon = camEven->UniversalLongitude();
 
     // Let's figure out where this is in the nearest odd framelet (hopefully framelet 1)
-    if(camOdd->SetUniversalGround(framelet2StartLat, framelet2StartLon)) {
+    if(camOdd->SetUniversalGround(naif, framelet2StartLat, framelet2StartLon)) {
       // The equivalent line to the start of framelet 2 is this found line
       int equivalentLine = (int)(camOdd->Line() + 0.5);
       frameletOverlap = frameletSize - equivalentLine;

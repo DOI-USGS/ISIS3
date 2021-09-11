@@ -14,6 +14,7 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   PvlGroup dependency("Dependencies");
 
   // Create the database writer based on the kernel type
@@ -25,7 +26,7 @@ void IsisMain() {
   QList<FileName> lskFiles = evaluateDependencies(dependency, "LeapsecondKernel", "LSK");
   QList<FileName> extraFiles = evaluateDependencies(dependency, "ExtraKernel", "EXTRA");
 
-  sdg.FurnishDependencies(sclkFiles, lskFiles, extraFiles);
+  sdg.FurnishDependencies(naif, sclkFiles, lskFiles, extraFiles);
 
   // Determine the type of kernel that the user wants a database for. This will
   // eventually become the name of the object in the output PVL
@@ -74,7 +75,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("PREDICTFILTER", filter);
-    PvlObject result = sdg.Direct("Predicted", location, filter, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Predicted", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -83,7 +84,7 @@ void IsisMain() {
   }
   else if (ui.WasEntered("PREDICTLIST")) {
     FileList kernList(ui.GetFileName("PREDICTLIST"));
-    PvlObject result = sdg.Direct("Predicted", kernList, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Predicted", kernList, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -98,7 +99,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("RECONFILTER", filter);
-    PvlObject result = sdg.Direct("Reconstructed", location, filter, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Reconstructed", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -107,7 +108,7 @@ void IsisMain() {
   }
   else if (ui.WasEntered("RECONLIST")) {
     FileList kernList(ui.GetFileName("RECONLIST"));
-    PvlObject result = sdg.Direct("Reconstructed", kernList, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Reconstructed", kernList, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -122,7 +123,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("SMITHEDFILTER", filter);
-    PvlObject result = sdg.Direct("Smithed", location, filter, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Smithed", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -131,7 +132,7 @@ void IsisMain() {
   }
   else if (ui.WasEntered("SMITHEDLIST")) {
     FileList kernList(ui.GetFileName("SMITHEDLIST"));
-    PvlObject result = sdg.Direct("Smithed", kernList, startOffset, endOffset);
+    PvlObject result = sdg.Direct(naif, "Smithed", kernList, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);

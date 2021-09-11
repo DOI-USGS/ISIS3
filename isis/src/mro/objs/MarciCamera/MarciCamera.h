@@ -67,7 +67,7 @@ namespace Isis {
       ~MarciCamera();
 
       // Sets the band to the band number given
-      void SetBand(const int band);
+      void SetBand(const int band, NaifContextPtr naif);
       bool IsBandIndependent();
 
       virtual int CkFrameId() const;

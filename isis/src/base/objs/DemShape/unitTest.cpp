@@ -70,13 +70,15 @@ class MyShape : public DemShape {
 int main() {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
     QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();
     std::vector<Distance> radii = c->target()->radii();
     Pvl &pvl = *cube.label();
-    Target targ(c, pvl);
+    Target targ(c, pvl, naif);
     targ.setRadii(radii);
 
     cout << "Begin testing Dem Shape Model class...." << endl;
@@ -94,9 +96,9 @@ int main() {
     cout << "    Set a pixel in the image and check again." << endl;
     double line = 453.0;
     double sample = 534.0;
-    c->SetImage(sample, line);
+    c->SetImage(sample, line, naif);
     std::vector<double> sB(3);
-    c->instrumentPosition((double *) &sB[0]);
+    c->instrumentPosition((double *) &sB[0], naif);
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     std::vector<double> lookB(3);
@@ -109,7 +111,7 @@ int main() {
     Incidence                  = 85.341094499768
     Emission                   = 46.966269013795
     */
-    if (!shape.intersectSurface(sB, lookB)) {
+    if (!shape.intersectSurface(naif, sB, lookB)) {
         cout << "    ...  intersectSurface method failed" << endl;
         return -1;
     }
@@ -121,7 +123,7 @@ int main() {
     cout << endl << "  Testing class method calculateLocalNormal "
                     "with no neighbor points" << endl;
     QVector<double *>  neighborPoints;
-    shape.calculateLocalNormal(neighborPoints);
+    shape.calculateLocalNormal(naif, neighborPoints);
     cout << "    has normal? " << toString(shape.hasNormal()) << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal "
@@ -148,18 +150,18 @@ int main() {
     neighborPoints[3][1]  = -2380.79;
     neighborPoints[3][2]  = 1194.63;
 
-    shape.calculateLocalNormal(neighborPoints);
+    shape.calculateLocalNormal(naif, neighborPoints);
     vector<double> myNormal(3);
     myNormal = shape.normal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal();
+    shape.calculateSurfaceNormal(naif);
     myNormal = shape.normal();
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
-    shape.calculateDefaultNormal();
+    shape.calculateDefaultNormal(naif);
     myNormal = shape.normal();
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
@@ -224,7 +226,7 @@ int main() {
     neighborPoints[3][1]  = 2380.59;
     neighborPoints[3][2]  = 1193.88;
     cout << endl << "  Testing method calculateLocalNormal with vector pointing outward" << endl;
-    shape.calculateLocalNormal(neighborPoints);
+    shape.calculateLocalNormal(naif, neighborPoints);
     myNormal = shape.normal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
@@ -233,7 +235,7 @@ int main() {
     neighborPoints[3][0]  = -2123.66;
     neighborPoints[3][1]  = -2380.59;
     cout << endl << "  Testing method calculateLocalNormal with magnitude = 0" << endl;
-    shape.calculateLocalNormal(neighborPoints);
+    shape.calculateLocalNormal(naif, neighborPoints);
     myNormal = shape.normal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
     }

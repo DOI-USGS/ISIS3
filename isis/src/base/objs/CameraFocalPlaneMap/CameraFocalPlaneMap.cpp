@@ -38,8 +38,8 @@ namespace Isis {
    * @param naifIkCode  code of the naif instrument for reading coefficients
    *
    */
-  CameraFocalPlaneMap::CameraFocalPlaneMap(Camera *parent, const int naifIkCode) {
-    Init(parent, naifIkCode);
+  CameraFocalPlaneMap::CameraFocalPlaneMap(NaifContextPtr naif, Camera *parent, const int naifIkCode) {
+    Init(naif, parent, naifIkCode);
   }
 
 
@@ -48,8 +48,8 @@ namespace Isis {
    * @param naifIkCode  code of the naif instrument for reading coefficients
    *
    */
-  CameraFocalPlaneMap::CameraFocalPlaneMap(const int naifIkCode) {
-    Init(0, naifIkCode);
+  CameraFocalPlaneMap::CameraFocalPlaneMap(NaifContextPtr naif, const int naifIkCode) {
+    Init(naif, 0, naifIkCode);
   }
 
 
@@ -105,7 +105,7 @@ namespace Isis {
    * @param parent Parent camera
    * @param naifIkCode  code of the naif instrument for reading coefficients
    */
-  void CameraFocalPlaneMap::Init(Camera *parent, const int naifIkCode) {
+  void CameraFocalPlaneMap::Init(NaifContextPtr naif, Camera *parent, const int naifIkCode) {
     p_detectorSampleOrigin = 0.0;
     p_detectorLineOrigin = 0.0;
     p_detectorSampleOffset = 0.0;
@@ -118,10 +118,10 @@ namespace Isis {
       QString ixkey = "INS" + toString(naifIkCode) + "_ITRANSS";
       QString iykey = "INS" + toString(naifIkCode) + "_ITRANSL";
       for (int i = 0; i < 3; ++i) {
-        p_transx[i]  = parent->getDouble(xkey, i);
-        p_transy[i]  = parent->getDouble(ykey, i);
-        p_itranss[i] = parent->getDouble(ixkey, i);
-        p_itransl[i] = parent->getDouble(iykey, i);
+        p_transx[i]  = parent->getDouble(naif, xkey, i);
+        p_transy[i]  = parent->getDouble(naif, ykey, i);
+        p_itranss[i] = parent->getDouble(naif, ixkey, i);
+        p_itransl[i] = parent->getDouble(naif, iykey, i);
       }
     }
     else {
@@ -130,10 +130,10 @@ namespace Isis {
       QString ixkey = "IDEAL_TRANSS";
       QString iykey = "IDEAL_TRANSL";
       for (int i = 0; i < 3; ++i) {
-        p_transx[i]  = parent->getDouble(xkey, i);
-        p_transy[i]  = parent->getDouble(ykey, i);
-        p_itranss[i] = parent->getDouble(ixkey, i);
-        p_itransl[i] = parent->getDouble(iykey, i);
+        p_transx[i]  = parent->getDouble(naif, xkey, i);
+        p_transy[i]  = parent->getDouble(naif, ykey, i);
+        p_itranss[i] = parent->getDouble(naif, ixkey, i);
+        p_itransl[i] = parent->getDouble(naif, iykey, i);
       }
     }
 

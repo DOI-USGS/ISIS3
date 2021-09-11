@@ -110,7 +110,7 @@ namespace Isis {
     // Setup focal plane map. The class will read the instrument addendum kernel to pull out the affine tronsforms
     // from detector samp,line to focal plane x,y.  This is where the non-square detector size are read and utilized.
     // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted for ISIS
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(naif, this, naifIkCode());
     double boresightSample = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
     double boresightLine   = Spice::getDouble(naif, "INS" + toString(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
     focalMap->SetDetectorOrigin(boresightSample,boresightLine);
